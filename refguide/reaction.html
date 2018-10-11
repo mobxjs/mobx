@@ -48,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="4.4" data-basepath=".." data-revision="Mon Aug 27 2018 11:22:20 GMT+0200 (CEST)">
+    <div class="book" data-level="4.4" data-basepath=".." data-revision="Thu Oct 11 2018 22:43:18 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -881,7 +881,7 @@ In other words: reaction requires you to produce the things you need in your sid
 <ul>
 <li><code>fireImmediately</code>: Boolean that indicates that the effect function should immediately be triggered after the first run of the data function. <code>false</code> by default.</li>
 <li><code>delay</code>: Number in milliseconds that can be used to debounce the effect function. If zero (the default), no debouncing will happen.</li>
-<li><code>equals</code>: <code>comparer.default</code> by default. If specified, this comparer function will be used to compare the previous and next values produced by the <em>data</em> function. The <em>effect</em> function will only be invoked if this function returns true. If specified, this will override <code>compareStructural</code>.</li>
+<li><code>equals</code>: <code>comparer.default</code> by default. If specified, this comparer function will be used to compare the previous and next values produced by the <em>data</em> function. The <em>effect</em> function will only be invoked if this function returns false. If specified, this will override <code>compareStructural</code>.</li>
 <li><code>name</code>: String that is used as name for this reaction in for example <a href="spy.html"><code>spy</code></a> events.</li>
 <li><code>onError</code>: function that will handle the errors of this reaction, rather then propagating them.</li>
 <li><code>scheduler</code>: Set a custom scheduler to determine how re-running the autorun function should be scheduled</li>
@@ -956,7 +956,7 @@ counter.count = <span class="hljs-number">2</span>;
 <span class="hljs-comment">// prints:</span>
 <span class="hljs-comment">// 2</span>
 </code></pre>
-<p>Reaction is roughly speaking sugar for: <code>computed(expression).observe(action(sideEffect))</code> or <code>autorun(() =&gt; action(sideEffect)(expression)</code></p>
+<p>Reaction is roughly speaking sugar for: <code>computed(expression).observe(action(sideEffect))</code> or <code>autorun(() =&gt; action(sideEffect)(expression))</code></p>
 </body></html>
                     
                     </section>

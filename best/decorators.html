@@ -48,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="8.3" data-basepath=".." data-revision="Mon Aug 27 2018 11:22:20 GMT+0200 (CEST)">
+    <div class="book" data-level="8.3" data-basepath=".." data-revision="Thu Oct 11 2018 22:43:18 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -955,7 +955,7 @@ decorate(Todo, {
 <p>If you want to use decorators follow the following steps.</p>
 <p><strong>TypeScript</strong></p>
 <p>Enable the compiler option <code>&quot;experimentalDecorators&quot;: true</code> in your <code>tsconfig.json</code>.</p>
-<p><strong>Babel: using <code>babel-preset-mobx</code></strong></p>
+<p><strong>Babel 6: using <code>babel-preset-mobx</code></strong></p>
 <p>A more convenient way to setup Babel for usage with mobx is to use the <a href="https://github.com/zwhitchcox/babel-preset-mobx" target="_blank"><code>mobx</code></a> preset, that incorporates decorators and several other plugins typically used with mobx:</p>
 <pre><code>npm install --save-dev babel-preset-mobx
 </code></pre><p>.babelrc:</p>
@@ -963,7 +963,7 @@ decorate(Todo, {
   <span class="hljs-string">&quot;presets&quot;</span>: [<span class="hljs-string">&quot;mobx&quot;</span>]
 }
 </code></pre>
-<p><strong>Babel: manually enabling decorators</strong></p>
+<p><strong>Babel 6: manually enabling decorators</strong></p>
 <p>To enable support for decorators without using the mobx preset, follow the following steps.
 Install support for decorators: <code>npm i --save-dev babel-plugin-transform-decorators-legacy</code>. And enable it in your <code>.babelrc</code> file:</p>
 <pre><code class="lang-json">{
@@ -973,10 +973,23 @@ Install support for decorators: <code>npm i --save-dev babel-plugin-transform-de
 </code></pre>
 <p>Note that the order of plugins is important: <code>transform-decorators-legacy</code> should be listed <em>first</em>.
 Having issues with the babel setup? Check this <a href="https://github.com/mobxjs/mobx/issues/105" target="_blank">issue</a> first.</p>
-<p>For babel 7, see <a href="https://github.com/mobxjs/mobx/issues/1352" target="_blank">issue 1352</a> for an example setup.</p>
-<h2 id="decorator-syntax-and-create-react-app"><a name="decorator-syntax-and-create-react-app" class="plugin-anchor" href="#decorator-syntax-and-create-react-app"><span class="fa fa-link"></span></a>Decorator syntax and Create React App</h2>
+<p><strong>Babel 7</strong></p>
+<p>Install support for decorators: <code>npm i --save-dev @babel/plugin-proposal-class-properties @babel/plugin-proposal-decorators</code>. And enable it in your <code>.babelrc</code> file:</p>
+<pre><code class="lang-json">{
+    <span class="hljs-string">&quot;plugins&quot;</span>: [
+        [<span class="hljs-string">&quot;@babel/plugin-proposal-decorators&quot;</span>, { <span class="hljs-string">&quot;legacy&quot;</span>: <span class="hljs-literal">true</span>}],
+        [<span class="hljs-string">&quot;@babel/plugin-proposal-class-properties&quot;</span>, { <span class="hljs-string">&quot;loose&quot;</span>: <span class="hljs-literal">true</span>}]
+    ]
+}
+</code></pre>
+<p>Note that the <code>legacy</code> mode is important (as is putting the decorators proposal first). Non-legacy mode is <a href="https://github.com/mobxjs/mobx/pull/1732" target="_blank">WIP</a>.</p>
+<h2 id="decorator-syntax-and-create-react-app-v1"><a name="decorator-syntax-and-create-react-app-v1" class="plugin-anchor" href="#decorator-syntax-and-create-react-app-v1"><span class="fa fa-link"></span></a>Decorator syntax and Create React App (v1)</h2>
 <ul>
-<li>decorators are not supported out of the box in <code>create-react-app</code>. To fix this, you can either eject, or use <a href="https://github.com/timarney/react-app-rewired/tree/master/packages/react-app-rewire-mobx" target="_blank">react-app-rewired</a>.</li>
+<li>Decorators are not supported out of the box in <code>create-react-app@1.*</code>. To fix this, you can either use the <code>decorate</code> utility, eject, or use the <a href="https://github.com/timarney/react-app-rewired/tree/master/packages/react-app-rewire-mobx" target="_blank">react-app-rewired</a> package.</li>
+</ul>
+<h2 id="decorator-syntax-and-create-react-app-v2"><a name="decorator-syntax-and-create-react-app-v2" class="plugin-anchor" href="#decorator-syntax-and-create-react-app-v2"><span class="fa fa-link"></span></a>Decorator syntax and Create React App (v2)</h2>
+<ul>
+<li>decorators are not supported out of the box in <code>create-react-app@2.*</code>. To fix this, you can either use the <code>decorate</code> utility, eject, or use the <a href="https://github.com/timarney/react-app-rewired/tree/master/packages/react-app-rewire-mobx" target="_blank">customize-cra</a> package.</li>
 </ul>
 <hr>
 <h2 id="disclamer-limitations-of-decorator-syntax"><a name="disclamer-limitations-of-decorator-syntax" class="plugin-anchor" href="#disclamer-limitations-of-decorator-syntax"><span class="fa fa-link"></span></a>Disclamer: Limitations of decorator syntax:</h2>

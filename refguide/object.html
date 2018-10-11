@@ -48,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="3.3" data-basepath=".." data-revision="Mon Aug 27 2018 11:22:20 GMT+0200 (CEST)">
+    <div class="book" data-level="3.3" data-basepath=".." data-revision="Thu Oct 11 2018 22:43:18 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -900,13 +900,13 @@ person.setAge(<span class="hljs-number">21</span>);
 </code></pre>
 <p>Some things to keep in mind when making objects observable:</p>
 <ul>
+<li><em>[MobX 4 and lower]</em> When passing objects through <code>observable</code>, only the properties that exist at the time of making the object observable will be observable. Properties that are added to the object at a later time won&apos;t become observable, unless <a href="object-api.html"><code>set</code></a> or <a href="extend-observable.html"><code>extendObservable</code></a> is used. See this <a href="https://medium.com/@trekinbami/observe-changes-in-dynamically-keyed-objects-with-mobx-and-react-24b4f857bae9" target="_blank">blog post</a> for the different options available to work with dynamically keyed objects in MobX 4</li>
 <li>Only plain objects will be made observable. For non-plain objects it is considered the responsibility of the constructor to initialize the observable properties. Either use the <a href="observable.html"><code>@observable</code></a> annotation or the <a href="extend-observable.html"><code>extendObservable</code></a> function.</li>
 <li>Property getters will be automatically turned into derived properties, just like <a href="computed-decorator"><code>@computed</code></a> would do.</li>
 <li><code>observable</code> is applied recursively to a whole object graph automatically. Both on instantiation and to any new values that will be assigned to observable properties in the future. Observable will not recurse into non-plain objects.</li>
 <li>These defaults are fine in 95% of the cases, but for more fine-grained on how and which properties should be made observable, see the <a href="modifiers.html">decorators</a> section.</li>
 <li>Pass <code>{ deep: false }</code> as 3rd argument to disable the auto conversion of property values</li>
 <li>Pass <code>{ name: &quot;my object&quot; }</code> to assign a friendly debug name to this object</li>
-<li><em>[MobX 4 and lower]</em> When passing objects through <code>observable</code>, only the properties that exist at the time of making the object observable will be observable. Properties that are added to the object at a later time won&apos;t become observable, unless <a href="object-api.html"><code>set</code></a> or <a href="extend-observable.html"><code>extendObservable</code></a> is used.</li>
 </ul>
 </body></html>
                     

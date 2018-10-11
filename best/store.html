@@ -48,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="8.5" data-basepath=".." data-revision="Mon Aug 27 2018 11:22:20 GMT+0200 (CEST)">
+    <div class="book" data-level="8.5" data-basepath=".." data-revision="Thu Oct 11 2018 22:43:18 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -869,9 +869,7 @@ This section is opinionated and you are in no way forced to apply these practice
 There are many ways of working with MobX and React, and this is just one of them.</p>
 <p>This section focuses on an unobtrusive way of working with MobX, which works well in existing code bases, or with classic MVC patterns. An alternative, more opinionated way of organizing stores is using <a href="https://github.com/mobxjs/mobx-state-tree" target="_blank">mobx-state-tree</a>, which ships with cool features as structurally shared snapshots, action middlewares, JSON patch support etc out of the box.</p>
 <h1 id="stores"><a name="stores" class="plugin-anchor" href="#stores"><span class="fa fa-link"></span></a>Stores</h1>
-<p>Let&apos;s start with <em>stores</em>.
-In the next sections we will discuss <em>actions</em> and React <em>components</em> as well.
-Stores can be found in any Flux architecture and can be compared a bit with controllers in the MVC pattern.
+<p>Stores can be found in any Flux architecture and can be compared a bit with controllers in the MVC pattern.
 The main responsibility of stores is to move <em>logic</em> and <em>state</em> out of your components into a standalone testable unit that can be used in both frontend and backend JavaScript.</p>
 <h2 id="stores-for-the-user-interface-state"><a name="stores-for-the-user-interface-state" class="plugin-anchor" href="#stores-for-the-user-interface-state"><span class="fa fa-link"></span></a>Stores for the user interface state</h2>
 <p>Most applications benefit from having at least two stores.
@@ -994,7 +992,7 @@ Especially in large applications this is important.</li>
     }
 
     <span class="hljs-comment">/**
-     * Fetches all todo&apos;s from the server
+     * Fetches all todos from the server
      */</span>
     loadTodos() {
         <span class="hljs-keyword">this</span>.isLoading = <span class="hljs-literal">true</span>;
@@ -1007,7 +1005,7 @@ Especially in large applications this is important.</li>
     <span class="hljs-comment">/**
      * Update a todo with information from the server. Guarantees a todo
      * only exists once. Might either construct a new todo, update an existing one,
-     * or remove an todo if it has been deleted on the server.
+     * or remove a todo if it has been deleted on the server.
      */</span>
     updateTodoFromServer(json) {
         <span class="hljs-keyword">var</span> todo = <span class="hljs-keyword">this</span>.todos.find(todo =&gt; todo.id === json.id);
@@ -1106,7 +1104,7 @@ Especially in large applications this is important.</li>
      * Update this todo with information from the server
      */</span>
     updateFromJson(json) {
-        <span class="hljs-comment">// make sure our changes aren&apos;t send back to the server</span>
+        <span class="hljs-comment">// make sure our changes aren&apos;t sent back to the server</span>
         <span class="hljs-keyword">this</span>.autoSave = <span class="hljs-literal">false</span>;
         <span class="hljs-keyword">this</span>.completed = json.completed;
         <span class="hljs-keyword">this</span>.task = json.task;

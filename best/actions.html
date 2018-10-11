@@ -48,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="5.2" data-basepath=".." data-revision="Mon Aug 27 2018 11:22:20 GMT+0200 (CEST)">
+    <div class="book" data-level="5.2" data-basepath=".." data-revision="Thu Oct 11 2018 22:43:18 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -1029,7 +1029,7 @@ The advantage of <code>flow</code> is that it is syntactically very close to asy
         <span class="hljs-keyword">try</span> {
             <span class="hljs-keyword">const</span> projects = <span class="hljs-keyword">yield</span> fetchGithubProjectsSomehow() <span class="hljs-comment">// yield instead of await</span>
             <span class="hljs-keyword">const</span> filteredProjects = somePreprocessing(projects)
-            <span class="hljs-comment">// the asynchronous blocks will automatically be wrapped actions and can modify state</span>
+            <span class="hljs-comment">// the asynchronous blocks will automatically be wrapped in actions and can modify state</span>
             <span class="hljs-keyword">this</span>.state = <span class="hljs-string">&quot;done&quot;</span>
             <span class="hljs-keyword">this</span>.githubProjects = filteredProjects
         } <span class="hljs-keyword">catch</span> (error) {
@@ -1038,6 +1038,8 @@ The advantage of <code>flow</code> is that it is syntactically very close to asy
     })
 }
 </code></pre>
+<h4 id="flows-can-be-cancelled"><a name="flows-can-be-cancelled" class="plugin-anchor" href="#flows-can-be-cancelled"><span class="fa fa-link"></span></a>Flows can be cancelled</h4>
+<p>Flows are canceallable, that means that you can call <code>cancel()</code> on the returned promise. This will stop the generator immediately, but any finally clause will still be processed. The returned promise itself will reject with <code>FLOW_CANCELLED</code>.</p>
 </body></html>
                     
                     </section>

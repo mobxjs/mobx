@@ -48,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="6.3" data-basepath=".." data-revision="Mon Aug 27 2018 11:22:20 GMT+0200 (CEST)">
+    <div class="book" data-level="6.3" data-basepath=".." data-revision="Thu Oct 11 2018 22:43:18 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -903,7 +903,7 @@ This clock will only actually tick if it is observed by someone.</p>
         <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.atom.reportObserved()) {
             <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.currentDateTime;
         } <span class="hljs-keyword">else</span> {
-            <span class="hljs-comment">// apparantly getTime was called but not while a reaction is running.</span>
+            <span class="hljs-comment">// apparently getTime was called but not while a reaction is running.</span>
             <span class="hljs-comment">// So, nobody depends on this value, hence the onBecomeObserved handler (startTicking) won&apos;t be fired</span>
             <span class="hljs-comment">// Depending on the nature of your atom</span>
             <span class="hljs-comment">// it might behave differently in such circumstances</span>
