@@ -252,7 +252,7 @@ Note that the async function must be a _generator_ and you must only _yield_ to 
 import { configure } from 'mobx';
 
 // don't allow state modifications outside actions
-configure({enforceActions: true});
+configure({enforceActions: "always"});
 
 class Store {
     @observable githubProjects = [];
