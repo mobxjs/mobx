@@ -48,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="8.1" data-basepath=".." data-revision="Thu Oct 11 2018 22:43:18 GMT+0200 (CEST)">
+    <div class="book" data-level="8.1" data-basepath=".." data-revision="Tue Oct 16 2018 14:59:50 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -877,7 +877,7 @@ Use for example RxJS to process and throttle user events and as a result of that
 If the state has been made observable by MobX, it will then take care of updating the UI and other derivations accordingly.</p>
 <h5 id="is-react-native-supported"><a name="is-react-native-supported" class="plugin-anchor" href="#is-react-native-supported"><span class="fa fa-link"></span></a>Is React Native supported?</h5>
 <p>Yes, <code>mobx</code> and <code>mobx-react</code> will work on React Native. The latter through importing <code>&quot;mobx-react/native&quot;</code>.
-The devtools don&apos;t support React Native. Note that if you indend to store state in a component that you want to be able to use with hot reloading, do not use decorators (annotations) in the component, use the functions instead (eg. <code>action(fn)</code> instead of <code>@action</code>).</p>
+The devtools don&apos;t support React Native. Note that if you indend to use your observer components with hot reloading, decorators in the components may not always work. If that is the case, use the functions instead (eg. <code>action(fn)</code> instead of <code>@action</code> or <code>observer(component)</code> instead of <code>@observer</code>).</p>
 <h5 id="how-does-mobx-compare-to-other-reactive-frameworks"><a name="how-does-mobx-compare-to-other-reactive-frameworks" class="plugin-anchor" href="#how-does-mobx-compare-to-other-reactive-frameworks"><span class="fa fa-link"></span></a>How does MobX compare to other Reactive frameworks?</h5>
 <p>See this <a href="https://github.com/mobxjs/mobx/issues/18" target="_blank">issue</a> for some considerations.</p>
 <h5 id="is-mobx-a-framework"><a name="is-mobx-a-framework" class="plugin-anchor" href="#is-mobx-a-framework"><span class="fa fa-link"></span></a>Is MobX a framework?</h5>
@@ -938,7 +938,7 @@ And look at this <a href="https://medium.com/@mweststrate/becoming-fully-reactiv
 
 <script>
 require(["gitbook"], function(gitbook) {
-    var config = {"fontSettings":{"theme":null,"family":"sans","size":2},"github":{"url":"https://github.com/mobxjs/mobx"},"edit-link":{"base":"https://github.com/mobxjs/mobx/tree/gh-pages/docs","label":"Edit This Page"},"ga":{"token":"UA-65632006-1","configuration":"auto"},"disqus":{"shortName":"mobservable"}};
+    var config = {"fontSettings":{"theme":null,"family":"sans","size":2},"github":{"url":"https://github.com/mobxjs/mobx"},"edit-link":{"base":"https://github.com/mobxjs/mobx/tree/gh-pages/docs","label":"Edit This Page"},"ga":{"token":"UA-65632006-1"},"disqus":{"shortName":"mobservable"}};
     gitbook.start(config);
 });
 </script>

@@ -48,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="2" data-basepath=".." data-revision="Thu Oct 11 2018 22:43:18 GMT+0200 (CEST)">
+    <div class="book" data-level="2" data-basepath=".." data-revision="Tue Oct 16 2018 14:59:50 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -1060,7 +1060,7 @@ Note: using <code>action</code> is mandatory when <em>strict mode</em> is enable
 <pre><code class="lang-js"><span class="hljs-keyword">import</span> { configure } <span class="hljs-keyword">from</span> <span class="hljs-string">&apos;mobx&apos;</span>;
 
 <span class="hljs-comment">// don&apos;t allow state modifications outside actions</span>
-configure({enforceActions: <span class="hljs-literal">true</span>});
+configure({enforceActions: <span class="hljs-string">&quot;always&quot;</span>});
 
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Store</span> </span>{
     @observable githubProjects = [];
