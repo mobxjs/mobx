@@ -1,13 +1,13 @@
 # Writing asynchronous actions
 
 The `action` wrapper / decorator only affects the currently running function, not functions that are scheduled (but not invoked) by the current function!
-This means that if you have a `setTimeout`, promise`.then` or `async` construction, and in that callback some more state is changed, those callbacks should be wrapped in `action` as well! There are several ways to create asynchronous actions. No approach is strictly better then the other, but this section just list different approaches you can take to writing asynchronous code.
+This means that if you have a `setTimeout`, promise`.then` or `async` construction, and in that callback some more state is changed, those callbacks should be wrapped in `action` as well! There are several ways to create asynchronous actions. No approach is strictly better than the other, but this section just list different approaches you can take to writing asynchronous code.
 Let's start with a basic example:
 
 ### Promises
 
 ```javascript
-mobx.configure({ enforceActions: true }) // don't allow state modifications outside actions
+mobx.configure({ enforceActions: "observed" }) // don't allow state modifications outside actions
 
 class Store {
 	@observable githubProjects = []
@@ -36,7 +36,7 @@ The above example would throw exceptions, as the callbacks passed to the `fetchG
 A first simple fix is to extract the callbacks to actions. (Note that binding using `action.bound` is important here to get a correct `this`!):
 
 ```javascript
-mobx.configure({ enforceActions: true })
+mobx.configure({ enforceActions: "observed" })
 
 class Store {
 	@observable githubProjects = []
@@ -66,7 +66,7 @@ class Store {
 Although this is clean and explicit, it might get a bit verbose with complex async flows. Alternative, you can wrap the promise callbacks with the `action` keyword. It is recommended, but not mandatory, to give them a name as well:
 
 ```javascript
-mobx.configure({ enforceActions: true })
+mobx.configure({ enforceActions: "observed" })
 
 class Store {
 	@observable githubProjects = []
@@ -99,7 +99,7 @@ Instead of creating an action for the entire callback, you can also run only the
 The advantage of this pattern is that it encourages you to not litter the place with `action`, but rather put all the state modifications as much as possible at the end of the whole process:
 
 ```javascript
-mobx.configure({ enforceActions: true })
+mobx.configure({ enforceActions: "observed" })
 
 class Store {
 	@observable githubProjects = []
@@ -141,7 +141,7 @@ And after each `await` a new asynchronous function is started, so after each `aw
 This is where `runInAction` comes in handy again:
 
 ```javascript
-mobx.configure({ enforceActions: true })
+mobx.configure({ enforceActions: "observed" })
 
 class Store {
 	@observable githubProjects = []
@@ -177,7 +177,7 @@ The advantage of `flow` is that it is syntactically very close to async / await 
 `flow` integrates neatly with MobX development tools, so that it is easy to trace the process of the async function.
 
 ```javascript
-mobx.configure({ enforceActions: true })
+mobx.configure({ enforceActions: "observed" })
 
 class Store {
 	@observable githubProjects = []
@@ -201,4 +201,4 @@ class Store {
 
 #### Flows can be cancelled
 
-Flows are canceallable, that means that you can call `cancel()` on the returned promise. This will stop the generator immediately, but any finally clause will still be processed. The returned promise itself will reject with `FLOW_CANCELLED`.
+Flows are cancellable, that means that you can call `cancel()` on the returned promise. This will stop the generator immediately, but any finally clause will still be processed. The returned promise itself will reject with `FLOW_CANCELLED`.
