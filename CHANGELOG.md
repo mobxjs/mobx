@@ -1,3 +1,9 @@
+# 5.5.1 / 4.5.1
+
+* `toJS` now has a `recurseEverything` everything option, that even detects and converts observable objects that are "behind" non-observable objects. See [#1699](https://github.com/mobxjs/mobx/pull/1699) by [wangyiz4262](https://github.com/wangyiz4262)
+* Added flow typings form `comparer`, see [#1751](https://github.com/mobxjs/mobx/pull/1752) by [pdong](https://github.com/pdong)
+* Update flow typings for configuration options, [#1772](https://github.com/mobxjs/mobx/pull/1772) by [alexandersorokin](https://github.com/alexandersorokin)
+
 # 5.5.0 / 4.5.0
 
 (Minor version of `5` was bumped significantly to make the number better correlate together :-))

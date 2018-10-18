@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /* Publish.js, publish a new version of the npm package as found in the current directory */
 /* Run this file from the root of the repository */
 
