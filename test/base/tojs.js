@@ -403,4 +403,9 @@ describe("recurseEverything set to true", function() {
         const convertedObj = mobx.toJS({ key: cycledObj }, { recurseEverything: true })
         expect(convertedObj.key).toBe(convertedObj.key.cycle)
     })
+    
+    test("should return null if source is null", function() {
+        expect(mobx.toJS(null)).toBeNull()
+        expect(mobx.toJS(null, { recurseEverything: true })).toBeNull()
+    })
 })
