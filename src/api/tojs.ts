@@ -25,6 +25,9 @@ function toJSHelper(source, options: ToJSOptions, __alreadySeen: Map<any, any>) 
     if (!options.recurseEverything && !isObservable(source)) return source
 
     if (typeof source !== "object") return source
+    
+    // Directly return null if source is null
+    if (source === null) return null
 
     // Directly return the Date object itself if contained in the observable
     if (source instanceof Date) return source
@@ -32,9 +35,7 @@ function toJSHelper(source, options: ToJSOptions, __alreadySeen: Map<any, any>) 
     if (isObservableValue(source)) return toJSHelper(source.get(), options!, __alreadySeen)
 
     // make sure we track the keys of the object
-    if (isObservable(source)) {
-        keys(source)
-    }
+    if (isObservable(source)) keys(source)
 
     const detectCycles = options.detectCycles === true
 
