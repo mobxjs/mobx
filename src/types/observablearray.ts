@@ -62,6 +62,8 @@ export interface IObservableArray<T = any> extends Array<T> {
     ): number
     remove(value: T): boolean
     move(fromIndex: number, toIndex: number): void
+    toJS(): T[]
+    toJSON(): T[]
 }
 
 // In 3.0, change to IArrayDidChange
