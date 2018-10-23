@@ -48,7 +48,7 @@
     <body>
         
         
-    <div class="book" data-level="5.2" data-basepath=".." data-revision="Tue Oct 16 2018 14:59:50 GMT+0200 (CEST)">
+    <div class="book" data-level="5.2" data-basepath=".." data-revision="Tue Oct 23 2018 11:39:00 GMT+0200 (CEST)">
     
 
 <div class="book-summary">
@@ -865,10 +865,10 @@
                     
                         <html><head></head><body><a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/best/actions.md" class="btn fa fa-edit pull-left">&#xA0;&#xA0;Edit This Page</a><h1 id="writing-asynchronous-actions"><a name="writing-asynchronous-actions" class="plugin-anchor" href="#writing-asynchronous-actions"><span class="fa fa-link"></span></a>Writing asynchronous actions</h1>
 <p>The <code>action</code> wrapper / decorator only affects the currently running function, not functions that are scheduled (but not invoked) by the current function!
-This means that if you have a <code>setTimeout</code>, promise<code>.then</code> or <code>async</code> construction, and in that callback some more state is changed, those callbacks should be wrapped in <code>action</code> as well! There are several ways to create asynchronous actions. No approach is strictly better then the other, but this section just list different approaches you can take to writing asynchronous code.
+This means that if you have a <code>setTimeout</code>, promise<code>.then</code> or <code>async</code> construction, and in that callback some more state is changed, those callbacks should be wrapped in <code>action</code> as well! There are several ways to create asynchronous actions. No approach is strictly better than the other, but this section just list different approaches you can take to writing asynchronous code.
 Let&apos;s start with a basic example:</p>
 <h3 id="promises"><a name="promises" class="plugin-anchor" href="#promises"><span class="fa fa-link"></span></a>Promises</h3>
-<pre><code class="lang-javascript">mobx.configure({ enforceActions: <span class="hljs-literal">true</span> }) <span class="hljs-comment">// don&apos;t allow state modifications outside actions</span>
+<pre><code class="lang-javascript">mobx.configure({ enforceActions: <span class="hljs-string">&quot;observed&quot;</span> }) <span class="hljs-comment">// don&apos;t allow state modifications outside actions</span>
 
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Store</span> </span>{
     @observable githubProjects = []
@@ -893,7 +893,7 @@ Let&apos;s start with a basic example:</p>
 </code></pre>
 <p>The above example would throw exceptions, as the callbacks passed to the <code>fetchGithubProjectsSomehow</code> promise are not part of the <code>fetchProjects</code> action, as actions only apply to the current stack.</p>
 <p>A first simple fix is to extract the callbacks to actions. (Note that binding using <code>action.bound</code> is important here to get a correct <code>this</code>!):</p>
-<pre><code class="lang-javascript">mobx.configure({ enforceActions: <span class="hljs-literal">true</span> })
+<pre><code class="lang-javascript">mobx.configure({ enforceActions: <span class="hljs-string">&quot;observed&quot;</span> })
 
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Store</span> </span>{
     @observable githubProjects = []
@@ -920,7 +920,7 @@ Let&apos;s start with a basic example:</p>
 }
 </code></pre>
 <p>Although this is clean and explicit, it might get a bit verbose with complex async flows. Alternative, you can wrap the promise callbacks with the <code>action</code> keyword. It is recommended, but not mandatory, to give them a name as well:</p>
-<pre><code class="lang-javascript">mobx.configure({ enforceActions: <span class="hljs-literal">true</span> })
+<pre><code class="lang-javascript">mobx.configure({ enforceActions: <span class="hljs-string">&quot;observed&quot;</span> })
 
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Store</span> </span>{
     @observable githubProjects = []
@@ -949,7 +949,7 @@ Let&apos;s start with a basic example:</p>
 <p>A downside of inline actions is that TypeScript does not apply type inference on them, so you would have type all your callbacks.
 Instead of creating an action for the entire callback, you can also run only the state modifying part of the callback in an action.
 The advantage of this pattern is that it encourages you to not litter the place with <code>action</code>, but rather put all the state modifications as much as possible at the end of the whole process:</p>
-<pre><code class="lang-javascript">mobx.configure({ enforceActions: <span class="hljs-literal">true</span> })
+<pre><code class="lang-javascript">mobx.configure({ enforceActions: <span class="hljs-string">&quot;observed&quot;</span> })
 
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Store</span> </span>{
     @observable githubProjects = []
@@ -986,7 +986,7 @@ Which is of course not the case, as async / await is just syntactic sugar around
 As a result, <code>@action</code> only applies to the code block until the first <code>await</code>.
 And after each <code>await</code> a new asynchronous function is started, so after each <code>await</code>, state modifying code should be wrapped as action.
 This is where <code>runInAction</code> comes in handy again:</p>
-<pre><code class="lang-javascript">mobx.configure({ enforceActions: <span class="hljs-literal">true</span> })
+<pre><code class="lang-javascript">mobx.configure({ enforceActions: <span class="hljs-string">&quot;observed&quot;</span> })
 
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Store</span> </span>{
     @observable githubProjects = []
@@ -1017,7 +1017,7 @@ This is where <code>runInAction</code> comes in handy again:</p>
 The advantage of <code>flow</code> is that it is syntactically very close to async / await (with different keywords), and no manually action wrapping is needed for async parts, resulting in very clean code.</p>
 <p><code>flow</code> can be used only as function and not as decorator.
 <code>flow</code> integrates neatly with MobX development tools, so that it is easy to trace the process of the async function.</p>
-<pre><code class="lang-javascript">mobx.configure({ enforceActions: <span class="hljs-literal">true</span> })
+<pre><code class="lang-javascript">mobx.configure({ enforceActions: <span class="hljs-string">&quot;observed&quot;</span> })
 
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Store</span> </span>{
     @observable githubProjects = []
@@ -1039,7 +1039,7 @@ The advantage of <code>flow</code> is that it is syntactically very close to asy
 }
 </code></pre>
 <h4 id="flows-can-be-cancelled"><a name="flows-can-be-cancelled" class="plugin-anchor" href="#flows-can-be-cancelled"><span class="fa fa-link"></span></a>Flows can be cancelled</h4>
-<p>Flows are canceallable, that means that you can call <code>cancel()</code> on the returned promise. This will stop the generator immediately, but any finally clause will still be processed. The returned promise itself will reject with <code>FLOW_CANCELLED</code>.</p>
+<p>Flows are cancellable, that means that you can call <code>cancel()</code> on the returned promise. This will stop the generator immediately, but any finally clause will still be processed. The returned promise itself will reject with <code>FLOW_CANCELLED</code>.</p>
 </body></html>
                     
                     </section>
