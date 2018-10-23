@@ -12,12 +12,12 @@ _Simple, scalable state management_
 [![OpenCollective](https://opencollective.com/mobx/sponsors/badge.svg)](#sponsors)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 
-MobX is proudly sponsored by Mendix, Coinbase, Facebook Open Source, Algolia, Guilded, Canva and many [individual sponsors](#backers)
+MobX is proudly sponsored by Mendix, Coinbase, Facebook Open Source, Canva, Algolia, Guilded and many [individual sponsors](#backers)
 
 <img src="docs/mendix-logo.png" align="center" width="100" title="Mendix" alt="Mendix" /> <img src="docs/coinbase.jpeg" align="center" width="100" title="Coinbase" alt="Coinbase" /> <img src="docs/fbos.jpeg" align="center" width="100" title="Facebook Open Source" alt="Facebook Open Source" />
+<img src="docs/canva.png" align="center" width="100" title="Canva" alt="Canva" />
 <img src="docs/algolia.jpg" align="center" width="100" title="Algolia" alt="Algolia" />
 <img src="docs/guilded.jpg" align="center" width="100" title="Guilded" alt="Guilded" />
-<img src="docs/canva.png" align="center" width="100" title="Canva" alt="Canva" />
 
 # Installation
 
