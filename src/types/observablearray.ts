@@ -39,6 +39,8 @@ export interface IObservableArray<T = any> extends Array<T> {
     clear(): T[]
     replace(newItems: T[]): T[]
     remove(value: T): boolean
+    toJS(): T[]
+    toJSON(): T[]
 }
 
 // In 3.0, change to IArrayDidChange
