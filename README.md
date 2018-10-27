@@ -23,8 +23,8 @@ MobX is proudly sponsored by Mendix, Coinbase, Facebook Open Source, Algolia, Gu
 
 * Installation: `npm install mobx --save`. React bindings: `npm install mobx-react --save`. To enable ESNext decorators (optional), see below.
 * CDN:
-- https://unpkg.com/mobx/lib/mobx.umd.js
-- https://cdnjs.com/libraries/mobx
+   * https://unpkg.com/mobx/lib/mobx.umd.js
+   * https://cdnjs.com/libraries/mobx
 
 
 _Tip: Consider using the faster and smaller ES6 build if targetting a modern environment: `lib/mobx.es6.js`. For example by setting up a webpack alias: `resolve: { alias: { mobx: __dirname + "/node_modules/mobx/lib/mobx.es6.js" }}`_
