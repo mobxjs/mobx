@@ -474,6 +474,22 @@ test("can define properties on arrays", () => {
     expect("" + ar).toBe("hoi")
 })
 
+test("can define settable properties on arrays", () => {
+    const ar = observable.array([1, 2])
+    let value = true
+    Object.defineProperty(ar, "isTest", {
+        get() {
+            return value
+        },
+        set(v) {
+            value = v
+        }
+    })
+    expect(ar.isTest).toBe(true)
+    ar.isTest = false
+    expect(ar.isTest).toBe(false)
+})
+
 test("concats correctly #1667", () => {
     const x = observable({ data: [] })
 

@@ -104,6 +104,10 @@ const arrayTraps = {
             arrayExtensions.set.call(target, parseInt(name), value)
             return true
         }
+        if (target.hasOwnProperty(name)) {
+            target[name] = value
+            return true
+        }
         return false
     },
     preventExtensions(target) {
@@ -166,15 +170,17 @@ class ObservableArrayAdministration
         fireImmediately = false
     ): Lambda {
         if (fireImmediately) {
-            listener(<IArraySplice<any>>{
-                object: this.proxy as any,
-                type: "splice",
-                index: 0,
-                added: this.values.slice(),
-                addedCount: this.values.length,
-                removed: [],
-                removedCount: 0
-            })
+            listener(
+                <IArraySplice<any>>{
+                    object: this.proxy as any,
+                    type: "splice",
+                    index: 0,
+                    added: this.values.slice(),
+                    addedCount: this.values.length,
+                    removed: [],
+                    removedCount: 0
+                }
+            )
         }
         return registerListener(this, listener)
     }
@@ -424,9 +430,9 @@ const arrayExtensions = {
                 return adm.dehanceValue(adm.values[index])
             }
             console.warn(
-                `[mobx.array] Attempt to read an array index (${index}) that is out of bounds (${
-                    adm.values.length
-                }). Please check length first. Out of bound indices will not be tracked by MobX`
+                `[mobx.array] Attempt to read an array index (${index}) that is out of bounds (${adm
+                    .values
+                    .length}). Please check length first. Out of bound indices will not be tracked by MobX`
             )
         }
         return undefined
