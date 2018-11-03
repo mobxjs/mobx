@@ -95,7 +95,7 @@ Or with just ES5 syntax:
 
 ```javascript
 function Message() {
-    extendObservable({
+    extendObservable(this, {
         message: "Hello world",
         author: null
     }, {
