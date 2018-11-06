@@ -95,7 +95,6 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     private equals: IEqualsComparer<any>
     private requiresReaction: boolean
     private keepAlive: boolean
-    private firstGet: boolean = true
 
     /**
      * Create a new computed value based on a function expression.
@@ -138,12 +137,8 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
      * Will evaluate its computation first if needed.
      */
     public get(): T {
-        if (this.keepAlive && this.firstGet) {
-            this.firstGet = false
-            autorun(() => this.get())
-        }
         if (this.isComputing) fail(`Cycle detected in computation ${this.name}: ${this.derivation}`)
-        if (globalState.inBatch === 0 && this.observers.length === 0) {
+        if (globalState.inBatch === 0 && this.observers.length === 0 && !this.keepAlive) {
             if (shouldCompute(this)) {
                 this.warnAboutUntrackedRead()
                 startBatch() // See perf test 'computed memoization'
@@ -237,8 +232,10 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     }
 
     suspend() {
-        clearObserving(this)
-        this.value = undefined // don't hold on to computed value!
+        if (!this.keepAlive) {
+            clearObserving(this)
+            this.value = undefined // don't hold on to computed value!
+        }
     }
 
     observe(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda {
