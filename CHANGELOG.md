@@ -1,3 +1,9 @@
+# 5.6.0 / 4.6.0
+
+* `keepAlive` has become smarter and won't recomputed computed values that are kept alive, as long as they aren't read. Implements [#1534](https://github.com/mobxjs/mobx/issues/1534)
+* Fixed [#1796](https://github.com/mobxjs/mobx/issues/1796), undeleting a property that had an initial value of `undefined` was undetected
+* Improved Flow typings, see [#1794](https://github.com/mobxjs/mobx/pull/1794) and [#1786](https://github.com/mobxjs/mobx/pull/1786)
+
 # 5.5.2 / 4.5.2
 
 * Fixed bug in `toJS` not handling `null` values correctly. Fixes [#1557](https://github.com/mobxjs/mobx/issues/1557) through [#1783](https://github.com/mobxjs/mobx/pull/1783) by [@wangyiz4262](https://github.com/wangyiz4262)
