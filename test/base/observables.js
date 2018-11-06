@@ -1921,22 +1921,7 @@ test("keeping computed properties alive runs on first access", () => {
         }
     )
 
-    expect(x.y).toBe(2) // perform calculation on access
-    expect(calcs).toBe(1)
-})
-
-test("(for objects) keeping computed properties alive runs on first access", () => {
-    let calcs = 0
-    class Foo {
-        @observable x = 1
-        @computed({ keepAlive: true })
-        get y() {
-            calcs++
-            return this.x * 2
-        }
-    }
-    const x = new Foo()
-
+    expect(calcs).toBe(0)
     expect(x.y).toBe(2) // perform calculation on access
     expect(calcs).toBe(1)
 })
@@ -1961,23 +1946,6 @@ test("keeping computed properties alive caches values on subsequent accesses", (
     expect(calcs).toBe(1) // only one calculation: cached!
 })
 
-test("(for objects) keeping computed properties alive caches values on subsequent accesses", () => {
-    let calcs = 0
-    class Foo {
-        @observable x = 1
-        @computed({ keepAlive: true })
-        get y() {
-            calcs++
-            return this.x * 2
-        }
-    }
-    const x = new Foo()
-
-    expect(x.y).toBe(2) // first access: do calculation
-    expect(x.y).toBe(2) // second access: use cached value, no calculation
-    expect(calcs).toBe(1) // only one calculation: cached!
-})
-
 test("keeping computed properties alive does not recalculate when dirty", () => {
     let calcs = 0
     const x = observable(
@@ -1994,24 +1962,7 @@ test("keeping computed properties alive does not recalculate when dirty", () => 
     )
 
     expect(x.y).toBe(2) // first access: do calculation
-    x.x = 3 // mark as dirty: no calculation
     expect(calcs).toBe(1)
-    expect(x.y).toBe(6)
-})
-
-test("(for objects) keeping computed properties alive does not recalculate when dirty", () => {
-    let calcs = 0
-    class Foo {
-        @observable x = 1
-        @computed({ keepAlive: true })
-        get y() {
-            calcs++
-            return this.x * 2
-        }
-    }
-    const x = new Foo()
-
-    expect(x.y).toBe(2) // first access: do calculation
     x.x = 3 // mark as dirty: no calculation
     expect(calcs).toBe(1)
     expect(x.y).toBe(6)
@@ -2033,7 +1984,9 @@ test("keeping computed properties alive recalculates when accessing it dirty", (
     )
 
     expect(x.y).toBe(2) // first access: do calculation
+    expect(calcs).toBe(1)
     x.x = 3 // mark as dirty: no calculation
+    expect(calcs).toBe(1)
     expect(x.y).toBe(6) // second access: do calculation because it is dirty
     expect(calcs).toBe(2)
 })
@@ -2051,7 +2004,9 @@ test("(for objects) keeping computed properties alive recalculates when accessin
     const x = new Foo()
 
     expect(x.y).toBe(2) // first access: do calculation
+    expect(calcs).toBe(1)
     x.x = 3 // mark as dirty: no calculation
+    expect(calcs).toBe(1)
     expect(x.y).toBe(6) // second access: do calculation because it is dirty
     expect(calcs).toBe(2)
 })
