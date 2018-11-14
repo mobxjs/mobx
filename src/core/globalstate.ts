@@ -1,4 +1,4 @@
-import { IDerivation, IObservable, Reaction, fail } from "../internal"
+import { IDerivation, IObservable, IScheduledReaction, fail } from "../internal"
 
 /**
  * These values will persist if global state is reset
@@ -59,7 +59,7 @@ export class MobXGlobals {
     /**
      * List of scheduled, not yet executed, reactions.
      */
-    pendingReactions: Reaction[] = []
+    pendingReactions: IScheduledReaction[] = []
 
     /**
      * Are we currently processing reactions?

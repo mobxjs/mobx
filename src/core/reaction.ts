@@ -50,7 +50,11 @@ export interface IReactionDisposer {
     $mobx: Reaction
 }
 
-export class Reaction implements IDerivation, IReactionPublic {
+export interface IScheduledReaction {
+    runReaction(): void
+}
+
+abstract class ReactionBase implements IDerivation, IScheduledReaction, IReactionPublic {
     observing: IObservable[] = [] // nodes we are looking at. Our value depends on these nodes
     newObserving: IObservable[] = []
     dependenciesState = IDerivationState.NOT_TRACKING
@@ -66,7 +70,6 @@ export class Reaction implements IDerivation, IReactionPublic {
 
     constructor(
         public name: string = "Reaction@" + getNextId(),
-        private onInvalidate: () => void,
         private errorHandler?: (error: any, derivation: IDerivation) => void
     ) {}
 
@@ -89,33 +92,7 @@ export class Reaction implements IDerivation, IReactionPublic {
     /**
      * internal, use schedule() if you intend to kick off a reaction
      */
-    runReaction() {
-        if (!this.isDisposed) {
-            startBatch()
-            this._isScheduled = false
-            if (shouldCompute(this)) {
-                this._isTrackPending = true
-
-                try {
-                    this.onInvalidate()
-                    if (
-                        this._isTrackPending &&
-                        isSpyEnabled() &&
-                        process.env.NODE_ENV !== "production"
-                    ) {
-                        // onInvalidate didn't trigger track right away..
-                        spyReport({
-                            name: this.name,
-                            type: "scheduled-reaction"
-                        })
-                    }
-                } catch (e) {
-                    this.reportExceptionInDerivation(e)
-                }
-            }
-            endBatch()
-        }
-    }
+    abstract runReaction();
 
     track(fn: () => void) {
         startBatch()
@@ -193,6 +170,89 @@ export class Reaction implements IDerivation, IReactionPublic {
 
     trace(enterBreakPoint: boolean = false) {
         trace(this, enterBreakPoint)
+    }
+}
+
+export class Reaction extends ReactionBase {
+
+    constructor(
+        name: string = "Reaction@" + getNextId(),
+        private onInvalidate: () => void,
+        errorHandler?: (error: any, derivation: IDerivation) => void
+    ) {
+        super(name, errorHandler)
+    }
+
+    /**
+     * internal, use schedule() if you intend to kick off a reaction
+     */
+    runReaction() {
+        if (!this.isDisposed) {
+            startBatch()
+            this._isScheduled = false
+            if (shouldCompute(this)) {
+                this._isTrackPending = true
+
+                try {
+                    this.onInvalidate()
+                    if (
+                        this._isTrackPending &&
+                        isSpyEnabled() &&
+                        process.env.NODE_ENV !== "production"
+                    ) {
+                        // onInvalidate didn't trigger track right away..
+                        spyReport({
+                            name: this.name,
+                            type: "scheduled-reaction"
+                        })
+                    }
+                } catch (e) {
+                    this.reportExceptionInDerivation(e)
+                }
+            }
+            endBatch()
+        }
+    }
+
+}
+
+export class ReactionEx extends ReactionBase implements IDerivation, IReactionPublic {
+
+    constructor(
+        name: string = "Reaction@" + getNextId(),
+        private onInvalidate: () => void,
+        errorHandler?: (error: any, derivation: IDerivation) => void
+    ) {
+        super(name, errorHandler)
+    }
+
+    /**
+     * internal, use schedule() if you intend to kick off a reaction
+     */
+    runReaction() {
+        this._isScheduled = false
+        if (this.isDisposed || this.dependenciesState === IDerivationState.UP_TO_DATE)
+            return;
+
+        try {
+            this.onInvalidate()
+
+            if (this.dependenciesState !== <IDerivationState>IDerivationState.UP_TO_DATE
+                && isSpyEnabled()
+                && process.env.NODE_ENV !== "production"
+            ) {
+                spyReport({
+                    name: this.name,
+                    type: "scheduled-reaction",
+                })
+            }
+        } catch (e) {
+            this.reportExceptionInDerivation(e)
+        }
+    }
+
+    shouldCompute() {
+        return shouldCompute(this)
     }
 }
 

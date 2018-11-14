@@ -51,6 +51,7 @@ export {
     IObservable,
     IDepTreeNode,
     Reaction,
+    ReactionEx,
     IReactionPublic,
     IReactionDisposer,
     IDerivation,
