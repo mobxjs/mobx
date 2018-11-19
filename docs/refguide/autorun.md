@@ -18,7 +18,18 @@ As a rule of thumb: use `autorun` if you have a function that should run automat
 Use `computed` for everything else. Autoruns are about initiating _effects_, not about producing new values.
 If a string is passed as first argument to `autorun`, it will be used as debug name.
 
-The return value from autorun is a disposer function, which can be used to dispose of the autorun when you no longer need it.
+The return value from autorun is a disposer function, which can be used to dispose of the autorun when you no longer need it.  The reaction itself will also be passed as the only argument to the function given to autorun, which allows you to manipulate it from within the autorun function.  This means there are two ways you can dispose of the reaction when you no longer need it:
+```javascript
+const disposer = autorun( reaction => { /* do some stuff */ } );
+disposer();
+
+// or
+
+autorun( reaction => {
+  /* do some stuff */
+  reaction.dispose();
+} );
+```
 
 Just like the [`@observer` decorator/function](./observer-component.md), `autorun` will only observe data that is used during the execution of the provided function.
 
