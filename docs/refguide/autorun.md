@@ -18,7 +18,7 @@ As a rule of thumb: use `autorun` if you have a function that should run automat
 Use `computed` for everything else. Autoruns are about initiating _effects_, not about producing new values.
 If a string is passed as first argument to `autorun`, it will be used as debug name.
 
-The function passed to autorun will receive one argument when invoked, the current reaction (autorun), which can be used to dispose the autorun during execution.
+The return value from autorun is a disposer function, which can be used to dispose of the autorun when you no longer need it.
 
 Just like the [`@observer` decorator/function](./observer-component.md), `autorun` will only observe data that is used during the execution of the provided function.
 
