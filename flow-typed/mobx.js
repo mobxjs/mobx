@@ -260,13 +260,6 @@ declare export class IObservableFactories {
     deep(target: Object, property?: string, descriptor?: PropertyDescriptor): IObservableDecorator
 }
 
-export interface Iterator<T> {
-    next(): {
-        done: boolean,
-        value?: T
-    }
-}
-
 export interface Lambda {
     (): void,
     name?: string
@@ -326,7 +319,11 @@ export interface IWhenOptions {
     onError?: (error: any) => void
 }
 
-declare export function when(cond: () => boolean, effect: Lambda, options?: IWhenOptions): () => mixed
+declare export function when(
+    cond: () => boolean,
+    effect: Lambda,
+    options?: IWhenOptions
+): () => mixed
 declare export function when(cond: () => boolean, options?: IWhenOptions): Promise<any>
 
 declare export function computed<T>(
@@ -357,7 +354,7 @@ declare export function isObservableProp(value: any, property: string): boolean
 declare export var comparer: {
     identity: IEqualsComparer<any>,
     structural: IEqualsComparer<any>,
-    default: IEqualsComparer<any>,
+    default: IEqualsComparer<any>
 }
 
 declare export var observable: IObservableFactory &
