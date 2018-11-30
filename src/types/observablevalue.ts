@@ -18,7 +18,9 @@ import {
     spyReport,
     spyReportEnd,
     spyReportStart,
-    toPrimitive
+    toPrimitive,
+    globalState,
+    IUNCHANGED
 } from "../internal"
 
 export interface IValueWillChange<T> {
@@ -30,10 +32,6 @@ export interface IValueWillChange<T> {
 export interface IValueDidChange<T> extends IValueWillChange<T> {
     oldValue: T | undefined
 }
-
-export type IUNCHANGED = {}
-
-export const UNCHANGED: IUNCHANGED = {}
 
 export interface IObservableValue<T> {
     get(): T
@@ -72,7 +70,7 @@ export class ObservableValue<T> extends Atom
     public set(newValue: T) {
         const oldValue = this.value
         newValue = this.prepareNewValue(newValue) as any
-        if (newValue !== UNCHANGED) {
+        if (newValue !== globalState.UNCHANGED) {
             const notifySpy = isSpyEnabled()
             if (notifySpy && process.env.NODE_ENV !== "production") {
                 spyReportStart({
@@ -95,12 +93,12 @@ export class ObservableValue<T> extends Atom
                 type: "update",
                 newValue
             })
-            if (!change) return UNCHANGED
+            if (!change) return globalState.UNCHANGED
             newValue = change.newValue
         }
         // apply modifier
         newValue = this.enhancer(newValue, this.value, this.name)
-        return this.value !== newValue ? newValue : UNCHANGED
+        return this.value !== newValue ? newValue : globalState.UNCHANGED
     }
 
     setNewValue(newValue: T) {

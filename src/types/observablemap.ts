@@ -6,7 +6,6 @@ import {
     IListenable,
     Lambda,
     ObservableValue,
-    UNCHANGED,
     checkIfStateModificationsAreAllowed,
     createAtom,
     createInstanceofPredicate,
@@ -29,7 +28,8 @@ import {
     spyReportEnd,
     spyReportStart,
     transaction,
-    untracked
+    untracked,
+    globalState
 } from "../internal"
 
 export interface IKeyValueMap<V = any> {
@@ -183,7 +183,7 @@ export class ObservableMap<K = any, V = any>
     private _updateValue(key: K, newValue: V | undefined) {
         const observable = this._data.get(key)!
         newValue = (observable as any).prepareNewValue(newValue) as V
-        if (newValue !== UNCHANGED) {
+        if (newValue !== globalState.UNCHANGED) {
             const notifySpy = isSpyEnabled()
             const notify = hasListeners(this)
             const change =

@@ -9,7 +9,6 @@ import {
     IListenable,
     Lambda,
     ObservableValue,
-    UNCHANGED,
     addHiddenProp,
     assertPropertyConfigurable,
     createInstanceofPredicate,
@@ -31,7 +30,8 @@ import {
     registerListener,
     spyReportEnd,
     spyReportStart,
-    startBatch
+    startBatch,
+    globalState
 } from "../internal"
 
 export interface IObservableObject {
@@ -115,7 +115,7 @@ export class ObservableObjectAdministration
         newValue = (observable as any).prepareNewValue(newValue)
 
         // notify spy & observers
-        if (newValue !== UNCHANGED) {
+        if (newValue !== globalState.UNCHANGED) {
             const notify = hasListeners(this)
             const notifySpy = isSpyEnabled()
             const change =
