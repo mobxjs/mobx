@@ -1,4 +1,4 @@
-import { ObservableValue, UNCHANGED } from "./observablevalue"
+import { ObservableValue } from "./observablevalue"
 import { ComputedValue, IComputedValueOptions } from "../core/computedvalue"
 import {
     createInstanceofPredicate,
@@ -22,6 +22,7 @@ import { IEnhancer, referenceEnhancer, deepEnhancer } from "./modifiers"
 import { ObservableArray, IObservableArray } from "./observablearray"
 import { initializeInstance } from "../utils/decorators2"
 import { startBatch, endBatch } from "../core/observable"
+import { globalState } from "../core/globalstate"
 
 export interface IObservableObject {
     "observable-object": IObservableObject
@@ -103,7 +104,7 @@ export class ObservableObjectAdministration
         newValue = (observable as any).prepareNewValue(newValue)
 
         // notify spy & observers
-        if (newValue !== UNCHANGED) {
+        if (newValue !== globalState.UNCHANGED) {
             const notify = hasListeners(this)
             const notifySpy = isSpyEnabled()
             const change =

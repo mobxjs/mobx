@@ -1,7 +1,7 @@
 import { IEnhancer, deepEnhancer } from "./modifiers"
 import { untracked } from "../core/derivation"
 import { IObservableArray, ObservableArray } from "./observablearray"
-import { ObservableValue, UNCHANGED } from "./observablevalue"
+import { ObservableValue } from "./observablevalue"
 import {
     createInstanceofPredicate,
     isPlainObject,
@@ -25,6 +25,7 @@ import { isSpyEnabled, spyReportStart, spyReportEnd } from "../core/spy"
 import { declareIterator, iteratorSymbol, makeIterable } from "../utils/iterable"
 import { transaction } from "../api/transaction"
 import { referenceEnhancer } from "./modifiers"
+import { globalState } from "../core/globalstate"
 
 export interface IKeyValueMap<V = any> {
     [key: string]: V
@@ -181,7 +182,7 @@ export class ObservableMap<K = any, V = any>
     private _updateValue(key: K, newValue: V | undefined) {
         const observable = this._data.get(key)!
         newValue = (observable as any).prepareNewValue(newValue) as V
-        if (newValue !== UNCHANGED) {
+        if (newValue !== globalState.UNCHANGED) {
             const notifySpy = isSpyEnabled()
             const notify = hasListeners(this)
             const change =
@@ -324,10 +325,10 @@ export class ObservableMap<K = any, V = any>
     }
 
     /**
-	 * Returns a plain object that represents this map.
-	 * Note that all the keys being stringified.
-	 * If there are duplicating keys after converting them to strings, behaviour is undetermined.
-	 */
+     * Returns a plain object that represents this map.
+     * Note that all the keys being stringified.
+     * If there are duplicating keys after converting them to strings, behaviour is undetermined.
+     */
     toPOJO(): IKeyValueMap<V> {
         const res: IKeyValueMap<V> = {}
         this._keys.forEach(key => (res["" + key] = this.get(key)!))
@@ -335,9 +336,9 @@ export class ObservableMap<K = any, V = any>
     }
 
     /**
-	 * Returns a shallow non observable object clone of this map.
-	 * Note that the values migth still be observable. For a deep clone use mobx.toJS.
-	 */
+     * Returns a shallow non observable object clone of this map.
+     * Note that the values migth still be observable. For a deep clone use mobx.toJS.
+     */
     toJS(): Map<K, V> {
         const res: Map<K, V> = new Map()
         this._keys.forEach(key => res.set(key, this.get(key)!))
@@ -359,10 +360,10 @@ export class ObservableMap<K = any, V = any>
     }
 
     /**
-	 * Observes this object. Triggers for the events 'add', 'update' and 'delete'.
-	 * See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe
-	 * for callback details
-	 */
+     * Observes this object. Triggers for the events 'add', 'update' and 'delete'.
+     * See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe
+     * for callback details
+     */
     observe(listener: (changes: IMapDidChange<K, V>) => void, fireImmediately?: boolean): Lambda {
         process.env.NODE_ENV !== "production" &&
             invariant(

@@ -6,14 +6,17 @@ import { IObservable } from "./observable"
 /**
  * These values will persist if global state is reset
  */
-const persistentKeys = [
+const persistentKeys: (keyof MobXGlobals)[] = [
     "mobxGuid",
     "spyListeners",
     "enforceActions",
     "computedRequiresReaction",
     "disableErrorBoundaries",
-    "runId"
+    "runId",
+    "UNCHANGED"
 ]
+
+export type IUNCHANGED = {}
 
 export class MobXGlobals {
     /**
@@ -25,6 +28,11 @@ export class MobXGlobals {
      * internal state storage of MobX, and can be the same across many different package versions
      */
     version = 5
+
+    /**
+     * globally unique token to signal unchanged
+     */
+    UNCHANGED: IUNCHANGED = {}
 
     /**
      * Currently running derivation
@@ -124,6 +132,7 @@ export let globalState: MobXGlobals = (function() {
         return new MobXGlobals()
     } else if (global.__mobxGlobals) {
         global.__mobxInstanceCount += 1
+        if (!global.__mobxGlobals.UNCHANGED) global.__mobxGlobals.UNCHANGED = {} // make merge backward compatible
         return global.__mobxGlobals
     } else {
         global.__mobxInstanceCount = 1
@@ -156,6 +165,6 @@ export function getGlobalState(): any {
 export function resetGlobalState() {
     const defaultGlobals = new MobXGlobals()
     for (let key in defaultGlobals)
-        if (persistentKeys.indexOf(key) === -1) globalState[key] = defaultGlobals[key]
+        if (persistentKeys.indexOf(key as any) === -1) globalState[key] = defaultGlobals[key]
     globalState.allowStateChanges = !globalState.enforceActions
 }

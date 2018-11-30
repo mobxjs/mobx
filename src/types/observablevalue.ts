@@ -17,6 +17,7 @@ import {
 import { IListenable, registerListener, hasListeners, notifyListeners } from "./listen-utils"
 import { isSpyEnabled, spyReportStart, spyReportEnd, spyReport } from "../core/spy"
 import { IEnhancer } from "./modifiers"
+import { globalState, IUNCHANGED } from "../core/globalstate"
 
 export interface IValueWillChange<T> {
     object: any
@@ -27,10 +28,6 @@ export interface IValueWillChange<T> {
 export interface IValueDidChange<T> extends IValueWillChange<T> {
     oldValue: T | undefined
 }
-
-export type IUNCHANGED = {}
-
-export const UNCHANGED: IUNCHANGED = {}
 
 export interface IObservableValue<T> {
     get(): T
@@ -71,7 +68,7 @@ export class ObservableValue<T> extends Atom
     public set(newValue: T) {
         const oldValue = this.value
         newValue = this.prepareNewValue(newValue) as any
-        if (newValue !== UNCHANGED) {
+        if (newValue !== globalState.UNCHANGED) {
             const notifySpy = isSpyEnabled()
             if (notifySpy) {
                 spyReportStart({
@@ -94,12 +91,12 @@ export class ObservableValue<T> extends Atom
                 type: "update",
                 newValue
             })
-            if (!change) return UNCHANGED
+            if (!change) return globalState.UNCHANGED
             newValue = change.newValue
         }
         // apply modifier
         newValue = this.enhancer(newValue, this.value, this.name)
-        return this.value !== newValue ? newValue : UNCHANGED
+        return this.value !== newValue ? newValue : globalState.UNCHANGED
     }
 
     setNewValue(newValue: T) {
