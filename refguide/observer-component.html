@@ -8,7 +8,7 @@
         <title>(@)observer | MobX</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
-        <meta name="generator" content="GitBook 2.4.3">
+        <meta name="generator" content="GitBook 2.6.9">
         
         
         <meta name="HandheldFriendly" content="true"/>
@@ -32,6 +32,14 @@
         <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-highlight/website.css">
         
     
+        
+        <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-search/search.css">
+        
+    
+        
+        <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-fontsettings/website.css">
+        
+    
     
 
         
@@ -48,13 +56,16 @@
     <body>
         
         
-    <div class="book" data-level="4.5" data-basepath=".." data-revision="Tue Oct 23 2018 11:39:00 GMT+0200 (CEST)">
+    <div class="book"
+        data-level="4.5"
+        data-chapter-title="(@)observer"
+        data-filepath="refguide/observer-component.md"
+        data-basepath=".."
+        data-revision="Fri Nov 30 2018 16:57:29 GMT+0100 (CET)"
+        data-innerlanguage="">
     
 
 <div class="book-summary">
-    <div class="book-search" role="search">
-        <input type="text" placeholder="Type to search" class="form-control" />
-    </div>
     <nav role="navigation">
         <ul class="summary">
             
@@ -775,80 +786,7 @@
         <div class="body-inner">
             <div class="book-header" role="navigation">
     <!-- Actions Left -->
-    <a href="#" class="btn pull-left toggle-summary" aria-label="Table of Contents"><i class="fa fa-align-justify"></i></a>
-    <a href="#" class="btn pull-left toggle-search" aria-label="Search"><i class="fa fa-search"></i></a>
     
-    <div id="font-settings-wrapper" class="dropdown pull-left">
-        <a href="#" class="btn toggle-dropdown" aria-label="Font Settings"><i class="fa fa-font"></i>
-        </a>
-        <div class="dropdown-menu font-settings">
-    <div class="dropdown-caret">
-        <span class="caret-outer"></span>
-        <span class="caret-inner"></span>
-    </div>
-
-    <div class="buttons">
-        <button type="button" id="reduce-font-size" class="button size-2">A</button>
-        <button type="button" id="enlarge-font-size" class="button size-2">A</button>
-    </div>
-
-    <div class="buttons font-family-list">
-        <button type="button" data-font="0" class="button">Serif</button>
-        <button type="button" data-font="1" class="button">Sans</button>
-    </div>
-
-    <div class="buttons color-theme-list">
-        <button type="button" id="color-theme-preview-0" class="button size-3" data-theme="0">White</button>
-        <button type="button" id="color-theme-preview-1" class="button size-3" data-theme="1">Sepia</button>
-        <button type="button" id="color-theme-preview-2" class="button size-3" data-theme="2">Night</button>
-    </div>
-</div>
-
-    </div>
-
-    <!-- Actions Right -->
-    
-    <div class="dropdown pull-right">
-        <a href="#" class="btn toggle-dropdown" aria-label="Share"><i class="fa fa-share-alt"></i>
-        </a>
-        <div class="dropdown-menu font-settings dropdown-left">
-            <div class="dropdown-caret">
-                <span class="caret-outer"></span>
-                <span class="caret-inner"></span>
-            </div>
-            <div class="buttons">
-                <button type="button" data-sharing="twitter" class="button">
-                    Share on Twitter
-                </button>
-                <button type="button" data-sharing="google-plus" class="button">
-                    Share on Google
-                </button>
-                <button type="button" data-sharing="facebook" class="button">
-                    Share on Facebook
-                </button>
-                <button type="button" data-sharing="weibo" class="button">
-                    Share on Weibo
-                </button>
-                <button type="button" data-sharing="instapaper" class="button">
-                    Share on Instapaper
-                </button>
-            </div>
-        </div>
-    </div>
-    
-
-    
-    <a href="#" target="_blank" class="btn pull-right google-plus-sharing-link sharing-link" data-sharing="google-plus" aria-label="Google"><i class="fa fa-google-plus"></i></a>
-    
-    
-    <a href="#" target="_blank" class="btn pull-right facebook-sharing-link sharing-link" data-sharing="facebook" aria-label="Facebook"><i class="fa fa-facebook"></i></a>
-    
-    
-    <a href="#" target="_blank" class="btn pull-right twitter-sharing-link sharing-link" data-sharing="twitter" aria-label="Twitter"><i class="fa fa-twitter"></i></a>
-    
-    
-    
-
 
     <!-- Title -->
     <h1>
@@ -863,7 +801,7 @@
                 
                     <section class="normal" id="section-">
                     
-                        <html><head></head><body><a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/observer-component.md" class="btn fa fa-edit pull-left">&#xA0;&#xA0;Edit This Page</a><h1 id="-observer"><a name="-observer" class="plugin-anchor" href="#-observer"><span class="fa fa-link"></span></a>@observer</h1>
+                        <html><head></head><body><a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/observer-component.md" class="btn fa fa-edit pull-left">&#xA0;&#xA0;Edit This Page</a><h1 id="observer"><a name="observer" class="plugin-anchor" href="#observer"><span class="fa fa-link"></span></a>@observer</h1>
 <details>
     <summary style="color: white; background:green;padding:5px;margin:5px;border-radius:2px">egghead.io lesson 1: observable &amp; observer</summary>
     <br>
@@ -981,12 +919,12 @@ It is still a good separation of concerns for where to handle events, make reque
 All components become responsible for updating when their <em>own</em> dependencies change.
 Its overhead is neglectable and it makes sure that whenever you start using observable data the component will respond to it.
 See this <a href="https://www.reddit.com/r/reactjs/comments/4vnxg5/free_eggheadio_course_learn_mobx_react_in_30/d61oh0l" target="_blank">thread</a> for more details.</p>
-<h2 id="-observer-and-purecomponent"><a name="-observer-and-purecomponent" class="plugin-anchor" href="#-observer-and-purecomponent"><span class="fa fa-link"></span></a><code>observer</code> and <code>PureComponent</code></h2>
+<h2 id="observer-and-purecomponent"><a name="observer-and-purecomponent" class="plugin-anchor" href="#observer-and-purecomponent"><span class="fa fa-link"></span></a><code>observer</code> and <code>PureComponent</code></h2>
 <p><code>observer</code> also prevents re-renderings when the <em>props</em> of the component have only shallowly changed, which makes a lot of sense if the data passed into the component is reactive.
 This behavior is similar to <a href="https://reactjs.org/docs/react-api.html#reactpurecomponent" target="_blank">React PureComponent</a>, except that <em>state</em> changes are still always processed.
 If a component provides its own <code>shouldComponentUpdate</code>, that one takes precedence.</p>
 <p>See for an explanation this <a href="https://github.com/mobxjs/mobx/issues/101" target="_blank">github issue</a></p>
-<h2 id="-componentwillreact-lifecycle-hook"><a name="-componentwillreact-lifecycle-hook" class="plugin-anchor" href="#-componentwillreact-lifecycle-hook"><span class="fa fa-link"></span></a><code>componentWillReact</code> (lifecycle hook)</h2>
+<h2 id="componentwillreact-lifecycle-hook"><a name="componentwillreact-lifecycle-hook" class="plugin-anchor" href="#componentwillreact-lifecycle-hook"><span class="fa fa-link"></span></a><code>componentWillReact</code> (lifecycle hook)</h2>
 <p>React components usually render on a fresh stack, so that makes it often hard to figure out what <em>caused</em> a component to re-render.
 When using <code>mobx-react</code> you can define a new life cycle hook, <code>componentWillReact</code> (pun intended) that will be triggered when a component will be scheduled to re-render because
 data it observes has changed. This makes it easy to trace renders back to the action that caused the rendering.</p>
@@ -1009,7 +947,7 @@ data it observes has changed. This makes it easy to trace renders back to the ac
 </ul>
 <h2 id="optimizing-components"><a name="optimizing-components" class="plugin-anchor" href="#optimizing-components"><span class="fa fa-link"></span></a>Optimizing components</h2>
 <p>See the relevant <a href="../best/react-performance.html">section</a>.</p>
-<h2 id="mobx-react-devtools"><a name="mobx-react-devtools" class="plugin-anchor" href="#mobx-react-devtools"><span class="fa fa-link"></span></a>MobX-React-DevTools</h2>
+<h2 id="mobxreactdevtools"><a name="mobxreactdevtools" class="plugin-anchor" href="#mobxreactdevtools"><span class="fa fa-link"></span></a>MobX-React-DevTools</h2>
 <p>In combination with <code>@observer</code> you can use the MobX-React-DevTools, it shows exactly when your components are re-rendered and you can inspect the data dependencies of your components.
 See the <a href="../best/devtools.html">DevTools</a> section.</p>
 <h2 id="characteristics-of-observer-components"><a name="characteristics-of-observer-components" class="plugin-anchor" href="#characteristics-of-observer-components"><span class="fa fa-link"></span></a>Characteristics of observer components</h2>
@@ -1066,9 +1004,25 @@ See the <a href="../best/devtools.html">DevTools</a> section.</p>
     <script src="../gitbook/plugins/gitbook-plugin-edit-link/plugin.js"></script>
     
 
+    
+    <script src="../gitbook/plugins/gitbook-plugin-search/lunr.min.js"></script>
+    
+
+    
+    <script src="../gitbook/plugins/gitbook-plugin-search/search.js"></script>
+    
+
+    
+    <script src="../gitbook/plugins/gitbook-plugin-sharing/buttons.js"></script>
+    
+
+    
+    <script src="../gitbook/plugins/gitbook-plugin-fontsettings/buttons.js"></script>
+    
+
 <script>
 require(["gitbook"], function(gitbook) {
-    var config = {"fontSettings":{"theme":null,"family":"sans","size":2},"github":{"url":"https://github.com/mobxjs/mobx"},"edit-link":{"base":"https://github.com/mobxjs/mobx/tree/gh-pages/docs","label":"Edit This Page"},"ga":{"token":"UA-65632006-1","configuration":"auto"},"disqus":{"shortName":"mobservable"}};
+    var config = {"github":{"url":"https://github.com/mobxjs/mobx"},"edit-link":{"base":"https://github.com/mobxjs/mobx/tree/gh-pages/docs","label":"Edit This Page"},"ga":{"token":"UA-65632006-1","configuration":"auto"},"disqus":{"shortName":"mobservable"},"anchors":{},"highlight":{},"search":{"maxIndexSize":1000000},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2}};
     gitbook.start(config);
 });
 </script>

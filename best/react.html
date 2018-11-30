@@ -8,7 +8,7 @@
         <title>Understanding what MobX reacts to | MobX</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
-        <meta name="generator" content="GitBook 2.4.3">
+        <meta name="generator" content="GitBook 2.6.9">
         
         
         <meta name="HandheldFriendly" content="true"/>
@@ -32,6 +32,14 @@
         <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-highlight/website.css">
         
     
+        
+        <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-search/search.css">
+        
+    
+        
+        <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-fontsettings/website.css">
+        
+    
     
 
         
@@ -48,13 +56,16 @@
     <body>
         
         
-    <div class="book" data-level="4.6" data-basepath=".." data-revision="Tue Oct 23 2018 11:39:00 GMT+0200 (CEST)">
+    <div class="book"
+        data-level="4.6"
+        data-chapter-title="Understanding what MobX reacts to"
+        data-filepath="best/react.md"
+        data-basepath=".."
+        data-revision="Fri Nov 30 2018 16:57:29 GMT+0100 (CET)"
+        data-innerlanguage="">
     
 
 <div class="book-summary">
-    <div class="book-search" role="search">
-        <input type="text" placeholder="Type to search" class="form-control" />
-    </div>
     <nav role="navigation">
         <ul class="summary">
             
@@ -775,80 +786,7 @@
         <div class="body-inner">
             <div class="book-header" role="navigation">
     <!-- Actions Left -->
-    <a href="#" class="btn pull-left toggle-summary" aria-label="Table of Contents"><i class="fa fa-align-justify"></i></a>
-    <a href="#" class="btn pull-left toggle-search" aria-label="Search"><i class="fa fa-search"></i></a>
     
-    <div id="font-settings-wrapper" class="dropdown pull-left">
-        <a href="#" class="btn toggle-dropdown" aria-label="Font Settings"><i class="fa fa-font"></i>
-        </a>
-        <div class="dropdown-menu font-settings">
-    <div class="dropdown-caret">
-        <span class="caret-outer"></span>
-        <span class="caret-inner"></span>
-    </div>
-
-    <div class="buttons">
-        <button type="button" id="reduce-font-size" class="button size-2">A</button>
-        <button type="button" id="enlarge-font-size" class="button size-2">A</button>
-    </div>
-
-    <div class="buttons font-family-list">
-        <button type="button" data-font="0" class="button">Serif</button>
-        <button type="button" data-font="1" class="button">Sans</button>
-    </div>
-
-    <div class="buttons color-theme-list">
-        <button type="button" id="color-theme-preview-0" class="button size-3" data-theme="0">White</button>
-        <button type="button" id="color-theme-preview-1" class="button size-3" data-theme="1">Sepia</button>
-        <button type="button" id="color-theme-preview-2" class="button size-3" data-theme="2">Night</button>
-    </div>
-</div>
-
-    </div>
-
-    <!-- Actions Right -->
-    
-    <div class="dropdown pull-right">
-        <a href="#" class="btn toggle-dropdown" aria-label="Share"><i class="fa fa-share-alt"></i>
-        </a>
-        <div class="dropdown-menu font-settings dropdown-left">
-            <div class="dropdown-caret">
-                <span class="caret-outer"></span>
-                <span class="caret-inner"></span>
-            </div>
-            <div class="buttons">
-                <button type="button" data-sharing="twitter" class="button">
-                    Share on Twitter
-                </button>
-                <button type="button" data-sharing="google-plus" class="button">
-                    Share on Google
-                </button>
-                <button type="button" data-sharing="facebook" class="button">
-                    Share on Facebook
-                </button>
-                <button type="button" data-sharing="weibo" class="button">
-                    Share on Weibo
-                </button>
-                <button type="button" data-sharing="instapaper" class="button">
-                    Share on Instapaper
-                </button>
-            </div>
-        </div>
-    </div>
-    
-
-    
-    <a href="#" target="_blank" class="btn pull-right google-plus-sharing-link sharing-link" data-sharing="google-plus" aria-label="Google"><i class="fa fa-google-plus"></i></a>
-    
-    
-    <a href="#" target="_blank" class="btn pull-right facebook-sharing-link sharing-link" data-sharing="facebook" aria-label="Facebook"><i class="fa fa-facebook"></i></a>
-    
-    
-    <a href="#" target="_blank" class="btn pull-right twitter-sharing-link sharing-link" data-sharing="twitter" aria-label="Twitter"><i class="fa fa-twitter"></i></a>
-    
-    
-    
-
 
     <!-- Title -->
     <h1>
@@ -922,7 +860,7 @@ message.title = <span class="hljs-string">&quot;Hello&quot;</span>
 <span class="hljs-comment">// { name: &apos;Autorun@4&apos;,</span>
 <span class="hljs-comment">//  dependencies: [ { name: &apos;ObservableObject@1.title&apos; } ] }</span>
 </code></pre>
-<h4 id="incorrect-changing-a-non-observable-reference"><a name="incorrect-changing-a-non-observable-reference" class="plugin-anchor" href="#incorrect-changing-a-non-observable-reference"><span class="fa fa-link"></span></a>Incorrect: changing a non-observable reference</h4>
+<h4 id="incorrect-changing-a-nonobservable-reference"><a name="incorrect-changing-a-nonobservable-reference" class="plugin-anchor" href="#incorrect-changing-a-nonobservable-reference"><span class="fa fa-link"></span></a>Incorrect: changing a non-observable reference</h4>
 <pre><code class="lang-javascript">autorun(() =&gt; {
     <span class="hljs-built_in">console</span>.log(message.title)
 })
@@ -957,7 +895,7 @@ message.author = { name: <span class="hljs-string">&quot;John&quot;</span> };
 </code></pre>
 <p>The first change will be picked up, <code>message.author</code> and <code>author</code> are the same object, and the <code>.name</code> property is dereferenced in the autorun.
 However the second change will <strong>not</strong> be picked up, the <code>message.author</code> relation is not tracked by the <code>autorun</code>. Autorun is still using the &quot;old&quot; <code>author</code>.</p>
-<h4 id="common-pitfall-console-log"><a name="common-pitfall-console-log" class="plugin-anchor" href="#common-pitfall-console-log"><span class="fa fa-link"></span></a>Common pitfall: console.log</h4>
+<h4 id="common-pitfall-consolelog"><a name="common-pitfall-consolelog" class="plugin-anchor" href="#common-pitfall-consolelog"><span class="fa fa-link"></span></a>Common pitfall: console.log</h4>
 <pre><code class="lang-javascript"><span class="hljs-keyword">const</span> message = observable({ title: <span class="hljs-string">&quot;hello&quot;</span> })
 
 autorun(() =&gt; {
@@ -996,7 +934,7 @@ message.likes.push(<span class="hljs-string">&quot;Jennifer&quot;</span>);
 <p>This will react as expected. <code>.length</code> counts towards a property.
 Note that this will react to <em>any</em> change in the array.
 Arrays are not tracked per index / property (like observable objects and maps) but as a whole.</p>
-<h4 id="incorrect-access-out-of-bounds-indices-in-tracked-function"><a name="incorrect-access-out-of-bounds-indices-in-tracked-function" class="plugin-anchor" href="#incorrect-access-out-of-bounds-indices-in-tracked-function"><span class="fa fa-link"></span></a>Incorrect: access out-of-bounds indices in tracked function</h4>
+<h4 id="incorrect-access-outofbounds-indices-in-tracked-function"><a name="incorrect-access-outofbounds-indices-in-tracked-function" class="plugin-anchor" href="#incorrect-access-outofbounds-indices-in-tracked-function"><span class="fa fa-link"></span></a>Incorrect: access out-of-bounds indices in tracked function</h4>
 <pre><code class="lang-javascript">autorun(() =&gt; {
     <span class="hljs-built_in">console</span>.log(message.likes[<span class="hljs-number">0</span>]);
 })
@@ -1027,7 +965,7 @@ message.likes.push(<span class="hljs-string">&quot;Jennifer&quot;</span>);
 </code></pre>
 <p>This will <strong>not</strong> react. Simply because the <code>likes</code> array itself is not being used by the <code>autorun</code>, only the reference to the array.
 So in contrast, <code>messages.likes = [&quot;Jennifer&quot;]</code> would be picked up; that statement does not modify the array, but the <code>likes</code> property itself.</p>
-<h4 id="using-non-observable-object-properties"><a name="using-non-observable-object-properties" class="plugin-anchor" href="#using-non-observable-object-properties"><span class="fa fa-link"></span></a>Using non-observable object properties</h4>
+<h4 id="using-nonobservable-object-properties"><a name="using-nonobservable-object-properties" class="plugin-anchor" href="#using-nonobservable-object-properties"><span class="fa fa-link"></span></a>Using non-observable object properties</h4>
 <pre><code class="lang-javascript">autorun(() =&gt; {
     <span class="hljs-built_in">console</span>.log(message.postDate)
 })
@@ -1045,7 +983,7 @@ set(message, <span class="hljs-string">&quot;postDate&quot;</span>,  <span class
 <p>In MobX 5 this <strong>will</strong> react, as MobX 5 can track not-yet existing properties.
 Note that this is only done for objects created with <code>observable</code> or <code>observable.object</code>.
 New properties on class instances will not be made observable automatically.</p>
-<h4 id="-mobx-4-and-lower-incorrect-using-not-yet-existing-observable-object-properties"><a name="-mobx-4-and-lower-incorrect-using-not-yet-existing-observable-object-properties" class="plugin-anchor" href="#-mobx-4-and-lower-incorrect-using-not-yet-existing-observable-object-properties"><span class="fa fa-link"></span></a>[MobX 4 and lower] Incorrect: using not yet existing observable object properties</h4>
+<h4 id="mobx-4-and-lower-incorrect-using-not-yet-existing-observable-object-properties"><a name="mobx-4-and-lower-incorrect-using-not-yet-existing-observable-object-properties" class="plugin-anchor" href="#mobx-4-and-lower-incorrect-using-not-yet-existing-observable-object-properties"><span class="fa fa-link"></span></a>[MobX 4 and lower] Incorrect: using not yet existing observable object properties</h4>
 <pre><code class="lang-javascript">autorun(() =&gt; {
     <span class="hljs-built_in">console</span>.log(message.postDate)
 })
@@ -1069,7 +1007,7 @@ twitterUrls.set(<span class="hljs-string">&quot;Sara&quot;</span>, <span class="
 Note that this will initially print <code>undefined</code>.
 You can check for the existence of an entry first by using <code>twitterUrls.has(&quot;Sara&quot;)</code>.
 So for dynamically keyed collections, always use observable maps.</p>
-<h4 id="correct-using-mobx-utilities-to-read-write-to-objects"><a name="correct-using-mobx-utilities-to-read-write-to-objects" class="plugin-anchor" href="#correct-using-mobx-utilities-to-read-write-to-objects"><span class="fa fa-link"></span></a>Correct: using MobX utilities to read / write to objects</h4>
+<h4 id="correct-using-mobx-utilities-to-read--write-to-objects"><a name="correct-using-mobx-utilities-to-read--write-to-objects" class="plugin-anchor" href="#correct-using-mobx-utilities-to-read--write-to-objects"><span class="fa fa-link"></span></a>Correct: using MobX utilities to read / write to objects</h4>
 <p>Since MobX 4 it is also possible to use observable objects as dynamic collection, if they are read / updated by using the mobx apis, so that mobx can keep track of the property changes. The following will react as well:</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">import</span> { get, set, observable } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>
 
@@ -1223,7 +1161,7 @@ const Likes = observer(({ likes }) =&gt;
 <li>* If the <code>Author</code> component was invoked like: <code>&lt;Author author={ message.author.name} /&gt;</code>. Then <code>Message</code> would be the dereferencing component and react to changes to <code>message.author.name</code>. Nonetheless <code>&lt;Author&gt;</code> would rerender as well, because it receives a new value. So performance wise it is best to dereference as late as possible.</li>
 <li>** If likes were objects instead of strings, and if they were rendered by their own <code>Like</code> component, the <code>Likes</code> component would not rerender for changes happening inside a specific like.</li>
 </ol>
-<h2 id="tl-dr"><a name="tl-dr" class="plugin-anchor" href="#tl-dr"><span class="fa fa-link"></span></a>TL;DR</h2>
+<h2 id="tldr"><a name="tldr" class="plugin-anchor" href="#tldr"><span class="fa fa-link"></span></a>TL;DR</h2>
 <blockquote>
 <p>MobX reacts to any <em>existing</em> <strong>observable</strong> <em>property</em> that is read during the execution of a tracked function.</p>
 </blockquote>
@@ -1264,9 +1202,25 @@ const Likes = observer(({ likes }) =&gt;
     <script src="../gitbook/plugins/gitbook-plugin-edit-link/plugin.js"></script>
     
 
+    
+    <script src="../gitbook/plugins/gitbook-plugin-search/lunr.min.js"></script>
+    
+
+    
+    <script src="../gitbook/plugins/gitbook-plugin-search/search.js"></script>
+    
+
+    
+    <script src="../gitbook/plugins/gitbook-plugin-sharing/buttons.js"></script>
+    
+
+    
+    <script src="../gitbook/plugins/gitbook-plugin-fontsettings/buttons.js"></script>
+    
+
 <script>
 require(["gitbook"], function(gitbook) {
-    var config = {"fontSettings":{"theme":null,"family":"sans","size":2},"github":{"url":"https://github.com/mobxjs/mobx"},"edit-link":{"base":"https://github.com/mobxjs/mobx/tree/gh-pages/docs","label":"Edit This Page"},"ga":{"token":"UA-65632006-1","configuration":"auto"},"disqus":{"shortName":"mobservable"}};
+    var config = {"github":{"url":"https://github.com/mobxjs/mobx"},"edit-link":{"base":"https://github.com/mobxjs/mobx/tree/gh-pages/docs","label":"Edit This Page"},"ga":{"token":"UA-65632006-1","configuration":"auto"},"disqus":{"shortName":"mobservable"},"anchors":{},"highlight":{},"search":{"maxIndexSize":1000000},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2}};
     gitbook.start(config);
 });
 </script>

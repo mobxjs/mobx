@@ -8,7 +8,7 @@
         <title>Common Pitfalls &amp; Best Practices | MobX</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
-        <meta name="generator" content="GitBook 2.4.3">
+        <meta name="generator" content="GitBook 2.6.9">
         
         
         <meta name="HandheldFriendly" content="true"/>
@@ -32,6 +32,14 @@
         <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-highlight/website.css">
         
     
+        
+        <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-search/search.css">
+        
+    
+        
+        <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-fontsettings/website.css">
+        
+    
     
 
         
@@ -48,13 +56,16 @@
     <body>
         
         
-    <div class="book" data-level="8.2" data-basepath=".." data-revision="Tue Oct 23 2018 11:39:00 GMT+0200 (CEST)">
+    <div class="book"
+        data-level="8.2"
+        data-chapter-title="Common Pitfalls &amp; Best Practices"
+        data-filepath="best/pitfalls.md"
+        data-basepath=".."
+        data-revision="Fri Nov 30 2018 16:57:29 GMT+0100 (CET)"
+        data-innerlanguage="">
     
 
 <div class="book-summary">
-    <div class="book-search" role="search">
-        <input type="text" placeholder="Type to search" class="form-control" />
-    </div>
     <nav role="navigation">
         <ul class="summary">
             
@@ -775,80 +786,7 @@
         <div class="body-inner">
             <div class="book-header" role="navigation">
     <!-- Actions Left -->
-    <a href="#" class="btn pull-left toggle-summary" aria-label="Table of Contents"><i class="fa fa-align-justify"></i></a>
-    <a href="#" class="btn pull-left toggle-search" aria-label="Search"><i class="fa fa-search"></i></a>
     
-    <div id="font-settings-wrapper" class="dropdown pull-left">
-        <a href="#" class="btn toggle-dropdown" aria-label="Font Settings"><i class="fa fa-font"></i>
-        </a>
-        <div class="dropdown-menu font-settings">
-    <div class="dropdown-caret">
-        <span class="caret-outer"></span>
-        <span class="caret-inner"></span>
-    </div>
-
-    <div class="buttons">
-        <button type="button" id="reduce-font-size" class="button size-2">A</button>
-        <button type="button" id="enlarge-font-size" class="button size-2">A</button>
-    </div>
-
-    <div class="buttons font-family-list">
-        <button type="button" data-font="0" class="button">Serif</button>
-        <button type="button" data-font="1" class="button">Sans</button>
-    </div>
-
-    <div class="buttons color-theme-list">
-        <button type="button" id="color-theme-preview-0" class="button size-3" data-theme="0">White</button>
-        <button type="button" id="color-theme-preview-1" class="button size-3" data-theme="1">Sepia</button>
-        <button type="button" id="color-theme-preview-2" class="button size-3" data-theme="2">Night</button>
-    </div>
-</div>
-
-    </div>
-
-    <!-- Actions Right -->
-    
-    <div class="dropdown pull-right">
-        <a href="#" class="btn toggle-dropdown" aria-label="Share"><i class="fa fa-share-alt"></i>
-        </a>
-        <div class="dropdown-menu font-settings dropdown-left">
-            <div class="dropdown-caret">
-                <span class="caret-outer"></span>
-                <span class="caret-inner"></span>
-            </div>
-            <div class="buttons">
-                <button type="button" data-sharing="twitter" class="button">
-                    Share on Twitter
-                </button>
-                <button type="button" data-sharing="google-plus" class="button">
-                    Share on Google
-                </button>
-                <button type="button" data-sharing="facebook" class="button">
-                    Share on Facebook
-                </button>
-                <button type="button" data-sharing="weibo" class="button">
-                    Share on Weibo
-                </button>
-                <button type="button" data-sharing="instapaper" class="button">
-                    Share on Instapaper
-                </button>
-            </div>
-        </div>
-    </div>
-    
-
-    
-    <a href="#" target="_blank" class="btn pull-right google-plus-sharing-link sharing-link" data-sharing="google-plus" aria-label="Google"><i class="fa fa-google-plus"></i></a>
-    
-    
-    <a href="#" target="_blank" class="btn pull-right facebook-sharing-link sharing-link" data-sharing="facebook" aria-label="Facebook"><i class="fa fa-facebook"></i></a>
-    
-    
-    <a href="#" target="_blank" class="btn pull-right twitter-sharing-link sharing-link" data-sharing="twitter" aria-label="Twitter"><i class="fa fa-twitter"></i></a>
-    
-    
-    
-
 
     <!-- Title -->
     <h1>
@@ -863,7 +801,7 @@
                 
                     <section class="normal" id="section-">
                     
-                        <html><head></head><body><a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/best/pitfalls.md" class="btn fa fa-edit pull-left">&#xA0;&#xA0;Edit This Page</a><h1 id="common-pitfalls-best-practices"><a name="common-pitfalls-best-practices" class="plugin-anchor" href="#common-pitfalls-best-practices"><span class="fa fa-link"></span></a>Common pitfalls &amp; best practices</h1>
+                        <html><head></head><body><a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/best/pitfalls.md" class="btn fa fa-edit pull-left">&#xA0;&#xA0;Edit This Page</a><h1 id="common-pitfalls--best-practices"><a name="common-pitfalls--best-practices" class="plugin-anchor" href="#common-pitfalls--best-practices"><span class="fa fa-link"></span></a>Common pitfalls &amp; best practices</h1>
 <p>Stuck with MobX? This section contains a list of common issues people new to MobX might run into.</p>
 <h4 id="importing-from-wrong-location"><a name="importing-from-wrong-location" class="plugin-anchor" href="#importing-from-wrong-location"><span class="fa fa-link"></span></a>Importing from wrong location</h4>
 <p>Because MobX ships with typescript typings out of the box, some import autocompleting tools (at least in VSCode) have the habit of auto completing with a wrong import, like</p>
@@ -876,14 +814,14 @@
 </code></pre>
 <h4 id="issues-with-decorators"><a name="issues-with-decorators" class="plugin-anchor" href="#issues-with-decorators"><span class="fa fa-link"></span></a>Issues with decorators?</h4>
 <p>For setup tips and limitations on decorators, check the <a href="decorators.html">decorators</a> page</p>
-<h4 id="-array-isarray-observable-1-2-3-false"><a name="-array-isarray-observable-1-2-3-false" class="plugin-anchor" href="#-array-isarray-observable-1-2-3-false"><span class="fa fa-link"></span></a><code>Array.isArray(observable([1,2,3])) === false</code></h4>
+<h4 id="arrayisarrayobservable123--false"><a name="arrayisarrayobservable123--false" class="plugin-anchor" href="#arrayisarrayobservable123--false"><span class="fa fa-link"></span></a><code>Array.isArray(observable([1,2,3])) === false</code></h4>
 <p><em>This limitation applies to MobX 4 and lower only</em></p>
 <p>In ES5 there is no way to reliably inherit from arrays, and hence observable arrays inherit from objects.
 This means that regularly libraries are not able to recognize observable arrays as normal arrays (like lodash, or built-in operations like <code>Array.concat</code>).
 This can simply be fixed by passing calling <code>observable.toJS()</code> or <code>observable.slice()</code> before passing the array to another library.
 As long as the external library has no intent to modify the array, this will further work completely as expected.
 You can use <code>isObservableArray(observable)</code> to check whether something is an observable array.</p>
-<h4 id="-object-somenewprop-value-is-not-picked-up"><a name="-object-somenewprop-value-is-not-picked-up" class="plugin-anchor" href="#-object-somenewprop-value-is-not-picked-up"><span class="fa fa-link"></span></a><code>object.someNewProp = value</code> is not picked up</h4>
+<h4 id="objectsomenewprop--value-is-not-picked-up"><a name="objectsomenewprop--value-is-not-picked-up" class="plugin-anchor" href="#objectsomenewprop--value-is-not-picked-up"><span class="fa fa-link"></span></a><code>object.someNewProp = value</code> is not picked up</h4>
 <p><em>This limitation applies to MobX 4 and lower</em></p>
 <p><em>In MobX 5 this limitation applies to class instances and other objects that were <strong>not</strong> created using <code>observable()</code> / <code>observable.object()</code>.</em></p>
 <p>MobX observable <em>objects</em> do not detect or react to property assignments that weren&apos;t declared observable before.
@@ -892,10 +830,10 @@ You can use <code>extendObservable(target, props)</code> to introduce new observ
 However object iterators like <code>for .. in</code> or <code>Object.keys()</code> won&apos;t react to this automatically.
 If you need a dynamically keyed object in MobX 4 and lower, for example to store users by id, create observable <em>maps</em> using <a href="../refguide/map.html"><code>observable.map</code></a> or use the utility methods as exposed by the <a href="../refguide/object-api.html">Object API</a>.
 For more info see <a href="react.html">what will MobX react to?</a>.</p>
-<h3 id="use-observer-on-all-components-that-render-observable-s"><a name="use-observer-on-all-components-that-render-observable-s" class="plugin-anchor" href="#use-observer-on-all-components-that-render-observable-s"><span class="fa fa-link"></span></a>Use <code>@observer</code> on all components that render <code>@observable</code>s.</h3>
+<h3 id="use-observer-on-all-components-that-render-observables"><a name="use-observer-on-all-components-that-render-observables" class="plugin-anchor" href="#use-observer-on-all-components-that-render-observables"><span class="fa fa-link"></span></a>Use <code>@observer</code> on all components that render <code>@observable</code>s.</h3>
 <p><code>@observer</code> only enhances the component you are decorating, not the components used inside it.
 So usually all your components should be decorated. Don&apos;t worry, this is not inefficient, in contrast, more <code>observer</code> components make rendering more efficient.</p>
-<h3 id="don-t-copy-observables-properties-and-store-them-locally"><a name="don-t-copy-observables-properties-and-store-them-locally" class="plugin-anchor" href="#don-t-copy-observables-properties-and-store-them-locally"><span class="fa fa-link"></span></a>Don&apos;t copy observables properties and store them locally</h3>
+<h3 id="dont-copy-observables-properties-and-store-them-locally"><a name="dont-copy-observables-properties-and-store-them-locally" class="plugin-anchor" href="#dont-copy-observables-properties-and-store-them-locally"><span class="fa fa-link"></span></a>Don&apos;t copy observables properties and store them locally</h3>
 <p>Observer components only track data that is accessed <em>during</em> the render method. A common mistake is that data plucked of from an observable property and stored will for that reason not be tracked:</p>
 <pre><code class="lang-javascript"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">User</span> </span>{
   @observable name
@@ -1041,7 +979,7 @@ const _MyComponent = observer((props =&gt; <span class="hljs-tag">&lt;<span clas
 <p>For more info see <a href="https://github.com/mobxjs/mobx/issues/476" target="_blank">#476</a></p>
 <h4 id="declaring-proptypes-might-cause-unnecessary-renders-in-dev-mode"><a name="declaring-proptypes-might-cause-unnecessary-renders-in-dev-mode" class="plugin-anchor" href="#declaring-proptypes-might-cause-unnecessary-renders-in-dev-mode"><span class="fa fa-link"></span></a>Declaring propTypes might cause unnecessary renders in dev mode</h4>
 <p>See: <a href="https://github.com/mobxjs/mobx-react/issues/56" target="_blank">https://github.com/mobxjs/mobx-react/issues/56</a></p>
-<h4 id="don-t-decorate-some-react-lifecycle-methods-as-action-bound-on-observer-react-components"><a name="don-t-decorate-some-react-lifecycle-methods-as-action-bound-on-observer-react-components" class="plugin-anchor" href="#don-t-decorate-some-react-lifecycle-methods-as-action-bound-on-observer-react-components"><span class="fa fa-link"></span></a>Don&apos;t decorate (some) React lifecycle methods as <code>action.bound</code> on <code>Observer</code> React components</h4>
+<h4 id="dont-decorate-some-react-lifecycle-methods-as-actionbound-on-observer-react-components"><a name="dont-decorate-some-react-lifecycle-methods-as-actionbound-on-observer-react-components" class="plugin-anchor" href="#dont-decorate-some-react-lifecycle-methods-as-actionbound-on-observer-react-components"><span class="fa fa-link"></span></a>Don&apos;t decorate (some) React lifecycle methods as <code>action.bound</code> on <code>Observer</code> React components</h4>
 <p>As mentioned above, all React components which used observable data should be marked as <code>@observer</code> Additionally, if you are going to be modifying any observable data in a function in your React component, that function should be marked as <code>@action</code>. Additionally, if you want <code>this</code> to refer to the instance of your component class, you should use <code>@action.bound</code>. Consider the following class:</p>
 <pre><code class="lang-js"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ExampleComponent</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">Component</span> </span>{
   @observable disposer <span class="hljs-comment">// &lt;--- this value is disposed in addActed</span>
@@ -1115,9 +1053,25 @@ const _MyComponent = observer((props =&gt; <span class="hljs-tag">&lt;<span clas
     <script src="../gitbook/plugins/gitbook-plugin-edit-link/plugin.js"></script>
     
 
+    
+    <script src="../gitbook/plugins/gitbook-plugin-search/lunr.min.js"></script>
+    
+
+    
+    <script src="../gitbook/plugins/gitbook-plugin-search/search.js"></script>
+    
+
+    
+    <script src="../gitbook/plugins/gitbook-plugin-sharing/buttons.js"></script>
+    
+
+    
+    <script src="../gitbook/plugins/gitbook-plugin-fontsettings/buttons.js"></script>
+    
+
 <script>
 require(["gitbook"], function(gitbook) {
-    var config = {"fontSettings":{"theme":null,"family":"sans","size":2},"github":{"url":"https://github.com/mobxjs/mobx"},"edit-link":{"base":"https://github.com/mobxjs/mobx/tree/gh-pages/docs","label":"Edit This Page"},"ga":{"token":"UA-65632006-1","configuration":"auto"},"disqus":{"shortName":"mobservable"}};
+    var config = {"github":{"url":"https://github.com/mobxjs/mobx"},"edit-link":{"base":"https://github.com/mobxjs/mobx/tree/gh-pages/docs","label":"Edit This Page"},"ga":{"token":"UA-65632006-1","configuration":"auto"},"disqus":{"shortName":"mobservable"},"anchors":{},"highlight":{},"search":{"maxIndexSize":1000000},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2}};
     gitbook.start(config);
 });
 </script>

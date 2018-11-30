@@ -8,7 +8,7 @@
         <title>API overview | MobX</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
-        <meta name="generator" content="GitBook 2.4.3">
+        <meta name="generator" content="GitBook 2.6.9">
         
         
         <meta name="HandheldFriendly" content="true"/>
@@ -32,6 +32,14 @@
         <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-highlight/website.css">
         
     
+        
+        <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-search/search.css">
+        
+    
+        
+        <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-fontsettings/website.css">
+        
+    
     
 
         
@@ -48,13 +56,16 @@
     <body>
         
         
-    <div class="book" data-level="2" data-basepath=".." data-revision="Tue Oct 23 2018 11:39:00 GMT+0200 (CEST)">
+    <div class="book"
+        data-level="2"
+        data-chapter-title="API overview"
+        data-filepath="refguide/api.md"
+        data-basepath=".."
+        data-revision="Fri Nov 30 2018 16:57:29 GMT+0100 (CET)"
+        data-innerlanguage="">
     
 
 <div class="book-summary">
-    <div class="book-search" role="search">
-        <input type="text" placeholder="Type to search" class="form-control" />
-    </div>
     <nav role="navigation">
         <ul class="summary">
             
@@ -775,80 +786,7 @@
         <div class="body-inner">
             <div class="book-header" role="navigation">
     <!-- Actions Left -->
-    <a href="#" class="btn pull-left toggle-summary" aria-label="Table of Contents"><i class="fa fa-align-justify"></i></a>
-    <a href="#" class="btn pull-left toggle-search" aria-label="Search"><i class="fa fa-search"></i></a>
     
-    <div id="font-settings-wrapper" class="dropdown pull-left">
-        <a href="#" class="btn toggle-dropdown" aria-label="Font Settings"><i class="fa fa-font"></i>
-        </a>
-        <div class="dropdown-menu font-settings">
-    <div class="dropdown-caret">
-        <span class="caret-outer"></span>
-        <span class="caret-inner"></span>
-    </div>
-
-    <div class="buttons">
-        <button type="button" id="reduce-font-size" class="button size-2">A</button>
-        <button type="button" id="enlarge-font-size" class="button size-2">A</button>
-    </div>
-
-    <div class="buttons font-family-list">
-        <button type="button" data-font="0" class="button">Serif</button>
-        <button type="button" data-font="1" class="button">Sans</button>
-    </div>
-
-    <div class="buttons color-theme-list">
-        <button type="button" id="color-theme-preview-0" class="button size-3" data-theme="0">White</button>
-        <button type="button" id="color-theme-preview-1" class="button size-3" data-theme="1">Sepia</button>
-        <button type="button" id="color-theme-preview-2" class="button size-3" data-theme="2">Night</button>
-    </div>
-</div>
-
-    </div>
-
-    <!-- Actions Right -->
-    
-    <div class="dropdown pull-right">
-        <a href="#" class="btn toggle-dropdown" aria-label="Share"><i class="fa fa-share-alt"></i>
-        </a>
-        <div class="dropdown-menu font-settings dropdown-left">
-            <div class="dropdown-caret">
-                <span class="caret-outer"></span>
-                <span class="caret-inner"></span>
-            </div>
-            <div class="buttons">
-                <button type="button" data-sharing="twitter" class="button">
-                    Share on Twitter
-                </button>
-                <button type="button" data-sharing="google-plus" class="button">
-                    Share on Google
-                </button>
-                <button type="button" data-sharing="facebook" class="button">
-                    Share on Facebook
-                </button>
-                <button type="button" data-sharing="weibo" class="button">
-                    Share on Weibo
-                </button>
-                <button type="button" data-sharing="instapaper" class="button">
-                    Share on Instapaper
-                </button>
-            </div>
-        </div>
-    </div>
-    
-
-    
-    <a href="#" target="_blank" class="btn pull-right google-plus-sharing-link sharing-link" data-sharing="google-plus" aria-label="Google"><i class="fa fa-google-plus"></i></a>
-    
-    
-    <a href="#" target="_blank" class="btn pull-right facebook-sharing-link sharing-link" data-sharing="facebook" aria-label="Facebook"><i class="fa fa-facebook"></i></a>
-    
-    
-    <a href="#" target="_blank" class="btn pull-right twitter-sharing-link sharing-link" data-sharing="twitter" aria-label="Twitter"><i class="fa fa-twitter"></i></a>
-    
-    
-    
-
 
     <!-- Title -->
     <h1>
@@ -877,7 +815,7 @@
  to master MobX and use it in your applications!</p>
 </blockquote>
 <h2 id="creating-observables"><a name="creating-observables" class="plugin-anchor" href="#creating-observables"><span class="fa fa-link"></span></a>Creating observables</h2>
-<h3 id="-observable-value"><a name="-observable-value" class="plugin-anchor" href="#-observable-value"><span class="fa fa-link"></span></a><code>observable(value)</code></h3>
+<h3 id="observablevalue"><a name="observablevalue" class="plugin-anchor" href="#observablevalue"><span class="fa fa-link"></span></a><code>observable(value)</code></h3>
 <p>Usage:</p>
 <ul>
 <li><code>observable(value)</code></li>
@@ -909,31 +847,31 @@
 <li><em>[MobX 4 and below]</em> To create dynamically keyed objects, always use maps! Only initially existing properties on an object will be made observable, although new ones can be added using <code>extendObservable</code>.</li>
 </ul>
 <p><a href="observable.html">&#xAB;<code>observable</code>&#xBB;</a>  &#x2014;  <a href="observable-decorator.html">&#xAB;<code>@observable</code>&#xBB;</a></p>
-<h3 id="-observable-property-value"><a name="-observable-property-value" class="plugin-anchor" href="#-observable-property-value"><span class="fa fa-link"></span></a><code>@observable property =  value</code></h3>
+<h3 id="observable-property---value"><a name="observable-property---value" class="plugin-anchor" href="#observable-property---value"><span class="fa fa-link"></span></a><code>@observable property =  value</code></h3>
 <p><code>observable</code> can also be used as property decorator. It requires <a href="../best/decorators.html">decorators to be enabled</a> and is syntactic
 sugar for <code>extendObservable(this, { property: value })</code>.</p>
 <p><a href="observable-decorator.html">&#xAB;<code>details</code>&#xBB;</a></p>
-<h3 id="-observable-box-value-options"><a name="-observable-box-value-options" class="plugin-anchor" href="#-observable-box-value-options"><span class="fa fa-link"></span></a><code>observable.box(value, options?)</code></h3>
+<h3 id="observableboxvalue-options"><a name="observableboxvalue-options" class="plugin-anchor" href="#observableboxvalue-options"><span class="fa fa-link"></span></a><code>observable.box(value, options?)</code></h3>
 <p>Creates an observable <em>box</em> that stores an observable reference to a value. Use <code>get()</code> to get the current value of the box, and <code>set()</code> to update it.
 This is the foundation on which all other observables are built, but in practice you will use it rarely.</p>
 <p>Normal boxes will automatically try to turn any new value into an observable if it isn&apos;t already. Use the <code>{deep: false}</code> option to disable this behavior.</p>
 <p><a href="boxed.html">&#xAB;<code>details</code>&#xBB;</a></p>
-<h3 id="-observable-object-value-decorators-options"><a name="-observable-object-value-decorators-options" class="plugin-anchor" href="#-observable-object-value-decorators-options"><span class="fa fa-link"></span></a><code>observable.object(value, decorators?, options?)</code></h3>
+<h3 id="observableobjectvalue-decorators-options"><a name="observableobjectvalue-decorators-options" class="plugin-anchor" href="#observableobjectvalue-decorators-options"><span class="fa fa-link"></span></a><code>observable.object(value, decorators?, options?)</code></h3>
 <p>Creates a clone of the provided object and makes all its properties observable.
 By default any values in those properties will be made observable as well, but when using the <code>{deep: false}</code> options, only the properties will be made into observable
 references, leaving the values untouched. (This holds also for any values assigned in the future).</p>
 <p>The second argument in <code>observable.object()</code> can be used to fine tune the observability with <a href="#decorators"><code>decorators</code></a>.</p>
 <p><a href="object.html">&#xAB;<code>details</code>&#xBB;</a></p>
-<h3 id="-observable-array-value-options"><a name="-observable-array-value-options" class="plugin-anchor" href="#-observable-array-value-options"><span class="fa fa-link"></span></a><code>observable.array(value, options?)</code></h3>
+<h3 id="observablearrayvalue-options"><a name="observablearrayvalue-options" class="plugin-anchor" href="#observablearrayvalue-options"><span class="fa fa-link"></span></a><code>observable.array(value, options?)</code></h3>
 <p>Creates a new observable array based on the provided value.</p>
 <p>Use the <code>{deep: false}</code> option if the values in the array should not be turned into observables.</p>
 <p><a href="array.html">&#xAB;<code>details</code>&#xBB;</a></p>
-<h3 id="-observable-map-value-options"><a name="-observable-map-value-options" class="plugin-anchor" href="#-observable-map-value-options"><span class="fa fa-link"></span></a><code>observable.map(value, options?)</code></h3>
+<h3 id="observablemapvalue-options"><a name="observablemapvalue-options" class="plugin-anchor" href="#observablemapvalue-options"><span class="fa fa-link"></span></a><code>observable.map(value, options?)</code></h3>
 <p>Creates a new observable map based on the provided value. Use the <code>{deep: false}</code> option if the values in the map should not be turned into observables.</p>
 <p>Use <code>map</code> whenever you want to create a dynamically keyed collections and the addition / removal of keys needs to be observed.
 Since this uses the full-blown <em>ES6 Map</em> internally, you are free to use any type for the key and <em>not limited</em> to string keys.</p>
 <p><a href="map.html">&#xAB;<code>details</code>&#xBB;</a></p>
-<h3 id="-extendobservable"><a name="-extendobservable" class="plugin-anchor" href="#-extendobservable"><span class="fa fa-link"></span></a><code>extendObservable</code></h3>
+<h3 id="extendobservable"><a name="extendobservable" class="plugin-anchor" href="#extendobservable"><span class="fa fa-link"></span></a><code>extendObservable</code></h3>
 <p>Usage: <code>extendObservable(target, properties, decorators?, options?)</code>.</p>
 <p>For each key/value pair in each <code>propertyMap</code> a (new) observable property will be introduced on the target object.
 This can be used in constructor functions to introduce observable properties without using decorators.
@@ -973,7 +911,7 @@ Note that decorators always &apos;stick&apos; to the property. So they will rema
 })
 </code></pre>
 <p><a href="modifiers.html">&#xAB;details&#xBB;</a></p>
-<h3 id="-decorate"><a name="-decorate" class="plugin-anchor" href="#-decorate"><span class="fa fa-link"></span></a><code>decorate</code></h3>
+<h3 id="decorate"><a name="decorate" class="plugin-anchor" href="#decorate"><span class="fa fa-link"></span></a><code>decorate</code></h3>
 <p>Usage: <code>decorate(object, decorators)</code>
 This is a convenience method to apply observability <a href="#decorators">decorators</a> to the properties of a plain object or class instance. The second argument is an object with properties set to certain decorators.</p>
 <p>Use this if you cannot use the <em>@decorator</em> syntax or need more control over setting observability.</p>
@@ -1105,12 +1043,12 @@ The returned promise itself will reject with <code>FLOW_CANCELLED</code></p>
 
 <span class="hljs-keyword">const</span> res = <span class="hljs-keyword">await</span> count() <span class="hljs-comment">// 6</span>
 </code></pre>
-<h2 id="reactions-derivations"><a name="reactions-derivations" class="plugin-anchor" href="#reactions-derivations"><span class="fa fa-link"></span></a>Reactions &amp; Derivations</h2>
+<h2 id="reactions--derivations"><a name="reactions--derivations" class="plugin-anchor" href="#reactions--derivations"><span class="fa fa-link"></span></a>Reactions &amp; Derivations</h2>
 <p><em>Computed values</em> are <strong>values</strong> that react automatically to state changes.
 <em>Reactions</em> are <strong>side effects</strong> that react automatically to state changes.
 Reactions <em>can</em> be used to ensure that a certain side effect (mainly I/O) is automatically executed when relevant state changes, like logging, network requests etc.
 The most commonly used reaction is the <code>observer</code> decorator for React components (see below).</p>
-<h3 id="-observer"><a name="-observer" class="plugin-anchor" href="#-observer"><span class="fa fa-link"></span></a><code>observer</code></h3>
+<h3 id="observer"><a name="observer" class="plugin-anchor" href="#observer"><span class="fa fa-link"></span></a><code>observer</code></h3>
 <p>Can be used as higher order component around a React component.
 The component will then automatically re-render if any of the observables used in the <code>render</code> function of the component has changed.
 Note that <code>observer</code> is provided by the <code>&quot;mobx-react&quot;</code> package and not by <code>&quot;mobx&quot;</code> itself.</p>
@@ -1122,7 +1060,7 @@ Note that <code>observer</code> is provided by the <code>&quot;mobx-react&quot;<
 <li><code>observer(class MyComponent extends React.Component { ... })</code></li>
 <li><code>@observer class MyComponent extends React.Component { ... }</code></li>
 </ul>
-<h3 id="-autorun"><a name="-autorun" class="plugin-anchor" href="#-autorun"><span class="fa fa-link"></span></a><code>autorun</code></h3>
+<h3 id="autorun"><a name="autorun" class="plugin-anchor" href="#autorun"><span class="fa fa-link"></span></a><code>autorun</code></h3>
 <p>Usage: <code>autorun(() =&gt; { sideEffect }, options)</code>. Autorun runs the provided <code>sideEffect</code> and tracks which observable state is accessed while running the side effect.
 Whenever one of the used observables is changed in the future, the same sideEffect will be run again.
 Returns a disposer function to cancel the side effect.</p>
@@ -1134,7 +1072,7 @@ Returns a disposer function to cancel the side effect.</p>
 <li><strong><code>onError?: (error) =&gt; void</code></strong>: error handler that will be triggered if the autorun function throws an exception</li>
 <li><strong><code>scheduler?: (callback) =&gt; void</code></strong>: Set a custom scheduler to determine how re-running the autorun function should be scheduled</li>
 </ul>
-<h3 id="-when"><a name="-when" class="plugin-anchor" href="#-when"><span class="fa fa-link"></span></a><code>when</code></h3>
+<h3 id="when"><a name="when" class="plugin-anchor" href="#when"><span class="fa fa-link"></span></a><code>when</code></h3>
 <p>Usage: <code>when(() =&gt; condition, () =&gt; { sideEffect }, options)</code>.
 The condition expression will react automatically to any observables it uses.
 As soon as the expression returns true the sideEffect function will be invoked, but only once.</p>
@@ -1148,7 +1086,7 @@ As soon as the expression returns true the sideEffect function will be invoked, 
 <li><strong><code>onError?: (error) =&gt; void</code></strong>: error handler that will be triggered if the <em>predicate-function</em> or the <em>effect-function</em> throws an exception</li>
 <li><strong><code>timeout: number</code></strong> a timeout in milliseconds, after which the <code>onError</code> handler will be triggered to signal the condition not being met within a certain time</li>
 </ul>
-<h3 id="-reaction"><a name="-reaction" class="plugin-anchor" href="#-reaction"><span class="fa fa-link"></span></a><code>reaction</code></h3>
+<h3 id="reaction"><a name="reaction" class="plugin-anchor" href="#reaction"><span class="fa fa-link"></span></a><code>reaction</code></h3>
 <p>Usage: <code>reaction(() =&gt; data, data =&gt; { sideEffect }, options)</code>.
 A variation on <code>autorun</code> that gives more fine-grained control on which observables that will be tracked.
 It takes two function, the first one is tracked and returns data that is used as input for the second one, the side effect.
@@ -1162,7 +1100,7 @@ The side effect can be debounced, just like <code>autorunAsync</code>.</p>
 <li><strong><code>equals</code></strong>: Custom equality function to determine whether the expr function differed from it&apos;s previous result, and hence should fire effect. Accepts the same options as the equals option of <code>computed</code>.</li>
 <li>Also accepts all of the options from <a href="#autorun"><code>autorun</code></a></li>
 </ul>
-<h3 id="-onreactionerror"><a name="-onreactionerror" class="plugin-anchor" href="#-onreactionerror"><span class="fa fa-link"></span></a><code>onReactionError</code></h3>
+<h3 id="onreactionerror"><a name="onreactionerror" class="plugin-anchor" href="#onreactionerror"><span class="fa fa-link"></span></a><code>onReactionError</code></h3>
 <p>Usage: <code>onReactionError(handler: (error: any, derivation) =&gt; void)</code></p>
 <p>This method attaches a global error listener, which is invoked for every error that is thrown from a <em>reaction</em>.
 This can be used for monitoring or test purposes.</p>
@@ -1170,9 +1108,9 @@ This can be used for monitoring or test purposes.</p>
 <h1 id="utilities"><a name="utilities" class="plugin-anchor" href="#utilities"><span class="fa fa-link"></span></a>Utilities</h1>
 <p><em>Here are some utilities that might make working with observable objects or computed values more convenient.
 More, less trivial utilities can be found in the * <a href="https://github.com/mobxjs/mobx-utils" target="_blank">mobx-utils</a> package.</em></p>
-<h3 id="-provider-mobx-react-package"><a name="-provider-mobx-react-package" class="plugin-anchor" href="#-provider-mobx-react-package"><span class="fa fa-link"></span></a><code>Provider</code> (<code>mobx-react</code> package)</h3>
+<h3 id="provider-mobxreact-package"><a name="provider-mobxreact-package" class="plugin-anchor" href="#provider-mobxreact-package"><span class="fa fa-link"></span></a><code>Provider</code> (<code>mobx-react</code> package)</h3>
 <p>Can be used to pass stores to child components using React&apos;s context mechanism. See the <a href="https://github.com/mobxjs/mobx-react#provider-experimental" target="_blank"><code>mobx-react</code> docs</a>.</p>
-<h3 id="-inject-mobx-react-package"><a name="-inject-mobx-react-package" class="plugin-anchor" href="#-inject-mobx-react-package"><span class="fa fa-link"></span></a><code>inject</code> (<code>mobx-react</code> package)</h3>
+<h3 id="inject-mobxreact-package"><a name="inject-mobxreact-package" class="plugin-anchor" href="#inject-mobxreact-package"><span class="fa fa-link"></span></a><code>inject</code> (<code>mobx-react</code> package)</h3>
 <p>Higher order component and counterpart of <code>Provider</code>. Can be used to pick stores from React&apos;s context and pass it as props to the target component. Usage:</p>
 <ul>
 <li><code>inject(&quot;store1&quot;, &quot;store2&quot;)(observer(MyComponent))</code></li>
@@ -1180,7 +1118,7 @@ More, less trivial utilities can be found in the * <a href="https://github.com/m
 <li><code>@inject((stores, props, context) =&gt; props) @observer MyComponent</code></li>
 <li><code>@observer([&quot;store1&quot;, &quot;store2&quot;]) MyComponent</code> is a shorthand for the the <code>@inject() @observer</code> combo.</li>
 </ul>
-<h3 id="-tojs"><a name="-tojs" class="plugin-anchor" href="#-tojs"><span class="fa fa-link"></span></a><code>toJS</code></h3>
+<h3 id="tojs"><a name="tojs" class="plugin-anchor" href="#tojs"><span class="fa fa-link"></span></a><code>toJS</code></h3>
 <p>Usage: <code>toJS(observableDataStructure, options?)</code>. Converts observable data structures back to plain javascript objects, ignoring computed values.</p>
 <p>The <code>options</code> include:</p>
 <ul>
@@ -1188,29 +1126,29 @@ More, less trivial utilities can be found in the * <a href="https://github.com/m
 <li><strong><code>exportMapsAsObjects: boolean</code></strong>: Treats ES6 Maps as regular objects for export. Defaults to <code>true</code></li>
 </ul>
 <p><a href="tojson.html">&#xAB;details&#xBB;</a>.</p>
-<h3 id="-isobservable-and-isobservableprop"><a name="-isobservable-and-isobservableprop" class="plugin-anchor" href="#-isobservable-and-isobservableprop"><span class="fa fa-link"></span></a><code>isObservable</code> and <code>isObservableProp</code></h3>
+<h3 id="isobservable-and-isobservableprop"><a name="isobservable-and-isobservableprop" class="plugin-anchor" href="#isobservable-and-isobservableprop"><span class="fa fa-link"></span></a><code>isObservable</code> and <code>isObservableProp</code></h3>
 <p>Usage: <code>isObservable(thing)</code> or <code>isObservableProp(thing, property?)</code>. Returns true if the given thing, or the <code>property</code> of the given thing is observable.
 Works for all observables, computed values and disposer functions of reactions.</p>
 <p><a href="is-observable">&#xAB;details&#xBB;</a></p>
-<h3 id="-isobservableobject-array-map-and-isboxedobservable"><a name="-isobservableobject-array-map-and-isboxedobservable" class="plugin-anchor" href="#-isobservableobject-array-map-and-isboxedobservable"><span class="fa fa-link"></span></a><code>isObservableObject|Array|Map</code> and <code>isBoxedObservable</code></h3>
+<h3 id="isobservableobjectarraymap-and-isboxedobservable"><a name="isobservableobjectarraymap-and-isboxedobservable" class="plugin-anchor" href="#isobservableobjectarraymap-and-isboxedobservable"><span class="fa fa-link"></span></a><code>isObservableObject|Array|Map</code> and <code>isBoxedObservable</code></h3>
 <p>Usage: <code>isObservableObject(thing)</code>, <code>isObservableArray(thing)</code>, <code>isObservableMap(thing)</code>, <code>isBoxedObservable(thing)</code>. Returns <code>true</code> if.., well, do the math.</p>
-<h3 id="-isarraylike"><a name="-isarraylike" class="plugin-anchor" href="#-isarraylike"><span class="fa fa-link"></span></a><code>isArrayLike</code></h3>
+<h3 id="isarraylike"><a name="isarraylike" class="plugin-anchor" href="#isarraylike"><span class="fa fa-link"></span></a><code>isArrayLike</code></h3>
 <p>Usage: <code>isArrayLike(thing)</code>. Returns <code>true</code> if the given thing is either a true JS-array or an observable (MobX-)array.
 This is intended as convenience/shorthand.
 Note that observable arrays can be <code>.slice()</code>d to turn them into true JS-arrays.</p>
-<h3 id="-isaction"><a name="-isaction" class="plugin-anchor" href="#-isaction"><span class="fa fa-link"></span></a><code>isAction</code></h3>
+<h3 id="isaction"><a name="isaction" class="plugin-anchor" href="#isaction"><span class="fa fa-link"></span></a><code>isAction</code></h3>
 <p>Usage: <code>isAction(func)</code>. Returns true if the given function is wrapped / decorated with <code>action</code>.</p>
-<h3 id="-iscomputed-and-iscomputedprop"><a name="-iscomputed-and-iscomputedprop" class="plugin-anchor" href="#-iscomputed-and-iscomputedprop"><span class="fa fa-link"></span></a><code>isComputed</code> and <code>isComputedProp</code></h3>
+<h3 id="iscomputed-and-iscomputedprop"><a name="iscomputed-and-iscomputedprop" class="plugin-anchor" href="#iscomputed-and-iscomputedprop"><span class="fa fa-link"></span></a><code>isComputed</code> and <code>isComputedProp</code></h3>
 <p>Usage: <code>isComputed(thing)</code> or <code>isComputedProp(thing, property?)</code>. Returns true if the given thing is a boxed computed value, or if the designated property is a computed value.</p>
-<h3 id="-intercept"><a name="-intercept" class="plugin-anchor" href="#-intercept"><span class="fa fa-link"></span></a><code>intercept</code></h3>
+<h3 id="intercept"><a name="intercept" class="plugin-anchor" href="#intercept"><span class="fa fa-link"></span></a><code>intercept</code></h3>
 <p>Usage: <code>intercept(object, property?, interceptor)</code>.
 Api that can be used to intercept changes before they are applied to an observable api. Useful for validation, normalization or cancellation.</p>
 <p><a href="observe.html">&#xAB;details&#xBB;</a></p>
-<h3 id="-observe"><a name="-observe" class="plugin-anchor" href="#-observe"><span class="fa fa-link"></span></a><code>observe</code></h3>
+<h3 id="observe"><a name="observe" class="plugin-anchor" href="#observe"><span class="fa fa-link"></span></a><code>observe</code></h3>
 <p>Usage: <code>observe(object, property?, listener, fireImmediately = false)</code>
 Low-level api that can be used to observe a single observable value.</p>
 <p><a href="observe.html">&#xAB;details&#xBB;</a></p>
-<h3 id="-onbecomeobserved-and-onbecomeunobserved"><a name="-onbecomeobserved-and-onbecomeunobserved" class="plugin-anchor" href="#-onbecomeobserved-and-onbecomeunobserved"><span class="fa fa-link"></span></a><code>onBecomeObserved</code> and <code>onBecomeUnobserved</code></h3>
+<h3 id="onbecomeobserved-and-onbecomeunobserved"><a name="onbecomeobserved-and-onbecomeunobserved" class="plugin-anchor" href="#onbecomeobserved-and-onbecomeunobserved"><span class="fa fa-link"></span></a><code>onBecomeObserved</code> and <code>onBecomeUnobserved</code></h3>
 <p>Usage: <code>onBecomeObserved(observable, property?, listener: () =&gt; void): (() =&gt; void)</code> and
 <code>onBecomeUnobserved(observable, property?, listener: () =&gt; void): (() =&gt; void)</code></p>
 <p>These functions are hooks into the observability system of MobX and get notified when observables <em>start</em> / <em>stop</em> becoming observed. It can be used to execute some lazy operations or perform network fetches.</p>
@@ -1244,7 +1182,7 @@ Low-level api that can be used to observe a single observable value.</p>
     }
 }
 </code></pre>
-<h3 id="-configure"><a name="-configure" class="plugin-anchor" href="#-configure"><span class="fa fa-link"></span></a><code>configure</code></h3>
+<h3 id="configure"><a name="configure" class="plugin-anchor" href="#configure"><span class="fa fa-link"></span></a><code>configure</code></h3>
 <p>Usage: <code>configure(options)</code>.
 Sets global behavior settings on the active MobX instance.
 Use this to change how MobX behaves as a whole.</p>
@@ -1254,18 +1192,18 @@ configure({
     <span class="hljs-comment">// ...</span>
 });
 </code></pre>
-<h4 id="-arraybuffer-number"><a name="-arraybuffer-number" class="plugin-anchor" href="#-arraybuffer-number"><span class="fa fa-link"></span></a><code>arrayBuffer: number</code></h4>
+<h4 id="arraybuffer-number"><a name="arraybuffer-number" class="plugin-anchor" href="#arraybuffer-number"><span class="fa fa-link"></span></a><code>arrayBuffer: number</code></h4>
 <p>Increases the default created size of observable arrays to <code>arrayBuffer</code>, if the maximum size isn&apos;t yet there.</p>
 <p>Observable arrays lazily create getters on members of <code>ObservableArray.prototype</code> starting at <code>0</code>.
 This will create the members from <code>0</code> to <code>arrayBuffer</code> if they don&apos;t yet exist.
 Use <code>arrayBuffer</code> if you know you&apos;ll have a common minimum array size and don&apos;t want to risk first creating those getters in hot code paths.
 See also <code>observable</code>.</p>
-<h4 id="-computedrequiresreaction-boolean"><a name="-computedrequiresreaction-boolean" class="plugin-anchor" href="#-computedrequiresreaction-boolean"><span class="fa fa-link"></span></a><code>computedRequiresReaction: boolean</code></h4>
+<h4 id="computedrequiresreaction-boolean"><a name="computedrequiresreaction-boolean" class="plugin-anchor" href="#computedrequiresreaction-boolean"><span class="fa fa-link"></span></a><code>computedRequiresReaction: boolean</code></h4>
 <p>Forbids the access of any unobserved computed value.
 Use this if you want to check whether you are using computed properties without a reactive context.</p>
 <pre><code class="lang-javascript">configure({ computedRequiresReaction: <span class="hljs-literal">true</span> });
 </code></pre>
-<h4 id="-disableerrorboundaries-boolean"><a name="-disableerrorboundaries-boolean" class="plugin-anchor" href="#-disableerrorboundaries-boolean"><span class="fa fa-link"></span></a><code>disableErrorBoundaries: boolean</code></h4>
+<h4 id="disableerrorboundaries-boolean"><a name="disableerrorboundaries-boolean" class="plugin-anchor" href="#disableerrorboundaries-boolean"><span class="fa fa-link"></span></a><code>disableErrorBoundaries: boolean</code></h4>
 <p>By default, MobX will catch and rethrow exceptions happening in your code to make sure that a reaction in one exception does not prevent the scheduled execution of other, possibly unrelated, reactions. This means exceptions are not propagated back to the original causing code and therefore you won&apos;t be able to catch them using try/catch.</p>
 <p>There may be times when you want to catch those errors, for example when unit testing your reactions. You can disable this behaviour using <code>disableErrorBoundaries</code>.</p>
 <pre><code class="lang-javascript">configure({ disableErrorBoundaries: <span class="hljs-literal">true</span> });
@@ -1285,7 +1223,7 @@ test(<span class="hljs-string">&apos;Throw if age is negative&apos;</span>, () =
 <blockquote>
 <p>Prior to MobX 4, <code>_resetGlobalState</code> was <code>extras.resetGlobalState</code>.</p>
 </blockquote>
-<h4 id="-enforceactions"><a name="-enforceactions" class="plugin-anchor" href="#-enforceactions"><span class="fa fa-link"></span></a><code>enforceActions</code></h4>
+<h4 id="enforceactions"><a name="enforceactions" class="plugin-anchor" href="#enforceactions"><span class="fa fa-link"></span></a><code>enforceActions</code></h4>
 <p>Also known as &quot;strict mode&quot;.
 In strict mode, it is not allowed to change any state outside of an <a href="action.html"><code>action</code></a>.
 Accepted values:</p>
@@ -1294,14 +1232,14 @@ Accepted values:</p>
 <li><code>&quot;observed&quot;</code>: All state that is observed <em>somewhere</em> needs to be changed through actions. This is the recommended strictness mode in non-trivial applications.</li>
 <li><code>&quot;always&quot;</code>: State always needs be updated (which in practice also includes creation) in actions.</li>
 </ul>
-<h4 id="-isolateglobalstate-boolean"><a name="-isolateglobalstate-boolean" class="plugin-anchor" href="#-isolateglobalstate-boolean"><span class="fa fa-link"></span></a><code>isolateGlobalState: boolean</code></h4>
+<h4 id="isolateglobalstate-boolean"><a name="isolateglobalstate-boolean" class="plugin-anchor" href="#isolateglobalstate-boolean"><span class="fa fa-link"></span></a><code>isolateGlobalState: boolean</code></h4>
 <p>Isolates the global state of MobX, when there are multiple instances of MobX in the same environment.
 This is useful when you have an encapsulated library that is using MobX, living in the same page as the app that is using MobX.
 The reactivity inside the library will remain self-contained when you call <code>configure({isolateGlobalState: true})</code> inside the library.</p>
 <p>Without this options, if multiple MobX instances are active, the internal state will be shared. The benefit is that observables from both instances work together, the downside is that the MobX versions have to match.</p>
 <pre><code class="lang-javascript">configure({ isolateGlobalState: <span class="hljs-literal">true</span> });
 </code></pre>
-<h4 id="-reactionscheduler-f-void-void"><a name="-reactionscheduler-f-void-void" class="plugin-anchor" href="#-reactionscheduler-f-void-void"><span class="fa fa-link"></span></a><code>reactionScheduler: (f: () =&gt; void) =&gt; void</code></h4>
+<h4 id="reactionscheduler-f---void--void"><a name="reactionscheduler-f---void--void" class="plugin-anchor" href="#reactionscheduler-f---void--void"><span class="fa fa-link"></span></a><code>reactionScheduler: (f: () =&gt; void) =&gt; void</code></h4>
 <p>Sets a new function that executes all MobX reactions.
 By default <code>reactionScheduler</code> just runs the <code>f</code> reaction without any other behavior.
 This can be useful for basic debugging, or slowing down reactions to visualize application updates.</p>
@@ -1325,11 +1263,11 @@ This can be useful for basic debugging, or slowing down reactions to visualize a
 </ul>
 <h1 id="development-utilities"><a name="development-utilities" class="plugin-anchor" href="#development-utilities"><span class="fa fa-link"></span></a>Development utilities</h1>
 <p><em>The following api&apos;s might come in handy if you want to build cool tools on top of MobX or if you want to inspect the internal state of MobX</em></p>
-<h3 id="-mobx-react-devtools-package"><a name="-mobx-react-devtools-package" class="plugin-anchor" href="#-mobx-react-devtools-package"><span class="fa fa-link"></span></a><code>&quot;mobx-react-devtools&quot;</code> package</h3>
+<h3 id="mobxreactdevtools-package"><a name="mobxreactdevtools-package" class="plugin-anchor" href="#mobxreactdevtools-package"><span class="fa fa-link"></span></a><code>&quot;mobx-react-devtools&quot;</code> package</h3>
 <p>The mobx-react-devtools is a powerful package that helps you to investigate the performance and dependencies of your react components.
 Also has a powerful logger utility based on <code>spy</code>.</p>
 <p><a href="../best/devtools.html">&#xAB;details&#xBB;</a></p>
-<h3 id="-trace"><a name="-trace" class="plugin-anchor" href="#-trace"><span class="fa fa-link"></span></a><code>trace</code></h3>
+<h3 id="trace"><a name="trace" class="plugin-anchor" href="#trace"><span class="fa fa-link"></span></a><code>trace</code></h3>
 <p>Usage:</p>
 <ul>
 <li><code>trace(enterDebugger?)</code></li>
@@ -1341,25 +1279,25 @@ If it is enabled, it will start logging when the value is being invalidated, and
 If <code>enterDebugger</code> is set to true, and developer tools are enabled, the javascript engine
 will break on the point where it is triggered.</p>
 <p><a href="../best/trace.html">&#xAB;trace&#xBB;</a></p>
-<h3 id="-spy"><a name="-spy" class="plugin-anchor" href="#-spy"><span class="fa fa-link"></span></a><code>spy</code></h3>
+<h3 id="spy"><a name="spy" class="plugin-anchor" href="#spy"><span class="fa fa-link"></span></a><code>spy</code></h3>
 <p>Usage: <code>spy(listener)</code>.
 Registers a global spy listener that listens to all events that happen in MobX.
 It is similar to attaching an <code>observe</code> listener to <em>all</em> observables at once, but also notifies about running (trans/re)actions and computations.
 Used for example by the <code>mobx-react-devtools</code>.</p>
 <p><a href="spy.html">&#xAB;details&#xBB;</a></p>
-<h3 id="-getatom"><a name="-getatom" class="plugin-anchor" href="#-getatom"><span class="fa fa-link"></span></a><code>getAtom</code></h3>
+<h3 id="getatom"><a name="getatom" class="plugin-anchor" href="#getatom"><span class="fa fa-link"></span></a><code>getAtom</code></h3>
 <p>Usage: <code>getAtom(thing, property?)</code>.
 Returns the backing <em>Atom</em> of a given observable object, property, reaction etc.</p>
-<h3 id="-getdebugname"><a name="-getdebugname" class="plugin-anchor" href="#-getdebugname"><span class="fa fa-link"></span></a><code>getDebugName</code></h3>
+<h3 id="getdebugname"><a name="getdebugname" class="plugin-anchor" href="#getdebugname"><span class="fa fa-link"></span></a><code>getDebugName</code></h3>
 <p>Usage: <code>getDebugName(thing, property?)</code>
 Returns a (generated) friendly debug name of an observable object, property, reaction etc. Used by for example the <code>mobx-react-devtools</code>.</p>
-<h3 id="-getdependencytree"><a name="-getdependencytree" class="plugin-anchor" href="#-getdependencytree"><span class="fa fa-link"></span></a><code>getDependencyTree</code></h3>
+<h3 id="getdependencytree"><a name="getdependencytree" class="plugin-anchor" href="#getdependencytree"><span class="fa fa-link"></span></a><code>getDependencyTree</code></h3>
 <p>Usage: <code>getDependencyTree(thing, property?)</code>.
 Returns a tree structure with all observables the given reaction / computation currently depends upon.</p>
-<h3 id="-getobservertree"><a name="-getobservertree" class="plugin-anchor" href="#-getobservertree"><span class="fa fa-link"></span></a><code>getObserverTree</code></h3>
+<h3 id="getobservertree"><a name="getobservertree" class="plugin-anchor" href="#getobservertree"><span class="fa fa-link"></span></a><code>getObserverTree</code></h3>
 <p>Usage: <code>getObserverTree(thing, property?)</code>.
 Returns a tree structure with all reactions / computations that are observing the given observable.</p>
-<h3 id="-mobx-react-development-hooks"><a name="-mobx-react-development-hooks" class="plugin-anchor" href="#-mobx-react-development-hooks"><span class="fa fa-link"></span></a><code>&quot;mobx-react&quot;</code> development hooks</h3>
+<h3 id="mobxreact-development-hooks"><a name="mobxreact-development-hooks" class="plugin-anchor" href="#mobxreact-development-hooks"><span class="fa fa-link"></span></a><code>&quot;mobx-react&quot;</code> development hooks</h3>
 <p>The <code>mobx-react</code> package exposes the following additional api&apos;s that are used by the <code>mobx-react-devtools</code>:</p>
 <ul>
 <li><code>trackComponents()</code>: enables the tracking of <code>observer</code> based React components</li>
@@ -1368,7 +1306,7 @@ Returns a tree structure with all reactions / computations that are observing th
 </ul>
 <h1 id="internal-functions"><a name="internal-functions" class="plugin-anchor" href="#internal-functions"><span class="fa fa-link"></span></a>Internal functions</h1>
 <p><em>The following methods are all used internally by MobX, and might come in handy in rare cases. But usually MobX offers more declarative alternatives to tackle the same problem. They might come in handy though if you try to extend MobX</em></p>
-<h3 id="-transaction"><a name="-transaction" class="plugin-anchor" href="#-transaction"><span class="fa fa-link"></span></a><code>transaction</code></h3>
+<h3 id="transaction"><a name="transaction" class="plugin-anchor" href="#transaction"><span class="fa fa-link"></span></a><code>transaction</code></h3>
 <p><em>Transaction is a low-level api, it is recommended to use actions instead</em></p>
 <p><code>transaction(worker: () =&gt; void)</code> can be used to batch a bunch of updates without notifying any observers until the end of the transaction.
 <code>transaction</code> takes a single, parameterless <code>worker</code> function as argument and runs it.
@@ -1392,7 +1330,7 @@ transaction(() =&gt; {
 });
 <span class="hljs-comment">// Prints: &apos;3 numbers!&apos;</span>
 </code></pre>
-<h3 id="-untracked"><a name="-untracked" class="plugin-anchor" href="#-untracked"><span class="fa fa-link"></span></a><code>untracked</code></h3>
+<h3 id="untracked"><a name="untracked" class="plugin-anchor" href="#untracked"><span class="fa fa-link"></span></a><code>untracked</code></h3>
 <p>Untracked allows you to run a piece of code without establishing observers.
 Like <code>transaction</code>, <code>untracked</code> is automatically applied by <code>(@)action</code>, so usually it makes more sense to use actions than to use <code>untracked</code> directly.
 Example:</p>
@@ -1418,7 +1356,7 @@ person.firstName = <span class="hljs-string">&quot;G.K.&quot;</span>;
 person.lastName = <span class="hljs-string">&quot;Chesterton&quot;</span>;
 <span class="hljs-comment">// prints: Chesterton, G.K.</span>
 </code></pre>
-<h3 id="-createatom"><a name="-createatom" class="plugin-anchor" href="#-createatom"><span class="fa fa-link"></span></a><code>createAtom</code></h3>
+<h3 id="createatom"><a name="createatom" class="plugin-anchor" href="#createatom"><span class="fa fa-link"></span></a><code>createAtom</code></h3>
 <p>Utility function that can be used to create your own observable data structures and hook them up to MobX.
 Used internally by all observable data types.</p>
 <p><a href="extending.html">&#xAB;details&#xBB;</a></p>
@@ -1459,9 +1397,25 @@ Used internally by all observable data types.</p>
     <script src="../gitbook/plugins/gitbook-plugin-edit-link/plugin.js"></script>
     
 
+    
+    <script src="../gitbook/plugins/gitbook-plugin-search/lunr.min.js"></script>
+    
+
+    
+    <script src="../gitbook/plugins/gitbook-plugin-search/search.js"></script>
+    
+
+    
+    <script src="../gitbook/plugins/gitbook-plugin-sharing/buttons.js"></script>
+    
+
+    
+    <script src="../gitbook/plugins/gitbook-plugin-fontsettings/buttons.js"></script>
+    
+
 <script>
 require(["gitbook"], function(gitbook) {
-    var config = {"fontSettings":{"theme":null,"family":"sans","size":2},"github":{"url":"https://github.com/mobxjs/mobx"},"edit-link":{"base":"https://github.com/mobxjs/mobx/tree/gh-pages/docs","label":"Edit This Page"},"ga":{"token":"UA-65632006-1","configuration":"auto"},"disqus":{"shortName":"mobservable"}};
+    var config = {"github":{"url":"https://github.com/mobxjs/mobx"},"edit-link":{"base":"https://github.com/mobxjs/mobx/tree/gh-pages/docs","label":"Edit This Page"},"ga":{"token":"UA-65632006-1","configuration":"auto"},"disqus":{"shortName":"mobservable"},"anchors":{},"highlight":{},"search":{"maxIndexSize":1000000},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2}};
     gitbook.start(config);
 });
 </script>
