@@ -574,7 +574,7 @@ test("enumerability", () => {
         @computed
         get b() {
             return this.a
-        } // non-enumerable, on proto
+        } // non-enumerable, (and, ideally, on proto)
         @action
         m() {} // non-enumerable, on proto
         @action m2 = () => {} // non-enumerable, on self
@@ -596,8 +596,8 @@ test("enumerability", () => {
     expect(props).toEqual(["a", "a2"])
 
     expect("a" in a).toBe(true)
-    expect(a.hasOwnProperty("a")).toBe(false) // true would better..
-    expect(a.hasOwnProperty("b")).toBe(false)
+    expect(a.hasOwnProperty("a")).toBe(false)
+    expect(a.hasOwnProperty("b")).toBe(false) // true would be more consistent, see below
     expect(a.hasOwnProperty("m")).toBe(false)
     expect(a.hasOwnProperty("m2")).toBe(true)
 
@@ -624,7 +624,7 @@ test("enumerability", () => {
     expect("a" in a).toBe(true)
     expect(a.hasOwnProperty("a")).toBe(true)
     expect(a.hasOwnProperty("a2")).toBe(true)
-    expect(a.hasOwnProperty("b")).toBe(true) // better, false, but, see: #1398
+    expect(a.hasOwnProperty("b")).toBe(true) // true would better.. but, #1777
     expect(a.hasOwnProperty("m")).toBe(false)
     expect(a.hasOwnProperty("m2")).toBe(true)
 })
@@ -636,7 +636,7 @@ test("enumerability - workaround", () => {
         @computed
         get b() {
             return this.a
-        } // non-enumerable, on proto
+        } // non-enumerable, (and, ideally, on proto)
         @action
         m() {} // non-enumerable, on proto
         @action m2 = () => {} // non-enumerable, on self
@@ -663,7 +663,7 @@ test("enumerability - workaround", () => {
     expect("a" in a).toBe(true)
     expect(a.hasOwnProperty("a")).toBe(true)
     expect(a.hasOwnProperty("a2")).toBe(true)
-    expect(a.hasOwnProperty("b")).toBe(true) // better, false, but, see: #1398
+    expect(a.hasOwnProperty("b")).toBe(true) // ideally, false, but #1777
     expect(a.hasOwnProperty("m")).toBe(false)
     expect(a.hasOwnProperty("m2")).toBe(true)
 })

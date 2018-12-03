@@ -802,7 +802,7 @@ test("enumerability", () => {
         @computed
         get b() {
             return this.a
-        } // non-enumerable, on proto
+        } // non-enumerable, (and, ideally, on proto)
         @action
         m() {} // non-enumerable, on proto
         @action m2 = () => {} // non-enumerable, on self
@@ -826,7 +826,7 @@ test("enumerability", () => {
 
     t.equal("a" in a, true)
     t.equal(a.hasOwnProperty("a"), true)
-    t.equal(a.hasOwnProperty("b"), true) // better, false, but, see: #1398
+    t.equal(a.hasOwnProperty("b"), true) // false would be slightly better, true also ok-ish, and, see #1777
     t.equal(a.hasOwnProperty("m"), false)
     t.equal(a.hasOwnProperty("m2"), true)
 
@@ -849,7 +849,7 @@ test("enumerability", () => {
 
     t.equal("a" in a, true)
     t.equal(a.hasOwnProperty("a"), true)
-    t.equal(a.hasOwnProperty("b"), true) // better, false, but, see: #1398
+    t.equal(a.hasOwnProperty("b"), true) // false would be slightly better, true also ok-ish, and, see #1777
     t.equal(a.hasOwnProperty("m"), false)
     t.equal(a.hasOwnProperty("m2"), true)
 })
