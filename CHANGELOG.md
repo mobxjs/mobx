@@ -1,3 +1,11 @@
+# 5.7.0 / 4.7.0
+
+* Upgraded typings to TypeScript 3
+* Fixed [#1742](https://github.com/mobxjs/mobx/issues/1742), change detection fails when multiple mobx instances were active.
+* Fixed [#1624](https://github.com/mobxjs/mobx/issues/1624), use built-in flow types for iterators
+* Fixed [#1777](https://github.com/mobxjs/mobx/issues/1777) through [#1826](https://github.com/mobxjs/mobx/pull/1826), stack overflow exception, in development mode, when using `@computed` on a React component. The MobX 5 behavior here has been reverted to the MobX 4 behavior.
+
+
 # 5.6.0 / 4.6.0
 
 * `keepAlive` has become smarter and won't recomputed computed values that are kept alive, as long as they aren't read. Implements [#1534](https://github.com/mobxjs/mobx/issues/1534)
