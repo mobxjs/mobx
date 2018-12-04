@@ -124,6 +124,7 @@ export {
     onBecomeObserved,
     onBecomeUnobserved,
     flow,
+    castFlowReturn,
     toJS,
     trace,
     IObserverTree,
@@ -143,8 +144,7 @@ export {
     isComputingDerivation as _isComputingDerivation,
     onReactionError,
     interceptReads as _interceptReads,
-    IComputedValueOptions,
-    castFlowReturn
+    IComputedValueOptions
 } from "./internal"
 
 // Devtools support

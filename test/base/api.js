@@ -20,6 +20,7 @@ test("correct api should be exposed", function() {
             "decorate",
             "extendObservable",
             "flow",
+            "castFlowReturn",
             "get",
             "_getAdministration",
             "getAtom",
