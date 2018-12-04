@@ -29,7 +29,7 @@ try {
     // (in which case the expression below would be substituted with 'production')
     process.env.NODE_ENV
 } catch (e) {
-    var g = typeof window !== "undefined" ? window : global
+    const g = typeof window !== "undefined" ? window : global
     if (typeof process === "undefined") g.process = {}
     g.process.env = {}
 }
@@ -143,7 +143,8 @@ export {
     isComputingDerivation as _isComputingDerivation,
     onReactionError,
     interceptReads as _interceptReads,
-    IComputedValueOptions
+    IComputedValueOptions,
+    castFlowReturn
 } from "./internal"
 
 // Devtools support
