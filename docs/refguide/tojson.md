@@ -9,7 +9,7 @@ Cycles are detected and properly supported by default, but this can be disabled 
 
 `toJS` accepts two options
   1. `exportMapsAsObjects` whether to serialize observable maps to objects (`true`) or javascript Map objects (`false`) default `true`.
-  2. `detectCycles` if I cycle is detected, reuse the already serialized object. Which prevents endless recursion. Default `true`.
+  2. `detectCycles` if a cycle is detected, reuse the already serialized object. Which prevents endless recursion. Default `true`.
 
 For more complex (de)serialization scenario's, one can use [serializr](https://github.com/mobxjs/serializr)
 
