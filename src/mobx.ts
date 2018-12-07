@@ -32,7 +32,8 @@ try {
     function testCodeMinification() {}
     if (
         testCodeMinification.name !== "testCodeMinification" &&
-        process.env.NODE_ENV !== "production"
+        process.env.NODE_ENV !== "production" &&
+        process.env.IGNORE_MOBX_MINIFY_WARNING !== "true"
     ) {
         // Template literal(backtick) is used for fix issue with rollup-plugin-commonjs https://github.com/rollup/rollup-plugin-commonjs/issues/344
         ;`[mobx] you are running a minified build, but 'process.env.NODE_ENV' was not set to 'production' in your bundler. This results in an unnecessarily large and slow bundle`
