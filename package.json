@@ -5,6 +5,11 @@
   "main": "lib/mobx.js",
   "umd:main": "lib/mobx.umd.js",
   "module": "lib/mobx.module.js",
+  "browser": {
+    "./lib/mobx.js": "./lib/mobx.js",
+    "./lib/mobx.module.js": "./lib/mobx.module.js"
+  },
+  "unpkg": "lib/mobx.umd.min.js",
   "jsnext:main": "lib/mobx.module.js",
   "react-native": "lib/mobx.module.js",
   "typings": "lib/mobx.d.ts",
