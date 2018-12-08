@@ -38,12 +38,14 @@ function interceptHook(hook: "onBecomeObserved" | "onBecomeUnobserved", thing, a
     const atom: IObservable =
         typeof arg2 === "string" ? getAtom(thing, arg2) : (getAtom(thing) as any)
     const cb = typeof arg2 === "string" ? arg3 : arg2
-    const listenersKey = `${hook}Listeners`
+    const listenersKey = `${hook}Listeners` as
+        | "onBecomeObservedListeners"
+        | "onBecomeUnobservedListeners"
 
-    if (!atom[listenersKey]) {
-        atom[listenersKey] = new Set<Lambda>([cb])
+    if (atom[listenersKey]) {
+        atom[listenersKey]!.add(cb)
     } else {
-        ;(atom[listenersKey] as Set<Lambda>).add(cb)
+        atom[listenersKey] = new Set<Lambda>([cb])
     }
 
     const orig = atom[hook]
@@ -51,7 +53,7 @@ function interceptHook(hook: "onBecomeObserved" | "onBecomeUnobserved", thing, a
         return fail(process.env.NODE_ENV !== "production" && "Not an atom that can be (un)observed")
 
     return function() {
-        const hookListeners = atom[listenersKey] as Set<Lambda> | undefined
+        const hookListeners = atom[listenersKey]
         if (hookListeners) {
             hookListeners.delete(cb)
             if (hookListeners.size === 0) {
