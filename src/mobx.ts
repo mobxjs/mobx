@@ -38,7 +38,8 @@ try {
     function testCodeMinification() {}
     if (
         testCodeMinification.name !== "testCodeMinification" &&
-        process.env.NODE_ENV !== "production"
+        process.env.NODE_ENV !== "production" &&
+        process.env.IGNORE_MOBX_MINIFY_WARNING !== "true"
     ) {
         console.warn(
             // Template literal(backtick) is used for fix issue with rollup-plugin-commonjs https://github.com/rollup/rollup-plugin-commonjs/issues/344
