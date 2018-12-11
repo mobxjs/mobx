@@ -1,6 +1,7 @@
 "use strict"
+
 var mobx = require("../../src/mobx.ts")
-const { observable, $mobx, when } = mobx
+const { observable, $mobx, when, _getAdministration } = mobx
 var iterall = require("iterall")
 
 function buffer() {
@@ -491,4 +492,20 @@ test("concats correctly #1667", () => {
     expect(Array.isArray(x.data)).toBe(true)
     expect(x.data[0]).toBe(first)
     expect(x.data.length).toBe(11000)
+})
+
+test("dehances last value on shift/pop", () => {
+    const x1 = observable([3, 5])
+    _getAdministration(x1).dehancer = value => {
+        return value * 2
+    }
+    expect(x1.shift()).toBe(6)
+    expect(x1.shift()).toBe(10)
+
+    const x2 = observable([3, 5])
+    _getAdministration(x2).dehancer = value => {
+        return value * 2
+    }
+    expect(x2.pop()).toBe(10)
+    expect(x2.pop()).toBe(6)
 })
