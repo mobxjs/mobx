@@ -16,7 +16,9 @@ export interface FlowReturn<T> {
 
 // we skip promises that are the result of yielding promises (except if they use flowReturn)
 export type FlowReturnType<R> = IfAllAreFlowYieldThenVoid<
-    R extends FlowReturn<infer FR> ? FR : R extends Promise<any> ? FlowYield : R
+    R extends FlowReturn<infer FR>
+        ? FR extends Promise<infer FRP> ? FRP : FR
+        : R extends Promise<any> ? FlowYield : R
 >
 
 // we extract yielded promises from the return type
@@ -111,7 +113,7 @@ function cancelPromise(promise) {
 }
 
 /**
- * Used for TypeScript to force a flow to return a promise.
+ * Used for TypeScript to make flows that return a promise return the actual promise result.
  *
  * @export
  * @template T
