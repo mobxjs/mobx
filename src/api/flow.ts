@@ -10,32 +10,9 @@ export interface FlowIterator<T> {
     throw?(e?: any): IteratorResult<T> | Promise<IteratorResult<T>>
 }
 
-export function flow<R>(generator: () => FlowIterator<any>): () => CancellablePromise<R>
-export function flow<A1>(
-    generator: (a1: A1) => FlowIterator<any>
-): (a1: A1) => CancellablePromise<any> // Ideally we want to have R instead of Any, but cannot specify R without specifying A1 etc... 'any' as result is better then not specifying request args
-export function flow<A1, A2>(
-    generator: (a1: A1, a2: A2) => FlowIterator<any>
-): (a1: A1, a2: A2) => CancellablePromise<any>
-export function flow<A1, A2, A3>(
-    generator: (a1: A1, a2: A2, a3: A3) => FlowIterator<any>
-): (a1: A1, a2: A2, a3: A3) => CancellablePromise<any>
-export function flow<A1, A2, A3, A4>(
-    generator: (a1: A1, a2: A2, a3: A3, a4: A4) => FlowIterator<any>
-): (a1: A1, a2: A2, a3: A3, a4: A4) => CancellablePromise<any>
-export function flow<A1, A2, A3, A4, A5>(
-    generator: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5) => FlowIterator<any>
-): (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5) => CancellablePromise<any>
-export function flow<A1, A2, A3, A4, A5, A6>(
-    generator: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5, a6: A6) => FlowIterator<any>
-): (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5, a6: A6) => CancellablePromise<any>
-export function flow<A1, A2, A3, A4, A5, A6, A7>(
-    generator: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5, a6: A6, a7: A7) => FlowIterator<any>
-): (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5, a6: A6, a7: A7) => CancellablePromise<any>
-export function flow<A1, A2, A3, A4, A5, A6, A7, A8>(
-    generator: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5, a6: A6, a7: A7, a8: A8) => FlowIterator<any>
-): (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5, a6: A6, a7: A7, a8: A8) => CancellablePromise<any>
-export function flow(generator: Function) {
+export function flow<T, U extends any[]>(
+    generator: (...args: U) => FlowIterator<any>
+): (...args: U) => CancellablePromise<T> {
     if (arguments.length !== 1)
         fail(process.env.NODE_ENV && `Flow expects one 1 argument and cannot be used as decorator`)
     const name = generator.name || "<unnamed flow>"
@@ -49,7 +26,7 @@ export function flow(generator: Function) {
         let rejector: (error: any) => void
         let pendingPromise: CancellablePromise<any> | undefined = undefined
 
-        const res = new Promise(function(resolve, reject) {
+        const res = new Promise<T>(function(resolve, reject) {
             let stepId = 0
             rejector = reject
 
@@ -111,7 +88,7 @@ export function flow(generator: Function) {
                 rejector(e) // there could be a throwing finally block
             }
         })
-        return res
+        return res as CancellablePromise<T>
     }
 }
 
