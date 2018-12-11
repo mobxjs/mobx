@@ -1,3 +1,6 @@
+# 5.7.1 / 4.7.1
+* Fixed [#1839](https://github.com/mobxjs/mobx/issues/1839), ObservableArrayAdministration.dehanceValues does not dehance last value.
+
 # 5.7.0 / 4.7.0
 
 * Upgraded typings to TypeScript 3
