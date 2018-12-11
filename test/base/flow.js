@@ -1,4 +1,5 @@
 import * as mobx from "../../src/mobx.ts"
+import { castFlowReturn } from "../../src/mobx"
 const { flow } = mobx
 
 function delay(time, value, shouldThrow = false) {
@@ -348,4 +349,8 @@ test("cancelled flow should not result in runaway reject", async () => {
     } catch (e) {
         expect("" + e).toBe("Error: FLOW_CANCELLED")
     }
+})
+
+test("castFlowReturn should return the passed argument", () => {
+    expect(castFlowReturn(5)).toBe(5)
 })

@@ -311,6 +311,8 @@ And finally, kudos to all the people that believed in, tried, validated and even
 
 > The #mobx is the way I always want things to be! It's really surprising simple and fast! Totally awesome! Don't miss it!
 
+> I've been using MobX for over 2 years now, and it *still* feels like cheating! 😎
+
 ## Contributing
 
 * Feel free to send small pull requests. Please discuss new features or big changes in a GitHub issue first.

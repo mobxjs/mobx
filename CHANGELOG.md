@@ -1,5 +1,11 @@
 *   Improved flow support in typescript. It will now infer arguments and return values correctly. The only exception is that when the `flow` wrapped function returns a `Promise` then it should `return castFlowReturn(somePromise)` to keep the type inference happy.
 
+# 5.7.1 / 4.7.1
+
+*   Fixed [#1839](https://github.com/mobxjs/mobx/issues/1839), ObservableArrayAdministration.dehanceValues does not dehance last value.
+
+# 5.7.0 / 4.7.0
+
 # 5.7.0 / 4.7.0
 
 *   Upgraded typings to TypeScript 3

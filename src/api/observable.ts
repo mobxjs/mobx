@@ -75,7 +75,7 @@ function getEnhancerFromOptions(options: CreateObservableOptions): IEnhancer<any
 function createObservable(v: any, arg2?: any, arg3?: any) {
     // @observable someProp;
     if (typeof arguments[1] === "string") {
-        return deepDecorator.apply(null, arguments)
+        return deepDecorator.apply(null, arguments as any)
     }
 
     // it is an observable already, done
