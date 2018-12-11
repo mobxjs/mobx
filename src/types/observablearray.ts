@@ -173,7 +173,7 @@ class ObservableArrayAdministration<T>
     }
 
     dehanceValues(values: T[]): T[] {
-        if (this.dehancer !== undefined && this.values.length > 0)
+        if (this.dehancer !== undefined && values.length > 0)
             return values.map(this.dehancer) as any
         return values
     }
