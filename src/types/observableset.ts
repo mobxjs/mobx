@@ -42,18 +42,18 @@ export type ISetDidChange<T = any> =
           type: "delete"
           oldValue: T
       }
+
+export type ISetWillChange<T = any> =
     | {
+          type: "delete"
           object: ObservableSet<T>
-          type: "update"
-          newValue: T
           oldValue: T
       }
-
-export interface ISetWillChange<T = any> {
-    type: "update" | "delete" | "add"
-    object: ObservableSet<T>
-    newValue?: T
-}
+    | {
+          type: "add"
+          object: ObservableSet<T>
+          newValue: T
+      }
 
 export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillChange>, IListenable {
     [$mobx] = ObservableSetMarker
@@ -110,7 +110,16 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
 
     add(value: T) {
         checkIfStateModificationsAreAllowed(this._atom)
-
+        if (hasInterceptors(this)) {
+            const change = interceptChange<ISetWillChange<T>>(this, {
+                type: "add",
+                object: this,
+                newValue: value
+            })
+            if (!change) return this
+            // TODO: ideally, value = change.value would be done here, so that values can be
+            // changed by interceptor. Same applies for other Set and Map api's.
+        }
         if (!this.has(value)) {
             transaction(() => {
                 this._data.add(this.enhancer(value, undefined))
@@ -138,7 +147,8 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
         if (hasInterceptors(this)) {
             const change = interceptChange<ISetWillChange<T>>(this, {
                 type: "delete",
-                object: this
+                object: this,
+                oldValue: value
             })
             if (!change) return false
         }
