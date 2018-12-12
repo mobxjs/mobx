@@ -11,6 +11,7 @@ import {
     reportObserved,
     startBatch
 } from "../internal"
+import { Lambda } from "../utils/utils"
 
 export const $mobx = Symbol("mobx administration")
 
@@ -33,12 +34,19 @@ export class Atom implements IAtom {
      */
     constructor(public name = "Atom@" + getNextId()) {}
 
-    public onBecomeUnobserved() {
-        // noop
-    }
+    public onBecomeObservedListeners: Set<Lambda> | undefined
+    public onBecomeUnobservedListeners: Set<Lambda> | undefined
 
     public onBecomeObserved() {
-        /* noop */
+        if (this.onBecomeObservedListeners) {
+            this.onBecomeObservedListeners.forEach(listener => listener())
+        }
+    }
+
+    public onBecomeUnobserved() {
+        if (this.onBecomeUnobservedListeners) {
+            this.onBecomeUnobservedListeners.forEach(listener => listener())
+        }
     }
 
     /**
@@ -71,7 +79,13 @@ export function createAtom(
     onBecomeUnobservedHandler: () => void = noop
 ): IAtom {
     const atom = new Atom(name)
-    onBecomeObserved(atom, onBecomeObservedHandler)
-    onBecomeUnobserved(atom, onBecomeUnobservedHandler)
+    // default `noop` listener will not initialize the hook Set
+    if (onBecomeObservedHandler !== noop) {
+        onBecomeObserved(atom, onBecomeObservedHandler)
+    }
+
+    if (onBecomeUnobservedHandler !== noop) {
+        onBecomeUnobserved(atom, onBecomeUnobservedHandler)
+    }
     return atom
 }
