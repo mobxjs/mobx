@@ -12,7 +12,8 @@ export interface FlowIterator<T> {
 
 export function flow<T, U extends any[]>(
     generator: (...args: U) => FlowIterator<any>
-): (...args: U) => CancellablePromise<T> {
+): (...args: U) => CancellablePromise<T>
+export function flow(generator: Function): Function {
     if (arguments.length !== 1)
         fail(process.env.NODE_ENV && `Flow expects one 1 argument and cannot be used as decorator`)
     const name = generator.name || "<unnamed flow>"
@@ -26,7 +27,7 @@ export function flow<T, U extends any[]>(
         let rejector: (error: any) => void
         let pendingPromise: CancellablePromise<any> | undefined = undefined
 
-        const res = new Promise<T>(function(resolve, reject) {
+        const res = new Promise(function(resolve, reject) {
             let stepId = 0
             rejector = reject
 
@@ -88,7 +89,7 @@ export function flow<T, U extends any[]>(
                 rejector(e) // there could be a throwing finally block
             }
         })
-        return res as CancellablePromise<T>
+        return res
     }
 }
 
