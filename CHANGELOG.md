@@ -1,5 +1,6 @@
 # 5.8.0 / 4.8.0
 
+* MobX now requires TypeScript 3 (this was already the case in 5.7.0, but in this version the difference is actually noticeable in the typings). 
 * Fixed array dehancer sometimes skipping. Fixes [#1839](https://github.com/mobxjs/mobx/issues/1839) through [#1841](https://github.com/mobxjs/mobx/pull/1841) by [k-g-a](https://github.com/k-g-a) 
 * Fixed issue where webpack 4 wouldn't use the ESM module [#1834](https://github.com/mobxjs/mobx/pull/1834) by [mrtnbroder](https://github.com/mrtnbroder)
 * Improved type inference for `flow` in TypeScript 3. Fixes [#1816](https://github.com/mobxjs/mobx/issue/1816) through [#1825](https://github.com/mobxjs/mobx/pull/1825) by [ismailhabib](https://github.com/ismailhabib)
