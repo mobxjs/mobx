@@ -57,8 +57,10 @@ The `name` option can be used to give the array a friendly debug name, to be use
 ## Array limitations in MobX 4 and below
 
 Due to limitations of native arrays in ES5 `observable.array` will create a faux-array (array-like object) instead of a real array.
-In practice, these arrays work just as fine as native arrays and all native methods are supported, including index assignments, up-to and including the length of the array.
+In practice, these arrays work just as fine as native arrays and all native methods are supported, including index assignments, up-to and including the length of the array. 
 
-Bear in mind however that `Array.isArray(observable([]))` will yield `false`, so whenever you need to pass an observable array to an external library,
-it is a good idea to _create a shallow copy before passing it to other libraries or built-in functions_ (which is good practice anyway) by using `array.slice()`.
+Bear in mind however that `Array.isArray(observable([]))` will yield `false`, so whenever you need to pass an observable
+array to an external library or use native methods (such as `[].concat(observable([]))`) that rely on this test returning
+true, it is a good idea to _create a shallow copy before passing it to other libraries or built-in functions_ (which is 
+good practice anyway) by using `array.slice()`.
 In other words, `Array.isArray(observable([]).slice())` will yield `true`.
