@@ -134,7 +134,7 @@ Example:
 
 ```javascript
 import {observable, computed} from "mobx";
-var name = observable("John");
+var name = observable.box("John");
 
 var upperCaseName = computed(() =>
 	name.get().toUpperCase()
