@@ -2,6 +2,7 @@
     "version": "2.0.10",
     "compilerOptions": {
         "target": "es5",
+        "rootDir": "src",
         "outDir": "lib",
         "sourceMap": false,
         "declaration": true,
