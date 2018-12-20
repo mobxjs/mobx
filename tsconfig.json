@@ -1,6 +1,7 @@
 {
     "version": "2.0.10",
     "compilerOptions": {
+        "rootDir": "src",
         "target": "es6",
         "module": "commonjs",
         "moduleResolution": "node",
