@@ -1,4 +1,4 @@
-* Improved flow support in typescript. It will now infer arguments and return values correctly. The only exception is that when the `flow` wrapped function returns a `Promise` then it should `return castFlowReturn(somePromise)` to keep the type inference happy.
+* Improved flow support in typescript. It will now infer arguments and return values correctly.
 
 # 5.8.0 / 4.8.0
 
