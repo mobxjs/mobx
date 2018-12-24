@@ -111,15 +111,3 @@ export function flow<R, Args extends any[]>(
 function cancelPromise(promise) {
     if (typeof promise.cancel === "function") promise.cancel()
 }
-
-/**
- * Used for TypeScript to make flows that return a promise return the actual promise result.
- *
- * @export
- * @template T
- * @param {T} val
- * @returns {FlowReturn<T>}
- */
-export function castFlowReturn<T>(val: T): FlowReturn<T> {
-    return val as any
-}
