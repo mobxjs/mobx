@@ -125,7 +125,6 @@ export {
     onBecomeObserved,
     onBecomeUnobserved,
     flow,
-    castFlowReturn,
     toJS,
     trace,
     IObserverTree,
