@@ -9,7 +9,9 @@ import {
     IValueDidChange,
     Lambda,
     ObservableMap,
-    getAdministration
+    getAdministration,
+    ObservableSet,
+    ISetDidChange
 } from "../internal"
 
 export function observe<T>(
@@ -20,6 +22,11 @@ export function observe<T>(
 export function observe<T>(
     observableArray: IObservableArray<T>,
     listener: (change: IArrayChange<T> | IArraySplice<T>) => void,
+    fireImmediately?: boolean
+): Lambda
+export function observe<V>(
+    observableMap: ObservableSet<V>,
+    listener: (change: ISetDidChange<V>) => void,
     fireImmediately?: boolean
 ): Lambda
 export function observe<K, V>(

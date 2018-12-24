@@ -237,3 +237,32 @@ test("toStringTag", () => {
     expect(x[Symbol.toStringTag]).toBe("Set")
     expect(Object.prototype.toString.call(x)).toBe("[object Set]")
 })
+
+test("getAtom", () => {
+    var x = set([1])
+    expect(mobx.getAtom(x)).toBeTruthy()
+
+    expect(mobx.isObservableSet(x)).toBeTruthy()
+    expect(mobx.isObservable(x)).toBeTruthy()
+})
+
+test("observe", () => {
+    const vals = []
+    var x = set([1])
+    mobx.observe(x, v => {
+        vals.push(v)
+    })
+    x.add(2)
+    x.add(1)
+    expect(vals).toEqual([{ newValue: 2, object: x, type: "add" }])
+})
+
+test("toJS", () => {
+    const x = mobx.observable({ x: 1 })
+    const y = set([x, 1])
+
+    const z = mobx.toJS(y)
+    expect(z).toEqual([{ x: 1 }, 1])
+    expect(z.x).not.toBe(x)
+    expect(mobx.isObservable(z.x)).toBeFalsy()
+})
