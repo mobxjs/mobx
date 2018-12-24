@@ -124,9 +124,20 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         propagateMaybeChanged(this)
     }
 
-    onBecomeUnobserved() {}
+    public onBecomeObservedListeners: Set<Lambda> | undefined
+    public onBecomeUnobservedListeners: Set<Lambda> | undefined
 
-    onBecomeObserved() {}
+    public onBecomeObserved() {
+        if (this.onBecomeObservedListeners) {
+            this.onBecomeObservedListeners.forEach(listener => listener())
+        }
+    }
+
+    public onBecomeUnobserved() {
+        if (this.onBecomeUnobservedListeners) {
+            this.onBecomeUnobservedListeners.forEach(listener => listener())
+        }
+    }
 
     /**
      * Returns the current value of this computed value.

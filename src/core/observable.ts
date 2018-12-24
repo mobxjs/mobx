@@ -1,4 +1,5 @@
 import {
+    Lambda,
     ComputedValue,
     IDependencyTree,
     IDerivation,
@@ -31,6 +32,9 @@ export interface IObservable extends IDepTreeNode {
 
     onBecomeUnobserved(): void
     onBecomeObserved(): void
+
+    onBecomeUnobservedListeners: Set<Lambda> | undefined
+    onBecomeObservedListeners: Set<Lambda> | undefined
 }
 
 export function hasObservers(observable: IObservable): boolean {

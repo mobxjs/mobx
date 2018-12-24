@@ -30,6 +30,7 @@ Want to sponser MobX as well? https://mobxjs.github.io/mobx/donate.html
 * Mattia Manzati
 * Michael Fisher
 * Michael Mazurczak
+* Michael Tiller
 * Mihail Diordiev
 * Nikolay Ivanov
 * Uncomon
