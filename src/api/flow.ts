@@ -10,6 +10,9 @@ export interface FlowIterator<T> {
     throw?(e?: any): IteratorResult<T> | Promise<IteratorResult<T>>
 }
 
+export function flow<T>(
+    generator: () => FlowIterator<any>
+): () => CancellablePromise<T>
 export function flow<T, U extends any[]>(
     generator: (...args: U) => FlowIterator<any>
 ): (...args: U) => CancellablePromise<T>
