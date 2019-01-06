@@ -13,9 +13,11 @@ import { isObservable } from "./isobservable"
 import { IObservableObject } from "../types/observableobject"
 import { extendObservable } from "./extendobservable"
 import { IObservableMapInitialValues, ObservableMap } from "../types/observablemap"
+import { IEqualsComparer } from "../utils/comparer"
 
 export type CreateObservableOptions = {
     name?: string
+    equals?: IEqualsComparer<any>
     deep?: boolean
     defaultDecorator?: IObservableDecorator
 }
@@ -36,7 +38,7 @@ Object.freeze(defaultCreateObservableOptions)
 Object.freeze(shallowCreateObservableOptions)
 
 function assertValidOption(key: string) {
-    if (!/^(deep|name|defaultDecorator)$/.test(key))
+    if (!/^(deep|name|equals|defaultDecorator)$/.test(key))
         fail(`invalid option for (extend)observable: ${key}`)
 }
 
@@ -53,7 +55,9 @@ export function asCreateObservableOptions(thing: any): CreateObservableOptions {
 function getEnhancerFromOptions(options: CreateObservableOptions): IEnhancer<any> {
     return options.defaultDecorator
         ? options.defaultDecorator.enhancer
-        : options.deep === false ? referenceEnhancer : deepEnhancer
+        : options.deep === false
+        ? referenceEnhancer
+        : deepEnhancer
 }
 
 export const deepDecorator = createDecoratorForEnhancer(deepEnhancer)
@@ -77,7 +81,11 @@ function createObservable(v: any, arg2?: any, arg3?: any) {
     // something that can be converted and mutated?
     const res = isPlainObject(v)
         ? observable.object(v, arg2, arg3)
-        : Array.isArray(v) ? observable.array(v, arg2) : isES6Map(v) ? observable.map(v, arg2) : v
+        : Array.isArray(v)
+        ? observable.array(v, arg2)
+        : isES6Map(v)
+        ? observable.map(v, arg2)
+        : v
 
     // this value could be converted to a new observable data structure, return it
     if (res !== v) return res
@@ -145,7 +153,7 @@ const observableFactories: IObservableFactories = {
     box<T = any>(value?: T, options?: CreateObservableOptions): IObservableValue<T> {
         if (arguments.length > 2) incorrectlyUsedAsDecorator("box")
         const o = asCreateObservableOptions(options)
-        return new ObservableValue(value, getEnhancerFromOptions(o), o.name)
+        return new ObservableValue(value, getEnhancerFromOptions(o), o)
     },
     shallowBox<T = any>(value?: T, name?: string): IObservableValue<T> {
         if (arguments.length > 2) incorrectlyUsedAsDecorator("shallowBox")
