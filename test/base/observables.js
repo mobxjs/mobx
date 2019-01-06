@@ -149,6 +149,60 @@ test("dynamic2", function(done) {
     }
 })
 
+test("box uses equals", function(done) {
+    try {
+        var x = observable.box("a", {
+            equals: (oldValue, newValue) => {
+                return oldValue.toLowerCase() === newValue.toLowerCase()
+            }
+        })
+
+        var b = buffer()
+        m.observe(x, b)
+
+        x.set("A")
+        x.set("b")
+        x.set("B")
+        x.set("C")
+
+        expect(["b", "C"]).toEqual(b.toArray())
+        expect(mobx._isComputingDerivation()).toBe(false)
+
+        done()
+    } catch (e) {
+        console.log(e.stack)
+    }
+})
+
+test("box uses equals2", function(done) {
+    try {
+        var x = observable.box("01", {
+            equals: (oldValue, newValue) => {
+                return parseInt(oldValue) === parseInt(newValue)
+            }
+        })
+
+        var y = computed(function() {
+            return parseInt(x)
+        })
+
+        var b = buffer()
+        m.observe(y, b)
+
+        x.set("2")
+        x.set("02")
+        x.set("002")
+        x.set("03")
+
+        expect([2, 3]).toEqual(b.toArray())
+        expect(mobx._isComputingDerivation()).toBe(false)
+
+        done()
+    } catch (e) {
+        console.log(e.stack)
+    }
+})
+
 test("readme1", function(done) {
     try {
         var b = buffer()
@@ -157,7 +211,7 @@ test("readme1", function(done) {
         var order = {}
         order.price = observable.box(10)
         // Prints: New price: 24
-        //in TS, just: value(() => this.price() * (1+vat()))
+        // in TS, just: value(() => this.price() * (1+vat()))
         order.priceWithVat = computed(function() {
             return order.price.get() * (1 + vat.get())
         })
@@ -191,7 +245,7 @@ test("batch", function() {
 
     a.set(4)
     b.set(5)
-    // Note, 60 should not happen! (that is d beign computed before c after update of b)
+    // Note, 60 should not happen! (that is d begin computed before c after update of b)
     expect(buf.toArray()).toEqual([36, 100])
 
     var x = mobx.transaction(function() {

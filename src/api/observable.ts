@@ -1,5 +1,6 @@
 import {
     IEnhancer,
+    IEqualsComparer,
     IObservableArray,
     IObservableDecorator,
     IObservableMapInitialValues,
@@ -25,6 +26,7 @@ import {
 
 export type CreateObservableOptions = {
     name?: string
+    equals?: IEqualsComparer<any>
     deep?: boolean
     defaultDecorator?: IObservableDecorator
     proxy?: boolean
@@ -41,7 +43,7 @@ export const defaultCreateObservableOptions: CreateObservableOptions = {
 Object.freeze(defaultCreateObservableOptions)
 
 function assertValidOption(key: string) {
-    if (!/^(deep|name|defaultDecorator|proxy)$/.test(key))
+    if (!/^(deep|name|equals|defaultDecorator|proxy)$/.test(key))
         fail(`invalid option for (extend)observable: ${key}`)
 }
 
@@ -142,7 +144,7 @@ const observableFactories: IObservableFactories = {
     box<T = any>(value?: T, options?: CreateObservableOptions): IObservableValue<T> {
         if (arguments.length > 2) incorrectlyUsedAsDecorator("box")
         const o = asCreateObservableOptions(options)
-        return new ObservableValue(value, getEnhancerFromOptions(o), o.name)
+        return new ObservableValue(value, getEnhancerFromOptions(o), o)
     },
     array<T = any>(initialValues?: T[], options?: CreateObservableOptions): IObservableArray<T> {
         if (arguments.length > 2) incorrectlyUsedAsDecorator("array")

@@ -148,7 +148,7 @@ export class ObservableObjectAdministration
             entry = new ObservableValue(
                 exists,
                 referenceEnhancer,
-                `${this.name}.${key.toString()}?`,
+                { name: `${this.name}.${key.toString()}?` },
                 false
             )
             map.set(key, entry)
@@ -173,7 +173,7 @@ export class ObservableObjectAdministration
         const observable = new ObservableValue(
             newValue,
             enhancer,
-            `${this.name}.${propName}`,
+            { name: `${this.name}.${propName}` },
             false
         )
         this.values.set(propName, observable)
