@@ -3,6 +3,7 @@
 var mobx = require("../../src/mobx.ts")
 var map = mobx.observable.map
 var autorun = mobx.autorun
+var observable = mobx.observable
 var iterall = require("iterall")
 
 test("map crud", function() {
@@ -115,6 +116,45 @@ test("observe value", function() {
     a.replace({ y: "stuff", z: "zoef" })
     expect(valueY).toBe("stuff")
     expect(mobx.keys(a)).toEqual(["y", "z"])
+})
+
+test("map from subclass of ES6 Map", function() {
+    var values = []
+    var valueX = undefined
+    class SubMap1 extends Map {
+        pushValue(value) {
+            values.push(value)
+        }
+    }
+
+    var m1 = observable(new SubMap1([["a", 1], ["b", 2]]))
+    m1.pushValue(1)
+    expect(values).toEqual([1])
+
+    autorun(function() {
+        valueX = m1.get("x")
+    })
+    expect(valueX).toBe(undefined)
+    m1.set("x", "x is set")
+    expect(valueX).toBe("x is set")
+
+    class SubMap2 extends Map {
+        pushValue(value) {
+            values.push(value * 10)
+        }
+        pushValue10x(value) {
+            values.push(value * 10)
+        }
+    }
+    const m2 = new SubMap2([["c", 3]])
+    m1.merge(m2)
+
+    // existing prop will not be override
+    m1.pushValue(2)
+    // prop that does not exist on map will be added
+    m1.pushValue10x(3)
+    expect(values).toEqual([1, 2, 30])
+    expect(m1.toJSON()).toEqual({ a: 1, b: 2, c: 3, x: "x is set" })
 })
 
 test("initialize with entries", function() {

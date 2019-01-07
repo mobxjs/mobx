@@ -291,6 +291,21 @@ export class ObservableMap<K = any, V = any>
         for (const [key, value] of this) callback.call(thisArg, value, key, this)
     }
 
+    mergeProtoProp(initialData: IObservableMapInitialValues<K, V>) {
+        const copyProp = (from, to) => {
+            // do not override exists prop to protect props of observable map
+            const existProps = Object.getOwnPropertyNames(to)
+            Object.getOwnPropertyNames(from).forEach(key => {
+                if (existProps.indexOf(key) === -1) {
+                    const descriptor = Object.getOwnPropertyDescriptor(from, key)
+                    Object.defineProperty(to, key, descriptor!)
+                }
+            })
+        }
+
+        copyProp(Object.getPrototypeOf(initialData), Object.getPrototypeOf(this))
+    }
+
     /** Merge another object into this object, returns this. */
     merge(other: ObservableMap<K, V> | IKeyValueMap<V> | any): ObservableMap<K, V> {
         if (isObservableMap(other)) {
@@ -300,8 +315,10 @@ export class ObservableMap<K = any, V = any>
             if (isPlainObject(other))
                 Object.keys(other).forEach(key => this.set((key as any) as K, other[key]))
             else if (Array.isArray(other)) other.forEach(([key, value]) => this.set(key, value))
-            else if (isES6Map(other)) other.forEach((value, key) => this.set(key, value))
-            else if (other !== null && other !== undefined)
+            else if (isES6Map(other)) {
+                other.forEach((value, key) => this.set(key, value))
+                this.mergeProtoProp(other)
+            } else if (other !== null && other !== undefined)
                 fail("Cannot initialize map from " + other)
         })
         return this
