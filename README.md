@@ -197,7 +197,7 @@ For example the following `autorun` prints a log message each time the amount of
 
 ```javascript
 autorun(() => {
-    console.log(`Tasks left: { todos.unfinishedTodoCount }`)
+    console.log(`Tasks left: ${ todos.unfinishedTodoCount }`)
 })
 ```
 
