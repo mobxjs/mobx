@@ -88,11 +88,11 @@ MobX adds observable capabilities to existing data structures like objects, arra
 This can simply be done by annotating your class properties with the [@observable](http://mobxjs.github.io/mobx/refguide/observable-decorator.html) decorator (ES.Next).
 
 ```javascript
-import { observable } from "mobx"
+import { observable } from 'mobx';
 
 class Todo {
     id = Math.random();
-    @observable title = "";
+    @observable title = '';
     @observable finished = false;
 }
 ```
@@ -106,11 +106,11 @@ Or you can skip them altoghether, as MobX can be used fine without decorator _sy
 Many MobX users prefer the slightly more concise decorator syntax, but the following snippet achieves the same:
 
 ```javascript
-import { decorate, observable } from "mobx"
+import { decorate, observable } from 'mobx';
 
 class Todo {
     id = Math.random();
-    title = "";
+    title = '';
     finished = false;
 }
 decorate(Todo, {
@@ -173,7 +173,7 @@ class TodoListView extends Component {
 const TodoView = observer(({todo}) =>
     <li>
         <input
-            type="checkbox"
+            type='checkbox'
             checked={todo.finished}
             onClick={() => todo.finished = !todo.finished}
         />{todo.title}
@@ -197,7 +197,7 @@ For example the following `autorun` prints a log message each time the amount of
 
 ```javascript
 autorun(() => {
-    console.log("Tasks left: " + todos.unfinishedTodoCount)
+    console.log(`Tasks left: ${ todos.unfinishedTodoCount }`)
 })
 ```
 
@@ -227,8 +227,8 @@ There is no technical need for firing events, calling a dispatcher, etc. A React
 
 ```javascript
 store.todos.push(
-    new Todo("Get Coffee"),
-    new Todo("Write simpler code")
+    new Todo('Get Coffee'),
+    new Todo('Write simpler code')
 );
 store.todos[0].finished = true;
 ```
