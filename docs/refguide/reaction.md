@@ -83,7 +83,7 @@ The following example shows a `reaction` that is invoked only once.
 ```javascript
 const counter = observable({ count: 0 });
 
-// invoke once of and dispose reaction: reacts to obserbable value.
+// invoke once of and dispose reaction: reacts to observable value.
 const reaction3 = reaction(
     () => counter.count,
     (count, reaction) => {
