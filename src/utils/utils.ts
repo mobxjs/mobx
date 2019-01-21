@@ -58,14 +58,14 @@ export function deprecated(msg: string, thing?: string): boolean {
  */
 export function once(func: Lambda): Lambda {
     let invoked = false
-    return function () {
+    return function() {
         if (invoked) return
         invoked = true
         return (func as any).apply(this, arguments)
     }
 }
 
-export const noop = () => { }
+export const noop = () => {}
 
 export function unique<T>(list: T[]): T[] {
     const res: T[] = []
@@ -84,8 +84,6 @@ export function isPlainObject(value) {
     const proto = Object.getPrototypeOf(value)
     return proto === Object.prototype || proto === null
 }
-
-
 
 export function makeNonEnumerable(object: any, propNames: string[]) {
     for (let i = 0; i < propNames.length; i++) {
@@ -129,7 +127,7 @@ export function createInstanceofPredicate<T>(
 ): (x: any) => x is T {
     const propName = "isMobX" + name
     clazz.prototype[propName] = true
-    return function (x) {
+    return function(x) {
         return isObject(x) && x[propName] === true
     } as any
 }
@@ -148,6 +146,10 @@ export function isArrayLike(x: any): x is Array<any> | IObservableArray<any> {
 export function isES6Map(thing): boolean {
     if (getGlobal().Map !== undefined && thing instanceof getGlobal().Map) return true
     return false
+}
+
+export function isES6Set(thing): thing is Set<any> {
+    return thing instanceof Set
 }
 
 export function getMapLikeKeys<K, V>(map: ObservableMap<K, V>): ReadonlyArray<K>

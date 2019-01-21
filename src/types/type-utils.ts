@@ -1,12 +1,13 @@
 import { IDepTreeNode } from "../core/observable"
 import { fail } from "../utils/utils"
 import { initializeInstance } from "../utils/decorators2"
-import { isAtom } from "../core/atom"
+import { isAtom, $mobx } from "../core/atom"
 import { isComputedValue } from "../core/computedvalue"
 import { isReaction } from "../core/reaction"
 import { isObservableArray } from "./observablearray"
 import { isObservableMap } from "./observablemap"
 import { isObservableObject } from "./observableobject"
+import { isObservableSet } from "./observableset"
 
 export function getAtom(thing: any, property?: string): IDepTreeNode {
     if (typeof thing === "object" && thing !== null) {
@@ -17,6 +18,9 @@ export function getAtom(thing: any, property?: string): IDepTreeNode {
                         "It is not possible to get index atoms from arrays"
                 )
             return (thing as any).$mobx.atom
+        }
+        if (isObservableSet(thing)) {
+            return (thing as any)[$mobx]
         }
         if (isObservableMap(thing)) {
             const anyThing = thing as any
@@ -63,7 +67,7 @@ export function getAdministration(thing: any, property?: string) {
     if (!thing) fail("Expecting some object")
     if (property !== undefined) return getAdministration(getAtom(thing, property))
     if (isAtom(thing) || isComputedValue(thing) || isReaction(thing)) return thing
-    if (isObservableMap(thing)) return thing
+    if (isObservableMap(thing) || isObservableSet(thing)) return thing
     // Initializers run lazily when transpiling to babel, so make sure they are run...
     initializeInstance(thing)
     if (thing.$mobx) return thing.$mobx
@@ -73,7 +77,8 @@ export function getAdministration(thing: any, property?: string) {
 export function getDebugName(thing: any, property?: string): string {
     let named
     if (property !== undefined) named = getAtom(thing, property)
-    else if (isObservableObject(thing) || isObservableMap(thing)) named = getAdministration(thing)
+    else if (isObservableObject(thing) || isObservableMap(thing) || isObservableSet(thing))
+        named = getAdministration(thing)
     else named = getAtom(thing) // valid for arrays as well
     return named.name
 }

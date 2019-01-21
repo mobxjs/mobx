@@ -10,20 +10,23 @@ export function deepEnhancer(v, _, name) {
     if (Array.isArray(v)) return observable.array(v, { name })
     if (isPlainObject(v)) return observable.object(v, undefined, { name })
     if (isES6Map(v)) return observable.map(v, { name })
+    if (isES6Set(v)) return observable.set(v, { name })
 
     return v
 }
 
 export function shallowEnhancer(v, _, name): any {
     if (v === undefined || v === null) return v
-    if (isObservableObject(v) || isObservableArray(v) || isObservableMap(v)) return v
+    if (isObservableObject(v) || isObservableArray(v) || isObservableMap(v) || isObservableSet(v))
+        return v
     if (Array.isArray(v)) return observable.array(v, { name, deep: false })
     if (isPlainObject(v)) return observable.object(v, undefined, { name, deep: false })
     if (isES6Map(v)) return observable.map(v, { name, deep: false })
+    if (isES6Set(v)) return observable.set(v, { name, deep: false })
 
     return fail(
         process.env.NODE_ENV !== "production" &&
-            "The shallow modifier / decorator can only used in combination with arrays, objects and maps"
+            "The shallow modifier / decorator can only used in combination with arrays, objects, maps and sets"
     )
 }
 
@@ -41,8 +44,9 @@ export function refStructEnhancer(v, oldValue, name): any {
 
 import { observable } from "../api/observable"
 import { isObservable } from "../api/isobservable"
-import { fail, isPlainObject, isES6Map } from "../utils/utils"
+import { fail, isPlainObject, isES6Map, isES6Set } from "../utils/utils"
 import { isObservableObject } from "./observableobject"
 import { isObservableArray } from "./observablearray"
+import { isObservableSet } from "./observableset"
 import { isObservableMap } from "./observablemap"
 import { deepEqual } from "../utils/eq"

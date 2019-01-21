@@ -6,6 +6,7 @@ import { IComputedValue } from "../core/computedvalue"
 import { IObservableValue, IValueDidChange } from "../types/observablevalue"
 import { Lambda } from "../utils/utils"
 import { getAdministration } from "../types/type-utils"
+import { ObservableSet, ISetDidChange } from "../types/observableset"
 
 export function observe<T>(
     value: IObservableValue<T> | IComputedValue<T>,
@@ -15,6 +16,11 @@ export function observe<T>(
 export function observe<T>(
     observableArray: IObservableArray<T>,
     listener: (change: IArrayChange<T> | IArraySplice<T>) => void,
+    fireImmediately?: boolean
+): Lambda
+export function observe<V>(
+    observableMap: ObservableSet<V>,
+    listener: (change: ISetDidChange<V>) => void,
     fireImmediately?: boolean
 ): Lambda
 export function observe<K, V>(

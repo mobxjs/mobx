@@ -5,6 +5,7 @@ import { IObjectWillChange } from "../types/observableobject"
 import { IValueWillChange, IObservableValue } from "../types/observablevalue"
 import { Lambda } from "../utils/utils"
 import { getAdministration } from "../types/type-utils"
+import { ObservableSet, ISetWillChange } from "../types/observableset"
 
 export function intercept<T>(
     value: IObservableValue<T>,
@@ -17,6 +18,10 @@ export function intercept<T>(
 export function intercept<K, V>(
     observableMap: ObservableMap<K, V>,
     handler: IInterceptor<IMapWillChange<K, V>>
+): Lambda
+export function intercept<V>(
+    observableMap: ObservableSet<V>,
+    handler: IInterceptor<ISetWillChange<V>>
 ): Lambda
 export function intercept<K, V>(
     observableMap: ObservableMap<K, V>,

@@ -5,9 +5,15 @@ import { Lambda } from "../utils/utils"
 import { getAtom } from "../types/type-utils"
 import { IObservable } from "../core/observable"
 import { fail } from "../utils/utils"
+import { ObservableSet } from "../types/observableset"
 
 export function onBecomeObserved(
-    value: IObservable | IComputedValue<any> | IObservableArray<any> | ObservableMap<any, any>,
+    value:
+        | IObservable
+        | IComputedValue<any>
+        | IObservableArray<any>
+        | ObservableMap<any, any>
+        | ObservableSet<any>,
     listener: Lambda
 ): Lambda
 export function onBecomeObserved<K, V = any>(
@@ -20,7 +26,12 @@ export function onBecomeObserved(thing, arg2, arg3?): Lambda {
 }
 
 export function onBecomeUnobserved(
-    value: IObservable | IComputedValue<any> | IObservableArray<any> | ObservableMap<any, any>,
+    value:
+        | IObservable
+        | IComputedValue<any>
+        | IObservableArray<any>
+        | ObservableMap<any, any>
+        | ObservableSet<any>,
     listener: Lambda
 ): Lambda
 export function onBecomeUnobserved<K, V = any>(
@@ -34,7 +45,7 @@ export function onBecomeUnobserved(thing, arg2, arg3?): Lambda {
 
 function interceptHook(hook: "onBecomeObserved" | "onBecomeUnobserved", thing, arg2, arg3) {
     const atom: IObservable =
-        typeof arg2 === "string" ? getAtom(thing, arg2) : getAtom(thing) as any
+        typeof arg2 === "string" ? getAtom(thing, arg2) : (getAtom(thing) as any)
     const cb = typeof arg2 === "string" ? arg3 : arg2
     const orig = atom[hook]
 

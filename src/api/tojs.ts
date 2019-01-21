@@ -3,6 +3,7 @@ import { isObservableMap } from "../types/observablemap"
 import { isObservableValue } from "../types/observablevalue"
 import { isObservable } from "./isobservable"
 import { keys } from "./object-api"
+import { isObservableSet } from "../types/observableset"
 
 export type ToJSOptions = {
     detectCycles?: boolean
@@ -25,7 +26,7 @@ function toJSHelper(source, options: ToJSOptions, __alreadySeen: Map<any, any>) 
     if (!options.recurseEverything && !isObservable(source)) return source
 
     if (typeof source !== "object") return source
-    
+
     // Directly return null if source is null
     if (source === null) return null
 
@@ -49,6 +50,22 @@ function toJSHelper(source, options: ToJSOptions, __alreadySeen: Map<any, any>) 
         res.length = toAdd.length
         for (let i = 0, l = toAdd.length; i < l; i++) res[i] = toAdd[i]
         return res
+    }
+
+    if (isObservableSet(source) || Object.getPrototypeOf(source) === Set.prototype) {
+        if (options.exportMapsAsObjects === false) {
+            const res = cache(__alreadySeen, source, new Set(), options)
+            source.forEach(value => {
+                res.add(toJSHelper(value, options!, __alreadySeen))
+            })
+            return res
+        } else {
+            const res = cache(__alreadySeen, source, [] as any[], options)
+            source.forEach(value => {
+                res.push(toJSHelper(value, options!, __alreadySeen))
+            })
+            return res
+        }
     }
 
     if (isObservableMap(source) || Object.getPrototypeOf(source) === Map.prototype) {

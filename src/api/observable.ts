@@ -1,4 +1,4 @@
-import { fail, deprecated, isES6Map, isPlainObject } from "../utils/utils"
+import { fail, deprecated, isES6Map, isPlainObject, isES6Set } from "../utils/utils"
 import {
     deepEnhancer,
     referenceEnhancer,
@@ -14,6 +14,7 @@ import { IObservableObject } from "../types/observableobject"
 import { extendObservable } from "./extendobservable"
 import { IObservableMapInitialValues, ObservableMap } from "../types/observablemap"
 import { IEqualsComparer } from "../utils/comparer"
+import { IObservableSetInitialValues, ObservableSet } from "../types/observableset"
 
 export type CreateObservableOptions = {
     name?: string
@@ -85,6 +86,8 @@ function createObservable(v: any, arg2?: any, arg3?: any) {
         ? observable.array(v, arg2)
         : isES6Map(v)
         ? observable.map(v, arg2)
+        : isES6Set(v)
+        ? observable.set(v, arg2)
         : v
 
     // this value could be converted to a new observable data structure, return it
@@ -118,6 +121,10 @@ export interface IObservableFactories {
         initialValues?: T[],
         options?: CreateObservableOptions
     ): IObservableArray<T>
+    set<T = any>(
+        initialValues?: IObservableSetInitialValues<T>,
+        options?: CreateObservableOptions
+    ): ObservableSet<T>
     map<K = any, V = any>(
         initialValues?: IObservableMapInitialValues<K, V>,
         options?: CreateObservableOptions
@@ -185,6 +192,14 @@ const observableFactories: IObservableFactories = {
         if (arguments.length > 2) incorrectlyUsedAsDecorator("shallowMap")
         deprecated(`observable.shallowMap`, `observable.map(values, { deep: false })`)
         return observable.map(initialValues, { name, deep: false })
+    },
+    set<T = any>(
+        initialValues?: IObservableSetInitialValues<T>,
+        options?: CreateObservableOptions
+    ): ObservableSet<T> {
+        if (arguments.length > 2) incorrectlyUsedAsDecorator("set")
+        const o = asCreateObservableOptions(options)
+        return new ObservableSet<T>(initialValues, getEnhancerFromOptions(o), o.name)
     },
     object<T = any>(
         props: T,

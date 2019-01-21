@@ -84,6 +84,13 @@ export {
     isObservableMap,
     IObservableMapInitialValues
 } from "./types/observablemap"
+export {
+    ObservableSet,
+    isObservableSet,
+    ISetDidChange,
+    ISetWillChange,
+    IObservableSetInitialValues
+} from "./types/observableset"
 
 export { transaction } from "./api/transaction"
 export { observable, IObservableFactory, IObservableFactories } from "./api/observable"
@@ -132,7 +139,7 @@ import { spy } from "./core/spy"
 import { getDebugName } from "./types/type-utils"
 import { fail } from "./utils/utils"
 
-declare var __MOBX_DEVTOOLS_GLOBAL_HOOK__: { injectMobx: ((any) => void) }
+declare var __MOBX_DEVTOOLS_GLOBAL_HOOK__: { injectMobx: (any) => void }
 if (typeof __MOBX_DEVTOOLS_GLOBAL_HOOK__ === "object") {
     // See: https://github.com/andykog/mobx-devtools/
     __MOBX_DEVTOOLS_GLOBAL_HOOK__.injectMobx({

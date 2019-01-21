@@ -2,7 +2,11 @@ import * as fs from "fs"
 var mobx = require("../../src/mobx.ts")
 
 test("correct api should be exposed", function() {
-    expect(Object.keys(mobx).filter(key => mobx[key] !== undefined).sort()).toEqual(
+    expect(
+        Object.keys(mobx)
+            .filter(key => mobx[key] !== undefined)
+            .sort()
+    ).toEqual(
         [
             "action",
             "_allowStateChanges",
@@ -36,10 +40,12 @@ test("correct api should be exposed", function() {
             "isObservable",
             "isObservableArray",
             "isObservableMap",
+            "isObservableSet",
             "isObservableObject",
             "isObservableProp",
             "keys",
             "ObservableMap",
+            "ObservableSet",
             "observable",
             "observe",
             "onReactionError",

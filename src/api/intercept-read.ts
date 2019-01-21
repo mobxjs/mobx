@@ -4,6 +4,7 @@ import { isObservableMap, ObservableMap } from "../types/observablemap"
 import { isObservableObject } from "../types/observableobject"
 import { IObservableValue, isObservableValue } from "../types/observablevalue"
 import { getAdministration } from "../types/type-utils"
+import { ObservableSet } from "../types/observableset"
 
 export type ReadInterceptor<T> = (value: any) => T
 
@@ -15,6 +16,10 @@ export function interceptReads<T>(
 ): Lambda
 export function interceptReads<K, V>(
     observableMap: ObservableMap<K, V>,
+    handler: ReadInterceptor<V>
+): Lambda
+export function interceptReads<V>(
+    observableSet: ObservableSet<V>,
     handler: ReadInterceptor<V>
 ): Lambda
 export function interceptReads(
