@@ -174,12 +174,7 @@ export class ObservableMap<K = any, V = any>
         if (entry) {
             entry.setNewValue(value)
         } else {
-            entry = new ObservableValue(
-                value,
-                referenceEnhancer,
-                { name: `${this.name}.${key}?` },
-                false
-            )
+            entry = new ObservableValue(value, referenceEnhancer, `${this.name}.${key}?`, false)
             this._hasMap.set(key, entry)
         }
         return entry
@@ -215,7 +210,7 @@ export class ObservableMap<K = any, V = any>
             const observable = new ObservableValue(
                 newValue,
                 this.enhancer,
-                { name: `${this.name}.${key}` },
+                `${this.name}.${key}`,
                 false
             )
             this._data.set(key, observable)

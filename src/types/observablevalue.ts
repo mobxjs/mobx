@@ -49,16 +49,13 @@ export class ObservableValue<T> extends Atom
     changeListeners
     value
     dehancer: any
-    private equals: IEqualsComparer<any>
 
     constructor(
         value: T,
         public enhancer: IEnhancer<T>,
-        {
-            name = "ObservableValue@" + getNextId(),
-            equals = comparer.default
-        }: { name?: string; equals?: IEqualsComparer<any> },
-        notifySpy = true
+        public name = "ObservableValue@" + getNextId(),
+        notifySpy = true,
+        private equals: IEqualsComparer<any> = comparer.default
     ) {
         super(name)
         this.value = enhancer(value, undefined, name)
@@ -66,7 +63,6 @@ export class ObservableValue<T> extends Atom
             // only notify spy if this is a stand-alone observable
             spyReport({ type: "create", name: this.name, newValue: "" + this.value })
         }
-        this.equals = equals
     }
 
     private dehanceValue(value: T): T {
@@ -77,9 +73,7 @@ export class ObservableValue<T> extends Atom
     public set(newValue: T) {
         const oldValue = this.value
         newValue = this.prepareNewValue(newValue) as any
-        const changed = !this.equals(oldValue, newValue)
-
-        if (newValue !== globalState.UNCHANGED && changed) {
+        if (newValue !== globalState.UNCHANGED) {
             const notifySpy = isSpyEnabled()
             if (notifySpy && process.env.NODE_ENV !== "production") {
                 spyReportStart({
@@ -107,7 +101,7 @@ export class ObservableValue<T> extends Atom
         }
         // apply modifier
         newValue = this.enhancer(newValue, this.value, this.name)
-        return this.value !== newValue ? newValue : globalState.UNCHANGED
+        return this.equals(this.value, newValue) ? globalState.UNCHANGED : newValue
     }
 
     setNewValue(newValue: T) {
