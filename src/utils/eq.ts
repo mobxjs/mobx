@@ -1,7 +1,11 @@
-import { isES6Map, isES6Set, iteratorToArray } from "./utils"
-import { isObservableArray } from "../types/observablearray"
-import { isObservableMap } from "../types/observablemap"
-import { isObservableSet } from "../types/observableset"
+import {
+    isES6Map,
+    isES6Set,
+    iteratorToArray,
+    isObservableArray,
+    isObservableMap,
+    isObservableSet
+} from "../internal"
 
 declare var Symbol
 const toString = Object.prototype.toString

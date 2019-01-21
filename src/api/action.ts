@@ -1,6 +1,13 @@
-import { invariant, fail, addHiddenProp } from "../utils/utils"
-import { createAction, executeAction, IAction } from "../core/action"
-import { namedActionDecorator, boundActionDecorator } from "./actiondecorator"
+import {
+    IAction,
+    addHiddenProp,
+    boundActionDecorator,
+    createAction,
+    executeAction,
+    fail,
+    invariant,
+    namedActionDecorator
+} from "../internal"
 
 export interface IActionFactory {
     // nameless actions
@@ -33,7 +40,11 @@ export interface IActionFactory {
     <T extends Function>(name: string, fn: T): T & IAction
 
     // named decorator
-    (customName: string): (target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor) => void
+    (customName: string): (
+        target: Object,
+        key: string | symbol,
+        baseDescriptor?: PropertyDescriptor
+    ) => void
 
     // unnamed decorator
     (target: Object, propertyKey: string | symbol, descriptor?: PropertyDescriptor): void

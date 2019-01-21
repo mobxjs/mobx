@@ -1,7 +1,4 @@
-import { isObservableObject } from "../types/observableobject"
-import { getAtom } from "../types/type-utils"
-import { isComputedValue } from "../core/computedvalue"
-import { fail } from "../utils/utils"
+import { isObservableObject, getAtom, isComputedValue, fail } from "../internal"
 
 export function _isComputed(value, property?: string): boolean {
     if (value === null || value === undefined) return false

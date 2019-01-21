@@ -1,4 +1,4 @@
-import { addHiddenFinalProp } from "./utils"
+import { addHiddenFinalProp } from "../internal"
 
 // inspired by https://github.com/leebyron/iterall/
 

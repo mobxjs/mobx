@@ -1,7 +1,4 @@
-import { getGlobal, fail } from "../utils/utils"
-import { IDerivation } from "./derivation"
-import { Reaction } from "./reaction"
-import { IObservable } from "./observable"
+import { getGlobal, fail, IDerivation, IObservable, Reaction } from "../internal"
 
 /**
  * These values will persist if global state is reset
@@ -111,7 +108,7 @@ export class MobXGlobals {
     disableErrorBoundaries = false
 
     /*
-     * If true, we are already handling an exception in an action. Any errors in reactions should be supressed, as 
+     * If true, we are already handling an exception in an action. Any errors in reactions should be supressed, as
      * they are not the cause, see: https://github.com/mobxjs/mobx/issues/1836
      */
     suppressReactionErrors = false

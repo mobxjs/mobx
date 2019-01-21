@@ -1,7 +1,11 @@
-import { defineObservableProperty } from "../types/observableobject"
-import { fail, invariant } from "../utils/utils"
-import { IEnhancer } from "../types/modifiers"
-import { createPropDecorator, BabelDescriptor } from "../utils/decorators2"
+import {
+    fail,
+    invariant,
+    IEnhancer,
+    createPropDecorator,
+    BabelDescriptor,
+    defineObservableProperty
+} from "../internal"
 
 export type IObservableDecorator = {
     (target: Object, property: string | symbol, descriptor?: PropertyDescriptor): void
@@ -25,7 +29,9 @@ export function createDecoratorForEnhancer(enhancer: IEnhancer<any>): IObservabl
                 )
             }
             const initialValue = descriptor
-                ? descriptor.initializer ? descriptor.initializer.call(target) : descriptor.value
+                ? descriptor.initializer
+                    ? descriptor.initializer.call(target)
+                    : descriptor.value
                 : undefined
             defineObservableProperty(target, propertyName, initialValue, enhancer)
         }

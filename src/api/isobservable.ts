@@ -1,10 +1,13 @@
-import { isObservableArray } from "../types/observablearray"
-import { isObservableMap } from "../types/observablemap"
-import { isObservableObject, ObservableObjectAdministration } from "../types/observableobject"
-import { isAtom } from "../core/atom"
-import { isComputedValue } from "../core/computedvalue"
-import { isReaction } from "../core/reaction"
-import { fail } from "../utils/utils"
+import {
+    isObservableArray,
+    fail,
+    isObservableMap,
+    isObservableObject,
+    ObservableObjectAdministration,
+    isAtom,
+    isReaction,
+    isComputedValue
+} from "../internal"
 
 function _isObservable(value, property?: string): boolean {
     if (value === null || value === undefined) return false

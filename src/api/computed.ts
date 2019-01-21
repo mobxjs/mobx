@@ -1,9 +1,12 @@
-import { comparer } from "../utils/comparer"
-import { IComputedValueOptions } from "../core/computedvalue"
-import { defineComputedProperty } from "../types/observableobject"
-import { invariant } from "../utils/utils"
-import { ComputedValue, IComputedValue } from "../core/computedvalue"
-import { createPropDecorator } from "../utils/decorators2"
+import {
+    comparer,
+    IComputedValueOptions,
+    IComputedValue,
+    createPropDecorator,
+    defineComputedProperty,
+    invariant,
+    ComputedValue
+} from "../internal"
 
 export interface IComputed {
     <T>(options: IComputedValueOptions<T>): any // decorator

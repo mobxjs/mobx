@@ -1,7 +1,11 @@
-import { globalState, isolateGlobalState } from "../core/globalstate"
-import { reserveArrayBuffer } from "../types/observablearray"
-import { setReactionScheduler } from "../core/reaction"
-import { deprecated } from "../utils/utils"
+import {
+    globalState,
+    fail,
+    isolateGlobalState,
+    deprecated,
+    reserveArrayBuffer,
+    setReactionScheduler
+} from "../internal"
 
 export function configure(options: {
     enforceActions?: boolean | "strict" | "never" | "always" | "observed"

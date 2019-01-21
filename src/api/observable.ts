@@ -1,20 +1,29 @@
-import { fail, deprecated, isES6Map, isPlainObject, isES6Set } from "../utils/utils"
 import {
-    deepEnhancer,
+    fail,
+    deprecated,
+    isES6Map,
+    isPlainObject,
+    isES6Set,
+    IEqualsComparer,
+    IObservableDecorator,
+    IEnhancer,
     referenceEnhancer,
+    deepEnhancer,
+    createDecoratorForEnhancer,
     shallowEnhancer,
     refStructEnhancer,
-    IEnhancer
-} from "../types/modifiers"
-import { IObservableValue, ObservableValue } from "../types/observablevalue"
-import { IObservableArray, ObservableArray } from "../types/observablearray"
-import { createDecoratorForEnhancer, IObservableDecorator } from "./observabledecorator"
-import { isObservable } from "./isobservable"
-import { IObservableObject } from "../types/observableobject"
-import { extendObservable } from "./extendobservable"
-import { IObservableMapInitialValues, ObservableMap } from "../types/observablemap"
-import { IEqualsComparer } from "../utils/comparer"
-import { IObservableSetInitialValues, ObservableSet } from "../types/observableset"
+    isObservable,
+    IObservableArray,
+    ObservableMap,
+    IObservableObject,
+    IObservableValue,
+    IObservableSetInitialValues,
+    ObservableSet,
+    IObservableMapInitialValues,
+    ObservableValue,
+    ObservableArray,
+    extendObservable
+} from "../internal"
 
 export type CreateObservableOptions = {
     name?: string

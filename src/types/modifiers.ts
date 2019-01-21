@@ -1,3 +1,17 @@
+import {
+    isObservable,
+    observable,
+    isPlainObject,
+    isES6Map,
+    isES6Set,
+    isObservableObject,
+    isObservableArray,
+    isObservableMap,
+    isObservableSet,
+    deepEqual,
+    fail
+} from "../internal"
+
 export interface IEnhancer<T> {
     (newValue: T, oldValue: T | undefined, name: string): T
 }
@@ -41,12 +55,3 @@ export function refStructEnhancer(v, oldValue, name): any {
     if (deepEqual(v, oldValue)) return oldValue
     return v
 }
-
-import { observable } from "../api/observable"
-import { isObservable } from "../api/isobservable"
-import { fail, isPlainObject, isES6Map, isES6Set } from "../utils/utils"
-import { isObservableObject } from "./observableobject"
-import { isObservableArray } from "./observablearray"
-import { isObservableSet } from "./observableset"
-import { isObservableMap } from "./observablemap"
-import { deepEqual } from "../utils/eq"

@@ -1,11 +1,13 @@
-import { IObservableArray } from "../types/observablearray"
-import { ObservableMap } from "../types/observablemap"
-import { IComputedValue } from "../core/computedvalue"
-import { Lambda } from "../utils/utils"
-import { getAtom } from "../types/type-utils"
-import { IObservable } from "../core/observable"
-import { fail } from "../utils/utils"
-import { ObservableSet } from "../types/observableset"
+import {
+    IObservableArray,
+    IObservable,
+    IComputedValue,
+    ObservableMap,
+    ObservableSet,
+    Lambda,
+    getAtom,
+    fail
+} from "../internal"
 
 export function onBecomeObserved(
     value:

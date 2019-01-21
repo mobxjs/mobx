@@ -1,4 +1,4 @@
-import { addHiddenProp, fail, EMPTY_ARRAY } from "./utils"
+import { addHiddenProp, fail, EMPTY_ARRAY } from "../internal"
 
 type DecoratorTarget = {
     __mobxDidRunLazyInitializers?: boolean

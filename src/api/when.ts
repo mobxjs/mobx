@@ -1,7 +1,4 @@
-import { Lambda, fail, getNextId } from "../utils/utils"
-import { IReactionDisposer } from "../core/reaction"
-import { autorun } from "./autorun"
-import { createAction } from "../core/action"
+import { Lambda, fail, getNextId, IReactionDisposer, createAction, autorun } from "../internal"
 
 export interface IWhenOptions {
     name?: string

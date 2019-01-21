@@ -1,8 +1,13 @@
-import { IObservable, IDepTreeNode, addObserver, removeObserver } from "./observable"
-import { IAtom } from "./atom"
-import { globalState } from "./globalstate"
-import { fail } from "../utils/utils"
-import { isComputedValue } from "./computedvalue"
+import {
+    fail,
+    IDepTreeNode,
+    IObservable,
+    isComputedValue,
+    globalState,
+    IAtom,
+    removeObserver,
+    addObserver
+} from "../internal"
 
 export enum IDerivationState {
     // before being run or (outside batch and not being observed)
@@ -135,7 +140,9 @@ export function checkIfStateModificationsAreAllowed(atom: IAtom) {
     if (globalState.computationDepth > 0 && hasObservers)
         fail(
             process.env.NODE_ENV !== "production" &&
-                `Computed values are not allowed to cause side effects by changing observables that are already being observed. Tried to modify: ${atom.name}`
+                `Computed values are not allowed to cause side effects by changing observables that are already being observed. Tried to modify: ${
+                    atom.name
+                }`
         )
     // Should not be possible to change observed state outside strict mode, except during initialization, see #563
     if (!globalState.allowStateChanges && (hasObservers || globalState.enforceActions === "strict"))

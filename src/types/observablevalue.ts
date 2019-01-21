@@ -1,24 +1,30 @@
-import { Atom, declareAtom } from "../core/atom"
-import { checkIfStateModificationsAreAllowed } from "../core/derivation"
 import {
     Lambda,
-    getNextId,
-    createInstanceofPredicate,
-    primitiveSymbol,
-    toPrimitive
-} from "../utils/utils"
-import {
-    hasInterceptors,
-    IInterceptable,
     IInterceptor,
+    Atom,
+    IInterceptable,
+    IListenable,
+    IEnhancer,
+    getNextId,
+    IEqualsComparer,
+    comparer,
+    isSpyEnabled,
+    spyReport,
+    globalState,
+    spyReportStart,
+    spyReportEnd,
+    IUNCHANGED,
+    checkIfStateModificationsAreAllowed,
+    hasInterceptors,
+    interceptChange,
+    hasListeners,
+    notifyListeners,
     registerInterceptor,
-    interceptChange
-} from "./intercept-utils"
-import { IListenable, registerListener, hasListeners, notifyListeners } from "./listen-utils"
-import { isSpyEnabled, spyReportStart, spyReport, spyReportEnd } from "../core/spy"
-import { IEnhancer } from "./modifiers"
-import { globalState, IUNCHANGED } from "../core/globalstate"
-import { IEqualsComparer, comparer } from "../utils/comparer"
+    registerListener,
+    toPrimitive,
+    primitiveSymbol,
+    createInstanceofPredicate
+} from "../internal"
 
 export interface IValueWillChange<T> {
     object: any
@@ -36,8 +42,6 @@ export interface IObservableValue<T> {
     intercept(handler: IInterceptor<IValueWillChange<T>>): Lambda
     observe(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda
 }
-
-declareAtom()
 
 export class ObservableValue<T> extends Atom
     implements IObservableValue<T>, IInterceptable<IValueWillChange<T>>, IListenable {

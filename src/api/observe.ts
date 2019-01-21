@@ -1,12 +1,18 @@
-import { IObservableArray, IArrayChange, IArraySplice } from "../types/observablearray"
-import { ObservableMap, IMapDidChange } from "../types/observablemap"
-import { IObjectDidChange } from "../types/observableobject"
-import { IComputedValue } from "../core/computedvalue"
-
-import { IObservableValue, IValueDidChange } from "../types/observablevalue"
-import { Lambda } from "../utils/utils"
-import { getAdministration } from "../types/type-utils"
-import { ObservableSet, ISetDidChange } from "../types/observableset"
+import {
+    IObservableArray,
+    IArrayChange,
+    IArraySplice,
+    IObservableValue,
+    IComputedValue,
+    IValueDidChange,
+    Lambda,
+    ObservableSet,
+    ISetDidChange,
+    ObservableMap,
+    IMapDidChange,
+    IObjectDidChange,
+    getAdministration
+} from "../internal"
 
 export function observe<T>(
     value: IObservableValue<T> | IComputedValue<T>,

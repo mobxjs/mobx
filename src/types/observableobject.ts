@@ -1,28 +1,36 @@
-import { ObservableValue } from "./observablevalue"
-import { ComputedValue, IComputedValueOptions } from "../core/computedvalue"
 import {
-    createInstanceofPredicate,
-    isObject,
-    Lambda,
-    getNextId,
-    invariant,
-    assertPropertyConfigurable,
-    isPlainObject,
-    addHiddenFinalProp
-} from "../utils/utils"
-import {
-    hasInterceptors,
+    ObservableValue,
     IInterceptable,
+    IListenable,
+    ComputedValue,
+    IObservableArray,
+    IEnhancer,
+    hasInterceptors,
+    interceptChange,
+    globalState,
+    hasListeners,
+    isSpyEnabled,
+    spyReportStart,
+    notifyListeners,
+    spyReportEnd,
+    startBatch,
+    endBatch,
+    Lambda,
+    invariant,
+    registerListener,
     registerInterceptor,
-    interceptChange
-} from "./intercept-utils"
-import { IListenable, registerListener, hasListeners, notifyListeners } from "./listen-utils"
-import { isSpyEnabled, spyReportStart, spyReportEnd } from "../core/spy"
-import { IEnhancer, referenceEnhancer, deepEnhancer } from "./modifiers"
-import { ObservableArray, IObservableArray } from "./observablearray"
-import { initializeInstance } from "../utils/decorators2"
-import { startBatch, endBatch } from "../core/observable"
-import { globalState } from "../core/globalstate"
+    ObservableArray,
+    referenceEnhancer,
+    deepEnhancer,
+    isPlainObject,
+    getNextId,
+    addHiddenFinalProp,
+    assertPropertyConfigurable,
+    IComputedValueOptions,
+    initializeInstance,
+    createInstanceofPredicate,
+    isObject
+} from "../internal"
 
 export interface IObservableObject {
     "observable-object": IObservableObject

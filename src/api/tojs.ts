@@ -1,9 +1,11 @@
-import { isObservableArray } from "../types/observablearray"
-import { isObservableMap } from "../types/observablemap"
-import { isObservableValue } from "../types/observablevalue"
-import { isObservable } from "./isobservable"
-import { keys } from "./object-api"
-import { isObservableSet } from "../types/observableset"
+import {
+    isObservableArray,
+    isObservable,
+    isObservableValue,
+    keys,
+    isObservableSet,
+    isObservableMap
+} from "../internal"
 
 export type ToJSOptions = {
     detectCycles?: boolean

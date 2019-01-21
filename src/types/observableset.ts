@@ -1,5 +1,4 @@
 import {
-    $mobx,
     createAtom,
     deepEnhancer,
     getNextId,
@@ -24,7 +23,8 @@ import {
     untracked,
     makeIterable,
     transaction,
-    isES6Set
+    isES6Set,
+    $mobx
 } from "../internal"
 
 const ObservableSetMarker = {}

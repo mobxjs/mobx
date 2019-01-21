@@ -1,7 +1,4 @@
-import { globalState } from "../core/globalstate"
-import { getAtom } from "../types/type-utils"
-import { fail } from "../utils/utils"
-import { TraceMode } from "../core/derivation"
+import { globalState, TraceMode, getAtom, fail } from "../internal"
 
 export function trace(thing?: any, prop?: string, enterBreakPoint?: boolean): void
 export function trace(thing?: any, enterBreakPoint?: boolean): void

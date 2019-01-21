@@ -1,5 +1,4 @@
-import { globalState } from "./globalstate"
-import { once, Lambda } from "../utils/utils"
+import { once, Lambda, globalState } from "../internal"
 
 export function isSpyEnabled() {
     return !!globalState.spyListeners.length

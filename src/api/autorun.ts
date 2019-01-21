@@ -1,7 +1,17 @@
-import { Lambda, getNextId, invariant, EMPTY_OBJECT, deprecated } from "../utils/utils"
-import { Reaction, IReactionPublic, IReactionDisposer } from "../core/reaction"
-import { action, isAction } from "./action"
-import { IEqualsComparer, comparer } from "../utils/comparer"
+import {
+    Lambda,
+    getNextId,
+    invariant,
+    EMPTY_OBJECT,
+    deprecated,
+    IReactionPublic,
+    IReactionDisposer,
+    isAction,
+    Reaction,
+    IEqualsComparer,
+    action,
+    comparer
+} from "../internal"
 
 export interface IAutorunOptions {
     delay?: number
@@ -79,7 +89,9 @@ const run = (f: Lambda) => f()
 function createSchedulerFromOptions(opts: IReactionOptions) {
     return opts.scheduler
         ? opts.scheduler
-        : opts.delay ? (f: Lambda) => setTimeout(f, opts.delay!) : run
+        : opts.delay
+        ? (f: Lambda) => setTimeout(f, opts.delay!)
+        : run
 }
 
 export function reaction<T>(

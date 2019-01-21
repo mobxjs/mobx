@@ -1,7 +1,3 @@
-import { IEnhancer, deepEnhancer } from "./modifiers"
-import { untracked } from "../core/derivation"
-import { IObservableArray, ObservableArray } from "./observablearray"
-import { ObservableValue } from "./observablevalue"
 import {
     createInstanceofPredicate,
     isPlainObject,
@@ -11,21 +7,33 @@ import {
     isES6Map,
     getMapLikeKeys,
     fail,
-    addHiddenFinalProp
-} from "../utils/utils"
-import {
+    addHiddenFinalProp,
     IInterceptable,
-    IInterceptor,
+    IListenable,
+    ObservableValue,
+    IObservableArray,
+    ObservableArray,
+    referenceEnhancer,
+    IEnhancer,
+    deepEnhancer,
     hasInterceptors,
+    interceptChange,
+    isSpyEnabled,
+    hasListeners,
+    spyReportStart,
+    transaction,
+    notifyListeners,
+    spyReportEnd,
+    globalState,
+    iteratorSymbol,
+    makeIterable,
+    untracked,
+    registerListener,
+    IInterceptor,
     registerInterceptor,
-    interceptChange
-} from "./intercept-utils"
-import { IListenable, registerListener, hasListeners, notifyListeners } from "./listen-utils"
-import { isSpyEnabled, spyReportStart, spyReportEnd } from "../core/spy"
-import { declareIterator, iteratorSymbol, makeIterable } from "../utils/iterable"
-import { transaction } from "../api/transaction"
-import { referenceEnhancer } from "./modifiers"
-import { globalState } from "../core/globalstate"
+    declareIterator,
+    $mobx
+} from "../internal"
 
 export interface IKeyValueMap<V = any> {
     [key: string]: V
@@ -71,7 +79,7 @@ export type IObservableMapInitialValues<K = any, V = any> =
 
 export class ObservableMap<K = any, V = any>
     implements Map<K, V>, IInterceptable<IMapWillChange<K, V>>, IListenable {
-    $mobx = ObservableMapMarker
+    [$mobx] = ObservableMapMarker
     private _data: Map<K, ObservableValue<V>>
     private _hasMap: Map<K, ObservableValue<boolean>> // hasMap, not hashMap >-).
     private _keys: IObservableArray<K> = <any>(

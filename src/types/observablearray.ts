@@ -1,29 +1,35 @@
 import {
-    isObject,
-    createInstanceofPredicate,
-    getNextId,
-    makeNonEnumerable,
+    IInterceptor,
     Lambda,
+    IInterceptable,
+    IListenable,
+    IAtom,
+    IEnhancer,
+    Atom,
+    getNextId,
+    registerInterceptor,
+    registerListener,
+    checkIfStateModificationsAreAllowed,
     EMPTY_ARRAY,
+    hasInterceptors,
+    interceptChange,
+    isSpyEnabled,
+    hasListeners,
+    spyReportStart,
+    notifyListeners,
+    spyReportEnd,
     addHiddenFinalProp,
+    allowStateChangesStart,
+    allowStateChangesEnd,
+    deprecated,
+    declareIterator,
+    makeIterable,
     addHiddenProp,
     invariant,
-    deprecated
-} from "../utils/utils"
-import { Atom, IAtom } from "../core/atom"
-import { checkIfStateModificationsAreAllowed } from "../core/derivation"
-import {
-    IInterceptable,
-    IInterceptor,
-    hasInterceptors,
-    registerInterceptor,
-    interceptChange
-} from "./intercept-utils"
-import { IListenable, registerListener, hasListeners, notifyListeners } from "./listen-utils"
-import { isSpyEnabled, spyReportStart, spyReportEnd } from "../core/spy"
-import { declareIterator, makeIterable } from "../utils/iterable"
-import { IEnhancer } from "./modifiers"
-import { allowStateChangesEnd, allowStateChangesStart } from "../core/action"
+    makeNonEnumerable,
+    createInstanceofPredicate,
+    isObject
+} from "../internal"
 
 const MAX_SPLICE_SIZE = 10000 // See e.g. https://github.com/mobxjs/mobx/issues/859
 
@@ -187,17 +193,15 @@ class ObservableArrayAdministration<T>
         fireImmediately = false
     ): Lambda {
         if (fireImmediately) {
-            listener(
-                <IArraySplice<T>>{
-                    object: this.array,
-                    type: "splice",
-                    index: 0,
-                    added: this.values.slice(),
-                    addedCount: this.values.length,
-                    removed: [],
-                    removedCount: 0
-                }
-            )
+            listener(<IArraySplice<T>>{
+                object: this.array,
+                type: "splice",
+                index: 0,
+                added: this.values.slice(),
+                addedCount: this.values.length,
+                removed: [],
+                removedCount: 0
+            })
         }
         return registerListener(this, listener)
     }
@@ -539,9 +543,9 @@ export class ObservableArray<T> extends StubArray {
                 return impl.dehanceValue(impl.values[index])
             }
             console.warn(
-                `[mobx.array] Attempt to read an array index (${index}) that is out of bounds (${impl
-                    .values
-                    .length}). Please check length first. Out of bound indices will not be tracked by MobX`
+                `[mobx.array] Attempt to read an array index (${index}) that is out of bounds (${
+                    impl.values.length
+                }). Please check length first. Out of bound indices will not be tracked by MobX`
             )
         }
         return undefined
@@ -610,7 +614,7 @@ Object.defineProperty(ObservableArray.prototype, "length", {
 if (typeof Symbol !== "undefined" && Symbol.toStringTag) {
     addHiddenProp(
         ObservableArray.prototype,
-        typeof Symbol !== "undefined" ? Symbol.toStringTag : "@@toStringTag" as any,
+        typeof Symbol !== "undefined" ? Symbol.toStringTag : ("@@toStringTag" as any),
         "Array"
     )
 }

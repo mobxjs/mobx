@@ -1,5 +1,4 @@
-import { action } from "./action"
-import { fail, noop } from "../utils/utils"
+import { action, fail, noop } from "../internal"
 
 let generatorId = 0
 
@@ -47,7 +46,7 @@ export function flow<R, Args extends any[]>(
         let rejector: (error: any) => void
         let pendingPromise: CancellablePromise<any> | undefined = undefined
 
-        const res = new Promise<T>(function(resolve, reject) {
+        const res = new Promise<R>(function(resolve, reject) {
             let stepId = 0
             rejector = reject
 
@@ -109,7 +108,7 @@ export function flow<R, Args extends any[]>(
                 rejector(e) // there could be a throwing finally block
             }
         })
-        return res as CancellablePromise<T>
+        return (res as CancellablePromise<R>) as any
     }
 }
 

@@ -1,5 +1,4 @@
-import { Lambda, once } from "../utils/utils"
-import { untrackedStart, untrackedEnd } from "../core/derivation"
+import { Lambda, once, untrackedStart, untrackedEnd } from "../internal"
 
 export interface IListenable {
     changeListeners: Function[] | undefined
