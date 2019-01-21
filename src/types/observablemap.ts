@@ -74,11 +74,8 @@ export class ObservableMap<K = any, V = any>
     $mobx = ObservableMapMarker
     private _data: Map<K, ObservableValue<V>>
     private _hasMap: Map<K, ObservableValue<boolean>> // hasMap, not hashMap >-).
-    private _keys: IObservableArray<K> = <any>new ObservableArray(
-        undefined,
-        referenceEnhancer,
-        `${this.name}.keys()`,
-        true
+    private _keys: IObservableArray<K> = <any>(
+        new ObservableArray(undefined, referenceEnhancer, `${this.name}.keys()`, true)
     )
     interceptors
     changeListeners
@@ -262,20 +259,18 @@ export class ObservableMap<K = any, V = any>
     entries(): IterableIterator<IMapEntry<K, V>> {
         const self = this
         let nextIndex = 0
-        return makeIterable(
-            {
-                next: function() {
-                    if (nextIndex < self._keys.length) {
-                        const key = self._keys[nextIndex++]
-                        return {
-                            value: [key, self.get(key)!] as [K, V],
-                            done: false
-                        }
+        return makeIterable({
+            next: function() {
+                if (nextIndex < self._keys.length) {
+                    const key = self._keys[nextIndex++]
+                    return {
+                        value: [key, self.get(key)!] as [K, V],
+                        done: false
                     }
-                    return { done: true }
                 }
-            } as any
-        )
+                return { done: true }
+            }
+        } as any)
     }
 
     forEach(callback: (value: V, key: K, object: Map<K, V>) => void, thisArg?) {
@@ -291,8 +286,11 @@ export class ObservableMap<K = any, V = any>
             if (isPlainObject(other))
                 Object.keys(other).forEach(key => this.set((key as any) as K, other[key]))
             else if (Array.isArray(other)) other.forEach(([key, value]) => this.set(key, value))
-            else if (isES6Map(other)) other.forEach((value, key) => this.set(key, value))
-            else if (other !== null && other !== undefined)
+            else if (isES6Map(other)) {
+                if (other.constructor !== Map)
+                    return fail("Cannot initialize from classes that inherit from Map: " + other.constructor.name) // prettier-ignore
+                other.forEach((value, key) => this.set(key, value))
+            } else if (other !== null && other !== undefined)
                 fail("Cannot initialize map from " + other)
         })
         return this
@@ -384,7 +382,7 @@ declareIterator(ObservableMap.prototype, function() {
 
 addHiddenFinalProp(
     ObservableMap.prototype,
-    typeof Symbol !== "undefined" ? Symbol.toStringTag : "@@toStringTag" as any,
+    typeof Symbol !== "undefined" ? Symbol.toStringTag : ("@@toStringTag" as any),
     "Map"
 )
 
