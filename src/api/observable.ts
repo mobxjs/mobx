@@ -153,7 +153,7 @@ const observableFactories: IObservableFactories = {
     box<T = any>(value?: T, options?: CreateObservableOptions): IObservableValue<T> {
         if (arguments.length > 2) incorrectlyUsedAsDecorator("box")
         const o = asCreateObservableOptions(options)
-        return new ObservableValue(value, getEnhancerFromOptions(o), o)
+        return new ObservableValue(value, getEnhancerFromOptions(o), o.name, true, o.equals)
     },
     shallowBox<T = any>(value?: T, name?: string): IObservableValue<T> {
         if (arguments.length > 2) incorrectlyUsedAsDecorator("shallowBox")
