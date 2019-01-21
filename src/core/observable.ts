@@ -273,7 +273,7 @@ You are entering this break point because derivation '${derivation.name}' is bei
 Just follow the stacktrace you should now see in the devtools to see precisely what piece of your code is causing this update
 The stackframe you are looking for is at least ~6-8 stack-frames up.
 
-${derivation instanceof ComputedValue ? derivation.derivation.toString() : ""}
+${derivation instanceof ComputedValue ? derivation.derivation.toString().replace(/[*]\//g, "/") : ""}
 
 The dependencies for this derivation are:
 
