@@ -240,3 +240,12 @@ test("warn on unsafe reads", function() {
         mobx.configure({ computedRequiresReaction: false })
     }
 })
+
+test("#1869", function() {
+    const x = mobx.observable.box(3)
+    mobx.configure({ enforceActions: "always", isolateGlobalState: true })
+    expect(() => {
+        x.set(4)
+    }).toThrow("Since strict-mode is enabled")
+    mobx._resetGlobalState() // should preserve strict mode
+})

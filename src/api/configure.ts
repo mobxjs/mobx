@@ -18,6 +18,9 @@ export function configure(options: {
         arrayBuffer,
         reactionScheduler
     } = options
+    if (options.isolateGlobalState === true) {
+        isolateGlobalState()
+    }
     if (enforceActions !== undefined) {
         if (typeof enforceActions === "boolean" || enforceActions === "strict")
             deprecated(
@@ -47,9 +50,6 @@ export function configure(options: {
     }
     if (computedRequiresReaction !== undefined) {
         globalState.computedRequiresReaction = !!computedRequiresReaction
-    }
-    if (options.isolateGlobalState === true) {
-        isolateGlobalState()
     }
     if (disableErrorBoundaries !== undefined) {
         if (disableErrorBoundaries === true)
