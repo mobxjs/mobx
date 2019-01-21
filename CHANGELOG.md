@@ -1,3 +1,19 @@
+# 5.9.0 / 4.9.0
+
+**Features**
+
+* Introduced support for observable sets! Through [#1592](https://github.com/mobxjs/mobx/pull/1592) by [@newraina](https://github.com/newraina)
+* `observable.box` now accepts an `equals` option, to be able to pass a custom comparision function. Through [#1862](https://github.com/mobxjs/mobx/pull/1862), [#1874](https://github.com/mobxjs/mobx/pull/1874) by [@fi3ework](https://github.com/fi3ework). Fixes [#1580](https://github.com/mobxjs/mobx/issues/1580)
+* Improved logging of reactions; if an action throws an exception, errors in reactions that react to that are only logged as warnings. Fixes [#1836](https://github.com/mobxjs/mobx/issues/1836)
+
+**Fixes**
+
+* Improved typings for `flow`, see [#1827](https://github.com/mobxjs/mobx/pull/1827) by [@xaviergonz](https://github.com/xaviergonz)
+* Don't allow subclassing map, fixes [#1858](https://github.com/mobxjs/mobx/issues/1858)
+* Fixed `trace(true)` not being able to handle multi-line comments in traced function. Fixes [#1850](https://github.com/mobxjs/mobx/issues/1850)
+* `@computed` now introduces non-configurable properties, to fail fast on incorrect inheritance or property deletion. Fixes [#1867](https://github.com/mobxjs/mobx/issues/1867)
+* The options `enforceActions` and `isolateGlobalState` now work correctly when used together. Fixes [#1869](https://github.com/mobxjs/mobx/issues/1869)
+
 # 5.8.0 / 4.8.0
 
 * MobX now requires TypeScript 3 (this was already the case in 5.7.0, but in this version the difference is actually noticeable in the typings). 
