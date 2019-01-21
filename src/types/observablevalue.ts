@@ -2,10 +2,12 @@ import {
     Atom,
     IEnhancer,
     IInterceptable,
+    IEqualsComparer,
     IInterceptor,
     IListenable,
     Lambda,
     checkIfStateModificationsAreAllowed,
+    comparer,
     createInstanceofPredicate,
     getNextId,
     hasInterceptors,
@@ -51,8 +53,9 @@ export class ObservableValue<T> extends Atom
     constructor(
         value: T,
         public enhancer: IEnhancer<T>,
-        name = "ObservableValue@" + getNextId(),
-        notifySpy = true
+        public name = "ObservableValue@" + getNextId(),
+        notifySpy = true,
+        private equals: IEqualsComparer<any> = comparer.default
     ) {
         super(name)
         this.value = enhancer(value, undefined, name)
@@ -98,7 +101,7 @@ export class ObservableValue<T> extends Atom
         }
         // apply modifier
         newValue = this.enhancer(newValue, this.value, this.name)
-        return this.value !== newValue ? newValue : globalState.UNCHANGED
+        return this.equals(this.value, newValue) ? globalState.UNCHANGED : newValue
     }
 
     setNewValue(newValue: T) {
