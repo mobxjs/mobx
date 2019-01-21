@@ -1,6 +1,7 @@
 "use strict"
 
 const mobx = require("../../src/mobx.ts")
+const utils = require("../utils/test-utils")
 
 test("trace", () => {
     mobx._resetGlobalState()
@@ -58,23 +59,25 @@ test("trace", () => {
 })
 
 test("1850", () => {
-    const x = mobx.observable({
-        firstname: "Michel",
-        lastname: "Weststrate",
-        get fullname() {
-            /* test multi line comment 
-                (run this unit test from VS code, to manually verify serialization) 
-            */
-            var res = this.firstname + " " + this.lastname
-            mobx.trace(this, "fullname", true)
-            return res
-        }
-    })
+    utils.supressConsole(() => {
+        const x = mobx.observable({
+            firstname: "Michel",
+            lastname: "Weststrate",
+            get fullname() {
+                /* test multi line comment 
+                    (run this unit test from VS code, to manually verify serialization) 
+                */
+                var res = this.firstname + " " + this.lastname
+                mobx.trace(this, "fullname", true)
+                return res
+            }
+        })
 
-    mobx.autorun(() => {
-        x.fullname
+        mobx.autorun(() => {
+            x.fullname
+        })
+        expect(() => {
+            x.firstname += "!"
+        }).not.toThrow("Unexpected identifier")
     })
-    expect(() => {
-        x.firstname += "!"
-    }).not.toThrow("Unexpected identifier")
 })

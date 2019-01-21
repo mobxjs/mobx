@@ -38,16 +38,22 @@ export function consoleWarn(block, regex) {
 }
 
 export function supressConsole(block) {
+    const messages = []
     const { warn, error } = console
     Object.assign(console, {
-        warn() {},
-        error() {}
+        warn(e) {
+            messages.push("[warn] " + e)
+        },
+        error(e) {
+            messages.push("[error] " + e)
+        }
     })
     try {
         block()
     } finally {
         Object.assign(console, { warn, error })
     }
+    return messages
 }
 
 export function stripAdminFromDescriptors(snapshot) {
