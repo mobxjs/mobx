@@ -506,3 +506,23 @@ test("Fix #1367", () => {
     )
     expect(mobx.isAction(x.method)).toBe(true)
 })
+
+test("error logging, #1836", () => {
+    const messages = utils.consoleError(() => {
+        try {
+            const a = mobx.observable.box(3)
+            mobx.autorun(() => {
+                if (a.get() === 4) throw new Error("Reaction error")
+            })
+
+            mobx.action(() => {
+                a.set(4)
+                throw new Error("Action error")
+            })()
+        } catch (e) {
+            console.error(e)
+        }
+    })
+
+    expect(messages).toMatchSnapshot()
+})
