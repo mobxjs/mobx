@@ -106,6 +106,12 @@ export class MobXGlobals {
      * the stack when an exception occurs while debugging.
      */
     disableErrorBoundaries = false
+
+    /*
+     * If true, we are already handling an exception in an action. Any errors in reactions should be supressed, as 
+     * they are not the cause, see: https://github.com/mobxjs/mobx/issues/1836
+     */
+    suppressReactionErrors = false
 }
 
 let canMergeGlobalState = true
