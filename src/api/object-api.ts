@@ -3,6 +3,7 @@ import {
     IIsObservableObject,
     IObservableArray,
     ObservableMap,
+    ObservableSet,
     ObservableObjectAdministration,
     endBatch,
     fail,
@@ -10,12 +11,14 @@ import {
     invariant,
     isObservableArray,
     isObservableMap,
+    isObservableSet,
     isObservableObject,
     startBatch
 } from "../internal"
 
 export function keys<K>(map: ObservableMap<K, any>): ReadonlyArray<K>
 export function keys<T>(ar: IObservableArray<T>): ReadonlyArray<number>
+export function keys<T>(set: ObservableSet<T>): ReadonlyArray<T>
 export function keys<T extends Object>(obj: T): ReadonlyArray<string>
 export function keys(obj: any): any {
     if (isObservableObject(obj)) {
@@ -24,16 +27,20 @@ export function keys(obj: any): any {
     if (isObservableMap(obj)) {
         return Array.from(obj.keys())
     }
+    if (isObservableSet(obj)) {
+        return Array.from(obj.keys())
+    }
     if (isObservableArray(obj)) {
         return obj.map((_, index) => index)
     }
     return fail(
         process.env.NODE_ENV !== "production" &&
-            "'keys()' can only be used on observable objects, arrays and maps"
+            "'keys()' can only be used on observable objects, arrays, sets and maps"
     )
 }
 
 export function values<K, T>(map: ObservableMap<K, T>): ReadonlyArray<T>
+export function values<T>(set: ObservableSet<T>): ReadonlyArray<T>
 export function values<T>(ar: IObservableArray<T>): ReadonlyArray<T>
 export function values<T = any>(obj: T): ReadonlyArray<any>
 export function values(obj: any): string[] {
@@ -43,16 +50,20 @@ export function values(obj: any): string[] {
     if (isObservableMap(obj)) {
         return keys(obj).map(key => obj.get(key))
     }
+    if (isObservableSet(obj)) {
+        return Array.from(obj.values())
+    }
     if (isObservableArray(obj)) {
         return obj.slice()
     }
     return fail(
         process.env.NODE_ENV !== "production" &&
-            "'values()' can only be used on observable objects, arrays and maps"
+            "'values()' can only be used on observable objects, arrays, sets and maps"
     )
 }
 
 export function entries<K, T>(map: ObservableMap<K, T>): ReadonlyArray<[K, T]>
+export function entries<T>(set: ObservableSet<T>): ReadonlyArray<[T, T]>
 export function entries<T>(ar: IObservableArray<T>): ReadonlyArray<[number, T]>
 export function entries<T = any>(obj: T): ReadonlyArray<[string, any]>
 export function entries(obj: any): any {
@@ -61,6 +72,9 @@ export function entries(obj: any): any {
     }
     if (isObservableMap(obj)) {
         return keys(obj).map(key => [key, obj.get(key)])
+    }
+    if (isObservableSet(obj)) {
+        return Array.from(obj.entries())
     }
     if (isObservableArray(obj)) {
         return obj.map((key, index) => [index, key])
@@ -113,12 +127,15 @@ export function set(obj: any, key: any, value?: any): void {
 }
 
 export function remove<K, V>(obj: ObservableMap<K, V>, key: K)
+export function remove<T>(obj: ObservableSet<T>, key: T)
 export function remove<T>(obj: IObservableArray<T>, index: number)
 export function remove<T extends Object>(obj: T, key: string)
 export function remove(obj: any, key: any): void {
     if (isObservableObject(obj)) {
         ;((obj as any) as IIsObservableObject)[$mobx].remove(key)
     } else if (isObservableMap(obj)) {
+        obj.delete(key)
+    } else if (isObservableSet(obj)) {
         obj.delete(key)
     } else if (isObservableArray(obj)) {
         if (typeof key !== "number") key = parseInt(key, 10)
@@ -133,6 +150,7 @@ export function remove(obj: any, key: any): void {
 }
 
 export function has<K>(obj: ObservableMap<K, any>, key: K): boolean
+export function has<T>(obj: ObservableSet<T>, key: T): boolean
 export function has<T>(obj: IObservableArray<T>, index: number): boolean
 export function has<T extends Object>(obj: T, key: string): boolean
 export function has(obj: any, key: any): boolean {
@@ -141,6 +159,8 @@ export function has(obj: any, key: any): boolean {
         const adm = getAdministration(obj) as ObservableObjectAdministration
         return adm.has(key)
     } else if (isObservableMap(obj)) {
+        return obj.has(key)
+    } else if (isObservableSet(obj)) {
         return obj.has(key)
     } else if (isObservableArray(obj)) {
         return key >= 0 && key < obj.length

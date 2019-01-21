@@ -5,11 +5,17 @@ import {
     Lambda,
     ObservableMap,
     fail,
-    getAtom
+    getAtom,
+    ObservableSet
 } from "../internal"
 
 export function onBecomeObserved(
-    value: IObservable | IComputedValue<any> | IObservableArray<any> | ObservableMap<any, any>,
+    value:
+        | IObservable
+        | IComputedValue<any>
+        | IObservableArray<any>
+        | ObservableMap<any, any>
+        | ObservableSet<any>,
     listener: Lambda
 ): Lambda
 export function onBecomeObserved<K, V = any>(
@@ -22,7 +28,12 @@ export function onBecomeObserved(thing, arg2, arg3?): Lambda {
 }
 
 export function onBecomeUnobserved(
-    value: IObservable | IComputedValue<any> | IObservableArray<any> | ObservableMap<any, any>,
+    value:
+        | IObservable
+        | IComputedValue<any>
+        | IObservableArray<any>
+        | ObservableMap<any, any>
+        | ObservableSet<any>,
     listener: Lambda
 ): Lambda
 export function onBecomeUnobserved<K, V = any>(

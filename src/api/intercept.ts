@@ -9,7 +9,9 @@ import {
     IValueWillChange,
     Lambda,
     ObservableMap,
-    getAdministration
+    getAdministration,
+    ObservableSet,
+    ISetWillChange
 } from "../internal"
 
 export function intercept<T>(
@@ -23,6 +25,10 @@ export function intercept<T>(
 export function intercept<K, V>(
     observableMap: ObservableMap<K, V>,
     handler: IInterceptor<IMapWillChange<K, V>>
+): Lambda
+export function intercept<V>(
+    observableMap: ObservableSet<V>,
+    handler: IInterceptor<ISetWillChange<V>>
 ): Lambda
 export function intercept<K, V>(
     observableMap: ObservableMap<K, V>,

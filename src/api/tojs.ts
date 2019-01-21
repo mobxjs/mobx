@@ -3,7 +3,8 @@ import {
     isObservable,
     isObservableArray,
     isObservableValue,
-    isObservableMap
+    isObservableMap,
+    isObservableSet
 } from "../internal"
 
 export type ToJSOptions = {
@@ -27,7 +28,7 @@ function toJSHelper(source, options: ToJSOptions, __alreadySeen: Map<any, any>) 
     if (!options.recurseEverything && !isObservable(source)) return source
 
     if (typeof source !== "object") return source
-    
+
     // Directly return null if source is null
     if (source === null) return null
 
@@ -51,6 +52,22 @@ function toJSHelper(source, options: ToJSOptions, __alreadySeen: Map<any, any>) 
         res.length = toAdd.length
         for (let i = 0, l = toAdd.length; i < l; i++) res[i] = toAdd[i]
         return res
+    }
+
+    if (isObservableSet(source) || Object.getPrototypeOf(source) === Set.prototype) {
+        if (options.exportMapsAsObjects === false) {
+            const res = cache(__alreadySeen, source, new Set(), options)
+            source.forEach(value => {
+                res.add(toJSHelper(value, options!, __alreadySeen))
+            })
+            return res
+        } else {
+            const res = cache(__alreadySeen, source, [] as any[], options)
+            source.forEach(value => {
+                res.push(toJSHelper(value, options!, __alreadySeen))
+            })
+            return res
+        }
     }
 
     if (isObservableMap(source) || Object.getPrototypeOf(source) === Map.prototype) {
