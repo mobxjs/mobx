@@ -2,10 +2,12 @@ import {
     Atom,
     IEnhancer,
     IInterceptable,
+    IEqualsComparer,
     IInterceptor,
     IListenable,
     Lambda,
     checkIfStateModificationsAreAllowed,
+    comparer,
     createInstanceofPredicate,
     getNextId,
     hasInterceptors,
@@ -47,11 +49,15 @@ export class ObservableValue<T> extends Atom
     changeListeners
     value
     dehancer: any
+    private equals: IEqualsComparer<any>
 
     constructor(
         value: T,
         public enhancer: IEnhancer<T>,
-        name = "ObservableValue@" + getNextId(),
+        {
+            name = "ObservableValue@" + getNextId(),
+            equals = comparer.default
+        }: { name?: string; equals?: IEqualsComparer<any> },
         notifySpy = true
     ) {
         super(name)
@@ -60,6 +66,7 @@ export class ObservableValue<T> extends Atom
             // only notify spy if this is a stand-alone observable
             spyReport({ type: "create", name: this.name, newValue: "" + this.value })
         }
+        this.equals = equals
     }
 
     private dehanceValue(value: T): T {
@@ -70,7 +77,9 @@ export class ObservableValue<T> extends Atom
     public set(newValue: T) {
         const oldValue = this.value
         newValue = this.prepareNewValue(newValue) as any
-        if (newValue !== globalState.UNCHANGED) {
+        const changed = !this.equals(oldValue, newValue)
+
+        if (newValue !== globalState.UNCHANGED && changed) {
             const notifySpy = isSpyEnabled()
             if (notifySpy && process.env.NODE_ENV !== "production") {
                 spyReportStart({
