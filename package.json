@@ -77,6 +77,7 @@
     "tape": "^4.2.2",
     "ts-jest": "^22.0.0",
     "tslib": "^1.7.1",
+    "tslint-config-prettier": "^1.17.0",
     "typescript": "^3.2.1",
     "uglify-es": "^3.3.9"
   },

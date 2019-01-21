@@ -1,5 +1,5 @@
 import * as mobx from "../../src/mobx.ts"
-const { flow } = mobx
+import { flow } from "../../src/mobx"
 
 function delay(time, value, shouldThrow = false) {
     return new Promise((resolve, reject) => {
