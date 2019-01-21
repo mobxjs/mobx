@@ -24,10 +24,19 @@ export function createAction(actionName: string, fn: Function): Function & IActi
 
 export function executeAction(actionName: string, fn: Function, scope?: any, args?: IArguments) {
     const runInfo = startAction(actionName, fn, scope, args)
+    let shouldSupressReactionError = true
     try {
-        return fn.apply(scope, args)
+        const res = fn.apply(scope, args)
+        shouldSupressReactionError = false
+        return res
     } finally {
-        endAction(runInfo)
+        if (shouldSupressReactionError) {
+            globalState.suppressReactionErrors = shouldSupressReactionError
+            endAction(runInfo)
+            globalState.suppressReactionErrors = false
+        } else {
+            endAction(runInfo)
+        }
     }
 }
 

@@ -507,8 +507,8 @@ test("Fix #1367", () => {
     expect(mobx.isAction(x.method)).toBe(true)
 })
 
-test("error logging, #1836", () => {
-    const messages = utils.consoleError(() => {
+test("error logging, #1836 - 1", () => {
+    const messages = utils.supressConsole(() => {
         try {
             const a = mobx.observable.box(3)
             mobx.autorun(() => {
@@ -520,6 +520,27 @@ test("error logging, #1836", () => {
                 throw new Error("Action error")
             })()
         } catch (e) {
+            expect(e.toString()).toEqual("Error: Action error")
+            console.error(e)
+        }
+    })
+
+    expect(messages).toMatchSnapshot()
+})
+
+test("error logging, #1836 - 2", () => {
+    const messages = utils.supressConsole(() => {
+        try {
+            const a = mobx.observable.box(3)
+            mobx.autorun(() => {
+                if (a.get() === 4) throw new Error("Reaction error")
+            })
+
+            mobx.action(() => {
+                a.set(4)
+            })()
+        } catch (e) {
+            expect(e.toString()).toEqual("Error: Action error")
             console.error(e)
         }
     })
