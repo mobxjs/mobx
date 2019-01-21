@@ -15,7 +15,8 @@ exports.consoleError = function(block, regex) {
         console.error = orig
     }
     expect(messages.length).toBeGreaterThan(0)
-    expect(messages).toMatch(regex)
+    if (regex) expect(messages).toMatch(regex)
+    return messages
 }
 
 exports.consoleWarn = function(block, regex) {
