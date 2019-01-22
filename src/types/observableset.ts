@@ -23,8 +23,7 @@ import {
     untracked,
     makeIterable,
     transaction,
-    isES6Set,
-    $mobx
+    isES6Set
 } from "../internal"
 
 const ObservableSetMarker = {}
@@ -56,7 +55,7 @@ export type ISetWillChange<T = any> =
       }
 
 export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillChange>, IListenable {
-    [$mobx] = ObservableSetMarker
+    $mobx = ObservableSetMarker
     private _data: Set<any> = new Set()
     private _atom = createAtom(this.name)
     changeListeners

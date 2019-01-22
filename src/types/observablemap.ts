@@ -31,8 +31,7 @@ import {
     registerListener,
     IInterceptor,
     registerInterceptor,
-    declareIterator,
-    $mobx
+    declareIterator
 } from "../internal"
 
 export interface IKeyValueMap<V = any> {
@@ -79,11 +78,14 @@ export type IObservableMapInitialValues<K = any, V = any> =
 
 export class ObservableMap<K = any, V = any>
     implements Map<K, V>, IInterceptable<IMapWillChange<K, V>>, IListenable {
-    [$mobx] = ObservableMapMarker
+    $mobx = ObservableMapMarker
     private _data: Map<K, ObservableValue<V>>
     private _hasMap: Map<K, ObservableValue<boolean>> // hasMap, not hashMap >-).
-    private _keys: IObservableArray<K> = <any>(
-        new ObservableArray(undefined, referenceEnhancer, `${this.name}.keys()`, true)
+    private _keys: IObservableArray<K> = <any>new ObservableArray(
+        undefined,
+        referenceEnhancer,
+        `${this.name}.keys()`,
+        true
     )
     interceptors
     changeListeners
@@ -296,8 +298,9 @@ export class ObservableMap<K = any, V = any>
             else if (Array.isArray(other)) other.forEach(([key, value]) => this.set(key, value))
             else if (isES6Map(other)) {
                 if (other.constructor !== Map)
-                    return fail("Cannot initialize from classes that inherit from Map: " + other.constructor.name) // prettier-ignore
-                other.forEach((value, key) => this.set(key, value))
+                    fail("Cannot initialize from classes that inherit from Map: " + other.constructor.name) // prettier-ignore
+                else
+                    other.forEach((value, key) => this.set(key, value))
             } else if (other !== null && other !== undefined)
                 fail("Cannot initialize map from " + other)
         })

@@ -342,6 +342,19 @@ test("json cycles when exporting maps as maps", function() {
     expect(cloneA.e).toBe(cloneA)
 })
 
+test("map to JS", () => {
+    class MyClass {
+        @observable meta = new Map()
+
+        constructor(props) {
+            this.meta.set("test", { abc: "def", ghi: "jkl" })
+
+            expect(mobx.toJS(this.meta).constructor.name).toBe("Object")
+        }
+    }
+    new MyClass()
+})
+
 describe("recurseEverything set to true", function() {
     test("prototype chain will be removed even if the object is not observable", function() {
         function Person() {
@@ -403,7 +416,7 @@ describe("recurseEverything set to true", function() {
         const convertedObj = mobx.toJS({ key: cycledObj }, { recurseEverything: true })
         expect(convertedObj.key).toBe(convertedObj.key.cycle)
     })
-    
+
     test("should return null if source is null", function() {
         expect(mobx.toJS(null)).toBeNull()
         expect(mobx.toJS(null, { recurseEverything: true })).toBeNull()

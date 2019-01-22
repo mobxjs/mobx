@@ -1,6 +1,3 @@
-// forward compatibility with mobx, so that packages can easily support mobx 4 & 5
-export const $mobx = "$mobx"
-
 /*
 The only reason for this file to exist is pure horror:
 Without it rollup can make the bundling fail at any point in time; when it rolls up the files in the wrong order

@@ -143,12 +143,14 @@ export {
     isComputingDerivation as _isComputingDerivation,
     onReactionError,
     interceptReads as _interceptReads,
-    IComputedValueOptions,
-    $mobx
+    IComputedValueOptions
 } from "./internal"
 
+// forward compatibility with mobx, so that packages can easily support mobx 4 & 5
+export const $mobx = "$mobx"
+
 // Devtools support
-import { spy, getDebugName, $mobx } from "./internal"
+import { spy, getDebugName } from "./internal"
 
 declare var __MOBX_DEVTOOLS_GLOBAL_HOOK__: { injectMobx: (any) => void }
 if (typeof __MOBX_DEVTOOLS_GLOBAL_HOOK__ === "object") {

@@ -3,7 +3,6 @@ import {
     isObservableArray,
     isObservableSet,
     isObservableMap,
-    $mobx,
     fail,
     initializeInstance,
     isObservableObject,
@@ -23,7 +22,7 @@ export function getAtom(thing: any, property?: string): IDepTreeNode {
             return (thing as any).$mobx.atom
         }
         if (isObservableSet(thing)) {
-            return (thing as any)[$mobx]
+            return (thing as any).$mobx
         }
         if (isObservableMap(thing)) {
             const anyThing = thing as any
