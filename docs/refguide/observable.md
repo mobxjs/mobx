@@ -28,6 +28,7 @@ Observable values can be JS primitives, references, plain objects, class instanc
 The following conversion rules are applied, but can be fine-tuned by using *modifiers*. See below.
 
 1. If *value* is an ES6 `Map`: a new [Observable Map](map.md) will be returned. Observable maps are very useful if you don't want to react just to the change of a specific entry, but also to the addition or removal of entries.
+1. If *value* is an ES6 `Set`: a new Observable Set will be returned. 
 1. If *value* is an array, a new [Observable Array](array.md) will be returned.
 1. If *value* is an object *without* prototype, all its current properties will be made observable. See [Observable Object](object.md)
 1. If *value* is an object *with* a prototype, a JavaScript primitive or function, `observable` will throw. Use [Boxed Observable](boxed.md) observables instead if you want to create a stand-alone observable reference to such a value. MobX will not make objects with a prototype automatically observable; as that is considered the responsibility of its constructor function. Use `extendObservable` in the constructor, or `@observable` / `decorate` in its class definition instead.
