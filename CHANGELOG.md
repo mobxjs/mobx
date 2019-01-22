@@ -1,3 +1,7 @@
+# 4.9.1
+
+* Fixed regression in `toJS`: observable maps were not properly serialized. Fixes [#1875](https://github.com/mobxjs/mobx/issues/1875)
+
 # 5.9.0 / 4.9.0
 
 **Features**
