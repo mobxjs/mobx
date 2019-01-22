@@ -122,9 +122,9 @@ This allows MobX to automatically suspend computations that are not actively in 
 See this [blog](https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254) or [issue #356](https://github.com/mobxjs/mobx/issues/356) for an explanation.
 So if you fiddle arounds, computed properties might not seem efficient. But when applied in a project that uses `observer`, `autorun` etc, they become very efficient.
 
-MobX computeds will automatically be kept alive during transactions as well, see PRs: [#452](https://github.com/mobxjs/mobx/pull/452) and [#489](https://github.com/mobxjs/mobx/pull/489)
+MobX `computed`s will automatically be kept alive during transactions as well, see PRs: [#452](https://github.com/mobxjs/mobx/pull/452) and [#489](https://github.com/mobxjs/mobx/pull/489)
 
-To force computed values to stay alive one can use the `keepAlive: true` option, but not that this can potentially create memory leaks.
+To force computed values to stay alive one can use the `keepAlive: true` option, but note that this can potentially create memory leaks.
 
 #### Always dispose reactions
 
