@@ -61,7 +61,7 @@
         data-chapter-title="arrays"
         data-filepath="refguide/array.md"
         data-basepath=".."
-        data-revision="Fri Nov 30 2018 16:57:29 GMT+0100 (CET)"
+        data-revision="Tue Jan 22 2019 10:42:25 GMT+0100 (CET)"
         data-innerlanguage="">
     
 
@@ -848,10 +848,10 @@ Create a shallow array to disable this behavior and store a values as-is. See al
 <p>The <code>name</code> option can be used to give the array a friendly debug name, to be used in for example <code>spy</code> or the MobX dev tools.</p>
 <h2 id="array-limitations-in-mobx-4-and-below"><a name="array-limitations-in-mobx-4-and-below" class="plugin-anchor" href="#array-limitations-in-mobx-4-and-below"><span class="fa fa-link"></span></a>Array limitations in MobX 4 and below</h2>
 <p>Due to limitations of native arrays in ES5 <code>observable.array</code> will create a faux-array (array-like object) instead of a real array.
-In practice, these arrays work just as fine as native arrays and all native methods are supported, including index assignments, up-to and including the length of the array.</p>
-<p>Bear in mind however that <code>Array.isArray(observable([]))</code> will yield <code>false</code>, so whenever you need to pass an observable array to an external library,
-it is a good idea to <em>create a shallow copy before passing it to other libraries or built-in functions</em> (which is good practice anyway) by using <code>array.slice()</code>.
-In other words, <code>Array.isArray(observable([]).slice())</code> will yield <code>true</code>.</p>
+In practice, these arrays work just as fine as native arrays and all native methods are supported, including index assignments, up-to and including the length of the array. </p>
+<p>Bear in mind however that <code>Array.isArray(observable([]))</code> will yield <code>false</code>, which some native array manipulation methods require and which some external libraries may also require. 
+E.g. <code>[].concat(observable([]))</code> will not work as expected since the native array concat method expects the test to return <code>true</code>. 
+So whenever you need to pass an observable array to an external library or use the observable array as an argument to native array manipulation methods, you should <em>create a shallow copy by using <code>array.slice()</code></em>, which will cause <code>Array.isArray(observable([]).slice())</code> to yield <code>true</code>.</p>
 </body></html>
                     
                     </section>

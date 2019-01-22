@@ -61,7 +61,7 @@
         data-chapter-title="toJS"
         data-filepath="refguide/tojson.md"
         data-basepath=".."
-        data-revision="Fri Nov 30 2018 16:57:29 GMT+0100 (CET)"
+        data-revision="Tue Jan 22 2019 10:42:25 GMT+0100 (CET)"
         data-innerlanguage="">
     
 
@@ -810,7 +810,7 @@ Cycles are detected and properly supported by default, but this can be disabled 
 <p><code>toJS</code> accepts two options</p>
 <ol>
 <li><code>exportMapsAsObjects</code> whether to serialize observable maps to objects (<code>true</code>) or javascript Map objects (<code>false</code>) default <code>true</code>.</li>
-<li><code>detectCycles</code> if I cycle is detected, reuse the already serialized object. Which prevents endless recursion. Default <code>true</code>.</li>
+<li><code>detectCycles</code> if a cycle is detected, reuse the already serialized object. Which prevents endless recursion. Default <code>true</code>.</li>
 </ol>
 <p>For more complex (de)serialization scenario&apos;s, one can use <a href="https://github.com/mobxjs/serializr" target="_blank">serializr</a></p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">var</span> obj = mobx.observable({

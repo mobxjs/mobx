@@ -61,7 +61,7 @@
         data-chapter-title="Common Pitfalls &amp; Best Practices"
         data-filepath="best/pitfalls.md"
         data-basepath=".."
-        data-revision="Fri Nov 30 2018 16:57:29 GMT+0100 (CET)"
+        data-revision="Tue Jan 22 2019 10:42:25 GMT+0100 (CET)"
         data-innerlanguage="">
     
 
@@ -889,8 +889,8 @@ Computed values will only track their dependencies if they are observed.
 This allows MobX to automatically suspend computations that are not actively in use.
 See this <a href="https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254" target="_blank">blog</a> or <a href="https://github.com/mobxjs/mobx/issues/356" target="_blank">issue #356</a> for an explanation.
 So if you fiddle arounds, computed properties might not seem efficient. But when applied in a project that uses <code>observer</code>, <code>autorun</code> etc, they become very efficient.</p>
-<p>MobX computeds will automatically be kept alive during transactions as well, see PRs: <a href="https://github.com/mobxjs/mobx/pull/452" target="_blank">#452</a> and <a href="https://github.com/mobxjs/mobx/pull/489" target="_blank">#489</a></p>
-<p>To force computed values to stay alive one can use the <code>keepAlive: true</code> option, but not that this can potentially create memory leaks.</p>
+<p>MobX <code>computed</code>s will automatically be kept alive during transactions as well, see PRs: <a href="https://github.com/mobxjs/mobx/pull/452" target="_blank">#452</a> and <a href="https://github.com/mobxjs/mobx/pull/489" target="_blank">#489</a></p>
+<p>To force computed values to stay alive one can use the <code>keepAlive: true</code> option, but note that this can potentially create memory leaks.</p>
 <h4 id="always-dispose-reactions"><a name="always-dispose-reactions" class="plugin-anchor" href="#always-dispose-reactions"><span class="fa fa-link"></span></a>Always dispose reactions</h4>
 <p>All forms of <code>autorun</code>, <code>observe</code> and <code>intercept</code> will only be garbage collected if all objects they observe are garbage collected themselves.
 So it is recommend to use the disposer function that is returned from these methods to stop them when you no longer need them.

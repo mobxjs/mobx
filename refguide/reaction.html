@@ -61,7 +61,7 @@
         data-chapter-title="reaction"
         data-filepath="refguide/reaction.md"
         data-basepath=".."
-        data-revision="Fri Nov 30 2018 16:57:29 GMT+0100 (CET)"
+        data-revision="Tue Jan 22 2019 10:42:25 GMT+0100 (CET)"
         data-innerlanguage="">
     
 
@@ -873,7 +873,7 @@ When invoked <code>reaction</code>, second argument can use as disposer.
 The following example shows a <code>reaction</code> that is invoked only once.</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">const</span> counter = observable({ count: <span class="hljs-number">0</span> });
 
-<span class="hljs-comment">// invoke once of and dispose reaction: reacts to obserbable value.</span>
+<span class="hljs-comment">// invoke once of and dispose reaction: reacts to observable value.</span>
 <span class="hljs-keyword">const</span> reaction3 = reaction(
     () =&gt; counter.count,
     (count, reaction) =&gt; {
