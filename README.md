@@ -12,12 +12,17 @@ _Simple, scalable state management_
 [![OpenCollective](https://opencollective.com/mobx/sponsors/badge.svg)](#sponsors)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 
-MobX is proudly sponsored by Mendix, Coinbase, Facebook Open Source, Canva, Algolia, Guilded and many [individual sponsors](#backers)
+MobX is proudly sponsored by Mendix, Coinbase, Facebook Open Source, Canva, Algolia, Guilded and many [individual sponsors](#backers).
 
-<img src="docs/mendix-logo.png" align="center" width="100" title="Mendix" alt="Mendix" /> <img src="docs/coinbase.jpeg" align="center" width="100" title="Coinbase" alt="Coinbase" /> <img src="docs/fbos.jpeg" align="center" width="100" title="Facebook Open Source" alt="Facebook Open Source" />
-<img src="docs/canva.png" align="center" width="100" title="Canva" alt="Canva" />
-<img src="docs/algolia.jpg" align="center" width="100" title="Algolia" alt="Algolia" />
-<img src="docs/guilded.jpg" align="center" width="100" title="Guilded" alt="Guilded" />
+<a href="https://mendix.com/"><img src="docs/mendix-logo.png" align="center" width="100" title="Mendix" alt="Mendix" /></a>
+<a href="https://coinbase.com/"><img src="docs/coinbase.jpeg" align="center" width="100" title="Coinbase" alt="Coinbase" /></a>
+<a href="https://opensource.facebook.com/"><img src="docs/fbos.jpeg" align="center" width="100" title="Facebook Open Source" alt="Facebook Open Source" /></a>
+<a href="https://www.canva.com/"><img src="docs/canva.png" align="center" width="100" title="Canva" alt="Canva" /></a>
+<a href="https://www.algolia.com/"><img src="docs/algolia.jpg" align="center" width="100" title="Algolia" alt="Algolia" /></a>
+<a href="https://www.guilded.gg/"><img src="docs/guilded.jpg" align="center" width="100" title="Guilded" alt="Guilded" /></a>
+<a href="http://auctionfrontier.com/"><img src="docs/auctionfrontier.jpeg" align="center" width="100" title="Auction Frontier" alt="Auction Frontier"></a>
+<a href="https://mantro.net/jobs/warlock"><img src="docs/mantro.png" align="center" width="100" title="mantro GmbH" alt="mantro GmbH"></a>
+<a href="https://talentplot.com/"><img src="docs/talentplot.png" align="center" width="100" title="talentplot" alt="talentplot"></a>
 
 # Installation
 
