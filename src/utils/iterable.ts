@@ -19,6 +19,10 @@ export function makeIterable<T>(iterator: Iterator<T>): IterableIterator<T> {
     return iterator as any
 }
 
+export function toStringTagSymbol() {
+    return (typeof Symbol === "function" && Symbol.toStringTag) || "@@toStringTag"
+}
+
 function self() {
     return this
 }
