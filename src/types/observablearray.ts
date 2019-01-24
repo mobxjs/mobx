@@ -28,7 +28,8 @@ import {
     invariant,
     makeNonEnumerable,
     createInstanceofPredicate,
-    isObject
+    isObject,
+    toStringTagSymbol
 } from "../internal"
 
 const MAX_SPLICE_SIZE = 10000 // See e.g. https://github.com/mobxjs/mobx/issues/859
@@ -611,13 +612,7 @@ Object.defineProperty(ObservableArray.prototype, "length", {
     }
 })
 
-if (typeof Symbol !== "undefined" && Symbol.toStringTag) {
-    addHiddenProp(
-        ObservableArray.prototype,
-        typeof Symbol !== "undefined" ? Symbol.toStringTag : ("@@toStringTag" as any),
-        "Array"
-    )
-}
+addHiddenProp(ObservableArray.prototype, toStringTagSymbol(), "Array")
 
 // Internet Explorer on desktop doesn't support this.....
 // So, let's don't do this to avoid different semantics

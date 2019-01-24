@@ -26,6 +26,7 @@ import {
     spyReportEnd,
     globalState,
     iteratorSymbol,
+    toStringTagSymbol,
     makeIterable,
     untracked,
     registerListener,
@@ -81,17 +82,14 @@ export class ObservableMap<K = any, V = any>
     $mobx = ObservableMapMarker
     private _data: Map<K, ObservableValue<V>>
     private _hasMap: Map<K, ObservableValue<boolean>> // hasMap, not hashMap >-).
-    private _keys: IObservableArray<K> = <any>new ObservableArray(
-        undefined,
-        referenceEnhancer,
-        `${this.name}.keys()`,
-        true
+    private _keys: IObservableArray<K> = <any>(
+        new ObservableArray(undefined, referenceEnhancer, `${this.name}.keys()`, true)
     )
     interceptors
     changeListeners
     dehancer: any;
-    [Symbol.iterator];
-    [Symbol.toStringTag]
+    [iteratorSymbol()];
+    [toStringTagSymbol()]
 
     constructor(
         initialData?: IObservableMapInitialValues<K, V>,
@@ -391,11 +389,7 @@ declareIterator(ObservableMap.prototype, function() {
     return this.entries()
 })
 
-addHiddenFinalProp(
-    ObservableMap.prototype,
-    typeof Symbol !== "undefined" ? Symbol.toStringTag : ("@@toStringTag" as any),
-    "Map"
-)
+addHiddenFinalProp(ObservableMap.prototype, toStringTagSymbol(), "Map")
 
 /* 'var' fixes small-build issue */
 export var isObservableMap = createInstanceofPredicate("ObservableMap", ObservableMap) as (

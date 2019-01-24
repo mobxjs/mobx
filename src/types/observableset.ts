@@ -23,7 +23,9 @@ import {
     untracked,
     makeIterable,
     transaction,
-    isES6Set
+    isES6Set,
+    iteratorSymbol,
+    toStringTagSymbol
 } from "../internal"
 
 const ObservableSetMarker = {}
@@ -256,11 +258,11 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
         return this.name + "[ " + Array.from(this).join(", ") + " ]"
     }
 
-    [Symbol.iterator]() {
+    [iteratorSymbol()]() {
         return this.values()
     }
 
-    [Symbol.toStringTag]: "Set" = "Set"
+    [toStringTagSymbol()]: "Set" = "Set"
 }
 
 export const isObservableSet = createInstanceofPredicate("ObservableSet", ObservableSet) as (
