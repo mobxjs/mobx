@@ -1,3 +1,7 @@
+# 4.9.2
+
+* Fixed regression [#1878](https://github.com/mobxjs/mobx/issues/1878), accidental use of `Symbol` breaking Internet Explorer / React Native compatibility.
+
 # 4.9.1
 
 * Fixed regression in `toJS`: observable maps were not properly serialized. Fixes [#1875](https://github.com/mobxjs/mobx/issues/1875)
