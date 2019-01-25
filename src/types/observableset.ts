@@ -24,8 +24,9 @@ import {
     makeIterable,
     transaction,
     isES6Set,
-    iteratorSymbol,
-    toStringTagSymbol
+    toStringTagSymbol,
+    declareIterator,
+    addHiddenFinalProp
 } from "../internal"
 
 const ObservableSetMarker = {}
@@ -63,7 +64,9 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
     changeListeners
     interceptors
     dehancer: any
-    enhancer: (newV: any, oldV: any | undefined) => any
+    enhancer: (newV: any, oldV: any | undefined) => any;
+    [Symbol.iterator]: () => IterableIterator<T>; // only used for typings!
+    [Symbol.toStringTag]: string // only used for typings!
 
     constructor(
         initialData?: IObservableSetInitialValues<T>,
@@ -93,15 +96,17 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
     clear() {
         transaction(() => {
             untracked(() => {
-                for (const value of this._data.values()) this.delete(value)
+                this._data.forEach(value => {
+                    this.delete(value)
+                })
             })
         })
     }
 
     forEach(callbackFn: (value: T, value2: T, set: Set<T>) => void, thisArg?: any) {
-        for (const value of this) {
+        this._data.forEach(value => {
             callbackFn.call(thisArg, value, value, this)
-        }
+        })
     }
 
     get size() {
@@ -257,13 +262,13 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
     toString(): string {
         return this.name + "[ " + Array.from(this).join(", ") + " ]"
     }
-
-    [iteratorSymbol()]() {
-        return this.values()
-    }
-
-    [toStringTagSymbol()]: "Set" = "Set"
 }
+
+declareIterator(ObservableSet.prototype, function() {
+    return this.values()
+})
+
+addHiddenFinalProp(ObservableSet.prototype, toStringTagSymbol(), "Set")
 
 export const isObservableSet = createInstanceofPredicate("ObservableSet", ObservableSet) as (
     thing: any

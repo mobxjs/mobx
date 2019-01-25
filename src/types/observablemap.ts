@@ -88,8 +88,8 @@ export class ObservableMap<K = any, V = any>
     interceptors
     changeListeners
     dehancer: any;
-    [iteratorSymbol()];
-    [toStringTagSymbol()]
+    [Symbol.iterator]: () => IterableIterator<[K, V]>; // only used for typings!
+    [Symbol.toStringTag]: string // only used for typings!
 
     constructor(
         initialData?: IObservableMapInitialValues<K, V>,
