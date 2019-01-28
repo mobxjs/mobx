@@ -161,7 +161,7 @@ Note that the `legacy` mode is important (as is putting the decorators proposal 
 
 ## Decorator syntax and Create React App (v2)
 
-* decorators are not supported out of the box in `create-react-app@2.*`. To fix this, you can either use the `decorate` utility, eject, or use the [customize-cra](https://github.com/arackaf/customize-cra) package.
+* Decorators are only supported out of the box in `create-react-app@^2.1.1`. In older versions fix this by using either the `decorate` utility, eject, or the [customize-cra](https://github.com/arackaf/customize-cra) package.
 
 ---
 
