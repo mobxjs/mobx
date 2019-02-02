@@ -675,7 +675,7 @@ test("enumerability - workaround", () => {
     expect(a.hasOwnProperty("m2")).toBe(true)
 })
 
-test.skip("Babel bug", () => {
+test("Babel bug", () => {
     // See: https://github.com/babel/babel/issues/8760
     class Todo1 {
         id = 1
@@ -693,7 +693,7 @@ test.skip("Babel bug", () => {
     expect(Object.getOwnPropertyDescriptor(t1, "id").enumerable).toBe(true)
 
     const t2 = new Todo2()
-    expect(Object.getOwnPropertyDescriptor(t2, "id").enumerable).toBe(true) // fails
+    expect(Object.getOwnPropertyDescriptor(t2, "id").enumerable).toBe(true)
 })
 
 test("issue 285 (babel)", () => {
@@ -715,7 +715,7 @@ test("issue 285 (babel)", () => {
     const res = toJS(todo)
 
     expect(res).toEqual({
-        // TODO: should inclue id: 1 // Babel 7 bug, see https://github.com/babel/babel/issues/8760
+        id: 1,
         title: "Something to do",
         finished: false,
         childThings: [1, 2, 3]
@@ -1201,7 +1201,6 @@ test("computed setter problem - 2", () => {
         }
     }
 
-    debugger
     mobx.decorate(Contact, {
         fullName: computed({
             // This doesn't work

@@ -71,6 +71,10 @@ export function stage2NamedActionDecorator(
         // @action.bound method = () => {}
         return {
             ...elementDescriptor,
+            descriptor: {
+                ...descriptor,
+                enumerable: false // fields are by default enumerable, be we don't like enumerable actions
+            },
             initializer() {
                 return createAction(name, elementDescriptor.initializer!.call(this))
             }
