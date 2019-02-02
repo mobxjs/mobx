@@ -341,3 +341,71 @@ test("json cycles when exporting maps as maps", function() {
     expect(cloneD.get("c")).toBe(cloneC)
     expect(cloneA.e).toBe(cloneA)
 })
+
+describe("recurseEverything set to true", function() {
+    test("prototype chain will be removed even if the object is not observable", function() {
+        function Person() {
+            this.firstname = "michel"
+            this.lastname = "weststrate"
+        }
+        const p = new Person()
+
+        expect(mobx.toJS(p)).toBeInstanceOf(Person)
+        expect(mobx.toJS(p, { recurseEverything: true })).not.toBeInstanceOf(Person)
+        expect(mobx.toJS(p)).toEqual({ firstname: "michel", lastname: "weststrate" })
+        expect(mobx.toJS(p)).toEqual(mobx.toJS(p, { recurseEverything: true }))
+    })
+
+    test("properties on prototype should be flattened to plain object", function() {
+        const observableValue = mobx.observable.box("b")
+        const Base = function() {
+            this.a = "a"
+        }
+        const derived = Object.create(new Base(), {
+            b: { value: observableValue, enumerable: true }
+        })
+
+        const simpleCopy = mobx.toJS(derived)
+        const deepCopy = mobx.toJS(derived, { recurseEverything: true })
+        expect(simpleCopy).toBeInstanceOf(Base)
+        expect(simpleCopy).toEqual({ b: observableValue })
+        expect(simpleCopy.a).toBe("a")
+        expect(simpleCopy.hasOwnProperty("a")).toBeFalsy()
+
+        expect(deepCopy).not.toBeInstanceOf(Base)
+        expect(deepCopy).toEqual({ a: "a", b: "b" })
+        expect(deepCopy.hasOwnProperty("a")).toBeTruthy()
+    })
+
+    test("Date type should not be converted", function() {
+        const date = new Date()
+        expect(mobx.toJS(mobx.observable.box(date), { recurseEverything: true })).toBe(date)
+    })
+
+    describe("observable array", function() {
+        test("observable array should be converted to a plain array", function() {
+            const arr = [1, 2, 3]
+            expect(mobx.toJS(mobx.observable.array(arr), { recurseEverything: true })).toEqual(arr)
+            expect(mobx.toJS(arr, { recurseEverything: true })).toEqual(arr)
+        })
+
+        test("observable array inside an array will be converted with recurseEverything flag", function() {
+            const obj = { arr: mobx.observable.array([1, 2, 3]) }
+            expect(mobx.isObservable(mobx.toJS(obj).arr)).toBeTruthy()
+            expect(mobx.isObservable(mobx.toJS(obj, { recurseEverything: true }).arr)).toBeFalsy()
+            expect(mobx.toJS(obj, { recurseEverything: true }).arr).toEqual([1, 2, 3])
+        })
+    })
+
+    test("detectCycles should forcibly be set to true if recurseEverything is true", function() {
+        const cycledObj = {}
+        cycledObj.cycle = cycledObj
+        const convertedObj = mobx.toJS({ key: cycledObj }, { recurseEverything: true })
+        expect(convertedObj.key).toBe(convertedObj.key.cycle)
+    })
+
+    test("should return null if source is null", function() {
+        expect(mobx.toJS(null)).toBeNull()
+        expect(mobx.toJS(null, { recurseEverything: true })).toBeNull()
+    })
+})

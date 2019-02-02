@@ -399,6 +399,59 @@ test("onBecome(Un)Observed - less simple", () => {
     expect(events.length).toBe(0)
 })
 
+test("onBecomeObserved correctly disposes second listener #1537", () => {
+    const x = mobx.observable.box(3)
+    const events = []
+    const d1 = mobx.onBecomeObserved(x, "a", () => {
+        events.push("a observed")
+    })
+    const d2 = mobx.onBecomeObserved(x, "b", () => {
+        events.push("b observed")
+    })
+    d1()
+    mobx.reaction(() => x.get(), () => {})
+    expect(events.length).toBe(1)
+    expect(events).toEqual(["b observed"])
+})
+
+test("onBecomeObserved correctly disposes second listener #1537", () => {
+    const x = mobx.observable.box(3)
+    const events = []
+    const d1 = mobx.onBecomeObserved(x, "a", () => {
+        events.push("a observed")
+    })
+    const d2 = mobx.onBecomeObserved(x, "b", () => {
+        events.push("b observed")
+    })
+    d1()
+    const d3 = mobx.reaction(() => x.get(), () => {})
+    d3()
+    expect(events.length).toBe(1)
+    expect(events).toEqual(["b observed"])
+    d2()
+    const d4 = mobx.reaction(() => x.get(), () => {})
+    expect(events).toEqual(["b observed"])
+})
+
+test("onBecomeUnobserved correctly disposes second listener #1537", () => {
+    const x = mobx.observable.box(3)
+    const events = []
+    const d1 = mobx.onBecomeUnobserved(x, "a", () => {
+        events.push("a unobserved")
+    })
+    const d2 = mobx.onBecomeUnobserved(x, "b", () => {
+        events.push("b unobserved")
+    })
+    d1()
+    const d3 = mobx.reaction(() => x.get(), () => {})
+    d3()
+    expect(events.length).toBe(1)
+    expect(events).toEqual(["b unobserved"])
+    d2()
+    const d4 = mobx.reaction(() => x.get(), () => {})
+    expect(events).toEqual(["b unobserved"])
+})
+
 test("deepEquals should yield correct results for complex objects #1118 - 1", () => {
     const d2016jan1 = new Date("2016-01-01")
     const d2016jan1_2 = new Date("2016-01-01")

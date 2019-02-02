@@ -46,7 +46,7 @@ export function namedActionDecorator(name: string) {
             }
         }
         // bound instance methods
-        return actionFieldDecorator(name).apply(this, arguments)
+        return actionFieldDecorator(name).apply(this, arguments as any)
     }
 }
 

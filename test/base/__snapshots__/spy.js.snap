@@ -33,7 +33,7 @@ Array [
   },
   Object {
     "error": "Oops",
-    "message": "[mobx] Encountered an uncaught exception that was thrown by a reaction or observer component, in: 'Reaction[autorun]",
+    "message": "[mobx] Encountered an uncaught exception that was thrown by a reaction or observer component, in: 'Reaction[autorun]'",
     "name": "autorun",
     "type": "error",
   },

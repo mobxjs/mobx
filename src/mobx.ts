@@ -29,7 +29,7 @@ try {
     // (in which case the expression below would be substituted with 'production')
     process.env.NODE_ENV
 } catch (e) {
-    var g = typeof window !== "undefined" ? window : global
+    const g = typeof window !== "undefined" ? window : global
     if (typeof process === "undefined") g.process = {}
     g.process.env = {}
 }
@@ -38,7 +38,8 @@ try {
     function testCodeMinification() {}
     if (
         testCodeMinification.name !== "testCodeMinification" &&
-        process.env.NODE_ENV !== "production"
+        process.env.NODE_ENV !== "production" &&
+        process.env.IGNORE_MOBX_MINIFY_WARNING !== "true"
     ) {
         console.warn(
             // Template literal(backtick) is used for fix issue with rollup-plugin-commonjs https://github.com/rollup/rollup-plugin-commonjs/issues/344
@@ -89,6 +90,11 @@ export {
     IMapDidChange,
     isObservableMap,
     IObservableMapInitialValues,
+    ObservableSet,
+    isObservableSet,
+    ISetDidChange,
+    ISetWillChange,
+    IObservableSetInitialValues,
     transaction,
     observable,
     IObservableFactory,
@@ -136,6 +142,7 @@ export {
     getAtom,
     getAdministration as _getAdministration,
     allowStateChanges as _allowStateChanges,
+    allowStateChangesInsideComputed as _allowStateChangesInsideComputed,
     Lambda,
     isArrayLike,
     $mobx,
@@ -148,7 +155,7 @@ export {
 // Devtools support
 import { spy, getDebugName, $mobx } from "./internal"
 
-declare var __MOBX_DEVTOOLS_GLOBAL_HOOK__: { injectMobx: ((any) => void) }
+declare var __MOBX_DEVTOOLS_GLOBAL_HOOK__: { injectMobx: (any) => void }
 if (typeof __MOBX_DEVTOOLS_GLOBAL_HOOK__ === "object") {
     // See: https://github.com/andykog/mobx-devtools/
     __MOBX_DEVTOOLS_GLOBAL_HOOK__.injectMobx({

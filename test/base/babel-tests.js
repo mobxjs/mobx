@@ -415,13 +415,13 @@ test("custom action decorator on field (babel)", function() {
 })
 
 test("267 (babel) should be possible to declare properties observable outside strict mode", () => {
-    configure({ enforceActions: true })
+    configure({ enforceActions: "observed" })
 
     class Store {
         @observable timer
     }
 
-    configure({ enforceActions: false })
+    configure({ enforceActions: "never" })
 })
 
 test("288 atom not detected for object property", () => {
@@ -579,7 +579,7 @@ test("enumerability", () => {
         @computed
         get b() {
             return this.a
-        } // non-enumerable, on proto
+        } // non-enumerable, (and, ideally, on proto)
         @action
         m() {} // non-enumerable, on proto
         @action m2 = () => {} // non-enumerable, on self
@@ -643,7 +643,7 @@ test("enumerability - workaround", () => {
         @computed
         get b() {
             return this.a
-        } // non-enumerable, on proto
+        } // non-enumerable, (and, ideally, on proto)
         @action
         m() {} // non-enumerable, on proto
         @action m2 = () => {} // non-enumerable, on self
@@ -1122,7 +1122,7 @@ test("actions are reassignable", () => {
 test("it should support asyncAction (babel)", async () => {
     const values = []
 
-    mobx.configure({ enforceActions: true })
+    mobx.configure({ enforceActions: "observed" })
 
     class X {
         @observable a = 1
@@ -1225,4 +1225,32 @@ test("computed setter problem - 2", () => {
     c.fullName = "Michel Weststrate"
     expect(c.firstName).toBe("Michel")
     expect(c.lastName).toBe("Weststrate")
+})
+
+test("#1740, combining extendObservable & decorators", () => {
+    class AppState {
+        constructor(id) {
+            extendObservable(this, {
+                id
+            })
+            expect(this.foo).toBe(id)
+        }
+
+        @computed
+        get foo() {
+            return this.id
+        }
+    }
+
+    let app = new AppState(1)
+    expect(app.id).toBe(1)
+    expect(app.foo).toBe(1)
+    expect(isObservableProp(app, "id")).toBe(true)
+    expect(isComputedProp(app, "foo")).toBe(true)
+
+    app = new AppState(2)
+    expect(app.id).toBe(2)
+    expect(app.foo).toBe(2)
+    expect(isObservableProp(app, "id")).toBe(true)
+    expect(isComputedProp(app, "foo")).toBe(true)
 })

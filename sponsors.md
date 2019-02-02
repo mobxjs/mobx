@@ -1,7 +1,12 @@
 MobX Sponsors
 ===========
 
-Want to sponser MobX as well? https://mobxjs.github.io/mobx/donate.html
+This is the list of individual or one time contributions!
+
+Our montly donors can be found on open collective https://opencollective.com/mobx#contributors!
+Montly donations can be done through https://opencollective.com/mobx.
+
+Want to make a one-time contribution? https://mobxjs.github.io/mobx/donate.html
 
 * Anders Sjöberg
 * Andrei Zvonimir Crnković
@@ -10,11 +15,15 @@ Want to sponser MobX as well? https://mobxjs.github.io/mobx/donate.html
 * Bayu Fitri Andrianto
 * Benjamin Gruenbaum
 * Chance Snow
+* Chris Richard
 * Code Hat Programming Inc.
+* Constantine Genchevsky
 * Dane Hitchcox
 * Daniel Nakov
 * Dardo Kukovec
+* Derek Knox
 * Dominik Nowik
+* GumoIsland
 * Graham Kaemmer
 * Greg Zapp
 * James Athanassakis
@@ -22,14 +31,17 @@ Want to sponser MobX as well? https://mobxjs.github.io/mobx/donate.html
 * Jeff Hansen
 * Joinbox
 * Jorge Luis Acosta
+* Juwan Wheatley
 * Karolis Astrauka
 * Kevin Samuel
 * Konrad Mazanowski
+* Marcel Ryser
 * Matt Ruby
 * Matthieu Dumont
 * Mattia Manzati
 * Michael Fisher
 * Michael Mazurczak
+* Michael Tiller
 * Mihail Diordiev
 * Nikolay Ivanov
 * Uncomon
@@ -42,6 +54,7 @@ Want to sponser MobX as well? https://mobxjs.github.io/mobx/donate.html
 * Rob Searle
 * Steven Pérez
 * Surafel D
+* Tanguy Krotoff
 * Taylor Goolsby
 * Thibault Maekelbergh
 * Timor Zhiyentayev
@@ -51,6 +64,7 @@ Want to sponser MobX as well? https://mobxjs.github.io/mobx/donate.html
 * Wilson Lee
 * Yousuf Nejati
 * Zheng Renzhe
+* Zhenqing Peng
 
 Or... Become my personal Patreon! https://www.patreon.com/mweststrate
 

@@ -6,7 +6,6 @@ import {
     IListenable,
     Lambda,
     ObservableValue,
-    UNCHANGED,
     checkIfStateModificationsAreAllowed,
     createAtom,
     createInstanceofPredicate,
@@ -29,7 +28,8 @@ import {
     spyReportEnd,
     spyReportStart,
     transaction,
-    untracked
+    untracked,
+    globalState
 } from "../internal"
 
 export interface IKeyValueMap<V = any> {
@@ -183,7 +183,7 @@ export class ObservableMap<K = any, V = any>
     private _updateValue(key: K, newValue: V | undefined) {
         const observable = this._data.get(key)!
         newValue = (observable as any).prepareNewValue(newValue) as V
-        if (newValue !== UNCHANGED) {
+        if (newValue !== globalState.UNCHANGED) {
             const notifySpy = isSpyEnabled()
             const notify = hasListeners(this)
             const change =
@@ -300,8 +300,11 @@ export class ObservableMap<K = any, V = any>
             if (isPlainObject(other))
                 Object.keys(other).forEach(key => this.set((key as any) as K, other[key]))
             else if (Array.isArray(other)) other.forEach(([key, value]) => this.set(key, value))
-            else if (isES6Map(other)) other.forEach((value, key) => this.set(key, value))
-            else if (other !== null && other !== undefined)
+            else if (isES6Map(other)) {
+                if (other.constructor !== Map)
+                    return fail("Cannot initialize from classes that inherit from Map: " + other.constructor.name) // prettier-ignore
+                other.forEach((value, key) => this.set(key, value))
+            } else if (other !== null && other !== undefined)
                 fail("Cannot initialize map from " + other)
         })
         return this

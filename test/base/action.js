@@ -173,6 +173,44 @@ test("should be possible to change unobserved state in an action called from com
     mobx._resetGlobalState()
 })
 
+test("should be possible to change observed state in an action called from computed if run inside _allowStateChangesInsideComputed", () => {
+    const a = mobx.observable.box(2)
+    const d = mobx.autorun(() => {
+        a.get()
+    })
+
+    const testAction = mobx.action(() => {
+        mobx._allowStateChangesInsideComputed(() => {
+            a.set(3)
+            // a second level computed should throw
+            expect(() => c2.get()).toThrowError(
+                /Computed values are not allowed to cause side effects by changing observables that are already being observed/
+            )
+        })
+        expect(a.get()).toBe(3)
+        expect(() => {
+            a.set(4)
+        }).toThrowError(
+            /Computed values are not allowed to cause side effects by changing observables that are already being observed/
+        )
+    })
+
+    const c = mobx.computed(() => {
+        testAction()
+        return a.get()
+    })
+
+    const c2 = mobx.computed(() => {
+        a.set(6)
+        return a.get()
+    })
+
+    c.get()
+
+    mobx._resetGlobalState()
+    d()
+})
+
 test("should not be possible to change observed state in an action called from computed", () => {
     var a = mobx.observable.box(2)
     var d = mobx.autorun(() => {
@@ -467,4 +505,45 @@ test("Fix #1367", () => {
         }
     )
     expect(mobx.isAction(x.method)).toBe(true)
+})
+
+test("error logging, #1836 - 1", () => {
+    const messages = utils.supressConsole(() => {
+        try {
+            const a = mobx.observable.box(3)
+            mobx.autorun(() => {
+                if (a.get() === 4) throw new Error("Reaction error")
+            })
+
+            mobx.action(() => {
+                a.set(4)
+                throw new Error("Action error")
+            })()
+        } catch (e) {
+            expect(e.toString()).toEqual("Error: Action error")
+            console.error(e)
+        }
+    })
+
+    expect(messages).toMatchSnapshot()
+})
+
+test("error logging, #1836 - 2", () => {
+    const messages = utils.supressConsole(() => {
+        try {
+            const a = mobx.observable.box(3)
+            mobx.autorun(() => {
+                if (a.get() === 4) throw new Error("Reaction error")
+            })
+
+            mobx.action(() => {
+                a.set(4)
+            })()
+        } catch (e) {
+            expect(e.toString()).toEqual("Error: Action error")
+            console.error(e)
+        }
+    })
+
+    expect(messages).toMatchSnapshot()
 })

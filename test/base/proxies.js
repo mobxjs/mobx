@@ -146,10 +146,10 @@ test("in operator", () => {
             return 5
         }
     })
-    expect("a" in x).toBeTruthy()
-    expect("b" in x).toBeTruthy()
     expect("x" in x).toBeTruthy()
     expect("y" in x).toBeTruthy()
+    expect("a" in x).toBeTruthy()
+    expect("b" in x).toBeTruthy()
     expect("z" in x).toBeTruthy()
     expect("c" in x).toBeFalsy()
     expect("c" in x).toBeFalsy() // not accidentally create
@@ -370,4 +370,23 @@ test("predictable 'this' - 2", () => {
     expect(a.a1()).toBe(a)
     expect(a.a2()).toBe(a)
     expect(a.computed).toBe(a)
+})
+
+test("1796 - deleting / recreate prop", () => {
+    let value = observable({
+        foo: undefined // if foo is something like 'abc', it works.
+    })
+
+    const events = []
+
+    const aut = autorun(() => {
+        events.push(value.foo)
+    })
+    delete value.foo
+    value.foo = "def"
+    expect(events).toEqual([
+        undefined,
+        undefined, // ideally  not, but ok..
+        "def"
+    ])
 })

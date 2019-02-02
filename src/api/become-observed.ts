@@ -5,11 +5,17 @@ import {
     Lambda,
     ObservableMap,
     fail,
-    getAtom
+    getAtom,
+    ObservableSet
 } from "../internal"
 
 export function onBecomeObserved(
-    value: IObservable | IComputedValue<any> | IObservableArray<any> | ObservableMap<any, any>,
+    value:
+        | IObservable
+        | IComputedValue<any>
+        | IObservableArray<any>
+        | ObservableMap<any, any>
+        | ObservableSet<any>,
     listener: Lambda
 ): Lambda
 export function onBecomeObserved<K, V = any>(
@@ -22,7 +28,12 @@ export function onBecomeObserved(thing, arg2, arg3?): Lambda {
 }
 
 export function onBecomeUnobserved(
-    value: IObservable | IComputedValue<any> | IObservableArray<any> | ObservableMap<any, any>,
+    value:
+        | IObservable
+        | IComputedValue<any>
+        | IObservableArray<any>
+        | ObservableMap<any, any>
+        | ObservableSet<any>,
     listener: Lambda
 ): Lambda
 export function onBecomeUnobserved<K, V = any>(
@@ -38,16 +49,27 @@ function interceptHook(hook: "onBecomeObserved" | "onBecomeUnobserved", thing, a
     const atom: IObservable =
         typeof arg2 === "string" ? getAtom(thing, arg2) : (getAtom(thing) as any)
     const cb = typeof arg2 === "string" ? arg3 : arg2
-    const orig = atom[hook]
+    const listenersKey = `${hook}Listeners` as
+        | "onBecomeObservedListeners"
+        | "onBecomeUnobservedListeners"
 
+    if (atom[listenersKey]) {
+        atom[listenersKey]!.add(cb)
+    } else {
+        atom[listenersKey] = new Set<Lambda>([cb])
+    }
+
+    const orig = atom[hook]
     if (typeof orig !== "function")
         return fail(process.env.NODE_ENV !== "production" && "Not an atom that can be (un)observed")
 
-    atom[hook] = function() {
-        orig.call(this)
-        cb.call(this)
-    }
     return function() {
-        atom[hook] = orig
+        const hookListeners = atom[listenersKey]
+        if (hookListeners) {
+            hookListeners.delete(cb)
+            if (hookListeners.size === 0) {
+                delete atom[listenersKey]
+            }
+        }
     }
 }

@@ -4,38 +4,35 @@ let generatorId = 0
 
 export type CancellablePromise<T> = Promise<T> & { cancel(): void }
 
-export interface FlowIterator<T> {
-    next(value?: any): IteratorResult<T> | Promise<IteratorResult<T>>
-    return?(value?: any): IteratorResult<T> | Promise<IteratorResult<T>>
-    throw?(e?: any): IteratorResult<T> | Promise<IteratorResult<T>>
+export interface FlowYield {
+    // fake, only for typing
+    "!!flowYield": undefined
 }
 
-export function flow<R>(generator: () => FlowIterator<any>): () => CancellablePromise<R>
-export function flow<A1>(
-    generator: (a1: A1) => FlowIterator<any>
-): (a1: A1) => CancellablePromise<any> // Ideally we want to have R instead of Any, but cannot specify R without specifying A1 etc... 'any' as result is better then not specifying request args
-export function flow<A1, A2>(
-    generator: (a1: A1, a2: A2) => FlowIterator<any>
-): (a1: A1, a2: A2) => CancellablePromise<any>
-export function flow<A1, A2, A3>(
-    generator: (a1: A1, a2: A2, a3: A3) => FlowIterator<any>
-): (a1: A1, a2: A2, a3: A3) => CancellablePromise<any>
-export function flow<A1, A2, A3, A4>(
-    generator: (a1: A1, a2: A2, a3: A3, a4: A4) => FlowIterator<any>
-): (a1: A1, a2: A2, a3: A3, a4: A4) => CancellablePromise<any>
-export function flow<A1, A2, A3, A4, A5>(
-    generator: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5) => FlowIterator<any>
-): (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5) => CancellablePromise<any>
-export function flow<A1, A2, A3, A4, A5, A6>(
-    generator: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5, a6: A6) => FlowIterator<any>
-): (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5, a6: A6) => CancellablePromise<any>
-export function flow<A1, A2, A3, A4, A5, A6, A7>(
-    generator: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5, a6: A6, a7: A7) => FlowIterator<any>
-): (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5, a6: A6, a7: A7) => CancellablePromise<any>
-export function flow<A1, A2, A3, A4, A5, A6, A7, A8>(
-    generator: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5, a6: A6, a7: A7, a8: A8) => FlowIterator<any>
-): (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5, a6: A6, a7: A7, a8: A8) => CancellablePromise<any>
-export function flow(generator: Function) {
+export interface FlowReturn<T> {
+    // fake, only for typing
+    "!!flowReturn": T
+}
+
+// we skip promises that are the result of yielding promises (except if they use flowReturn)
+export type FlowReturnType<R> = IfAllAreFlowYieldThenVoid<
+    R extends FlowReturn<infer FR>
+        ? FR extends Promise<infer FRP>
+            ? FRP
+            : FR
+        : R extends Promise<any>
+        ? FlowYield
+        : R
+>
+
+// we extract yielded promises from the return type
+export type IfAllAreFlowYieldThenVoid<R> = Exclude<R, FlowYield> extends never
+    ? void
+    : Exclude<R, FlowYield>
+
+export function flow<R, Args extends any[]>(
+    generator: (...args: Args) => IterableIterator<R>
+): (...args: Args) => CancellablePromise<FlowReturnType<R>> {
     if (arguments.length !== 1)
         fail(process.env.NODE_ENV && `Flow expects one 1 argument and cannot be used as decorator`)
     const name = generator.name || "<unnamed flow>"
@@ -49,7 +46,7 @@ export function flow(generator: Function) {
         let rejector: (error: any) => void
         let pendingPromise: CancellablePromise<any> | undefined = undefined
 
-        const res = new Promise(function(resolve, reject) {
+        const promise = new Promise<R>(function(resolve, reject) {
             let stepId = 0
             rejector = reject
 
@@ -96,7 +93,7 @@ export function flow(generator: Function) {
             onFulfilled(undefined) // kick off the process
         }) as any
 
-        res.cancel = action(`${name} - runid: ${runId} - cancel`, function() {
+        promise.cancel = action(`${name} - runid: ${runId} - cancel`, function() {
             try {
                 if (pendingPromise) cancelPromise(pendingPromise)
                 // Finally block can return (or yield) stuff..
@@ -111,7 +108,7 @@ export function flow(generator: Function) {
                 rejector(e) // there could be a throwing finally block
             }
         })
-        return res
+        return promise as CancellablePromise<FlowReturnType<R>>
     }
 }
 

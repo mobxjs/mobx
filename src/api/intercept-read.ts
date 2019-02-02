@@ -8,7 +8,8 @@ import {
     isObservableArray,
     isObservableMap,
     isObservableObject,
-    isObservableValue
+    isObservableValue,
+    ObservableSet
 } from "../internal"
 
 export type ReadInterceptor<T> = (value: any) => T
@@ -21,6 +22,10 @@ export function interceptReads<T>(
 ): Lambda
 export function interceptReads<K, V>(
     observableMap: ObservableMap<K, V>,
+    handler: ReadInterceptor<V>
+): Lambda
+export function interceptReads<V>(
+    observableSet: ObservableSet<V>,
     handler: ReadInterceptor<V>
 ): Lambda
 export function interceptReads(

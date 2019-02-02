@@ -1,11 +1,14 @@
 import {
     IEnhancer,
+    IEqualsComparer,
     IObservableArray,
     IObservableDecorator,
     IObservableMapInitialValues,
+    IObservableSetInitialValues,
     IObservableObject,
     IObservableValue,
     ObservableMap,
+    ObservableSet,
     ObservableValue,
     createDecoratorForEnhancer,
     createDynamicObservableObject,
@@ -14,6 +17,7 @@ import {
     extendObservable,
     fail,
     isES6Map,
+    isES6Set,
     isObservable,
     isPlainObject,
     refStructEnhancer,
@@ -26,6 +30,7 @@ import {
 
 export type CreateObservableOptions = {
     name?: string
+    equals?: IEqualsComparer<any>
     deep?: boolean
     defaultDecorator?: IObservableDecorator
     proxy?: boolean
@@ -42,7 +47,7 @@ export const defaultCreateObservableOptions: CreateObservableOptions = {
 Object.freeze(defaultCreateObservableOptions)
 
 function assertValidOption(key: string) {
-    if (!/^(deep|name|defaultDecorator|proxy)$/.test(key))
+    if (!/^(deep|name|equals|defaultDecorator|proxy)$/.test(key))
         fail(`invalid option for (extend)observable: ${key}`)
 }
 
@@ -65,8 +70,8 @@ function getEnhancerFromOptions(options: CreateObservableOptions): IEnhancer<any
     return options.defaultDecorator
         ? options.defaultDecorator.enhancer
         : options.deep === false
-            ? referenceEnhancer
-            : deepEnhancer
+        ? referenceEnhancer
+        : deepEnhancer
 }
 
 /**
@@ -76,7 +81,7 @@ function getEnhancerFromOptions(options: CreateObservableOptions): IEnhancer<any
 function createObservable(v: any, arg2?: any, arg3?: any) {
     // @observable someProp;
     if (typeof arguments[1] === "string" || quacksLikeAStage2Decorator(arguments)) {
-        return deepDecorator.apply(null, arguments)
+        return deepDecorator.apply(null, arguments as any)
     }
 
     // it is an observable already, done
@@ -86,10 +91,12 @@ function createObservable(v: any, arg2?: any, arg3?: any) {
     const res = isPlainObject(v)
         ? observable.object(v, arg2, arg3)
         : Array.isArray(v)
-            ? observable.array(v, arg2)
-            : isES6Map(v)
-                ? observable.map(v, arg2)
-                : v
+        ? observable.array(v, arg2)
+        : isES6Map(v)
+        ? observable.map(v, arg2)
+        : isES6Set(v)
+        ? observable.set(v, arg2)
+        : v
 
     // this value could be converted to a new observable data structure, return it
     if (res !== v) return res
@@ -117,6 +124,10 @@ export interface IObservableFactory {
 export interface IObservableFactories {
     box<T = any>(value?: T, options?: CreateObservableOptions): IObservableValue<T>
     array<T = any>(initialValues?: T[], options?: CreateObservableOptions): IObservableArray<T>
+    set<T = any>(
+        initialValues?: IObservableSetInitialValues<T>,
+        options?: CreateObservableOptions
+    ): ObservableSet<T>
     map<K = any, V = any>(
         initialValues?: IObservableMapInitialValues<K, V>,
         options?: CreateObservableOptions
@@ -143,7 +154,7 @@ const observableFactories: IObservableFactories = {
     box<T = any>(value?: T, options?: CreateObservableOptions): IObservableValue<T> {
         if (arguments.length > 2) incorrectlyUsedAsDecorator("box")
         const o = asCreateObservableOptions(options)
-        return new ObservableValue(value, getEnhancerFromOptions(o), o.name)
+        return new ObservableValue(value, getEnhancerFromOptions(o), o.name, true, o.equals)
     },
     array<T = any>(initialValues?: T[], options?: CreateObservableOptions): IObservableArray<T> {
         if (arguments.length > 2) incorrectlyUsedAsDecorator("array")
@@ -157,6 +168,14 @@ const observableFactories: IObservableFactories = {
         if (arguments.length > 2) incorrectlyUsedAsDecorator("map")
         const o = asCreateObservableOptions(options)
         return new ObservableMap<K, V>(initialValues, getEnhancerFromOptions(o), o.name)
+    },
+    set<T = any>(
+        initialValues?: IObservableSetInitialValues<T>,
+        options?: CreateObservableOptions
+    ): ObservableSet<T> {
+        if (arguments.length > 2) incorrectlyUsedAsDecorator("set")
+        const o = asCreateObservableOptions(options)
+        return new ObservableSet<T>(initialValues, getEnhancerFromOptions(o), o.name)
     },
     object<T = any>(
         props: T,

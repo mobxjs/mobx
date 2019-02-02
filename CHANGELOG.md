@@ -1,4 +1,4 @@
-# 5.5.0 / 4.5.0
+# Next Minor
 
 (Jumped minor version of 5 to have the numbers more closely aligned)
 
@@ -31,6 +31,79 @@ In summary: this is the babel config that uses the stage2 decorators implementat
     ]
 }
 ```
+
+# 4.9.2
+
+* Fixed regression [#1878](https://github.com/mobxjs/mobx/issues/1878), accidental use of `Symbol` breaking Internet Explorer / React Native compatibility.
+
+# 4.9.1
+
+* Fixed regression in `toJS`: observable maps were not properly serialized. Fixes [#1875](https://github.com/mobxjs/mobx/issues/1875)
+
+# 5.9.0 / 4.9.0
+
+**Features**
+
+* Introduced support for observable sets! Through [#1592](https://github.com/mobxjs/mobx/pull/1592) by [@newraina](https://github.com/newraina)
+* `observable.box` now accepts an `equals` option, to be able to pass a custom comparision function. Through [#1862](https://github.com/mobxjs/mobx/pull/1862), [#1874](https://github.com/mobxjs/mobx/pull/1874) by [@fi3ework](https://github.com/fi3ework). Fixes [#1580](https://github.com/mobxjs/mobx/issues/1580)
+* Improved logging of reactions; if an action throws an exception, errors in reactions that react to that are only logged as warnings. Fixes [#1836](https://github.com/mobxjs/mobx/issues/1836)
+
+**Fixes**
+
+* Improved typings for `flow`, see [#1827](https://github.com/mobxjs/mobx/pull/1827) by [@xaviergonz](https://github.com/xaviergonz)
+* Don't allow subclassing map, fixes [#1858](https://github.com/mobxjs/mobx/issues/1858)
+* Fixed `trace(true)` not being able to handle multi-line comments in traced function. Fixes [#1850](https://github.com/mobxjs/mobx/issues/1850)
+* `@computed` now introduces non-configurable properties, to fail fast on incorrect inheritance or property deletion. Fixes [#1867](https://github.com/mobxjs/mobx/issues/1867)
+* The options `enforceActions` and `isolateGlobalState` now work correctly when used together. Fixes [#1869](https://github.com/mobxjs/mobx/issues/1869)
+
+# 5.8.0 / 4.8.0
+
+* MobX now requires TypeScript 3 (this was already the case in 5.7.0, but in this version the difference is actually noticeable in the typings). 
+* Fixed array dehancer sometimes skipping. Fixes [#1839](https://github.com/mobxjs/mobx/issues/1839) through [#1841](https://github.com/mobxjs/mobx/pull/1841) by [k-g-a](https://github.com/k-g-a) 
+* Fixed issue where webpack 4 wouldn't use the ESM module [#1834](https://github.com/mobxjs/mobx/pull/1834) by [mrtnbroder](https://github.com/mrtnbroder)
+* Improved type inference for `flow` in TypeScript 3. Fixes [#1816](https://github.com/mobxjs/mobx/issue/1816) through [#1825](https://github.com/mobxjs/mobx/pull/1825) by [ismailhabib](https://github.com/ismailhabib)
+* Introduced support for global environment variable `IGNORE_MOBX_MINIFIY_WARNING=true` to skip the built-in minification warning. See [#1835](https://github.com/mobxjs/mobx/pull/1835) by [fi3ework](https://github.com/fi3ework)
+* Fixed onBecome(Un)Observed dispoer cleanup. Fixes [#1537](https://github.com/mobxjs/mobx/issues/1537) through [#1833](https://github.com/mobxjs/mobx/pull/1833) by [fi3ework](https://github.com/fi3ework)
+
+# 5.7.1 / 4.7.1
+* Fixed [#1839](https://github.com/mobxjs/mobx/issues/1839), ObservableArrayAdministration.dehanceValues does not dehance last value.
+
+# 5.7.0 / 4.7.0
+
+* Upgraded typings to TypeScript 3
+* Fixed [#1742](https://github.com/mobxjs/mobx/issues/1742), change detection fails when multiple mobx instances were active.
+* Fixed [#1624](https://github.com/mobxjs/mobx/issues/1624), use built-in flow types for iterators
+* Fixed [#1777](https://github.com/mobxjs/mobx/issues/1777) through [#1826](https://github.com/mobxjs/mobx/pull/1826), stack overflow exception, in development mode, when using `@computed` on a React component. The MobX 5 behavior here has been reverted to the MobX 4 behavior.
+
+
+# 5.6.0 / 4.6.0
+
+* `keepAlive` has become smarter and won't recomputed computed values that are kept alive, as long as they aren't read. Implements [#1534](https://github.com/mobxjs/mobx/issues/1534)
+* Fixed [#1796](https://github.com/mobxjs/mobx/issues/1796), undeleting a property that had an initial value of `undefined` was undetected
+* Improved Flow typings, see [#1794](https://github.com/mobxjs/mobx/pull/1794) and [#1786](https://github.com/mobxjs/mobx/pull/1786)
+
+# 5.5.2 / 4.5.2
+
+* Fixed bug in `toJS` not handling `null` values correctly. Fixes [#1557](https://github.com/mobxjs/mobx/issues/1557) through [#1783](https://github.com/mobxjs/mobx/pull/1783) by [@wangyiz4262](https://github.com/wangyiz4262)
+
+# 5.5.1 / 4.5.1
+
+* `toJS` now has a `recurseEverything` everything option, that even detects and converts observable objects that are "behind" non-observable objects. See [#1699](https://github.com/mobxjs/mobx/pull/1699) by [wangyiz4262](https://github.com/wangyiz4262)
+* Added flow typings form `comparer`, see [#1751](https://github.com/mobxjs/mobx/pull/1752) by [pdong](https://github.com/pdong)
+* Update flow typings for configuration options, [#1772](https://github.com/mobxjs/mobx/pull/1772) by [alexandersorokin](https://github.com/alexandersorokin)
+
+# 5.5.0 / 4.5.0
+
+(Minor version of `5` was bumped significantly to make the number better correlate together :-))
+
+* Fixed [#1740](https://github.com/mobxjs/mobx/issues/1740): combining decorators and `extendObservable` in a class constructor caused errors to be thrown
+* Fixed [#1739](https://github.com/mobxjs/mobx/issues/1740):
+   * Proxies: `delete`-ing a property was not always picked up by the reactivity system
+   * Non-proxies: `remove()`-ing a property was not always picked up by the `has()` and `get()` utilities
+   * `has` now returns `true` for computed fields
+   * `get` now returns a value for computed fields
+* Introduced `_allowStateChangeInsideComputed`. Don't use it :-).
+* MobX is now transpiled using babel 7
 
 # 5.1.2 / 4.4.2
 

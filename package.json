@@ -1,17 +1,21 @@
 {
   "name": "mobx",
-  "version": "5.1.2",
+  "version": "5.9.0",
   "description": "Simple, scalable state management.",
   "main": "lib/mobx.js",
   "umd:main": "lib/mobx.umd.js",
   "module": "lib/mobx.module.js",
+  "browser": {
+    "./lib/mobx.js": "./lib/mobx.js",
+    "./lib/mobx.module.js": "./lib/mobx.module.js"
+  },
   "unpkg": "lib/mobx.umd.min.js",
   "jsnext:main": "lib/mobx.module.js",
   "react-native": "lib/mobx.module.js",
   "typings": "lib/mobx.d.ts",
   "scripts": {
-    "test": "yarn jest",
-    "watch": "yarn jest --watch",
+    "test": "jest",
+    "watch": "jest --watch",
     "test:mixed-versions": "jest --testRegex mixed-versions",
     "test:all": "yarn small-build && yarn jest -i && yarn test:flow && yarn test:mixed-versions",
     "test:webpack": "node scripts/webpack-regression-tests.js",
@@ -24,7 +28,8 @@
     "small-build": "node scripts/build.js",
     "lint": "tslint -c tslint.json src/*.ts src/types/*.ts src/api/*.ts src/core/*.ts src/utils/*.ts",
     "size": "size-limit --babili 20KB lib/mobx.js",
-    "precommit": "lint-staged"
+    "precommit": "lint-staged",
+    "publish-script": "node scripts/publish.js"
   },
   "repository": {
     "type": "git",
@@ -61,18 +66,19 @@
     "lint-staged": "^3.6.1",
     "lodash.intersection": "^3.2.0",
     "ncp": "^2.0.0",
-    "nscript": "^0.1.10",
-    "prettier": "~1.13.0",
+    "prettier": "^1.4.4",
     "regenerator-runtime": "^0.11.1",
     "rollup": "^0.41.6",
     "rollup-plugin-filesize": "^1.3.2",
     "rollup-plugin-node-resolve": "^3.0.0",
     "serializr": "^1.3.0",
+    "shelljs": "^0.8.2",
     "size-limit": "^0.2.0",
     "tape": "^4.2.2",
     "ts-jest": "^22.0.0",
     "tslib": "^1.7.1",
-    "typescript": "^2.9.0",
+    "tslint-config-prettier": "^1.17.0",
+    "typescript": "^3.2.1",
     "uglify-es": "^3.3.9"
   },
   "dependencies": {},

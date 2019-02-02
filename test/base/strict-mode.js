@@ -5,7 +5,7 @@ var strictError = /Since strict-mode is enabled, changing observed observable va
 
 test("strict mode should not allow changes outside action", () => {
     var a = mobx.observable.box(2)
-    mobx.configure({ enforceActions: true })
+    mobx.configure({ enforceActions: "observed" })
 
     // allowed, a is not observed
     a.set(3)
@@ -15,7 +15,7 @@ test("strict mode should not allow changes outside action", () => {
     expect(() => a.set(3)).toThrowError(strictError)
     d()
 
-    mobx.configure({ enforceActions: false })
+    mobx.configure({ enforceActions: "never" })
     a.set(4)
     expect(a.get()).toBe(4)
 })
@@ -24,32 +24,32 @@ test("actions can modify observed state in strict mode", () => {
     var a = mobx.observable.box(2)
     var d = mobx.autorun(() => a.get())
 
-    mobx.configure({ enforceActions: true })
+    mobx.configure({ enforceActions: "observed" })
     mobx.action(() => {
         a.set(3)
         var b = mobx.observable.box(4)
     })()
 
-    mobx.configure({ enforceActions: false })
+    mobx.configure({ enforceActions: "never" })
     d()
 })
 
 test("actions can modify non-observed state in strict mode", () => {
     var a = mobx.observable.box(2)
 
-    mobx.configure({ enforceActions: true })
+    mobx.configure({ enforceActions: "observed" })
     mobx.action(() => {
         a.set(3)
         var b = mobx.observable.box(4)
     })()
 
-    mobx.configure({ enforceActions: false })
+    mobx.configure({ enforceActions: "never" })
 })
 
 test("reactions cannot modify state in strict mode", () => {
     var a = mobx.observable.box(3)
     var b = mobx.observable.box(4)
-    mobx.configure({ enforceActions: true })
+    mobx.configure({ enforceActions: "observed" })
     mobx._resetGlobalState() // should preserve strict mode
 
     var bd = mobx.autorun(() => {
@@ -71,7 +71,7 @@ test("reactions cannot modify state in strict mode", () => {
 
     expect(() => a.set(5)).toThrowError(strictError)
 
-    mobx.configure({ enforceActions: false })
+    mobx.configure({ enforceActions: "never" })
     d()
     bd()
 })
@@ -84,7 +84,7 @@ test("action inside reaction in strict mode can modify state", () => {
         b.get() // make sure it is observed
     })
 
-    mobx.configure({ enforceActions: true })
+    mobx.configure({ enforceActions: "observed" })
     var act = mobx.action(() => b.set(b.get() + 1))
 
     var d = mobx.autorun(() => {
@@ -103,7 +103,7 @@ test("action inside reaction in strict mode can modify state", () => {
     setA(16)
     expect(b.get()).toBe(4)
 
-    mobx.configure({ enforceActions: false })
+    mobx.configure({ enforceActions: "never" })
     bd()
     d()
 })
@@ -113,7 +113,7 @@ test("cannot create or modify objects in strict mode without action", () => {
     var ar = mobx.observable([1])
     var map = mobx.observable.map({ a: 2 })
 
-    mobx.configure({ enforceActions: true })
+    mobx.configure({ enforceActions: "observed" })
 
     // introducing new observables is ok!
     // mobx.observable({ a: 2, b: function() { return this.a }});
@@ -129,7 +129,7 @@ test("cannot create or modify objects in strict mode without action", () => {
     // t.throws(() => map.set("b", 4), strictError);
     // t.throws(() => map.delete("a"), strictError);
 
-    mobx.configure({ enforceActions: false })
+    mobx.configure({ enforceActions: "never" })
 
     // can modify again
     obj.a = 42
@@ -140,7 +140,7 @@ test("can create objects in strict mode with action", () => {
     var ar = mobx.observable([1])
     var map = mobx.observable.map({ a: 2 })
 
-    mobx.configure({ enforceActions: true })
+    mobx.configure({ enforceActions: "observed" })
 
     mobx.action(() => {
         mobx.observable({
@@ -161,7 +161,7 @@ test("can create objects in strict mode with action", () => {
         map.delete("a")
     })()
 
-    mobx.configure({ enforceActions: false })
+    mobx.configure({ enforceActions: "never" })
 })
 
 test("strict mode checks", function() {
@@ -206,13 +206,13 @@ test("enforceActions 'strict' does not allow changing unobserved observables", (
 
         d()
     } finally {
-        mobx.configure({ enforceActions: false })
+        mobx.configure({ enforceActions: "never" })
     }
 })
 
 test("enforceActions 'strict' should not throw exception while observable array initialization", () => {
     try {
-        mobx.configure({ enforceActions: "strict" })
+        mobx.configure({ enforceActions: "always" })
 
         expect(() => {
             const x = mobx.observable({
@@ -220,7 +220,7 @@ test("enforceActions 'strict' should not throw exception while observable array 
             })
         }).not.toThrow(/Since strict-mode is enabled/)
     } finally {
-        mobx.configure({ enforceActions: false })
+        mobx.configure({ enforceActions: "never" })
     }
 })
 
@@ -239,4 +239,13 @@ test("warn on unsafe reads", function() {
     } finally {
         mobx.configure({ computedRequiresReaction: false })
     }
+})
+
+test("#1869", function() {
+    const x = mobx.observable.box(3)
+    mobx.configure({ enforceActions: "always", isolateGlobalState: true })
+    expect(() => {
+        x.set(4)
+    }).toThrow("Since strict-mode is enabled")
+    mobx._resetGlobalState() // should preserve strict mode
 })

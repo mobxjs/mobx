@@ -530,7 +530,7 @@ test("work with 'toString' key", () => {
 })
 
 test("issue 940, should not be possible to change maps outside strict mode", () => {
-    mobx.configure({ enforceActions: true })
+    mobx.configure({ enforceActions: "observed" })
 
     try {
         const m = mobx.observable.map()
@@ -542,7 +542,7 @@ test("issue 940, should not be possible to change maps outside strict mode", () 
 
         d()
     } finally {
-        mobx.configure({ enforceActions: false })
+        mobx.configure({ enforceActions: "never" })
     }
 })
 
@@ -704,4 +704,13 @@ test("#1583 map.size not reactive", () => {
     d()
     map.set(3, 3)
     expect(sizes).toEqual([0, 1, 2])
+})
+
+test("#1858 Map should not be inherited", () => {
+    class MyMap extends Map {}
+
+    const map = new MyMap()
+    expect(() => {
+        mobx.observable.map(map)
+    }).toThrow("Cannot initialize from classes that inherit from Map: MyMap")
 })

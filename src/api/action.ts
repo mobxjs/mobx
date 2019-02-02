@@ -70,7 +70,7 @@ export var action: IActionFactory = function action(arg1, arg2?, arg3?, arg4?): 
     } else {
         // arg2: legacy decorators
         // arg1.key: stage2 decorators
-        return namedActionDecorator(arg2 || arg1.key).apply(null, arguments)
+        return namedActionDecorator(arg2 || arg1.key).apply(null, arguments as any)
     }
 } as any
 

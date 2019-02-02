@@ -32,7 +32,8 @@ const legacyComputedDecorator = createPropDecorator(
         // Optimization: faster on decorator target or instance? Assuming target
         // Optimization: find out if declaring on instance isn't just faster. (also makes the property descriptor simpler). But, more memory usage..
         const options = decoratorArgs[0] || EMPTY_OBJECT
-        asObservableObject(instance).addComputedProp(decoratorTarget, propertyName, {
+        // Forcing instance now, fixes hot reloadig issues on React Native:
+        asObservableObject(instance).addComputedProp(instance, propertyName, {
             get,
             set,
             context: instance,

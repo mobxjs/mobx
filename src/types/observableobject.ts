@@ -9,7 +9,6 @@ import {
     IListenable,
     Lambda,
     ObservableValue,
-    UNCHANGED,
     addHiddenProp,
     assertPropertyConfigurable,
     createInstanceofPredicate,
@@ -31,7 +30,8 @@ import {
     registerListener,
     spyReportEnd,
     spyReportStart,
-    startBatch
+    startBatch,
+    globalState
 } from "../internal"
 
 export interface IObservableObject {
@@ -115,7 +115,7 @@ export class ObservableObjectAdministration
         newValue = (observable as any).prepareNewValue(newValue)
 
         // notify spy & observers
-        if (newValue !== UNCHANGED) {
+        if (newValue !== globalState.UNCHANGED) {
             const notify = hasListeners(this)
             const notifySpy = isSpyEnabled()
             const change =
@@ -138,26 +138,22 @@ export class ObservableObjectAdministration
     }
 
     has(key: string) {
-        if (this.values.get(key) instanceof ObservableValue) return true
-        else {
-            this.waitForKey(key)
-            return false
-        }
-    }
-
-    private waitForKey(key: string) {
         const map = this.pendingKeys || (this.pendingKeys = new Map())
         let entry = map.get(key)
-        if (!entry) {
+        if (entry) return entry.get()
+        else {
+            const exists = !!this.values.get(key)
+            // Possible optimization: Don't have a separate map for non existing keys,
+            // but store them in the values map instead, using a special symbol to denote "not existing"
             entry = new ObservableValue(
-                false,
+                exists,
                 referenceEnhancer,
                 `${this.name}.${key.toString()}?`,
                 false
             )
             map.set(key, entry)
+            return entry.get() // read to subscribe
         }
-        entry.get() // read to subscribe
     }
 
     addObservableProp(propName: string, newValue, enhancer: IEnhancer<any> = this.defaultEnhancer) {
@@ -221,8 +217,14 @@ export class ObservableObjectAdministration
             const oldObservable = this.values.get(key)
             const oldValue = oldObservable && oldObservable.get()
             oldObservable && oldObservable.set(undefined)
+            // notify key and keyset listeners
             this.keysAtom.reportChanged()
             this.values.delete(key)
+            if (this.pendingKeys) {
+                const entry = this.pendingKeys.get(key)
+                if (entry) entry.set(false)
+            }
+            // delete the prop
             delete this.target[key]
             const change =
                 notify || notifySpy
@@ -377,7 +379,7 @@ export function generateComputedPropConfig(propName) {
     return (
         computedPropertyConfigs[propName] ||
         (computedPropertyConfigs[propName] = {
-            configurable: true,
+            configurable: false, // See https://github.com/mobxjs/mobx/issues/1867, for computeds, we don't want reconfiguration, as this will potentially leak memory!
             enumerable: false,
             get() {
                 return getAdministrationForComputedPropOwner(this).read(propName)
