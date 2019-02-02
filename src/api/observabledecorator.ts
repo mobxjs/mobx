@@ -72,17 +72,11 @@ function stage2ObservableDecorator(
             // To run some code upon initialization,
             // see: https://github.com/tc39/proposal-decorators/issues/153
             {
-                key: "__mobx-initializer-" + key,
-                kind: "field",
+                kind: "hook",
                 placement: "own",
-                descriptor: {
-                    enumerable: false,
-                    configurable: true,
-                    writable: true
-                },
                 initializer() {
                     asObservableObject(this).initializeObservableProp(
-                        key,
+                        key!,
                         initializer && initializer.call(this),
                         enhancer
                     )

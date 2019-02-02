@@ -1,8 +1,8 @@
 export type Stage2Decorator = {
-    kind: "field" | "method" | "class"
-    key: string
+    kind: "field" | "method" | "class" | "hook"
+    key?: string
     placement: "static" | "prototype" | "own"
-    descriptor: PropertyDescriptor
+    descriptor?: PropertyDescriptor
     initializer?: () => any
     finisher?: (klass) => void
     extras?: Stage2Decorator[]
