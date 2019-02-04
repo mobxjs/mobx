@@ -23,6 +23,7 @@ MobX is proudly sponsored by Mendix, Coinbase, Facebook Open Source, Canva, Algo
 <a href="http://auctionfrontier.com/"><img src="docs/auctionfrontier.jpeg" align="center" width="100" title="Auction Frontier" alt="Auction Frontier"></a>
 <a href="https://mantro.net/jobs/warlock"><img src="docs/mantro.png" align="center" width="100" title="mantro GmbH" alt="mantro GmbH"></a>
 <a href="https://talentplot.com/"><img src="docs/talentplot.png" align="center" width="100" title="talentplot" alt="talentplot"></a>
+<a href="https://www.codefirst.co.uk/"><img src="https://mobx.js.org/docs/codefirst.png" align="center" width="100" title="CodeFirst" alt="CodeFirst"/></a>
 
 # Installation
 
