@@ -20,9 +20,10 @@ MobX is proudly sponsored by Mendix, Coinbase, Facebook Open Source, Canva, Algo
 <a href="https://www.canva.com/"><img src="docs/canva.png" align="center" width="100" title="Canva" alt="Canva" /></a>
 <a href="https://www.algolia.com/"><img src="docs/algolia.jpg" align="center" width="100" title="Algolia" alt="Algolia" /></a>
 <a href="https://www.guilded.gg/"><img src="docs/guilded.jpg" align="center" width="100" title="Guilded" alt="Guilded" /></a>
-<a href="http://auctionfrontier.com/"><img src="docs/auctionfrontier.jpeg" align="center" width="100" title="Auction Frontier" alt="Auction Frontier"></a>
-<a href="https://mantro.net/jobs/warlock"><img src="docs/mantro.png" align="center" width="100" title="mantro GmbH" alt="mantro GmbH"></a>
-<a href="https://talentplot.com/"><img src="docs/talentplot.png" align="center" width="100" title="talentplot" alt="talentplot"></a>
+<a href="http://auctionfrontier.com/"><img src="docs/auctionfrontier.jpeg" align="center" width="100" title="Auction Frontier" alt="Auction Frontier"/></a>
+<a href="https://mantro.net/jobs/warlock"><img src="docs/mantro.png" align="center" width="100" title="mantro GmbH" alt="mantro GmbH"/></a>
+<a href="https://talentplot.com/"><img src="docs/talentplot.png" align="center" width="100" title="talentplot" alt="talentplot"/></a>
+<a href="https://www.codefirst.co.uk/"><img src="docs/codefirst.png" align="center" width="100" title="CodeFirst" alt="CodeFirst"/></a>
 
 
 # Installation
