@@ -13,6 +13,12 @@
 	"prettier.useTabs": false,
 	"prettier.printWidth": 100,
 	"prettier.singleQuote": false,
-	"typescript.tsdk": "node_modules/typescript/lib"
+    "typescript.tsdk": "node_modules/typescript/lib",
 	// "javascript.validate.enable": false // enable for flow
+	"eslint.validate": [
+		"javascript",
+		"javascriptreact",
+		"typescript",
+		"typescriptreact"
+	  ]
 }
