@@ -45,7 +45,7 @@ const computedStructDecorator = computedDecorator({ equals: comparer.structural 
  * Decorator for class properties: @computed get value() { return expr; }.
  * For legacy purposes also invokable as ES5 observable created: `computed(() => expr)`;
  */
-export var computed: IComputed = function computed(arg1, arg2, arg3) {
+export const computed: IComputed = function computed(arg1, arg2, arg3) {
     if (typeof arg2 === "string") {
         // @computed
         return computedDecorator.apply(null, arguments)

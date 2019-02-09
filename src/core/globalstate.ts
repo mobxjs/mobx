@@ -172,7 +172,7 @@ export function resetGlobalState() {
     globalState.allowStateChanges = !globalState.enforceActions
 }
 
-declare var window: any
+declare const window: any
 
 export function getGlobal() {
     return typeof window !== "undefined" ? window : global

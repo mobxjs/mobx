@@ -22,7 +22,7 @@ if (typeof Proxy === "undefined" || typeof Symbol === "undefined") {
     )
 }
 
-declare var window: any
+declare const window: any
 try {
     // define process.env if needed
     // if this is not a production build in the first place
@@ -155,7 +155,7 @@ export {
 // Devtools support
 import { spy, getDebugName, $mobx } from "./internal"
 
-declare var __MOBX_DEVTOOLS_GLOBAL_HOOK__: { injectMobx: (any) => void }
+declare const __MOBX_DEVTOOLS_GLOBAL_HOOK__: { injectMobx: (any) => void }
 if (typeof __MOBX_DEVTOOLS_GLOBAL_HOOK__ === "object") {
     // See: https://github.com/andykog/mobx-devtools/
     __MOBX_DEVTOOLS_GLOBAL_HOOK__.injectMobx({
