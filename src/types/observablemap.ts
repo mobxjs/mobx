@@ -302,7 +302,7 @@ export class ObservableMap<K = any, V = any>
             else if (Array.isArray(other)) other.forEach(([key, value]) => this.set(key, value))
             else if (isES6Map(other)) {
                 if (other.constructor !== Map)
-                    return fail("Cannot initialize from classes that inherit from Map: " + other.constructor.name) // prettier-ignore
+                    fail("Cannot initialize from classes that inherit from Map: " + other.constructor.name) // prettier-ignore
                 other.forEach((value, key) => this.set(key, value))
             } else if (other !== null && other !== undefined)
                 fail("Cannot initialize map from " + other)

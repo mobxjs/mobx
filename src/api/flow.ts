@@ -38,7 +38,10 @@ export function flow<R, Args extends any[]>(
         const ctx = this
         const args = arguments
         const runId = ++generatorId
-        const gen = action(`${name} - runid: ${runId} - init`, generator).apply(ctx, args)
+        const gen = action(`${name} - runid: ${runId} - init`, generator).apply(
+            ctx,
+            (args as any) as Args
+        )
         let rejector: (error: any) => void
         let pendingPromise: CancellablePromise<any> | undefined = undefined
 
@@ -65,7 +68,7 @@ export function flow<R, Args extends any[]>(
                 pendingPromise = undefined
                 let ret
                 try {
-                    ret = action(`${name} - runid: ${runId} - yield ${stepId++}`, gen.throw).call(
+                    ret = action(`${name} - runid: ${runId} - yield ${stepId++}`, gen.throw!).call(
                         gen,
                         err
                     )
@@ -93,7 +96,7 @@ export function flow<R, Args extends any[]>(
             try {
                 if (pendingPromise) cancelPromise(pendingPromise)
                 // Finally block can return (or yield) stuff..
-                const res = gen.return()
+                const res = gen.return!()
                 // eat anything that promise would do, it's cancelled!
                 const yieldedPromise = Promise.resolve(res.value)
                 yieldedPromise.then(noop, noop)
