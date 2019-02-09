@@ -5,7 +5,7 @@ script: CI=true yarn test:travis
 after_success:
   - cat ./coverage/lcov.info|./node_modules/coveralls/bin/coveralls.js
 node_js:
-  - 9.3
+  - 9.10
 addons:
     apt:
         packages:
