@@ -306,6 +306,7 @@ export class ObservableMap<K = any, V = any>
                 other.forEach((value, key) => this.set(key, value))
             } else if (other !== null && other !== undefined)
                 fail("Cannot initialize map from " + other)
+            return
         })
         return this
     }
