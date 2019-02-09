@@ -18,7 +18,7 @@
 
 if (typeof Proxy === "undefined" || typeof Symbol === "undefined") {
     throw new Error(
-        "[mobx] MobX 5+ requires Proxy and Symbol objects. If your environment doesn't support Proxy objects, please downgrade to MobX 4. For React Native Android, consider upgrading JSCore."
+        "[mobx] MobX 5+ requires Proxy and Symbol objects. If your environment doesn't support Symbol or Proxy objects, please downgrade to MobX 4. For React Native Android, consider upgrading JSCore."
     )
 }
 
@@ -155,7 +155,7 @@ export {
 // Devtools support
 import { spy, getDebugName, $mobx } from "./internal"
 
-declare var __MOBX_DEVTOOLS_GLOBAL_HOOK__: { injectMobx: ((any) => void) }
+declare var __MOBX_DEVTOOLS_GLOBAL_HOOK__: { injectMobx: (any) => void }
 if (typeof __MOBX_DEVTOOLS_GLOBAL_HOOK__ === "object") {
     // See: https://github.com/andykog/mobx-devtools/
     __MOBX_DEVTOOLS_GLOBAL_HOOK__.injectMobx({
