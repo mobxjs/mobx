@@ -65,7 +65,9 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
     interceptors
     dehancer: any
     enhancer: (newV: any, oldV: any | undefined) => any;
+    // eslint-disable-next-line
     [Symbol.iterator]: () => IterableIterator<T>; // only used for typings!
+    // eslint-disable-next-line
     [Symbol.toStringTag]: string // only used for typings!
 
     constructor(

@@ -1,4 +1,4 @@
-import { invariant, isPlainObject } from "../internal"
+import { fail, isPlainObject } from "../internal"
 
 export function decorate<T>(
     clazz: new (...args: any[]) => T,
@@ -21,19 +21,17 @@ export function decorate<T>(
     }
 ): T
 export function decorate(thing: any, decorators: any) {
-    process.env.NODE_ENV !== "production" &&
-        invariant(isPlainObject(decorators), "Decorators should be a key value map")
+    if (process.env.NODE_ENV !== "production" && !isPlainObject(decorators))
+        fail("Decorators should be a key value map")
     const target = typeof thing === "function" ? thing.prototype : thing
     for (let prop in decorators) {
         let propertyDecorators = decorators[prop]
         if (!Array.isArray(propertyDecorators)) {
             propertyDecorators = [propertyDecorators]
         }
-        process.env.NODE_ENV !== "production" &&
-            invariant(
-                propertyDecorators.every(decorator => typeof decorator === "function"),
-                `Decorate: expected a decorator function or array of decorator functions for '${prop}'`
-            )
+        // prettier-ignore
+        if (process.env.NODE_ENV !== "production" && !propertyDecorators.every(decorator => typeof decorator === "function"))
+            fail(`Decorate: expected a decorator function or array of decorator functions for '${prop}'`)
         const descriptor = Object.getOwnPropertyDescriptor(target, prop)
         const newDescriptor = propertyDecorators.reduce(
             (accDescriptor, decorator) => decorator(target, prop, accDescriptor),

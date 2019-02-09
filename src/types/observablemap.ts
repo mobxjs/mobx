@@ -88,7 +88,9 @@ export class ObservableMap<K = any, V = any>
     interceptors
     changeListeners
     dehancer: any;
+    // eslint-disable-next-line
     [Symbol.iterator]: () => IterableIterator<[K, V]>; // only used for typings!
+    // eslint-disable-next-line
     [Symbol.toStringTag]: string // only used for typings!
 
     constructor(
@@ -392,6 +394,6 @@ declareIterator(ObservableMap.prototype, function() {
 addHiddenFinalProp(ObservableMap.prototype, toStringTagSymbol(), "Map")
 
 /* 'var' fixes small-build issue */
-export var isObservableMap = createInstanceofPredicate("ObservableMap", ObservableMap) as (
+export const isObservableMap = createInstanceofPredicate("ObservableMap", ObservableMap) as (
     thing: any
 ) => thing is ObservableMap<any, any>

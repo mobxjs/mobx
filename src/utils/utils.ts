@@ -7,6 +7,8 @@ import {
     isObservableMap
 } from "../internal"
 
+declare const Symbol: any
+
 export const OBFUSCATED_ERROR =
     "An invariant failed, however the error is obfuscated because this is an production build."
 
@@ -16,7 +18,7 @@ Object.freeze(EMPTY_ARRAY)
 export const EMPTY_OBJECT = {}
 Object.freeze(EMPTY_OBJECT)
 
-declare var window: any
+declare const window: any
 
 export function getGlobal() {
     return typeof window !== "undefined" ? window : global
@@ -182,6 +184,7 @@ export function iteratorToArray<T>(it: Iterator<T>): ReadonlyArray<T> {
 }
 
 export function primitiveSymbol() {
+    // es-disable-next-line
     return (typeof Symbol === "function" && Symbol.toPrimitive) || "@@toPrimitive"
 }
 

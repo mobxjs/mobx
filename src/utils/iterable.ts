@@ -2,7 +2,7 @@ import { addHiddenFinalProp } from "../internal"
 
 // inspired by https://github.com/leebyron/iterall/
 
-declare var Symbol
+declare const Symbol
 
 export function iteratorSymbol() {
     return (typeof Symbol === "function" && Symbol.iterator) || "@@iterator"

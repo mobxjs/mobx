@@ -7,7 +7,6 @@ import {
     isObservableSet
 } from "../internal"
 
-declare var Symbol
 const toString = Object.prototype.toString
 
 export function deepEqual(a: any, b: any): boolean {
@@ -25,7 +24,7 @@ function eq(a: any, b: any, aStack?: any[], bStack?: any[]) {
     // `NaN`s are equivalent, but non-reflexive.
     if (a !== a) return b !== b
     // Exhaust primitive checks
-    var type = typeof a
+    const type = typeof a
     if (type !== "function" && type !== "object" && typeof b != "object") return false
     return deepEq(a, b, aStack, bStack)
 }
@@ -36,7 +35,7 @@ function deepEq(a: any, b: any, aStack?: any[], bStack?: any[]) {
     a = unwrap(a)
     b = unwrap(b)
     // Compare `[[Class]]` names.
-    var className = toString.call(a)
+    const className = toString.call(a)
     if (className !== toString.call(b)) return false
     switch (className) {
         // Strings, numbers, regular expressions, dates, and booleans are compared by value.
@@ -60,17 +59,18 @@ function deepEq(a: any, b: any, aStack?: any[], bStack?: any[]) {
             return +a === +b
         case "[object Symbol]":
             return (
+                // eslint-disable-next-line
                 typeof Symbol !== "undefined" && Symbol.valueOf.call(a) === Symbol.valueOf.call(b)
             )
     }
 
-    var areArrays = className === "[object Array]"
+    const areArrays = className === "[object Array]"
     if (!areArrays) {
         if (typeof a != "object" || typeof b != "object") return false
 
         // Objects with different constructors are not equivalent, but `Object`s or `Array`s
         // from different frames are.
-        var aCtor = a.constructor,
+        const aCtor = a.constructor,
             bCtor = b.constructor
         if (
             aCtor !== bCtor &&
@@ -92,7 +92,7 @@ function deepEq(a: any, b: any, aStack?: any[], bStack?: any[]) {
     // It's done here since we only need them for objects and arrays comparison.
     aStack = aStack || []
     bStack = bStack || []
-    var length = aStack.length
+    let length = aStack.length
     while (length--) {
         // Linear search. Performance is inversely proportional to the number of
         // unique nested structures.
@@ -114,8 +114,8 @@ function deepEq(a: any, b: any, aStack?: any[], bStack?: any[]) {
         }
     } else {
         // Deep compare objects.
-        var keys = Object.keys(a),
-            key
+        const keys = Object.keys(a)
+        let key
         length = keys.length
         // Ensure that both objects contain the same number of properties before comparing deep equality.
         if (Object.keys(b).length !== length) return false

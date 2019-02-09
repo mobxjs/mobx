@@ -53,7 +53,7 @@ export interface IActionFactory {
     bound(target: Object, propertyKey: string | symbol, descriptor?: PropertyDescriptor): void
 }
 
-export var action: IActionFactory = function action(arg1, arg2?, arg3?, arg4?): any {
+export const action: IActionFactory = function action(arg1, arg2?, arg3?, arg4?): any {
     // action(fn() {})
     if (arguments.length === 1 && typeof arg1 === "function")
         return createAction(arg1.name || "<unnamed action>", arg1)

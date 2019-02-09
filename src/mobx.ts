@@ -16,11 +16,12 @@
  *
  */
 
-declare var window: any
+declare const window: any
 try {
     // define process.env if needed
     // if this is not a production build in the first place
     // (in which case the expression below would be substituted with 'production')
+    // tslint:disable-next-line
     process.env.NODE_ENV
 } catch (e) {
     const g = typeof window !== "undefined" ? window : global
@@ -150,9 +151,9 @@ export {
 export const $mobx = "$mobx"
 
 // Devtools support
-import { spy, getDebugName } from "./internal"
+import { spy, getDebugName, fail } from "./internal"
 
-declare var __MOBX_DEVTOOLS_GLOBAL_HOOK__: { injectMobx: (any) => void }
+declare const __MOBX_DEVTOOLS_GLOBAL_HOOK__: { injectMobx: (any) => void }
 if (typeof __MOBX_DEVTOOLS_GLOBAL_HOOK__ === "object") {
     // See: https://github.com/andykog/mobx-devtools/
     __MOBX_DEVTOOLS_GLOBAL_HOOK__.injectMobx({
