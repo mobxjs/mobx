@@ -202,9 +202,12 @@ export function propagateChangeConfirmed(observable: IObservable) {
     observable.lowestObserverState = IDerivationState.STALE
 
     observable.observers.forEach(d => {
-        if (d.dependenciesState === IDerivationState.POSSIBLY_STALE)
+        if (d.dependenciesState === IDerivationState.POSSIBLY_STALE) {
             d.dependenciesState = IDerivationState.STALE
-        else if (
+            if (d.isTracing !== TraceMode.NONE) {
+                logTraceInfo(d, observable)
+            }
+        } else if (
             d.dependenciesState === IDerivationState.UP_TO_DATE // this happens during computing of `d`, just keep lowestObserverState up to date.
         )
             observable.lowestObserverState = IDerivationState.UP_TO_DATE
@@ -221,9 +224,6 @@ export function propagateMaybeChanged(observable: IObservable) {
     observable.observers.forEach(d => {
         if (d.dependenciesState === IDerivationState.UP_TO_DATE) {
             d.dependenciesState = IDerivationState.POSSIBLY_STALE
-            if (d.isTracing !== TraceMode.NONE) {
-                logTraceInfo(d, observable)
-            }
             d.onBecomeStale()
         }
     })
