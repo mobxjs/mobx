@@ -69,7 +69,7 @@ const Timer = observer(({ timerData }) =>
 ## Observable local component state
 
 Just like normal classes, you can introduce observable properties on a component by using the `@observable` decorator.
-This means that you can have local state in components that doesn't need to be manged by React's verbose and imperative `setState` mechanism, but is as powerful.
+This means that you can have local state in components that doesn't need to be managed by React's verbose and imperative `setState` mechanism, but is as powerful.
 The reactive state will be picked up by `render` but will not explicitly invoke other React lifecycle methods except `componentWillUpdate` and `componentDidUpdate`.
 If you need other React lifecycle methods, just use the normal React `state` based APIs.
 
