@@ -322,7 +322,9 @@ And finally, kudos to all the people that believed in, tried, validated and even
 ## Contributing
 
 * Feel free to send small pull requests. Please discuss new features or big changes in a GitHub issue first.
-* Use `npm test` to run the basic test suite, `npm run coverage` for the test suite with coverage and `npm run test:performance` for the performance tests.
+* Use `yarn test` to run the basic test suite.
+* Use `yarn test:travis` for the test suite with coverage.
+* and `yarn test:performance` for the performance tests.
 * Please note that if you want to backport a feature / fix to MobX 4 a second PR needs to be opened to the mobx4-master branch.
 
 # MobX 4 vs MobX 5
