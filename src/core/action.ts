@@ -16,14 +16,14 @@ export interface IAction {
     isMobxAction: boolean
 }
 
-export function createAction(actionName: string, fn: Function): Function & IAction {
+export function createAction(actionName: string, fn: Function, ref?: Object): Function & IAction {
     if (process.env.NODE_ENV !== "production") {
         invariant(typeof fn === "function", "`action` can only be invoked on functions")
         if (typeof actionName !== "string" || !actionName)
             fail(`actions should have valid names, got: '${actionName}'`)
     }
     const res = function() {
-        return executeAction(actionName, fn, this, arguments)
+        return executeAction(actionName, fn, ref || this, arguments)
     }
     ;(res as any).isMobxAction = true
     return res as any

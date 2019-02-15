@@ -73,7 +73,10 @@ test("spy error", () => {
             get y() {
                 if (this.x === 3) throw "Oops"
                 return this.x * 2
-            }
+            },
+            setX: mobx.action(function setX(x) {
+                this.x = x
+            })
         })
 
         var events = []
@@ -82,13 +85,18 @@ test("spy error", () => {
         var d = mobx.autorun(() => a.y, { name: "autorun" })
 
         a.x = 3
-
+        a.setX(4)
+        const actionEvents = events.filter(event => event.type === "action")
+        const isActionsTypeofObservable = actionEvents.reduce(
+            (ret, action) => ret && action.object === a,
+            true
+        )
         events.forEach(x => {
             delete x.fn
             delete x.object
             delete x.time
         })
-
+        expect(isActionsTypeofObservable).toBe(true)
         expect(events).toMatchSnapshot()
 
         d()
