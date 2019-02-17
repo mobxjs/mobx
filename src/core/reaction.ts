@@ -1,5 +1,6 @@
 import {
     $mobx,
+    fail,
     IDerivation,
     IDerivationState,
     IObservable,
@@ -118,6 +119,9 @@ export class Reaction implements IDerivation, IReactionPublic {
     }
 
     track(fn: () => void) {
+        if (this.isDisposed) {
+            fail("Reaction already disposed")
+        }
         startBatch()
         const notify = isSpyEnabled()
         let startTime
