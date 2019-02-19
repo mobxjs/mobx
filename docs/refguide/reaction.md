@@ -13,7 +13,7 @@ The second function (the *effect* function) passed to `reaction` will receive tw
 The first argument is the value returned by the *data* function. The second argument is the current reaction,
 which can be used to dispose the `reaction` during execution.
 
-It is important to notice that the side effect will *only* react to data that was *accessed* in the data expression, which might be less then the data that is actually used in the effect.
+It is important to notice that the side effect will *only* react to data that was *accessed* in the data expression, which might be less than the data that is actually used in the effect.
 Also, the side effect will only be triggered when the data returned by the expression has changed.
 In other words: reaction requires you to produce the things you need in your side effect.
 
