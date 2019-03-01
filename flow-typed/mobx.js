@@ -311,7 +311,7 @@ declare export function reaction<T>(
     expression: (r: IReactionPublic) => T,
     effect: (arg: T, r: IReactionPublic) => void,
     opts?: IReactionOptions
-): () => mixed
+): () => void
 
 export interface IWhenOptions {
     name?: string,
@@ -323,7 +323,7 @@ declare export function when(
     cond: () => boolean,
     effect: Lambda,
     options?: IWhenOptions
-): () => mixed
+): () => void
 declare export function when(cond: () => boolean, options?: IWhenOptions): Promise<any>
 
 declare export function computed<T>(
