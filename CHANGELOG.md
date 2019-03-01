@@ -158,6 +158,7 @@ _Note June 7th, 2018:_ Both issues are already in Jest master and should be rele
   * Don't `slice()` arrays when passing them to external libraries. (Note you still shouldn't pass observable data structures to non-`observer` React components, which is an orthogonal concept)
   * You could replace observable maps with observable objects if you are only using string-based keys.
 * Don't call the `reverse` or `sort` operations directly on observableArray's anymore, as it's behavior slightly differed from the built-in implementations of those methods. Instead use `observableArray.slice().sort()` to perform the sort on a copy. This gives no additional performance overhead compared to MobX 4. (The reason behind this is that built-in `sort` updates the array in place, but the observable array implementation always performed the sort on a defensive copy, and this change makes that explicit).
+* you may remove usages of `isArrayLike()` since `Array.isArray()` will now return true for observable arrays
 
 
 ### API's that have been dropped
