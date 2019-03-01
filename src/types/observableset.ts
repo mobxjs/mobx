@@ -26,7 +26,8 @@ import {
     isES6Set,
     toStringTagSymbol,
     declareIterator,
-    addHiddenFinalProp
+    addHiddenFinalProp,
+    iteratorToArray
 } from "../internal"
 
 const ObservableSetMarker = {}
@@ -192,8 +193,8 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
 
     entries() {
         let nextIndex = 0
-        const keys = Array.from(this.keys())
-        const values = Array.from(this.values())
+        const keys = iteratorToArray(this.keys())
+        const values = iteratorToArray(this.values())
         return makeIterable<[T, T]>({
             next() {
                 const index = nextIndex
@@ -213,7 +214,15 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
         this._atom.reportObserved()
         const self = this
         let nextIndex = 0
-        const observableValues = Array.from(this._data.values())
+        let observableValues: any[]
+
+        if (this._data.values !== undefined) {
+            observableValues = iteratorToArray(this._data.values())
+        } else {
+            // There is no values function in IE11
+            observableValues = []
+            this._data.forEach(e => observableValues.push(e))
+        }
         return makeIterable<T>({
             next() {
                 return nextIndex < observableValues.length
@@ -262,7 +271,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
     }
 
     toString(): string {
-        return this.name + "[ " + Array.from(this).join(", ") + " ]"
+        return this.name + "[ " + iteratorToArray(this.keys()).join(", ") + " ]"
     }
 }
 
