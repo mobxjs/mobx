@@ -1,5 +1,28 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`trace - #1803 1`] = `
+Array [
+  Arguments [
+    "[mobx.trace] 'final' tracing enabled",
+  ],
+  Arguments [
+    Object {},
+  ],
+  Arguments [
+    "[mobx.trace] 'final' is invalidated due to a change in: 'b'",
+  ],
+  Arguments [
+    Object {},
+  ],
+  Arguments [
+    "[mobx.trace] 'final' is invalidated due to a change in: 'b'",
+  ],
+  Arguments [
+    Object {},
+  ],
+]
+`;
+
 exports[`trace 1`] = `
 Array [
   "- INIT -",

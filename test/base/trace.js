@@ -3,6 +3,8 @@
 const mobx = require("../../src/mobx.ts")
 const utils = require("../utils/test-utils")
 
+const { computed, observable, autorun, runInAction, trace } = mobx
+
 test("trace", () => {
     mobx._resetGlobalState()
     const baselog = console.log
@@ -51,6 +53,57 @@ test("trace", () => {
         lines.push("- DISPOSE -")
 
         d()
+
+        expect(lines).toMatchSnapshot()
+    } finally {
+        console.log = baselog
+    }
+})
+
+test("trace - #1803", () => {
+    mobx._resetGlobalState()
+    const baselog = console.log
+    try {
+        const lines = []
+        console.log = function() {
+            lines.push(arguments)
+        }
+
+        const a = observable.box(null, { name: "a" })
+
+        const b = computed(
+            () => {
+                void a.get()
+                return 2
+            },
+            { name: "b" }
+        )
+
+        const c = observable.box(null, { name: "c" })
+
+        const final = computed(
+            () => {
+                trace()
+                c.get()
+                b.get()
+                return {}
+            },
+            { name: "final" }
+        )
+
+        autorun(() => {
+            console.log(final.get())
+        })
+
+        runInAction(() => {
+            a.set(1)
+            c.set(1)
+        })
+
+        runInAction(() => {
+            a.set(2)
+            c.set(2)
+        })
 
         expect(lines).toMatchSnapshot()
     } finally {
