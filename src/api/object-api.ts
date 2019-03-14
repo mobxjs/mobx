@@ -12,6 +12,7 @@ import {
     endBatch,
     defineObservableProperty,
     invariant,
+    iteratorToArray,
     getAdministration,
     ObservableObjectAdministration
 } from "../internal"
@@ -28,7 +29,7 @@ export function keys(obj: any): any {
         return (obj as any)._keys.slice()
     }
     if (isObservableSet(obj)) {
-        return Array.from(obj.keys())
+        return iteratorToArray(obj.keys())
     }
     if (isObservableArray(obj)) {
         return obj.map((_, index) => index)
@@ -51,7 +52,7 @@ export function values(obj: any): string[] {
         return keys(obj).map(key => obj.get(key))
     }
     if (isObservableSet(obj)) {
-        return Array.from(obj.values())
+        return iteratorToArray(obj.values())
     }
     if (isObservableArray(obj)) {
         return obj.slice()
@@ -74,7 +75,7 @@ export function entries(obj: any): any {
         return keys(obj).map(key => [key, obj.get(key)])
     }
     if (isObservableSet(obj)) {
-        return Array.from(obj.entries())
+        return iteratorToArray(obj.entries())
     }
     if (isObservableArray(obj)) {
         return obj.map((key, index) => [index, key])

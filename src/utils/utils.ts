@@ -173,7 +173,7 @@ export function getMapLikeKeys(map: any): any {
 }
 
 // use Array.from in Mobx 5
-export function iteratorToArray<T>(it: Iterator<T>): ReadonlyArray<T> {
+export function iteratorToArray<T>(it: Iterator<T>): Array<T> {
     const res: T[] = []
     while (true) {
         const r: any = it.next()
