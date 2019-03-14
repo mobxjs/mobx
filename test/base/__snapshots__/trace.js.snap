@@ -9,13 +9,13 @@ Array [
     Object {},
   ],
   Arguments [
-    "[mobx.trace] 'final' is invalidated due to a change in: 'b'",
+    "[mobx.trace] 'final' is invalidated due to a change in: 'c'",
   ],
   Arguments [
     Object {},
   ],
   Arguments [
-    "[mobx.trace] 'final' is invalidated due to a change in: 'b'",
+    "[mobx.trace] 'final' is invalidated due to a change in: 'c'",
   ],
   Arguments [
     Object {},
