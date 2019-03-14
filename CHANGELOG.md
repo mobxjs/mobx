@@ -1,5 +1,3 @@
-# For latest changes, see CHANGELOG on master
-
 Changelog continues [here](https://github.com/mobxjs/mobx/blob/master/CHANGELOG.md)
 
 ---
