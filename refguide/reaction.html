@@ -61,7 +61,7 @@
         data-chapter-title="reaction"
         data-filepath="refguide/reaction.md"
         data-basepath=".."
-        data-revision="Mon Feb 04 2019 13:33:21 GMT+0100 (CET)"
+        data-revision="Thu Mar 14 2019 11:27:23 GMT+0100 (CET)"
         data-innerlanguage="">
     
 
@@ -811,7 +811,7 @@ Any observables that are accessed while executing the side effect will not be tr
 <p>The second function (the <em>effect</em> function) passed to <code>reaction</code> will receive two arguments when invoked.
 The first argument is the value returned by the <em>data</em> function. The second argument is the current reaction,
 which can be used to dispose the <code>reaction</code> during execution.</p>
-<p>It is important to notice that the side effect will <em>only</em> react to data that was <em>accessed</em> in the data expression, which might be less then the data that is actually used in the effect.
+<p>It is important to notice that the side effect will <em>only</em> react to data that was <em>accessed</em> in the data expression, which might be less than the data that is actually used in the effect.
 Also, the side effect will only be triggered when the data returned by the expression has changed.
 In other words: reaction requires you to produce the things you need in your side effect.</p>
 <h2 id="options"><a name="options" class="plugin-anchor" href="#options"><span class="fa fa-link"></span></a>Options</h2>

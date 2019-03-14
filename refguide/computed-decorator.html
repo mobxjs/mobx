@@ -61,7 +61,7 @@
         data-chapter-title="(@)computed"
         data-filepath="refguide/computed-decorator.md"
         data-basepath=".."
-        data-revision="Mon Feb 04 2019 13:33:21 GMT+0100 (CET)"
+        data-revision="Thu Mar 14 2019 11:27:23 GMT+0100 (CET)"
         data-innerlanguage="">
     
 
@@ -960,6 +960,45 @@ divided.get() <span class="hljs-comment">// Throws: Division by zero</span>
 y.set(<span class="hljs-number">2</span>)
 divided.get() <span class="hljs-comment">// Recovered; Returns 1.5</span>
 </code></pre>
+<h2 id="computeds-with-arguments"><a name="computeds-with-arguments" class="plugin-anchor" href="#computeds-with-arguments"><span class="fa fa-link"></span></a>Computeds with arguments?</h2>
+<p>Sometimes you might want to have a computed value that takes an argument, like:</p>
+<pre><code class="lang-typescript"><span class="hljs-comment">// Parameterized computed views:</span>
+<span class="hljs-comment">// Create computed&apos;s and store them in a cache</span>
+<span class="hljs-keyword">import</span> { observable, computed } from <span class="hljs-string">&quot;mobx&quot;</span>
+
+<span class="hljs-keyword">class</span> Todos {
+  @observable todos = []
+
+  @computed <span class="hljs-comment">// Not possible, computed cannot be applied to functions!</span>
+  getAllTodosByUser(userId) {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.todos.filter(todo =&gt; todo.user === userId))
+  }
+}
+</code></pre>
+<p>The above pattern is not supported out of the box by MobX, the reason is that it would require a memoization 
+cache based on all possible values of <code>userId</code>.
+However, this would potentially leak to 
+it would require a memoization table based on the arguments, for which it is unclear when we can remove entries.</p>
+<p>That being said, it is not hard to implement such a memoization table by hand!</p>
+<pre><code class="lang-typescript"><span class="hljs-comment">// Create computed&apos;s and store them in a cache</span>
+<span class="hljs-keyword">import</span> { observable, computed } from <span class="hljs-string">&quot;mobx&quot;</span>
+
+<span class="hljs-keyword">class</span> Todos {
+  @observable todos = []
+
+  <span class="hljs-keyword">private</span> todosByUserCache = <span class="hljs-keyword">new</span> Map()
+
+  getAllTodosByUser(userId) {
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.todosByUserCache.has(userId))
+      <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.todosByUserCache.get(userId).get()
+
+    <span class="hljs-keyword">const</span> computedFilter = computed(() =&gt; <span class="hljs-keyword">this</span>.todos.filter(todo =&gt; todo.user === userId))
+    <span class="hljs-keyword">this</span>.todosByUserCache.set(userId, computedFilter) <span class="hljs-comment">// Q: when do we remove items from the cache? Never? When user is unloaded?</span>
+    <span class="hljs-keyword">return</span> todosByUserCache.get()
+  }
+}
+</code></pre>
+<p>See also <a href="https://github.com/mobxjs/mobx/issues/1388" target="_blank">#1388</a> and <a href="https://github.com/mobxjs/mobx-utils/issues/184" target="_blank">#184</a></p>
 </body></html>
                     
                     </section>
