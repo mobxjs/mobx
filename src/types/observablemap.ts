@@ -91,7 +91,7 @@ export class ObservableMap<K = any, V = any>
     // eslint-disable-next-line
     [Symbol.iterator]: () => IterableIterator<[K, V]>; // only used for typings!
     // eslint-disable-next-line
-    [Symbol.toStringTag]: string // only used for typings!
+    [Symbol.toStringTag]: 'Map' // only used for typings!
 
     constructor(
         initialData?: IObservableMapInitialValues<K, V>,
