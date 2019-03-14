@@ -174,7 +174,12 @@ export class ObservableMap<K = any, V = any>
         if (entry) {
             entry.setNewValue(value)
         } else {
-            entry = new ObservableValue(value, referenceEnhancer, `${this.name}.${key}?`, false)
+            entry = new ObservableValue(
+                value,
+                referenceEnhancer,
+                `${this.name}.${stringifyKey(key)}?`,
+                false
+            )
             this._hasMap.set(key, entry)
         }
         return entry
@@ -210,7 +215,7 @@ export class ObservableMap<K = any, V = any>
             const observable = new ObservableValue(
                 newValue,
                 this.enhancer,
-                `${this.name}.${key}`,
+                `${this.name}.${stringifyKey(key)}`,
                 false
             )
             this._data.set(key, observable)
@@ -345,7 +350,8 @@ export class ObservableMap<K = any, V = any>
     toPOJO(): IKeyValueMap<V> {
         const res: IKeyValueMap<V> = {}
         for (const [key, value] of this) {
-            res["" + key] = value
+            // We lie about symbol key types due to https://github.com/Microsoft/TypeScript/issues/1863
+            res[typeof key === "symbol" ? <any>key : stringifyKey(key)] = value
         }
         return res
     }
@@ -368,7 +374,7 @@ export class ObservableMap<K = any, V = any>
             this.name +
             "[{ " +
             Array.from(this.keys())
-                .map(key => `${key}: ${"" + this.get(key)}`)
+                .map(key => `${stringifyKey(key)}: ${"" + this.get(key)}`)
                 .join(", ") +
             " }]"
         )
@@ -393,6 +399,11 @@ export class ObservableMap<K = any, V = any>
     intercept(handler: IInterceptor<IMapWillChange<K, V>>): Lambda {
         return registerInterceptor(this, handler)
     }
+}
+
+function stringifyKey(key: any): string {
+    if (key && key.toString) return key.toString()
+    else return new String(key).toString()
 }
 
 /* 'var' fixes small-build issue */
