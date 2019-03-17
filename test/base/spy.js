@@ -1,11 +1,11 @@
 "use strict"
-var mobx = require("../../src/mobx.ts")
+const mobx = require("../../src/mobx.ts")
 const utils = require("../utils/test-utils")
 
 test("spy output", () => {
-    var events = []
+    const events = []
 
-    var stop = mobx.spy(c => events.push(c))
+    const stop = mobx.spy(c => events.push(c))
 
     doStuff()
 
@@ -23,30 +23,30 @@ test("spy output", () => {
 })
 
 function doStuff() {
-    var a = mobx.observable.box(2)
+    const a = mobx.observable.box(2)
     a.set(3)
 
-    var b = mobx.observable({
+    const b = mobx.observable({
         c: 4
     })
     b.c = 5
     mobx.extendObservable(b, { d: 6 })
     b.d = 7
 
-    var e = mobx.observable([1, 2])
+    const e = mobx.observable([1, 2])
     e.push(3, 4)
     e.shift()
     e[2] = 5
 
-    var f = mobx.observable.map({ g: 1 })
+    const f = mobx.observable.map({ g: 1 })
     f.delete("h")
     f.delete("g")
     f.set("i", 5)
     f.set("i", 6)
 
-    var j = mobx.computed(() => a.get() * 2)
+    const j = mobx.computed(() => a.get() * 2)
 
-    var stop = mobx.autorun(() => {
+    mobx.autorun(() => {
         j.get()
     })
 
@@ -57,11 +57,9 @@ function doStuff() {
         a.set(6)
     })
 
-    mobx
-        .action("myTestAction", newValue => {
-            a.set(newValue)
-        })
-        .call({}, 7)
+    mobx.action("myTestAction", newValue => {
+        a.set(newValue)
+    }).call({}, 7)
 }
 
 test("spy error", () => {
@@ -79,10 +77,10 @@ test("spy error", () => {
             })
         })
 
-        var events = []
-        var stop = mobx.spy(c => events.push(c))
+        const events = []
+        const stop = mobx.spy(c => events.push(c))
 
-        var d = mobx.autorun(() => a.y, { name: "autorun" })
+        const d = mobx.autorun(() => a.y, { name: "autorun" })
 
         a.x = 3
         a.setX(4)

@@ -17,8 +17,12 @@ export interface FlowReturn<T> {
 // we skip promises that are the result of yielding promises (except if they use flowReturn)
 export type FlowReturnType<R> = IfAllAreFlowYieldThenVoid<
     R extends FlowReturn<infer FR>
-        ? FR extends Promise<infer FRP> ? FRP : FR
-        : R extends Promise<any> ? FlowYield : R
+        ? FR extends Promise<infer FRP>
+            ? FRP
+            : FR
+        : R extends Promise<any>
+        ? FlowYield
+        : R
 >
 
 // we extract yielded promises from the return type
@@ -30,7 +34,9 @@ export function flow<R, Args extends any[]>(
     generator: (...args: Args) => IterableIterator<R>
 ): (...args: Args) => CancellablePromise<FlowReturnType<R>> {
     if (arguments.length !== 1)
-        fail(process.env.NODE_ENV && `Flow expects one 1 argument and cannot be used as decorator`)
+        fail(
+            !!process.env.NODE_ENV && `Flow expects one 1 argument and cannot be used as decorator`
+        )
     const name = generator.name || "<unnamed flow>"
 
     // Implementation based on https://github.com/tj/co/blob/master/index.js

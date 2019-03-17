@@ -3,19 +3,15 @@
 import {
     observable,
     computed,
-    transaction,
     autorun,
-    extendObservable,
     action,
     isObservableObject,
-    observe,
     isObservable,
     isObservableProp,
     isComputedProp,
     spy,
     isAction,
-    decorate,
-    reaction
+    decorate
 } from "../../src/mobx"
 
 import { serializable, primitive, serialize, deserialize } from "serializr"
@@ -59,7 +55,7 @@ test("decorate should work", function() {
         addSize: action
     })
 
-    var box = new Box()
+    const box = new Box()
     expect(isObservableObject(box)).toBe(true)
     expect(box.uninitialized).toBe(undefined)
     expect(box.height).toBe(20)
@@ -71,7 +67,7 @@ test("decorate should work", function() {
     expect(isComputedProp(box, "width")).toBe(true)
     expect(isAction(box.addSize)).toBe(true)
 
-    var ar = []
+    const ar = []
 
     autorun(() => {
         ar.push(box.width)
@@ -143,7 +139,7 @@ test("decorate should work with plain object", function() {
     expect(isComputedProp(box, "width")).toBe(true)
     expect(isAction(box.addSize)).toBe(true)
 
-    var ar = []
+    const ar = []
 
     autorun(() => {
         ar.push(box.width)
@@ -213,7 +209,7 @@ test("decorate should work with Object.create", function() {
     expect(isComputedProp(box, "width")).toBe(true)
     expect(isAction(box.addSize)).toBe(true)
 
-    var ar = []
+    const ar = []
 
     autorun(() => {
         ar.push(box.width)
@@ -247,7 +243,7 @@ test("decorate should work with constructor function", function() {
             enumerable: false,
             get() {
                 /** @type {Box} */
-                var t /** @type {any} */ = this
+                const t /** @type {any} */ = this
 
                 return (
                     // @ts-ignore
@@ -293,7 +289,7 @@ test("decorate should work with constructor function", function() {
     expect(isComputedProp(box, "width")).toBe(true)
     expect(isAction(box.addSize)).toBe(true)
 
-    var ar = []
+    const ar = []
 
     autorun(() => {
         // @ts-ignore

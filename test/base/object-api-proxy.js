@@ -1,18 +1,5 @@
 const mobx = require("../../src/mobx")
-const {
-    has,
-    autorun,
-    when,
-    set,
-    remove,
-    values,
-    runInAction,
-    entries,
-    reaction,
-    observable,
-    extendObservable,
-    $mobx
-} = mobx
+const { has, autorun, when, values, runInAction, entries, reaction, observable } = mobx
 
 test("keys should be observable when extending", () => {
     const todos = observable({})
@@ -135,7 +122,6 @@ test("has and get are reactive", async () => {
     const todos = observable({})
 
     const p1 = when(() => {
-        debugger
         return "x" in todos
     })
     const p2 = when(() => {

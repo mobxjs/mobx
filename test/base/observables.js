@@ -1,24 +1,15 @@
 "use strict"
 
-var mobx = require("../../src/mobx")
-var m = mobx
-const {
-    $mobx,
-    observable,
-    computed,
-    transaction,
-    action,
-    autorun,
-    extendObservable,
-    decorate
-} = mobx
+const mobx = require("../../src/mobx")
+const m = mobx
+const { $mobx, observable, computed, transaction, autorun, extendObservable, decorate } = mobx
 const utils = require("../utils/test-utils")
 
-var voidObserver = function() {}
+const voidObserver = function() {}
 
 function buffer() {
-    var b = []
-    var res = function(x) {
+    const b = []
+    const res = function(x) {
         if (typeof x.newValue === "object") {
             const copy = { ...x.newValue }
             delete copy[$mobx]
@@ -34,15 +25,15 @@ function buffer() {
 }
 
 test("argumentless observable", () => {
-    var a = observable.box()
+    const a = observable.box()
 
     expect(m.isObservable(a)).toBe(true)
     expect(a.get()).toBe(undefined)
 })
 
 test("basic", function() {
-    var x = observable.box(3)
-    var b = buffer()
+    const x = observable.box(3)
+    const b = buffer()
     m.observe(x, b)
     expect(3).toBe(x.get())
 
@@ -53,11 +44,11 @@ test("basic", function() {
 })
 
 test("basic2", function() {
-    var x = observable.box(3)
-    var z = computed(function() {
+    const x = observable.box(3)
+    const z = computed(function() {
         return x.get() * 2
     })
-    var y = computed(function() {
+    const y = computed(function() {
         return x.get() * 3
     })
 
@@ -74,9 +65,9 @@ test("basic2", function() {
 })
 
 test("computed with asStructure modifier", function() {
-    var x1 = observable.box(3)
-    var x2 = observable.box(5)
-    var y = m.computed(
+    const x1 = observable.box(3)
+    const x2 = observable.box(5)
+    const y = m.computed(
         function() {
             return {
                 sum: x1.get() + x2.get()
@@ -84,7 +75,7 @@ test("computed with asStructure modifier", function() {
         },
         { compareStructural: true }
     )
-    var b = buffer()
+    const b = buffer()
     m.observe(y, b, true)
 
     expect(8).toBe(y.get().sum)
@@ -104,11 +95,11 @@ test("computed with asStructure modifier", function() {
 
 test("dynamic", function(done) {
     try {
-        var x = observable.box(3)
-        var y = m.computed(function() {
+        const x = observable.box(3)
+        const y = m.computed(function() {
             return x.get()
         })
-        var b = buffer()
+        const b = buffer()
         m.observe(y, b, true)
 
         expect(3).toBe(y.get()) // First evaluation here..
@@ -127,13 +118,13 @@ test("dynamic", function(done) {
 
 test("dynamic2", function(done) {
     try {
-        var x = observable.box(3)
-        var y = computed(function() {
+        const x = observable.box(3)
+        const y = computed(function() {
             return x.get() * x.get()
         })
 
         expect(9).toBe(y.get())
-        var b = buffer()
+        const b = buffer()
         m.observe(y, b)
 
         x.set(5)
@@ -151,13 +142,13 @@ test("dynamic2", function(done) {
 
 test("box uses equals", function(done) {
     try {
-        var x = observable.box("a", {
+        const x = observable.box("a", {
             equals: (oldValue, newValue) => {
                 return oldValue.toLowerCase() === newValue.toLowerCase()
             }
         })
 
-        var b = buffer()
+        const b = buffer()
         m.observe(x, b)
 
         x.set("A")
@@ -176,17 +167,17 @@ test("box uses equals", function(done) {
 
 test("box uses equals2", function(done) {
     try {
-        var x = observable.box("01", {
+        const x = observable.box("01", {
             equals: (oldValue, newValue) => {
                 return parseInt(oldValue) === parseInt(newValue)
             }
         })
 
-        var y = computed(function() {
+        const y = computed(function() {
             return parseInt(x)
         })
 
-        var b = buffer()
+        const b = buffer()
         m.observe(y, b)
 
         x.set("2")
@@ -205,10 +196,10 @@ test("box uses equals2", function(done) {
 
 test("readme1", function(done) {
     try {
-        var b = buffer()
+        const b = buffer()
 
-        var vat = observable.box(0.2)
-        var order = {}
+        const vat = observable.box(0.2)
+        const order = {}
         order.price = observable.box(10)
         // Prints: New price: 24
         // in TS, just: value(() => this.price() * (1+vat()))
@@ -232,15 +223,15 @@ test("readme1", function(done) {
 })
 
 test("batch", function() {
-    var a = observable.box(2)
-    var b = observable.box(3)
-    var c = computed(function() {
+    const a = observable.box(2)
+    const b = observable.box(3)
+    const c = computed(function() {
         return a.get() * b.get()
     })
-    var d = computed(function() {
+    const d = computed(function() {
         return c.get() * b.get()
     })
-    var buf = buffer()
+    const buf = buffer()
     m.observe(d, buf)
 
     a.set(4)
@@ -248,7 +239,7 @@ test("batch", function() {
     // Note, 60 should not happen! (that is d begin computed before c after update of b)
     expect(buf.toArray()).toEqual([36, 100])
 
-    var x = mobx.transaction(function() {
+    const x = mobx.transaction(function() {
         a.set(2)
         b.set(3)
         a.set(6)
@@ -262,9 +253,9 @@ test("batch", function() {
 })
 
 test("transaction with inspection", function() {
-    var a = observable.box(2)
-    var calcs = 0
-    var b = computed(function() {
+    const a = observable.box(2)
+    let calcs = 0
+    const b = computed(function() {
         calcs++
         return a.get() * 2
     })
@@ -289,9 +280,9 @@ test("transaction with inspection", function() {
 })
 
 test("transaction with inspection 2", function() {
-    var a = observable.box(2)
-    var calcs = 0
-    var b
+    const a = observable.box(2)
+    let calcs = 0
+    let b
     mobx.autorun(function() {
         calcs++
         b = a.get() * 2
@@ -317,8 +308,8 @@ test("transaction with inspection 2", function() {
 })
 
 test("scope", function() {
-    var vat = observable.box(0.2)
-    var Order = function() {
+    const vat = observable.box(0.2)
+    const Order = function() {
         this.price = observable.box(20)
         this.amount = observable.box(2)
         this.total = computed(
@@ -329,7 +320,7 @@ test("scope", function() {
         )
     }
 
-    var order = new Order()
+    const order = new Order()
     m.observe(order.total, voidObserver)
     order.price.set(10)
     order.amount.set(3)
@@ -338,8 +329,8 @@ test("scope", function() {
 })
 
 test("props1", function() {
-    var vat = observable.box(0.2)
-    var Order = function() {
+    const vat = observable.box(0.2)
+    const Order = function() {
         mobx.extendObservable(this, {
             price: 20,
             amount: 2,
@@ -349,14 +340,14 @@ test("props1", function() {
         })
     }
 
-    var order = new Order()
+    const order = new Order()
     expect(48).toBe(order.total)
     order.price = 10
     order.amount = 3
     expect(36).toBe(order.total)
 
-    var totals = []
-    var sub = mobx.autorun(function() {
+    const totals = []
+    const sub = mobx.autorun(function() {
         totals.push(order.total)
     })
     order.amount = 4
@@ -368,8 +359,8 @@ test("props1", function() {
 })
 
 test("props2", function() {
-    var vat = observable.box(0.2)
-    var Order = function() {
+    const vat = observable.box(0.2)
+    const Order = function() {
         mobx.extendObservable(this, {
             price: 20,
             amount: 2,
@@ -379,7 +370,7 @@ test("props2", function() {
         })
     }
 
-    var order = new Order()
+    const order = new Order()
     expect(48).toBe(order.total)
     order.price = 10
     order.amount = 3
@@ -398,8 +389,8 @@ test("props4", function() {
         })
     }
 
-    var x = new Bzz()
-    var ar = x.fluff
+    const x = new Bzz()
+    x.fluff
     expect(x.sum).toBe(3)
     x.fluff.push(3)
     expect(x.sum).toBe(6)
@@ -410,7 +401,7 @@ test("props4", function() {
 })
 
 test("extend observable multiple prop maps", function() {
-    var x = { a: 1 }
+    const x = { a: 1 }
     expect(() => {
         mobx.extendObservable(
             x,
@@ -425,23 +416,23 @@ test("extend observable multiple prop maps", function() {
 })
 
 test("object enumerable props", function() {
-    var x = mobx.observable({
+    const x = mobx.observable({
         a: 3,
         get b() {
             return 2 * this.a
         }
     })
     mobx.extendObservable(x, { c: 4 })
-    var ar = []
-    for (var key in x) ar.push(key)
+    const ar = []
+    for (const key in x) ar.push(key)
     expect(ar).toEqual(["a", "c"])
 })
 
 test("observe property", function() {
-    var sb = []
-    var mb = []
+    const sb = []
+    const mb = []
 
-    var Wrapper = function(chocolateBar) {
+    const Wrapper = function(chocolateBar) {
         mobx.extendObservable(this, {
             chocolateBar: chocolateBar,
             get calories() {
@@ -450,20 +441,20 @@ test("observe property", function() {
         })
     }
 
-    var snickers = mobx.observable({
+    const snickers = mobx.observable({
         calories: null
     })
-    var mars = mobx.observable({
+    const mars = mobx.observable({
         calories: undefined
     })
 
-    var wrappedSnickers = new Wrapper(snickers)
-    var wrappedMars = new Wrapper(mars)
+    const wrappedSnickers = new Wrapper(snickers)
+    const wrappedMars = new Wrapper(mars)
 
-    var disposeSnickers = mobx.autorun(function() {
+    const disposeSnickers = mobx.autorun(function() {
         sb.push(wrappedSnickers.calories)
     })
-    var disposeMars = mobx.autorun(function() {
+    const disposeMars = mobx.autorun(function() {
         mb.push(wrappedMars.calories)
     })
     snickers.calories = 10
@@ -479,14 +470,14 @@ test("observe property", function() {
 })
 
 test("observe object", function() {
-    var events = []
-    var a = observable({
+    let events = []
+    const a = observable({
         a: 1,
         get da() {
             return this.a * 2
         }
     })
-    var stop = m.observe(a, function(change) {
+    const stop = m.observe(a, function(change) {
         events.push(change)
     })
 
@@ -533,18 +524,18 @@ test("observe object", function() {
 })
 
 test("mobx.observe", function() {
-    var events = []
-    var o = observable({ b: 2 })
-    var ar = observable([3])
-    var map = mobx.observable.map({})
+    const events = []
+    const o = observable({ b: 2 })
+    const ar = observable([3])
+    const map = mobx.observable.map({})
 
-    var push = function(event) {
+    const push = function(event) {
         events.push(event)
     }
 
-    var stop2 = mobx.observe(o, push)
-    var stop3 = mobx.observe(ar, push)
-    var stop4 = mobx.observe(map, push)
+    const stop2 = mobx.observe(o, push)
+    const stop3 = mobx.observe(ar, push)
+    const stop4 = mobx.observe(map, push)
 
     o.b = 5
     ar[0] = 6
@@ -583,14 +574,14 @@ test("mobx.observe", function() {
 })
 
 test("change count optimization", function() {
-    var bCalcs = 0
-    var cCalcs = 0
-    var a = observable.box(3)
-    var b = computed(function() {
+    let bCalcs = 0
+    let cCalcs = 0
+    const a = observable.box(3)
+    const b = computed(function() {
         bCalcs += 1
         return 4 + a.get() - a.get()
     })
-    var c = computed(function() {
+    const c = computed(function() {
         cCalcs += 1
         return b.get()
     })
@@ -613,10 +604,10 @@ test("change count optimization", function() {
 })
 
 test("observables removed", function() {
-    var calcs = 0
-    var a = observable.box(1)
-    var b = observable.box(2)
-    var c = computed(function() {
+    let calcs = 0
+    const a = observable.box(1)
+    const b = observable.box(2)
+    const c = computed(function() {
         calcs++
         if (a.get() === 1) return b.get() * a.get() * b.get()
         return 3
@@ -642,18 +633,18 @@ test("observables removed", function() {
 })
 
 test("lazy evaluation", function() {
-    var bCalcs = 0
-    var cCalcs = 0
-    var dCalcs = 0
-    var observerChanges = 0
+    let bCalcs = 0
+    let cCalcs = 0
+    let dCalcs = 0
+    let observerChanges = 0
 
-    var a = observable.box(1)
-    var b = computed(function() {
+    const a = observable.box(1)
+    const b = computed(function() {
         bCalcs += 1
         return a.get() + 1
     })
 
-    var c = computed(function() {
+    const c = computed(function() {
         cCalcs += 1
         return b.get() + 1
     })
@@ -676,12 +667,12 @@ test("lazy evaluation", function() {
     expect(bCalcs).toBe(3)
     expect(cCalcs).toBe(3)
 
-    var d = computed(function() {
+    const d = computed(function() {
         dCalcs += 1
         return b.get() * 2
     })
 
-    var handle = m.observe(
+    const handle = m.observe(
         d,
         function() {
             observerChanges += 1
@@ -720,23 +711,23 @@ test("lazy evaluation", function() {
 })
 
 test("multiple view dependencies", function() {
-    var bCalcs = 0
-    var dCalcs = 0
-    var a = observable.box(1)
-    var b = computed(function() {
+    let bCalcs = 0
+    let dCalcs = 0
+    const a = observable.box(1)
+    const b = computed(function() {
         bCalcs++
         return 2 * a.get()
     })
-    var c = observable.box(2)
-    var d = computed(function() {
+    const c = observable.box(2)
+    const d = computed(function() {
         dCalcs++
         return 3 * c.get()
     })
 
-    var zwitch = true
-    var buffer = []
-    var fCalcs = 0
-    var dis = mobx.autorun(function() {
+    let zwitch = true
+    const buffer = []
+    let fCalcs = 0
+    const dis = mobx.autorun(function() {
         fCalcs++
         if (zwitch) buffer.push(b.get() + d.get())
         else buffer.push(d.get() + b.get())
@@ -764,12 +755,12 @@ test("multiple view dependencies", function() {
 })
 
 test("nested observable2", function() {
-    var factor = observable.box(0)
-    var price = observable.box(100)
-    var totalCalcs = 0
-    var innerCalcs = 0
+    const factor = observable.box(0)
+    const price = observable.box(100)
+    let totalCalcs = 0
+    let innerCalcs = 0
 
-    var total = computed(function() {
+    const total = computed(function() {
         totalCalcs += 1 // outer observable shouldn't recalc if inner observable didn't publish a real change
         return (
             price.get() *
@@ -780,8 +771,8 @@ test("nested observable2", function() {
         )
     })
 
-    var b = []
-    var sub = m.observe(
+    const b = []
+    m.observe(
         total,
         function(x) {
             b.push(x.newValue)
@@ -802,13 +793,13 @@ test("nested observable2", function() {
 })
 
 test("observe", function() {
-    var x = observable.box(3)
-    var x2 = computed(function() {
+    const x = observable.box(3)
+    const x2 = computed(function() {
         return x.get() * 2
     })
-    var b = []
+    const b = []
 
-    var cancel = mobx.autorun(function() {
+    const cancel = mobx.autorun(function() {
         b.push(x2.get())
     })
 
@@ -821,9 +812,9 @@ test("observe", function() {
 })
 
 test("when", function() {
-    var x = observable.box(3)
+    const x = observable.box(3)
 
-    var called = 0
+    let called = 0
     mobx.when(
         function() {
             return x.get() === 4
@@ -844,10 +835,10 @@ test("when", function() {
 })
 
 test("when 2", function() {
-    var x = observable.box(3)
+    const x = observable.box(3)
 
-    var called = 0
-    var d = mobx.when(
+    let called = 0
+    const d = mobx.when(
         function() {
             return x.get() === 3
         },
@@ -878,7 +869,7 @@ function stripSpyOutput(events) {
 test("issue 50", function(done) {
     m._resetGlobalState()
     mobx._getGlobalState().mobxGuid = 0
-    var x = observable({
+    const x = observable({
         a: true,
         b: false,
         get c() {
@@ -887,14 +878,14 @@ test("issue 50", function(done) {
         }
     })
 
-    var result
-    var events = []
-    var disposer1 = mobx.autorun(function ar() {
+    let result
+    const events = []
+    const disposer1 = mobx.autorun(function ar() {
         events.push("auto")
         result = [x.a, x.b, x.c].join(",")
     })
 
-    var disposer2 = mobx.spy(function(info) {
+    const disposer2 = mobx.spy(function(info) {
         events.push(info)
     })
 
@@ -921,7 +912,7 @@ test("verify transaction events", function() {
     m._resetGlobalState()
     mobx._getGlobalState().mobxGuid = 0
 
-    var x = observable({
+    const x = observable({
         b: 1,
         get c() {
             events.push("calc c")
@@ -929,13 +920,13 @@ test("verify transaction events", function() {
         }
     })
 
-    var events = []
-    var disposer1 = mobx.autorun(function ar() {
+    const events = []
+    const disposer1 = mobx.autorun(function ar() {
         events.push("auto")
         x.c
     })
 
-    var disposer2 = mobx.spy(function(info) {
+    const disposer2 = mobx.spy(function(info) {
         events.push(info)
     })
 
@@ -954,14 +945,14 @@ test("verify transaction events", function() {
 })
 
 test("verify array in transaction", function() {
-    var ar = observable([])
-    var aCount = 0
-    var aValue
+    const ar = observable([])
+    let aCount = 0
+    let aValue
 
     mobx.autorun(function() {
         aCount++
         aValue = 0
-        for (var i = 0; i < ar.length; i++) aValue += ar[i]
+        for (let i = 0; i < ar.length; i++) aValue += ar[i]
     })
 
     mobx.transaction(function() {
@@ -977,19 +968,19 @@ test("verify array in transaction", function() {
 test("delay autorun until end of transaction", function() {
     m._resetGlobalState()
     mobx._getGlobalState().mobxGuid = 0
-    var events = []
-    var x = observable({
+    const events = []
+    const x = observable({
         a: 2,
         get b() {
             events.push("calc y")
             return this.a
         }
     })
-    var disposer1
-    var disposer2 = mobx.spy(function(info) {
+    let disposer1
+    const disposer2 = mobx.spy(function(info) {
         events.push(info)
     })
-    var didRun = false
+    let didRun = false
 
     mobx.transaction(function() {
         mobx.transaction(function() {
@@ -1025,8 +1016,8 @@ test("delay autorun until end of transaction", function() {
 })
 
 test("prematurely end autorun", function() {
-    var x = observable.box(2)
-    var dis1, dis2
+    const x = observable.box(2)
+    let dis1, dis2
     mobx.transaction(function() {
         dis1 = mobx.autorun(function() {
             x.get()
@@ -1053,12 +1044,12 @@ test("prematurely end autorun", function() {
 })
 
 test("computed values believe NaN === NaN", function() {
-    var a = observable.box(2)
-    var b = observable.box(3)
-    var c = computed(function() {
+    const a = observable.box(2)
+    const b = observable.box(3)
+    const c = computed(function() {
         return String(a.get() * b.get())
     })
-    var buf = buffer()
+    const buf = buffer()
     m.observe(c, buf)
 
     a.set(NaN)
@@ -1071,15 +1062,15 @@ test("computed values believe NaN === NaN", function() {
 })
 
 test("computed values believe deep NaN === deep NaN when using compareStructural", function() {
-    var a = observable({ b: { a: 1 } })
-    var c = computed(
+    const a = observable({ b: { a: 1 } })
+    const c = computed(
         function() {
             return a.b
         },
         { compareStructural: true }
     )
 
-    var buf = new buffer()
+    const buf = new buffer()
     c.observe(newValue => {
         buf(newValue)
     })
@@ -1090,7 +1081,7 @@ test("computed values believe deep NaN === deep NaN when using compareStructural
     a.b = { a: 2 }
     a.b = { a: NaN }
 
-    var bufArray = buf.toArray()
+    const bufArray = buf.toArray()
     expect(isNaN(bufArray[0].b)).toBe(true)
     expect(bufArray[1]).toEqual({ a: 2 })
     expect(isNaN(bufArray[2].b)).toEqual(true)
@@ -1098,7 +1089,7 @@ test("computed values believe deep NaN === deep NaN when using compareStructural
 })
 
 test("issue 71, transacting running transformation", function() {
-    var state = mobx.observable({
+    const state = mobx.observable({
         things: []
     })
 
@@ -1123,8 +1114,8 @@ test("issue 71, transacting running transformation", function() {
         )
     }
 
-    var copy
-    var vSum
+    let copy
+    let vSum
     mobx.autorun(function() {
         copy = state.things.map(function(thing) {
             return thing.value
@@ -1151,15 +1142,15 @@ test("issue 71, transacting running transformation", function() {
 })
 
 test("eval in transaction", function() {
-    var bCalcs = 0
-    var x = mobx.observable({
+    let bCalcs = 0
+    const x = mobx.observable({
         a: 1,
         get b() {
             bCalcs++
             return this.a * 2
         }
     })
-    var c
+    let c
 
     mobx.autorun(function() {
         c = x.b
@@ -1184,14 +1175,14 @@ test("eval in transaction", function() {
 })
 
 test("forcefully tracked reaction should still yield valid results", function() {
-    var x = observable.box(3)
-    var z
-    var runCount = 0
-    var identity = function() {
+    const x = observable.box(3)
+    let z
+    let runCount = 0
+    const identity = function() {
         runCount++
         z = x.get()
     }
-    var a = new mobx.Reaction("test", function() {
+    const a = new mobx.Reaction("test", function() {
         this.track(identity)
     })
     a.runReaction()
@@ -1228,11 +1219,11 @@ test("forcefully tracked reaction should still yield valid results", function() 
 })
 
 test("autoruns created in autoruns should kick off", function() {
-    var x = observable.box(3)
-    var x2 = []
-    var d
+    const x = observable.box(3)
+    const x2 = []
+    let d
 
-    var a = m.autorun(function() {
+    const a = m.autorun(function() {
         if (d) {
             // dispose previous autorun
             d()
@@ -1251,29 +1242,29 @@ test("autoruns created in autoruns should kick off", function() {
 })
 
 test("#502 extendObservable throws on objects created with Object.create(null)", () => {
-    var a = Object.create(null)
+    const a = Object.create(null)
     mobx.extendObservable(a, { b: 3 })
     expect(mobx.isObservableProp(a, "b")).toBe(true)
 })
 
 test("#328 atom throwing exception if observing stuff in onObserved", () => {
-    var b = mobx.observable.box(1)
-    var a = mobx.createAtom("test atom", () => {
+    const b = mobx.observable.box(1)
+    const a = mobx.createAtom("test atom", () => {
         b.get()
     })
-    var d = mobx.autorun(() => {
+    const d = mobx.autorun(() => {
         a.reportObserved() // threw
     })
     d()
 })
 
 test("prematurely ended autoruns are cleaned up properly", () => {
-    var a = mobx.observable.box(1)
-    var b = mobx.observable.box(2)
-    var c = mobx.observable.box(3)
-    var called = 0
+    const a = mobx.observable.box(1)
+    const b = mobx.observable.box(2)
+    const c = mobx.observable.box(3)
+    let called = 0
 
-    var d = mobx.autorun(() => {
+    const d = mobx.autorun(() => {
         called++
         if (a.get() === 2) {
             d() // dispose
@@ -1300,14 +1291,14 @@ test("prematurely ended autoruns are cleaned up properly", () => {
 })
 
 test("unoptimizable subscriptions are diffed correctly", () => {
-    var a = mobx.observable.box(1)
-    var b = mobx.observable.box(1)
-    var c = mobx.computed(() => {
+    const a = mobx.observable.box(1)
+    const b = mobx.observable.box(1)
+    const c = mobx.computed(() => {
         a.get()
         return 3
     })
-    var called = 0
-    var val = 0
+    let called = 0
+    let val = 0
 
     const d = mobx.autorun(() => {
         called++
@@ -1349,17 +1340,17 @@ test("unoptimizable subscriptions are diffed correctly", () => {
 })
 
 test("atom events #427", () => {
-    var start = 0
-    var stop = 0
-    var runs = 0
+    let start = 0
+    let stop = 0
+    let runs = 0
 
-    var a = mobx.createAtom("test", () => start++, () => stop++)
+    const a = mobx.createAtom("test", () => start++, () => stop++)
     expect(a.reportObserved()).toEqual(false)
 
     expect(start).toBe(0)
     expect(stop).toBe(0)
 
-    var d = mobx.autorun(() => {
+    let d = mobx.autorun(() => {
         runs++
         expect(a.reportObserved()).toBe(true)
         expect(start).toBe(1)
@@ -1402,25 +1393,25 @@ test("atom events #427", () => {
 })
 
 test("verify calculation count", () => {
-    var calcs = []
-    var a = observable.box(1)
-    var b = mobx.computed(() => {
+    const calcs = []
+    const a = observable.box(1)
+    const b = mobx.computed(() => {
         calcs.push("b")
         return a.get()
     })
-    var c = mobx.computed(() => {
+    const c = mobx.computed(() => {
         calcs.push("c")
         return b.get()
     })
-    var d = mobx.autorun(() => {
+    const d = mobx.autorun(() => {
         calcs.push("d")
         return b.get()
     })
-    var e = mobx.autorun(() => {
+    const e = mobx.autorun(() => {
         calcs.push("e")
         return c.get()
     })
-    var f = mobx.computed(() => {
+    const f = mobx.computed(() => {
         calcs.push("f")
         return c.get()
     })
@@ -1523,7 +1514,7 @@ test("support computed property getters / setters", () => {
 })
 
 test("computed getter / setter for plan objects should succeed", function() {
-    var b = observable({
+    const b = observable({
         a: 3,
         get propX() {
             return this.a * 2
@@ -1533,7 +1524,7 @@ test("computed getter / setter for plan objects should succeed", function() {
         }
     })
 
-    var values = []
+    const values = []
     mobx.autorun(function() {
         return values.push(b.propX)
     })
@@ -1545,7 +1536,7 @@ test("computed getter / setter for plan objects should succeed", function() {
 })
 
 test("helpful error for self referencing setter", function() {
-    var a = observable({
+    const a = observable({
         x: 1,
         get y() {
             return this.x
@@ -1559,7 +1550,7 @@ test("helpful error for self referencing setter", function() {
 })
 
 test("#558 boxed observables stay boxed observables", function() {
-    var a = observable({
+    const a = observable({
         x: observable.box(3)
     })
 
@@ -1577,7 +1568,7 @@ test("iscomputed", function() {
         )
     ).toBe(true)
 
-    var x = observable({
+    const x = observable({
         a: 3,
         get b() {
             return this.a
@@ -1589,9 +1580,9 @@ test("iscomputed", function() {
 })
 
 test("603 - transaction should not kill reactions", () => {
-    var a = observable.box(1)
-    var b = 1
-    var d = mobx.autorun(() => {
+    const a = observable.box(1)
+    let b = 1
+    const d = mobx.autorun(() => {
         b = a.get()
     })
 
@@ -1600,7 +1591,9 @@ test("603 - transaction should not kill reactions", () => {
             a.set(2)
             throw 3
         })
-    } catch (e) {}
+    } catch (e) {
+        // empty
+    }
 
     expect(a.observers.size).toBe(1)
     expect(d[$mobx].observing.length).toBe(1)
@@ -1617,7 +1610,7 @@ test("603 - transaction should not kill reactions", () => {
 
 test("#561 test toPrimitive() of observable objects", function() {
     if (typeof Symbol !== "undefined" && Symbol.toPrimitive) {
-        var x = observable.box(3)
+        let x = observable.box(3)
 
         expect(x.valueOf()).toBe(3)
         expect(x[Symbol.toPrimitive]()).toBe(3)
@@ -1625,14 +1618,14 @@ test("#561 test toPrimitive() of observable objects", function() {
         expect(+x).toBe(3)
         expect(++x).toBe(4)
 
-        var y = observable.box(3)
+        const y = observable.box(3)
 
         expect(y + 7).toBe(10)
 
-        var z = computed(() => ({ a: 3 }))
+        const z = computed(() => ({ a: 3 }))
         expect(3 + z).toBe("3[object Object]")
     } else {
-        var x = observable.box(3)
+        let x = observable.box(3)
 
         expect(x.valueOf()).toBe(3)
         expect(x["@@toPrimitive"]()).toBe(3)
@@ -1640,11 +1633,11 @@ test("#561 test toPrimitive() of observable objects", function() {
         expect(+x).toBe(3)
         expect(++x).toBe(4)
 
-        var y = observable.box(3)
+        const y = observable.box(3)
 
         expect(y + 7).toBe(10)
 
-        var z = computed(() => ({ a: 3 }))
+        const z = computed(() => ({ a: 3 }))
         expect("3" + z["@@toPrimitive"]()).toBe("3[object Object]")
     }
 })
@@ -1780,7 +1773,7 @@ test("It should not be possible to redefine a computed property", () => {
 
 test("extendObservable should not be able to set a computed property", () => {
     expect(() => {
-        const x = observable({
+        observable({
             a: computed(
                 function() {
                     return this.b * 2

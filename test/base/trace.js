@@ -19,7 +19,7 @@ test("trace", () => {
                 /* test multi line comment 
                     (run this unit test from VS code, and pass 'true'  as third argument to trace below to verify) 
                 */
-                var res = this.firstname + " " + this.lastname
+                const res = this.firstname + " " + this.lastname
                 mobx.trace(this, "fullname")
                 return res
             }
@@ -67,7 +67,7 @@ test("1850", () => {
                 /* test multi line comment 
                     (run this unit test from VS code, to manually verify serialization) 
                 */
-                var res = this.firstname + " " + this.lastname
+                const res = this.firstname + " " + this.lastname
                 mobx.trace(this, "fullname", true)
                 return res
             }
