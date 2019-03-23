@@ -53,15 +53,11 @@ function runTypeScriptBuild(outDir, target, declarations) {
 async function generateBundledModule(inputFile, outputFile, format, production) {
     console.log(`Generating ${outputFile} bundle.`)
 
-    function getEnvVariables(production) {
-        return { "process.env.NODE_ENV": production ? "'production'" : "'development'" }
-    }
-
     let plugins
     if (production) {
         plugins = [
             resolvePlugin(),
-            replacePlugin(getEnvVariables(true)),
+            replacePlugin({ "process.env.NODE_ENV": JSON.stringify("production") }),
             terserPlugin(),
             filesizePlugin()
         ]
