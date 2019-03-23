@@ -2,7 +2,7 @@ const { rollup } = require("rollup")
 const resolvePlugin = require("rollup-plugin-node-resolve")
 const filesizePlugin = require("rollup-plugin-filesize")
 const replacePlugin = require("rollup-plugin-replace")
-const uglifyPlugin = require("rollup-plugin-uglify").uglify
+const terserPlugin = require("rollup-plugin-terser").terser
 
 const fs = require("fs-extra")
 const path = require("path")
@@ -62,7 +62,7 @@ async function generateBundledModule(inputFile, outputFile, format, production) 
         plugins = [
             resolvePlugin(),
             replacePlugin(getEnvVariables(true)),
-            uglifyPlugin(),
+            terserPlugin(),
             filesizePlugin()
         ]
     } else {
