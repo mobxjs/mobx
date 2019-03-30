@@ -1,6 +1,7 @@
-# Unreleased
+# 5.9.4 / 4.9.4
 
 * Allow symbol keys in `ObservableMap`, see [#1930](https://github.com/mobxjs/mobx/pull/1930) by [pimterry](https://github.com/pimterry)
+* Fixed type definitions of `toStringTag` for Maps and Sets, see [#1929](https://github.com/mobxjs/mobx/pull/1929) by [lennerd](https://github.com/mobxjs/mobx/pull/1929)
 
 # 4.9.3
 
