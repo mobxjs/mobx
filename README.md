@@ -39,7 +39,7 @@ _Tip: Consider using the faster and smaller ES6 build if targetting a modern env
 
 | MobX version | Actively supported  | Supported browsers | GitHub branch |
 | ----- | ----- | --- | --- |
-| 5.* | Yes | Any browser that supports [ES6 Proxies](https://kangax.github.io/compat-table/es6/#test-Proxy) (non polyfillable). _NOT:_ IE 11 and lower, Node 5 and lower | `master` |
+| 5.* | Yes | Any browser that supports [ES6 Proxies](https://kangax.github.io/compat-table/es6/#test-Proxy) (non polyfillable). _NOT:_ IE 11 and lower, Node 5 and lower, Google's crawler bot | `master` |
 | 4.* | Yes (LTS) | Any ES5 compliant browser | `mobx4-master` |
 | 1-3.* | No |  Any ES5 compliant browser | No active branch |
 
