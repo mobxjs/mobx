@@ -43,7 +43,7 @@ _Tip: Consider using the faster and smaller ES6 build if targetting a modern env
 | 4.* | Yes (LTS) | Any ES5 compliant browser | `mobx4-master` |
 | 1-3.* | No |  Any ES5 compliant browser | No active branch |
 
-* MobX >=5 runs on any browser with [ES6 proxy support](https://kangax.github.io/compat-table/es6/#test-Proxy). It will throw an error on startup on older environments such as IE11, Node.js <6 or React Native Android on old JavaScriptCore [how-to-upgrade](https://github.com/react-community/jsc-android-buildscripts#how-to-use-it-with-my-react-native-app). _Warning: since upgrading JSC is non-trivial, and decorators can be [troublesome](https://github.com/mobxjs/mobx/issues/1777) as well in React Native, for now it is recommended to stick to MobX 4.x for React Native Android development_.
+* MobX >=5 runs on any browser with [ES6 proxy support](https://kangax.github.io/compat-table/es6/#test-Proxy). It will throw an error on startup on older environments such as IE11, Node.js <6 or React Native Android on old JavaScriptCore [how-to-upgrade](https://github.com/react-community/jsc-android-buildscripts#how-to-use-it-with-my-react-native-app). 
 * MobX 4 runs on any ES5 browser and will be actively maintained. The MobX 4 and 5 api's are the same and semantically can achieve the same, but MobX 4 has some [limitations](#mobx-4-vs-mobx-5).
 
 
