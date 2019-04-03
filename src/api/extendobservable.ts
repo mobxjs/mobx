@@ -14,7 +14,9 @@ import {
     isComputed,
     computedDecorator,
     endBatch,
-    fail
+    fail,
+    getPlainObjectKeys,
+    stringifyKey
 } from "../internal"
 
 export function extendShallowObservable<A extends Object, B extends Object>(
@@ -51,10 +53,16 @@ export function extendObservable<A extends Object, B extends Object>(
             !isObservable(properties),
             "Extending an object with another observable (object) is not supported. Please construct an explicit propertymap, using `toJS` if need. See issue #540"
         )
-        if (decorators)
-            for (let key in decorators)
-                if (!(key in properties))
-                    fail(`Trying to declare a decorator for unspecified property '${key}'`)
+        if (decorators) {
+            getPlainObjectKeys(decorators).forEach(key => {
+                if (!(key in properties!))
+                    fail(
+                        `Trying to declare a decorator for unspecified property '${stringifyKey(
+                            key
+                        )}'`
+                    )
+            })
+        }
     }
 
     options = asCreateObservableOptions(options)
@@ -64,12 +72,16 @@ export function extendObservable<A extends Object, B extends Object>(
     asObservableObject(target, options.name, defaultDecorator.enhancer) // make sure object is observable, even without initial props
     startBatch()
     try {
-        for (let key in properties) {
+        const keys = getPlainObjectKeys(properties)
+        for (let i in keys) {
+            const key = keys[i]
             const descriptor = Object.getOwnPropertyDescriptor(properties, key)!
             if (process.env.NODE_ENV !== "production") {
                 if (Object.getOwnPropertyDescriptor(target, key))
                     fail(
-                        `'extendObservable' can only be used to introduce new properties. Use 'set' or 'decorate' instead. The property '${key}' already exists on '${target}'`
+                        `'extendObservable' can only be used to introduce new properties. Use 'set' or 'decorate' instead. The property '${stringifyKey(
+                            key
+                        )}' already exists on '${target}'`
                     )
                 if (isComputed(descriptor.value))
                     fail(
@@ -83,7 +95,7 @@ export function extendObservable<A extends Object, B extends Object>(
                     ? computedDecorator
                     : defaultDecorator
             if (process.env.NODE_ENV !== "production" && typeof decorator !== "function")
-                return fail(`Not a valid decorator for '${key}', got: ${decorator}`)
+                return fail(`Not a valid decorator for '${stringifyKey(key)}', got: ${decorator}`)
 
             const resultDescriptor = decorator!(target, key, descriptor, true)
             if (

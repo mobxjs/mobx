@@ -21,6 +21,7 @@ import {
     isSpyEnabled,
     hasListeners,
     spyReportStart,
+    stringifyKey,
     transaction,
     notifyListeners,
     spyReportEnd,
@@ -32,7 +33,8 @@ import {
     registerListener,
     IInterceptor,
     registerInterceptor,
-    declareIterator
+    declareIterator,
+    getPlainObjectKeys
 } from "../internal"
 
 export interface IKeyValueMap<V = any> {
@@ -299,7 +301,7 @@ export class ObservableMap<K = any, V = any>
         }
         transaction(() => {
             if (isPlainObject(other))
-                Object.keys(other).forEach(key => this.set((key as any) as K, other[key]))
+                getPlainObjectKeys(other).forEach(key => this.set((key as any) as K, other[key]))
             else if (Array.isArray(other)) other.forEach(([key, value]) => this.set(key, value))
             else if (isES6Map(other)) {
                 if (other.constructor !== Map)
@@ -392,11 +394,6 @@ export class ObservableMap<K = any, V = any>
     intercept(handler: IInterceptor<IMapWillChange<K, V>>): Lambda {
         return registerInterceptor(this, handler)
     }
-}
-
-function stringifyKey(key: any): string {
-    if (key && key.toString) return key.toString()
-    else return new String(key).toString()
 }
 
 declareIterator(ObservableMap.prototype, function() {

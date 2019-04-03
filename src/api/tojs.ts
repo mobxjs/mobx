@@ -4,7 +4,8 @@ import {
     isObservableValue,
     keys,
     isObservableSet,
-    isObservableMap
+    isObservableMap,
+    getPlainObjectKeys
 } from "../internal"
 
 export type ToJSOptions = {
@@ -88,9 +89,9 @@ function toJSHelper(source, options: ToJSOptions, __alreadySeen: Map<any, any>) 
 
     // Fallback to the situation that source is an ObservableObject or a plain object
     const res = cache(__alreadySeen, source, {}, options)
-    for (let key in source) {
+    getPlainObjectKeys(source).forEach(key => {
         res[key] = toJSHelper(source[key], options!, __alreadySeen)
-    }
+    })
 
     return res
 }
