@@ -12,6 +12,10 @@ function getAdm(target): ObservableObjectAdministration {
     return target[$mobx]
 }
 
+function isPropertyKey(val) {
+    return typeof val === "string" || typeof val === "number" || typeof val === "symbol"
+}
+
 // Optimization: we don't need the intermediate objects and could have a completely custom administration for DynamicObjects,
 // and skip either the internal values map, or the base object with its property descriptors!
 const objectProxyTraps: ProxyHandler<any> = {
@@ -22,14 +26,14 @@ const objectProxyTraps: ProxyHandler<any> = {
         // MWE: should `in` operator be reactive? If not, below code path will be faster / more memory efficient
         // TODO: check performance stats!
         // if (adm.values.get(name as string)) return true
-        if (typeof name === "string") return adm.has(name)
+        if (isPropertyKey(name)) return adm.has(name)
         return (name as any) in target
     },
     get(target: IIsObservableObject, name: PropertyKey) {
         if (name === $mobx || name === "constructor" || name === mobxDidRunLazyInitializersSymbol)
             return target[name]
         const adm = getAdm(target)
-        const observable = adm.values.get(name as string)
+        const observable = adm.values.get(name)
         if (observable instanceof Atom) {
             const result = (observable as any).get()
             if (result === undefined) {
@@ -42,16 +46,16 @@ const objectProxyTraps: ProxyHandler<any> = {
         }
         // make sure we start listening to future keys
         // note that we only do this here for optimization
-        if (typeof name === "string") adm.has(name)
+        if (isPropertyKey(name)) adm.has(name)
         return target[name]
     },
     set(target: IIsObservableObject, name: PropertyKey, value: any) {
-        if (typeof name !== "string") return false
+        if (!isPropertyKey(name)) return false
         set(target, name, value)
         return true
     },
     deleteProperty(target: IIsObservableObject, name: PropertyKey) {
-        if (typeof name !== "string") return false
+        if (!isPropertyKey(name)) return false
         const adm = getAdm(target)
         adm.remove(name)
         return true

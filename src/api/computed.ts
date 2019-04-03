@@ -20,7 +20,7 @@ export const computedDecorator = createPropDecorator(
     false,
     (
         instance: any,
-        propertyName: string,
+        propertyName: PropertyKey,
         descriptor: any,
         decoratorTarget: any,
         decoratorArgs: any[]

@@ -1,10 +1,14 @@
 import {
+    $mobx,
     keys,
     isObservable,
     isObservableArray,
     isObservableValue,
     isObservableMap,
-    isObservableSet
+    isObservableSet,
+    getPlainObjectKeys,
+    mobxDidRunLazyInitializersSymbol,
+    mobxPendingDecorators
 } from "../internal"
 
 export type ToJSOptions = {
@@ -88,7 +92,15 @@ function toJSHelper(source, options: ToJSOptions, __alreadySeen: Map<any, any>) 
 
     // Fallback to the situation that source is an ObservableObject or a plain object
     const res = cache(__alreadySeen, source, {}, options)
-    for (let key in source) {
+    const objKeys = getPlainObjectKeys(source)
+    for (let i in objKeys) {
+        const key = objKeys[i]
+        if (
+            key === $mobx ||
+            key === mobxDidRunLazyInitializersSymbol ||
+            key === mobxPendingDecorators
+        )
+            continue
         res[key] = toJSHelper(source[key], options!, __alreadySeen)
     }
 

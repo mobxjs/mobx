@@ -150,6 +150,27 @@ export function isES6Set(thing): thing is Set<any> {
     return thing instanceof Set
 }
 
+/**
+ * Returns the following: own keys, prototype keys & own symbol keys.
+ */
+export function getPlainObjectKeys(object) {
+    return unique(
+        ([] as PropertyKey[]).concat.apply(
+            [],
+            [
+                Object.keys(object),
+                Object.keys(Object.getPrototypeOf(object)),
+                Object.getOwnPropertySymbols(object)
+            ]
+        )
+    )
+}
+
+export function stringifyKey(key: any): string {
+    if (key && key.toString) return key.toString()
+    else return new String(key).toString()
+}
+
 export function getMapLikeKeys<K, V>(map: ObservableMap<K, V>): ReadonlyArray<K>
 export function getMapLikeKeys<V>(map: IKeyValueMap<V> | any): ReadonlyArray<string>
 export function getMapLikeKeys(map: any): any {

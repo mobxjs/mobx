@@ -221,6 +221,23 @@ test("toJS handles dates", () => {
     expect(a.d === b.d).toBe(true)
 })
 
+test("toJS handles symbol keys in objects and maps", () => {
+    var key = Symbol("key")
+    var a = observable({
+        [key]: 42
+    })
+
+    var b = mobx.toJS(a)
+    expect(b[key]).toBe(42)
+
+    var x = observable.map({
+        [key]: 43
+    })
+
+    var y = mobx.toJS(x)
+    expect(y[key]).toBe(43)
+})
+
 test("json cycles", function() {
     var a = observable({
         b: 1,
@@ -403,7 +420,7 @@ describe("recurseEverything set to true", function() {
         const convertedObj = mobx.toJS({ key: cycledObj }, { recurseEverything: true })
         expect(convertedObj.key).toBe(convertedObj.key.cycle)
     })
-    
+
     test("should return null if source is null", function() {
         expect(mobx.toJS(null)).toBeNull()
         expect(mobx.toJS(null, { recurseEverything: true })).toBeNull()
