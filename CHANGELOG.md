@@ -1,4 +1,4 @@
-* Added `set` support for `observable.set` see [#1945](https://github.com/mobxjs/mobx/pull/1945) by [xaviergonz](https://github.com/xaviergonz)
+* Added `set` support for `observable.set`, fixed keys not being reactive, see [#1945](https://github.com/mobxjs/mobx/pull/1945) by [xaviergonz](https://github.com/xaviergonz)
 
 # 5.9.4 / 4.9.4
 
