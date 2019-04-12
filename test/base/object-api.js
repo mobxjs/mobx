@@ -336,3 +336,18 @@ test("#1739 - delete and undelete should work", () => {
     set(x, "a", 3)
     expect(events).toEqual([false, true, false, true, false, true])
 })
+
+test("set - set, remove, keys are reactive", () => {
+    const todos = observable.set([1])
+    const snapshots = []
+
+    reaction(() => keys(todos), keys => snapshots.push(keys))
+
+    set(todos, 2)
+    remove(todos, 2)
+    set(todos, 3)
+    set(todos, 4)
+    remove(todos, 3)
+
+    expect(snapshots).toEqual([[1, 2], [1], [1, 3], [1, 3, 4], [1, 4]])
+})
