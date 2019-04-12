@@ -198,7 +198,6 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
     }
 
     keys(): IterableIterator<T> {
-        this._atom.reportObserved()
         return this.values()
     }
 
