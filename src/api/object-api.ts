@@ -87,11 +87,12 @@ export function entries(obj: any): any {
 
 export function set<V>(obj: ObservableMap<string, V>, values: { [key: string]: V })
 export function set<K, V>(obj: ObservableMap<K, V>, key: K, value: V)
+export function set<T>(obj: ObservableSet<T>, value: T)
 export function set<T>(obj: IObservableArray<T>, index: number, value: T)
 export function set<T extends Object>(obj: T, values: { [key: string]: any })
 export function set<T extends Object>(obj: T, key: string, value: any)
 export function set(obj: any, key: any, value?: any): void {
-    if (arguments.length === 2) {
+    if (arguments.length === 2 && !isObservableSet(obj)) {
         startBatch()
         const values = key
         try {
@@ -111,6 +112,8 @@ export function set(obj: any, key: any, value?: any): void {
         }
     } else if (isObservableMap(obj)) {
         obj.set(key, value)
+    } else if (isObservableSet(obj)) {
+        obj.add(key)
     } else if (isObservableArray(obj)) {
         if (typeof key !== "number") key = parseInt(key, 10)
         invariant(key >= 0, `Not a valid index: '${key}'`)
