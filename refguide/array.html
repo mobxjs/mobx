@@ -21,7 +21,7 @@
     <link rel="stylesheet" href="../gitbook/style.css">
     
         
-        <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-edit-link/plugin.css">
+        <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-disqus/plugin.css">
         
     
         
@@ -61,7 +61,7 @@
         data-chapter-title="arrays"
         data-filepath="refguide/array.md"
         data-basepath=".."
-        data-revision="Thu Mar 14 2019 11:27:23 GMT+0100 (CET)"
+        data-revision="Tue Apr 16 2019 14:43:31 GMT+0200 (CEST)"
         data-innerlanguage="">
     
 
@@ -801,7 +801,7 @@
                 
                     <section class="normal" id="section-">
                     
-                        <html><head></head><body><a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/array.md" class="btn fa fa-edit pull-left">&#xA0;&#xA0;Edit This Page</a><h2 id="observable-arrays"><a name="observable-arrays" class="plugin-anchor" href="#observable-arrays"><span class="fa fa-link"></span></a>Observable Arrays</h2>
+                        <h2 id="observable-arrays">Observable Arrays</h2>
 <p>Similar to objects, arrays can be made observable using <code>observable.array(values?)</code> or by passing an array to <code>observable</code>.
 This works recursively as well, so all (future) values of the array will also be observable.</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observable, autorun} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>;
@@ -841,18 +841,18 @@ todos.shift();
 <li><em>[MobX 4 and lower]</em> <code>peek()</code> Returns an array with all the values which can safely be passed to other libraries, similar to <code>slice()</code>.</li>
 </ul>
 <p>Unlike the built-in implementation of the functions <code>sort</code> and <code>reverse</code>, observableArray.sort and reverse  will not change the array in-place, but only will return a sorted / reversed copy. From MobX 5 and higher this will show a warning. It is recommended to use <code>array.slice().sort()</code> instead.</p>
-<h2 id="observablearrayvalues--deep-false-"><a name="observablearrayvalues--deep-false-" class="plugin-anchor" href="#observablearrayvalues--deep-false-"><span class="fa fa-link"></span></a><code>observable.array(values, { deep: false })</code></h2>
+<h2 id="observablearrayvalues--deep-false-"><code>observable.array(values, { deep: false })</code></h2>
 <p>Any values assigned to an observable array will be default passed through <a href="observable.html"><code>observable</code></a> to make them observable.
 Create a shallow array to disable this behavior and store a values as-is. See also <a href="modifiers.html">modifiers</a> for more details on this mechanism.</p>
-<h2 id="observablearrayvalues--name-my-array-"><a name="observablearrayvalues--name-my-array-" class="plugin-anchor" href="#observablearrayvalues--name-my-array-"><span class="fa fa-link"></span></a><code>observable.array(values, { name: &quot;my array&quot; })</code></h2>
+<h2 id="observablearrayvalues--name-my-array-"><code>observable.array(values, { name: &quot;my array&quot; })</code></h2>
 <p>The <code>name</code> option can be used to give the array a friendly debug name, to be used in for example <code>spy</code> or the MobX dev tools.</p>
-<h2 id="array-limitations-in-mobx-4-and-below"><a name="array-limitations-in-mobx-4-and-below" class="plugin-anchor" href="#array-limitations-in-mobx-4-and-below"><span class="fa fa-link"></span></a>Array limitations in MobX 4 and below</h2>
+<h2 id="array-limitations-in-mobx-4-and-below">Array limitations in MobX 4 and below</h2>
 <p>Due to limitations of native arrays in ES5 <code>observable.array</code> will create a faux-array (array-like object) instead of a real array.
 In practice, these arrays work just as fine as native arrays and all native methods are supported, including index assignments, up-to and including the length of the array. </p>
 <p>Bear in mind however that <code>Array.isArray(observable([]))</code> will yield <code>false</code>, which some native array manipulation methods require and which some external libraries may also require. 
 E.g. <code>[].concat(observable([]))</code> will not work as expected since the native array concat method expects the test to return <code>true</code>. 
 So whenever you need to pass an observable array to an external library or use the observable array as an argument to native array manipulation methods, you should <em>create a shallow copy by using <code>array.slice()</code></em>, which will cause <code>Array.isArray(observable([]).slice())</code> to yield <code>true</code>.</p>
-</body></html>
+
                     
                     </section>
                 
@@ -882,6 +882,10 @@ So whenever you need to pass an observable array to an external library or use t
     
 
     
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/URI.js/1.16.1/URI.min.js"></script>
+    
+
+    
     <script src="../gitbook/plugins/gitbook-plugin-disqus/plugin.js"></script>
     
 
@@ -907,12 +911,12 @@ So whenever you need to pass an observable array to an external library or use t
 
 <script>
 require(["gitbook"], function(gitbook) {
-    var config = {"github":{"url":"https://github.com/mobxjs/mobx"},"edit-link":{"base":"https://github.com/mobxjs/mobx/tree/gh-pages/docs","label":"Edit This Page"},"ga":{"token":"UA-65632006-1","configuration":"auto"},"disqus":{"shortName":"mobservable"},"anchors":{},"highlight":{},"search":{"maxIndexSize":1000000},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2}};
+    var config = {"github":{"url":"https://github.com/mobxjs/mobx"},"edit-link":{"base":"https://github.com/mobxjs/mobx/tree/gh-pages/docs","label":"Edit This Page"},"ga":{"token":"UA-65632006-1","configuration":"auto"},"disqus":{"shortName":"mobservable","useIdentifier":false},"anchors":{},"codefund":{},"highlight":{},"search":{"maxIndexSize":1000000},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2}};
     gitbook.start(config);
 });
 </script>
 
-        <script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create', 'UA-65632006-1', 'auto');ga('send', 'pageview');</script>
+        <script>$("<div id='codefund' style='float:right'></div>").prependTo(".page-inner section")</script><script src="https://codefund.app/properties/259/funder.js"></script>
     </body>
     
 </html>

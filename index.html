@@ -21,7 +21,7 @@
     <link rel="stylesheet" href="gitbook/style.css">
     
         
-        <link rel="stylesheet" href="gitbook/plugins/gitbook-plugin-edit-link/plugin.css">
+        <link rel="stylesheet" href="gitbook/plugins/gitbook-plugin-disqus/plugin.css">
         
     
         
@@ -59,7 +59,7 @@
         data-chapter-title="Introduction"
         data-filepath="README.md"
         data-basepath="."
-        data-revision="Thu Mar 14 2019 11:27:23 GMT+0100 (CET)"
+        data-revision="Tue Apr 16 2019 14:43:31 GMT+0200 (CEST)"
         data-innerlanguage="">
     
 
@@ -799,8 +799,8 @@
                 
                     <section class="normal" id="section-">
                     
-                        <html><head></head><body><a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/README.md" class="btn fa fa-edit pull-left">&#xA0;&#xA0;Edit This Page</a><p><img src="docs/mobx.png" alt="logo" height="120" align="right"></p>
-<h1 id="mobx"><a name="mobx" class="plugin-anchor" href="#mobx"><span class="fa fa-link"></span></a>MobX</h1>
+                        <p><img src="docs/mobx.png" alt="logo" height="120" align="right"></p>
+<h1 id="mobx">MobX</h1>
 <p><em>Simple, scalable state management</em></p>
 <p><a href="https://travis-ci.org/mobxjs/mobx" target="_blank"><img src="https://travis-ci.org/mobxjs/mobx.svg?branch=master" alt="Build Status"></a>
 <a href="https://coveralls.io/github/mobxjs/mobx?branch=master" target="_blank"><img src="https://coveralls.io/repos/mobxjs/mobx/badge.svg?branch=master&amp;service=github" alt="Coverage Status"></a>
@@ -820,24 +820,24 @@
 <a href="https://mantro.net/jobs/warlock" target="_blank"><img src="docs/mantro.png" align="center" width="100" title="mantro GmbH" alt="mantro GmbH"></a>
 <a href="https://talentplot.com/" target="_blank"><img src="docs/talentplot.png" align="center" width="100" title="talentplot" alt="talentplot"></a>
 <a href="https://www.codefirst.co.uk/" target="_blank"><img src="docs/codefirst.png" align="center" width="100" title="CodeFirst" alt="CodeFirst"></a></p>
-<h1 id="installation"><a name="installation" class="plugin-anchor" href="#installation"><span class="fa fa-link"></span></a>Installation</h1>
+<h1 id="installation">Installation</h1>
 <ul>
 <li>Installation: <code>npm install mobx --save</code>. React bindings: <code>npm install mobx-react --save</code>. To enable ESNext decorators (optional), see below.</li>
 <li>CDN:</li>
 <li><a href="https://unpkg.com/mobx/lib/mobx.umd.js" target="_blank">https://unpkg.com/mobx/lib/mobx.umd.js</a></li>
 <li><a href="https://cdnjs.com/libraries/mobx" target="_blank">https://cdnjs.com/libraries/mobx</a></li>
 </ul>
-<h1 id="browser-support"><a name="browser-support" class="plugin-anchor" href="#browser-support"><span class="fa fa-link"></span></a>Browser support</h1>
+<h1 id="browser-support">Browser support</h1>
 <ul>
 <li>MobX &gt;=5 runs on any browser with <a href="https://kangax.github.io/compat-table/es6/#test-Proxy" target="_blank">ES6 proxy support</a>. It will throw an error on startup on older environments such as IE11, Node.js &lt;6 or React Native Android on old JavaScriptCore <a href="https://github.com/react-community/jsc-android-buildscripts#how-to-use-it-with-my-react-native-app" target="_blank">how-to-upgrade</a>.</li>
 <li>MobX 4 runs on any ES5 browser and will be actively maintained. The MobX 4 and 5 api&apos;s are the same and semantically can achieve the same, but MobX 4 has some <a href="#mobx-4-vs-mobx-5">limitations</a>.</li>
 </ul>
 <p><em>Tip: the main entry point of the MobX 5 package ships with ES5 code for backward compatibility with all build tools. But since MobX 5 runs only on modern browsers anyway, consider using the faster and smaller ES6 build: <code>lib/mobx.es6.js</code>. For example by setting up a webpack alias: <code>resolve: { alias: { mobx: __dirname + &quot;/node_modules/mobx/lib/mobx.es6.js&quot; }}</code></em></p>
-<h2 id="translations"><a name="translations" class="plugin-anchor" href="#translations"><span class="fa fa-link"></span></a>Translations</h2>
+<h2 id="translations">Translations</h2>
 <ul>
 <li><a href="http://cn.mobx.js.org" target="_blank">&#x4E2D;&#x6587;</a></li>
 </ul>
-<h2 id="getting-started"><a name="getting-started" class="plugin-anchor" href="#getting-started"><span class="fa fa-link"></span></a>Getting started</h2>
+<h2 id="getting-started">Getting started</h2>
 <ul>
 <li><i><a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/courses/manage-complex-state-in-react-apps-with-mobx" target="_blank">egghead.io course</a></i></li>
 <li><a href="https://mobxjs.github.io/mobx/getting-started.html" target="_blank">Ten minute, interactive MobX + React tutorial</a></li>
@@ -854,7 +854,7 @@
 <li><a href="http://mobxjs.github.io/mobx/faq/boilerplates.html" target="_blank">Boilerplates and related projects</a></li>
 <li>More tutorials, blogs, videos, and other helpful resources can be found on the <a href="https://github.com/mobxjs/awesome-mobx#awesome-mobx" target="_blank">MobX awesome list</a></li>
 </ul>
-<h2 id="introduction"><a name="introduction" class="plugin-anchor" href="#introduction"><span class="fa fa-link"></span></a>Introduction</h2>
+<h2 id="introduction">Introduction</h2>
 <p>MobX is a battle tested library that makes state management simple and scalable by transparently applying functional reactive programming (TFRP).
 The philosophy behind MobX is very simple:</p>
 <p><em>Anything that can be derived from the application state, should be derived. Automatically.</em></p>
@@ -862,9 +862,9 @@ The philosophy behind MobX is very simple:</p>
 <p><img alt="MobX unidirectional flow" src="docs/flow.png" align="center"></p>
 <p>React and MobX together are a powerful combination. React renders the application state by providing mechanisms to translate it into a tree of renderable components. MobX provides the mechanism to store and update the application state that React then uses.</p>
 <p>Both React and MobX provide an optimal and unique solutions to common problems in application development. React provides mechanisms to optimally render UI by using a virtual DOM that reduces the number of costly DOM mutations. MobX provides mechanisms to optimally synchronize application state with your React components by using a reactive virtual dependency state graph that is only updated when strictly needed and is never stale.</p>
-<h2 id="core-concepts"><a name="core-concepts" class="plugin-anchor" href="#core-concepts"><span class="fa fa-link"></span></a>Core concepts</h2>
+<h2 id="core-concepts">Core concepts</h2>
 <p>MobX has only a few core concepts. The following snippets can be tried online using <a href="https://codesandbox.io/s/v3v0my2370" target="_blank">codesandbox example</a>.</p>
-<h3 id="observable-state"><a name="observable-state" class="plugin-anchor" href="#observable-state"><span class="fa fa-link"></span></a>Observable state</h3>
+<h3 id="observable-state">Observable state</h3>
 <p><i><a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/javascript-sync-the-ui-with-the-app-state-using-mobx-observable-and-observer-in-react" target="_blank">Egghead.io lesson 1: observable &amp; observer</a></i></p>
 <p>MobX adds observable capabilities to existing data structures like objects, arrays and class instances.
 This can simply be done by annotating your class properties with the <a href="http://mobxjs.github.io/mobx/refguide/observable-decorator.html" target="_blank">@observable</a> decorator (ES.Next).</p>
@@ -894,7 +894,7 @@ decorate(Todo, {
     finished: observable
 })
 </code></pre>
-<h3 id="computed-values"><a name="computed-values" class="plugin-anchor" href="#computed-values"><span class="fa fa-link"></span></a>Computed values</h3>
+<h3 id="computed-values">Computed values</h3>
 <p><i><a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/javascript-derive-computed-values-and-manage-side-effects-with-mobx-reactions" target="_blank">Egghead.io lesson 3: computed values</a></i></p>
 <p>With MobX you can define values that will be derived automatically when relevant data is modified.
 By using the <a href="http://mobxjs.github.io/mobx/refguide/computed-decorator.html" target="_blank"><code>@computed</code></a> decorator or by using getter / setter functions when using <code>(extend)Observable</code> (Of course, you can use <code>decorate</code> here again as alternative to the <code>@</code> syntax).</p>
@@ -907,11 +907,11 @@ By using the <a href="http://mobxjs.github.io/mobx/refguide/computed-decorator.h
 </code></pre>
 <p>MobX will ensure that <code>unfinishedTodoCount</code> is updated automatically when a todo is added or when one of the <code>finished</code> properties is modified.
 Computations like these resemble formulas in spreadsheet programs like MS Excel. They update automatically and only when required.</p>
-<h3 id="reactions"><a name="reactions" class="plugin-anchor" href="#reactions"><span class="fa fa-link"></span></a>Reactions</h3>
+<h3 id="reactions">Reactions</h3>
 <p><i><a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-write-custom-mobx-reactions-with-when-and-autorun" target="_blank">Egghead.io lesson 9: custom reactions</a></i></p>
 <p>Reactions are similar to a computed value, but instead of producing a new value, a reaction produces a side effect for things like printing to the console, making network requests, incrementally updating the React component tree to patch the DOM, etc.
 In short, reactions bridge <a href="https://en.wikipedia.org/wiki/Reactive_programming" target="_blank">reactive</a> and <a href="https://en.wikipedia.org/wiki/Imperative_programming" target="_blank">imperative</a> programming.</p>
-<h4 id="react-components"><a name="react-components" class="plugin-anchor" href="#react-components"><span class="fa fa-link"></span></a>React components</h4>
+<h4 id="react-components">React components</h4>
 <p><i><a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/courses/manage-complex-state-in-react-apps-with-mobx" target="_blank">Egghead.io lesson 1: observable &amp; observer</a></i></p>
 <p>If you are using React, you can turn your (stateless function) components into reactive components by simply adding the <a href="http://mobxjs.github.io/mobx/refguide/observer-component.html" target="_blank"><code>observer</code></a> function / decorator from the <code>mobx-react</code> package onto them.</p>
 <pre><code class="lang-javascript">import React, {Component} from &apos;react&apos;;
@@ -949,7 +949,7 @@ ReactDOM.render(&lt;TodoListView todoList={store} /&gt;, document.getElementById
 When using MobX there are no smart or dumb components.
 All components render smartly but are defined in a dumb manner. MobX will simply make sure the components are always re-rendered whenever needed, but also no more than that. So the <code>onClick</code> handler in the above example will force the proper <code>TodoView</code> to render, and it will cause the <code>TodoListView</code> to render if the number of unfinished tasks has changed.
 However, if you would remove the <code>Tasks left</code> line (or put it into a separate component), the <code>TodoListView</code> will no longer re-render when ticking a box. You can verify this yourself by changing the <a href="https://jsfiddle.net/mweststrate/wv3yopo0/" target="_blank">JSFiddle</a>.</p>
-<h4 id="custom-reactions"><a name="custom-reactions" class="plugin-anchor" href="#custom-reactions"><span class="fa fa-link"></span></a>Custom reactions</h4>
+<h4 id="custom-reactions">Custom reactions</h4>
 <p>Custom reactions can simply be created using the <a href="http://mobxjs.github.io/mobx/refguide/autorun.html" target="_blank"><code>autorun</code></a>,
 <a href="http://mobxjs.github.io/mobx/refguide/reaction.html" target="_blank"><code>reaction</code></a> or <a href="http://mobxjs.github.io/mobx/refguide/when.html" target="_blank"><code>when</code></a> functions to fit your specific situations.</p>
 <p>For example the following <code>autorun</code> prints a log message each time the amount of <code>unfinishedTodoCount</code> changes:</p>
@@ -957,11 +957,11 @@ However, if you would remove the <code>Tasks left</code> line (or put it into a 
     <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;Tasks left: &quot;</span> + todos.unfinishedTodoCount)
 })
 </code></pre>
-<h3 id="what-will-mobx-react-to"><a name="what-will-mobx-react-to" class="plugin-anchor" href="#what-will-mobx-react-to"><span class="fa fa-link"></span></a>What will MobX react to?</h3>
+<h3 id="what-will-mobx-react-to">What will MobX react to?</h3>
 <p>Why does a new message get printed each time the <code>unfinishedTodoCount</code> is changed? The answer is this rule of thumb:</p>
 <p><em>MobX reacts to any existing observable property that is read during the execution of a tracked function.</em></p>
 <p>For an in-depth explanation about how MobX determines to which observables needs to be reacted, check <a href="https://github.com/mobxjs/mobx/blob/gh-pages/docs/best/react.md" target="_blank">understanding what MobX reacts to</a>.</p>
-<h3 id="actions"><a name="actions" class="plugin-anchor" href="#actions"><span class="fa fa-link"></span></a>Actions</h3>
+<h3 id="actions">Actions</h3>
 <p><i><a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-use-mobx-actions-to-change-and-guard-state" target="_blank">Egghead.io lesson 5: actions</a></i></p>
 <p>Unlike many flux frameworks, MobX is unopinionated about how user events should be handled.</p>
 <ul>
@@ -981,32 +981,32 @@ store.todos[<span class="hljs-number">0</span>].finished = <span class="hljs-lit
 <p>Nonetheless, MobX has an optional built-in concept of <a href="https://mobxjs.github.io/mobx/refguide/action.html" target="_blank"><code>actions</code></a>.
 Read this section as well if you want to know more about writing asynchronous actions. It&apos;s easy!
 Use them to your advantage; they will help you to structure your code better and make wise decisions about when and where state should be modified.</p>
-<h2 id="mobx-simple-and-scalable"><a name="mobx-simple-and-scalable" class="plugin-anchor" href="#mobx-simple-and-scalable"><span class="fa fa-link"></span></a>MobX: Simple and scalable</h2>
+<h2 id="mobx-simple-and-scalable">MobX: Simple and scalable</h2>
 <p>MobX is one of the least obtrusive libraries you can use for state management. That makes the <code>MobX</code> approach not just simple, but very scalable as well:</p>
-<h3 id="using-classes-and-real-references"><a name="using-classes-and-real-references" class="plugin-anchor" href="#using-classes-and-real-references"><span class="fa fa-link"></span></a>Using classes and real references</h3>
+<h3 id="using-classes-and-real-references">Using classes and real references</h3>
 <p>With MobX you don&apos;t need to normalize your data. This makes the library very suitable for very complex domain models (At Mendix for example ~500 different domain classes in a single application).</p>
-<h3 id="referential-integrity-is-guaranteed"><a name="referential-integrity-is-guaranteed" class="plugin-anchor" href="#referential-integrity-is-guaranteed"><span class="fa fa-link"></span></a>Referential integrity is guaranteed</h3>
+<h3 id="referential-integrity-is-guaranteed">Referential integrity is guaranteed</h3>
 <p>Since data doesn&apos;t need to be normalized, and MobX automatically tracks the relations between state and derivations, you get referential integrity for free. Rendering something that is accessed through three levels of indirection?</p>
 <p>No problem, MobX will track them and re-render whenever one of the references changes. As a result staleness bugs are a thing of the past. As a programmer you might forget that changing some data might influence a seemingly unrelated component in a corner case. MobX won&apos;t forget.</p>
-<h3 id="simpler-actions-are-easier-to-maintain"><a name="simpler-actions-are-easier-to-maintain" class="plugin-anchor" href="#simpler-actions-are-easier-to-maintain"><span class="fa fa-link"></span></a>Simpler actions are easier to maintain</h3>
+<h3 id="simpler-actions-are-easier-to-maintain">Simpler actions are easier to maintain</h3>
 <p>As demonstrated above, modifying state when using MobX is very straightforward. You simply write down your intentions. MobX will take care of the rest.</p>
-<h3 id="fine-grained-observability-is-efficient"><a name="fine-grained-observability-is-efficient" class="plugin-anchor" href="#fine-grained-observability-is-efficient"><span class="fa fa-link"></span></a>Fine grained observability is efficient</h3>
+<h3 id="fine-grained-observability-is-efficient">Fine grained observability is efficient</h3>
 <p>MobX builds a graph of all the derivations in your application to find the least number of re-computations that is needed to prevent staleness. &quot;Derive everything&quot; might sound expensive, MobX builds a virtual derivation graph to minimize the number of recomputations needed to keep derivations in sync with the state.</p>
 <p>In fact, when testing MobX at Mendix we found out that using this library to track the relations in our code is often a lot more efficient than pushing changes through our application by using handwritten events or &quot;smart&quot; selector based container components.</p>
 <p>The simple reason is that MobX will establish far more fine grained &apos;listeners&apos; on your data than you would do as a programmer.</p>
 <p>Secondly MobX sees the causality between derivations so it can order them in such a way that no derivation has to run twice or introduces a glitch.</p>
 <p>How that works? See this <a href="https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254" target="_blank">in-depth explanation of MobX</a>.</p>
-<h3 id="easy-interoperability"><a name="easy-interoperability" class="plugin-anchor" href="#easy-interoperability"><span class="fa fa-link"></span></a>Easy interoperability</h3>
+<h3 id="easy-interoperability">Easy interoperability</h3>
 <p>MobX works with plain javascript structures. Due to its unobtrusiveness it works with most javascript libraries out of the box, without needing MobX specific library flavors.</p>
 <p>So you can simply keep using your existing router, data fetching, and utility libraries like <code>react-router</code>, <code>director</code>, <code>superagent</code>, <code>lodash</code> etc.</p>
 <p>For the same reason you can use it out of the box both server and client side, in isomorphic applications and with react-native.</p>
 <p>The result of this is that you often need to learn less new concepts when using MobX in comparison to other state management solutions.</p>
 <hr>
-<h2 id="credits"><a name="credits" class="plugin-anchor" href="#credits"><span class="fa fa-link"></span></a>Credits</h2>
+<h2 id="credits">Credits</h2>
 <p>MobX is inspired by reactive programming principles as found in spreadsheets. It is inspired by MVVM frameworks like in MeteorJS tracker, knockout and Vue.js. But MobX brings Transparent Functional Reactive Programming to the next level and provides a stand alone implementation. It implements TFRP in a glitch-free, synchronous, predictable and efficient manner.</p>
 <p>A ton of credits for <a href="https://github.com/mendix" target="_blank">Mendix</a>, for providing the flexibility and support to maintain MobX and the chance to proof the philosophy of MobX in a real, complex, performance critical applications.</p>
 <p>And finally kudos for all the people that believed in, tried, validated and even <a href="https://github.com/mobxjs/mobx/blob/master/sponsors.md" target="_blank">sponsored</a> MobX.</p>
-<h2 id="further-resources-and-documentation"><a name="further-resources-and-documentation" class="plugin-anchor" href="#further-resources-and-documentation"><span class="fa fa-link"></span></a>Further resources and documentation</h2>
+<h2 id="further-resources-and-documentation">Further resources and documentation</h2>
 <ul>
 <li><img src="images/book.jpg" height="80px"> <a href="https://books.google.nl/books?id=ALFmDwAAQBAJ&amp;pg=PP1&amp;lpg=PP1&amp;dq=michel+weststrate+mobx+quick+start+guide:+supercharge+the+client+state+in+your+react+apps+with+mobx&amp;source=bl&amp;ots=D460fxti0F&amp;sig=ivDGTxsPNwlOjLHrpKF1nweZFl8&amp;hl=nl&amp;sa=X&amp;ved=2ahUKEwiwl8XO--ncAhWPmbQKHWOYBqIQ6AEwAnoECAkQAQ#v=onepage&amp;q=michel%20weststrate%20mobx%20quick%20start%20guide%3A%20supercharge%20the%20client%20state%20in%20your%20react%20apps%20with%20mobx&amp;f=false" target="_blank">The MobX book</a> by Pavan Podila and Michel Weststrate (which despite it&apos;s name is in-depth!)</li>
 <li><a href="http://mobxjs.github.io/mobx/faq/blogs.html" target="_blank">MobX homepage</a></li>
@@ -1015,7 +1015,7 @@ Use them to your advantage; they will help you to structure your code better and
 <li><a href="http://mobxjs.github.io/mobx/faq/boilerplates.html" target="_blank">Boilerplates</a></li>
 <li><a href="http://mobxjs.github.io/mobx/faq/related.html" target="_blank">Related projects</a></li>
 </ul>
-<h2 id="what-others-are-saying"><a name="what-others-are-saying" class="plugin-anchor" href="#what-others-are-saying"><span class="fa fa-link"></span></a>What others are saying...</h2>
+<h2 id="what-others-are-saying">What others are saying...</h2>
 <blockquote>
 <p>Guise, #mobx isn&apos;t pubsub, or your grandpa&apos;s observer pattern. Nay, it is a carefully orchestrated observable dimensional portal fueled by the power cosmic. It doesn&apos;t do change detection, it&apos;s actually a level 20 psionic with soul knife, slashing your viewmodel into submission.</p>
 <p>After using #mobx for lone projects for a few weeks, it feels awesome to introduce it to the team. Time: 1/2, Fun: 2X</p>
@@ -1024,13 +1024,13 @@ Use them to your advantage; they will help you to structure your code better and
 <p>I have built big apps with MobX already and comparing to the one before that which was using Redux, it is simpler to read and much easier to reason about.</p>
 <p>The #mobx is the way I always want things to be! It&apos;s really surprising simple and fast! Totally awesome! Don&apos;t miss it!</p>
 </blockquote>
-<h2 id="contributing"><a name="contributing" class="plugin-anchor" href="#contributing"><span class="fa fa-link"></span></a>Contributing</h2>
+<h2 id="contributing">Contributing</h2>
 <ul>
 <li>Feel free to send small pull requests. Please discuss new features or big changes in a GitHub issue first.</li>
 <li>Use <code>npm test</code> to run the basic test suite, <code>npm run coverage</code> for the test suite with coverage and <code>npm run test:performance</code> for the performance tests.</li>
 <li>Please note that if you want to backport a feature / fix to MobX 4 a second PR needs to be opened to the mobx4-master branch.</li>
 </ul>
-<h1 id="mobx-4-vs-mobx-5"><a name="mobx-4-vs-mobx-5" class="plugin-anchor" href="#mobx-4-vs-mobx-5"><span class="fa fa-link"></span></a>MobX 4 vs MobX 5</h1>
+<h1 id="mobx-4-vs-mobx-5">MobX 4 vs MobX 5</h1>
 <p>The difference between MobX 4 and MobX 5 is that the latter uses Proxies to do property tracking. As a consequence MobX 5 only runs on Proxy supporting browsers, in contrast to MobX 4 that runs on any ES 5 environment.</p>
 <p>The most noteable limitations of MobX 4:</p>
 <ul>
@@ -1038,7 +1038,7 @@ Use them to your advantage; they will help you to structure your code better and
 <li>Adding properties to existing observable objects after creation is not automatically picked up. Either use observable maps instead, or use the the build in <a href="https://mobx.js.org/refguide/object-api.html" target="_blank">utility functions</a> to read / write / iterate objects that you want to dynamically add properties to.</li>
 </ul>
 <p>For more details see the <a href="https://mobx.js.org/best/pitfalls.html" target="_blank">caveats page</a>.</p>
-<h2 id="flow-support"><a name="flow-support" class="plugin-anchor" href="#flow-support"><span class="fa fa-link"></span></a>Flow support</h2>
+<h2 id="flow-support">Flow support</h2>
 <p>MobX ships with <a href="https://github.com/mobxjs/mobx/blob/master/flow-typed/mobx.js" target="_blank">flow typings</a>. Flow will automatically include them when you import mobx modules. Although you <strong>do not</strong> need to import the types explicitly, you can still do it like this: <code>import type { ... } from &apos;mobx&apos;</code>.</p>
 <p>To use the <a href="https://github.com/mobxjs/mobx/blob/master/flow-typed/mobx.js" target="_blank">flow typings</a> shipped with MobX:</p>
 <ul>
@@ -1046,10 +1046,10 @@ Use them to your advantage; they will help you to structure your code better and
 <li>In <code>.flowconfig</code>, you <strong>cannot</strong> import it explicitly in the <code>[libs]</code> section.</li>
 <li>You <strong>do not</strong> need to install library definition using <a href="https://github.com/flowtype/flow-typed" target="_blank">flow-typed</a>.</li>
 </ul>
-<h2 id="donating"><a name="donating" class="plugin-anchor" href="#donating"><span class="fa fa-link"></span></a>Donating</h2>
+<h2 id="donating">Donating</h2>
 <p>Was MobX key in making your project a success?
 Join our <a href="https://opencollective.com/mobx#" target="_blank">open collective</a> or use the <a href="https://mobxjs.github.io/mobx/donate.html" target="_blank">donate button</a>!</p>
-<h3 id="backers"><a name="backers" class="plugin-anchor" href="#backers"><span class="fa fa-link"></span></a>Backers</h3>
+<h3 id="backers">Backers</h3>
 <p>Support us with a monthly donation and help us continue our activities. [<a href="https://opencollective.com/mobx#backer" target="_blank">Become a backer</a>]</p>
 <p><a href="https://opencollective.com/mobx/backer/0/website" target="_blank"><img src="https://opencollective.com/mobx/backer/0/avatar.svg"></a>
 <a href="https://opencollective.com/mobx/backer/1/website" target="_blank"><img src="https://opencollective.com/mobx/backer/1/avatar.svg"></a>
@@ -1113,7 +1113,7 @@ Join our <a href="https://opencollective.com/mobx#" target="_blank">open collect
 <a href="https://opencollective.com/mobx/backer/59/website" target="_blank"><img src="https://opencollective.com/mobx/backer/59/avatar.svg"></a></p>
 <p>One time donations through paypal are welcome as well and are recorded in the <a href="sponsors.md">sponsors</a> list.</p>
 <p><a href="https://mobxjs.github.io/mobx/donate.html" target="_blank"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" alt="Donate"></a></p>
-<h3 id="sponsors"><a name="sponsors" class="plugin-anchor" href="#sponsors"><span class="fa fa-link"></span></a>Sponsors</h3>
+<h3 id="sponsors">Sponsors</h3>
 <p>Become a sponsor and get your logo on our README on Github with a link to your site. [<a href="https://opencollective.com/mobx#sponsor" target="_blank">Become a sponsor</a>]</p>
 <p><a href="https://opencollective.com/mobx/sponsor/0/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/0/avatar.svg"></a>
 <a href="https://opencollective.com/mobx/sponsor/1/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/1/avatar.svg"></a>
@@ -1175,7 +1175,7 @@ Join our <a href="https://opencollective.com/mobx#" target="_blank">open collect
 <a href="https://opencollective.com/mobx/sponsor/57/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/57/avatar.svg"></a>
 <a href="https://opencollective.com/mobx/sponsor/58/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/58/avatar.svg"></a>
 <a href="https://opencollective.com/mobx/sponsor/59/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/59/avatar.svg"></a></p>
-</body></html>
+
                     
                     </section>
                 
@@ -1200,6 +1200,10 @@ Join our <a href="https://opencollective.com/mobx#" target="_blank">open collect
 
     
     <script src="gitbook/plugins/gitbook-plugin-ga/plugin.js"></script>
+    
+
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/URI.js/1.16.1/URI.min.js"></script>
     
 
     
@@ -1228,12 +1232,12 @@ Join our <a href="https://opencollective.com/mobx#" target="_blank">open collect
 
 <script>
 require(["gitbook"], function(gitbook) {
-    var config = {"github":{"url":"https://github.com/mobxjs/mobx"},"edit-link":{"base":"https://github.com/mobxjs/mobx/tree/gh-pages/docs","label":"Edit This Page"},"ga":{"token":"UA-65632006-1","configuration":"auto"},"disqus":{"shortName":"mobservable"},"anchors":{},"highlight":{},"search":{"maxIndexSize":1000000},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2}};
+    var config = {"github":{"url":"https://github.com/mobxjs/mobx"},"edit-link":{"base":"https://github.com/mobxjs/mobx/tree/gh-pages/docs","label":"Edit This Page"},"ga":{"token":"UA-65632006-1","configuration":"auto"},"disqus":{"shortName":"mobservable","useIdentifier":false},"anchors":{},"codefund":{},"highlight":{},"search":{"maxIndexSize":1000000},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2}};
     gitbook.start(config);
 });
 </script>
 
-        <script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create', 'UA-65632006-1', 'auto');ga('send', 'pageview');</script>
+        <script>$("<div id='codefund' style='float:right'></div>").prependTo(".page-inner section")</script><script src="https://codefund.app/properties/259/funder.js"></script>
     </body>
     
 </html>

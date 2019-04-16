@@ -21,7 +21,7 @@
     <link rel="stylesheet" href="../gitbook/style.css">
     
         
-        <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-edit-link/plugin.css">
+        <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-disqus/plugin.css">
         
     
         
@@ -61,7 +61,7 @@
         data-chapter-title="Using trace for debugging"
         data-filepath="best/trace.md"
         data-basepath=".."
-        data-revision="Thu Mar 14 2019 11:27:23 GMT+0100 (CET)"
+        data-revision="Tue Apr 16 2019 14:43:31 GMT+0200 (CEST)"
         data-innerlanguage="">
     
 
@@ -801,7 +801,7 @@
                 
                     <section class="normal" id="section-">
                     
-                        <html><head></head><body><a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/best/trace.md" class="btn fa fa-edit pull-left">&#xA0;&#xA0;Edit This Page</a><h1 id="using-trace-for-debugging"><a name="using-trace-for-debugging" class="plugin-anchor" href="#using-trace-for-debugging"><span class="fa fa-link"></span></a>Using <code>trace</code> for debugging</h1>
+                        <h1 id="using-trace-for-debugging">Using <code>trace</code> for debugging</h1>
 <p>Trace is a small utility that helps to find out why your computed values, reactions or components are re-evaluating.</p>
 <p>It can be used by simply importing <code>import { trace } from &quot;mobx&quot;</code>, and then put it inside a reaction or computed value.
 It will print why it is re-evaluating the current derivation.</p>
@@ -810,11 +810,11 @@ This way the exact mutation that causes the reaction to re-run is still in stack
 <p>In debugger mode, the debug information will also reveal the full derivation tree that is affecting the current computation / reaction.</p>
 <p><img src="../images/trace-tips2.png" alt="trace"></p>
 <p><img src="../images/trace.gif" alt="trace"></p>
-<h2 id="live-examples"><a name="live-examples" class="plugin-anchor" href="#live-examples"><span class="fa fa-link"></span></a>Live examples</h2>
+<h2 id="live-examples">Live examples</h2>
 <p>Simple codesandbox trace example: <a href="https://codesandbox.io/s/nr58ylyn4m" target="_blank">https://codesandbox.io/s/nr58ylyn4m</a></p>
 <p>Here&apos;s a deployed example for exploring the stack: <a href="https://csb-nr58ylyn4m-hontnuliaa.now.sh/" target="_blank">https://csb-nr58ylyn4m-hontnuliaa.now.sh/</a>
 Be sure to play with chrome debugger&apos;s blackbox feature!</p>
-<h2 id="usage-examples"><a name="usage-examples" class="plugin-anchor" href="#usage-examples"><span class="fa fa-link"></span></a>Usage examples</h2>
+<h2 id="usage-examples">Usage examples</h2>
 <p>There are different ways of calling <code>trace()</code>, some examples:</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">import</span> { observer } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx-react&quot;</span>
 <span class="hljs-keyword">import</span> { trace } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>
@@ -836,7 +836,7 @@ class MyComponent extends React.Component {
 <p>Pass in the property name of a computed property:</p>
 <pre><code class="lang-javascript">trace(user, <span class="hljs-string">&quot;fullname&quot;</span>)
 </code></pre>
-</body></html>
+
                     
                     </section>
                 
@@ -866,6 +866,10 @@ class MyComponent extends React.Component {
     
 
     
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/URI.js/1.16.1/URI.min.js"></script>
+    
+
+    
     <script src="../gitbook/plugins/gitbook-plugin-disqus/plugin.js"></script>
     
 
@@ -891,12 +895,12 @@ class MyComponent extends React.Component {
 
 <script>
 require(["gitbook"], function(gitbook) {
-    var config = {"github":{"url":"https://github.com/mobxjs/mobx"},"edit-link":{"base":"https://github.com/mobxjs/mobx/tree/gh-pages/docs","label":"Edit This Page"},"ga":{"token":"UA-65632006-1","configuration":"auto"},"disqus":{"shortName":"mobservable"},"anchors":{},"highlight":{},"search":{"maxIndexSize":1000000},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2}};
+    var config = {"github":{"url":"https://github.com/mobxjs/mobx"},"edit-link":{"base":"https://github.com/mobxjs/mobx/tree/gh-pages/docs","label":"Edit This Page"},"ga":{"token":"UA-65632006-1","configuration":"auto"},"disqus":{"shortName":"mobservable","useIdentifier":false},"anchors":{},"codefund":{},"highlight":{},"search":{"maxIndexSize":1000000},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2}};
     gitbook.start(config);
 });
 </script>
 
-        <script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create', 'UA-65632006-1', 'auto');ga('send', 'pageview');</script>
+        <script>$("<div id='codefund' style='float:right'></div>").prependTo(".page-inner section")</script><script src="https://codefund.app/properties/259/funder.js"></script>
     </body>
     
 </html>

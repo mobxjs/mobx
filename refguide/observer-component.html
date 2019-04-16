@@ -21,7 +21,7 @@
     <link rel="stylesheet" href="../gitbook/style.css">
     
         
-        <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-edit-link/plugin.css">
+        <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-disqus/plugin.css">
         
     
         
@@ -61,7 +61,7 @@
         data-chapter-title="(@)observer"
         data-filepath="refguide/observer-component.md"
         data-basepath=".."
-        data-revision="Thu Mar 14 2019 11:27:23 GMT+0100 (CET)"
+        data-revision="Tue Apr 16 2019 14:43:31 GMT+0200 (CEST)"
         data-innerlanguage="">
     
 
@@ -801,7 +801,7 @@
                 
                     <section class="normal" id="section-">
                     
-                        <html><head></head><body><a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/refguide/observer-component.md" class="btn fa fa-edit pull-left">&#xA0;&#xA0;Edit This Page</a><h1 id="observer"><a name="observer" class="plugin-anchor" href="#observer"><span class="fa fa-link"></span></a>@observer</h1>
+                        <h1 id="observer">@observer</h1>
 <details>
     <summary style="color: white; background:green;padding:5px;margin:5px;border-radius:2px">egghead.io lesson 1: observable &amp; observer</summary>
     <br>
@@ -835,7 +835,7 @@ ReactDOM.render(<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-t
 <p>Tip: when <code>observer</code> needs to be combined with other decorators or higher-order-components, make sure that <code>observer</code> is the innermost (first applied) decorator;
 otherwise it might do nothing at all.</p>
 <p>Note that using <code>@observer</code> as decorator is optional, <code>observer(class Timer ... { })</code> achieves exactly the same.</p>
-<h2 id="gotcha-dereference-values-inside-your-components"><a name="gotcha-dereference-values-inside-your-components" class="plugin-anchor" href="#gotcha-dereference-values-inside-your-components"><span class="fa fa-link"></span></a>Gotcha: dereference values <em>inside</em> your components</h2>
+<h2 id="gotcha-dereference-values-inside-your-components">Gotcha: dereference values <em>inside</em> your components</h2>
 <p>MobX can do a lot, but it cannot make primitive values observable (although it can wrap them in an object see <a href="boxed.html">boxed observables</a>).
 So not the <em>values</em> that are observable, but the <em>properties</em> of an object. This means that <code>@observer</code> actually reacts to the fact that you dereference a value.
 So in our above example, the <code>Timer</code> component would <strong>not</strong> react if it was initialized as follows:</p>
@@ -844,9 +844,9 @@ So in our above example, the <code>Timer</code> component would <strong>not</str
 <p>In this snippet just the current value of <code>secondsPassed</code> is passed to the <code>Timer</code>, which is the immutable value <code>0</code> (all primitives are immutable in JS).
 That number won&apos;t change anymore in the future, so <code>Timer</code> will never update. It is the property <code>secondsPassed</code> that will change in the future,
 so we need to access it <em>in</em> the component. Or in other words: values need to be passed <em>by reference</em> and not by value.</p>
-<h2 id="es5-support"><a name="es5-support" class="plugin-anchor" href="#es5-support"><span class="fa fa-link"></span></a>ES5 support</h2>
+<h2 id="es5-support">ES5 support</h2>
 <p>In ES5 environments, observer components can be simple declared using <code>observer(React.createClass({ ...</code>. See also the <a href="../best/syntax.md">syntax guide</a></p>
-<h2 id="stateless-function-components"><a name="stateless-function-components" class="plugin-anchor" href="#stateless-function-components"><span class="fa fa-link"></span></a>Stateless function components</h2>
+<h2 id="stateless-function-components">Stateless function components</h2>
 <p>The above timer widget could also be written using stateless function components that are passed through <code>observer</code>:</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observer} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx-react&quot;</span>;
 
@@ -854,7 +854,7 @@ so we need to access it <em>in</em> the component. Or in other words: values nee
     <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">span</span>&gt;</span>Seconds passed: { timerData.secondsPassed } <span class="hljs-tag">&lt;/<span class="hljs-title">span</span>&gt;</span>
 )</span>;
 </code></pre>
-<h2 id="observable-local-component-state"><a name="observable-local-component-state" class="plugin-anchor" href="#observable-local-component-state"><span class="fa fa-link"></span></a>Observable local component state</h2>
+<h2 id="observable-local-component-state">Observable local component state</h2>
 <p>Just like normal classes, you can introduce observable properties on a component by using the <code>@observable</code> decorator.
 This means that you can have local state in components that doesn&apos;t need to be managed by React&apos;s verbose and imperative <code>setState</code> mechanism, but is as powerful.
 The reactive state will be picked up by <code>render</code> but will not explicitly invoke other React lifecycle methods except <code>componentWillUpdate</code> and <code>componentDidUpdate</code>.
@@ -880,7 +880,7 @@ If you need other React lifecycle methods, just use the normal React <code>state
 ReactDOM.render(&lt;Timer /&gt;, document.body)
 </code></pre>
 <p>For more advantages of using observable local component state, see <a href="https://medium.com/@mweststrate/3-reasons-why-i-stopped-using-react-setstate-ab73fc67a42e" target="_blank">3 reasons why I stopped using <code>setState</code></a>.</p>
-<h2 id="connect-components-to-provided-stores-using-inject"><a name="connect-components-to-provided-stores-using-inject" class="plugin-anchor" href="#connect-components-to-provided-stores-using-inject"><span class="fa fa-link"></span></a>Connect components to provided stores using <code>inject</code></h2>
+<h2 id="connect-components-to-provided-stores-using-inject">Connect components to provided stores using <code>inject</code></h2>
 <p><a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-connect-mobx-observer-components-to-the-store-with-the-react-provider" target="_blank">egghead.io lesson 8: inject stores with Provider</a></p>
 <p>The <code>mobx-react</code> package also provides the <code>Provider</code> component that can be used to pass down stores using React&apos;s context mechanism.
 To connect to those stores, pass a list of store names to <code>inject</code>, which will make the stores available as props.</p>
@@ -911,7 +911,7 @@ colors.foreground = <span class="hljs-string">&apos;blue&apos;</span>;
 <span class="hljs-comment">// all buttons updated</span>
 </code></pre>
 <p>See for more information the <a href="https://github.com/mobxjs/mobx-react#provider-and-inject" target="_blank"><code>mobx-react</code> docs</a>.</p>
-<h2 id="when-to-apply-observer"><a name="when-to-apply-observer" class="plugin-anchor" href="#when-to-apply-observer"><span class="fa fa-link"></span></a>When to apply <code>observer</code>?</h2>
+<h2 id="when-to-apply-observer">When to apply <code>observer</code>?</h2>
 <p>The simple rule of thumb is: <em>all components that render observable data</em>.
 If you don&apos;t want to mark a component as observer, for example to reduce the dependencies of a generic component package, make sure you only pass it plain data.</p>
 <p>With <code>@observer</code> there is no need to distinguish &apos;smart&apos; components from &apos;dumb&apos; components for the purpose of rendering.
@@ -919,12 +919,12 @@ It is still a good separation of concerns for where to handle events, make reque
 All components become responsible for updating when their <em>own</em> dependencies change.
 Its overhead is neglectable and it makes sure that whenever you start using observable data the component will respond to it.
 See this <a href="https://www.reddit.com/r/reactjs/comments/4vnxg5/free_eggheadio_course_learn_mobx_react_in_30/d61oh0l" target="_blank">thread</a> for more details.</p>
-<h2 id="observer-and-purecomponent"><a name="observer-and-purecomponent" class="plugin-anchor" href="#observer-and-purecomponent"><span class="fa fa-link"></span></a><code>observer</code> and <code>PureComponent</code></h2>
+<h2 id="observer-and-purecomponent"><code>observer</code> and <code>PureComponent</code></h2>
 <p><code>observer</code> also prevents re-renderings when the <em>props</em> of the component have only shallowly changed, which makes a lot of sense if the data passed into the component is reactive.
 This behavior is similar to <a href="https://reactjs.org/docs/react-api.html#reactpurecomponent" target="_blank">React PureComponent</a>, except that <em>state</em> changes are still always processed.
 If a component provides its own <code>shouldComponentUpdate</code>, that one takes precedence.</p>
 <p>See for an explanation this <a href="https://github.com/mobxjs/mobx/issues/101" target="_blank">github issue</a></p>
-<h2 id="componentwillreact-lifecycle-hook"><a name="componentwillreact-lifecycle-hook" class="plugin-anchor" href="#componentwillreact-lifecycle-hook"><span class="fa fa-link"></span></a><code>componentWillReact</code> (lifecycle hook)</h2>
+<h2 id="componentwillreact-lifecycle-hook"><code>componentWillReact</code> (lifecycle hook)</h2>
 <p>React components usually render on a fresh stack, so that makes it often hard to figure out what <em>caused</em> a component to re-render.
 When using <code>mobx-react</code> you can define a new life cycle hook, <code>componentWillReact</code> (pun intended) that will be triggered when a component will be scheduled to re-render because
 data it observes has changed. This makes it easy to trace renders back to the action that caused the rendering.</p>
@@ -945,12 +945,12 @@ data it observes has changed. This makes it easy to trace renders back to the ac
 <li><code>componentWillReact</code> won&apos;t fire before the initial render (use <code>componentWillMount</code> instead)</li>
 <li><code>componentWillReact</code> for mobx-react@4+, the hook will fire when receiving new props and after <code>setState</code> calls</li>
 </ul>
-<h2 id="optimizing-components"><a name="optimizing-components" class="plugin-anchor" href="#optimizing-components"><span class="fa fa-link"></span></a>Optimizing components</h2>
+<h2 id="optimizing-components">Optimizing components</h2>
 <p>See the relevant <a href="../best/react-performance.html">section</a>.</p>
-<h2 id="mobxreactdevtools"><a name="mobxreactdevtools" class="plugin-anchor" href="#mobxreactdevtools"><span class="fa fa-link"></span></a>MobX-React-DevTools</h2>
+<h2 id="mobxreactdevtools">MobX-React-DevTools</h2>
 <p>In combination with <code>@observer</code> you can use the MobX-React-DevTools, it shows exactly when your components are re-rendered and you can inspect the data dependencies of your components.
 See the <a href="../best/devtools.html">DevTools</a> section.</p>
-<h2 id="characteristics-of-observer-components"><a name="characteristics-of-observer-components" class="plugin-anchor" href="#characteristics-of-observer-components"><span class="fa fa-link"></span></a>Characteristics of observer components</h2>
+<h2 id="characteristics-of-observer-components">Characteristics of observer components</h2>
 <ul>
 <li>Observer only subscribe to the data structures that were actively used during the last render. This means that you cannot under-subscribe or over-subscribe. You can even use data in your rendering that will only be available at later moment in time. This is ideal for asynchronously loading data.</li>
 <li>You are not required to declare what data a component will use. Instead, dependencies are determined at runtime and tracked in a very fine-grained manner.</li>
@@ -960,14 +960,14 @@ See the <a href="../best/devtools.html">DevTools</a> section.</p>
 <li><code>@observer</code> does not depend on React&apos;s context system.</li>
 <li>In mobx-react@4+, the props object and the state object of an observer component are automatically made observable to make it easier to create @computed properties that derive from props inside such a component. If you have a reaction (i.e. <code>autorun</code>) inside your <code>@observer</code> component that must <em>not</em> be re-evaluated when the specific props it uses don&apos;t change, be sure to derefence those specific props for use inside your reaction (i.e. <code>const myProp = props.myProp</code>). Otherwise, if you reference <code>props.myProp</code> inside the reaction, then a change in <em>any</em> of the props will cause the reaction to be re-evaluated. For a typical use case with React-Router, see <a href="https://alexhisen.gitbooks.io/mobx-recipes/content/observable-based-routing.html" target="_blank">this article</a>.</li>
 </ul>
-<h2 id="enabling-es6-decorators-in-your-transpiler"><a name="enabling-es6-decorators-in-your-transpiler" class="plugin-anchor" href="#enabling-es6-decorators-in-your-transpiler"><span class="fa fa-link"></span></a>Enabling ES6 decorators in your transpiler</h2>
+<h2 id="enabling-es6-decorators-in-your-transpiler">Enabling ES6 decorators in your transpiler</h2>
 <p>Decorators are not supported by default when using TypeScript or Babel pending a definitive definition in the ES standard.</p>
 <ul>
 <li>For <em>typescript</em>, enable the <code>--experimentalDecorators</code> compiler flag or set the compiler option <code>experimentalDecorators</code> to <code>true</code> in <code>tsconfig.json</code> (Recommended)</li>
 <li>For <em>babel5</em>, make sure <code>--stage 0</code> is passed to the Babel CLI</li>
 <li>For <em>babel6</em>, see the example configuration as suggested in this <a href="https://github.com/mobxjs/mobx/issues/105" target="_blank">issue</a></li>
 </ul>
-</body></html>
+
                     
                     </section>
                 
@@ -997,6 +997,10 @@ See the <a href="../best/devtools.html">DevTools</a> section.</p>
     
 
     
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/URI.js/1.16.1/URI.min.js"></script>
+    
+
+    
     <script src="../gitbook/plugins/gitbook-plugin-disqus/plugin.js"></script>
     
 
@@ -1022,12 +1026,12 @@ See the <a href="../best/devtools.html">DevTools</a> section.</p>
 
 <script>
 require(["gitbook"], function(gitbook) {
-    var config = {"github":{"url":"https://github.com/mobxjs/mobx"},"edit-link":{"base":"https://github.com/mobxjs/mobx/tree/gh-pages/docs","label":"Edit This Page"},"ga":{"token":"UA-65632006-1","configuration":"auto"},"disqus":{"shortName":"mobservable"},"anchors":{},"highlight":{},"search":{"maxIndexSize":1000000},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2}};
+    var config = {"github":{"url":"https://github.com/mobxjs/mobx"},"edit-link":{"base":"https://github.com/mobxjs/mobx/tree/gh-pages/docs","label":"Edit This Page"},"ga":{"token":"UA-65632006-1","configuration":"auto"},"disqus":{"shortName":"mobservable","useIdentifier":false},"anchors":{},"codefund":{},"highlight":{},"search":{"maxIndexSize":1000000},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2}};
     gitbook.start(config);
 });
 </script>
 
-        <script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create', 'UA-65632006-1', 'auto');ga('send', 'pageview');</script>
+        <script>$("<div id='codefund' style='float:right'></div>").prependTo(".page-inner section")</script><script src="https://codefund.app/properties/259/funder.js"></script>
     </body>
     
 </html>

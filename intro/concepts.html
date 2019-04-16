@@ -21,7 +21,7 @@
     <link rel="stylesheet" href="../gitbook/style.css">
     
         
-        <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-edit-link/plugin.css">
+        <link rel="stylesheet" href="../gitbook/plugins/gitbook-plugin-disqus/plugin.css">
         
     
         
@@ -61,7 +61,7 @@
         data-chapter-title="Concepts &amp; Principles"
         data-filepath="intro/concepts.md"
         data-basepath=".."
-        data-revision="Thu Mar 14 2019 11:27:23 GMT+0100 (CET)"
+        data-revision="Tue Apr 16 2019 14:43:31 GMT+0200 (CEST)"
         data-innerlanguage="">
     
 
@@ -801,14 +801,14 @@
                 
                     <section class="normal" id="section-">
                     
-                        <html><head></head><body><a id="edit-link" href="https://github.com/mobxjs/mobx/tree/gh-pages/docs/intro/concepts.md" class="btn fa fa-edit pull-left">&#xA0;&#xA0;Edit This Page</a><h1 id="concepts--principles"><a name="concepts--principles" class="plugin-anchor" href="#concepts--principles"><span class="fa fa-link"></span></a>Concepts &amp; Principles</h1>
-<h2 id="concepts"><a name="concepts" class="plugin-anchor" href="#concepts"><span class="fa fa-link"></span></a>Concepts</h2>
+                        <h1 id="concepts--principles">Concepts &amp; Principles</h1>
+<h2 id="concepts">Concepts</h2>
 <p>MobX distinguishes the following concepts in your application. You saw them in the previous gist, but let&apos;s dive into them in a bit more detail.</p>
-<h3 id="1-state"><a name="1-state" class="plugin-anchor" href="#1-state"><span class="fa fa-link"></span></a>1. State</h3>
+<h3 id="1-state">1. State</h3>
 <p><em>State</em> is the data that drives your application.
 Usually there is <em>domain specific state</em> like a list of todo items and there is <em>view state</em> such as the currently selected element.
 Remember, state is like spreadsheets cells that hold a value.</p>
-<h3 id="2-derivations"><a name="2-derivations" class="plugin-anchor" href="#2-derivations"><span class="fa fa-link"></span></a>2. Derivations</h3>
+<h3 id="2-derivations">2. Derivations</h3>
 <p><em>Anything</em> that can be derived from the <em>state</em> without any further interaction is a derivation.
 Derivations exist in many forms:</p>
 <ul>
@@ -824,12 +824,12 @@ Derivations exist in many forms:</p>
 <p>People starting with MobX tend to use reactions too often.
 The golden rule is: if you want to create a value based on the current state, use <code>computed</code>.</p>
 <p>Back to the spreadsheet analogy, formulas are derivations that <em>compute</em> a value. But for you as a user to be able to see it on the screen a <em>reaction</em> is needed that repaints part of the GUI.</p>
-<h3 id="3-actions"><a name="3-actions" class="plugin-anchor" href="#3-actions"><span class="fa fa-link"></span></a>3. Actions</h3>
+<h3 id="3-actions">3. Actions</h3>
 <p>An <em>action</em> is any piece of code that changes the <em>state</em>. User events, backend data pushes, scheduled events, etc.
 An action is like a user that enters a new value in a spreadsheet cell.</p>
 <p>Actions can be defined explicitly in MobX to help you to structure code more clearly.
 If MobX is used in <a href="../refguide/api##-enforceactions-"><em>strict mode</em></a>, MobX will enforce that no state can be modified outside actions.</p>
-<h2 id="principles"><a name="principles" class="plugin-anchor" href="#principles"><span class="fa fa-link"></span></a>Principles</h2>
+<h2 id="principles">Principles</h2>
 <p>MobX supports a uni-directional data flow where <em>actions</em> change the <em>state</em>, which in turn updates all affected <em>views</em>.</p>
 <p><img src="../images/action-state-view.png" alt="Action, State, View"></p>
 <p>All <em>Derivations</em> are updated <strong>automatically</strong> and <strong>atomically</strong> when the <em>state</em> changes. As a result it is never possible to observe intermediate values.</p>
@@ -837,7 +837,7 @@ If MobX is used in <a href="../refguide/api##-enforceactions-"><em>strict mode</
 <p><em>Computed values</em> are updated <strong>lazily</strong>. Any computed value that is not actively in use will not be updated until it is needed for a side effect (I/O).
 If a view is no longer in use it will be garbage collected automatically.</p>
 <p>All <em>Computed values</em> should be <strong>pure</strong>. They are not supposed to change <em>state</em>.</p>
-<h2 id="illustration"><a name="illustration" class="plugin-anchor" href="#illustration"><span class="fa fa-link"></span></a>Illustration</h2>
+<h2 id="illustration">Illustration</h2>
 <p>The following listing illustrates the above concepts and principles:</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observable, autorun} <span class="hljs-keyword">from</span> <span class="hljs-string">&apos;mobx&apos;</span>;
 
@@ -870,7 +870,7 @@ todoStore.todos[<span class="hljs-number">0</span>].completed = <span class="hlj
 <span class="hljs-comment">// -&gt; synchronously prints &apos;Completed 1 of 1 items&apos;</span>
 </code></pre>
 <p>In the <a href="https://mobxjs.github.io/mobx/getting-started.html" target="_blank">10 minute introduction to MobX and React</a> you can dive deeper into this example and build a user interface using <a href="https://facebook.github.io/react/" target="_blank">React</a> around it.</p>
-</body></html>
+
                     
                     </section>
                 
@@ -900,6 +900,10 @@ todoStore.todos[<span class="hljs-number">0</span>].completed = <span class="hlj
     
 
     
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/URI.js/1.16.1/URI.min.js"></script>
+    
+
+    
     <script src="../gitbook/plugins/gitbook-plugin-disqus/plugin.js"></script>
     
 
@@ -925,12 +929,12 @@ todoStore.todos[<span class="hljs-number">0</span>].completed = <span class="hlj
 
 <script>
 require(["gitbook"], function(gitbook) {
-    var config = {"github":{"url":"https://github.com/mobxjs/mobx"},"edit-link":{"base":"https://github.com/mobxjs/mobx/tree/gh-pages/docs","label":"Edit This Page"},"ga":{"token":"UA-65632006-1","configuration":"auto"},"disqus":{"shortName":"mobservable"},"anchors":{},"highlight":{},"search":{"maxIndexSize":1000000},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2}};
+    var config = {"github":{"url":"https://github.com/mobxjs/mobx"},"edit-link":{"base":"https://github.com/mobxjs/mobx/tree/gh-pages/docs","label":"Edit This Page"},"ga":{"token":"UA-65632006-1","configuration":"auto"},"disqus":{"shortName":"mobservable","useIdentifier":false},"anchors":{},"codefund":{},"highlight":{},"search":{"maxIndexSize":1000000},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2}};
     gitbook.start(config);
 });
 </script>
 
-        <script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create', 'UA-65632006-1', 'auto');ga('send', 'pageview');</script>
+        <script>$("<div id='codefund' style='float:right'></div>").prependTo(".page-inner section")</script><script src="https://codefund.app/properties/259/funder.js"></script>
     </body>
     
 </html>

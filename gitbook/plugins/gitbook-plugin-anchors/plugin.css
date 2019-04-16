@@ -11,12 +11,20 @@ a.plugin-anchor {
     bottom: 0;
 }
 
-a.plugin-anchor span {
-    margin-left: -25px;
-    font-size: 15px;
+a.plugin-anchor i {
+    margin-left: -30px;
+    font-size: 15px !important;
 }
 
-h1:hover a.plugin-anchor, h2:hover a.plugin-anchor, h3:hover a.plugin-anchor, 
+h1, h2, h3, h4, h5, h6 {
+    position: relative;
+}
+
+h1:hover a.plugin-anchor, h2:hover a.plugin-anchor, h3:hover a.plugin-anchor,
 h4:hover a.plugin-anchor, h5:hover a.plugin-anchor, h6:hover a.plugin-anchor {
     display: inline-block;
+}
+
+.book .book-body .page-wrapper .page-inner section.normal {
+    overflow: visible;
 }
