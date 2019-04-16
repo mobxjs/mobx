@@ -1,5 +1,5 @@
 {
-    "plugins":["github", "ga", "disqus", "edit-link", "anchors"],
+    "plugins":["github", "ga", "disqus", "edit-link", "anchors", "codefund"],
     "pluginsConfig": {
         "github": {
             "url": "https://github.com/mobxjs/mobx"
