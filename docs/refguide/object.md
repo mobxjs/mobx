@@ -1,3 +1,5 @@
+<div id='codefund' style='float:right'></div>
+
 ## Observable Objects
 
 Usage `observable.object(props, decorators?, options?)`

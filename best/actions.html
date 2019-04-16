@@ -61,7 +61,7 @@
         data-chapter-title="async actions &amp; flows"
         data-filepath="best/actions.md"
         data-basepath=".."
-        data-revision="Tue Apr 16 2019 14:43:31 GMT+0200 (CEST)"
+        data-revision="Tue Apr 16 2019 14:56:54 GMT+0200 (CEST)"
         data-innerlanguage="">
     
 
@@ -801,7 +801,9 @@
                 
                     <section class="normal" id="section-">
                     
-                        <h1 id="writing-asynchronous-actions">Writing asynchronous actions</h1>
+                        <div id="codefund" style="float:right"></div>
+
+<h1 id="writing-asynchronous-actions">Writing asynchronous actions</h1>
 <p>The <code>action</code> wrapper / decorator only affects the currently running function, not functions that are scheduled (but not invoked) by the current function!
 This means that if you have a <code>setTimeout</code>, promise<code>.then</code> or <code>async</code> construction, and in that callback some more state is changed, those callbacks should be wrapped in <code>action</code> as well! There are several ways to create asynchronous actions. No approach is strictly better than the other, but this section just list different approaches you can take to writing asynchronous code.
 Let&apos;s start with a basic example:</p>
@@ -1042,7 +1044,7 @@ require(["gitbook"], function(gitbook) {
 });
 </script>
 
-        <script>$("<div id='codefund' style='float:right'></div>").prependTo(".page-inner section")</script><script src="https://codefund.app/properties/259/funder.js"></script>
+        <script src="https://codefund.app/properties/259/funder.js"></script>
     </body>
     
 </html>

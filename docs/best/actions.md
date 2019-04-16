@@ -1,3 +1,5 @@
+<div id='codefund' style='float:right'></div>
+
 # Writing asynchronous actions
 
 The `action` wrapper / decorator only affects the currently running function, not functions that are scheduled (but not invoked) by the current function!

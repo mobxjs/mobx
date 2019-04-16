@@ -1,3 +1,5 @@
+<div id='codefund' style='float:right'></div>
+
 # Decorators
 
 In MobX there is a set of decorators that defines how observable properties will behave.

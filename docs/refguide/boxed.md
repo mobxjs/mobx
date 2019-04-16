@@ -1,3 +1,5 @@
+<div id='codefund' style='float:right'></div>
+
 ## Primitive values and references
 
 All primitive values in JavaScript are immutable and hence per definition not observable.

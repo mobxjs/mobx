@@ -1,3 +1,5 @@
+<div id='codefund' style='float:right'></div>
+
 ## FAQ
 
 ##### Which browsers are supported?

@@ -1,3 +1,5 @@
+<div id='codefund' style='float:right'></div>
+
 # Common pitfalls & best practices
 
 Stuck with MobX? This section contains a list of common issues people new to MobX might run into.

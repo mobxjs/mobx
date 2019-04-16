@@ -1,3 +1,5 @@
+<div id='codefund' style='float:right'></div>
+
 # Using `trace` for debugging
 
 Trace is a small utility that helps to find out why your computed values, reactions or components are re-evaluating.

@@ -1,3 +1,5 @@
+<div id='codefund' style='float:right'></div>
+
 # How to (not) use decorators
 
 Using ES.next decorators in MobX is optional. This section explains how to use them, or how to avoid them.

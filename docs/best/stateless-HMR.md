@@ -1,3 +1,5 @@
+<div id='codefund' style='float:right'></div>
+
 # Hot Module Reloading with Stateless Components
 
 One thing that can be a challenge when getting started with MobX (and React in general) is understanding why Hot Module Reloading (HMR) sometimes breaks. When you initially get it working, it seems like magic (and it kind of is), however there's at least one rough edge with regard to HMR and React: stateless components. Since stateless components don't explicitly identify themselves as React components, HMR doesn't quite know what to do with them, and so you'll often see warnings in your console like this:

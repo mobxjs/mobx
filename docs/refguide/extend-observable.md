@@ -1,3 +1,5 @@
+<div id='codefund' style='float:right'></div>
+
 # extendObservable
 
 `extendObservable(target, properties, decorators?, options?)`

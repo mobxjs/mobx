@@ -1,3 +1,5 @@
+<div id='codefund' style='float:right'></div>
+
 # Best Practices for building large scale maintainable projects
 
 This section contains some best practices we discovered at Mendix while working with MobX.

@@ -1,3 +1,5 @@
+<div id='codefund' style='float:right'></div>
+
 ## Observable Arrays
 
 Similar to objects, arrays can be made observable using `observable.array(values?)` or by passing an array to `observable`.
