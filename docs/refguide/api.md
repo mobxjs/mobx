@@ -485,9 +485,9 @@ export class City {
         clearInterval(this.interval)
     }
 
-    @flow fetchTemperature = function*() {
+    fetchTemperature = flow(function*() {
         // data fetching logic
-    }
+    })
 }
 ```
 
