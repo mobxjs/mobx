@@ -197,9 +197,10 @@ y.set(2)
 divided.get() // Recovered; Returns 1.5
 ```
 
-## Computeds with arguments?
+## Computeds with arguments
 
-Sometimes you might want to have a computed value that takes an argument, like:
+Sometimes you might want to have a computed value that takes one or more arguments. 
+In such cases mobx-util's [`computedFn`](Mobx-util's `computedFn` now supports creating computeds for functions with arguments: https://github.com/mobxjs/mobx-utils#computedfn) can be used:
 
 ```typescript
 // Parameterized computed views:
@@ -209,38 +210,12 @@ import { observable, computed } from "mobx"
 class Todos {
   @observable todos = []
   
-  @computed // Not possible, computed cannot be applied to functions!
-  getAllTodosByUser(userId) {
+  getAllTodosByUser = computedFn(function getAllTodosByUser(userId) {
     return this.todos.filter(todo => todo.user === userId))
-  }
+  })
 }
 ```
 
-The above pattern is not supported out of the box by MobX, the reason is that it would require a memoization 
-cache based on all possible values of `userId`.
-However, this would potentially leak to 
-it would require a memoization table based on the arguments, for which it is unclear when we can remove entries.
+Note: don't use arrow functions as the `this` would be incorrect. 
 
-That being said, it is not hard to implement such a memoization table by hand!
-
-```typescript
-// Create computed's and store them in a cache
-import { observable, computed } from "mobx"
-
-class Todos {
-  @observable todos = []
-  
-  private todosByUserCache = new Map()
-
-  getAllTodosByUser(userId) {
-    if (this.todosByUserCache.has(userId))
-      return this.todosByUserCache.get(userId).get()
-      
-    const computedFilter = computed(() => this.todos.filter(todo => todo.user === userId))
-    this.todosByUserCache.set(userId, computedFilter) // Q: when do we remove items from the cache? Never? When user is unloaded?
-    return todosByUserCache.get()
-  }
-}
-```
-
-See also [#1388](https://github.com/mobxjs/mobx/issues/1388) and [#184](https://github.com/mobxjs/mobx-utils/issues/184)
+Fur further details, check the mobx-utils [docs](https://github.com/mobxjs/mobx-utils#computedfn)

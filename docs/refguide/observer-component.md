@@ -52,6 +52,14 @@ In this snippet just the current value of `secondsPassed` is passed to the `Time
 That number won't change anymore in the future, so `Timer` will never update. It is the property `secondsPassed` that will change in the future,
 so we need to access it *in* the component. Or in other words: values need to be passed _by reference_ and not by value.
 
+## Hooks support (React 16.8+)
+
+Hooks support in `observer` components is currently work-in-progress, and it is not possible yet to use hooks inside `observer` based function components.
+
+However, `<Observer>{() => rendering}</Observer>` can be used without problem in normal hook based function components.
+
+Alternatively, check out [`mobx-react-lite`](https://github.com/mobxjs/mobx-react-lite) which does support `observer` for hook based components, but doesn't offer class support. Or use our current beta of `mobx-react` 6 if you feel lucky :). `yarn install mobx-react@beta`
+
 ## ES5 support
 
 In ES5 environments, observer components can be simple declared using `observer(React.createClass({ ...`. See also the [syntax guide](../best/syntax.md)
