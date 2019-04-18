@@ -61,7 +61,7 @@
         data-chapter-title="(@)observer"
         data-filepath="refguide/observer-component.md"
         data-basepath=".."
-        data-revision="Tue Apr 16 2019 15:11:23 GMT+0200 (CEST)"
+        data-revision="Thu Apr 18 2019 16:49:03 GMT+0200 (CEST)"
         data-innerlanguage="">
     
 
@@ -846,6 +846,10 @@ So in our above example, the <code>Timer</code> component would <strong>not</str
 <p>In this snippet just the current value of <code>secondsPassed</code> is passed to the <code>Timer</code>, which is the immutable value <code>0</code> (all primitives are immutable in JS).
 That number won&apos;t change anymore in the future, so <code>Timer</code> will never update. It is the property <code>secondsPassed</code> that will change in the future,
 so we need to access it <em>in</em> the component. Or in other words: values need to be passed <em>by reference</em> and not by value.</p>
+<h2 id="hooks-support-react-168">Hooks support (React 16.8+)</h2>
+<p>Hooks support in <code>observer</code> components is currently work-in-progress, and it is not possible yet to use hooks inside <code>observer</code> based function components.</p>
+<p>However, <code>&lt;Observer&gt;{() =&gt; rendering}&lt;/Observer&gt;</code> can be used without problem in normal hook based function components.</p>
+<p>Alternatively, check out <a href="https://github.com/mobxjs/mobx-react-lite" target="_blank"><code>mobx-react-lite</code></a> which does support <code>observer</code> for hook based components, but doesn&apos;t offer class support. Or use our current beta of <code>mobx-react</code> 6 if you feel lucky :). <code>yarn install mobx-react@beta</code></p>
 <h2 id="es5-support">ES5 support</h2>
 <p>In ES5 environments, observer components can be simple declared using <code>observer(React.createClass({ ...</code>. See also the <a href="../best/syntax.md">syntax guide</a></p>
 <h2 id="stateless-function-components">Stateless function components</h2>
