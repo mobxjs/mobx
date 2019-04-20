@@ -15,9 +15,8 @@ module.exports = {
         "getter-return": "off",
         "no-console": "off",
         "no-var": "error",
-        // Things that don't play nicely with TS:
-        "no-unused-vars": "off",
-        "no-extra-semi": "off"
+        "no-undef": "off",
+        "no-extra-semi": "off" // doesn't get along well with prettier
     },
     globals: {
         process: "readable",
@@ -25,9 +24,15 @@ module.exports = {
         console: "readable",
         setTimeout: "readable",
         clearTimeout: "readable",
-        module: "writable",
-        Promise: "readable",
-        Map: "readable",
-        Set: "readable"
+        module: "writable"
+    },
+    overrides: {
+        files: ["**/*.ts"],
+        rules: {
+            // Things that don't play nicely with TS:
+            "require-yield": "off",
+            "no-unused-vars": "off",
+            "no-extra-semi": "off"
+        }
     }
 }

@@ -1,5 +1,4 @@
 {
-    "version": "2.0.10",
     "compilerOptions": {
         "target": "es5",
         "rootDir": "src",
@@ -13,13 +12,10 @@
         "noImplicitUseStrict": true,
         "noUnusedLocals": true,
         "noImplicitAny": false,
-        "moduleResolution": "node",
         "downlevelIteration": true,
-        "lib": [
-            "es6"
-        ]
+        "noImplicitThis": false,
+        "experimentalDecorators": true,
+        "lib": ["es6"]
     },
-    "include": [
-        "src/**/*.ts"
-    ]
+    "include": ["src/**/*.ts"]
 }

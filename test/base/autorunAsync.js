@@ -1,10 +1,10 @@
-var m = require("../../src/mobx.ts")
+const m = require("../../src/mobx.ts")
 
 test("autorun 1", function(done) {
-    var _fired = 0
-    var _result = null
-    var _cCalcs = 0
-    var to = setTimeout
+    let _fired = 0
+    let _result = null
+    let _cCalcs = 0
+    const to = setTimeout
 
     function check(fired, cCalcs, result) {
         expect(_fired).toBe(fired)
@@ -14,18 +14,18 @@ test("autorun 1", function(done) {
         _cCalcs = 0
     }
 
-    var a = m.observable.box(2)
-    var b = m.observable.box(3)
-    var c = m.computed(function() {
+    const a = m.observable.box(2)
+    const b = m.observable.box(3)
+    const c = m.computed(function() {
         _cCalcs++
         return a.get() * b.get()
     })
-    var d = m.observable.box(1)
-    var autorun = function() {
+    const d = m.observable.box(1)
+    const autorun = function() {
         _fired++
         _result = d.get() > 0 ? a.get() * c.get() : d.get()
     }
-    var disp = m.autorun(autorun, { delay: 20 })
+    let disp = m.autorun(autorun, { delay: 20 })
 
     check(0, 0, null)
     disp()
@@ -79,13 +79,13 @@ test("autorun 1", function(done) {
 })
 
 test("autorun should not result in loop", function(done) {
-    var i = 0
-    var a = m.observable({
+    let i = 0
+    const a = m.observable({
         x: i
     })
 
-    var autoRunsCalled = 0
-    var d = m.autorun(
+    let autoRunsCalled = 0
+    const d = m.autorun(
         function() {
             autoRunsCalled++
             a.x = ++i
@@ -106,9 +106,9 @@ test("autorun should not result in loop", function(done) {
 })
 
 test("autorunAsync passes Reaction as an argument to view function", function(done) {
-    var a = m.observable.box(1)
+    const a = m.observable.box(1)
 
-    var autoRunsCalled = 0
+    let autoRunsCalled = 0
 
     m.autorun(
         r => {
@@ -131,16 +131,16 @@ test("autorunAsync passes Reaction as an argument to view function", function(do
 })
 
 test("autorunAsync accepts a scheduling function", function(done) {
-    var a = m.observable({
+    const a = m.observable({
         x: 0,
         y: 1
     })
 
-    var autoRunsCalled = 0
-    var schedulingsCalled = 0
+    let autoRunsCalled = 0
+    let schedulingsCalled = 0
 
     m.autorun(
-        function(r) {
+        function() {
             autoRunsCalled++
             expect(a.y).toBe(a.x + 1)
 
@@ -170,16 +170,16 @@ test("autorunAsync accepts a scheduling function", function(done) {
 })
 
 test("reaction accepts a scheduling function", function(done) {
-    var a = m.observable({
+    const a = m.observable({
         x: 0,
         y: 1
     })
 
-    var autoRunsCalled = 0
-    var schedulingsCalled = 0
-    var exprCalled = 0
+    let autoRunsCalled = 0
+    let schedulingsCalled = 0
+    let exprCalled = 0
 
-    var values = []
+    const values = []
 
     m.reaction(
         () => {
@@ -218,13 +218,13 @@ test("reaction accepts a scheduling function", function(done) {
 })
 
 test("autorunAsync warns when passed an action", function() {
-    var action = m.action(() => {})
+    const action = m.action(() => {})
     expect.assertions(1)
     expect(() => m.autorun(action)).toThrowError(/Autorun does not accept actions/)
 })
 
 test("whenWithTimeout should operate normally", done => {
-    var a = m.observable.box(1)
+    const a = m.observable.box(1)
 
     m.when(() => a.get() === 2, () => done(), {
         timeout: 500,

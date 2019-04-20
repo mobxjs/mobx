@@ -1,14 +1,13 @@
 "use strict"
 
-var mobx = require("../../src/mobx.ts")
-var m = mobx
-var observable = mobx.observable
-var transaction = mobx.transaction
+const mobx = require("../../src/mobx.ts")
+const m = mobx
+const observable = mobx.observable
 
 test("json1", function() {
     mobx._resetGlobalState()
 
-    var todos = observable([
+    const todos = observable([
         {
             title: "write blog"
         },
@@ -17,7 +16,7 @@ test("json1", function() {
         }
     ])
 
-    var output
+    let output
     mobx.autorun(function() {
         output = todos
             .map(function(todo) {
@@ -33,7 +32,7 @@ test("json1", function() {
 })
 
 test("json2", function() {
-    var source = {
+    const source = {
         todos: [
             {
                 title: "write blog",
@@ -52,15 +51,15 @@ test("json2", function() {
         ]
     }
 
-    var o = mobx.observable(JSON.parse(JSON.stringify(source)))
+    const o = mobx.observable(JSON.parse(JSON.stringify(source)))
 
     expect(mobx.toJS(o)).toEqual(source)
 
-    var analyze = mobx.computed(function() {
+    const analyze = mobx.computed(function() {
         return [o.todos.length, o.todos[1].details.url]
     })
 
-    var alltags = mobx.computed(function() {
+    const alltags = mobx.computed(function() {
         return o.todos
             .map(function(todo) {
                 return todo.tags.join(",")
@@ -68,8 +67,8 @@ test("json2", function() {
             .join(",")
     })
 
-    var ab = []
-    var tb = []
+    let ab = []
+    let tb = []
 
     m.observe(
         analyze,
@@ -212,17 +211,17 @@ test("json2", function() {
 })
 
 test("toJS handles dates", () => {
-    var a = observable({
+    const a = observable({
         d: new Date()
     })
 
-    var b = mobx.toJS(a)
+    const b = mobx.toJS(a)
     expect(b.d instanceof Date).toBe(true)
     expect(a.d === b.d).toBe(true)
 })
 
 test("json cycles", function() {
-    var a = observable({
+    const a = observable({
         b: 1,
         c: [2],
         d: mobx.observable.map(),
@@ -235,9 +234,9 @@ test("json cycles", function() {
     a.d.set("d", a.d)
     a.d.set("c", a.c)
 
-    var cloneA = mobx.toJS(a, true)
-    var cloneC = cloneA.c
-    var cloneD = cloneA.d
+    const cloneA = mobx.toJS(a, true)
+    const cloneC = cloneA.c
+    const cloneD = cloneA.d
 
     expect(cloneA.b).toBe(1)
     expect(cloneA.c[0]).toBe(2)
@@ -314,7 +313,7 @@ test("verify already seen", () => {
 })
 
 test("json cycles when exporting maps as maps", function() {
-    var a = observable({
+    const a = observable({
         b: 1,
         c: [2],
         d: mobx.observable.map(),
@@ -327,9 +326,9 @@ test("json cycles when exporting maps as maps", function() {
     a.d.set("d", a.d)
     a.d.set("c", a.c)
 
-    var cloneA = mobx.toJS(a, { exportMapsAsObjects: false, detectCycles: true })
-    var cloneC = cloneA.c
-    var cloneD = cloneA.d
+    const cloneA = mobx.toJS(a, { exportMapsAsObjects: false, detectCycles: true })
+    const cloneC = cloneA.c
+    const cloneD = cloneA.d
 
     expect(cloneA.b).toBe(1)
     expect(cloneA.c[0]).toBe(2)

@@ -1,15 +1,15 @@
 "use strict"
 
-var mobx = require("../../src/mobx.ts")
-var map = mobx.observable.map
-var autorun = mobx.autorun
-var iterall = require("iterall")
+const mobx = require("../../src/mobx.ts")
+const map = mobx.observable.map
+const autorun = mobx.autorun
+const iterall = require("iterall")
 
 test("map crud", function() {
     mobx._getGlobalState().mobxGuid = 0 // hmm dangerous reset?
 
-    var events = []
-    var m = map({ "1": "a" })
+    const events = []
+    const m = map({ "1": "a" })
     m.observe(function(changes) {
         events.push(changes)
     })
@@ -26,12 +26,12 @@ test("map crud", function() {
     expect(m.get("1")).toBe("aa")
     expect(m.get(1)).toBe("b")
 
-    var k = ["arr"]
+    const k = ["arr"]
     m.set(k, "arrVal")
     expect(m.has(k)).toBe(true)
     expect(m.get(k)).toBe("arrVal")
 
-    var s = Symbol("test")
+    const s = Symbol("test")
     expect(m.has(s)).toBe(false)
     expect(m.get(s)).toBe(undefined)
     m.set(s, "symbol-value")
@@ -74,17 +74,17 @@ test("map crud", function() {
 })
 
 test("map merge", function() {
-    var a = map({ a: 1, b: 2, c: 2 })
-    var b = map({ c: 3, d: 4 })
+    const a = map({ a: 1, b: 2, c: 2 })
+    const b = map({ c: 3, d: 4 })
     a.merge(b)
     expect(a.toJSON()).toEqual({ a: 1, b: 2, c: 3, d: 4 })
 })
 
 test("observe value", function() {
-    var a = map()
-    var hasX = false
-    var valueX = undefined
-    var valueY = undefined
+    const a = map()
+    let hasX = false
+    let valueX = undefined
+    let valueY = undefined
 
     autorun(function() {
         hasX = a.has("x")
@@ -130,14 +130,14 @@ test("observe value", function() {
 
 test("initialize with entries", function() {
     const thing = [{ x: 3 }]
-    var a = map([["a", 1], [thing, 2]])
+    const a = map([["a", 1], [thing, 2]])
     expect(Array.from(a)).toEqual([["a", 1], [thing, 2]])
 })
 
 test("initialize with empty value", function() {
-    var a = map()
-    var b = map({})
-    var c = map([])
+    const a = map()
+    const b = map({})
+    const c = map([])
 
     a.set("0", 0)
     b.set("0", 0)
@@ -149,8 +149,8 @@ test("initialize with empty value", function() {
 })
 
 test("observe collections", function() {
-    var x = map()
-    var keys, values, entries
+    const x = map()
+    let keys, values, entries
 
     autorun(function() {
         keys = mobx.keys(x)
@@ -197,14 +197,14 @@ test("observe collections", function() {
 })
 
 test("cleanup", function() {
-    var x = map({ a: 1 })
+    const x = map({ a: 1 })
 
-    var aValue
-    var disposer = autorun(function() {
+    let aValue
+    const disposer = autorun(function() {
         aValue = x.get("a")
     })
 
-    var observable = x._data.get("a")
+    let observable = x._data.get("a")
 
     expect(aValue).toBe(1)
     expect(observable.observers.length).toBe(1)
@@ -231,14 +231,14 @@ test("cleanup", function() {
 })
 
 test("strict", function() {
-    var x = map()
+    const x = map()
     autorun(function() {
         x.get("y") // should not throw
     })
 })
 
 test("issue 100", function() {
-    var that = {}
+    const that = {}
     mobx.extendObservable(that, {
         myMap: map()
     })
@@ -247,8 +247,8 @@ test("issue 100", function() {
 })
 
 test("issue 119 - unobserve before delete", function() {
-    var propValues = []
-    var myObservable = mobx.observable({
+    const propValues = []
+    const myObservable = mobx.observable({
         myMap: map()
     })
     myObservable.myMap.set("myId", {
@@ -271,7 +271,7 @@ test("issue 119 - unobserve before delete", function() {
 })
 
 test("issue 116 - has should not throw on invalid keys", function() {
-    var x = map()
+    const x = map()
     expect(x.has(undefined)).toBe(false)
     expect(x.has({})).toBe(false)
     expect(x.get({})).toBe(undefined)
@@ -279,7 +279,7 @@ test("issue 116 - has should not throw on invalid keys", function() {
 })
 
 test("map modifier", () => {
-    var x = mobx.observable.map({ a: 1 })
+    let x = mobx.observable.map({ a: 1 })
     expect(mobx.isObservableMap(x)).toBe(true)
     expect(x.get("a")).toBe(1)
     x.set("b", {})
@@ -299,7 +299,7 @@ test("map modifier", () => {
 })
 
 test("map modifier with modifier", () => {
-    var x = mobx.observable.map({ a: { c: 3 } })
+    let x = mobx.observable.map({ a: { c: 3 } })
     expect(mobx.isObservableObject(x.get("a"))).toBe(true)
     x.set("b", { d: 4 })
     expect(mobx.isObservableObject(x.get("b"))).toBe(true)
@@ -318,9 +318,9 @@ test("map modifier with modifier", () => {
 })
 
 test("256, map.clear should not be tracked", () => {
-    var x = new mobx.observable.map({ a: 3 })
-    var c = 0
-    var d = mobx.autorun(() => {
+    const x = mobx.observable.map({ a: 3 })
+    let c = 0
+    const d = mobx.autorun(() => {
         c++
         x.clear()
     })
@@ -333,11 +333,11 @@ test("256, map.clear should not be tracked", () => {
 })
 
 test("256, map.merge should be not be tracked for target", () => {
-    var x = mobx.observable.map({ a: 3 })
-    var y = mobx.observable.map({ b: 3 })
-    var c = 0
+    const x = mobx.observable.map({ a: 3 })
+    const y = mobx.observable.map({ b: 3 })
+    let c = 0
 
-    var d = mobx.autorun(() => {
+    const d = mobx.autorun(() => {
         c++
         x.merge(y)
     })
@@ -357,7 +357,7 @@ test("256, map.merge should be not be tracked for target", () => {
 })
 
 test("308, map keys should be coerced to strings correctly", () => {
-    var m = mobx.observable.map()
+    const m = mobx.observable.map()
     m.set(1, true)
     m.delete(1)
     expect(mobx.keys(m)).toEqual([])
@@ -384,12 +384,13 @@ test("308, map keys should be coerced to strings correctly", () => {
 })
 
 test("map should support iterall / iterable ", () => {
-    var a = mobx.observable.map({ a: 1, b: 2 })
+    const a = mobx.observable.map({ a: 1, b: 2 })
 
     function leech(iter) {
-        var values = []
+        const values = []
+        let v
         do {
-            var v = iter.next()
+            v = iter.next()
             if (!v.done) values.push(v.value)
         } while (!v.done)
         return values
@@ -406,30 +407,30 @@ test("map should support iterall / iterable ", () => {
 })
 
 test("support for ES6 Map", () => {
-    var x = new Map()
+    const x = new Map()
     x.set("x", 3)
     x.set("y", 2)
 
-    var m = mobx.observable(x)
+    const m = mobx.observable(x)
     expect(mobx.isObservableMap(m)).toBe(true)
     expect(Array.from(m)).toEqual([["x", 3], ["y", 2]])
 
-    var x2 = new Map()
+    const x2 = new Map()
     x2.set("y", 4)
     x2.set("z", 5)
     m.merge(x2)
     expect(m.get("z")).toEqual(5)
 
-    var x3 = new Map()
+    const x3 = new Map()
     x3.set({ y: 2 }, { z: 4 })
 })
 
 test("deepEqual map", () => {
-    var x = new Map()
+    const x = new Map()
     x.set("x", 3)
     x.set("y", { z: 2 })
 
-    var x2 = mobx.observable.map()
+    const x2 = mobx.observable.map()
     x2.set("x", 3)
     x2.set("y", { z: 3 })
 
@@ -449,8 +450,8 @@ test("798, cannot return observable map from computed prop", () => {
     // MWE: this is an anti pattern, yet should be possible in certain cases nonetheless..?
     // https://jsfiddle.net/7e6Ltscr/
 
-    const form = function(settings) {
-        var form = mobx.observable({
+    const form = function() {
+        const form = mobx.observable({
             reactPropsMap: mobx.observable.map({
                 onSubmit: function() {}
             }),
@@ -465,7 +466,7 @@ test("798, cannot return observable map from computed prop", () => {
     }
 
     const customerSearchStore = function() {
-        var customerSearchStore = mobx.observable({
+        const customerSearchStore = mobx.observable({
             customerType: "RUBY",
             searchTypeFormStore() {
                 return form(customerSearchStore.customerType)
@@ -476,16 +477,16 @@ test("798, cannot return observable map from computed prop", () => {
         })
         return customerSearchStore
     }
-    var cs = customerSearchStore()
+    const cs = customerSearchStore()
 
     expect(() => {
-        const x = Object.assign({}, cs.customerSearchType)
+        Object.assign({}, cs.customerSearchType)
         // console.log(x)
     }).not.toThrow()
 })
 
 test("869, deeply observable map should make added items observables as well", () => {
-    var store = {
+    const store = {
         map_deep1: mobx.observable(new Map()),
         map_deep2: mobx.observable.map()
     }
@@ -503,7 +504,7 @@ test("869, deeply observable map should make added items observables as well", (
 })
 
 test("using deep map", () => {
-    var store = {
+    const store = {
         map_deep: mobx.observable(new Map())
     }
 
@@ -511,7 +512,7 @@ test("using deep map", () => {
     let observed = -1
     mobx.autorun(function() {
         // Use the map, to observe all changes
-        var _ = mobx.toJS(store.map_deep)
+        mobx.toJS(store.map_deep)
         observed++
     })
 
@@ -561,7 +562,6 @@ test("issue 1243, .replace should not trigger change on unchanged values", () =>
     const m = mobx.observable.map({ a: 1, b: 2, c: 3 })
 
     let recomputeCount = 0
-    let visitedComputed = false
     const computedValue = mobx.computed(() => {
         recomputeCount++
         return m.get("a")
@@ -671,7 +671,7 @@ test("can iterate map - values", () => {
 })
 
 test("NaN as map key", function() {
-    var a = map(new Map([[NaN, 0]]))
+    const a = map(new Map([[NaN, 0]]))
     expect(a.has(NaN)).toBe(true)
     expect(a.get(NaN)).toBe(0)
     a.set(NaN, 1)

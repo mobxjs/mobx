@@ -1,28 +1,19 @@
-const rollup = require("rollup")
+const { rollup } = require("rollup")
+const resolvePlugin = require("rollup-plugin-node-resolve")
+const filesizePlugin = require("rollup-plugin-filesize")
+const replacePlugin = require("rollup-plugin-replace")
+const uglifyPlugin = require("rollup-plugin-uglify").uglify
+
 const fs = require("fs-extra")
 const path = require("path")
 const ts = require("typescript")
-const shell = require("shelljs")
-const exec = shell.exec
-
-// exit upon first error
-shell.set("-e")
-
-const binFolder = path.resolve("node_modules/.bin/")
-
-function getCmd(cmd) {
-    if (process.platform === "win32") {
-        return path.join(binFolder, cmd + ".cmd")
-    }
-    return cmd
-}
 
 // make sure we're in the right folder
 process.chdir(path.resolve(__dirname, ".."))
 
 fs.removeSync("lib")
-fs.removeSync(".build.cjs")
-fs.removeSync(".build.es")
+fs.removeSync(".build.es5")
+fs.removeSync(".build.es6")
 
 function runTypeScriptBuild(outDir, target, declarations) {
     console.log(`Running typescript build (target: ${ts.ScriptTarget[target]}) in ${outDir}/`)
@@ -49,9 +40,9 @@ function runTypeScriptBuild(outDir, target, declarations) {
         const message = result.diagnostics
             .map(
                 d =>
-                    `${ts.DiagnosticCategory[
-                        d.category
-                    ]} ${d.code} (${d.file}:${d.start}): ${d.messageText}`
+                    `${ts.DiagnosticCategory[d.category]} ${d.code} (${d.file}:${d.start}): ${
+                        d.messageText
+                    }`
             )
             .join("\n")
 
@@ -59,76 +50,66 @@ function runTypeScriptBuild(outDir, target, declarations) {
     }
 }
 
-const rollupPlugins = [require("rollup-plugin-node-resolve")(), require("rollup-plugin-filesize")()]
-
-function generateBundledModule(inputFile, outputFile, format) {
+async function generateBundledModule(inputFile, outputFile, format, production) {
     console.log(`Generating ${outputFile} bundle.`)
 
-    return rollup
-        .rollup({
-            entry: inputFile,
-            plugins: rollupPlugins
-        })
-        .then(bundle =>
-            bundle.write({
-                dest: outputFile,
-                format,
-                banner: "/** MobX - (c) Michel Weststrate 2015, 2016 - MIT Licensed */",
-                exports: "named"
-            })
-        )
-}
-
-function generateUmd() {
-    console.log("Generating mobx.umd.js")
-    exec("browserify -s mobx -e lib/mobx.js -o lib/mobx.umd.js")
-}
-
-function generateMinified() {
-    const prodEnv = {
-        ...process.env,
-        NODE_ENV: "production"
+    function getEnvVariables(production) {
+        return { "process.env.NODE_ENV": production ? "'production'" : "'development'" }
     }
 
-    console.log("Generating mobx.min.js and mobx.umd.min.js")
-    exec(`${getCmd(`envify`)} lib/mobx.js > lib/mobx.prod.js`, { env: prodEnv })
-    exec(
-        `${binFolder}/uglifyjs -m sort,toplevel -c warnings=false --screw-ie8 --preamble "/** MobX - (c) Michel Weststrate 2015, 2016 - MIT Licensed */" --source-map lib/mobx.min.js.map -o lib/mobx.min.js lib/mobx.prod.js`
-    )
-    exec(`${getCmd(`envify`)} lib/mobx.umd.js > lib/mobx.prod.umd.js`, {
-        env: prodEnv
+    let plugins
+    if (production) {
+        plugins = [
+            resolvePlugin(),
+            replacePlugin(getEnvVariables(true)),
+            uglifyPlugin(),
+            filesizePlugin()
+        ]
+    } else {
+        plugins = [resolvePlugin(), filesizePlugin()]
+    }
+
+    const bundle = await rollup({
+        input: inputFile,
+        plugins
     })
-    exec(
-        `${binFolder}/uglifyjs -m sort,toplevel -c warnings=false --screw-ie8 --preamble "/** MobX - (c) Michel Weststrate 2015, 2016 - MIT Licensed */" --source-map lib/mobx.umd.min.js.map -o lib/mobx.umd.min.js lib/mobx.prod.umd.js`
-    )
-    shell.rm("lib/mobx.prod.js", "lib/mobx.prod.umd.js")
+
+    await bundle.write({
+        file: outputFile,
+        format,
+        banner: "/** MobX - (c) Michel Weststrate 2015 - 2018 - MIT Licensed */",
+        exports: "named",
+        name: format === "umd" ? "mobx" : undefined
+    })
+
+    console.log(`Generation of ${outputFile} bundle finished.`)
 }
 
 function copyFlowDefinitions() {
     console.log("Copying flowtype definitions")
-    exec(`${getCmd(`ncp`)} flow-typed/mobx.js lib/mobx.js.flow`)
+    fs.copyFileSync("flow-typed/mobx.js", "lib/mobx.js.flow")
+    console.log("Copying of flowtype definitions done")
 }
 
-function build() {
-    runTypeScriptBuild(".build.cjs", ts.ScriptTarget.ES5, true)
-    runTypeScriptBuild(".build.es", ts.ScriptTarget.ES5, false)
-    return Promise.all([
-        generateBundledModule(
-            path.resolve(".build.cjs", "mobx.js"),
-            path.resolve("lib", "mobx.js"),
-            "cjs"
-        ),
+async function build() {
+    runTypeScriptBuild(".build.es5", ts.ScriptTarget.ES5, true)
+    runTypeScriptBuild(".build.es6", ts.ScriptTarget.ES2015, false)
 
-        generateBundledModule(
-            path.resolve(".build.es", "mobx.js"),
-            path.resolve("lib", "mobx.module.js"),
-            "es"
-        )
-    ]).then(() => {
-        generateUmd()
-        generateMinified()
-        copyFlowDefinitions()
-    })
+    const es5Build = path.join(".build.es5", "mobx.js")
+    const es6Build = path.join(".build.es6", "mobx.js")
+
+    await Promise.all([
+        generateBundledModule(es5Build, path.join("lib", "mobx.js"), "cjs", false),
+        generateBundledModule(es5Build, path.join("lib", "mobx.min.js"), "cjs", true),
+
+        generateBundledModule(es5Build, path.join("lib", "mobx.module.js"), "es", false),
+
+        generateBundledModule(es6Build, path.join("lib", "mobx.es6.js"), "es", false),
+
+        generateBundledModule(es5Build, path.join("lib", "mobx.umd.js"), "umd", false),
+        generateBundledModule(es5Build, path.join("lib", "mobx.umd.min.js"), "umd", true)
+    ])
+    copyFlowDefinitions()
 }
 
 build().catch(e => {

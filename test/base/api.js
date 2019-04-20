@@ -1,5 +1,5 @@
 import * as fs from "fs"
-var mobx = require("../../src/mobx.ts")
+const mobx = require("../../src/mobx.ts")
 
 test("correct api should be exposed", function() {
     expect(

@@ -64,6 +64,7 @@ test("it should support try catch in async generator", done => {
 
 test("it should support throw from async generator", done => {
     mobx.flow(function*() {
+        yield "a"
         throw 7
     })().then(
         () => {
@@ -196,7 +197,7 @@ test("flows can be cancelled - 2 - finally clauses are run", done => {
     })
     const promise = start()
     promise.then(
-        res => {
+        () => {
             fail()
         },
         err => {
@@ -220,6 +221,7 @@ test("flows can be cancelled - 3 - throw in finally should be catched", done => 
             counter.counter = 15
         } finally {
             counter.counter = 4
+            // eslint-disable-next-line no-unsafe-finally
             throw "OOPS"
         }
     })
@@ -259,9 +261,8 @@ test("flows can be cancelled - 4 - pending Promise will be ignored", done => {
 })
 
 test("flows can be cancelled - 5 - return before cancel", done => {
-    let steps = 0
+    // eslint-disable-next-line require-yield
     const start = flow(function*() {
-        steps = 1
         return Promise.resolve(2) // cancel will be to late..
     })
 
@@ -270,7 +271,7 @@ test("flows can be cancelled - 5 - return before cancel", done => {
         value => {
             expect(value).toBe(2), done()
         },
-        err => {
+        () => {
             fail()
         }
     )
@@ -315,7 +316,6 @@ test("flows can be cancelled - 5 - flows cancel recursively", done => {
 })
 
 test("flows yield anything", async () => {
-    let steps = 0
     const start = flow(function*() {
         const x = yield 2
         return x
@@ -332,6 +332,7 @@ test("cancelled flow should not result in runaway reject", async () => {
             return x
         } finally {
             yield Promise.reject("Oh noes")
+            // eslint-disable-next-line no-unsafe-finally
             return 4
         }
     })

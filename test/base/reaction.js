@@ -1,12 +1,12 @@
-var mobx = require("../../src/mobx.ts")
-var reaction = mobx.reaction
+const mobx = require("../../src/mobx.ts")
+const reaction = mobx.reaction
 const utils = require("../utils/test-utils")
 
 test("basic", () => {
-    var a = mobx.observable.box(1)
-    var values = []
+    const a = mobx.observable.box(1)
+    const values = []
 
-    var d = reaction(
+    const d = reaction(
         () => a.get(),
         newValue => {
             values.push(newValue)
@@ -22,10 +22,10 @@ test("basic", () => {
 })
 
 test("effect fireImmediately is honored", () => {
-    var a = mobx.observable.box(1)
-    var values = []
+    const a = mobx.observable.box(1)
+    const values = []
 
-    var d = reaction(
+    const d = reaction(
         () => a.get(),
         newValue => {
             values.push(newValue)
@@ -42,11 +42,11 @@ test("effect fireImmediately is honored", () => {
 })
 
 test("effect is untracked", () => {
-    var a = mobx.observable.box(1)
-    var b = mobx.observable.box(2)
-    var values = []
+    const a = mobx.observable.box(1)
+    const b = mobx.observable.box(2)
+    const values = []
 
-    var d = reaction(
+    const d = reaction(
         () => a.get(),
         newValue => {
             values.push(newValue * b.get())
@@ -74,11 +74,11 @@ test("effect debounce is honored", () => {
     expect.assertions(2)
 
     return new Promise((resolve, reject) => {
-        var a = mobx.observable.box(1)
-        var values = []
-        var exprCount = 0
+        const a = mobx.observable.box(1)
+        const values = []
+        let exprCount = 0
 
-        var d = reaction(
+        const d = reaction(
             () => {
                 exprCount++
                 return a.get()
@@ -120,11 +120,11 @@ test("effect debounce is honored", () => {
 test("effect debounce + fire immediately is honored", () => {
     expect.assertions(2)
     return new Promise((resolve, reject) => {
-        var a = mobx.observable.box(1)
-        var values = []
-        var exprCount = 0
+        const a = mobx.observable.box(1)
+        const values = []
+        let exprCount = 0
 
-        var d = reaction(
+        const d = reaction(
             () => {
                 exprCount++
                 return a.get()
@@ -155,8 +155,8 @@ test("effect debounce + fire immediately is honored", () => {
 })
 
 test("passes Reaction as an argument to expression function", () => {
-    var a = mobx.observable.box(1)
-    var values = []
+    const a = mobx.observable.box(1)
+    const values = []
 
     reaction(
         r => {
@@ -179,8 +179,8 @@ test("passes Reaction as an argument to expression function", () => {
 })
 
 test("passes Reaction as an argument to effect function", () => {
-    var a = mobx.observable.box(1)
-    var values = []
+    const a = mobx.observable.box(1)
+    const values = []
 
     reaction(
         () => a.get(),
@@ -201,9 +201,9 @@ test("passes Reaction as an argument to effect function", () => {
 })
 
 test("can dispose reaction on first run", () => {
-    var a = mobx.observable.box(1)
+    const a = mobx.observable.box(1)
 
-    var valuesExpr1st = []
+    const valuesExpr1st = []
     reaction(
         () => a.get(),
         (newValue, r) => {
@@ -213,7 +213,7 @@ test("can dispose reaction on first run", () => {
         true
     )
 
-    var valuesEffect1st = []
+    const valuesEffect1st = []
     reaction(
         r => {
             r.dispose()
@@ -225,7 +225,7 @@ test("can dispose reaction on first run", () => {
         true
     )
 
-    var valuesExpr = []
+    const valuesExpr = []
     reaction(
         () => a.get(),
         (newValue, r) => {
@@ -234,7 +234,7 @@ test("can dispose reaction on first run", () => {
         }
     )
 
-    var valuesEffect = []
+    const valuesEffect = []
     reaction(
         r => {
             r.dispose()
@@ -255,10 +255,10 @@ test("can dispose reaction on first run", () => {
 })
 
 test("#278 do not rerun if expr output doesn't change", () => {
-    var a = mobx.observable.box(1)
-    var values = []
+    const a = mobx.observable.box(1)
+    const values = []
 
-    var d = reaction(
+    const d = reaction(
         () => (a.get() < 10 ? a.get() : 11),
         newValue => {
             values.push(newValue)
@@ -281,7 +281,7 @@ test("#278 do not rerun if expr output doesn't change", () => {
 })
 
 test("#278 do not rerun if expr output doesn't change structurally", () => {
-    var users = mobx.observable([
+    const users = mobx.observable([
         {
             name: "jan",
             get uppername() {
@@ -295,9 +295,9 @@ test("#278 do not rerun if expr output doesn't change structurally", () => {
             }
         }
     ])
-    var values = []
+    const values = []
 
-    var d = reaction(
+    const d = reaction(
         () => users.map(user => user.uppername),
         newValue => {
             values.push(newValue)
@@ -320,18 +320,18 @@ test("#278 do not rerun if expr output doesn't change structurally", () => {
 })
 
 test("do not rerun if prev & next expr output is NaN", () => {
-    var v = mobx.observable.box("a")
-    var values = []
-    var valuesS = []
+    const v = mobx.observable.box("a")
+    const values = []
+    const valuesS = []
 
-    var d = reaction(
+    const d = reaction(
         () => v.get(),
         newValue => {
             values.push(String(newValue))
         },
         { fireImmediately: true }
     )
-    var dd = reaction(
+    const dd = reaction(
         () => v.get(),
         newValue => {
             valuesS.push(String(newValue))
@@ -462,7 +462,6 @@ test("Introduce custom onError for - autorun - 1", () => {
 })
 
 test("Introduce custom onError for - autorun - 2", done => {
-    let error = ""
     let globalHandlerCalled = false
     const d = mobx.onReactionError(() => {
         globalHandlerCalled = true

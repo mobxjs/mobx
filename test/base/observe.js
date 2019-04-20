@@ -1,14 +1,14 @@
-var m = require("../../src/mobx.ts")
+const m = require("../../src/mobx.ts")
 
 test("observe object and map properties", function() {
-    var map = m.observable.map({ a: 1 })
-    var events = []
+    const map = m.observable.map({ a: 1 })
+    const events = []
 
     expect(function() {
         m.observe(map, "b", function() {})
     }).toThrow(/the entry 'b' does not exist in the observable map/)
 
-    var d1 = m.observe(map, "a", function(e) {
+    const d1 = m.observe(map, "a", function(e) {
         events.push([e.newValue, e.oldValue])
     })
 
@@ -17,14 +17,14 @@ test("observe object and map properties", function() {
     d1()
     map.set("a", 4)
 
-    var o = m.observable({
+    const o = m.observable({
         a: 5
     })
 
     expect(function() {
         m.observe(o, "b", function() {})
     }).toThrow(/no observable property 'b' found on the observable object/)
-    var d2 = m.observe(o, "a", function(e) {
+    const d2 = m.observe(o, "a", function(e) {
         events.push([e.newValue, e.oldValue])
     })
 
@@ -37,15 +37,15 @@ test("observe object and map properties", function() {
 })
 
 test("observe computed values", function() {
-    var events = []
+    const events = []
 
-    var v = m.observable.box(0)
-    var f = m.observable.box(0)
-    var c = m.computed(function() {
+    const v = m.observable.box(0)
+    const f = m.observable.box(0)
+    const c = m.computed(function() {
         return v.get()
     })
 
-    var d2 = c.observe(function(e) {
+    c.observe(function(e) {
         v.get()
         f.get()
         events.push([e.newValue, e.oldValue])
