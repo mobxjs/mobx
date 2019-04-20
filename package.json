@@ -72,7 +72,7 @@
     "rollup-plugin-terser": "^4.0.4",
     "serializr": "^1.5.1",
     "shelljs": "^0.8.3",
-    "size-limit": "^0.21.1",
+    "size-limit": "^1.0.0",
     "tape": "^4.10.1",
     "ts-jest": "^24.0.0",
     "tslib": "^1.9.3",
