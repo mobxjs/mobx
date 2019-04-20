@@ -31,14 +31,23 @@ test("map crud", function() {
     expect(m.has(k)).toBe(true)
     expect(m.get(k)).toBe("arrVal")
 
-    expect(mobx.keys(m)).toEqual(["1", 1, k])
-    expect(mobx.values(m)).toEqual(["aa", "b", "arrVal"])
-    expect(Array.from(m)).toEqual([["1", "aa"], [1, "b"], [k, "arrVal"]])
-    expect(m.toJS()).toEqual(new Map([["1", "aa"], [1, "b"], [k, "arrVal"]]))
-    expect(m.toPOJO()).toEqual({ "1": "b", arr: "arrVal" })
+    var s = Symbol("test")
+    expect(m.has(s)).toBe(false)
+    expect(m.get(s)).toBe(undefined)
+    m.set(s, "symbol-value")
+    expect(m.get(s)).toBe("symbol-value")
+    expect(m.get(s.toString())).toBe(undefined)
+
+    expect(mobx.keys(m)).toEqual(["1", 1, k, s])
+    expect(mobx.values(m)).toEqual(["aa", "b", "arrVal", "symbol-value"])
+    expect(Array.from(m)).toEqual([["1", "aa"], [1, "b"], [k, "arrVal"], [s, "symbol-value"]])
+    expect(m.toJS()).toEqual(new Map([["1", "aa"], [1, "b"], [k, "arrVal"], [s, "symbol-value"]]))
+    expect(m.toPOJO()).toEqual({ "1": "b", arr: "arrVal", [s]: "symbol-value" })
     expect(JSON.stringify(m)).toEqual('{"1":"b","arr":"arrVal"}')
-    expect(m.toString()).toBe("ObservableMap@1[{ 1: aa, 1: b, arr: arrVal }]")
-    expect(m.size).toBe(3)
+    expect(m.toString()).toBe(
+        "ObservableMap@1[{ 1: aa, 1: b, arr: arrVal, Symbol(test): symbol-value }]"
+    )
+    expect(m.size).toBe(4)
 
     m.clear()
     expect(mobx.keys(m)).toEqual([])
@@ -56,9 +65,11 @@ test("map crud", function() {
         { object: m, name: "1", newValue: "aa", oldValue: "a", type: "update" },
         { object: m, name: 1, newValue: "b", type: "add" },
         { object: m, name: ["arr"], newValue: "arrVal", type: "add" },
+        { object: m, name: s, newValue: "symbol-value", type: "add" },
         { object: m, name: "1", oldValue: "aa", type: "delete" },
         { object: m, name: 1, oldValue: "b", type: "delete" },
-        { object: m, name: ["arr"], oldValue: "arrVal", type: "delete" }
+        { object: m, name: ["arr"], oldValue: "arrVal", type: "delete" },
+        { object: m, name: s, oldValue: "symbol-value", type: "delete" }
     ])
 })
 

@@ -1,3 +1,10 @@
+* Added `set` support for `observable.set`, see [#1945](https://github.com/mobxjs/mobx/pull/1945) by [xaviergonz](https://github.com/xaviergonz)
+
+# 5.9.4 / 4.9.4
+
+* Allow symbol keys in `ObservableMap`, see [#1930](https://github.com/mobxjs/mobx/pull/1930) by [pimterry](https://github.com/pimterry)
+* Fixed type definitions of `toStringTag` for Maps and Sets, see [#1929](https://github.com/mobxjs/mobx/pull/1929) by [lennerd](https://github.com/lennerd)
+
 # 4.9.3
 
 * Fixed `observable.set` compatibility with IE 11, see [#1917](https://github.com/mobxjs/mobx/pull/1917) by [kalmi](https://github.com/kalmi)
