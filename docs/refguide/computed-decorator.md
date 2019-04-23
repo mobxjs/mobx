@@ -218,4 +218,4 @@ class Todos {
 
 Note: don't use arrow functions as the `this` would be incorrect. 
 
-Fur further details, check the mobx-utils [docs](https://github.com/mobxjs/mobx-utils#computedfn)
+For further details, check the mobx-utils [docs](https://github.com/mobxjs/mobx-utils#computedfn)
