@@ -59,7 +59,7 @@
         data-chapter-title="Introduction"
         data-filepath="README.md"
         data-basepath="."
-        data-revision="Thu Apr 18 2019 16:49:03 GMT+0200 (CEST)"
+        data-revision="Wed May 01 2019 21:22:38 GMT+0200 (CEST)"
         data-innerlanguage="">
     
 
@@ -811,8 +811,6 @@
 <a href="https://github.com/prettier/prettier" target="_blank"><img src="https://img.shields.io/badge/code_style-prettier-ff69b4.svg" alt="code style: prettier"></a></p>
 <div id="codefund"></div>
 
-
-
 <p>MobX is proudly sponsored by Mendix, Coinbase, Facebook Open Source, Canva, Algolia, Guilded, Auction Frontier, Mantro and TalentPlot for 100$/month or more! And beyond that by many <a href="#backers">individual backers</a> and through <a href="https://github.com/mobxjs/mobx/blob/master/sponsors.md" target="_blank">one time contributions</a>.</p>
 <p><a href="https://mendix.com/" target="_blank"><img src="docs/mendix-logo.png" align="center" width="100" title="Mendix" alt="Mendix"></a>
 <a href="https://coinbase.com/" target="_blank"><img src="docs/coinbase.jpeg" align="center" width="100" title="Coinbase" alt="Coinbase"></a>
@@ -823,12 +821,17 @@
 <a href="http://auctionfrontier.com/" target="_blank"><img src="docs/auctionfrontier.jpeg" align="center" width="100" title="Auction Frontier" alt="Auction Frontier"></a>
 <a href="https://mantro.net/jobs/warlock" target="_blank"><img src="docs/mantro.png" align="center" width="100" title="mantro GmbH" alt="mantro GmbH"></a>
 <a href="https://talentplot.com/" target="_blank"><img src="docs/talentplot.png" align="center" width="100" title="talentplot" alt="talentplot"></a>
-<a href="https://www.codefirst.co.uk/" target="_blank"><img src="docs/codefirst.png" align="center" width="100" title="CodeFirst" alt="CodeFirst"></a></p>
+<a href="https://www.codefirst.co.uk/" target="_blank"><img src="docs/codefirst.png" align="center" width="100" title="CodeFirst" alt="CodeFirst"></a>
+<a href="https://blokt.com/" target="_blank"><img src="docs/blokt.jpg" align="center" width="100" title="Blokt" alt="Blokt"></a>
+<a href="https://www.faire.com/" target="_blank"><img src="docs/faire.jpg" align="center" width="100" title="Faire" alt="Faire"></a></p>
+<p><a href="https://www.faire.com/" target="_blank">https://www.faire.com/</a></p>
 <h1 id="installation">Installation</h1>
 <ul>
 <li>Installation: <code>npm install mobx --save</code>. React bindings: <code>npm install mobx-react --save</code>. To enable ESNext decorators (optional), see below.</li>
-<li>CDN:</li>
-<li><a href="https://unpkg.com/mobx/lib/mobx.umd.js" target="_blank">https://unpkg.com/mobx/lib/mobx.umd.js</a></li>
+<li><p>CDN:</p>
+</li>
+<li><p><a href="https://unpkg.com/mobx/lib/mobx.umd.js" target="_blank">https://unpkg.com/mobx/lib/mobx.umd.js</a></p>
+</li>
 <li><a href="https://cdnjs.com/libraries/mobx" target="_blank">https://cdnjs.com/libraries/mobx</a></li>
 </ul>
 <h1 id="browser-support">Browser support</h1>
@@ -872,12 +875,12 @@ The philosophy behind MobX is very simple:</p>
 <p><i><a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/javascript-sync-the-ui-with-the-app-state-using-mobx-observable-and-observer-in-react" target="_blank">Egghead.io lesson 1: observable &amp; observer</a></i></p>
 <p>MobX adds observable capabilities to existing data structures like objects, arrays and class instances.
 This can simply be done by annotating your class properties with the <a href="http://mobxjs.github.io/mobx/refguide/observable-decorator.html" target="_blank">@observable</a> decorator (ES.Next).</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> { observable } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>
+<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> { observable } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>;
 
-class Todo {
-    id = Math.random();
-    @observable title = <span class="hljs-string">&quot;&quot;</span>;
-    @observable finished = <span class="hljs-literal">false</span>;
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Todo</span> </span>{
+  id = <span class="hljs-built_in">Math</span>.random();
+  @observable title = <span class="hljs-string">&quot;&quot;</span>;
+  @observable finished = <span class="hljs-literal">false</span>;
 }
 </code></pre>
 <p>Using <code>observable</code> is like turning a property of an object into a spreadsheet cell.
@@ -886,27 +889,27 @@ But unlike spreadsheets, these values can be not only primitive values, but also
 You can read <a href="http://mobxjs.github.io/mobx/best/decorators.html" target="_blank">here</a> about how to set them up.
 Or you can skip them altogether, as MobX can be used fine without decorator <em>syntax</em>, by leveraging the <em>decorate</em> utility.
 Many MobX users do prefer the decorator syntax though, as it is slightly more concise.</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> { decorate, observable } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>
+<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> { decorate, observable } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>;
 
-class Todo {
-    id = Math.random();
-    title = <span class="hljs-string">&quot;&quot;</span>;
-    finished = <span class="hljs-literal">false</span>;
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Todo</span> </span>{
+  id = <span class="hljs-built_in">Math</span>.random();
+  title = <span class="hljs-string">&quot;&quot;</span>;
+  finished = <span class="hljs-literal">false</span>;
 }
 decorate(Todo, {
-    title: observable,
-    finished: observable
-})
+  title: observable,
+  finished: observable
+});
 </code></pre>
 <h3 id="computed-values">Computed values</h3>
 <p><i><a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/javascript-derive-computed-values-and-manage-side-effects-with-mobx-reactions" target="_blank">Egghead.io lesson 3: computed values</a></i></p>
 <p>With MobX you can define values that will be derived automatically when relevant data is modified.
 By using the <a href="http://mobxjs.github.io/mobx/refguide/computed-decorator.html" target="_blank"><code>@computed</code></a> decorator or by using getter / setter functions when using <code>(extend)Observable</code> (Of course, you can use <code>decorate</code> here again as alternative to the <code>@</code> syntax).</p>
 <pre><code class="lang-javascript"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TodoList</span> </span>{
-    @observable todos = [];
-    @computed get unfinishedTodoCount() {
-        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.todos.filter(todo =&gt; !todo.finished).length;
-    }
+  @observable todos = [];
+  @computed get unfinishedTodoCount() {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.todos.filter(todo =&gt; !todo.finished).length;
+  }
 }
 </code></pre>
 <p>MobX will ensure that <code>unfinishedTodoCount</code> is updated automatically when a todo is added or when one of the <code>finished</code> properties is modified.
@@ -918,36 +921,42 @@ In short, reactions bridge <a href="https://en.wikipedia.org/wiki/Reactive_progr
 <h4 id="react-components">React components</h4>
 <p><i><a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/courses/manage-complex-state-in-react-apps-with-mobx" target="_blank">Egghead.io lesson 1: observable &amp; observer</a></i></p>
 <p>If you are using React, you can turn your (stateless function) components into reactive components by simply adding the <a href="http://mobxjs.github.io/mobx/refguide/observer-component.html" target="_blank"><code>observer</code></a> function / decorator from the <code>mobx-react</code> package onto them.</p>
-<pre><code class="lang-javascript">import React, {Component} from &apos;react&apos;;
-import ReactDOM from &apos;react-dom&apos;;
-import {observer} from &apos;mobx-react&apos;;
+<pre><code class="lang-javascript">import React, { Component } from &quot;react&quot;;
+import ReactDOM from &quot;react-dom&quot;;
+import { observer } from &quot;mobx-react&quot;;
 
 @observer
 class TodoListView extends Component {
-    render() {
-        return &lt;div&gt;
-            &lt;ul&gt;
-                {this.props.todoList.todos.map(todo =&gt;
-                    &lt;TodoView todo={todo} key={todo.id} /&gt;
-                )}
-            &lt;/ul&gt;
-            Tasks left: {this.props.todoList.unfinishedTodoCount}
-        &lt;/div&gt;
-    }
+  render() {
+    return (
+      &lt;div&gt;
+        &lt;ul&gt;
+          {this.props.todoList.todos.map(todo =&gt; (
+            &lt;TodoView todo={todo} key={todo.id} /&gt;
+          ))}
+        &lt;/ul&gt;
+        Tasks left: {this.props.todoList.unfinishedTodoCount}
+      &lt;/div&gt;
+    );
+  }
 }
 
-const TodoView = observer(({todo}) =&gt;
-    &lt;li&gt;
-        &lt;input
-            type=&quot;checkbox&quot;
-            checked={todo.finished}
-            onClick={() =&gt; todo.finished = !todo.finished}
-        /&gt;{todo.title}
-    &lt;/li&gt;
-)
+const TodoView = observer(({ todo }) =&gt; (
+  &lt;li&gt;
+    &lt;input
+      type=&quot;checkbox&quot;
+      checked={todo.finished}
+      onClick={() =&gt; (todo.finished = !todo.finished)}
+    /&gt;
+    {todo.title}
+  &lt;/li&gt;
+));
 
 const store = new TodoList();
-ReactDOM.render(&lt;TodoListView todoList={store} /&gt;, document.getElementById(&apos;mount&apos;));
+ReactDOM.render(
+  &lt;TodoListView todoList={store} /&gt;,
+  document.getElementById(&quot;mount&quot;)
+);
 </code></pre>
 <p><code>observer</code> turns React (function) components into derivations of the data they render.
 When using MobX there are no smart or dumb components.
@@ -958,8 +967,8 @@ However, if you would remove the <code>Tasks left</code> line (or put it into a 
 <a href="http://mobxjs.github.io/mobx/refguide/reaction.html" target="_blank"><code>reaction</code></a> or <a href="http://mobxjs.github.io/mobx/refguide/when.html" target="_blank"><code>when</code></a> functions to fit your specific situations.</p>
 <p>For example the following <code>autorun</code> prints a log message each time the amount of <code>unfinishedTodoCount</code> changes:</p>
 <pre><code class="lang-javascript">autorun(() =&gt; {
-    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;Tasks left: &quot;</span> + todos.unfinishedTodoCount)
-})
+  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;Tasks left: &quot;</span> + todos.unfinishedTodoCount);
+});
 </code></pre>
 <h3 id="what-will-mobx-react-to">What will MobX react to?</h3>
 <p>Why does a new message get printed each time the <code>unfinishedTodoCount</code> is changed? The answer is this rule of thumb:</p>
@@ -976,10 +985,7 @@ However, if you would remove the <code>Tasks left</code> line (or put it into a 
 <p>In the end it all boils down to: Somehow the state should be updated.</p>
 <p>After updating the state <code>MobX</code> will take care of the rest in an efficient, glitch-free manner. So simple statements, like below, are enough to automatically update the user interface.</p>
 <p>There is no technical need for firing events, calling a dispatcher or what more. A React component in the end is nothing more than a fancy representation of your state. A derivation that will be managed by MobX.</p>
-<pre><code class="lang-javascript">store.todos.push(
-    <span class="hljs-keyword">new</span> Todo(<span class="hljs-string">&quot;Get Coffee&quot;</span>),
-    <span class="hljs-keyword">new</span> Todo(<span class="hljs-string">&quot;Write simpler code&quot;</span>)
-);
+<pre><code class="lang-javascript">store.todos.push(<span class="hljs-keyword">new</span> Todo(<span class="hljs-string">&quot;Get Coffee&quot;</span>), <span class="hljs-keyword">new</span> Todo(<span class="hljs-string">&quot;Write simpler code&quot;</span>));
 store.todos[<span class="hljs-number">0</span>].finished = <span class="hljs-literal">true</span>;
 </code></pre>
 <p>Nonetheless, MobX has an optional built-in concept of <a href="https://mobxjs.github.io/mobx/refguide/action.html" target="_blank"><code>actions</code></a>.
