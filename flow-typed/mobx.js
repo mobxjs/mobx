@@ -58,13 +58,20 @@ export interface IComputedValueOptions<T> {
     context?: any;
 }
 
-declare type PropertyDescriptor = any
+type PropertyDescriptor<T> = {
+    enumerable?: boolean,
+    configurable?: boolean,
+    writable?: boolean,
+    value?: T,
+    get?: () => T,
+    set?: (value: T) => void
+}
 
 export interface IComputed {
     <T>(func: () => T, setter?: (value: T) => void): IComputedValue<T>;
     <T>(func: () => T, options: IComputedValueOptions<T>): IComputedValue<T>;
-    (target: Object, key: string, baseDescriptor?: PropertyDescriptor): void;
-    struct(target: Object, key: string, baseDescriptor?: PropertyDescriptor): void;
+    (target: Object, key: string, baseDescriptor?: PropertyDescriptor<*>): void;
+    struct(target: Object, key: string, baseDescriptor?: PropertyDescriptor<*>): void;
 }
 
 export interface IDependencyTree {
@@ -225,7 +232,7 @@ export interface IEnhancer<T> {
 
 export interface IObservableFactory {
     // observable overloads
-    (target: Object, key: string, baseDescriptor?: PropertyDescriptor): any;
+    (target: Object, key: string, baseDescriptor?: PropertyDescriptor<*>): any;
     <T>(value: Array<T>): IObservableArray<T>;
     <T>(value: null | void): IObservableValue<T>;
     (value: null | void): IObservableValue<any>;
@@ -234,7 +241,7 @@ export interface IObservableFactory {
 }
 
 export type IObservableDecorator = {
-    (target: Object, property: string, descriptor?: PropertyDescriptor): void,
+    (target: Object, property: string, descriptor?: PropertyDescriptor<*>): void,
     enhancer: IEnhancer<any>
 }
 
@@ -252,13 +259,21 @@ declare export class IObservableFactories {
         options?: CreateObservableOptions
     ): ObservableMap<K, V>;
     object<T>(props: T, options?: CreateObservableOptions): T & IObservableObject;
-    ref(target: Object, property?: string, descriptor?: PropertyDescriptor): IObservableDecorator;
+    ref(
+        target: Object,
+        property?: string,
+        descriptor?: PropertyDescriptor<*>
+    ): IObservableDecorator;
     shallow(
         target: Object,
         property?: string,
-        descriptor?: PropertyDescriptor
+        descriptor?: PropertyDescriptor<*>
     ): IObservableDecorator;
-    deep(target: Object, property?: string, descriptor?: PropertyDescriptor): IObservableDecorator;
+    deep(
+        target: Object,
+        property?: string,
+        descriptor?: PropertyDescriptor<*>
+    ): IObservableDecorator;
 }
 
 export interface Lambda {
@@ -268,7 +283,7 @@ export interface Lambda {
 
 export interface IActionFactory {
     (a1: any, a2?: any, a3?: any, a4?: any, a6?: any): any;
-    bound(target: Object, propertyKey: string, descriptor?: PropertyDescriptor): void;
+    bound(target: Object, propertyKey: string, descriptor?: PropertyDescriptor<*>): void;
 }
 
 declare export class ObservableMap<K, V> {
@@ -296,7 +311,7 @@ declare export class ObservableMap<K, V> {
 declare export function action(
     targetOrName: any,
     propertyKeyOrFuc?: any,
-    descriptor?: PropertyDescriptor
+    descriptor?: PropertyDescriptor<*>
 ): any
 declare export function action<T>(name: string, func: T): T
 declare export function action<T>(func: T): T
@@ -330,7 +345,7 @@ declare export function when(cond: () => boolean, options?: IWhenOptions): Promi
 declare export function computed<T>(
     target: any,
     key?: string,
-    baseDescriptor?: PropertyDescriptor
+    baseDescriptor?: PropertyDescriptor<*>
 ): any
 
 declare export function extendObservable<A, B>(
