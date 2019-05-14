@@ -61,6 +61,8 @@ function runTypeScriptBuild(outDir, target, declarations) {
 
 const rollupPlugins = [require("rollup-plugin-node-resolve")(), require("rollup-plugin-filesize")()]
 
+const licensePreamble = "/** MobX - (c) Michel Weststrate 2015 - 2019 - MIT Licensed */"
+
 function generateBundledModule(inputFile, outputFile, format) {
     console.log(`Generating ${outputFile} bundle.`)
 
@@ -73,7 +75,7 @@ function generateBundledModule(inputFile, outputFile, format) {
             bundle.write({
                 dest: outputFile,
                 format,
-                banner: "/** MobX - (c) Michel Weststrate 2015 - 2018 - MIT Licensed */",
+                banner: licensePreamble,
                 exports: "named"
             })
         )
@@ -95,7 +97,7 @@ function generateMinified() {
     exec(
         `${getCmd(
             "uglifyjs"
-        )} --toplevel -m -c warnings=false --preamble "/** MobX - (c) Michel Weststrate 2015 - 2018 - MIT Licensed */" --source-map -o lib/mobx.min.js lib/mobx.prod.js`
+        )} --toplevel -m -c warnings=false -b beautify=false,preamble='"${licensePreamble}"' --source-map -o lib/mobx.min.js lib/mobx.prod.js`
     )
     exec(`${getCmd(`envify`)} lib/mobx.umd.js > lib/mobx.prod.umd.js`, {
         env: prodEnv
@@ -103,7 +105,7 @@ function generateMinified() {
     exec(
         `${getCmd(
             `uglifyjs`
-        )} --toplevel -m -c warnings=false --preamble "/** MobX - (c) Michel Weststrate 2015 - 2018 - MIT Licensed */" --source-map -o lib/mobx.umd.min.js lib/mobx.prod.umd.js`
+        )} --toplevel -m -c warnings=false -b beautify=false,preamble='"${licensePreamble}"' --source-map -o lib/mobx.umd.min.js lib/mobx.prod.umd.js`
     )
     shell.rm("lib/mobx.prod.js", "lib/mobx.prod.umd.js")
 }
