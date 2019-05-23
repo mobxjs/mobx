@@ -200,7 +200,7 @@ divided.get() // Recovered; Returns 1.5
 ## Computeds with arguments
 
 Sometimes you might want to have a computed value that takes one or more arguments. 
-In such cases mobx-util's [`computedFn`](Mobx-util's `computedFn` now supports creating computeds for functions with arguments: https://github.com/mobxjs/mobx-utils#computedfn) can be used:
+In such cases mobx-util's [`computedFn`](https://github.com/mobxjs/mobx-utils#computedfn) can be used:
 
 ```typescript
 // Parameterized computed views:
