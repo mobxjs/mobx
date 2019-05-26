@@ -1,0 +1,7 @@
+[
+    {
+        "path": "lib/mobx.js",
+        "limit": "20 KB",
+        "running": false
+    }
+]
