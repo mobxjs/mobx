@@ -108,11 +108,11 @@ The api is further the same as the [ES6 set api](https://developer.mozilla.org/e
 
 Usage: `extendObservable(target, properties, decorators?, options?)`.
 
-For each key/value pair in each `propertyMap` a (new) observable property will be introduced on the target object.
+For each key/value pair in each `properties` a (new) observable property will be introduced on the target object.
 This can be used in constructor functions to introduce observable properties without using decorators.
-If a value of the `propertyMap` is a getter function, a *computed* property will be introduced.
+If a value of the `properties` is a getter function, a *computed* property will be introduced.
 
-Use `extendObservable(target, props, decorators?, {deep: false})` if the new properties should not be infective (that is; newly assigned values should not be turned into observables automatically).
+Use `extendObservable(target, properties, decorators?, {deep: false})` if the new properties should not be infective (that is; newly assigned values should not be turned into observables automatically).
 Note that `extendObservable` enhances existing objects, unlike `observable.object` which creates a new object.
 
 [&laquo;details&raquo;](extend-observable.md)
