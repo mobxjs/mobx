@@ -112,6 +112,7 @@ export interface IObservableFactory {
     (value: number | string | null | undefined | boolean): never // Nope, not supported, use box
     (target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): any // decorator
     <T = any>(value: T[], options?: CreateObservableOptions): IObservableArray<T>
+    <T = any>(value: Set<T>, options?: CreateObservableOptions): ObservableSet<T>
     <K = any, V = any>(value: Map<K, V>, options?: CreateObservableOptions): ObservableMap<K, V>
     <T extends Object>(
         value: T,
