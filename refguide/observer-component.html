@@ -61,7 +61,7 @@
         data-chapter-title="(@)observer"
         data-filepath="refguide/observer-component.md"
         data-basepath=".."
-        data-revision="Wed May 01 2019 21:22:38 GMT+0200 (CEST)"
+        data-revision="Wed May 29 2019 16:49:25 GMT+0200 (CEST)"
         data-innerlanguage="">
     
 
@@ -718,29 +718,14 @@
             
         </li>
     
-        <li class="chapter " data-level="8.7" data-path="best/devtools.html">
-            
-                
-                    <a href="../best/devtools.html">
-                
-                        <i class="fa fa-check"></i>
-                        
-                            <b>8.7.</b>
-                        
-                        DevTools
-                    </a>
-            
-            
-        </li>
-    
-        <li class="chapter " data-level="8.8" data-path="refguide/spy.html">
+        <li class="chapter " data-level="8.7" data-path="refguide/spy.html">
             
                 
                     <a href="../refguide/spy.html">
                 
                         <i class="fa fa-check"></i>
                         
-                            <b>8.8.</b>
+                            <b>8.7.</b>
                         
                         spy
                     </a>
@@ -816,24 +801,25 @@
 <p>The <code>observer</code> function / decorator can be used to turn ReactJS components into reactive components.
 It wraps the component&apos;s render function in <code>mobx.autorun</code> to make sure that any data that is used during the rendering of a component forces a re-rendering upon change.
 It is available through the separate <code>mobx-react</code> package.</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observer} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx-react&quot;</span>;
+<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> { observer } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx-react&quot;</span>
 
-<span class="hljs-keyword">var</span> timerData = observable({
-    secondsPassed: <span class="hljs-number">0</span>
-});
+var timerData = observable({
+  secondsPassed: 0
+})
 
 setInterval(() =&gt; {
-    timerData.secondsPassed++;
-}, <span class="hljs-number">1000</span>);
+  timerData.secondsPassed++
+}, 1000)
 
-@observer <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Timer</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">Component</span> </span>{
-    render() {
-        <span class="hljs-keyword">return</span> (<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">span</span>&gt;</span>Seconds passed: { this.props.timerData.secondsPassed } <span class="hljs-tag">&lt;/<span class="hljs-title">span</span>&gt;</span> )</span>
-    }
-};
+@observer
+class Timer extends React.Component {
+  render() {
+    return &lt;span&gt;Seconds passed: {this.props.timerData.secondsPassed} &lt;/span&gt;
+  }
+}
 
-ReactDOM.render(<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">Timer</span> <span class="hljs-attribute">timerData</span>=<span class="hljs-value">{timerData}</span> /&gt;</span>, document.body);
-</span></code></pre>
+ReactDOM.render(&lt;Timer timerData={timerData} /&gt;, document.body)
+</code></pre>
 <p>Tip: when <code>observer</code> needs to be combined with other decorators or higher-order-components, make sure that <code>observer</code> is the innermost (first applied) decorator;
 otherwise it might do nothing at all.</p>
 <p>Note that using <code>@observer</code> as decorator is optional, <code>observer(class Timer ... { })</code> achieves exactly the same.</p>
@@ -846,19 +832,15 @@ So in our above example, the <code>Timer</code> component would <strong>not</str
 <p>In this snippet just the current value of <code>secondsPassed</code> is passed to the <code>Timer</code>, which is the immutable value <code>0</code> (all primitives are immutable in JS).
 That number won&apos;t change anymore in the future, so <code>Timer</code> will never update. It is the property <code>secondsPassed</code> that will change in the future,
 so we need to access it <em>in</em> the component. Or in other words: values need to be passed <em>by reference</em> and not by value.</p>
-<h2 id="hooks-support-react-168">Hooks support (React 16.8+)</h2>
-<p>Hooks support in <code>observer</code> components is currently work-in-progress, and it is not possible yet to use hooks inside <code>observer</code> based function components.</p>
-<p>However, <code>&lt;Observer&gt;{() =&gt; rendering}&lt;/Observer&gt;</code> can be used without problem in normal hook based function components.</p>
-<p>Alternatively, check out <a href="https://github.com/mobxjs/mobx-react-lite" target="_blank"><code>mobx-react-lite</code></a> which does support <code>observer</code> for hook based components, but doesn&apos;t offer class support. Or use our current beta of <code>mobx-react</code> 6 if you feel lucky :). <code>yarn install mobx-react@beta</code></p>
 <h2 id="es5-support">ES5 support</h2>
 <p>In ES5 environments, observer components can be simple declared using <code>observer(React.createClass({ ...</code>. See also the <a href="../best/syntax.md">syntax guide</a></p>
 <h2 id="stateless-function-components">Stateless function components</h2>
 <p>The above timer widget could also be written using stateless function components that are passed through <code>observer</code>:</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observer} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx-react&quot;</span>;
+<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> { observer } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx-react&quot;</span>
 
-<span class="hljs-keyword">const</span> Timer = observer(({ timerData }) =&gt;
-    <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">span</span>&gt;</span>Seconds passed: { timerData.secondsPassed } <span class="hljs-tag">&lt;/<span class="hljs-title">span</span>&gt;</span>
-)</span>;
+const Timer = observer(({ timerData }) =&gt; (
+  &lt;span&gt;Seconds passed: {timerData.secondsPassed} &lt;/span&gt;
+))
 </code></pre>
 <h2 id="observable-local-component-state">Observable local component state</h2>
 <p>Just like normal classes, you can introduce observable properties on a component by using the <code>@observable</code> decorator.
@@ -866,28 +848,32 @@ This means that you can have local state in components that doesn&apos;t need to
 The reactive state will be picked up by <code>render</code> but will not explicitly invoke other React lifecycle methods except <code>componentWillUpdate</code> and <code>componentDidUpdate</code>.
 If you need other React lifecycle methods, just use the normal React <code>state</code> based APIs.</p>
 <p>The example above could also have been written as:</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observer} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx-react&quot;</span>
-<span class="hljs-keyword">import</span> {observable} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>
+<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> { observer } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx-react&quot;</span>
+<span class="hljs-keyword">import</span> { observable } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx&quot;</span>
 
-@observer class Timer extends React.Component {
-    @observable secondsPassed = 0
+@observer
+class Timer extends React.Component {
+  @observable secondsPassed = 0
 
-    componentWillMount() {
-        setInterval(() =&gt; {
-            this.secondsPassed++
-        }, 1000)
-    }
+  componentWillMount() {
+    setInterval(() =&gt; {
+      this.secondsPassed++
+    }, 1000)
+  }
 
-    render() {
-        return (&lt;span&gt;Seconds passed: { this.secondsPassed } &lt;/span&gt; )
-    }
+  render() {
+    return &lt;span&gt;Seconds passed: {this.secondsPassed} &lt;/span&gt;
+  }
 }
 
 ReactDOM.render(&lt;Timer /&gt;, document.body)
 </code></pre>
 <p>For more advantages of using observable local component state, see <a href="https://medium.com/@mweststrate/3-reasons-why-i-stopped-using-react-setstate-ab73fc67a42e" target="_blank">3 reasons why I stopped using <code>setState</code></a>.</p>
+<h2 id="observable-local-state-in-hook-based-components">Observable local state in hook based components</h2>
+<p>To work with local observable state inside function components, the <a href="https://github.com/mobxjs/mobx-react#uselocalstore-hook" target="_blank"><code>useLocalStore</code></a> and <a href="https://github.com/mobxjs/mobx-react#useasobservablesource-hook" target="_blank"><code>useAsObservableSource</code></a> hooks can be used.</p>
 <h2 id="connect-components-to-provided-stores-using-inject">Connect components to provided stores using <code>inject</code></h2>
 <p><a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-connect-mobx-observer-components-to-the-store-with-the-react-provider" target="_blank">egghead.io lesson 8: inject stores with Provider</a></p>
+<p><em>Tip: it is recommended to use <code>React.creatContext</code> instead</em></p>
 <p>The <code>mobx-react</code> package also provides the <code>Provider</code> component that can be used to pass down stores using React&apos;s context mechanism.
 To connect to those stores, pass a list of store names to <code>inject</code>, which will make the stores available as props.</p>
 <p><em> N.B. the syntax to inject stores has changed since mobx-react 4, always use <code>inject(stores)(component)</code> or <code>@inject(stores) class Component...</code>.
@@ -925,37 +911,8 @@ It is still a good separation of concerns for where to handle events, make reque
 All components become responsible for updating when their <em>own</em> dependencies change.
 Its overhead is neglectable and it makes sure that whenever you start using observable data the component will respond to it.
 See this <a href="https://www.reddit.com/r/reactjs/comments/4vnxg5/free_eggheadio_course_learn_mobx_react_in_30/d61oh0l" target="_blank">thread</a> for more details.</p>
-<h2 id="observer-and-purecomponent"><code>observer</code> and <code>PureComponent</code></h2>
-<p><code>observer</code> also prevents re-renderings when the <em>props</em> of the component have only shallowly changed, which makes a lot of sense if the data passed into the component is reactive.
-This behavior is similar to <a href="https://reactjs.org/docs/react-api.html#reactpurecomponent" target="_blank">React PureComponent</a>, except that <em>state</em> changes are still always processed.
-If a component provides its own <code>shouldComponentUpdate</code>, that one takes precedence.</p>
-<p>See for an explanation this <a href="https://github.com/mobxjs/mobx/issues/101" target="_blank">github issue</a></p>
-<h2 id="componentwillreact-lifecycle-hook"><code>componentWillReact</code> (lifecycle hook)</h2>
-<p>React components usually render on a fresh stack, so that makes it often hard to figure out what <em>caused</em> a component to re-render.
-When using <code>mobx-react</code> you can define a new life cycle hook, <code>componentWillReact</code> (pun intended) that will be triggered when a component will be scheduled to re-render because
-data it observes has changed. This makes it easy to trace renders back to the action that caused the rendering.</p>
-<pre><code class="lang-javascript"><span class="hljs-keyword">import</span> {observer} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;mobx-react&quot;</span>;
-
-@observer <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TodoView</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">Component</span> </span>{
-    componentWillReact() {
-        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;I will re-render, since the todo has changed!&quot;</span>);
-    }
-
-    render() {
-        <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">div</span>&gt;</span>this.props.todo.title<span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>;</span>
-    }
-}
-</code></pre>
-<ul>
-<li><code>componentWillReact</code> doesn&apos;t take arguments</li>
-<li><code>componentWillReact</code> won&apos;t fire before the initial render (use <code>componentWillMount</code> instead)</li>
-<li><code>componentWillReact</code> for mobx-react@4+, the hook will fire when receiving new props and after <code>setState</code> calls</li>
-</ul>
 <h2 id="optimizing-components">Optimizing components</h2>
 <p>See the relevant <a href="../best/react-performance.html">section</a>.</p>
-<h2 id="mobxreactdevtools">MobX-React-DevTools</h2>
-<p>In combination with <code>@observer</code> you can use the MobX-React-DevTools, it shows exactly when your components are re-rendered and you can inspect the data dependencies of your components.
-See the <a href="../best/devtools.html">DevTools</a> section.</p>
 <h2 id="characteristics-of-observer-components">Characteristics of observer components</h2>
 <ul>
 <li>Observer only subscribe to the data structures that were actively used during the last render. This means that you cannot under-subscribe or over-subscribe. You can even use data in your rendering that will only be available at later moment in time. This is ideal for asynchronously loading data.</li>
@@ -965,13 +922,6 @@ See the <a href="../best/devtools.html">DevTools</a> section.</p>
 <li>Reactive components sideways load data; parent components won&apos;t re-render unnecessarily even when child components will.</li>
 <li><code>@observer</code> does not depend on React&apos;s context system.</li>
 <li>In mobx-react@4+, the props object and the state object of an observer component are automatically made observable to make it easier to create @computed properties that derive from props inside such a component. If you have a reaction (i.e. <code>autorun</code>) inside your <code>@observer</code> component that must <em>not</em> be re-evaluated when the specific props it uses don&apos;t change, be sure to derefence those specific props for use inside your reaction (i.e. <code>const myProp = props.myProp</code>). Otherwise, if you reference <code>props.myProp</code> inside the reaction, then a change in <em>any</em> of the props will cause the reaction to be re-evaluated. For a typical use case with React-Router, see <a href="https://alexhisen.gitbooks.io/mobx-recipes/content/observable-based-routing.html" target="_blank">this article</a>.</li>
-</ul>
-<h2 id="enabling-es6-decorators-in-your-transpiler">Enabling ES6 decorators in your transpiler</h2>
-<p>Decorators are not supported by default when using TypeScript or Babel pending a definitive definition in the ES standard.</p>
-<ul>
-<li>For <em>typescript</em>, enable the <code>--experimentalDecorators</code> compiler flag or set the compiler option <code>experimentalDecorators</code> to <code>true</code> in <code>tsconfig.json</code> (Recommended)</li>
-<li>For <em>babel5</em>, make sure <code>--stage 0</code> is passed to the Babel CLI</li>
-<li>For <em>babel6</em>, see the example configuration as suggested in this <a href="https://github.com/mobxjs/mobx/issues/105" target="_blank">issue</a></li>
 </ul>
 
                     

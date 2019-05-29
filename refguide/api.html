@@ -61,7 +61,7 @@
         data-chapter-title="API overview"
         data-filepath="refguide/api.md"
         data-basepath=".."
-        data-revision="Wed May 01 2019 21:22:38 GMT+0200 (CEST)"
+        data-revision="Wed May 29 2019 16:49:25 GMT+0200 (CEST)"
         data-innerlanguage="">
     
 
@@ -718,29 +718,14 @@
             
         </li>
     
-        <li class="chapter " data-level="8.7" data-path="best/devtools.html">
-            
-                
-                    <a href="../best/devtools.html">
-                
-                        <i class="fa fa-check"></i>
-                        
-                            <b>8.7.</b>
-                        
-                        DevTools
-                    </a>
-            
-            
-        </li>
-    
-        <li class="chapter " data-level="8.8" data-path="refguide/spy.html">
+        <li class="chapter " data-level="8.7" data-path="refguide/spy.html">
             
                 
                     <a href="../refguide/spy.html">
                 
                         <i class="fa fa-check"></i>
                         
-                            <b>8.8.</b>
+                            <b>8.7.</b>
                         
                         spy
                     </a>
@@ -880,10 +865,10 @@ Note that your browser needs to support ES6 sets, or polyfill them, to make sets
 <p>The api is further the same as the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set" target="_blank">ES6 set api</a></p>
 <h3 id="extendobservable"><code>extendObservable</code></h3>
 <p>Usage: <code>extendObservable(target, properties, decorators?, options?)</code>.</p>
-<p>For each key/value pair in each <code>propertyMap</code> a (new) observable property will be introduced on the target object.
+<p>For each key/value pair in each <code>properties</code> a (new) observable property will be introduced on the target object.
 This can be used in constructor functions to introduce observable properties without using decorators.
-If a value of the <code>propertyMap</code> is a getter function, a <em>computed</em> property will be introduced.</p>
-<p>Use <code>extendObservable(target, props, decorators?, {deep: false})</code> if the new properties should not be infective (that is; newly assigned values should not be turned into observables automatically).
+If a value of the <code>properties</code> is a getter function, a <em>computed</em> property will be introduced.</p>
+<p>Use <code>extendObservable(target, properties, decorators?, {deep: false})</code> if the new properties should not be infective (that is; newly assigned values should not be turned into observables automatically).
 Note that <code>extendObservable</code> enhances existing objects, unlike <code>observable.object</code> which creates a new object.</p>
 <p><a href="extend-observable.html">&#xAB;details&#xBB;</a></p>
 <h3 id="decorators">Decorators</h3>
@@ -1273,7 +1258,7 @@ This can be useful for basic debugging, or slowing down reactions to visualize a
 <h3 id="mobxreactdevtools-package"><code>&quot;mobx-react-devtools&quot;</code> package</h3>
 <p>The mobx-react-devtools is a powerful package that helps you to investigate the performance and dependencies of your react components.
 Also has a powerful logger utility based on <code>spy</code>.</p>
-<p><a href="../best/devtools.html">&#xAB;details&#xBB;</a></p>
+<p><a href="../best/devtools.md">&#xAB;details&#xBB;</a></p>
 <h3 id="trace"><code>trace</code></h3>
 <p>Usage:</p>
 <ul>
