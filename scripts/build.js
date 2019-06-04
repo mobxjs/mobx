@@ -73,7 +73,7 @@ async function generateBundledModule(inputFile, outputFile, format, production) 
     await bundle.write({
         file: outputFile,
         format,
-        banner: "/** MobX - (c) Michel Weststrate 2015 - 2018 - MIT Licensed */",
+        banner: "/** MobX - (c) Michel Weststrate 2015 - 2019 - MIT Licensed */",
         exports: "named",
         name: format === "umd" ? "mobx" : undefined
     })
