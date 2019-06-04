@@ -13,6 +13,7 @@ import {
     fail,
     getMapLikeKeys,
     getNextId,
+    getPlainObjectKeys,
     hasInterceptors,
     hasListeners,
     interceptChange,
@@ -27,6 +28,7 @@ import {
     registerListener,
     spyReportEnd,
     spyReportStart,
+    stringifyKey,
     transaction,
     untracked,
     globalState
@@ -303,7 +305,7 @@ export class ObservableMap<K = any, V = any>
         }
         transaction(() => {
             if (isPlainObject(other))
-                Object.keys(other).forEach(key => this.set((key as any) as K, other[key]))
+                getPlainObjectKeys(other).forEach(key => this.set((key as any) as K, other[key]))
             else if (Array.isArray(other)) other.forEach(([key, value]) => this.set(key, value))
             else if (isES6Map(other)) {
                 if (other.constructor !== Map)
@@ -399,11 +401,6 @@ export class ObservableMap<K = any, V = any>
     intercept(handler: IInterceptor<IMapWillChange<K, V>>): Lambda {
         return registerInterceptor(this, handler)
     }
-}
-
-function stringifyKey(key: any): string {
-    if (key && key.toString) return key.toString()
-    else return new String(key).toString()
 }
 
 /* 'var' fixes small-build issue */

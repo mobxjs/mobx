@@ -12,7 +12,7 @@ export type BabelDescriptor = PropertyDescriptor & { initializer?: () => any }
 
 export type PropertyCreator = (
     instance: any,
-    propertyName: string,
+    propertyName: PropertyKey,
     descriptor: BabelDescriptor | undefined,
     decoratorTarget: any,
     decoratorArgs: any[]

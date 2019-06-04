@@ -220,6 +220,23 @@ test("toJS handles dates", () => {
     expect(a.d === b.d).toBe(true)
 })
 
+test("toJS handles symbol keys in objects and maps", () => {
+    var key = Symbol("key")
+    var a = observable({
+        [key]: 42
+    })
+
+    var b = mobx.toJS(a)
+    expect(b[key]).toBe(42)
+
+    var x = observable.map({
+        [key]: 43
+    })
+
+    var y = mobx.toJS(x)
+    expect(y[key]).toBe(43)
+})
+
 test("json cycles", function() {
     const a = observable({
         b: 1,
