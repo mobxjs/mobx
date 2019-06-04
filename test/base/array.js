@@ -1,22 +1,11 @@
 "use strict"
 
-var mobx = require("../../src/mobx.ts")
-const { observable, $mobx, when, _getAdministration } = mobx
-var iterall = require("iterall")
-
-function buffer() {
-    var b = []
-    var res = function(newValue) {
-        b.push(newValue)
-    }
-    res.toArray = function() {
-        return b
-    }
-    return res
-}
+const mobx = require("../../src/mobx.ts")
+const { observable, when, _getAdministration } = mobx
+const iterall = require("iterall")
 
 test("test1", function() {
-    var a = observable.array([])
+    const a = observable.array([])
     expect(a.length).toBe(0)
     expect(Object.keys(a)).toEqual([])
     expect(a.slice()).toEqual([])
@@ -29,7 +18,7 @@ test("test1", function() {
     expect(a.length).toBe(2)
     expect(a.slice()).toEqual([1, 2])
 
-    var sum = mobx.computed(function() {
+    const sum = mobx.computed(function() {
         return (
             -1 +
             a.reduce(function(a, b) {
@@ -97,17 +86,17 @@ test("test1", function() {
 })
 
 test("array should support iterall / iterable ", () => {
-    var a = observable([1, 2, 3])
+    const a = observable([1, 2, 3])
 
     expect(iterall.isIterable(a)).toBe(true)
     expect(iterall.isArrayLike(a)).toBe(true)
 
-    var values = []
+    const values = []
     iterall.forEach(a, v => values.push(v))
 
     expect(values).toEqual([1, 2, 3])
 
-    var iter = iterall.getIterator(a)
+    let iter = iterall.getIterator(a)
     expect(iter.next()).toEqual({ value: 1, done: false })
     expect(iter.next()).toEqual({ value: 2, done: false })
     expect(iter.next()).toEqual({ value: 3, done: false })
@@ -119,8 +108,8 @@ test("array should support iterall / iterable ", () => {
 })
 
 test("find(findIndex) and remove", function() {
-    var a = mobx.observable([10, 20, 20])
-    var idx = -1
+    const a = mobx.observable([10, 20, 20])
+    let idx = -1
     function predicate(item, index) {
         if (item === 20) {
             idx = index
@@ -147,15 +136,15 @@ test("find(findIndex) and remove", function() {
 })
 
 test("concat should automatically slice observable arrays, #260", () => {
-    var a1 = mobx.observable([1, 2])
-    var a2 = mobx.observable([3, 4])
+    const a1 = mobx.observable([1, 2])
+    const a2 = mobx.observable([3, 4])
     expect(a1.concat(a2)).toEqual([1, 2, 3, 4])
 })
 
 test("observe", function() {
-    var ar = mobx.observable([1, 4])
-    var buf = []
-    var disposer = ar.observe(function(changes) {
+    const ar = mobx.observable([1, 4])
+    const buf = []
+    const disposer = ar.observe(function(changes) {
         buf.push(changes)
     }, true)
 
@@ -177,7 +166,7 @@ test("observe", function() {
         delete change.object
     })
 
-    var result = [
+    const result = [
         { type: "splice", index: 0, addedCount: 2, removed: [], added: [1, 4], removedCount: 0 },
         { type: "update", index: 1, oldValue: 4, newValue: 3 },
         { type: "splice", index: 2, addedCount: 1, removed: [], added: [0], removedCount: 0 },
@@ -210,15 +199,15 @@ test("observe", function() {
 })
 
 test("array modification1", function() {
-    var a = mobx.observable([1, 2, 3])
-    var r = a.splice(-10, 5, 4, 5, 6)
+    const a = mobx.observable([1, 2, 3])
+    const r = a.splice(-10, 5, 4, 5, 6)
     expect(a.slice()).toEqual([4, 5, 6])
     expect(r).toEqual([1, 2, 3])
 })
 
 test("serialize", function() {
-    var a = [1, 2, 3]
-    var m = mobx.observable(a)
+    let a = [1, 2, 3]
+    const m = mobx.observable(a)
 
     expect(JSON.stringify(m)).toEqual(JSON.stringify(a))
 
@@ -231,14 +220,14 @@ test("serialize", function() {
 })
 
 test("array modification functions", function() {
-    var ars = [[], [1, 2, 3]]
-    var funcs = ["push", "pop", "shift", "unshift"]
+    const ars = [[], [1, 2, 3]]
+    const funcs = ["push", "pop", "shift", "unshift"]
     funcs.forEach(function(f) {
         ars.forEach(function(ar) {
-            var a = ar.slice()
-            var b = mobx.observable(a)
-            var res1 = a[f](4)
-            var res2 = b[f](4)
+            const a = ar.slice()
+            const b = mobx.observable(a)
+            const res1 = a[f](4)
+            const res2 = b[f](4)
             expect(res1).toEqual(res2)
             expect(a).toEqual(b.slice())
         })
@@ -246,9 +235,9 @@ test("array modification functions", function() {
 })
 
 test("array modifications", function() {
-    var a2 = mobx.observable([])
-    var inputs = [undefined, -10, -4, -3, -1, 0, 1, 3, 4, 10]
-    var arrays = [
+    const a2 = mobx.observable([])
+    const inputs = [undefined, -10, -4, -3, -1, 0, 1, 3, 4, 10]
+    const arrays = [
         [],
         [1],
         [1, 2, 3, 4],
@@ -256,11 +245,11 @@ test("array modifications", function() {
         [1, undefined],
         [undefined]
     ]
-    for (var i = 0; i < inputs.length; i++)
-        for (var j = 0; j < inputs.length; j++)
-            for (var k = 0; k < arrays.length; k++)
-                for (var l = 0; l < arrays.length; l++) {
-                    var msg = [
+    for (let i = 0; i < inputs.length; i++)
+        for (let j = 0; j < inputs.length; j++)
+            for (let k = 0; k < arrays.length; k++)
+                for (let l = 0; l < arrays.length; l++) {
+                    ;[
                         "array mod: [",
                         arrays[k].toString(),
                         "] i: ",
@@ -271,10 +260,10 @@ test("array modifications", function() {
                         arrays[l].toString(),
                         "]"
                     ].join(" ")
-                    var a1 = arrays[k].slice()
+                    const a1 = arrays[k].slice()
                     a2.replace(a1)
-                    var res1 = a1.splice.apply(a1, [inputs[i], inputs[j]].concat(arrays[l]))
-                    var res2 = a2.splice.apply(a2, [inputs[i], inputs[j]].concat(arrays[l]))
+                    const res1 = a1.splice.apply(a1, [inputs[i], inputs[j]].concat(arrays[l]))
+                    const res2 = a2.splice.apply(a2, [inputs[i], inputs[j]].concat(arrays[l]))
                     expect(a1.slice()).toEqual(a2.slice())
                     expect(res1).toEqual(res2)
                     expect(a1.length).toBe(a2.length)
@@ -282,7 +271,7 @@ test("array modifications", function() {
 })
 
 test("is array", function() {
-    var x = mobx.observable([])
+    const x = mobx.observable([])
     expect(x instanceof Array).toBe(true)
 
     // would be cool if this would return true...
@@ -324,11 +313,11 @@ test("observes when stringified to locale", function() {
 })
 
 test("react to sort changes", function() {
-    var x = mobx.observable([4, 2, 3])
-    var sortedX = mobx.computed(function() {
+    const x = mobx.observable([4, 2, 3])
+    const sortedX = mobx.computed(function() {
         return x.slice().sort()
     })
-    var sorted
+    let sorted
 
     mobx.autorun(function() {
         sorted = sortedX.get()
@@ -345,9 +334,9 @@ test("react to sort changes", function() {
 })
 
 test("autoextend buffer length", function() {
-    var ar = observable(new Array(1000))
-    var changesCount = 0
-    ar.observe(changes => ++changesCount)
+    const ar = observable(new Array(1000))
+    let changesCount = 0
+    ar.observe(() => ++changesCount)
 
     ar[ar.length] = 0
     ar.push(0)
@@ -356,18 +345,18 @@ test("autoextend buffer length", function() {
 })
 
 test("array exposes correct keys", () => {
-    var keys = []
-    var ar = observable([1, 2])
-    for (var key in ar) keys.push(key)
+    const keys = []
+    const ar = observable([1, 2])
+    for (const key in ar) keys.push(key)
 
     expect(keys).toEqual(["0", "1"])
 })
 
 test("isArrayLike", () => {
-    var arr = [0, 1, 2]
-    var observableArr = observable(arr)
+    const arr = [0, 1, 2]
+    const observableArr = observable(arr)
 
-    var isArrayLike = mobx.isArrayLike
+    const isArrayLike = mobx.isArrayLike
     expect(typeof isArrayLike).toBe("function")
 
     expect(isArrayLike(observableArr)).toBe(true)
@@ -379,7 +368,7 @@ test("isArrayLike", () => {
 test("accessing out of bound values throws", () => {
     const a = mobx.observable([])
 
-    var warns = 0
+    let warns = 0
     const baseWarn = console.warn
     console.warn = () => {
         warns++

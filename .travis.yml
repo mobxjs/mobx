@@ -1,11 +1,11 @@
 language: node_js
 install:
     - yarn install --frozen-lockfile
-script: CI=true yarn test:travis
-after_success:
-  - cat ./coverage/lcov.info|./node_modules/coveralls/bin/coveralls.js
+script:
+    - CI=true yarn test:travis
+    - cat ./coverage/lcov.info|./node_modules/coveralls/bin/coveralls.js
 node_js:
-  - 10
+    - 10
 addons:
     apt:
         packages:

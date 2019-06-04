@@ -1,19 +1,5 @@
 const mobx = require("../../src/mobx")
-const {
-    autorun,
-    keys,
-    when,
-    set,
-    remove,
-    values,
-    entries,
-    reaction,
-    observable,
-    extendObservable,
-    has,
-    get,
-    $mobx
-} = mobx
+const { autorun, keys, when, set, remove, values, entries, reaction, observable, has, get } = mobx
 
 test("keys should be observable when extending", () => {
     const todos = observable({})

@@ -1,5 +1,4 @@
 {
-    "version": "2.0.10",
     "compilerOptions": {
         "rootDir": "src",
         "target": "es6",
@@ -17,11 +16,8 @@
         "noUnusedParameters": false,
         "noImplicitAny": false,
         "noImplicitThis": false,
-        "lib": [
-            "es6"
-        ]
+        "experimentalDecorators": true,
+        "lib": ["es6"]
     },
-    "include": [
-        "src/**/*.ts"
-    ]
+    "include": ["src/**/*.ts"]
 }
