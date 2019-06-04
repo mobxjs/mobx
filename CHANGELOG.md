@@ -1,4 +1,10 @@
+# 5.10.0 / 4.10.0
+
+* Added support for symbol named properties in maps and objects. Fixes [#1809](https://github.com/mobxjs/mobx/issues/1809) and [#1925](https://github.com/mobxjs/mobx/issues/1925) through [#1944](https://github.com/mobxjs/mobx/pull/1944) by [@loklaan](https://github.com/loklaan)
 * Added `set` support for `observable.set`, see [#1945](https://github.com/mobxjs/mobx/pull/1945) by [xaviergonz](https://github.com/xaviergonz)
+* Fixed events for arrays using the wrong object, [#1964](https://github.com/mobxjs/mobx/pull/1964) by [xaviergonz](https://github.com/xaviergonz)
+* Improved flow typings [#1960](https://github.com/mobxjs/mobx/pull/1960) by [@tbezman](https://github.com/tbezman)
+* Updated tooling, [#1949](https://github.com/mobxjs/mobx/pull/1949) and [#1931](https://github.com/mobxjs/mobx/pull/1931) by [xaviergonz](https://github.com/xaviergonz)
 
 # 5.9.4 / 4.9.4
 
