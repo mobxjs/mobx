@@ -1,13 +1,10 @@
-var mobx = require("../../src/mobx.ts")
-var m = mobx
-var o = mobx.observable
-
-var value = mobx.value
-var voidObserver = function() {}
+const mobx = require("../../src/mobx.ts")
+const m = mobx
+const o = mobx.observable
 
 function buffer() {
-    var b = []
-    var res = function(x) {
+    const b = []
+    const res = function(x) {
         b.push(x)
     }
     res.toArray = function() {
@@ -17,7 +14,7 @@ function buffer() {
 }
 
 test("isObservable", function() {
-    function Order(price) {}
+    function Order() {}
 
     function ReactiveOrder(price) {
         m.extendObservable(this, {
@@ -42,7 +39,7 @@ test("isObservable", function() {
     expect(m.isObservable(new ReactiveOrder())).toBe(true)
     expect(m.isObservable(m.observable.box(3))).toBe(true)
 
-    var obj = {}
+    const obj = {}
     expect(m.isObservable(obj)).toBe(false)
 
     expect(m.isObservable(m.observable.box(function() {}))).toBe(true)
@@ -74,14 +71,14 @@ test("observable1", function() {
     m._resetGlobalState()
 
     // recursive structure
-    var x = m.observable({
+    const x = m.observable({
         a: {
             b: {
                 c: 3
             }
         }
     })
-    var b = buffer()
+    const b = buffer()
     m.autorun(function() {
         b(x.a.b.c)
     })
@@ -91,7 +88,7 @@ test("observable1", function() {
 
     // recursive structure, but asReference passed in
     expect(m.isObservable(x.a.b)).toBe(true)
-    var x2 = m.observable.object(
+    const x2 = m.observable.object(
         {
             a: {
                 b: {
@@ -108,7 +105,7 @@ test("observable1", function() {
     expect(m.isObservable(x2.a)).toBe(false)
     expect(m.isObservable(x2.a.b)).toBe(false)
 
-    var b2 = buffer()
+    const b2 = buffer()
     m.autorun(function() {
         b2(x2.a.b.c)
     })
@@ -117,14 +114,18 @@ test("observable1", function() {
     expect(b2.toArray()).toEqual([3, 4])
 
     // non recursive structure
-    var x3 = o.shallowObject({
-        a: {
-            b: {
-                c: 3
+    const x3 = o.object(
+        {
+            a: {
+                b: {
+                    c: 3
+                }
             }
-        }
-    })
-    var b3 = buffer()
+        },
+        {},
+        { deep: false }
+    )
+    const b3 = buffer()
     m.autorun(function() {
         b3(x3.a.b.c)
     })
@@ -138,11 +139,11 @@ test("observable3", function() {
         this.price = price
     }
 
-    var x = m.observable({
+    const x = m.observable({
         orders: [new Order(1), new Order(2)]
     })
 
-    var b = buffer()
+    const b = buffer()
     m.autorun(function() {
         b(x.orders.length)
     })
@@ -157,9 +158,9 @@ test("observable3", function() {
 })
 
 test("observable4", function() {
-    var x = m.observable([{ x: 1 }, { x: 2 }])
+    const x = m.observable([{ x: 1 }, { x: 2 }])
 
-    var b = buffer()
+    const b = buffer()
     m.observe(
         m.computed(function() {
             return x.map(function(d) {
@@ -176,9 +177,9 @@ test("observable4", function() {
     expect(b.toArray()).toEqual([[1, 2], [3, 2], [2], [2, 5]])
 
     // non recursive
-    var x2 = o.shallowArray([{ x: 1 }, { x: 2 }])
+    const x2 = o.array([{ x: 1 }, { x: 2 }], { deep: false })
 
-    var b2 = buffer()
+    const b2 = buffer()
     m.observe(
         m.computed(function() {
             return x2.map(function(d) {
@@ -196,20 +197,20 @@ test("observable4", function() {
 })
 
 test("observable5", function() {
-    var x = m.computed(function() {})
+    let x = m.computed(function() {})
     expect(function() {
         x.set(7) // set not allowed
     }).toThrow(/It is not possible to assign a new value to a computed value/)
 
-    var f = function() {}
-    var x2 = m.observable.box(f)
+    let f = function() {}
+    const x2 = m.observable.box(f)
     expect(x2.get()).toBe(f)
     x2.set(null) // allowed
 
     f = function() {
         return this.price
     }
-    var x = m.observable({
+    x = m.observable({
         price: 17,
         get reactive() {
             return this.price
@@ -217,13 +218,13 @@ test("observable5", function() {
         nonReactive: f
     })
 
-    var b = buffer()
+    const b = buffer()
     m.autorun(function() {
         b([x.reactive, x.nonReactive, x.nonReactive()])
     })
 
     x.price = 18
-    var three = function() {
+    const three = function() {
         return 3
     }
     x.nonReactive = three
@@ -231,7 +232,7 @@ test("observable5", function() {
 })
 
 test("flat array", function() {
-    var x = m.observable.object(
+    const x = m.observable.object(
         {
             x: [
                 {
@@ -242,9 +243,9 @@ test("flat array", function() {
         { x: m.observable.shallow }
     )
 
-    var result
-    var updates = 0
-    var dis = m.autorun(function() {
+    let result
+    let updates = 0
+    m.autorun(function() {
         updates++
         result = JSON.stringify(mobx.toJS(x))
     })
@@ -270,13 +271,17 @@ test("flat array", function() {
 })
 
 test("flat object", function() {
-    var y = m.observable.shallowObject({
-        x: { z: 3 }
-    })
+    const y = m.observable.object(
+        {
+            x: { z: 3 }
+        },
+        {},
+        { deep: false }
+    )
 
-    var result
-    var updates = 0
-    var dis = m.autorun(function() {
+    let result
+    let updates = 0
+    m.autorun(function() {
         updates++
         result = JSON.stringify(mobx.toJS(y))
     })
@@ -298,7 +303,7 @@ test("flat object", function() {
 })
 
 test("as structure", function() {
-    var x = m.observable.object(
+    const x = m.observable.object(
         {
             x: null
         },
@@ -307,8 +312,8 @@ test("as structure", function() {
         }
     )
 
-    var changed = 0
-    var dis = m.autorun(function() {
+    let changed = 0
+    const dis = m.autorun(function() {
         changed++
         JSON.stringify(x)
     })
@@ -394,7 +399,7 @@ test("as structure", function() {
 })
 
 test("as structure view", function() {
-    var x = m.observable.object(
+    const x = m.observable.object(
         {
             a: 1,
             aa: 1,
@@ -412,15 +417,15 @@ test("as structure view", function() {
         }
     )
 
-    var bc = 0
-    var bo = m.autorun(function() {
+    let bc = 0
+    m.autorun(function() {
         x.b
         bc++
     })
     expect(bc).toBe(1)
 
-    var cc = 0
-    var co = m.autorun(function() {
+    let cc = 0
+    m.autorun(function() {
         x.c
         cc++
     })
@@ -436,7 +441,7 @@ test("as structure view", function() {
 })
 
 test("ES5 non reactive props", function() {
-    var te = m.observable({})
+    let te = m.observable({})
     Object.defineProperty(te, "nonConfigurable", {
         enumerable: true,
         configurable: false,
@@ -445,7 +450,7 @@ test("ES5 non reactive props", function() {
     })
     // should throw if trying to reconfigure an existing non-configurable prop
     expect(function() {
-        const a = m.extendObservable(te2, { notConfigurable: 1 })
+        m.extendObservable(te2, { notConfigurable: 1 })
     }).toThrow(/'extendObservable' expects an object as first argument/)
     // should skip non-configurable / writable props when using `observable`
     expect(() => {
@@ -456,7 +461,7 @@ test("ES5 non reactive props", function() {
     const d1 = Object.getOwnPropertyDescriptor(te, "nonConfigurable")
     expect(d1.value).toBe("static")
 
-    var te2 = m.observable({})
+    const te2 = m.observable({})
     Object.defineProperty(te2, "notWritable", {
         enumerable: true,
         configurable: true,
@@ -465,7 +470,7 @@ test("ES5 non reactive props", function() {
     })
     // should throw if trying to reconfigure an existing non-writable prop
     expect(function() {
-        const a = m.set(te2, { notWritable: 1 })
+        m.set(te2, { notWritable: 1 })
     }).toThrow(/Cannot make property 'notWritable' observable/)
     const d2 = Object.getOwnPropertyDescriptor(te2, "notWritable")
     expect(d2.value).toBe("static")
@@ -475,7 +480,7 @@ test("ES5 non reactive props", function() {
 })
 
 test("ES5 non reactive props - 2", function() {
-    var te = {}
+    const te = {}
     Object.defineProperty(te, "nonConfigurable", {
         enumerable: true,
         configurable: false,
@@ -499,11 +504,11 @@ test("540 - extendobservable should not report cycles", function() {
         /Cannot make the designated object observable/
     )
 
-    var objWrapper = mobx.observable({
+    const objWrapper = mobx.observable({
         value: null
     })
 
-    var obj = {
+    const obj = {
         name: "Hello"
     }
 
@@ -527,7 +532,7 @@ test("mobx 3", () => {
 
 test("computed value", () => {
     mobx._getGlobalState().mobxGuid = 0
-    var c = mobx.computed(() => 3)
+    const c = mobx.computed(() => 3)
 
     expect(c.toJSON()).toBe(3)
     expect(mobx.isComputed(c)).toBe(true)
@@ -535,7 +540,7 @@ test("computed value", () => {
 })
 
 test("boxed value json", () => {
-    var a = mobx.observable.box({ x: 1 })
+    const a = mobx.observable.box({ x: 1 })
     expect(a.get().x).toEqual(1)
     a.set(3)
     expect(a.get()).toEqual(3)
@@ -544,7 +549,7 @@ test("boxed value json", () => {
 })
 
 test("computed value scope", () => {
-    var a = mobx.observable({
+    const a = mobx.observable({
         x: 1,
         get y() {
             return this.x * 2
@@ -562,7 +567,7 @@ test("computed value scope", () => {
 })
 
 test("shallow array", () => {
-    var a = mobx.observable.shallowArray()
+    const a = mobx.observable.array([], { deep: false })
     a.push({ x: 1 }, [], 2, mobx.observable({ y: 3 }))
 
     expect(mobx.isObservable(a)).toBe(true)
@@ -573,7 +578,7 @@ test("shallow array", () => {
 })
 
 test("761 - deeply nested modifiers work", () => {
-    var a = {}
+    const a = {}
     mobx.extendObservable(a, {
         someKey: mobx.observable.object(
             {
@@ -602,7 +607,7 @@ test("761 - deeply nested modifiers work", () => {
 })
 
 test("compare structurally, ref", () => {
-    var a = mobx.observable.object(
+    const a = mobx.observable.object(
         {
             x: undefined
         },
@@ -611,8 +616,8 @@ test("compare structurally, ref", () => {
         }
     )
 
-    var changed = 0
-    var d = mobx.autorun(() => {
+    let changed = 0
+    const d = mobx.autorun(() => {
         mobx.toJS(a)
         changed++
     })

@@ -62,7 +62,6 @@ test("fix #1535: stale observables", cb => {
         // Acessing computed outside of action causes staleness
         // NOTE IT DOESN'T MATTER WHICH COMPUTED IS ACCESSED
         // derived1.get();
-        debugger
         derived2.get()
     }
 

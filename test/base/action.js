@@ -1,15 +1,15 @@
 "use strict"
 
-var mobx = require("../../src/mobx.ts")
-var utils = require("../utils/test-utils")
+const mobx = require("../../src/mobx.ts")
+const utils = require("../utils/test-utils")
 
 test("action should wrap in transaction", () => {
-    var values = []
+    const values = []
 
-    var observable = mobx.observable.box(0)
-    var d = mobx.autorun(() => values.push(observable.get()))
+    const observable = mobx.observable.box(0)
+    mobx.autorun(() => values.push(observable.get()))
 
-    var increment = mobx.action("increment", amount => {
+    const increment = mobx.action("increment", amount => {
         observable.set(observable.get() + amount * 2)
         observable.set(observable.get() - amount) // oops
     })
@@ -23,9 +23,9 @@ test("action should wrap in transaction", () => {
 })
 
 test("action modifications should be picked up 1", () => {
-    var a = mobx.observable.box(1)
-    var i = 3
-    var b = 0
+    const a = mobx.observable.box(1)
+    let i = 3
+    let b = 0
 
     mobx.autorun(() => {
         b = a.get() * 2
@@ -33,7 +33,7 @@ test("action modifications should be picked up 1", () => {
 
     expect(b).toBe(2)
 
-    var action = mobx.action(() => {
+    const action = mobx.action(() => {
         a.set(++i)
     })
 
@@ -45,8 +45,8 @@ test("action modifications should be picked up 1", () => {
 })
 
 test("action modifications should be picked up 1", () => {
-    var a = mobx.observable.box(1)
-    var b = 0
+    const a = mobx.observable.box(1)
+    let b = 0
 
     mobx.autorun(() => {
         b = a.get() * 2
@@ -54,7 +54,7 @@ test("action modifications should be picked up 1", () => {
 
     expect(b).toBe(2)
 
-    var action = mobx.action(() => {
+    const action = mobx.action(() => {
         a.set(a.get() + 1) // ha, no loop!
     })
 
@@ -66,10 +66,10 @@ test("action modifications should be picked up 1", () => {
 })
 
 test("action modifications should be picked up 3", () => {
-    var a = mobx.observable.box(1)
-    var b = 0
+    const a = mobx.observable.box(1)
+    let b = 0
 
-    var doubler = mobx.computed(() => a.get() * 2)
+    const doubler = mobx.computed(() => a.get() * 2)
 
     doubler.observe(() => {
         b = doubler.get()
@@ -77,7 +77,7 @@ test("action modifications should be picked up 3", () => {
 
     expect(b).toBe(2)
 
-    var action = mobx.action(() => {
+    const action = mobx.action(() => {
         a.set(a.get() + 1) // ha, no loop!
     })
 
@@ -89,19 +89,19 @@ test("action modifications should be picked up 3", () => {
 })
 
 test("test action should be untracked", () => {
-    var a = mobx.observable.box(3)
-    var b = mobx.observable.box(4)
-    var latest = 0
-    var runs = 0
+    const a = mobx.observable.box(3)
+    const b = mobx.observable.box(4)
+    let latest = 0
+    let runs = 0
 
-    var action = mobx.action(baseValue => {
+    const action = mobx.action(baseValue => {
         b.set(baseValue * 2)
         latest = b.get() // without action this would trigger loop
     })
 
-    var d = mobx.autorun(() => {
+    const d = mobx.autorun(() => {
         runs++
-        var current = a.get()
+        const current = a.get()
         action(current)
     })
 
@@ -130,19 +130,19 @@ test("test action should be untracked", () => {
     d()
 })
 
-test("should be possible to create autorun in ation", () => {
-    var a = mobx.observable.box(1)
-    var values = []
+test("should be possible to create autorun in action", () => {
+    const a = mobx.observable.box(1)
+    const values = []
 
-    var adder = mobx.action(inc => {
+    const adder = mobx.action(inc => {
         return mobx.autorun(() => {
             values.push(a.get() + inc)
         })
     })
 
-    var d1 = adder(2)
+    const d1 = adder(2)
     a.set(3)
-    var d2 = adder(17)
+    const d2 = adder(17)
     a.set(24)
     d1()
     a.set(11)
@@ -153,13 +153,13 @@ test("should be possible to create autorun in ation", () => {
 })
 
 test("should be possible to change unobserved state in an action called from computed", () => {
-    var a = mobx.observable.box(2)
+    const a = mobx.observable.box(2)
 
-    var testAction = mobx.action(() => {
+    const testAction = mobx.action(() => {
         a.set(3)
     })
 
-    var c = mobx.computed(() => {
+    const c = mobx.computed(() => {
         testAction()
     })
 
@@ -212,16 +212,16 @@ test("should be possible to change observed state in an action called from compu
 })
 
 test("should not be possible to change observed state in an action called from computed", () => {
-    var a = mobx.observable.box(2)
-    var d = mobx.autorun(() => {
+    const a = mobx.observable.box(2)
+    const d = mobx.autorun(() => {
         a.get()
     })
 
-    var testAction = mobx.action(() => {
+    const testAction = mobx.action(() => {
         a.set(3)
     })
 
-    var c = mobx.computed(() => {
+    const c = mobx.computed(() => {
         testAction()
         return a.get()
     })
@@ -237,13 +237,13 @@ test("should not be possible to change observed state in an action called from c
 })
 
 test("action in autorun should be untracked", () => {
-    var a = mobx.observable.box(2)
-    var b = mobx.observable.box(3)
+    const a = mobx.observable.box(2)
+    const b = mobx.observable.box(3)
 
-    var data = []
-    var multiplier = mobx.action(val => val * b.get())
+    const data = []
+    const multiplier = mobx.action(val => val * b.get())
 
-    var d = mobx.autorun(() => {
+    const d = mobx.autorun(() => {
         data.push(multiplier(a.get()))
     })
 
@@ -259,7 +259,7 @@ test("action in autorun should be untracked", () => {
 })
 
 test("action should not be converted to computed when using (extend)observable", () => {
-    var a = mobx.observable({
+    const a = mobx.observable({
         a: 1,
         b: mobx.action(function() {
             this.a++
@@ -282,7 +282,7 @@ test("action should not be converted to computed when using (extend)observable",
 })
 
 test("#286 exceptions in actions should not affect global state", () => {
-    var autorunTimes = 0
+    let autorunTimes = 0
     function Todos() {
         mobx.extendObservable(this, {
             count: 0,
@@ -312,9 +312,9 @@ test("#286 exceptions in actions should not affect global state", () => {
 
 test("runInAction", () => {
     mobx.configure({ enforceActions: "observed" })
-    var values = []
-    var events = []
-    var spyDisposer = mobx.spy(ev => {
+    const values = []
+    const events = []
+    const spyDisposer = mobx.spy(ev => {
         if (ev.type === "action")
             events.push({
                 name: ev.name,
@@ -322,10 +322,10 @@ test("runInAction", () => {
             })
     })
 
-    var observable = mobx.observable.box(0)
-    var d = mobx.autorun(() => values.push(observable.get()))
+    const observable = mobx.observable.box(0)
+    const d = mobx.autorun(() => values.push(observable.get()))
 
-    var res = mobx.runInAction("increment", () => {
+    let res = mobx.runInAction("increment", () => {
         observable.set(observable.get() + 6 * 2)
         observable.set(observable.get() - 3) // oops
         return 2
@@ -432,9 +432,9 @@ test("extendObservable respects action decorators", () => {
     expect(mobx.isAction(x.a2)).toBe(true)
     expect(mobx.isAction(x.a3)).toBe(false)
 
-    const global = (function() {
-        return this
-    })()
+    // const global = (function() {
+    //     return this
+    // })()
 
     const { a1, a2, a3 } = x
     expect(a1.call(x)).toBe(x)
@@ -458,8 +458,8 @@ test("expect warning superfluos decorator", () => {
 })
 
 test("bound actions bind", () => {
-    var called = 0
-    var x = mobx.observable(
+    let called = 0
+    const x = mobx.observable(
         {
             y: 0,
             z: function(v) {
@@ -476,13 +476,13 @@ test("bound actions bind", () => {
         }
     )
 
-    var d = mobx.autorun(() => {
+    const d = mobx.autorun(() => {
         x.yValue
     })
-    var events = []
-    var d2 = mobx.spy(e => events.push(e))
+    const events = []
+    const d2 = mobx.spy(e => events.push(e))
 
-    var runner = x.z
+    const runner = x.z
     runner(3)
     expect(x.yValue).toBe(6)
     expect(called).toBe(2)

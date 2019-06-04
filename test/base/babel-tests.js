@@ -36,13 +36,13 @@ test("babel", function() {
         }
     }
 
-    var box = new Box()
-    var ar = []
+    const box = new Box()
+    const ar = []
     autorun(() => {
         ar.push(box.width)
     })
 
-    var s = ar.slice()
+    let s = ar.slice()
     expect(s).toEqual([40])
     box.height = 10
     s = ar.slice()
@@ -67,6 +67,7 @@ test("should not be possible to use @action with getters", () => {
             @action
             get Test() {}
         }
+        A // just to avoid the linter warning
     }).toThrowError(/@action cannot be used with getters/)
 
     mobx._resetGlobalState()
@@ -129,7 +130,7 @@ class Order {
     @observable price = 3
     @observable amount = 2
     @observable orders = []
-    @observable aFunction = function(a) {}
+    @observable aFunction = function() {}
 
     @computed
     get total() {
@@ -138,16 +139,16 @@ class Order {
 }
 
 test("decorators", function() {
-    var o = new Order()
+    const o = new Order()
     expect(isObservableObject(o)).toBe(true)
     expect(isObservableProp(o, "amount")).toBe(true)
     expect(o.total).toBe(6) // .... this is required to initialize the props which are made reactive lazily...
     expect(isObservableProp(o, "total")).toBe(true)
 
-    var events = []
-    var d1 = observe(o, ev => events.push(ev.name, ev.oldValue))
-    var d2 = observe(o, "price", ev => events.push(ev.newValue, ev.oldValue))
-    var d3 = observe(o, "total", ev => events.push(ev.newValue, ev.oldValue))
+    const events = []
+    const d1 = observe(o, ev => events.push(ev.name, ev.oldValue))
+    const d2 = observe(o, "price", ev => events.push(ev.newValue, ev.oldValue))
+    const d3 = observe(o, "total", ev => events.push(ev.newValue, ev.oldValue))
 
     o.price = 4
 
@@ -173,11 +174,11 @@ test("issue 191 - shared initializers (babel)", function() {
         @observable array = [2]
     }
 
-    var t1 = new Test()
+    const t1 = new Test()
     t1.obj.a = 2
     t1.array.push(3)
 
-    var t2 = new Test()
+    const t2 = new Test()
     t2.obj.a = 3
     t2.array.push(4)
 
@@ -415,6 +416,7 @@ test("267 (babel) should be possible to declare properties observable outside st
     class Store {
         @observable timer
     }
+    Store // just to avoid linter warning
 
     configure({ enforceActions: "never" })
 })
@@ -454,12 +456,12 @@ test.skip("observable performance", () => {
     const objs = []
     const start = Date.now()
 
-    for (var i = 0; i < AMOUNT; i++) objs.push(new A())
+    for (let i = 0; i < AMOUNT; i++) objs.push(new A())
 
     console.log("created in ", Date.now() - start)
 
-    for (var j = 0; j < 4; j++) {
-        for (var i = 0; i < AMOUNT; i++) {
+    for (let j = 0; j < 4; j++) {
+        for (let i = 0; i < AMOUNT; i++) {
             const obj = objs[i]
             obj.a += 3
             obj.b *= 4
@@ -523,7 +525,7 @@ test("inheritance overrides observable", () => {
         @observable a = 2
     }
 
-    class B {
+    class B extends A {
         @observable a = 5
         @observable b = 3
         @computed
@@ -585,13 +587,11 @@ test("enumerability", () => {
     // not initialized yet
     let ownProps = Object.keys(a)
     let props = []
-    for (var key in a) props.push(key)
+    for (const key in a) props.push(key)
 
-    expect(ownProps).toEqual(
-        [
-            // should have a, not supported yet in babel...
-        ]
-    )
+    expect(ownProps).toEqual([
+        // should have a, not supported yet in babel...
+    ])
 
     expect(props).toEqual(["a", "a2"])
 
@@ -612,7 +612,7 @@ test("enumerability", () => {
 
     ownProps = Object.keys(a)
     props = []
-    for (var key in a) props.push(key)
+    for (const key in a) props.push(key)
 
     expect(ownProps).toEqual([
         "a",
@@ -651,7 +651,7 @@ test("enumerability - workaround", () => {
 
     const ownProps = Object.keys(a)
     const props = []
-    for (var key in a) props.push(key)
+    for (const key in a) props.push(key)
 
     expect(ownProps).toEqual([
         "a",
@@ -681,7 +681,7 @@ test("issue 285 (babel)", () => {
         }
     }
 
-    var todo = new Todo("Something to do")
+    const todo = new Todo("Something to do")
 
     expect(toJS(todo)).toEqual({
         id: 1,
@@ -701,11 +701,9 @@ test("verify object assign (babel)", () => {
     }
 
     const todo = new Todo()
-    expect(Object.assign({}, todo)).toEqual(
-        {
-            //		Should be:	title: "test"!
-        }
-    )
+    expect(Object.assign({}, todo)).toEqual({
+        //		Should be:	title: "test"!
+    })
 
     todo.title // lazy initialization :'(
 
@@ -1091,8 +1089,6 @@ test("actions are reassignable", () => {
 })
 
 test("it should support asyncAction (babel)", async () => {
-    const values = []
-
     mobx.configure({ enforceActions: "observed" })
 
     class X {
@@ -1172,7 +1168,6 @@ test("computed setter problem - 2", () => {
         }
     }
 
-    debugger
     mobx.decorate(Contact, {
         fullName: computed({
             // This doesn't work

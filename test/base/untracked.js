@@ -1,11 +1,11 @@
-var m = require("../../src/mobx.ts")
+const m = require("../../src/mobx.ts")
 
 test("untracked 1", function() {
-    var cCalcs = 0,
+    let cCalcs = 0,
         dCalcs = 0
-    var a = m.observable.box(1)
-    var b = m.observable.box(2)
-    var c = m.computed(function() {
+    const a = m.observable.box(1)
+    const b = m.observable.box(2)
+    const c = m.computed(function() {
         cCalcs++
         return (
             a.get() +
@@ -14,9 +14,9 @@ test("untracked 1", function() {
             })
         )
     })
-    var result
+    let result
 
-    var d = m.autorun(function() {
+    m.autorun(function() {
         dCalcs++
         result = c.get()
     })

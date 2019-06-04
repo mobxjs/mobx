@@ -1,8 +1,8 @@
-var test = require("tape")
-var mobx = require("../../lib/mobx.min.js")
-var observable = mobx.observable
-var computed = mobx.computed
-var log = require("./index.js").logMeasurement
+const test = require("tape")
+const mobx = require("../../lib/mobx.js")
+const observable = mobx.observable
+const computed = mobx.computed
+const log = require("./index.js").logMeasurement
 
 function gc() {
     if (typeof global.gc === "function") global.gc()
@@ -22,11 +22,11 @@ results of this test:
 */
 test("one observes ten thousand that observe one", function(t) {
     gc()
-    var a = observable.box(2)
+    const a = observable.box(2)
 
     // many observers that listen to one..
-    var observers = []
-    for (var i = 0; i < 10000; i++) {
+    const observers = []
+    for (let i = 0; i < 10000; i++) {
         ;(function(idx) {
             observers.push(
                 computed(function() {
@@ -36,25 +36,25 @@ test("one observes ten thousand that observe one", function(t) {
         })(i)
     }
 
-    var bCalcs = 0
+    // let bCalcs = 0
     // one observers that listens to many..
-    var b = computed(function() {
-        var res = 0
-        for (var i = 0; i < observers.length; i++) res += observers[i].get()
-        bCalcs += 1
+    const b = computed(function() {
+        let res = 0
+        for (let i = 0; i < observers.length; i++) res += observers[i].get()
+        // bCalcs += 1
         return res
     })
 
-    var start = now()
+    const start = now()
 
     mobx.observe(b, voidObserver, true) // start observers
     t.equal(99990000, b.get())
-    var initial = now()
+    const initial = now()
 
     a.set(3)
     t.equal(149985000, b.get()) // yes, I verified ;-).
     //t.equal(2, bCalcs);
-    var end = now()
+    const end = now()
 
     log(
         "One observers many observes one - Started/Updated in " +
@@ -68,8 +68,8 @@ test("one observes ten thousand that observe one", function(t) {
 
 test("five hundrend properties that observe their sibling", function(t) {
     gc()
-    var observables = [observable.box(1)]
-    for (var i = 0; i < 500; i++) {
+    const observables = [observable.box(1)]
+    for (let i = 0; i < 500; i++) {
         ;(function(idx) {
             observables.push(
                 computed(function() {
@@ -79,16 +79,16 @@ test("five hundrend properties that observe their sibling", function(t) {
         })(i)
     }
 
-    var start = now()
+    const start = now()
 
-    var last = observables[observables.length - 1]
+    const last = observables[observables.length - 1]
     mobx.observe(last, voidObserver)
     t.equal(501, last.get())
-    var initial = now()
+    const initial = now()
 
     observables[0].set(2)
     t.equal(502, last.get())
-    var end = now()
+    const end = now()
 
     log(
         "500 props observing sibling -  Started/Updated in " +
@@ -102,20 +102,20 @@ test("five hundrend properties that observe their sibling", function(t) {
 
 test("late dependency change", function(t) {
     gc()
-    var values = []
-    for (var i = 0; i < 100; i++) values.push(observable.box(0))
+    const values = []
+    for (let i = 0; i < 100; i++) values.push(observable.box(0))
 
-    var sum = computed(function() {
-        var sum = 0
-        for (var i = 0; i < 100; i++) sum += values[i].get()
+    const sum = computed(function() {
+        let sum = 0
+        for (let i = 0; i < 100; i++) sum += values[i].get()
         return sum
     })
 
     mobx.observe(sum, voidObserver, true)
 
-    var start = new Date()
+    const start = new Date()
 
-    for (var i = 0; i < 10000; i++) values[99].set(i)
+    for (let i = 0; i < 10000; i++) values[99].set(i)
 
     t.equal(sum.get(), 9999)
     log("Late dependency change - Updated in " + (new Date() - start) + "ms.")
@@ -124,11 +124,11 @@ test("late dependency change", function(t) {
 
 test("lots of unused computables", function(t) {
     gc()
-    var a = observable.box(1)
+    const a = observable.box(1)
 
     // many observers that listen to one..
-    var observers = []
-    for (var i = 0; i < 10000; i++) {
+    const observers = []
+    for (let i = 0; i < 10000; i++) {
         ;(function(idx) {
             observers.push(
                 computed(function() {
@@ -139,14 +139,14 @@ test("lots of unused computables", function(t) {
     }
 
     // one observers that listens to many..
-    var b = computed(function() {
-        var res = 0
-        for (var i = 0; i < observers.length; i++) res += observers[i].get()
+    const b = computed(function() {
+        let res = 0
+        for (let i = 0; i < observers.length; i++) res += observers[i].get()
         return res
     })
 
-    var sum = 0
-    var subscription = mobx.observe(
+    let sum = 0
+    const subscription = mobx.observe(
         b,
         function(e) {
             sum = e.newValue
@@ -159,12 +159,12 @@ test("lots of unused computables", function(t) {
     // unsubscribe, nobody should listen to a() now!
     subscription()
 
-    var start = now()
+    const start = now()
 
     a.set(3)
     t.equal(sum, 49995000) // unchanged!
 
-    var end = now()
+    const end = now()
 
     log("Unused computables -   Updated in " + (end - start) + " ms.")
     t.end()
@@ -172,20 +172,20 @@ test("lots of unused computables", function(t) {
 
 test("many unreferenced observables", function(t) {
     gc()
-    var a = observable.box(3)
-    var b = observable.box(6)
-    var c = observable.box(7)
-    var d = computed(function() {
+    const a = observable.box(3)
+    const b = observable.box(6)
+    const c = observable.box(7)
+    const d = computed(function() {
         return a.get() * b.get() * c.get()
     })
     t.equal(d.get(), 126)
     t.equal(d.dependenciesState, -1)
-    var start = now()
-    for (var i = 0; i < 10000; i++) {
+    const start = now()
+    for (let i = 0; i < 10000; i++) {
         c.set(i)
         d.get()
     }
-    var end = now()
+    const end = now()
 
     log("Unused observables -  Updated in " + (end - start) + " ms.")
 
@@ -194,11 +194,11 @@ test("many unreferenced observables", function(t) {
 
 test("array reduce", function(t) {
     gc()
-    var aCalc = 0
-    var ar = observable([])
-    var b = observable.box(1)
+    let aCalc = 0
+    const ar = observable([])
+    const b = observable.box(1)
 
-    var sum = computed(function() {
+    const sum = computed(function() {
         aCalc++
         return ar.reduce(function(a, c) {
             return a + c * b.get()
@@ -206,23 +206,23 @@ test("array reduce", function(t) {
     })
     mobx.observe(sum, voidObserver)
 
-    var start = now()
+    const start = now()
 
-    for (var i = 0; i < 1000; i++) ar.push(i)
+    for (let i = 0; i < 1000; i++) ar.push(i)
 
     t.equal(499500, sum.get())
     t.equal(1001, aCalc)
     aCalc = 0
 
-    var initial = now()
+    const initial = now()
 
-    for (var i = 0; i < 1000; i++) ar[i] = ar[i] * 2
+    for (let i = 0; i < 1000; i++) ar[i] = ar[i] * 2
     b.set(2)
 
     t.equal(1998000, sum.get())
     t.equal(1000, aCalc)
 
-    var end = now()
+    const end = now()
 
     log("Array reduce -  Started/Updated in " + (initial - start) + "/" + (end - initial) + " ms.")
     t.end()
@@ -230,35 +230,35 @@ test("array reduce", function(t) {
 
 test("array classic loop", function(t) {
     gc()
-    var ar = observable([])
-    var aCalc = 0
-    var b = observable.box(1)
-    var sum = computed(function() {
-        var s = 0
+    const ar = observable([])
+    let aCalc = 0
+    const b = observable.box(1)
+    const sum = computed(function() {
+        let s = 0
         aCalc++
-        for (var i = 0; i < ar.length; i++) s += ar[i] * b.get()
+        for (let i = 0; i < ar.length; i++) s += ar[i] * b.get()
         return s
     })
     mobx.observe(sum, voidObserver, true) // calculate
 
-    var start = now()
+    const start = now()
 
     t.equal(1, aCalc)
-    for (var i = 0; i < 1000; i++) ar.push(i)
+    for (let i = 0; i < 1000; i++) ar.push(i)
 
     t.equal(499500, sum.get())
     t.equal(1001, aCalc)
 
-    var initial = now()
+    const initial = now()
     aCalc = 0
 
-    for (var i = 0; i < 1000; i++) ar[i] = ar[i] * 2
+    for (let i = 0; i < 1000; i++) ar[i] = ar[i] * 2
     b.set(2)
 
     t.equal(1998000, sum.get())
     t.equal(1000, aCalc)
 
-    var end = now()
+    const end = now()
 
     log("Array loop -  Started/Updated in " + (initial - start) + "/" + (end - initial) + " ms.")
     t.end()
@@ -267,13 +267,13 @@ test("array classic loop", function(t) {
 function order_system_helper(t, usebatch, keepObserving) {
     gc()
     t.equal(mobx._isComputingDerivation(), false)
-    var orders = observable([])
-    var vat = observable.box(2)
+    const orders = observable([])
+    const vat = observable.box(2)
 
-    var totalAmount = computed(function() {
-        var sum = 0,
+    const totalAmount = computed(function() {
+        let sum = 0,
             l = orders.length
-        for (var i = 0; i < l; i++) sum += orders[i].total.get()
+        for (let i = 0; i < l; i++) sum += orders[i].total.get()
         return sum
     })
 
@@ -310,16 +310,16 @@ function order_system_helper(t, usebatch, keepObserving) {
         )
     }
 
-    var disp
+    let disp
     if (keepObserving) disp = mobx.observe(totalAmount, voidObserver)
 
-    var start = now()
+    const start = now()
 
     function setup() {
-        for (var i = 0; i < 100; i++) {
-            var c = new Order(i % 2 == 0)
+        for (let i = 0; i < 100; i++) {
+            const c = new Order(i % 2 == 0)
             orders.push(c)
-            for (var j = 0; j < 100; j++) c.lines.unshift(new OrderLine(c, 5, 5))
+            for (let j = 0; j < 100; j++) c.lines.unshift(new OrderLine(c, 5, 5))
         }
     }
 
@@ -328,10 +328,10 @@ function order_system_helper(t, usebatch, keepObserving) {
 
     t.equal(totalAmount.get(), 375000)
 
-    var initial = now()
+    const initial = now()
 
     function update() {
-        for (var i = 0; i < 50; i++) orders[i].includeVat.set(!orders[i].includeVat.get())
+        for (let i = 0; i < 50; i++) orders[i].includeVat.set(!orders[i].includeVat.get())
         vat.set(3)
     }
 
@@ -342,7 +342,7 @@ function order_system_helper(t, usebatch, keepObserving) {
 
     if (keepObserving) disp()
 
-    var end = now()
+    const end = now()
     log(
         "Order system batched: " +
             usebatch +
@@ -376,20 +376,20 @@ test("order system batched lazy", function(t) {
 
 test("create array", function(t) {
     gc()
-    var a = []
-    for (var i = 0; i < 1000; i++) a.push(i)
-    var start = now()
-    for (var i = 0; i < 1000; i++) observable.array(a)
+    const a = []
+    for (let i = 0; i < 1000; i++) a.push(i)
+    const start = now()
+    for (let i = 0; i < 1000; i++) observable.array(a)
     log("\nCreate array -  Created in " + (now() - start) + "ms.")
     t.end()
 })
 
 test("create array (fast)", function(t) {
     gc()
-    var a = []
-    for (var i = 0; i < 1000; i++) a.push(i)
-    var start = now()
-    for (var i = 0; i < 1000; i++) mobx.observable.shallowArray(a)
+    const a = []
+    for (let i = 0; i < 1000; i++) a.push(i)
+    const start = now()
+    for (let i = 0; i < 1000; i++) mobx.observable.array(a, { deep: false })
     log("\nCreate array (non-recursive)  Created in " + (now() - start) + "ms.")
     t.end()
 })
@@ -397,16 +397,16 @@ test("create array (fast)", function(t) {
 test("observe and dispose", t => {
     gc()
 
-    var start = now()
-    var a = mobx.observable.box(1)
-    var observers = []
-    var MAX = 50000
+    const start = now()
+    const a = mobx.observable.box(1)
+    const observers = []
+    const MAX = 50000
 
-    for (var i = 0; i < MAX * 2; i++) observers.push(mobx.autorun(() => a.get()))
+    for (let i = 0; i < MAX * 2; i++) observers.push(mobx.autorun(() => a.get()))
     a.set(2)
     // favorable order
     // + unfavorable order
-    for (var i = 0; i < MAX; i++) {
+    for (let i = 0; i < MAX; i++) {
         observers[i]()
         observers[observers.length - 1 - i]()
     }
@@ -428,7 +428,7 @@ test("sort", t => {
             }
         })
     }
-    var items = mobx.observable([])
+    const items = mobx.observable([])
 
     function sortFn(l, r) {
         items.length // screw all optimizations!
@@ -443,40 +443,40 @@ test("sort", t => {
         return 0
     }
 
-    var sorted = mobx.computed(() => {
-        items.sort(sortFn)
+    const sorted = mobx.computed(() => {
+        items.slice().sort(sortFn)
     })
 
-    var start = now()
-    var MAX = 100000
+    let start = now()
+    const MAX = 100000
 
-    var ar = mobx.autorun(() => sorted.get())
+    const ar = mobx.autorun(() => sorted.get())
 
     mobx.transaction(() => {
-        for (var i = 0; i < MAX; i++) items.push(new Item(i % 10, i % 3, i % 7))
+        for (let i = 0; i < MAX; i++) items.push(new Item(i % 10, i % 3, i % 7))
     })
 
     log("expensive sort: created " + (now() - start))
-    var start = now()
+    start = now()
 
-    for (var i = 0; i < 5; i++) {
+    for (let i = 0; i < 5; i++) {
         items[i * 1000].a = 7
         items[i * 1100].b = 5
         items[i * 1200].c = 9
     }
 
     log("expensive sort: updated " + (now() - start))
-    var start = now()
+    start = now()
 
     ar()
 
     log("expensive sort: disposed" + (now() - start))
 
-    var plain = mobx.toJS(items, false)
+    const plain = mobx.toJS(items, false)
     t.equal(plain.length, MAX)
 
-    var start = now()
-    for (var i = 0; i < 5; i++) {
+    start = now()
+    for (let i = 0; i < 5; i++) {
         plain[i * 1000].a = 7
         plain.sort(sortFn)
         plain[i * 1100].b = 5
@@ -492,13 +492,13 @@ test("sort", t => {
 test("computed temporary memoization", t => {
     "use strict"
     gc()
-    var computeds = []
+    const computeds = []
     for (let i = 0; i < 40; i++) {
         computeds.push(
             mobx.computed(() => (i ? computeds[i - 1].get() + computeds[i - 1].get() : 1))
         )
     }
-    var start = now()
+    const start = now()
     t.equal(computeds[27].get(), 134217728)
 
     log("computed memoization " + (now() - start) + "ms")
@@ -507,38 +507,37 @@ test("computed temporary memoization", t => {
 
 test("Map: initializing", function(t) {
     gc()
-    var iterationsCount = 100000
-    var map
-    var i
+    const iterationsCount = 100000
+    let i
 
-    var start = Date.now()
+    const start = Date.now()
     for (i = 0; i < iterationsCount; i++) {
-        map = mobx.observable.map()
+        mobx.observable.map()
     }
-    var end = Date.now()
+    const end = Date.now()
     log("Initilizing " + iterationsCount + " maps: " + (end - start) + " ms.")
     t.end()
 })
 
 test("Map: looking up properties", function(t) {
     gc()
-    var iterationsCount = 1000
-    var propertiesCount = 100
-    var map = mobx.observable.map()
-    var i
-    var p
+    const iterationsCount = 1000
+    const propertiesCount = 100
+    const map = mobx.observable.map()
+    let i
+    let p
 
     for (p = 0; p < propertiesCount; p++) {
         map.set("" + p, p)
     }
 
-    var start = Date.now()
+    const start = Date.now()
     for (i = 0; i < iterationsCount; i++) {
         for (p = 0; p < propertiesCount; p++) {
             map.get("" + p)
         }
     }
-    var end = Date.now()
+    const end = Date.now()
 
     log(
         "Looking up " +
@@ -554,13 +553,13 @@ test("Map: looking up properties", function(t) {
 
 test("Map: setting and deleting properties", function(t) {
     gc()
-    var iterationsCount = 1000
-    var propertiesCount = 100
-    var map = mobx.observable.map()
-    var i
-    var p
+    const iterationsCount = 1000
+    const propertiesCount = 100
+    const map = mobx.observable.map()
+    let i
+    let p
 
-    var start = Date.now()
+    const start = Date.now()
     for (i = 0; i < iterationsCount; i++) {
         for (p = 0; p < propertiesCount; p++) {
             map.set("" + p, i)
@@ -569,7 +568,7 @@ test("Map: setting and deleting properties", function(t) {
             map.delete("" + p, i)
         }
     }
-    var end = Date.now()
+    const end = Date.now()
 
     log(
         "Setting and deleting " +

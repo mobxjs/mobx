@@ -161,7 +161,7 @@ test("cleanup", function() {
 
     let hasA
 
-    const disposer = autorun(function() {
+    autorun(function() {
         hasA = s.has("a")
     })
 
@@ -172,12 +172,13 @@ test("cleanup", function() {
 })
 
 test("set should support iterall / iterable ", () => {
-    var a = set([1, 2])
+    const a = set([1, 2])
 
     function leech(iter) {
-        var values = []
+        const values = []
+        let v
         do {
-            var v = iter.next()
+            v = iter.next()
             if (!v.done) values.push(v.value)
         } while (!v.done)
         return values
@@ -194,21 +195,21 @@ test("set should support iterall / iterable ", () => {
 })
 
 test("support for ES6 Set", () => {
-    var x = new Set()
+    const x = new Set()
     x.add(1)
     x.add(2)
 
-    var s = mobx.observable(x)
+    const s = mobx.observable(x)
     expect(mobx.isObservableSet(s)).toBe(true)
     expect(Array.from(s)).toEqual([1, 2])
 })
 
 test("deepEqual set", () => {
-    var x = new Set()
+    const x = new Set()
     x.add(1)
     x.add({ z: 1 })
 
-    var x2 = mobx.observable.set()
+    const x2 = mobx.observable.set()
     x2.add(1)
     x2.add({ z: 2 })
 
@@ -218,9 +219,9 @@ test("deepEqual set", () => {
 })
 
 test("set.clear should not be tracked", () => {
-    var x = set([1])
-    var c = 0
-    var d = mobx.autorun(() => {
+    const x = set([1])
+    let c = 0
+    const d = mobx.autorun(() => {
         c++
         x.clear()
     })
@@ -239,7 +240,7 @@ test("toStringTag", () => {
 })
 
 test("getAtom", () => {
-    var x = set([1])
+    const x = set([1])
     expect(mobx.getAtom(x)).toBeTruthy()
 
     expect(mobx.isObservableSet(x)).toBeTruthy()
@@ -248,7 +249,7 @@ test("getAtom", () => {
 
 test("observe", () => {
     const vals = []
-    var x = set([1])
+    const x = set([1])
     mobx.observe(x, v => {
         vals.push(v)
     })
