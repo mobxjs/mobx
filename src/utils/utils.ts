@@ -150,6 +150,25 @@ export function isES6Set(thing): thing is Set<any> {
     return thing instanceof Set
 }
 
+/**
+ * Returns the following: own keys, prototype keys & own symbol keys, if they are enumerable.
+ */
+export function getPlainObjectKeys(object) {
+    const enumerables = new Set<PropertyKey>()
+    for (let key in object) enumerables.add(key) // *all* enumerables
+    Object.getOwnPropertySymbols(object).forEach(k => {
+        if (Object.getOwnPropertyDescriptor(object, k)!.enumerable) enumerables.add(k)
+    }) // *own* symbols
+    // Note: this implementation is missing enumerable, inherited, symbolic property names! That would however pretty expensive to add,
+    // as there is no efficient iterator that returns *all* properties
+    return Array.from(enumerables)
+}
+
+export function stringifyKey(key: any): string {
+    if (key && key.toString) return key.toString()
+    else return new String(key).toString()
+}
+
 export function getMapLikeKeys<K, V>(map: ObservableMap<K, V>): ReadonlyArray<K>
 export function getMapLikeKeys<V>(map: IKeyValueMap<V> | any): ReadonlyArray<string>
 export function getMapLikeKeys(map: any): any {
