@@ -18,6 +18,7 @@ test("intercept observable value", () => {
     expect(a.get()).toBe(3)
 
     d = intercept(a, c => {
+        expect(c.object).toBe(a)
         if (c.newValue % 2 === 0) {
             throw "value should be odd!"
         }
@@ -34,6 +35,7 @@ test("intercept observable value", () => {
 
     d()
     d = intercept(a, c => {
+        expect(c.object).toBe(a)
         c.newValue *= 2
         return c
     })
@@ -42,6 +44,7 @@ test("intercept observable value", () => {
     expect(a.get()).toBe(12)
 
     intercept(a, c => {
+        expect(c.object).toBe(a)
         c.newValue += 1
         return c
     })
@@ -64,6 +67,7 @@ test("intercept array", () => {
     d()
 
     d = intercept(a, c => {
+        expect(c.object).toBe(a)
         if (c.type === "splice") {
             c.added.push(c.added[0] * 2)
             c.removedCount = 1
@@ -87,6 +91,7 @@ test("intercept object", () => {
     })
 
     intercept(a, change => {
+        expect(change.object).toBe(a)
         change.newValue *= 3
         return change
     })
@@ -121,6 +126,7 @@ test("intercept object", () => {
 test("intercept property additions", () => {
     const a = m.observable({})
     const d4 = intercept(a, change => {
+        expect(change.object).toBe(a)
         if (change.type === "add") {
             return null
         }
@@ -144,6 +150,7 @@ test("intercept map", () => {
     })
 
     intercept(a, c => {
+        expect(c.object).toBe(a)
         c.newValue *= 3
         return c
     })
@@ -161,6 +168,7 @@ test("intercept map", () => {
     expect(a.get("b")).toBe(16)
 
     const d3 = intercept(a, c => {
+        expect(c.object).toBe(a)
         expect(c.name).toBe("b"), expect(c.object).toBe(a)
         expect(c.type).toBe("update")
         return null
@@ -174,6 +182,7 @@ test("intercept map", () => {
     expect(a.get("b")).toBe(22)
 
     const d4 = intercept(a, c => {
+        expect(c.object).toBe(a)
         if (c.type === "delete") return null
         return c
     })
