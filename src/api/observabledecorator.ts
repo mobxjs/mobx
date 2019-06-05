@@ -4,8 +4,7 @@ import {
     IEnhancer,
     createPropDecorator,
     BabelDescriptor,
-    defineObservableProperty,
-    stringifyKey
+    defineObservableProperty
 } from "../internal"
 
 export type IObservableDecorator = {
@@ -18,7 +17,7 @@ export function createDecoratorForEnhancer(enhancer: IEnhancer<any>): IObservabl
         true,
         (
             target: any,
-            propertyName: PropertyKey,
+            propertyName: string,
             descriptor: BabelDescriptor,
             _decoratorTarget,
             decoratorArgs: any[]
@@ -26,9 +25,7 @@ export function createDecoratorForEnhancer(enhancer: IEnhancer<any>): IObservabl
             if (process.env.NODE_ENV !== "production") {
                 invariant(
                     !descriptor || !descriptor.get,
-                    `@observable cannot be used on getter (property "${stringifyKey(
-                        propertyName
-                    )}"), use @computed instead.`
+                    `@observable cannot be used on getter (property "${propertyName}"), use @computed instead.`
                 )
             }
             const initialValue = descriptor
