@@ -29,8 +29,6 @@ MobX is proudly sponsored by Mendix, Coinbase, Facebook Open Source, Canva, Algo
 <a href="https://blokt.com/"><img src="docs/blokt.jpg" align="center" width="100" title="Blokt" alt="Blokt"/></a>
 <a href="https://www.faire.com/"><img src="docs/faire.jpg" align="center" width="100" title="Faire" alt="Faire"/></a>
 
-https://www.faire.com/
-
 # Installation
 
 - Installation: `npm install mobx --save`. React bindings: `npm install mobx-react --save`. To enable ESNext decorators (optional), see below.
