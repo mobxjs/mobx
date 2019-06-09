@@ -444,7 +444,7 @@ const arrayExtensions = {
             if (hasInterceptors(adm)) {
                 const change = interceptChange<IArrayWillChange<any>>(adm as any, {
                     type: "update",
-                    object: this.proxy,
+                    object: adm.proxy as any, // since "this" is the real array we need to pass its proxy 
                     index,
                     newValue
                 })
