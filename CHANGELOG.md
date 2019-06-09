@@ -1,3 +1,7 @@
+# 5.10.1
+
+* Fixed a recent regression where array update events would send undefined as `change.object` through [#1985](https://github.com/mobxjs/mobx/pull/1985) by [xaviergonz](https://github.com/xaviergonz)
+
 # 5.10.0 / 4.10.0
 
 * Added support for symbol named properties in maps and objects. Fixes [#1809](https://github.com/mobxjs/mobx/issues/1809) and [#1925](https://github.com/mobxjs/mobx/issues/1925) through [#1944](https://github.com/mobxjs/mobx/pull/1944) by [@loklaan](https://github.com/loklaan)
