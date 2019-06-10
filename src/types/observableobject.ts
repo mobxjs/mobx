@@ -87,7 +87,7 @@ export class ObservableObjectAdministration
         public name: string,
         public defaultEnhancer: IEnhancer<any>
     ) {
-        this.keysAtom = new Atom(name + ".keys")
+        this.keysAtom = new Atom(name + ".keys") as IAtom
     }
 
     read(key: PropertyKey) {
