@@ -67,7 +67,7 @@ export function extendObservableObjectWithProperties(
         )
         if (decorators) {
             const keys = getPlainObjectKeys(decorators)
-            for (let i in keys) {
+            for (let i = 0; i < keys.length; i++) {
                 const key = keys[i]
                 if (!(key in properties!))
                     fail(
@@ -81,7 +81,7 @@ export function extendObservableObjectWithProperties(
     startBatch()
     try {
         const keys = getPlainObjectKeys(properties)
-        for (let i in keys) {
+        for (let i = 0; i < keys.length; i++) {
             const key = keys[i]
             const descriptor = Object.getOwnPropertyDescriptor(properties, key)!
             if (process.env.NODE_ENV !== "production") {
@@ -100,8 +100,8 @@ export function extendObservableObjectWithProperties(
                 decorators && key in decorators
                     ? decorators[key]
                     : descriptor.get
-                        ? computedDecorator
-                        : defaultDecorator
+                    ? computedDecorator
+                    : defaultDecorator
             if (process.env.NODE_ENV !== "production" && typeof decorator !== "function")
                 fail(`Not a valid decorator for '${stringifyKey(key)}', got: ${decorator}`)
 
