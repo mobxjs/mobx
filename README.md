@@ -4,7 +4,7 @@
 
 _Simple, scalable state management_
 
-[![Build Status](https://travis-ci.org/mobxjs/mobx.svg?branch=master)](https://travis-ci.org/mobxjs/mobx)
+[![CircleCI](https://circleci.com/gh/mobxjs/mobx.svg?style=svg)](https://circleci.com/gh/mobxjs/mobx)
 [![Coverage Status](https://coveralls.io/repos/mobxjs/mobx/badge.svg?branch=master&service=github)](https://coveralls.io/github/mobxjs/mobx?branch=master)
 [![Join the chat at https://gitter.im/mobxjs/mobx](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mobxjs/mobx?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Discuss MobX on Hashnode](https://hashnode.github.io/badges/mobx.svg)](https://hashnode.com/n/mobx)
@@ -321,7 +321,7 @@ And finally, kudos to all the people that believed in, tried, validated and even
 
 *   Feel free to send small pull requests. Please discuss new features or big changes in a GitHub issue first.
 *   Use `yarn test` to run the basic test suite.
-*   Use `yarn test:travis` for the test suite with coverage.
+*   Use `yarn test:ci` for the test suite with coverage.
 *   and `yarn test:performance` for the performance tests.
 *   Please note that if you want to backport a feature / fix to MobX 4 a second PR needs to be opened to the mobx4-master branch.
 
