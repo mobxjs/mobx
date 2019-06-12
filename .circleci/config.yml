@@ -84,6 +84,14 @@ jobs:
 
             - run: yarn test:webpack
 
+    test-es5:
+        executor: my-executor
+        steps:
+            - attach_workspace:
+                  at: .
+
+            - run: yarn test:es5
+
     test-size:
         executor: my-executor
         steps:
@@ -127,6 +135,9 @@ workflows:
                   requires:
                       - build
             - test-webpack:
+                  requires:
+                      - build
+            - test-es5:
                   requires:
                       - build
             - test-size:
