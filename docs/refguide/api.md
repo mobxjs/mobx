@@ -247,7 +247,7 @@ Usage:
 * `@action boundClassMethod = (args) => { body }`
 * `@action.bound boundClassMethod(args) { body }`
 
-For one-time-actions `runInAction(name?, fn)` can be used, which is sugar for `action(name, fn)()`.
+For one-time-actions `runInAction(name, fn)` can be used, which is sugar for `action(name, fn)()`.
 
 ### Flow
 
