@@ -1,3 +1,11 @@
+# 4.11.0
+
+**BREAKING CHANGE**
+
+Reverted the support of Symbols in general in MobX 4, as it gives to many potential build errors and increases the system requirements for MobX 4 (which was an oversight in 4.10.0). Apologies for the breaking change (lack of new major version numbers). If lock files are properly used however, no harm should be caused by this change.
+
+* Reverted `Symbol` support in observable maps and objects. Reverts [#1944](https://github.com/mobxjs/mobx/pull/1944) through [#1988](https://github.com/mobxjs/mobx/pull/1988). Fixes [#1986](https://github.com/mobxjs/mobx/issues/1986), [#1987](https://github.com/mobxjs/mobx/issues/1987)
+
 # 5.10.1
 
 * Fixed a recent regression where array update events would send undefined as `change.object` through [#1985](https://github.com/mobxjs/mobx/pull/1985) by [xaviergonz](https://github.com/xaviergonz)
