@@ -29,10 +29,8 @@ import {
     IComputedValueOptions,
     initializeInstance,
     createInstanceofPredicate,
-    isObject,
-    stringifyKey
+    isObject
 } from "../internal"
-import { getPlainObjectKeys } from "../utils/utils"
 
 export interface IObservableObject {
     "observable-object": IObservableObject
@@ -40,20 +38,20 @@ export interface IObservableObject {
 
 export type IObjectDidChange =
     | {
-          name: PropertyKey
+          name: string
           object: any
           type: "add"
           newValue: any
       }
     | {
-          name: PropertyKey
+          name: string
           object: any
           type: "update"
           oldValue: any
           newValue: any
       }
     | {
-          name: PropertyKey
+          name: string
           object: any
           type: "remove"
           oldValue: any
@@ -63,26 +61,25 @@ export type IObjectWillChange =
     | {
           object: any
           type: "update" | "add"
-          name: PropertyKey
+          name: string
           newValue: any
       }
     | {
           object: any
           type: "remove"
-          name: PropertyKey
+          name: string
       }
 
 export class ObservableObjectAdministration
     implements IInterceptable<IObjectWillChange>, IListenable {
-    // @ts-ignore
-    values: { [key: PropertyKey]: ObservableValue<any> | ComputedValue<any> } = {}
-    keys: undefined | IObservableArray<PropertyKey>
+    values: { [key: string]: ObservableValue<any> | ComputedValue<any> } = {}
+    keys: undefined | IObservableArray<string>
     changeListeners
     interceptors
 
     constructor(public target: any, public name: string, public defaultEnhancer: IEnhancer<any>) {}
 
-    read(owner: any, key: PropertyKey) {
+    read(owner: any, key: string) {
         if (process.env.NODE_ENV === "production" && this.target !== owner) {
             this.illegalAccess(owner, key)
             if (!this.values[key]) return undefined
@@ -90,7 +87,7 @@ export class ObservableObjectAdministration
         return this.values[key].get()
     }
 
-    write(owner: any, key: PropertyKey, newValue) {
+    write(owner: any, key: string, newValue) {
         const instance = this.target
         if (process.env.NODE_ENV === "production" && instance !== owner) {
             this.illegalAccess(owner, key)
@@ -136,7 +133,7 @@ export class ObservableObjectAdministration
         }
     }
 
-    remove(key: PropertyKey) {
+    remove(key: string) {
         if (!this.values[key]) return
         const { target } = this
         if (hasInterceptors(this)) {
@@ -172,7 +169,7 @@ export class ObservableObjectAdministration
         }
     }
 
-    illegalAccess(owner, propName: PropertyKey) {
+    illegalAccess(owner, propName) {
         /**
          * This happens if a property is accessed through the prototype chain, but the property was
          * declared directly as own property on the prototype.
@@ -193,9 +190,7 @@ export class ObservableObjectAdministration
          * When using decorate, the property will always be redeclared as own property on the actual instance
          */
         console.warn(
-            `Property '${stringifyKey(
-                propName
-            )}' of '${owner}' was accessed through the prototype chain. Use 'decorate' instead to declare the prop or access it statically through it's owner`
+            `Property '${propName}' of '${owner}' was accessed through the prototype chain. Use 'decorate' instead to declare the prop or access it statically through it's owner`
         )
     }
 
@@ -217,11 +212,11 @@ export class ObservableObjectAdministration
         return registerInterceptor(this, handler)
     }
 
-    getKeys(): PropertyKey[] {
+    getKeys(): string[] {
         if (this.keys === undefined) {
             this.keys = <any>(
                 new ObservableArray(
-                    getPlainObjectKeys(this.values).filter(
+                    Object.keys(this.values).filter(
                         key => this.values[key] instanceof ObservableValue
                     ),
                     referenceEnhancer,
@@ -262,7 +257,7 @@ export function asObservableObject(
 
 export function defineObservableProperty(
     target: any,
-    propName: PropertyKey,
+    propName: string,
     newValue,
     enhancer: IEnhancer<any>
 ) {
@@ -282,7 +277,7 @@ export function defineObservableProperty(
     const observable = (adm.values[propName] = new ObservableValue(
         newValue,
         enhancer,
-        `${adm.name}.${stringifyKey(propName)}`,
+        `${adm.name}.${propName}`,
         false
     ))
     newValue = (observable as any).value // observableValue might have changed it
@@ -294,11 +289,11 @@ export function defineObservableProperty(
 
 export function defineComputedProperty(
     target: any, // which objects holds the observable and provides `this` context?
-    propName: PropertyKey,
+    propName: string,
     options: IComputedValueOptions<any>
 ) {
     const adm = asObservableObject(target)
-    options.name = `${adm.name}.${stringifyKey(propName)}`
+    options.name = `${adm.name}.${propName}`
     options.context = target
     adm.values[propName] = new ComputedValue(options)
     Object.defineProperty(target, propName, generateComputedPropConfig(propName))
@@ -353,7 +348,7 @@ export function generateComputedPropConfig(propName) {
 function notifyPropertyAddition(
     adm: ObservableObjectAdministration,
     object,
-    key: PropertyKey,
+    key: string,
     newValue
 ) {
     const notify = hasListeners(adm)
