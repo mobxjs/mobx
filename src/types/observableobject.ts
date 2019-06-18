@@ -385,7 +385,7 @@ export function generateComputedPropConfig(propName) {
     return (
         computedPropertyConfigs[propName] ||
         (computedPropertyConfigs[propName] = {
-            configurable: false, // See https://github.com/mobxjs/mobx/issues/1867, for computeds, we don't want reconfiguration, as this will potentially leak memory!
+            configurable: globalState.computedConfigurable,
             enumerable: false,
             get() {
                 return getAdministrationForComputedPropOwner(this).read(propName)

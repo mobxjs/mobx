@@ -101,6 +101,12 @@ export class MobXGlobals {
      */
     computedRequiresReaction = false
 
+    /**
+     * Allows overwriting of computed properties, useful in tests but not prod as it can cause
+     * memory leaks. See https://github.com/mobxjs/mobx/issues/1867
+     */
+    computedConfigurable = false
+
     /*
      * Don't catch and rethrow exceptions. This is useful for inspecting the state of
      * the stack when an exception occurs while debugging.
@@ -108,7 +114,7 @@ export class MobXGlobals {
     disableErrorBoundaries = false
 
     /*
-     * If true, we are already handling an exception in an action. Any errors in reactions should be supressed, as 
+     * If true, we are already handling an exception in an action. Any errors in reactions should be supressed, as
      * they are not the cause, see: https://github.com/mobxjs/mobx/issues/1836
      */
     suppressReactionErrors = false
