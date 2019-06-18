@@ -1,3 +1,7 @@
+# 4.12.0
+
+* Added `computedConfigurable` config [#2011](https://github.com/mobxjs/mobx/pull/2011)
+
 # 4.11.0
 
 **BREAKING CHANGE**
