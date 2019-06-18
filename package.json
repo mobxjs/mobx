@@ -1,6 +1,6 @@
 {
   "name": "mobx",
-  "version": "4.12.0",
+  "version": "4.11.0",
   "description": "Simple, scalable state management.",
   "main": "lib/mobx.js",
   "umd:main": "lib/mobx.umd.js",
