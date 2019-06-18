@@ -520,6 +520,14 @@ Use this if you want to check whether you are using computed properties without 
 configure({ computedRequiresReaction: true });
 ```
 
+#### `computedConfigurable: boolean`
+Allows overwriting computed values. This is useful for testing purposes *only*. Don't enable this
+ on production as it can cause memory-leaks. 
+
+```javascript
+configure({ computedConfigurable: true });
+```
+
 #### `disableErrorBoundaries: boolean`
 By default, MobX will catch and rethrow exceptions happening in your code to make sure that a reaction in one exception does not prevent the scheduled execution of other, possibly unrelated, reactions. This means exceptions are not propagated back to the original causing code and therefore you won't be able to catch them using try/catch.
 
