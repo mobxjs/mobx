@@ -249,3 +249,24 @@ test("#1869", function() {
     }).toThrow("Since strict-mode is enabled")
     mobx._resetGlobalState() // should preserve strict mode
 })
+
+test("allow overwriting computed if configured", function() {
+    try {
+        mobx.configure({ computedConfigurable: true })
+        const x = mobx.observable({
+            v: 2,
+            @mobx.computed
+            get multiplied() {
+                return this.v * 2
+            }
+        })
+        expect(() => {
+            Object.defineProperty(x, "multiplied", {
+                value: 12
+            })
+        }).not.toThrow()
+        expect(x.multiplied).toBe(12)
+    } finally {
+        mobx.configure({ computedConfigurable: false })
+    }
+})
