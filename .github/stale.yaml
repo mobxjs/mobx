@@ -4,9 +4,6 @@ daysUntilStale: 60
 daysUntilClose: 10
 # Issues with these labels will never be considered stale
 exemptLabels:
-  - pinned
-  - security
-  - discuss
   - bug
   - has PR
 # Label to use when marking an issue as stale
