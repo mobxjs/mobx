@@ -10,6 +10,7 @@ import {
 export function configure(options: {
     enforceActions?: boolean | "strict" | "never" | "always" | "observed"
     computedRequiresReaction?: boolean
+    computedConfigurable?: boolean
     isolateGlobalState?: boolean
     disableErrorBoundaries?: boolean
     arrayBuffer?: number
@@ -18,6 +19,7 @@ export function configure(options: {
     const {
         enforceActions,
         computedRequiresReaction,
+        computedConfigurable,
         disableErrorBoundaries,
         arrayBuffer,
         reactionScheduler
@@ -54,6 +56,9 @@ export function configure(options: {
     }
     if (computedRequiresReaction !== undefined) {
         globalState.computedRequiresReaction = !!computedRequiresReaction
+    }
+    if (computedConfigurable !== undefined) {
+        globalState.computedConfigurable = !!computedConfigurable
     }
     if (disableErrorBoundaries !== undefined) {
         if (disableErrorBoundaries === true)
