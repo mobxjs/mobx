@@ -171,23 +171,23 @@ Either use `extendObservable` in `componentWillMount` instead of `@observable`, 
 
 #### The display name of react components is not set
 
-If you use `export const MyComponent = observer((props => <div>hi</div>))`, no display name will be visible in the devtools.
+If you use `export const MyComponent = observer(props => <div>hi</div>)`, no display name will be visible in the devtools.
 The following approaches can be used to fix this:
 
 ```javascript
 // 1 (set displayName explicitly)
-export const MyComponent = observer((props => <div>hi</div>))
+export const MyComponent = observer(props => <div>hi</div>)
 myComponent.displayName = "MyComponent"
 
 // 2 (MobX infers component name from function name)
 export const MyComponent = observer(function MyComponent(props) { return <div>hi</div> })
 
 // 3 (transpiler will infer component name from variable name)
-const _MyComponent = observer((props => <div>hi</div>)) //
+const _MyComponent = props => <div>hi</div>
 export const MyComponent = observer(_MyComponent)
 
 // 4 (with default export)
-const MyComponent = observer((props => <div>hi</div>))
+const MyComponent = props => <div>hi</div>
 export default observer(MyComponent)
 ```
 
