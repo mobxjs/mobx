@@ -16,18 +16,22 @@ _Simple, scalable state management_
 
 MobX is proudly sponsored by Mendix, Coinbase, Facebook Open Source, Canva, Algolia, Guilded, Auction Frontier, Mantro and TalentPlot for 100\$/month or more! And beyond that by many [individual backers](#backers) and through [one time contributions](https://github.com/mobxjs/mobx/blob/master/sponsors.md).
 
+**🥇Gold sponsors (\$250+ pm):** <br/>
 <a href="https://mendix.com/"><img src="docs/mendix-logo.png" align="center" width="100" title="Mendix" alt="Mendix" /></a>
-<a href="https://coinbase.com/"><img src="docs/coinbase.jpeg" align="center" width="100" title="Coinbase" alt="Coinbase" /></a>
+<a href="http://auctionfrontier.com/"><img src="docs/auctionfrontier.jpeg" align="center" width="100" title="Auction Frontier" alt="Auction Frontier"></a>
+
+**🥈Silver sponsors (\$100+ pm):**<br/>
 <a href="https://opensource.facebook.com/"><img src="docs/fbos.jpeg" align="center" width="100" title="Facebook Open Source" alt="Facebook Open Source" /></a>
 <a href="https://www.canva.com/"><img src="docs/canva.png" align="center" width="100" title="Canva" alt="Canva" /></a>
-<a href="https://www.algolia.com/"><img src="docs/algolia.jpg" align="center" width="100" title="Algolia" alt="Algolia" /></a>
 <a href="https://www.guilded.gg/"><img src="docs/guilded.jpg" align="center" width="100" title="Guilded" alt="Guilded" /></a>
-<a href="http://auctionfrontier.com/"><img src="docs/auctionfrontier.jpeg" align="center" width="100" title="Auction Frontier" alt="Auction Frontier"/></a>
-<a href="https://mantro.net/jobs/warlock"><img src="docs/mantro.png" align="center" width="100" title="mantro GmbH" alt="mantro GmbH"/></a>
-<a href="https://talentplot.com/"><img src="docs/talentplot.png" align="center" width="100" title="talentplot" alt="talentplot"/></a>
-<a href="https://www.codefirst.co.uk/"><img src="docs/codefirst.png" align="center" width="100" title="CodeFirst" alt="CodeFirst"/></a>
-<a href="https://blokt.com/"><img src="docs/blokt.jpg" align="center" width="100" title="Blokt" alt="Blokt"/></a>
-<a href="https://www.faire.com/"><img src="docs/faire.jpg" align="center" width="100" title="Faire" alt="Faire"/></a>
+<a href="https://mantro.net/jobs/warlock"><img src="docs/mantro.png" align="center" width="100" title="mantro GmbH" alt="mantro GmbH"></a>
+<a href="https://www.codefirst.co.uk/"><img src="https://mobx.js.org/docs/codefirst.png" align="center" width="100" title="CodeFirst" alt="CodeFirst"/></a>
+<a href="https://blokt.com/"><img src="https://mobx.js.org/docs/blokt.jpg" align="center" width="100" title="Blokt" alt="Blokt"/></a>
+
+**🥉Bronze sponsors:**<br/>
+<a href="https://coinbase.com/"><img src="docs/coinbase.jpeg" align="center" width="100" title="Coinbase" alt="Coinbase" /></a>
+<a href="https://www.algolia.com/"><img src="docs/algolia.jpg" align="center" width="100" title="Algolia" alt="Algolia" /></a>
+<a href="https://talentplot.com/"><img src="docs/talentplot.png" align="center" width="100" title="talentplot" alt="talentplot"></a>
 
 # Installation
 
@@ -90,12 +94,12 @@ MobX adds observable capabilities to existing data structures like objects, arra
 This can simply be done by annotating your class properties with the [@observable](http://mobxjs.github.io/mobx/refguide/observable-decorator.html) decorator (ES.Next).
 
 ```javascript
-import { observable } from "mobx";
+import { observable } from "mobx"
 
 class Todo {
-  id = Math.random();
-  @observable title = "";
-  @observable finished = false;
+  id = Math.random()
+  @observable title = ""
+  @observable finished = false
 }
 ```
 
@@ -108,17 +112,17 @@ Or you can skip them altogether, as MobX can be used fine without decorator _syn
 Many MobX users do prefer the decorator syntax though, as it is slightly more concise.
 
 ```javascript
-import { decorate, observable } from "mobx";
+import { decorate, observable } from "mobx"
 
 class Todo {
-  id = Math.random();
-  title = "";
-  finished = false;
+  id = Math.random()
+  title = ""
+  finished = false
 }
 decorate(Todo, {
   title: observable,
   finished: observable
-});
+})
 ```
 
 ### Computed values
@@ -130,9 +134,9 @@ By using the [`@computed`](http://mobxjs.github.io/mobx/refguide/computed-decora
 
 ```javascript
 class TodoList {
-  @observable todos = [];
+  @observable todos = []
   @computed get unfinishedTodoCount() {
-    return this.todos.filter(todo => !todo.finished).length;
+    return this.todos.filter(todo => !todo.finished).length
   }
 }
 ```
@@ -154,9 +158,9 @@ In short, reactions bridge [reactive](https://en.wikipedia.org/wiki/Reactive_pro
 If you are using React, you can turn your (stateless function) components into reactive components by simply adding the [`observer`](http://mobxjs.github.io/mobx/refguide/observer-component.html) function / decorator from the `mobx-react` package onto them.
 
 ```javascript
-import React, { Component } from "react";
-import ReactDOM from "react-dom";
-import { observer } from "mobx-react";
+import React, { Component } from "react"
+import ReactDOM from "react-dom"
+import { observer } from "mobx-react"
 
 @observer
 class TodoListView extends Component {
@@ -170,26 +174,19 @@ class TodoListView extends Component {
         </ul>
         Tasks left: {this.props.todoList.unfinishedTodoCount}
       </div>
-    );
+    )
   }
 }
 
 const TodoView = observer(({ todo }) => (
   <li>
-    <input
-      type="checkbox"
-      checked={todo.finished}
-      onClick={() => (todo.finished = !todo.finished)}
-    />
+    <input type="checkbox" checked={todo.finished} onClick={() => (todo.finished = !todo.finished)} />
     {todo.title}
   </li>
-));
+))
 
-const store = new TodoList();
-ReactDOM.render(
-  <TodoListView todoList={store} />,
-  document.getElementById("mount")
-);
+const store = new TodoList()
+ReactDOM.render(<TodoListView todoList={store} />, document.getElementById("mount"))
 ```
 
 `observer` turns React (function) components into derivations of the data they render.
@@ -206,8 +203,8 @@ For example the following `autorun` prints a log message each time the amount of
 
 ```javascript
 autorun(() => {
-  console.log("Tasks left: " + todos.unfinishedTodoCount);
-});
+  console.log("Tasks left: " + todos.unfinishedTodoCount)
+})
 ```
 
 ### What will MobX react to?
@@ -235,8 +232,8 @@ After updating the state `MobX` will take care of the rest in an efficient, glit
 There is no technical need for firing events, calling a dispatcher or what more. A React component in the end is nothing more than a fancy representation of your state. A derivation that will be managed by MobX.
 
 ```javascript
-store.todos.push(new Todo("Get Coffee"), new Todo("Write simpler code"));
-store.todos[0].finished = true;
+store.todos.push(new Todo("Get Coffee"), new Todo("Write simpler code"))
+store.todos[0].finished = true
 ```
 
 Nonetheless, MobX has an optional built-in concept of [`actions`](https://mobxjs.github.io/mobx/refguide/action.html).
