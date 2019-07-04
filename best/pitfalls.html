@@ -61,7 +61,7 @@
         data-chapter-title="Common Pitfalls &amp; Best Practices"
         data-filepath="best/pitfalls.md"
         data-basepath=".."
-        data-revision="Wed May 29 2019 16:49:25 GMT+0200 (CEST)"
+        data-revision="Thu Jul 04 2019 12:23:15 GMT+0200 (CEST)"
         data-innerlanguage="">
     
 
@@ -912,23 +912,23 @@ So make sure to always dispose your reactions when you no longer need them!</p>
 <p>The following exception: <code>Uncaught TypeError: Cannot assign to read only property &apos;__mobxLazyInitializers&apos; of object</code> occurs when using a <code>react-hot-loader</code> that does not support decorators.
 Either use <code>extendObservable</code> in <code>componentWillMount</code> instead of <code>@observable</code>, or upgrade to <code>react-hot-loader</code> <code>&quot;^3.0.0-beta.2&quot;</code> or higher.</p>
 <h4 id="the-display-name-of-react-components-is-not-set">The display name of react components is not set</h4>
-<p>If you use <code>export const MyComponent = observer((props =&gt; &lt;div&gt;hi&lt;/div&gt;))</code>, no display name will be visible in the devtools.
+<p>If you use <code>export const MyComponent = observer(props =&gt; &lt;div&gt;hi&lt;/div&gt;)</code>, no display name will be visible in the devtools.
 The following approaches can be used to fix this:</p>
 <pre><code class="lang-javascript"><span class="hljs-comment">// 1 (set displayName explicitly)</span>
-<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> MyComponent = observer((props =&gt; <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">div</span>&gt;</span>hi<span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>)</span>)
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> MyComponent = observer(props =&gt; <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">div</span>&gt;</span>hi<span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>)</span>
 myComponent.displayName = <span class="hljs-string">&quot;MyComponent&quot;</span>
 
 <span class="hljs-comment">// 2 (MobX infers component name from function name)</span>
 <span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> MyComponent = observer(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">MyComponent</span>(<span class="hljs-params">props</span>) </span>{ <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">div</span>&gt;</span>hi<span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span> })
 
 // 3 (transpiler will infer component name from variable name)
-const _MyComponent = observer((props =&gt; <span class="hljs-tag">&lt;<span class="hljs-title">div</span>&gt;</span>hi<span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>)</span>) <span class="hljs-comment">//</span>
-<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> MyComponent = observer(_MyComponent)
+const _MyComponent = props =&gt; <span class="hljs-tag">&lt;<span class="hljs-title">div</span>&gt;</span>hi<span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>
+export const MyComponent = observer(_MyComponent)
 
-<span class="hljs-comment">// 4 (with default export)</span>
-<span class="hljs-keyword">const</span> MyComponent = observer((props =&gt; <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">div</span>&gt;</span>hi<span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>)</span>)
-<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> observer(MyComponent)
-</code></pre>
+// 4 (with default export)
+const MyComponent = props =&gt; <span class="hljs-tag">&lt;<span class="hljs-title">div</span>&gt;</span>hi<span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>
+export default observer(MyComponent)
+</span></code></pre>
 <p>See also: <a href="http://mobxjs.github.io/mobx/best/stateless-HMR.html" target="_blank">http://mobxjs.github.io/mobx/best/stateless-HMR.html</a> or <a href="https://github.com/mobxjs/mobx/issues/141#issuecomment-228457886" target="_blank">#141</a>.</p>
 <h4 id="the-proptype-of-an-observable-array-is-object">The propType of an observable array is object</h4>
 <p>Observable arrays are actually objects, so they comply to <code>propTypes.object</code> instead of <code>array</code>.

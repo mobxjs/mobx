@@ -61,7 +61,7 @@
         data-chapter-title="API overview"
         data-filepath="refguide/api.md"
         data-basepath=".."
-        data-revision="Wed May 29 2019 16:49:25 GMT+0200 (CEST)"
+        data-revision="Thu Jul 04 2019 12:23:15 GMT+0200 (CEST)"
         data-innerlanguage="">
     
 
@@ -1194,6 +1194,11 @@ See also <code>observable</code>.</p>
 <p>Forbids the access of any unobserved computed value.
 Use this if you want to check whether you are using computed properties without a reactive context.</p>
 <pre><code class="lang-javascript">configure({ computedRequiresReaction: <span class="hljs-literal">true</span> });
+</code></pre>
+<h4 id="computedconfigurable-boolean"><code>computedConfigurable: boolean</code></h4>
+<p>Allows overwriting computed values. This is useful for testing purposes <em>only</em>. Don&apos;t enable this
+ on production as it can cause memory-leaks. </p>
+<pre><code class="lang-javascript">configure({ computedConfigurable: <span class="hljs-literal">true</span> });
 </code></pre>
 <h4 id="disableerrorboundaries-boolean"><code>disableErrorBoundaries: boolean</code></h4>
 <p>By default, MobX will catch and rethrow exceptions happening in your code to make sure that a reaction in one exception does not prevent the scheduled execution of other, possibly unrelated, reactions. This means exceptions are not propagated back to the original causing code and therefore you won&apos;t be able to catch them using try/catch.</p>

@@ -61,7 +61,7 @@
         data-chapter-title="toJS"
         data-filepath="refguide/tojson.md"
         data-basepath=".."
-        data-revision="Wed May 29 2019 16:49:25 GMT+0200 (CEST)"
+        data-revision="Thu Jul 04 2019 12:23:15 GMT+0200 (CEST)"
         data-innerlanguage="">
     
 
@@ -794,10 +794,11 @@
 Supports observable arrays, objects, maps and primitives.
 Computed values and other non-enumerable properties won&apos;t be part of the result.
 Cycles are detected and properly supported by default, but this can be disabled to improve performance.</p>
-<p><code>toJS</code> accepts two options</p>
+<p><code>toJS</code> accepts three options</p>
 <ol>
 <li><code>exportMapsAsObjects</code> whether to serialize observable maps to objects (<code>true</code>) or javascript Map objects (<code>false</code>) default <code>true</code>.</li>
 <li><code>detectCycles</code> if a cycle is detected, reuse the already serialized object. Which prevents endless recursion. Default <code>true</code>.</li>
+<li><code>recurseEverything</code> detects and converts observable objects that are &quot;behind&quot; non-observable objects.</li>
 </ol>
 <p>For more complex (de)serialization scenario&apos;s, one can use <a href="https://github.com/mobxjs/serializr" target="_blank">serializr</a></p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">var</span> obj = mobx.observable({
