@@ -149,8 +149,11 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
             if (shouldCompute(this)) {
                 this.warnAboutUntrackedRead()
                 startBatch() // See perf test 'computed memoization'
-                this.value = this.computeValue(false)
-                endBatch()
+                try {
+                    this.value = this.computeValue(false)
+                } finally {
+                    endBatch()
+                }
             }
         } else {
             reportObserved(this)

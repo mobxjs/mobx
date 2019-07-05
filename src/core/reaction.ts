@@ -93,28 +93,31 @@ export class Reaction implements IDerivation, IReactionPublic {
     runReaction() {
         if (!this.isDisposed) {
             startBatch()
-            this._isScheduled = false
-            if (shouldCompute(this)) {
-                this._isTrackPending = true
+            try {
+                this._isScheduled = false
+                if (shouldCompute(this)) {
+                    this._isTrackPending = true
 
-                try {
-                    this.onInvalidate()
-                    if (
-                        this._isTrackPending &&
-                        isSpyEnabled() &&
-                        process.env.NODE_ENV !== "production"
-                    ) {
-                        // onInvalidate didn't trigger track right away..
-                        spyReport({
-                            name: this.name,
-                            type: "scheduled-reaction"
-                        })
+                    try {
+                        this.onInvalidate()
+                        if (
+                            this._isTrackPending &&
+                            isSpyEnabled() &&
+                            process.env.NODE_ENV !== "production"
+                        ) {
+                            // onInvalidate didn't trigger track right away..
+                            spyReport({
+                                name: this.name,
+                                type: "scheduled-reaction"
+                            })
+                        }
+                    } catch (e) {
+                        this.reportExceptionInDerivation(e)
                     }
-                } catch (e) {
-                    this.reportExceptionInDerivation(e)
                 }
+            } finally {
+                endBatch()
             }
-            endBatch()
         }
     }
 
@@ -124,30 +127,33 @@ export class Reaction implements IDerivation, IReactionPublic {
             // console.warn("Reaction already disposed") // Note: Not a warning / error in mobx 4 either
         }
         startBatch()
-        const notify = isSpyEnabled()
-        let startTime
-        if (notify && process.env.NODE_ENV !== "production") {
-            startTime = Date.now()
-            spyReportStart({
-                name: this.name,
-                type: "reaction"
-            })
+        try {
+            const notify = isSpyEnabled()
+            let startTime
+            if (notify && process.env.NODE_ENV !== "production") {
+                startTime = Date.now()
+                spyReportStart({
+                    name: this.name,
+                    type: "reaction"
+                })
+            }
+            this._isRunning = true
+            const result = trackDerivedFunction(this, fn, undefined)
+            this._isRunning = false
+            this._isTrackPending = false
+            if (this.isDisposed) {
+                // disposed during last run. Clean up everything that was bound after the dispose call.
+                clearObserving(this)
+            }
+            if (isCaughtException(result)) this.reportExceptionInDerivation(result.cause)
+            if (notify && process.env.NODE_ENV !== "production") {
+                spyReportEnd({
+                    time: Date.now() - startTime
+                })
+            }
+        } finally {
+            endBatch()
         }
-        this._isRunning = true
-        const result = trackDerivedFunction(this, fn, undefined)
-        this._isRunning = false
-        this._isTrackPending = false
-        if (this.isDisposed) {
-            // disposed during last run. Clean up everything that was bound after the dispose call.
-            clearObserving(this)
-        }
-        if (isCaughtException(result)) this.reportExceptionInDerivation(result.cause)
-        if (notify && process.env.NODE_ENV !== "production") {
-            spyReportEnd({
-                time: Date.now() - startTime
-            })
-        }
-        endBatch()
     }
 
     reportExceptionInDerivation(error: any) {
@@ -184,8 +190,11 @@ export class Reaction implements IDerivation, IReactionPublic {
             if (!this._isRunning) {
                 // if disposed while running, clean up later. Maybe not optimal, but rare case
                 startBatch()
-                clearObserving(this)
-                endBatch()
+                try {
+                    clearObserving(this)
+                } finally {
+                    endBatch()
+                }
             }
         }
     }

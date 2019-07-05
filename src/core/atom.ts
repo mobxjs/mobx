@@ -62,8 +62,11 @@ export class Atom implements IAtom {
      */
     public reportChanged() {
         startBatch()
-        propagateChanged(this)
-        endBatch()
+        try {
+            propagateChanged(this)
+        } finally {
+            endBatch()
+        }
     }
 
     toString() {

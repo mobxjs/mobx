@@ -86,11 +86,14 @@ function startAction(
 }
 
 function endAction(runInfo: IActionRunInfo) {
-    allowStateChangesEnd(runInfo.prevAllowStateChanges)
-    endBatch()
-    untrackedEnd(runInfo.prevDerivation)
-    if (runInfo.notifySpy && process.env.NODE_ENV !== "production")
-        spyReportEnd({ time: Date.now() - runInfo.startTime })
+    try {
+        allowStateChangesEnd(runInfo.prevAllowStateChanges)
+    } finally {
+        endBatch()
+        untrackedEnd(runInfo.prevDerivation)
+        if (runInfo.notifySpy && process.env.NODE_ENV !== "production")
+            spyReportEnd({ time: Date.now() - runInfo.startTime })
+    }
 }
 
 export function allowStateChanges<T>(allowStateChanges: boolean, func: () => T): T {

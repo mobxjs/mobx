@@ -106,7 +106,11 @@ export function startBatch() {
 }
 
 export function endBatch() {
-    if (--globalState.inBatch === 0) {
+    if (
+        --globalState.inBatch === 0 ||
+        globalState.pendingReactions.length > 0 ||
+        globalState.pendingUnobservations.length > 0
+    ) {
         runReactions()
         // the batch is actually about to finish, all unobserving should happen here.
         const list = globalState.pendingUnobservations
@@ -240,7 +244,7 @@ function logTraceInfo(derivation: IDerivation, observable: IObservable) {
 
         // prettier-ignore
         new Function(
-`debugger;
+            `debugger;
 /*
 Tracing '${derivation.name}'
 

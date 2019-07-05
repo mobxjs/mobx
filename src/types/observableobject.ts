@@ -211,8 +211,8 @@ export class ObservableObjectAdministration
             })
             if (!change) return
         }
+        startBatch()
         try {
-            startBatch()
             const notify = hasListeners(this)
             const notifySpy = isSpyEnabled()
             const oldObservable = this.values.get(key)

@@ -65,7 +65,9 @@ export function values(obj: any): string[] {
 export function entries<K, T>(map: ObservableMap<K, T>): ReadonlyArray<[K, T]>
 export function entries<T>(set: ObservableSet<T>): ReadonlyArray<[T, T]>
 export function entries<T>(ar: IObservableArray<T>): ReadonlyArray<[number, T]>
-export function entries<T = any>(obj: T): ReadonlyArray<[string, T extends object ? T[keyof T] : any]>
+export function entries<T = any>(
+    obj: T
+): ReadonlyArray<[string, T extends object ? T[keyof T] : any]>
 export function entries(obj: any): any {
     if (isObservableObject(obj)) {
         return keys(obj).map(key => [key, obj[key]])
@@ -94,8 +96,8 @@ export function set<T extends Object>(obj: T, key: PropertyKey, value: any)
 export function set(obj: any, key: any, value?: any): void {
     if (arguments.length === 2 && !isObservableSet(obj)) {
         startBatch()
-        const values = key
         try {
+            const values = key
             for (let key in values) set(obj, key, values[key])
         } finally {
             endBatch()
@@ -118,9 +120,12 @@ export function set(obj: any, key: any, value?: any): void {
         if (typeof key !== "number") key = parseInt(key, 10)
         invariant(key >= 0, `Not a valid index: '${key}'`)
         startBatch()
-        if (key >= obj.length) obj.length = key + 1
-        obj[key] = value
-        endBatch()
+        try {
+            if (key >= obj.length) obj.length = key + 1
+            obj[key] = value
+        } finally {
+            endBatch()
+        }
     } else {
         return fail(
             process.env.NODE_ENV !== "production" &&
