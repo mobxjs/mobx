@@ -227,7 +227,28 @@ test("cleanup", function() {
     disposer()
     expect(aValue).toBe(2)
     expect(observable.observers.size).toBe(0)
-    expect(x._hasMap.get("a").observers.size).toBe(0)
+    expect(x._hasMap.has("a")).toBe(false)
+})
+
+test("getAtom encapsulation leak test", function() {
+    const x = map({})
+
+    let disposer = autorun(function() {
+        x.has("a")
+    })
+
+    let atom = mobx.getAtom(x, "a")
+
+    disposer()
+
+    expect(x._hasMap.get("a")).toBe(undefined)
+
+    disposer = autorun(function() {
+        x.has("a")
+        atom && atom.reportObserved()
+    })
+
+    expect(x._hasMap.get("a")).not.toBe(atom)
 })
 
 test("strict", function() {
