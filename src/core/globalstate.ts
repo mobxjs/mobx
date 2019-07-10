@@ -82,6 +82,11 @@ export class MobXGlobals {
     allowStateChanges = true
 
     /**
+     * If enabled, runs typeChecking regardless of NODE_ENV="production"
+     * useful to run typeChecking in production.
+     */
+    enableTypeCheck = false
+    /**
      * If strict mode is enabled, state changes are by default not allowed
      */
     enforceActions: boolean | "strict" = false
@@ -123,7 +128,7 @@ export class MobXGlobals {
 let canMergeGlobalState = true
 let isolateCalled = false
 
-export let globalState: MobXGlobals = (function() {
+export let globalState: MobXGlobals = (function () {
     const global = getGlobal()
 
     if (global.__mobxInstanceCount > 0 && !global.__mobxGlobals) canMergeGlobalState = false

@@ -8,6 +8,7 @@ import {
 
 export function configure(options: {
     enforceActions?: boolean | "strict" | "never" | "always" | "observed"
+    enableTypeCheck?: boolean
     computedRequiresReaction?: boolean
     computedConfigurable?: boolean
     isolateGlobalState?: boolean
@@ -16,6 +17,7 @@ export function configure(options: {
 }): void {
     const {
         enforceActions,
+        enableTypeCheck,
         computedRequiresReaction,
         computedConfigurable,
         disableErrorBoundaries,
@@ -50,6 +52,9 @@ export function configure(options: {
         }
         globalState.enforceActions = ea
         globalState.allowStateChanges = ea === true || ea === "strict" ? false : true
+    }
+    if (enableTypeCheck) {
+        globalState.enableTypeCheck = !!enableTypeCheck;
     }
     if (computedRequiresReaction !== undefined) {
         globalState.computedRequiresReaction = !!computedRequiresReaction
