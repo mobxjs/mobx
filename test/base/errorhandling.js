@@ -23,6 +23,13 @@ test("exception1", function() {
     checkGlobalState()
 })
 
+test("sets enableTypeCheck", () => {
+    const gs = mobx._getGlobalState()
+    expect(gs.enableTypeCheck).toBe(false)
+    mobx.configure({ enableTypeCheck: true })
+    expect(gs.enableTypeCheck).toBe(true)
+})
+
 test("exceptions in computed values can be recovered from", () => {
     const a = observable({
         x: 1,
