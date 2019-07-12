@@ -170,6 +170,10 @@ MobX provides three built-in `comparer`s which should cover most needs:
 - `comparer.default`: The same as `comparer.identity`, but also considers `NaN` to be equal to `NaN`.
 - `comparer.structural`: Performs deep structural comparison to determine if two values are the same.
 
+## Computed values run more often than expected
+
+Please check the [`pitfalls`](https://mobx.js.org/best/pitfalls.html#computed-values-run-more-often-than-expected) section if you experience this.
+
 ## Note on error handling
 
 If a computed value throws an exception during its computation, this exception will be caught and rethrown any time its value is read.
