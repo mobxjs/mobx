@@ -29,8 +29,7 @@ The following functions are not in the ES6 spec but are available in MobX:
 * `intercept(interceptor)`. Registers an interceptor that will be triggered before any changes are applied to the map. See [observe & intercept](observe.md).
 * `observe(listener, fireImmediately?)`. Registers a listener that fires upon each change in this map, similarly to the events that are emitted for [Object.observe](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe). See [observe & intercept](observe.md) for more details.
 * `merge(values)`. Copies all entries from the provided object into this map. `values` can be a plain object, array of entries or string-keyed ES6 Map.
-* `replace(values)`. Replaces the entire contents of this map with the provided values. Short hand for `.clear().merge(values)`
-
+* `replace(values)`. Replaces the entire contents of this map with the provided values. 
 ## `observable.map(values, { deep: false })`
 
 Any values assigned to an observable map will be default passed through [`observable`](observable.md) to make them observable.
