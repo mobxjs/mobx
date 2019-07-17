@@ -1,7 +1,7 @@
 "use strict"
 
 const mobx = require("../../src/mobx.ts")
-const { observable, _getAdministration } = mobx
+const { observable, _getAdministration, reaction } = mobx
 const iterall = require("iterall")
 
 test("test1", function() {
@@ -533,4 +533,94 @@ test("dehances last value on shift/pop", () => {
     }
     expect(x2.pop()).toBe(10)
     expect(x2.pop()).toBe(6)
+})
+
+test("#2044 symbol key on array", () => {
+    const x = observable([1, 2])
+    const s = Symbol("test")
+    x[s] = 3
+    expect(x[s]).toBe(3)
+
+    let reacted = false
+    const d = reaction(
+        () => x[s],
+        () => {
+            reacted = true
+        }
+    )
+
+    x[s] = 4
+    expect(x[s]).toBe(4)
+
+    // although x[s] can be stored, it won't be reactive!
+    expect(reacted).toBe(false)
+    d()
+})
+
+test("#2044 non-symbol key on array", () => {
+    const x = observable([1, 2])
+    const s = "test"
+    x[s] = 3
+    expect(x[s]).toBe(3)
+
+    let reacted = false
+    const d = reaction(
+        () => x[s],
+        () => {
+            reacted = true
+        }
+    )
+
+    x[s] = 4
+    expect(x[s]).toBe(4)
+
+    // although x[s] can be stored, it won't be reactive!
+    expect(reacted).toBe(false)
+    d()
+})
+
+describe("extended array prototype", () => {
+    const extensionKey = "__extension"
+
+    // A single setup/teardown for all tests because we're pretending to do a
+    // singular global (dirty) change to the "environment".
+    beforeAll(() => {
+        Array.prototype[extensionKey] = () => {}
+    })
+    afterAll(() => {
+        delete Array.prototype[extensionKey]
+    })
+
+    test("creating an observable should work", () => {
+        const a = mobx.observable({ b: "b" })
+    })
+
+    test("extending an observable should work", () => {
+        const a = { b: "b" }
+        const c = mobx.extendObservable(a, {})
+    })
+})
+
+test("reproduce #2021", () => {
+    expect.assertions(1)
+    try {
+        Array.prototype.extension = function() {
+            console.log("I'm the extension!", this.length)
+        }
+
+        class Test {
+            @observable
+            data = null
+        }
+
+        const test = new Test()
+
+        mobx.autorun(() => {
+            if (test.data) expect(test.data.someStr).toBe("123")
+        })
+
+        test.data = { someStr: "123" }
+    } finally {
+        delete Array.prototype.extension
+    }
 })
