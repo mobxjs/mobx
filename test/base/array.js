@@ -542,3 +542,49 @@ test("#2044 non-symbol key on array", () => {
     expect(reacted).toBe(false)
     d()
 })
+
+describe("extended array prototype", () => {
+    const extensionKey = "__extension"
+
+    // A single setup/teardown for all tests because we're pretending to do a
+    // singular global (dirty) change to the "environment".
+    beforeAll(() => {
+        Array.prototype[extensionKey] = () => {}
+    })
+    afterAll(() => {
+        delete Array.prototype[extensionKey]
+    })
+
+    test("creating an observable should work", () => {
+        const a = mobx.observable({ b: "b" })
+    })
+
+    test("extending an observable should work", () => {
+        const a = { b: "b" }
+        const c = mobx.extendObservable(a, {})
+    })
+})
+
+test("reproduce #2021", () => {
+    expect.assertions(1)
+    try {
+        Array.prototype.extension = function() {
+            console.log("I'm the extension!", this.length)
+        }
+
+        class Test {
+            @observable
+            data = null
+        }
+
+        const test = new Test()
+
+        mobx.autorun(() => {
+            if (test.data) expect(test.data.someStr).toBe("123")
+        })
+
+        test.data = { someStr: "123" }
+    } finally {
+        delete Array.prototype.extension
+    }
+})
