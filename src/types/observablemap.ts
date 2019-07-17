@@ -31,6 +31,7 @@ import {
     stringifyKey,
     transaction,
     untracked,
+    onBecomeUnobserved,
     globalState
 } from "../internal"
 
@@ -108,8 +109,22 @@ export class ObservableMap<K = any, V = any>
     }
 
     has(key: K): boolean {
-        if (this._hasMap.has(key)) return this._hasMap.get(key)!.get()
-        return this._updateHasMapEntry(key, false).get()
+        if (!globalState.trackingDerivation) return this._has(key)
+
+        let entry = this._hasMap.get(key)
+        if (!entry) {
+            // todo: replace with atom (breaking change)
+            const newEntry = (entry = new ObservableValue(
+                this._has(key),
+                referenceEnhancer,
+                `${this.name}.${stringifyKey(key)}?`,
+                false
+            ))
+            this._hasMap.set(key, newEntry)
+            onBecomeUnobserved(newEntry, () => this._hasMap.delete(key))
+        }
+
+        return entry.get()
     }
 
     set(key: K, value: V) {
@@ -170,21 +185,11 @@ export class ObservableMap<K = any, V = any>
         return false
     }
 
-    private _updateHasMapEntry(key: K, value: boolean): ObservableValue<boolean> {
-        // optimization; don't fill the hasMap if we are not observing, or remove entry if there are no observers anymore
+    private _updateHasMapEntry(key: K, value: boolean) {
         let entry = this._hasMap.get(key)
         if (entry) {
             entry.setNewValue(value)
-        } else {
-            entry = new ObservableValue(
-                value,
-                referenceEnhancer,
-                `${this.name}.${stringifyKey(key)}?`,
-                false
-            )
-            this._hasMap.set(key, entry)
         }
-        return entry
     }
 
     private _updateValue(key: K, newValue: V | undefined) {
