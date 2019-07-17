@@ -520,3 +520,25 @@ test("#2044 symbol key on array", () => {
     expect(reacted).toBe(false)
     d()
 })
+
+test("#2044 non-symbol key on array", () => {
+    const x = observable([1, 2])
+    const s = "test"
+    x[s] = 3
+    expect(x[s]).toBe(3)
+
+    let reacted = false
+    const d = reaction(
+        () => x[s],
+        () => {
+            reacted = true
+        }
+    )
+
+    x[s] = 4
+    expect(x[s]).toBe(4)
+
+    // although x[s] can be stored, it won't be reactive!
+    expect(reacted).toBe(false)
+    d()
+})

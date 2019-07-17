@@ -96,21 +96,17 @@ const arrayTraps = {
     set(target, name, value): boolean {
         if (name === "length") {
             target[$mobx].setArrayLength(value)
-            return true
         }
         if (typeof name === "number") {
             arrayExtensions.set.call(target, name, value)
-            return true
         }
-        if (typeof name === "symbol") {
+        if (typeof name === "symbol" || isNaN(name)) {
             target[name] = value
-            return true
-        }
-        if (!isNaN(name)) {
+        } else {
+            // numeric string
             arrayExtensions.set.call(target, parseInt(name), value)
-            return true
         }
-        return false
+        return true
     },
     preventExtensions(target) {
         fail(`Observable arrays cannot be frozen`)
