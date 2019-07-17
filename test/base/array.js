@@ -1,7 +1,7 @@
 "use strict"
 
 const mobx = require("../../src/mobx.ts")
-const { observable, when, _getAdministration } = mobx
+const { observable, when, _getAdministration, reaction } = mobx
 const iterall = require("iterall")
 
 test("test1", function() {
@@ -497,4 +497,26 @@ test("dehances last value on shift/pop", () => {
     }
     expect(x2.pop()).toBe(10)
     expect(x2.pop()).toBe(6)
+})
+
+test("#2044 symbol key on array", () => {
+    const x = observable([1, 2])
+    const s = Symbol("test")
+    x[s] = 3
+    expect(x[s]).toBe(3)
+
+    let reacted = false
+    const d = reaction(
+        () => x[s],
+        () => {
+            reacted = true
+        }
+    )
+
+    x[s] = 4
+    expect(x[s]).toBe(4)
+
+    // although x[s] can be stored, it won't be reactive!
+    expect(reacted).toBe(false)
+    d()
 })
