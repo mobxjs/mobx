@@ -47,8 +47,10 @@ export class ObservableValue<T> extends Atom
     hasUnreportedChange = false
     interceptors
     changeListeners
-    value
+    value: T
     dehancer: any
+
+    private prevObservedValue: T | IUNCHANGED
 
     constructor(
         value: T,
@@ -59,6 +61,7 @@ export class ObservableValue<T> extends Atom
     ) {
         super(name)
         this.value = enhancer(value, undefined, name)
+        this.prevObservedValue = globalState.UNCHANGED
         if (notifySpy && isSpyEnabled() && process.env.NODE_ENV !== "production") {
             // only notify spy if this is a stand-alone observable
             spyReport({ type: "create", name: this.name, newValue: "" + this.value })
@@ -107,7 +110,10 @@ export class ObservableValue<T> extends Atom
     setNewValue(newValue: T) {
         const oldValue = this.value
         this.value = newValue
-        this.reportChanged()
+
+        if (this.prevObservedValue === globalState.UNCHANGED) this.prevObservedValue = oldValue
+
+        this.reportMaybeChanged()
         if (hasListeners(this)) {
             notifyListeners(this, {
                 type: "update",
@@ -120,6 +126,17 @@ export class ObservableValue<T> extends Atom
 
     public get(): T {
         this.reportObserved()
+
+        const oldPrevObservedValue = this.prevObservedValue
+        this.prevObservedValue = globalState.UNCHANGED
+
+        if (
+            oldPrevObservedValue !== globalState.UNCHANGED &&
+            !this.equals(this.value, oldPrevObservedValue)
+        ) {
+            this.reportChangeConfirmed()
+        }
+
         return this.dehanceValue(this.value)
     }
 

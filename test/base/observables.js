@@ -140,6 +140,33 @@ test("dynamic2", function(done) {
     }
 })
 
+test("dynamic3", function(done) {
+    try {
+        const x = observable.box(3)
+        const y = computed(function() {
+            return x.get() * x.get()
+        })
+
+        expect(9).toBe(y.get())
+        const b = buffer()
+        m.observe(y, b)
+
+        m.runInAction(() => {
+            x.set(4)
+            x.set(5)
+        })
+        expect(25).toBe(y.get())
+
+        //no intermediate value 16!
+        expect([25]).toEqual(b.toArray())
+        expect(mobx._isComputingDerivation()).toBe(false)
+
+        done()
+    } catch (e) {
+        console.log(e.stack)
+    }
+})
+
 test("box uses equals", function(done) {
     try {
         const x = observable.box("a", {

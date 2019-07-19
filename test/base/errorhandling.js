@@ -472,7 +472,7 @@ test("peeking inside erroring computed value doesn't bork (global) state", () =>
     expect(a.isPendingUnobservation).toBe(false)
     expect(a.observers.size).toBe(0)
     expect(a.diffValue).toBe(0)
-    expect(a.lowestObserverState).toBe(-1)
+    expect(a.lowestObserverState).toBe(0)
     expect(a.hasUnreportedChange).toBe(false)
     expect(a.value).toBe(1)
 
@@ -510,7 +510,7 @@ describe("peeking inside autorun doesn't bork (global) state", () => {
         expect(a.isPendingUnobservation).toBe(false)
         expect(a.observers.size).toBe(1)
         expect(a.diffValue).toBe(0)
-        expect(a.lowestObserverState).toBe(-1)
+        expect(a.lowestObserverState).toBe(0)
         expect(a.hasUnreportedChange).toBe(false)
         expect(a.value).toBe(1)
 

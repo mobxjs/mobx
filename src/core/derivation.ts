@@ -91,25 +91,23 @@ export function shouldCompute(derivation: IDerivation): boolean {
                 l = obs.length
             for (let i = 0; i < l; i++) {
                 const obj = obs[i]
-                if (isComputedValue(obj)) {
-                    if (globalState.disableErrorBoundaries) {
+                if (globalState.disableErrorBoundaries) {
+                    obj.get()
+                } else {
+                    try {
                         obj.get()
-                    } else {
-                        try {
-                            obj.get()
-                        } catch (e) {
-                            // we are not interested in the value *or* exception at this moment, but if there is one, notify all
-                            untrackedEnd(prevUntracked)
-                            return true
-                        }
-                    }
-                    // if ComputedValue `obj` actually changed it will be computed and propagated to its observers.
-                    // and `derivation` is an observer of `obj`
-                    // invariantShouldCompute(derivation)
-                    if ((derivation.dependenciesState as any) === IDerivationState.STALE) {
+                    } catch (e) {
+                        // we are not interested in the value *or* exception at this moment, but if there is one, notify all
                         untrackedEnd(prevUntracked)
                         return true
                     }
+                }
+                // if ComputedValue `obj` actually changed it will be computed and propagated to its observers.
+                // and `derivation` is an observer of `obj`
+                // invariantShouldCompute(derivation)
+                if ((derivation.dependenciesState as any) === IDerivationState.STALE) {
+                    untrackedEnd(prevUntracked)
+                    return true
                 }
             }
             changeDependenciesStateTo0(derivation)

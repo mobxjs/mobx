@@ -8,6 +8,8 @@ import {
     onBecomeObserved,
     onBecomeUnobserved,
     propagateChanged,
+    propagateMaybeChanged,
+    propagateChangeConfirmed,
     reportObserved,
     startBatch
 } from "../internal"
@@ -27,7 +29,7 @@ export class Atom implements IAtom {
 
     diffValue = 0
     lastAccessedBy = 0
-    lowestObserverState = IDerivationState.NOT_TRACKING
+    lowestObserverState = IDerivationState.UP_TO_DATE
     /**
      * Create a new atom. For debugging purposes it is recommended to give it a name.
      * The onBecomeObserved and onBecomeUnobserved callbacks can be used for resource management.
@@ -65,6 +67,20 @@ export class Atom implements IAtom {
         propagateChanged(this)
         endBatch()
     }
+
+    protected reportMaybeChanged() {
+        startBatch()
+        propagateMaybeChanged(this)
+        endBatch()
+    }
+
+    protected reportChangeConfirmed() {
+        startBatch()
+        propagateChangeConfirmed(this)
+        endBatch()
+    }
+
+    public get() {}
 
     toString() {
         return this.name
