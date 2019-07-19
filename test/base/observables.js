@@ -2080,3 +2080,14 @@ test("tuples", () => {
 
     expect(myStuff.map(x => x * 2)).toEqual([4, 34])
 })
+
+test("extendObservable should not accept complex objects as second argument", () => {
+    class X {
+        x = 3
+    }
+    expect(() => {
+        extendObservable({}, new X())
+    }).toThrowErrorMatchingInlineSnapshot(
+        `"[mobx] 'extendObservabe' only accepts plain objects as second argument"`
+    )
+})

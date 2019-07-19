@@ -17,6 +17,7 @@ import {
     initializeInstance
 } from "../internal"
 import { IObservableDecorator } from "./observabledecorator"
+import { isPlainObject } from "../utils/utils"
 
 export function extendObservable<A extends Object, B extends Object>(
     target: A,
@@ -83,6 +84,8 @@ export function extendObservableObjectWithProperties(
         for (const key of keys) {
             const descriptor = Object.getOwnPropertyDescriptor(properties, key)!
             if (process.env.NODE_ENV !== "production") {
+                if (!isPlainObject(properties))
+                    fail(`'extendObservabe' only accepts plain objects as second argument`)
                 if (Object.getOwnPropertyDescriptor(target, key))
                     fail(
                         `'extendObservable' can only be used to introduce new properties. Use 'set' or 'decorate' instead. The property '${stringifyKey(
