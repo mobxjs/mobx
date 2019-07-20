@@ -127,12 +127,12 @@ export interface IObservableArray<T> extends Array<T> {
     clear(): T[];
     replace(newItems: T[]): T[];
     find(
-        predicate: (item: T, index: number, array: Array<T>) => boolean,
+        predicate: (item: T, index: number, array: Array<T>) => mixed,
         thisArg?: any,
         fromIndex?: number
     ): T | any;
     findIndex(
-        predicate: (item: T, index: number, array: Array<T>) => boolean,
+        predicate: (item: T, index: number, array: Array<T>) => mixed,
         thisArg?: any,
         fromIndex?: number
     ): number;
