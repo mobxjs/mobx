@@ -209,7 +209,8 @@ In such cases mobx-util's [`computedFn`](https://github.com/mobxjs/mobx-utils#co
 ```typescript
 // Parameterized computed views:
 // Create computed's and store them in a cache
-import { observable, computed } from "mobx"
+import { observable } from "mobx"
+import { computedFn } from "mobx-utils"
 
 class Todos {
   @observable todos = []
