@@ -618,9 +618,20 @@ test("issue 1243, .replace should not trigger change on unchanged values", () =>
 
     expect(() => {
         m.replace("not-an-object")
-    }).toThrow(/Cannot get keys from 'not-an-object'/)
+    }).toThrow(/Cannot convert to map from 'not-an-object'/)
 
     d()
+})
+
+test("#1980 .replace should not breaks entities order!", () => {
+    const original = mobx.observable.map([["a", "first"], ["b", "second"]])
+    const replacement = new Map([["b", "first"], ["a", "second"]])
+    original.replace(replacement)
+    const newKeys = Array.from(replacement)
+    const originalKeys = Array.from(replacement)
+    for (let i = 0; i < newKeys.length; i++) {
+        expect(newKeys[i]).toEqual(originalKeys[i])
+    }
 })
 
 test("#1258 cannot replace maps anymore", () => {
