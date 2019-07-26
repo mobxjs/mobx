@@ -17,7 +17,7 @@
     "test": "jest",
     "watch": "jest --watch",
     "test:mixed-versions": "jest --testRegex mixed-versions",
-    "test:all": "yarn lint && yarn jest -i && yarn test:flow && yarn test:mixed-versions",
+    "test:all": "yarn tsc --noEmit && yarn lint && yarn jest -i && yarn test:flow && yarn test:mixed-versions",
     "test:webpack": "node scripts/webpack-regression-tests.js",
     "test:flow": "node_modules/.bin/flow check",
     "test:performance": "PERSIST=true time node --expose-gc test/perf/index.js",
