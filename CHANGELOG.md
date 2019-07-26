@@ -161,14 +161,7 @@ MobX 5 is the first MobX version fully leveraging Proxies. This has two big adva
 
 ### The system requirements to run MobX has been upped
 
-* MobX 5 can only be used on environments that support `Proxies`. In practice this means:
-    - no Internet Explorer (Edge is fine)
-    - Node.js >= 6  
-React Native:
-    - iOS >= 10
-    - Android from RN 0.59 (or with manual JavaScript core [upgrade](https://github.com/react-community/jsc-android-buildscripts#how-to-use-it-with-my-react-native-app))
-    - Hermes runtime is [not supported](https://github.com/facebook/hermes/issues/28)  
-All modern browsers are supported.
+* MobX 5 can only be used on environments that support `Proxies`. See the [browser support](https://github.com/mobxjs/mobx#browser-support) for details.
 * Since MobX no longer runs on older browsers, the compilation target has been upgraded to ES2015 syntax supporting browsers. This means that MobX is not loadable on older browsers without down compilation to ES5.
 * If for whatever reason your project cannot meet this requirements, please stick to MobX 4. It will be actively maintained. All current features of MobX 5 are expressable in MobX 4 as well, but it means that for example to use dynamic objects some [additional APIs](https://mobx.js.org/refguide/object-api.html) are needed.
 * The performance footprint of MobX 5 should be pretty similar to MobX 4. In our performance tests we saw some minor improvements in memory footprint, but overall it should be pretty comparable.

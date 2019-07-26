@@ -48,15 +48,11 @@ _Tip: Consider using the faster and smaller ES6 build if targetting a modern env
 | 4.\*         | Yes (LTS)          | Any ES5 compliant browser                                                                                                                                   | `mobx4-master`   |
 | 1-3.\*       | No                 | Any ES5 compliant browser                                                                                                                                   | No active branch |
 
--   MobX >=5 runs on any browser with [ES6 proxy support](https://kangax.github.io/compat-table/es6/#test-Proxy). In practice this means:
-    - no Internet Explorer (Edge is fine)
-    - Node.js >= 6  
-React Native:
-    - iOS >= 10
-    - Android from RN 0.59 (or with manual JavaScript core [upgrade](https://github.com/react-community/jsc-android-buildscripts#how-to-use-it-with-my-react-native-app))
-    - Hermes runtime is [not supported](https://github.com/facebook/hermes/issues/28)  
-All modern browsers are supported.
+-   All modern browsers are supported.
+-   MobX >=5 runs on any browser with [ES6 proxy support](https://kangax.github.io/compat-table/es6/#test-Proxy). In practice this means: - no Internet Explorer (Edge is fine) - Node.js >= 6  
+    React Native: - iOS >= 10 - Android from RN 0.59 (or with manual JavaScript core [upgrade](https://github.com/react-community/jsc-android-buildscripts#how-to-use-it-with-my-react-native-app)) - Hermes runtime is [not supported](https://github.com/facebook/hermes/issues/28) (Use MobX 4 instead)
 -   MobX 4 runs on any ES5 browser and will be actively maintained. The MobX 4 and 5 api's are the same and semantically can achieve the same, but MobX 4 has some [limitations](#mobx-4-vs-mobx-5).
+-   The latest versions of libraries like mobx-react, mobx-react-lite, mobx-state-tree etc are kept compatible with both MobX 4 and 5.
 
 ## Translations
 
