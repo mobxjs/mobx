@@ -634,6 +634,18 @@ test("#1980 .replace should not breaks entities order!", () => {
     }
 })
 
+test("#1980 .replace should should invoke autorun", () => {
+    const original = mobx.observable.map({ a: "a", b: "b" })
+    const replacement = { b: "b", a: "a" }
+    let numOfInvokes = 0
+    autorun(() => {
+        numOfInvokes = numOfInvokes + 1
+        return original.entries()
+    })
+    original.replace(replacement)
+    expect(numOfInvokes).toBe(1)
+})
+
 test("#1258 cannot replace maps anymore", () => {
     const items = mobx.observable.map()
     items.replace(mobx.observable.map())
