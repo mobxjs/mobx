@@ -1,14 +1,11 @@
 import {
-    $mobx,
     keys,
     isObservable,
     isObservableArray,
     isObservableValue,
     isObservableMap,
     isObservableSet,
-    getPlainObjectKeys,
-    mobxDidRunLazyInitializersSymbol,
-    mobxPendingDecorators
+    getPlainObjectKeys
 } from "../internal"
 
 export type ToJSOptions = {
