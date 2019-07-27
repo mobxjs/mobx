@@ -88,18 +88,6 @@ export function isPlainObject(value) {
     return proto === Object.prototype || proto === null
 }
 
-export function convertToMap(dataStructure) {
-    if (isES6Map(dataStructure) || isObservableMap(dataStructure)) {
-        return dataStructure
-    } else if (Array.isArray(dataStructure)) {
-        return new Map(dataStructure)
-    } else if (isPlainObject(dataStructure)) {
-        return new Map(Object.entries(dataStructure))
-    } else {
-        return fail(`Cannot convert to map from '${dataStructure}'`)
-    }
-}
-
 export function makeNonEnumerable(object: any, propNames: PropertyKey[]) {
     for (let i = 0; i < propNames.length; i++) {
         addHiddenProp(object, propNames[i], object[propNames[i]])
