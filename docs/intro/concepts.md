@@ -42,7 +42,7 @@ If MobX is used in [*strict mode*](../refguide/api##-enforceactions-), MobX will
 
 MobX supports a uni-directional data flow where _actions_ change the _state_, which in turn updates all affected _views_.
 
-![Action, State, View](../images/action-state-view.png)
+![Action, State, View](../assets/action-state-view.png)
 
 All _Derivations_ are updated **automatically** and **atomically** when the _state_ changes. As a result it is never possible to observe intermediate values.
 

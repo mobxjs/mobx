@@ -12,9 +12,9 @@ This way the exact mutation that causes the reaction to re-run is still in stack
 
 In debugger mode, the debug information will also reveal the full derivation tree that is affecting the current computation / reaction.
 
-![trace](../images/trace-tips2.png)
+![trace](../assets/trace-tips2.png)
 
-![trace](../images/trace.gif)
+![trace](../assets/trace.gif)
 
 ## Live examples
 

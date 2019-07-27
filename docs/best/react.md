@@ -35,7 +35,7 @@ let message = observable({
 
 In memory that looks as follows. The green boxes indicate _observable_ properties. Note that the _values_ themselves are not observable!
 
-![MobX reacts to changing references](../images/observed-refs.png)
+![MobX reacts to changing references](../assets/observed-refs.png)
 
 Now what MobX basically does is recording which _arrows_ you use in your function. After that, it will re-run whenever one of this _arrows_ changes; when they start to refer to something else.
 

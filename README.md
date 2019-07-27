@@ -1,4 +1,4 @@
-<img src="docs/mobx.png" alt="logo" height="120" align="right" />
+<img src=/docs/assets/mobx.png" alt="logo" height="120" align="right" />
 
 # MobX
 
@@ -15,21 +15,21 @@ _Simple, scalable state management_
 MobX is proudly sponsored by Mendix, Coinbase, Facebook Open Source, Canva, Algolia, Guilded, Auction Frontier, Mantro and TalentPlot for 100\$/month or more! And beyond that by many [individual backers](#backers) and through [one time contributions](https://github.com/mobxjs/mobx/blob/master/sponsors.md).
 
 **🥇Gold sponsors (\$250+ pm):** <br/>
-<a href="https://mendix.com/"><img src="docs/mendix-logo.png" align="center" width="100" title="Mendix" alt="Mendix" /></a>
-<a href="http://auctionfrontier.com/"><img src="docs/auctionfrontier.jpeg" align="center" width="100" title="Auction Frontier" alt="Auction Frontier"></a>
+<a href="https://mendix.com/"><img src=docs/assets/mendix-logo.png" align="center" width="100" title="Mendix" alt="Mendix" /></a>
+<a href="http://auctionfrontier.com/"><img src=docs/assets/auctionfrontier.jpeg" align="center" width="100" title="Auction Frontier" alt="Auction Frontier"></a>
 
 **🥈Silver sponsors (\$100+ pm):**<br/>
-<a href="https://opensource.facebook.com/"><img src="docs/fbos.jpeg" align="center" width="100" title="Facebook Open Source" alt="Facebook Open Source" /></a>
-<a href="https://www.canva.com/"><img src="docs/canva.png" align="center" width="100" title="Canva" alt="Canva" /></a>
-<a href="https://www.guilded.gg/"><img src="docs/guilded.jpg" align="center" width="100" title="Guilded" alt="Guilded" /></a>
-<a href="https://mantro.net/jobs/warlock"><img src="docs/mantro.png" align="center" width="100" title="mantro GmbH" alt="mantro GmbH"></a>
-<a href="https://www.codefirst.co.uk/"><img src="https://mobx.js.org/docs/codefirst.png" align="center" width="100" title="CodeFirst" alt="CodeFirst"/></a>
-<a href="https://blokt.com/"><img src="https://mobx.js.org/docs/blokt.jpg" align="center" width="100" title="Blokt" alt="Blokt"/></a>
+<a href="https://opensource.facebook.com/"><img src=docs/assets/fbos.jpeg" align="center" width="100" title="Facebook Open Source" alt="Facebook Open Source" /></a>
+<a href="https://www.canva.com/"><img src=docs/assets/canva.png" align="center" width="100" title="Canva" alt="Canva" /></a>
+<a href="https://www.guilded.gg/"><img src=docs/assets/guilded.jpg" align="center" width="100" title="Guilded" alt="Guilded" /></a>
+<a href="https://mantro.net/jobs/warlock"><img src=docs/assets/mantro.png" align="center" width="100" title="mantro GmbH" alt="mantro GmbH"></a>
+<a href="https://www.codefirst.co.uk/"><img src="docs/codefirst.png" align="center" width="100" title="CodeFirst" alt="CodeFirst"/></a>
+<a href="https://blokt.com/"><img src="docs/blokt.jpg" align="center" width="100" title="Blokt" alt="Blokt"/></a>
 
 **🥉Bronze sponsors:**<br/>
-<a href="https://coinbase.com/"><img src="docs/coinbase.jpeg" align="center" width="100" title="Coinbase" alt="Coinbase" /></a>
-<a href="https://www.algolia.com/"><img src="docs/algolia.jpg" align="center" width="100" title="Algolia" alt="Algolia" /></a>
-<a href="https://talentplot.com/"><img src="docs/talentplot.png" align="center" width="100" title="talentplot" alt="talentplot"></a>
+<a href="https://coinbase.com/"><img src=docs/assets/coinbase.jpeg" align="center" width="100" title="Coinbase" alt="Coinbase" /></a>
+<a href="https://www.algolia.com/"><img src=docs/assets/algolia.jpg" align="center" width="100" title="Algolia" alt="Algolia" /></a>
+<a href="https://talentplot.com/"><img src=docs/assets/talentplot.png" align="center" width="100" title="talentplot" alt="talentplot"></a>
 
 # Installation
 
@@ -62,7 +62,7 @@ _Tip: Consider using the faster and smaller ES6 build if targetting a modern env
 
 -   <i><a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/courses/manage-complex-state-in-react-apps-with-mobx">Egghead.io course</a></i>
 -   [Ten minute, interactive MobX + React tutorial](https://mobxjs.github.io/mobx/getting-started.html)
--   <img src="docs/book.jpg" height="80px"/> [The MobX book](https://books.google.nl/books?id=ALFmDwAAQBAJ&pg=PP1&lpg=PP1&dq=michel+weststrate+mobx+quick+start+guide:+supercharge+the+client+state+in+your+react+apps+with+mobx&source=bl&ots=D460fxti0F&sig=ivDGTxsPNwlOjLHrpKF1nweZFl8&hl=nl&sa=X&ved=2ahUKEwiwl8XO--ncAhWPmbQKHWOYBqIQ6AEwAnoECAkQAQ#v=onepage&q=michel%20weststrate%20mobx%20quick%20start%20guide%3A%20supercharge%20the%20client%20state%20in%20your%20react%20apps%20with%20mobx&f=false) by Pavan Podila and Michel Weststrate (which despite it's name is in-depth!)
+-   <img src=/docs/assets/book.jpg" height="80px"/> [The MobX book](https://books.google.nl/books?id=ALFmDwAAQBAJ&pg=PP1&lpg=PP1&dq=michel+weststrate+mobx+quick+start+guide:+supercharge+the+client+state+in+your+react+apps+with+mobx&source=bl&ots=D460fxti0F&sig=ivDGTxsPNwlOjLHrpKF1nweZFl8&hl=nl&sa=X&ved=2ahUKEwiwl8XO--ncAhWPmbQKHWOYBqIQ6AEwAnoECAkQAQ#v=onepage&q=michel%20weststrate%20mobx%20quick%20start%20guide%3A%20supercharge%20the%20client%20state%20in%20your%20react%20apps%20with%20mobx&f=false) by Pavan Podila and Michel Weststrate (which despite it's name is in-depth!)
 -   [Official MobX 4 documentation and API overview](https://mobxjs.github.io/mobx/refguide/api.html) ([MobX 3](https://github.com/mobxjs/mobx/blob/54557dc319b04e92e31cb87427bef194ec1c549c/docs/refguide/api.md), [MobX 2](https://github.com/mobxjs/mobx/blob/7c9e7c86e0c6ead141bb0539d33143d0e1f576dd/docs/refguide/api.md))
 -   [How to (not) use decorators](https://mobx.js.org/best/decorators.html)
 -   Videos:
@@ -82,7 +82,7 @@ _Anything that can be derived from the application state, should be derived. Aut
 
 This includes the UI, data serialization, server communication, etc.
 
-<img alt="MobX unidirectional flow" src="docs/flow.png" align="center" />
+<img alt="MobX unidirectional flow" src=/docs/assets/flow.png" align="center" />
 
 React and MobX together are a powerful combination. React renders the application state by providing mechanisms to translate it into a tree of renderable components. MobX provides the mechanism to store and update the application state that React then uses.
 
@@ -303,7 +303,7 @@ And finally, kudos to all the people that believed in, tried, validated and even
 
 ## Further resources and documentation
 
--   <img src="docs/book.jpg" height="80px"/> [The MobX book](https://books.google.nl/books?id=ALFmDwAAQBAJ&pg=PP1&lpg=PP1&dq=michel+weststrate+mobx+quick+start+guide:+supercharge+the+client+state+in+your+react+apps+with+mobx&source=bl&ots=D460fxti0F&sig=ivDGTxsPNwlOjLHrpKF1nweZFl8&hl=nl&sa=X&ved=2ahUKEwiwl8XO--ncAhWPmbQKHWOYBqIQ6AEwAnoECAkQAQ#v=onepage&q=michel%20weststrate%20mobx%20quick%20start%20guide%3A%20supercharge%20the%20client%20state%20in%20your%20react%20apps%20with%20mobx&f=false) by Pavan Podila and Michel Weststrate (which despite it's name is in-depth!)
+-   <img src=/docs/assets/book.jpg" height="80px"/> [The MobX book](https://books.google.nl/books?id=ALFmDwAAQBAJ&pg=PP1&lpg=PP1&dq=michel+weststrate+mobx+quick+start+guide:+supercharge+the+client+state+in+your+react+apps+with+mobx&source=bl&ots=D460fxti0F&sig=ivDGTxsPNwlOjLHrpKF1nweZFl8&hl=nl&sa=X&ved=2ahUKEwiwl8XO--ncAhWPmbQKHWOYBqIQ6AEwAnoECAkQAQ#v=onepage&q=michel%20weststrate%20mobx%20quick%20start%20guide%3A%20supercharge%20the%20client%20state%20in%20your%20react%20apps%20with%20mobx&f=false) by Pavan Podila and Michel Weststrate (which despite it's name is in-depth!)
 -   [MobX homepage](http://mobxjs.github.io/mobx/faq/blogs.html)
 -   [API overview](http://mobxjs.github.io/mobx/refguide/api.html)
 -   [Tutorials, Blogs & Videos](http://mobxjs.github.io/mobx/faq/blogs.html)

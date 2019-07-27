@@ -14,7 +14,7 @@
 
 MobX ships with DevTools that can be used to track the rendering behavior and data dependencies of your app.
 
-![devtools](../images/devtools.gif)
+![devtools](../assets/devtools.gif)
 
 ## Usage:
 

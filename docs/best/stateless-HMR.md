@@ -27,7 +27,7 @@ export default ToDoItem;
 
 And here's how that will appear in the React DevTools:
 
-![devtools-noname](../images/devtools-noDisplayName.png)
+![devtools-noname](../assets/devtools-noDisplayName.png)
 
 On the other hand, using a function declaration will allow you to build the same stateless component AND see it in the DevTools:
 
@@ -42,7 +42,7 @@ export default observer(ToDoItem);
 
 And now the component shows up correctly in the DevTools:
 
-![devtools-withname](../images/devtools-withDisplayName.png)
+![devtools-withname](../assets/devtools-withDisplayName.png)
 
 ## Make sure your top-level component is a stateful observer
 
