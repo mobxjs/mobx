@@ -11,6 +11,7 @@ import {
     createInstanceofPredicate,
     deepEnhancer,
     fail,
+    getMapLikeKeys,
     getNextId,
     getPlainObjectKeys,
     hasInterceptors,
@@ -31,8 +32,7 @@ import {
     transaction,
     untracked,
     onBecomeUnobserved,
-    globalState,
-    convertToMap
+    globalState
 } from "../internal"
 
 export interface IKeyValueMap<V = any> {
@@ -335,24 +335,11 @@ export class ObservableMap<K = any, V = any>
             // grab all the keys that are present in the new map but not present in the current map
             // and delete them from the map, then merge the new map
             // this will cause reactions only on changed values
-            const replacementMap = convertToMap(values)
-            const orderedData = new Map()
+            const newKeys = (getMapLikeKeys(values) as any) as K[]
             const oldKeys = Array.from(this.keys())
-
-            for (let i = 0; i < oldKeys.length; i++) {
-                const oldKey = oldKeys[i]
-                // delete missing key
-                if (!replacementMap.has(oldKey)) {
-                    this.delete(oldKey)
-                }
-            }
-            // set new keys in the right order
-            replacementMap.forEach((value, key) => {
-                this.set(key, value)
-                orderedData.set(key, this._data.get(key))
-            })
-            // use data with correct order
-            this._data = orderedData
+            const missingKeys = oldKeys.filter(k => newKeys.indexOf(k) === -1)
+            missingKeys.forEach(k => this.delete(k))
+            this.merge(values)
         })
         return this
     }

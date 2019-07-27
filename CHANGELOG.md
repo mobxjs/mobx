@@ -1,6 +1,5 @@
 # 5.13.0 / 4.13.0
 
-* Fixed bug that observable map replace function breaks entities order. related issues:[#1980](https://github.com/mobxjs/mobx/issues/1980) and [#2003](https://github.com/mobxjs/mobx/issues/2003)
 * Fixed potential memory leak in observable maps, when non-primitive values are used as keys. Fixes [#2031](https://github.com/mobxjs/mobx/issues/2031) through [#2032](https://github.com/mobxjs/mobx/pull/2032).
 * Added support to store additional non-observable(!) fields (string or symbol based) on array, to better reflect behavior of MobX 4. Fixes [#2044](https://github.com/mobxjs/mobx/issues/2044) through [#2046](https://github.com/mobxjs/mobx/pull/2046)
 
