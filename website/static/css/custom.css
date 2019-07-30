@@ -1,5 +1,17 @@
 /* your custom css */
 
+
+/* 
+Docusaurus's default displays img tags as block. 
+Numerous images in the main README.md relied on default (inline-block) img tag styling
+when this project was migrated initially.
+
+Override that style here
+*/
+article p img {
+  display: inline-block;
+}
+
 @media only screen and (min-device-width: 360px) and (max-device-width: 736px) {
 }
 

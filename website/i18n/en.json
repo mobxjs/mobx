@@ -157,15 +157,11 @@
       "refguide/when": {
         "title": "when",
         "sidebar_label": "when"
-      },
-      "SUMMARY": {
-        "title": "SUMMARY"
       }
     },
     "links": {
       "Documentation": "Documentation",
-      "Introduction": "Introduction",
-      "Blog": "Blog"
+      "Introduction": "Introduction"
     },
     "categories": {
       "Introduction": "Introduction",
