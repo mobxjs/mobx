@@ -23,20 +23,29 @@ const users = [
 const siteConfig = {
   title: "MobX", // Title for your website.
   tagline: "Simple, scalable state management",
-  url: "https://cloverich.github.io", // Your website URL
-  baseUrl: "/mobx", // Base URL for your project */
+
   // For github.io type URLs, you would set the url and baseUrl like:
   //   url: 'https://facebook.github.io',
   //   baseUrl: '/test-site/',
+  baseUrl: "/mobx/", // Base URL for your project */
+  // Used for publishing and more
+
+  // Changed these so I can publish to my forked repo for testing
+  // projectName: "MobX",
+  // organizationName: "mobxjs",
+  // url: "https://mobx.js.org", // Your website URL
+  projectName: "mobx",
+  organizationName: "cloverich",
+  url: "https://cloverich.github.io", // Your website URL
+
 
   // URL for editing docs, usage example: editUrl + 'en/doc1.md'.
   // If this field is omitted, there will be no "Edit this Doc" button
   // for each document.
   editUrl: "docs/",
 
-  // Used for publishing and more
-  projectName: "MobX",
-  organizationName: "mobxjs",
+
+
   // For top-level user or org sites, the organization is still the same.
   // e.g., for the https://JoelMarcey.github.io site, it would be set like...
   //   organizationName: 'JoelMarcey'
