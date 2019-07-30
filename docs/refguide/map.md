@@ -1,3 +1,9 @@
+---
+id: map
+title: Observable Maps
+sidebar_label: maps
+---
+
 <div id='codefund' style='float:right'></div>
 
 # Observable Maps

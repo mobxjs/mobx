@@ -1,3 +1,9 @@
+---
+id: boxed
+title: Boxed Values
+sidebar_label: boxed values
+---
+
 <div id='codefund' style='float:right'></div>
 
 ## Primitive values and references

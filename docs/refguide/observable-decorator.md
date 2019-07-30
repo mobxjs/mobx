@@ -1,3 +1,9 @@
+---
+id: observable-decorator
+title: @obsevable
+sidebar_label: @observable
+---
+
 <div id='codefund' style='float:right'></div>
 
 # @observable

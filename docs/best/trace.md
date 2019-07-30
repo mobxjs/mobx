@@ -1,3 +1,9 @@
+---
+id: trace
+sidebar_label: Using trace for debugging
+title: Using `trace` for debugging
+---
+
 <div id='codefund' style='float:right'></div>
 
 # Using `trace` for debugging

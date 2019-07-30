@@ -1,3 +1,8 @@
+---
+id: extend-observable
+sidebar_label: extendObservable
+---
+
 <div id='codefund' style='float:right'></div>
 
 # extendObservable

@@ -1,3 +1,9 @@
+---
+id: autorun
+title: autorun
+sidebar_label: autorun
+---
+
 <div id='codefund' style='float:right'></div>
 
 # Autorun

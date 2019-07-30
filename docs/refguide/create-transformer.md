@@ -1,3 +1,9 @@
+---
+id: create-transformer
+title: createTransformer
+sidebar_label: mobxUtils.createTransformer
+---
+
 <div id='codefund' style='float:right'></div>
 
 # createTransformer

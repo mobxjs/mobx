@@ -1,3 +1,9 @@
+---
+id: spy
+sidebar_label: spy
+title: Spy
+---
+
 <div id='codefund' style='float:right'></div>
 
 # Spy

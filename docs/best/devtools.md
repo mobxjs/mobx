@@ -1,3 +1,9 @@
+---
+id: devtools
+sidebar_label: MobX + React DevTools
+title: MobX + React DevTools
+---
+
 <div id='codefund' style='float:right'></div>
 
 # MobX + React DevTools

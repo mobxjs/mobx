@@ -1,3 +1,9 @@
+---
+id: actions
+sidebar_label: async actions & flows
+title: Writing asynchronous actions
+---
+
 <div id='codefund' style='float:right'></div>
 
 # Writing asynchronous actions

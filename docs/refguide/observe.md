@@ -1,3 +1,9 @@
+---
+id: observe
+sidebar_label: intercept & observe
+title: Intercept & Observe
+---
+
 <div id='codefund' style='float:right'></div>
 
 # Intercept & Observe

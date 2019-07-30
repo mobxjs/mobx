@@ -1,3 +1,9 @@
+---
+id: array
+title: Observable Arrays
+sidebar_label: arrays
+---
+
 <div id='codefund' style='float:right'></div>
 
 ## Observable Arrays

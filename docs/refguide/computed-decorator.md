@@ -1,3 +1,9 @@
+---
+id: computed-decorator
+title: (@)computed
+sidebar_label: (@)computed
+---
+
 <div id='codefund' style='float:right'></div>
 
 # (@)computed

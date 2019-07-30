@@ -1,3 +1,9 @@
+---
+id: observer-decorator
+title: (@)observer
+sidebar_label: (@)observer
+---
+
 <div id='codefund' style='float:right'></div>
 
 # @observer

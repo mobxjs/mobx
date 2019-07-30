@@ -1,3 +1,9 @@
+---
+id: react
+title: What does MobX react to?
+sidebar_label: Understanding what MobX reacts to
+---
+
 <div id='codefund' style='float:right'></div>
 
 # What does MobX react to?

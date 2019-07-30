@@ -1,3 +1,9 @@
+---
+id: modifiers
+title: Decorators
+sidebar_label: decorators
+---
+
 <div id='codefund' style='float:right'></div>
 
 # Decorators

@@ -1,3 +1,9 @@
+---
+id: decorators
+sidebar_label: How to (not) use decorator syntax
+title: How to (not) use decorators
+---
+
 <div id='codefund' style='float:right'></div>
 
 # How to (not) use decorators

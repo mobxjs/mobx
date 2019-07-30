@@ -1,3 +1,9 @@
+---
+id: store
+sidebar_label: Defining data stores
+title: Best Practices for building large scale maintainable projects
+---
+
 <div id='codefund' style='float:right'></div>
 
 # Best Practices for building large scale maintainable projects

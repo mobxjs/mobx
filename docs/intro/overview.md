@@ -1,3 +1,9 @@
+---
+id: concepts
+title: Concepts & Principles
+sidebar_label: Concepts & Principles
+---
+
 <div id='codefund' style='float:right'></div>
 
 # The gist of MobX

@@ -1,3 +1,9 @@
+---
+id: api
+title: MobX Api Reference
+sidebar_label: API overview
+---
+
 <div id='codefund' style='float:right'></div>
 
 # MobX Api Reference

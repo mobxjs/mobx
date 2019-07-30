@@ -1,3 +1,9 @@
+---
+id: object
+title: Observable Objects
+sidebar_label: objects
+---
+
 <div id='codefund' style='float:right'></div>
 
 ## Observable Objects

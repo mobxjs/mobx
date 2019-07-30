@@ -1,3 +1,8 @@
+---
+id: expr
+sidebar_label: mobxUtils.expr
+---
+
 <div id='codefund' style='float:right'></div>
 
 # Expr

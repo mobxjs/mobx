@@ -1,3 +1,9 @@
+---
+id: pitfalls
+sidebar_label: Common Pitfalls & Best Practices
+title: Common pitfalls & best practices
+---
+
 <div id='codefund' style='float:right'></div>
 
 # Common pitfalls & best practices

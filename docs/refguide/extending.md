@@ -1,3 +1,8 @@
+---
+id: extending
+sidebar_label: createAtom
+---
+
 <div id='codefund' style='float:right'></div>
 
 # Creating observable data structures and reactions

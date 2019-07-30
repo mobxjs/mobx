@@ -1,3 +1,9 @@
+---
+id: object-api
+sidebar_label: Object api
+title: Object api
+---
+
 <div id='codefund' style='float:right'></div>
 
 ## Direct Observable manipulation

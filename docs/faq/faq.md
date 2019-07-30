@@ -1,3 +1,9 @@
+---
+id: faq
+sidebar_label: Frequently Asked Questions
+title: FAQ
+---
+
 <div id='codefund' style='float:right'></div>
 
 ## FAQ
