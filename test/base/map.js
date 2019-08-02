@@ -640,10 +640,15 @@ test("#1980 .replace should should invoke autorun", () => {
     let numOfInvokes = 0
     autorun(() => {
         numOfInvokes = numOfInvokes + 1
-        return original.entries()
+        return original.entries().next()
     })
     original.replace(replacement)
-    expect(numOfInvokes).toBe(1)
+    const orgKeys = Array.from(original.keys())
+    const newKeys = Object.keys(replacement)
+    for (let i = 0; i < newKeys.length; i++) {
+        expect(newKeys[i]).toEqual(orgKeys[i])
+    }
+    expect(numOfInvokes).toBe(2)
 })
 
 test("#1258 cannot replace maps anymore", () => {
