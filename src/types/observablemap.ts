@@ -327,26 +327,32 @@ export class ObservableMap<K = any, V = any>
 
     replace(values: ObservableMap<K, V> | IKeyValueMap<V> | any): ObservableMap<K, V> {
         transaction(() => {
-            // grab all the keys that are present in the new map but not present in the current map
-            // and delete them from the map, then merge the new map
-            // this will cause reactions only on changed values
             const replacementMap = convertToMap(values)
-            const orderedData = new Map()
-            const oldKeys = Array.from(this.keys())
+            const oldKeys = this._keys
+            const newKeys: Array<any> = Array.from(replacementMap.keys())
+            let keysChanged = false
             for (let i = 0; i < oldKeys.length; i++) {
                 const oldKey = oldKeys[i]
-                // delete missing key
+                // key order change
+                if (oldKeys.length === newKeys.length && oldKey !== newKeys[i]) {
+                    keysChanged = true
+                }
+                // deleted key
                 if (!replacementMap.has(oldKey)) {
+                    keysChanged = true
                     this.delete(oldKey)
                 }
             }
-            // set new keys in the right order
             replacementMap.forEach((value, key) => {
+                // new key
+                if (!this._data.has(key)) {
+                    keysChanged = true
+                }
                 this.set(key, value)
-                orderedData.set(key, this._data.get(key))
             })
-            // use data with correct order
-            this._data = orderedData
+            if (keysChanged) {
+                this._keys.replace(newKeys)
+            }
         })
         return this
     }
