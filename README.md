@@ -49,7 +49,9 @@ _Tip: Consider using the faster and smaller ES6 build if targetting a modern env
 | 1-3.\*       | No                 | Any ES5 compliant browser                                                                                                                                   | No active branch |
 
 -   All modern browsers are supported.
--   MobX >=5 runs on any browser with [ES6 proxy support](https://kangax.github.io/compat-table/es6/#test-Proxy). In practice this means: - no Internet Explorer (Edge is fine) - Node.js >= 6  
+-   MobX >=5 runs on any browser with [ES6 proxy support](https://kangax.github.io/compat-table/es6/#test-Proxy). In practice this means:
+    - no Internet Explorer (Edge is fine)
+    - Node.js >= 6  
 -   React Native:
     - iOS >= 10
     - Android from RN 0.59 (or with manual JavaScript core [upgrade](https://github.com/react-community/jsc-android-buildscripts#how-to-use-it-with-my-react-native-app))
