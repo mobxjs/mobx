@@ -651,6 +651,21 @@ test("#1980 .replace should should invoke autorun", () => {
     expect(numOfInvokes).toBe(2)
 })
 
+test("#1980 .replace should not report changed unnecessarily", () => {
+    const mapArray = [["swappedA", "swappedA"], ["swappedB", "swappedB"], ["removed", "removed"]]
+    const replacementArray = [mapArray[1], mapArray[0], ["added", "added"]]
+    const map = mobx.observable.map(mapArray)
+    let autorunInvocationCount = 0
+    autorun(() => {
+        map.get("swappedA")
+        map.get("swappedB")
+        autorunInvocationCount++
+    })
+    map.replace(replacementArray)
+    expect(Array.from(map.entries())).toEqual(replacementArray)
+    expect(autorunInvocationCount).toBe(1)
+})
+
 test("#1258 cannot replace maps anymore", () => {
     const items = mobx.observable.map()
     items.replace(mobx.observable.map())
