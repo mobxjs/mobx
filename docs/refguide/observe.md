@@ -111,8 +111,8 @@ These are the additional fields that are available per type:
 | Array | splice | index | starting index of the splice. Splices are also fired by `push`, `unshift`, `replace` etc. | √ | |
 | | | removedCount | amount of items being removed | √ | √ |
 | | | added | array with items being added | √ | √ |
-| | | removed | array with items that where removed | | |
-| | | addedCount | amount of items that where added | | |
+| | | removed | array with items that were removed | | |
+| | | addedCount | amount of items that were added | | |
 | | update | index | index of the single entry that is being updated | √ | |
 | | | newValue | the newValue that is / will be assigned | √ | √ |
 | | | oldValue | the old value that was replaced | | |
