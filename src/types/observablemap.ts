@@ -5,7 +5,6 @@ import {
     Lambda,
     invariant,
     isES6Map,
-    getMapLikeKeys,
     fail,
     addHiddenFinalProp,
     IInterceptable,
@@ -33,7 +32,8 @@ import {
     IInterceptor,
     registerInterceptor,
     declareIterator,
-    onBecomeUnobserved
+    onBecomeUnobserved,
+    convertToMap
 } from "../internal"
 
 export interface IKeyValueMap<V = any> {
@@ -327,14 +327,32 @@ export class ObservableMap<K = any, V = any>
 
     replace(values: ObservableMap<K, V> | IKeyValueMap<V> | any): ObservableMap<K, V> {
         transaction(() => {
-            // grab all the keys that are present in the new map but not present in the current map
-            // and delete them from the map, then merge the new map
-            // this will cause reactions only on changed values
-            const newKeys = (getMapLikeKeys(values) as any) as K[]
+            const replacementMap = convertToMap(values)
             const oldKeys = this._keys
-            const missingKeys = oldKeys.filter(k => newKeys.indexOf(k) === -1)
-            missingKeys.forEach(k => this.delete(k))
-            this.merge(values)
+            const newKeys: Array<any> = Array.from(replacementMap.keys())
+            let keysChanged = false
+            for (let i = 0; i < oldKeys.length; i++) {
+                const oldKey = oldKeys[i]
+                // key order change
+                if (oldKeys.length === newKeys.length && oldKey !== newKeys[i]) {
+                    keysChanged = true
+                }
+                // deleted key
+                if (!replacementMap.has(oldKey)) {
+                    keysChanged = true
+                    this.delete(oldKey)
+                }
+            }
+            replacementMap.forEach((value, key) => {
+                // new key
+                if (!this._data.has(key)) {
+                    keysChanged = true
+                }
+                this.set(key, value)
+            })
+            if (keysChanged) {
+                this._keys.replace(newKeys)
+            }
         })
         return this
     }
