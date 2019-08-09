@@ -20,8 +20,16 @@ Object.freeze(EMPTY_OBJECT)
 
 declare const window: any
 
+const mockGlobal = {}
+
 export function getGlobal() {
-    return typeof window !== "undefined" ? window : global
+    if (typeof window !== "undefined") {
+        return window
+    }
+    if (typeof global !== "undefined") {
+        return global
+    }
+    return mockGlobal
 }
 
 export interface Lambda {
