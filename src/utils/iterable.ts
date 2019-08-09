@@ -15,7 +15,7 @@ export function declareIterator<T>(prototType, iteratorFactory: () => IterableIt
 }
 
 export function makeIterable<T>(iterator: Iterator<T>): IterableIterator<T> {
-    iterator[iteratorSymbol()] = self
+    iterator[iteratorSymbol()] = getSelf
     return iterator as any
 }
 
@@ -23,6 +23,6 @@ export function toStringTagSymbol() {
     return (typeof Symbol === "function" && Symbol.toStringTag) || "@@toStringTag"
 }
 
-function self() {
+function getSelf() {
     return this
 }
