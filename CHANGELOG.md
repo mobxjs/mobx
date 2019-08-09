@@ -1,3 +1,7 @@
+# 5.13.1 / 4.13.1
+
+* Don't use `global` and `self` keywords unless defined. Fixes [#2070](https://github.com/mobxjs/mobx/issues/2070).
+
 # 5.13.0 / 4.13.0
 
 * Fixed potential memory leak in observable maps, when non-primitive values are used as keys. Fixes [#2031](https://github.com/mobxjs/mobx/issues/2031) through [#2032](https://github.com/mobxjs/mobx/pull/2032).
