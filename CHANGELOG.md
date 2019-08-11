@@ -1,6 +1,8 @@
 # 5.13.1 / 4.13.1
 
 * Don't use `global` and `self` keywords unless defined. Fixes [#2070](https://github.com/mobxjs/mobx/issues/2070).
+* onBecome(Un)Observed didn't trigger when using number as key of observable map. Fixes [#2067](https://github.com/mobxjs/mobx/issues/2067).
+
 
 # 5.13.0 / 4.13.0
 
