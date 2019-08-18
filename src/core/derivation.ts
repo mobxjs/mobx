@@ -55,6 +55,11 @@ export interface IDerivation extends IDepTreeNode {
     __mapid: string
     onBecomeStale(): void
     isTracing: TraceMode
+
+    /**
+     *  warn if the derivation has no dependencies after creation/update
+     */
+    requiresObservable?: boolean
 }
 
 export class CaughtException {
@@ -155,12 +160,23 @@ export function checkIfStateModificationsAreAllowed(atom: IAtom) {
         )
 }
 
+export function checkIfStateReadsAreAllowed(observable: IObservable) {
+    if (
+        process.env.NODE_ENV !== "production" &&
+        !globalState.allowStateReads &&
+        globalState.observableRequiresReaction
+    ) {
+        console.warn(`[mobx] Observable ${observable.name} being read outside a reactive context`)
+    }
+}
+
 /**
  * Executes the provided function `f` and tracks which observables are being accessed.
  * The tracking information is stored on the `derivation` object and the derivation is registered
  * as observer of any of the accessed observables.
  */
 export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T, context: any) {
+    const prevAllowStateReads = allowStateReadsStart(true)
     // pre allocate array allocation + room for variation in deps
     // array will be trimmed by bindDependencies
     changeDependenciesStateTo0(derivation)
@@ -181,7 +197,26 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T, con
     }
     globalState.trackingDerivation = prevTracking
     bindDependencies(derivation)
+
+    warnAboutDerivationWithoutDependencies(derivation)
+
+    allowStateReadsEnd(prevAllowStateReads)
+
     return result
+}
+
+function warnAboutDerivationWithoutDependencies(derivation: IDerivation) {
+    if (process.env.NODE_ENV === "production") return
+
+    if (derivation.observing.length !== 0) return
+
+    if (globalState.reactionRequiresObservable || derivation.requiresObservable) {
+        console.warn(
+            `[mobx] Derivation ${
+                derivation.name
+            } is created/updated without reading any observable value`
+        )
+    }
 }
 
 /**
@@ -276,6 +311,16 @@ export function untrackedStart(): IDerivation | null {
 
 export function untrackedEnd(prev: IDerivation | null) {
     globalState.trackingDerivation = prev
+}
+
+export function allowStateReadsStart(allowStateReads: boolean) {
+    const prev = globalState.allowStateReads
+    globalState.allowStateReads = allowStateReads
+    return prev
+}
+
+export function allowStateReadsEnd(prev: boolean) {
+    globalState.allowStateReads = prev
 }
 
 /**

@@ -67,7 +67,8 @@ export class Reaction implements IDerivation, IReactionPublic {
     constructor(
         public name: string = "Reaction@" + getNextId(),
         private onInvalidate: () => void,
-        private errorHandler?: (error: any, derivation: IDerivation) => void
+        private errorHandler?: (error: any, derivation: IDerivation) => void,
+        public requiresObservable = false
     ) {}
 
     onBecomeStale() {

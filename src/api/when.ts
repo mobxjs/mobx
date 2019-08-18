@@ -11,6 +11,11 @@ import {
 export interface IWhenOptions {
     name?: string
     timeout?: number
+    /**
+     * Experimental.
+     * Warns if the view doesn't track observables
+     */
+    requiresObservable?: boolean
     onError?: (error: any) => void
 }
 

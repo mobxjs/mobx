@@ -7,7 +7,8 @@ import {
     TraceMode,
     getDependencyTree,
     globalState,
-    runReactions
+    runReactions,
+    checkIfStateReadsAreAllowed
 } from "../internal"
 
 export interface IDepTreeNode {
@@ -131,6 +132,8 @@ export function endBatch() {
 }
 
 export function reportObserved(observable: IObservable): boolean {
+    checkIfStateReadsAreAllowed(observable)
+
     const derivation = globalState.trackingDerivation
     if (derivation !== null) {
         /**
@@ -151,6 +154,7 @@ export function reportObserved(observable: IObservable): boolean {
     } else if (observable.observers.size === 0 && globalState.inBatch > 0) {
         queueForUnobservation(observable)
     }
+
     return false
 }
 
