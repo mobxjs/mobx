@@ -5,6 +5,8 @@ export type IObservableMapInitialValues<K, V> = IMapEntries<K, V> | KeyValueMap<
 export interface IMobxConfigurationOptions {
     +enforceActions?: boolean | "strict" | "never" | "always" | "observed";
     computedRequiresReaction?: boolean;
+    derivationRequiresObservable?: boolean;
+    observablesRequiresReaction?: boolean;
     isolateGlobalState?: boolean;
     disableErrorBoundaries?: boolean;
     arrayBuffer?: number;

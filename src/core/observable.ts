@@ -169,8 +169,11 @@ export function reportObserved(observable: IObservable): boolean {
             }
         }
         return true
-    } else if (observable.observers.length === 0 && globalState.inBatch > 0) {
-        queueForUnobservation(observable)
+    } else if (observable.observers.length === 0) {
+        if (globalState.inBatch > 0) {
+            queueForUnobservation(observable)
+        }
+        warnAboutUntrackedObservableRead(observable.name)
     }
     return false
 }
@@ -294,4 +297,11 @@ function printDepTree(tree: IDependencyTree, lines: string[], depth: number) {
     }
     lines.push(`${new Array(depth).join("\t")}${tree.name}`) // MWE: not the fastest, but the easiest way :)
     if (tree.dependencies) tree.dependencies.forEach(child => printDepTree(child, lines, depth + 1))
+}
+
+function warnAboutUntrackedObservableRead(name: string) {
+    if (process.env.NODE_ENV === "production") return
+    if (globalState.observablesRequiresReaction) {
+        console.warn(`[mobx] Observable ${name} being read outside a reactive context`)
+    }
 }

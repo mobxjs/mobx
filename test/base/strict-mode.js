@@ -1,3 +1,6 @@
+/**
+ * @type {typeof import("../../src/mobx")}
+ */
 const mobx = require("../../src/mobx.ts")
 const utils = require("../utils/test-utils")
 
@@ -224,7 +227,7 @@ test("enforceActions 'strict' should not throw exception while observable array 
     }
 })
 
-test("warn on unsafe reads", function() {
+test("warn on unsafe reads of computed", function() {
     try {
         mobx.configure({ computedRequiresReaction: true })
         const x = mobx.observable({
@@ -238,6 +241,47 @@ test("warn on unsafe reads", function() {
         }, /being read outside a reactive context/)
     } finally {
         mobx.configure({ computedRequiresReaction: false })
+    }
+})
+test("warn on unsafe reads of observable 1", function() {
+    try {
+        mobx.configure({ observablesRequiresReaction: true })
+        const x = mobx.observable({
+            y: 3
+        })
+        utils.consoleWarn(() => {
+            x.yy
+        }, /being read outside a reactive context/)
+    } finally {
+        mobx.configure({ observablesRequiresReaction: false })
+    }
+})
+
+test("warn on unsafe reads of observable array", function() {
+    try {
+        mobx.configure({ observablesRequiresReaction: true })
+        const x = mobx.observable({
+            arr: [1, 2, 3]
+        })
+        utils.consoleWarn(() => {
+            x.arr[1]
+        }, /being read outside a reactive context/)
+    } finally {
+        mobx.configure({ observablesRequiresReaction: false })
+    }
+})
+
+test("warn on derivation creation without dependencies", function() {
+    try {
+        mobx.configure({ derivationRequiresObservable: true })
+
+        utils.consoleWarn(() => {
+            const dispose = mobx.reaction(() => "plain value", newValue => newValue)
+
+            dispose()
+        }, /is created without reading any observable value/)
+    } finally {
+        mobx.configure({ derivationRequiresObservable: false })
     }
 })
 

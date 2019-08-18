@@ -181,7 +181,19 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T, con
     }
     globalState.trackingDerivation = prevTracking
     bindDependencies(derivation)
+
+    if (derivation.observing.length === 0) {
+        warnAboutDerivationWithoutDependencies(derivation.name)
+    }
+
     return result
+}
+
+function warnAboutDerivationWithoutDependencies(name: string) {
+    if (process.env.NODE_ENV === "production") return
+    if (globalState.derivationRequiresObservable) {
+        console.warn(`[mobx] Derivation ${name} is created without reading any observable value`)
+    }
 }
 
 /**

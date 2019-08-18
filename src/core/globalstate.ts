@@ -102,6 +102,16 @@ export class MobXGlobals {
     computedRequiresReaction = false
 
     /**
+     * Warn if you try to create to derivation / reactive context without accessing any observable.
+     */
+    derivationRequiresObservable = false
+
+    /**
+     * Warn if observables are accessed outside a reactive context
+     */
+    observablesRequiresReaction = false
+
+    /**
      * Allows overwriting of computed properties, useful in tests but not prod as it can cause
      * memory leaks. See https://github.com/mobxjs/mobx/issues/1867
      */
