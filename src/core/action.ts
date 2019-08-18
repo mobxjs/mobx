@@ -11,6 +11,7 @@ import {
     untrackedEnd,
     spyReportEnd
 } from "../internal"
+import { allowStateReadsStart, allowStateReadsEnd } from "./derivation"
 
 export interface IAction {
     isMobxAction: boolean
@@ -44,6 +45,7 @@ export function executeAction(actionName: string, fn: Function, scope?: any, arg
 export interface IActionRunInfo {
     prevDerivation: IDerivation | null
     prevAllowStateChanges: boolean
+    prevAllowStateReads: boolean
     notifySpy: boolean
     startTime: number
     error?: any
@@ -69,9 +71,11 @@ export function _startAction(actionName: string, scope: any, args?: IArguments):
     const prevDerivation = untrackedStart()
     startBatch()
     const prevAllowStateChanges = allowStateChangesStart(true)
+    const prevAllowStateReads = allowStateReadsStart(true)
     const runInfo = {
         prevDerivation,
         prevAllowStateChanges,
+        prevAllowStateReads,
         notifySpy,
         startTime,
         actionId: globalState.nextActionId++,
@@ -91,6 +95,7 @@ export function _endAction(runInfo: IActionRunInfo) {
         globalState.suppressReactionErrors = true
     }
     allowStateChangesEnd(runInfo.prevAllowStateChanges)
+    allowStateReadsEnd(runInfo.prevAllowStateReads)
     endBatch()
     untrackedEnd(runInfo.prevDerivation)
     if (runInfo.notifySpy) {

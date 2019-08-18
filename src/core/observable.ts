@@ -6,7 +6,8 @@ import {
     runReactions,
     ComputedValue,
     getDependencyTree,
-    IDependencyTree
+    IDependencyTree,
+    checkIfStateReadsAreAllowed
 } from "../internal"
 
 export interface IDepTreeNode {
@@ -153,6 +154,8 @@ export function endBatch() {
 }
 
 export function reportObserved(observable: IObservable): boolean {
+    checkIfStateReadsAreAllowed(observable)
+
     const derivation = globalState.trackingDerivation
     if (derivation !== null) {
         /**
@@ -172,6 +175,7 @@ export function reportObserved(observable: IObservable): boolean {
     } else if (observable.observers.length === 0 && globalState.inBatch > 0) {
         queueForUnobservation(observable)
     }
+
     return false
 }
 

@@ -10,6 +10,16 @@ import {
 export function configure(options: {
     enforceActions?: boolean | "strict" | "never" | "always" | "observed"
     computedRequiresReaction?: boolean
+    /**
+     * (Experimental)
+     * Warn if you try to create to derivation / reactive context without accessing any observable.
+     */
+    reactionRequiresObservable?: boolean
+    /**
+     * (Experimental)
+     * Warn if observables are accessed outside a reactive context
+     */
+    observableRequiresReaction?: boolean
     computedConfigurable?: boolean
     isolateGlobalState?: boolean
     disableErrorBoundaries?: boolean
@@ -22,7 +32,9 @@ export function configure(options: {
         computedConfigurable,
         disableErrorBoundaries,
         arrayBuffer,
-        reactionScheduler
+        reactionScheduler,
+        reactionRequiresObservable,
+        observableRequiresReaction
     } = options
     if (options.isolateGlobalState === true) {
         isolateGlobalState()
@@ -56,6 +68,14 @@ export function configure(options: {
     }
     if (computedRequiresReaction !== undefined) {
         globalState.computedRequiresReaction = !!computedRequiresReaction
+    }
+    if (reactionRequiresObservable !== undefined) {
+        globalState.reactionRequiresObservable = !!reactionRequiresObservable
+    }
+    if (observableRequiresReaction !== undefined) {
+        globalState.observableRequiresReaction = !!observableRequiresReaction
+
+        globalState.allowStateReads = !globalState.observableRequiresReaction
     }
     if (computedConfigurable !== undefined) {
         globalState.computedConfigurable = !!computedConfigurable
