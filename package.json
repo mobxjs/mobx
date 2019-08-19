@@ -28,8 +28,7 @@
     "small-build": "node scripts/build.js",
     "lint": "eslint src/**/*.ts",
     "size": "size-limit",
-    "publish-script": "node scripts/publish.js",
-    "yarn-deduplicate": "yarn-deduplicate -s fewer yarn.lock"
+    "publish-script": "node scripts/publish.js"
   },
   "repository": {
     "type": "git",
@@ -77,8 +76,7 @@
     "tape": "^4.10.1",
     "ts-jest": "^24.0.0",
     "tslib": "^1.9.3",
-    "typescript": "^3.3.3333",
-    "yarn-deduplicate": "^1.1.1"
+    "typescript": "^3.3.3333"
   },
   "dependencies": {},
   "keywords": [
