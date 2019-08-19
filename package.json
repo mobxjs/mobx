@@ -28,7 +28,8 @@
     "small-build": "node scripts/build.js",
     "lint": "eslint src/**/*.ts",
     "size": "size-limit",
-    "publish-script": "node scripts/publish.js"
+    "publish-script": "node scripts/publish.js",
+    "dedup": "npx yarn-deduplicate -s fewer yarn.lock"
   },
   "repository": {
     "type": "git",
