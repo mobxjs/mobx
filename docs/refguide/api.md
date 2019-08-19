@@ -349,7 +349,8 @@ Returns a disposer function to cancel the side effect.
 - **`name?: string`**: A name for easier identification and debugging
 - **`delay?: number`**: the sideEffect will be delayed and debounced with the given `delay`. Defaults to `0`.
 - **`onError?: (error) => void`**: error handler that will be triggered if the autorun function throws an exception
-- **`scheduler?: (callback) => void`**: Set a custom scheduler to determine how re-running the autorun function should be scheduled
+- **`scheduler?: (callback) => void`**: Set a custom scheduler to determine how re-running the autorun function should be scheduled  
+- **`requiresObservable?: boolean`** Enables [`reactionRequiresObservable`](#reactionrequiresobservable-boolean) locally for the autorun
 
 
 ### `when`
@@ -369,6 +370,7 @@ If no effect function is passed to `when`, it will return a promise that can be 
 - **`name?: string`**: A name for easier identification and debugging
 - **`onError?: (error) => void`**: error handler that will be triggered if the _predicate-function_ or the _effect-function_ throws an exception
 - **`timeout: number`** a timeout in milliseconds, after which the `onError` handler will be triggered to signal the condition not being met within a certain time
+- **`requiresObservable?: boolean`** Enables [`reactionRequiresObservable`](#reactionrequiresobservable-boolean) locally for the when
 
 ### `reaction`
 Usage: `reaction(() => data, data => { sideEffect }, options)`.
@@ -384,6 +386,7 @@ The side effect can be debounced, just like `autorunAsync`.
 - **`delay?: number`**: the sideEffect will be delayed and debounced with the given `delay`. Defaults to `0`.
 - **`equals`**: Custom equality function to determine whether the expr function differed from it's previous result, and hence should fire effect. Accepts the same options as the equals option of `computed`.
 - Also accepts all of the options from [`autorun`](#autorun)
+- **`requiresObservable?: boolean`** Enables [`reactionRequiresObservable`](#reactionrequiresobservable-boolean) locally for the reaction
 
 ### `onReactionError`
 
@@ -519,6 +522,22 @@ Use this if you want to check whether you are using computed properties without 
 
 ```javascript
 configure({ computedRequiresReaction: true });
+```
+
+#### `observableRequiresReaction: boolean`
+Warns about any unobserved observable access.  
+Use this if you want to check whether you are using observables without a reactive context (eg not inside an autorun, action, or react component without observer wrapping).
+
+```javascript
+configure({ observableRequiresReaction: true });
+```
+
+#### `reactionRequiresObservable: boolean`
+Warns when a reaction (eg `autorun`) is created without any observable access.  
+Use this to check whether you are unneededly wrapping react components with `observer`, or to find possible related bugs.
+
+```javascript
+configure({ reactionRequiresObservable: true });
 ```
 
 #### `computedConfigurable: boolean`
