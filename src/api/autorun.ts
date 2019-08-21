@@ -11,6 +11,7 @@ import {
     invariant,
     isAction
 } from "../internal"
+import { startTrackDerivation } from "../core/derivation"
 
 export interface IAutorunOptions {
     delay?: number
@@ -150,6 +151,21 @@ export function reaction<T>(
 
     r.schedule()
     return r.getDisposer()
+}
+
+export function startTrack(effect: () => void) {
+    const reaction = new Reaction("startTrack@" + getNextId(), effect)
+    const endReactionTrack = reaction.startTrack()
+    const endTrackDerivation = startTrackDerivation(reaction)
+    let hadEndTrack = false
+    return function endTrack() {
+        if (!hadEndTrack) {
+            hadEndTrack = true
+            endTrackDerivation()
+            endReactionTrack()
+        }
+        return reaction.dispose.bind(reaction)
+    }
 }
 
 function wrapErrorHandler(errorHandler, baseFn) {

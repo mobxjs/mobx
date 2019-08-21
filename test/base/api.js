@@ -58,6 +58,7 @@ test("correct api should be exposed", function() {
             "runInAction",
             "set",
             "spy",
+            "startTrack",
             "toJS",
             "trace",
             "transaction",

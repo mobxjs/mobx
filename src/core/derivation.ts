@@ -155,6 +155,19 @@ export function checkIfStateModificationsAreAllowed(atom: IAtom) {
         )
 }
 
+export function startTrackDerivation(derivation: IDerivation) {
+    changeDependenciesStateTo0(derivation)
+    derivation.newObserving = new Array(derivation.observing.length + 100)
+    derivation.unboundDepsCount = 0
+    derivation.runId = ++globalState.runId
+    const prevTracking = globalState.trackingDerivation
+    globalState.trackingDerivation = derivation
+    return function endTrackDerivation() {
+        globalState.trackingDerivation = prevTracking
+        bindDependencies(derivation)
+    }
+}
+
 /**
  * Executes the provided function `f` and tracks which observables are being accessed.
  * The tracking information is stored on the `derivation` object and the derivation is registered
@@ -163,12 +176,7 @@ export function checkIfStateModificationsAreAllowed(atom: IAtom) {
 export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T, context: any) {
     // pre allocate array allocation + room for variation in deps
     // array will be trimmed by bindDependencies
-    changeDependenciesStateTo0(derivation)
-    derivation.newObserving = new Array(derivation.observing.length + 100)
-    derivation.unboundDepsCount = 0
-    derivation.runId = ++globalState.runId
-    const prevTracking = globalState.trackingDerivation
-    globalState.trackingDerivation = derivation
+    const endTrackDerivation = startTrackDerivation(derivation)
     let result
     if (globalState.disableErrorBoundaries === true) {
         result = f.call(context)
@@ -179,8 +187,7 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T, con
             result = new CaughtException(e)
         }
     }
-    globalState.trackingDerivation = prevTracking
-    bindDependencies(derivation)
+    endTrackDerivation()
     return result
 }
 

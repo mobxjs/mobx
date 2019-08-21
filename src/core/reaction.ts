@@ -117,7 +117,7 @@ export class Reaction implements IDerivation, IReactionPublic {
         }
     }
 
-    track(fn: () => void) {
+    startTrack() {
         startBatch()
         const notify = isSpyEnabled()
         let startTime
@@ -129,20 +129,28 @@ export class Reaction implements IDerivation, IReactionPublic {
             })
         }
         this._isRunning = true
+        const endTrack = (result?: any) => {
+            this._isRunning = false
+            this._isTrackPending = false
+            if (this.isDisposed) {
+                // disposed during last run. Clean up everything that was bound after the dispose call.
+                clearObserving(this)
+            }
+            if (result && isCaughtException(result)) this.reportExceptionInDerivation(result.cause)
+            if (notify && process.env.NODE_ENV !== "production") {
+                spyReportEnd({
+                    time: Date.now() - startTime
+                })
+            }
+            endBatch()
+        }
+        return endTrack
+    }
+
+    track(fn: () => void) {
+        const endTrack = this.startTrack()
         const result = trackDerivedFunction(this, fn, undefined)
-        this._isRunning = false
-        this._isTrackPending = false
-        if (this.isDisposed) {
-            // disposed during last run. Clean up everything that was bound after the dispose call.
-            clearObserving(this)
-        }
-        if (isCaughtException(result)) this.reportExceptionInDerivation(result.cause)
-        if (notify && process.env.NODE_ENV !== "production") {
-            spyReportEnd({
-                time: Date.now() - startTime
-            })
-        }
-        endBatch()
+        endTrack(result)
     }
 
     reportExceptionInDerivation(error: any) {

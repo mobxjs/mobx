@@ -111,6 +111,7 @@ export {
     autorun,
     IAutorunOptions,
     reaction,
+    startTrack,
     IReactionOptions,
     when,
     IWhenOptions,
