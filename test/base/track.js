@@ -15,6 +15,19 @@ test("basic", () => {
     expect(values).toEqual([1])
 })
 
+test("can be disposed", () => {
+    let a = mobx.observable.box(1)
+    let values = []
+
+    const endTrack = startTrack(() => values.push(1))
+    a.get()
+    const dispose = endTrack()
+
+    dispose()
+    a.set(2)
+    expect(values).toEqual([])
+})
+
 test("only reaction for one time", () => {
     let a = mobx.observable.box(1)
     let values = []
@@ -46,7 +59,6 @@ test("nested track", () => {
     expect(values).toEqual([1])
 
     a.set(2)
-    b.get()
     // but trackA can track the content out of trackB
     expect(values).toEqual([1, 0])
 })
