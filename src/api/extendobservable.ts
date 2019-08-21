@@ -6,15 +6,18 @@ import {
     deepDecorator,
     endBatch,
     fail,
+    getPlainObjectKeys,
     invariant,
     isComputed,
     isObservable,
     isObservableMap,
     refDecorator,
     startBatch,
+    stringifyKey,
     initializeInstance
 } from "../internal"
 import { IObservableDecorator } from "./observabledecorator"
+import { isPlainObject } from "../utils/utils"
 
 export function extendObservable<A extends Object, B extends Object>(
     target: A,
@@ -63,19 +66,31 @@ export function extendObservableObjectWithProperties(
             !isObservable(properties),
             "Extending an object with another observable (object) is not supported. Please construct an explicit propertymap, using `toJS` if need. See issue #540"
         )
-        if (decorators)
-            for (let key in decorators)
+        if (decorators) {
+            const keys = getPlainObjectKeys(decorators)
+            for (const key of keys) {
                 if (!(key in properties!))
-                    fail(`Trying to declare a decorator for unspecified property '${key}'`)
+                    fail(
+                        `Trying to declare a decorator for unspecified property '${stringifyKey(
+                            key
+                        )}'`
+                    )
+            }
+        }
     }
     startBatch()
     try {
-        for (let key in properties) {
+        const keys = getPlainObjectKeys(properties)
+        for (const key of keys) {
             const descriptor = Object.getOwnPropertyDescriptor(properties, key)!
             if (process.env.NODE_ENV !== "production") {
+                if (!isPlainObject(properties))
+                    fail(`'extendObservabe' only accepts plain objects as second argument`)
                 if (Object.getOwnPropertyDescriptor(target, key))
                     fail(
-                        `'extendObservable' can only be used to introduce new properties. Use 'set' or 'decorate' instead. The property '${key}' already exists on '${target}'`
+                        `'extendObservable' can only be used to introduce new properties. Use 'set' or 'decorate' instead. The property '${stringifyKey(
+                            key
+                        )}' already exists on '${target}'`
                     )
                 if (isComputed(descriptor.value))
                     fail(
@@ -86,10 +101,10 @@ export function extendObservableObjectWithProperties(
                 decorators && key in decorators
                     ? decorators[key]
                     : descriptor.get
-                        ? computedDecorator
-                        : defaultDecorator
+                    ? computedDecorator
+                    : defaultDecorator
             if (process.env.NODE_ENV !== "production" && typeof decorator !== "function")
-                fail(`Not a valid decorator for '${key}', got: ${decorator}`)
+                fail(`Not a valid decorator for '${stringifyKey(key)}', got: ${decorator}`)
 
             const resultDescriptor = decorator!(target, key, descriptor, true)
             if (

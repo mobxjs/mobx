@@ -6,23 +6,23 @@ const { $mobx } = mobx
 test("treeD", function() {
     m._resetGlobalState()
     mobx._getGlobalState().mobxGuid = 0
-    var a = m.observable.box(3)
-    var aName = "ObservableValue@1"
+    const a = m.observable.box(3)
+    const aName = "ObservableValue@1"
 
-    var dtree = m.getDependencyTree
+    const dtree = m.getDependencyTree
     expect(dtree(a)).toEqual({
         name: aName
     })
 
-    var b = m.computed(() => a.get() * a.get())
-    var bName = "ComputedValue@3"
+    const b = m.computed(() => a.get() * a.get())
+    const bName = "ComputedValue@3"
     expect(dtree(b)).toEqual({
         name: bName
         // no dependencies yet, since it isn't observed yet
     })
 
-    var c = m.autorun(() => b.get())
-    var cName = "Autorun@4"
+    const c = m.autorun(() => b.get())
+    const cName = "Autorun@4"
     expect(dtree(c[$mobx])).toEqual({
         name: cName,
         dependencies: [
@@ -54,8 +54,8 @@ test("treeD", function() {
         ]
     })
 
-    var x = mobx.observable.map({ temperature: 0 })
-    var d = mobx.autorun(function() {
+    const x = mobx.observable.map({ temperature: 0 })
+    const d = mobx.autorun(function() {
         Array.from(x.keys())
         if (x.has("temperature")) x.get("temperature")
         x.has("absent")
@@ -84,7 +84,7 @@ test("names", function() {
     m._resetGlobalState()
     mobx._getGlobalState().mobxGuid = 0
 
-    var struct = {
+    const struct = {
         x: "ObservableValue@1",
         y: {
             z: 7
@@ -97,7 +97,7 @@ test("names", function() {
         ]
     }
 
-    var rstruct = m.observable(struct)
+    const rstruct = m.observable(struct)
     m.extendObservable(rstruct.y, { a: { b: 2 } })
     rstruct.ar.push({ b: 2 })
     rstruct.ar.push([])
@@ -110,7 +110,7 @@ test("names", function() {
     expect(rstruct.y.a[$mobx].values.get("b").name).toBe("ObservableObject@1.y.a.b")
     expect(rstruct.ar[2][$mobx].values.get("b").name).toBe("ObservableObject@1.ar[..].b")
 
-    var d = m.autorun(function() {})
+    const d = m.autorun(function() {})
     expect(d[$mobx].name).toBeTruthy()
 
     expect(m.autorun(function namedFunction() {})[$mobx].name).toBe("namedFunction")
@@ -125,7 +125,7 @@ test("names", function() {
         })
     }
 
-    var task = new Task()
+    const task = new Task()
     expect(task[$mobx].name).toBe("Task@8")
     expect(task[$mobx].values.get("title").name).toBe("Task@8.title")
 })
@@ -142,16 +142,16 @@ function stripTrackerOutput(output) {
 
 test("spy 1", function() {
     m._resetGlobalState()
-    var lines = []
+    const lines = []
 
-    var a = m.observable.box(3)
-    var b = m.computed(function() {
+    const a = m.observable.box(3)
+    const b = m.computed(function() {
         return a.get() * 2
     })
-    var c = m.autorun(function() {
+    m.autorun(function() {
         b.get()
     })
-    var stop = m.spy(function(line) {
+    const stop = m.spy(function(line) {
         lines.push(line)
     })
 
@@ -171,21 +171,21 @@ test("get atom", function() {
         })
     }
 
-    var a = mobx.observable.box(3)
-    var b = mobx.observable({ a: 3 })
-    var c = mobx.observable.map({ a: 3 })
-    var d = mobx.observable([1, 2])
-    var e = mobx.computed(() => 3)
-    var f = mobx.autorun(() => c.has("b"))
-    var g = new Clazz()
+    const a = mobx.observable.box(3)
+    const b = mobx.observable({ a: 3 })
+    const c = mobx.observable.map({ a: 3 })
+    const d = mobx.observable([1, 2])
+    const e = mobx.computed(() => 3)
+    const f = mobx.autorun(() => c.has("b"))
+    const g = new Clazz()
 
     function atom(thing, prop) {
         return mobx.getAtom(thing, prop).constructor.name
     }
 
-    var ovClassName = mobx.observable.box(3).constructor.name
-    var atomClassName = mobx.createAtom("test").constructor.name
-    var reactionClassName = mobx.Reaction.name
+    const ovClassName = mobx.observable.box(3).constructor.name
+    const atomClassName = mobx.createAtom("test").constructor.name
+    // const reactionClassName = mobx.Reaction.name
 
     expect(atom(a)).toBe(ovClassName)
 
@@ -224,14 +224,14 @@ test("get debug name", function() {
         })
     }
 
-    var a = mobx.observable.box(3)
-    var b = mobx.observable({ a: 3 })
-    var c = mobx.observable.map({ a: 3 })
-    var d = mobx.observable([1, 2])
-    var e = mobx.computed(() => 3)
-    var f = mobx.autorun(() => c.has("b"))
-    var g = new Clazz()
-    var h = mobx.observable({ b: function() {}, c() {} })
+    const a = mobx.observable.box(3)
+    const b = mobx.observable({ a: 3 })
+    const c = mobx.observable.map({ a: 3 })
+    const d = mobx.observable([1, 2])
+    const e = mobx.computed(() => 3)
+    const f = mobx.autorun(() => c.has("b"))
+    const g = new Clazz()
+    const h = mobx.observable({ b: function() {}, c() {} })
 
     function name(thing, prop) {
         return mobx.getDebugName(thing, prop)
@@ -276,13 +276,13 @@ test("get administration", function() {
         })
     }
 
-    var a = mobx.observable.box(3)
-    var b = mobx.observable({ a: 3 })
-    var c = mobx.observable.map({ a: 3 })
-    var d = mobx.observable([1, 2])
-    var e = mobx.computed(() => 3)
-    var f = mobx.autorun(() => c.has("b"))
-    var g = new Clazz()
+    const a = mobx.observable.box(3)
+    const b = mobx.observable({ a: 3 })
+    const c = mobx.observable.map({ a: 3 })
+    const d = mobx.observable([1, 2])
+    const e = mobx.computed(() => 3)
+    const f = mobx.autorun(() => c.has("b"))
+    const g = new Clazz()
     const h = {}
     mobx.extendObservable(h, { a: 3 })
 
@@ -290,8 +290,8 @@ test("get administration", function() {
         return mobx._getAdministration(thing, prop).constructor.name
     }
 
-    var ovClassName = mobx.observable.box(3).constructor.name
-    var mapClassName = mobx.observable.map().constructor.name
+    const ovClassName = mobx.observable.box(3).constructor.name
+    const mapClassName = mobx.observable.map().constructor.name
 
     expect(adm(a)).toBe(ovClassName)
 
@@ -327,10 +327,10 @@ test("onBecome(Un)Observed simple", () => {
     const x = mobx.observable.box(3)
     const events = []
 
-    const d1 = mobx.onBecomeObserved(x, () => {
+    mobx.onBecomeObserved(x, () => {
         events.push("x observed")
     })
-    const d2 = mobx.onBecomeUnobserved(x, () => {
+    mobx.onBecomeUnobserved(x, () => {
         events.push("x unobserved")
     })
 
@@ -405,7 +405,7 @@ test("onBecomeObserved correctly disposes second listener #1537", () => {
     const d1 = mobx.onBecomeObserved(x, "a", () => {
         events.push("a observed")
     })
-    const d2 = mobx.onBecomeObserved(x, "b", () => {
+    mobx.onBecomeObserved(x, "b", () => {
         events.push("b observed")
     })
     d1()
@@ -429,7 +429,7 @@ test("onBecomeObserved correctly disposes second listener #1537", () => {
     expect(events.length).toBe(1)
     expect(events).toEqual(["b observed"])
     d2()
-    const d4 = mobx.reaction(() => x.get(), () => {})
+    mobx.reaction(() => x.get(), () => {})
     expect(events).toEqual(["b observed"])
 })
 
@@ -448,7 +448,7 @@ test("onBecomeUnobserved correctly disposes second listener #1537", () => {
     expect(events.length).toBe(1)
     expect(events).toEqual(["b unobserved"])
     d2()
-    const d4 = mobx.reaction(() => x.get(), () => {})
+    mobx.reaction(() => x.get(), () => {})
     expect(events).toEqual(["b unobserved"])
 })
 

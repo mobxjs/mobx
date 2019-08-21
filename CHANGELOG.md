@@ -1,3 +1,47 @@
+# 5.13.1 / 4.13.1
+
+* Don't use `global` and `self` keywords unless defined. Fixes [#2070](https://github.com/mobxjs/mobx/issues/2070).
+* onBecome(Un)Observed didn't trigger when using number as key of observable map. Fixes [#2067](https://github.com/mobxjs/mobx/issues/2067).
+
+
+# 5.13.0 / 4.13.0
+
+* Fixed potential memory leak in observable maps, when non-primitive values are used as keys. Fixes [#2031](https://github.com/mobxjs/mobx/issues/2031) through [#2032](https://github.com/mobxjs/mobx/pull/2032).
+* Added support to store additional non-observable(!) fields (string or symbol based) on array, to better reflect behavior of MobX 4. Fixes [#2044](https://github.com/mobxjs/mobx/issues/2044) through [#2046](https://github.com/mobxjs/mobx/pull/2046)
+
+# 5.11.0 / 4.12.0
+
+* Added `computedConfigurable` config [#2011](https://github.com/mobxjs/mobx/pull/2011), [#2013](https://github.com/mobxjs/mobx/pull/2014)
+
+# 4.11.0
+
+**BREAKING CHANGE**
+
+Reverted the support of Symbols in general in MobX 4, as it gives to many potential build errors and increases the system requirements for MobX 4 (which was an oversight in 4.10.0). Apologies for the breaking change (lack of new major version numbers). If lock files are properly used however, no harm should be caused by this change.
+
+* Reverted `Symbol` support in observable maps and objects. Reverts [#1944](https://github.com/mobxjs/mobx/pull/1944) through [#1988](https://github.com/mobxjs/mobx/pull/1988). Fixes [#1986](https://github.com/mobxjs/mobx/issues/1986), [#1987](https://github.com/mobxjs/mobx/issues/1987)
+
+# 5.10.1
+
+* Fixed a recent regression where array update events would send undefined as `change.object` through [#1985](https://github.com/mobxjs/mobx/pull/1985) by [xaviergonz](https://github.com/xaviergonz)
+
+# 5.10.0 / 4.10.0
+
+* Added support for symbol named properties in maps and objects. Fixes [#1809](https://github.com/mobxjs/mobx/issues/1809) and [#1925](https://github.com/mobxjs/mobx/issues/1925) through [#1944](https://github.com/mobxjs/mobx/pull/1944) by [@loklaan](https://github.com/loklaan)
+* Added `set` support for `observable.set`, see [#1945](https://github.com/mobxjs/mobx/pull/1945) by [xaviergonz](https://github.com/xaviergonz)
+* Fixed events for arrays using the wrong object, [#1964](https://github.com/mobxjs/mobx/pull/1964) by [xaviergonz](https://github.com/xaviergonz)
+* Improved flow typings [#1960](https://github.com/mobxjs/mobx/pull/1960) by [@tbezman](https://github.com/tbezman)
+* Updated tooling, [#1949](https://github.com/mobxjs/mobx/pull/1949) and [#1931](https://github.com/mobxjs/mobx/pull/1931) by [xaviergonz](https://github.com/xaviergonz)
+
+# 5.9.4 / 4.9.4
+
+* Allow symbol keys in `ObservableMap`, see [#1930](https://github.com/mobxjs/mobx/pull/1930) by [pimterry](https://github.com/pimterry)
+* Fixed type definitions of `toStringTag` for Maps and Sets, see [#1929](https://github.com/mobxjs/mobx/pull/1929) by [lennerd](https://github.com/lennerd)
+
+# 4.9.3
+
+* Fixed `observable.set` compatibility with IE 11, see [#1917](https://github.com/mobxjs/mobx/pull/1917) by [kalmi](https://github.com/kalmi)
+
 # 4.9.2
 
 * Fixed regression [#1878](https://github.com/mobxjs/mobx/issues/1878), accidental use of `Symbol` breaking Internet Explorer / React Native compatibility.
@@ -122,7 +166,7 @@ MobX 5 is the first MobX version fully leveraging Proxies. This has two big adva
 
 ### The system requirements to run MobX has been upped
 
-* MobX 5 can only be used on environments that support `Proxies`. In practice this means, no Internet Explorer (Edge is fine). No nodejs < 6. React Native on Android only when JavaScript core is [upgraded](https://github.com/react-community/jsc-android-buildscripts#how-to-use-it-with-my-react-native-app). All modern browsers are supported.
+* MobX 5 can only be used on environments that support `Proxies`. See the [browser support](https://github.com/mobxjs/mobx#browser-support) for details.
 * Since MobX no longer runs on older browsers, the compilation target has been upgraded to ES2015 syntax supporting browsers. This means that MobX is not loadable on older browsers without down compilation to ES5.
 * If for whatever reason your project cannot meet this requirements, please stick to MobX 4. It will be actively maintained. All current features of MobX 5 are expressable in MobX 4 as well, but it means that for example to use dynamic objects some [additional APIs](https://mobx.js.org/refguide/object-api.html) are needed.
 * The performance footprint of MobX 5 should be pretty similar to MobX 4. In our performance tests we saw some minor improvements in memory footprint, but overall it should be pretty comparable.

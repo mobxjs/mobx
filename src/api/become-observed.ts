@@ -47,8 +47,8 @@ export function onBecomeUnobserved(thing, arg2, arg3?): Lambda {
 
 function interceptHook(hook: "onBecomeObserved" | "onBecomeUnobserved", thing, arg2, arg3) {
     const atom: IObservable =
-        typeof arg2 === "string" ? getAtom(thing, arg2) : (getAtom(thing) as any)
-    const cb = typeof arg2 === "string" ? arg3 : arg2
+        typeof arg3 === "function" ? getAtom(thing, arg2) : (getAtom(thing) as any)
+    const cb = typeof arg3 === "function" ? arg3 : arg2
     const listenersKey = `${hook}Listeners` as
         | "onBecomeObservedListeners"
         | "onBecomeUnobservedListeners"

@@ -29,12 +29,12 @@ import {
 } from "../../src/mobx"
 import * as mobx from "../../src/mobx"
 
-var v = observable.box(3)
+const v = observable.box(3)
 observe(v, () => {})
 
-var a = observable([1, 2, 3])
+const a = observable([1, 2, 3])
 
-var testFunction = function(a: any) {}
+const testFunction = function(a: any) {}
 
 // lazy wrapper around yest
 
@@ -71,15 +71,15 @@ test("decorators", () => {
         // @observable hoepie() { return 3; }
     }
 
-    var o = new Order()
+    const o = new Order()
     t.equal(isObservableObject(o), true)
     t.equal(isObservableProp(o, "amount"), true)
     t.equal(isObservableProp(o, "total"), true)
 
-    var events: any[] = []
-    var d1 = observe(o, (ev: IObjectDidChange) => events.push(ev.name, (ev as any).oldValue))
-    var d2 = observe(o, "price", ev => events.push(ev.newValue, ev.oldValue))
-    var d3 = observe(o, "total", ev => events.push(ev.newValue, ev.oldValue))
+    const events: any[] = []
+    const d1 = observe(o, (ev: IObjectDidChange) => events.push(ev.name, (ev as any).oldValue))
+    const d2 = observe(o, "price", ev => events.push(ev.newValue, ev.oldValue))
+    const d3 = observe(o, "total", ev => events.push(ev.newValue, ev.oldValue))
 
     o.price = 4
 
@@ -100,8 +100,8 @@ test("decorators", () => {
 })
 
 test("observable", () => {
-    var a = observable.box(3)
-    var b = computed(() => a.get() * 2)
+    const a = observable.box(3)
+    const b = computed(() => a.get() * 2)
     t.equal(b.get(), 6)
 })
 
@@ -118,11 +118,11 @@ test("annotations", () => {
         }
     }
 
-    var order1totals: number[] = []
-    var order1 = new Order()
-    var order2 = new Order()
+    const order1totals: number[] = []
+    const order1 = new Order()
+    const order2 = new Order()
 
-    var disposer = autorun(() => {
+    const disposer = autorun(() => {
         order1totals.push(order1.total)
     })
 
@@ -144,7 +144,7 @@ test("annotations", () => {
     t.deepEqual(order1totals, [6, 3, 9])
 
     t.equal(order1.aFunction, testFunction)
-    var x = function() {
+    const x = function() {
         return 3
     }
     order1.aFunction = x
@@ -152,7 +152,7 @@ test("annotations", () => {
 })
 
 test("scope", () => {
-    var x = observable({
+    const x = observable({
         y: 3,
         // this wo't work here.
         get z() {
@@ -179,14 +179,14 @@ test("scope", () => {
         })
     }
 
-    var x3: IThing = new (<any>Thing)()
+    const x3: IThing = new (<any>Thing)()
     t.equal(x3.z, 6)
     x3.y = 4
     t.equal(x3.z, 8)
 })
 
 test("typing", () => {
-    var ar: IObservableArray<number> = observable([1, 2])
+    const ar: IObservableArray<number> = observable([1, 2])
     ar.intercept((c: IArrayWillChange<number> | IArrayWillSplice<number>) => {
         // console.log(c.type)
         return null
@@ -195,7 +195,7 @@ test("typing", () => {
         // console.log(d.type)
     })
 
-    var ar2: IObservableArray<number> = observable([1, 2])
+    const ar2: IObservableArray<number> = observable([1, 2])
     ar2.intercept((c: IArrayWillChange<number> | IArrayWillSplice<number>) => {
         // console.log(c.type)
         return null
@@ -204,7 +204,7 @@ test("typing", () => {
         // console.log(d.type)
     })
 
-    var x: IObservableValue<number> = observable.box(3)
+    const x: IObservableValue<number> = observable.box(3)
 })
 
 const state: any = observable({
@@ -247,9 +247,9 @@ test("box", () => {
         }
     }
 
-    var box = new Box()
+    const box = new Box()
 
-    var ar: number[] = []
+    const ar: number[] = []
 
     autorun(() => {
         ar.push(box.width)
@@ -292,7 +292,7 @@ test("atom clock example", done => {
 
     class Clock {
         atom: IAtom
-        intervalHandler: number | null = null
+        intervalHandler: NodeJS.Timeout | null = null
         currentDateTime: string | undefined = undefined
 
         constructor() {
@@ -457,11 +457,11 @@ test("issue 191 - shared initializers (ts)", () => {
         @observable array = [2]
     }
 
-    var t1 = new Test()
+    const t1 = new Test()
     t1.obj.a = 2
     t1.array.push(3)
 
-    var t2 = new Test()
+    const t2 = new Test()
     t2.obj.a = 3
     t2.array.push(4)
 
@@ -684,12 +684,12 @@ test.skip("observable performance", () => {
     const objs: any[] = []
     const start = Date.now()
 
-    for (var i = 0; i < AMOUNT; i++) objs.push(new A())
+    for (let i = 0; i < AMOUNT; i++) objs.push(new A())
 
     console.log("created in ", Date.now() - start)
 
-    for (var j = 0; j < 4; j++) {
-        for (var i = 0; i < AMOUNT; i++) {
+    for (let j = 0; j < 4; j++) {
+        for (let i = 0; i < AMOUNT; i++) {
             const obj = objs[i]
             obj.a += 3
             obj.b *= 4
@@ -813,7 +813,7 @@ test("enumerability", () => {
     // not initialized yet
     let ownProps = Object.keys(a)
     let props: string[] = []
-    for (var key in a) props.push(key)
+    for (const key in a) props.push(key)
 
     t.deepEqual(ownProps, [
         "a" // yeej!
@@ -841,7 +841,7 @@ test("enumerability", () => {
 
     ownProps = Object.keys(a)
     props = []
-    for (var key in a) props.push(key)
+    for (const key in a) props.push(key)
 
     t.deepEqual(ownProps, ["a"])
 
@@ -867,7 +867,7 @@ test("issue 285 (typescript)", () => {
         }
     }
 
-    var todo = new Todo("Something to do")
+    const todo = new Todo("Something to do")
 
     t.deepEqual(toJS(todo), {
         id: 1,
@@ -1291,9 +1291,9 @@ test("computed comparer works with decorate (TS)", () => {
 test("computed comparer works with decorate (TS) - 2", () => {
     const sameTime = (from: Time, to: Time) => from.hour === to.hour && from.minute === to.minute
     class Time {
-        hour: number
-        minute: number
-        readonly time: number
+        hour!: number
+        minute!: number
+        readonly time!: number
 
         constructor(hour: number, minute: number) {
             extendObservable(
@@ -1552,8 +1552,6 @@ test("promised when can be cancelled", async () => {
 })
 
 test("it should support asyncAction as decorator (ts)", async () => {
-    const values = []
-
     mobx.configure({ enforceActions: "observed" })
 
     class X {
@@ -1586,14 +1584,13 @@ test("flow support async generators", async () => {
         yield 3
     }
 
-    let steps = 0
     const start = mobx.flow(async function*() {
         let total = 0
         for await (const number of someNumbers()) {
             total += number
         }
         return total
-    })
+    } as any) // TODO: fix typings
 
     const p = start()
     const res = await p
@@ -1612,14 +1609,13 @@ test("flow support throwing async generators", async () => {
         throw "OOPS"
     }
 
-    let steps = 0
     const start = mobx.flow(async function*() {
         let total = 0
         for await (const number of someNumbers()) {
             total += number
         }
         return total
-    })
+    } as any) // TODO: fix typings
 
     const p = start()
     try {

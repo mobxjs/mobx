@@ -1,6 +1,7 @@
 import {
     IDerivationState,
     IObservable,
+    IDerivation,
     createInstanceofPredicate,
     endBatch,
     getNextId,
@@ -23,7 +24,7 @@ export interface IAtom extends IObservable {
 export class Atom implements IAtom {
     isPendingUnobservation = false // for effective unobserving. BaseAtom has true, for extra optimization, so its onBecomeUnobserved never gets called, because it's not needed
     isBeingObserved = false
-    observers = new Set()
+    observers = new Set<IDerivation>()
 
     diffValue = 0
     lastAccessedBy = 0

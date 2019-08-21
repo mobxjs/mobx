@@ -69,8 +69,8 @@ function getEnhancerFromOptions(options: CreateObservableOptions): IEnhancer<any
     return options.defaultDecorator
         ? options.defaultDecorator.enhancer
         : options.deep === false
-            ? referenceEnhancer
-            : deepEnhancer
+        ? referenceEnhancer
+        : deepEnhancer
 }
 
 /**
@@ -90,12 +90,12 @@ function createObservable(v: any, arg2?: any, arg3?: any) {
     const res = isPlainObject(v)
         ? observable.object(v, arg2, arg3)
         : Array.isArray(v)
-            ? observable.array(v, arg2)
-            : isES6Map(v)
-                ? observable.map(v, arg2)
-                : isES6Set(v)
-                    ? observable.set(v, arg2)
-                    : v
+        ? observable.array(v, arg2)
+        : isES6Map(v)
+        ? observable.map(v, arg2)
+        : isES6Set(v)
+        ? observable.set(v, arg2)
+        : v
 
     // this value could be converted to a new observable data structure, return it
     if (res !== v) return res
@@ -112,6 +112,7 @@ export interface IObservableFactory {
     (value: number | string | null | undefined | boolean): never // Nope, not supported, use box
     (target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): any // decorator
     <T = any>(value: T[], options?: CreateObservableOptions): IObservableArray<T>
+    <T = any>(value: Set<T>, options?: CreateObservableOptions): ObservableSet<T>
     <K = any, V = any>(value: Map<K, V>, options?: CreateObservableOptions): ObservableMap<K, V>
     <T extends Object>(
         value: T,

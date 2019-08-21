@@ -1,8 +1,8 @@
 export function makeIterable<T>(iterator: Iterator<T>): IterableIterator<T> {
-    iterator[Symbol.iterator] = self
+    iterator[Symbol.iterator] = getSelf
     return iterator as any
 }
 
-function self() {
+function getSelf() {
     return this
 }

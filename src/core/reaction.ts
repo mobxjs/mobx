@@ -136,7 +136,7 @@ export class Reaction implements IDerivation, IReactionPublic {
                 // disposed during last run. Clean up everything that was bound after the dispose call.
                 clearObserving(this)
             }
-            if (result && isCaughtException(result)) this.reportExceptionInDerivation(result.cause)
+            if (isCaughtException(result)) this.reportExceptionInDerivation(result.cause)
             if (notify && process.env.NODE_ENV !== "production") {
                 spyReportEnd({
                     time: Date.now() - startTime
@@ -148,9 +148,14 @@ export class Reaction implements IDerivation, IReactionPublic {
     }
 
     track(fn: () => void) {
+        if (this.isDisposed) {
+            return
+            // console.warn("Reaction already disposed") // Note: Not a warning / error in mobx 4 either
+        }
         const endTrack = this.startTrack()
         const result = trackDerivedFunction(this, fn, undefined)
         endTrack(result)
+        return result
     }
 
     reportExceptionInDerivation(error: any) {

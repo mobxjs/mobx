@@ -1,6 +1,5 @@
 import {
     computed,
-    decorate,
     isComputedProp,
     isAction,
     isObservableProp,
@@ -9,8 +8,7 @@ import {
     action,
     reaction,
     extendObservable,
-    keys,
-    $mobx
+    keys
 } from "../../src/mobx.ts"
 
 import { stripAdminFromDescriptors } from "../utils/test-utils"
@@ -232,7 +230,6 @@ test("ownKeys invariant not broken - 2", () => {
 test("non-proxied object", () => {
     const a = observable({ x: 3 }, {}, { proxy: false })
     a.b = 4
-    debugger
     extendObservable(
         a,
         {
@@ -249,7 +246,6 @@ test("non-proxied object", () => {
     )
 
     expect(a.y).toBe(6)
-    debugger
     a.double()
     expect(a.y).toBe(12)
     expect(isComputedProp(a, "y")).toBe(true)
@@ -277,7 +273,6 @@ test("extend proxies", () => {
     )
 
     expect(a.y).toBe(6)
-    debugger
     a.double()
     expect(a.y).toBe(12)
     expect(isComputedProp(a, "y")).toBe(true)
@@ -314,7 +309,6 @@ test("decorate proxies", () => {
 })
 
 test("predictable 'this' - 1", () => {
-    debugger
     const a = observable.object(
         {
             a0() {
@@ -379,7 +373,7 @@ test("1796 - deleting / recreate prop", () => {
 
     const events = []
 
-    const aut = autorun(() => {
+    autorun(() => {
         events.push(value.foo)
     })
     delete value.foo

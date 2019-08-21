@@ -31,6 +31,7 @@ import {
     spyReportEnd,
     spyReportStart,
     startBatch,
+    stringifyKey,
     globalState
 } from "../internal"
 
@@ -40,20 +41,20 @@ export interface IObservableObject {
 
 export type IObjectDidChange =
     | {
-          name: string
+          name: PropertyKey
           object: any
           type: "add"
           newValue: any
       }
     | {
-          name: string
+          name: PropertyKey
           object: any
           type: "update"
           oldValue: any
           newValue: any
       }
     | {
-          name: string
+          name: PropertyKey
           object: any
           type: "remove"
           oldValue: any
@@ -63,13 +64,13 @@ export type IObjectWillChange =
     | {
           object: any
           type: "update" | "add"
-          name: string
+          name: PropertyKey
           newValue: any
       }
     | {
           object: any
           type: "remove"
-          name: string
+          name: PropertyKey
       }
 
 export class ObservableObjectAdministration
@@ -78,22 +79,22 @@ export class ObservableObjectAdministration
     changeListeners
     interceptors
     private proxy: any
-    private pendingKeys: undefined | Map<string, ObservableValue<boolean>>
+    private pendingKeys: undefined | Map<PropertyKey, ObservableValue<boolean>>
 
     constructor(
         public target: any,
-        public values = new Map<string, ObservableValue<any> | ComputedValue<any>>(),
+        public values = new Map<PropertyKey, ObservableValue<any> | ComputedValue<any>>(),
         public name: string,
         public defaultEnhancer: IEnhancer<any>
     ) {
         this.keysAtom = new Atom(name + ".keys")
     }
 
-    read(key: string) {
+    read(key: PropertyKey) {
         return this.values.get(key)!.get()
     }
 
-    write(key: string, newValue) {
+    write(key: PropertyKey, newValue) {
         const instance = this.target
         const observable = this.values.get(key)
         if (observable instanceof ComputedValue) {
@@ -137,7 +138,7 @@ export class ObservableObjectAdministration
         }
     }
 
-    has(key: string) {
+    has(key: PropertyKey) {
         const map = this.pendingKeys || (this.pendingKeys = new Map())
         let entry = map.get(key)
         if (entry) return entry.get()
@@ -148,7 +149,7 @@ export class ObservableObjectAdministration
             entry = new ObservableValue(
                 exists,
                 referenceEnhancer,
-                `${this.name}.${key.toString()}?`,
+                `${this.name}.${stringifyKey(key)}?`,
                 false
             )
             map.set(key, entry)
@@ -156,7 +157,11 @@ export class ObservableObjectAdministration
         }
     }
 
-    addObservableProp(propName: string, newValue, enhancer: IEnhancer<any> = this.defaultEnhancer) {
+    addObservableProp(
+        propName: PropertyKey,
+        newValue,
+        enhancer: IEnhancer<any> = this.defaultEnhancer
+    ) {
         const { target } = this
         assertPropertyConfigurable(target, propName)
 
@@ -173,7 +178,7 @@ export class ObservableObjectAdministration
         const observable = new ObservableValue(
             newValue,
             enhancer,
-            `${this.name}.${propName}`,
+            `${this.name}.${stringifyKey(propName)}`,
             false
         )
         this.values.set(propName, observable)
@@ -185,17 +190,17 @@ export class ObservableObjectAdministration
 
     addComputedProp(
         propertyOwner: any, // where is the property declared?
-        propName: string,
+        propName: PropertyKey,
         options: IComputedValueOptions<any>
     ) {
         const { target } = this
-        options.name = options.name || `${this.name}.${propName}`
+        options.name = options.name || `${this.name}.${stringifyKey(propName)}`
         this.values.set(propName, new ComputedValue(options))
         if (propertyOwner === target || isPropertyConfigurable(propertyOwner, propName))
             Object.defineProperty(propertyOwner, propName, generateComputedPropConfig(propName))
     }
 
-    remove(key: string) {
+    remove(key: PropertyKey) {
         if (!this.values.has(key)) return
         const { target } = this
         if (hasInterceptors(this)) {
@@ -283,7 +288,7 @@ export class ObservableObjectAdministration
         return registerInterceptor(this, handler)
     }
 
-    notifyPropertyAddition(key: string, newValue) {
+    notifyPropertyAddition(key: PropertyKey, newValue) {
         const notify = hasListeners(this)
         const notifySpy = isSpyEnabled()
         const change =
@@ -307,10 +312,10 @@ export class ObservableObjectAdministration
         this.keysAtom.reportChanged()
     }
 
-    getKeys(): string[] {
+    getKeys(): PropertyKey[] {
         this.keysAtom.reportObserved()
         // return Reflect.ownKeys(this.values) as any
-        const res: string[] = []
+        const res: PropertyKey[] = []
         for (const [key, value] of this.values) if (value instanceof ObservableValue) res.push(key)
         return res
     }
@@ -322,7 +327,7 @@ export interface IIsObservableObject {
 
 export function asObservableObject(
     target: any,
-    name: string = "",
+    name: PropertyKey = "",
     defaultEnhancer: IEnhancer<any> = deepEnhancer
 ): ObservableObjectAdministration {
     if (Object.prototype.hasOwnProperty.call(target, $mobx)) return target[$mobx]
@@ -336,7 +341,12 @@ export function asObservableObject(
         name = (target.constructor.name || "ObservableObject") + "@" + getNextId()
     if (!name) name = "ObservableObject@" + getNextId()
 
-    const adm = new ObservableObjectAdministration(target, new Map(), name, defaultEnhancer)
+    const adm = new ObservableObjectAdministration(
+        target,
+        new Map(),
+        stringifyKey(name),
+        defaultEnhancer
+    )
     addHiddenProp(target, $mobx, adm)
     return adm
 }
@@ -375,7 +385,7 @@ export function generateComputedPropConfig(propName) {
     return (
         computedPropertyConfigs[propName] ||
         (computedPropertyConfigs[propName] = {
-            configurable: false, // See https://github.com/mobxjs/mobx/issues/1867, for computeds, we don't want reconfiguration, as this will potentially leak memory!
+            configurable: globalState.computedConfigurable,
             enumerable: false,
             get() {
                 return getAdministrationForComputedPropOwner(this).read(propName)

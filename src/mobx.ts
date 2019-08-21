@@ -41,9 +41,10 @@ try {
         process.env.NODE_ENV !== "production" &&
         process.env.IGNORE_MOBX_MINIFY_WARNING !== "true"
     ) {
+        // trick so it doesn't get replaced
+        const varName = ["process", "env", "NODE_ENV"].join(".")
         console.warn(
-            // Template literal(backtick) is used for fix issue with rollup-plugin-commonjs https://github.com/rollup/rollup-plugin-commonjs/issues/344
-            `[mobx] you are running a minified build, but 'process.env.NODE_ENV' was not set to 'production' in your bundler. This results in an unnecessarily large and slow bundle`
+            `[mobx] you are running a minified build, but '${varName}' was not set to 'production' in your bundler. This results in an unnecessarily large and slow bundle`
         )
     }
 })()

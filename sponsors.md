@@ -20,9 +20,11 @@ Want to make a one-time contribution? https://mobxjs.github.io/mobx/donate.html
 * Constantine Genchevsky
 * Dane Hitchcox
 * Daniel Nakov
-* Dardo Kukovec
+* Darko Kukovec
 * Derek Knox
 * Dominik Nowik
+* Dong Woo Gim
+* Dushko Jordanovski
 * GumoIsland
 * Graham Kaemmer
 * Greg Zapp

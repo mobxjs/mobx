@@ -1,6 +1,5 @@
 const mobx = require("../../src/mobx.ts")
 const startTrack = mobx.startTrack
-const utils = require("../utils/test-utils")
 
 test("basic", () => {
     let a = mobx.observable.box(1)

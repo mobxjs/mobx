@@ -1,8 +1,8 @@
-var start = Date.now()
+const start = Date.now()
 
 if (process.env.PERSIST) {
-    var fs = require("fs")
-    var logFile = __dirname + "/perf.txt"
+    const fs = require("fs")
+    const logFile = __dirname + "/perf.txt"
     // clear previous results
     if (fs.existsSync(logFile)) fs.unlinkSync(logFile)
 
