@@ -72,7 +72,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     newObserving = null // during tracking it's an array with new observed observers
     isBeingObserved = false
     isPendingUnobservation: boolean = false
-    observers = new Set()
+    observers = new Set<IDerivation>()
     diffValue = 0
     runId = 0
     lastAccessedBy = 0
@@ -173,7 +173,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
             invariant(
                 !this.isRunningSetter,
                 `The setter of computed value '${
-                    this.name
+                this.name
                 }' is trying to update itself. Did you intend to update an _observable_ value, instead of the computed property?`
             )
             this.isRunningSetter = true
@@ -186,9 +186,9 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
             invariant(
                 false,
                 process.env.NODE_ENV !== "production" &&
-                    `[ComputedValue '${
-                        this.name
-                    }'] It is not possible to assign a new value to a computed value.`
+                `[ComputedValue '${
+                this.name
+                }'] It is not possible to assign a new value to a computed value.`
             )
     }
 
@@ -275,14 +275,14 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         if (this.isTracing !== TraceMode.NONE) {
             console.log(
                 `[mobx.trace] '${
-                    this.name
+                this.name
                 }' is being read outside a reactive context. Doing a full recompute`
             )
         }
         if (globalState.computedRequiresReaction) {
             console.warn(
                 `[mobx] Computed value ${
-                    this.name
+                this.name
                 } is being read outside a reactive context. Doing a full recompute`
             )
         }

@@ -34,8 +34,8 @@ try {
     g.process.env = {}
 }
 
-;(() => {
-    function testCodeMinification() {}
+; (() => {
+    function testCodeMinification() { }
     if (
         testCodeMinification.name !== "testCodeMinification" &&
         process.env.NODE_ENV !== "production" &&
@@ -150,7 +150,8 @@ export {
     isComputingDerivation as _isComputingDerivation,
     onReactionError,
     interceptReads as _interceptReads,
-    IComputedValueOptions
+    IComputedValueOptions,
+    _await
 } from "./internal"
 
 // Devtools support

@@ -4,35 +4,9 @@ let generatorId = 0
 
 export type CancellablePromise<T> = Promise<T> & { cancel(): void }
 
-export interface FlowYield {
-    // fake, only for typing
-    "!!flowYield": undefined
-}
-
-export interface FlowReturn<T> {
-    // fake, only for typing
-    "!!flowReturn": T
-}
-
-// we skip promises that are the result of yielding promises (except if they use flowReturn)
-export type FlowReturnType<R> = IfAllAreFlowYieldThenVoid<
-    R extends FlowReturn<infer FR>
-        ? FR extends Promise<infer FRP>
-            ? FRP
-            : FR
-        : R extends Promise<any>
-        ? FlowYield
-        : R
->
-
-// we extract yielded promises from the return type
-export type IfAllAreFlowYieldThenVoid<R> = Exclude<R, FlowYield> extends never
-    ? void
-    : Exclude<R, FlowYield>
-
 export function flow<R, Args extends any[]>(
-    generator: (...args: Args) => IterableIterator<R>
-): (...args: Args) => CancellablePromise<FlowReturnType<R>> {
+    generator: (...args: Args) => Generator<any, R, any>
+): (...args: Args) => CancellablePromise<R> {
     if (arguments.length !== 1)
         fail(
             !!process.env.NODE_ENV && `Flow expects one 1 argument and cannot be used as decorator`
@@ -40,7 +14,7 @@ export function flow<R, Args extends any[]>(
     const name = generator.name || "<unnamed flow>"
 
     // Implementation based on https://github.com/tj/co/blob/master/index.js
-    return function() {
+    return function () {
         const ctx = this
         const args = arguments
         const runId = ++generatorId
@@ -51,7 +25,7 @@ export function flow<R, Args extends any[]>(
         let rejector: (error: any) => void
         let pendingPromise: CancellablePromise<any> | undefined = undefined
 
-        const promise = new Promise<R>(function(resolve, reject) {
+        const promise = new Promise<R>(function (resolve, reject) {
             let stepId = 0
             rejector = reject
 
@@ -98,11 +72,11 @@ export function flow<R, Args extends any[]>(
             onFulfilled(undefined) // kick off the process
         }) as any
 
-        promise.cancel = action(`${name} - runid: ${runId} - cancel`, function() {
+        promise.cancel = action(`${name} - runid: ${runId} - cancel`, function () {
             try {
                 if (pendingPromise) cancelPromise(pendingPromise)
                 // Finally block can return (or yield) stuff..
-                const res = gen.return!()
+                const res = (gen.return as any)()
                 // eat anything that promise would do, it's cancelled!
                 const yieldedPromise = Promise.resolve(res.value)
                 yieldedPromise.then(noop, noop)
@@ -113,10 +87,25 @@ export function flow<R, Args extends any[]>(
                 rejector(e) // there could be a throwing finally block
             }
         })
-        return promise as CancellablePromise<FlowReturnType<R>>
+        return promise
     }
 }
 
 function cancelPromise(promise) {
     if (typeof promise.cancel === "function") promise.cancel()
+}
+
+function* promiseGenerator(p: any) {
+    return yield p
+}
+
+/**
+ * Makes a promise a flow, so it can be awaited with yield*.
+ *
+ * @typeparam T Promise return type.
+ * @param promise Promise.
+ * @returns
+ */
+export function _await<P extends Promise<any>>(promise: P): P extends Promise<infer R> ? Generator<P, R, unknown> : never {
+    return promiseGenerator(promise) as any
 }

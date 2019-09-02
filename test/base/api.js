@@ -1,7 +1,7 @@
 import * as fs from "fs"
 const mobx = require("../../src/mobx.ts")
 
-test("correct api should be exposed", function() {
+test("correct api should be exposed", function () {
     expect(
         Object.keys(mobx)
             .filter(key => mobx[key] !== undefined)
@@ -64,7 +64,8 @@ test("correct api should be exposed", function() {
             "untracked",
             "values",
             "entries",
-            "when"
+            "when",
+            "_await"
         ].sort()
     )
 })

@@ -25,16 +25,18 @@ import {
     decorate,
     IAtom,
     createAtom,
-    runInAction
+    runInAction,
+    flow,
+    _await
 } from "../../src/mobx"
 import * as mobx from "../../src/mobx"
 
 const v = observable.box(3)
-observe(v, () => {})
+observe(v, () => { })
 
 const a = observable([1, 2, 3])
 
-const testFunction = function(a: any) {}
+const testFunction = function (a: any) { }
 
 // lazy wrapper around yest
 
@@ -144,7 +146,7 @@ test("annotations", () => {
     t.deepEqual(order1totals, [6, 3, 9])
 
     t.equal(order1.aFunction, testFunction)
-    const x = function() {
+    const x = function () {
         return 3
     }
     order1.aFunction = x
@@ -169,7 +171,7 @@ test("scope", () => {
         y: number
     }
 
-    const Thing = function(this: any) {
+    const Thing = function (this: any) {
         extendObservable(this, {
             y: 3,
             // this will work here
@@ -233,7 +235,7 @@ test("box", () => {
         @observable height = 20
         @observable sizes = [2]
         @observable
-        someFunc = function() {
+        someFunc = function () {
             return 2
         }
         @computed
@@ -397,7 +399,7 @@ test("issue 165", () => {
     }
 
     class Card {
-        constructor(public game: Game, public id: number) {}
+        constructor(public game: Game, public id: number) { }
 
         @computed
         get isWrong() {
@@ -425,7 +427,7 @@ test("issue 165", () => {
             return report(
                 "Computing isMatchWrong",
                 this.secondCardSelected !== null &&
-                    this.firstCardSelected!.id !== this.secondCardSelected.id
+                this.firstCardSelected!.id !== this.secondCardSelected.id
             )
         }
     }
@@ -484,7 +486,7 @@ function normalizeSpyEvents(events: any[]) {
 
 test("action decorator (typescript)", () => {
     class Store {
-        constructor(private multiplier: number) {}
+        constructor(private multiplier: number) { }
 
         @action
         add(a: number, b: number): number {
@@ -514,7 +516,7 @@ test("action decorator (typescript)", () => {
 
 test("custom action decorator (typescript)", () => {
     class Store {
-        constructor(private multiplier: number) {}
+        constructor(private multiplier: number) { }
 
         @action("zoem zoem")
         add(a: number, b: number): number {
@@ -562,7 +564,7 @@ test("custom action decorator (typescript)", () => {
 
 test("action decorator on field (typescript)", () => {
     class Store {
-        constructor(private multiplier: number) {}
+        constructor(private multiplier: number) { }
 
         @action
         add = (a: number, b: number) => {
@@ -594,7 +596,7 @@ test("action decorator on field (typescript)", () => {
 
 test("custom action decorator on field (typescript)", () => {
     class Store {
-        constructor(private multiplier: number) {}
+        constructor(private multiplier: number) { }
 
         @action("zoem zoem")
         add = (a: number, b: number) => {
@@ -705,10 +707,10 @@ test("unbound methods", () => {
     class A {
         // shared across all instances
         @action
-        m1() {}
+        m1() { }
 
         // per instance
-        @action m2 = () => {}
+        @action m2 = () => { }
     }
 
     const a1 = new A()
@@ -804,8 +806,8 @@ test("enumerability", () => {
             return this.a
         } // non-enumerable, (and, ideally, on proto)
         @action
-        m() {} // non-enumerable, on proto
-        @action m2 = () => {} // non-enumerable, on self
+        m() { } // non-enumerable, on proto
+        @action m2 = () => { } // non-enumerable, on self
     }
 
     const a = new A()
@@ -1037,7 +1039,7 @@ test("484 - isObservableObject type guard includes type T", () => {
 })
 
 test("484 - isObservableObject type guard includes type IObservableObject", () => {
-    const requires_observable_object = (o: IObservableObject): void => {}
+    const requires_observable_object = (o: IObservableObject): void => { }
     const o = observable({ stuff: "things" })
 
     if (isObservableObject(o)) {
@@ -1158,7 +1160,7 @@ test("action.bound binds (TS)", () => {
 })
 
 test("803 - action.bound and action preserve type info", () => {
-    function thingThatAcceptsCallback(cb: (elem: { x: boolean }) => void) {}
+    function thingThatAcceptsCallback(cb: (elem: { x: boolean }) => void) { }
 
     thingThatAcceptsCallback(elem => {
         // console.log(elem.x) // x is boolean
@@ -1175,7 +1177,7 @@ test("803 - action.bound and action preserve type info", () => {
         return { x: "3" } as Object
     }) as () => void
 
-    const bound2 = action(function() {}) as (() => void)
+    const bound2 = action(function () { }) as (() => void)
 })
 
 test("@computed.equals (TS)", () => {
@@ -1219,7 +1221,7 @@ test("@computed.equals (TS)", () => {
 test("computed comparer works with decorate (TS)", () => {
     const sameTime = (from: Time, to: Time) => from.hour === to.hour && from.minute === to.minute
     class Time {
-        constructor(public hour: number, public minute: number) {}
+        constructor(public hour: number, public minute: number) { }
 
         get time() {
             return { hour: this.hour, minute: this.minute }
@@ -1255,7 +1257,7 @@ test("computed comparer works with decorate (TS)", () => {
 test("computed comparer works with decorate (TS)", () => {
     const sameTime = (from: Time, to: Time) => from.hour === to.hour && from.minute === to.minute
     class Time {
-        constructor(public hour: number, public minute: number) {}
+        constructor(public hour: number, public minute: number) { }
 
         get time() {
             return { hour: this.hour, minute: this.minute }
@@ -1374,7 +1376,7 @@ test("1072 - @observable without initial value and observe before first access",
     }
 
     const user = new User()
-    observe(user, "loginCount", () => {})
+    observe(user, "loginCount", () => { })
 })
 
 test("typescript - decorate works with classes", () => {
@@ -1429,7 +1431,7 @@ test("issue #1122", done => {
             },
             () => {
                 // console.log("Value getting unobserved.")
-                runInAction(() => {}) // <-- INFINITE RECURSION
+                runInAction(() => { }) // <-- INFINITE RECURSION
             }
         )
         get value() {
@@ -1464,7 +1466,7 @@ test("unread computed reads should trow with requiresReaction enabled", () => {
         a.y
     }).toThrow(/is read outside a reactive context/)
 
-    const d = mobx.reaction(() => a.y, () => {})
+    const d = mobx.reaction(() => a.y, () => { })
     expect(() => {
         a.y
     }).not.toThrow()
@@ -1491,11 +1493,11 @@ test("actions are reassignable", () => {
     // See #1398 and #1545, make actions reassignable to support stubbing
     class A {
         @action
-        m1() {}
-        @action m2 = () => {}
+        m1() { }
+        @action m2 = () => { }
         @action.bound
-        m3() {}
-        @action.bound m4 = () => {}
+        m3() { }
+        @action.bound m4 = () => { }
     }
 
     const a = new A()
@@ -1503,13 +1505,13 @@ test("actions are reassignable", () => {
     expect(isAction(a.m2)).toBe(true)
     expect(isAction(a.m3)).toBe(true)
     expect(isAction(a.m4)).toBe(true)
-    a.m1 = () => {}
+    a.m1 = () => { }
     expect(isAction(a.m1)).toBe(false)
-    a.m2 = () => {}
+    a.m2 = () => { }
     expect(isAction(a.m2)).toBe(false)
-    a.m3 = () => {}
+    a.m3 = () => { }
     expect(isAction(a.m3)).toBe(false)
-    a.m4 = () => {}
+    a.m4 = () => { }
     expect(isAction(a.m4)).toBe(false)
 })
 
@@ -1572,7 +1574,7 @@ test("it should support asyncAction as decorator (ts)", async () => {
 
 test("flow support async generators", async () => {
     if (!(Symbol as any).asyncIterator) {
-        ;(Symbol as any).asyncIterator = Symbol.for("Symbol.asyncIterator")
+        ; (Symbol as any).asyncIterator = Symbol.for("Symbol.asyncIterator")
     }
 
     async function* someNumbers() {
@@ -1584,7 +1586,7 @@ test("flow support async generators", async () => {
         yield 3
     }
 
-    const start = mobx.flow(async function*() {
+    const start = mobx.flow(async function* () {
         let total = 0
         for await (const number of someNumbers()) {
             total += number
@@ -1599,7 +1601,7 @@ test("flow support async generators", async () => {
 
 test("flow support throwing async generators", async () => {
     if (!(Symbol as any).asyncIterator) {
-        ;(Symbol as any).asyncIterator = Symbol.for("Symbol.asyncIterator")
+        ; (Symbol as any).asyncIterator = Symbol.for("Symbol.asyncIterator")
     }
 
     async function* someNumbers() {
@@ -1609,7 +1611,7 @@ test("flow support throwing async generators", async () => {
         throw "OOPS"
     }
 
-    const start = mobx.flow(async function*() {
+    const start = mobx.flow(async function* () {
         let total = 0
         for await (const number of someNumbers()) {
             total += number
@@ -1646,4 +1648,27 @@ test("verify #1528", () => {
     })
 
     expect(appState.timer).toBe(0)
+})
+
+test("new flow typings", async () => {
+    const otherFlow = flow(function* () {
+        const x = yield* _await(Promise.resolve(3))
+        return x
+    })
+
+    const otherFlow2 = flow(function* () {
+        // should work, but it is better to enforce promises on the types
+        const x = yield* _await(5 as any as Promise<number>)
+        return x
+    })
+
+    const start = flow(function* () {
+        const a = yield* _await(Promise.resolve(2))
+        const b = yield* _await(otherFlow())
+        const c = yield* _await(otherFlow2())
+        return a + b + c
+    })
+
+    const res = await start()
+    expect(res).toBe(3 + 2 + 5)
 })
