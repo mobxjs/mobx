@@ -24,6 +24,7 @@ export interface IObservable extends IDepTreeNode {
      */
     lastAccessedBy: number
     isBeingObserved: boolean
+    computedCreatedIn?: number
 
     lowestObserverState: IDerivationState // Used to avoid redundant propagations
     isPendingUnobservation: boolean // Used to push itself to global.pendingUnobservations at most once per batch.
@@ -133,12 +134,18 @@ export function endBatch() {
 export function reportObserved(observable: IObservable): boolean {
     const derivation = globalState.trackingDerivation
     if (derivation !== null) {
-        /**
-         * Simple optimization, give each derivation run an unique id (runId)
-         * Check if last time this observable was accessed the same runId is used
-         * if this is the case, the relation is already known
-         */
-        if (derivation.runId !== observable.lastAccessedBy) {
+        if (
+            /**
+             * Simple optimization, give each derivation run an unique id (runId)
+             * Check if last time this observable was accessed the same runId is used
+             * if this is the case, the relation is already known
+             */
+            derivation.runId !== observable.lastAccessedBy &&
+            /**
+             * Ensure that we're not observing an observable that was just created in this derivation (see #2096)
+             */
+            derivation.runId !== observable.computedCreatedIn
+        ) {
             observable.lastAccessedBy = derivation.runId
             // Tried storing newObserving, or observing, or both as Set, but performance didn't come close...
             derivation.newObserving![derivation.unboundDepsCount++] = observable

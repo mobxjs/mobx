@@ -2091,3 +2091,58 @@ test("extendObservable should not accept complex objects as second argument", ()
         `"[mobx] 'extendObservabe' only accepts plain objects as second argument"`
     )
 })
+
+test("observables created within a computed are not themselves observed", () => {
+    let count = 0
+    let count2 = 0
+    let o1
+    const c = computed(() => {
+        const o2 = observable.box(2)
+
+        o2.set(o2.get() * 2)
+        count++
+
+        return o2
+    })
+
+    const c2 = computed(() => {
+        count2++
+        return c.get().get()
+    })
+
+    autorun(() => {
+        o1 = c.get()
+        expect(c2.get()).toEqual(o1.get())
+    })
+
+    expect(count).toBe(1)
+    expect(count2).toBe(1)
+    o1.set(10)
+    expect(count).toBe(1)
+    expect(count2).toBe(2)
+})
+
+test("observables created within a computed are not themselves observed (class)", () => {
+    class Foo {
+        @computed
+        get store() {
+            return new Store({ name: "foo" })
+        }
+    }
+    class Store {
+        @observable obj
+        @observable name
+
+        constructor(obj) {
+            this.obj = obj
+            this.name = this.obj.name
+        }
+    }
+
+    const f = new Foo()
+    autorun(() => f.store)
+    const g = f.store
+    expect(g).toBe(f.store)
+    g.obj.name = "new name"
+    expect(g).toBe(f.store)
+})

@@ -10,7 +10,8 @@ import {
     onBecomeUnobserved,
     propagateChanged,
     reportObserved,
-    startBatch
+    startBatch,
+    globalState
 } from "../internal"
 import { Lambda } from "../utils/utils"
 
@@ -26,6 +27,7 @@ export class Atom implements IAtom {
     isBeingObserved = false
     observers = new Set<IDerivation>()
 
+    computedCreatedIn: number | undefined = undefined
     diffValue = 0
     lastAccessedBy = 0
     lowestObserverState = IDerivationState.NOT_TRACKING
@@ -33,7 +35,12 @@ export class Atom implements IAtom {
      * Create a new atom. For debugging purposes it is recommended to give it a name.
      * The onBecomeObserved and onBecomeUnobserved callbacks can be used for resource management.
      */
-    constructor(public name = "Atom@" + getNextId()) {}
+    constructor(public name = "Atom@" + getNextId()) {
+        //  If we're created in a computed we need to keep track which one as to not be observed by it (see #2096)
+        if (globalState.trackingDerivation && globalState.computationDepth) {
+            this.computedCreatedIn = globalState.runId
+        }
+    }
 
     public onBecomeObservedListeners: Set<Lambda> | undefined
     public onBecomeUnobservedListeners: Set<Lambda> | undefined
