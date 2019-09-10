@@ -37,11 +37,11 @@ In memory that looks as follows. The green boxes indicate _observable_ propertie
 
 ![MobX reacts to changing references](../images/observed-refs.png)
 
-Now what MobX basically does is recording which _arrows_ you use in your function. After that, it will re-run whenever one of this _arrows_ changes; when they start to refer to something else.
+Now what MobX basically does is recording which _arrows_ you use in your function. After that, it will re-run whenever one of these _arrows_ changes; when they start to refer to something else.
 
 ## Examples
 
-Lets show that with a bunch of examples (based on the `message` variable defined above):
+Let's show that with a bunch of examples (based on the `message` variable defined above):
 
 #### Correct: dereference inside the tracked function
 
@@ -342,7 +342,7 @@ In general this is quite obvious and rarely causes issues.
 
 ## MobX only tracks data accessed for `observer` components if they are directly accessed by `render`
 
-A common mistake made with `observer` is that it doesnt track data that syntactically seems parent of the `observer` component,
+A common mistake made with `observer` is that it doesn't track data that syntactically seems parent of the `observer` component,
 but in practice is actually rendered out by a different component. This often happens when render callbacks of components are passed in first class to another component.
 
 Take for example the following contrived example:
