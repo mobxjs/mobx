@@ -41,6 +41,8 @@
         
     
     
+        <link rel="stylesheet" href="../styles/website.css">
+    
 
         
     
@@ -61,7 +63,7 @@
         data-chapter-title="(@)computed"
         data-filepath="refguide/computed-decorator.md"
         data-basepath=".."
-        data-revision="Thu Jul 04 2019 17:47:21 GMT+0200 (CEST)"
+        data-revision="Tue Sep 10 2019 14:16:40 GMT+0200 (CEST)"
         data-innerlanguage="">
     
 
@@ -925,6 +927,8 @@ name.set(<span class="hljs-string">&quot;Dave&quot;</span>);
 <li><code>comparer.default</code>: The same as <code>comparer.identity</code>, but also considers <code>NaN</code> to be equal to <code>NaN</code>.</li>
 <li><code>comparer.structural</code>: Performs deep structural comparison to determine if two values are the same.</li>
 </ul>
+<h2 id="computed-values-run-more-often-than-expected">Computed values run more often than expected</h2>
+<p>Please check the <a href="https://mobx.js.org/best/pitfalls.html#computed-values-run-more-often-than-expected" target="_blank"><code>pitfalls</code></a> section if you experience this.</p>
 <h2 id="note-on-error-handling">Note on error handling</h2>
 <p>If a computed value throws an exception during its computation, this exception will be caught and rethrown any time its value is read.
 It is strongly recommended to always throw <code>Error</code>&apos;s, so that the original stack trace is preserved. E.g.: <code>throw new Error(&quot;Uhoh&quot;)</code> instead of <code>throw &quot;Uhoh&quot;</code>.
@@ -952,7 +956,8 @@ divided.get() <span class="hljs-comment">// Recovered; Returns 1.5</span>
 In such cases mobx-util&apos;s <a href="https://github.com/mobxjs/mobx-utils#computedfn" target="_blank"><code>computedFn</code></a> can be used:</p>
 <pre><code class="lang-typescript"><span class="hljs-comment">// Parameterized computed views:</span>
 <span class="hljs-comment">// Create computed&apos;s and store them in a cache</span>
-<span class="hljs-keyword">import</span> { observable, computed } from <span class="hljs-string">&quot;mobx&quot;</span>
+<span class="hljs-keyword">import</span> { observable } from <span class="hljs-string">&quot;mobx&quot;</span>
+<span class="hljs-keyword">import</span> { computedFn } from <span class="hljs-string">&quot;mobx-utils&quot;</span>
 
 <span class="hljs-keyword">class</span> Todos {
   @observable todos = []

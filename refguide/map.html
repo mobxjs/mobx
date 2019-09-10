@@ -41,6 +41,8 @@
         
     
     
+        <link rel="stylesheet" href="../styles/website.css">
+    
 
         
     
@@ -61,7 +63,7 @@
         data-chapter-title="maps"
         data-filepath="refguide/map.md"
         data-basepath=".."
-        data-revision="Thu Jul 04 2019 17:47:21 GMT+0200 (CEST)"
+        data-revision="Tue Sep 10 2019 14:16:40 GMT+0200 (CEST)"
         data-innerlanguage="">
     
 
@@ -814,9 +816,9 @@ Optionally takes an object, entries array or string keyed <a href="https://devel
 <li><code>intercept(interceptor)</code>. Registers an interceptor that will be triggered before any changes are applied to the map. See <a href="observe.html">observe &amp; intercept</a>.</li>
 <li><code>observe(listener, fireImmediately?)</code>. Registers a listener that fires upon each change in this map, similarly to the events that are emitted for <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe" target="_blank">Object.observe</a>. See <a href="observe.html">observe &amp; intercept</a> for more details.</li>
 <li><code>merge(values)</code>. Copies all entries from the provided object into this map. <code>values</code> can be a plain object, array of entries or string-keyed ES6 Map.</li>
-<li><code>replace(values)</code>. Replaces the entire contents of this map with the provided values. Short hand for <code>.clear().merge(values)</code></li>
+<li><code>replace(values)</code>. Replaces the entire contents of this map with the provided values. <h2 id="observablemapvalues--deep-false-"><code>observable.map(values, { deep: false })</code></h2>
+</li>
 </ul>
-<h2 id="observablemapvalues--deep-false-"><code>observable.map(values, { deep: false })</code></h2>
 <p>Any values assigned to an observable map will be default passed through <a href="observable.html"><code>observable</code></a> to make them observable.
 Create a shallow map to disable this behavior and store are values as-is. See also <a href="modifiers.html">decorators</a> for more details on this mechanism.</p>
 <h2 id="observablemapvalues--name-my-map-"><code>observable.map(values, { name: &quot;my map&quot; })</code></h2>

@@ -41,6 +41,8 @@
         
     
     
+        <link rel="stylesheet" href="../styles/website.css">
+    
 
         
     
@@ -61,7 +63,7 @@
         data-chapter-title="(@)observer"
         data-filepath="refguide/observer-component.md"
         data-basepath=".."
-        data-revision="Thu Jul 04 2019 17:47:21 GMT+0200 (CEST)"
+        data-revision="Tue Sep 10 2019 14:16:40 GMT+0200 (CEST)"
         data-innerlanguage="">
     
 
@@ -873,7 +875,7 @@ ReactDOM.render(&lt;Timer /&gt;, document.body)
 <p>To work with local observable state inside function components, the <a href="https://github.com/mobxjs/mobx-react#uselocalstore-hook" target="_blank"><code>useLocalStore</code></a> and <a href="https://github.com/mobxjs/mobx-react#useasobservablesource-hook" target="_blank"><code>useAsObservableSource</code></a> hooks can be used.</p>
 <h2 id="connect-components-to-provided-stores-using-inject">Connect components to provided stores using <code>inject</code></h2>
 <p><a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-connect-mobx-observer-components-to-the-store-with-the-react-provider" target="_blank">egghead.io lesson 8: inject stores with Provider</a></p>
-<p><em>Tip: it is recommended to use <code>React.creatContext</code> instead</em></p>
+<p><em>Tip: it is recommended to use <code>React.createContext</code> instead</em></p>
 <p>The <code>mobx-react</code> package also provides the <code>Provider</code> component that can be used to pass down stores using React&apos;s context mechanism.
 To connect to those stores, pass a list of store names to <code>inject</code>, which will make the stores available as props.</p>
 <p><em> N.B. the syntax to inject stores has changed since mobx-react 4, always use <code>inject(stores)(component)</code> or <code>@inject(stores) class Component...</code>.

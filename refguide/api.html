@@ -41,6 +41,8 @@
         
     
     
+        <link rel="stylesheet" href="../styles/website.css">
+    
 
         
     
@@ -61,7 +63,7 @@
         data-chapter-title="API overview"
         data-filepath="refguide/api.md"
         data-basepath=".."
-        data-revision="Thu Jul 04 2019 17:47:21 GMT+0200 (CEST)"
+        data-revision="Tue Sep 10 2019 14:16:40 GMT+0200 (CEST)"
         data-innerlanguage="">
     
 
@@ -860,8 +862,8 @@ Since this uses the full-blown <em>ES6 Map</em> internally, you are free to use 
 <p><a href="map.html">&#xAB;<code>details</code>&#xBB;</a></p>
 <h3 id="observablesetvalue-options"><code>observable.set(value, options?)</code></h3>
 <p>Creates a new observable map based on the provided value. Use the <code>{deep: false}</code> option if the values in the map should not be turned into observables.</p>
-<p>Use <code>set</code> whenever you want to create a dynamic set where the addition / removal of values needs to be observed, and where values can appear only once in the collection.
-Note that your browser needs to support ES6 sets, or polyfill them, to make sets work.</p>
+<p>Use <code>set</code> whenever you want to create a dynamic set where the addition / removal of values needs to be observed, and where values can appear only once in the collection.</p>
+<p>Note that your browser needs to support ES6 sets, or polyfill them, to make sets work.</p>
 <p>The api is further the same as the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set" target="_blank">ES6 set api</a></p>
 <h3 id="extendobservable"><code>extendObservable</code></h3>
 <p>Usage: <code>extendObservable(target, properties, decorators?, options?)</code>.</p>

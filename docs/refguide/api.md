@@ -100,6 +100,7 @@ Since this uses the full-blown _ES6 Map_ internally, you are free to use any typ
 Creates a new observable map based on the provided value. Use the `{deep: false}` option if the values in the map should not be turned into observables.
 
 Use `set` whenever you want to create a dynamic set where the addition / removal of values needs to be observed, and where values can appear only once in the collection.
+
 Note that your browser needs to support ES6 sets, or polyfill them, to make sets work.
 
 The api is further the same as the [ES6 set api](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set)

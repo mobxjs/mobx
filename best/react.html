@@ -41,6 +41,8 @@
         
     
     
+        <link rel="stylesheet" href="../styles/website.css">
+    
 
         
     
@@ -61,7 +63,7 @@
         data-chapter-title="Understanding what MobX reacts to"
         data-filepath="best/react.md"
         data-basepath=".."
-        data-revision="Thu Jul 04 2019 17:47:21 GMT+0200 (CEST)"
+        data-revision="Tue Sep 10 2019 14:16:40 GMT+0200 (CEST)"
         data-innerlanguage="">
     
 
@@ -820,9 +822,9 @@ At that point it is invaluable to understand how MobX determines what to react t
 </code></pre>
 <p>In memory that looks as follows. The green boxes indicate <em>observable</em> properties. Note that the <em>values</em> themselves are not observable!</p>
 <p><img src="../images/observed-refs.png" alt="MobX reacts to changing references"></p>
-<p>Now what MobX basically does is recording which <em>arrows</em> you use in your function. After that, it will re-run whenever one of this <em>arrows</em> changes; when they start to refer to something else.</p>
+<p>Now what MobX basically does is recording which <em>arrows</em> you use in your function. After that, it will re-run whenever one of these <em>arrows</em> changes; when they start to refer to something else.</p>
 <h2 id="examples">Examples</h2>
-<p>Lets show that with a bunch of examples (based on the <code>message</code> variable defined above):</p>
+<p>Let&apos;s show that with a bunch of examples (based on the <code>message</code> variable defined above):</p>
 <h4 id="correct-dereference-inside-the-tracked-function">Correct: dereference inside the tracked function</h4>
 <pre><code class="lang-javascript">autorun(() =&gt; {
     <span class="hljs-built_in">console</span>.log(message.title)
@@ -1033,7 +1035,7 @@ message.likes.push(<span class="hljs-string">&quot;Jennifer&quot;</span>);
 <p>This will <strong>not</strong> react, during the execution of the <code>autorun</code> no observables where accessed, only during the <code>setTimeout</code>.
 In general this is quite obvious and rarely causes issues.</p>
 <h2 id="mobx-only-tracks-data-accessed-for-observer-components-if-they-are-directly-accessed-by-render">MobX only tracks data accessed for <code>observer</code> components if they are directly accessed by <code>render</code></h2>
-<p>A common mistake made with <code>observer</code> is that it doesnt track data that syntactically seems parent of the <code>observer</code> component,
+<p>A common mistake made with <code>observer</code> is that it doesn&apos;t track data that syntactically seems parent of the <code>observer</code> component,
 but in practice is actually rendered out by a different component. This often happens when render callbacks of components are passed in first class to another component.</p>
 <p>Take for example the following contrived example:</p>
 <pre><code class="lang-javascript"><span class="hljs-keyword">const</span> MyComponent = observer(({ message }) =&gt;
