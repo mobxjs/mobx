@@ -42,7 +42,7 @@ const siteConfig = {
   // URL for editing docs, usage example: editUrl + 'en/doc1.md'.
   // If this field is omitted, there will be no "Edit this Doc" button
   // for each document.
-  editUrl: "docs/",
+  // editUrl: "docs/",
 
 
 
