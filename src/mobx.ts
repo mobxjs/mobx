@@ -24,7 +24,6 @@ if (typeof Proxy === "undefined" || typeof Symbol === "undefined") {
     )
 }
 
-declare const window: any
 try {
     // define process.env if needed
     // if this is not a production build in the first place
