@@ -15,8 +15,8 @@ const GridBlock = CompLibrary.GridBlock;
 
 class HomeSplash extends React.Component {
   render() {
-    const {siteConfig, language = ''} = this.props;
-    const {baseUrl, docsUrl} = siteConfig;
+    const { siteConfig, language = '' } = this.props;
+    const { baseUrl, docsUrl } = siteConfig;
     const docsPart = `${docsUrl ? `${docsUrl}/` : ''}`;
     const langPart = `${language ? `${language}/` : ''}`;
     const docUrl = doc => `${baseUrl}${docsPart}${langPart}${doc}`;
@@ -60,13 +60,10 @@ class HomeSplash extends React.Component {
 
     return (
       <SplashContainer>
-        <Logo img_src={`${baseUrl}img/undraw_monitor.svg`} />
         <div className="inner">
           <ProjectTitle siteConfig={siteConfig} />
           <PromoSection>
-            <Button href="#try">Try It Out</Button>
-            <Button href={docUrl('doc1.html')}>Example Link</Button>
-            <Button href={docUrl('doc2.html')}>Example Link 2</Button>
+            <Button href={docUrl('README')}>Documentation</Button>
           </PromoSection>
         </div>
       </SplashContainer>
@@ -76,8 +73,8 @@ class HomeSplash extends React.Component {
 
 class Index extends React.Component {
   render() {
-    const {config: siteConfig, language = ''} = this.props;
-    const {baseUrl} = siteConfig;
+    const { config: siteConfig, language = '' } = this.props;
+    const { baseUrl } = siteConfig;
 
     const Block = props => (
       <Container
@@ -95,7 +92,7 @@ class Index extends React.Component {
     const FeatureCallout = () => (
       <div
         className="productShowcaseSection paddingBottom"
-        style={{textAlign: 'center'}}>
+        style={{ textAlign: 'center' }}>
         <h2>Feature Callout</h2>
         <MarkdownBlock>These are features of this project</MarkdownBlock>
       </div>
@@ -196,14 +193,6 @@ class Index extends React.Component {
     return (
       <div>
         <HomeSplash siteConfig={siteConfig} language={language} />
-        <div className="mainContainer">
-          <Features />
-          <FeatureCallout />
-          <LearnHow />
-          <TryOut />
-          <Description />
-          <Showcase />
-        </div>
       </div>
     );
   }

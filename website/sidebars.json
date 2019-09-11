@@ -2,7 +2,6 @@
   "docs": {
     "Introduction": [
       "README",
-      "intro/overview", 
       "intro/concepts", 
       "refguide/api"
     ],
