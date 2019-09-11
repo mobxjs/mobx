@@ -18,7 +18,6 @@
 
 import { getGlobal, spy, getDebugName, fail } from "./internal"
 
-declare const window: any
 try {
     // define process.env if needed
     // if this is not a production build in the first place
