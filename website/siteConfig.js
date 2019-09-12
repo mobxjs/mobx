@@ -27,16 +27,12 @@ const siteConfig = {
   // For github.io type URLs, you would set the url and baseUrl like:
   //   url: 'https://facebook.github.io',
   //   baseUrl: '/test-site/',
-  baseUrl: "/mobx/", // Base URL for your project */
+  url: "https://mobx-docs.netlify.com/", // Your website URL
+  baseUrl: "/", // Base URL for your project */
   // Used for publishing and more
 
-  // Changed these so I can publish to my forked repo for testing
-  // projectName: "MobX",
-  // organizationName: "mobxjs",
-  // url: "https://mobx.js.org", // Your website URL
   projectName: "mobx",
-  organizationName: "cloverich",
-  url: "https://cloverich.github.io", // Your website URL
+  organizationName: "mobxjs",
 
 
   // URL for editing docs, usage example: editUrl + 'en/doc1.md'.
