@@ -92,7 +92,13 @@ myOtherFont: [
   },
 
   // Add custom scripts here that would be placed in <script> tags.
-  scripts: ["https://buttons.github.io/buttons.js"],
+  scripts: [
+    "https://buttons.github.io/buttons.js",
+    {
+      src: "https://codefund.app/properties/259/funder.js",
+      async: true,
+    }
+  ],
 
   // On page navigation for the current documentation page.
   onPageNav: "separate",
