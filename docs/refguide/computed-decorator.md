@@ -1,11 +1,11 @@
 ---
 title: (@)computed
 sidebar_label: (@)computed
+hide_title: true
 ---
 
-<div id='codefund' ></div>
-
 # (@)computed
+<div id='codefund' ></div>
 
 <details>
     <summary style="color: white; background:green;padding:5px;margin:5px;border-radius:2px">egghead.io lesson 3: computed values</summary>

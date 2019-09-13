@@ -1,11 +1,11 @@
 ---
 title: (@)observer
 sidebar_label: (@)observer
+hide_title: true
 ---
 
-<div id='codefund' ></div>
-
 # @observer
+<div id='codefund' ></div>
 
 <details>
     <summary style="color: white; background:green;padding:5px;margin:5px;border-radius:2px">egghead.io lesson 1: observable & observer</summary>

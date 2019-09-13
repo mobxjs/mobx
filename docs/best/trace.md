@@ -1,11 +1,11 @@
 ---
 sidebar_label: Using trace for debugging
 title: Using `trace` for debugging
+hide_title: true
 ---
 
-<div id='codefund' ></div>
-
 # Using `trace` for debugging
+<div id='codefund' ></div>
 
 Trace is a small utility that helps to find out why your computed values, reactions or components are re-evaluating.
 

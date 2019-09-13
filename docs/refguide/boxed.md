@@ -1,11 +1,11 @@
 ---
 title: Boxed Values
 sidebar_label: boxed values
+hide_title: true
 ---
 
-<div id='codefund' ></div>
-
 ## Primitive values and references
+<div id='codefund' ></div>
 
 All primitive values in JavaScript are immutable and hence per definition not observable.
 Usually that is fine, as MobX usually can just make the _property_ that contains the value observable.

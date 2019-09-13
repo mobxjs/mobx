@@ -1,11 +1,11 @@
 ---
 sidebar_label: Defining data stores
 title: Best Practices for building large scale maintainable projects
+hide_title: true
 ---
 
-<div id='codefund' ></div>
-
 # Best Practices for building large scale maintainable projects
+<div id='codefund' ></div>
 
 This section contains some best practices we discovered at Mendix while working with MobX.
 This section is opinionated and you are in no way forced to apply these practices.

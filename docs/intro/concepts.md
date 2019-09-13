@@ -1,11 +1,11 @@
 ---
 title: Concepts & Principles
 sidebar_label: Concepts & Principles
+hide_title: true
 ---
 
-<div id='codefund'></div>
-
 # Concepts & Principles
+<div id='codefund'></div>
 
 ## Concepts
 

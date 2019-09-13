@@ -1,11 +1,11 @@
 ---
 title: createTransformer
 sidebar_label: mobxUtils.createTransformer
+hide_title: true
 ---
 
-<div id='codefund' ></div>
-
 # createTransformer
+<div id='codefund' ></div>
 
 Provided by the `mobx-utils` package.
 

@@ -1,11 +1,11 @@
 ---
 sidebar_label: MobX + React DevTools
 title: MobX + React DevTools
+hide_title: true
 ---
 
-<div id='codefund' ></div>
-
 # MobX + React DevTools
+<div id='codefund' ></div>
 
 <details>
     <summary style="color: white; background:green;padding:5px;margin:5px;border-radius:2px">egghead.io lesson 2: devtools</summary>

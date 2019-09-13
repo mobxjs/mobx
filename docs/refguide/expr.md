@@ -1,10 +1,10 @@
 ---
 sidebar_label: mobxUtils.expr
+hide_title: true
 ---
 
-<div id='codefund' ></div>
-
 # Expr
+<div id='codefund' ></div>
 
 Provided by the `mobx-utils` package.
 

@@ -1,11 +1,11 @@
 ---
 title: Observable Maps
 sidebar_label: maps
+hide_title: true
 ---
 
-<div id='codefund' ></div>
-
 # Observable Maps
+<div id='codefund' ></div>
 
 ## `observable.map(values, options?)`
 

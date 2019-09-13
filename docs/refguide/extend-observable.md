@@ -1,10 +1,10 @@
 ---
 sidebar_label: extendObservable
+hide_title: true
 ---
 
-<div id='codefund' ></div>
-
 # extendObservable
+<div id='codefund' ></div>
 
 `extendObservable(target, properties, decorators?, options?)`
 

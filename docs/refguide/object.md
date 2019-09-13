@@ -1,11 +1,11 @@
 ---
 title: Observable Objects
 sidebar_label: objects
+hide_title: true
 ---
 
-<div id='codefund' ></div>
-
 ## Observable Objects
+<div id='codefund' ></div>
 
 Usage `observable.object(props, decorators?, options?)`
 

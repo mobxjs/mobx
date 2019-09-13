@@ -1,5 +1,6 @@
 ---
 sidebar_label: MobX-utils
+hide_title: true
 ---
 
 # MobX-utils

@@ -1,11 +1,11 @@
 ---
 sidebar_label: spy
 title: Spy
+hide_title: true
 ---
 
-<div id='codefund' ></div>
-
 # Spy
+<div id='codefund' ></div>
 
 Usage: `spy(listener)`.
 Registers a global spy listener that listens to all events that happen in MobX.

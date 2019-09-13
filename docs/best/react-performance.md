@@ -1,11 +1,11 @@
 ---
 sidebar_label: Optimizing React components
 title: Optimizing rendering React components
+hide_title: true
 ---
 
-<div id='codefund' ></div>
-
 # Optimizing rendering React components
+<div id='codefund' ></div>
 
 MobX is very fast, [often even faster than Redux](https://twitter.com/mweststrate/status/718444275239882753). But here are some tips to get most out of React and MobX. Note that most tips apply to React in general and are not specific for MobX.
 

@@ -1,11 +1,12 @@
 ---
 sidebar_label: async actions & flows
 title: Writing asynchronous actions
+hide_title: true
 ---
 
-<div id='codefund' ></div>
 
 # Writing asynchronous actions
+<div id='codefund' ></div>
 
 The `action` wrapper / decorator only affects the currently running function, not functions that are scheduled (but not invoked) by the current function!
 This means that if you have a `setTimeout`, promise`.then` or `async` construction, and in that callback some more state is changed, those callbacks should be wrapped in `action` as well! There are several ways to create asynchronous actions. No approach is strictly better than the other, but this section just list different approaches you can take to writing asynchronous code.

@@ -1,11 +1,11 @@
 ---
 title: Decorators
 sidebar_label: decorators
+hide_title: true
 ---
 
-<div id='codefund' ></div>
-
 # Decorators
+<div id='codefund' ></div>
 
 In MobX there is a set of decorators that defines how observable properties will behave.
 

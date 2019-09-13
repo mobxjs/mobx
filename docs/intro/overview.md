@@ -1,11 +1,11 @@
 ---
 title: The gist of MobX
 sidebar_label: The gist of MobX
+hide_title: true
 ---
 
-<div id='codefund' ></div>
-
 # The gist of MobX
+<div id='codefund' ></div>
 
 <details>
     <summary style="color: white; background:green;padding:5px;margin:5px;border-radius:2px">egghead.io lesson 1: observable & observer</summary>

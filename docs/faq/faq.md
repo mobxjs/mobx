@@ -1,11 +1,11 @@
 ---
 sidebar_label: Frequently Asked Questions
 title: FAQ
+hide_title: true
 ---
 
-<div id='codefund' ></div>
-
 ## FAQ
+<div id='codefund' ></div>
 
 ##### Which browsers are supported?
 

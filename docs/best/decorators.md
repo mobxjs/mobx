@@ -1,11 +1,12 @@
 ---
 sidebar_label: How to (not) use decorator syntax
 title: How to (not) use decorators
+hide_title: true
 ---
 
-<div id='codefund' ></div>
 
 # How to (not) use decorators
+<div id='codefund' ></div>
 
 Using ES.next decorators in MobX is optional. This section explains how to use them, or how to avoid them.
 

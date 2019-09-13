@@ -1,11 +1,11 @@
 ---
 title: Observable Arrays
 sidebar_label: arrays
+hide_title: true
 ---
 
-<div id='codefund' ></div>
-
 ## Observable Arrays
+<div id='codefund' ></div>
 
 Similar to objects, arrays can be made observable using `observable.array(values?)` or by passing an array to `observable`.
 This works recursively as well, so all (future) values of the array will also be observable.

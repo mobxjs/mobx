@@ -1,11 +1,11 @@
 ---
 sidebar_label: Object api
 title: Object api
+hide_title: true
 ---
 
-<div id='codefund' ></div>
-
 ## Direct Observable manipulation
+<div id='codefund' ></div>
 
 There is now an utility API that enables manipulating observable maps, objects and arrays with the same API. These api's are fully reactive, which means that even new property declarations can be detected by mobx if `set` is used to add them, and `values` or `keys` to iterate them.
 

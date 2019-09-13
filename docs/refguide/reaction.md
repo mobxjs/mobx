@@ -1,11 +1,11 @@
 ---
 title: reaction
 sidebar_label: reaction
+hide_title: true
 ---
 
-<div id='codefund' ></div>
-
 # Reaction
+<div id='codefund' ></div>
 
 Usage: `reaction(() => data, (data, reaction) => { sideEffect }, options?)`.
 

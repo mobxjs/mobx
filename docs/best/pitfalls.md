@@ -1,11 +1,11 @@
 ---
 sidebar_label: Common Pitfalls & Best Practices
 title: Common pitfalls & best practices
+hide_title: true
 ---
 
-<div id='codefund' ></div>
-
 # Common pitfalls & best practices
+<div id='codefund' ></div>
 
 Stuck with MobX? This section contains a list of common issues people new to MobX might run into.
 

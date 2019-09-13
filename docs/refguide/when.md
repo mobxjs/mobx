@@ -1,11 +1,11 @@
 ---
 title: when
 sidebar_label: when
+hide_title: true
 ---
 
-<div id='codefund' ></div>
-
 # when
+<div id='codefund' ></div>
 
 <details>
     <summary style="color: white; background:green;padding:5px;margin:5px;border-radius:2px">egghead.io lesson 9: custom reactions</summary>

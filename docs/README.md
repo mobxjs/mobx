@@ -1,6 +1,7 @@
 ---
 title: Introduction
 sidebar_label: Introduction
+hide_title: true
 ---
 
 <img src="assets/mobx.png" alt="logo" height="120" align="right" />

@@ -1,11 +1,11 @@
 ---
 sidebar_label: intercept & observe
 title: Intercept & Observe
+hide_title: true
 ---
 
-<div id='codefund' ></div>
-
 # Intercept & Observe
+<div id='codefund' ></div>
 
 `observe` and `intercept` can be used to monitor the changes of a single observable (they ***don't*** track nested observables).
 `intercept` can be used to detect and modify mutations before they are applied to the observable.

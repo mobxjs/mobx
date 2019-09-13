@@ -1,11 +1,11 @@
 ---
 title: What does MobX react to?
 sidebar_label: Understanding what MobX reacts to
+hide_title: true
 ---
 
-<div id='codefund' ></div>
-
 # What does MobX react to?
+<div id='codefund' ></div>
 
 MobX usually reacts to exactly the things you expect it to.
 Which means that in 90% of your use cases mobx "just works".

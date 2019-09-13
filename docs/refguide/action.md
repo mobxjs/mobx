@@ -1,11 +1,11 @@
 ---
 title: action
 sidebar_label: action
+hide_title: true
 ---
 
-<div id='codefund' ></div>
-
 # action
+<div id='codefund' ></div>
 
 <details>
     <summary style="color: white; background:green;padding:5px;margin:5px;border-radius:2px">egghead.io lesson 5: actions</summary>

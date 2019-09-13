@@ -1,11 +1,11 @@
 ---
 title: MobX Api Reference
 sidebar_label: API overview
+hide_title: true
 ---
 
-<div id='codefund' ></div>
-
 # MobX Api Reference
+<div id='codefund' ></div>
 
 **Applies to MobX 4 and higher**
 

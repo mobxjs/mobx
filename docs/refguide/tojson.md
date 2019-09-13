@@ -1,11 +1,11 @@
 ---
 sidebar_label: toJS
 title: toJS
+hide_title: true
 ---
 
-<div id='codefund' ></div>
-
 # toJS
+<div id='codefund' ></div>
 
 `toJS(value, options?)`
 

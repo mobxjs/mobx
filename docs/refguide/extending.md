@@ -1,10 +1,10 @@
 ---
 sidebar_label: createAtom
+hide_title: true
 ---
 
-<div id='codefund' ></div>
-
 # Creating observable data structures and reactions
+<div id='codefund' ></div>
 
 ## Atoms
 
