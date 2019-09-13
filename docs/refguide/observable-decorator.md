@@ -1,5 +1,4 @@
 ---
-id: observable-decorator
 title: @obsevable
 sidebar_label: @observable
 ---

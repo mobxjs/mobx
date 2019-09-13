@@ -1,5 +1,4 @@
 ---
-id: tojson
 sidebar_label: toJS
 title: toJS
 ---

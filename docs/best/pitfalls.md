@@ -1,5 +1,4 @@
 ---
-id: pitfalls
 sidebar_label: Common Pitfalls & Best Practices
 title: Common pitfalls & best practices
 ---

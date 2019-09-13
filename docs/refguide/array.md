@@ -1,5 +1,4 @@
 ---
-id: array
 title: Observable Arrays
 sidebar_label: arrays
 ---

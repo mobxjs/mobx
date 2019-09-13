@@ -1,7 +1,6 @@
 ---
-id: concepts
-title: Concepts & Principles
-sidebar_label: Concepts & Principles
+title: The gist of MobX
+sidebar_label: The gist of MobX
 ---
 
 <div id='codefund' style='float:right'></div>

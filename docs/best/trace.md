@@ -1,5 +1,4 @@
 ---
-id: trace
 sidebar_label: Using trace for debugging
 title: Using `trace` for debugging
 ---

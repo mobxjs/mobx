@@ -1,5 +1,4 @@
 ---
-id: faq
 sidebar_label: Frequently Asked Questions
 title: FAQ
 ---

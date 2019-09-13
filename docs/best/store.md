@@ -1,5 +1,4 @@
 ---
-id: store
 sidebar_label: Defining data stores
 title: Best Practices for building large scale maintainable projects
 ---

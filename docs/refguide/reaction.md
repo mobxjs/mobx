@@ -1,5 +1,4 @@
 ---
-id: reaction
 title: reaction
 sidebar_label: reaction
 ---

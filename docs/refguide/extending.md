@@ -1,5 +1,4 @@
 ---
-id: extending
 sidebar_label: createAtom
 ---
 

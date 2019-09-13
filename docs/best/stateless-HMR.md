@@ -1,5 +1,4 @@
 ---
-id: stateless-HMR
 title: Hot Module Reloading with Stateless Components
 sidebar_label: Hot Module Reloading with Stateless Components
 ---

@@ -2,7 +2,8 @@
   "docs": {
     "Introduction": [
       "README",
-      "intro/concepts", 
+      "intro/concepts",
+      "intro/overview",
       "refguide/api"
     ],
     "Making things observable": [

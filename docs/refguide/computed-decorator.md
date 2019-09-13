@@ -1,5 +1,4 @@
 ---
-id: computed-decorator
 title: (@)computed
 sidebar_label: (@)computed
 ---

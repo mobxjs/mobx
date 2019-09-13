@@ -1,10 +1,9 @@
 ---
-id: api
-title: MobX Api Reference
-sidebar_label: API overview
+title: Concepts & Principles
+sidebar_label: Concepts & Principles
 ---
 
-<div id='codefund' style='float:right'></div>
+<div id='codefund'></div>
 
 # Concepts & Principles
 

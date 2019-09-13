@@ -1,5 +1,4 @@
 ---
-id: actions
 sidebar_label: async actions & flows
 title: Writing asynchronous actions
 ---

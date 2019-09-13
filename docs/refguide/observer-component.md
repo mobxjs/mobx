@@ -1,5 +1,4 @@
 ---
-id: observer-decorator
 title: (@)observer
 sidebar_label: (@)observer
 ---
@@ -63,7 +62,7 @@ so we need to access it _in_ the component. Or in other words: values need to be
 
 ## ES5 support
 
-In ES5 environments, observer components can be simple declared using `observer(React.createClass({ ...`. See also the [syntax guide](../best/syntax.md)
+In ES5 environments, observer components can be simple declared using `observer(React.createClass({ ...`. See also the [syntax guide](../best/decorators.md)
 
 ## Stateless function components
 

@@ -1,5 +1,4 @@
 ---
-id: spy
 sidebar_label: spy
 title: Spy
 ---

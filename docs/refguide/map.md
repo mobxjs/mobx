@@ -1,5 +1,4 @@
 ---
-id: map
 title: Observable Maps
 sidebar_label: maps
 ---

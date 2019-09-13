@@ -1,5 +1,4 @@
 ---
-id: action
 title: action
 sidebar_label: action
 ---

@@ -1,5 +1,4 @@
 ---
-id: decorators
 sidebar_label: How to (not) use decorator syntax
 title: How to (not) use decorators
 ---

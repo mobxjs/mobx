@@ -1,5 +1,4 @@
 ---
-id: object
 title: Observable Objects
 sidebar_label: objects
 ---

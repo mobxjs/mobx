@@ -1,5 +1,4 @@
 ---
-id: observable
 title: observable
 sidebar_label: observable
 ---

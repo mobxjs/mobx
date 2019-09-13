@@ -1,5 +1,4 @@
 ---
-id: expr
 sidebar_label: mobxUtils.expr
 ---
 

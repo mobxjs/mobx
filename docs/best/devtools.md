@@ -1,5 +1,4 @@
 ---
-id: devtools
 sidebar_label: MobX + React DevTools
 title: MobX + React DevTools
 ---

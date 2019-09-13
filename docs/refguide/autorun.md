@@ -1,5 +1,4 @@
 ---
-id: autorun
 title: autorun
 sidebar_label: autorun
 ---

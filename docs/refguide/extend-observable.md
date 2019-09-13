@@ -1,5 +1,4 @@
 ---
-id: extend-observable
 sidebar_label: extendObservable
 ---
 

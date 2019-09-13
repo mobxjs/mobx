@@ -37,9 +37,6 @@
         "title": "Best Practices for building large scale maintainable projects",
         "sidebar_label": "Defining data stores"
       },
-      "best/syntax": {
-        "title": "best/syntax"
-      },
       "best/trace": {
         "title": "Using `trace` for debugging",
         "sidebar_label": "Using trace for debugging"
@@ -48,20 +45,20 @@
         "title": "FAQ",
         "sidebar_label": "Frequently Asked Questions"
       },
-      "intro/api": {
-        "title": "MobX Api Reference",
-        "sidebar_label": "API overview"
-      },
       "intro/concepts": {
         "title": "Concepts & Principles",
         "sidebar_label": "Concepts & Principles"
+      },
+      "intro/overview": {
+        "title": "The gist of MobX",
+        "sidebar_label": "The gist of MobX"
       },
       "LINKS": {
         "title": "LINKS"
       },
       "README": {
-        "title": "MobX",
-        "sidebar_label": "Why MobX?"
+        "title": "Introduction",
+        "sidebar_label": "Introduction"
       },
       "refguide/action": {
         "title": "action",
@@ -135,7 +132,7 @@
         "title": "Intercept & Observe",
         "sidebar_label": "intercept & observe"
       },
-      "refguide/observer-decorator": {
+      "refguide/observer-component": {
         "title": "(@)observer",
         "sidebar_label": "(@)observer"
       },

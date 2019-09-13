@@ -1,5 +1,4 @@
 ---
-id: api
 title: MobX Api Reference
 sidebar_label: API overview
 ---

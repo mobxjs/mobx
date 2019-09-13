@@ -1,5 +1,4 @@
 ---
-id: boxed
 title: Boxed Values
 sidebar_label: boxed values
 ---

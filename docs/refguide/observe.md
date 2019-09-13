@@ -1,5 +1,4 @@
 ---
-id: observe
 sidebar_label: intercept & observe
 title: Intercept & Observe
 ---

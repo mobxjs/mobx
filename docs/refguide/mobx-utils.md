@@ -1,5 +1,4 @@
 ---
-id: mobx-utils
 sidebar_label: MobX-utils
 ---
 

@@ -1,5 +1,4 @@
 ---
-id: object-api
 sidebar_label: Object api
 title: Object api
 ---

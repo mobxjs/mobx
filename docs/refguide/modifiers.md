@@ -1,5 +1,4 @@
 ---
-id: modifiers
 title: Decorators
 sidebar_label: decorators
 ---

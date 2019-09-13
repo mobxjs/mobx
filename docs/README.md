@@ -1,7 +1,6 @@
 ---
-id: README
-title: MobX
-sidebar_label: Why MobX?
+title: Introduction
+sidebar_label: Introduction
 ---
 
 <img src="assets/mobx.png" alt="logo" height="120" align="right" />
