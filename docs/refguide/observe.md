@@ -3,7 +3,7 @@ sidebar_label: intercept & observe
 title: Intercept & Observe
 ---
 
-<div id='codefund' style='float:right'></div>
+<div id='codefund' ></div>
 
 # Intercept & Observe
 

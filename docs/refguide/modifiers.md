@@ -3,7 +3,7 @@ title: Decorators
 sidebar_label: decorators
 ---
 
-<div id='codefund' style='float:right'></div>
+<div id='codefund' ></div>
 
 # Decorators
 

@@ -3,7 +3,7 @@ title: autorun
 sidebar_label: autorun
 ---
 
-<div id='codefund' style='float:right'></div>
+<div id='codefund' ></div>
 
 # Autorun
 

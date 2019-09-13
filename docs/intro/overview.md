@@ -3,7 +3,7 @@ title: The gist of MobX
 sidebar_label: The gist of MobX
 ---
 
-<div id='codefund' style='float:right'></div>
+<div id='codefund' ></div>
 
 # The gist of MobX
 

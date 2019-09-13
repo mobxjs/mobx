@@ -3,7 +3,7 @@ title: Boxed Values
 sidebar_label: boxed values
 ---
 
-<div id='codefund' style='float:right'></div>
+<div id='codefund' ></div>
 
 ## Primitive values and references
 

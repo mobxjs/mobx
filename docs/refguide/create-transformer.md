@@ -3,7 +3,7 @@ title: createTransformer
 sidebar_label: mobxUtils.createTransformer
 ---
 
-<div id='codefund' style='float:right'></div>
+<div id='codefund' ></div>
 
 # createTransformer
 

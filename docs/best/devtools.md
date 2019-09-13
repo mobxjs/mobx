@@ -3,7 +3,7 @@ sidebar_label: MobX + React DevTools
 title: MobX + React DevTools
 ---
 
-<div id='codefund' style='float:right'></div>
+<div id='codefund' ></div>
 
 # MobX + React DevTools
 

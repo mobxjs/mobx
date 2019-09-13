@@ -3,7 +3,7 @@ sidebar_label: async actions & flows
 title: Writing asynchronous actions
 ---
 
-<div id='codefund' style='float:right'></div>
+<div id='codefund' ></div>
 
 # Writing asynchronous actions
 

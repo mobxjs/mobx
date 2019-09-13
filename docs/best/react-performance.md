@@ -3,7 +3,7 @@ sidebar_label: Optimizing React components
 title: Optimizing rendering React components
 ---
 
-<div id='codefund' style='float:right'></div>
+<div id='codefund' ></div>
 
 # Optimizing rendering React components
 

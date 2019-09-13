@@ -3,7 +3,7 @@ title: (@)computed
 sidebar_label: (@)computed
 ---
 
-<div id='codefund' style='float:right'></div>
+<div id='codefund' ></div>
 
 # (@)computed
 

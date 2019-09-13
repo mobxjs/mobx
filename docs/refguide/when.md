@@ -3,7 +3,7 @@ title: when
 sidebar_label: when
 ---
 
-<div id='codefund' style='float:right'></div>
+<div id='codefund' ></div>
 
 # when
 

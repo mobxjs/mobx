@@ -3,7 +3,7 @@ sidebar_label: How to (not) use decorator syntax
 title: How to (not) use decorators
 ---
 
-<div id='codefund' style='float:right'></div>
+<div id='codefund' ></div>
 
 # How to (not) use decorators
 

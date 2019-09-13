@@ -3,7 +3,7 @@ sidebar_label: spy
 title: Spy
 ---
 
-<div id='codefund' style='float:right'></div>
+<div id='codefund' ></div>
 
 # Spy
 

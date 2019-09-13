@@ -3,7 +3,7 @@ sidebar_label: toJS
 title: toJS
 ---
 
-<div id='codefund' style='float:right'></div>
+<div id='codefund' ></div>
 
 # toJS
 

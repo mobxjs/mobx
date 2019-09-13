@@ -2,7 +2,7 @@
 sidebar_label: extendObservable
 ---
 
-<div id='codefund' style='float:right'></div>
+<div id='codefund' ></div>
 
 # extendObservable
 

@@ -3,7 +3,7 @@ title: action
 sidebar_label: action
 ---
 
-<div id='codefund' style='float:right'></div>
+<div id='codefund' ></div>
 
 # action
 

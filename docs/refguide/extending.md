@@ -2,7 +2,7 @@
 sidebar_label: createAtom
 ---
 
-<div id='codefund' style='float:right'></div>
+<div id='codefund' ></div>
 
 # Creating observable data structures and reactions
 

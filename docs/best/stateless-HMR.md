@@ -3,7 +3,7 @@ title: Hot Module Reloading with Stateless Components
 sidebar_label: Hot Module Reloading with Stateless Components
 ---
 
-<div id='codefund' style='float:right'></div>
+<div id='codefund' ></div>
 
 # Hot Module Reloading with Stateless Components
 

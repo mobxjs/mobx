@@ -3,7 +3,7 @@ title: Observable Maps
 sidebar_label: maps
 ---
 
-<div id='codefund' style='float:right'></div>
+<div id='codefund' ></div>
 
 # Observable Maps
 

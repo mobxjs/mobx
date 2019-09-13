@@ -3,7 +3,7 @@ title: MobX Api Reference
 sidebar_label: API overview
 ---
 
-<div id='codefund' style='float:right'></div>
+<div id='codefund' ></div>
 
 # MobX Api Reference
 

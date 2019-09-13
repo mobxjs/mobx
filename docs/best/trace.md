@@ -3,7 +3,7 @@ sidebar_label: Using trace for debugging
 title: Using `trace` for debugging
 ---
 
-<div id='codefund' style='float:right'></div>
+<div id='codefund' ></div>
 
 # Using `trace` for debugging
 

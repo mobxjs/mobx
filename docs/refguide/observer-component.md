@@ -3,7 +3,7 @@ title: (@)observer
 sidebar_label: (@)observer
 ---
 
-<div id='codefund' style='float:right'></div>
+<div id='codefund' ></div>
 
 # @observer
 
