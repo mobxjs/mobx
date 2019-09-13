@@ -350,7 +350,7 @@ To use the [flow typings](https://github.com/mobxjs/mobx/blob/master/flow-typed/
 ## Donating
 
 Was MobX key in making your project a success?
-Join our [open collective](https://opencollective.com/mobx#) or use the [donate button](https://mobxjs.github.io/mobx/donate.html)!
+Join our [open collective](https://opencollective.com/mobx#)!
 
 ### Backers
 

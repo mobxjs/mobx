@@ -43,8 +43,7 @@
       "best/trace",
       "best/store",
       "best/react-performance",
-      "refguide/spy",
-      "donating"
+      "refguide/spy"
     ]
   }
 }
