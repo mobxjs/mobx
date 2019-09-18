@@ -117,7 +117,7 @@ To work with local observable state inside function components, the [`useLocalSt
 
 <a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-connect-mobx-observer-components-to-the-store-with-the-react-provider">egghead.io lesson 8: inject stores with Provider</a>
 
-_Tip: it is recommended to use `React.creatContext` instead_
+_Tip: it is recommended to use `React.createContext` instead_
 
 The `mobx-react` package also provides the `Provider` component that can be used to pass down stores using React's context mechanism.
 To connect to those stores, pass a list of store names to `inject`, which will make the stores available as props.
