@@ -154,7 +154,8 @@
       }
     },
     "links": {
-      "Documentation": "Documentation"
+      "Documentation": "Documentation",
+      "Github": "Github"
     },
     "categories": {
       "Introduction": "Introduction",

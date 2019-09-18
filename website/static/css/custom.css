@@ -26,3 +26,17 @@ article p img {
 
 @media only screen and (min-width: 1500px) {
 }
+
+/* Transform Github link. Lifted from Redux's CSS */
+/* https://github.com/reduxjs/redux/blob/master/website/static/css/custom.css#L134 */
+
+.navigationSlider .slidingNav ul a[href*="github"] {
+  font-size: 0;
+}
+
+.navigationSlider .slidingNav ul a[href*="github"]::before {
+  content : "";
+  width : 32px;
+  height : 32px;
+  background: url("/img/github-brand.svg");
+}
