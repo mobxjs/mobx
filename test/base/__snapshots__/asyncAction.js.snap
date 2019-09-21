@@ -1,0 +1,83 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`it should support logging 1`] = `
+Array [
+  Object {
+    "arguments": Array [
+      2,
+    ],
+    "name": "myaction - runId 5 - step 0",
+    "spyReportStart": true,
+    "type": "action",
+  },
+  Object {
+    "key": "a",
+    "name": "ObservableObject@10",
+    "newValue": 2,
+    "oldValue": 1,
+    "spyReportStart": true,
+    "type": "update",
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+  Object {
+    "arguments": Array [
+      2,
+    ],
+    "name": "myaction - runId 5 - step 1",
+    "spyReportStart": true,
+    "type": "action",
+  },
+  Object {
+    "key": "a",
+    "name": "ObservableObject@10",
+    "newValue": 5,
+    "oldValue": 2,
+    "spyReportStart": true,
+    "type": "update",
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+  Object {
+    "key": "a",
+    "name": "ObservableObject@10",
+    "newValue": 4,
+    "oldValue": 5,
+    "spyReportStart": true,
+    "type": "update",
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+  Object {
+    "arguments": Array [
+      2,
+    ],
+    "name": "myaction - runId 5 - step 2",
+    "spyReportStart": true,
+    "type": "action",
+  },
+  Object {
+    "key": "a",
+    "name": "ObservableObject@10",
+    "newValue": 3,
+    "oldValue": 4,
+    "spyReportStart": true,
+    "type": "update",
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+]
+`;

@@ -3,6 +3,7 @@
 * Don't use `global` and `self` keywords unless defined. Fixes [#2070](https://github.com/mobxjs/mobx/issues/2070).
 * onBecome(Un)Observed didn't trigger when using number as key of observable map. Fixes [#2067](https://github.com/mobxjs/mobx/issues/2067).
 * Added `startActionWithFinisher` to be able to start and action and finish it without needing a code block. Useful for library creators.
+* Added `asyncAction` as an alternative to flows.
 
 # 5.13.0 / 4.13.0
 

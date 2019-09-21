@@ -1647,3 +1647,17 @@ test("verify #1528", () => {
 
     expect(appState.timer).toBe(0)
 })
+
+test("asyncAction typing", async () => {
+    const nothingAsync = async function() {
+        return [5]
+    }
+
+    const f = mobx.asyncAction(async function(_, _initial: number) {
+        const _n: number[] = await _(nothingAsync())
+        expect(_n).toEqual([5])
+        return "string"
+    })
+
+    const n: string = await f(5)
+})

@@ -152,7 +152,8 @@ export {
     onReactionError,
     interceptReads as _interceptReads,
     IComputedValueOptions,
-    startActionWithFinisher
+    startActionWithFinisher,
+    asyncAction
 } from "./internal"
 
 // Devtools support
