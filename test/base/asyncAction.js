@@ -18,8 +18,8 @@ test("it should support async actions", done => {
 
     const f = asyncAction(async function(_, initial) {
         x.a = initial // this runs in action
-        x.a = await _(delay(100, 3))
-        await _(delay(100, 0))
+        x.a = await _(() => delay(100, 3))
+        await _(() => delay(100, 0))
         x.a = 4
         return x.a
     })
@@ -42,8 +42,8 @@ test("it should support try catch in async", done => {
     const f = asyncAction(async function(_, initial) {
         x.a = initial // this runs in action
         try {
-            x.a = await _(delay(100, 5, true))
-            await _(delay(100, 0))
+            x.a = await _(() => delay(100, 5, true))
+            await _(() => delay(100, 0))
             x.a = 4
         } catch (e) {
             x.a = e
@@ -62,7 +62,7 @@ test("it should support try catch in async", done => {
 
 test("it should support throw from async actions", done => {
     asyncAction(async function(_) {
-        await await _(delay(10, 7))
+        await await _(() => delay(10, 7))
         throw 7
     })().then(
         () => {
@@ -77,7 +77,7 @@ test("it should support throw from async actions", done => {
 
 test("it should support throw from awaited promise", done => {
     asyncAction(async function(_) {
-        return await _(delay(10, 7, true))
+        return await _(() => delay(10, 7, true))
     })().then(
         () => {
             done.fail("should fail")
@@ -100,8 +100,8 @@ test("it should support async action in classes", done => {
         f = asyncAction(async function(_, initial) {
             this.a = initial // this runs in action
             try {
-                this.a = await _(delay(100, 5, true))
-                await _(delay(100, 0))
+                this.a = await _(() => delay(100, 5, true))
+                await _(() => delay(100, 0))
                 this.a = 4
             } catch (e) {
                 this.a = e
@@ -133,9 +133,9 @@ test("it should support logging", done => {
 
     const f = asyncAction(async function myaction(_, initial) {
         x.a = initial
-        x.a = await _(delay(100, 5))
+        x.a = await _(() => delay(100, 5))
         x.a = 4
-        x.a = await _(delay(100, 3))
+        x.a = await _(() => delay(100, 3))
         return x.a
     })
     const d = mobx.spy(ev => events.push(ev))
@@ -166,16 +166,16 @@ test("it should support async actions within async actions", done => {
 
     const innerF = asyncAction(async function(_, initial) {
         x.a = initial // this runs in action
-        x.a = await _(delay(100, 3))
-        await _(delay(100, 0))
+        x.a = await _(() => delay(100, 3))
+        await _(() => delay(100, 0))
         x.a = 4
         return x.a
     })
 
     const f = asyncAction(async function(_, initial) {
-        x.a = await _(innerF(initial))
-        x.a = await _(delay(100, 5))
-        await _(delay(100, 0))
+        x.a = await _(() => innerF(initial))
+        x.a = await _(() => delay(100, 5))
+        await _(() => delay(100, 0))
         x.a = 6
         return x.a
     })
@@ -197,16 +197,16 @@ test("it should support async actions within async actions that throw", done => 
 
     const innerF = asyncAction(async function(_, initial) {
         x.a = initial // this runs in action
-        x.a = await _(delay(100, 3))
-        await _(delay(100, 0))
+        x.a = await _(() => delay(100, 3))
+        await _(() => delay(100, 0))
         x.a = 4
         throw "err"
     })
 
     const f = asyncAction(async function(_, initial) {
-        x.a = await _(innerF(initial))
-        x.a = await _(delay(100, 5))
-        await _(delay(100, 0))
+        x.a = await _(() => innerF(initial))
+        x.a = await _(() => delay(100, 5))
+        await _(() => delay(100, 0))
         x.a = 6
         return x.a
     })

@@ -33,8 +33,15 @@ function assertAsyncActionContextNotExists(ctx: IAsyncActionContext | undefined)
 
 export async function defaultAwaiter<R>(
     ctxRef: IAsyncActionContextRef,
-    promise: Promise<R>
+    promiseGen: () => Promise<R>
 ): Promise<R> {
+    if (process.env.NODE_ENV !== "production") {
+        invariant(
+            typeof promiseGen === "function",
+            "async awaiter expects a function that returns a promise"
+        )
+    }
+
     assertAsyncActionContextExists(ctxRef.current)
 
     const { runId, actionName, args, scope, finisher, step } = ctxRef.current!
@@ -43,7 +50,7 @@ export async function defaultAwaiter<R>(
     finisher(false)
 
     try {
-        return await promise
+        return await promiseGen()
     } finally {
         assertAsyncActionContextNotExists(ctxRef.current)
         ctxRef.current = {
@@ -61,14 +68,14 @@ export async function defaultAwaiter<R>(
     }
 }
 
-export type AsyncActionAwaiter = <R>(promise: Promise<R>) => Promise<R>
+export type AsyncActionAwaiter = <R>(promiseGen: () => Promise<R>) => Promise<R>
 
 export function asyncAction<ActionArgs extends any[], ActionResult>(
     name: string,
     fn: (awaiter: AsyncActionAwaiter, ...args: ActionArgs) => Promise<ActionResult>
 ): (...args: ActionArgs) => Promise<ActionResult>
 export function asyncAction<Args extends any[], R>(
-    fn: (awaiter: <R2>(promise: Promise<R2>) => Promise<R2>, ...args: Args) => Promise<R>
+    fn: (awaiter: AsyncActionAwaiter, ...args: Args) => Promise<R>
 ): (...args: Args) => Promise<R>
 
 export function asyncAction(arg1?: any, arg2?: any): any {

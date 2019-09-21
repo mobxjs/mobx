@@ -1654,7 +1654,7 @@ test("asyncAction typing", async () => {
     }
 
     const f = mobx.asyncAction(async function(_, _initial: number) {
-        const _n: number[] = await _(nothingAsync())
+        const _n: number[] = await _(() => nothingAsync())
         expect(_n).toEqual([5])
         return "string"
     })
