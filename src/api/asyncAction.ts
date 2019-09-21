@@ -61,12 +61,11 @@ export async function defaultAwaiter<R>(
     }
 }
 
+export type AsyncActionAwaiter = <R>(promise: Promise<R>) => Promise<R>
+
 export function asyncAction<ActionArgs extends any[], ActionResult>(
     name: string,
-    fn: (
-        awaiter: <R>(promise: Promise<R>) => Promise<R>,
-        ...args: ActionArgs
-    ) => Promise<ActionResult>
+    fn: (awaiter: AsyncActionAwaiter, ...args: ActionArgs) => Promise<ActionResult>
 ): (...args: ActionArgs) => Promise<ActionResult>
 export function asyncAction<Args extends any[], R>(
     fn: (awaiter: <R2>(promise: Promise<R2>) => Promise<R2>, ...args: Args) => Promise<R>

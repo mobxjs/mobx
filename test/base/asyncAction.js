@@ -164,7 +164,7 @@ test("it should support async actions within async actions", done => {
     const x = mobx.observable({ a: 1 })
     mobx.reaction(() => x.a, v => values.push(v), { fireImmediately: true })
 
-    const innferF = asyncAction(async function(_, initial) {
+    const innerF = asyncAction(async function(_, initial) {
         x.a = initial // this runs in action
         x.a = await _(delay(100, 3))
         await _(delay(100, 0))
@@ -173,7 +173,7 @@ test("it should support async actions within async actions", done => {
     })
 
     const f = asyncAction(async function(_, initial) {
-        x.a = await _(innferF(initial))
+        x.a = await _(innerF(initial))
         x.a = await _(delay(100, 5))
         await _(delay(100, 0))
         x.a = 6
@@ -195,7 +195,7 @@ test("it should support async actions within async actions that throw", done => 
     const x = mobx.observable({ a: 1 })
     mobx.reaction(() => x.a, v => values.push(v), { fireImmediately: true })
 
-    const innferF = asyncAction(async function(_, initial) {
+    const innerF = asyncAction(async function(_, initial) {
         x.a = initial // this runs in action
         x.a = await _(delay(100, 3))
         await _(delay(100, 0))
@@ -204,7 +204,7 @@ test("it should support async actions within async actions that throw", done => 
     })
 
     const f = asyncAction(async function(_, initial) {
-        x.a = await _(innferF(initial))
+        x.a = await _(innerF(initial))
         x.a = await _(delay(100, 5))
         await _(delay(100, 0))
         x.a = 6

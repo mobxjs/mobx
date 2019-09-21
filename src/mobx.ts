@@ -153,7 +153,8 @@ export {
     interceptReads as _interceptReads,
     IComputedValueOptions,
     startActionWithFinisher,
-    asyncAction
+    asyncAction,
+    AsyncActionAwaiter
 } from "./internal"
 
 // Devtools support
