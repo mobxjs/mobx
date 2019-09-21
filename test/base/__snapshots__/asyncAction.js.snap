@@ -6,7 +6,7 @@ Array [
     "arguments": Array [
       2,
     ],
-    "name": "myaction - runId 5 - step 0",
+    "name": "myaction - runid 5 - step 0",
     "spyReportStart": true,
     "type": "action",
   },
@@ -28,7 +28,7 @@ Array [
     "arguments": Array [
       2,
     ],
-    "name": "myaction - runId 5 - step 1",
+    "name": "myaction - runid 5 - step 1",
     "spyReportStart": true,
     "type": "action",
   },
@@ -61,7 +61,7 @@ Array [
     "arguments": Array [
       2,
     ],
-    "name": "myaction - runId 5 - step 2",
+    "name": "myaction - runid 5 - step 2",
     "spyReportStart": true,
     "type": "action",
   },

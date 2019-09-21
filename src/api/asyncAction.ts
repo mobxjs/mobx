@@ -57,7 +57,7 @@ export async function defaultAwaiter<R>(
             runId,
             step: nextStep,
             finisher: startActionWithFinisher(
-                `${actionName} - runId ${runId} - step ${nextStep}`,
+                getAsyncActionName(actionName, runId, nextStep),
                 this,
                 args
             ),
@@ -95,7 +95,7 @@ export function asyncAction(arg1?: any, arg2?: any): any {
                 runId: nextRunId,
                 step: 0,
                 finisher: startActionWithFinisher(
-                    `${actionName} - runId ${nextRunId} - step 0`,
+                    getAsyncActionName(actionName, nextRunId, 0),
                     this,
                     arguments
                 ),
@@ -119,4 +119,8 @@ export function asyncAction(arg1?: any, arg2?: any): any {
             finisher(threw)
         }
     }
+}
+
+function getAsyncActionName(actionName: string, runId: number, step: number) {
+    return `${actionName} - runid ${runId} - step ${step}`
 }
