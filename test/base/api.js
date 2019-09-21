@@ -65,7 +65,8 @@ test("correct api should be exposed", function() {
             "values",
             "entries",
             "when",
-            "$mobx"
+            "$mobx",
+            "startActionWithFinisher"
         ].sort()
     )
 })

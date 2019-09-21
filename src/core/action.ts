@@ -29,8 +29,26 @@ export function createAction(actionName: string, fn: Function): Function & IActi
     return res as any
 }
 
+export function startActionWithFinisher(
+    actionName: string,
+    scope?: any,
+    args?: IArguments
+): (threw: boolean) => void {
+    const runInfo = startAction(actionName, scope, args)
+
+    return (threw: boolean) => {
+        if (threw) {
+            globalState.suppressReactionErrors = true
+            endAction(runInfo)
+            globalState.suppressReactionErrors = false
+        } else {
+            endAction(runInfo)
+        }
+    }
+}
+
 export function executeAction(actionName: string, fn: Function, scope?: any, args?: IArguments) {
-    const runInfo = startAction(actionName, fn, scope, args)
+    const runInfo = startAction(actionName, scope, args)
     let shouldSupressReactionError = true
     try {
         const res = fn.apply(scope, args)
@@ -38,7 +56,7 @@ export function executeAction(actionName: string, fn: Function, scope?: any, arg
         return res
     } finally {
         if (shouldSupressReactionError) {
-            globalState.suppressReactionErrors = shouldSupressReactionError
+            globalState.suppressReactionErrors = true
             endAction(runInfo)
             globalState.suppressReactionErrors = false
         } else {
@@ -54,12 +72,7 @@ interface IActionRunInfo {
     startTime: number
 }
 
-function startAction(
-    actionName: string,
-    fn: Function,
-    scope: any,
-    args?: IArguments
-): IActionRunInfo {
+function startAction(actionName: string, scope: any, args?: IArguments): IActionRunInfo {
     const notifySpy = isSpyEnabled() && !!actionName
     let startTime: number = 0
     if (notifySpy) {

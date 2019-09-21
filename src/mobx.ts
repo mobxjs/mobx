@@ -146,7 +146,8 @@ export {
     isComputingDerivation as _isComputingDerivation,
     onReactionError,
     interceptReads as _interceptReads,
-    IComputedValueOptions
+    IComputedValueOptions,
+    startActionWithFinisher
 } from "./internal"
 
 // forward compatibility with mobx, so that packages can easily support mobx 4 & 5
