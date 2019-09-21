@@ -8,7 +8,7 @@ interface IAsyncActionContext {
     finisher: ReturnType<typeof startActionWithFinisher>
     actionName: string
     scope: any
-    args: IArguments | undefined
+    args: IArguments
 }
 
 interface IAsyncActionContextRef {
@@ -31,7 +31,7 @@ function assertAsyncActionContextNotExists(ctx: IAsyncActionContext | undefined)
     }
 }
 
-export async function defaultAwaiter<R>(
+async function defaultAwaiter<R>(
     ctxRef: IAsyncActionContextRef,
     promiseGen: () => Promise<R>
 ): Promise<R> {
@@ -74,6 +74,7 @@ export function asyncAction<ActionArgs extends any[], ActionResult>(
     name: string,
     fn: (awaiter: AsyncActionAwaiter, ...args: ActionArgs) => Promise<ActionResult>
 ): (...args: ActionArgs) => Promise<ActionResult>
+
 export function asyncAction<Args extends any[], R>(
     fn: (awaiter: AsyncActionAwaiter, ...args: Args) => Promise<R>
 ): (...args: Args) => Promise<R>
