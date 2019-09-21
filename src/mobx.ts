@@ -151,7 +151,8 @@ export {
     isComputingDerivation as _isComputingDerivation,
     onReactionError,
     interceptReads as _interceptReads,
-    IComputedValueOptions
+    IComputedValueOptions,
+    startActionWithFinisher
 } from "./internal"
 
 // Devtools support
