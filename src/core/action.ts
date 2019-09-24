@@ -96,7 +96,7 @@ export function endAction(runInfo: IActionRunInfo) {
     allowStateChangesEnd(runInfo.prevAllowStateChanges)
     endBatch()
     untrackedEnd(runInfo.prevDerivation)
-    if (runInfo.notifySpy && process.env.NODE_ENV !== "production") {
+    if (runInfo.notifySpy) {
         spyReportEnd({ time: Date.now() - runInfo.startTime })
     }
     globalState.suppressReactionErrors = false
