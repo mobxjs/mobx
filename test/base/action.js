@@ -547,3 +547,17 @@ test("error logging, #1836 - 2", () => {
 
     expect(messages).toMatchSnapshot()
 })
+
+test("startActionWithFinisher - out of order", () => {
+    const a1 = mobx.startActionWithFinisher("a1")
+    const a2 = mobx.startActionWithFinisher("a2")
+
+    expect(() => a1()).toThrow("invalid action stack")
+
+    a2()
+
+    // double finishing
+    expect(() => a2()).toThrow("invalid action stack")
+
+    a1()
+})
