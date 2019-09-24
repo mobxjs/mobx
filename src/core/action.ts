@@ -29,40 +29,27 @@ export function createAction(actionName: string, fn: Function): Function & IActi
     return res as any
 }
 
-export function startActionWithFinisher(
-    actionName: string,
-    scope?: any,
-    args?: IArguments
-): (threw: boolean) => void {
-    const runInfo = startAction(actionName, scope, args)
-
-    return (threw: boolean) => {
-        runInfo.threw = threw
-        endAction(runInfo)
-    }
-}
-
 export function executeAction(actionName: string, fn: Function, scope?: any, args?: IArguments) {
     const runInfo = startAction(actionName, scope, args)
-    runInfo.threw = true
     try {
-        const res = fn.apply(scope, args)
-        runInfo.threw = false
-        return res
+        return fn.apply(scope, args)
+    } catch (err) {
+        runInfo.error = err
+        throw err
     } finally {
         endAction(runInfo)
     }
 }
 
-interface IActionRunInfo {
+export interface IActionRunInfo {
     prevDerivation: IDerivation | null
     prevAllowStateChanges: boolean
     notifySpy: boolean
     startTime: number
-    threw?: boolean
+    error?: any
 }
 
-function startAction(actionName: string, scope: any, args?: IArguments): IActionRunInfo {
+export function startAction(actionName: string, scope: any, args?: IArguments): IActionRunInfo {
     const notifySpy = isSpyEnabled() && !!actionName
     let startTime: number = 0
     if (notifySpy) {
@@ -92,7 +79,7 @@ function startAction(actionName: string, scope: any, args?: IArguments): IAction
     return runInfo
 }
 
-function endAction(runInfo: IActionRunInfo) {
+export function endAction(runInfo: IActionRunInfo) {
     if (process.env.NODE_ENV !== "production") {
         const actionStack = globalState.actionStack
         const expectedRunInfo = actionStack[actionStack.length - 1]
@@ -103,7 +90,7 @@ function endAction(runInfo: IActionRunInfo) {
         }
     }
 
-    if (runInfo.threw) {
+    if (runInfo.error !== undefined) {
         globalState.suppressReactionErrors = true
     }
     allowStateChangesEnd(runInfo.prevAllowStateChanges)

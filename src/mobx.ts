@@ -147,7 +147,9 @@ export {
     onReactionError,
     interceptReads as _interceptReads,
     IComputedValueOptions,
-    startActionWithFinisher
+    IActionRunInfo,
+    startAction,
+    endAction
 } from "./internal"
 
 // forward compatibility with mobx, so that packages can easily support mobx 4 & 5
