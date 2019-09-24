@@ -118,6 +118,11 @@ export class MobXGlobals {
      * they are not the cause, see: https://github.com/mobxjs/mobx/issues/1836
      */
     suppressReactionErrors = false
+
+    /*
+     * Action stack.
+     */
+    actionStack: object[] = []
 }
 
 let canMergeGlobalState = true

@@ -37,31 +37,20 @@ export function startActionWithFinisher(
     const runInfo = startAction(actionName, scope, args)
 
     return (threw: boolean) => {
-        if (threw) {
-            globalState.suppressReactionErrors = true
-            endAction(runInfo)
-            globalState.suppressReactionErrors = false
-        } else {
-            endAction(runInfo)
-        }
+        runInfo.threw = threw
+        endAction(runInfo)
     }
 }
 
 export function executeAction(actionName: string, fn: Function, scope?: any, args?: IArguments) {
     const runInfo = startAction(actionName, scope, args)
-    let shouldSupressReactionError = true
+    runInfo.threw = true
     try {
         const res = fn.apply(scope, args)
-        shouldSupressReactionError = false
+        runInfo.threw = false
         return res
     } finally {
-        if (shouldSupressReactionError) {
-            globalState.suppressReactionErrors = true
-            endAction(runInfo)
-            globalState.suppressReactionErrors = false
-        } else {
-            endAction(runInfo)
-        }
+        endAction(runInfo)
     }
 }
 
@@ -70,6 +59,7 @@ interface IActionRunInfo {
     prevAllowStateChanges: boolean
     notifySpy: boolean
     startTime: number
+    threw?: boolean
 }
 
 function startAction(actionName: string, scope: any, args?: IArguments): IActionRunInfo {
@@ -90,20 +80,39 @@ function startAction(actionName: string, scope: any, args?: IArguments): IAction
     const prevDerivation = untrackedStart()
     startBatch()
     const prevAllowStateChanges = allowStateChangesStart(true)
-    return {
+    const runInfo = {
         prevDerivation,
         prevAllowStateChanges,
         notifySpy,
         startTime
     }
+    if (process.env.NODE_ENV !== "production") {
+        globalState.actionStack.push(runInfo)
+    }
+    return runInfo
 }
 
 function endAction(runInfo: IActionRunInfo) {
+    if (process.env.NODE_ENV !== "production") {
+        const actionStack = globalState.actionStack
+        const expectedRunInfo = actionStack[actionStack.length - 1]
+        if (expectedRunInfo !== runInfo) {
+            fail("invalid action stack. did you forget to finish an action?")
+        } else {
+            actionStack.pop()
+        }
+    }
+
+    if (runInfo.threw) {
+        globalState.suppressReactionErrors = true
+    }
     allowStateChangesEnd(runInfo.prevAllowStateChanges)
     endBatch()
     untrackedEnd(runInfo.prevDerivation)
-    if (runInfo.notifySpy && process.env.NODE_ENV !== "production")
+    if (runInfo.notifySpy && process.env.NODE_ENV !== "production") {
         spyReportEnd({ time: Date.now() - runInfo.startTime })
+    }
+    globalState.suppressReactionErrors = false
 }
 
 export function allowStateChanges<T>(allowStateChanges: boolean, func: () => T): T {
