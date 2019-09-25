@@ -148,8 +148,8 @@ export {
     interceptReads as _interceptReads,
     IComputedValueOptions,
     IActionRunInfo,
-    startAction,
-    endAction
+    _startAction,
+    _endAction
 } from "./internal"
 
 // forward compatibility with mobx, so that packages can easily support mobx 4 & 5
