@@ -2,7 +2,7 @@
 
 * Don't use `global` and `self` keywords unless defined. Fixes [#2070](https://github.com/mobxjs/mobx/issues/2070).
 * onBecome(Un)Observed didn't trigger when using number as key of observable map. Fixes [#2067](https://github.com/mobxjs/mobx/issues/2067).
-* Exposed `startAction` and `endAction` to be able to start and action and finish it without needing a code block. This is low level stuff you shouldn't need that's mostly useful for library creators.
+* Exposed `_startAction` and `_endAction` to be able to start and action and finish it without needing a code block. This is low level stuff you shouldn't need that's mostly useful for library creators.
 
 # 5.13.0 / 4.13.0
 

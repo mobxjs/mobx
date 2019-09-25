@@ -153,8 +153,8 @@ export {
     interceptReads as _interceptReads,
     IComputedValueOptions,
     IActionRunInfo,
-    startAction,
-    endAction
+    _startAction,
+    _endAction
 } from "./internal"
 
 // Devtools support

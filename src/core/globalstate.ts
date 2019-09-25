@@ -120,9 +120,14 @@ export class MobXGlobals {
     suppressReactionErrors = false
 
     /*
-     * Action stack.
+     * Current action id.
      */
-    actionStack: object[] = []
+    currentActionId = 0
+
+    /*
+     * Next action id.
+     */
+    nextActionId = 1
 }
 
 let canMergeGlobalState = true

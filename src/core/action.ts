@@ -30,14 +30,14 @@ export function createAction(actionName: string, fn: Function, ref?: Object): Fu
 }
 
 export function executeAction(actionName: string, fn: Function, scope?: any, args?: IArguments) {
-    const runInfo = startAction(actionName, scope, args)
+    const runInfo = _startAction(actionName, scope, args)
     try {
         return fn.apply(scope, args)
     } catch (err) {
         runInfo.error = err
         throw err
     } finally {
-        endAction(runInfo)
+        _endAction(runInfo)
     }
 }
 
@@ -47,9 +47,11 @@ export interface IActionRunInfo {
     notifySpy: boolean
     startTime: number
     error?: any
+    parentActionId: number
+    actionId: number
 }
 
-export function startAction(actionName: string, scope: any, args?: IArguments): IActionRunInfo {
+export function _startAction(actionName: string, scope: any, args?: IArguments): IActionRunInfo {
     const notifySpy = isSpyEnabled() && !!actionName
     let startTime: number = 0
     if (notifySpy && process.env.NODE_ENV !== "production") {
@@ -71,24 +73,19 @@ export function startAction(actionName: string, scope: any, args?: IArguments): 
         prevDerivation,
         prevAllowStateChanges,
         notifySpy,
-        startTime
+        startTime,
+        actionId: globalState.nextActionId++,
+        parentActionId: globalState.currentActionId
     }
-    if (process.env.NODE_ENV !== "production") {
-        globalState.actionStack.push(runInfo)
-    }
+    globalState.currentActionId = runInfo.actionId
     return runInfo
 }
 
-export function endAction(runInfo: IActionRunInfo) {
-    if (process.env.NODE_ENV !== "production") {
-        const actionStack = globalState.actionStack
-        const expectedRunInfo = actionStack[actionStack.length - 1]
-        if (expectedRunInfo !== runInfo) {
-            fail("invalid action stack. did you forget to finish an action?")
-        } else {
-            actionStack.pop()
-        }
+export function _endAction(runInfo: IActionRunInfo) {
+    if (globalState.currentActionId !== runInfo.actionId) {
+        fail("invalid action stack. did you forget to finish an action?")
     }
+    globalState.currentActionId = runInfo.parentActionId
 
     if (runInfo.error !== undefined) {
         globalState.suppressReactionErrors = true

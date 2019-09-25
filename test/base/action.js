@@ -549,15 +549,15 @@ test("error logging, #1836 - 2", () => {
 })
 
 test("out of order startAction / endAction", () => {
-    const a1 = mobx.startAction("a1")
-    const a2 = mobx.startAction("a2")
+    const a1 = mobx._startAction("a1")
+    const a2 = mobx._startAction("a2")
 
-    expect(() => mobx.endAction(a1)).toThrow("invalid action stack")
+    expect(() => mobx._endAction(a1)).toThrow("invalid action stack")
 
-    mobx.endAction(a2)
+    mobx._endAction(a2)
 
     // double finishing
-    expect(() => mobx.endAction(a2)).toThrow("invalid action stack")
+    expect(() => mobx._endAction(a2)).toThrow("invalid action stack")
 
-    mobx.endAction(a1)
+    mobx._endAction(a1)
 })
