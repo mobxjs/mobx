@@ -64,7 +64,9 @@ test("correct api should be exposed", function() {
             "untracked",
             "values",
             "entries",
-            "when"
+            "when",
+            "_startAction",
+            "_endAction"
         ].sort()
     )
 })
