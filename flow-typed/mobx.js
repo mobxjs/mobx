@@ -5,6 +5,8 @@ export type IObservableMapInitialValues<K, V> = IMapEntries<K, V> | KeyValueMap<
 export interface IMobxConfigurationOptions {
     +enforceActions?: boolean | "strict" | "never" | "always" | "observed";
     computedRequiresReaction?: boolean;
+    reactionRequiresObservable?: boolean;
+    observableRequiresReaction?: boolean;
     isolateGlobalState?: boolean;
     disableErrorBoundaries?: boolean;
     arrayBuffer?: number;
@@ -16,6 +18,10 @@ declare export function configure(options: IMobxConfigurationOptions): void
 export interface IAutorunOptions {
     delay?: number;
     name?: string;
+    /**
+     *  warn if the derivation has no dependencies after creation/update
+     */
+    requiresObservable?: boolean;
     scheduler?: (callback: () => void) => any;
     onError?: (error: any) => void;
 }

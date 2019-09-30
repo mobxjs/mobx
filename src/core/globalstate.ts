@@ -8,6 +8,9 @@ const persistentKeys: (keyof MobXGlobals)[] = [
     "spyListeners",
     "enforceActions",
     "computedRequiresReaction",
+    "reactionRequiresObservable",
+    "observableRequiresReaction",
+    "allowStateReads",
     "disableErrorBoundaries",
     "runId",
     "UNCHANGED"
@@ -82,6 +85,12 @@ export class MobXGlobals {
     allowStateChanges = true
 
     /**
+     * Is it allowed to read observables at this point?
+     * Used to hold the state needed for `observableRequiresReaction`
+     */
+    allowStateReads = true
+
+    /**
      * If strict mode is enabled, state changes are by default not allowed
      */
     enforceActions: boolean | "strict" = false
@@ -100,6 +109,18 @@ export class MobXGlobals {
      * Warn if computed values are accessed outside a reactive context
      */
     computedRequiresReaction = false
+
+    /**
+     * (Experimental)
+     * Warn if you try to create to derivation / reactive context without accessing any observable.
+     */
+    reactionRequiresObservable = false
+
+    /**
+     * (Experimental)
+     * Warn if observables are accessed outside a reactive context
+     */
+    observableRequiresReaction = false
 
     /**
      * Allows overwriting of computed properties, useful in tests but not prod as it can cause

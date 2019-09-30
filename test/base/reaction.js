@@ -1,3 +1,6 @@
+/**
+ * @type {typeof import("./../../src/mobx")}
+ */
 const mobx = require("../../src/mobx.ts")
 const reaction = mobx.reaction
 const utils = require("../utils/test-utils")
@@ -612,4 +615,32 @@ test("Introduce custom onError for - when - 2", () => {
     expect(error).toBe("OOPS")
     expect(globalHandlerCalled).toBe(false)
     d()
+})
+
+describe("reaction opts requiresObservable", () => {
+    test("warn when no observable", () => {
+        utils.consoleWarn(() => {
+            const disposer = mobx.reaction(() => 2, () => 1, {
+                requiresObservable: true
+            })
+
+            disposer()
+        }, /is created\/updated without reading any observable value/)
+    })
+
+    test("Don't warn when observable", () => {
+        const obsr = mobx.observable({
+            x: 1
+        })
+
+        const messages = utils.supressConsole(() => {
+            const disposer = mobx.reaction(() => obsr.x, () => 1, {
+                requiresObservable: true
+            })
+
+            disposer()
+        })
+
+        expect(messages.length).toBe(0)
+    })
 })

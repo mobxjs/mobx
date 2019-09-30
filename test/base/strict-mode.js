@@ -1,3 +1,6 @@
+/**
+ * @type {typeof import("../../src/mobx")}
+ */
 const mobx = require("../../src/mobx.ts")
 const utils = require("../utils/test-utils")
 
@@ -224,7 +227,7 @@ test("enforceActions 'strict' should not throw exception while observable array 
     }
 })
 
-test("warn on unsafe reads", function() {
+test("warn on unsafe reads of computed", function() {
     try {
         mobx.configure({ computedRequiresReaction: true })
         const x = mobx.observable({
@@ -239,6 +242,124 @@ test("warn on unsafe reads", function() {
     } finally {
         mobx.configure({ computedRequiresReaction: false })
     }
+})
+
+describe("observableRequiresReaction", function() {
+    test("warn on unsafe reads of observable", function() {
+        try {
+            mobx.configure({ observableRequiresReaction: true })
+            const x = mobx.observable({
+                y: 3
+            })
+            utils.consoleWarn(() => {
+                x.y
+            }, /being read outside a reactive context/)
+        } finally {
+            mobx.configure({ observableRequiresReaction: false })
+        }
+    })
+
+    test("warn on unsafe reads of observable also when there are other subscriptions", function() {
+        try {
+            mobx.configure({ observableRequiresReaction: true })
+            const x = mobx.observable({
+                y: 3
+            })
+
+            const dispose = mobx.autorun(() => x.y)
+
+            utils.consoleWarn(() => {
+                x.y
+            }, /being read outside a reactive context/)
+
+            dispose()
+        } finally {
+            mobx.configure({ observableRequiresReaction: false })
+        }
+    })
+
+    test("warn on unsafe reads of observable array", function() {
+        try {
+            mobx.configure({ observableRequiresReaction: true })
+            const x = mobx.observable({
+                arr: [1, 2, 3]
+            })
+            utils.consoleWarn(() => {
+                x.arr[1]
+            }, /being read outside a reactive context/)
+        } finally {
+            mobx.configure({ observableRequiresReaction: false })
+        }
+    })
+    test("don't warn on reads inside a computed", function() {
+        try {
+            mobx.configure({ observableRequiresReaction: true })
+            const x = mobx.observable({
+                y: 1
+            })
+
+            const fooComputed = mobx.computed(() => x.y + 1)
+
+            const messages = utils.supressConsole(() => {
+                const dispose = mobx.autorun(() => fooComputed.get())
+                dispose()
+            })
+
+            expect(messages.length).toBe(0)
+        } finally {
+            mobx.configure({ observableRequiresReaction: false })
+        }
+    })
+
+    test("don't warn on reads inside an action", function() {
+        try {
+            mobx.configure({ observableRequiresReaction: true })
+            const x = mobx.observable({
+                y: 1
+            })
+
+            const fooAction = mobx.action(() => x.y)
+
+            const messages = utils.supressConsole(() => {
+                fooAction()
+            })
+
+            expect(messages.length).toBe(0)
+        } finally {
+            mobx.configure({ observableRequiresReaction: false })
+        }
+    })
+
+    test("warn on reads inside a transaction", function() {
+        try {
+            mobx.configure({ observableRequiresReaction: true })
+            const x = mobx.observable({
+                y: 1
+            })
+
+            utils.consoleWarn(() => {
+                mobx.transaction(() => x.y)
+            }, /being read outside a reactive context/)
+        } finally {
+            mobx.configure({ observableRequiresReaction: false })
+        }
+    })
+})
+
+describe("reactionRequiresObservable", function() {
+    test("warn on reaction creation without dependencies", function() {
+        try {
+            mobx.configure({ reactionRequiresObservable: true })
+
+            utils.consoleWarn(() => {
+                const dispose = mobx.reaction(() => "plain value", newValue => newValue)
+
+                dispose()
+            }, /is created\/updated without reading any observable value/)
+        } finally {
+            mobx.configure({ reactionRequiresObservable: false })
+        }
+    })
 })
 
 test("#1869", function() {
