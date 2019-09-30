@@ -1,4 +1,4 @@
-<div id='codefund' style='float:right'></div>
+<div id='codefund' style='float:left'></div>
 
 # Common pitfalls & best practices
 
