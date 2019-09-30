@@ -1,10 +1,14 @@
-const m = require("../../src/mobx.ts")
+/**
+ * @type {typeof import("./../../src/mobx")}
+ */
+const mobx = require("../../src/mobx.ts")
+const utils = require("../utils/test-utils")
 
 test("autorun passes Reaction as an argument to view function", function() {
-    const a = m.observable.box(1)
+    const a = mobx.observable.box(1)
     const values = []
 
-    m.autorun(r => {
+    mobx.autorun(r => {
         expect(typeof r.dispose).toBe("function")
         if (a.get() === "pleaseDispose") r.dispose()
         values.push(a.get())
@@ -20,10 +24,10 @@ test("autorun passes Reaction as an argument to view function", function() {
 })
 
 test("autorun can be disposed on first run", function() {
-    const a = m.observable.box(1)
+    const a = mobx.observable.box(1)
     const values = []
 
-    m.autorun(r => {
+    mobx.autorun(r => {
         r.dispose()
         values.push(a.get())
     })
@@ -34,9 +38,9 @@ test("autorun can be disposed on first run", function() {
 })
 
 test("autorun warns when passed an action", function() {
-    const action = m.action(() => {})
+    const action = mobx.action(() => {})
     expect.assertions(1)
-    expect(() => m.autorun(action)).toThrowError(/Autorun does not accept actions/)
+    expect(() => mobx.autorun(action)).toThrowError(/Autorun does not accept actions/)
 })
 
 test("autorun batches automatically", function() {
@@ -44,7 +48,7 @@ test("autorun batches automatically", function() {
     let a1runs = 0
     let a2runs = 0
 
-    const x = m.observable({
+    const x = mobx.observable({
         a: 1,
         b: 1,
         c: 1,
@@ -54,12 +58,12 @@ test("autorun batches automatically", function() {
         }
     })
 
-    const d1 = m.autorun(() => {
+    const d1 = mobx.autorun(() => {
         a1runs++
         x.d // read
     })
 
-    const d2 = m.autorun(() => {
+    const d2 = mobx.autorun(() => {
         a2runs++
         x.b = x.a
         x.c = x.a
@@ -80,12 +84,12 @@ test("autorun batches automatically", function() {
 })
 
 test("autorun tracks invalidation of unbound dependencies", function() {
-    const a = m.observable.box(0)
-    const b = m.observable.box(0)
-    const c = m.computed(() => a.get() + b.get())
+    const a = mobx.observable.box(0)
+    const b = mobx.observable.box(0)
+    const c = mobx.computed(() => a.get() + b.get())
     const values = []
 
-    m.autorun(() => {
+    mobx.autorun(() => {
         values.push(c.get())
         b.set(100)
     })
@@ -95,21 +99,49 @@ test("autorun tracks invalidation of unbound dependencies", function() {
 })
 
 test("when effect is an action", function(done) {
-    const a = m.observable.box(0)
+    const a = mobx.observable.box(0)
 
-    m.configure({ enforceActions: "observed" })
-    m.when(
+    mobx.configure({ enforceActions: "observed" })
+    mobx.when(
         () => a.get() === 1,
         () => {
             a.set(2)
 
-            m.configure({ enforceActions: "never" })
+            mobx.configure({ enforceActions: "never" })
             done()
         },
         { timeout: 1 }
     )
 
-    m.runInAction(() => {
+    mobx.runInAction(() => {
         a.set(1)
+    })
+})
+
+describe("autorun opts requiresObservable", () => {
+    test("warn when no observable", () => {
+        utils.consoleWarn(() => {
+            const disposer = mobx.autorun(() => 2, {
+                requiresObservable: true
+            })
+
+            disposer()
+        }, /is created\/updated without reading any observable value/)
+    })
+
+    test("Don't warn when observable", () => {
+        const obsr = mobx.observable({
+            x: 1
+        })
+
+        const messages = utils.supressConsole(() => {
+            const disposer = mobx.autorun(() => obsr.x, {
+                requiresObservable: true
+            })
+
+            disposer()
+        })
+
+        expect(messages.length).toBe(0)
     })
 })

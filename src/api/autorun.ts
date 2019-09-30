@@ -15,6 +15,11 @@ import {
 export interface IAutorunOptions {
     delay?: number
     name?: string
+    /**
+     * Experimental.
+     * Warns if the view doesn't track observables
+     */
+    requiresObservable?: boolean
     scheduler?: (callback: () => void) => any
     onError?: (error: any) => void
 }
@@ -48,7 +53,8 @@ export function autorun(
             function(this: Reaction) {
                 this.track(reactionRunner)
             },
-            opts.onError
+            opts.onError,
+            opts.requiresObservable
         )
     } else {
         const scheduler = createSchedulerFromOptions(opts)
@@ -66,7 +72,8 @@ export function autorun(
                     })
                 }
             },
-            opts.onError
+            opts.onError,
+            opts.requiresObservable
         )
     }
 
@@ -89,8 +96,8 @@ function createSchedulerFromOptions(opts: IReactionOptions) {
     return opts.scheduler
         ? opts.scheduler
         : opts.delay
-            ? (f: Lambda) => setTimeout(f, opts.delay!)
-            : run
+        ? (f: Lambda) => setTimeout(f, opts.delay!)
+        : run
 }
 
 export function reaction<T>(
@@ -131,7 +138,8 @@ export function reaction<T>(
                 scheduler!(reactionRunner)
             }
         },
-        opts.onError
+        opts.onError,
+        opts.requiresObservable
     )
 
     function reactionRunner() {
