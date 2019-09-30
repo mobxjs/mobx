@@ -27,6 +27,7 @@ export function createAction(actionName: string, fn: Function, ref?: Object): Fu
         return executeAction(actionName, fn, ref || this, arguments)
     }
     ;(res as any).isMobxAction = true
+    Object.defineProperty(res, "name", {value: actionName});
     return res as any
 }
 
