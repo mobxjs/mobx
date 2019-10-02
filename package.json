@@ -28,7 +28,10 @@
     "small-build": "node scripts/build.js",
     "lint": "eslint src/**/*.ts",
     "size": "size-limit",
-    "publish-script": "node scripts/publish.js"
+    "publish-script": "node scripts/publish.js",
+    "docs:build": "yarn --cwd website build",
+    "docs:start": "yarn --cwd website start",
+    "postinstall": "yarn --cwd website install"
   },
   "repository": {
     "type": "git",
