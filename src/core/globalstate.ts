@@ -8,6 +8,9 @@ const persistentKeys: (keyof MobXGlobals)[] = [
     "spyListeners",
     "enforceActions",
     "computedRequiresReaction",
+    "reactionRequiresObservable",
+    "observableRequiresReaction",
+    "allowStateReads",
     "disableErrorBoundaries",
     "runId",
     "UNCHANGED"
@@ -82,6 +85,12 @@ export class MobXGlobals {
     allowStateChanges = true
 
     /**
+     * Is it allowed to read observables at this point?
+     * Used to hold the state needed for `observableRequiresReaction`
+     */
+    allowStateReads = true
+
+    /**
      * If strict mode is enabled, state changes are by default not allowed
      */
     enforceActions: boolean | "strict" = false
@@ -102,6 +111,18 @@ export class MobXGlobals {
     computedRequiresReaction = false
 
     /**
+     * (Experimental)
+     * Warn if you try to create to derivation / reactive context without accessing any observable.
+     */
+    reactionRequiresObservable = false
+
+    /**
+     * (Experimental)
+     * Warn if observables are accessed outside a reactive context
+     */
+    observableRequiresReaction = false
+
+    /**
      * Allows overwriting of computed properties, useful in tests but not prod as it can cause
      * memory leaks. See https://github.com/mobxjs/mobx/issues/1867
      */
@@ -114,10 +135,20 @@ export class MobXGlobals {
     disableErrorBoundaries = false
 
     /*
-     * If true, we are already handling an exception in an action. Any errors in reactions should be supressed, as
+     * If true, we are already handling an exception in an action. Any errors in reactions should be suppressed, as
      * they are not the cause, see: https://github.com/mobxjs/mobx/issues/1836
      */
     suppressReactionErrors = false
+
+    /*
+     * Current action id.
+     */
+    currentActionId = 0
+
+    /*
+     * Next action id.
+     */
+    nextActionId = 1
 }
 
 let canMergeGlobalState = true
@@ -180,6 +211,14 @@ export function resetGlobalState() {
 
 declare const window: any
 
+const mockGlobal = {}
+
 export function getGlobal() {
-    return typeof window !== "undefined" ? window : global
+    if (typeof window !== "undefined") {
+        return window
+    }
+    if (typeof global !== "undefined") {
+        return global
+    }
+    return mockGlobal
 }

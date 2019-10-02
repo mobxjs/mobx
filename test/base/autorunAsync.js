@@ -1,6 +1,11 @@
-const m = require("../../src/mobx.ts")
+/**
+ * @type {typeof import("../../src/mobx")}
+ */
+const mobx = require("../../src/mobx.ts")
 
-const { $mobx } = m
+const utils = require("../utils/test-utils")
+
+const { $mobx } = mobx
 
 test("autorun 1", function(done) {
     let _fired = 0
@@ -16,24 +21,24 @@ test("autorun 1", function(done) {
         _cCalcs = 0
     }
 
-    const a = m.observable.box(2)
-    const b = m.observable.box(3)
-    const c = m.computed(function() {
+    const a = mobx.observable.box(2)
+    const b = mobx.observable.box(3)
+    const c = mobx.computed(function() {
         _cCalcs++
         return a.get() * b.get()
     })
-    const d = m.observable.box(1)
+    const d = mobx.observable.box(1)
     const autorun = function() {
         _fired++
         _result = d.get() > 0 ? a.get() * c.get() : d.get()
     }
-    let disp = m.autorun(autorun, { delay: 20 })
+    let disp = mobx.autorun(autorun, { delay: 20 })
 
     check(0, 0, null)
     disp()
     to(function() {
         check(0, 0, null)
-        disp = m.autorun(autorun, { delay: 20 })
+        disp = mobx.autorun(autorun, { delay: 20 })
 
         to(function() {
             check(1, 1, 12)
@@ -82,12 +87,12 @@ test("autorun 1", function(done) {
 
 test("autorun should not result in loop", function(done) {
     let i = 0
-    const a = m.observable({
+    const a = mobx.observable({
         x: i
     })
 
     let autoRunsCalled = 0
-    const d = m.autorun(
+    const d = mobx.autorun(
         function() {
             autoRunsCalled++
             a.x = ++i
@@ -108,11 +113,11 @@ test("autorun should not result in loop", function(done) {
 })
 
 test("autorunAsync passes Reaction as an argument to view function", function(done) {
-    const a = m.observable.box(1)
+    const a = mobx.observable.box(1)
 
     let autoRunsCalled = 0
 
-    m.autorun(
+    mobx.autorun(
         r => {
             expect(typeof r.dispose).toBe("function")
             autoRunsCalled++
@@ -133,7 +138,7 @@ test("autorunAsync passes Reaction as an argument to view function", function(do
 })
 
 test("autorunAsync accepts a scheduling function", function(done) {
-    const a = m.observable({
+    const a = mobx.observable({
         x: 0,
         y: 1
     })
@@ -141,7 +146,7 @@ test("autorunAsync accepts a scheduling function", function(done) {
     let autoRunsCalled = 0
     let schedulingsCalled = 0
 
-    m.autorun(
+    mobx.autorun(
         function() {
             autoRunsCalled++
             expect(a.y).toBe(a.x + 1)
@@ -172,7 +177,7 @@ test("autorunAsync accepts a scheduling function", function(done) {
 })
 
 test("reaction accepts a scheduling function", function(done) {
-    const a = m.observable({
+    const a = mobx.observable({
         x: 0,
         y: 1
     })
@@ -183,7 +188,7 @@ test("reaction accepts a scheduling function", function(done) {
 
     const values = []
 
-    m.reaction(
+    mobx.reaction(
         () => {
             exprCalled++
             return a.x
@@ -220,26 +225,26 @@ test("reaction accepts a scheduling function", function(done) {
 })
 
 test("autorunAsync warns when passed an action", function() {
-    const action = m.action(() => {})
+    const action = mobx.action(() => {})
     expect.assertions(1)
-    expect(() => m.autorun(action)).toThrowError(/Autorun does not accept actions/)
+    expect(() => mobx.autorun(action)).toThrowError(/Autorun does not accept actions/)
 })
 
 test("whenWithTimeout should operate normally", done => {
-    const a = m.observable.box(1)
+    const a = mobx.observable.box(1)
 
-    m.when(() => a.get() === 2, () => done(), {
+    mobx.when(() => a.get() === 2, () => done(), {
         timeout: 500,
         onError: () => done.fail("error triggered")
     })
 
-    setTimeout(m.action(() => a.set(2)), 200)
+    setTimeout(mobx.action(() => a.set(2)), 200)
 })
 
 test("whenWithTimeout should timeout", done => {
-    const a = m.observable.box(1)
+    const a = mobx.observable.box(1)
 
-    m.when(() => a.get() === 2, () => done.fail("should have timed out"), {
+    mobx.when(() => a.get() === 2, () => done.fail("should have timed out"), {
         timeout: 500,
         onError: e => {
             expect("" + e).toMatch(/WHEN_TIMEOUT/)
@@ -247,18 +252,18 @@ test("whenWithTimeout should timeout", done => {
         }
     })
 
-    setTimeout(m.action(() => a.set(2)), 1000)
+    setTimeout(mobx.action(() => a.set(2)), 1000)
 })
 
 test("whenWithTimeout should dispose", done => {
-    const a = m.observable.box(1)
+    const a = mobx.observable.box(1)
 
-    const d1 = m.when(() => a.get() === 2, () => done.fail("1 should not finsih"), {
+    const d1 = mobx.when(() => a.get() === 2, () => done.fail("1 should not finsih"), {
         timeout: 100,
         onError: () => done.fail("1 should not timeout")
     })
 
-    const d2 = m.when(() => a.get() === 2, () => t.fail("2 should not finsih"), {
+    const d2 = mobx.when(() => a.get() === 2, () => t.fail("2 should not finsih"), {
         timeout: 200,
         onError: () => done.fail("2 should not timeout")
     })
@@ -267,10 +272,38 @@ test("whenWithTimeout should dispose", done => {
     d2()
 
     setTimeout(
-        m.action(() => {
+        mobx.action(() => {
             a.set(2)
             done()
         }),
         150
     )
+})
+
+describe("when opts requiresObservable", () => {
+    test("warn when no observable", () => {
+        utils.consoleWarn(() => {
+            const disposer = mobx.when(() => 2, {
+                requiresObservable: true
+            })
+
+            disposer.cancel()
+        }, /is created\/updated without reading any observable value/)
+    })
+
+    test("Don't warn when observable", () => {
+        const obsr = mobx.observable({
+            x: 1
+        })
+
+        const messages = utils.supressConsole(() => {
+            const disposer = mobx.when(() => obsr.x, {
+                requiresObservable: true
+            })
+
+            disposer.cancel()
+        })
+
+        expect(messages.length).toBe(0)
+    })
 })

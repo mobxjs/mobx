@@ -389,7 +389,7 @@ const arrayExtensions = {
             // so we deviate from the default and just make it an dervitation
             if (process.env.NODE_ENV !== "production") {
                 console.warn(
-                    "[mobx] `observableArray.reverse()` will not update the array in place. Use `observableArray.slice().reverse()` to supress this warning and perform the operation on a copy, or `observableArray.replace(observableArray.slice().reverse())` to reverse & update in place"
+                    "[mobx] `observableArray.reverse()` will not update the array in place. Use `observableArray.slice().reverse()` to suppress this warning and perform the operation on a copy, or `observableArray.replace(observableArray.slice().reverse())` to reverse & update in place"
                 )
             }
             const clone = (<any>this).slice()
@@ -401,7 +401,7 @@ const arrayExtensions = {
             // which goes against all good practices. Let's not change the array in place!
             if (process.env.NODE_ENV !== "production") {
                 console.warn(
-                    "[mobx] `observableArray.sort()` will not update the array in place. Use `observableArray.slice().sort()` to supress this warning and perform the operation on a copy, or `observableArray.replace(observableArray.slice().sort())` to sort & update in place"
+                    "[mobx] `observableArray.sort()` will not update the array in place. Use `observableArray.slice().sort()` to suppress this warning and perform the operation on a copy, or `observableArray.replace(observableArray.slice().sort())` to sort & update in place"
                 )
             }
             const clone = (<any>this).slice()
