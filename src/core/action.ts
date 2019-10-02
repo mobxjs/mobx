@@ -27,8 +27,11 @@ export function createAction(actionName: string, fn: Function, ref?: Object): Fu
         return executeAction(actionName, fn, ref || this, arguments)
     }
     ;(res as any).isMobxAction = true
-    if (process.env.NODE_ENV !== "production" && Object.getOwnPropertyDescriptor(res, "name").configurable) {
-        Object.defineProperty(res, "name", {value: actionName});
+    if (process.env.NODE_ENV !== "production") {
+        const descriptor = Object.getOwnPropertyDescriptor(res, "name");
+        if (descriptor && descriptor.configurable) {
+            Object.defineProperty(res, "name", {value: actionName});
+        }
     }
     return res as any
 }
