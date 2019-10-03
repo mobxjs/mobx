@@ -63,7 +63,7 @@
         data-chapter-title="API overview"
         data-filepath="refguide/api.md"
         data-basepath=".."
-        data-revision="Tue Sep 10 2019 14:16:40 GMT+0200 (CEST)"
+        data-revision="Thu Oct 03 2019 21:29:54 GMT+0200 (CEST)"
         data-innerlanguage="">
     
 
@@ -1064,7 +1064,8 @@ Returns a disposer function to cancel the side effect.</p>
 <li><strong><code>name?: string</code></strong>: A name for easier identification and debugging</li>
 <li><strong><code>delay?: number</code></strong>: the sideEffect will be delayed and debounced with the given <code>delay</code>. Defaults to <code>0</code>.</li>
 <li><strong><code>onError?: (error) =&gt; void</code></strong>: error handler that will be triggered if the autorun function throws an exception</li>
-<li><strong><code>scheduler?: (callback) =&gt; void</code></strong>: Set a custom scheduler to determine how re-running the autorun function should be scheduled</li>
+<li><strong><code>scheduler?: (callback) =&gt; void</code></strong>: Set a custom scheduler to determine how re-running the autorun function should be scheduled  </li>
+<li><strong><code>requiresObservable?: boolean</code></strong> Enables <a href="#reactionrequiresobservable-boolean"><code>reactionRequiresObservable</code></a> locally for the autorun</li>
 </ul>
 <h3 id="when"><code>when</code></h3>
 <p>Usage: <code>when(() =&gt; condition, () =&gt; { sideEffect }, options)</code>.
@@ -1079,6 +1080,7 @@ As soon as the expression returns true the sideEffect function will be invoked, 
 <li><strong><code>name?: string</code></strong>: A name for easier identification and debugging</li>
 <li><strong><code>onError?: (error) =&gt; void</code></strong>: error handler that will be triggered if the <em>predicate-function</em> or the <em>effect-function</em> throws an exception</li>
 <li><strong><code>timeout: number</code></strong> a timeout in milliseconds, after which the <code>onError</code> handler will be triggered to signal the condition not being met within a certain time</li>
+<li><strong><code>requiresObservable?: boolean</code></strong> Enables <a href="#reactionrequiresobservable-boolean"><code>reactionRequiresObservable</code></a> locally for the when</li>
 </ul>
 <h3 id="reaction"><code>reaction</code></h3>
 <p>Usage: <code>reaction(() =&gt; data, data =&gt; { sideEffect }, options)</code>.
@@ -1093,6 +1095,7 @@ The side effect can be debounced, just like <code>autorunAsync</code>.</p>
 <li><strong><code>delay?: number</code></strong>: the sideEffect will be delayed and debounced with the given <code>delay</code>. Defaults to <code>0</code>.</li>
 <li><strong><code>equals</code></strong>: Custom equality function to determine whether the expr function differed from it&apos;s previous result, and hence should fire effect. Accepts the same options as the equals option of <code>computed</code>.</li>
 <li>Also accepts all of the options from <a href="#autorun"><code>autorun</code></a></li>
+<li><strong><code>requiresObservable?: boolean</code></strong> Enables <a href="#reactionrequiresobservable-boolean"><code>reactionRequiresObservable</code></a> locally for the reaction</li>
 </ul>
 <h3 id="onreactionerror"><code>onReactionError</code></h3>
 <p>Usage: <code>onReactionError(handler: (error: any, derivation) =&gt; void)</code></p>
@@ -1196,6 +1199,14 @@ See also <code>observable</code>.</p>
 <p>Forbids the access of any unobserved computed value.
 Use this if you want to check whether you are using computed properties without a reactive context.</p>
 <pre><code class="lang-javascript">configure({ computedRequiresReaction: <span class="hljs-literal">true</span> });
+</code></pre>
+<h4 id="observablerequiresreaction-boolean"><code>observableRequiresReaction: boolean</code></h4>
+<p>Warns about any unobserved observable access.<br>Use this if you want to check whether you are using observables without a reactive context (eg not inside an autorun, action, or react component without observer wrapping).</p>
+<pre><code class="lang-javascript">configure({ observableRequiresReaction: <span class="hljs-literal">true</span> });
+</code></pre>
+<h4 id="reactionrequiresobservable-boolean"><code>reactionRequiresObservable: boolean</code></h4>
+<p>Warns when a reaction (eg <code>autorun</code>) is created without any observable access.<br>Use this to check whether you are unneededly wrapping react components with <code>observer</code>, or to find possible related bugs.</p>
+<pre><code class="lang-javascript">configure({ reactionRequiresObservable: <span class="hljs-literal">true</span> });
 </code></pre>
 <h4 id="computedconfigurable-boolean"><code>computedConfigurable: boolean</code></h4>
 <p>Allows overwriting computed values. This is useful for testing purposes <em>only</em>. Don&apos;t enable this
