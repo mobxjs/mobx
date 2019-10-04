@@ -1,3 +1,5 @@
+* Fixed a possible issue with action stack errors and multiple mobx versions installed at the same time [#2135](https://github.com/mobxjs/mobx/issues/2135).
+
 # 5.14.0 / 4.14.0
 
 * Added experimental `reactionRequiresObservable` & `observableRequiresReaction` config [#2079](https://github.com/mobxjs/mobx/pull/2079), [Docs](https://github.com/mobxjs/mobx/pull/2082)
