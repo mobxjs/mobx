@@ -1,0 +1,243 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Writing asynchronous actions · MobX</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="# Writing asynchronous actions"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Writing asynchronous actions · MobX"/><meta property="og:type" content="website"/><meta property="og:url" content="https://mobx.js.org//"/><meta property="og:description" content="# Writing asynchronous actions"/><meta property="og:image" content="https://mobx.js.org/img/undraw_online.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://mobx.js.org/img/undraw_tweetstorm.svg"/><link rel="shortcut icon" href="/img/favicon.png"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script>
+              (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+              (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+              m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+              })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+              ga('create', 'UA-65632006-1', 'auto');
+              ga('send', 'pageview');
+            </script><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script type="text/javascript" src="https://codefund.app/properties/259/funder.js" async=""></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><img class="logo" src="/img/mobx.png" alt="MobX"/><h2 class="headerTitleWithLogo">MobX</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/intro/concepts" target="_self">Documentation</a></li><li class=""><a href="https://github.com/mobxjs/mobx" target="_self">Github</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Changing observables</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Introduction</h3><ul class=""><li class="navListItem"><a class="navItem" href="/README">Introduction</a></li><li class="navListItem"><a class="navItem" href="/intro/concepts">Concepts &amp; Principles</a></li><li class="navListItem"><a class="navItem" href="/intro/overview">The gist of MobX</a></li><li class="navListItem"><a class="navItem" href="/refguide/api">API overview</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Making things observable</h3><ul class=""><li class="navListItem"><a class="navItem" href="/refguide/observable">observable</a></li><li class="navListItem"><a class="navItem" href="/refguide/observable-decorator">@observable</a></li><li class="navListItem"><a class="navItem" href="/refguide/object">objects</a></li><li class="navListItem"><a class="navItem" href="/refguide/array">arrays</a></li><li class="navListItem"><a class="navItem" href="/refguide/map">maps</a></li><li class="navListItem"><a class="navItem" href="/refguide/boxed">boxed values</a></li><li class="navListItem"><a class="navItem" href="/refguide/modifiers">decorators</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Reacting to observables</h3><ul class=""><li class="navListItem"><a class="navItem" href="/refguide/computed-decorator">(@)computed</a></li><li class="navListItem"><a class="navItem" href="/refguide/autorun">autorun</a></li><li class="navListItem"><a class="navItem" href="/refguide/when">when</a></li><li class="navListItem"><a class="navItem" href="/refguide/reaction">reaction</a></li><li class="navListItem"><a class="navItem" href="/refguide/observer-component">(@)observer</a></li><li class="navListItem"><a class="navItem" href="/best/react">Understanding what MobX reacts to</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Changing observables</h3><ul class=""><li class="navListItem"><a class="navItem" href="/refguide/action">action</a></li><li class="navListItem navListItemActive"><a class="navItem" href="/best/actions">async actions &amp; flows</a></li><li class="navListItem"><a class="navItem" href="/refguide/object-api">Object api</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Utility functions</h3><ul class=""><li class="navListItem"><a class="navItem" href="/refguide/tojson">toJS</a></li><li class="navListItem"><a class="navItem" href="/refguide/extend-observable">extendObservable</a></li><li class="navListItem"><a class="navItem" href="/refguide/extending">createAtom</a></li><li class="navListItem"><a class="navItem" href="/refguide/observe">intercept &amp; observe</a></li><li class="navListItem"><a class="navItem" href="/refguide/create-transformer">mobxUtils.createTransformer</a></li><li class="navListItem"><a class="navItem" href="/refguide/expr">mobxUtils.expr</a></li><li class="navListItem"><a class="navItem" href="/refguide/mobx-utils">MobX-utils</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Tips &amp; Tricks</h3><ul class=""><li class="navListItem"><a class="navItem" href="/faq/faq">Frequently Asked Questions</a></li><li class="navListItem"><a class="navItem" href="/best/pitfalls">Common Pitfalls &amp; Best Practices</a></li><li class="navListItem"><a class="navItem" href="/best/decorators">How to (not) use decorator syntax</a></li><li class="navListItem"><a class="navItem" href="/best/trace">Using trace for debugging</a></li><li class="navListItem"><a class="navItem" href="/best/store">Defining data stores</a></li><li class="navListItem"><a class="navItem" href="/best/react-performance">Optimizing React components</a></li><li class="navListItem"><a class="navItem" href="/refguide/spy">spy</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer"><div class="wrapper"><div class="post"><header class="postHeader"><a class="edit-page-link button" href="https://github.com/mobxjs/mobx/edit/master/docs/best/actions.md" target="_blank" rel="noreferrer noopener">Edit</a></header><article><div><span><h1><a class="anchor" aria-hidden="true" id="writing-asynchronous-actions"></a><a href="#writing-asynchronous-actions" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Writing asynchronous actions</h1>
+<div id='codefund' ></div>
+<p>The <code>action</code> wrapper / decorator only affects the currently running function, not functions that are scheduled (but not invoked) by the current function!
+This means that if you have a <code>setTimeout</code>, promise<code>.then</code> or <code>async</code> construction, and in that callback some more state is changed, those callbacks should be wrapped in <code>action</code> as well! There are several ways to create asynchronous actions. No approach is strictly better than the other, but this section just list different approaches you can take to writing asynchronous code.
+Let's start with a basic example:</p>
+<h3><a class="anchor" aria-hidden="true" id="promises"></a><a href="#promises" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Promises</h3>
+<pre><code class="hljs css language-javascript">mobx.configure({ <span class="hljs-attr">enforceActions</span>: <span class="hljs-string">"observed"</span> }) <span class="hljs-comment">// don't allow state modifications outside actions</span>
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Store</span> </span>{
+    @observable githubProjects = []
+    @observable state = <span class="hljs-string">"pending"</span> <span class="hljs-comment">// "pending" / "done" / "error"</span>
+
+    @action
+    fetchProjects() {
+        <span class="hljs-keyword">this</span>.githubProjects = []
+        <span class="hljs-keyword">this</span>.state = <span class="hljs-string">"pending"</span>
+        fetchGithubProjectsSomehow().then(
+            <span class="hljs-function"><span class="hljs-params">projects</span> =&gt;</span> {
+                <span class="hljs-keyword">const</span> filteredProjects = somePreprocessing(projects)
+                <span class="hljs-keyword">this</span>.githubProjects = filteredProjects
+                <span class="hljs-keyword">this</span>.state = <span class="hljs-string">"done"</span>
+            },
+            error =&gt; {
+                <span class="hljs-keyword">this</span>.state = <span class="hljs-string">"error"</span>
+            }
+        )
+    }
+}
+</code></pre>
+<p>The above example would throw exceptions, as the callbacks passed to the <code>fetchGithubProjectsSomehow</code> promise are not part of the <code>fetchProjects</code> action, as actions only apply to the current stack.</p>
+<p>A first simple fix is to extract the callbacks to actions. (Note that binding using <code>action.bound</code> is important here to get a correct <code>this</code>!):</p>
+<pre><code class="hljs css language-javascript">mobx.configure({ <span class="hljs-attr">enforceActions</span>: <span class="hljs-string">"observed"</span> })
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Store</span> </span>{
+    @observable githubProjects = []
+    @observable state = <span class="hljs-string">"pending"</span> <span class="hljs-comment">// "pending" / "done" / "error"</span>
+
+    @action
+    fetchProjects() {
+        <span class="hljs-keyword">this</span>.githubProjects = []
+        <span class="hljs-keyword">this</span>.state = <span class="hljs-string">"pending"</span>
+        fetchGithubProjectsSomehow().then(<span class="hljs-keyword">this</span>.fetchProjectsSuccess, <span class="hljs-keyword">this</span>.fetchProjectsError)
+    }
+
+    @action.bound
+    fetchProjectsSuccess(projects) {
+        <span class="hljs-keyword">const</span> filteredProjects = somePreprocessing(projects)
+        <span class="hljs-keyword">this</span>.githubProjects = filteredProjects
+        <span class="hljs-keyword">this</span>.state = <span class="hljs-string">"done"</span>
+    }
+
+    @action.bound
+    fetchProjectsError(error) {
+        <span class="hljs-keyword">this</span>.state = <span class="hljs-string">"error"</span>
+    }
+}
+</code></pre>
+<p>Although this is clean and explicit, it might get a bit verbose with complex async flows. Alternative, you can wrap the promise callbacks with the <code>action</code> keyword. It is recommended, but not mandatory, to give them a name as well:</p>
+<pre><code class="hljs css language-javascript">mobx.configure({ <span class="hljs-attr">enforceActions</span>: <span class="hljs-string">"observed"</span> })
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Store</span> </span>{
+    @observable githubProjects = []
+    @observable state = <span class="hljs-string">"pending"</span> <span class="hljs-comment">// "pending" / "done" / "error"</span>
+
+    @action
+    fetchProjects() {
+        <span class="hljs-keyword">this</span>.githubProjects = []
+        <span class="hljs-keyword">this</span>.state = <span class="hljs-string">"pending"</span>
+        fetchGithubProjectsSomehow().then(
+            <span class="hljs-comment">// inline created action</span>
+            action(<span class="hljs-string">"fetchSuccess"</span>, projects =&gt; {
+                <span class="hljs-keyword">const</span> filteredProjects = somePreprocessing(projects)
+                <span class="hljs-keyword">this</span>.githubProjects = filteredProjects
+                <span class="hljs-keyword">this</span>.state = <span class="hljs-string">"done"</span>
+            }),
+            <span class="hljs-comment">// inline created action</span>
+            action(<span class="hljs-string">"fetchError"</span>, error =&gt; {
+                <span class="hljs-keyword">this</span>.state = <span class="hljs-string">"error"</span>
+            })
+        )
+    }
+}
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="the-runinaction-utility"></a><a href="#the-runinaction-utility" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>The <code>runInAction</code> utility</h3>
+<p>A downside of inline actions is that TypeScript does not apply type inference on them, so you would have type all your callbacks.
+Instead of creating an action for the entire callback, you can also run only the state modifying part of the callback in an action.
+The advantage of this pattern is that it encourages you to not litter the place with <code>action</code>, but rather put all the state modifications as much as possible at the end of the whole process:</p>
+<pre><code class="hljs css language-javascript">mobx.configure({ <span class="hljs-attr">enforceActions</span>: <span class="hljs-string">"observed"</span> })
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Store</span> </span>{
+    @observable githubProjects = []
+    @observable state = <span class="hljs-string">"pending"</span> <span class="hljs-comment">// "pending" / "done" / "error"</span>
+
+    @action
+    fetchProjects() {
+        <span class="hljs-keyword">this</span>.githubProjects = []
+        <span class="hljs-keyword">this</span>.state = <span class="hljs-string">"pending"</span>
+        fetchGithubProjectsSomehow().then(
+            <span class="hljs-function"><span class="hljs-params">projects</span> =&gt;</span> {
+                <span class="hljs-keyword">const</span> filteredProjects = somePreprocessing(projects)
+                <span class="hljs-comment">// put the 'final' modification in an anonymous action</span>
+                runInAction(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+                    <span class="hljs-keyword">this</span>.githubProjects = filteredProjects
+                    <span class="hljs-keyword">this</span>.state = <span class="hljs-string">"done"</span>
+                })
+            },
+            error =&gt; {
+                <span class="hljs-comment">// the alternative ending of this process:...</span>
+                runInAction(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+                    <span class="hljs-keyword">this</span>.state = <span class="hljs-string">"error"</span>
+                })
+            }
+        )
+    }
+}
+</code></pre>
+<p>Note that <code>runInAction</code>'s can also be given a name as first argument. <code>runInAction(f)</code> is in fact just sugar for <code>action(f)()</code></p>
+<h3><a class="anchor" aria-hidden="true" id="async-await"></a><a href="#async-await" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>async / await</h3>
+<p>Async / await based functions can initially seem confusing when starting with actions.
+Because lexically they appear to synchronous functions, it gives the impression that <code>@action</code> applies to the entire function.
+Which is of course not the case, as async / await is just syntactic sugar around a promise based process.
+As a result, <code>@action</code> only applies to the code block until the first <code>await</code>.
+And after each <code>await</code> a new asynchronous function is started, so after each <code>await</code>, state modifying code should be wrapped as action.
+This is where <code>runInAction</code> comes in handy again:</p>
+<pre><code class="hljs css language-javascript">mobx.configure({ <span class="hljs-attr">enforceActions</span>: <span class="hljs-string">"observed"</span> })
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Store</span> </span>{
+    @observable githubProjects = []
+    @observable state = <span class="hljs-string">"pending"</span> <span class="hljs-comment">// "pending" / "done" / "error"</span>
+
+    @action
+    <span class="hljs-keyword">async</span> fetchProjects() {
+        <span class="hljs-keyword">this</span>.githubProjects = []
+        <span class="hljs-keyword">this</span>.state = <span class="hljs-string">"pending"</span>
+        <span class="hljs-keyword">try</span> {
+            <span class="hljs-keyword">const</span> projects = <span class="hljs-keyword">await</span> fetchGithubProjectsSomehow()
+            <span class="hljs-keyword">const</span> filteredProjects = somePreprocessing(projects)
+            <span class="hljs-comment">// after await, modifying state again, needs an actions:</span>
+            runInAction(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+                <span class="hljs-keyword">this</span>.state = <span class="hljs-string">"done"</span>
+                <span class="hljs-keyword">this</span>.githubProjects = filteredProjects
+            })
+        } <span class="hljs-keyword">catch</span> (error) {
+            runInAction(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+                <span class="hljs-keyword">this</span>.state = <span class="hljs-string">"error"</span>
+            })
+        }
+    }
+}
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="flows"></a><a href="#flows" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>flows</h3>
+<p>However, a nicer approach is to use the built-in concept of <code>flow</code>s. They use generators. Which might look scary in the beginning, but it works the same as <code>async</code> / <code>await</code>. Just use <code>function *</code> instead of <code>async</code> and <code>yield</code> instead of <code>await</code>.
+The advantage of <code>flow</code> is that it is syntactically very close to async / await (with different keywords), and no manually action wrapping is needed for async parts, resulting in very clean code.</p>
+<p><code>flow</code> can be used only as function and not as decorator.
+<code>flow</code> integrates neatly with MobX development tools, so that it is easy to trace the process of the async function.</p>
+<pre><code class="hljs css language-javascript">mobx.configure({ <span class="hljs-attr">enforceActions</span>: <span class="hljs-string">"observed"</span> })
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Store</span> </span>{
+    @observable githubProjects = []
+    @observable state = <span class="hljs-string">"pending"</span>
+
+    fetchProjects = flow(<span class="hljs-function"><span class="hljs-keyword">function</span> * (<span class="hljs-params"></span>) </span>{ <span class="hljs-comment">// &lt;- note the star, this a generator function!</span>
+        <span class="hljs-keyword">this</span>.githubProjects = []
+        <span class="hljs-keyword">this</span>.state = <span class="hljs-string">"pending"</span>
+        <span class="hljs-keyword">try</span> {
+            <span class="hljs-keyword">const</span> projects = <span class="hljs-keyword">yield</span> fetchGithubProjectsSomehow() <span class="hljs-comment">// yield instead of await</span>
+            <span class="hljs-keyword">const</span> filteredProjects = somePreprocessing(projects)
+            <span class="hljs-comment">// the asynchronous blocks will automatically be wrapped in actions and can modify state</span>
+            <span class="hljs-keyword">this</span>.state = <span class="hljs-string">"done"</span>
+            <span class="hljs-keyword">this</span>.githubProjects = filteredProjects
+        } <span class="hljs-keyword">catch</span> (error) {
+            <span class="hljs-keyword">this</span>.state = <span class="hljs-string">"error"</span>
+        }
+    })
+}
+</code></pre>
+<h4><a class="anchor" aria-hidden="true" id="flows-can-be-cancelled"></a><a href="#flows-can-be-cancelled" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Flows can be cancelled</h4>
+<p>Flows are cancellable, that means that you can call <code>cancel()</code> on the returned promise. This will stop the generator immediately, but any finally clause will still be processed. The returned promise itself will reject with <code>FLOW_CANCELLED</code>.</p>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/refguide/action"><span class="arrow-prev">← </span><span>action</span></a><a class="docs-next button" href="/refguide/object-api"><span>Object api</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/mobx.png" alt="MobX" width="66" height="58"/></a><div><h5>Docs</h5><a href="/en/README">Why MobX</a><a href="/en/intro/concepts">Concepts</a></div><div><h5>Community</h5><a href="https://stackoverflow.com/questions/tagged/mobx" target="_blank" rel="noreferrer noopener">Stack Overflow</a><a href="https://gitter.im/mobxjs/mobx">Project Chat</a></div><div><h5>More</h5><a class="github-button" href="https://github.com/mobxjs/mobx" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section></footer></div></body></html>

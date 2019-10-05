@@ -1,0 +1,648 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>MobX Api Reference · MobX</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="# MobX Api Reference"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="MobX Api Reference · MobX"/><meta property="og:type" content="website"/><meta property="og:url" content="https://mobx.js.org//"/><meta property="og:description" content="# MobX Api Reference"/><meta property="og:image" content="https://mobx.js.org/img/undraw_online.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://mobx.js.org/img/undraw_tweetstorm.svg"/><link rel="shortcut icon" href="/img/favicon.png"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script>
+              (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+              (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+              m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+              })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+              ga('create', 'UA-65632006-1', 'auto');
+              ga('send', 'pageview');
+            </script><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script type="text/javascript" src="https://codefund.app/properties/259/funder.js" async=""></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><img class="logo" src="/img/mobx.png" alt="MobX"/><h2 class="headerTitleWithLogo">MobX</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/intro/concepts" target="_self">Documentation</a></li><li class=""><a href="https://github.com/mobxjs/mobx" target="_self">Github</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Introduction</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Introduction</h3><ul class=""><li class="navListItem"><a class="navItem" href="/README">Introduction</a></li><li class="navListItem"><a class="navItem" href="/intro/concepts">Concepts &amp; Principles</a></li><li class="navListItem"><a class="navItem" href="/intro/overview">The gist of MobX</a></li><li class="navListItem navListItemActive"><a class="navItem" href="/refguide/api">API overview</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Making things observable</h3><ul class=""><li class="navListItem"><a class="navItem" href="/refguide/observable">observable</a></li><li class="navListItem"><a class="navItem" href="/refguide/observable-decorator">@observable</a></li><li class="navListItem"><a class="navItem" href="/refguide/object">objects</a></li><li class="navListItem"><a class="navItem" href="/refguide/array">arrays</a></li><li class="navListItem"><a class="navItem" href="/refguide/map">maps</a></li><li class="navListItem"><a class="navItem" href="/refguide/boxed">boxed values</a></li><li class="navListItem"><a class="navItem" href="/refguide/modifiers">decorators</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Reacting to observables</h3><ul class=""><li class="navListItem"><a class="navItem" href="/refguide/computed-decorator">(@)computed</a></li><li class="navListItem"><a class="navItem" href="/refguide/autorun">autorun</a></li><li class="navListItem"><a class="navItem" href="/refguide/when">when</a></li><li class="navListItem"><a class="navItem" href="/refguide/reaction">reaction</a></li><li class="navListItem"><a class="navItem" href="/refguide/observer-component">(@)observer</a></li><li class="navListItem"><a class="navItem" href="/best/react">Understanding what MobX reacts to</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Changing observables</h3><ul class=""><li class="navListItem"><a class="navItem" href="/refguide/action">action</a></li><li class="navListItem"><a class="navItem" href="/best/actions">async actions &amp; flows</a></li><li class="navListItem"><a class="navItem" href="/refguide/object-api">Object api</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Utility functions</h3><ul class=""><li class="navListItem"><a class="navItem" href="/refguide/tojson">toJS</a></li><li class="navListItem"><a class="navItem" href="/refguide/extend-observable">extendObservable</a></li><li class="navListItem"><a class="navItem" href="/refguide/extending">createAtom</a></li><li class="navListItem"><a class="navItem" href="/refguide/observe">intercept &amp; observe</a></li><li class="navListItem"><a class="navItem" href="/refguide/create-transformer">mobxUtils.createTransformer</a></li><li class="navListItem"><a class="navItem" href="/refguide/expr">mobxUtils.expr</a></li><li class="navListItem"><a class="navItem" href="/refguide/mobx-utils">MobX-utils</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Tips &amp; Tricks</h3><ul class=""><li class="navListItem"><a class="navItem" href="/faq/faq">Frequently Asked Questions</a></li><li class="navListItem"><a class="navItem" href="/best/pitfalls">Common Pitfalls &amp; Best Practices</a></li><li class="navListItem"><a class="navItem" href="/best/decorators">How to (not) use decorator syntax</a></li><li class="navListItem"><a class="navItem" href="/best/trace">Using trace for debugging</a></li><li class="navListItem"><a class="navItem" href="/best/store">Defining data stores</a></li><li class="navListItem"><a class="navItem" href="/best/react-performance">Optimizing React components</a></li><li class="navListItem"><a class="navItem" href="/refguide/spy">spy</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer"><div class="wrapper"><div class="post"><header class="postHeader"><a class="edit-page-link button" href="https://github.com/mobxjs/mobx/edit/master/docs/refguide/api.md" target="_blank" rel="noreferrer noopener">Edit</a></header><article><div><span><h1><a class="anchor" aria-hidden="true" id="mobx-api-reference"></a><a href="#mobx-api-reference" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>MobX Api Reference</h1>
+<div id='codefund' ></div>
+<p><strong>Applies to MobX 4 and higher</strong></p>
+<ul>
+<li>Using Mobx 3? Use this <a href="https://github.com/mobxjs/mobx/wiki/Migrating-from-mobx-3-to-mobx-4">migration guide</a> to switch gears.</li>
+<li><a href="https://github.com/mobxjs/mobx/blob/54557dc319b04e92e31cb87427bef194ec1c549c/docs/refguide/api.md">MobX 3 documentation</a></li>
+<li>For MobX 2, the old documentation is still available on <a href="https://github.com/mobxjs/mobx/blob/7c9e7c86e0c6ead141bb0539d33143d0e1f576dd/docs/refguide/api.md">github</a>.</li>
+</ul>
+<h1><a class="anchor" aria-hidden="true" id="core-api"></a><a href="#core-api" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Core API</h1>
+<p><em>These are the most important MobX API's.</em></p>
+<blockquote>
+<p>Understanding <code>observable</code>, <code>computed</code>, <code>reaction</code> and <code>action</code> is enough
+to master MobX and use it in your applications!</p>
+</blockquote>
+<h2><a class="anchor" aria-hidden="true" id="creating-observables"></a><a href="#creating-observables" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Creating observables</h2>
+<h3><a class="anchor" aria-hidden="true" id="observablevalue"></a><a href="#observablevalue" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>observable(value)</code></h3>
+<p>Usage:</p>
+<ul>
+<li><code>observable(value)</code></li>
+<li><code>@observable classProperty = value</code></li>
+</ul>
+<p>Observable values can be JS primitives, references, plain objects, class instances, arrays and maps.</p>
+<p><strong>Note:</strong> <code>observable(value)</code> is a convenience API that will succeed only if it can be made into
+an observable data structure (<em>Array</em>, <em>Map</em>, or <em>observable-object</em>). For all other values, no conversion will be performed.</p>
+<p>You can also directly create the desired observable type, see below.</p>
+<p>The following conversion rules are applied, but can be fine-tuned by using <a href="#decorators"><em>decorators</em></a>. See below.</p>
+<ol>
+<li>If <em>value</em> is an instance of an <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map">ES6 Map</a>: a new <a href="/refguide/map">Observable Map</a> will be returned. Observable maps are very useful if you don't want to react just to the change of a specific entry, but also to the addition or removal of entries.</li>
+<li>If <em>value</em> is an array, a new <a href="/refguide/array">Observable Array</a> will be returned.</li>
+<li>If <em>value</em> is an object <em>without</em> prototype or its prototype is <code>Object.prototype</code>, the object will be cloned and all its current properties will be made observable. See <a href="/refguide/object">Observable Object</a></li>
+<li>If <em>value</em> is an object <em>with</em> a prototype, a JavaScript primitive or function, there will be no change made to the value. If you do need a <a href="/refguide/boxed">Boxed Observable</a>, you can do one of the following:
+<ul>
+<li>Call <code>observable.box(value)</code> explicitly</li>
+<li>Use <code>@observable</code> in the class definition</li>
+<li>Call <a href="#decorate"><code>decorate()</code></a></li>
+<li>Use <code>extendObservable()</code> to introduce properties on a class definition</li>
+</ul></li>
+</ol>
+<p>MobX will not make objects with a prototype automatically observable; as that is the responsibility of its constructor function. Use <code>extendObservable</code> in the constructor, or <code>@observable</code> in its class definition instead.</p>
+<p>These rules might seem complicated at first sight, but you will notice that in practice they are very intuitive to work with.</p>
+<p><strong>Some notes:</strong></p>
+<ul>
+<li>To use the <code>@observable</code> decorator, make sure that <a href="http://mobxjs.github.io/mobx/refguide/observable-decorator.html">decorators are enabled</a> in your transpiler (babel or typescript).</li>
+<li>By default making a data structure observable is <em>infective</em>; that means that <code>observable</code> is applied automatically to any value that is contained by the data structure, or will be contained by the data structure in the future. This behavior can be changed by using <a href="#decorators"><em>decorators</em></a>.</li>
+<li><em>[MobX 4 and below]</em> To create dynamically keyed objects, always use maps! Only initially existing properties on an object will be made observable, although new ones can be added using <code>extendObservable</code>.</li>
+</ul>
+<p><a href="/refguide/observable">«<code>observable</code>»</a>  —  <a href="/refguide/observable-decorator">«<code>@observable</code>»</a></p>
+<h3><a class="anchor" aria-hidden="true" id="observable-property-value"></a><a href="#observable-property-value" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>@observable property = value</code></h3>
+<p><code>observable</code> can also be used as property decorator. It requires <a href="/best/decorators">decorators to be enabled</a> and is syntactic
+sugar for <code>extendObservable(this, { property: value })</code>.</p>
+<p><a href="/refguide/observable-decorator">«<code>details</code>»</a></p>
+<h3><a class="anchor" aria-hidden="true" id="observableboxvalue-options"></a><a href="#observableboxvalue-options" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>observable.box(value, options?)</code></h3>
+<p>Creates an observable <em>box</em> that stores an observable reference to a value. Use <code>get()</code> to get the current value of the box, and <code>set()</code> to update it.
+This is the foundation on which all other observables are built, but in practice you will use it rarely.</p>
+<p>Normal boxes will automatically try to turn any new value into an observable if it isn't already. Use the <code>{deep: false}</code> option to disable this behavior.</p>
+<p><a href="/refguide/boxed">«<code>details</code>»</a></p>
+<h3><a class="anchor" aria-hidden="true" id="observableobjectvalue-decorators-options"></a><a href="#observableobjectvalue-decorators-options" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>observable.object(value, decorators?, options?)</code></h3>
+<p>Creates a clone of the provided object and makes all its properties observable.
+By default any values in those properties will be made observable as well, but when using the <code>{deep: false}</code> options, only the properties will be made into observable
+references, leaving the values untouched. (This holds also for any values assigned in the future).</p>
+<p>The second argument in <code>observable.object()</code> can be used to fine tune the observability with <a href="#decorators"><code>decorators</code></a>.</p>
+<p><a href="/refguide/object">«<code>details</code>»</a></p>
+<h3><a class="anchor" aria-hidden="true" id="observablearrayvalue-options"></a><a href="#observablearrayvalue-options" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>observable.array(value, options?)</code></h3>
+<p>Creates a new observable array based on the provided value.</p>
+<p>Use the <code>{deep: false}</code> option if the values in the array should not be turned into observables.</p>
+<p><a href="/refguide/array">«<code>details</code>»</a></p>
+<h3><a class="anchor" aria-hidden="true" id="observablemapvalue-options"></a><a href="#observablemapvalue-options" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>observable.map(value, options?)</code></h3>
+<p>Creates a new observable map based on the provided value. Use the <code>{deep: false}</code> option if the values in the map should not be turned into observables.</p>
+<p>Use <code>map</code> whenever you want to create a dynamically keyed collections and the addition / removal of keys needs to be observed.
+Since this uses the full-blown <em>ES6 Map</em> internally, you are free to use any type for the key and <em>not limited</em> to string keys.</p>
+<p><a href="/refguide/map">«<code>details</code>»</a></p>
+<h3><a class="anchor" aria-hidden="true" id="observablesetvalue-options"></a><a href="#observablesetvalue-options" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>observable.set(value, options?)</code></h3>
+<p>Creates a new observable map based on the provided value. Use the <code>{deep: false}</code> option if the values in the map should not be turned into observables.</p>
+<p>Use <code>set</code> whenever you want to create a dynamic set where the addition / removal of values needs to be observed, and where values can appear only once in the collection.
+Note that your browser needs to support ES6 sets, or polyfill them, to make sets work.</p>
+<p>The api is further the same as the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set">ES6 set api</a></p>
+<h3><a class="anchor" aria-hidden="true" id="extendobservable"></a><a href="#extendobservable" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>extendObservable</code></h3>
+<p>Usage: <code>extendObservable(target, properties, decorators?, options?)</code>.</p>
+<p>For each key/value pair in each <code>properties</code> a (new) observable property will be introduced on the target object.
+This can be used in constructor functions to introduce observable properties without using decorators.
+If a value of the <code>properties</code> is a getter function, a <em>computed</em> property will be introduced.</p>
+<p>Use <code>extendObservable(target, properties, decorators?, {deep: false})</code> if the new properties should not be infective (that is; newly assigned values should not be turned into observables automatically).
+Note that <code>extendObservable</code> enhances existing objects, unlike <code>observable.object</code> which creates a new object.</p>
+<p><a href="/refguide/extend-observable">«details»</a></p>
+<h3><a class="anchor" aria-hidden="true" id="decorators"></a><a href="#decorators" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Decorators</h3>
+<p>Use decorators to fine tune the observability of properties defined via <code>observable</code>, <code>extendObservable</code> and <code>observable.object</code>. They can also control the auto-conversion rules for specific properties.</p>
+<p>The following decorators are available:</p>
+<ul>
+<li><strong><code>observable.deep</code></strong>: This is the default decorator, used by any observable. It converts any assigned, non-primitive value into an observable if it isn't one yet.</li>
+<li><strong><code>observable.ref</code></strong>: Disables automatic observable conversion, just creates an observable reference instead.</li>
+<li><strong><code>observable.shallow</code></strong>: Can only be used in combination with collections. Turns any assigned collection into a collection, which is shallowly observable (instead of deep). In other words; the values inside the collection won't become observables automatically.</li>
+<li><strong><code>computed</code></strong>: Creates a derived property, see <a href="/refguide/computed-decorator"><code>computed</code></a></li>
+<li><strong><code>action</code></strong>: Creates an action, see <a href="/refguide/action"><code>action</code></a></li>
+<li><strong><code>action.bound</code></strong>: Creates a bound action, see <a href="/refguide/action"><code>action</code></a></li>
+</ul>
+<p>You can apply these decorators using the <em>@decorator</em> syntax:</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> {observable, action} <span class="hljs-keyword">from</span> <span class="hljs-string">'mobx'</span>;
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TaskStore</span> </span>{
+    @observable.shallow tasks = []
+    @action addTask(task) { <span class="hljs-comment">/* ... */</span> }
+}
+</code></pre>
+<p>Or by passing in property decorators via <code>observable.object</code> / <code>observable.extendObservable</code> or <a href="#decorate"><code>decorate()</code></a>.
+Note that decorators always 'stick' to the property. So they will remain in effect even if a new value is assigned.</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> {observable, action} <span class="hljs-keyword">from</span> <span class="hljs-string">'mobx'</span>;
+
+<span class="hljs-keyword">const</span> taskStore = observable({
+    <span class="hljs-attr">tasks</span>: [],
+    addTask(task) { <span class="hljs-comment">/* ... */</span> }
+}, {
+    <span class="hljs-attr">tasks</span>: observable.shallow,
+    <span class="hljs-attr">addTask</span>: action
+})
+</code></pre>
+<p><a href="/refguide/modifiers">«details»</a></p>
+<h3><a class="anchor" aria-hidden="true" id="decorate"></a><a href="#decorate" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>decorate</code></h3>
+<p>Usage: <code>decorate(object, decorators)</code>
+This is a convenience method to apply observability <a href="#decorators">decorators</a> to the properties of a plain object or class instance. The second argument is an object with properties set to certain decorators.</p>
+<p>Use this if you cannot use the <em>@decorator</em> syntax or need more control over setting observability.</p>
+<pre><code class="hljs css language-js"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TodoList</span> </span>{
+    todos = {}
+    <span class="hljs-keyword">get</span> unfinishedTodoCount() {
+        <span class="hljs-keyword">return</span> values(<span class="hljs-keyword">this</span>.todos).filter(<span class="hljs-function"><span class="hljs-params">todo</span> =&gt;</span> !todo.finished).length
+    }
+    addTodo() {
+        <span class="hljs-keyword">const</span> t = <span class="hljs-keyword">new</span> Todo()
+        t.title = <span class="hljs-string">'Test_'</span> + <span class="hljs-built_in">Math</span>.random()
+        <span class="hljs-keyword">set</span>(this.todos, t.id, t)
+    }
+}
+
+decorate(TodoList, {
+    todos: observable,
+    <span class="hljs-attr">unfinishedTodoCount</span>: computed,
+    <span class="hljs-attr">addTodo</span>: action.bound
+})
+</code></pre>
+<p>For applying multiple decorators on a single property, you can pass an array of decorators. The decorators application order is from right to left.</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { decorate, observable } <span class="hljs-keyword">from</span> <span class="hljs-string">'mobx'</span>
+<span class="hljs-keyword">import</span> { serializable, primitive } <span class="hljs-keyword">from</span> <span class="hljs-string">'serializr'</span>
+<span class="hljs-keyword">import</span> persist <span class="hljs-keyword">from</span> <span class="hljs-string">'mobx-persist'</span>
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Todo</span> </span>{
+    id = <span class="hljs-built_in">Math</span>.random();
+    title = <span class="hljs-string">''</span>;
+    finished = <span class="hljs-literal">false</span>;
+}
+
+decorate(Todo, {
+    <span class="hljs-attr">title</span>: [serializable(primitive), persist(<span class="hljs-string">'object'</span>), observable],
+    <span class="hljs-attr">finished</span>: [serializable(primitive), observable]
+})
+</code></pre>
+<p>Note: Not all decorators can be composed together, and this functionality is just best-effort. Some decorators affect the instance directly and can 'hide' the effect of other decorators that only change the prototype.</p>
+<h2><a class="anchor" aria-hidden="true" id="computed-values"></a><a href="#computed-values" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Computed values</h2>
+<p>Usage:</p>
+<ul>
+<li><code>computed(() =&gt; expression)</code></li>
+<li><code>computed(() =&gt; expression, (newValue) =&gt; void)</code></li>
+<li><code>computed(() =&gt; expression, options)</code></li>
+<li><code>@computed get classProperty() { return expression; }</code></li>
+<li><code>@computed({equals: compareFn}) get classProperty() { return expression; }</code></li>
+<li><code>@computed.struct get classProperty() { return expression; }</code></li>
+</ul>
+<p>Creates a computed property. The <code>expression</code> should not have side effects but return a value.
+The expression will automatically be re-evaluated if any observables it uses changes, but only if it is in use by some <em>reaction</em>.</p>
+<p>There are various <code>options</code> that can be used to control the behavior of <code>computed</code>. These include:</p>
+<ul>
+<li><strong><code>equals: (value, value) =&gt; boolean</code></strong> Comparison method can be used to override the default detection on when something is changed. Built-in comparers are: <code>comparer.identity</code>, <code>comparer.default</code>, <code>comparer.structural</code>.</li>
+<li><strong><code>name: string</code></strong> Provide a debug name to this computed property</li>
+<li><strong><code>requiresReaction: boolean</code></strong> Wait for a change in value of the tracked observables, before recomputing the derived property</li>
+<li><strong><code>get: () =&gt; value)</code></strong> Override the getter for the computed property.</li>
+<li><strong><code>set: (value) =&gt; void</code></strong> Override the setter for the computed property</li>
+<li><strong><code>keepAlive: boolean</code></strong> Set to true to automatically keep computed values alive, rather then suspending then when there are no observers.</li>
+</ul>
+<p><a href="/refguide/computed-decorator">«details»</a></p>
+<h2><a class="anchor" aria-hidden="true" id="actions"></a><a href="#actions" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Actions</h2>
+<p>Any application has actions. Actions are anything that modify the state.</p>
+<p>With MobX you can make it explicit in your code where your actions live by marking them.
+Actions helps you to structure your code better.
+It is advised to use them on any function that modifies observables or has side effects.
+<code>action</code> also provides useful debugging information in combination with the devtools.
+Note: using <code>action</code> is mandatory when <em>strict mode</em> is enabled, see <code>enforceActions</code>.
+<a href="/refguide/action">«details»</a></p>
+<p>Usage:</p>
+<ul>
+<li><code>action(fn)</code></li>
+<li><code>action(name, fn)</code></li>
+<li><code>@action classMethod</code></li>
+<li><code>@action(name) classMethod</code></li>
+<li><code>@action boundClassMethod = (args) =&gt; { body }</code></li>
+<li><code>@action.bound boundClassMethod(args) { body }</code></li>
+</ul>
+<p>For one-time-actions <code>runInAction(name?, fn)</code> can be used, which is sugar for <code>action(name, fn)()</code>.</p>
+<h3><a class="anchor" aria-hidden="true" id="flow"></a><a href="#flow" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Flow</h3>
+<p>Usage: <code>flow(function* (args) { })</code></p>
+<p><code>flow()</code> takes a generator function as its only input</p>
+<p>When dealing with <em>async actions</em>, the code that executes in the callback is not wrapped by <code>action</code>. This means the observable state that you are mutating, will fail the <a href="#configure"><code>enforceActions</code></a> check. An easy way to retain the action semantics is by wrapping the async function with flow. This will ensure to wrap all your callbacks in <code>action()</code>.</p>
+<p>Note that the async function must be a <em>generator</em> and you must only <em>yield</em> to promises inside. <code>flow</code> gives you back a promise that you can <code>cancel()</code> if you want.</p>
+<pre><code class="hljs css language-js"><span class="hljs-keyword">import</span> { configure } <span class="hljs-keyword">from</span> <span class="hljs-string">'mobx'</span>;
+
+<span class="hljs-comment">// don't allow state modifications outside actions</span>
+configure({<span class="hljs-attr">enforceActions</span>: <span class="hljs-string">"always"</span>});
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Store</span> </span>{
+    @observable githubProjects = [];
+    @observable state = <span class="hljs-string">"pending"</span>; <span class="hljs-comment">// "pending" / "done" / "error"</span>
+
+
+    fetchProjects = flow(<span class="hljs-function"><span class="hljs-keyword">function</span>* <span class="hljs-title">fetchProjects</span>(<span class="hljs-params"></span>) </span>{ <span class="hljs-comment">// &lt;- note the star, this a generator function!</span>
+        <span class="hljs-keyword">this</span>.githubProjects = [];
+        <span class="hljs-keyword">this</span>.state = <span class="hljs-string">"pending"</span>;
+        <span class="hljs-keyword">try</span> {
+            <span class="hljs-keyword">const</span> projects = <span class="hljs-keyword">yield</span> fetchGithubProjectsSomehow(); <span class="hljs-comment">// yield instead of await</span>
+            <span class="hljs-keyword">const</span> filteredProjects = somePreprocessing(projects);
+
+            <span class="hljs-comment">// the asynchronous blocks will automatically be wrapped actions</span>
+            <span class="hljs-keyword">this</span>.state = <span class="hljs-string">"done"</span>;
+            <span class="hljs-keyword">this</span>.githubProjects = filteredProjects;
+        } <span class="hljs-keyword">catch</span> (error) {
+            <span class="hljs-keyword">this</span>.state = <span class="hljs-string">"error"</span>;
+        }
+    })
+}
+</code></pre>
+<p><em>Tip: it is recommended to give the generator function a name, this is the name that will show up in dev tools and such</em></p>
+<p><strong>Flows can be cancelled</strong></p>
+<p>Flows are canceallable, that means that you can call <code>cancel()</code> on the returned promise. This will stop the generator immediately, but any <code>finally</code> clause will still be processed.
+The returned promise itself will reject with <code>FLOW_CANCELLED</code></p>
+<p><strong>Flows support async iterators</strong></p>
+<p>Flows support async iterators, that means you can use async generators:</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>* <span class="hljs-title">someNumbers</span>(<span class="hljs-params"></span>) </span>{
+    <span class="hljs-keyword">yield</span> <span class="hljs-built_in">Promise</span>.resolve(<span class="hljs-number">1</span>)
+    <span class="hljs-keyword">yield</span> <span class="hljs-built_in">Promise</span>.resolve(<span class="hljs-number">2</span>)
+    <span class="hljs-keyword">yield</span> <span class="hljs-built_in">Promise</span>.resolve(<span class="hljs-number">3</span>)
+}
+
+<span class="hljs-keyword">const</span> count = mobx.flow(<span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>*(<span class="hljs-params"></span>) </span>{
+    <span class="hljs-comment">// use for await to loop async iterators</span>
+    <span class="hljs-keyword">for</span> <span class="hljs-keyword">await</span> (<span class="hljs-keyword">const</span> number <span class="hljs-keyword">of</span> someNumbers()) {
+        total += number
+    }
+    <span class="hljs-keyword">return</span> total
+})
+
+<span class="hljs-keyword">const</span> res = <span class="hljs-keyword">await</span> count() <span class="hljs-comment">// 6</span>
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="reactions-derivations"></a><a href="#reactions-derivations" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Reactions &amp; Derivations</h2>
+<p><em>Computed values</em> are <strong>values</strong> that react automatically to state changes.
+<em>Reactions</em> are <strong>side effects</strong> that react automatically to state changes.
+Reactions <em>can</em> be used to ensure that a certain side effect (mainly I/O) is automatically executed when relevant state changes, like logging, network requests etc.
+The most commonly used reaction is the <code>observer</code> decorator for React components (see below).</p>
+<h3><a class="anchor" aria-hidden="true" id="observer"></a><a href="#observer" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>observer</code></h3>
+<p>Can be used as higher order component around a React component.
+The component will then automatically re-render if any of the observables used in the <code>render</code> function of the component has changed.
+Note that <code>observer</code> is provided by the <code>&quot;mobx-react&quot;</code> package and not by <code>&quot;mobx&quot;</code> itself.</p>
+<p><a href="/refguide/observer-component">«details»</a></p>
+<p>Usage:</p>
+<ul>
+<li><code>observer(React.createClass({ ... }))</code></li>
+<li><code>observer((props, context) =&gt; ReactElement)</code></li>
+<li><code>observer(class MyComponent extends React.Component { ... })</code></li>
+<li><code>@observer class MyComponent extends React.Component { ... }</code></li>
+</ul>
+<h3><a class="anchor" aria-hidden="true" id="autorun"></a><a href="#autorun" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>autorun</code></h3>
+<p>Usage: <code>autorun(() =&gt; { sideEffect }, options)</code>. Autorun runs the provided <code>sideEffect</code> and tracks which observable state is accessed while running the side effect.
+Whenever one of the used observables is changed in the future, the same sideEffect will be run again.
+Returns a disposer function to cancel the side effect.</p>
+<p><a href="/refguide/autorun">«details»</a></p>
+<p><strong>options</strong></p>
+<ul>
+<li><strong><code>name?: string</code></strong>: A name for easier identification and debugging</li>
+<li><strong><code>delay?: number</code></strong>: the sideEffect will be delayed and debounced with the given <code>delay</code>. Defaults to <code>0</code>.</li>
+<li><strong><code>onError?: (error) =&gt; void</code></strong>: error handler that will be triggered if the autorun function throws an exception</li>
+<li><strong><code>scheduler?: (callback) =&gt; void</code></strong>: Set a custom scheduler to determine how re-running the autorun function should be scheduled</li>
+<li><strong><code>requiresObservable?: boolean</code></strong> Enables <a href="#reactionrequiresobservable-boolean"><code>reactionRequiresObservable</code></a> locally for the autorun</li>
+</ul>
+<h3><a class="anchor" aria-hidden="true" id="when"></a><a href="#when" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>when</code></h3>
+<p>Usage: <code>when(() =&gt; condition, () =&gt; { sideEffect }, options)</code>.
+The condition expression will react automatically to any observables it uses.
+As soon as the expression returns true the sideEffect function will be invoked, but only once.</p>
+<p><strong>Note:</strong> the <em>effect-function</em> (second argument) is actually optional. If no effect-function is provided, it will return a cancelable promise (i.e. having a <code>cancel()</code> method on the promise)</p>
+<p><code>when</code> returns a disposer to prematurely cancel the whole thing.</p>
+<p>If no effect function is passed to <code>when</code>, it will return a promise that can be awaited until the condition settles.</p>
+<p><a href="/refguide/when">«details»</a>.</p>
+<p><strong>options</strong></p>
+<ul>
+<li><strong><code>name?: string</code></strong>: A name for easier identification and debugging</li>
+<li><strong><code>onError?: (error) =&gt; void</code></strong>: error handler that will be triggered if the <em>predicate-function</em> or the <em>effect-function</em> throws an exception</li>
+<li><strong><code>timeout: number</code></strong> a timeout in milliseconds, after which the <code>onError</code> handler will be triggered to signal the condition not being met within a certain time</li>
+<li><strong><code>requiresObservable?: boolean</code></strong> Enables <a href="#reactionrequiresobservable-boolean"><code>reactionRequiresObservable</code></a> locally for the when</li>
+</ul>
+<h3><a class="anchor" aria-hidden="true" id="reaction"></a><a href="#reaction" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>reaction</code></h3>
+<p>Usage: <code>reaction(() =&gt; data, data =&gt; { sideEffect }, options)</code>.
+A variation on <code>autorun</code> that gives more fine-grained control on which observables that will be tracked.
+It takes two function, the first one is tracked and returns data that is used as input for the second one, the side effect.
+Unlike <code>autorun</code> the side effect won't be run initially, and any observables that are accessed while executing the side effect will not be tracked.
+The side effect can be debounced, just like <code>autorunAsync</code>.</p>
+<p><a href="/refguide/reaction">«details»</a></p>
+<p><strong>options</strong></p>
+<ul>
+<li><strong><code>fireImmediately?: boolean</code></strong>: Wait for a change before firing the <em>effect function</em>. Defaults to <code>false</code>.</li>
+<li><strong><code>delay?: number</code></strong>: the sideEffect will be delayed and debounced with the given <code>delay</code>. Defaults to <code>0</code>.</li>
+<li><strong><code>equals</code></strong>: Custom equality function to determine whether the expr function differed from it's previous result, and hence should fire effect. Accepts the same options as the equals option of <code>computed</code>.</li>
+<li>Also accepts all of the options from <a href="#autorun"><code>autorun</code></a></li>
+<li><strong><code>requiresObservable?: boolean</code></strong> Enables <a href="#reactionrequiresobservable-boolean"><code>reactionRequiresObservable</code></a> locally for the reaction</li>
+</ul>
+<h3><a class="anchor" aria-hidden="true" id="onreactionerror"></a><a href="#onreactionerror" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>onReactionError</code></h3>
+<p>Usage: <code>onReactionError(handler: (error: any, derivation) =&gt; void)</code></p>
+<p>This method attaches a global error listener, which is invoked for every error that is thrown from a <em>reaction</em>.
+This can be used for monitoring or test purposes.</p>
+<hr>
+<h1><a class="anchor" aria-hidden="true" id="utilities"></a><a href="#utilities" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Utilities</h1>
+<p><em>Here are some utilities that might make working with observable objects or computed values more convenient.
+More, less trivial utilities can be found in the * <a href="https://github.com/mobxjs/mobx-utils">mobx-utils</a> package.</em></p>
+<h3><a class="anchor" aria-hidden="true" id="provider-mobx-react-package"></a><a href="#provider-mobx-react-package" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>Provider</code> (<code>mobx-react</code> package)</h3>
+<p>Can be used to pass stores to child components using React's context mechanism. See the <a href="https://github.com/mobxjs/mobx-react#provider-experimental"><code>mobx-react</code> docs</a>.</p>
+<h3><a class="anchor" aria-hidden="true" id="inject-mobx-react-package"></a><a href="#inject-mobx-react-package" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>inject</code> (<code>mobx-react</code> package)</h3>
+<p>Higher order component and counterpart of <code>Provider</code>. Can be used to pick stores from React's context and pass it as props to the target component. Usage:</p>
+<ul>
+<li><code>inject(&quot;store1&quot;, &quot;store2&quot;)(observer(MyComponent))</code></li>
+<li><code>@inject(&quot;store1&quot;, &quot;store2&quot;) @observer MyComponent</code></li>
+<li><code>@inject((stores, props, context) =&gt; props) @observer MyComponent</code></li>
+<li><code>@observer([&quot;store1&quot;, &quot;store2&quot;]) MyComponent</code> is a shorthand for the the <code>@inject() @observer</code> combo.</li>
+</ul>
+<h3><a class="anchor" aria-hidden="true" id="tojs"></a><a href="#tojs" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>toJS</code></h3>
+<p>Usage: <code>toJS(observableDataStructure, options?)</code>. Converts observable data structures back to plain javascript objects, ignoring computed values.</p>
+<p>The <code>options</code> include:</p>
+<ul>
+<li><strong><code>detectCycles: boolean</code></strong>: Checks for cyclical references in the observable data-structure. Defaults to <code>true</code>.</li>
+<li><strong><code>exportMapsAsObjects: boolean</code></strong>: Treats ES6 Maps as regular objects for export. Defaults to <code>true</code></li>
+</ul>
+<p><a href="/refguide/tojson">«details»</a>.</p>
+<h3><a class="anchor" aria-hidden="true" id="isobservable-and-isobservableprop"></a><a href="#isobservable-and-isobservableprop" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>isObservable</code> and <code>isObservableProp</code></h3>
+<p>Usage: <code>isObservable(thing)</code> or <code>isObservableProp(thing, property?)</code>. Returns true if the given thing, or the <code>property</code> of the given thing is observable.
+Works for all observables, computed values and disposer functions of reactions.</p>
+<p><a href="is-observable">«details»</a></p>
+<h3><a class="anchor" aria-hidden="true" id="isobservableobject-array-map-and-isboxedobservable"></a><a href="#isobservableobject-array-map-and-isboxedobservable" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>isObservableObject|Array|Map</code> and <code>isBoxedObservable</code></h3>
+<p>Usage: <code>isObservableObject(thing)</code>, <code>isObservableArray(thing)</code>, <code>isObservableMap(thing)</code>, <code>isBoxedObservable(thing)</code>. Returns <code>true</code> if.., well, do the math.</p>
+<h3><a class="anchor" aria-hidden="true" id="isarraylike"></a><a href="#isarraylike" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>isArrayLike</code></h3>
+<p>Usage: <code>isArrayLike(thing)</code>. Returns <code>true</code> if the given thing is either a true JS-array or an observable (MobX-)array.
+This is intended as convenience/shorthand.
+Note that observable arrays can be <code>.slice()</code>d to turn them into true JS-arrays.</p>
+<h3><a class="anchor" aria-hidden="true" id="isaction"></a><a href="#isaction" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>isAction</code></h3>
+<p>Usage: <code>isAction(func)</code>. Returns true if the given function is wrapped / decorated with <code>action</code>.</p>
+<h3><a class="anchor" aria-hidden="true" id="iscomputed-and-iscomputedprop"></a><a href="#iscomputed-and-iscomputedprop" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>isComputed</code> and <code>isComputedProp</code></h3>
+<p>Usage: <code>isComputed(thing)</code> or <code>isComputedProp(thing, property?)</code>. Returns true if the given thing is a boxed computed value, or if the designated property is a computed value.</p>
+<h3><a class="anchor" aria-hidden="true" id="intercept"></a><a href="#intercept" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>intercept</code></h3>
+<p>Usage: <code>intercept(object, property?, interceptor)</code>.
+Api that can be used to intercept changes before they are applied to an observable api. Useful for validation, normalization or cancellation.</p>
+<p><a href="/refguide/observe">«details»</a></p>
+<h3><a class="anchor" aria-hidden="true" id="observe"></a><a href="#observe" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>observe</code></h3>
+<p>Usage: <code>observe(object, property?, listener, fireImmediately = false)</code>
+Low-level api that can be used to observe a single observable value.</p>
+<p><a href="/refguide/observe">«details»</a></p>
+<h3><a class="anchor" aria-hidden="true" id="onbecomeobserved-and-onbecomeunobserved"></a><a href="#onbecomeobserved-and-onbecomeunobserved" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>onBecomeObserved</code> and <code>onBecomeUnobserved</code></h3>
+<p>Usage: <code>onBecomeObserved(observable, property?, listener: () =&gt; void): (() =&gt; void)</code> and
+<code>onBecomeUnobserved(observable, property?, listener: () =&gt; void): (() =&gt; void)</code></p>
+<p>These functions are hooks into the observability system of MobX and get notified when observables <em>start</em> / <em>stop</em> becoming observed. It can be used to execute some lazy operations or perform network fetches.</p>
+<p>The return value is a <em>diposer-function</em> that will detach the <em>listener</em>.</p>
+<pre><code class="hljs css language-javascript">
+<span class="hljs-keyword">export</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">City</span> </span>{
+    @observable location
+    @observable temperature
+    interval
+
+    <span class="hljs-keyword">constructor</span>(location) {
+        <span class="hljs-keyword">this</span>.location = location
+        <span class="hljs-comment">// only start data fetching if temperature is actually used!</span>
+        onBecomeObserved(<span class="hljs-keyword">this</span>, <span class="hljs-string">'temperature'</span>, <span class="hljs-keyword">this</span>.resume)
+        onBecomeUnobserved(<span class="hljs-keyword">this</span>, <span class="hljs-string">'temperature'</span>, <span class="hljs-keyword">this</span>.suspend)
+    }
+
+    resume = <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+        log(<span class="hljs-string">`Resuming <span class="hljs-subst">${<span class="hljs-keyword">this</span>.location}</span>`</span>)
+        <span class="hljs-keyword">this</span>.interval = setInterval(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-keyword">this</span>.fetchTemperature(), <span class="hljs-number">5000</span>)
+    }
+
+    suspend = <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+        log(<span class="hljs-string">`Suspending <span class="hljs-subst">${<span class="hljs-keyword">this</span>.location}</span>`</span>)
+        <span class="hljs-keyword">this</span>.temperature = <span class="hljs-literal">undefined</span>
+        clearInterval(<span class="hljs-keyword">this</span>.interval)
+    }
+
+    fetchTemperature = flow(<span class="hljs-function"><span class="hljs-keyword">function</span>*(<span class="hljs-params"></span>) </span>{
+        <span class="hljs-comment">// data fetching logic</span>
+    })
+}
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="configure"></a><a href="#configure" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>configure</code></h3>
+<p>Usage: <code>configure(options)</code>.
+Sets global behavior settings on the active MobX instance.
+Use this to change how MobX behaves as a whole.</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { configure } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx"</span>;
+
+configure({
+    <span class="hljs-comment">// ...</span>
+});
+</code></pre>
+<h4><a class="anchor" aria-hidden="true" id="arraybuffer-number"></a><a href="#arraybuffer-number" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>arrayBuffer: number</code></h4>
+<p>Increases the default created size of observable arrays to <code>arrayBuffer</code>, if the maximum size isn't yet there.</p>
+<p>Observable arrays lazily create getters on members of <code>ObservableArray.prototype</code> starting at <code>0</code>.
+This will create the members from <code>0</code> to <code>arrayBuffer</code> if they don't yet exist.
+Use <code>arrayBuffer</code> if you know you'll have a common minimum array size and don't want to risk first creating those getters in hot code paths.
+See also <code>observable</code>.</p>
+<h4><a class="anchor" aria-hidden="true" id="computedrequiresreaction-boolean"></a><a href="#computedrequiresreaction-boolean" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>computedRequiresReaction: boolean</code></h4>
+<p>Forbids the access of any unobserved computed value.
+Use this if you want to check whether you are using computed properties without a reactive context.</p>
+<pre><code class="hljs css language-javascript">configure({ <span class="hljs-attr">computedRequiresReaction</span>: <span class="hljs-literal">true</span> });
+</code></pre>
+<h4><a class="anchor" aria-hidden="true" id="observablerequiresreaction-boolean"></a><a href="#observablerequiresreaction-boolean" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>observableRequiresReaction: boolean</code></h4>
+<p>Warns about any unobserved observable access.
+Use this if you want to check whether you are using observables without a reactive context (eg not inside an autorun, action, or react component without observer wrapping).</p>
+<pre><code class="hljs css language-javascript">configure({ <span class="hljs-attr">observableRequiresReaction</span>: <span class="hljs-literal">true</span> });
+</code></pre>
+<h4><a class="anchor" aria-hidden="true" id="reactionrequiresobservable-boolean"></a><a href="#reactionrequiresobservable-boolean" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>reactionRequiresObservable: boolean</code></h4>
+<p>Warns when a reaction (eg <code>autorun</code>) is created without any observable access.
+Use this to check whether you are unneededly wrapping react components with <code>observer</code>, or to find possible related bugs.</p>
+<pre><code class="hljs css language-javascript">configure({ <span class="hljs-attr">reactionRequiresObservable</span>: <span class="hljs-literal">true</span> });
+</code></pre>
+<h4><a class="anchor" aria-hidden="true" id="computedconfigurable-boolean"></a><a href="#computedconfigurable-boolean" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>computedConfigurable: boolean</code></h4>
+<p>Allows overwriting computed values. This is useful for testing purposes <em>only</em>. Don't enable this
+on production as it can cause memory-leaks.</p>
+<pre><code class="hljs css language-javascript">configure({ <span class="hljs-attr">computedConfigurable</span>: <span class="hljs-literal">true</span> });
+</code></pre>
+<h4><a class="anchor" aria-hidden="true" id="disableerrorboundaries-boolean"></a><a href="#disableerrorboundaries-boolean" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>disableErrorBoundaries: boolean</code></h4>
+<p>By default, MobX will catch and rethrow exceptions happening in your code to make sure that a reaction in one exception does not prevent the scheduled execution of other, possibly unrelated, reactions. This means exceptions are not propagated back to the original causing code and therefore you won't be able to catch them using try/catch.</p>
+<p>There may be times when you want to catch those errors, for example when unit testing your reactions. You can disable this behaviour using <code>disableErrorBoundaries</code>.</p>
+<pre><code class="hljs css language-javascript">configure({ <span class="hljs-attr">disableErrorBoundaries</span>: <span class="hljs-literal">true</span> });
+</code></pre>
+<p>Please note that MobX won't recover from errors when using this configuration. For that reason, you may need to use <code>_resetGlobalState</code> after each exception. Example:</p>
+<pre><code class="hljs css language-js">configure({ <span class="hljs-attr">disableErrorBoundaries</span>: <span class="hljs-literal">true</span> })
+
+test(<span class="hljs-string">'Throw if age is negative'</span>, () =&gt; {
+  expect(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    <span class="hljs-keyword">const</span> age = observable.box(<span class="hljs-number">10</span>)
+    autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> { <span class="hljs-keyword">if</span> (age.get() &lt; <span class="hljs-number">0</span>) <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'Age should not be negative'</span>) })
+    age.set(<span class="hljs-number">-1</span>)
+  }).toThrow()
+  _resetGlobalState() <span class="hljs-comment">// Needed after each exception</span>
+})
+</code></pre>
+<blockquote>
+<p>Prior to MobX 4, <code>_resetGlobalState</code> was <code>extras.resetGlobalState</code>.</p>
+</blockquote>
+<h4><a class="anchor" aria-hidden="true" id="enforceactions"></a><a href="#enforceactions" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>enforceActions</code></h4>
+<p>Also known as &quot;strict mode&quot;.
+In strict mode, it is not allowed to change any state outside of an <a href="/refguide/action"><code>action</code></a>.
+Accepted values:</p>
+<ul>
+<li><code>&quot;never&quot;</code> (default): State can be modified from anywhere</li>
+<li><code>&quot;observed&quot;</code>: All state that is observed <em>somewhere</em> needs to be changed through actions. This is the recommended strictness mode in non-trivial applications.</li>
+<li><code>&quot;always&quot;</code>: State always needs be updated (which in practice also includes creation) in actions.</li>
+</ul>
+<h4><a class="anchor" aria-hidden="true" id="isolateglobalstate-boolean"></a><a href="#isolateglobalstate-boolean" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>isolateGlobalState: boolean</code></h4>
+<p>Isolates the global state of MobX, when there are multiple instances of MobX in the same environment.
+This is useful when you have an encapsulated library that is using MobX, living in the same page as the app that is using MobX.
+The reactivity inside the library will remain self-contained when you call <code>configure({isolateGlobalState: true})</code> inside the library.</p>
+<p>Without this options, if multiple MobX instances are active, the internal state will be shared. The benefit is that observables from both instances work together, the downside is that the MobX versions have to match.</p>
+<pre><code class="hljs css language-javascript">configure({ <span class="hljs-attr">isolateGlobalState</span>: <span class="hljs-literal">true</span> });
+</code></pre>
+<h4><a class="anchor" aria-hidden="true" id="reactionscheduler-f-void-void"></a><a href="#reactionscheduler-f-void-void" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>reactionScheduler: (f: () =&gt; void) =&gt; void</code></h4>
+<p>Sets a new function that executes all MobX reactions.
+By default <code>reactionScheduler</code> just runs the <code>f</code> reaction without any other behavior.
+This can be useful for basic debugging, or slowing down reactions to visualize application updates.</p>
+<pre><code class="hljs css language-javascript">configure({
+    <span class="hljs-attr">reactionScheduler</span>: (f): <span class="hljs-function"><span class="hljs-params">void</span> =&gt;</span> {
+        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Running an event after a delay:"</span>, f);
+        setTimeout(f, <span class="hljs-number">100</span>);
+    }
+});
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="direct-observable-manipulation"></a><a href="#direct-observable-manipulation" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Direct Observable manipulation</h2>
+<p>There is now an utility API that enables manipulating observable maps, objects and arrays with the same API. These api's are fully reactive, which means that even new property declarations can be detected by mobx if <code>set</code> is used to add them, and <code>values</code> or <code>keys</code> to iterate them.</p>
+<ul>
+<li><strong><code>values(thing)</code></strong> returns all values in the collection as array</li>
+<li><strong><code>keys(thing)</code></strong> returns all keys in the collection as array</li>
+<li><strong><code>entries(thing)</code></strong> returns a [key, value] pair for all entries in the collection as array</li>
+<li><strong><code>set(thing, key, value)</code></strong> or <strong><code>set(thing, { key: value })</code></strong> Updates the given collection with the provided key / value pair(s).</li>
+<li><strong><code>remove(thing, key)</code></strong> removes the specified child from the collection. For arrays splicing is used.</li>
+<li><strong><code>has(thing, key)</code></strong> returns true if the collection has the specified <em>observable</em> property.</li>
+<li><strong><code>get(thing, key)</code></strong> returns the child under the specified key.</li>
+</ul>
+<h1><a class="anchor" aria-hidden="true" id="development-utilities"></a><a href="#development-utilities" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Development utilities</h1>
+<p><em>The following api's might come in handy if you want to build cool tools on top of MobX or if you want to inspect the internal state of MobX</em></p>
+<h3><a class="anchor" aria-hidden="true" id="mobx-react-devtools-package"></a><a href="#mobx-react-devtools-package" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>&quot;mobx-react-devtools&quot;</code> package</h3>
+<p>The mobx-react-devtools is a powerful package that helps you to investigate the performance and dependencies of your react components.
+Also has a powerful logger utility based on <code>spy</code>.</p>
+<p><a href="/best/devtools">«details»</a></p>
+<h3><a class="anchor" aria-hidden="true" id="trace"></a><a href="#trace" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>trace</code></h3>
+<p>Usage:</p>
+<ul>
+<li><code>trace(enterDebugger?)</code></li>
+<li><code>trace(Reaction object / ComputedValue object / disposer function, enterDebugger?)</code></li>
+<li><code>trace(object, computedValuePropertyName, enterDebugger?)</code></li>
+</ul>
+<p><code>trace</code> is a small utility that you can use inside a computed value or reaction.
+If it is enabled, it will start logging when the value is being invalidated, and why.
+If <code>enterDebugger</code> is set to true, and developer tools are enabled, the javascript engine
+will break on the point where it is triggered.</p>
+<p><a href="/best/trace">«trace»</a></p>
+<h3><a class="anchor" aria-hidden="true" id="spy"></a><a href="#spy" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>spy</code></h3>
+<p>Usage: <code>spy(listener)</code>.
+Registers a global spy listener that listens to all events that happen in MobX.
+It is similar to attaching an <code>observe</code> listener to <em>all</em> observables at once, but also notifies about running (trans/re)actions and computations.
+Used for example by the <code>mobx-react-devtools</code>.</p>
+<p><a href="/refguide/spy">«details»</a></p>
+<h3><a class="anchor" aria-hidden="true" id="getatom"></a><a href="#getatom" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>getAtom</code></h3>
+<p>Usage: <code>getAtom(thing, property?)</code>.
+Returns the backing <em>Atom</em> of a given observable object, property, reaction etc.</p>
+<h3><a class="anchor" aria-hidden="true" id="getdebugname"></a><a href="#getdebugname" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>getDebugName</code></h3>
+<p>Usage: <code>getDebugName(thing, property?)</code>
+Returns a (generated) friendly debug name of an observable object, property, reaction etc. Used by for example the <code>mobx-react-devtools</code>.</p>
+<h3><a class="anchor" aria-hidden="true" id="getdependencytree"></a><a href="#getdependencytree" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>getDependencyTree</code></h3>
+<p>Usage: <code>getDependencyTree(thing, property?)</code>.
+Returns a tree structure with all observables the given reaction / computation currently depends upon.</p>
+<h3><a class="anchor" aria-hidden="true" id="getobservertree"></a><a href="#getobservertree" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>getObserverTree</code></h3>
+<p>Usage: <code>getObserverTree(thing, property?)</code>.
+Returns a tree structure with all reactions / computations that are observing the given observable.</p>
+<h3><a class="anchor" aria-hidden="true" id="mobx-react-development-hooks"></a><a href="#mobx-react-development-hooks" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>&quot;mobx-react&quot;</code> development hooks</h3>
+<p>The <code>mobx-react</code> package exposes the following additional api's that are used by the <code>mobx-react-devtools</code>:</p>
+<ul>
+<li><code>trackComponents()</code>: enables the tracking of <code>observer</code> based React components</li>
+<li><code>renderReporter.on(callback)</code>: callback will be invoked on each rendering of an <code>observer</code> enabled React component, with timing information etc</li>
+<li><code>componentByNodeRegistery</code>: ES6 WeakMap that maps from DOMNode to a <code>observer</code> based React component instance</li>
+</ul>
+<h1><a class="anchor" aria-hidden="true" id="internal-functions"></a><a href="#internal-functions" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Internal functions</h1>
+<p><em>The following methods are all used internally by MobX, and might come in handy in rare cases. But usually MobX offers more declarative alternatives to tackle the same problem. They might come in handy though if you try to extend MobX</em></p>
+<h3><a class="anchor" aria-hidden="true" id="transaction"></a><a href="#transaction" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>transaction</code></h3>
+<p><em>Transaction is a low-level api, it is recommended to use actions instead</em></p>
+<p><code>transaction(worker: () =&gt; void)</code> can be used to batch a bunch of updates without notifying any observers until the end of the transaction.
+<code>transaction</code> takes a single, parameterless <code>worker</code> function as argument and runs it.
+No observers are notified until this function has completed.
+<code>transaction</code> returns any value that was returned by the <code>worker</code> function.
+Note that <code>transaction</code> runs completely synchronously.
+Transactions can be nested. Only after completing the outermost <code>transaction</code> pending reactions will be run.</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> {observable, transaction, autorun} <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx"</span>;
+
+<span class="hljs-keyword">const</span> numbers = observable([]);
+
+autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-built_in">console</span>.log(numbers.length, <span class="hljs-string">"numbers!"</span>));
+<span class="hljs-comment">// Prints: '0 numbers!'</span>
+
+transaction(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    transaction(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+        numbers.push(<span class="hljs-number">1</span>);
+        numbers.push(<span class="hljs-number">2</span>);
+    });
+    numbers.push(<span class="hljs-number">3</span>);
+});
+<span class="hljs-comment">// Prints: '3 numbers!'</span>
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="untracked"></a><a href="#untracked" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>untracked</code></h3>
+<p>Untracked allows you to run a piece of code without establishing observers.
+Like <code>transaction</code>, <code>untracked</code> is automatically applied by <code>(@)action</code>, so usually it makes more sense to use actions than to use <code>untracked</code> directly.
+Example:</p>
+<pre><code class="hljs css language-javascript">
+<span class="hljs-keyword">const</span> person = observable({
+    <span class="hljs-attr">firstName</span>: <span class="hljs-string">"Michel"</span>,
+    <span class="hljs-attr">lastName</span>: <span class="hljs-string">"Weststrate"</span>
+});
+
+autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(
+        person.lastName,
+        <span class="hljs-string">","</span>,
+        <span class="hljs-comment">// this untracked block will return the person's firstName without establishing a dependency</span>
+        untracked(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> person.firstName)
+    );
+});
+<span class="hljs-comment">// prints: Weststrate, Michel</span>
+
+person.firstName = <span class="hljs-string">"G.K."</span>;
+<span class="hljs-comment">// doesn't print!</span>
+
+person.lastName = <span class="hljs-string">"Chesterton"</span>;
+<span class="hljs-comment">// prints: Chesterton, G.K.</span>
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="createatom"></a><a href="#createatom" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>createAtom</code></h3>
+<p>Utility function that can be used to create your own observable data structures and hook them up to MobX.
+Used internally by all observable data types.</p>
+<p><a href="/refguide/extending">«details»</a></p>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/intro/overview"><span class="arrow-prev">← </span><span class="function-name-prevnext">The gist of MobX</span></a><a class="docs-next button" href="/refguide/observable"><span>observable</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#creating-observables">Creating observables</a><ul class="toc-headings"><li><a href="#observablevalue"><code>observable(value)</code></a></li><li><a href="#observable-property-value"><code>@observable property = value</code></a></li><li><a href="#observableboxvalue-options"><code>observable.box(value, options?)</code></a></li><li><a href="#observableobjectvalue-decorators-options"><code>observable.object(value, decorators?, options?)</code></a></li><li><a href="#observablearrayvalue-options"><code>observable.array(value, options?)</code></a></li><li><a href="#observablemapvalue-options"><code>observable.map(value, options?)</code></a></li><li><a href="#observablesetvalue-options"><code>observable.set(value, options?)</code></a></li><li><a href="#extendobservable"><code>extendObservable</code></a></li><li><a href="#decorators">Decorators</a></li><li><a href="#decorate"><code>decorate</code></a></li></ul></li><li><a href="#computed-values">Computed values</a></li><li><a href="#actions">Actions</a><ul class="toc-headings"><li><a href="#flow">Flow</a></li></ul></li><li><a href="#reactions-derivations">Reactions &amp; Derivations</a><ul class="toc-headings"><li><a href="#observer"><code>observer</code></a></li><li><a href="#autorun"><code>autorun</code></a></li><li><a href="#when"><code>when</code></a></li><li><a href="#reaction"><code>reaction</code></a></li><li><a href="#onreactionerror"><code>onReactionError</code></a></li><li><a href="#provider-mobx-react-package"><code>Provider</code> (<code>mobx-react</code> package)</a></li><li><a href="#inject-mobx-react-package"><code>inject</code> (<code>mobx-react</code> package)</a></li><li><a href="#tojs"><code>toJS</code></a></li><li><a href="#isobservable-and-isobservableprop"><code>isObservable</code> and <code>isObservableProp</code></a></li><li><a href="#isobservableobject-array-map-and-isboxedobservable"><code>isObservableObject|Array|Map</code> and <code>isBoxedObservable</code></a></li><li><a href="#isarraylike"><code>isArrayLike</code></a></li><li><a href="#isaction"><code>isAction</code></a></li><li><a href="#iscomputed-and-iscomputedprop"><code>isComputed</code> and <code>isComputedProp</code></a></li><li><a href="#intercept"><code>intercept</code></a></li><li><a href="#observe"><code>observe</code></a></li><li><a href="#onbecomeobserved-and-onbecomeunobserved"><code>onBecomeObserved</code> and <code>onBecomeUnobserved</code></a></li><li><a href="#configure"><code>configure</code></a></li></ul></li><li><a href="#direct-observable-manipulation">Direct Observable manipulation</a><ul class="toc-headings"><li><a href="#mobx-react-devtools-package"><code>&quot;mobx-react-devtools&quot;</code> package</a></li><li><a href="#trace"><code>trace</code></a></li><li><a href="#spy"><code>spy</code></a></li><li><a href="#getatom"><code>getAtom</code></a></li><li><a href="#getdebugname"><code>getDebugName</code></a></li><li><a href="#getdependencytree"><code>getDependencyTree</code></a></li><li><a href="#getobservertree"><code>getObserverTree</code></a></li><li><a href="#mobx-react-development-hooks"><code>&quot;mobx-react&quot;</code> development hooks</a></li><li><a href="#transaction"><code>transaction</code></a></li><li><a href="#untracked"><code>untracked</code></a></li><li><a href="#createatom"><code>createAtom</code></a></li></ul></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/mobx.png" alt="MobX" width="66" height="58"/></a><div><h5>Docs</h5><a href="/en/README">Why MobX</a><a href="/en/intro/concepts">Concepts</a></div><div><h5>Community</h5><a href="https://stackoverflow.com/questions/tagged/mobx" target="_blank" rel="noreferrer noopener">Stack Overflow</a><a href="https://gitter.im/mobxjs/mobx">Project Chat</a></div><div><h5>More</h5><a class="github-button" href="https://github.com/mobxjs/mobx" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section></footer></div></body></html>
