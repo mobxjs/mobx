@@ -31,6 +31,7 @@
     "publish-script": "node scripts/publish.js",
     "docs:build": "yarn --cwd website build",
     "docs:start": "yarn --cwd website start",
+    "docs:publish": "yarn --cwd website publish-gh-pages",
     "postinstall": "yarn --cwd website install",
     "dedup": "npx yarn-deduplicate -s fewer yarn.lock"
   },
