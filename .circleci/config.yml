@@ -114,12 +114,12 @@ jobs:
 workflows:
     version: 2
     build-and-test:
-        branches:
-            ignore:
-                - gh-pages
         jobs:
-            - build
-
+            - build:
+                filters:
+                    branches:
+                        ignore:
+                            - gh-pages
             - test-all:
                   requires:
                       - build
