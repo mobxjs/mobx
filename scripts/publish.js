@@ -35,6 +35,10 @@ async function prompt(question, defaultValue) {
 }
 
 async function main() {
+    const gitUser =
+        process.env.GIT_USER ||
+        (await prompt("Please enter the github user to publish the docs with"))
+
     // build
     run("npm run small-build")
 
@@ -75,6 +79,7 @@ async function main() {
 
         run("git push")
         run("git push --tags")
+        run(`GIT_USER=${gitUser} USE_SSH=true yarn docs:publish`)
         console.log("Published!")
         exit(0)
     } else {
