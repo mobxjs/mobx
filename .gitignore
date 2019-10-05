@@ -1,9 +1,0 @@
-docs/_book
-refguide/*.md
-.DS_Store
-*.iml
-*.ipr
-*.iws
-/.idea
-.vscode
-node_modules

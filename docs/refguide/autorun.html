@@ -1,0 +1,143 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>autorun · MobX</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="# Autorun"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="autorun · MobX"/><meta property="og:type" content="website"/><meta property="og:url" content="https://mobx.js.org//"/><meta property="og:description" content="# Autorun"/><meta property="og:image" content="https://mobx.js.org/img/undraw_online.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://mobx.js.org/img/undraw_tweetstorm.svg"/><link rel="shortcut icon" href="/img/favicon.png"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script>
+              (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+              (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+              m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+              })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+              ga('create', 'UA-65632006-1', 'auto');
+              ga('send', 'pageview');
+            </script><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script type="text/javascript" src="https://codefund.app/properties/259/funder.js" async=""></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><img class="logo" src="/img/mobx.png" alt="MobX"/><h2 class="headerTitleWithLogo">MobX</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/docs/intro/concepts" target="_self">Documentation</a></li><li class=""><a href="https://github.com/mobxjs/mobx" target="_self">Github</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Reacting to observables</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Introduction</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/README">Introduction</a></li><li class="navListItem"><a class="navItem" href="/docs/intro/concepts">Concepts &amp; Principles</a></li><li class="navListItem"><a class="navItem" href="/docs/intro/overview">The gist of MobX</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/api">API overview</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Making things observable</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/refguide/observable">observable</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/observable-decorator">@observable</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/object">objects</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/array">arrays</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/map">maps</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/boxed">boxed values</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/modifiers">decorators</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Reacting to observables</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/refguide/computed-decorator">(@)computed</a></li><li class="navListItem navListItemActive"><a class="navItem" href="/docs/refguide/autorun">autorun</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/when">when</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/reaction">reaction</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/observer-component">(@)observer</a></li><li class="navListItem"><a class="navItem" href="/docs/best/react">Understanding what MobX reacts to</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Changing observables</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/refguide/action">action</a></li><li class="navListItem"><a class="navItem" href="/docs/best/actions">async actions &amp; flows</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/object-api">Object api</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Utility functions</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/refguide/tojson">toJS</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/extend-observable">extendObservable</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/extending">createAtom</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/observe">intercept &amp; observe</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/create-transformer">mobxUtils.createTransformer</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/expr">mobxUtils.expr</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/mobx-utils">MobX-utils</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Tips &amp; Tricks</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/faq/faq">Frequently Asked Questions</a></li><li class="navListItem"><a class="navItem" href="/docs/best/pitfalls">Common Pitfalls &amp; Best Practices</a></li><li class="navListItem"><a class="navItem" href="/docs/best/decorators">How to (not) use decorator syntax</a></li><li class="navListItem"><a class="navItem" href="/docs/best/trace">Using trace for debugging</a></li><li class="navListItem"><a class="navItem" href="/docs/best/store">Defining data stores</a></li><li class="navListItem"><a class="navItem" href="/docs/best/react-performance">Optimizing React components</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/spy">spy</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer"><div class="wrapper"><div class="post"><header class="postHeader"><a class="edit-page-link button" href="https://github.com/mobxjs/mobx/edit/master/docs/refguide/autorun.md" target="_blank" rel="noreferrer noopener">Edit</a></header><article><div><span><h1><a class="anchor" aria-hidden="true" id="autorun"></a><a href="#autorun" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Autorun</h1>
+<div id='codefund' ></div>
+<p><details>
+<summary style="color: white; background:green;padding:5px;margin:5px;border-radius:2px">egghead.io lesson 9: custom reactions</summary>
+<br>
+<div style="padding:5px;">
+<iframe style="border: none;" width=760 height=427  src="https://egghead.io/lessons/react-write-custom-mobx-reactions-with-when-and-autorun/embed" ></iframe>
+</div>
+<a style="font-style:italic;padding:5px;margin:5px;"  href="https://egghead.io/lessons/react-write-custom-mobx-reactions-with-when-and-autorun">Hosted on egghead.io</a>
+</details></p>
+<p><code>mobx.autorun</code> can be used in those cases where you want to create a reactive function that will never have observers itself.
+This is usually the case when you need to bridge from reactive to imperative code, for example for logging, persistence, or UI-updating code.
+When <code>autorun</code> is used, the provided function will always be triggered once immediately and then again each time one of its dependencies changes.
+In contrast, <code>computed(function)</code> creates functions that only re-evaluate if it has
+observers on its own, otherwise its value is considered to be irrelevant.
+As a rule of thumb: use <code>autorun</code> if you have a function that should run automatically but that doesn't result in a new value.
+Use <code>computed</code> for everything else. Autoruns are about initiating <em>effects</em>, not about producing new values.
+If a string is passed as first argument to <code>autorun</code>, it will be used as debug name.</p>
+<p>The return value from autorun is a disposer function, which can be used to dispose of the autorun when you no longer need it.  The reaction itself will also be passed as the only argument to the function given to autorun, which allows you to manipulate it from within the autorun function.  This means there are two ways you can dispose of the reaction when you no longer need it:</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> disposer = autorun( <span class="hljs-function"><span class="hljs-params">reaction</span> =&gt;</span> { <span class="hljs-comment">/* do some stuff */</span> } );
+disposer();
+
+<span class="hljs-comment">// or</span>
+
+autorun( <span class="hljs-function"><span class="hljs-params">reaction</span> =&gt;</span> {
+  <span class="hljs-comment">/* do some stuff */</span>
+  reaction.dispose();
+} );
+</code></pre>
+<p>Just like the <a href="/docs/refguide/observer-component"><code>@observer</code> decorator/function</a>, <code>autorun</code> will only observe data that is used during the execution of the provided function.</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">var</span> numbers = observable([<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>]);
+<span class="hljs-keyword">var</span> sum = computed(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> numbers.reduce(<span class="hljs-function">(<span class="hljs-params">a, b</span>) =&gt;</span> a + b, <span class="hljs-number">0</span>));
+
+<span class="hljs-keyword">var</span> disposer = autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-built_in">console</span>.log(sum.get()));
+<span class="hljs-comment">// prints '6'</span>
+numbers.push(<span class="hljs-number">4</span>);
+<span class="hljs-comment">// prints '10'</span>
+
+disposer();
+numbers.push(<span class="hljs-number">5</span>);
+<span class="hljs-comment">// won't print anything, nor is `sum` re-evaluated</span>
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="options"></a><a href="#options" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Options</h2>
+<p>Autorun accepts as the second argument an options object with the following optional options:</p>
+<ul>
+<li><code>delay</code>: Number in milliseconds that can be used to debounce the effect function. If zero (the default), no debouncing will happen.</li>
+<li><code>name</code>: String that is used as name for this reaction in for example <a href="/docs/refguide/spy"><code>spy</code></a> events.</li>
+<li><code>onError</code>: function that will handle the errors of this reaction, rather then propagating them.</li>
+<li><code>scheduler</code>: Set a custom scheduler to determine how re-running the autorun function should be scheduled. It takes a function that should be invoked at some point in the future, for example: <code>{ scheduler: run =&gt; { setTimeout(run, 1000) }}</code></li>
+</ul>
+<h2><a class="anchor" aria-hidden="true" id="the-delay-option"></a><a href="#the-delay-option" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>The <code>delay</code> option</h2>
+<pre><code class="hljs css language-javascript">autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    <span class="hljs-comment">// Assuming that profile.asJson returns an observable Json representation of profile,</span>
+    <span class="hljs-comment">// send it to the server each time it is changed, but await at least 300 milliseconds before sending it.</span>
+    <span class="hljs-comment">// When sent, the latest value of profile.asJson will be used.</span>
+    sendProfileToServer(profile.asJson);
+}, { <span class="hljs-attr">delay</span>: <span class="hljs-number">300</span> });
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="the-onerror-option"></a><a href="#the-onerror-option" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>The <code>onError</code> option</h2>
+<p>Exceptions thrown in autorun and all other types reactions are caught and logged to the console, but not propagated back to the original causing code.
+This is to make sure that a reaction in one exception does not prevent the scheduled execution of other, possibly unrelated, reactions.
+This also allows reactions to recover from exceptions; throwing an exception does not break the tracking done by MobX,
+so as subsequent run of a reaction might complete normally again if the cause for the exception is removed.</p>
+<p>It is possible to override the default logging behavior of Reactions by providing the <code>onError</code> option
+Example:</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> age = observable.box(<span class="hljs-number">10</span>)
+
+<span class="hljs-keyword">const</span> dispose = autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    <span class="hljs-keyword">if</span> (age.get() &lt; <span class="hljs-number">0</span>)
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">"Age should not be negative"</span>)
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Age"</span>, age.get())
+}, {
+    onError(e) {
+        <span class="hljs-built_in">window</span>.alert(<span class="hljs-string">"Please enter a valid age"</span>)
+    }
+})
+</code></pre>
+<p>A global onError handler can be set as well, use <code>onReactionError(handler)</code>. This can be useful in tests or for client side error monitoring.</p>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/docs/refguide/computed-decorator"><span class="arrow-prev">← </span><span>(@)computed</span></a><a class="docs-next button" href="/docs/refguide/when"><span>when</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#options">Options</a></li><li><a href="#the-delay-option">The <code>delay</code> option</a></li><li><a href="#the-onerror-option">The <code>onError</code> option</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/mobx.png" alt="MobX" width="66" height="58"/></a><div><h5>Docs</h5><a href="/docs/en/README">Why MobX</a><a href="/docs/en/intro/concepts">Concepts</a></div><div><h5>Community</h5><a href="https://stackoverflow.com/questions/tagged/mobx" target="_blank" rel="noreferrer noopener">Stack Overflow</a><a href="https://gitter.im/mobxjs/mobx">Project Chat</a></div><div><h5>More</h5><a class="github-button" href="https://github.com/mobxjs/mobx" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section></footer></div></body></html>

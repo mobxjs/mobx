@@ -1,0 +1,200 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>(@)observer · MobX</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="# @observer"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="(@)observer · MobX"/><meta property="og:type" content="website"/><meta property="og:url" content="https://mobx.js.org//"/><meta property="og:description" content="# @observer"/><meta property="og:image" content="https://mobx.js.org/img/undraw_online.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://mobx.js.org/img/undraw_tweetstorm.svg"/><link rel="shortcut icon" href="/img/favicon.png"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script>
+              (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+              (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+              m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+              })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+              ga('create', 'UA-65632006-1', 'auto');
+              ga('send', 'pageview');
+            </script><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script type="text/javascript" src="https://codefund.app/properties/259/funder.js" async=""></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><img class="logo" src="/img/mobx.png" alt="MobX"/><h2 class="headerTitleWithLogo">MobX</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/docs/intro/concepts" target="_self">Documentation</a></li><li class=""><a href="https://github.com/mobxjs/mobx" target="_self">Github</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Reacting to observables</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Introduction</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/README">Introduction</a></li><li class="navListItem"><a class="navItem" href="/docs/intro/concepts">Concepts &amp; Principles</a></li><li class="navListItem"><a class="navItem" href="/docs/intro/overview">The gist of MobX</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/api">API overview</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Making things observable</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/refguide/observable">observable</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/observable-decorator">@observable</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/object">objects</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/array">arrays</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/map">maps</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/boxed">boxed values</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/modifiers">decorators</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Reacting to observables</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/refguide/computed-decorator">(@)computed</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/autorun">autorun</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/when">when</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/reaction">reaction</a></li><li class="navListItem navListItemActive"><a class="navItem" href="/docs/refguide/observer-component">(@)observer</a></li><li class="navListItem"><a class="navItem" href="/docs/best/react">Understanding what MobX reacts to</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Changing observables</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/refguide/action">action</a></li><li class="navListItem"><a class="navItem" href="/docs/best/actions">async actions &amp; flows</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/object-api">Object api</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Utility functions</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/refguide/tojson">toJS</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/extend-observable">extendObservable</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/extending">createAtom</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/observe">intercept &amp; observe</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/create-transformer">mobxUtils.createTransformer</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/expr">mobxUtils.expr</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/mobx-utils">MobX-utils</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Tips &amp; Tricks</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/faq/faq">Frequently Asked Questions</a></li><li class="navListItem"><a class="navItem" href="/docs/best/pitfalls">Common Pitfalls &amp; Best Practices</a></li><li class="navListItem"><a class="navItem" href="/docs/best/decorators">How to (not) use decorator syntax</a></li><li class="navListItem"><a class="navItem" href="/docs/best/trace">Using trace for debugging</a></li><li class="navListItem"><a class="navItem" href="/docs/best/store">Defining data stores</a></li><li class="navListItem"><a class="navItem" href="/docs/best/react-performance">Optimizing React components</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/spy">spy</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer"><div class="wrapper"><div class="post"><header class="postHeader"><a class="edit-page-link button" href="https://github.com/mobxjs/mobx/edit/master/docs/refguide/observer-component.md" target="_blank" rel="noreferrer noopener">Edit</a></header><article><div><span><h1><a class="anchor" aria-hidden="true" id="observer"></a><a href="#observer" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>@observer</h1>
+<div id='codefund' ></div>
+<p><details>
+<summary style="color: white; background:green;padding:5px;margin:5px;border-radius:2px">egghead.io lesson 1: observable &amp; observer</summary>
+<br />
+<div style="padding:5px;">
+<iframe style="border: none;" width=760 height=427  src="https://egghead.io/lessons/javascript-sync-the-ui-with-the-app-state-using-mobx-observable-and-observer-in-react/embed" ></iframe>
+</div>
+<a style="font-style:italic;padding:5px;margin:5px;"  href="https://egghead.io/lessons/javascript-sync-the-ui-with-the-app-state-using-mobx-observable-and-observer-in-react">Hosted on egghead.io</a>
+</details></p>
+<p>The <code>observer</code> function / decorator can be used to turn ReactJS components into reactive components.
+It wraps the component's render function in <code>mobx.autorun</code> to make sure that any data that is used during the rendering of a component forces a re-rendering upon change.
+It is available through the separate <code>mobx-react</code> package.</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { observer } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx-react"</span>
+
+<span class="hljs-keyword">var</span> timerData = observable({
+  <span class="hljs-attr">secondsPassed</span>: <span class="hljs-number">0</span>
+})
+
+setInterval(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+  timerData.secondsPassed++
+}, <span class="hljs-number">1000</span>)
+
+@observer
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Timer</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">Component</span> </span>{
+  render() {
+    <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>Seconds passed: {this.props.timerData.secondsPassed} <span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span></span>
+  }
+}
+
+ReactDOM.render(<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">Timer</span> <span class="hljs-attr">timerData</span>=<span class="hljs-string">{timerData}</span> /&gt;</span>, document.body)
+</span></code></pre>
+<p>Tip: when <code>observer</code> needs to be combined with other decorators or higher-order-components, make sure that <code>observer</code> is the innermost (first applied) decorator;
+otherwise it might do nothing at all.</p>
+<p>Note that using <code>@observer</code> as decorator is optional, <code>observer(class Timer ... { })</code> achieves exactly the same.</p>
+<h2><a class="anchor" aria-hidden="true" id="gotcha-dereference-values-_inside_-your-components"></a><a href="#gotcha-dereference-values-_inside_-your-components" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Gotcha: dereference values <em>inside</em> your components</h2>
+<p>MobX can do a lot, but it cannot make primitive values observable (although it can wrap them in an object see <a href="/docs/refguide/boxed">boxed observables</a>).
+So not the <em>values</em> that are observable, but the <em>properties</em> of an object. This means that <code>@observer</code> actually reacts to the fact that you dereference a value.
+So in our above example, the <code>Timer</code> component would <strong>not</strong> react if it was initialized as follows:</p>
+<pre><code class="hljs css language-javascript">React.render(<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">Timer</span> <span class="hljs-attr">timerData</span>=<span class="hljs-string">{timerData.secondsPassed}</span> /&gt;</span>, document.body)
+</span></code></pre>
+<p>In this snippet just the current value of <code>secondsPassed</code> is passed to the <code>Timer</code>, which is the immutable value <code>0</code> (all primitives are immutable in JS).
+That number won't change anymore in the future, so <code>Timer</code> will never update. It is the property <code>secondsPassed</code> that will change in the future,
+so we need to access it <em>in</em> the component. Or in other words: values need to be passed <em>by reference</em> and not by value.</p>
+<h2><a class="anchor" aria-hidden="true" id="es5-support"></a><a href="#es5-support" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>ES5 support</h2>
+<p>In ES5 environments, observer components can be simple declared using <code>observer(React.createClass({ ...</code>. See also the <a href="/docs/best/decorators">syntax guide</a></p>
+<h2><a class="anchor" aria-hidden="true" id="stateless-function-components"></a><a href="#stateless-function-components" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Stateless function components</h2>
+<p>The above timer widget could also be written using stateless function components that are passed through <code>observer</code>:</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { observer } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx-react"</span>
+
+<span class="hljs-keyword">const</span> Timer = observer(<span class="hljs-function">(<span class="hljs-params">{ timerData }</span>) =&gt;</span> (
+  <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>Seconds passed: {timerData.secondsPassed} <span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span></span>
+))
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="observable-local-component-state"></a><a href="#observable-local-component-state" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Observable local component state</h2>
+<p>Just like normal classes, you can introduce observable properties on a component by using the <code>@observable</code> decorator.
+This means that you can have local state in components that doesn't need to be managed by React's verbose and imperative <code>setState</code> mechanism, but is as powerful.
+The reactive state will be picked up by <code>render</code> but will not explicitly invoke other React lifecycle methods except <code>componentWillUpdate</code> and <code>componentDidUpdate</code>.
+If you need other React lifecycle methods, just use the normal React <code>state</code> based APIs.</p>
+<p>The example above could also have been written as:</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { observer } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx-react"</span>
+<span class="hljs-keyword">import</span> { observable } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx"</span>
+
+@observer
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Timer</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">Component</span> </span>{
+  @observable secondsPassed = <span class="hljs-number">0</span>
+
+  componentWillMount() {
+    setInterval(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+      <span class="hljs-keyword">this</span>.secondsPassed++
+    }, <span class="hljs-number">1000</span>)
+  }
+
+  render() {
+    <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>Seconds passed: {this.secondsPassed} <span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span></span>
+  }
+}
+
+ReactDOM.render(<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">Timer</span> /&gt;</span>, document.body)
+</span></code></pre>
+<p>For more advantages of using observable local component state, see <a href="https://medium.com/@mweststrate/3-reasons-why-i-stopped-using-react-setstate-ab73fc67a42e">3 reasons why I stopped using <code>setState</code></a>.</p>
+<h2><a class="anchor" aria-hidden="true" id="observable-local-state-in-hook-based-components"></a><a href="#observable-local-state-in-hook-based-components" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Observable local state in hook based components</h2>
+<p>To work with local observable state inside function components, the <a href="https://github.com/mobxjs/mobx-react#uselocalstore-hook"><code>useLocalStore</code></a> and <a href="https://github.com/mobxjs/mobx-react#useasobservablesource-hook"><code>useAsObservableSource</code></a> hooks can be used.</p>
+<h2><a class="anchor" aria-hidden="true" id="connect-components-to-provided-stores-using-inject"></a><a href="#connect-components-to-provided-stores-using-inject" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Connect components to provided stores using <code>inject</code></h2>
+<p><a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-connect-mobx-observer-components-to-the-store-with-the-react-provider">egghead.io lesson 8: inject stores with Provider</a></p>
+<p><em>Tip: it is recommended to use <code>React.createContext</code> instead</em></p>
+<p>The <code>mobx-react</code> package also provides the <code>Provider</code> component that can be used to pass down stores using React's context mechanism.
+To connect to those stores, pass a list of store names to <code>inject</code>, which will make the stores available as props.</p>
+<p>_ N.B. the syntax to inject stores has changed since mobx-react 4, always use <code>inject(stores)(component)</code> or <code>@inject(stores) class Component...</code>.
+Passing store names directly to <code>observer</code> is deprecated._</p>
+<p>Example:</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> colors = observable({
+   <span class="hljs-attr">foreground</span>: <span class="hljs-string">'#000'</span>,
+   <span class="hljs-attr">background</span>: <span class="hljs-string">'#fff'</span>
+});
+
+<span class="hljs-keyword">const</span> App = <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span>
+  <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">Provider</span> <span class="hljs-attr">colors</span>=<span class="hljs-string">{colors}</span>&gt;</span>
+     <span class="hljs-tag">&lt;<span class="hljs-name">app</span> <span class="hljs-attr">stuff...</span> /&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">Provider</span>&gt;</span>;
+
+const Button = inject("colors")(observer(({ colors, label, onClick }) =&gt;
+  <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">style</span>=<span class="hljs-string">{{</span>
+      <span class="hljs-attr">color:</span> <span class="hljs-attr">colors.foreground</span>,
+      <span class="hljs-attr">backgroundColor:</span> <span class="hljs-attr">colors.background</span>
+    }}
+    <span class="hljs-attr">onClick</span>=<span class="hljs-string">{onClick}</span>
+  &gt;</span>{label}<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+));
+
+// later..
+colors.foreground = 'blue';
+// all buttons updated
+</span></code></pre>
+<p>See for more information the <a href="https://github.com/mobxjs/mobx-react#provider-and-inject"><code>mobx-react</code> docs</a>.</p>
+<h2><a class="anchor" aria-hidden="true" id="when-to-apply-observer"></a><a href="#when-to-apply-observer" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>When to apply <code>observer</code>?</h2>
+<p>The simple rule of thumb is: <em>all components that render observable data</em>.
+If you don't want to mark a component as observer, for example to reduce the dependencies of a generic component package, make sure you only pass it plain data.</p>
+<p>With <code>@observer</code> there is no need to distinguish 'smart' components from 'dumb' components for the purpose of rendering.
+It is still a good separation of concerns for where to handle events, make requests etc.
+All components become responsible for updating when their <em>own</em> dependencies change.
+Its overhead is neglectable and it makes sure that whenever you start using observable data the component will respond to it.
+See this <a href="https://www.reddit.com/r/reactjs/comments/4vnxg5/free_eggheadio_course_learn_mobx_react_in_30/d61oh0l">thread</a> for more details.</p>
+<h2><a class="anchor" aria-hidden="true" id="optimizing-components"></a><a href="#optimizing-components" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Optimizing components</h2>
+<p>See the relevant <a href="/docs/best/react-performance">section</a>.</p>
+<h2><a class="anchor" aria-hidden="true" id="characteristics-of-observer-components"></a><a href="#characteristics-of-observer-components" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Characteristics of observer components</h2>
+<ul>
+<li>Observer only subscribe to the data structures that were actively used during the last render. This means that you cannot under-subscribe or over-subscribe. You can even use data in your rendering that will only be available at later moment in time. This is ideal for asynchronously loading data.</li>
+<li>You are not required to declare what data a component will use. Instead, dependencies are determined at runtime and tracked in a very fine-grained manner.</li>
+<li>Usually reactive components have no or little state, as it is often more convenient to encapsulate (view) state in objects that are shared with other component. But you are still free to use state.</li>
+<li><code>@observer</code> implements <code>shouldComponentUpdate</code> in the same way as <code>PureComponent</code> so that children are not re-rendered unnecessary.</li>
+<li>Reactive components sideways load data; parent components won't re-render unnecessarily even when child components will.</li>
+<li><code>@observer</code> does not depend on React's context system.</li>
+<li>In mobx-react@4+, the props object and the state object of an observer component are automatically made observable to make it easier to create @computed properties that derive from props inside such a component. If you have a reaction (i.e. <code>autorun</code>) inside your <code>@observer</code> component that must <em>not</em> be re-evaluated when the specific props it uses don't change, be sure to derefence those specific props for use inside your reaction (i.e. <code>const myProp = props.myProp</code>). Otherwise, if you reference <code>props.myProp</code> inside the reaction, then a change in <em>any</em> of the props will cause the reaction to be re-evaluated. For a typical use case with React-Router, see <a href="https://alexhisen.gitbooks.io/mobx-recipes/content/observable-based-routing.html">this article</a>.</li>
+</ul>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/docs/refguide/reaction"><span class="arrow-prev">← </span><span>reaction</span></a><a class="docs-next button" href="/docs/best/react"><span class="function-name-prevnext">Understanding what MobX reacts to</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#gotcha-dereference-values-_inside_-your-components">Gotcha: dereference values <em>inside</em> your components</a></li><li><a href="#es5-support">ES5 support</a></li><li><a href="#stateless-function-components">Stateless function components</a></li><li><a href="#observable-local-component-state">Observable local component state</a></li><li><a href="#observable-local-state-in-hook-based-components">Observable local state in hook based components</a></li><li><a href="#connect-components-to-provided-stores-using-inject">Connect components to provided stores using <code>inject</code></a></li><li><a href="#when-to-apply-observer">When to apply <code>observer</code>?</a></li><li><a href="#optimizing-components">Optimizing components</a></li><li><a href="#characteristics-of-observer-components">Characteristics of observer components</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/mobx.png" alt="MobX" width="66" height="58"/></a><div><h5>Docs</h5><a href="/docs/en/README">Why MobX</a><a href="/docs/en/intro/concepts">Concepts</a></div><div><h5>Community</h5><a href="https://stackoverflow.com/questions/tagged/mobx" target="_blank" rel="noreferrer noopener">Stack Overflow</a><a href="https://gitter.im/mobxjs/mobx">Project Chat</a></div><div><h5>More</h5><a class="github-button" href="https://github.com/mobxjs/mobx" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section></footer></div></body></html>

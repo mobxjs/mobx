@@ -1,0 +1,145 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>refguide/extending · MobX</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="# Creating observable data structures and reactions"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="refguide/extending · MobX"/><meta property="og:type" content="website"/><meta property="og:url" content="https://mobx.js.org//"/><meta property="og:description" content="# Creating observable data structures and reactions"/><meta property="og:image" content="https://mobx.js.org/img/undraw_online.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://mobx.js.org/img/undraw_tweetstorm.svg"/><link rel="shortcut icon" href="/img/favicon.png"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script>
+              (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+              (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+              m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+              })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+              ga('create', 'UA-65632006-1', 'auto');
+              ga('send', 'pageview');
+            </script><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script type="text/javascript" src="https://codefund.app/properties/259/funder.js" async=""></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><img class="logo" src="/img/mobx.png" alt="MobX"/><h2 class="headerTitleWithLogo">MobX</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/docs/intro/concepts" target="_self">Documentation</a></li><li class=""><a href="https://github.com/mobxjs/mobx" target="_self">Github</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Utility functions</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Introduction</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/README">Introduction</a></li><li class="navListItem"><a class="navItem" href="/docs/intro/concepts">Concepts &amp; Principles</a></li><li class="navListItem"><a class="navItem" href="/docs/intro/overview">The gist of MobX</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/api">API overview</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Making things observable</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/refguide/observable">observable</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/observable-decorator">@observable</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/object">objects</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/array">arrays</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/map">maps</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/boxed">boxed values</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/modifiers">decorators</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Reacting to observables</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/refguide/computed-decorator">(@)computed</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/autorun">autorun</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/when">when</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/reaction">reaction</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/observer-component">(@)observer</a></li><li class="navListItem"><a class="navItem" href="/docs/best/react">Understanding what MobX reacts to</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Changing observables</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/refguide/action">action</a></li><li class="navListItem"><a class="navItem" href="/docs/best/actions">async actions &amp; flows</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/object-api">Object api</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Utility functions</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/refguide/tojson">toJS</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/extend-observable">extendObservable</a></li><li class="navListItem navListItemActive"><a class="navItem" href="/docs/refguide/extending">createAtom</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/observe">intercept &amp; observe</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/create-transformer">mobxUtils.createTransformer</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/expr">mobxUtils.expr</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/mobx-utils">MobX-utils</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Tips &amp; Tricks</h3><ul class=""><li class="navListItem"><a class="navItem" href="/docs/faq/faq">Frequently Asked Questions</a></li><li class="navListItem"><a class="navItem" href="/docs/best/pitfalls">Common Pitfalls &amp; Best Practices</a></li><li class="navListItem"><a class="navItem" href="/docs/best/decorators">How to (not) use decorator syntax</a></li><li class="navListItem"><a class="navItem" href="/docs/best/trace">Using trace for debugging</a></li><li class="navListItem"><a class="navItem" href="/docs/best/store">Defining data stores</a></li><li class="navListItem"><a class="navItem" href="/docs/best/react-performance">Optimizing React components</a></li><li class="navListItem"><a class="navItem" href="/docs/refguide/spy">spy</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer"><div class="wrapper"><div class="post"><header class="postHeader"><a class="edit-page-link button" href="https://github.com/mobxjs/mobx/edit/master/docs/refguide/extending.md" target="_blank" rel="noreferrer noopener">Edit</a></header><article><div><span><h1><a class="anchor" aria-hidden="true" id="creating-observable-data-structures-and-reactions"></a><a href="#creating-observable-data-structures-and-reactions" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Creating observable data structures and reactions</h1>
+<div id='codefund' ></div>
+<h2><a class="anchor" aria-hidden="true" id="atoms"></a><a href="#atoms" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Atoms</h2>
+<p>At some point you might want to have more data structures or other things (like streams) that can be used in reactive computations.
+Achieving that is pretty simple by using the concept of atoms.
+Atoms can be used to signal MobX that some observable data source has been observed or changed.
+And MobX will signal the atom whenever it is used or no longer in use.</p>
+<p><em>Tip: in many cases you can avoid the need to create your own atoms, by just creating a normal observable, and use
+the <code>onBecomeObserved</code> or <code>onBecomeUnobserved</code> utility to be notified when MobX starts tracking an observable</em></p>
+<p>The following example demonstrates how you can create an observable <code>Clock</code>, which can be used in reactive functions,
+and returns the current date-time.
+This clock will only actually tick if it is observed by someone.</p>
+<p>The complete API of the <code>Atom</code> class is demonstrated by this example.</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> {createAtom, autorun} <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx"</span>;
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Clock</span> </span>{
+    atom;
+    intervalHandler = <span class="hljs-literal">null</span>;
+    currentDateTime;
+
+    <span class="hljs-keyword">constructor</span>() {
+        <span class="hljs-comment">// creates an atom to interact with the MobX core algorithm</span>
+        <span class="hljs-keyword">this</span>.atom = createAtom(
+            <span class="hljs-comment">// first param: a name for this atom, for debugging purposes</span>
+            <span class="hljs-string">"Clock"</span>,
+            <span class="hljs-comment">// second (optional) parameter: callback for when this atom transitions from unobserved to observed.</span>
+            () =&gt; <span class="hljs-keyword">this</span>.startTicking(),
+            <span class="hljs-comment">// third (optional) parameter: callback for when this atom transitions from observed to unobserved</span>
+            <span class="hljs-comment">// note that the same atom transitions multiple times between these two states</span>
+            () =&gt; <span class="hljs-keyword">this</span>.stopTicking()
+        );
+    }
+
+    getTime() {
+        <span class="hljs-comment">// let MobX know this observable data source has been used</span>
+        <span class="hljs-comment">// reportObserved will return true if the atom is currently being observed</span>
+        <span class="hljs-comment">// by some reaction.</span>
+        <span class="hljs-comment">// reportObserved will also trigger the onBecomeObserved event handler (startTicking) if needed</span>
+        <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.atom.reportObserved()) {
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.currentDateTime;
+        } <span class="hljs-keyword">else</span> {
+            <span class="hljs-comment">// apparently getTime was called but not while a reaction is running.</span>
+            <span class="hljs-comment">// So, nobody depends on this value, hence the onBecomeObserved handler (startTicking) won't be fired</span>
+            <span class="hljs-comment">// Depending on the nature of your atom</span>
+            <span class="hljs-comment">// it might behave differently in such circumstances</span>
+            <span class="hljs-comment">// (like throwing an error, returning a default value etc)</span>
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>();
+        }
+    }
+
+    tick() {
+        <span class="hljs-keyword">this</span>.currentDateTime = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>();
+        <span class="hljs-comment">// let MobX know that this data source has changed</span>
+        <span class="hljs-keyword">this</span>.atom.reportChanged();
+    }
+
+    startTicking() {
+        <span class="hljs-keyword">this</span>.tick(); <span class="hljs-comment">// initial tick</span>
+        <span class="hljs-keyword">this</span>.intervalHandler = setInterval(
+            <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-keyword">this</span>.tick(),
+            <span class="hljs-number">1000</span>
+        );
+    }
+
+    stopTicking() {
+        clearInterval(<span class="hljs-keyword">this</span>.intervalHandler);
+        <span class="hljs-keyword">this</span>.intervalHandler = <span class="hljs-literal">null</span>;
+    }
+}
+
+<span class="hljs-keyword">const</span> clock = <span class="hljs-keyword">new</span> Clock();
+
+<span class="hljs-keyword">const</span> disposer = autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-built_in">console</span>.log(clock.getTime()));
+
+<span class="hljs-comment">// ... prints the time each second</span>
+
+disposer();
+
+<span class="hljs-comment">// printing stops. If nobody else uses the same `clock` the clock will stop ticking as well.</span>
+</code></pre>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/docs/refguide/extend-observable"><span class="arrow-prev">← </span><span class="function-name-prevnext">extendObservable</span></a><a class="docs-next button" href="/docs/refguide/observe"><span>intercept &amp; observe</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#atoms">Atoms</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/mobx.png" alt="MobX" width="66" height="58"/></a><div><h5>Docs</h5><a href="/docs/en/README">Why MobX</a><a href="/docs/en/intro/concepts">Concepts</a></div><div><h5>Community</h5><a href="https://stackoverflow.com/questions/tagged/mobx" target="_blank" rel="noreferrer noopener">Stack Overflow</a><a href="https://gitter.im/mobxjs/mobx">Project Chat</a></div><div><h5>More</h5><a class="github-button" href="https://github.com/mobxjs/mobx" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section></footer></div></body></html>
