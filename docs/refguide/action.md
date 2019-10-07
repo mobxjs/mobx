@@ -37,9 +37,9 @@ This makes sure intermediate or incomplete values produced during an action are 
 It is advised to use `(@)action` on any function that modifies observables or has side effects.
 `action` also provides useful debugging information in combination with the devtools.
 
-Using the `@action` decorator with setters (i.e. `@action set propertyName`) is not supported; however, setters of [computed properties are automatically actions](https://github.com/mobxjs/mobx/blob/gh-pages/docs/refguide/computed-decorator.md#setters-for-computed-values).
+Using the `@action` decorator with setters (i.e. `@action set propertyName`) is not supported; however, setters of [computed properties are automatically actions](computed-decorator.md).
 
-Note: using `action` is mandatory when MobX is configured to require actions to make state changes, see [`enforceActions`](https://github.com/mobxjs/mobx/blob/gh-pages/docs/refguide/api.md#configure).
+Note: using `action` is mandatory when MobX is configured to require actions to make state changes, see [`enforceActions`](api.md#configure).
 
 ## When to use actions?
 
@@ -47,7 +47,7 @@ Actions should only, and always, be used on functions that _modify_ state.
 Functions that just perform look-ups, filters etc should _not_ be marked as actions; to allow MobX to track their invocations.
 
 
-["enforce actions"](https://github.com/mobxjs/mobx/blob/gh-pages/docs/refguide/api.md#configure) enforces that all state modifications are done by an action. This is a useful best practice in larger, long term code bases.
+["enforce actions"](api.md#configure) enforces that all state modifications are done by an action. This is a useful best practice in larger, long term code bases.
 
 ## Bound actions
 
