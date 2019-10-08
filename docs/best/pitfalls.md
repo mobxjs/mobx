@@ -147,7 +147,7 @@ Example:
 ```javascript
 const VAT = observable(1.20)
 
-class OrderLIne {
+class OrderLine {
     @observable price = 10;
     @observable amount = 1;
     constructor() {
