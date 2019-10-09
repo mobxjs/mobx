@@ -5,17 +5,19 @@ hide_title: true
 ---
 
 # Spy
+
 <div id='codefund' ></div>
 
 Usage: `spy(listener)`.
 Registers a global spy listener that listens to all events that happen in MobX.
-It is similar to attaching an `observe` listener to *all* observables at once, but also notifies about running (trans/re)actions and computations.
+It is similar to attaching an `observe` listener to _all_ observables at once, but also notifies about running (trans/re)actions and computations.
 Used for example by the `mobx-react-devtools`.
 
 Example usage of spying all actions:
+
 ```javascript
-spy((event) => {
-    if (event.type === 'action') {
+spy(event => {
+    if (event.type === "action") {
         console.log(`${event.name} with args: ${event.arguments}`)
     }
 })
@@ -23,21 +25,21 @@ spy((event) => {
 
 Spy listeners always receive one object, which usually has at least a `type` field. The following events are emitted by default by spy.
 
-| event | fields | nested |
-| --- | --- |--- |
-| action | name, object (scope), arguments | yes |
-| scheduled-reaction | name | no |
-| reaction | name | yes
-| compute | name | no
-| error | message | no |
-| update (array) | object (the array), index, newValue, oldValue | yes
-| update (map) | object (observable map instance), name, newValue, oldValue | yes
-| update (object) | object (instance), name, newValue, oldValue | yes
-| splice (array) | object (the array), index, added, removed, addedCount, removedCount | yes
-| add (map) | object, name, newValue | yes
-| add (object) | object, name, newValue | yes
-| delete (map) | object, name, oldValue | yes
-| create (boxed observable) | object (ObservableValue instance), newValue | yes |
+| event                     | fields                                                              | nested |
+| ------------------------- | ------------------------------------------------------------------- | ------ |
+| action                    | name, object (scope), arguments                                     | yes    |
+| scheduled-reaction        | name                                                                | no     |
+| reaction                  | name                                                                | yes    |
+| compute                   | name                                                                | no     |
+| error                     | message                                                             | no     |
+| update (array)            | object (the array), index, newValue, oldValue                       | yes    |
+| update (map)              | object (observable map instance), name, newValue, oldValue          | yes    |
+| update (object)           | object (instance), name, newValue, oldValue                         | yes    |
+| splice (array)            | object (the array), index, added, removed, addedCount, removedCount | yes    |
+| add (map)                 | object, name, newValue                                              | yes    |
+| add (object)              | object, name, newValue                                              | yes    |
+| delete (map)              | object, name, oldValue                                              | yes    |
+| create (boxed observable) | object (ObservableValue instance), newValue                         | yes    |
 
 Note that there are events with the signature `{ spyReportEnd: true, time? }`.
 These events might not have a `type` field, but they are part of an earlier fired event that had `spyReportStart: true`.

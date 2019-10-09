@@ -5,6 +5,7 @@ hide_title: true
 ---
 
 # @observer
+
 <div id='codefund' ></div>
 
 <details>
@@ -24,18 +25,18 @@ It is available through the separate `mobx-react` package.
 import { observer } from "mobx-react"
 
 var timerData = observable({
-  secondsPassed: 0
+    secondsPassed: 0
 })
 
 setInterval(() => {
-  timerData.secondsPassed++
+    timerData.secondsPassed++
 }, 1000)
 
 @observer
 class Timer extends React.Component {
-  render() {
-    return <span>Seconds passed: {this.props.timerData.secondsPassed} </span>
-  }
+    render() {
+        return <span>Seconds passed: {this.props.timerData.secondsPassed} </span>
+    }
 }
 
 ReactDOM.render(<Timer timerData={timerData} />, document.body)
@@ -71,9 +72,7 @@ The above timer widget could also be written using stateless function components
 ```javascript
 import { observer } from "mobx-react"
 
-const Timer = observer(({ timerData }) => (
-  <span>Seconds passed: {timerData.secondsPassed} </span>
-))
+const Timer = observer(({ timerData }) => <span>Seconds passed: {timerData.secondsPassed} </span>)
 ```
 
 ## Observable local component state
@@ -91,17 +90,17 @@ import { observable } from "mobx"
 
 @observer
 class Timer extends React.Component {
-  @observable secondsPassed = 0
+    @observable secondsPassed = 0
 
-  componentWillMount() {
-    setInterval(() => {
-      this.secondsPassed++
-    }, 1000)
-  }
+    componentWillMount() {
+        setInterval(() => {
+            this.secondsPassed++
+        }, 1000)
+    }
 
-  render() {
-    return <span>Seconds passed: {this.secondsPassed} </span>
-  }
+    render() {
+        return <span>Seconds passed: {this.secondsPassed} </span>
+    }
 }
 
 ReactDOM.render(<Timer />, document.body)
@@ -171,10 +170,10 @@ See the relevant [section](../best/react-performance.md).
 
 ## Characteristics of observer components
 
-- Observer only subscribe to the data structures that were actively used during the last render. This means that you cannot under-subscribe or over-subscribe. You can even use data in your rendering that will only be available at later moment in time. This is ideal for asynchronously loading data.
-- You are not required to declare what data a component will use. Instead, dependencies are determined at runtime and tracked in a very fine-grained manner.
-- Usually reactive components have no or little state, as it is often more convenient to encapsulate (view) state in objects that are shared with other component. But you are still free to use state.
-- `@observer` implements `shouldComponentUpdate` in the same way as `PureComponent` so that children are not re-rendered unnecessary.
-- Reactive components sideways load data; parent components won't re-render unnecessarily even when child components will.
-- `@observer` does not depend on React's context system.
-- In mobx-react@4+, the props object and the state object of an observer component are automatically made observable to make it easier to create @computed properties that derive from props inside such a component. If you have a reaction (i.e. `autorun`) inside your `@observer` component that must _not_ be re-evaluated when the specific props it uses don't change, be sure to derefence those specific props for use inside your reaction (i.e. `const myProp = props.myProp`). Otherwise, if you reference `props.myProp` inside the reaction, then a change in _any_ of the props will cause the reaction to be re-evaluated. For a typical use case with React-Router, see [this article](https://alexhisen.gitbooks.io/mobx-recipes/content/observable-based-routing.html).
+-   Observer only subscribe to the data structures that were actively used during the last render. This means that you cannot under-subscribe or over-subscribe. You can even use data in your rendering that will only be available at later moment in time. This is ideal for asynchronously loading data.
+-   You are not required to declare what data a component will use. Instead, dependencies are determined at runtime and tracked in a very fine-grained manner.
+-   Usually reactive components have no or little state, as it is often more convenient to encapsulate (view) state in objects that are shared with other component. But you are still free to use state.
+-   `@observer` implements `shouldComponentUpdate` in the same way as `PureComponent` so that children are not re-rendered unnecessary.
+-   Reactive components sideways load data; parent components won't re-render unnecessarily even when child components will.
+-   `@observer` does not depend on React's context system.
+-   In mobx-react@4+, the props object and the state object of an observer component are automatically made observable to make it easier to create @computed properties that derive from props inside such a component. If you have a reaction (i.e. `autorun`) inside your `@observer` component that must _not_ be re-evaluated when the specific props it uses don't change, be sure to derefence those specific props for use inside your reaction (i.e. `const myProp = props.myProp`). Otherwise, if you reference `props.myProp` inside the reaction, then a change in _any_ of the props will cause the reaction to be re-evaluated. For a typical use case with React-Router, see [this article](https://alexhisen.gitbooks.io/mobx-recipes/content/observable-based-routing.html).

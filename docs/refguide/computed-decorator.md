@@ -5,6 +5,7 @@ hide_title: true
 ---
 
 # (@)computed
+
 <div id='codefund' ></div>
 
 <details>
@@ -22,8 +23,8 @@ Computed values can't be underestimated, as they help you to make your actual mo
 Besides that they are highly optimized, so use them wherever possible.
 
 Don't confuse `computed` with `autorun`. They are both reactively invoked expressions,
-but use `@computed` if you want to reactively produce a *value* that can be used by other observers and
-`autorun` if you don't want to produce a new value but rather want to achieve an *effect*.
+but use `@computed` if you want to reactively produce a _value_ that can be used by other observers and
+`autorun` if you don't want to produce a new value but rather want to achieve an _effect_.
 For example imperative side effects like logging, making network requests etc.
 
 Computed values are automatically derived from your state if any value that affects them changes.
@@ -43,18 +44,18 @@ Note that `computed` properties are not enumerable. Nor can they be overwritten 
 If you have [decorators enabled](../best/decorators.md) you can use the `@computed` decorator on any getter of a class property to declaratively create computed properties.
 
 ```javascript
-import {observable, computed} from "mobx";
+import { observable, computed } from "mobx"
 
 class OrderLine {
-    @observable price = 0;
-    @observable amount = 1;
+    @observable price = 0
+    @observable amount = 1
 
     constructor(price) {
-        this.price = price;
+        this.price = price
     }
 
     @computed get total() {
-        return this.price * this.amount;
+        return this.price * this.amount
     }
 }
 ```
@@ -62,18 +63,18 @@ class OrderLine {
 Otherwise, use `decorate` to introduce them:
 
 ```javascript
-import {decorate, observable, computed} from "mobx";
+import { decorate, observable, computed } from "mobx"
 
 class OrderLine {
-    price = 0;
-    amount = 1;
+    price = 0
+    amount = 1
 
     constructor(price) {
-        this.price = price;
+        this.price = price
     }
 
     get total() {
-        return this.price * this.amount;
+        return this.price * this.amount
     }
 }
 decorate(OrderLine, {
@@ -94,7 +95,6 @@ const orderLine = observable.object({
     }
 })
 ```
-
 
 ## Setters for computed values
 
@@ -118,12 +118,13 @@ And similarly
 
 ```javascript
 class Foo {
-    @observable length = 2;
+    @observable length = 2
     @computed get squared() {
-        return this.length * this.length;
+        return this.length * this.length
     }
-    set squared(value) { //this is automatically an action, no annotation necessary
-        this.length = Math.sqrt(value);
+    set squared(value) {
+        //this is automatically an action, no annotation necessary
+        this.length = Math.sqrt(value)
     }
 }
 ```
@@ -140,16 +141,14 @@ This form of `computed` is not used very often, but in some cases where you need
 Example:
 
 ```javascript
-import {observable, computed} from "mobx";
-var name = observable.box("John");
+import { observable, computed } from "mobx"
+var name = observable.box("John")
 
-var upperCaseName = computed(() =>
-	name.get().toUpperCase()
-);
+var upperCaseName = computed(() => name.get().toUpperCase())
 
-var disposer = upperCaseName.observe(change => console.log(change.newValue));
+var disposer = upperCaseName.observe(change => console.log(change.newValue))
 
-name.set("Dave");
+name.set("Dave")
 // prints: 'DAVE'
 ```
 
@@ -157,12 +156,12 @@ name.set("Dave");
 
 When using `computed` as modifier or as box, it accepts a second options argument with the following optional arguments:
 
-* `name`: String, the debug name used in spy and the MobX devtools
-* `context`: The `this` that should be used in the provided expression
-* `set`: The setter function to be used. Without setter it is not possible to assign new values to a computed value. If the second argument passed to `computed` is a function, this is assumed to be a setter.
-* `equals`: By default `comparer.default`. This acts as a comparison function for comparing the previous value with the next value. If this function considers the previous and next values to be equal, then observers will not be re-evaluated. This is useful when working with structural data, and types from other libraries. For example, a computed [moment](https://momentjs.com/) instance could use `(a, b) => a.isSame(b)`. `comparer.structural` comes in handy if you want to use structural comparison to determine whether the new value is different from the previous value (and as a result notify observers).
-* `requiresReaction`: It is recommended to set this one to `true` on very expensive computed values. If you try to read it's value, but the value is not being tracked by some observer (in which case MobX won't cache the value), it will cause the computed to throw, instead of doing an expensive re-evalution.
-* `keepAlive`: don't suspend this computed value if it is not observed by anybody. _Be aware, this can easily lead to memory leaks as it will result in every observable used by this computed value, keeping the computed value in memory!_
+-   `name`: String, the debug name used in spy and the MobX devtools
+-   `context`: The `this` that should be used in the provided expression
+-   `set`: The setter function to be used. Without setter it is not possible to assign new values to a computed value. If the second argument passed to `computed` is a function, this is assumed to be a setter.
+-   `equals`: By default `comparer.default`. This acts as a comparison function for comparing the previous value with the next value. If this function considers the previous and next values to be equal, then observers will not be re-evaluated. This is useful when working with structural data, and types from other libraries. For example, a computed [moment](https://momentjs.com/) instance could use `(a, b) => a.isSame(b)`. `comparer.structural` comes in handy if you want to use structural comparison to determine whether the new value is different from the previous value (and as a result notify observers).
+-   `requiresReaction`: It is recommended to set this one to `true` on very expensive computed values. If you try to read it's value, but the value is not being tracked by some observer (in which case MobX won't cache the value), it will cause the computed to throw, instead of doing an expensive re-evalution.
+-   `keepAlive`: don't suspend this computed value if it is not observed by anybody. _Be aware, this can easily lead to memory leaks as it will result in every observable used by this computed value, keeping the computed value in memory!_
 
 ## `@computed.struct` for structural comparison
 
@@ -171,9 +170,10 @@ The `@computed` decorator does not take arguments. If you want to to create a co
 ## Built-in comparers
 
 MobX provides three built-in `comparer`s which should cover most needs:
-- `comparer.identity`: Uses the identity (`===`) operator to determine if two values are the same.
-- `comparer.default`: The same as `comparer.identity`, but also considers `NaN` to be equal to `NaN`.
-- `comparer.structural`: Performs deep structural comparison to determine if two values are the same.
+
+-   `comparer.identity`: Uses the identity (`===`) operator to determine if two values are the same.
+-   `comparer.default`: The same as `comparer.identity`, but also considers `NaN` to be equal to `NaN`.
+-   `comparer.structural`: Performs deep structural comparison to determine if two values are the same.
 
 ## Computed values run more often than expected
 
@@ -191,8 +191,7 @@ Example:
 const x = observable(3)
 const y = observable(1)
 const divided = computed(() => {
-    if (y.get() === 0)
-        throw new Error("Division by zero")
+    if (y.get() === 0) throw new Error("Division by zero")
     return x.get() / y.get()
 })
 
@@ -208,7 +207,7 @@ divided.get() // Recovered; Returns 1.5
 
 ## Computeds with arguments
 
-Sometimes you might want to have a computed value that takes one or more arguments. 
+Sometimes you might want to have a computed value that takes one or more arguments.
 In such cases mobx-util's [`computedFn`](https://github.com/mobxjs/mobx-utils#computedfn) can be used:
 
 ```typescript
@@ -219,13 +218,13 @@ import { computedFn } from "mobx-utils"
 
 class Todos {
   @observable todos = []
-  
+
   getAllTodosByUser = computedFn(function getAllTodosByUser(userId) {
     return this.todos.filter(todo => todo.user === userId))
   })
 }
 ```
 
-Note: don't use arrow functions as the `this` would be incorrect. 
+Note: don't use arrow functions as the `this` would be incorrect.
 
 For further details, check the mobx-utils [docs](https://github.com/mobxjs/mobx-utils#computedfn)

@@ -5,6 +5,7 @@ hide_title: true
 ---
 
 # when
+
 <div id='codefund' ></div>
 
 <details>
@@ -27,22 +28,22 @@ For example:
 
 ```javascript
 class MyResource {
-	constructor() {
-		when(
-			// once...
-			() => !this.isVisible,
-			// ... then
-			() => this.dispose()
-		);
-	}
+    constructor() {
+        when(
+            // once...
+            () => !this.isVisible,
+            // ... then
+            () => this.dispose()
+        )
+    }
 
-	@computed get isVisible() {
-		// indicate whether this item is visible
-	}
+    @computed get isVisible() {
+        // indicate whether this item is visible
+    }
 
-	dispose() {
-		// dispose
-	}
+    dispose() {
+        // dispose
+    }
 }
 ```
 

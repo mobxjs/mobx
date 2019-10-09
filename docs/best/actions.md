@@ -4,8 +4,8 @@ title: Writing asynchronous actions
 hide_title: true
 ---
 
-
 # Writing asynchronous actions
+
 <div id='codefund' ></div>
 
 The `action` wrapper / decorator only affects the currently running function, not functions that are scheduled (but not invoked) by the current function!
@@ -18,24 +18,24 @@ Let's start with a basic example:
 mobx.configure({ enforceActions: "observed" }) // don't allow state modifications outside actions
 
 class Store {
-	@observable githubProjects = []
-	@observable state = "pending" // "pending" / "done" / "error"
+    @observable githubProjects = []
+    @observable state = "pending" // "pending" / "done" / "error"
 
-	@action
-	fetchProjects() {
-		this.githubProjects = []
-		this.state = "pending"
-		fetchGithubProjectsSomehow().then(
-			projects => {
-				const filteredProjects = somePreprocessing(projects)
-				this.githubProjects = filteredProjects
-				this.state = "done"
-			},
-			error => {
-				this.state = "error"
-			}
-		)
-	}
+    @action
+    fetchProjects() {
+        this.githubProjects = []
+        this.state = "pending"
+        fetchGithubProjectsSomehow().then(
+            projects => {
+                const filteredProjects = somePreprocessing(projects)
+                this.githubProjects = filteredProjects
+                this.state = "done"
+            },
+            error => {
+                this.state = "error"
+            }
+        )
+    }
 }
 ```
 
@@ -47,27 +47,27 @@ A first simple fix is to extract the callbacks to actions. (Note that binding us
 mobx.configure({ enforceActions: "observed" })
 
 class Store {
-	@observable githubProjects = []
-	@observable state = "pending" // "pending" / "done" / "error"
+    @observable githubProjects = []
+    @observable state = "pending" // "pending" / "done" / "error"
 
-	@action
-	fetchProjects() {
-		this.githubProjects = []
-		this.state = "pending"
-		fetchGithubProjectsSomehow().then(this.fetchProjectsSuccess, this.fetchProjectsError)
-	}
+    @action
+    fetchProjects() {
+        this.githubProjects = []
+        this.state = "pending"
+        fetchGithubProjectsSomehow().then(this.fetchProjectsSuccess, this.fetchProjectsError)
+    }
 
-	@action.bound
-	fetchProjectsSuccess(projects) {
-		const filteredProjects = somePreprocessing(projects)
-		this.githubProjects = filteredProjects
-		this.state = "done"
-	}
+    @action.bound
+    fetchProjectsSuccess(projects) {
+        const filteredProjects = somePreprocessing(projects)
+        this.githubProjects = filteredProjects
+        this.state = "done"
+    }
 
-	@action.bound
-	fetchProjectsError(error) {
-		this.state = "error"
-	}
+    @action.bound
+    fetchProjectsError(error) {
+        this.state = "error"
+    }
 }
 ```
 
@@ -77,26 +77,26 @@ Although this is clean and explicit, it might get a bit verbose with complex asy
 mobx.configure({ enforceActions: "observed" })
 
 class Store {
-	@observable githubProjects = []
-	@observable state = "pending" // "pending" / "done" / "error"
+    @observable githubProjects = []
+    @observable state = "pending" // "pending" / "done" / "error"
 
-	@action
-	fetchProjects() {
-		this.githubProjects = []
-		this.state = "pending"
-		fetchGithubProjectsSomehow().then(
-			// inline created action
-			action("fetchSuccess", projects => {
-				const filteredProjects = somePreprocessing(projects)
-				this.githubProjects = filteredProjects
-				this.state = "done"
-			}),
-			// inline created action
-			action("fetchError", error => {
-				this.state = "error"
-			})
-		)
-	}
+    @action
+    fetchProjects() {
+        this.githubProjects = []
+        this.state = "pending"
+        fetchGithubProjectsSomehow().then(
+            // inline created action
+            action("fetchSuccess", projects => {
+                const filteredProjects = somePreprocessing(projects)
+                this.githubProjects = filteredProjects
+                this.state = "done"
+            }),
+            // inline created action
+            action("fetchError", error => {
+                this.state = "error"
+            })
+        )
+    }
 }
 ```
 
@@ -110,30 +110,30 @@ The advantage of this pattern is that it encourages you to not litter the place 
 mobx.configure({ enforceActions: "observed" })
 
 class Store {
-	@observable githubProjects = []
-	@observable state = "pending" // "pending" / "done" / "error"
+    @observable githubProjects = []
+    @observable state = "pending" // "pending" / "done" / "error"
 
-	@action
-	fetchProjects() {
-		this.githubProjects = []
-		this.state = "pending"
-		fetchGithubProjectsSomehow().then(
-			projects => {
-				const filteredProjects = somePreprocessing(projects)
-				// put the 'final' modification in an anonymous action
-				runInAction(() => {
-					this.githubProjects = filteredProjects
-					this.state = "done"
-				})
-			},
-			error => {
-				// the alternative ending of this process:...
-				runInAction(() => {
-					this.state = "error"
-				})
-			}
-		)
-	}
+    @action
+    fetchProjects() {
+        this.githubProjects = []
+        this.state = "pending"
+        fetchGithubProjectsSomehow().then(
+            projects => {
+                const filteredProjects = somePreprocessing(projects)
+                // put the 'final' modification in an anonymous action
+                runInAction(() => {
+                    this.githubProjects = filteredProjects
+                    this.state = "done"
+                })
+            },
+            error => {
+                // the alternative ending of this process:...
+                runInAction(() => {
+                    this.state = "error"
+                })
+            }
+        )
+    }
 }
 ```
 
@@ -152,27 +152,27 @@ This is where `runInAction` comes in handy again:
 mobx.configure({ enforceActions: "observed" })
 
 class Store {
-	@observable githubProjects = []
-	@observable state = "pending" // "pending" / "done" / "error"
+    @observable githubProjects = []
+    @observable state = "pending" // "pending" / "done" / "error"
 
-	@action
-	async fetchProjects() {
-		this.githubProjects = []
-		this.state = "pending"
-		try {
-			const projects = await fetchGithubProjectsSomehow()
-			const filteredProjects = somePreprocessing(projects)
-			// after await, modifying state again, needs an actions:
-			runInAction(() => {
-				this.state = "done"
-				this.githubProjects = filteredProjects
-			})
-		} catch (error) {
-			runInAction(() => {
-				this.state = "error"
-			})
-		}
-	}
+    @action
+    async fetchProjects() {
+        this.githubProjects = []
+        this.state = "pending"
+        try {
+            const projects = await fetchGithubProjectsSomehow()
+            const filteredProjects = somePreprocessing(projects)
+            // after await, modifying state again, needs an actions:
+            runInAction(() => {
+                this.state = "done"
+                this.githubProjects = filteredProjects
+            })
+        } catch (error) {
+            runInAction(() => {
+                this.state = "error"
+            })
+        }
+    }
 }
 ```
 
@@ -188,22 +188,23 @@ The advantage of `flow` is that it is syntactically very close to async / await 
 mobx.configure({ enforceActions: "observed" })
 
 class Store {
-	@observable githubProjects = []
-	@observable state = "pending"
+    @observable githubProjects = []
+    @observable state = "pending"
 
-	fetchProjects = flow(function * () { // <- note the star, this a generator function!
-		this.githubProjects = []
-		this.state = "pending"
-		try {
-			const projects = yield fetchGithubProjectsSomehow() // yield instead of await
-			const filteredProjects = somePreprocessing(projects)
-			// the asynchronous blocks will automatically be wrapped in actions and can modify state
-			this.state = "done"
-			this.githubProjects = filteredProjects
-		} catch (error) {
-			this.state = "error"
-		}
-	})
+    fetchProjects = flow(function*() {
+        // <- note the star, this a generator function!
+        this.githubProjects = []
+        this.state = "pending"
+        try {
+            const projects = yield fetchGithubProjectsSomehow() // yield instead of await
+            const filteredProjects = somePreprocessing(projects)
+            // the asynchronous blocks will automatically be wrapped in actions and can modify state
+            this.state = "done"
+            this.githubProjects = filteredProjects
+        } catch (error) {
+            this.state = "error"
+        }
+    })
 }
 ```
 

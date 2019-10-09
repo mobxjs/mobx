@@ -4,6 +4,7 @@ hide_title: true
 ---
 
 # extendObservable
+
 <div id='codefund' ></div>
 
 `extendObservable(target, properties, decorators?, options?)`
@@ -18,30 +19,34 @@ Use the `deep: false` option to make the new properties _shallow_. That is, prev
 
 ```javascript
 var Person = function(firstName, lastName) {
-	// initialize observable properties on a new instance
-	extendObservable(this, {
-		firstName: firstName,
-		lastName: lastName,
-		get fullName() {
-			return this.firstName + "  " + this.lastName
-		},
-		setFirstName(firstName) {
-			this.firstName = firstName
-		}
-	}, {
-		setFirstName: action
-	});
+    // initialize observable properties on a new instance
+    extendObservable(
+        this,
+        {
+            firstName: firstName,
+            lastName: lastName,
+            get fullName() {
+                return this.firstName + "  " + this.lastName
+            },
+            setFirstName(firstName) {
+                this.firstName = firstName
+            }
+        },
+        {
+            setFirstName: action
+        }
+    )
 }
 
-var matthew = new Person("Matthew", "Henry");
+var matthew = new Person("Matthew", "Henry")
 
 // add an observable property to an already observable object
 extendObservable(matthew, {
-	age: 353
-});
+    age: 353
+})
 ```
 
-Note:  `observable.object(object)` is actually an alias for `extendObservable({}, object)`.
+Note: `observable.object(object)` is actually an alias for `extendObservable({}, object)`.
 
 Note: `decorate` could be used to introduce observable properties to an object, similar to `extendObservable`. The difference is that `extendObservable` is designed to introduce properties directly on the target instance, where `decorate` introduces them on prototypes; you can either pass it a constructor function (class) directly, or an object that will act as prototype for others.
 

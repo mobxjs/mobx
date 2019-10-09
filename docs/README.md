@@ -39,40 +39,39 @@ MobX is proudly sponsored by Mendix, Coinbase, Facebook Open Source, Canva, Algo
 <a href="https://www.algolia.com/"><img src="assets/algolia.jpg" align="center" width="100" title="Algolia" alt="Algolia" /></a>
 <a href="https://talentplot.com/"><img src="assets/talentplot.png" align="center" width="100" title="talentplot" alt="talentplot"></a>
 
-
 # Installation
 
-- Installation: `npm install mobx --save`. React bindings: `npm install mobx-react --save`. To enable ESNext decorators (optional), see below.
-- CDN:
+-   Installation: `npm install mobx --save`. React bindings: `npm install mobx-react --save`. To enable ESNext decorators (optional), see below.
+-   CDN:
 
-* https://unpkg.com/mobx/lib/mobx.umd.js
-* https://cdnjs.com/libraries/mobx
+*   https://unpkg.com/mobx/lib/mobx.umd.js
+*   https://cdnjs.com/libraries/mobx
 
 # Browser support
 
-- MobX >=5 runs on any browser with [ES6 proxy support](https://kangax.github.io/compat-table/es6/#test-Proxy). It will throw an error on startup on older environments such as IE11, Node.js <6 or React Native Android on old JavaScriptCore [how-to-upgrade](https://github.com/react-community/jsc-android-buildscripts#how-to-use-it-with-my-react-native-app).
-- MobX 4 runs on any ES5 browser and will be actively maintained. The MobX 4 and 5 api's are the same and semantically can achieve the same, but MobX 4 has some [limitations](#mobx-4-vs-mobx-5).
+-   MobX >=5 runs on any browser with [ES6 proxy support](https://kangax.github.io/compat-table/es6/#test-Proxy). It will throw an error on startup on older environments such as IE11, Node.js <6 or React Native Android on old JavaScriptCore [how-to-upgrade](https://github.com/react-community/jsc-android-buildscripts#how-to-use-it-with-my-react-native-app).
+-   MobX 4 runs on any ES5 browser and will be actively maintained. The MobX 4 and 5 api's are the same and semantically can achieve the same, but MobX 4 has some [limitations](#mobx-4-vs-mobx-5).
 
 _Tip: the main entry point of the MobX 5 package ships with ES5 code for backward compatibility with all build tools. But since MobX 5 runs only on modern browsers anyway, consider using the faster and smaller ES6 build: `lib/mobx.es6.js`. For example by setting up a webpack alias: `resolve: { alias: { mobx: __dirname + "/node_modules/mobx/lib/mobx.es6.js" }}`_
 
 ## Translations
 
-- [中文](http://cn.mobx.js.org)
+-   [中文](http://cn.mobx.js.org)
 
 ## Getting started
 
-- <i><a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/courses/manage-complex-state-in-react-apps-with-mobx">egghead.io course</a></i>
-- [Ten minute, interactive MobX + React tutorial](https://mobxjs.github.io/mobx/getting-started.html)
-- <img src="assets/book.jpg" height="80px"/> [The MobX book](https://books.google.nl/books?id=ALFmDwAAQBAJ&pg=PP1&lpg=PP1&dq=michel+weststrate+mobx+quick+start+guide:+supercharge+the+client+state+in+your+react+apps+with+mobx&source=bl&ots=D460fxti0F&sig=ivDGTxsPNwlOjLHrpKF1nweZFl8&hl=nl&sa=X&ved=2ahUKEwiwl8XO--ncAhWPmbQKHWOYBqIQ6AEwAnoECAkQAQ#v=onepage&q=michel%20weststrate%20mobx%20quick%20start%20guide%3A%20supercharge%20the%20client%20state%20in%20your%20react%20apps%20with%20mobx&f=false) by Pavan Podila and Michel Weststrate (which despite its name is in-depth!)
-- [Official MobX 4 documentation and API overview](https://mobxjs.github.io/mobx/refguide/api.html) ([MobX 3](https://github.com/mobxjs/mobx/blob/54557dc319b04e92e31cb87427bef194ec1c549c/docs/refguide/api.md), [MobX 2](https://github.com/mobxjs/mobx/blob/7c9e7c86e0c6ead141bb0539d33143d0e1f576dd/docs/refguide/api.md))
-- Videos:
-  - [ReactNext 2016: Real World MobX](https://www.youtube.com/watch?v=Aws40KOx90U) - 40m [slides](https://docs.google.com/presentation/d/1DrI6Hc2xIPTLBkfNH8YczOcPXQTOaCIcDESdyVfG_bE/edit?usp=sharing)
-  - [Practical React with MobX](https://www.youtube.com/watch?v=XGwuM_u7UeQ). In depth introduction and explanation to MobX and React by Matt Ruby on OpenSourceNorth (ES5 only) - 42m.
-  - LearnCode.academy MobX tutorial [Part I: MobX + React is AWESOME (7m)](https://www.youtube.com/watch?v=_q50BXqkAfI) [Part II: Computed Values and Nested/Referenced Observables (12m.)](https://www.youtube.com/watch?v=nYvNqKrl69s)
-  - [Screencast: intro to MobX](https://www.youtube.com/watch?v=K8dr8BMU7-8) - 8m
-  - [Talk: State Management Is Easy, React Amsterdam 2016 conf](https://www.youtube.com/watch?v=ApmSsu3qnf0&feature=youtu.be) ([slides](https://speakerdeck.com/mweststrate/state-management-is-easy-introduction-to-mobx))
-- [Boilerplates and related projects](http://mobxjs.github.io/mobx/faq/boilerplates.html)
-- More tutorials, blogs, videos, and other helpful resources can be found on the [MobX awesome list](https://github.com/mobxjs/awesome-mobx#awesome-mobx)
+-   <i><a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/courses/manage-complex-state-in-react-apps-with-mobx">egghead.io course</a></i>
+-   [Ten minute, interactive MobX + React tutorial](https://mobxjs.github.io/mobx/getting-started.html)
+-   <img src="assets/book.jpg" height="80px"/> [The MobX book](https://books.google.nl/books?id=ALFmDwAAQBAJ&pg=PP1&lpg=PP1&dq=michel+weststrate+mobx+quick+start+guide:+supercharge+the+client+state+in+your+react+apps+with+mobx&source=bl&ots=D460fxti0F&sig=ivDGTxsPNwlOjLHrpKF1nweZFl8&hl=nl&sa=X&ved=2ahUKEwiwl8XO--ncAhWPmbQKHWOYBqIQ6AEwAnoECAkQAQ#v=onepage&q=michel%20weststrate%20mobx%20quick%20start%20guide%3A%20supercharge%20the%20client%20state%20in%20your%20react%20apps%20with%20mobx&f=false) by Pavan Podila and Michel Weststrate (which despite its name is in-depth!)
+-   [Official MobX 4 documentation and API overview](https://mobxjs.github.io/mobx/refguide/api.html) ([MobX 3](https://github.com/mobxjs/mobx/blob/54557dc319b04e92e31cb87427bef194ec1c549c/docs/refguide/api.md), [MobX 2](https://github.com/mobxjs/mobx/blob/7c9e7c86e0c6ead141bb0539d33143d0e1f576dd/docs/refguide/api.md))
+-   Videos:
+    -   [ReactNext 2016: Real World MobX](https://www.youtube.com/watch?v=Aws40KOx90U) - 40m [slides](https://docs.google.com/presentation/d/1DrI6Hc2xIPTLBkfNH8YczOcPXQTOaCIcDESdyVfG_bE/edit?usp=sharing)
+    -   [Practical React with MobX](https://www.youtube.com/watch?v=XGwuM_u7UeQ). In depth introduction and explanation to MobX and React by Matt Ruby on OpenSourceNorth (ES5 only) - 42m.
+    -   LearnCode.academy MobX tutorial [Part I: MobX + React is AWESOME (7m)](https://www.youtube.com/watch?v=_q50BXqkAfI) [Part II: Computed Values and Nested/Referenced Observables (12m.)](https://www.youtube.com/watch?v=nYvNqKrl69s)
+    -   [Screencast: intro to MobX](https://www.youtube.com/watch?v=K8dr8BMU7-8) - 8m
+    -   [Talk: State Management Is Easy, React Amsterdam 2016 conf](https://www.youtube.com/watch?v=ApmSsu3qnf0&feature=youtu.be) ([slides](https://speakerdeck.com/mweststrate/state-management-is-easy-introduction-to-mobx))
+-   [Boilerplates and related projects](http://mobxjs.github.io/mobx/faq/boilerplates.html)
+-   More tutorials, blogs, videos, and other helpful resources can be found on the [MobX awesome list](https://github.com/mobxjs/awesome-mobx#awesome-mobx)
 
 ## Introduction
 
@@ -104,9 +103,9 @@ This can simply be done by annotating your class properties with the [@observabl
 import { observable } from "mobx"
 
 class Todo {
-  id = Math.random()
-  @observable title = ""
-  @observable finished = false
+    id = Math.random()
+    @observable title = ""
+    @observable finished = false
 }
 ```
 
@@ -122,13 +121,13 @@ Many MobX users do prefer the decorator syntax though, as it is slightly more co
 import { decorate, observable } from "mobx"
 
 class Todo {
-  id = Math.random()
-  title = ""
-  finished = false
+    id = Math.random()
+    title = ""
+    finished = false
 }
 decorate(Todo, {
-  title: observable,
-  finished: observable
+    title: observable,
+    finished: observable
 })
 ```
 
@@ -141,10 +140,10 @@ By using the [`@computed`](http://mobxjs.github.io/mobx/refguide/computed-decora
 
 ```javascript
 class TodoList {
-  @observable todos = []
-  @computed get unfinishedTodoCount() {
-    return this.todos.filter(todo => !todo.finished).length
-  }
+    @observable todos = []
+    @computed get unfinishedTodoCount() {
+        return this.todos.filter(todo => !todo.finished).length
+    }
 }
 ```
 
@@ -171,25 +170,29 @@ import { observer } from "mobx-react"
 
 @observer
 class TodoListView extends Component {
-  render() {
-    return (
-      <div>
-        <ul>
-          {this.props.todoList.todos.map(todo => (
-            <TodoView todo={todo} key={todo.id} />
-          ))}
-        </ul>
-        Tasks left: {this.props.todoList.unfinishedTodoCount}
-      </div>
-    )
-  }
+    render() {
+        return (
+            <div>
+                <ul>
+                    {this.props.todoList.todos.map(todo => (
+                        <TodoView todo={todo} key={todo.id} />
+                    ))}
+                </ul>
+                Tasks left: {this.props.todoList.unfinishedTodoCount}
+            </div>
+        )
+    }
 }
 
 const TodoView = observer(({ todo }) => (
-  <li>
-    <input type="checkbox" checked={todo.finished} onClick={() => (todo.finished = !todo.finished)} />
-    {todo.title}
-  </li>
+    <li>
+        <input
+            type="checkbox"
+            checked={todo.finished}
+            onClick={() => (todo.finished = !todo.finished)}
+        />
+        {todo.title}
+    </li>
 ))
 
 const store = new TodoList()
@@ -210,7 +213,7 @@ For example the following `autorun` prints a log message each time the amount of
 
 ```javascript
 autorun(() => {
-  console.log("Tasks left: " + todos.unfinishedTodoCount)
+    console.log("Tasks left: " + todos.unfinishedTodoCount)
 })
 ```
 
@@ -228,9 +231,9 @@ For an in-depth explanation about how MobX determines to which observables needs
 
 Unlike many flux frameworks, MobX is unopinionated about how user events should be handled.
 
-- This can be done in a Flux like manner.
-- Or by processing events using RxJS.
-- Or by simply handling events in the most straightforward way possible, as demonstrated in the above `onClick` handler.
+-   This can be done in a Flux like manner.
+-   Or by processing events using RxJS.
+-   Or by simply handling events in the most straightforward way possible, as demonstrated in the above `onClick` handler.
 
 In the end it all boils down to: Somehow the state should be updated.
 
@@ -299,12 +302,12 @@ And finally kudos for all the people that believed in, tried, validated and even
 
 ## Further resources and documentation
 
-- <img src="assets/book.jpg" height="80px"/> [The MobX book](https://books.google.nl/books?id=ALFmDwAAQBAJ&pg=PP1&lpg=PP1&dq=michel+weststrate+mobx+quick+start+guide:+supercharge+the+client+state+in+your+react+apps+with+mobx&source=bl&ots=D460fxti0F&sig=ivDGTxsPNwlOjLHrpKF1nweZFl8&hl=nl&sa=X&ved=2ahUKEwiwl8XO--ncAhWPmbQKHWOYBqIQ6AEwAnoECAkQAQ#v=onepage&q=michel%20weststrate%20mobx%20quick%20start%20guide%3A%20supercharge%20the%20client%20state%20in%20your%20react%20apps%20with%20mobx&f=false) by Pavan Podila and Michel Weststrate (which despite its name is in-depth!)
-- [MobX homepage](http://mobxjs.github.io/mobx/faq/blogs.html)
-- [API overview](http://mobxjs.github.io/mobx/refguide/api.html)
-- [Tutorials, Blogs & Videos](http://mobxjs.github.io/mobx/faq/blogs.html)
-- [Boilerplates](http://mobxjs.github.io/mobx/faq/boilerplates.html)
-- [Related projects](http://mobxjs.github.io/mobx/faq/related.html)
+-   <img src="assets/book.jpg" height="80px"/> [The MobX book](https://books.google.nl/books?id=ALFmDwAAQBAJ&pg=PP1&lpg=PP1&dq=michel+weststrate+mobx+quick+start+guide:+supercharge+the+client+state+in+your+react+apps+with+mobx&source=bl&ots=D460fxti0F&sig=ivDGTxsPNwlOjLHrpKF1nweZFl8&hl=nl&sa=X&ved=2ahUKEwiwl8XO--ncAhWPmbQKHWOYBqIQ6AEwAnoECAkQAQ#v=onepage&q=michel%20weststrate%20mobx%20quick%20start%20guide%3A%20supercharge%20the%20client%20state%20in%20your%20react%20apps%20with%20mobx&f=false) by Pavan Podila and Michel Weststrate (which despite its name is in-depth!)
+-   [MobX homepage](http://mobxjs.github.io/mobx/faq/blogs.html)
+-   [API overview](http://mobxjs.github.io/mobx/refguide/api.html)
+-   [Tutorials, Blogs & Videos](http://mobxjs.github.io/mobx/faq/blogs.html)
+-   [Boilerplates](http://mobxjs.github.io/mobx/faq/boilerplates.html)
+-   [Related projects](http://mobxjs.github.io/mobx/faq/related.html)
 
 ## What others are saying...
 
@@ -322,9 +325,9 @@ And finally kudos for all the people that believed in, tried, validated and even
 
 ## Contributing
 
-- Feel free to send small pull requests. Please discuss new features or big changes in a GitHub issue first.
-- Use `npm test` to run the basic test suite, `npm run coverage` for the test suite with coverage and `npm run test:performance` for the performance tests.
-- Please note that if you want to backport a feature / fix to MobX 4 a second PR needs to be opened to the mobx4-master branch.
+-   Feel free to send small pull requests. Please discuss new features or big changes in a GitHub issue first.
+-   Use `npm test` to run the basic test suite, `npm run coverage` for the test suite with coverage and `npm run test:performance` for the performance tests.
+-   Please note that if you want to backport a feature / fix to MobX 4 a second PR needs to be opened to the mobx4-master branch.
 
 # MobX 4 vs MobX 5
 
@@ -332,8 +335,8 @@ The difference between MobX 4 and MobX 5 is that the latter uses Proxies to do p
 
 The most noteable limitations of MobX 4:
 
-- Observable arrays are not real arrays, so they won't pass the `Array.isArray()` check. The practical consequence is that you often need to `.slice()` the array first (to get a real array shallow copy) before passing to third party libraries.
-- Adding properties to existing observable objects after creation is not automatically picked up. Either use observable maps instead, or use the the build in [utility functions](https://mobx.js.org/refguide/object-api.html) to read / write / iterate objects that you want to dynamically add properties to.
+-   Observable arrays are not real arrays, so they won't pass the `Array.isArray()` check. The practical consequence is that you often need to `.slice()` the array first (to get a real array shallow copy) before passing to third party libraries.
+-   Adding properties to existing observable objects after creation is not automatically picked up. Either use observable maps instead, or use the the build in [utility functions](https://mobx.js.org/refguide/object-api.html) to read / write / iterate objects that you want to dynamically add properties to.
 
 For more details see the [caveats page](https://mobx.js.org/best/pitfalls.html).
 
@@ -343,9 +346,9 @@ MobX ships with [flow typings](https://github.com/mobxjs/mobx/blob/master/flow-t
 
 To use the [flow typings](https://github.com/mobxjs/mobx/blob/master/flow-typed/mobx.js) shipped with MobX:
 
-- In `.flowconfig`, you **cannot** ignore `node_modules`.
-- In `.flowconfig`, you **cannot** import it explicitly in the `[libs]` section.
-- You **do not** need to install library definition using [flow-typed](https://github.com/flowtype/flow-typed).
+-   In `.flowconfig`, you **cannot** ignore `node_modules`.
+-   In `.flowconfig`, you **cannot** import it explicitly in the `[libs]` section.
+-   You **do not** need to install library definition using [flow-typed](https://github.com/flowtype/flow-typed).
 
 ## Donating
 

@@ -5,6 +5,7 @@ hide_title: true
 ---
 
 # @observable
+
 <div id='codefund' ></div>
 
 <details>
@@ -25,20 +26,19 @@ hide_title: true
     <a style="font-style:italic;padding:5px;margin:5px;"  href="https://egghead.io/lessons/react-use-observable-objects-arrays-and-maps-to-store-state-in-mobx">Hosted on egghead.io</a>
 </details>
 
-
 Decorator that can be used on ES7- or TypeScript class properties to make them observable.
 The `@observable` can be used on instance fields and property getters.
 This offers fine-grained control on which parts of your object become observable.
 
 ```javascript
-import { observable, computed } from "mobx";
+import { observable, computed } from "mobx"
 
 class OrderLine {
-    @observable price = 0;
-    @observable amount = 1;
+    @observable price = 0
+    @observable amount = 1
 
     @computed get total() {
-        return this.price * this.amount;
+        return this.price * this.amount
     }
 }
 ```
