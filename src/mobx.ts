@@ -23,14 +23,14 @@ if (typeof Proxy === "undefined" || typeof Symbol === "undefined") {
         "[mobx] MobX 5+ requires Proxy and Symbol objects. If your environment doesn't support Symbol or Proxy objects, please downgrade to MobX 4. For React Native Android, consider upgrading JSCore."
     )
 }
-let g
+
 try {
     // define process.env if needed
     // if this is not a production build in the first place
     // (in which case the expression below would be substituted with 'production')
     process.env.NODE_ENV
 } catch (e) {
-    g = getGlobal()
+    const g = getGlobal()
     if (typeof process === "undefined") g.process = {}
     g.process.env = {}
 }
@@ -39,9 +39,10 @@ try {
     function testCodeMinification() {}
     if (
         testCodeMinification.name !== "testCodeMinification" &&
-        g &&
-        g.process.env.NODE_ENV !== "production" &&
-        g.process.env.IGNORE_MOBX_MINIFY_WARNING !== "true"
+        typeof process !== "undefined" &&
+        process.env &&
+        process.env.NODE_ENV !== "production" &&
+        process.env.IGNORE_MOBX_MINIFY_WARNING !== "true"
     ) {
         // trick so it doesn't get replaced
         const varName = ["process", "env", "NODE_ENV"].join(".")
