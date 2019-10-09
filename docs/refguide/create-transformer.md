@@ -5,6 +5,7 @@ hide_title: true
 ---
 
 # createTransformer
+
 <div id='codefund' ></div>
 
 Provided by the `mobx-utils` package.
@@ -41,30 +42,30 @@ const store = observable({
     boxes: [],
     arrows: [],
     selection: null
-});
+})
 
 /**
     Serialize store to json upon each change and push it onto the states list
 */
-const states = [];
+const states = []
 
 autorun(() => {
-    states.push(serializeState(store));
-});
+    states.push(serializeState(store))
+})
 
 const serializeState = createTransformer(store => ({
     boxes: store.boxes.map(serializeBox),
     arrows: store.arrows.map(serializeArrow),
     selection: store.selection ? store.selection.id : null
-}));
+}))
 
-const serializeBox = createTransformer(box => ({...box}));
+const serializeBox = createTransformer(box => ({ ...box }))
 
 const serializeArrow = createTransformer(arrow => ({
     id: arrow.id,
     to: arrow.to.id,
     from: arrow.from.id
-}));
+}))
 ```
 
 In this example the state is serialized by composing three different transformation functions.
@@ -72,18 +73,18 @@ The autorunner triggers the serialization of the `store` object, which in turn s
 Let's take closer look at the life of an imaginary example box#3.
 
 1. The first time box#3 is passed by `map` to `serializeBox`,
-the serializeBox transformation is executed and an entry containing box#3 and its serialized representation is added to the internal memoization table of `serializeBox`.
+   the serializeBox transformation is executed and an entry containing box#3 and its serialized representation is added to the internal memoization table of `serializeBox`.
 2. Imagine that another box is added to the `store.boxes` list.
-This would cause the `serializeState` function to re-compute, resulting in a complete remapping of all the boxes.
-However, all the invocations of `serializeBox` will now return their old values from the memoization tables since their transformation functions didn't (need to) run again.
+   This would cause the `serializeState` function to re-compute, resulting in a complete remapping of all the boxes.
+   However, all the invocations of `serializeBox` will now return their old values from the memoization tables since their transformation functions didn't (need to) run again.
 3. Secondly, if somebody changes a property of box#3 this will cause the application of the `serializeBox` to box#3 to re-compute, just like any other reactive function in MobX.
-Since the transformation will now produce a new Json object based on box#3, all observers of that specific transformation will be forced to run again as well.
-That's the `serializeState` transformation in this case.
-`serializeState` will now produce a new value in turn and map all the boxes again. But except for box#3, all other boxes will be returned from the memoization table.
+   Since the transformation will now produce a new Json object based on box#3, all observers of that specific transformation will be forced to run again as well.
+   That's the `serializeState` transformation in this case.
+   `serializeState` will now produce a new value in turn and map all the boxes again. But except for box#3, all other boxes will be returned from the memoization table.
 4. Finally, if box#3 is removed from `store.boxes`, `serializeState` will compute again.
-But since it will no longer be using the application of `serializeBox` to box#3,
-that reactive function will go back to non-reactive mode.
-This signals the memoization table that the entry can be removed so that it is ready for GC.
+   But since it will no longer be using the application of `serializeBox` to box#3,
+   that reactive function will go back to non-reactive mode.
+   This signals the memoization table that the entry can be removed so that it is ready for GC.
 
 So effectively we have achieved state tracking using immutable, shared datas structures here.
 All boxes and arrows are mapped and reduced into single state tree.
@@ -103,13 +104,12 @@ the `DisplayFolder` objects track the associated `Folder` objects themselves.
 
 In the following example all mutations to the `state` graph will be processed automatically.
 Some examples:
+
 1. Changing the name of a folder will update its own `path` property and the `path` property of all its descendants.
 2. Collapsing a folder will remove all descendant `DisplayFolders` from the tree.
 3. Expanding a folder will restore them again.
 4. Setting a search filter will remove all nodes that do not match the filter, unless they have a descendant that matches the filter.
 5. Etc.
-
-
 
 ```javascript
 var m = require('mobx')

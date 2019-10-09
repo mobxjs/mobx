@@ -4,21 +4,21 @@ title: How to (not) use decorators
 hide_title: true
 ---
 
-
 # How to (not) use decorators
+
 <div id='codefund' ></div>
 
 Using ES.next decorators in MobX is optional. This section explains how to use them, or how to avoid them.
 
 Advantages of using decorator syntax:
 
-* Minimizes boilerplate, declarative.
-* Easy to use and read. A majority of the MobX users use them.
+-   Minimizes boilerplate, declarative.
+-   Easy to use and read. A majority of the MobX users use them.
 
 Disadvantages of using decorator syntax:
 
-* Stage-2 ES.next feature
-* Requires a little setup and transpilation, only supported with Babel / Typescript transpilation so far
+-   Stage-2 ES.next feature
+-   Requires a little setup and transpilation, only supported with Babel / Typescript transpilation so far
 
 You can approach using decorators in two ways in MobX
 
@@ -28,47 +28,47 @@ You can approach using decorators in two ways in MobX
 Using decorator syntax:
 
 ```javascript
-import { observable, computed, action } from "mobx";
+import { observable, computed, action } from "mobx"
 
 class Timer {
-  @observable start = Date.now();
-  @observable current = Date.now();
+    @observable start = Date.now()
+    @observable current = Date.now()
 
-  @computed
-  get elapsedTime() {
-    return this.current - this.start + "milliseconds";
-  }
+    @computed
+    get elapsedTime() {
+        return this.current - this.start + "milliseconds"
+    }
 
-  @action
-  tick() {
-    this.current = Date.now();
-  }
+    @action
+    tick() {
+        this.current = Date.now()
+    }
 }
 ```
 
 Using the `decorate` utility:
 
 ```javascript
-import { observable, computed, action, decorate } from "mobx";
+import { observable, computed, action, decorate } from "mobx"
 
 class Timer {
-  start = Date.now();
-  current = Date.now();
+    start = Date.now()
+    current = Date.now()
 
-  get elapsedTime() {
-    return this.current - this.start + "milliseconds";
-  }
+    get elapsedTime() {
+        return this.current - this.start + "milliseconds"
+    }
 
-  tick() {
-    this.current = Date.now();
-  }
+    tick() {
+        this.current = Date.now()
+    }
 }
 decorate(Timer, {
-  start: observable,
-  current: observable,
-  elapsedTime: computed,
-  tick: action
-});
+    start: observable,
+    current: observable,
+    elapsedTime: computed,
+    tick: action
+})
 ```
 
 For applying multiple decorators on a single property, you can pass an array of decorators. The decorators application order is from right to left.
@@ -76,18 +76,19 @@ For applying multiple decorators on a single property, you can pass an array of 
 ```javascript
 import { decorate, observable } from "mobx"
 import { serializable, primitive } from "serializr"
-import persist from "mobx-persist";
+import persist from "mobx-persist"
 
 class Todo {
-    id = Math.random();
-    title = "";
-    finished = false;
+    id = Math.random()
+    title = ""
+    finished = false
 }
 decorate(Todo, {
     title: [serializable(primitive), persist("object"), observable],
     finished: [serializable(primitive), observable]
 })
 ```
+
 Note: Not all decorators can be composed together, and this functionality is just best-effort. Some decorators affect the instance directly and can 'hide' the effect of other decorators that only change the prototype.
 
 ---
@@ -129,7 +130,7 @@ npm install --save-dev babel-preset-mobx
 
 ```json
 {
-  "presets": ["mobx"]
+    "presets": ["mobx"]
 }
 ```
 
@@ -140,8 +141,8 @@ Install support for decorators: `npm i --save-dev babel-plugin-transform-decorat
 
 ```json
 {
-  "presets": ["es2015", "stage-1"],
-  "plugins": ["transform-decorators-legacy"]
+    "presets": ["es2015", "stage-1"],
+    "plugins": ["transform-decorators-legacy"]
 }
 ```
 
@@ -155,8 +156,8 @@ Install support for decorators: `npm i --save-dev @babel/plugin-proposal-class-p
 ```json
 {
     "plugins": [
-        ["@babel/plugin-proposal-decorators", { "legacy": true}],
-        ["@babel/plugin-proposal-class-properties", { "loose": true}]
+        ["@babel/plugin-proposal-decorators", { "legacy": true }],
+        ["@babel/plugin-proposal-class-properties", { "loose": true }]
     ]
 }
 ```
@@ -165,11 +166,11 @@ Note that the `legacy` mode is important (as is putting the decorators proposal 
 
 ## Decorator syntax and Create React App (v1)
 
-* Decorators are not supported out of the box in `create-react-app@1.*`. To fix this, you can either use the `decorate` utility, eject, or use the [react-app-rewired](https://github.com/timarney/react-app-rewired/tree/master/packages/react-app-rewire-mobx) package.
+-   Decorators are not supported out of the box in `create-react-app@1.*`. To fix this, you can either use the `decorate` utility, eject, or use the [react-app-rewired](https://github.com/timarney/react-app-rewired/tree/master/packages/react-app-rewire-mobx) package.
 
 ## Decorator syntax and Create React App (v2)
 
-* Decorators are only supported out of the box when using TypeScript in `create-react-app@^2.1.1`. In older versions or when using vanilla JavaScript use either the `decorate` utility, eject, or the [customize-cra](https://github.com/arackaf/customize-cra) package.
+-   Decorators are only supported out of the box when using TypeScript in `create-react-app@^2.1.1`. In older versions or when using vanilla JavaScript use either the `decorate` utility, eject, or the [customize-cra](https://github.com/arackaf/customize-cra) package.
 
 ---
 
@@ -182,10 +183,10 @@ behave consistently accross all environments_
 
 The following patterns are not officially supported by the MobX community:
 
-* Redefining decorated class members in inheritance trees
-* Decorating static class members
-* Combining decorators provided by MobX with other decorators
-* Hot module reloading (HMR) / React-hot-loader might not work as expected
+-   Redefining decorated class members in inheritance trees
+-   Decorating static class members
+-   Combining decorators provided by MobX with other decorators
+-   Hot module reloading (HMR) / React-hot-loader might not work as expected
 
 Decorated properties might not be visible yet on class instances as _own_ property until the first read / write to that property occurred.
 

@@ -22,7 +22,7 @@
     "test:flow": "node_modules/.bin/flow check",
     "test:performance": "PERSIST=true time node --expose-gc test/perf/index.js",
     "test:ci": "yarn test:all && yarn test:performance && yarn test -i --coverage && yarn test:webpack && yarn size",
-    "prettier": "prettier \"**/*.js\" \"**/*.jsx\" \"**/*.tsx\" \"**/*.ts\"",
+    "prettier": "prettier \"**/*.js\" \"**/*.jsx\" \"**/*.tsx\" \"**/*.ts\" \"docs/**/*.md\"",
     "_prepublish": "yarn small-build",
     "quick-build": "tsc --pretty",
     "small-build": "node scripts/build.js",
@@ -99,7 +99,7 @@
     "data flow"
   ],
   "lint-staged": {
-    "*.{ts,tsx,js,jsx}": [
+    "*.{ts,tsx,js,jsx,md}": [
       "prettier --write",
       "git add"
     ]

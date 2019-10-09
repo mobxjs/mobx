@@ -5,6 +5,7 @@ hide_title: true
 ---
 
 # Optimizing rendering React components
+
 <div id='codefund' ></div>
 
 MobX is very fast, [often even faster than Redux](https://twitter.com/mweststrate/status/718444275239882753). But here are some tips to get most out of React and MobX. Note that most tips apply to React in general and are not specific for MobX.
@@ -23,15 +24,20 @@ It is therefore recommended to have components that just map over a collection a
 Bad:
 
 ```javascript
-@observer class MyComponent extends Component {
+@observer
+class MyComponent extends Component {
     render() {
-        const {todos, user} = this.props;
-        return (<div>
-            {user.name}
-            <ul>
-                {todos.map(todo => <TodoView todo={todo} key={todo.id} />)}
-            </ul>
-        </div>)
+        const { todos, user } = this.props
+        return (
+            <div>
+                {user.name}
+                <ul>
+                    {todos.map(todo => (
+                        <TodoView todo={todo} key={todo.id} />
+                    ))}
+                </ul>
+            </div>
+        )
     }
 }
 ```
@@ -124,9 +130,9 @@ This approach will allow `GenericNameDisplayer` to be reused throughout your app
 This tip applies to React in general and libraries using `PureRenderMixin` especially, try to avoid creating new closures in render methods.
 
 See also these resources:
-* [Autobinding with property initializers](https://facebook.github.io/react/blog/2015/01/27/react-v0.13.0-beta-1.html#autobinding)
-* [ESLint rule for no-bind](https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/jsx-no-bind.md)
 
+-   [Autobinding with property initializers](https://facebook.github.io/react/blog/2015/01/27/react-v0.13.0-beta-1.html#autobinding)
+-   [ESLint rule for no-bind](https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/jsx-no-bind.md)
 
 Bad:
 

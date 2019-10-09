@@ -5,6 +5,7 @@ hide_title: true
 ---
 
 # Autorun
+
 <div id='codefund' ></div>
 
 <details>
@@ -25,32 +26,35 @@ As a rule of thumb: use `autorun` if you have a function that should run automat
 Use `computed` for everything else. Autoruns are about initiating _effects_, not about producing new values.
 If a string is passed as first argument to `autorun`, it will be used as debug name.
 
-The return value from autorun is a disposer function, which can be used to dispose of the autorun when you no longer need it.  The reaction itself will also be passed as the only argument to the function given to autorun, which allows you to manipulate it from within the autorun function.  This means there are two ways you can dispose of the reaction when you no longer need it:
+The return value from autorun is a disposer function, which can be used to dispose of the autorun when you no longer need it. The reaction itself will also be passed as the only argument to the function given to autorun, which allows you to manipulate it from within the autorun function. This means there are two ways you can dispose of the reaction when you no longer need it:
+
 ```javascript
-const disposer = autorun( reaction => { /* do some stuff */ } );
-disposer();
+const disposer = autorun(reaction => {
+    /* do some stuff */
+})
+disposer()
 
 // or
 
-autorun( reaction => {
-  /* do some stuff */
-  reaction.dispose();
-} );
+autorun(reaction => {
+    /* do some stuff */
+    reaction.dispose()
+})
 ```
 
 Just like the [`@observer` decorator/function](./observer-component.md), `autorun` will only observe data that is used during the execution of the provided function.
 
 ```javascript
-var numbers = observable([1,2,3]);
-var sum = computed(() => numbers.reduce((a, b) => a + b, 0));
+var numbers = observable([1, 2, 3])
+var sum = computed(() => numbers.reduce((a, b) => a + b, 0))
 
-var disposer = autorun(() => console.log(sum.get()));
+var disposer = autorun(() => console.log(sum.get()))
 // prints '6'
-numbers.push(4);
+numbers.push(4)
 // prints '10'
 
-disposer();
-numbers.push(5);
+disposer()
+numbers.push(5)
 // won't print anything, nor is `sum` re-evaluated
 ```
 
@@ -58,20 +62,23 @@ numbers.push(5);
 
 Autorun accepts as the second argument an options object with the following optional options:
 
-* `delay`: Number in milliseconds that can be used to debounce the effect function. If zero (the default), no debouncing will happen.
-* `name`: String that is used as name for this reaction in for example [`spy`](spy.md) events.
-* `onError`: function that will handle the errors of this reaction, rather then propagating them.
-* `scheduler`: Set a custom scheduler to determine how re-running the autorun function should be scheduled. It takes a function that should be invoked at some point in the future, for example: `{ scheduler: run => { setTimeout(run, 1000) }}`
+-   `delay`: Number in milliseconds that can be used to debounce the effect function. If zero (the default), no debouncing will happen.
+-   `name`: String that is used as name for this reaction in for example [`spy`](spy.md) events.
+-   `onError`: function that will handle the errors of this reaction, rather then propagating them.
+-   `scheduler`: Set a custom scheduler to determine how re-running the autorun function should be scheduled. It takes a function that should be invoked at some point in the future, for example: `{ scheduler: run => { setTimeout(run, 1000) }}`
 
 ## The `delay` option
 
 ```javascript
-autorun(() => {
-	// Assuming that profile.asJson returns an observable Json representation of profile,
-	// send it to the server each time it is changed, but await at least 300 milliseconds before sending it.
-	// When sent, the latest value of profile.asJson will be used.
-	sendProfileToServer(profile.asJson);
-}, { delay: 300 });
+autorun(
+    () => {
+        // Assuming that profile.asJson returns an observable Json representation of profile,
+        // send it to the server each time it is changed, but await at least 300 milliseconds before sending it.
+        // When sent, the latest value of profile.asJson will be used.
+        sendProfileToServer(profile.asJson)
+    },
+    { delay: 300 }
+)
 ```
 
 ## The `onError` option
@@ -87,15 +94,17 @@ Example:
 ```javascript
 const age = observable.box(10)
 
-const dispose = autorun(() => {
-    if (age.get() < 0)
-        throw new Error("Age should not be negative")
-    console.log("Age", age.get())
-}, {
-    onError(e) {
-        window.alert("Please enter a valid age")
+const dispose = autorun(
+    () => {
+        if (age.get() < 0) throw new Error("Age should not be negative")
+        console.log("Age", age.get())
+    },
+    {
+        onError(e) {
+            window.alert("Please enter a valid age")
+        }
     }
-})
+)
 ```
 
 A global onError handler can be set as well, use `onReactionError(handler)`. This can be useful in tests or for client side error monitoring.
