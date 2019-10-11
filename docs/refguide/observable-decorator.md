@@ -1,5 +1,5 @@
 ---
-title: @obsevable
+title: @observable
 sidebar_label: @observable
 hide_title: true
 ---
