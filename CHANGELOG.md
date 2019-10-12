@@ -1,3 +1,4 @@
+* Fixed a possible issue with action stack errors and multiple mobx versions installed at the same time [#2135](https://github.com/mobxjs/mobx/issues/2135).
 * Added `comparer.shallow` for shallow object/array comparisons [#1561](https://github.com/mobxjs/mobx/issues/1561).
 
 # 5.14.0 / 4.14.0

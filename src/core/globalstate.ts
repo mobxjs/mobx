@@ -139,16 +139,6 @@ export class MobXGlobals {
      * they are not the cause, see: https://github.com/mobxjs/mobx/issues/1836
      */
     suppressReactionErrors = false
-
-    /*
-     * Current action id.
-     */
-    currentActionId = 0
-
-    /*
-     * Next action id.
-     */
-    nextActionId = 1
 }
 
 let canMergeGlobalState = true
