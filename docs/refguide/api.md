@@ -237,7 +237,7 @@ The expression will automatically be re-evaluated if any observables it uses cha
 
 There are various `options` that can be used to control the behavior of `computed`. These include:
 
--   **`equals: (value, value) => boolean`** Comparison method can be used to override the default detection on when something is changed. Built-in comparers are: `comparer.identity`, `comparer.default`, `comparer.structural`.
+-   **`equals: (value, value) => boolean`** Comparison method can be used to override the default detection on when something is changed. Built-in comparers are: `comparer.identity`, `comparer.default`, `comparer.structural`, `comparer.shallow`.
 -   **`name: string`** Provide a debug name to this computed property
 -   **`requiresReaction: boolean`** Wait for a change in value of the tracked observables, before recomputing the derived property
 -   **`get: () => value)`** Override the getter for the computed property.

@@ -1,3 +1,5 @@
+* Added `comparer.shallow` for shallow object/array comparisons [#1561](https://github.com/mobxjs/mobx/issues/1561).
+
 # 5.14.0 / 4.14.0
 
 * Added experimental `reactionRequiresObservable` & `observableRequiresReaction` config [#2079](https://github.com/mobxjs/mobx/pull/2079), [Docs](https://github.com/mobxjs/mobx/pull/2082)
