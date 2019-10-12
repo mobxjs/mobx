@@ -65,7 +65,9 @@ export function values(obj: any): string[] {
 export function entries<K, T>(map: ObservableMap<K, T>): ReadonlyArray<[K, T]>
 export function entries<T>(set: ObservableSet<T>): ReadonlyArray<[T, T]>
 export function entries<T>(ar: IObservableArray<T>): ReadonlyArray<[number, T]>
-export function entries<T = any>(obj: T): ReadonlyArray<[string, T extends object ? T[keyof T] : any]>
+export function entries<T = any>(
+    obj: T
+): ReadonlyArray<[string, T extends object ? T[keyof T] : any]>
 export function entries(obj: any): any {
     if (isObservableObject(obj)) {
         return keys(obj).map(key => [key, obj[key]])

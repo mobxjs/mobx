@@ -1,0 +1,7 @@
+h1 {
+    display: -ms-flexbox;
+    display: flex;
+    width: 100%;
+    -ms-flex-pack: start;
+    justify-content: flex-start;
+}

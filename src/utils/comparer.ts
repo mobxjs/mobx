@@ -12,6 +12,10 @@ function structuralComparer(a: any, b: any): boolean {
     return deepEqual(a, b)
 }
 
+function shallowComparer(a: any, b: any): boolean {
+    return deepEqual(a, b, 1)
+}
+
 function defaultComparer(a: any, b: any): boolean {
     return Object.is(a, b)
 }
@@ -19,5 +23,6 @@ function defaultComparer(a: any, b: any): boolean {
 export const comparer = {
     identity: identityComparer,
     structural: structuralComparer,
-    default: defaultComparer
+    default: defaultComparer,
+    shallow: shallowComparer
 }
