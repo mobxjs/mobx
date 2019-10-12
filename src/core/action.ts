@@ -13,6 +13,11 @@ import {
 } from "../internal"
 import { allowStateReadsStart, allowStateReadsEnd } from "./derivation"
 
+// we don't use globalState for these in order to avoid possible issues with multiple
+// mobx versions
+let currentActionId = 0
+let nextActionId = 1
+
 export interface IAction {
     isMobxAction: boolean
 }
@@ -78,18 +83,18 @@ export function _startAction(actionName: string, scope: any, args?: IArguments):
         prevAllowStateReads,
         notifySpy,
         startTime,
-        actionId: globalState.nextActionId++,
-        parentActionId: globalState.currentActionId
+        actionId: nextActionId++,
+        parentActionId: currentActionId
     }
-    globalState.currentActionId = runInfo.actionId
+    currentActionId = runInfo.actionId
     return runInfo
 }
 
 export function _endAction(runInfo: IActionRunInfo) {
-    if (globalState.currentActionId !== runInfo.actionId) {
+    if (currentActionId !== runInfo.actionId) {
         fail("invalid action stack. did you forget to finish an action?")
     }
-    globalState.currentActionId = runInfo.parentActionId
+    currentActionId = runInfo.parentActionId
 
     if (runInfo.error !== undefined) {
         globalState.suppressReactionErrors = true
