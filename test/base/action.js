@@ -561,3 +561,24 @@ test("out of order startAction / endAction", () => {
 
     mobx._endAction(a1)
 })
+
+test("action should wrap async function in multiple transactions", async () => {
+    const values = []
+
+    const observable = mobx.observable.box(0)
+    mobx.autorun(() => values.push(observable.get()))
+
+    const increment = mobx.action(async () => {
+        observable.set(observable.get() + 1)
+        await 0 // next tick
+        observable.set(observable.get() + 1)
+        observable.set(observable.get() - 1)
+        observable.set(observable.get() + 1)
+        await 0
+        observable.set(observable.get() + 1)
+    })
+
+    await increment()
+
+    expect(values).toEqual([0, 1, 2, 3])
+})

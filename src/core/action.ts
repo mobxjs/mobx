@@ -38,7 +38,7 @@ export function createAction(actionName: string, fn: Function, ref?: Object): Fu
 export function executeAction(actionName: string, fn: Function, scope?: any, args?: IArguments) {
     const runInfo = _startAction(actionName, scope, args)
     try {
-        return fn.apply(scope, args)
+        return _hookIntoAsyncResolvers(actionName, scope, () => fn.apply(scope, args))
     } catch (err) {
         runInfo.error = err
         throw err
@@ -140,4 +140,27 @@ export function allowStateChangesInsideComputed<T>(func: () => T): T {
         globalState.computationDepth = prev
     }
     return res
+}
+
+const promiseHooks = ["then", "catch", "finally"]
+function _hookIntoAsyncResolvers(actionName: string, scope: any, executor: Function) {
+    const hooks = promiseHooks.reduce((acc, methodName) => {
+        acc[methodName] = Promise.prototype[methodName]
+        return acc
+    }, {})
+    promiseHooks.forEach(methodName => {
+        Promise.prototype[methodName] = function() {
+            return hooks[methodName].apply(
+                this,
+                [...arguments].map(callback =>
+                    callback ? createAction(actionName, callback, scope) : callback
+                )
+            )
+        }
+    })
+    const result = executor()
+    promiseHooks.forEach(methodName => {
+        Promise.prototype[methodName] = hooks[methodName]
+    })
+    return result
 }
