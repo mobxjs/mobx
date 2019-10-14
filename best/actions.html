@@ -223,7 +223,8 @@ The advantage of <code>flow</code> is that it is syntactically very close to asy
     @observable githubProjects = []
     @observable state = <span class="hljs-string">"pending"</span>
 
-    fetchProjects = flow(<span class="hljs-function"><span class="hljs-keyword">function</span> * (<span class="hljs-params"></span>) </span>{ <span class="hljs-comment">// &lt;- note the star, this a generator function!</span>
+    fetchProjects = flow(<span class="hljs-function"><span class="hljs-keyword">function</span>*(<span class="hljs-params"></span>) </span>{
+        <span class="hljs-comment">// &lt;- note the star, this a generator function!</span>
         <span class="hljs-keyword">this</span>.githubProjects = []
         <span class="hljs-keyword">this</span>.state = <span class="hljs-string">"pending"</span>
         <span class="hljs-keyword">try</span> {

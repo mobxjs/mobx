@@ -94,32 +94,30 @@ See also <a href="../best/react">what will MobX React to?</a>.</p>
 <pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> todos = observable([
     {
         <span class="hljs-attr">title</span>: <span class="hljs-string">"Make coffee"</span>,
-        <span class="hljs-attr">done</span>: <span class="hljs-literal">true</span>,
+        <span class="hljs-attr">done</span>: <span class="hljs-literal">true</span>
     },
     {
         <span class="hljs-attr">title</span>: <span class="hljs-string">"Find biscuit"</span>,
         <span class="hljs-attr">done</span>: <span class="hljs-literal">false</span>
     }
-]);
+])
 
 <span class="hljs-comment">// wrong use of reaction: reacts to length changes, but not to title changes!</span>
 <span class="hljs-keyword">const</span> reaction1 = reaction(
     <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> todos.length,
     length =&gt; <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"reaction 1:"</span>, todos.map(<span class="hljs-function"><span class="hljs-params">todo</span> =&gt;</span> todo.title).join(<span class="hljs-string">", "</span>))
-);
+)
 
 <span class="hljs-comment">// correct use of reaction: reacts to length and title changes</span>
 <span class="hljs-keyword">const</span> reaction2 = reaction(
     <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> todos.map(<span class="hljs-function"><span class="hljs-params">todo</span> =&gt;</span> todo.title),
     titles =&gt; <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"reaction 2:"</span>, titles.join(<span class="hljs-string">", "</span>))
-);
+)
 
 <span class="hljs-comment">// autorun reacts to just everything that is used in its function</span>
-<span class="hljs-keyword">const</span> autorun1 = autorun(
-    <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"autorun 1:"</span>, todos.map(<span class="hljs-function"><span class="hljs-params">todo</span> =&gt;</span> todo.title).join(<span class="hljs-string">", "</span>))
-);
+<span class="hljs-keyword">const</span> autorun1 = autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"autorun 1:"</span>, todos.map(<span class="hljs-function"><span class="hljs-params">todo</span> =&gt;</span> todo.title).join(<span class="hljs-string">", "</span>)))
 
-todos.push({ <span class="hljs-attr">title</span>: <span class="hljs-string">"explain reactions"</span>, <span class="hljs-attr">done</span>: <span class="hljs-literal">false</span> });
+todos.push({ <span class="hljs-attr">title</span>: <span class="hljs-string">"explain reactions"</span>, <span class="hljs-attr">done</span>: <span class="hljs-literal">false</span> })
 <span class="hljs-comment">// prints:</span>
 <span class="hljs-comment">// reaction 1: Make coffee, find biscuit, explain reactions</span>
 <span class="hljs-comment">// reaction 2: Make coffee, find biscuit, explain reactions</span>
@@ -133,26 +131,26 @@ todos[<span class="hljs-number">0</span>].title = <span class="hljs-string">"Mak
 <p>In the following example <code>reaction3</code>, will react to the change in the <code>counter</code> count.
 When invoked <code>reaction</code>, second argument can use as disposer.
 The following example shows a <code>reaction</code> that is invoked only once.</p>
-<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> counter = observable({ <span class="hljs-attr">count</span>: <span class="hljs-number">0</span> });
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> counter = observable({ <span class="hljs-attr">count</span>: <span class="hljs-number">0</span> })
 
 <span class="hljs-comment">// invoke once of and dispose reaction: reacts to observable value.</span>
 <span class="hljs-keyword">const</span> reaction3 = reaction(
     <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> counter.count,
     (count, reaction) =&gt; {
-        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"reaction 3: invoked. counter.count = "</span> + count);
-        reaction.dispose();
+        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"reaction 3: invoked. counter.count = "</span> + count)
+        reaction.dispose()
     }
-);
+)
 
-counter.count = <span class="hljs-number">1</span>;
+counter.count = <span class="hljs-number">1</span>
 <span class="hljs-comment">// prints:</span>
 <span class="hljs-comment">// reaction 3: invoked. counter.count = 1</span>
 
-counter.count = <span class="hljs-number">2</span>;
+counter.count = <span class="hljs-number">2</span>
 <span class="hljs-comment">// prints:</span>
 <span class="hljs-comment">// (There are no logging, because of reaction disposed. But, counter continue reaction)</span>
 
-<span class="hljs-built_in">console</span>.log(counter.count);
+<span class="hljs-built_in">console</span>.log(counter.count)
 <span class="hljs-comment">// prints:</span>
 <span class="hljs-comment">// 2</span>
 </code></pre>

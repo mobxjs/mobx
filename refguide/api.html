@@ -108,7 +108,7 @@ an observable data structure (<em>Array</em>, <em>Map</em>, or <em>observable-ob
 <li>By default making a data structure observable is <em>infective</em>; that means that <code>observable</code> is applied automatically to any value that is contained by the data structure, or will be contained by the data structure in the future. This behavior can be changed by using <a href="#decorators"><em>decorators</em></a>.</li>
 <li><em>[MobX 4 and below]</em> To create dynamically keyed objects, always use maps! Only initially existing properties on an object will be made observable, although new ones can be added using <code>extendObservable</code>.</li>
 </ul>
-<p><a href="/refguide/observable.html">«<code>observable</code>»</a>  —  <a href="/refguide/observable-decorator.html">«<code>@observable</code>»</a></p>
+<p><a href="/refguide/observable.html">«<code>observable</code>»</a> — <a href="/refguide/observable-decorator.html">«<code>@observable</code>»</a></p>
 <h3><a class="anchor" aria-hidden="true" id="observable-property-value"></a><a href="#observable-property-value" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>@observable property = value</code></h3>
 <p><code>observable</code> can also be used as property decorator. It requires <a href="/best/decorators.html">decorators to be enabled</a> and is syntactic
 sugar for <code>extendObservable(this, { property: value })</code>.</p>
@@ -158,24 +158,31 @@ Note that <code>extendObservable</code> enhances existing objects, unlike <code>
 <li><strong><code>action.bound</code></strong>: Creates a bound action, see <a href="/refguide/action.html"><code>action</code></a></li>
 </ul>
 <p>You can apply these decorators using the <em>@decorator</em> syntax:</p>
-<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> {observable, action} <span class="hljs-keyword">from</span> <span class="hljs-string">'mobx'</span>;
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { observable, action } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx"</span>
 
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TaskStore</span> </span>{
     @observable.shallow tasks = []
-    @action addTask(task) { <span class="hljs-comment">/* ... */</span> }
+    @action addTask(task) {
+        <span class="hljs-comment">/* ... */</span>
+    }
 }
 </code></pre>
 <p>Or by passing in property decorators via <code>observable.object</code> / <code>observable.extendObservable</code> or <a href="#decorate"><code>decorate()</code></a>.
 Note that decorators always 'stick' to the property. So they will remain in effect even if a new value is assigned.</p>
-<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> {observable, action} <span class="hljs-keyword">from</span> <span class="hljs-string">'mobx'</span>;
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { observable, action } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx"</span>
 
-<span class="hljs-keyword">const</span> taskStore = observable({
-    <span class="hljs-attr">tasks</span>: [],
-    addTask(task) { <span class="hljs-comment">/* ... */</span> }
-}, {
-    <span class="hljs-attr">tasks</span>: observable.shallow,
-    <span class="hljs-attr">addTask</span>: action
-})
+<span class="hljs-keyword">const</span> taskStore = observable(
+    {
+        <span class="hljs-attr">tasks</span>: [],
+        addTask(task) {
+            <span class="hljs-comment">/* ... */</span>
+        }
+    },
+    {
+        <span class="hljs-attr">tasks</span>: observable.shallow,
+        <span class="hljs-attr">addTask</span>: action
+    }
+)
 </code></pre>
 <p><a href="/refguide/modifiers.html">«details»</a></p>
 <h3><a class="anchor" aria-hidden="true" id="decorate"></a><a href="#decorate" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>decorate</code></h3>
@@ -189,7 +196,7 @@ This is a convenience method to apply observability <a href="#decorators">decora
     }
     addTodo() {
         <span class="hljs-keyword">const</span> t = <span class="hljs-keyword">new</span> Todo()
-        t.title = <span class="hljs-string">'Test_'</span> + <span class="hljs-built_in">Math</span>.random()
+        t.title = <span class="hljs-string">"Test_"</span> + <span class="hljs-built_in">Math</span>.random()
         <span class="hljs-keyword">set</span>(this.todos, t.id, t)
     }
 }
@@ -201,18 +208,18 @@ decorate(TodoList, {
 })
 </code></pre>
 <p>For applying multiple decorators on a single property, you can pass an array of decorators. The decorators application order is from right to left.</p>
-<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { decorate, observable } <span class="hljs-keyword">from</span> <span class="hljs-string">'mobx'</span>
-<span class="hljs-keyword">import</span> { serializable, primitive } <span class="hljs-keyword">from</span> <span class="hljs-string">'serializr'</span>
-<span class="hljs-keyword">import</span> persist <span class="hljs-keyword">from</span> <span class="hljs-string">'mobx-persist'</span>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { decorate, observable } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx"</span>
+<span class="hljs-keyword">import</span> { serializable, primitive } <span class="hljs-keyword">from</span> <span class="hljs-string">"serializr"</span>
+<span class="hljs-keyword">import</span> persist <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx-persist"</span>
 
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Todo</span> </span>{
-    id = <span class="hljs-built_in">Math</span>.random();
-    title = <span class="hljs-string">''</span>;
-    finished = <span class="hljs-literal">false</span>;
+    id = <span class="hljs-built_in">Math</span>.random()
+    title = <span class="hljs-string">""</span>
+    finished = <span class="hljs-literal">false</span>
 }
 
 decorate(Todo, {
-    <span class="hljs-attr">title</span>: [serializable(primitive), persist(<span class="hljs-string">'object'</span>), observable],
+    <span class="hljs-attr">title</span>: [serializable(primitive), persist(<span class="hljs-string">"object"</span>), observable],
     <span class="hljs-attr">finished</span>: [serializable(primitive), observable]
 })
 </code></pre>
@@ -231,7 +238,7 @@ decorate(Todo, {
 The expression will automatically be re-evaluated if any observables it uses changes, but only if it is in use by some <em>reaction</em>.</p>
 <p>There are various <code>options</code> that can be used to control the behavior of <code>computed</code>. These include:</p>
 <ul>
-<li><strong><code>equals: (value, value) =&gt; boolean</code></strong> Comparison method can be used to override the default detection on when something is changed. Built-in comparers are: <code>comparer.identity</code>, <code>comparer.default</code>, <code>comparer.structural</code>.</li>
+<li><strong><code>equals: (value, value) =&gt; boolean</code></strong> Comparison method can be used to override the default detection on when something is changed. Built-in comparers are: <code>comparer.identity</code>, <code>comparer.default</code>, <code>comparer.structural</code>, <code>comparer.shallow</code>.</li>
 <li><strong><code>name: string</code></strong> Provide a debug name to this computed property</li>
 <li><strong><code>requiresReaction: boolean</code></strong> Wait for a change in value of the tracked observables, before recomputing the derived property</li>
 <li><strong><code>get: () =&gt; value)</code></strong> Override the getter for the computed property.</li>
@@ -262,28 +269,28 @@ Note: using <code>action</code> is mandatory when <em>strict mode</em> is enable
 <p><code>flow()</code> takes a generator function as its only input</p>
 <p>When dealing with <em>async actions</em>, the code that executes in the callback is not wrapped by <code>action</code>. This means the observable state that you are mutating, will fail the <a href="#configure"><code>enforceActions</code></a> check. An easy way to retain the action semantics is by wrapping the async function with flow. This will ensure to wrap all your callbacks in <code>action()</code>.</p>
 <p>Note that the async function must be a <em>generator</em> and you must only <em>yield</em> to promises inside. <code>flow</code> gives you back a promise that you can <code>cancel()</code> if you want.</p>
-<pre><code class="hljs css language-js"><span class="hljs-keyword">import</span> { configure } <span class="hljs-keyword">from</span> <span class="hljs-string">'mobx'</span>;
+<pre><code class="hljs css language-js"><span class="hljs-keyword">import</span> { configure } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx"</span>
 
 <span class="hljs-comment">// don't allow state modifications outside actions</span>
-configure({<span class="hljs-attr">enforceActions</span>: <span class="hljs-string">"always"</span>});
+configure({ <span class="hljs-attr">enforceActions</span>: <span class="hljs-string">"always"</span> })
 
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Store</span> </span>{
-    @observable githubProjects = [];
-    @observable state = <span class="hljs-string">"pending"</span>; <span class="hljs-comment">// "pending" / "done" / "error"</span>
+    @observable githubProjects = []
+    @observable state = <span class="hljs-string">"pending"</span> <span class="hljs-comment">// "pending" / "done" / "error"</span>
 
-
-    fetchProjects = flow(<span class="hljs-function"><span class="hljs-keyword">function</span>* <span class="hljs-title">fetchProjects</span>(<span class="hljs-params"></span>) </span>{ <span class="hljs-comment">// &lt;- note the star, this a generator function!</span>
-        <span class="hljs-keyword">this</span>.githubProjects = [];
-        <span class="hljs-keyword">this</span>.state = <span class="hljs-string">"pending"</span>;
+    fetchProjects = flow(<span class="hljs-function"><span class="hljs-keyword">function</span>* <span class="hljs-title">fetchProjects</span>(<span class="hljs-params"></span>) </span>{
+        <span class="hljs-comment">// &lt;- note the star, this a generator function!</span>
+        <span class="hljs-keyword">this</span>.githubProjects = []
+        <span class="hljs-keyword">this</span>.state = <span class="hljs-string">"pending"</span>
         <span class="hljs-keyword">try</span> {
-            <span class="hljs-keyword">const</span> projects = <span class="hljs-keyword">yield</span> fetchGithubProjectsSomehow(); <span class="hljs-comment">// yield instead of await</span>
-            <span class="hljs-keyword">const</span> filteredProjects = somePreprocessing(projects);
+            <span class="hljs-keyword">const</span> projects = <span class="hljs-keyword">yield</span> fetchGithubProjectsSomehow() <span class="hljs-comment">// yield instead of await</span>
+            <span class="hljs-keyword">const</span> filteredProjects = somePreprocessing(projects)
 
             <span class="hljs-comment">// the asynchronous blocks will automatically be wrapped actions</span>
-            <span class="hljs-keyword">this</span>.state = <span class="hljs-string">"done"</span>;
-            <span class="hljs-keyword">this</span>.githubProjects = filteredProjects;
+            <span class="hljs-keyword">this</span>.state = <span class="hljs-string">"done"</span>
+            <span class="hljs-keyword">this</span>.githubProjects = filteredProjects
         } <span class="hljs-keyword">catch</span> (error) {
-            <span class="hljs-keyword">this</span>.state = <span class="hljs-string">"error"</span>;
+            <span class="hljs-keyword">this</span>.state = <span class="hljs-string">"error"</span>
         }
     })
 }
@@ -423,8 +430,7 @@ Low-level api that can be used to observe a single observable value.</p>
 <code>onBecomeUnobserved(observable, property?, listener: () =&gt; void): (() =&gt; void)</code></p>
 <p>These functions are hooks into the observability system of MobX and get notified when observables <em>start</em> / <em>stop</em> becoming observed. It can be used to execute some lazy operations or perform network fetches.</p>
 <p>The return value is a <em>diposer-function</em> that will detach the <em>listener</em>.</p>
-<pre><code class="hljs css language-javascript">
-<span class="hljs-keyword">export</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">City</span> </span>{
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">export</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">City</span> </span>{
     @observable location
     @observable temperature
     interval
@@ -432,8 +438,8 @@ Low-level api that can be used to observe a single observable value.</p>
     <span class="hljs-keyword">constructor</span>(location) {
         <span class="hljs-keyword">this</span>.location = location
         <span class="hljs-comment">// only start data fetching if temperature is actually used!</span>
-        onBecomeObserved(<span class="hljs-keyword">this</span>, <span class="hljs-string">'temperature'</span>, <span class="hljs-keyword">this</span>.resume)
-        onBecomeUnobserved(<span class="hljs-keyword">this</span>, <span class="hljs-string">'temperature'</span>, <span class="hljs-keyword">this</span>.suspend)
+        onBecomeObserved(<span class="hljs-keyword">this</span>, <span class="hljs-string">"temperature"</span>, <span class="hljs-keyword">this</span>.resume)
+        onBecomeUnobserved(<span class="hljs-keyword">this</span>, <span class="hljs-string">"temperature"</span>, <span class="hljs-keyword">this</span>.suspend)
     }
 
     resume = <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
@@ -456,11 +462,11 @@ Low-level api that can be used to observe a single observable value.</p>
 <p>Usage: <code>configure(options)</code>.
 Sets global behavior settings on the active MobX instance.
 Use this to change how MobX behaves as a whole.</p>
-<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { configure } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx"</span>;
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { configure } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx"</span>
 
 configure({
     <span class="hljs-comment">// ...</span>
-});
+})
 </code></pre>
 <h4><a class="anchor" aria-hidden="true" id="arraybuffer-number"></a><a href="#arraybuffer-number" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>arrayBuffer: number</code></h4>
 <p>Increases the default created size of observable arrays to <code>arrayBuffer</code>, if the maximum size isn't yet there.</p>
@@ -471,38 +477,40 @@ See also <code>observable</code>.</p>
 <h4><a class="anchor" aria-hidden="true" id="computedrequiresreaction-boolean"></a><a href="#computedrequiresreaction-boolean" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>computedRequiresReaction: boolean</code></h4>
 <p>Forbids the access of any unobserved computed value.
 Use this if you want to check whether you are using computed properties without a reactive context.</p>
-<pre><code class="hljs css language-javascript">configure({ <span class="hljs-attr">computedRequiresReaction</span>: <span class="hljs-literal">true</span> });
+<pre><code class="hljs css language-javascript">configure({ <span class="hljs-attr">computedRequiresReaction</span>: <span class="hljs-literal">true</span> })
 </code></pre>
 <h4><a class="anchor" aria-hidden="true" id="observablerequiresreaction-boolean"></a><a href="#observablerequiresreaction-boolean" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>observableRequiresReaction: boolean</code></h4>
 <p>Warns about any unobserved observable access.
 Use this if you want to check whether you are using observables without a reactive context (eg not inside an autorun, action, or react component without observer wrapping).</p>
-<pre><code class="hljs css language-javascript">configure({ <span class="hljs-attr">observableRequiresReaction</span>: <span class="hljs-literal">true</span> });
+<pre><code class="hljs css language-javascript">configure({ <span class="hljs-attr">observableRequiresReaction</span>: <span class="hljs-literal">true</span> })
 </code></pre>
 <h4><a class="anchor" aria-hidden="true" id="reactionrequiresobservable-boolean"></a><a href="#reactionrequiresobservable-boolean" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>reactionRequiresObservable: boolean</code></h4>
 <p>Warns when a reaction (eg <code>autorun</code>) is created without any observable access.
 Use this to check whether you are unneededly wrapping react components with <code>observer</code>, or to find possible related bugs.</p>
-<pre><code class="hljs css language-javascript">configure({ <span class="hljs-attr">reactionRequiresObservable</span>: <span class="hljs-literal">true</span> });
+<pre><code class="hljs css language-javascript">configure({ <span class="hljs-attr">reactionRequiresObservable</span>: <span class="hljs-literal">true</span> })
 </code></pre>
 <h4><a class="anchor" aria-hidden="true" id="computedconfigurable-boolean"></a><a href="#computedconfigurable-boolean" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>computedConfigurable: boolean</code></h4>
 <p>Allows overwriting computed values. This is useful for testing purposes <em>only</em>. Don't enable this
 on production as it can cause memory-leaks.</p>
-<pre><code class="hljs css language-javascript">configure({ <span class="hljs-attr">computedConfigurable</span>: <span class="hljs-literal">true</span> });
+<pre><code class="hljs css language-javascript">configure({ <span class="hljs-attr">computedConfigurable</span>: <span class="hljs-literal">true</span> })
 </code></pre>
 <h4><a class="anchor" aria-hidden="true" id="disableerrorboundaries-boolean"></a><a href="#disableerrorboundaries-boolean" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>disableErrorBoundaries: boolean</code></h4>
 <p>By default, MobX will catch and rethrow exceptions happening in your code to make sure that a reaction in one exception does not prevent the scheduled execution of other, possibly unrelated, reactions. This means exceptions are not propagated back to the original causing code and therefore you won't be able to catch them using try/catch.</p>
 <p>There may be times when you want to catch those errors, for example when unit testing your reactions. You can disable this behaviour using <code>disableErrorBoundaries</code>.</p>
-<pre><code class="hljs css language-javascript">configure({ <span class="hljs-attr">disableErrorBoundaries</span>: <span class="hljs-literal">true</span> });
+<pre><code class="hljs css language-javascript">configure({ <span class="hljs-attr">disableErrorBoundaries</span>: <span class="hljs-literal">true</span> })
 </code></pre>
 <p>Please note that MobX won't recover from errors when using this configuration. For that reason, you may need to use <code>_resetGlobalState</code> after each exception. Example:</p>
 <pre><code class="hljs css language-js">configure({ <span class="hljs-attr">disableErrorBoundaries</span>: <span class="hljs-literal">true</span> })
 
-test(<span class="hljs-string">'Throw if age is negative'</span>, () =&gt; {
-  expect(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
-    <span class="hljs-keyword">const</span> age = observable.box(<span class="hljs-number">10</span>)
-    autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> { <span class="hljs-keyword">if</span> (age.get() &lt; <span class="hljs-number">0</span>) <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'Age should not be negative'</span>) })
-    age.set(<span class="hljs-number">-1</span>)
-  }).toThrow()
-  _resetGlobalState() <span class="hljs-comment">// Needed after each exception</span>
+test(<span class="hljs-string">"Throw if age is negative"</span>, () =&gt; {
+    expect(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+        <span class="hljs-keyword">const</span> age = observable.box(<span class="hljs-number">10</span>)
+        autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+            <span class="hljs-keyword">if</span> (age.get() &lt; <span class="hljs-number">0</span>) <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">"Age should not be negative"</span>)
+        })
+        age.set(<span class="hljs-number">-1</span>)
+    }).toThrow()
+    _resetGlobalState() <span class="hljs-comment">// Needed after each exception</span>
 })
 </code></pre>
 <blockquote>
@@ -522,7 +530,7 @@ Accepted values:</p>
 This is useful when you have an encapsulated library that is using MobX, living in the same page as the app that is using MobX.
 The reactivity inside the library will remain self-contained when you call <code>configure({isolateGlobalState: true})</code> inside the library.</p>
 <p>Without this options, if multiple MobX instances are active, the internal state will be shared. The benefit is that observables from both instances work together, the downside is that the MobX versions have to match.</p>
-<pre><code class="hljs css language-javascript">configure({ <span class="hljs-attr">isolateGlobalState</span>: <span class="hljs-literal">true</span> });
+<pre><code class="hljs css language-javascript">configure({ <span class="hljs-attr">isolateGlobalState</span>: <span class="hljs-literal">true</span> })
 </code></pre>
 <h4><a class="anchor" aria-hidden="true" id="reactionscheduler-f-void-void"></a><a href="#reactionscheduler-f-void-void" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>reactionScheduler: (f: () =&gt; void) =&gt; void</code></h4>
 <p>Sets a new function that executes all MobX reactions.
@@ -530,10 +538,10 @@ By default <code>reactionScheduler</code> just runs the <code>f</code> reaction 
 This can be useful for basic debugging, or slowing down reactions to visualize application updates.</p>
 <pre><code class="hljs css language-javascript">configure({
     <span class="hljs-attr">reactionScheduler</span>: (f): <span class="hljs-function"><span class="hljs-params">void</span> =&gt;</span> {
-        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Running an event after a delay:"</span>, f);
-        setTimeout(f, <span class="hljs-number">100</span>);
+        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Running an event after a delay:"</span>, f)
+        setTimeout(f, <span class="hljs-number">100</span>)
     }
-});
+})
 </code></pre>
 <h2><a class="anchor" aria-hidden="true" id="direct-observable-manipulation"></a><a href="#direct-observable-manipulation" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Direct Observable manipulation</h2>
 <p>There is now an utility API that enables manipulating observable maps, objects and arrays with the same API. These api's are fully reactive, which means that even new property declarations can be detected by mobx if <code>set</code> is used to add them, and <code>values</code> or <code>keys</code> to iterate them.</p>
@@ -599,31 +607,30 @@ No observers are notified until this function has completed.
 <code>transaction</code> returns any value that was returned by the <code>worker</code> function.
 Note that <code>transaction</code> runs completely synchronously.
 Transactions can be nested. Only after completing the outermost <code>transaction</code> pending reactions will be run.</p>
-<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> {observable, transaction, autorun} <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx"</span>;
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { observable, transaction, autorun } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx"</span>
 
-<span class="hljs-keyword">const</span> numbers = observable([]);
+<span class="hljs-keyword">const</span> numbers = observable([])
 
-autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-built_in">console</span>.log(numbers.length, <span class="hljs-string">"numbers!"</span>));
+autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-built_in">console</span>.log(numbers.length, <span class="hljs-string">"numbers!"</span>))
 <span class="hljs-comment">// Prints: '0 numbers!'</span>
 
 transaction(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
     transaction(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
-        numbers.push(<span class="hljs-number">1</span>);
-        numbers.push(<span class="hljs-number">2</span>);
-    });
-    numbers.push(<span class="hljs-number">3</span>);
-});
+        numbers.push(<span class="hljs-number">1</span>)
+        numbers.push(<span class="hljs-number">2</span>)
+    })
+    numbers.push(<span class="hljs-number">3</span>)
+})
 <span class="hljs-comment">// Prints: '3 numbers!'</span>
 </code></pre>
 <h3><a class="anchor" aria-hidden="true" id="untracked"></a><a href="#untracked" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>untracked</code></h3>
 <p>Untracked allows you to run a piece of code without establishing observers.
 Like <code>transaction</code>, <code>untracked</code> is automatically applied by <code>(@)action</code>, so usually it makes more sense to use actions than to use <code>untracked</code> directly.
 Example:</p>
-<pre><code class="hljs css language-javascript">
-<span class="hljs-keyword">const</span> person = observable({
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> person = observable({
     <span class="hljs-attr">firstName</span>: <span class="hljs-string">"Michel"</span>,
     <span class="hljs-attr">lastName</span>: <span class="hljs-string">"Weststrate"</span>
-});
+})
 
 autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
     <span class="hljs-built_in">console</span>.log(
@@ -631,14 +638,14 @@ autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</s
         <span class="hljs-string">","</span>,
         <span class="hljs-comment">// this untracked block will return the person's firstName without establishing a dependency</span>
         untracked(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> person.firstName)
-    );
-});
+    )
+})
 <span class="hljs-comment">// prints: Weststrate, Michel</span>
 
-person.firstName = <span class="hljs-string">"G.K."</span>;
+person.firstName = <span class="hljs-string">"G.K."</span>
 <span class="hljs-comment">// doesn't print!</span>
 
-person.lastName = <span class="hljs-string">"Chesterton"</span>;
+person.lastName = <span class="hljs-string">"Chesterton"</span>
 <span class="hljs-comment">// prints: Chesterton, G.K.</span>
 </code></pre>
 <h3><a class="anchor" aria-hidden="true" id="createatom"></a><a href="#createatom" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>createAtom</code></h3>

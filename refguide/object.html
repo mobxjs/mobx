@@ -68,34 +68,37 @@
 <p>If a plain JavaScript object is passed to <code>observable</code> all properties inside will be copied into a clone and made observable.
 (A plain object is an object that wasn't created using a constructor function / but has <code>Object</code> as its prototype, or no prototype at all.)
 <code>observable</code> is by default applied recursively, so if one of the encountered values is an object or array, that value will be passed through <code>observable</code> as well.</p>
-<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> {observable, autorun, action} <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx"</span>;
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { observable, autorun, action } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx"</span>
 
-<span class="hljs-keyword">var</span> person = observable({
-    <span class="hljs-comment">// observable properties:</span>
-    name: <span class="hljs-string">"John"</span>,
-    <span class="hljs-attr">age</span>: <span class="hljs-number">42</span>,
-    <span class="hljs-attr">showAge</span>: <span class="hljs-literal">false</span>,
+<span class="hljs-keyword">var</span> person = observable(
+    {
+        <span class="hljs-comment">// observable properties:</span>
+        name: <span class="hljs-string">"John"</span>,
+        <span class="hljs-attr">age</span>: <span class="hljs-number">42</span>,
+        <span class="hljs-attr">showAge</span>: <span class="hljs-literal">false</span>,
 
-    <span class="hljs-comment">// computed property:</span>
-    <span class="hljs-keyword">get</span> labelText() {
-        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.showAge ? <span class="hljs-string">`<span class="hljs-subst">${<span class="hljs-keyword">this</span>.name}</span> (age: <span class="hljs-subst">${<span class="hljs-keyword">this</span>.age}</span>)`</span> : <span class="hljs-keyword">this</span>.name;
+        <span class="hljs-comment">// computed property:</span>
+        <span class="hljs-keyword">get</span> labelText() {
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.showAge ? <span class="hljs-string">`<span class="hljs-subst">${<span class="hljs-keyword">this</span>.name}</span> (age: <span class="hljs-subst">${<span class="hljs-keyword">this</span>.age}</span>)`</span> : <span class="hljs-keyword">this</span>.name
+        },
+
+        setAge(age) {
+            <span class="hljs-keyword">this</span>.age = age
+        }
     },
-
-    setAge(age) {
-        <span class="hljs-keyword">this</span>.age = age;
+    {
+        <span class="hljs-attr">setAge</span>: action
     }
-}, {
-    <span class="hljs-attr">setAge</span>: action
-});
+)
 
 <span class="hljs-comment">// object properties don't expose an 'observe' method,</span>
 <span class="hljs-comment">// but don't worry, 'mobx.autorun' is even more powerful</span>
-autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-built_in">console</span>.log(person.labelText));
+autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-built_in">console</span>.log(person.labelText))
 
-person.name = <span class="hljs-string">"Dave"</span>;
+person.name = <span class="hljs-string">"Dave"</span>
 <span class="hljs-comment">// prints: 'Dave'</span>
 
-person.setAge(<span class="hljs-number">21</span>);
+person.setAge(<span class="hljs-number">21</span>)
 <span class="hljs-comment">// etc</span>
 </code></pre>
 <p>Some things to keep in mind when making objects observable:</p>

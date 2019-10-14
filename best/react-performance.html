@@ -73,15 +73,20 @@ So the smaller your components are, the smaller the change they have to re-rende
 React is notoriously bad at rendering large collections as the reconciler has to evaluate the components produced by a collection on each collection change.
 It is therefore recommended to have components that just map over a collection and render it, and render nothing else:</p>
 <p>Bad:</p>
-<pre><code class="hljs css language-javascript">@observer <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyComponent</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Component</span> </span>{
+<pre><code class="hljs css language-javascript">@observer
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyComponent</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Component</span> </span>{
     render() {
-        <span class="hljs-keyword">const</span> {todos, user} = <span class="hljs-keyword">this</span>.props;
-        <span class="hljs-keyword">return</span> (<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>
-            {user.name}
-            <span class="hljs-tag">&lt;<span class="hljs-name">ul</span>&gt;</span>
-                {todos.map(todo =&gt; <span class="hljs-tag">&lt;<span class="hljs-name">TodoView</span> <span class="hljs-attr">todo</span>=<span class="hljs-string">{todo}</span> <span class="hljs-attr">key</span>=<span class="hljs-string">{todo.id}</span> /&gt;</span>)}
-            <span class="hljs-tag">&lt;/<span class="hljs-name">ul</span>&gt;</span>
-        <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>)
+        <span class="hljs-keyword">const</span> { todos, user } = <span class="hljs-keyword">this</span>.props
+        <span class="hljs-keyword">return</span> (
+            <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>
+                {user.name}
+                <span class="hljs-tag">&lt;<span class="hljs-name">ul</span>&gt;</span>
+                    {todos.map(todo =&gt; (
+                        <span class="hljs-tag">&lt;<span class="hljs-name">TodoView</span> <span class="hljs-attr">todo</span>=<span class="hljs-string">{todo}</span> <span class="hljs-attr">key</span>=<span class="hljs-string">{todo.id}</span> /&gt;</span>
+                    ))}
+                <span class="hljs-tag">&lt;/<span class="hljs-name">ul</span>&gt;</span>
+            <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+        )
     }
 }
 </span></code></pre>

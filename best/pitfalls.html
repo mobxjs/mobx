@@ -98,41 +98,41 @@ So usually all your components should be decorated. Don't worry, this is not ine
 <h3><a class="anchor" aria-hidden="true" id="dont-copy-observables-properties-and-store-them-locally"></a><a href="#dont-copy-observables-properties-and-store-them-locally" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Don't copy observables properties and store them locally</h3>
 <p>Observer components only track data that is accessed <em>during</em> the render method. A common mistake is that data plucked of from an observable property and stored will for that reason not be tracked:</p>
 <pre><code class="hljs css language-javascript"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">User</span> </span>{
-  @observable name
+    @observable name
 }
 
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Profile</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">Component</span> </span>{
-  name
+    name
 
-  componentWillMount() {
-    <span class="hljs-comment">// Wrong</span>
-    <span class="hljs-comment">// This dereferences user.name and just copies the value once! Future updates will not be tracked, as lifecycle hooks are not reactive</span>
-    <span class="hljs-comment">// assignments like these create redundant data</span>
-    <span class="hljs-keyword">this</span>.name = <span class="hljs-keyword">this</span>.props.user.name
-  }
+    componentWillMount() {
+        <span class="hljs-comment">// Wrong</span>
+        <span class="hljs-comment">// This dereferences user.name and just copies the value once! Future updates will not be tracked, as lifecycle hooks are not reactive</span>
+        <span class="hljs-comment">// assignments like these create redundant data</span>
+        <span class="hljs-keyword">this</span>.name = <span class="hljs-keyword">this</span>.props.user.name
+    }
 
-  render() {
-    <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>{this.name}<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
-  }
+    render() {
+        <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>{this.name}<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
+    }
 }
 </code></pre>
 <p>The correct approach is either by not storing the values of observables locally (obviously, the above example is simple but contrived), or by defining them as computed property:</p>
 <pre><code class="hljs css language-javascript"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">User</span> </span>{
-  @observable name
+    @observable name
 }
 
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Profile</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">Component</span> </span>{
-  @computed <span class="hljs-keyword">get</span> name() {
-    <span class="hljs-comment">// correct; computed property will track the `user.name` property</span>
-    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.props.user.name
-  }
+    @computed <span class="hljs-keyword">get</span> name() {
+        <span class="hljs-comment">// correct; computed property will track the `user.name` property</span>
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.props.user.name
+    }
 
-  render() {
-    <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>{this.name}<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
-  }
+    render() {
+        <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>{this.name}<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
+    }
 }
 </code></pre>
-<h3><a class="anchor" aria-hidden="true" id="render-callbacks-are-not-part-of-the-render-method"></a><a href="#render-callbacks-are-not-part-of-the-render-method" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Render callbacks are <em>not</em> part of the render method</h3>
+<h3><a class="anchor" aria-hidden="true" id="render-callbacks-are-_not_-part-of-the-render-method"></a><a href="#render-callbacks-are-_not_-part-of-the-render-method" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Render callbacks are <em>not</em> part of the render method</h3>
 <p>Because <code>observer</code> only applies to exactly the <code>render</code> function of the current component; passing a render callback or component to a child component doesn't become reactive automatically.
 For more details, see the <a href="https://github.com/mobxjs/mobx/blob/gh-pages/docs/best/react.md#mobx-only-tracks-data-accessed-for-observer-components-if-they-are-directly-accessed-by-render">what will Mobx react to</a> guide.</p>
 <h3><a class="anchor" aria-hidden="true" id="dereference-values-as-late-as-possible"></a><a href="#dereference-values-as-late-as-possible" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Dereference values as late as possible</h3>
@@ -161,11 +161,11 @@ For reactions like <code>autorun</code> it is more tricky, as they might observe
 the reaction will remain in scope which means that all other observables it uses are also kept alive to support future recomputions.
 So make sure to always dispose your reactions when you no longer need them!</p>
 <p>Example:</p>
-<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> VAT = observable(<span class="hljs-number">1.20</span>)
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> VAT = observable(<span class="hljs-number">1.2</span>)
 
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">OrderLIne</span> </span>{
-    @observable price = <span class="hljs-number">10</span>;
-    @observable amount = <span class="hljs-number">1</span>;
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">OrderLine</span> </span>{
+    @observable price = <span class="hljs-number">10</span>
+    @observable amount = <span class="hljs-number">1</span>
     <span class="hljs-keyword">constructor</span>() {
         <span class="hljs-comment">// this autorun will be GC-ed together with the current orderline instance</span>
         <span class="hljs-keyword">this</span>.handler = autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
@@ -182,7 +182,6 @@ So make sure to always dispose your reactions when you no longer need them!</p>
         <span class="hljs-comment">// When the reaction is no longer needed!</span>
     }
 }
-
 </code></pre>
 <h4><a class="anchor" aria-hidden="true" id="i-have-a-weird-exception-when-using-observable-in-a-react-component"></a><a href="#i-have-a-weird-exception-when-using-observable-in-a-react-component" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>I have a weird exception when using <code>@observable</code> in a React component.</h4>
 <p>The following exception: <code>Uncaught TypeError: Cannot assign to read only property '__mobxLazyInitializers' of object</code> occurs when using a <code>react-hot-loader</code> that does not support decorators.
@@ -212,31 +211,28 @@ myComponent.displayName = <span class="hljs-string">"MyComponent"</span>
 <h4><a class="anchor" aria-hidden="true" id="rendering-listviews-in-react-native"></a><a href="#rendering-listviews-in-react-native" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Rendering ListViews in React Native</h4>
 <p><code>ListView.DataSource</code> in React Native expects real arrays. Observable arrays are actually objects, make sure to <code>.slice()</code> them first before passing to list views. Furthermore, <code>ListView.DataSource</code> itself can be moved to the store and have it automatically updated with a <code>@computed</code>, this step can also be done on the component level.</p>
 <pre><code class="hljs css language-javascript"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ListStore</span> </span>{
-  @observable list = [
-    <span class="hljs-string">'Hello World!'</span>,
-    <span class="hljs-string">'Hello React Native!'</span>,
-    <span class="hljs-string">'Hello MobX!'</span>
-  ];
+    @observable list = [<span class="hljs-string">"Hello World!"</span>, <span class="hljs-string">"Hello React Native!"</span>, <span class="hljs-string">"Hello MobX!"</span>]
 
-  ds = <span class="hljs-keyword">new</span> ListView.DataSource({ <span class="hljs-attr">rowHasChanged</span>: <span class="hljs-function">(<span class="hljs-params">r1, r2</span>) =&gt;</span> r1 !== r2 });
+    ds = <span class="hljs-keyword">new</span> ListView.DataSource({ <span class="hljs-attr">rowHasChanged</span>: <span class="hljs-function">(<span class="hljs-params">r1, r2</span>) =&gt;</span> r1 !== r2 })
 
-  @computed <span class="hljs-keyword">get</span> dataSource() {
-    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.ds.cloneWithRows(<span class="hljs-keyword">this</span>.list.slice());
-  }
+    @computed <span class="hljs-keyword">get</span> dataSource() {
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.ds.cloneWithRows(<span class="hljs-keyword">this</span>.list.slice())
+    }
 }
 
-<span class="hljs-keyword">const</span> listStore = <span class="hljs-keyword">new</span> ListStore();
+<span class="hljs-keyword">const</span> listStore = <span class="hljs-keyword">new</span> ListStore()
 
-@observer <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">List</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Component</span> </span>{
-  render() {
-    <span class="hljs-keyword">return</span> (
-      <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">ListView</span>
-        <span class="hljs-attr">dataSource</span>=<span class="hljs-string">{listStore.dataSource}</span>
-        <span class="hljs-attr">renderRow</span>=<span class="hljs-string">{row</span> =&gt;</span> <span class="hljs-tag">&lt;<span class="hljs-name">Text</span>&gt;</span>{row}<span class="hljs-tag">&lt;/<span class="hljs-name">Text</span>&gt;</span>}
-        enableEmptySections={true}
-      /&gt;
-    );
-  }
+@observer
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">List</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Component</span> </span>{
+    render() {
+        <span class="hljs-keyword">return</span> (
+            <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">ListView</span>
+                <span class="hljs-attr">dataSource</span>=<span class="hljs-string">{listStore.dataSource}</span>
+                <span class="hljs-attr">renderRow</span>=<span class="hljs-string">{row</span> =&gt;</span> <span class="hljs-tag">&lt;<span class="hljs-name">Text</span>&gt;</span>{row}<span class="hljs-tag">&lt;/<span class="hljs-name">Text</span>&gt;</span>}
+                enableEmptySections={true}
+            /&gt;
+        )
+    }
 }
 </span></code></pre>
 <p>For more info see <a href="https://github.com/mobxjs/mobx/issues/476">#476</a></p>
@@ -246,12 +242,12 @@ myComponent.displayName = <span class="hljs-string">"MyComponent"</span>
 <p>As mentioned above, all React components which used observable data should be marked as <code>@observer</code> Additionally, if you are going to be modifying any observable data in a function in your React component, that function should be marked as <code>@action</code>. Additionally, if you want <code>this</code> to refer to the instance of your component class, you should use <code>@action.bound</code>. Consider the following class:</p>
 <pre><code class="hljs css language-js"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ExampleComponent</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">Component</span> </span>{
   @observable disposer <span class="hljs-comment">// &lt;--- this value is disposed in addActed</span>
-  
+
   @action.bound
   addActed() {
     <span class="hljs-keyword">this</span>.dispose()
   }
-  
+
   @action.bound
   componentDidMount() {
     <span class="hljs-keyword">this</span>.disposer = <span class="hljs-keyword">this</span>.observe(....) <span class="hljs-comment">//&lt;-- details don't matter</span>
@@ -262,12 +258,12 @@ myComponent.displayName = <span class="hljs-string">"MyComponent"</span>
 <p>On the other hand, consider the following:</p>
 <pre><code class="hljs css language-js"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ExampleComponent</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">Component</span> </span>{
   @observable disposer <span class="hljs-comment">// &lt;--- this value is disposed in addActed</span>
-  
+
   @action.bound
   componentWillUnmount() {
     <span class="hljs-keyword">this</span>.dispose()
   }
-  
+
   @action.bound
   componentDidMount() {
     <span class="hljs-keyword">this</span>.disposer = <span class="hljs-keyword">this</span>.observe(....) <span class="hljs-comment">//&lt;-- details don't matter</span>

@@ -75,12 +75,12 @@ the <code>onBecomeObserved</code> or <code>onBecomeUnobserved</code> utility to 
 and returns the current date-time.
 This clock will only actually tick if it is observed by someone.</p>
 <p>The complete API of the <code>Atom</code> class is demonstrated by this example.</p>
-<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> {createAtom, autorun} <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx"</span>;
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { createAtom, autorun } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx"</span>
 
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Clock</span> </span>{
-    atom;
-    intervalHandler = <span class="hljs-literal">null</span>;
-    currentDateTime;
+    atom
+    intervalHandler = <span class="hljs-literal">null</span>
+    currentDateTime
 
     <span class="hljs-keyword">constructor</span>() {
         <span class="hljs-comment">// creates an atom to interact with the MobX core algorithm</span>
@@ -92,7 +92,7 @@ This clock will only actually tick if it is observed by someone.</p>
             <span class="hljs-comment">// third (optional) parameter: callback for when this atom transitions from observed to unobserved</span>
             <span class="hljs-comment">// note that the same atom transitions multiple times between these two states</span>
             () =&gt; <span class="hljs-keyword">this</span>.stopTicking()
-        );
+        )
     }
 
     getTime() {
@@ -101,44 +101,41 @@ This clock will only actually tick if it is observed by someone.</p>
         <span class="hljs-comment">// by some reaction.</span>
         <span class="hljs-comment">// reportObserved will also trigger the onBecomeObserved event handler (startTicking) if needed</span>
         <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.atom.reportObserved()) {
-            <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.currentDateTime;
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.currentDateTime
         } <span class="hljs-keyword">else</span> {
             <span class="hljs-comment">// apparently getTime was called but not while a reaction is running.</span>
             <span class="hljs-comment">// So, nobody depends on this value, hence the onBecomeObserved handler (startTicking) won't be fired</span>
             <span class="hljs-comment">// Depending on the nature of your atom</span>
             <span class="hljs-comment">// it might behave differently in such circumstances</span>
             <span class="hljs-comment">// (like throwing an error, returning a default value etc)</span>
-            <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>();
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>()
         }
     }
 
     tick() {
-        <span class="hljs-keyword">this</span>.currentDateTime = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>();
+        <span class="hljs-keyword">this</span>.currentDateTime = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>()
         <span class="hljs-comment">// let MobX know that this data source has changed</span>
-        <span class="hljs-keyword">this</span>.atom.reportChanged();
+        <span class="hljs-keyword">this</span>.atom.reportChanged()
     }
 
     startTicking() {
-        <span class="hljs-keyword">this</span>.tick(); <span class="hljs-comment">// initial tick</span>
-        <span class="hljs-keyword">this</span>.intervalHandler = setInterval(
-            <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-keyword">this</span>.tick(),
-            <span class="hljs-number">1000</span>
-        );
+        <span class="hljs-keyword">this</span>.tick() <span class="hljs-comment">// initial tick</span>
+        <span class="hljs-keyword">this</span>.intervalHandler = setInterval(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-keyword">this</span>.tick(), <span class="hljs-number">1000</span>)
     }
 
     stopTicking() {
-        clearInterval(<span class="hljs-keyword">this</span>.intervalHandler);
-        <span class="hljs-keyword">this</span>.intervalHandler = <span class="hljs-literal">null</span>;
+        clearInterval(<span class="hljs-keyword">this</span>.intervalHandler)
+        <span class="hljs-keyword">this</span>.intervalHandler = <span class="hljs-literal">null</span>
     }
 }
 
-<span class="hljs-keyword">const</span> clock = <span class="hljs-keyword">new</span> Clock();
+<span class="hljs-keyword">const</span> clock = <span class="hljs-keyword">new</span> Clock()
 
-<span class="hljs-keyword">const</span> disposer = autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-built_in">console</span>.log(clock.getTime()));
+<span class="hljs-keyword">const</span> disposer = autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-built_in">console</span>.log(clock.getTime()))
 
 <span class="hljs-comment">// ... prints the time each second</span>
 
-disposer();
+disposer()
 
 <span class="hljs-comment">// printing stops. If nobody else uses the same `clock` the clock will stop ticking as well.</span>
 </code></pre>

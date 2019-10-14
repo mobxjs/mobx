@@ -69,8 +69,8 @@ Registers a global spy listener that listens to all events that happen in MobX.
 It is similar to attaching an <code>observe</code> listener to <em>all</em> observables at once, but also notifies about running (trans/re)actions and computations.
 Used for example by the <code>mobx-react-devtools</code>.</p>
 <p>Example usage of spying all actions:</p>
-<pre><code class="hljs css language-javascript">spy(<span class="hljs-function">(<span class="hljs-params">event</span>) =&gt;</span> {
-    <span class="hljs-keyword">if</span> (event.type === <span class="hljs-string">'action'</span>) {
+<pre><code class="hljs css language-javascript">spy(<span class="hljs-function"><span class="hljs-params">event</span> =&gt;</span> {
+    <span class="hljs-keyword">if</span> (event.type === <span class="hljs-string">"action"</span>) {
         <span class="hljs-built_in">console</span>.log(<span class="hljs-string">`<span class="hljs-subst">${event.name}</span> with args: <span class="hljs-subst">${event.<span class="hljs-built_in">arguments</span>}</span>`</span>)
     }
 })

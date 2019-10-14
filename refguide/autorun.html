@@ -80,28 +80,30 @@ observers on its own, otherwise its value is considered to be irrelevant.
 As a rule of thumb: use <code>autorun</code> if you have a function that should run automatically but that doesn't result in a new value.
 Use <code>computed</code> for everything else. Autoruns are about initiating <em>effects</em>, not about producing new values.
 If a string is passed as first argument to <code>autorun</code>, it will be used as debug name.</p>
-<p>The return value from autorun is a disposer function, which can be used to dispose of the autorun when you no longer need it.  The reaction itself will also be passed as the only argument to the function given to autorun, which allows you to manipulate it from within the autorun function.  This means there are two ways you can dispose of the reaction when you no longer need it:</p>
-<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> disposer = autorun( <span class="hljs-function"><span class="hljs-params">reaction</span> =&gt;</span> { <span class="hljs-comment">/* do some stuff */</span> } );
-disposer();
+<p>The return value from autorun is a disposer function, which can be used to dispose of the autorun when you no longer need it. The reaction itself will also be passed as the only argument to the function given to autorun, which allows you to manipulate it from within the autorun function. This means there are two ways you can dispose of the reaction when you no longer need it:</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> disposer = autorun(<span class="hljs-function"><span class="hljs-params">reaction</span> =&gt;</span> {
+    <span class="hljs-comment">/* do some stuff */</span>
+})
+disposer()
 
 <span class="hljs-comment">// or</span>
 
-autorun( <span class="hljs-function"><span class="hljs-params">reaction</span> =&gt;</span> {
-  <span class="hljs-comment">/* do some stuff */</span>
-  reaction.dispose();
-} );
+autorun(<span class="hljs-function"><span class="hljs-params">reaction</span> =&gt;</span> {
+    <span class="hljs-comment">/* do some stuff */</span>
+    reaction.dispose()
+})
 </code></pre>
 <p>Just like the <a href="/refguide/observer-component.html"><code>@observer</code> decorator/function</a>, <code>autorun</code> will only observe data that is used during the execution of the provided function.</p>
-<pre><code class="hljs css language-javascript"><span class="hljs-keyword">var</span> numbers = observable([<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>]);
-<span class="hljs-keyword">var</span> sum = computed(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> numbers.reduce(<span class="hljs-function">(<span class="hljs-params">a, b</span>) =&gt;</span> a + b, <span class="hljs-number">0</span>));
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">var</span> numbers = observable([<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>])
+<span class="hljs-keyword">var</span> sum = computed(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> numbers.reduce(<span class="hljs-function">(<span class="hljs-params">a, b</span>) =&gt;</span> a + b, <span class="hljs-number">0</span>))
 
-<span class="hljs-keyword">var</span> disposer = autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-built_in">console</span>.log(sum.get()));
+<span class="hljs-keyword">var</span> disposer = autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-built_in">console</span>.log(sum.get()))
 <span class="hljs-comment">// prints '6'</span>
-numbers.push(<span class="hljs-number">4</span>);
+numbers.push(<span class="hljs-number">4</span>)
 <span class="hljs-comment">// prints '10'</span>
 
-disposer();
-numbers.push(<span class="hljs-number">5</span>);
+disposer()
+numbers.push(<span class="hljs-number">5</span>)
 <span class="hljs-comment">// won't print anything, nor is `sum` re-evaluated</span>
 </code></pre>
 <h2><a class="anchor" aria-hidden="true" id="options"></a><a href="#options" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Options</h2>
@@ -113,12 +115,15 @@ numbers.push(<span class="hljs-number">5</span>);
 <li><code>scheduler</code>: Set a custom scheduler to determine how re-running the autorun function should be scheduled. It takes a function that should be invoked at some point in the future, for example: <code>{ scheduler: run =&gt; { setTimeout(run, 1000) }}</code></li>
 </ul>
 <h2><a class="anchor" aria-hidden="true" id="the-delay-option"></a><a href="#the-delay-option" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>The <code>delay</code> option</h2>
-<pre><code class="hljs css language-javascript">autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
-    <span class="hljs-comment">// Assuming that profile.asJson returns an observable Json representation of profile,</span>
-    <span class="hljs-comment">// send it to the server each time it is changed, but await at least 300 milliseconds before sending it.</span>
-    <span class="hljs-comment">// When sent, the latest value of profile.asJson will be used.</span>
-    sendProfileToServer(profile.asJson);
-}, { <span class="hljs-attr">delay</span>: <span class="hljs-number">300</span> });
+<pre><code class="hljs css language-javascript">autorun(
+    <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+        <span class="hljs-comment">// Assuming that profile.asJson returns an observable Json representation of profile,</span>
+        <span class="hljs-comment">// send it to the server each time it is changed, but await at least 300 milliseconds before sending it.</span>
+        <span class="hljs-comment">// When sent, the latest value of profile.asJson will be used.</span>
+        sendProfileToServer(profile.asJson)
+    },
+    { <span class="hljs-attr">delay</span>: <span class="hljs-number">300</span> }
+)
 </code></pre>
 <h2><a class="anchor" aria-hidden="true" id="the-onerror-option"></a><a href="#the-onerror-option" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>The <code>onError</code> option</h2>
 <p>Exceptions thrown in autorun and all other types reactions are caught and logged to the console, but not propagated back to the original causing code.
@@ -129,15 +134,17 @@ so as subsequent run of a reaction might complete normally again if the cause fo
 Example:</p>
 <pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> age = observable.box(<span class="hljs-number">10</span>)
 
-<span class="hljs-keyword">const</span> dispose = autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
-    <span class="hljs-keyword">if</span> (age.get() &lt; <span class="hljs-number">0</span>)
-        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">"Age should not be negative"</span>)
-    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Age"</span>, age.get())
-}, {
-    onError(e) {
-        <span class="hljs-built_in">window</span>.alert(<span class="hljs-string">"Please enter a valid age"</span>)
+<span class="hljs-keyword">const</span> dispose = autorun(
+    <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+        <span class="hljs-keyword">if</span> (age.get() &lt; <span class="hljs-number">0</span>) <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">"Age should not be negative"</span>)
+        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Age"</span>, age.get())
+    },
+    {
+        onError(e) {
+            <span class="hljs-built_in">window</span>.alert(<span class="hljs-string">"Please enter a valid age"</span>)
+        }
     }
-})
+)
 </code></pre>
 <p>A global onError handler can be set as well, use <code>onReactionError(handler)</code>. This can be useful in tests or for client side error monitoring.</p>
 </span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/refguide/computed-decorator.html"><span class="arrow-prev">← </span><span>(@)computed</span></a><a class="docs-next button" href="/refguide/when.html"><span>when</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#options">Options</a></li><li><a href="#the-delay-option">The <code>delay</code> option</a></li><li><a href="#the-onerror-option">The <code>onError</code> option</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/mobx.png" alt="MobX" width="66" height="58"/></a><div><h5>Docs</h5><a href="/en/README">Why MobX</a><a href="/en/intro/concepts">Concepts</a></div><div><h5>Community</h5><a href="https://stackoverflow.com/questions/tagged/mobx" target="_blank" rel="noreferrer noopener">Stack Overflow</a><a href="https://gitter.im/mobxjs/mobx">Project Chat</a></div><div><h5>More</h5><a class="github-button" href="https://github.com/mobxjs/mobx" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section></footer></div></body></html>

@@ -81,54 +81,54 @@
 <li>Don't enable decorator syntax, but leverage the MobX built-in utility <code>decorate</code> to apply decorators to your classes / objects.</li>
 </ol>
 <p>Using decorator syntax:</p>
-<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { observable, computed, action } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx"</span>;
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { observable, computed, action } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx"</span>
 
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Timer</span> </span>{
-  @observable start = <span class="hljs-built_in">Date</span>.now();
-  @observable current = <span class="hljs-built_in">Date</span>.now();
+    @observable start = <span class="hljs-built_in">Date</span>.now()
+    @observable current = <span class="hljs-built_in">Date</span>.now()
 
-  @computed
-  <span class="hljs-keyword">get</span> elapsedTime() {
-    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.current - <span class="hljs-keyword">this</span>.start + <span class="hljs-string">"milliseconds"</span>;
-  }
+    @computed
+    <span class="hljs-keyword">get</span> elapsedTime() {
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.current - <span class="hljs-keyword">this</span>.start + <span class="hljs-string">"milliseconds"</span>
+    }
 
-  @action
-  tick() {
-    <span class="hljs-keyword">this</span>.current = <span class="hljs-built_in">Date</span>.now();
-  }
+    @action
+    tick() {
+        <span class="hljs-keyword">this</span>.current = <span class="hljs-built_in">Date</span>.now()
+    }
 }
 </code></pre>
 <p>Using the <code>decorate</code> utility:</p>
-<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { observable, computed, action, decorate } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx"</span>;
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { observable, computed, action, decorate } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx"</span>
 
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Timer</span> </span>{
-  start = <span class="hljs-built_in">Date</span>.now();
-  current = <span class="hljs-built_in">Date</span>.now();
+    start = <span class="hljs-built_in">Date</span>.now()
+    current = <span class="hljs-built_in">Date</span>.now()
 
-  <span class="hljs-keyword">get</span> elapsedTime() {
-    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.current - <span class="hljs-keyword">this</span>.start + <span class="hljs-string">"milliseconds"</span>;
-  }
+    <span class="hljs-keyword">get</span> elapsedTime() {
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.current - <span class="hljs-keyword">this</span>.start + <span class="hljs-string">"milliseconds"</span>
+    }
 
-  tick() {
-    <span class="hljs-keyword">this</span>.current = <span class="hljs-built_in">Date</span>.now();
-  }
+    tick() {
+        <span class="hljs-keyword">this</span>.current = <span class="hljs-built_in">Date</span>.now()
+    }
 }
 decorate(Timer, {
-  <span class="hljs-attr">start</span>: observable,
-  <span class="hljs-attr">current</span>: observable,
-  <span class="hljs-attr">elapsedTime</span>: computed,
-  <span class="hljs-attr">tick</span>: action
-});
+    <span class="hljs-attr">start</span>: observable,
+    <span class="hljs-attr">current</span>: observable,
+    <span class="hljs-attr">elapsedTime</span>: computed,
+    <span class="hljs-attr">tick</span>: action
+})
 </code></pre>
 <p>For applying multiple decorators on a single property, you can pass an array of decorators. The decorators application order is from right to left.</p>
 <pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { decorate, observable } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx"</span>
 <span class="hljs-keyword">import</span> { serializable, primitive } <span class="hljs-keyword">from</span> <span class="hljs-string">"serializr"</span>
-<span class="hljs-keyword">import</span> persist <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx-persist"</span>;
+<span class="hljs-keyword">import</span> persist <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx-persist"</span>
 
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Todo</span> </span>{
-    id = <span class="hljs-built_in">Math</span>.random();
-    title = <span class="hljs-string">""</span>;
-    finished = <span class="hljs-literal">false</span>;
+    id = <span class="hljs-built_in">Math</span>.random()
+    title = <span class="hljs-string">""</span>
+    finished = <span class="hljs-literal">false</span>
 }
 decorate(Todo, {
     <span class="hljs-attr">title</span>: [serializable(primitive), persist(<span class="hljs-string">"object"</span>), observable],
@@ -161,15 +161,15 @@ decorate(Todo, {
 </span></code></pre>
 <p>.babelrc:</p>
 <pre><code class="hljs css language-json">{
-  <span class="hljs-attr">"presets"</span>: [<span class="hljs-string">"mobx"</span>]
+    <span class="hljs-attr">"presets"</span>: [<span class="hljs-string">"mobx"</span>]
 }
 </code></pre>
 <p><strong>Babel 6: manually enabling decorators</strong></p>
 <p>To enable support for decorators without using the mobx preset, follow the following steps.
 Install support for decorators: <code>npm i --save-dev babel-plugin-transform-decorators-legacy</code>. And enable it in your <code>.babelrc</code> file:</p>
 <pre><code class="hljs css language-json">{
-  <span class="hljs-attr">"presets"</span>: [<span class="hljs-string">"es2015"</span>, <span class="hljs-string">"stage-1"</span>],
-  <span class="hljs-attr">"plugins"</span>: [<span class="hljs-string">"transform-decorators-legacy"</span>]
+    <span class="hljs-attr">"presets"</span>: [<span class="hljs-string">"es2015"</span>, <span class="hljs-string">"stage-1"</span>],
+    <span class="hljs-attr">"plugins"</span>: [<span class="hljs-string">"transform-decorators-legacy"</span>]
 }
 </code></pre>
 <p>Note that the order of plugins is important: <code>transform-decorators-legacy</code> should be listed <em>first</em>.
@@ -178,8 +178,8 @@ Having issues with the babel setup? Check this <a href="https://github.com/mobxj
 <p>Install support for decorators: <code>npm i --save-dev @babel/plugin-proposal-class-properties @babel/plugin-proposal-decorators</code>. And enable it in your <code>.babelrc</code> file:</p>
 <pre><code class="hljs css language-json">{
     <span class="hljs-attr">"plugins"</span>: [
-        [<span class="hljs-string">"@babel/plugin-proposal-decorators"</span>, { <span class="hljs-attr">"legacy"</span>: <span class="hljs-literal">true</span>}],
-        [<span class="hljs-string">"@babel/plugin-proposal-class-properties"</span>, { <span class="hljs-attr">"loose"</span>: <span class="hljs-literal">true</span>}]
+        [<span class="hljs-string">"@babel/plugin-proposal-decorators"</span>, { <span class="hljs-attr">"legacy"</span>: <span class="hljs-literal">true</span> }],
+        [<span class="hljs-string">"@babel/plugin-proposal-class-properties"</span>, { <span class="hljs-attr">"loose"</span>: <span class="hljs-literal">true</span> }]
     ]
 }
 </code></pre>

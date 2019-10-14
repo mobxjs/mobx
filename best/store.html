@@ -105,24 +105,24 @@ Instead of pushing state in such a case upwards in the component tree, like you 
 <p>For isomorphic applications you might also want to provide a stub implementation of this store with sane defaults so that all components render as expected.
 You might distribute the <em>ui-state-store</em> through your application by passing it as a property through your component tree or using <code>Provider</code> and <code>inject</code> from the <code>mobx-react</code> package.</p>
 <p>Example of a store (using ES6 syntax):</p>
-<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> {observable, computed, asStructure} <span class="hljs-keyword">from</span> <span class="hljs-string">'mobx'</span>;
-<span class="hljs-keyword">import</span> jquery <span class="hljs-keyword">from</span> <span class="hljs-string">'jquery'</span>;
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { observable, computed, asStructure } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx"</span>
+<span class="hljs-keyword">import</span> jquery <span class="hljs-keyword">from</span> <span class="hljs-string">"jquery"</span>
 
 <span class="hljs-keyword">export</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UiState</span> </span>{
-    @observable language = <span class="hljs-string">"en_US"</span>;
-    @observable pendingRequestCount = <span class="hljs-number">0</span>;
+    @observable language = <span class="hljs-string">"en_US"</span>
+    @observable pendingRequestCount = <span class="hljs-number">0</span>
 
     <span class="hljs-comment">// .struct makes sure observer won't be signaled unless the</span>
     <span class="hljs-comment">// dimensions object changed in a deepEqual manner</span>
     @observable.struct windowDimensions = {
         <span class="hljs-attr">width</span>: jquery(<span class="hljs-built_in">window</span>).width(),
         <span class="hljs-attr">height</span>: jquery(<span class="hljs-built_in">window</span>).height()
-    };
+    }
 
     <span class="hljs-keyword">constructor</span>() {
         jquery.resize(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
-            <span class="hljs-keyword">this</span>.windowDimensions = getWindowDimensions();
-        });
+            <span class="hljs-keyword">this</span>.windowDimensions = getWindowDimensions()
+        })
     }
 
     @computed <span class="hljs-keyword">get</span> appIsInSync() {
@@ -175,31 +175,33 @@ Especially in large applications this is important.</li>
 <li>They are easily recognizable and can strictly be type-checked.</li>
 </ul>
 <h3><a class="anchor" aria-hidden="true" id="example-domain-store"></a><a href="#example-domain-store" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Example domain store</h3>
-<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> {observable, autorun} <span class="hljs-keyword">from</span> <span class="hljs-string">'mobx'</span>;
-<span class="hljs-keyword">import</span> uuid <span class="hljs-keyword">from</span> <span class="hljs-string">'node-uuid'</span>;
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { observable, autorun } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx"</span>
+<span class="hljs-keyword">import</span> uuid <span class="hljs-keyword">from</span> <span class="hljs-string">"node-uuid"</span>
 
 <span class="hljs-keyword">export</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TodoStore</span> </span>{
-    authorStore;
-    transportLayer;
-    @observable todos = [];
-    @observable isLoading = <span class="hljs-literal">true</span>;
+    authorStore
+    transportLayer
+    @observable todos = []
+    @observable isLoading = <span class="hljs-literal">true</span>
 
     <span class="hljs-keyword">constructor</span>(transportLayer, authorStore) {
-        <span class="hljs-keyword">this</span>.authorStore = authorStore; <span class="hljs-comment">// Store that can resolve authors for us</span>
-        <span class="hljs-keyword">this</span>.transportLayer = transportLayer; <span class="hljs-comment">// Thing that can make server requests for us</span>
-        <span class="hljs-keyword">this</span>.transportLayer.onReceiveTodoUpdate(<span class="hljs-function"><span class="hljs-params">updatedTodo</span> =&gt;</span> <span class="hljs-keyword">this</span>.updateTodoFromServer(updatedTodo));
-        <span class="hljs-keyword">this</span>.loadTodos();
+        <span class="hljs-keyword">this</span>.authorStore = authorStore <span class="hljs-comment">// Store that can resolve authors for us</span>
+        <span class="hljs-keyword">this</span>.transportLayer = transportLayer <span class="hljs-comment">// Thing that can make server requests for us</span>
+        <span class="hljs-keyword">this</span>.transportLayer.onReceiveTodoUpdate(<span class="hljs-function"><span class="hljs-params">updatedTodo</span> =&gt;</span>
+            <span class="hljs-keyword">this</span>.updateTodoFromServer(updatedTodo)
+        )
+        <span class="hljs-keyword">this</span>.loadTodos()
     }
 
     <span class="hljs-comment">/**
      * Fetches all todos from the server
      */</span>
     loadTodos() {
-        <span class="hljs-keyword">this</span>.isLoading = <span class="hljs-literal">true</span>;
+        <span class="hljs-keyword">this</span>.isLoading = <span class="hljs-literal">true</span>
         <span class="hljs-keyword">this</span>.transportLayer.fetchTodos().then(<span class="hljs-function"><span class="hljs-params">fetchedTodos</span> =&gt;</span> {
-            fetchedTodos.forEach(<span class="hljs-function"><span class="hljs-params">json</span> =&gt;</span> <span class="hljs-keyword">this</span>.updateTodoFromServer(json));
-            <span class="hljs-keyword">this</span>.isLoading = <span class="hljs-literal">false</span>;
-        });
+            fetchedTodos.forEach(<span class="hljs-function"><span class="hljs-params">json</span> =&gt;</span> <span class="hljs-keyword">this</span>.updateTodoFromServer(json))
+            <span class="hljs-keyword">this</span>.isLoading = <span class="hljs-literal">false</span>
+        })
     }
 
     <span class="hljs-comment">/**
@@ -208,15 +210,15 @@ Especially in large applications this is important.</li>
      * or remove a todo if it has been deleted on the server.
      */</span>
     updateTodoFromServer(json) {
-        <span class="hljs-keyword">var</span> todo = <span class="hljs-keyword">this</span>.todos.find(<span class="hljs-function"><span class="hljs-params">todo</span> =&gt;</span> todo.id === json.id);
+        <span class="hljs-keyword">var</span> todo = <span class="hljs-keyword">this</span>.todos.find(<span class="hljs-function"><span class="hljs-params">todo</span> =&gt;</span> todo.id === json.id)
         <span class="hljs-keyword">if</span> (!todo) {
-            todo = <span class="hljs-keyword">new</span> Todo(<span class="hljs-keyword">this</span>, json.id);
-            <span class="hljs-keyword">this</span>.todos.push(todo);
+            todo = <span class="hljs-keyword">new</span> Todo(<span class="hljs-keyword">this</span>, json.id)
+            <span class="hljs-keyword">this</span>.todos.push(todo)
         }
         <span class="hljs-keyword">if</span> (json.isDeleted) {
-            <span class="hljs-keyword">this</span>.removeTodo(todo);
+            <span class="hljs-keyword">this</span>.removeTodo(todo)
         } <span class="hljs-keyword">else</span> {
-            todo.updateFromJson(json);
+            todo.updateFromJson(json)
         }
     }
 
@@ -224,71 +226,70 @@ Especially in large applications this is important.</li>
      * Creates a fresh todo on the client and server
      */</span>
     createTodo() {
-        <span class="hljs-keyword">var</span> todo = <span class="hljs-keyword">new</span> Todo(<span class="hljs-keyword">this</span>);
-        <span class="hljs-keyword">this</span>.todos.push(todo);
-        <span class="hljs-keyword">return</span> todo;
+        <span class="hljs-keyword">var</span> todo = <span class="hljs-keyword">new</span> Todo(<span class="hljs-keyword">this</span>)
+        <span class="hljs-keyword">this</span>.todos.push(todo)
+        <span class="hljs-keyword">return</span> todo
     }
 
     <span class="hljs-comment">/**
      * A todo was somehow deleted, clean it from the client memory
      */</span>
     removeTodo(todo) {
-        <span class="hljs-keyword">this</span>.todos.splice(<span class="hljs-keyword">this</span>.todos.indexOf(todo), <span class="hljs-number">1</span>);
-        todo.dispose();
+        <span class="hljs-keyword">this</span>.todos.splice(<span class="hljs-keyword">this</span>.todos.indexOf(todo), <span class="hljs-number">1</span>)
+        todo.dispose()
     }
 }
 
 <span class="hljs-keyword">export</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Todo</span> </span>{
-
     <span class="hljs-comment">/**
      * unique id of this todo, immutable.
      */</span>
-    id = <span class="hljs-literal">null</span>;
+    id = <span class="hljs-literal">null</span>
 
-    @observable completed = <span class="hljs-literal">false</span>;
-    @observable task = <span class="hljs-string">""</span>;
+    @observable completed = <span class="hljs-literal">false</span>
+    @observable task = <span class="hljs-string">""</span>
 
     <span class="hljs-comment">/**
      * reference to an Author object (from the authorStore)
      */</span>
-    @observable author = <span class="hljs-literal">null</span>;
+    @observable author = <span class="hljs-literal">null</span>
 
-    store = <span class="hljs-literal">null</span>;
+    store = <span class="hljs-literal">null</span>
 
     <span class="hljs-comment">/**
      * Indicates whether changes in this object
      * should be submitted to the server
      */</span>
-    autoSave = <span class="hljs-literal">true</span>;
+    autoSave = <span class="hljs-literal">true</span>
 
     <span class="hljs-comment">/**
      * Disposer for the side effect that automatically
      * stores this Todo, see @dispose.
      */</span>
-    saveHandler = <span class="hljs-literal">null</span>;
+    saveHandler = <span class="hljs-literal">null</span>
 
-    <span class="hljs-keyword">constructor</span>(store, id=uuid.v4()) {
-        <span class="hljs-keyword">this</span>.store = store;
-        <span class="hljs-keyword">this</span>.id = id;
+    <span class="hljs-keyword">constructor</span>(store, id = uuid.v4()) {
+        <span class="hljs-keyword">this</span>.store = store
+        <span class="hljs-keyword">this</span>.id = id
 
         <span class="hljs-keyword">this</span>.saveHandler = reaction(
             <span class="hljs-comment">// observe everything that is used in the JSON:</span>
             <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-keyword">this</span>.asJson,
             <span class="hljs-comment">// if autoSave is on, send json to server</span>
-            (json) =&gt; {
+            json =&gt; {
                 <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.autoSave) {
-                    <span class="hljs-keyword">this</span>.store.transportLayer.saveTodo(json);
+                    <span class="hljs-keyword">this</span>.store.transportLayer.saveTodo(json)
                 }
             }
-        );
+        )
     }
 
     <span class="hljs-comment">/**
      * Remove this todo from the client and server
      */</span>
     <span class="hljs-keyword">delete</span>() {
-        <span class="hljs-keyword">this</span>.store.transportLayer.deleteTodo(<span class="hljs-keyword">this</span>.id);
-        <span class="hljs-keyword">this</span>.store.removeTodo(<span class="hljs-keyword">this</span>);
+        <span class="hljs-keyword">this</span>.store.transportLayer.deleteTodo(<span class="hljs-keyword">this</span>.id)
+        <span class="hljs-keyword">this</span>.store.removeTodo(<span class="hljs-keyword">this</span>)
     }
 
     @computed <span class="hljs-keyword">get</span> asJson() {
@@ -297,7 +298,7 @@ Especially in large applications this is important.</li>
             <span class="hljs-attr">completed</span>: <span class="hljs-keyword">this</span>.completed,
             <span class="hljs-attr">task</span>: <span class="hljs-keyword">this</span>.task,
             <span class="hljs-attr">authorId</span>: <span class="hljs-keyword">this</span>.author ? <span class="hljs-keyword">this</span>.author.id : <span class="hljs-literal">null</span>
-        };
+        }
     }
 
     <span class="hljs-comment">/**
@@ -305,16 +306,16 @@ Especially in large applications this is important.</li>
      */</span>
     updateFromJson(json) {
         <span class="hljs-comment">// make sure our changes aren't sent back to the server</span>
-        <span class="hljs-keyword">this</span>.autoSave = <span class="hljs-literal">false</span>;
-        <span class="hljs-keyword">this</span>.completed = json.completed;
-        <span class="hljs-keyword">this</span>.task = json.task;
-        <span class="hljs-keyword">this</span>.author = <span class="hljs-keyword">this</span>.store.authorStore.resolveAuthor(json.authorId);
-        <span class="hljs-keyword">this</span>.autoSave = <span class="hljs-literal">true</span>;
+        <span class="hljs-keyword">this</span>.autoSave = <span class="hljs-literal">false</span>
+        <span class="hljs-keyword">this</span>.completed = json.completed
+        <span class="hljs-keyword">this</span>.task = json.task
+        <span class="hljs-keyword">this</span>.author = <span class="hljs-keyword">this</span>.store.authorStore.resolveAuthor(json.authorId)
+        <span class="hljs-keyword">this</span>.autoSave = <span class="hljs-literal">true</span>
     }
 
     dispose() {
         <span class="hljs-comment">// clean up the observer</span>
-        <span class="hljs-keyword">this</span>.saveHandler();
+        <span class="hljs-keyword">this</span>.saveHandler()
     }
 }
 </code></pre>
@@ -328,29 +329,29 @@ Especially in large applications this is important.</li>
 </ol>
 <p>Example:</p>
 <pre><code class="hljs css language-javascript"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">RootStore</span> </span>{
-  <span class="hljs-keyword">constructor</span>() {
-    <span class="hljs-keyword">this</span>.userStore = <span class="hljs-keyword">new</span> UserStore(<span class="hljs-keyword">this</span>)
-    <span class="hljs-keyword">this</span>.todoStore = <span class="hljs-keyword">new</span> TodoStore(<span class="hljs-keyword">this</span>)
-  }
+    <span class="hljs-keyword">constructor</span>() {
+        <span class="hljs-keyword">this</span>.userStore = <span class="hljs-keyword">new</span> UserStore(<span class="hljs-keyword">this</span>)
+        <span class="hljs-keyword">this</span>.todoStore = <span class="hljs-keyword">new</span> TodoStore(<span class="hljs-keyword">this</span>)
+    }
 }
 
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UserStore</span> </span>{
-  <span class="hljs-keyword">constructor</span>(rootStore) {
-    <span class="hljs-keyword">this</span>.rootStore = rootStore
-  }
+    <span class="hljs-keyword">constructor</span>(rootStore) {
+        <span class="hljs-keyword">this</span>.rootStore = rootStore
+    }
 
-  getTodos(user) {
-    <span class="hljs-comment">// access todoStore through the root store</span>
-    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.rootStore.todoStore.todos.filter(<span class="hljs-function"><span class="hljs-params">todo</span> =&gt;</span> todo.author === user)
-  }
+    getTodos(user) {
+        <span class="hljs-comment">// access todoStore through the root store</span>
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.rootStore.todoStore.todos.filter(<span class="hljs-function"><span class="hljs-params">todo</span> =&gt;</span> todo.author === user)
+    }
 }
 
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TodoStore</span> </span>{
-  @observable todos = []
+    @observable todos = []
 
-  <span class="hljs-keyword">constructor</span>(rootStore) {
-    <span class="hljs-keyword">this</span>.rootStore = rootStore
-  }
+    <span class="hljs-keyword">constructor</span>(rootStore) {
+        <span class="hljs-keyword">this</span>.rootStore = rootStore
+    }
 }
 </code></pre>
 <p>When using React, this root store is typically inserted into the component tree by using <code>&lt;Provider rootStore={new RootStore()}&gt;&lt;App /&gt;&lt;/Provider&gt;</code></p>

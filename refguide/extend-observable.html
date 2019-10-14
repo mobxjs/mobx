@@ -72,28 +72,32 @@ Any getters in the properties map will be turned into computed properties.</p>
 <p>Use the <code>deep: false</code> option to make the new properties <em>shallow</em>. That is, prevent auto conversion of their <em>values</em> to observables.</p>
 <pre><code class="hljs css language-javascript"><span class="hljs-keyword">var</span> Person = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">firstName, lastName</span>) </span>{
     <span class="hljs-comment">// initialize observable properties on a new instance</span>
-    extendObservable(<span class="hljs-keyword">this</span>, {
-        <span class="hljs-attr">firstName</span>: firstName,
-        <span class="hljs-attr">lastName</span>: lastName,
-        <span class="hljs-keyword">get</span> fullName() {
-            <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.firstName + <span class="hljs-string">"  "</span> + <span class="hljs-keyword">this</span>.lastName
+    extendObservable(
+        <span class="hljs-keyword">this</span>,
+        {
+            <span class="hljs-attr">firstName</span>: firstName,
+            <span class="hljs-attr">lastName</span>: lastName,
+            <span class="hljs-keyword">get</span> fullName() {
+                <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.firstName + <span class="hljs-string">"  "</span> + <span class="hljs-keyword">this</span>.lastName
+            },
+            setFirstName(firstName) {
+                <span class="hljs-keyword">this</span>.firstName = firstName
+            }
         },
-        setFirstName(firstName) {
-            <span class="hljs-keyword">this</span>.firstName = firstName
+        {
+            <span class="hljs-attr">setFirstName</span>: action
         }
-    }, {
-        <span class="hljs-attr">setFirstName</span>: action
-    });
+    )
 }
 
-<span class="hljs-keyword">var</span> matthew = <span class="hljs-keyword">new</span> Person(<span class="hljs-string">"Matthew"</span>, <span class="hljs-string">"Henry"</span>);
+<span class="hljs-keyword">var</span> matthew = <span class="hljs-keyword">new</span> Person(<span class="hljs-string">"Matthew"</span>, <span class="hljs-string">"Henry"</span>)
 
 <span class="hljs-comment">// add an observable property to an already observable object</span>
 extendObservable(matthew, {
     <span class="hljs-attr">age</span>: <span class="hljs-number">353</span>
-});
+})
 </code></pre>
-<p>Note:  <code>observable.object(object)</code> is actually an alias for <code>extendObservable({}, object)</code>.</p>
+<p>Note: <code>observable.object(object)</code> is actually an alias for <code>extendObservable({}, object)</code>.</p>
 <p>Note: <code>decorate</code> could be used to introduce observable properties to an object, similar to <code>extendObservable</code>. The difference is that <code>extendObservable</code> is designed to introduce properties directly on the target instance, where <code>decorate</code> introduces them on prototypes; you can either pass it a constructor function (class) directly, or an object that will act as prototype for others.</p>
 <p>Note: <code>extendObservable</code> can not be used to introduce new properties on observable arrays or objects</p>
 </span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/refguide/tojson.html"><span class="arrow-prev">← </span><span class="function-name-prevnext">toJS</span></a><a class="docs-next button" href="/refguide/extending.html"><span class="function-name-prevnext">createAtom</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/mobx.png" alt="MobX" width="66" height="58"/></a><div><h5>Docs</h5><a href="/en/README">Why MobX</a><a href="/en/intro/concepts">Concepts</a></div><div><h5>Community</h5><a href="https://stackoverflow.com/questions/tagged/mobx" target="_blank" rel="noreferrer noopener">Stack Overflow</a><a href="https://gitter.im/mobxjs/mobx">Project Chat</a></div><div><h5>More</h5><a class="github-button" href="https://github.com/mobxjs/mobx" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section></footer></div></body></html>

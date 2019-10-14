@@ -88,30 +88,30 @@ Transformations will, like any other computed value, fall back to lazy evaluatio
     <span class="hljs-attr">boxes</span>: [],
     <span class="hljs-attr">arrows</span>: [],
     <span class="hljs-attr">selection</span>: <span class="hljs-literal">null</span>
-});
+})
 
 <span class="hljs-comment">/**
     Serialize store to json upon each change and push it onto the states list
 */</span>
-<span class="hljs-keyword">const</span> states = [];
+<span class="hljs-keyword">const</span> states = []
 
 autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
-    states.push(serializeState(store));
-});
+    states.push(serializeState(store))
+})
 
 <span class="hljs-keyword">const</span> serializeState = createTransformer(<span class="hljs-function"><span class="hljs-params">store</span> =&gt;</span> ({
     <span class="hljs-attr">boxes</span>: store.boxes.map(serializeBox),
     <span class="hljs-attr">arrows</span>: store.arrows.map(serializeArrow),
     <span class="hljs-attr">selection</span>: store.selection ? store.selection.id : <span class="hljs-literal">null</span>
-}));
+}))
 
-<span class="hljs-keyword">const</span> serializeBox = createTransformer(<span class="hljs-function"><span class="hljs-params">box</span> =&gt;</span> ({...box}));
+<span class="hljs-keyword">const</span> serializeBox = createTransformer(<span class="hljs-function"><span class="hljs-params">box</span> =&gt;</span> ({ ...box }))
 
 <span class="hljs-keyword">const</span> serializeArrow = createTransformer(<span class="hljs-function"><span class="hljs-params">arrow</span> =&gt;</span> ({
     <span class="hljs-attr">id</span>: arrow.id,
     <span class="hljs-attr">to</span>: arrow.to.id,
     <span class="hljs-attr">from</span>: arrow.from.id
-}));
+}))
 </code></pre>
 <p>In this example the state is serialized by composing three different transformation functions.
 The autorunner triggers the serialization of the <code>store</code> object, which in turn serializes all boxes and arrows.

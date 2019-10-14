@@ -83,11 +83,14 @@
 <a href="https://www.guilded.gg/"><img src="assets/guilded.jpg" align="center" width="100" title="Guilded" alt="Guilded" /></a>
 <a href="https://mantro.net/jobs/warlock"><img src="assets/mantro.png" align="center" width="100" title="mantro GmbH" alt="mantro GmbH"></a>
 <a href="https://www.codefirst.co.uk/"><img src="assets/codefirst.png" align="center" width="100" title="CodeFirst" alt="CodeFirst"/></a>
-<a href="https://blokt.com/"><img src="assets/blokt.jpg" align="center" width="100" title="Blokt" alt="Blokt"/></a></p>
-<p><strong>🥉Bronze sponsors:</strong><br/>
+<a href="https://blokt.com/"><img src="assets/blokt.jpg" align="center" width="100" title="Blokt" alt="Blokt"/></a>
+<a href="https://bugsnag.com/"><img src="assets/bugsnag.jpg" align="center" width="100" title="Bugsnag" alt="Bugsnag"/></a></p>
+<p><strong>🥉Bronze sponsors ($500+ total contributions):</strong><br/>
 <a href="https://coinbase.com/"><img src="assets/coinbase.jpeg" align="center" width="100" title="Coinbase" alt="Coinbase" /></a>
 <a href="https://www.algolia.com/"><img src="assets/algolia.jpg" align="center" width="100" title="Algolia" alt="Algolia" /></a>
-<a href="https://talentplot.com/"><img src="assets/talentplot.png" align="center" width="100" title="talentplot" alt="talentplot"></a></p>
+<a href="https://talentplot.com/"><img src="assets/talentplot.png" align="center" width="100" title="talentplot" alt="talentplot"></a>
+<a href="https://frontendmasters.com/"><img src="assets/frontendmasters.jpg" align="center" width="100" title="Frontend Masters" alt="Frontend Masters"></a>
+<a href="https://careers.dazn.com/"><img src="assets/dazn.png" align="center" width="100" title="DAZN" alt="DAZN"></a></p>
 <h1><a class="anchor" aria-hidden="true" id="installation"></a><a href="#installation" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Installation</h1>
 <ul>
 <li>Installation: <code>npm install mobx --save</code>. React bindings: <code>npm install mobx-react --save</code>. To enable ESNext decorators (optional), see below.</li>
@@ -141,9 +144,9 @@ This can simply be done by annotating your class properties with the <a href="ht
 <pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { observable } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx"</span>
 
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Todo</span> </span>{
-  id = <span class="hljs-built_in">Math</span>.random()
-  @observable title = <span class="hljs-string">""</span>
-  @observable finished = <span class="hljs-literal">false</span>
+    id = <span class="hljs-built_in">Math</span>.random()
+    @observable title = <span class="hljs-string">""</span>
+    @observable finished = <span class="hljs-literal">false</span>
 }
 </code></pre>
 <p>Using <code>observable</code> is like turning a property of an object into a spreadsheet cell.
@@ -155,13 +158,13 @@ Many MobX users do prefer the decorator syntax though, as it is slightly more co
 <pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { decorate, observable } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx"</span>
 
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Todo</span> </span>{
-  id = <span class="hljs-built_in">Math</span>.random()
-  title = <span class="hljs-string">""</span>
-  finished = <span class="hljs-literal">false</span>
+    id = <span class="hljs-built_in">Math</span>.random()
+    title = <span class="hljs-string">""</span>
+    finished = <span class="hljs-literal">false</span>
 }
 decorate(Todo, {
-  <span class="hljs-attr">title</span>: observable,
-  <span class="hljs-attr">finished</span>: observable
+    <span class="hljs-attr">title</span>: observable,
+    <span class="hljs-attr">finished</span>: observable
 })
 </code></pre>
 <h3><a class="anchor" aria-hidden="true" id="computed-values"></a><a href="#computed-values" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Computed values</h3>
@@ -169,10 +172,10 @@ decorate(Todo, {
 <p>With MobX you can define values that will be derived automatically when relevant data is modified.
 By using the <a href="http://mobxjs.github.io/mobx/refguide/computed-decorator.html"><code>@computed</code></a> decorator or by using getter / setter functions when using <code>(extend)Observable</code> (Of course, you can use <code>decorate</code> here again as alternative to the <code>@</code> syntax).</p>
 <pre><code class="hljs css language-javascript"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TodoList</span> </span>{
-  @observable todos = []
-  @computed <span class="hljs-keyword">get</span> unfinishedTodoCount() {
-    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.todos.filter(<span class="hljs-function"><span class="hljs-params">todo</span> =&gt;</span> !todo.finished).length
-  }
+    @observable todos = []
+    @computed <span class="hljs-keyword">get</span> unfinishedTodoCount() {
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.todos.filter(<span class="hljs-function"><span class="hljs-params">todo</span> =&gt;</span> !todo.finished).length
+    }
 }
 </code></pre>
 <p>MobX will ensure that <code>unfinishedTodoCount</code> is updated automatically when a todo is added or when one of the <code>finished</code> properties is modified.
@@ -190,25 +193,29 @@ In short, reactions bridge <a href="https://en.wikipedia.org/wiki/Reactive_progr
 
 @observer
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TodoListView</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Component</span> </span>{
-  render() {
-    <span class="hljs-keyword">return</span> (
-      &lt;div&gt;
-        &lt;ul&gt;
-          {this.props.todoList.todos.map(todo =&gt; (
-            &lt;TodoView todo={todo} key={todo.id} /&gt;
-          ))}
-        &lt;/ul&gt;
-        Tasks left: {this.props.todoList.unfinishedTodoCount}
-      &lt;/div&gt;
-    )
-  }
+    render() {
+        <span class="hljs-keyword">return</span> (
+            &lt;div&gt;
+                &lt;ul&gt;
+                    {this.props.todoList.todos.map(todo =&gt; (
+                        &lt;TodoView todo={todo} key={todo.id} /&gt;
+                    ))}
+                &lt;/ul&gt;
+                Tasks left: {this.props.todoList.unfinishedTodoCount}
+            &lt;/div&gt;
+        )
+    }
 }
 
 const TodoView = observer(({ todo }) =&gt; (
-  &lt;li&gt;
-    &lt;input type="checkbox" checked={todo.finished} onClick={() =&gt; (todo.finished = !todo.finished)} /&gt;
-    {todo.title}
-  &lt;/li&gt;
+    &lt;li&gt;
+        &lt;input
+            type="checkbox"
+            checked={todo.finished}
+            onClick={() =&gt; (todo.finished = !todo.finished)}
+        /&gt;
+        {todo.title}
+    &lt;/li&gt;
 ))
 
 const store = new TodoList()
@@ -223,7 +230,7 @@ However, if you would remove the <code>Tasks left</code> line (or put it into a 
 <a href="http://mobxjs.github.io/mobx/refguide/reaction.html"><code>reaction</code></a> or <a href="http://mobxjs.github.io/mobx/refguide/when.html"><code>when</code></a> functions to fit your specific situations.</p>
 <p>For example the following <code>autorun</code> prints a log message each time the amount of <code>unfinishedTodoCount</code> changes:</p>
 <pre><code class="hljs css language-javascript">autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
-  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Tasks left: "</span> + todos.unfinishedTodoCount)
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Tasks left: "</span> + todos.unfinishedTodoCount)
 })
 </code></pre>
 <h3><a class="anchor" aria-hidden="true" id="what-will-mobx-react-to"></a><a href="#what-will-mobx-react-to" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>What will MobX react to?</h3>
@@ -387,8 +394,6 @@ Join our <a href="https://opencollective.com/mobx#">open collective</a>!</p>
 <a href="https://opencollective.com/mobx/backer/57/website" target="_blank"><img src="https://opencollective.com/mobx/backer/57/avatar.svg"></a>
 <a href="https://opencollective.com/mobx/backer/58/website" target="_blank"><img src="https://opencollective.com/mobx/backer/58/avatar.svg"></a>
 <a href="https://opencollective.com/mobx/backer/59/website" target="_blank"><img src="https://opencollective.com/mobx/backer/59/avatar.svg"></a></p>
-<p>One time donations through paypal are welcome as well and are recorded in the <a href="sponsors.md">sponsors</a> list.</p>
-<p><a href="https://mobxjs.github.io/mobx/donate.html"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" alt="Donate"></a></p>
 <h3><a class="anchor" aria-hidden="true" id="sponsors"></a><a href="#sponsors" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Sponsors</h3>
 <p>Become a sponsor and get your logo on our README on Github with a link to your site. [<a href="https://opencollective.com/mobx#sponsor">Become a sponsor</a>]</p>
 <p><a href="https://opencollective.com/mobx/sponsor/0/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/0/avatar.svg"></a>

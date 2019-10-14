@@ -102,19 +102,19 @@ Some notes:</p>
 <li><em>[MobX 4 and lower]</em> To create <strong>dynamically keyed objects</strong> use an <a href="/refguide/map.html">Observable Map</a>! Only initially existing properties on an object will be made observable, although new ones can be added using <code>extendObservable</code>.</li>
 </ul>
 <p>Some examples:</p>
-<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> map = observable.map({ <span class="hljs-attr">key</span>: <span class="hljs-string">"value"</span>});
-map.set(<span class="hljs-string">"key"</span>, <span class="hljs-string">"new value"</span>);
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> map = observable.map({ <span class="hljs-attr">key</span>: <span class="hljs-string">"value"</span> })
+map.set(<span class="hljs-string">"key"</span>, <span class="hljs-string">"new value"</span>)
 
-<span class="hljs-keyword">const</span> list = observable([<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">4</span>]);
-list[<span class="hljs-number">2</span>] = <span class="hljs-number">3</span>;
+<span class="hljs-keyword">const</span> list = observable([<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">4</span>])
+list[<span class="hljs-number">2</span>] = <span class="hljs-number">3</span>
 
 <span class="hljs-keyword">const</span> person = observable({
     <span class="hljs-attr">firstName</span>: <span class="hljs-string">"Clive Staples"</span>,
     <span class="hljs-attr">lastName</span>: <span class="hljs-string">"Lewis"</span>
-});
-person.firstName = <span class="hljs-string">"C.S."</span>;
+})
+person.firstName = <span class="hljs-string">"C.S."</span>
 
-<span class="hljs-keyword">const</span> temperature = observable.box(<span class="hljs-number">20</span>);
-temperature.set(<span class="hljs-number">25</span>);
+<span class="hljs-keyword">const</span> temperature = observable.box(<span class="hljs-number">20</span>)
+temperature.set(<span class="hljs-number">25</span>)
 </code></pre>
 </span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/refguide/api.html"><span class="arrow-prev">← </span><span>API overview</span></a><a class="docs-next button" href="/refguide/observable-decorator.html"><span>@observable</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/mobx.png" alt="MobX" width="66" height="58"/></a><div><h5>Docs</h5><a href="/en/README">Why MobX</a><a href="/en/intro/concepts">Concepts</a></div><div><h5>Community</h5><a href="https://stackoverflow.com/questions/tagged/mobx" target="_blank" rel="noreferrer noopener">Stack Overflow</a><a href="https://gitter.im/mobxjs/mobx">Project Chat</a></div><div><h5>More</h5><a class="github-button" href="https://github.com/mobxjs/mobx" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section></footer></div></body></html>

@@ -88,9 +88,7 @@ At that point it is invaluable to understand how MobX determines what to react t
     <span class="hljs-attr">author</span>: {
         <span class="hljs-attr">name</span>: <span class="hljs-string">"Michel"</span>
     },
-    <span class="hljs-attr">likes</span>: [
-        <span class="hljs-string">"John"</span>, <span class="hljs-string">"Sara"</span>
-    ]
+    <span class="hljs-attr">likes</span>: [<span class="hljs-string">"John"</span>, <span class="hljs-string">"Sara"</span>]
 })
 </code></pre>
 <p>In memory that looks as follows. The green boxes indicate <em>observable</em> properties. Note that the <em>values</em> themselves are not observable!</p>
@@ -131,29 +129,29 @@ message = observable({ <span class="hljs-attr">title</span>: <span class="hljs-s
 <p>This will <strong>not</strong> react. <code>message</code> was changed, but <code>message</code> is not an observable, just a variable which <em>refers to</em> an observable,
 but the variable (reference) itself is not observable.</p>
 <h4><a class="anchor" aria-hidden="true" id="incorrect-dereference-outside-a-tracked-function"></a><a href="#incorrect-dereference-outside-a-tracked-function" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Incorrect: dereference outside a tracked function</h4>
-<pre><code class="hljs css language-javascript"><span class="hljs-keyword">var</span> title = message.title;
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">var</span> title = message.title
 autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
     <span class="hljs-built_in">console</span>.log(title)
 })
 message.title = <span class="hljs-string">"Bar"</span>
 </code></pre>
-<p>This will <strong>not</strong> react. <code>message.title</code> was dereferenced outside the <code>autorun</code>, and just contains the value of <code>message.title</code> at the  moment of dereferencing (the string <code>&quot;Foo&quot;</code>).
+<p>This will <strong>not</strong> react. <code>message.title</code> was dereferenced outside the <code>autorun</code>, and just contains the value of <code>message.title</code> at the moment of dereferencing (the string <code>&quot;Foo&quot;</code>).
 <code>title</code> is not an observable so <code>autorun</code> will never react.</p>
 <h4><a class="anchor" aria-hidden="true" id="correct-dereference-inside-the-tracked-function-1"></a><a href="#correct-dereference-inside-the-tracked-function-1" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Correct: dereference inside the tracked function</h4>
 <pre><code class="hljs css language-javascript">autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
     <span class="hljs-built_in">console</span>.log(message.author.name)
 })
-message.author.name = <span class="hljs-string">"Sara"</span>;
-message.author = { <span class="hljs-attr">name</span>: <span class="hljs-string">"John"</span> };
+message.author.name = <span class="hljs-string">"Sara"</span>
+message.author = { <span class="hljs-attr">name</span>: <span class="hljs-string">"John"</span> }
 </code></pre>
 <p>This will react to both changes. Both <code>author</code> and <code>author.name</code> are dotted into, allowing MobX to track these references.</p>
 <h4><a class="anchor" aria-hidden="true" id="incorrect-store-a-local-reference-to-an-observable-object-without-tracking"></a><a href="#incorrect-store-a-local-reference-to-an-observable-object-without-tracking" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Incorrect: store a local reference to an observable object without tracking</h4>
-<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> author = message.author;
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> author = message.author
 autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
     <span class="hljs-built_in">console</span>.log(author.name)
 })
-message.author.name = <span class="hljs-string">"Sara"</span>;
-message.author = { <span class="hljs-attr">name</span>: <span class="hljs-string">"John"</span> };
+message.author.name = <span class="hljs-string">"Sara"</span>
+message.author = { <span class="hljs-attr">name</span>: <span class="hljs-string">"John"</span> }
 </code></pre>
 <p>The first change will be picked up, <code>message.author</code> and <code>author</code> are the same object, and the <code>.name</code> property is dereferenced in the autorun.
 However the second change will <strong>not</strong> be picked up, the <code>message.author</code> relation is not tracked by the <code>autorun</code>. Autorun is still using the &quot;old&quot; <code>author</code>.</p>
@@ -180,7 +178,7 @@ autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</s
 })
 
 autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
-    <span class="hljs-built_in">console</span>.log({...message}) <span class="hljs-comment">// creates a shallow clone, also using `.title` in the process</span>
+    <span class="hljs-built_in">console</span>.log({ ...message }) <span class="hljs-comment">// creates a shallow clone, also using `.title` in the process</span>
 })
 
 autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
@@ -189,41 +187,41 @@ autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</s
 </code></pre>
 <h4><a class="anchor" aria-hidden="true" id="correct-access-array-properties-in-tracked-function"></a><a href="#correct-access-array-properties-in-tracked-function" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Correct: access array properties in tracked function</h4>
 <pre><code class="hljs css language-javascript">autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
-    <span class="hljs-built_in">console</span>.log(message.likes.length);
+    <span class="hljs-built_in">console</span>.log(message.likes.length)
 })
-message.likes.push(<span class="hljs-string">"Jennifer"</span>);
+message.likes.push(<span class="hljs-string">"Jennifer"</span>)
 </code></pre>
 <p>This will react as expected. <code>.length</code> counts towards a property.
 Note that this will react to <em>any</em> change in the array.
 Arrays are not tracked per index / property (like observable objects and maps) but as a whole.</p>
 <h4><a class="anchor" aria-hidden="true" id="incorrect-access-out-of-bounds-indices-in-tracked-function"></a><a href="#incorrect-access-out-of-bounds-indices-in-tracked-function" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Incorrect: access out-of-bounds indices in tracked function</h4>
 <pre><code class="hljs css language-javascript">autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
-    <span class="hljs-built_in">console</span>.log(message.likes[<span class="hljs-number">0</span>]);
+    <span class="hljs-built_in">console</span>.log(message.likes[<span class="hljs-number">0</span>])
 })
-message.likes.push(<span class="hljs-string">"Jennifer"</span>);
+message.likes.push(<span class="hljs-string">"Jennifer"</span>)
 </code></pre>
 <p>This will react with the above sample data, array indexers count as property access. But <strong>only</strong> if the provided <code>index &lt; length</code>.
 MobX will not track not-yet-existing indices or object properties (except when using maps).
 So always guard your array index based access with a <code>.length</code> check.</p>
 <h4><a class="anchor" aria-hidden="true" id="correct-access-array-functions-in-tracked-function"></a><a href="#correct-access-array-functions-in-tracked-function" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Correct: access array functions in tracked function</h4>
 <pre><code class="hljs css language-javascript">autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
-    <span class="hljs-built_in">console</span>.log(message.likes.join(<span class="hljs-string">", "</span>));
+    <span class="hljs-built_in">console</span>.log(message.likes.join(<span class="hljs-string">", "</span>))
 })
-message.likes.push(<span class="hljs-string">"Jennifer"</span>);
+message.likes.push(<span class="hljs-string">"Jennifer"</span>)
 </code></pre>
 <p>This will react as expected. All array functions that do not mutate the array are tracked automatically.</p>
 <hr>
 <pre><code class="hljs css language-javascript">autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
-    <span class="hljs-built_in">console</span>.log(message.likes.join(<span class="hljs-string">", "</span>));
+    <span class="hljs-built_in">console</span>.log(message.likes.join(<span class="hljs-string">", "</span>))
 })
-message.likes[<span class="hljs-number">2</span>] = <span class="hljs-string">"Jennifer"</span>;
+message.likes[<span class="hljs-number">2</span>] = <span class="hljs-string">"Jennifer"</span>
 </code></pre>
 <p>This will react as expected. All array index assignments are detected, but only if <code>index &lt;= length</code>.</p>
 <h4><a class="anchor" aria-hidden="true" id="incorrect-use-an-observable-but-without-accessing-any-of-its-properties"></a><a href="#incorrect-use-an-observable-but-without-accessing-any-of-its-properties" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Incorrect: &quot;use&quot; an observable but without accessing any of its properties</h4>
 <pre><code class="hljs css language-javascript">autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
-    message.likes;
+    message.likes
 })
-message.likes.push(<span class="hljs-string">"Jennifer"</span>);
+message.likes.push(<span class="hljs-string">"Jennifer"</span>)
 </code></pre>
 <p>This will <strong>not</strong> react. Simply because the <code>likes</code> array itself is not being used by the <code>autorun</code>, only the reference to the array.
 So in contrast, <code>messages.likes = [&quot;Jennifer&quot;]</code> would be picked up; that statement does not modify the array, but the <code>likes</code> property itself.</p>
@@ -239,7 +237,7 @@ However, it is possible to use the <code>get</code> and <code>set</code> methods
 <pre><code class="hljs css language-javascript">autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
     <span class="hljs-built_in">console</span>.log(<span class="hljs-keyword">get</span>(message, "postDate"))
 })
-<span class="hljs-keyword">set</span>(message, "postDate",  new Date())
+<span class="hljs-keyword">set</span>(message, "postDate", new Date())
 </code></pre>
 <p><em>MobX 5</em></p>
 <p>In MobX 5 this <strong>will</strong> react, as MobX 5 can track not-yet existing properties.
@@ -257,7 +255,7 @@ extendObservable(message, {
 If the two statements are swapped, or if any other observable causes the <code>autorun</code> to re-run, the <code>autorun</code> will start tracking the <code>postDate</code> as well.</p>
 <h4><a class="anchor" aria-hidden="true" id="correct-using-not-yet-existing-map-entries"></a><a href="#correct-using-not-yet-existing-map-entries" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Correct: using not yet existing map entries</h4>
 <pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> twitterUrls = observable.map({
-    <span class="hljs-string">"John"</span>: <span class="hljs-string">"twitter.com/johnny"</span>
+    <span class="hljs-attr">John</span>: <span class="hljs-string">"twitter.com/johnny"</span>
 })
 
 autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
@@ -274,19 +272,19 @@ So for dynamically keyed collections, always use observable maps.</p>
 <pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { <span class="hljs-keyword">get</span>, <span class="hljs-keyword">set</span>, observable } from "mobx"
 
 const twitterUrls = observable.object({
-    <span class="hljs-string">"John"</span>: <span class="hljs-string">"twitter.com/johnny"</span>
+    John: <span class="hljs-string">"twitter.com/johnny"</span>
 })
 
 autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
     <span class="hljs-built_in">console</span>.log(<span class="hljs-keyword">get</span>(twitterUrls, "Sara")) // <span class="hljs-keyword">get</span> can track not yet existing properties
 })
-<span class="hljs-keyword">set</span>(twitterUrls, { <span class="hljs-string">"Sara"</span> : <span class="hljs-string">"twitter.com/horsejs"</span>})
+<span class="hljs-keyword">set</span>(twitterUrls, { Sara: <span class="hljs-string">"twitter.com/horsejs"</span> })
 </code></pre>
 <p>See the <a href="https://mobx.js.org/refguide/api.html#direct-observable-manipulation">object manipulation api</a> for more details</p>
 <h2><a class="anchor" aria-hidden="true" id="mobx-only-tracks-synchronously-accessed-data"></a><a href="#mobx-only-tracks-synchronously-accessed-data" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>MobX only tracks synchronously accessed data</h2>
 <pre><code class="hljs css language-javascript"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">upperCaseAuthorName</span>(<span class="hljs-params">author</span>) </span>{
-    <span class="hljs-keyword">const</span> baseName = author.name;
-    <span class="hljs-keyword">return</span> baseName.toUpperCase();
+    <span class="hljs-keyword">const</span> baseName = author.name
+    <span class="hljs-keyword">return</span> baseName.toUpperCase()
 }
 autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
     <span class="hljs-built_in">console</span>.log(upperCaseAuthorName(message.author))
@@ -298,12 +296,9 @@ MobX will still track the dereferencing that happens in <code>upperCaseAuthorNam
 because it happens <em>during</em> the execution of the autorun.</p>
 <hr>
 <pre><code class="hljs css language-javascript">autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
-    setTimeout(
-        <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-built_in">console</span>.log(message.likes.join(<span class="hljs-string">", "</span>)),
-        <span class="hljs-number">10</span>
-    )
+    setTimeout(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-built_in">console</span>.log(message.likes.join(<span class="hljs-string">", "</span>)), <span class="hljs-number">10</span>)
 })
-message.likes.push(<span class="hljs-string">"Jennifer"</span>);
+message.likes.push(<span class="hljs-string">"Jennifer"</span>)
 </code></pre>
 <p>This will <strong>not</strong> react, during the execution of the <code>autorun</code> no observables where accessed, only during the <code>setTimeout</code>.
 In general this is quite obvious and rarely causes issues.</p>
@@ -311,11 +306,9 @@ In general this is quite obvious and rarely causes issues.</p>
 <p>A common mistake made with <code>observer</code> is that it doesn't track data that syntactically seems parent of the <code>observer</code> component,
 but in practice is actually rendered out by a different component. This often happens when render callbacks of components are passed in first class to another component.</p>
 <p>Take for example the following contrived example:</p>
-<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> MyComponent = observer(<span class="hljs-function">(<span class="hljs-params">{ message }</span>) =&gt;</span>
-    <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">SomeContainer</span>
-        <span class="hljs-attr">title</span> = <span class="hljs-string">{()</span> =&gt;</span> <span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>{message.title}<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>}
-    /&gt;
-)
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> MyComponent = observer(<span class="hljs-function">(<span class="hljs-params">{ message }</span>) =&gt;</span> (
+    <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">SomeContainer</span> <span class="hljs-attr">title</span>=<span class="hljs-string">{()</span> =&gt;</span> <span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>{message.title}<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>} /&gt;
+))
 
 message.title = "Bar"
 </span></code></pre>
@@ -335,24 +328,20 @@ const TitleRenderer = observer(({ message }) =&gt;
 message.title = "Bar"
 </code></pre>
 <p>Alternatively, to avoid creating additional components, it is also possible to use the mobx-react built-in <code>Observer</code> component, which takes no arguments, and a single render function as children:</p>
-<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> MyComponent = <span class="hljs-function">(<span class="hljs-params">{ message }</span>) =&gt;</span>
-    <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">SomeContainer</span>
-        <span class="hljs-attr">title</span> = <span class="hljs-string">{()</span> =&gt;</span>
-            <span class="hljs-tag">&lt;<span class="hljs-name">Observer</span>&gt;</span>
-                {() =&gt; <span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>{message.title}<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>}
-            <span class="hljs-tag">&lt;/<span class="hljs-name">Observer</span>&gt;</span>
-        }
-    /&gt;
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> MyComponent = <span class="hljs-function">(<span class="hljs-params">{ message }</span>) =&gt;</span> (
+    <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">SomeContainer</span> <span class="hljs-attr">title</span>=<span class="hljs-string">{()</span> =&gt;</span> <span class="hljs-tag">&lt;<span class="hljs-name">Observer</span>&gt;</span>{() =&gt; <span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>{message.title}<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>}<span class="hljs-tag">&lt;/<span class="hljs-name">Observer</span>&gt;</span>} /&gt;
+)
 
 message.title = "Bar"
 </span></code></pre>
 <h2><a class="anchor" aria-hidden="true" id="avoid-caching-observables-in-local-fields"></a><a href="#avoid-caching-observables-in-local-fields" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Avoid caching observables in local fields</h2>
 <p>A common mistake is to store local variables that dereference observables, and then expect components to react. For example:</p>
-<pre><code class="hljs css language-javascript">@observer <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyComponent</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">component</span> </span>{
-    author;
+<pre><code class="hljs css language-javascript">@observer
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyComponent</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">component</span> </span>{
+    author
     <span class="hljs-keyword">constructor</span>(props) {
         <span class="hljs-keyword">super</span>(props)
-        <span class="hljs-keyword">this</span>.author = props.message.author;
+        <span class="hljs-keyword">this</span>.author = props.message.author
     }
 
     render() {
@@ -372,25 +361,23 @@ This can simply be solved by doing the dereferencing inside <code>render()</code
 </code></pre>
 <h2><a class="anchor" aria-hidden="true" id="how-multiple-components-will-render"></a><a href="#how-multiple-components-will-render" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>How multiple components will render</h2>
 <p>Suppose that the following components are used to render our above <code>message</code> object.</p>
-<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> Message = observer(<span class="hljs-function">(<span class="hljs-params">{ message }</span>) =&gt;</span>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> Message = observer(<span class="hljs-function">(<span class="hljs-params">{ message }</span>) =&gt;</span> (
     &lt;div&gt;
         {message.title}
-        &lt;Author author={ message.author } /&gt;
-        &lt;Likes likes={ message.likes } /&gt;
+        &lt;Author author={message.author} /&gt;
+        &lt;Likes likes={message.likes} /&gt;
     &lt;/div&gt;
-)
+))
 
-const Author = observer(({ author }) =&gt;
-    &lt;span&gt;{author.name}&lt;/span&gt;
-)
+const Author = observer(({ author }) =&gt; &lt;span&gt;{author.name}&lt;/span&gt;)
 
-const Likes = observer(({ likes }) =&gt;
+const Likes = observer(({ likes }) =&gt; (
     &lt;ul&gt;
-        {likes.map(like =&gt;
+        {likes.map(like =&gt; (
             &lt;li&gt;{like}&lt;/li&gt;
-        )}
+        ))}
     &lt;/ul&gt;
-)
+))
 </code></pre>
 <table>
 <thead>

@@ -80,25 +80,28 @@
 </ul>
 <p>Decorators can be used with the api's <code>decorate</code>, <code>observable.object</code>, <code>extendObservable</code> and <code>observable</code> (when creating objects) to specify how object members should behave.
 If no decorators are passed in, the default behavior is to use <code>observable.deep</code> for any key / value pair, and <code>computed</code> for getters.</p>
-<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> {observable, autorun, action} <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx"</span>;
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { observable, autorun, action } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx"</span>
 
-<span class="hljs-keyword">var</span> person = observable({
-    <span class="hljs-attr">name</span>: <span class="hljs-string">"John"</span>,
-    <span class="hljs-attr">age</span>: <span class="hljs-number">42</span>,
-    <span class="hljs-attr">showAge</span>: <span class="hljs-literal">false</span>,
+<span class="hljs-keyword">var</span> person = observable(
+    {
+        <span class="hljs-attr">name</span>: <span class="hljs-string">"John"</span>,
+        <span class="hljs-attr">age</span>: <span class="hljs-number">42</span>,
+        <span class="hljs-attr">showAge</span>: <span class="hljs-literal">false</span>,
 
-    <span class="hljs-keyword">get</span> labelText() {
-        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.showAge ? <span class="hljs-string">`<span class="hljs-subst">${<span class="hljs-keyword">this</span>.name}</span> (age: <span class="hljs-subst">${<span class="hljs-keyword">this</span>.age}</span>)`</span> : <span class="hljs-keyword">this</span>.name;
+        <span class="hljs-keyword">get</span> labelText() {
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.showAge ? <span class="hljs-string">`<span class="hljs-subst">${<span class="hljs-keyword">this</span>.name}</span> (age: <span class="hljs-subst">${<span class="hljs-keyword">this</span>.age}</span>)`</span> : <span class="hljs-keyword">this</span>.name
+        },
+
+        <span class="hljs-comment">// action:</span>
+        setAge(age) {
+            <span class="hljs-keyword">this</span>.age = age
+        }
     },
-
-    <span class="hljs-comment">// action:</span>
-    setAge(age) {
-        <span class="hljs-keyword">this</span>.age = age;
+    {
+        <span class="hljs-attr">setAge</span>: action
+        <span class="hljs-comment">// the other properties will default to observables  / computed</span>
     }
-}, {
-    <span class="hljs-attr">setAge</span>: action
-    <span class="hljs-comment">// the other properties will default to observables  / computed</span>
-});
+)
 </code></pre>
 <pre><code class="hljs css language-javascript"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Person</span> </span>{
     name = <span class="hljs-string">"John"</span>
@@ -106,11 +109,11 @@ If no decorators are passed in, the default behavior is to use <code>observable.
     showAge = <span class="hljs-literal">false</span>
 
     <span class="hljs-keyword">get</span> labelText() {
-        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.showAge ? <span class="hljs-string">`<span class="hljs-subst">${<span class="hljs-keyword">this</span>.name}</span> (age: <span class="hljs-subst">${<span class="hljs-keyword">this</span>.age}</span>)`</span> : <span class="hljs-keyword">this</span>.name;
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.showAge ? <span class="hljs-string">`<span class="hljs-subst">${<span class="hljs-keyword">this</span>.name}</span> (age: <span class="hljs-subst">${<span class="hljs-keyword">this</span>.age}</span>)`</span> : <span class="hljs-keyword">this</span>.name
     }
 
     setAge(age) {
-        <span class="hljs-keyword">this</span>.age = age;
+        <span class="hljs-keyword">this</span>.age = age
     }
 }
 <span class="hljs-comment">// when using decorate, all fields should be specified (a class might have many more non-observable internal fields after all)</span>
@@ -144,12 +147,16 @@ For example:</p>
 </code></pre>
 <p>Or with just ES5 syntax:</p>
 <pre><code class="hljs css language-javascript"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">Message</span>(<span class="hljs-params"></span>) </span>{
-    extendObservable(<span class="hljs-keyword">this</span>, {
-        <span class="hljs-attr">message</span>: <span class="hljs-string">"Hello world"</span>,
-        <span class="hljs-attr">author</span>: <span class="hljs-literal">null</span>
-    }, {
-        <span class="hljs-attr">author</span>: observable.ref
-    })
+    extendObservable(
+        <span class="hljs-keyword">this</span>,
+        {
+            <span class="hljs-attr">message</span>: <span class="hljs-string">"Hello world"</span>,
+            <span class="hljs-attr">author</span>: <span class="hljs-literal">null</span>
+        },
+        {
+            <span class="hljs-attr">author</span>: observable.ref
+        }
+    )
 }
 </code></pre>
 <p>Note that an observable, boxed reference can be created by using <code>const box = observable.shallowBox(value)</code></p>
