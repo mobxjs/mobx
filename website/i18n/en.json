@@ -121,7 +121,7 @@
         "sidebar_label": "objects"
       },
       "refguide/observable-decorator": {
-        "title": "@obsevable",
+        "title": "@observable",
         "sidebar_label": "@observable"
       },
       "refguide/observable": {

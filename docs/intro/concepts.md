@@ -93,4 +93,4 @@ todoStore.todos[0].completed = true
 // -> synchronously prints 'Completed 1 of 1 items'
 ```
 
-In the [10 minute introduction to MobX and React](https://mobxjs.github.io/mobx/getting-started.html) you can dive deeper into this example and build a user interface using [React](https://facebook.github.io/react/) around it.
+In the [10 minute introduction to MobX and React](https://mobx.js.org/getting-started.html) you can dive deeper into this example and build a user interface using [React](https://facebook.github.io/react/) around it.
