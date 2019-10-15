@@ -29,16 +29,15 @@ export function interceptChange<T>(
 ): T | null {
     const prevU = untrackedStart()
     try {
-        const interceptors = interceptable.interceptors
-        if (interceptors)
-            for (let i = 0, l = interceptors.length; i < l; i++) {
-                change = interceptors[i](change)
-                invariant(
-                    !change || (change as any).type,
-                    "Intercept handlers should return nothing or a change object"
-                )
-                if (!change) break
-            }
+        const interceptors = [...(interceptable.interceptors || [])]
+        for (let i = 0, l = interceptors.length; i < l; i++) {
+            change = interceptors[i](change)
+            invariant(
+                !change || (change as any).type,
+                "Intercept handlers should return nothing or a change object"
+            )
+            if (!change) break
+        }
         return change
     } finally {
         untrackedEnd(prevU)
