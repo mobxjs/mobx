@@ -226,7 +226,7 @@ Why does a new message get printed each time the `unfinishedTodoCount` is change
 
 _MobX reacts to any existing observable property that is read during the execution of a tracked function._
 
-For an in-depth explanation about how MobX determines to which observables needs to be reacted, check [understanding what MobX reacts to](https://github.com/mobxjs/mobx/blob/gh-pages/docs/best/react.md).
+For an in-depth explanation about how MobX determines to which observables needs to be reacted, check [understanding what MobX reacts to](https://mobx.js.org/best/react.html).
 
 ### Actions
 
