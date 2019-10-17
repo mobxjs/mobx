@@ -270,7 +270,7 @@ export class ObservableMap<K = any, V = any>
         return makeIterable({
             next() {
                 return nextIndex < self._keys.length
-                    ? { value: self.get(self._keys[nextIndex++]), done: false }
+                    ? { value: self.get(self._keys[nextIndex++])!, done: false }
                     : { value: undefined as any, done: true }
             }
         })

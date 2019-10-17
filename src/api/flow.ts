@@ -4,35 +4,9 @@ let generatorId = 0
 
 export type CancellablePromise<T> = Promise<T> & { cancel(): void }
 
-export interface FlowYield {
-    // fake, only for typing
-    "!!flowYield": undefined
-}
-
-export interface FlowReturn<T> {
-    // fake, only for typing
-    "!!flowReturn": T
-}
-
-// we skip promises that are the result of yielding promises (except if they use flowReturn)
-export type FlowReturnType<R> = IfAllAreFlowYieldThenVoid<
-    R extends FlowReturn<infer FR>
-        ? FR extends Promise<infer FRP>
-            ? FRP
-            : FR
-        : R extends Promise<any>
-        ? FlowYield
-        : R
->
-
-// we extract yielded promises from the return type
-export type IfAllAreFlowYieldThenVoid<R> = Exclude<R, FlowYield> extends never
-    ? void
-    : Exclude<R, FlowYield>
-
 export function flow<R, Args extends any[]>(
-    generator: (...args: Args) => IterableIterator<R>
-): (...args: Args) => CancellablePromise<FlowReturnType<R>> {
+    generator: (...args: Args) => Generator<any, R, any>
+): (...args: Args) => CancellablePromise<R> {
     if (arguments.length !== 1)
         fail(
             !!process.env.NODE_ENV && `Flow expects one 1 argument and cannot be used as decorator`
@@ -110,7 +84,7 @@ export function flow<R, Args extends any[]>(
                 rejector(e) // there could be a throwing finally block
             }
         })
-        return (res as CancellablePromise<R>) as any
+        return res as CancellablePromise<R>
     }
 }
 
