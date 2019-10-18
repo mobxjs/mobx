@@ -1,3 +1,7 @@
+# 5.14.2 / 4.14.2
+
+-   Changed website dependency install to `prepare` step from `postinstall` [#2165](https://github.com/mobxjs/mobx/issues/2165).
+
 # 5.14.1 / 4.14.1
 
 -   Fixed a possible issue with action stack errors and multiple mobx versions installed at the same time [#2135](https://github.com/mobxjs/mobx/issues/2135).
