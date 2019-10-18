@@ -476,7 +476,9 @@ declare export function createAtom(
 declare export function decorate<T>(target: T, decorators: any): T
 
 export type CancellablePromise<T> = Promise<T> & { cancel: () => void }
-declare export function flow<T>(fn: (...args: any[]) => Generator<any, T | Promise<T>, any>): (...args: any[]) => CancellablePromise<T>
+declare export function flow<T>(
+    fn: (...args: any[]) => Generator<any, T | Promise<T>, any>
+): (...args: any[]) => CancellablePromise<T>
 declare export function flow<T>(
     name: string,
     fn: (...args: any[]) => Generator<any, T | Promise<T>, any>
