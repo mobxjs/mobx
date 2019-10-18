@@ -475,11 +475,12 @@ declare export function createAtom(
 
 declare export function decorate<T>(target: T, decorators: any): T
 
-declare export function flow<T>(fn: (...args: any[]) => T): (...args: any[]) => Promise<T>
+export type CancellablePromise<T> = Promise<T> & { cancel: () => void }
+declare export function flow<T>(fn: (...args: any[]) => Generator<any, T | Promise<T>, any>): (...args: any[]) => CancellablePromise<T>
 declare export function flow<T>(
     name: string,
-    fn: (...args: any[]) => T
-): (...args: any[]) => Promise<T>
+    fn: (...args: any[]) => Generator<any, T | Promise<T>, any>
+): (...args: any[]) => CancellablePromise<T>
 
 declare export function keys<K>(map: ObservableMap<K, any>): K[]
 declare export function keys(obj: any): string[]
