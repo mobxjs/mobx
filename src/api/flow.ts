@@ -5,7 +5,7 @@ let generatorId = 0
 export type CancellablePromise<T> = Promise<T> & { cancel(): void }
 
 export function flow<R, Args extends any[]>(
-    generator: (...args: Args) => Generator<any, R, any>
+    generator: (...args: Args) => Generator<any, R, any> | AsyncGenerator<any, R, any>
 ): (...args: Args) => CancellablePromise<R> {
     if (arguments.length !== 1)
         fail(
@@ -18,7 +18,9 @@ export function flow<R, Args extends any[]>(
         const ctx = this
         const args = arguments
         const runId = ++generatorId
-        const gen = action(`${name} - runid: ${runId} - init`, generator).apply(ctx, args)
+        const gen = action(`${name} - runid: ${runId} - init`, generator as (
+            ...args: Args
+        ) => Generator<any, R, any>).apply(ctx, args)
         let rejector: (error: any) => void
         let pendingPromise: CancellablePromise<any> | undefined = undefined
 
