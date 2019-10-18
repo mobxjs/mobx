@@ -16,3 +16,4 @@ dist/
 *.ipr
 *.iws
 yarn-error.log
+/website
