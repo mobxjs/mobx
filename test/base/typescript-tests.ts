@@ -1557,9 +1557,9 @@ test("it should support asyncAction as decorator (ts)", async () => {
     class X {
         @observable a = 1
 
-        f = mobx.flow(function* f(initial: number): any {
+        f = mobx.flow(function* f(this: X, initial: number) {
             this.a = initial // this runs in action
-            this.a += yield Promise.resolve(5)
+            this.a += yield Promise.resolve(5) as any
             this.a = this.a * 2
             return this.a
         })
@@ -1590,7 +1590,7 @@ test("flow support async generators", async () => {
             total += number
         }
         return total
-    } as any) // TODO: fix typings
+    })
 
     const p = start()
     const res = await p
@@ -1615,7 +1615,7 @@ test("flow support throwing async generators", async () => {
             total += number
         }
         return total
-    } as any) // TODO: fix typings
+    })
 
     const p = start()
     try {
@@ -1646,4 +1646,15 @@ test("verify #1528", () => {
     })
 
     expect(appState.timer).toBe(0)
+})
+
+test("type of flows that return promises", async () => {
+    mobx.configure({ enforceActions: "observed" })
+
+    const f = mobx.flow(function* f() {
+        return Promise.resolve(5)
+    })
+
+    const n: number = await f()
+    expect(n).toBe(5)
 })
