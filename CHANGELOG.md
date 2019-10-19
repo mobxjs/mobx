@@ -1,6 +1,6 @@
-# 5.14.2 / 4.14.2
+# 5.14.2
 
--   Changed website dependency install to `prepare` step from `postinstall` [#2165](https://github.com/mobxjs/mobx/issues/2165).
+-   Fixed installation issue trying to run `postinstall` hook for a website [#2165](https://github.com/mobxjs/mobx/issues/2165).
 
 # 5.14.1 / 4.14.1
 
