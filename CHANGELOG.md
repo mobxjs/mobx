@@ -1,3 +1,4 @@
+-   added `FLOW_CANCELLED` export for `"FLOW_CANCELLED"` constant representing flow cancellation
 -   Fix running mobx in web worker [#2184](https://github.com/mobxjs/mobx/pull/2184/files)
 -   Fixed flow typings for Facebook's Flow. A new `CancellablePromise` Flow type is exported.
 
