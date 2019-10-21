@@ -479,10 +479,6 @@ export type CancellablePromise<T> = Promise<T> & { cancel: () => void }
 declare export function flow<T>(
     fn: (...args: any[]) => Generator<any, T | Promise<T>, any>
 ): (...args: any[]) => CancellablePromise<T>
-declare export function flow<T>(
-    name: string,
-    fn: (...args: any[]) => Generator<any, T | Promise<T>, any>
-): (...args: any[]) => CancellablePromise<T>
 
 declare export function keys<K>(map: ObservableMap<K, any>): K[]
 declare export function keys(obj: any): string[]
