@@ -34,9 +34,7 @@ export function flow<R, Args extends any[]>(
     generator: (...args: Args) => IterableIterator<R>
 ): (...args: Args) => CancellablePromise<FlowReturnType<R>> {
     if (arguments.length !== 1)
-        fail(
-            !!process.env.NODE_ENV && `Flow expects one 1 argument and cannot be used as decorator`
-        )
+        fail(!!process.env.NODE_ENV && `Flow expects 1 argument and cannot be used as decorator`)
     const name = generator.name || "<unnamed flow>"
 
     // Implementation based on https://github.com/tj/co/blob/master/index.js
