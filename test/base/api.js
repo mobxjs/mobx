@@ -20,7 +20,7 @@ test("correct api should be exposed", function() {
             "decorate",
             "extendObservable",
             "flow",
-            "FLOW_CANCELLED",
+            "FlowCancellationError",
             "get",
             "_getAdministration",
             "getAtom",

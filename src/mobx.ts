@@ -132,7 +132,7 @@ export {
     onBecomeObserved,
     onBecomeUnobserved,
     flow,
-    FLOW_CANCELLED,
+    FlowCancellationError,
     toJS,
     trace,
     IObserverTree,

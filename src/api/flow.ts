@@ -2,7 +2,11 @@ import { action, fail, noop } from "../internal"
 
 let generatorId = 0
 
-export const FLOW_CANCELLED = "FLOW_CANCELLED"
+export class FlowCancellationError extends Error {
+    constructor() {
+        super("FLOW_CANCELLED")
+    }
+}
 
 export type CancellablePromise<T> = Promise<T> & { cancel(): void }
 
@@ -108,7 +112,7 @@ export function flow<R, Args extends any[]>(
                 yieldedPromise.then(noop, noop)
                 cancelPromise(yieldedPromise) // maybe it can be cancelled :)
                 // reject our original promise
-                rejector(new Error(FLOW_CANCELLED))
+                rejector(new FlowCancellationError())
             } catch (e) {
                 rejector(e) // there could be a throwing finally block
             }
