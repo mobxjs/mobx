@@ -21,6 +21,7 @@ test("correct api should be exposed", function() {
             "extendObservable",
             "flow",
             "FlowCancellationError",
+            "isFlowCancellationError",
             "get",
             "_getAdministration",
             "getAtom",

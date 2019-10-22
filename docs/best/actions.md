@@ -210,4 +210,4 @@ class Store {
 
 #### Flows can be cancelled
 
-Flows are cancellable, that means that you can call `cancel()` on the returned promise. This will stop the generator immediately, but any finally clause will still be processed. The returned promise itself will reject with an instance of `FlowCancellationError` (this error is exported from the package) whose message is `FLOW_CANCELLED`.
+Flows are cancellable, that means that you can call `cancel()` on the returned promise. This will stop the generator immediately, but any finally clause will still be processed. The returned promise itself will reject with an instance of `FlowCancellationError` (this error is exported from the package) whose message is `FLOW_CANCELLED`. Also exported is a `isFlowCancellationError(error)` helper that returns true if and only if the provided argument is a `FlowCancellationError`.

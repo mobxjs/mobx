@@ -8,6 +8,10 @@ export class FlowCancellationError extends Error {
     }
 }
 
+export function isFlowCancellationError(error: Error) {
+    return error instanceof FlowCancellationError
+}
+
 export type CancellablePromise<T> = Promise<T> & { cancel(): void }
 
 export interface FlowYield {

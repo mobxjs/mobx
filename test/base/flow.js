@@ -1,5 +1,5 @@
 import * as mobx from "../../src/mobx.ts"
-import { flow, FlowCancellationError } from "../../src/mobx"
+import { flow, FlowCancellationError, isFlowCancellationError } from "../../src/mobx"
 
 function delay(time, value, shouldThrow = false) {
     return new Promise((resolve, reject) => {
@@ -176,6 +176,11 @@ test("FlowCancellationError sanity check", () => {
     expect(cancellationError).toBeInstanceOf(Error)
     expect(cancellationError).toBeInstanceOf(FlowCancellationError)
     expect(cancellationError.message).toBe("FLOW_CANCELLED")
+})
+
+test("isFlowCancellationError returns true iff the argument is a FlowCancellationError", () => {
+    expect(isFlowCancellationError(new FlowCancellationError())).toBe(true)
+    expect(isFlowCancellationError(new Error("some random error"))).toBe(false)
 })
 
 test("flows can be cancelled - 1 - uncaught cancellation", done => {
