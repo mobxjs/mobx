@@ -1669,9 +1669,9 @@ test("#2159 - computed property keys", () => {
     })
 
     t.deepEqual(events, [
-        "new symbol value", // old total
-        "original symbol value", // new total
-        "new string value", // old price
-        "original string value" // new price
+        "new symbol value", // original symbol
+        "original symbol value", // new symbol
+        "new string value", // old string
+        "original string value" // new string
     ])
 })
