@@ -113,7 +113,8 @@ export function createPropDecorator(
 
 export function quacksLikeADecorator(args: IArguments): boolean {
     return (
-        ((args.length === 2 || args.length === 3) && typeof args[1] === "string") ||
+        ((args.length === 2 || args.length === 3) &&
+            (typeof args[1] === "string" || typeof args[1] === "symbol")) ||
         (args.length === 4 && args[3] === true)
     )
 }
