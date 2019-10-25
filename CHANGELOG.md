@@ -1,5 +1,7 @@
 -   Fixed flow typings for Facebook's Flow. A new `CancellablePromise` Flow type is exported.
 
+-   Added support for symbol keys on observable properties.
+
 # 5.14.2
 
 -   Fixed installation issue trying to run `postinstall` hook for a website [#2165](https://github.com/mobxjs/mobx/issues/2165).
