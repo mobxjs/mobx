@@ -51,7 +51,7 @@ So MobX observable objects act as records with predefined keys.
 You can use `extendObservable(target, props)` to introduce new observable properties to an object.
 However object iterators like `for .. in` or `Object.keys()` won't react to this automatically.
 If you need a dynamically keyed object in MobX 4 and lower, for example to store users by id, create observable _maps_ using [`observable.map`](../refguide/map.md) or use the utility methods as exposed by the [Object API](../refguide/object-api.md).
-For more info see [what will MobX react to?](react.md).
+For more info see [what will MobX react to?](https://mobx.js.org/best/react.html#what-does-mobx-react-to).
 
 ### Use `@observer` on all components that render `@observable`s.
 
@@ -105,7 +105,7 @@ class Profile extends React.Component {
 ### Render callbacks are _not_ part of the render method
 
 Because `observer` only applies to exactly the `render` function of the current component; passing a render callback or component to a child component doesn't become reactive automatically.
-For more details, see the [what will Mobx react to](https://github.com/mobxjs/mobx/blob/gh-pages/docs/best/react.md#mobx-only-tracks-data-accessed-for-observer-components-if-they-are-directly-accessed-by-render) guide.
+For more details, see the [what will Mobx react to](https://mobx.js.org/best/react.html#what-does-mobx-react-to) guide.
 
 ### Dereference values as late as possible
 
@@ -120,7 +120,7 @@ ReactDOM.render(<Timer timerData={timerData.secondsPassed} />, document.body)
 In this snippet just the current value of `secondsPassed` is passed to the `Timer`, which is the immutable value `0` (all primitives are immutable in JS).
 That number won't change anymore in the future, so `Timer` will never update. It is the property `secondsPassed` that will change in the future,
 so we need to access it _in_ the component. Or in other words: always try to pass the owning object of an observable property.
-For more info see [what will MobX react to?](react.md).
+For more info see [what will MobX react to?](https://mobx.js.org/best/react.html#what-does-mobx-react-to).
 
 #### Computed values run more often than expected
 
