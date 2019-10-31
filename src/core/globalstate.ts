@@ -141,6 +141,24 @@ export class MobXGlobals {
     suppressReactionErrors = false
 }
 
+declare const window: any
+declare const self: any
+
+const mockGlobal = {}
+
+export function getGlobal() {
+    if (typeof window !== "undefined") {
+        return window
+    }
+    if (typeof global !== "undefined") {
+        return global
+    }
+    if (typeof self !== "undefined") {
+        return self
+    }
+    return mockGlobal
+}
+
 let canMergeGlobalState = true
 let isolateCalled = false
 
@@ -197,22 +215,4 @@ export function resetGlobalState() {
     for (let key in defaultGlobals)
         if (persistentKeys.indexOf(key as any) === -1) globalState[key] = defaultGlobals[key]
     globalState.allowStateChanges = !globalState.enforceActions
-}
-
-declare const window: any
-declare const self: any
-
-const mockGlobal = {}
-
-export function getGlobal() {
-    if (typeof window !== "undefined") {
-        return window
-    }
-    if (typeof global !== "undefined") {
-        return global
-    }
-    if (typeof self !== "undefined") {
-        return self
-    }
-    return mockGlobal
 }
