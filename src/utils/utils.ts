@@ -19,6 +19,7 @@ export const EMPTY_OBJECT = {}
 Object.freeze(EMPTY_OBJECT)
 
 declare const window: any
+declare const self: any
 
 const mockGlobal = {}
 
@@ -28,6 +29,9 @@ export function getGlobal() {
     }
     if (typeof global !== "undefined") {
         return global
+    }
+    if (typeof self !== "undefined") {
+        return self
     }
     return mockGlobal
 }
