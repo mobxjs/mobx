@@ -1,4 +1,4 @@
--   Allow mobx to run in web worker
+-   Fix running mobx in web worker [#2184](https://github.com/mobxjs/mobx/pull/2184/files)
 -   Fixed flow typings for Facebook's Flow. A new `CancellablePromise` Flow type is exported.
 
 # 5.14.2
