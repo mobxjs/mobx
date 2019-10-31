@@ -1,3 +1,4 @@
+-   Allow mobx to run in web worker
 -   Fixed flow typings for Facebook's Flow. A new `CancellablePromise` Flow type is exported.
 
 # 5.14.2
