@@ -1,10 +1,10 @@
 ---
-title: Decorators
-sidebar_label: decorators
+title: Modifiers
+sidebar_label: modifiers
 hide_title: true
 ---
 
-# Decorators
+# Modifiers
 
 <div id='codefund' ></div>
 
