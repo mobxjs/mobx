@@ -3,8 +3,7 @@
     "Introduction": [
       "README",
       "intro/concepts",
-      "intro/overview",
-      "refguide/api"
+      "intro/overview"
     ],
     "Making things observable": [
       "refguide/observable",
@@ -27,6 +26,7 @@
       "refguide/object-api"
     ],
     "Utilities": [
+      "refguide/api",
       "refguide/boxed",
       "refguide/modifiers",
       "refguide/tojson",
