@@ -157,7 +157,7 @@ If you don't want to mark a component as observer, for example to reduce the dep
 -   Observer only subscribe to the data structures that were actively used during the last render. This means that you cannot under-subscribe or over-subscribe. You can even use data in your rendering that will only be available at later moment in time. This is ideal for asynchronously loading data.
 -   You are not required to declare what data a component will use. Instead, dependencies are determined at runtime and tracked in a very fine-grained manner.
 -   Usually reactive components have no or little state, as it is often more convenient to encapsulate (view) state in objects that are shared with other component. But you are still free to use state.
--   `@observer` implements `shouldComponentUpdate` in the same way as `PureComponent` so that children are not re-rendered unnecessary.
+-   `@observer` implements `shouldComponentUpdate` in the same way as `PureComponent` so that children are not re-rendered unnecessarily.
 -   `observer` based components sideways load data; parent components won't re-render unnecessarily even when child components will.
 -   The props object and the state object of an observer component are automatically made observable to make it easier to create @computed properties that derive from props inside such a component.
 
