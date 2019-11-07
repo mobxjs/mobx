@@ -2,11 +2,10 @@ import { action, fail, noop } from "../internal"
 
 let generatorId = 0
 
-export class FlowCancellationError extends Error {
-    constructor() {
-        super("FLOW_CANCELLED")
-    }
+export function FlowCancellationError() {
+    this.message = "FLOW_CANCELLED"
 }
+FlowCancellationError.prototype = Object.create(Error.prototype)
 
 export function isFlowCancellationError(error: Error) {
     return error instanceof FlowCancellationError
