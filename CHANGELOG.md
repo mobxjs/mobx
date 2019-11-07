@@ -1,9 +1,12 @@
--   Fixed flow typings with Typescript v3.6. This means that version of Typescript is required when using flows.
--   Cancelled flows now reject with a `FlowCancellationError` instance whose error message is the same as in previous versions (`"FLOW_CANCELLED"`) so this is not breaking.
--   Fix running mobx in web worker [#2184](https://github.com/mobxjs/mobx/pull/2184/files)
--   Fixed flow typings for Facebook's Flow. A new `CancellablePromise` Flow type is exported.
+# 5.15.0
 
--   Added support for symbol keys on observable properties.
+**The minimum required TypeScript version is now 3.6**
+
+-   Fixed flow typings with Typescript v3.6. This means that version of Typescript is required when using flows.
+-   Cancelled flows now reject with a `FlowCancellationError` instance whose error message is the same as in previous versions (`"FLOW_CANCELLED"`) so this is not breaking. [#2172](https://github.com/mobxjs/mobx/pull/2172) by [@vonovak](https://github.com/vonovak)
+-   Fix running mobx in web worker [#2184](https://github.com/mobxjs/mobx/pull/2184/files) by [@shahata](https://github.com/shahata)
+-   Fixed flow typings for Facebook's Flow. A new `CancellablePromise` Flow type is exported. [#2160](https://github.com/mobxjs/mobx/pull/2160) bu [@xaviergonz](https://github.com/xaviergonz)
+-   Added support for symbol keys on observable properties (MobX 5 only). [#2175](https://github.com/mobxjs/mobx/pull/2175) by [@StephenHaney](https://github.com/StephenHaney)
 
 # 5.14.2
 
