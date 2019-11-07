@@ -1647,3 +1647,31 @@ test("verify #1528", () => {
 
     expect(appState.timer).toBe(0)
 })
+
+test("#2159 - computed property keys", () => {
+    const testSymbol = Symbol("test symbol")
+    const testString = "testString"
+
+    class TestClass {
+        @observable [testSymbol] = "original symbol value";
+        @observable [testString] = "original string value"
+    }
+
+    const o = new TestClass()
+
+    const events: any[] = []
+    observe(o, testSymbol, ev => events.push(ev.newValue, ev.oldValue))
+    observe(o, testString, ev => events.push(ev.newValue, ev.oldValue))
+
+    runInAction(() => {
+        o[testSymbol] = "new symbol value"
+        o[testString] = "new string value"
+    })
+
+    t.deepEqual(events, [
+        "new symbol value", // new symbol
+        "original symbol value", // original symbol
+        "new string value", // new string
+        "original string value" // original string
+    ])
+})
