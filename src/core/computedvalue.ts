@@ -72,7 +72,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     newObserving = null // during tracking it's an array with new observed observers
     isBeingObserved = false
     isPendingUnobservation: boolean = false
-    observers = new Set()
+    observers = new Set<IDerivation>()
     diffValue = 0
     runId = 0
     lastAccessedBy = 0
