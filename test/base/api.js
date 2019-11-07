@@ -20,6 +20,8 @@ test("correct api should be exposed", function() {
             "extendObservable",
             "extendShallowObservable", // deprecated but still public
             "flow",
+            "FlowCancellationError",
+            "isFlowCancellationError",
             "get",
             "_getAdministration",
             "getAtom",
