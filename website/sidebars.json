@@ -11,25 +11,26 @@
       "refguide/observable-decorator",
       "refguide/object",
       "refguide/array",
-      "refguide/map",
-      "refguide/boxed",
-      "refguide/modifiers"
+      "refguide/map"
     ],
     "Reacting to observables": [
+      "refguide/observer-component",
       "refguide/computed-decorator",
       "refguide/autorun",
       "refguide/when",
       "refguide/reaction",
-      "refguide/observer-component",
       "best/react"
     ],
-    "Changing observables": [
+    "Updating observables": [
       "refguide/action",
       "best/actions",
       "refguide/object-api"
     ],
-    "Utility functions": [
+    "Utilities": [
+      "refguide/boxed",
+      "refguide/modifiers",
       "refguide/tojson",
+      "refguide/inject",
       "refguide/extend-observable",
       "refguide/extending",
       "refguide/observe",

@@ -1,6 +1,6 @@
 ---
 title: Introduction
-sidebar_label: Introduction
+sidebar_label: One page summary
 hide_title: true
 ---
 

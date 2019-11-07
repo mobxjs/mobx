@@ -8,6 +8,7 @@ exemptLabels:
   - has PR
   - discuss
   - enhancement
+  - documentation
   - candidate-for-next-version
   - ready-to-be-implemented-by-volunteer
   - needs investigation

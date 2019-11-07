@@ -1,6 +1,6 @@
 {
   "name": "mobx",
-  "version": "5.14.1",
+  "version": "5.14.2",
   "description": "Simple, scalable state management.",
   "main": "lib/mobx.js",
   "umd:main": "lib/mobx.umd.js",
@@ -32,7 +32,7 @@
     "docs:build": "yarn --cwd website build",
     "docs:start": "yarn --cwd website start",
     "docs:publish": "yarn --cwd website publish-gh-pages",
-    "postinstall": "yarn --cwd website install",
+    "prepare": "yarn --cwd website install",
     "dedup": "npx yarn-deduplicate -s fewer yarn.lock"
   },
   "repository": {

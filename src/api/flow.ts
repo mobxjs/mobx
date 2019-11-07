@@ -2,15 +2,23 @@ import { action, fail, noop } from "../internal"
 
 let generatorId = 0
 
+export class FlowCancellationError extends Error {
+    constructor() {
+        super("FLOW_CANCELLED")
+    }
+}
+
+export function isFlowCancellationError(error: Error) {
+    return error instanceof FlowCancellationError
+}
+
 export type CancellablePromise<T> = Promise<T> & { cancel(): void }
 
 export function flow<R, Args extends any[]>(
     generator: (...args: Args) => Generator<any, R, any> | AsyncGenerator<any, R, any>
 ): (...args: Args) => CancellablePromise<R> {
     if (arguments.length !== 1)
-        fail(
-            !!process.env.NODE_ENV && `Flow expects one 1 argument and cannot be used as decorator`
-        )
+        fail(!!process.env.NODE_ENV && `Flow expects 1 argument and cannot be used as decorator`)
     const name = generator.name || "<unnamed flow>"
 
     // Implementation based on https://github.com/tj/co/blob/master/index.js
@@ -81,7 +89,7 @@ export function flow<R, Args extends any[]>(
                 yieldedPromise.then(noop, noop)
                 cancelPromise(yieldedPromise) // maybe it can be cancelled :)
                 // reject our original promise
-                rejector(new Error("FLOW_CANCELLED"))
+                rejector(new FlowCancellationError())
             } catch (e) {
                 rejector(e) // there could be a throwing finally block
             }

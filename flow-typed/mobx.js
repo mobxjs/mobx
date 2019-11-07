@@ -475,11 +475,61 @@ declare export function createAtom(
 
 declare export function decorate<T>(target: T, decorators: any): T
 
-declare export function flow<T>(fn: (...args: any[]) => T): (...args: any[]) => Promise<T>
+export type CancellablePromise<T> = Promise<T> & { cancel: () => void }
+
 declare export function flow<T>(
-    name: string,
-    fn: (...args: any[]) => T
-): (...args: any[]) => Promise<T>
+    fn: () => Generator<any, T | Promise<T>, any> | AsyncGenerator<any, T | Promise<T>, any>
+): () => CancellablePromise<T>
+declare export function flow<T, A>(
+    fn: (A) => Generator<any, T | Promise<T>, any> | AsyncGenerator<any, T | Promise<T>, any>
+): A => CancellablePromise<T>
+declare export function flow<T, A, B>(
+    fn: (A, B) => Generator<any, T | Promise<T>, any> | AsyncGenerator<any, T | Promise<T>, any>
+): (A, B) => CancellablePromise<T>
+declare export function flow<T, A, B, C>(
+    fn: (A, B, C) => Generator<any, T | Promise<T>, any> | AsyncGenerator<any, T | Promise<T>, any>
+): (A, B, C) => CancellablePromise<T>
+declare export function flow<T, A, B, C, D>(
+    fn: (
+        A,
+        B,
+        C,
+        D
+    ) => Generator<any, T | Promise<T>, any> | AsyncGenerator<any, T | Promise<T>, any>
+): (A, B, C, D) => CancellablePromise<T>
+declare export function flow<T, A, B, C, D, E>(
+    fn: (
+        A,
+        B,
+        C,
+        D,
+        E
+    ) => Generator<any, T | Promise<T>, any> | AsyncGenerator<any, T | Promise<T>, any>
+): (A, B, C, D, E) => CancellablePromise<T>
+declare export function flow<T, A, B, C, D, E, F>(
+    fn: (
+        A,
+        B,
+        C,
+        D,
+        E,
+        F
+    ) => Generator<any, T | Promise<T>, any> | AsyncGenerator<any, T | Promise<T>, any>
+): (A, B, C, D, E, F) => CancellablePromise<T>
+declare export function flow<T, A, B, C, D, E, F, G, H>(
+    fn: (
+        A,
+        B,
+        C,
+        D,
+        E,
+        F,
+        G,
+        H
+    ) => Generator<any, T | Promise<T>, any> | AsyncGenerator<any, T | Promise<T>, any>
+): (A, B, C, D, E, F, G, H) => CancellablePromise<T>
+
+declare export function isFlowCancellationError(error: Error): boolean
 
 declare export function keys<K>(map: ObservableMap<K, any>): K[]
 declare export function keys(obj: any): string[]

@@ -1,4 +1,11 @@
-* Fixed flow typings with Typescript v3.6. This means that version of Typescript is required when using flows.
+-   Fixed flow typings with Typescript v3.6. This means that version of Typescript is required when using flows.
+-   Cancelled flows now reject with a `FlowCancellationError` instance whose error message is the same as in previous versions (`"FLOW_CANCELLED"`) so this is not breaking.
+-   Fix running mobx in web worker [#2184](https://github.com/mobxjs/mobx/pull/2184/files)
+-   Fixed flow typings for Facebook's Flow. A new `CancellablePromise` Flow type is exported.
+
+# 5.14.2
+
+-   Fixed installation issue trying to run `postinstall` hook for a website [#2165](https://github.com/mobxjs/mobx/issues/2165).
 
 # 5.14.1 / 4.14.1
 
