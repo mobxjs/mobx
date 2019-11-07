@@ -530,6 +530,8 @@ declare export function flow<T, A, B, C, D, E, F, G, H>(
     ) => Generator<any, T | Promise<T>, any> | AsyncGenerator<any, T | Promise<T>, any>
 ): (A, B, C, D, E, F, G, H) => CancellablePromise<T>
 
+declare export function isFlowCancellationError(error: Error): boolean
+
 declare export function keys<K>(map: ObservableMap<K, any>): K[]
 declare export function keys(obj: any): string[]
 
