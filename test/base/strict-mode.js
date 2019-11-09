@@ -311,6 +311,56 @@ describe("observableRequiresReaction", function() {
         }
     })
 
+    test("don't warn on autorun tracks invalidation of unbound dependencies", function() {
+        // #2195
+        try {
+            mobx.configure({ observableRequiresReaction: true })
+            const a = mobx.observable.box(0)
+            const b = mobx.observable.box(0)
+            const c = mobx.computed(() => a.get() + b.get())
+            const values = []
+
+            mobx.autorun(() => {
+                values.push(c.get())
+                b.set(100)
+            })
+
+            const messages = utils.supressConsole(() => {
+                a.set(1)
+            })
+
+            expect(messages.length).toBe(0)
+        } finally {
+            mobx.configure({ observableRequiresReaction: false })
+        }
+    })
+
+    test("don't warn on autorun tracks invalidation of unbound dependencies - also with action", function() {
+        // #2195
+        try {
+            mobx.configure({ observableRequiresReaction: true })
+            const a = mobx.observable.box(0)
+            const b = mobx.observable.box(0)
+            const c = mobx.computed(() => a.get() + b.get())
+            const values = []
+
+            mobx.autorun(() => {
+                values.push(c.get())
+                b.set(100)
+            })
+
+            const messages = utils.supressConsole(
+                mobx.action(() => {
+                    a.set(1)
+                })
+            )
+
+            expect(messages.length).toBe(0)
+        } finally {
+            mobx.configure({ observableRequiresReaction: false })
+        }
+    })
+
     test("don't warn on reads inside an action", function() {
         try {
             mobx.configure({ observableRequiresReaction: true })

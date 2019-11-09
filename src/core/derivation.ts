@@ -91,6 +91,8 @@ export function shouldCompute(derivation: IDerivation): boolean {
         case IDerivationState.STALE:
             return true
         case IDerivationState.POSSIBLY_STALE: {
+            // state propagation can occur outside of action/reactive context #2195
+            const prevAllowStateReads = allowStateReadsStart(true)
             const prevUntracked = untrackedStart() // no need for those computeds to be reported, they will be picked up in trackDerivedFunction.
             const obs = derivation.observing,
                 l = obs.length
@@ -113,12 +115,14 @@ export function shouldCompute(derivation: IDerivation): boolean {
                     // invariantShouldCompute(derivation)
                     if ((derivation.dependenciesState as any) === IDerivationState.STALE) {
                         untrackedEnd(prevUntracked)
+                        allowStateReadsEnd(prevAllowStateReads)
                         return true
                     }
                 }
             }
             changeDependenciesStateTo0(derivation)
             untrackedEnd(prevUntracked)
+            allowStateReadsEnd(prevAllowStateReads)
             return false
         }
     }

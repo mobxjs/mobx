@@ -1,3 +1,7 @@
+# 5.15.1 / 4.15.1
+
+-   Fixed an issue with `observableRequiresReaction` and updating observable during reaction [#2195](https://github.com/mobxjs/mobx/pull/2196)
+
 # 5.15.0
 
 **The minimum required TypeScript version is now 3.6**
