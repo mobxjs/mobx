@@ -102,7 +102,7 @@ class TodoStore {
 	report() {
 		if (this.todos.length === 0)
 			return "<none>";
-		return `Next todo: "${this.todos[0].task}". ` +
+		return `Next todo: "${this.todos.find(todo => todo.completed === false).task}". ` +
 			`Progress: ${this.completedTodosCount}/${this.todos.length}`;
 	}
 
@@ -177,7 +177,7 @@ class ObservableTodoStore {
 	@computed get report() {
 		if (this.todos.length === 0)
 			return "<none>";
-		return `Next todo: "${this.todos[0].task}". ` +
+		return `Next todo: "${this.todos.find(todo => todo.completed === false).task}". ` +
 			`Progress: ${this.completedTodosCount}/${this.todos.length}`;
 	}
 
