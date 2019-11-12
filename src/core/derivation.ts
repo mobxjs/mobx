@@ -107,6 +107,7 @@ export function shouldCompute(derivation: IDerivation): boolean {
                         } catch (e) {
                             // we are not interested in the value *or* exception at this moment, but if there is one, notify all
                             untrackedEnd(prevUntracked)
+                            allowStateReadsEnd(prevAllowStateReads)
                             return true
                         }
                     }
