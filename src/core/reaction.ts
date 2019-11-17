@@ -169,29 +169,30 @@ export class Reaction implements IDerivation, IReactionPublic {
         globalState.globalReactionErrorHandlers.forEach(f => f(error, this))
     }
 
-    dispose() {
-        if (!this.isDisposed) {
-            this.isDisposed = true
-            if (!this._isRunning) {
-                // if disposed while running, clean up later. Maybe not optimal, but rare case
-                startBatch()
-                clearObserving(this)
-                endBatch()
+    dispose: IReactionDisposer = Object.assign(
+        () => {
+            if (!this.isDisposed) {
+                this.isDisposed = true
+                if (!this._isRunning) {
+                    // if disposed while running, clean up later. Maybe not optimal, but rare case
+                    startBatch()
+                    clearObserving(this)
+                    endBatch()
+                }
             }
-        }
-    }
+        },
+        { $mobx: this }
+    )
 
-    getDisposer(): IReactionDisposer {
-        const r = this.dispose.bind(this)
-        r.$mobx = this
-        return r
+    getDisposer = (): IReactionDisposer => {
+        return this.dispose
     }
 
     toString() {
         return `Reaction[${this.name}]`
     }
 
-    trace(enterBreakPoint: boolean = false) {
+    trace = (enterBreakPoint: boolean = false) => {
         trace(this, enterBreakPoint)
     }
 }
