@@ -16,7 +16,7 @@ At that point it is invaluable to understand how MobX determines what to react t
 > MobX reacts to any _existing_ **observable** _property_ that is read during the execution of a tracked function.
 
 -   _"reading"_ is dereferencing an object's property, which can be done through "dotting into" it (eg. `user.name`) or using the bracket notation (eg. `user['name']`).
--   _"trackable functions"_ are the expression of `computed`, the `render()` method of an observer component, and the functions that are passed as the first param to `when`, `reaction` and `autorun`.
+-   _"tracked functions"_ are the expression of `computed`, the `render()` method of an observer component, and the functions that are passed as the first param to `when`, `reaction` and `autorun`.
 -   _"during"_ means that only those observables that are being read while the function is executing are tracked. It doesn't matter whether these values are used directly or indirectly by the tracked function.
 
 In other words, MobX will not react to:
