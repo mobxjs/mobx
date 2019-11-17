@@ -4,6 +4,7 @@
 const mobx = require("../../src/mobx.ts")
 const reaction = mobx.reaction
 const utils = require("../utils/test-utils")
+const { $mobx } = require("../../src/core/atom")
 
 test("basic", () => {
     const a = mobx.observable.box(1)
@@ -181,6 +182,30 @@ test("passes Reaction as an argument to expression function", () => {
     expect(values).toEqual([1, 2, "pleaseDispose"])
 })
 
+test("deconstructs Reaction and passes as an argument to expression function", () => {
+    const a = mobx.observable.box(1)
+    const values = []
+
+    reaction(
+        ({ dispose }) => {
+            if (a.get() === "pleaseDispose") dispose()
+            return a.get()
+        },
+        newValue => {
+            values.push(newValue)
+        },
+        { fireImmediately: true }
+    )
+
+    a.set(2)
+    a.set(2)
+    a.set("pleaseDispose")
+    a.set(3)
+    a.set(4)
+
+    expect(values).toEqual([1, 2, "pleaseDispose"])
+})
+
 test("passes Reaction as an argument to effect function", () => {
     const a = mobx.observable.box(1)
     const values = []
@@ -201,6 +226,49 @@ test("passes Reaction as an argument to effect function", () => {
     a.set(4)
 
     expect(values).toEqual([1, 2, "pleaseDispose"])
+})
+
+test("deconstructs Reaction and passes as an argument to effect function", () => {
+    const a = mobx.observable.box(1)
+    const values = []
+
+    reaction(
+        () => a.get(),
+        (newValue, { dispose }) => {
+            if (a.get() === "pleaseDispose") dispose()
+            values.push(newValue)
+        },
+        { fireImmediately: true }
+    )
+
+    a.set(2)
+    a.set(2)
+    a.set("pleaseDispose")
+    a.set(3)
+    a.set(4)
+
+    expect(values).toEqual([1, 2, "pleaseDispose"])
+})
+
+test("reaction should return the diposer which can dispose itself", () => {
+    const a = mobx.observable.box(1)
+    const values = []
+    const disposer = reaction(
+        () => a.get(),
+        newValue => {
+            values.push(newValue)
+        }
+    )
+    a.set(2)
+    a.set(2)
+    expect(disposer[$mobx].isDisposed).toBeFalsy()
+    expect(values).toEqual([2])
+
+    disposer()
+    a.set(3)
+    a.set(4)
+    expect(disposer[$mobx].isDisposed).toBeTruthy()
+    expect(values).toEqual([2])
 })
 
 test("can dispose reaction on first run", () => {

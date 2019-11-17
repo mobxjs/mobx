@@ -178,7 +178,7 @@ export class Reaction implements IDerivation, IReactionPublic {
         globalState.globalReactionErrorHandlers.forEach(f => f(error, this))
     }
 
-    dispose() {
+    dispose = () => {
         if (!this.isDisposed) {
             this.isDisposed = true
             if (!this._isRunning) {
@@ -190,8 +190,8 @@ export class Reaction implements IDerivation, IReactionPublic {
         }
     }
 
-    getDisposer(): IReactionDisposer {
-        const r = this.dispose.bind(this) as IReactionDisposer
+    getDisposer = (): IReactionDisposer => {
+        const r = this.dispose as IReactionDisposer
         r[$mobx] = this
         return r
     }
@@ -200,7 +200,7 @@ export class Reaction implements IDerivation, IReactionPublic {
         return `Reaction[${this.name}]`
     }
 
-    trace(enterBreakPoint: boolean = false) {
+    trace = (enterBreakPoint: boolean = false) => {
         trace(this, enterBreakPoint)
     }
 }
