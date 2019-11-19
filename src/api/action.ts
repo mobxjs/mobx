@@ -11,9 +11,9 @@ import {
 
 export interface IActionFactory {
     // nameless actions
-    <T>(fn: T): T & IAction
+    <T extends Function | null | undefined>(fn: T): T & IAction
     // named actions
-    <T>(name: string, fn: T): T & IAction
+    <T extends Function | null | undefined>(name: string, fn: T): T & IAction
 
     // named decorator
     (customName: string): (
