@@ -28,6 +28,7 @@ import {
     runInAction
 } from "../../src/mobx"
 import * as mobx from "../../src/mobx"
+import { assert, IsExact } from "conditional-type-checks"
 
 const v = observable.box(3)
 observe(v, () => {})
@@ -1175,7 +1176,7 @@ test("803 - action.bound and action preserve type info", () => {
         return { x: "3" } as Object
     }) as () => void
 
-    const bound2 = action(function() {}) as (() => void)
+    const bound2 = action(function() {}) as () => void
 })
 
 test("@computed.equals (TS)", () => {
@@ -1657,4 +1658,76 @@ test("type of flows that return promises", async () => {
 
     const n: number = await f()
     expect(n).toBe(5)
+})
+
+test("type inference of the action callback", () => {
+    function test1arg(fn: (a: number) => any) {}
+
+    function test2args(fn: (a: string, b: number) => any) {}
+
+    function test7args(
+        fn: (a: object, b: number, c: number, d: string, e: string, f: number, g: string) => any
+    ) {}
+
+    // Nameless actions
+    test1arg(
+        action(a1 => {
+            assert<IsExact<typeof a1, number>>(true)
+        })
+    )
+    test2args(
+        action((a1, a2) => {
+            assert<IsExact<typeof a1, string>>(true)
+            assert<IsExact<typeof a2, number>>(true)
+        })
+    )
+    test7args(
+        action((a1, a2, a3, a4, a5, a6, a7) => {
+            assert<IsExact<typeof a1, object>>(true)
+            assert<IsExact<typeof a2, number>>(true)
+            assert<IsExact<typeof a3, number>>(true)
+            assert<IsExact<typeof a4, string>>(true)
+            assert<IsExact<typeof a5, string>>(true)
+            assert<IsExact<typeof a6, number>>(true)
+            assert<IsExact<typeof a7, string>>(true)
+        })
+    )
+
+    // Named actions
+    test1arg(
+        action("named action", a1 => {
+            assert<IsExact<typeof a1, number>>(true)
+        })
+    )
+    test2args(
+        action("named action", (a1, a2) => {
+            assert<IsExact<typeof a1, string>>(true)
+            assert<IsExact<typeof a2, number>>(true)
+        })
+    )
+    test7args(
+        action("named action", (a1, a2, a3, a4, a5, a6, a7) => {
+            assert<IsExact<typeof a1, object>>(true)
+            assert<IsExact<typeof a2, number>>(true)
+            assert<IsExact<typeof a3, number>>(true)
+            assert<IsExact<typeof a4, string>>(true)
+            assert<IsExact<typeof a5, string>>(true)
+            assert<IsExact<typeof a6, number>>(true)
+            assert<IsExact<typeof a7, string>>(true)
+        })
+    )
+
+    // Promises
+    Promise.resolve(1).then(
+        action(arg => {
+            assert<IsExact<typeof arg, number>>(true)
+        })
+    )
+
+    // Promises with names actions
+    Promise.resolve(1).then(
+        action("named action", arg => {
+            assert<IsExact<typeof arg, number>>(true)
+        })
+    )
 })
