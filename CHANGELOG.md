@@ -1,6 +1,7 @@
 # 5.15.1 / 4.15.1
 
 -   Fixed an issue with `observableRequiresReaction` and updating observable during reaction [#2195](https://github.com/mobxjs/mobx/pull/2196)
+-   Improved type inference for `action` [#2213](https://github.com/mobxjs/mobx/pull/2213) ([see detailed explanation](https://github.com/mobxjs/mobx/pull/2218#discussion_r349889440))
 
 # 5.15.0
 
