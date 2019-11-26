@@ -73,7 +73,8 @@ _Tip: the main entry point of the MobX 5 package ships with ES5 code for backwar
     -   LearnCode.academy MobX tutorial [Part I: MobX + React is AWESOME (7m)](https://www.youtube.com/watch?v=_q50BXqkAfI) [Part II: Computed Values and Nested/Referenced Observables (12m.)](https://www.youtube.com/watch?v=nYvNqKrl69s)
     -   [Screencast: intro to MobX](https://www.youtube.com/watch?v=K8dr8BMU7-8) - 8m
     -   [Talk: State Management Is Easy, React Amsterdam 2016 conf](https://www.youtube.com/watch?v=ApmSsu3qnf0&feature=youtu.be) ([slides](https://speakerdeck.com/mweststrate/state-management-is-easy-introduction-to-mobx))
--   [Boilerplates and related projects](http://mobxjs.github.io/mobx/faq/boilerplates.html)
+-   Boilerplates [MobX awesome list](https://github.com/mobxjs/awesome-mobx#boilerplates)
+-   Related projects [MobX awesome list](https://github.com/mobxjs/awesome-mobx#related-projects-and-utilities)
 -   More tutorials, blogs, videos, and other helpful resources can be found on the [MobX awesome list](https://github.com/mobxjs/awesome-mobx#awesome-mobx)
 
 ## Introduction
@@ -306,11 +307,13 @@ And finally kudos for all the people that believed in, tried, validated and even
 ## Further resources and documentation
 
 -   <img src="assets/book.jpg" height="80px"/> [The MobX book](https://books.google.nl/books?id=ALFmDwAAQBAJ&pg=PP1&lpg=PP1&dq=michel+weststrate+mobx+quick+start+guide:+supercharge+the+client+state+in+your+react+apps+with+mobx&source=bl&ots=D460fxti0F&sig=ivDGTxsPNwlOjLHrpKF1nweZFl8&hl=nl&sa=X&ved=2ahUKEwiwl8XO--ncAhWPmbQKHWOYBqIQ6AEwAnoECAkQAQ#v=onepage&q=michel%20weststrate%20mobx%20quick%20start%20guide%3A%20supercharge%20the%20client%20state%20in%20your%20react%20apps%20with%20mobx&f=false) by Pavan Podila and Michel Weststrate (which despite its name is in-depth!)
--   [MobX homepage](http://mobxjs.github.io/mobx/faq/blogs.html)
+-   [MobX homepage](http://mobxjs.github.io)
 -   [API overview](http://mobxjs.github.io/mobx/refguide/api.html)
--   [Tutorials, Blogs & Videos](http://mobxjs.github.io/mobx/faq/blogs.html)
--   [Boilerplates](http://mobxjs.github.io/mobx/faq/boilerplates.html)
--   [Related projects](http://mobxjs.github.io/mobx/faq/related.html)
+-   [Tutorials](https://github.com/mobxjs/awesome-mobx#tutorials)
+-   [Blogs](https://github.com/mobxjs/awesome-mobx#blogs)
+-   [Videos](https://github.com/mobxjs/awesome-mobx#videos)
+-   [Boilerplates](https://github.com/mobxjs/awesome-mobx#boilerplates)
+-   [MobX awesome list](https://github.com/mobxjs/awesome-mobx#awesome-mobx)
 
 ## What others are saying...
 
