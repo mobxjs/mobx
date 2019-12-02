@@ -393,11 +393,29 @@ setTimeout(function() {
 
                         <h3>DevTools</h3>
                         <p>
+                            Following tools can be analyzed to analyze
+                            your mobx-react application:
+                        </p>
+                        <ul>
+                            <li>
+                                Visualizing re-rendering of components is now part of the standard
+                                <a href="https://reactjs.org/blog/2019/08/15/new-react-devtools.html" target="_blank">React devtools</a>
+                            </li>
+                            <li>
+                                The dependency tree of a component tree can be inspected by showing the state of the <code>useObserver</code>
+                                hook in the React devtools (older versions may display it as just an <code>Object</code>)
+                            </li>
+                            <li>
+                                Spying on events can still be done with the
+                                <a href="https://github.com/mobxjs/mobx-devtools" target="_blank">MobX-react browser plugin</a>
+                                through the <a href="https://github.com/winterbe/mobx-logger" target="_blank">mobx-logger package</a>
+                                or manually by using the <code>spy</code> or <code>trace</code> utility from the mobx package.
+                            </li>
+                        </ul>
+                        <p>
                             The <a href="https://github.com/mobxjs/mobx-react-devtools" target="_blank"><code>mobx-react-devtools</code></a> package
-                            provides the devtools that you find on the top right of this screen and which can be used in any MobX + ReactJS app.
-                            Clicking the first button will highlight each <code>@observer</code> component that is being re-rendered.
-                            If you click the second button and after that one of the components in the preview,
-                            the dependency tree of that component is shown so that you can precisely inspect which pieces of data it is observing at any given moment.
+                            (either as package or browser plugin) is
+                            <a href="https://github.com/mobxjs/mobx-react/blob/master/CHANGELOG.md#600" target="_blank">no longer supported</a>.
                         </p>
 
                         <h3>Conclusion</h3>
