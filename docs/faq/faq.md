@@ -12,6 +12,14 @@ hide_title: true
 
 MobX runs on any ES5 environment. That means that Node.js, Rhino and all browsers except for IE8 are supported. See [caniuse.com](http://caniuse.com/#feat=es5)
 
+##### While using Typescript I get `error TS2304: Cannot find name 'AsyncGenerator'`
+
+Edit your `tsconfig.json` and ensure your `lib` section array includes `es2018.asynciterable` or one of its super-sets (e.g. `es2018` or `esnext`). Note that this won't affect code generation in anyway, it just affects the standard type definitions the Typescript compiler will use, which should be a safe change. If your `tsconfig.json` does not include a lib section the defaults are:
+* ES5 target: DOM,ES5,ScriptHost
+* ES6 target: DOM,ES6,DOM.Iterable,ScriptHost
+
+So you'd need to add `es2018.asynciterable` to those defaults in this particular case.
+
 ##### Can MobX be combined with RxJS?
 
 Yes, you can use [toStream and fromStream from mobx-utils](https://github.com/mobxjs/mobx-utils#tostream) to use RXJS and other TC 39 compatible observables with mobx.
