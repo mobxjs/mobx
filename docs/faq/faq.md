@@ -10,7 +10,7 @@ hide_title: true
 
 ##### Which browsers are supported?
 
-MobX >=5 runs on any browser with [ES6 proxy support](https://kangax.github.io/compat-table/es6/#test-Proxy). MobX 4 runs on any ES5 browser. See [the README](https://mobx.js.org/README.html#browser-support) for more details.
+See the section on Browser Support in [the README](https://mobx.js.org/README.html#browser-support).
 
 ##### While using Typescript I get `error TS2304: Cannot find name 'AsyncGenerator'`
 
