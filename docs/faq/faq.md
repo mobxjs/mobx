@@ -10,7 +10,7 @@ hide_title: true
 
 ##### Which browsers are supported?
 
-See the section on Browser Support in [the README](https://mobx.js.org/README.html#browser-support).
+See the [browser support](https://mobx.js.org/README.html#browser-support).
 
 ##### While using Typescript I get `error TS2304: Cannot find name 'AsyncGenerator'`
 
