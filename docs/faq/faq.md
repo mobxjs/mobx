@@ -10,7 +10,7 @@ hide_title: true
 
 ##### Which browsers are supported?
 
-MobX runs on any ES5 environment. That means that Node.js, Rhino and all browsers except for IE8 are supported. See [caniuse.com](http://caniuse.com/#feat=es5)
+See the [browser support](https://mobx.js.org/README.html#browser-support).
 
 ##### While using Typescript I get `error TS2304: Cannot find name 'AsyncGenerator'`
 
