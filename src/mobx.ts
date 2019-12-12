@@ -151,7 +151,9 @@ export {
     IComputedValueOptions,
     IActionRunInfo,
     _startAction,
-    _endAction
+    _endAction,
+    allowStateReadsStart as _allowStateReadsStart,
+    allowStateReadsEnd as _allowStateReadsEnd
 } from "./internal"
 
 // forward compatibility with mobx, so that packages can easily support mobx 4 & 5
