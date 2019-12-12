@@ -12,6 +12,8 @@ test("correct api should be exposed", function() {
             "action",
             "_allowStateChanges",
             "_allowStateChangesInsideComputed",
+            "_allowStateReadsEnd",
+            "_allowStateReadsStart",
             "autorun",
             "comparer",
             "computed",

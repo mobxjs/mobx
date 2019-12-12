@@ -1,5 +1,6 @@
 # 5.15.1 / 4.15.1
 
+-   Expose `_allowStateReadsStart` & `_allowStateReadsEnd`. This is low level stuff you shouldn't need that's mostly useful for library creators.
 -   Fixed an issue with `observableRequiresReaction` and updating observable during reaction [#2195](https://github.com/mobxjs/mobx/pull/2196)
 -   Improved type inference for `action` [#2213](https://github.com/mobxjs/mobx/pull/2213) ([see detailed explanation](https://github.com/mobxjs/mobx/pull/2218#discussion_r349889440))
 
