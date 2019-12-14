@@ -32,7 +32,7 @@ import {
 
 const ObservableSetMarker = {}
 
-export type IObservableSetInitialValues<T> = Set<T> | T[]
+export type IObservableSetInitialValues<T> = Set<T> | readonly T[]
 
 export type ISetDidChange<T = any> =
     | {
