@@ -512,4 +512,18 @@ test("comparer.shallow should work", () => {
     expect(sh([1, 2, 3, 4], [1, 2, 3])).toBe(false)
     expect(sh([1, 2, 3], [1, 2, 3, 4])).toBe(false)
     expect(sh([{}, 2, 3], [{}, 2, 3])).toBe(false)
+
+    // Different types should not be equal.
+    expect(sh({}, [])).toBe(false)
+    expect(sh({}, new Set())).toBe(false)
+    expect(sh({}, new Map())).toBe(false)
+    expect(sh([], {})).toBe(false)
+    expect(sh([], new Set())).toBe(false)
+    expect(sh([], new Map())).toBe(false)
+    expect(sh(new Set(), {})).toBe(false)
+    expect(sh(new Set(), [])).toBe(false)
+    expect(sh(new Set(), new Map())).toBe(false)
+    expect(sh(new Map(), {})).toBe(false)
+    expect(sh(new Map(), [])).toBe(false)
+    expect(sh(new Map(), new Set())).toBe(false)
 })
