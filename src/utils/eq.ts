@@ -55,10 +55,11 @@ function eq(a: any, b: any, depth: number, aStack?: any[], bStack?: any[]) {
                 typeof Symbol !== "undefined" && Symbol.valueOf.call(a) === Symbol.valueOf.call(b)
             )
         case "[object Map]":
-            // Maps are unwrapped to an array of entries, each entry being an intermediate array.
-            // Hide this intermediate level by increasing the depth.
+        case "[object Set]":
+            // Maps and Sets are unwrapped to arrays of entry-pairs, adding an incidental level.
+            // Hide this extra level by increasing the depth.
             if (depth >= 0) {
-              depth++
+                depth++
             }
             break
     }
