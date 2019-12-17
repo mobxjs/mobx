@@ -56,7 +56,10 @@ function eq(a: any, b: any, depth: number, aStack?: any[], bStack?: any[]) {
             )
         case "[object Map]":
             // Maps are unwrapped to an array of entries, each entry being an intermediate array.
-            depth++
+            // Hide this intermediate level by increasing the depth.
+            if (depth >= 0) {
+              depth++
+            }
             break
     }
     // Unwrap any wrapped objects.
