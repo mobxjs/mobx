@@ -512,4 +512,6 @@ test("comparer.shallow should work", () => {
     expect(sh([1, 2, 3, 4], [1, 2, 3])).toBe(false)
     expect(sh([1, 2, 3], [1, 2, 3, 4])).toBe(false)
     expect(sh([{}, 2, 3], [{}, 2, 3])).toBe(false)
+
+    expect(sh(new Map([[1, 2]]), new Map([[1, 2]]))).toBe(true)
 })

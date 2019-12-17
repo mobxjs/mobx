@@ -27,9 +27,6 @@ function eq(a: any, b: any, depth: number, aStack?: any[], bStack?: any[]) {
     const type = typeof a
     if (type !== "function" && type !== "object" && typeof b != "object") return false
 
-    // Unwrap any wrapped objects.
-    a = unwrap(a)
-    b = unwrap(b)
     // Compare `[[Class]]` names.
     const className = toString.call(a)
     if (className !== toString.call(b)) return false
@@ -57,7 +54,14 @@ function eq(a: any, b: any, depth: number, aStack?: any[], bStack?: any[]) {
             return (
                 typeof Symbol !== "undefined" && Symbol.valueOf.call(a) === Symbol.valueOf.call(b)
             )
+        case "[object Map]":
+            // Maps are unwrapped to an array of entries, each entry being an intermediate array.
+            depth++
+            break
     }
+    // Unwrap any wrapped objects.
+    a = unwrap(a)
+    b = unwrap(b)
 
     const areArrays = className === "[object Array]"
     if (!areArrays) {
