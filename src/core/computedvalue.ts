@@ -107,8 +107,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
      * This is useful for working with vectors, mouse coordinates etc.
      */
     constructor(options: IComputedValueOptions<T>) {
-        if (process.env.NODE_ENV !== "production" && !options.get)
-            return fail("missing option for computed: get")
+        invariant(options.get, "missing option for computed: get")
         this.derivation = options.get!
         this.name = options.name || "ComputedValue@" + getNextId()
         if (options.set) this.setter = createAction(this.name + "-setter", options.set) as any
