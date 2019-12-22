@@ -1,3 +1,7 @@
+# 5.15.2 / 4.15.2
+
+-   Fixes #2230 - computedvalue: throw error object instead of string when options is empty [#2243](https://github.com/mobxjs/mobx/pull/2243)
+
 # 5.15.1 / 4.15.1
 
 -   Make initial values of observable set accept readonly array [#2202](https://github.com/mobxjs/mobx/pull/2202)
