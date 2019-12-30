@@ -488,31 +488,181 @@ test("deepEquals should yield correct results for complex objects #1118 - 2", ()
     expect(mobx.comparer.structural(a1, a4)).toBe(false)
 })
 
+test("comparer.shallow should require types to be equal", () => {
+    const sh = mobx.comparer.shallow
+
+    expect(sh({}, {})).toBe(true)
+    expect(sh({}, [])).toBe(false)
+    expect(sh({}, new Set())).toBe(false)
+    expect(sh({}, new Map())).toBe(false)
+    expect(sh({}, m.observable({}))).toBe(true)
+    expect(sh({}, m.observable([]))).toBe(false)
+    expect(sh({}, m.observable(new Set()))).toBe(false)
+    expect(sh({}, m.observable(new Map()))).toBe(false)
+
+    expect(sh([], {})).toBe(false)
+    expect(sh([], [])).toBe(true)
+    expect(sh([], new Set())).toBe(false)
+    expect(sh([], new Map())).toBe(false)
+    expect(sh([], m.observable({}))).toBe(false)
+    expect(sh([], m.observable([]))).toBe(true)
+    expect(sh([], m.observable(new Set()))).toBe(false)
+    expect(sh([], m.observable(new Map()))).toBe(false)
+
+    expect(sh(new Set(), {})).toBe(false)
+    expect(sh(new Set(), [])).toBe(false)
+    expect(sh(new Set(), new Set())).toBe(true)
+    expect(sh(new Set(), new Map())).toBe(false)
+    expect(sh(new Set(), m.observable({}))).toBe(false)
+    expect(sh(new Set(), m.observable([]))).toBe(false)
+    expect(sh(new Set(), m.observable(new Set()))).toBe(true)
+    expect(sh(new Set(), m.observable(new Map()))).toBe(false)
+
+    expect(sh(new Map(), {})).toBe(false)
+    expect(sh(new Map(), [])).toBe(false)
+    expect(sh(new Map(), new Set())).toBe(false)
+    expect(sh(new Map(), new Map())).toBe(true)
+    expect(sh(new Map(), m.observable({}))).toBe(false)
+    expect(sh(new Map(), m.observable([]))).toBe(false)
+    expect(sh(new Map(), m.observable(new Set()))).toBe(false)
+    expect(sh(new Map(), m.observable(new Map()))).toBe(true)
+
+    expect(sh(m.observable({}), {})).toBe(true)
+    expect(sh(m.observable({}), [])).toBe(false)
+    expect(sh(m.observable({}), new Set())).toBe(false)
+    expect(sh(m.observable({}), new Map())).toBe(false)
+    expect(sh(m.observable({}), m.observable({}))).toBe(true)
+    expect(sh(m.observable({}), m.observable([]))).toBe(false)
+    expect(sh(m.observable({}), m.observable(new Set()))).toBe(false)
+    expect(sh(m.observable({}), m.observable(new Map()))).toBe(false)
+
+    expect(sh(m.observable([]), {})).toBe(false)
+    expect(sh(m.observable([]), [])).toBe(true)
+    expect(sh(m.observable([]), new Set())).toBe(false)
+    expect(sh(m.observable([]), new Map())).toBe(false)
+    expect(sh(m.observable([]), m.observable({}))).toBe(false)
+    expect(sh(m.observable([]), m.observable([]))).toBe(true)
+    expect(sh(m.observable([]), m.observable(new Set()))).toBe(false)
+    expect(sh(m.observable([]), m.observable(new Map()))).toBe(false)
+
+    expect(sh(m.observable(new Set()), {})).toBe(false)
+    expect(sh(m.observable(new Set()), [])).toBe(false)
+    expect(sh(m.observable(new Set()), new Set())).toBe(true)
+    expect(sh(m.observable(new Set()), new Map())).toBe(false)
+    expect(sh(m.observable(new Set()), m.observable({}))).toBe(false)
+    expect(sh(m.observable(new Set()), m.observable([]))).toBe(false)
+    expect(sh(m.observable(new Set()), m.observable(new Set()))).toBe(true)
+    expect(sh(m.observable(new Set()), m.observable(new Map()))).toBe(false)
+
+    expect(sh(m.observable(new Map()), {})).toBe(false)
+    expect(sh(m.observable(new Map()), [])).toBe(false)
+    expect(sh(m.observable(new Map()), new Set())).toBe(false)
+    expect(sh(m.observable(new Map()), new Map())).toBe(true)
+    expect(sh(m.observable(new Map()), m.observable({}))).toBe(false)
+    expect(sh(m.observable(new Map()), m.observable([]))).toBe(false)
+    expect(sh(m.observable(new Map()), m.observable(new Set()))).toBe(false)
+    expect(sh(m.observable(new Map()), m.observable(new Map()))).toBe(true)
+})
 test("comparer.shallow should work", () => {
     const sh = mobx.comparer.shallow
 
     expect(sh(1, 1)).toBe(true)
-
     expect(sh(1, 2)).toBe(false)
 
-    expect(sh({}, {})).toBe(true)
-    expect(sh([], [])).toBe(true)
+    // Object tests
+    expect(sh({ a: 1, b: 2 }, { a: 1, b: 2 })).toBe(true)
+    expect(sh({ a: 1, b: 2 }, { b: 2, a: 1 })).toBe(true) // order does not matter
 
-    expect(sh({}, [])).toBe(false)
-    expect(sh([], {})).toBe(false)
+    expect(sh({ a: 1, b: 2 }, { a: 1, b: 3 })).toBe(false)
+    expect(sh({ a: 1, b: 2 }, { a: 1 })).toBe(false)
+    expect(sh({ a: 1 }, { a: 1, b: 2 })).toBe(false)
+    expect(sh({ a: {} }, { a: {} })).toBe(false)
 
-    expect(sh({ a: 1, b: 2, c: 3 }, { a: 1, b: 2, c: 3 })).toBe(true)
+    // Observable tests
+    expect(sh(m.observable({ a: 1, b: 2 }), m.observable({ a: 1, b: 2 }))).toBe(true)
+    expect(sh(m.observable({ a: 1, b: 2 }), m.observable({ b: 2, a: 1 }))).toBe(true) // order does not matter
 
-    expect(sh({ a: 1, b: 2, c: 3, d: 4 }, { a: 1, b: 2, c: 3 })).toBe(false)
-    expect(sh({ a: 1, b: 2, c: 3 }, { a: 1, b: 2, c: 3, d: 4 })).toBe(false)
-    expect(sh({ a: {}, b: 2, c: 3 }, { a: {}, b: 2, c: 3 })).toBe(false)
+    expect(sh(m.observable({ a: 1, b: 2 }), m.observable({ a: 1, b: 3 }))).toBe(false)
+    expect(sh(m.observable({ a: 1, b: 2 }), m.observable({ a: 1 }))).toBe(false)
+    expect(sh(m.observable({ a: 1 }), m.observable({ a: 1, b: 2 }))).toBe(false)
+    expect(sh(m.observable({ a: {} }), m.observable({ a: {} }))).toBe(false)
 
-    expect(sh([1, 2, 3], [1, 2, 3])).toBe(true)
+    // Array tests
+    expect(sh([1, 2], [1, 2])).toBe(true)
 
-    expect(sh([1, 2, 3, 4], [1, 2, 3])).toBe(false)
-    expect(sh([1, 2, 3], [1, 2, 3, 4])).toBe(false)
-    expect(sh([{}, 2, 3], [{}, 2, 3])).toBe(false)
+    expect(sh([1, 2], [2, 1])).toBe(false)
+    expect(sh([1, 2], [1])).toBe(false)
+    expect(sh([1], [1, 2])).toBe(false)
+    expect(sh([{}, 2], [{}, 2])).toBe(false)
 
+    // ObservableArray tests
+    expect(sh(m.observable([1, 2]), m.observable([1, 2]))).toBe(true)
+
+    expect(sh(m.observable([1, 2]), m.observable([3, 2]))).toBe(false)
+    expect(sh(m.observable([1, 2]), m.observable([1, 3]))).toBe(false)
+    expect(sh(m.observable([1, 2]), m.observable([1]))).toBe(false)
+    expect(sh(m.observable([1]), m.observable([1, 2]))).toBe(false)
+    expect(sh(m.observable([{}, 2]), m.observable([{}, 2]))).toBe(false)
+
+    // Set tests
     expect(sh(new Set([1, 2]), new Set([1, 2]))).toBe(true)
-    expect(sh(new Map([[1, 2]]), new Map([[1, 2]]))).toBe(true)
+
+    expect(sh(new Set([1, 2]), new Set([2, 1]))).toBe(false) // order matters
+    expect(sh(new Set([1, 2]), new Set([3, 2]))).toBe(false)
+    expect(sh(new Set([1, 2]), new Set([1, 3]))).toBe(false)
+    expect(sh(new Set([1, 2]), new Set([1]))).toBe(false)
+    expect(sh(new Set([1]), new Set([1, 2]))).toBe(false)
+    expect(sh(new Set([{}]), new Set([{}]))).toBe(false)
+
+    // ObservableSet tests
+    expect(sh(m.observable(new Set([1, 2])), m.observable(new Set([1, 2])))).toBe(true)
+
+    expect(sh(m.observable(new Set([1, 2])), m.observable(new Set([2, 1])))).toBe(false) // order matters
+    expect(sh(m.observable(new Set([1, 2])), m.observable(new Set([3, 2])))).toBe(false)
+    expect(sh(m.observable(new Set([1, 2])), m.observable(new Set([1, 3])))).toBe(false)
+    expect(sh(m.observable(new Set([1, 2])), m.observable(new Set([1])))).toBe(false)
+    expect(sh(m.observable(new Set([1])), m.observable(new Set([1, 2])))).toBe(false)
+    expect(sh(m.observable(new Set([{}])), m.observable(new Set([{}])))).toBe(false)
+
+    // Map tests
+    expect(sh(new Map([["a", 1], ["b", 2]]), new Map([["a", 1], ["b", 2]]))).toBe(true)
+
+    expect(sh(new Map([["a", 1], ["b", 2]]), new Map([["b", 2], ["a", 1]]))).toBe(false) // order matters
+    expect(sh(new Map([["a", 1], ["b", 2]]), new Map([["c", 1], ["b", 2]]))).toBe(false)
+    expect(sh(new Map([["a", 1], ["b", 2]]), new Map([["a", 3], ["b", 2]]))).toBe(false)
+    expect(sh(new Map([["a", 1], ["b", 2]]), new Map([["a", 1], ["c", 2]]))).toBe(false)
+    expect(sh(new Map([["a", 1], ["b", 2]]), new Map([["a", 1], ["b", 3]]))).toBe(false)
+    expect(sh(new Map([["a", 1], ["b", 2]]), new Map([["a", 1]]))).toBe(false)
+    expect(sh(new Map([["a", 1], ["b", 2]]), new Map([["b", 2]]))).toBe(false)
+    expect(sh(new Map([[{}, 1]]), new Map([[{}, 1]]))).toBe(false)
+    expect(sh(new Map([["a", {}]]), new Map([["a", {}]]))).toBe(false)
+
+    // ObservableMap tests
+    expect(
+        sh(m.observable(new Map([["a", 1], ["b", 2]])), m.observable(new Map([["a", 1], ["b", 2]])))
+    ).toBe(true)
+
+    expect(
+        sh(m.observable(new Map([["a", 1], ["b", 2]])), m.observable(new Map([["b", 2], ["a", 1]])))
+    ).toBe(false) // order matters
+    expect(
+        sh(m.observable(new Map([["a", 1], ["b", 2]])), m.observable(new Map([["c", 1], ["b", 2]])))
+    ).toBe(false)
+    expect(
+        sh(m.observable(new Map([["a", 1], ["b", 2]])), m.observable(new Map([["a", 3], ["b", 2]])))
+    ).toBe(false)
+    expect(
+        sh(m.observable(new Map([["a", 1], ["b", 2]])), m.observable(new Map([["a", 1], ["c", 2]])))
+    ).toBe(false)
+    expect(
+        sh(m.observable(new Map([["a", 1], ["b", 2]])), m.observable(new Map([["a", 1], ["b", 3]])))
+    ).toBe(false)
+    expect(sh(m.observable(new Map([["a", 1], ["b", 2]])), m.observable(new Map([["a", 1]])))).toBe(
+        false
+    )
+    expect(sh(m.observable(new Map([["a", 1], ["b", 2]])), m.observable(new Map([["b", 2]])))).toBe(
+        false
+    )
+    expect(sh(m.observable(new Map([[{}, 1]])), m.observable(new Map([[{}, 1]])))).toBe(false)
+    expect(sh(m.observable(new Map([["a", {}]])), m.observable(new Map([["a", {}]])))).toBe(false)
 })
