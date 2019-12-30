@@ -642,7 +642,7 @@ test("comparer.shallow should work", () => {
     expect(sh(new Map([["a", 1], ["b", 2]]), new Map([["a", 1], ["c", 2]]))).toBe(false)
     expect(sh(new Map([["a", 1], ["b", 2]]), new Map([["a", 1], ["b", 3]]))).toBe(false)
     expect(sh(new Map([["a", 1], ["b", 2]]), new Map([["a", 1]]))).toBe(false)
-    expect(sh(new Map([["a", 1], ["b", 2]]), new Map([["b", 2]]))).toBe(false)
+    expect(sh(new Map([["a", 1]]), new Map([["a", 1], ["b", 2]]))).toBe(false)
     expect(sh(new Map([[{}, 1]]), new Map([[{}, 1]]))).toBe(false)
     expect(sh(new Map([["a", {}]]), new Map([["a", {}]]))).toBe(false)
 
@@ -655,7 +655,7 @@ test("comparer.shallow should work", () => {
     expect(sh(obs(new Map([["a", 1], ["b", 2]])), obs(new Map([["a", 1], ["c", 2]])))).toBe(false)
     expect(sh(obs(new Map([["a", 1], ["b", 2]])), obs(new Map([["a", 1], ["b", 3]])))).toBe(false)
     expect(sh(obs(new Map([["a", 1], ["b", 2]])), obs(new Map([["a", 1]])))).toBe(false)
-    expect(sh(obs(new Map([["a", 1], ["b", 2]])), obs(new Map([["b", 2]])))).toBe(false)
+    expect(sh(obs(new Map([["a", 1]])), obs(new Map([["a", 1], ["b", 2]])))).toBe(false)
     expect(sh(obs(new Map([[{}, 1]])), obs(new Map([[{}, 1]])))).toBe(false)
     expect(sh(obs(new Map([["a", {}]])), obs(new Map([["a", {}]])))).toBe(false)
 })
