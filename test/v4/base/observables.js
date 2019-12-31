@@ -849,12 +849,12 @@ test("when 2", function() {
     )
 
     expect(called).toBe(1)
-    expect(x.observers.size).toBe(0)
+    expect(x.observers.length).toBe(0)
     x.set(5)
     x.set(3)
     expect(called).toBe(1)
 
-    expect(d[$mobx].name).toBe("when x is 3")
+    expect(d.$mobx.name).toBe("when x is 3")
 })
 
 function stripSpyOutput(events) {
@@ -1026,21 +1026,21 @@ test("prematurely end autorun", function() {
             x.get()
         })
 
-        expect(x.observers.size).toBe(0)
-        expect(dis1[$mobx].observing.length).toBe(0)
-        expect(dis2[$mobx].observing.length).toBe(0)
+        expect(x.observers.length).toBe(0)
+        expect(dis1.$mobx.observing.length).toBe(0)
+        expect(dis2.$mobx.observing.length).toBe(0)
 
         dis1()
     })
-    expect(x.observers.size).toBe(1)
-    expect(dis1[$mobx].observing.length).toBe(0)
-    expect(dis2[$mobx].observing.length).toBe(1)
+    expect(x.observers.length).toBe(1)
+    expect(dis1.$mobx.observing.length).toBe(0)
+    expect(dis2.$mobx.observing.length).toBe(1)
 
     dis2()
 
-    expect(x.observers.size).toBe(0)
-    expect(dis1[$mobx].observing.length).toBe(0)
-    expect(dis2[$mobx].observing.length).toBe(0)
+    expect(x.observers.length).toBe(0)
+    expect(dis1.$mobx.observing.length).toBe(0)
+    expect(dis2.$mobx.observing.length).toBe(0)
 })
 
 test("computed values believe NaN === NaN", function() {
@@ -1234,8 +1234,8 @@ test("autoruns created in autoruns should kick off", function() {
     })
 
     // a should be observed by the inner autorun, not the outer
-    expect(a[$mobx].observing.length).toBe(0)
-    expect(d[$mobx].observing.length).toBe(1)
+    expect(a.$mobx.observing.length).toBe(0)
+    expect(d.$mobx.observing.length).toBe(1)
 
     x.set(4)
     expect(x2).toEqual([6, 8])
@@ -1276,18 +1276,18 @@ test("prematurely ended autoruns are cleaned up properly", () => {
     })
 
     expect(called).toBe(1)
-    expect(a.observers.size).toBe(1)
-    expect(b.observers.size).toBe(0)
-    expect(c.observers.size).toBe(1)
-    expect(d[$mobx].observing.length).toBe(2)
+    expect(a.observers.length).toBe(1)
+    expect(b.observers.length).toBe(0)
+    expect(c.observers.length).toBe(1)
+    expect(d.$mobx.observing.length).toBe(2)
 
     a.set(2)
 
     expect(called).toBe(2)
-    expect(a.observers.size).toBe(0)
-    expect(b.observers.size).toBe(0)
-    expect(c.observers.size).toBe(0)
-    expect(d[$mobx].observing.length).toBe(0)
+    expect(a.observers.length).toBe(0)
+    expect(b.observers.length).toBe(0)
+    expect(c.observers.length).toBe(0)
+    expect(d.$mobx.observing.length).toBe(0)
 })
 
 test("unoptimizable subscriptions are diffed correctly", () => {
@@ -1313,28 +1313,28 @@ test("unoptimizable subscriptions are diffed correctly", () => {
 
     expect(called).toBe(1)
     expect(val).toBe(1)
-    expect(a.observers.size).toBe(2)
-    expect(b.observers.size).toBe(1)
-    expect(c.observers.size).toBe(1)
-    expect(d[$mobx].observing.length).toBe(3) // 3 would be better!
+    expect(a.observers.length).toBe(2)
+    expect(b.observers.length).toBe(1)
+    expect(c.observers.length).toBe(1)
+    expect(d.$mobx.observing.length).toBe(3) // 3 would be better!
 
     b.set(2)
 
     expect(called).toBe(2)
     expect(val).toBe(1)
-    expect(a.observers.size).toBe(2)
-    expect(b.observers.size).toBe(1)
-    expect(c.observers.size).toBe(1)
-    expect(d[$mobx].observing.length).toBe(3) // c was cached so accessing a was optimizable
+    expect(a.observers.length).toBe(2)
+    expect(b.observers.length).toBe(1)
+    expect(c.observers.length).toBe(1)
+    expect(d.$mobx.observing.length).toBe(3) // c was cached so accessing a was optimizable
 
     a.set(2)
 
     expect(called).toBe(3)
     expect(val).toBe(2)
-    expect(a.observers.size).toBe(2)
-    expect(b.observers.size).toBe(1)
-    expect(c.observers.size).toBe(1)
-    expect(d[$mobx].observing.length).toBe(3) // c was cached so accessing a was optimizable
+    expect(a.observers.length).toBe(2)
+    expect(b.observers.length).toBe(1)
+    expect(c.observers.length).toBe(1)
+    expect(d.$mobx.observing.length).toBe(3) // c was cached so accessing a was optimizable
 
     d()
 })
@@ -1344,11 +1344,7 @@ test("atom events #427", () => {
     let stop = 0
     let runs = 0
 
-    const a = mobx.createAtom(
-        "test",
-        () => start++,
-        () => stop++
-    )
+    const a = mobx.createAtom("test", () => start++, () => stop++)
     expect(a.reportObserved()).toEqual(false)
 
     expect(start).toBe(0)
@@ -1454,9 +1450,9 @@ test("verify calculation count", () => {
         "f",
         "change",
         "b",
-        "d",
         "c",
         "e",
+        "d",
         "f", // would have expected b c e d f, but alas
         "transaction",
         "f",
@@ -1467,8 +1463,8 @@ test("verify calculation count", () => {
         "try f",
         "f",
         "end transaction",
-        "d", // would have expected e d
-        "e"
+        "e",
+        "d" // would have expected e d
     ])
 
     d()
@@ -1599,8 +1595,8 @@ test("603 - transaction should not kill reactions", () => {
         // empty
     }
 
-    expect(a.observers.size).toBe(1)
-    expect(d[$mobx].observing.length).toBe(1)
+    expect(a.observers.length).toBe(1)
+    expect(d.$mobx.observing.length).toBe(1)
     const g = m._getGlobalState()
     expect(g.inBatch).toEqual(0)
     expect(g.pendingReactions.length).toEqual(0)
@@ -1646,6 +1642,17 @@ test("#561 test toPrimitive() of observable objects", function() {
     }
 })
 
+test("observables should not fail when ES6 Map is missing", () => {
+    const globalMapFunction = global.Map
+    global.Map = undefined
+    expect(global.Map).toBe(undefined)
+    const a = observable([1, 2, 3]) //trigger isES6Map in utils
+
+    expect(m.isObservable(a)).toBe(true)
+
+    global.Map = globalMapFunction
+})
+
 test("computed equals function only invoked when necessary", () => {
     utils.supressConsole(() => {
         const comparisons = []
@@ -1686,18 +1693,12 @@ test("computed equals function only invoked when necessary", () => {
 
         // Another value change will cause a comparison
         right.set("F")
-        expect(comparisons).toEqual([
-            { from: "ab", to: "cb" },
-            { from: "de", to: "df" }
-        ])
+        expect(comparisons).toEqual([{ from: "ab", to: "cb" }, { from: "de", to: "df" }])
 
         // Becoming unobserved, then observed won't cause a comparison
         disposeAutorun()
         disposeAutorun = mobx.autorun(() => values.push(combinedToLowerCase.get()))
-        expect(comparisons).toEqual([
-            { from: "ab", to: "cb" },
-            { from: "de", to: "df" }
-        ])
+        expect(comparisons).toEqual([{ from: "ab", to: "cb" }, { from: "de", to: "df" }])
 
         expect(values).toEqual(["ab", "cb", "de", "df", "df"])
 
@@ -1810,10 +1811,7 @@ test("computed comparer works with decorate (plain)", () => {
     time.minute = 0
     expect(changes).toEqual([{ hour: 9, minute: 0 }])
     time.hour = 10
-    expect(changes).toEqual([
-        { hour: 9, minute: 0 },
-        { hour: 10, minute: 0 }
-    ])
+    expect(changes).toEqual([{ hour: 9, minute: 0 }, { hour: 10, minute: 0 }])
     time.minute = 30
     expect(changes).toEqual([
         { hour: 9, minute: 0 },
@@ -1852,10 +1850,7 @@ test("computed comparer works with decorate (plain) - 2", () => {
     time.minute = 0
     expect(changes).toEqual([{ hour: 9, minute: 0 }])
     time.hour = 10
-    expect(changes).toEqual([
-        { hour: 9, minute: 0 },
-        { hour: 10, minute: 0 }
-    ])
+    expect(changes).toEqual([{ hour: 9, minute: 0 }, { hour: 10, minute: 0 }])
     time.minute = 30
     expect(changes).toEqual([
         { hour: 9, minute: 0 },
@@ -1890,10 +1885,7 @@ test("computed comparer works with decorate (plain) - 3", () => {
     time.minute = 0
     expect(changes).toEqual([{ hour: 9, minute: 0 }])
     time.hour = 10
-    expect(changes).toEqual([
-        { hour: 9, minute: 0 },
-        { hour: 10, minute: 0 }
-    ])
+    expect(changes).toEqual([{ hour: 9, minute: 0 }, { hour: 10, minute: 0 }])
     time.minute = 30
     expect(changes).toEqual([
         { hour: 9, minute: 0 },
@@ -2075,24 +2067,10 @@ test("tuples", () => {
     const myStuff = tuple(1, 3)
     const events = []
 
-    mobx.reaction(
-        () => myStuff[0],
-        val => events.push(val)
-    )
+    mobx.reaction(() => myStuff[0], val => events.push(val))
     myStuff[1] = 17 // should not react
     myStuff[0] = 2 // should react
     expect(events).toEqual([2])
 
     expect(myStuff.map(x => x * 2)).toEqual([4, 34])
-})
-
-test("extendObservable should not accept complex objects as second argument", () => {
-    class X {
-        x = 3
-    }
-    expect(() => {
-        extendObservable({}, new X())
-    }).toThrowErrorMatchingInlineSnapshot(
-        `"[mobx] 'extendObservabe' only accepts plain objects as second argument"`
-    )
 })

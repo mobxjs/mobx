@@ -1190,10 +1190,7 @@ test("@computed.equals (TS)", () => {
     time.minute = 0
     t.deepEqual(changes, [{ hour: 9, minute: 0 }])
     time.hour = 10
-    t.deepEqual(changes, [
-        { hour: 9, minute: 0 },
-        { hour: 10, minute: 0 }
-    ])
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }, { hour: 10, minute: 0 }])
     time.minute = 30
     t.deepEqual(changes, [
         { hour: 9, minute: 0 },
@@ -1229,10 +1226,7 @@ test("computed comparer works with decorate (TS)", () => {
     time.minute = 0
     t.deepEqual(changes, [{ hour: 9, minute: 0 }])
     time.hour = 10
-    t.deepEqual(changes, [
-        { hour: 9, minute: 0 },
-        { hour: 10, minute: 0 }
-    ])
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }, { hour: 10, minute: 0 }])
     time.minute = 30
     t.deepEqual(changes, [
         { hour: 9, minute: 0 },
@@ -1268,10 +1262,7 @@ test("computed comparer works with decorate (TS)", () => {
     time.minute = 0
     t.deepEqual(changes, [{ hour: 9, minute: 0 }])
     time.hour = 10
-    t.deepEqual(changes, [
-        { hour: 9, minute: 0 },
-        { hour: 10, minute: 0 }
-    ])
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }, { hour: 10, minute: 0 }])
     time.minute = 30
     t.deepEqual(changes, [
         { hour: 9, minute: 0 },
@@ -1316,10 +1307,7 @@ test("computed comparer works with decorate (TS) - 2", () => {
     time.minute = 0
     t.deepEqual(changes, [{ hour: 9, minute: 0 }])
     time.hour = 10
-    t.deepEqual(changes, [
-        { hour: 9, minute: 0 },
-        { hour: 10, minute: 0 }
-    ])
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }, { hour: 10, minute: 0 }])
     time.minute = 30
     t.deepEqual(changes, [
         { hour: 9, minute: 0 },
@@ -1354,10 +1342,7 @@ test("computed comparer works with decorate (TS) - 3", () => {
     time.minute = 0
     t.deepEqual(changes, [{ hour: 9, minute: 0 }])
     time.hour = 10
-    t.deepEqual(changes, [
-        { hour: 9, minute: 0 },
-        { hour: 10, minute: 0 }
-    ])
+    t.deepEqual(changes, [{ hour: 9, minute: 0 }, { hour: 10, minute: 0 }])
     time.minute = 30
     t.deepEqual(changes, [
         { hour: 9, minute: 0 },
@@ -1464,10 +1449,7 @@ test("unread computed reads should trow with requiresReaction enabled", () => {
         a.y
     }).toThrow(/is read outside a reactive context/)
 
-    const d = mobx.reaction(
-        () => a.y,
-        () => {}
-    )
+    const d = mobx.reaction(() => a.y, () => {})
     expect(() => {
         a.y
     }).not.toThrow()
@@ -1660,34 +1642,6 @@ test("type of flows that return promises", async () => {
 
     const n: number = await f()
     expect(n).toBe(5)
-})
-
-test("#2159 - computed property keys", () => {
-    const testSymbol = Symbol("test symbol")
-    const testString = "testString"
-
-    class TestClass {
-        @observable [testSymbol] = "original symbol value";
-        @observable [testString] = "original string value"
-    }
-
-    const o = new TestClass()
-
-    const events: any[] = []
-    observe(o, testSymbol, ev => events.push(ev.newValue, ev.oldValue))
-    observe(o, testString, ev => events.push(ev.newValue, ev.oldValue))
-
-    runInAction(() => {
-        o[testSymbol] = "new symbol value"
-        o[testString] = "new string value"
-    })
-
-    t.deepEqual(events, [
-        "new symbol value", // new symbol
-        "original symbol value", // original symbol
-        "new string value", // new string
-        "original string value" // original string
-    ])
 })
 
 test("type inference of the action callback", () => {

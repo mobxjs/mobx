@@ -136,9 +136,10 @@ export interface IObservableArray<T> extends Array<T> {
         fireImmediately?: boolean
     ): Lambda;
     intercept(handler: IInterceptor<IArrayWillChange<T> | IArrayWillSplice<T>>): Lambda;
-    intercept(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda;
-    intercept<T>(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda;
+    intercept(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda; // TODO: remove in 4.0
+    intercept<T>(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda; // TODO: remove in 4.0
     clear(): T[];
+    peek(): T[];
     replace(newItems: T[]): T[];
     find(
         predicate: (item: T, index: number, array: Array<T>) => mixed,
@@ -340,7 +341,7 @@ declare export function reaction<T>(
     expression: (r: IReactionPublic) => T,
     effect: (arg: T, r: IReactionPublic) => void,
     opts?: IReactionOptions
-): () => void
+): () => mixed
 
 export interface IWhenOptions {
     name?: string;
@@ -356,7 +357,7 @@ declare export function when(
     cond: () => boolean,
     effect: Lambda,
     options?: IWhenOptions
-): () => void
+): () => mixed
 declare export function when(cond: () => boolean, options?: IWhenOptions): Promise<any>
 
 declare export function computed<T>(

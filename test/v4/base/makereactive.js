@@ -64,7 +64,7 @@ test("isBoxedObservable", function() {
     expect(m.isBoxedObservable(m.observable.box(3))).toBe(true)
     expect(m.isBoxedObservable(m.observable.box(3))).toBe(true)
     expect(m.isBoxedObservable(m.observable.box({}))).toBe(true)
-    expect(m.isBoxedObservable(m.observable.box({}, { deep: false }))).toBe(true)
+    expect(m.isBoxedObservable(m.observable.shallowBox({}))).toBe(true)
 })
 
 test("observable1", function() {
@@ -228,11 +228,7 @@ test("observable5", function() {
         return 3
     }
     x.nonReactive = three
-    expect(b.toArray()).toEqual([
-        [17, f, 17],
-        [18, f, 18],
-        [18, three, 3]
-    ])
+    expect(b.toArray()).toEqual([[17, f, 17], [18, f, 18], [18, three, 3]])
 })
 
 test("flat array", function() {
@@ -444,11 +440,6 @@ test("as structure view", function() {
     expect(cc).toBe(2)
 })
 
-// This test doesn't make much sense anymore with proxies;
-// creating non configurable props on dynamic observable object
-// will break the invariants of proxies (when trying to determine keys)
-// which is not unfixiable in itself,
-// but definitely a pattern we don't want to encourage
 test("ES5 non reactive props", function() {
     let te = m.observable({})
     Object.defineProperty(te, "nonConfigurable", {
@@ -532,7 +523,7 @@ test("mobx 3", () => {
 
     expect(x === mobx.observable(x)).toBeTruthy()
 
-    const y = mobx.observable.box(null, { deep: false })
+    const y = mobx.observable.shallowBox(null)
     const obj = { a: 2 }
     y.set(obj)
     expect(y.get() === obj).toBeTruthy()
@@ -612,7 +603,7 @@ test("761 - deeply nested modifiers work", () => {
     expect(mobx.isObservable(a.someKey)).toBe(true)
     expect(mobx.isObservableProp(a.someKey, "someNestedKey")).toBe(true)
     expect(mobx.isObservable(a.someKey.someNestedKey)).toBe(true) // Too bad: no deep merge with Object.assign! someKey object gets replaced in its entirity
-    expect(Array.isArray(a.someKey.someNestedKey)).toBe(true)
+    expect(Array.isArray(a.someKey.someNestedKey)).toBe(false)
 })
 
 test("compare structurally, ref", () => {
@@ -684,41 +675,7 @@ test("structural collections", () => {
     }).toThrow("observable.struct should not be used with observable values")
 })
 
-test("jest is behaving correctly", () => {
-    const symbol = Symbol("test")
-    const a = []
-    const b = []
-    const c = []
-    a[symbol] = 1
-    b[symbol] = 1
-    c[symbol] = 2
-    expect(a).toEqual(b)
-    expect(a).not.toEqual(c)
-})
-
-test("All non-enumerables should be treated equally!", () => {
-    const actual1 = {
-        x: 3
-    }
-    Object.defineProperty(actual1, "test", {
-        enumerable: false,
-        value: 5
-    })
-
-    const actual2 = {
-        x: 3
-    }
-    const mySymbol = Symbol("test")
-    Object.defineProperty(actual2, mySymbol, {
-        enumerable: false,
-        value: 5
-    })
-
-    expect(actual1).toEqual({ x: 3 })
-    expect(actual2).toEqual({ x: 3 })
-})
-
-test("jest object equals issue - reference", () => {
+test("yest object equals issue - reference", () => {
     class Store {
         constructor() {
             mobx.extendObservable(this, { x: 3 })
@@ -729,7 +686,7 @@ test("jest object equals issue - reference", () => {
     expect(store).toEqual(new Store())
 })
 
-test("jest object equals issue", () => {
+test("yest object equals issue", () => {
     class Store {
         @mobx.observable x = 2
 
@@ -742,7 +699,7 @@ test("jest object equals issue", () => {
     expect(store).toEqual(new Store())
 })
 
-test("jest array equals issue", () => {
+test("yest array equals issue", () => {
     class Store {
         @mobx.observable things = []
     }
