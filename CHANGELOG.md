@@ -1,6 +1,7 @@
-# 5.15.2 / 4.15.2
+# 5.15.2 / 4.15.2 [NOT PUBLISHED YET]
 
 -   Fixes #2230 - computedvalue: throw error object instead of string when options is empty [#2243](https://github.com/mobxjs/mobx/pull/2243)
+-   supports ES6 Sets and Maps in shallow comparer. [#2238](https://github.com/mobxjs/mobx/pull/2238)
 
 # 5.15.1 / 4.15.1
 
