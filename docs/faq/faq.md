@@ -5,16 +5,27 @@ hide_title: true
 ---
 
 ## FAQ
+
 <div id='codefund' ></div>
 
 ##### Which browsers are supported?
 
-MobX runs on any ES5 environment. That means that Node.js, Rhino and all browsers except for IE8 are supported. See [caniuse.com](http://caniuse.com/#feat=es5)
+See the [browser support](https://mobx.js.org/README.html#browser-support).
+
+##### While using Typescript I get `error TS2304: Cannot find name 'AsyncGenerator'`
+
+Edit your `tsconfig.json` and ensure your `lib` section array includes `es2018.asynciterable` or one of its super-sets (e.g. `es2018` or `esnext`). Note that this won't affect code generation in anyway, it just affects the standard type definitions the Typescript compiler will use, which should be a safe change. If your `tsconfig.json` does not include a lib section the defaults are:
+* ES5 target: DOM,ES5,ScriptHost
+* ES6 target: DOM,ES6,DOM.Iterable,ScriptHost
+
+So you'd need to add `es2018.asynciterable` to those defaults in this particular case.
 
 ##### Can MobX be combined with RxJS?
+
 Yes, you can use [toStream and fromStream from mobx-utils](https://github.com/mobxjs/mobx-utils#tostream) to use RXJS and other TC 39 compatible observables with mobx.
 
 ##### When to use RxJS instead of MobX?
+
 For anything that involves explictly working with the concept of time,
 or when you need to reason about the historical values / events of an observable (and not just the latest), RxJs is recommended as it provides more low-level primitives.
 Whenever you want to react to _state_ instead of _events_, MobX offers an easier and more high-level approach.
@@ -33,7 +44,7 @@ See this [issue](https://github.com/mobxjs/mobx/issues/18) for some consideratio
 
 ##### Is MobX a framework?
 
-MobX is *not* a framework. It does not tell you how to structure your code, where to store state or how to process events. Yet it might free you from frameworks that poses all kinds of restrictions on your code in the name of performance.
+MobX is _not_ a framework. It does not tell you how to structure your code, where to store state or how to process events. Yet it might free you from frameworks that poses all kinds of restrictions on your code in the name of performance.
 
 ##### Can I combine MobX with Flux?
 

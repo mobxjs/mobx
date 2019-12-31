@@ -132,6 +132,8 @@ export {
     onBecomeObserved,
     onBecomeUnobserved,
     flow,
+    FlowCancellationError,
+    isFlowCancellationError,
     toJS,
     trace,
     IObserverTree,
@@ -154,7 +156,9 @@ export {
     IComputedValueOptions,
     IActionRunInfo,
     _startAction,
-    _endAction
+    _endAction,
+    allowStateReadsStart as _allowStateReadsStart,
+    allowStateReadsEnd as _allowStateReadsEnd
 } from "./internal"
 
 // Devtools support

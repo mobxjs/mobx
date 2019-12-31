@@ -2,41 +2,22 @@ import { action, fail, noop } from "../internal"
 
 let generatorId = 0
 
+export function FlowCancellationError() {
+    this.message = "FLOW_CANCELLED"
+}
+FlowCancellationError.prototype = Object.create(Error.prototype)
+
+export function isFlowCancellationError(error: Error) {
+    return error instanceof FlowCancellationError
+}
+
 export type CancellablePromise<T> = Promise<T> & { cancel(): void }
 
-export interface FlowYield {
-    // fake, only for typing
-    "!!flowYield": undefined
-}
-
-export interface FlowReturn<T> {
-    // fake, only for typing
-    "!!flowReturn": T
-}
-
-// we skip promises that are the result of yielding promises (except if they use flowReturn)
-export type FlowReturnType<R> = IfAllAreFlowYieldThenVoid<
-    R extends FlowReturn<infer FR>
-        ? FR extends Promise<infer FRP>
-            ? FRP
-            : FR
-        : R extends Promise<any>
-        ? FlowYield
-        : R
->
-
-// we extract yielded promises from the return type
-export type IfAllAreFlowYieldThenVoid<R> = Exclude<R, FlowYield> extends never
-    ? void
-    : Exclude<R, FlowYield>
-
 export function flow<R, Args extends any[]>(
-    generator: (...args: Args) => IterableIterator<R>
-): (...args: Args) => CancellablePromise<FlowReturnType<R>> {
+    generator: (...args: Args) => Generator<any, R, any> | AsyncGenerator<any, R, any>
+): (...args: Args) => CancellablePromise<R> {
     if (arguments.length !== 1)
-        fail(
-            !!process.env.NODE_ENV && `Flow expects one 1 argument and cannot be used as decorator`
-        )
+        fail(!!process.env.NODE_ENV && `Flow expects 1 argument and cannot be used as decorator`)
     const name = generator.name || "<unnamed flow>"
 
     // Implementation based on https://github.com/tj/co/blob/master/index.js
@@ -44,10 +25,9 @@ export function flow<R, Args extends any[]>(
         const ctx = this
         const args = arguments
         const runId = ++generatorId
-        const gen = action(`${name} - runid: ${runId} - init`, generator).apply(
-            ctx,
-            (args as any) as Args
-        )
+        const gen = action(`${name} - runid: ${runId} - init`, generator as (
+            ...args: Args
+        ) => Generator<any, R, any>).apply(ctx, (args as any) as Args)
         let rejector: (error: any) => void
         let pendingPromise: CancellablePromise<any> | undefined = undefined
 
@@ -102,18 +82,18 @@ export function flow<R, Args extends any[]>(
             try {
                 if (pendingPromise) cancelPromise(pendingPromise)
                 // Finally block can return (or yield) stuff..
-                const res = gen.return!()
+                const res = gen.return!(undefined as any)
                 // eat anything that promise would do, it's cancelled!
                 const yieldedPromise = Promise.resolve(res.value)
                 yieldedPromise.then(noop, noop)
                 cancelPromise(yieldedPromise) // maybe it can be cancelled :)
                 // reject our original promise
-                rejector(new Error("FLOW_CANCELLED"))
+                rejector(new FlowCancellationError())
             } catch (e) {
                 rejector(e) // there could be a throwing finally block
             }
         })
-        return promise as CancellablePromise<FlowReturnType<R>>
+        return promise as CancellablePromise<R>
     }
 }
 

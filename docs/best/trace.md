@@ -5,6 +5,7 @@ hide_title: true
 ---
 
 # Using `trace` for debugging
+
 <div id='codefund' ></div>
 
 Trace is a small utility that helps to find out why your computed values, reactions or components are re-evaluating.

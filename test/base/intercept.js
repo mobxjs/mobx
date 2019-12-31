@@ -196,3 +196,32 @@ test("intercept map", () => {
     expect(a.has("b")).toBe(false)
     expect(a.get("c")).toBe(undefined)
 })
+
+test("intercept prevent dispose from breaking current execution", () => {
+    const a = m.observable.box(1)
+
+    intercept(a, c => {
+        c.newValue += 1
+        return c
+    })
+
+    const d = intercept(a, c => {
+        d()
+        expect(c.object).toBe(a)
+        c.newValue *= 2
+        return c
+    })
+
+    intercept(a, c => {
+        c.newValue += 1
+        return c
+    })
+
+    a.set(2)
+
+    expect(a.get()).toBe(7)
+
+    a.set(2)
+
+    expect(a.get()).toBe(4)
+})

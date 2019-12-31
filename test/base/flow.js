@@ -1,5 +1,5 @@
 import * as mobx from "../../src/mobx.ts"
-import { flow } from "../../src/mobx"
+import { flow, FlowCancellationError, isFlowCancellationError } from "../../src/mobx"
 
 function delay(time, value, shouldThrow = false) {
     return new Promise((resolve, reject) => {
@@ -160,7 +160,30 @@ function stripEvents(events) {
     })
 }
 
-test("flows can be cancelled - 1 - uncatched cancellation", done => {
+test("flows are cancelled with an instance of FlowCancellationError", async () => {
+    const start = flow(function*() {
+        yield Promise.resolve()
+    })
+
+    const promise = start()
+
+    promise.cancel()
+    await expect(promise).rejects.toBeInstanceOf(FlowCancellationError)
+})
+
+test("FlowCancellationError sanity check", () => {
+    const cancellationError = new FlowCancellationError()
+    expect(cancellationError).toBeInstanceOf(Error)
+    expect(cancellationError).toBeInstanceOf(FlowCancellationError)
+    expect(cancellationError.message).toBe("FLOW_CANCELLED")
+})
+
+test("isFlowCancellationError returns true iff the argument is a FlowCancellationError", () => {
+    expect(isFlowCancellationError(new FlowCancellationError())).toBe(true)
+    expect(isFlowCancellationError(new Error("some random error"))).toBe(false)
+})
+
+test("flows can be cancelled - 1 - uncaught cancellation", done => {
     let steps = 0
     const start = flow(function*() {
         steps = 1
@@ -209,7 +232,7 @@ test("flows can be cancelled - 2 - finally clauses are run", done => {
     promise.cancel()
 })
 
-test("flows can be cancelled - 3 - throw in finally should be catched", done => {
+test("flows can be cancelled - 3 - throw in finally should be caught", done => {
     const counter = mobx.observable({ counter: 0 })
     const d = mobx.reaction(() => counter.counter, () => {})
     mobx.configure({ enforceActions: "observed" })
@@ -244,7 +267,7 @@ test("flows can be cancelled - 4 - pending Promise will be ignored", done => {
     let steps = 0
     const start = flow(function*() {
         steps = 1
-        yield Promise.reject("This won't be catched anywhere!") // cancel will resolve this flow before this one is throw, so this promise goes uncatched
+        yield Promise.reject("This won't be caught anywhere!") // cancel will resolve this flow before this one is throw, so this promise goes uncaught
         steps = 2
     })
 

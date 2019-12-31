@@ -139,16 +139,24 @@ export class MobXGlobals {
      * they are not the cause, see: https://github.com/mobxjs/mobx/issues/1836
      */
     suppressReactionErrors = false
+}
 
-    /*
-     * Current action id.
-     */
-    currentActionId = 0
+declare const window: any
+declare const self: any
 
-    /*
-     * Next action id.
-     */
-    nextActionId = 1
+const mockGlobal = {}
+
+export function getGlobal() {
+    if (typeof window !== "undefined") {
+        return window
+    }
+    if (typeof global !== "undefined") {
+        return global
+    }
+    if (typeof self !== "undefined") {
+        return self
+    }
+    return mockGlobal
 }
 
 let canMergeGlobalState = true
@@ -207,18 +215,4 @@ export function resetGlobalState() {
     for (let key in defaultGlobals)
         if (persistentKeys.indexOf(key as any) === -1) globalState[key] = defaultGlobals[key]
     globalState.allowStateChanges = !globalState.enforceActions
-}
-
-declare const window: any
-
-const mockGlobal = {}
-
-export function getGlobal() {
-    if (typeof window !== "undefined") {
-        return window
-    }
-    if (typeof global !== "undefined") {
-        return global
-    }
-    return mockGlobal
 }

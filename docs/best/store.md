@@ -5,6 +5,7 @@ hide_title: true
 ---
 
 # Best Practices for building large scale maintainable projects
+
 <div id='codefund' ></div>
 
 This section contains some best practices we discovered at Mendix while working with MobX.
@@ -29,19 +30,20 @@ This store typically doesn't have much logic in it, but will store a plethora of
 This is ideal as most applications will change the UI state often during the development process.
 
 Things you will typically find in UI stores:
-* Session information
-* Information about how far your application has loaded
-* Information that will not be stored in the backend
-* Information that affects the UI globally
-  * Window dimensions
-  * Accessibility information
-  * Current language
-  * Currently active theme
-* User interface state as soon as it affects multiple, further unrelated components:
-  * Current selection
-  * Visibility of toolbars, etc.
-  * State of a wizard
-  * State of a global overlay
+
+-   Session information
+-   Information about how far your application has loaded
+-   Information that will not be stored in the backend
+-   Information that affects the UI globally
+    -   Window dimensions
+    -   Accessibility information
+    -   Current language
+    -   Currently active theme
+-   User interface state as soon as it affects multiple, further unrelated components:
+    -   Current selection
+    -   Visibility of toolbars, etc.
+    -   State of a wizard
+    -   State of a global overlay
 
 It might very well be that these pieces of information start as internal state of a specific component (for example the visibility of a toolbar).
 But after a while you discover that you need this information somewhere else in your application.
@@ -53,24 +55,24 @@ You might distribute the _ui-state-store_ through your application by passing it
 Example of a store (using ES6 syntax):
 
 ```javascript
-import {observable, computed, asStructure} from 'mobx';
-import jquery from 'jquery';
+import { observable, computed, asStructure } from "mobx"
+import jquery from "jquery"
 
 export class UiState {
-    @observable language = "en_US";
-    @observable pendingRequestCount = 0;
+    @observable language = "en_US"
+    @observable pendingRequestCount = 0
 
     // .struct makes sure observer won't be signaled unless the
     // dimensions object changed in a deepEqual manner
     @observable.struct windowDimensions = {
         width: jquery(window).width(),
         height: jquery(window).height()
-    };
+    }
 
-	constructor() {
+    constructor() {
         jquery.resize(() => {
-            this.windowDimensions = getWindowDimensions();
-        });
+            this.windowDimensions = getWindowDimensions()
+        })
     }
 
     @computed get appIsInSync() {
@@ -93,16 +95,17 @@ As a rule of thumb: if the nature of the relationship between two items is conta
 So a store just manages _domain objects_.
 
 These are the responsibilities of a store:
-* Instantiate domain objects. Make sure domain objects know the store they belong to.
-* Make sure there is only one instance of each of your domain objects.
-The same user, order or todo should not be stored twice in memory.
-This way you can safely use references and also be sure you are looking at the latest instance, without ever having to resolve a reference.
-This is fast, straightforward and convenient when debugging.
-* Provide backend integration. Store data when needed.
-* Update existing instances if updates are received from the backend.
-* Provide a stand-alone, universal, testable component of your application.
-* To make sure your store is testable and can be run server-side, you probably will move doing actual websocket / http requests to a separate object so that you can abstract over your communication layer.
-* There should be only one instance of a store.
+
+-   Instantiate domain objects. Make sure domain objects know the store they belong to.
+-   Make sure there is only one instance of each of your domain objects.
+    The same user, order or todo should not be stored twice in memory.
+    This way you can safely use references and also be sure you are looking at the latest instance, without ever having to resolve a reference.
+    This is fast, straightforward and convenient when debugging.
+-   Provide backend integration. Store data when needed.
+-   Update existing instances if updates are received from the backend.
+-   Provide a stand-alone, universal, testable component of your application.
+-   To make sure your store is testable and can be run server-side, you probably will move doing actual websocket / http requests to a separate object so that you can abstract over your communication layer.
+-   There should be only one instance of a store.
 
 ### Domain objects
 
@@ -117,44 +120,46 @@ your business rules, actions and user interface.
 
 Domain objects can delegate all their logic to the store they belong to if that suits your application well.
 It is possible to express your domain objects as plain objects, but classes have some important advantages over plain objects:
-* They can have methods.
-This makes your domain concepts easier to use stand-alone and reduces the amount of contextual awareness that is needed in your application.
-Just pass objects around.
-You don't have to pass stores around, or have to figure out which actions can be applied to an object if they are just available as instance methods.
-Especially in large applications this is important.
-* They offer fine grained control over the visibility of attributes and methods.
-* Objects created using a constructor function can freely mix observable properties and functions, and non-observable properties and methods.
-* They are easily recognizable and can strictly be type-checked.
 
+-   They can have methods.
+    This makes your domain concepts easier to use stand-alone and reduces the amount of contextual awareness that is needed in your application.
+    Just pass objects around.
+    You don't have to pass stores around, or have to figure out which actions can be applied to an object if they are just available as instance methods.
+    Especially in large applications this is important.
+-   They offer fine grained control over the visibility of attributes and methods.
+-   Objects created using a constructor function can freely mix observable properties and functions, and non-observable properties and methods.
+-   They are easily recognizable and can strictly be type-checked.
 
 ### Example domain store
 
 ```javascript
-import {observable, autorun} from 'mobx';
-import uuid from 'node-uuid';
+import { observable, autorun } from "mobx"
+import uuid from "node-uuid"
 
 export class TodoStore {
-    authorStore;
-    transportLayer;
-    @observable todos = [];
-    @observable isLoading = true;
+    authorStore
+    transportLayer
+    @observable todos = []
+    @observable isLoading = true
 
     constructor(transportLayer, authorStore) {
-        this.authorStore = authorStore; // Store that can resolve authors for us
-        this.transportLayer = transportLayer; // Thing that can make server requests for us
-        this.transportLayer.onReceiveTodoUpdate(updatedTodo => this.updateTodoFromServer(updatedTodo));
-        this.loadTodos();
+        this.authorStore = authorStore // Store that can resolve authors for us
+        this.transportLayer = transportLayer // Thing that can make server requests for us
+        this.transportLayer.onReceiveTodoUpdate(updatedTodo =>
+            this.updateTodoFromServer(updatedTodo)
+        )
+        this.loadTodos()
     }
 
     /**
      * Fetches all todos from the server
      */
     loadTodos() {
-        this.isLoading = true;
+        this.isLoading = true
         this.transportLayer.fetchTodos().then(fetchedTodos => {
-            fetchedTodos.forEach(json => this.updateTodoFromServer(json));
-            this.isLoading = false;
-        });
+            fetchedTodos.forEach(json => this.updateTodoFromServer(json))
+            this.isLoading = false
+        })
     }
 
     /**
@@ -163,15 +168,15 @@ export class TodoStore {
      * or remove a todo if it has been deleted on the server.
      */
     updateTodoFromServer(json) {
-        var todo = this.todos.find(todo => todo.id === json.id);
+        var todo = this.todos.find(todo => todo.id === json.id)
         if (!todo) {
-            todo = new Todo(this, json.id);
-            this.todos.push(todo);
+            todo = new Todo(this, json.id)
+            this.todos.push(todo)
         }
         if (json.isDeleted) {
-            this.removeTodo(todo);
+            this.removeTodo(todo)
         } else {
-            todo.updateFromJson(json);
+            todo.updateFromJson(json)
         }
     }
 
@@ -179,71 +184,70 @@ export class TodoStore {
      * Creates a fresh todo on the client and server
      */
     createTodo() {
-        var todo = new Todo(this);
-        this.todos.push(todo);
-        return todo;
+        var todo = new Todo(this)
+        this.todos.push(todo)
+        return todo
     }
 
     /**
      * A todo was somehow deleted, clean it from the client memory
      */
     removeTodo(todo) {
-        this.todos.splice(this.todos.indexOf(todo), 1);
-        todo.dispose();
+        this.todos.splice(this.todos.indexOf(todo), 1)
+        todo.dispose()
     }
 }
 
 export class Todo {
-
     /**
      * unique id of this todo, immutable.
      */
-    id = null;
+    id = null
 
-    @observable completed = false;
-    @observable task = "";
+    @observable completed = false
+    @observable task = ""
 
     /**
      * reference to an Author object (from the authorStore)
      */
-    @observable author = null;
+    @observable author = null
 
-    store = null;
+    store = null
 
     /**
      * Indicates whether changes in this object
      * should be submitted to the server
      */
-    autoSave = true;
+    autoSave = true
 
     /**
      * Disposer for the side effect that automatically
      * stores this Todo, see @dispose.
      */
-    saveHandler = null;
+    saveHandler = null
 
-    constructor(store, id=uuid.v4()) {
-        this.store = store;
-        this.id = id;
+    constructor(store, id = uuid.v4()) {
+        this.store = store
+        this.id = id
 
         this.saveHandler = reaction(
             // observe everything that is used in the JSON:
             () => this.asJson,
             // if autoSave is on, send json to server
-            (json) => {
+            json => {
                 if (this.autoSave) {
-                    this.store.transportLayer.saveTodo(json);
+                    this.store.transportLayer.saveTodo(json)
                 }
             }
-        );
+        )
     }
 
     /**
      * Remove this todo from the client and server
      */
     delete() {
-        this.store.transportLayer.deleteTodo(this.id);
-        this.store.removeTodo(this);
+        this.store.transportLayer.deleteTodo(this.id)
+        this.store.removeTodo(this)
     }
 
     @computed get asJson() {
@@ -252,7 +256,7 @@ export class Todo {
             completed: this.completed,
             task: this.task,
             authorId: this.author ? this.author.id : null
-        };
+        }
     }
 
     /**
@@ -260,16 +264,16 @@ export class Todo {
      */
     updateFromJson(json) {
         // make sure our changes aren't sent back to the server
-        this.autoSave = false;
-        this.completed = json.completed;
-        this.task = json.task;
-        this.author = this.store.authorStore.resolveAuthor(json.authorId);
-        this.autoSave = true;
+        this.autoSave = false
+        this.completed = json.completed
+        this.task = json.task
+        this.author = this.store.authorStore.resolveAuthor(json.authorId)
+        this.autoSave = true
     }
 
     dispose() {
         // clean up the observer
-        this.saveHandler();
+        this.saveHandler()
     }
 }
 ```
@@ -288,29 +292,29 @@ Example:
 
 ```javascript
 class RootStore {
-  constructor() {
-    this.userStore = new UserStore(this)
-    this.todoStore = new TodoStore(this)
-  }
+    constructor() {
+        this.userStore = new UserStore(this)
+        this.todoStore = new TodoStore(this)
+    }
 }
 
 class UserStore {
-  constructor(rootStore) {
-    this.rootStore = rootStore
-  }
+    constructor(rootStore) {
+        this.rootStore = rootStore
+    }
 
-  getTodos(user) {
-    // access todoStore through the root store
-    return this.rootStore.todoStore.todos.filter(todo => todo.author === user)
-  }
+    getTodos(user) {
+        // access todoStore through the root store
+        return this.rootStore.todoStore.todos.filter(todo => todo.author === user)
+    }
 }
 
 class TodoStore {
-  @observable todos = []
+    @observable todos = []
 
-  constructor(rootStore) {
-    this.rootStore = rootStore
-  }
+    constructor(rootStore) {
+        this.rootStore = rootStore
+    }
 }
 ```
 

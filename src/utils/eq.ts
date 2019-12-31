@@ -9,13 +9,13 @@ import {
 declare const Symbol
 const toString = Object.prototype.toString
 
-export function deepEqual(a: any, b: any): boolean {
-    return eq(a, b)
+export function deepEqual(a: any, b: any, depth: number = -1): boolean {
+    return eq(a, b, depth)
 }
 
 // Copied from https://github.com/jashkenas/underscore/blob/5c237a7c682fb68fd5378203f0bf22dce1624854/underscore.js#L1186-L1289
 // Internal recursive comparison function for `isEqual`.
-function eq(a: any, b: any, aStack?: any[], bStack?: any[]) {
+function eq(a: any, b: any, depth: number, aStack?: any[], bStack?: any[]) {
     // Identical objects are equal. `0 === -0`, but they aren't identical.
     // See the [Harmony `egal` proposal](http://wiki.ecmascript.org/doku.php?id=harmony:egal).
     if (a === b) return a !== 0 || 1 / a === 1 / b
@@ -26,14 +26,7 @@ function eq(a: any, b: any, aStack?: any[], bStack?: any[]) {
     // Exhaust primitive checks
     const type = typeof a
     if (type !== "function" && type !== "object" && typeof b != "object") return false
-    return deepEq(a, b, aStack, bStack)
-}
 
-// Internal recursive comparison function for `isEqual`.
-function deepEq(a: any, b: any, aStack?: any[], bStack?: any[]) {
-    // Unwrap any wrapped objects.
-    a = unwrap(a)
-    b = unwrap(b)
     // Compare `[[Class]]` names.
     const className = toString.call(a)
     if (className !== toString.call(b)) return false
@@ -61,7 +54,18 @@ function deepEq(a: any, b: any, aStack?: any[], bStack?: any[]) {
             return (
                 typeof Symbol !== "undefined" && Symbol.valueOf.call(a) === Symbol.valueOf.call(b)
             )
+        case "[object Map]":
+        case "[object Set]":
+            // Maps and Sets are unwrapped to arrays of entry-pairs, adding an incidental level.
+            // Hide this extra level by increasing the depth.
+            if (depth >= 0) {
+                depth++
+            }
+            break
     }
+    // Unwrap any wrapped objects.
+    a = unwrap(a)
+    b = unwrap(b)
 
     const areArrays = className === "[object Array]"
     if (!areArrays) {
@@ -84,6 +88,13 @@ function deepEq(a: any, b: any, aStack?: any[], bStack?: any[]) {
             return false
         }
     }
+
+    if (depth === 0) {
+        return false
+    } else if (depth < 0) {
+        depth = -1
+    }
+
     // Assume equality for cyclic structures. The algorithm for detecting cyclic
     // structures is adapted from ES 5.1 section 15.12.3, abstract operation `JO`.
 
@@ -109,7 +120,7 @@ function deepEq(a: any, b: any, aStack?: any[], bStack?: any[]) {
         if (length !== b.length) return false
         // Deep compare the contents, ignoring non-numeric properties.
         while (length--) {
-            if (!eq(a[length], b[length], aStack, bStack)) return false
+            if (!eq(a[length], b[length], depth - 1, aStack, bStack)) return false
         }
     } else {
         // Deep compare objects.
@@ -121,7 +132,7 @@ function deepEq(a: any, b: any, aStack?: any[], bStack?: any[]) {
         while (length--) {
             // Deep compare each member
             key = keys[length]
-            if (!(has(b, key) && eq(a[key], b[key], aStack, bStack))) return false
+            if (!(has(b, key) && eq(a[key], b[key], depth - 1, aStack, bStack))) return false
         }
     }
     // Remove the first object from the stack of traversed objects.

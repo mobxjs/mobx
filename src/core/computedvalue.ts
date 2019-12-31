@@ -72,7 +72,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     newObserving = null // during tracking it's an array with new observed observers
     isBeingObserved = false
     isPendingUnobservation: boolean = false
-    observers = new Set()
+    observers = new Set<IDerivation>()
     diffValue = 0
     runId = 0
     lastAccessedBy = 0
@@ -105,8 +105,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
      * This is useful for working with vectors, mouse coordinates etc.
      */
     constructor(options: IComputedValueOptions<T>) {
-        if (process.env.NODE_ENV !== "production" && !options.get)
-            throw "[mobx] missing option for computed: get"
+        invariant(options.get, "missing option for computed: get")
         this.derivation = options.get!
         this.name = options.name || "ComputedValue@" + getNextId()
         if (options.set) this.setter = createAction(this.name + "-setter", options.set) as any

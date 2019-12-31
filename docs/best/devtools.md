@@ -5,6 +5,7 @@ hide_title: true
 ---
 
 # MobX + React DevTools
+
 <div id='codefund' ></div>
 
 <details>
@@ -15,7 +16,6 @@ hide_title: true
     </div>
     <a style="font-style:italic;padding:5px;margin:5px;"  href="https://egghead.io/lessons/react-analyze-react-components-with-mobx-react-devtools">Hosted on egghead.io</a>
 </details>
-
 
 MobX ships with DevTools that can be used to track the rendering behavior and data dependencies of your app.
 

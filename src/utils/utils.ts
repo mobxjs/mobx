@@ -8,7 +8,7 @@ import {
 } from "../internal"
 
 export const OBFUSCATED_ERROR =
-    "An invariant failed, however the error is obfuscated because this is an production build."
+    "An invariant failed, however the error is obfuscated because this is a production build."
 
 export const EMPTY_ARRAY = []
 Object.freeze(EMPTY_ARRAY)

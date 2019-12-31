@@ -58,7 +58,7 @@
       },
       "README": {
         "title": "Introduction",
-        "sidebar_label": "Introduction"
+        "sidebar_label": "One page summary"
       },
       "refguide/action": {
         "title": "action",
@@ -100,6 +100,10 @@
         "title": "refguide/extending",
         "sidebar_label": "createAtom"
       },
+      "refguide/inject": {
+        "title": "provider_inject",
+        "sidebar_label": "Provider / inject"
+      },
       "refguide/map": {
         "title": "Observable Maps",
         "sidebar_label": "maps"
@@ -109,8 +113,8 @@
         "sidebar_label": "MobX-utils"
       },
       "refguide/modifiers": {
-        "title": "Decorators",
-        "sidebar_label": "decorators"
+        "title": "Modifiers",
+        "sidebar_label": "modifiers"
       },
       "refguide/object-api": {
         "title": "Object api",
@@ -121,7 +125,7 @@
         "sidebar_label": "objects"
       },
       "refguide/observable-decorator": {
-        "title": "@obsevable",
+        "title": "@observable",
         "sidebar_label": "@observable"
       },
       "refguide/observable": {
@@ -133,8 +137,8 @@
         "sidebar_label": "intercept & observe"
       },
       "refguide/observer-component": {
-        "title": "(@)observer",
-        "sidebar_label": "(@)observer"
+        "title": "(@)observer components",
+        "sidebar_label": "(@)observer components"
       },
       "refguide/reaction": {
         "title": "reaction",
@@ -161,8 +165,8 @@
       "Introduction": "Introduction",
       "Making things observable": "Making things observable",
       "Reacting to observables": "Reacting to observables",
-      "Changing observables": "Changing observables",
-      "Utility functions": "Utility functions",
+      "Updating observables": "Updating observables",
+      "Utilities": "Utilities",
       "Tips & Tricks": "Tips & Tricks"
     }
   },

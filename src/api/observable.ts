@@ -69,8 +69,8 @@ function getEnhancerFromOptions(options: CreateObservableOptions): IEnhancer<any
     return options.defaultDecorator
         ? options.defaultDecorator.enhancer
         : options.deep === false
-            ? referenceEnhancer
-            : deepEnhancer
+        ? referenceEnhancer
+        : deepEnhancer
 }
 
 /**
@@ -79,7 +79,7 @@ function getEnhancerFromOptions(options: CreateObservableOptions): IEnhancer<any
  */
 function createObservable(v: any, arg2?: any, arg3?: any) {
     // @observable someProp;
-    if (typeof arguments[1] === "string") {
+    if (typeof arguments[1] === "string" || typeof arguments[1] === "symbol") {
         return deepDecorator.apply(null, arguments as any)
     }
 
@@ -90,12 +90,12 @@ function createObservable(v: any, arg2?: any, arg3?: any) {
     const res = isPlainObject(v)
         ? observable.object(v, arg2, arg3)
         : Array.isArray(v)
-            ? observable.array(v, arg2)
-            : isES6Map(v)
-                ? observable.map(v, arg2)
-                : isES6Set(v)
-                    ? observable.set(v, arg2)
-                    : v
+        ? observable.array(v, arg2)
+        : isES6Map(v)
+        ? observable.map(v, arg2)
+        : isES6Set(v)
+        ? observable.set(v, arg2)
+        : v
 
     // this value could be converted to a new observable data structure, return it
     if (res !== v) return res

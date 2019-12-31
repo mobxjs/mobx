@@ -5,6 +5,7 @@ hide_title: true
 ---
 
 # What does MobX react to?
+
 <div id='codefund' ></div>
 
 MobX usually reacts to exactly the things you expect it to.
@@ -14,13 +15,14 @@ At that point it is invaluable to understand how MobX determines what to react t
 
 > MobX reacts to any _existing_ **observable** _property_ that is read during the execution of a tracked function.
 
-* _"reading"_ is dereferencing an object's property, which can be done through "dotting into" it (eg. `user.name`) or using the bracket notation (eg. `user['name']`).
-* _"trackable functions"_ are the expression of `computed`, the `render()` method of an observer component, and the functions that are passed as the first param to `when`, `reaction` and `autorun`.
-* _"during"_ means that only those observables that are being read while the function is executing are tracked. It doesn't matter whether these values are used directly or indirectly by the tracked function.
+-   _"reading"_ is dereferencing an object's property, which can be done through "dotting into" it (eg. `user.name`) or using the bracket notation (eg. `user['name']`).
+-   _"tracked functions"_ are the expression of `computed`, the `render()` method of an observer component, and the functions that are passed as the first param to `when`, `reaction` and `autorun`.
+-   _"during"_ means that only those observables that are being read while the function is executing are tracked. It doesn't matter whether these values are used directly or indirectly by the tracked function.
 
 In other words, MobX will not react to:
- * Values that are obtained from observables, but outside a tracked function
- * Observables that are read in an asynchronously invoked code block
+
+-   Values that are obtained from observables, but outside a tracked function
+-   Observables that are read in an asynchronously invoked code block
 
 ## MobX tracks property access, not values
 
@@ -32,9 +34,7 @@ let message = observable({
     author: {
         name: "Michel"
     },
-    likes: [
-        "John", "Sara"
-    ]
+    likes: ["John", "Sara"]
 })
 ```
 
@@ -94,18 +94,17 @@ message = observable({ title: "Bar" })
 This will **not** react. `message` was changed, but `message` is not an observable, just a variable which _refers to_ an observable,
 but the variable (reference) itself is not observable.
 
-
 #### Incorrect: dereference outside a tracked function
 
 ```javascript
-var title = message.title;
+var title = message.title
 autorun(() => {
     console.log(title)
 })
 message.title = "Bar"
 ```
 
-This will **not** react. `message.title` was dereferenced outside the `autorun`, and just contains the value of `message.title` at the  moment of dereferencing (the string `"Foo"`).
+This will **not** react. `message.title` was dereferenced outside the `autorun`, and just contains the value of `message.title` at the moment of dereferencing (the string `"Foo"`).
 `title` is not an observable so `autorun` will never react.
 
 #### Correct: dereference inside the tracked function
@@ -114,8 +113,8 @@ This will **not** react. `message.title` was dereferenced outside the `autorun`,
 autorun(() => {
     console.log(message.author.name)
 })
-message.author.name = "Sara";
-message.author = { name: "John" };
+message.author.name = "Sara"
+message.author = { name: "John" }
 ```
 
 This will react to both changes. Both `author` and `author.name` are dotted into, allowing MobX to track these references.
@@ -123,12 +122,12 @@ This will react to both changes. Both `author` and `author.name` are dotted into
 #### Incorrect: store a local reference to an observable object without tracking
 
 ```javascript
-const author = message.author;
+const author = message.author
 autorun(() => {
     console.log(author.name)
 })
-message.author.name = "Sara";
-message.author = { name: "John" };
+message.author.name = "Sara"
+message.author = { name: "John" }
 ```
 
 The first change will be picked up, `message.author` and `author` are the same object, and the `.name` property is dereferenced in the autorun.
@@ -164,7 +163,7 @@ autorun(() => {
 })
 
 autorun(() => {
-    console.log({...message}) // creates a shallow clone, also using `.title` in the process
+    console.log({ ...message }) // creates a shallow clone, also using `.title` in the process
 })
 
 autorun(() => {
@@ -174,25 +173,24 @@ autorun(() => {
 
 #### Correct: access array properties in tracked function
 
-
 ```javascript
 autorun(() => {
-    console.log(message.likes.length);
+    console.log(message.likes.length)
 })
-message.likes.push("Jennifer");
+message.likes.push("Jennifer")
 ```
 
 This will react as expected. `.length` counts towards a property.
-Note that this will react to *any* change in the array.
+Note that this will react to _any_ change in the array.
 Arrays are not tracked per index / property (like observable objects and maps) but as a whole.
 
 #### Incorrect: access out-of-bounds indices in tracked function
 
 ```javascript
 autorun(() => {
-    console.log(message.likes[0]);
+    console.log(message.likes[0])
 })
-message.likes.push("Jennifer");
+message.likes.push("Jennifer")
 ```
 
 This will react with the above sample data, array indexers count as property access. But **only** if the provided `index < length`.
@@ -203,9 +201,9 @@ So always guard your array index based access with a `.length` check.
 
 ```javascript
 autorun(() => {
-    console.log(message.likes.join(", "));
+    console.log(message.likes.join(", "))
 })
-message.likes.push("Jennifer");
+message.likes.push("Jennifer")
 ```
 
 This will react as expected. All array functions that do not mutate the array are tracked automatically.
@@ -214,9 +212,9 @@ This will react as expected. All array functions that do not mutate the array ar
 
 ```javascript
 autorun(() => {
-    console.log(message.likes.join(", "));
+    console.log(message.likes.join(", "))
 })
-message.likes[2] = "Jennifer";
+message.likes[2] = "Jennifer"
 ```
 
 This will react as expected. All array index assignments are detected, but only if `index <= length`.
@@ -225,16 +223,15 @@ This will react as expected. All array index assignments are detected, but only 
 
 ```javascript
 autorun(() => {
-    message.likes;
+    message.likes
 })
-message.likes.push("Jennifer");
+message.likes.push("Jennifer")
 ```
 
 This will **not** react. Simply because the `likes` array itself is not being used by the `autorun`, only the reference to the array.
 So in contrast, `messages.likes = ["Jennifer"]` would be picked up; that statement does not modify the array, but the `likes` property itself.
 
 #### Using non-observable object properties
-
 
 ```javascript
 autorun(() => {
@@ -252,7 +249,7 @@ However, it is possible to use the `get` and `set` methods as exposed by MobX to
 autorun(() => {
     console.log(get(message, "postDate"))
 })
-set(message, "postDate",  new Date())
+set(message, "postDate", new Date())
 ```
 
 _MobX 5_
@@ -275,12 +272,11 @@ extendObservable(message, {
 This will **not** react. MobX will not react to observable properties that did not exist when tracking started.
 If the two statements are swapped, or if any other observable causes the `autorun` to re-run, the `autorun` will start tracking the `postDate` as well.
 
-
 #### Correct: using not yet existing map entries
 
 ```javascript
 const twitterUrls = observable.map({
-    "John": "twitter.com/johnny"
+    John: "twitter.com/johnny"
 })
 
 autorun(() => {
@@ -298,18 +294,17 @@ So for dynamically keyed collections, always use observable maps.
 
 Since MobX 4 it is also possible to use observable objects as dynamic collection, if they are read / updated by using the mobx apis, so that mobx can keep track of the property changes. The following will react as well:
 
-
 ```javascript
 import { get, set, observable } from "mobx"
 
 const twitterUrls = observable.object({
-    "John": "twitter.com/johnny"
+    John: "twitter.com/johnny"
 })
 
 autorun(() => {
     console.log(get(twitterUrls, "Sara")) // get can track not yet existing properties
 })
-set(twitterUrls, { "Sara" : "twitter.com/horsejs"})
+set(twitterUrls, { Sara: "twitter.com/horsejs" })
 ```
 
 See the [object manipulation api](https://mobx.js.org/refguide/api.html#direct-observable-manipulation) for more details
@@ -318,28 +313,26 @@ See the [object manipulation api](https://mobx.js.org/refguide/api.html#direct-o
 
 ```javascript
 function upperCaseAuthorName(author) {
-    const baseName = author.name;
-    return baseName.toUpperCase();
+    const baseName = author.name
+    return baseName.toUpperCase()
 }
 autorun(() => {
     console.log(upperCaseAuthorName(message.author))
 })
 message.author.name = "Chesterton"
 ```
+
 This will react. Even though `author.name` is not dereferenced by the thunk passed to `autorun` itself,
 MobX will still track the dereferencing that happens in `upperCaseAuthorName`,
 because it happens _during_ the execution of the autorun.
 
-----
+---
 
 ```javascript
 autorun(() => {
-    setTimeout(
-        () => console.log(message.likes.join(", ")),
-        10
-    )
+    setTimeout(() => console.log(message.likes.join(", ")), 10)
 })
-message.likes.push("Jennifer");
+message.likes.push("Jennifer")
 ```
 
 This will **not** react, during the execution of the `autorun` no observables where accessed, only during the `setTimeout`.
@@ -353,11 +346,9 @@ but in practice is actually rendered out by a different component. This often ha
 Take for example the following contrived example:
 
 ```javascript
-const MyComponent = observer(({ message }) =>
-    <SomeContainer
-        title = {() => <div>{message.title}</div>}
-    />
-)
+const MyComponent = observer(({ message }) => (
+    <SomeContainer title={() => <div>{message.title}</div>} />
+))
 
 message.title = "Bar"
 ```
@@ -384,14 +375,9 @@ message.title = "Bar"
 Alternatively, to avoid creating additional components, it is also possible to use the mobx-react built-in `Observer` component, which takes no arguments, and a single render function as children:
 
 ```javascript
-const MyComponent = ({ message }) =>
-    <SomeContainer
-        title = {() =>
-            <Observer>
-                {() => <div>{message.title}</div>}
-            </Observer>
-        }
-    />
+const MyComponent = ({ message }) => (
+    <SomeContainer title={() => <Observer>{() => <div>{message.title}</div>}</Observer>} />
+)
 
 message.title = "Bar"
 ```
@@ -401,11 +387,12 @@ message.title = "Bar"
 A common mistake is to store local variables that dereference observables, and then expect components to react. For example:
 
 ```javascript
-@observer class MyComponent extends React.component {
-    author;
+@observer
+class MyComponent extends React.component {
+    author
     constructor(props) {
         super(props)
-        this.author = props.message.author;
+        this.author = props.message.author
     }
 
     render() {
@@ -432,37 +419,36 @@ This can simply be solved by doing the dereferencing inside `render()`, or by in
 Suppose that the following components are used to render our above `message` object.
 
 ```javascript
-const Message = observer(({ message }) =>
+const Message = observer(({ message }) => (
     <div>
         {message.title}
-        <Author author={ message.author } />
-        <Likes likes={ message.likes } />
+        <Author author={message.author} />
+        <Likes likes={message.likes} />
     </div>
-)
+))
 
-const Author = observer(({ author }) =>
-    <span>{author.name}</span>
-)
+const Author = observer(({ author }) => <span>{author.name}</span>)
 
-const Likes = observer(({ likes }) =>
+const Likes = observer(({ likes }) => (
     <ul>
-        {likes.map(like =>
+        {likes.map(like => (
             <li>{like}</li>
-        )}
+        ))}
     </ul>
-)
+))
 ```
 
-| change | re-rendering component |
-| --- | --- |
-| `message.title = "Bar"` | `Message` |
-| `message.author.name = "Susan"` | `Author` (`.author` is dereferenced in `Message`, but didn't change)* |
-| `message.author = { name: "Susan"}` | `Message`, `Author` |
-| `message.likes[0] = "Michel"` | `Likes` |
+| change                              | re-rendering component                                                 |
+| ----------------------------------- | ---------------------------------------------------------------------- |
+| `message.title = "Bar"`             | `Message`                                                              |
+| `message.author.name = "Susan"`     | `Author` (`.author` is dereferenced in `Message`, but didn't change)\* |
+| `message.author = { name: "Susan"}` | `Message`, `Author`                                                    |
+| `message.likes[0] = "Michel"`       | `Likes`                                                                |
 
 Notes:
+
 1. \* If the `Author` component was invoked like: `<Author author={ message.author.name} />`. Then `Message` would be the dereferencing component and react to changes to `message.author.name`. Nonetheless `<Author>` would rerender as well, because it receives a new value. So performance wise it is best to dereference as late as possible.
-2. \** If likes were objects instead of strings, and if they were rendered by their own `Like` component, the `Likes` component would not rerender for changes happening inside a specific like.
+2. \*\* If likes were objects instead of strings, and if they were rendered by their own `Like` component, the `Likes` component would not rerender for changes happening inside a specific like.
 
 ## TL;DR
 

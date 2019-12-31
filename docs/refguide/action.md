@@ -5,6 +5,7 @@ hide_title: true
 ---
 
 # action
+
 <div id='codefund' ></div>
 
 <details>
@@ -17,13 +18,14 @@ hide_title: true
 </details>
 
 Usage:
-* `action(fn)`
-* `action(name, fn)`
-* `@action classMethod() {}`
-* `@action(name) classMethod () {}`
-* `@action boundClassMethod = (args) => { body }`
-* `@action(name) boundClassMethod = (args) => { body }`
-* `@action.bound classMethod() {}`
+
+-   `action(fn)`
+-   `action(name, fn)`
+-   `@action classMethod() {}`
+-   `@action(name) classMethod () {}`
+-   `@action boundClassMethod = (args) => { body }`
+-   `@action(name) boundClassMethod = (args) => { body }`
+-   `@action.bound classMethod() {}`
 
 Any application has actions. Actions are anything that modify the state.
 With MobX you can make it explicit in your code where your actions live by marking them.
@@ -46,7 +48,6 @@ Note: using `action` is mandatory when MobX is configured to require actions to 
 Actions should only, and always, be used on functions that _modify_ state.
 Functions that just perform look-ups, filters etc should _not_ be marked as actions; to allow MobX to track their invocations.
 
-
 ["enforce actions"](api.md#configure) enforces that all state modifications are done by an action. This is a useful best practice in larger, long term code bases.
 
 ## Bound actions
@@ -59,12 +60,12 @@ Example:
 
 ```javascript
 class Ticker {
-	@observable tick = 0
+    @observable tick = 0
 
-	@action.bound
-	increment() {
-		this.tick++ // 'this' will always be correct
-	}
+    @action.bound
+    increment() {
+        this.tick++ // 'this' will always be correct
+    }
 }
 
 const ticker = new Ticker()
@@ -73,8 +74,6 @@ setInterval(ticker.increment, 1000)
 
 _Note: don't use *action.bound* with arrow functions; arrow functions are already bound and cannot be rebound._
 
-
 ## `runInAction(name?, thunk)`
 
 `runInAction` is a simple utility that takes an code block and executes in an (anonymous) action. This is useful to create and execute actions on the fly, for example inside an asynchronous process. `runInAction(f)` is sugar for `action(f)()`
-

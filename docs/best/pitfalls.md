@@ -5,6 +5,7 @@ hide_title: true
 ---
 
 # Common pitfalls & best practices
+
 <div id='codefund' ></div>
 
 Stuck with MobX? This section contains a list of common issues people new to MobX might run into.
@@ -50,12 +51,33 @@ So MobX observable objects act as records with predefined keys.
 You can use `extendObservable(target, props)` to introduce new observable properties to an object.
 However object iterators like `for .. in` or `Object.keys()` won't react to this automatically.
 If you need a dynamically keyed object in MobX 4 and lower, for example to store users by id, create observable _maps_ using [`observable.map`](../refguide/map.md) or use the utility methods as exposed by the [Object API](../refguide/object-api.md).
-For more info see [what will MobX react to?](react.md).
+For more info see [what will MobX react to?](https://mobx.js.org/best/react.html#what-does-mobx-react-to).
 
 ### Use `@observer` on all components that render `@observable`s.
 
 `@observer` only enhances the component you are decorating, not the components used inside it.
 So usually all your components should be decorated. Don't worry, this is not inefficient, in contrast, more `observer` components make rendering more efficient.
+
+### `@inject('store')` before `@observer` will cause MobX to not trigger 
+
+The effect with React is that the it will never render on observable changes.
+
+This is wrong
+```typescript
+@observer
+@inject('store')
+```
+It must be 
+```typescript
+@inject('store')
+@observer
+```
+
+You'll notice a warning
+```
+Mobx observer: You are trying to use 'observer' on a component that already has 'inject'. Please apply 'observer' before applying 'inject'
+```
+
 
 ### Don't copy observables properties and store them locally
 
@@ -63,22 +85,22 @@ Observer components only track data that is accessed _during_ the render method.
 
 ```javascript
 class User {
-  @observable name
+    @observable name
 }
 
 class Profile extends React.Component {
-  name
+    name
 
-  componentWillMount() {
-    // Wrong
-    // This dereferences user.name and just copies the value once! Future updates will not be tracked, as lifecycle hooks are not reactive
-    // assignments like these create redundant data
-    this.name = this.props.user.name
-  }
+    componentWillMount() {
+        // Wrong
+        // This dereferences user.name and just copies the value once! Future updates will not be tracked, as lifecycle hooks are not reactive
+        // assignments like these create redundant data
+        this.name = this.props.user.name
+    }
 
-  render() {
-    return <div>{this.name}</div>
-  }
+    render() {
+        return <div>{this.name}</div>
+    }
 }
 ```
 
@@ -86,25 +108,25 @@ The correct approach is either by not storing the values of observables locally 
 
 ```javascript
 class User {
-  @observable name
+    @observable name
 }
 
 class Profile extends React.Component {
-  @computed get name() {
-    // correct; computed property will track the `user.name` property
-    return this.props.user.name
-  }
+    @computed get name() {
+        // correct; computed property will track the `user.name` property
+        return this.props.user.name
+    }
 
-  render() {
-    return <div>{this.name}</div>
-  }
+    render() {
+        return <div>{this.name}</div>
+    }
 }
 ```
 
-### Render callbacks are *not* part of the render method
+### Render callbacks are _not_ part of the render method
 
 Because `observer` only applies to exactly the `render` function of the current component; passing a render callback or component to a child component doesn't become reactive automatically.
-For more details, see the [what will Mobx react to](https://github.com/mobxjs/mobx/blob/gh-pages/docs/best/react.md#mobx-only-tracks-data-accessed-for-observer-components-if-they-are-directly-accessed-by-render) guide.
+For more details, see the [what will Mobx react to](https://mobx.js.org/best/react.html#what-does-mobx-react-to) guide.
 
 ### Dereference values as late as possible
 
@@ -118,12 +140,12 @@ ReactDOM.render(<Timer timerData={timerData.secondsPassed} />, document.body)
 
 In this snippet just the current value of `secondsPassed` is passed to the `Timer`, which is the immutable value `0` (all primitives are immutable in JS).
 That number won't change anymore in the future, so `Timer` will never update. It is the property `secondsPassed` that will change in the future,
-so we need to access it *in* the component. Or in other words: always try to pass the owning object of an observable property.
-For more info see [what will MobX react to?](react.md).
+so we need to access it _in_ the component. Or in other words: always try to pass the owning object of an observable property.
+For more info see [what will MobX react to?](https://mobx.js.org/best/react.html#what-does-mobx-react-to).
 
 #### Computed values run more often than expected
 
-If a computed property is *not* in use by some reaction (`autorun`, `observer` etc), computed expressions will be evaluated lazily; each time their value is requested (so they just act as normal property).
+If a computed property is _not_ in use by some reaction (`autorun`, `observer` etc), computed expressions will be evaluated lazily; each time their value is requested (so they just act as normal property).
 Computed values will only track their dependencies if they are observed.
 This allows MobX to automatically suspend computations that are not actively in use.
 See this [blog](https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254) or [issue #356](https://github.com/mobxjs/mobx/issues/356) for an explanation.
@@ -145,11 +167,11 @@ So make sure to always dispose your reactions when you no longer need them!
 Example:
 
 ```javascript
-const VAT = observable(1.20)
+const VAT = observable(1.2)
 
 class OrderLine {
-    @observable price = 10;
-    @observable amount = 1;
+    @observable price = 10
+    @observable amount = 1
     constructor() {
         // this autorun will be GC-ed together with the current orderline instance
         this.handler = autorun(() => {
@@ -166,7 +188,6 @@ class OrderLine {
         // When the reaction is no longer needed!
     }
 }
-
 ```
 
 #### I have a weird exception when using `@observable` in a React component.
@@ -209,31 +230,28 @@ Observable arrays are actually objects, so they comply to `propTypes.object` ins
 
 ```javascript
 class ListStore {
-  @observable list = [
-    'Hello World!',
-    'Hello React Native!',
-    'Hello MobX!'
-  ];
+    @observable list = ["Hello World!", "Hello React Native!", "Hello MobX!"]
 
-  ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
+    ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 })
 
-  @computed get dataSource() {
-    return this.ds.cloneWithRows(this.list.slice());
-  }
+    @computed get dataSource() {
+        return this.ds.cloneWithRows(this.list.slice())
+    }
 }
 
-const listStore = new ListStore();
+const listStore = new ListStore()
 
-@observer class List extends Component {
-  render() {
-    return (
-      <ListView
-        dataSource={listStore.dataSource}
-        renderRow={row => <Text>{row}</Text>}
-        enableEmptySections={true}
-      />
-    );
-  }
+@observer
+class List extends Component {
+    render() {
+        return (
+            <ListView
+                dataSource={listStore.dataSource}
+                renderRow={row => <Text>{row}</Text>}
+                enableEmptySections={true}
+            />
+        )
+    }
 }
 ```
 
@@ -250,12 +268,12 @@ As mentioned above, all React components which used observable data should be ma
 ```js
 class ExampleComponent extends React.Component {
   @observable disposer // <--- this value is disposed in addActed
-  
+
   @action.bound
   addActed() {
     this.dispose()
   }
-  
+
   @action.bound
   componentDidMount() {
     this.disposer = this.observe(....) //<-- details don't matter
@@ -270,12 +288,12 @@ On the other hand, consider the following:
 ```js
 class ExampleComponent extends React.Component {
   @observable disposer // <--- this value is disposed in addActed
-  
+
   @action.bound
   componentWillUnmount() {
     this.dispose()
   }
-  
+
   @action.bound
   componentDidMount() {
     this.disposer = this.observe(....) //<-- details don't matter

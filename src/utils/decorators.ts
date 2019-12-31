@@ -57,8 +57,10 @@ export function initializeInstance(target: DecoratorTarget) {
     const decorators = target[mobxPendingDecorators]
     if (decorators) {
         addHiddenProp(target, mobxDidRunLazyInitializersSymbol, true)
-        for (let key in decorators) {
-            const d = decorators[key]
+        // Build property key array from both strings and symbols
+        const keys = [...Object.getOwnPropertySymbols(decorators), ...Object.keys(decorators)]
+        for (const key of keys) {
+            const d = decorators[key as any]
             d.propertyCreator(target, d.prop, d.descriptor, d.decoratorTarget, d.decoratorArguments)
         }
     }
@@ -113,7 +115,8 @@ export function createPropDecorator(
 
 export function quacksLikeADecorator(args: IArguments): boolean {
     return (
-        ((args.length === 2 || args.length === 3) && typeof args[1] === "string") ||
+        ((args.length === 2 || args.length === 3) &&
+            (typeof args[1] === "string" || typeof args[1] === "symbol")) ||
         (args.length === 4 && args[3] === true)
     )
 }

@@ -5,6 +5,7 @@ hide_title: true
 ---
 
 # Hot Module Reloading with Stateless Components
+
 <div id='codefund' ></div>
 
 One thing that can be a challenge when getting started with MobX (and React in general) is understanding why Hot Module Reloading (HMR) sometimes breaks. When you initially get it working, it seems like magic (and it kind of is), however there's at least one rough edge with regard to HMR and React: stateless components. Since stateless components don't explicitly identify themselves as React components, HMR doesn't quite know what to do with them, and so you'll often see warnings in your console like this:
@@ -24,10 +25,9 @@ Function declarations still do the exact same thing as arrow functions, but they
 For instance, here's a stateless component built with an arrow function:
 
 ```javascript
-const ToDoItem = observer(props => <div>{props.item}</div>);
+const ToDoItem = observer(props => <div>{props.item}</div>)
 
-export default ToDoItem;
-
+export default ToDoItem
 ```
 
 And here's how that will appear in the React DevTools:
@@ -38,11 +38,10 @@ On the other hand, using a function declaration will allow you to build the same
 
 ```javascript
 function ToDoItem(props) {
-  return <div>{props.item}</div>
+    return <div>{props.item}</div>
 }
 
-export default observer(ToDoItem);
-
+export default observer(ToDoItem)
 ```
 
 And now the component shows up correctly in the DevTools:
@@ -54,27 +53,26 @@ And now the component shows up correctly in the DevTools:
 By "stateful observer", all I really mean is a component created with `React.Component` or `React.createClass` and which uses the `@observer` decorator, like so:
 
 ```javascript
-import { observer } from 'mobx-react';
+import { observer } from "mobx-react"
 
 @observer
 class App extends React.Component {
-  constructor(props) {
-    super(props);
-    this.store = props.store;
-  }
+    constructor(props) {
+        super(props)
+        this.store = props.store
+    }
 
-  render() {
-    return (
-      <div className="container">
-        <h2>Todos:</h2>
-        {
-          this.store.todos.map((t, idx) => <ToDoItem key={idx} item={t}/>)
-        }
-      </div>
-    );
-  }
+    render() {
+        return (
+            <div className="container">
+                <h2>Todos:</h2>
+                {this.store.todos.map((t, idx) => (
+                    <ToDoItem key={idx} item={t} />
+                ))}
+            </div>
+        )
+    }
 }
-
 ```
 
 In this case, `ToDoItem` is stateless, but will still work with HMR because the root-level of the UI tree is a stateful observer. As a result, whenever we change **any** stateless component, it will be hot-reloaded because the observers will trigger computations in the root-level component as well. And since the root-level component is a good old-fashioned React component, it'll trigger the HMR for all of its children and voila! All the magic of stateless components, observables, and hot module reloading working together beautifully.

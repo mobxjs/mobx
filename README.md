@@ -23,13 +23,16 @@ MobX is proudly sponsored by Mendix, Coinbase, Facebook Open Source, Canva, Algo
 <a href="https://www.canva.com/"><img src="docs/assets/canva.png" align="center" width="100" title="Canva" alt="Canva" /></a>
 <a href="https://www.guilded.gg/"><img src="docs/assets/guilded.jpg" align="center" width="100" title="Guilded" alt="Guilded" /></a>
 <a href="https://mantro.net/jobs/warlock"><img src="docs/assets/mantro.png" align="center" width="100" title="mantro GmbH" alt="mantro GmbH"></a>
-<a href="https://www.codefirst.co.uk/"><img src="docs/codefirst.png" align="center" width="100" title="CodeFirst" alt="CodeFirst"/></a>
-<a href="https://blokt.com/"><img src="docs/blokt.jpg" align="center" width="100" title="Blokt" alt="Blokt"/></a>
+<a href="https://www.codefirst.co.uk/"><img src="docs/assets/codefirst.png" align="center" width="100" title="CodeFirst" alt="CodeFirst"/></a>
+<a href="https://blokt.com/"><img src="docs/assets/blokt.jpg" align="center" width="100" title="Blokt" alt="Blokt"/></a>
+<a href="https://www.bugsnag.com/platforms/react-error-reporting?utm_source=MobX&utm_medium=Website&utm_content=open-source&utm_campaign=2019-community&utm_term=20190913"><img src="docs/assets/bugsnag.jpg" align="center" width="100" title="Bugsnag" alt="Bugsnag"/></a>
 
-**🥉Bronze sponsors:**<br/>
+**🥉Bronze sponsors (\$500+ total contributions):**<br/>
 <a href="https://coinbase.com/"><img src="docs/assets/coinbase.jpeg" align="center" width="100" title="Coinbase" alt="Coinbase" /></a>
 <a href="https://www.algolia.com/"><img src="docs/assets/algolia.jpg" align="center" width="100" title="Algolia" alt="Algolia" /></a>
 <a href="https://talentplot.com/"><img src="docs/assets/talentplot.png" align="center" width="100" title="talentplot" alt="talentplot"></a>
+<a href="https://frontendmasters.com/"><img src="docs/assets/frontendmasters.jpg" align="center" width="100" title="Frontend Masters" alt="Frontend Masters"></a>
+<a href="https://careers.dazn.com/"><img src="docs/assets/dazn.png" align="center" width="100" title="DAZN" alt="DAZN"></a>
 
 # Installation
 
@@ -50,12 +53,12 @@ _Tip: Consider using the faster and smaller ES6 build if targetting a modern env
 
 -   All modern browsers are supported.
 -   MobX >=5 runs on any browser with [ES6 proxy support](https://kangax.github.io/compat-table/es6/#test-Proxy). In practice this means:
-    - no Internet Explorer (Edge is fine)
-    - Node.js >= 6  
+    -   no Internet Explorer (Edge is fine)
+    -   Node.js >= 6
 -   React Native:
-    - iOS >= 10
-    - Android from RN 0.59 (or with manual JavaScript core [upgrade](https://github.com/react-community/jsc-android-buildscripts#how-to-use-it-with-my-react-native-app))
-    - Hermes runtime is [not supported](https://github.com/facebook/hermes/issues/28) (Use MobX 4 instead)
+    -   iOS >= 10
+    -   Android from RN 0.59 (or with manual JavaScript core [upgrade](https://github.com/react-community/jsc-android-buildscripts#how-to-use-it-with-my-react-native-app))
+    -   Hermes runtime is [not supported](https://github.com/facebook/hermes/issues/28) (Use MobX 4 instead)
 -   MobX 4 runs on any ES5 browser and will be actively maintained. The MobX 4 and 5 api's are the same and semantically can achieve the same, but MobX 4 has some [limitations](#mobx-4-vs-mobx-5).
 -   The latest versions of libraries like mobx-react, mobx-react-lite, mobx-state-tree etc are kept compatible with both MobX 4 and 5.
 
@@ -66,7 +69,7 @@ _Tip: Consider using the faster and smaller ES6 build if targetting a modern env
 ## Getting started
 
 -   <i><a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/courses/manage-complex-state-in-react-apps-with-mobx">Egghead.io course</a></i>
--   [Ten minute, interactive MobX + React tutorial](https://mobxjs.github.io/mobx/getting-started.html)
+-   [Ten minute, interactive MobX + React tutorial](https://mobxjs.github.io/mobx/getting-started)
 -   <img src="docs/assets/book.jpg" height="80px"/> [The MobX book](https://books.google.nl/books?id=ALFmDwAAQBAJ&pg=PP1&lpg=PP1&dq=michel+weststrate+mobx+quick+start+guide:+supercharge+the+client+state+in+your+react+apps+with+mobx&source=bl&ots=D460fxti0F&sig=ivDGTxsPNwlOjLHrpKF1nweZFl8&hl=nl&sa=X&ved=2ahUKEwiwl8XO--ncAhWPmbQKHWOYBqIQ6AEwAnoECAkQAQ#v=onepage&q=michel%20weststrate%20mobx%20quick%20start%20guide%3A%20supercharge%20the%20client%20state%20in%20your%20react%20apps%20with%20mobx&f=false) by Pavan Podila and Michel Weststrate (which despite its name is in-depth!)
 -   [Official MobX 4 documentation and API overview](https://mobxjs.github.io/mobx/refguide/api.html) ([MobX 3](https://github.com/mobxjs/mobx/blob/54557dc319b04e92e31cb87427bef194ec1c549c/docs/refguide/api.md), [MobX 2](https://github.com/mobxjs/mobx/blob/7c9e7c86e0c6ead141bb0539d33143d0e1f576dd/docs/refguide/api.md))
 -   [How to (not) use decorators](https://mobx.js.org/best/decorators.html)
@@ -76,7 +79,8 @@ _Tip: Consider using the faster and smaller ES6 build if targetting a modern env
     -   LearnCode.academy MobX tutorial [Part I: MobX + React is AWESOME (7m)](https://www.youtube.com/watch?v=_q50BXqkAfI) [Part II: Computed Values and Nested/Referenced Observables (12m.)](https://www.youtube.com/watch?v=nYvNqKrl69s)
     -   [Screencast: intro to MobX](https://www.youtube.com/watch?v=K8dr8BMU7-8) - 8m
     -   [Talk: State Management Is Easy, React Amsterdam 2016 conf](https://www.youtube.com/watch?v=ApmSsu3qnf0&feature=youtu.be) ([slides](https://speakerdeck.com/mweststrate/state-management-is-easy-introduction-to-mobx))
--   [Boilerplates and related projects](http://mobxjs.github.io/mobx/faq/boilerplates.html)
+-   Boilerplates [MobX awesome list](https://github.com/mobxjs/awesome-mobx#boilerplates)
+-   Related projects [MobX awesome list](https://github.com/mobxjs/awesome-mobx#related-projects-and-utilities)
 -   More tutorials, blogs, videos, and other helpful resources can be found on the [MobX awesome list](https://github.com/mobxjs/awesome-mobx#awesome-mobx)
 
 ## Introduction
@@ -229,7 +233,7 @@ Why does a new message get printed each time the `unfinishedTodoCount` is change
 
 _MobX reacts to any existing observable property that is read during the execution of a tracked function._
 
-For an in-depth explanation about how MobX determines to which observables needs to be reacted, check [understanding what MobX reacts to](https://github.com/mobxjs/mobx/blob/gh-pages/docs/best/react.md).
+For an in-depth explanation about how MobX determines to which observables needs to be reacted, check [understanding what MobX reacts to](https://mobx.js.org/best/react.html).
 
 ### Actions
 
@@ -309,11 +313,13 @@ And finally, kudos to all the people that believed in, tried, validated and even
 ## Further resources and documentation
 
 -   <img src="docs/assets/book.jpg" height="80px"/> [The MobX book](https://books.google.nl/books?id=ALFmDwAAQBAJ&pg=PP1&lpg=PP1&dq=michel+weststrate+mobx+quick+start+guide:+supercharge+the+client+state+in+your+react+apps+with+mobx&source=bl&ots=D460fxti0F&sig=ivDGTxsPNwlOjLHrpKF1nweZFl8&hl=nl&sa=X&ved=2ahUKEwiwl8XO--ncAhWPmbQKHWOYBqIQ6AEwAnoECAkQAQ#v=onepage&q=michel%20weststrate%20mobx%20quick%20start%20guide%3A%20supercharge%20the%20client%20state%20in%20your%20react%20apps%20with%20mobx&f=false) by Pavan Podila and Michel Weststrate (which despite its name is in-depth!)
--   [MobX homepage](http://mobxjs.github.io/mobx/faq/blogs.html)
+-   [MobX homepage](http://mobxjs.github.io)
 -   [API overview](http://mobxjs.github.io/mobx/refguide/api.html)
--   [Tutorials, Blogs & Videos](http://mobxjs.github.io/mobx/faq/blogs.html)
--   [Boilerplates](http://mobxjs.github.io/mobx/faq/boilerplates.html)
--   [Related projects](http://mobxjs.github.io/mobx/faq/related.html)
+-   [Tutorials](https://github.com/mobxjs/awesome-mobx#tutorials)
+-   [Blogs](https://github.com/mobxjs/awesome-mobx#blogs)
+-   [Videos](https://github.com/mobxjs/awesome-mobx#videos)
+-   [Boilerplates](https://github.com/mobxjs/awesome-mobx#boilerplates)
+-   [MobX awesome list](https://github.com/mobxjs/awesome-mobx#awesome-mobx)
 
 ## What others are saying...
 
@@ -429,10 +435,6 @@ Support us with a monthly donation and help us continue our activities. [[Become
 <a href="https://opencollective.com/mobx/backer/57/website" target="_blank"><img src="https://opencollective.com/mobx/backer/57/avatar.svg"></a>
 <a href="https://opencollective.com/mobx/backer/58/website" target="_blank"><img src="https://opencollective.com/mobx/backer/58/avatar.svg"></a>
 <a href="https://opencollective.com/mobx/backer/59/website" target="_blank"><img src="https://opencollective.com/mobx/backer/59/avatar.svg"></a>
-
-One time donations through paypal are welcome as well and are recorded in the [sponsors](sponsors.md) list.
-
-[![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://mobxjs.github.io/mobx/donate.html)
 
 ### Sponsors
 
