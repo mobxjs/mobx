@@ -2,6 +2,7 @@
 
 const mobx = require("../../src/mobx.ts")
 const map = mobx.observable.map
+const intercept = mobx.intercept
 const autorun = mobx.autorun
 const iterall = require("iterall")
 
@@ -788,4 +789,20 @@ test("#1858 Map should not be inherited", () => {
     expect(() => {
         mobx.observable.map(map)
     }).toThrow("Cannot initialize from classes that inherit from Map: MyMap")
+})
+
+test("#2253 Map with replace method with intercept", () => {
+    const data = {
+        prop1: 1,
+        propIgnored: 2,
+        prop2: 3
+    }
+    const observedMap = map({})
+
+    intercept(observedMap, change => (change.name === "propIgnored" ? null : change))
+    observedMap.replace(data)
+
+    expect(observedMap.size).toEqual(2)
+    expect(observedMap._keys.slice()).toBe(["prop1", "prop2"])
+    expect(observedMap.toJSON()).toBe({ prop1: 1, prop2: 2 })
 })
