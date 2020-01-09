@@ -116,7 +116,7 @@ The api is further the same as the [ES6 set api](https://developer.mozilla.org/e
 
 Usage: `extendObservable(target, properties, decorators?, options?)`.
 
-For each key/value pair in each `properties` a (new) observable property will be introduced on the target object.
+For each key/value pair in each `properties` a (new) observable property will be introduced on the target object if the property does not already exist on the target object. If the property does exist, it will be made observable.
 This can be used in constructor functions to introduce observable properties without using decorators.
 If a value of the `properties` is a getter function, a _computed_ property will be introduced.
 
