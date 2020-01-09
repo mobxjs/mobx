@@ -86,12 +86,6 @@ export function extendObservableObjectWithProperties(
             if (process.env.NODE_ENV !== "production") {
                 if (!isPlainObject(properties))
                     fail(`'extendObservabe' only accepts plain objects as second argument`)
-                if (Object.getOwnPropertyDescriptor(target, key))
-                    fail(
-                        `'extendObservable' can only be used to introduce new properties. Use 'set' or 'decorate' instead. The property '${stringifyKey(
-                            key
-                        )}' already exists on '${target}'`
-                    )
                 if (isComputed(descriptor.value))
                     fail(
                         `Passing a 'computed' as initial property value is no longer supported by extendObservable. Use a getter or decorator instead`
