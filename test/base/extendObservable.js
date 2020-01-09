@@ -1,11 +1,12 @@
 // @ts-check
 
 import {
-    computed,
+    action,
     autorun,
     isObservable,
     isObservableProp,
     isComputedProp,
+    isAction,
     extendObservable
 } from "../../src/mobx"
 
@@ -116,4 +117,46 @@ test("extendObservable should work with plain object", function() {
     })
 
     expect(ar.slice()).toEqual([40])
+})
+
+test("extendObservable should apply specified decorators", function() {
+    const box = {
+        /** @type {boolean | undefined} */
+        uninitialized: undefined,
+        height: 20,
+        sizes: [2],
+        someFunc: function() {
+            return 2
+        },
+        get width() {
+            return (
+                this.undeclared *
+                this.height *
+                this.sizes.length *
+                this.someFunc() *
+                (this.uninitialized ? 2 : 1)
+            )
+        },
+        addSize() {
+            // @ts-ignore
+            this.sizes.push([3])
+            // @ts-ignore
+            this.sizes.push([4])
+        }
+    }
+
+    box.undeclared = 1
+
+    extendObservable(
+        box,
+        {
+            someFunc: function() {
+                return 2
+            }
+        },
+        { someFunc: action }
+    )
+
+    expect(isAction(box.someFunc)).toBe(true)
+    expect(box.someFunc()).toEqual(2)
 })
