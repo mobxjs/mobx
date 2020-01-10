@@ -212,22 +212,6 @@ const state: any = observable({
     authToken: null
 })
 
-test("issue8", () => {
-    t.throws(() => {
-        class LoginStoreTest {
-            loggedIn2: boolean = false
-            constructor() {
-                extendObservable(this, {
-                    get loggedIn2() {
-                        return true
-                    }
-                })
-            }
-        }
-        const store = new LoginStoreTest()
-    }, /'extendObservable' can only be used to introduce new properties/)
-})
-
 test("box", () => {
     class Box {
         @observable uninitialized: any
@@ -1206,7 +1190,10 @@ test("@computed.equals (TS)", () => {
     time.minute = 0
     t.deepEqual(changes, [{ hour: 9, minute: 0 }])
     time.hour = 10
-    t.deepEqual(changes, [{ hour: 9, minute: 0 }, { hour: 10, minute: 0 }])
+    t.deepEqual(changes, [
+        { hour: 9, minute: 0 },
+        { hour: 10, minute: 0 }
+    ])
     time.minute = 30
     t.deepEqual(changes, [
         { hour: 9, minute: 0 },
@@ -1242,7 +1229,10 @@ test("computed comparer works with decorate (TS)", () => {
     time.minute = 0
     t.deepEqual(changes, [{ hour: 9, minute: 0 }])
     time.hour = 10
-    t.deepEqual(changes, [{ hour: 9, minute: 0 }, { hour: 10, minute: 0 }])
+    t.deepEqual(changes, [
+        { hour: 9, minute: 0 },
+        { hour: 10, minute: 0 }
+    ])
     time.minute = 30
     t.deepEqual(changes, [
         { hour: 9, minute: 0 },
@@ -1278,7 +1268,10 @@ test("computed comparer works with decorate (TS)", () => {
     time.minute = 0
     t.deepEqual(changes, [{ hour: 9, minute: 0 }])
     time.hour = 10
-    t.deepEqual(changes, [{ hour: 9, minute: 0 }, { hour: 10, minute: 0 }])
+    t.deepEqual(changes, [
+        { hour: 9, minute: 0 },
+        { hour: 10, minute: 0 }
+    ])
     time.minute = 30
     t.deepEqual(changes, [
         { hour: 9, minute: 0 },
@@ -1323,7 +1316,10 @@ test("computed comparer works with decorate (TS) - 2", () => {
     time.minute = 0
     t.deepEqual(changes, [{ hour: 9, minute: 0 }])
     time.hour = 10
-    t.deepEqual(changes, [{ hour: 9, minute: 0 }, { hour: 10, minute: 0 }])
+    t.deepEqual(changes, [
+        { hour: 9, minute: 0 },
+        { hour: 10, minute: 0 }
+    ])
     time.minute = 30
     t.deepEqual(changes, [
         { hour: 9, minute: 0 },
@@ -1358,7 +1354,10 @@ test("computed comparer works with decorate (TS) - 3", () => {
     time.minute = 0
     t.deepEqual(changes, [{ hour: 9, minute: 0 }])
     time.hour = 10
-    t.deepEqual(changes, [{ hour: 9, minute: 0 }, { hour: 10, minute: 0 }])
+    t.deepEqual(changes, [
+        { hour: 9, minute: 0 },
+        { hour: 10, minute: 0 }
+    ])
     time.minute = 30
     t.deepEqual(changes, [
         { hour: 9, minute: 0 },
@@ -1465,7 +1464,10 @@ test("unread computed reads should trow with requiresReaction enabled", () => {
         a.y
     }).toThrow(/is read outside a reactive context/)
 
-    const d = mobx.reaction(() => a.y, () => {})
+    const d = mobx.reaction(
+        () => a.y,
+        () => {}
+    )
     expect(() => {
         a.y
     }).not.toThrow()
