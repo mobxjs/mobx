@@ -791,7 +791,7 @@ test("#1858 Map should not be inherited", () => {
     }).toThrow("Cannot initialize from classes that inherit from Map: MyMap")
 })
 
-test("#2253 Map with replace method with intercept", () => {
+test("#2253 Map replace method with intercept", () => {
     const data = {
         prop1: 1,
         propIgnored: 2,
@@ -805,4 +805,21 @@ test("#2253 Map with replace method with intercept", () => {
     expect(observedMap.size).toEqual(2)
     expect(observedMap._keys.slice()).toEqual(["prop1", "prop2"])
     expect(observedMap.toJSON()).toEqual({ prop1: 1, prop2: 3 })
+})
+
+test("#2253 filled Map replace method with intercept", () => {
+    const data = {
+        prop4: 4,
+        propIgnored: "ignored",
+        prop5: 5,
+        prop6: 6
+    }
+    const observedMap = map({ prop4: 1, prop2: 2, prop3: 3 })
+
+    intercept(observedMap, change => (change.name == "propIgnored" ? null : change))
+    observedMap.replace(data)
+
+    expect(observedMap.size).toEqual(3)
+    expect(observedMap._keys.slice()).toEqual(["prop4", "prop5", "prop6"])
+    expect(observedMap.toJSON()).toEqual({ prop4: 4, prop5: 5, prop6: 6 })
 })
