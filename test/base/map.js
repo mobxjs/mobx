@@ -803,6 +803,6 @@ test("#2253 Map with replace method with intercept", () => {
     observedMap.replace(data)
 
     expect(observedMap.size).toEqual(2)
-    expect(observedMap._keys.slice()).toBe(["prop1", "prop2"])
-    expect(observedMap.toJSON()).toBe({ prop1: 1, prop2: 2 })
+    expect(observedMap._keys.slice()).toEqual(["prop1", "prop2"])
+    expect(observedMap.toJSON()).toEqual({ prop1: 1, prop2: 3 })
 })

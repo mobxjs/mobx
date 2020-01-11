@@ -344,11 +344,17 @@ export class ObservableMap<K = any, V = any>
                 }
             }
             replacementMap.forEach((value, key) => {
-                // new key
-                if (!this._data.has(key)) {
+                this.set(key, value)
+
+                // Does the set really work, if the change has been cancelled by an intercept
+                const keyHasBeenSet = this._data.has(key)
+                if (!keyHasBeenSet) {
+                    // Delete the intercept key in newKeys
+                    const interceptKey = newKeys.indexOf(key)
+                    newKeys.splice(interceptKey, 1)
+
                     keysChanged = true
                 }
-                this.set(key, value)
             })
             if (keysChanged) {
                 this._keys.replace(newKeys)
