@@ -808,17 +808,27 @@ test("#2253 Map replace method with intercept", () => {
 })
 
 test("#2253 filled Map replace method with intercept", () => {
+    let interceptCount = 0
     const data = {
+        propIgnored1: "ignored",
         prop4: 4,
-        propIgnored: "ignored",
+        propIgnored2: "ignored",
         prop5: 5,
-        prop6: 6
+        prop6: 6,
+        propIgnored3: "ignored"
     }
     const observedMap = map({ prop4: 1, prop2: 2, prop3: 3 })
 
-    intercept(observedMap, change => (change.name == "propIgnored" ? null : change))
+    intercept(observedMap, change => {
+        if (change.name.match("propIgnored")) {
+            interceptCount++
+            return null
+        }
+        return change
+    })
     observedMap.replace(data)
 
+    expect(interceptCount).toEqual(3)
     expect(observedMap.size).toEqual(3)
     expect(observedMap._keys.slice()).toEqual(["prop4", "prop5", "prop6"])
     expect(observedMap.toJSON()).toEqual({ prop4: 4, prop5: 5, prop6: 6 })
