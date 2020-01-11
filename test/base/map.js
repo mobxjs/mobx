@@ -817,7 +817,7 @@ test("#2253 filled Map replace method with intercept", () => {
         prop6: 6,
         propIgnored3: "ignored"
     }
-    const observedMap = map({ prop4: 1, prop2: 2, prop3: 3 })
+    const observedMap = map({ prop1: 1, prop2: 2, prop3: 3 })
 
     intercept(observedMap, change => {
         if (change.name.match("propIgnored")) {
