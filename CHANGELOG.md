@@ -3,6 +3,8 @@
 -   Fixes #2230 - computedvalue: throw error object instead of string when options is empty [#2243](https://github.com/mobxjs/mobx/pull/2243)
 -   supports ES6 Sets and Maps in shallow comparer. [#2238](https://github.com/mobxjs/mobx/pull/2238)
 
+-   Fixes #2250 - extendObservable: allows it to be used on an existing property [#2252](https://github.com/mobxjs/mobx/pull/2252)
+
 # 5.15.1 / 4.15.1
 
 -   Make initial values of observable set accept readonly array [#2202](https://github.com/mobxjs/mobx/pull/2202)

@@ -228,7 +228,11 @@ test("observable5", function() {
         return 3
     }
     x.nonReactive = three
-    expect(b.toArray()).toEqual([[17, f, 17], [18, f, 18], [18, three, 3]])
+    expect(b.toArray()).toEqual([
+        [17, f, 17],
+        [18, f, 18],
+        [18, three, 3]
+    ])
 })
 
 test("flat array", function() {
@@ -650,11 +654,6 @@ test("double declare property", () => {
     mobx.extendObservable(o, {
         a: 5
     })
-    expect(() => {
-        mobx.extendObservable(o, {
-            a: 3
-        })
-    }).toThrow(/can only be used to introduce new properties/)
     expect(() => {
         mobx.extendObservable(
             o,
