@@ -67,10 +67,6 @@ export function extendObservable<A extends Object, B extends Object>(
         for (let key in properties) {
             const descriptor = Object.getOwnPropertyDescriptor(properties, key)!
             if (process.env.NODE_ENV !== "production") {
-                if (Object.getOwnPropertyDescriptor(target, key))
-                    fail(
-                        `'extendObservable' can only be used to introduce new properties. Use 'set' or 'decorate' instead. The property '${key}' already exists on '${target}'`
-                    )
                 if (isComputed(descriptor.value))
                     fail(
                         `Passing a 'computed' as initial property value is no longer supported by extendObservable. Use a getter or decorator instead`
