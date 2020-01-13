@@ -833,3 +833,51 @@ test("#2253 filled Map replace method with intercept", () => {
     expect(observedMap._keys.slice()).toEqual(["prop4", "prop5", "prop6"])
     expect(observedMap.toJSON()).toEqual({ prop4: 4, prop5: 5, prop6: 6 })
 })
+
+test("#2253 filled Map replace method with intercept 2", () => {
+    let interceptCount = 0
+    const data = {
+        2: 5,
+        5: 20
+    }
+
+    const observedMap = map({ 1: 1, 2: 2, 3: 3, 4: 4 })
+
+    intercept(observedMap, change => {
+        if (change.name === "1" || change.name === "4") {
+            ++interceptCount
+            return null
+        }
+        return change
+    })
+    observedMap.replace(data)
+
+    expect(interceptCount).toEqual(2)
+    expect(observedMap.size).toEqual(4)
+    expect(observedMap._keys.slice()).toEqual(["1", "2", "4", "5"])
+    expect(observedMap.toJSON()).toEqual({ 1: 1, 2: 5, 4: 4, 5: 20 })
+})
+
+test("#2253 filled Map replace method with intercept 3", () => {
+    let interceptCount = 0
+    const data = {
+        3: 3,
+        2: 2,
+        1: 1
+    }
+
+    const observedMap = map({ 1: 1, 2: 2, 3: 3 })
+
+    intercept(observedMap, change => {
+        if (change.name === "1") {
+            return null
+        }
+        return change
+    })
+    observedMap.replace(data)
+
+    expect(interceptCount).toEqual(1)
+    expect(observedMap.size).toEqual(2)
+    expect(observedMap._keys.slice()).toEqual(["3", "2"])
+    expect(observedMap.toJSON()).toEqual({ 3: 3, 2: 2 })
+})
