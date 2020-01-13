@@ -1,9 +1,8 @@
-# 5.15.2 / 4.15.2 [NOT PUBLISHED YET]
+# 5.15.2 / 4.15.2
 
--   Fixes #2230 - computedvalue: throw error object instead of string when options is empty [#2243](https://github.com/mobxjs/mobx/pull/2243)
--   supports ES6 Sets and Maps in shallow comparer. [#2238](https://github.com/mobxjs/mobx/pull/2238)
-
--   Fixes #2250 - extendObservable: allows it to be used on an existing property [#2252](https://github.com/mobxjs/mobx/pull/2252)
+-   Fixed [#2230](https://github.com/mobxjs/mobx/issue/2230) computedvalue: throw error object instead of string when options is empty [#2243](https://github.com/mobxjs/mobx/pull/2243) by [@ramkumarvenkat](https://github.com/ramkumarvenkat)
+-   supports ES6 Sets and Maps in shallow comparer. [#2238](https://github.com/mobxjs/mobx/pull/2238) by [@hearnden](https://github.com/hearnden)
+-   `extendObservable`: can be used existing properties again. Fixes [#2250](https://github.com/mobxjs/mobx/issue/2250) through [#2252](https://github.com/mobxjs/mobx/pull/2252) by [@davefeucht](https://github.com/davefeucht)
 
 # 5.15.1 / 4.15.1
 
@@ -385,7 +384,7 @@ The changes mentioned here are discussed in detail in the [migration notes](http
 -   `observable.shallowObject(values)` has been removed, instead use `observable.object(values, {}, { deep: false })`
 -   `extendShallowObservable(target, props)`, instead use `extendObservable(target, props, {}, { deep: false })`
 -   The decorators `observable.ref`, `observable.shallow`, `observable.deep`, `observable.struct` can no longer be used as functions. Instead, they should be passed as part of the `decorators` param to resp. `observable.object` and `extendObservable`
--   The new signature of `extendObservable` is `extendObservable(target, props, decorators?, options?)`. This also means it is no longer possible to pass multiple bags of properties to `extendObservable`. `extendObservable` can no longer be used to re-declare properties. Use `set` instead to update existing properties (or introduce new ones).
+-   The new signature of `extendObservable` is `extendObservable(target, props, decorators?, options?)`. This also means it is no longer possible to pass multiple bags of properties to `extendObservable`. ~~`extendObservable` can no longer be used to re-declare properties. Use `set` instead to update existing properties (or introduce new ones).~~ Update 13-01-2020: the latter limitation has been reverted in MobX 4.15.2 / 5.15.2
 -   Iterating maps now follows the spec, that is, `map.values()`, `map.entries()`, `map.keys()`, `map[@@iterator]()` and `array[@@iterator]()` no longer return an array, but an iterator. Use `mobx.values(map)` or `Array.from(map)` to convert the iterators to arrays.
 -   dropped `@computed.equals`, instead, you can now use `@computed({ equals: ... })`
 -   `useStrict(boolean)` was dropped, use `configure({ enforceActions: boolean })` instead
