@@ -221,7 +221,7 @@ class Todos {
   @observable todos = []
 
   getAllTodosByUser = computedFn(function getAllTodosByUser(userId) {
-    return this.todos.filter(todo => todo.user === userId))
+    return this.todos.filter(todo => todo.user === userId)
   })
 }
 ```
