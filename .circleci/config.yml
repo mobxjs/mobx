@@ -95,7 +95,7 @@ jobs:
             - attach_workspace:
                   at: .
 
-            - run: yarn size
+            - run: yarn test:size
 
     # upload coverage
     upload-coveralls:
@@ -125,7 +125,9 @@ workflows:
                       branches:
                           ignore:
                               - gh-pages
-            - test-check
+            - test-check:
+                  requires:
+                      - build
             - test-performance:
                   requires:
                       - build

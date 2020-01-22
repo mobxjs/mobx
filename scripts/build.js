@@ -102,8 +102,8 @@ function copyAssets(outPath) {
 
 const pkg = require("../package.json")
 function writePackage(versionPath, version) {
-    // replace `x.y.z` with `v.y.z`, strip `v` from version
-    const pkgVersion = pkg.version.replace("x", version.replace("v", ""))
+    // replace `0.y.z` with `v.y.z`, strip `v` prefix
+    const pkgVersion = pkg.version.replace(/^0/, version.replace("v", ""))
     return fs.writeFile(
         path.resolve(versionPath, "package.json"),
         JSON.stringify(
