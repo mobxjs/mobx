@@ -1,7 +1,7 @@
 /**
- * @type {typeof import("../../src/mobx")}
+ * @type {typeof import("../../../src/v4/mobx")}
  */
-const mobx = require("../../src/mobx.ts")
+const mobx = require("../../../src/v4/mobx.ts")
 
 const utils = require("../utils/test-utils")
 

@@ -1,6 +1,6 @@
 "use strict"
 
-const mobx = require("../../src/mobx.ts")
+const mobx = require("../../../src/v5/mobx.ts")
 const m = mobx
 const observable = mobx.observable
 
@@ -221,19 +221,19 @@ test("toJS handles dates", () => {
 })
 
 test("toJS handles symbol keys in objects and maps", () => {
-    var key = Symbol("key")
-    var a = observable({
+    const key = Symbol("key")
+    const a = observable({
         [key]: 42
     })
 
-    var b = mobx.toJS(a)
+    const b = mobx.toJS(a)
     expect(b[key]).toBe(42)
 
-    var x = observable.map({
+    const x = observable.map({
         [key]: 43
     })
 
-    var y = mobx.toJS(x)
+    const y = mobx.toJS(x)
     expect(y[key]).toBe(43)
 })
 

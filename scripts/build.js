@@ -32,7 +32,7 @@ function runTypeScriptBuild(outDir, version, target, declarations) {
     options.outDir = path.resolve(outDir, version)
     options.declaration = declarations
 
-    options.module = ts.ModuleKind.ES2015
+    options.module = ts.ModuleKind.ESNext
     options.importHelpers = true
     options.noEmitHelpers = true
     if (declarations) options.declarationDir = path.resolve("dist", version, "lib")

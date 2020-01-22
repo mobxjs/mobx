@@ -1,6 +1,6 @@
 "use strict"
 
-const mobx = require("../../src/mobx.ts")
+const mobx = require("../../../src/v4/mobx.ts")
 const utils = require("../utils/test-utils")
 
 test("trace", () => {

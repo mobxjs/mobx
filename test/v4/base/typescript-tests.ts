@@ -26,8 +26,8 @@ import {
     IAtom,
     createAtom,
     runInAction
-} from "../../src/mobx"
-import * as mobx from "../../src/mobx"
+} from "../../../src/v4/mobx"
+import * as mobx from "../../../src/v4/mobx"
 import { assert, IsExact } from "conditional-type-checks"
 
 const v = observable.box(3)

@@ -1,6 +1,6 @@
 "use strict"
 
-const mobx = require("../../src/mobx")
+const mobx = require("../../../src/v4/mobx")
 const m = mobx
 const { $mobx, observable, computed, transaction, autorun, extendObservable, decorate } = mobx
 const utils = require("../utils/test-utils")

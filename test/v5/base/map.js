@@ -1,6 +1,6 @@
 "use strict"
 
-const mobx = require("../../src/mobx.ts")
+const mobx = require("../../../src/v5/mobx.ts")
 const map = mobx.observable.map
 const autorun = mobx.autorun
 const iterall = require("iterall")
@@ -31,7 +31,7 @@ test("map crud", function() {
     expect(m.has(k)).toBe(true)
     expect(m.get(k)).toBe("arrVal")
 
-    var s = Symbol("test")
+    const s = Symbol("test")
     expect(m.has(s)).toBe(false)
     expect(m.get(s)).toBe(undefined)
     m.set(s, "symbol-value")

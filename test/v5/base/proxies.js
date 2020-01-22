@@ -9,7 +9,7 @@ import {
     reaction,
     extendObservable,
     keys
-} from "../../src/mobx.ts"
+} from "../../../src/v5/mobx.ts"
 
 import { stripAdminFromDescriptors } from "../utils/test-utils"
 

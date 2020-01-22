@@ -12,7 +12,7 @@ import {
     spy,
     isAction,
     decorate
-} from "../../src/mobx"
+} from "../../../src/v4/mobx"
 
 import { serializable, primitive, serialize, deserialize } from "serializr"
 

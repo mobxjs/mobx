@@ -13,8 +13,8 @@ import {
     spy,
     isAction,
     configure
-} from "../../src/mobx.ts"
-import * as mobx from "../../src/mobx.ts"
+} from "../../../src/v5/mobx.ts"
+import * as mobx from "../../../src/v5/mobx.ts"
 
 test("babel", function() {
     class Box {

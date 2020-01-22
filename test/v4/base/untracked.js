@@ -1,4 +1,4 @@
-const m = require("../../src/mobx.ts")
+const m = require("../../../src/v4/mobx.ts")
 
 test("untracked 1", function() {
     let cCalcs = 0,

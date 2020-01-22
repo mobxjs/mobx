@@ -1,4 +1,4 @@
-const m = require("../../src/mobx.ts")
+const m = require("../../../src/v4/mobx.ts")
 
 test("observe object and map properties", function() {
     const map = m.observable.map({ a: 1 })

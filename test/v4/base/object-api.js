@@ -1,4 +1,4 @@
-const mobx = require("../../src/mobx")
+const mobx = require("../../../src/v4/mobx")
 const { autorun, keys, when, set, remove, values, entries, reaction, observable, has, get } = mobx
 
 test("keys should be observable when extending", () => {

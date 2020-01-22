@@ -1,7 +1,7 @@
 /**
- * @type {typeof import("../../src/mobx")}
+ * @type {typeof import("../../../src/v5/mobx")}
  */
-const mobx = require("../../src/mobx.ts")
+const mobx = require("../../../src/v5/mobx.ts")
 const utils = require("../utils/test-utils")
 
 const strictError = /Since strict-mode is enabled, changing observed observable values outside actions is not allowed. Please wrap the code in an `action` if this change is intended. Tried to modify: /

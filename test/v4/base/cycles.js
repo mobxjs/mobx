@@ -1,4 +1,4 @@
-const m = require("../../src/mobx.ts")
+const m = require("../../../src/v4/mobx.ts")
 
 test("cascading active state (form 1)", function() {
     const Store = function() {

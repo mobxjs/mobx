@@ -1,5 +1,5 @@
-import * as mobx from "../../src/mobx.ts"
-import { flow, FlowCancellationError, isFlowCancellationError } from "../../src/mobx"
+import * as mobx from "../../../src/v4/mobx.ts"
+import { flow, FlowCancellationError, isFlowCancellationError } from "../../../src/v4/mobx"
 
 function delay(time, value, shouldThrow = false) {
     return new Promise((resolve, reject) => {

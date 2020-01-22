@@ -8,7 +8,7 @@ import {
     isComputedProp,
     isAction,
     extendObservable
-} from "../../src/mobx"
+} from "../../../src/v4/mobx"
 
 test("extendObservable should work", function() {
     class Box {
