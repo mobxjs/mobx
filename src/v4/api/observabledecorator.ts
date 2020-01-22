@@ -1,9 +1,9 @@
 import {
+    BabelDescriptor,
+    IEnhancer,
     fail,
     invariant,
-    IEnhancer,
     createPropDecorator,
-    BabelDescriptor,
     defineObservableProperty
 } from "../internal"
 
@@ -13,12 +13,13 @@ export type IObservableDecorator = {
 }
 
 export function createDecoratorForEnhancer(enhancer: IEnhancer<any>): IObservableDecorator {
+    invariant(enhancer)
     const decorator = createPropDecorator(
         true,
         (
             target: any,
             propertyName: string,
-            descriptor: BabelDescriptor,
+            descriptor: BabelDescriptor | undefined,
             _decoratorTarget,
             decoratorArgs: any[]
         ) => {

@@ -1,8 +1,10 @@
 {
     "compilerOptions": {
         "target": "es6",
-        "module": "commonjs",
+        "module": "esnext",
         "moduleResolution": "node",
+        "lib": ["es6"],
+        "rootDir": "src",
         "downlevelIteration": true,
         "alwaysStrict": true,
         "sourceMap": false,
@@ -11,10 +13,9 @@
         "strict": true,
         "noImplicitReturns": true,
         "noUnusedLocals": true,
-        "noUnusedParameters": false,
         "noImplicitAny": false,
         "noImplicitThis": false,
-        "experimentalDecorators": true,
-        "lib": ["es6"]
-    }
+        "experimentalDecorators": true
+    },
+    "include": ["src/**/*.ts"]
 }

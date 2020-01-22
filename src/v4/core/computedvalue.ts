@@ -83,11 +83,11 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     __mapid = "#" + getNextId()
     protected value: T | undefined | CaughtException = new CaughtException(null)
     name: string
-    triggeredBy: string
+    triggeredBy?: string
     isComputing: boolean = false // to check for cycles
     isRunningSetter: boolean = false
     derivation: () => T
-    setter: (value: T) => void
+    setter?: (value: T) => void
     isTracing: TraceMode = TraceMode.NONE
     public scope: Object | undefined
     private equals: IEqualsComparer<any>

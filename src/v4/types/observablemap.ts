@@ -294,7 +294,7 @@ export class ObservableMap<K = any, V = any>
     }
 
     forEach(callback: (value: V, key: K, object: Map<K, V>) => void, thisArg?) {
-        this._keys.forEach(key => callback.call(thisArg, this.get(key), key, this))
+        this._keys.forEach(key => callback.call(thisArg, this.get(key)!, key, this))
     }
 
     /** Merge another object into this object, returns this. */

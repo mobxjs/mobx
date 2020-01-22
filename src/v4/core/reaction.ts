@@ -182,7 +182,7 @@ export class Reaction implements IDerivation, IReactionPublic {
     }
 
     getDisposer(): IReactionDisposer {
-        const r = this.dispose.bind(this)
+        const r = this.dispose.bind(this) as IReactionDisposer
         r.$mobx = this
         return r
     }

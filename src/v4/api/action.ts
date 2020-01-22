@@ -44,7 +44,7 @@ export const action: IActionFactory = function action(arg1, arg2?, arg3?, arg4?)
         // apply to instance immediately
         arg1[arg2] = createAction(arg1.name || arg2, arg3.value)
     } else {
-        return namedActionDecorator(arg2).apply(null, arguments)
+        return namedActionDecorator(arg2).apply(null, arguments as any)
     }
 } as any
 

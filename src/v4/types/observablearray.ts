@@ -329,6 +329,7 @@ class ObservableArrayAdministration<T>
 }
 
 export class ObservableArray<T> extends StubArray {
+    // @ts-ignore addHiddenFinalProp not recognized here
     private $mobx: ObservableArrayAdministration<T>
 
     constructor(
@@ -410,7 +411,7 @@ export class ObservableArray<T> extends StubArray {
             deprecated(
                 "The array.find fromIndex argument to find will not be supported anymore in the next major"
             )
-        const idx = this.findIndex.apply(this, arguments)
+        const idx = this.findIndex.apply(this, arguments as any)
         return idx === -1 ? undefined : this.get(idx)
     }
 

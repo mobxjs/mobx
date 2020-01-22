@@ -99,7 +99,7 @@ export function createPropDecorator(
         if (quacksLikeADecorator(arguments)) {
             // @decorator
             decoratorArguments = EMPTY_ARRAY
-            return decorator.apply(null, arguments)
+            return decorator.apply(null, arguments as any)
         } else {
             // @decorator(args)
             decoratorArguments = Array.prototype.slice.call(arguments)
