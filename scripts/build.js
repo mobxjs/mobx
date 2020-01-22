@@ -56,7 +56,7 @@ function runTypeScriptBuild(outDir, version, target, declarations) {
 }
 
 async function generateBundledModule(inputPath, version, outputFile, format, env = "development") {
-    const outputFilePath = console.log(`Generating ${version} ${outputFile} ${env} bundle.`)
+    console.log(`Generating ${version} ${outputFile} ${env} bundle.`)
 
     let plugins
     if (env === "production") {
