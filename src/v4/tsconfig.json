@@ -1,23 +1,18 @@
 {
     "compilerOptions": {
-        "rootDir": "src",
-        "target": "es6",
-        "module": "commonjs",
-        "moduleResolution": "node",
-        "downlevelIteration": true,
-        "alwaysStrict": true,
-        "outDir": "lib",
+        "target": "es5",
         "sourceMap": false,
         "declaration": true,
+        "module": "commonjs",
         "removeComments": false,
-        "strict": true,
+        "strictNullChecks": true,
         "noImplicitReturns": true,
+        "noImplicitUseStrict": true,
         "noUnusedLocals": true,
-        "noUnusedParameters": false,
         "noImplicitAny": false,
+        "downlevelIteration": true,
         "noImplicitThis": false,
         "experimentalDecorators": true,
         "lib": ["es6"]
-    },
-    "include": ["src/**/*.ts"]
+    }
 }
