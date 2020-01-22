@@ -1,6 +1,6 @@
 {
   "name": "mobx",
-  "version": "5.15.2",
+  "version": "x.15.2",
   "description": "Simple, scalable state management.",
   "main": "lib/mobx.js",
   "umd:main": "lib/mobx.umd.js",
@@ -22,6 +22,7 @@
     "test:flow": "node_modules/.bin/flow check",
     "test:performance": "PERSIST=true time node --expose-gc test/perf/index.js",
     "test:ci": "yarn test:all && yarn test:performance && yarn test -i --coverage && yarn test:webpack && yarn size",
+    "test:es5": "yarn es-check es5 lib/mobx.js",
     "prettier": "prettier \"**/*.js\" \"**/*.jsx\" \"**/*.tsx\" \"**/*.ts\" \"docs/**/*.md\"",
     "_prepublish": "yarn small-build",
     "quick-build": "tsc --pretty",
@@ -67,6 +68,7 @@
     "chalk": "^1.1.3",
     "conditional-type-checks": "^1.0.4",
     "coveralls": "^3.0.3",
+    "es-check": "^5.0.0",
     "eslint": "^5.15.2",
     "flow-bin": "^0.59.0",
     "fs-extra": "^7.0.1",
@@ -119,7 +121,7 @@
       "^.+\\.tsx?$": "ts-jest",
       "^.+\\.jsx?$": "babel-jest"
     },
-    "testRegex": "test/base/.*\\.(t|j)sx?$",
+    "testRegex": "test/v[4|5]/base/.*\\.(t|j)sx?$",
     "moduleFileExtensions": [
       "ts",
       "tsx",
