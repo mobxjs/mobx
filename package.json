@@ -45,7 +45,7 @@
   "license": "MIT",
   "funding": {
     "type": "opencollective",
-    "url": "https://opencollective.com/immer"
+    "url": "https://opencollective.com/mobx"
   },
   "bugs": {
     "url": "https://github.com/mobxjs/mobx/issues"
