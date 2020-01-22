@@ -45,13 +45,13 @@ jobs:
                   paths:
                       - ./*
 
-    test-all:
+    test-check:
         executor: my-executor
         steps:
             - attach_workspace:
                   at: .
 
-            - run: yarn test:all
+            - run: yarn test:check
 
     test-performance:
         executor: my-executor
@@ -121,13 +121,11 @@ workflows:
     build-and-test:
         jobs:
             - build:
-                filters:
-                    branches:
-                        ignore:
-                            - gh-pages
-            - test-all:
-                  requires:
-                      - build
+                  filters:
+                      branches:
+                          ignore:
+                              - gh-pages
+            - test-check
             - test-performance:
                   requires:
                       - build
