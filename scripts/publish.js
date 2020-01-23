@@ -93,7 +93,7 @@ async function main() {
     })
 
     if (npmInfoRet.code === 0) {
-        await Promise.all([execute(4), execute(5)])
+        await Promise.all([execute(4, "mobx4"), execute(5, "latest")])
         await writeJSON(rootPkgPath, { ...rootPkg, version: resp.action })
         run(`git commit -am --no-verify "Published version ${maskVerWithX(resp.action)}"`)
         run("git push --follow-tags")
@@ -104,7 +104,7 @@ async function main() {
         exit(0)
     }
 
-    async function execute(major) {
+    async function execute(major, distTag) {
         const nextVersionParsed = semver.coerce(resp.action)
         nextVersionParsed.major = major
         const nextVersion = nextVersionParsed.format()
@@ -121,7 +121,7 @@ async function main() {
         const verPkg = require(verPkgPath)
         await writeJSON(verPkgPath, { ...verPkg, version: nextVersion })
 
-        run(`npm publish ${distPath}`)
+        run(`npm publish ${distPath} --tag ${distTag}`)
         run(`git tag ${nextVersion}`)
     }
 }
