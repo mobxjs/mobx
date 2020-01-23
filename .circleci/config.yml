@@ -81,6 +81,14 @@ jobs:
                   paths:
                       - ./coverage
 
+    test-mixed:
+        executor: my-executor
+        steps:
+            - attach_workspace:
+                  at: .
+
+            - run: yarn test:mixed-versions
+
     test-size:
         executor: my-executor
         steps:
@@ -124,6 +132,9 @@ workflows:
                   requires:
                       - build
             - test-coverage:
+                  requires:
+                      - build
+            - test-mixed:
                   requires:
                       - build
             - test-size:

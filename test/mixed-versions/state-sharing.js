@@ -19,7 +19,7 @@ function testOutput(cmd, expected) {
     })
 }
 
-describe.skip("it should handle multiple instances with the correct warnings", () => {
+describe("it should handle multiple instances with the correct warnings", () => {
     testOutput(
         'require("../../");global.__mobxGlobals.version = -1; require("../../lib/mobx.umd.js")',
         "There are multiple, different versions of MobX active. Make sure MobX is loaded only once"

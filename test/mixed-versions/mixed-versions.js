@@ -9,7 +9,7 @@ try {
     child_process.execSync("yarn small-build", { stdio: "inherit" })
 }
 
-test.only("two versions should not work together by default", () => {
+test("two versions should not work together by default", () => {
     expect(global.__mobxInstanceCount).toBe(2)
     expect(global.__mobxGlobals).not.toBe(undefined)
 
