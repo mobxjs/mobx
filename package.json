@@ -21,7 +21,6 @@
     "test:check": "yarn test:types && yarn lint",
     "test:types": "yarn tsc --noEmit && yarn test:flow",
     "test:flow": "node_modules/.bin/flow check",
-    "test:webpack": "node scripts/webpack-regression-tests.js",
     "test:performance": "PERSIST=true time node --expose-gc test/perf/index.js",
     "test:size": "size-limit",
     "prettier": "prettier \"**/*.js\" \"**/*.jsx\" \"**/*.tsx\" \"**/*.ts\" \"docs/**/*.md\"",

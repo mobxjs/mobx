@@ -81,14 +81,6 @@ jobs:
                   paths:
                       - ./coverage
 
-    test-webpack:
-        executor: my-executor
-        steps:
-            - attach_workspace:
-                  at: .
-
-            - run: yarn test:webpack
-
     test-size:
         executor: my-executor
         steps:
@@ -132,9 +124,6 @@ workflows:
                   requires:
                       - build
             - test-coverage:
-                  requires:
-                      - build
-            - test-webpack:
                   requires:
                       - build
             - test-size:
