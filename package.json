@@ -22,6 +22,7 @@
     "test:check": "yarn test:types && yarn lint",
     "test:types": "yarn tsc --noEmit && yarn test:flow",
     "test:flow": "node_modules/.bin/flow check",
+    "test:coverage": "yarn test -i --coverage",
     "test:performance": "PERSIST=true time node --expose-gc test/perf/index.js",
     "test:size": "size-limit",
     "prettier": "prettier \"**/*.js\" \"**/*.jsx\" \"**/*.tsx\" \"**/*.ts\" \"docs/**/*.md\"",
@@ -54,6 +55,7 @@
     "LICENSE"
   ],
   "homepage": "https://mobx.js.org/",
+  "dependencies": {},
   "devDependencies": {
     "@babel/core": "^7.3.4",
     "@babel/plugin-proposal-class-properties": "^7.3.4",

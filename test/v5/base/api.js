@@ -76,6 +76,6 @@ test("correct api should be exposed", function() {
 })
 
 test("mobx has no dependencies", () => {
-    const pkg = JSON.parse(fs.readFileSync(__dirname + "/../../../package.json", "utf8"))
+    const pkg = require("../../../package.json")
     expect(pkg.dependencies).toEqual({})
 })

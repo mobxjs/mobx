@@ -75,7 +75,7 @@ jobs:
             - attach_workspace:
                   at: .
 
-            - run: yarn test -i --coverage
+            - run: yarn test:coverage
             - persist_to_workspace:
                   root: .
                   paths:
