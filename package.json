@@ -17,6 +17,7 @@
     "test": "jest",
     "lint": "eslint src/**/*.ts",
     "watch": "jest --watch",
+    "perf": "yarn test:performance v4 && yarn test:performance v5",
     "test:mixed-versions": "jest --testRegex mixed-versions",
     "test:check": "yarn test:types && yarn lint",
     "test:types": "yarn tsc --noEmit && yarn test:flow",
