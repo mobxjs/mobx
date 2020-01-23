@@ -1,7 +1,13 @@
 [
     {
-        "path": "lib/mobx.js",
+        "path": "dist/v4/lib/mobx.js",
+        "limit": "20 KB",
+        "running": false
+    },
+    {
+        "path": "dist/v5/lib/mobx.js",
         "limit": "20 KB",
         "running": false
     }
+
 ]

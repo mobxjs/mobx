@@ -1,6 +1,6 @@
 {
   "name": "mobx",
-  "version": "5.15.2",
+  "version": "0.15.2",
   "description": "Simple, scalable state management.",
   "main": "lib/mobx.js",
   "umd:main": "lib/mobx.umd.js",
@@ -15,20 +15,22 @@
   "typings": "lib/mobx.d.ts",
   "scripts": {
     "test": "jest",
+    "lint": "eslint src/**/*.ts",
     "watch": "jest --watch",
+    "perf": "yarn test:performance v4 && yarn test:performance v5",
     "test:mixed-versions": "jest --testRegex mixed-versions",
-    "test:all": "yarn tsc --noEmit && yarn lint && yarn jest -i && yarn test:flow && yarn test:mixed-versions",
-    "test:webpack": "node scripts/webpack-regression-tests.js",
+    "test:check": "yarn test:types && yarn lint",
+    "test:types": "yarn tsc --noEmit && yarn test:flow",
     "test:flow": "node_modules/.bin/flow check",
+    "test:coverage": "yarn test -i --coverage",
     "test:performance": "PERSIST=true time node --expose-gc test/perf/index.js",
-    "test:ci": "yarn test:all && yarn test:performance && yarn test -i --coverage && yarn test:webpack && yarn size",
+    "test:size": "size-limit",
     "prettier": "prettier \"**/*.js\" \"**/*.jsx\" \"**/*.tsx\" \"**/*.ts\" \"docs/**/*.md\"",
     "_prepublish": "yarn small-build",
     "quick-build": "tsc --pretty",
     "small-build": "node scripts/build.js",
-    "lint": "eslint src/**/*.ts",
-    "size": "size-limit",
-    "publish-script": "node scripts/publish.js",
+    "release": "node scripts/publish.js",
+    "publish-script": "yarn release",
     "docs:build": "yarn --cwd website build",
     "docs:start": "yarn --cwd website start",
     "docs:publish": "yarn --cwd website publish-gh-pages",
@@ -43,7 +45,7 @@
   "license": "MIT",
   "funding": {
     "type": "opencollective",
-    "url": "https://opencollective.com/immer"
+    "url": "https://opencollective.com/mobx"
   },
   "bugs": {
     "url": "https://github.com/mobxjs/mobx/issues"
@@ -53,6 +55,7 @@
     "LICENSE"
   ],
   "homepage": "https://mobx.js.org/",
+  "dependencies": {},
   "devDependencies": {
     "@babel/core": "^7.3.4",
     "@babel/plugin-proposal-class-properties": "^7.3.4",
@@ -60,6 +63,7 @@
     "@babel/plugin-transform-runtime": "^7.3.4",
     "@babel/preset-env": "^7.3.4",
     "@babel/runtime": "^7.3.4",
+    "@size-limit/preset-big-lib": "^3.0.0",
     "@types/jest": "^24.0.11",
     "@types/node": "^11.11.3",
     "@typescript-eslint/eslint-plugin": "^1.4.2",
@@ -75,20 +79,20 @@
     "jest": "^24.5.0",
     "lint-staged": "^8.1.5",
     "prettier": "^1.16.4",
+    "prompts": "^2.3.0",
     "rollup": "^1.6.0",
     "rollup-plugin-filesize": "^6.0.1",
     "rollup-plugin-node-resolve": "^4.0.1",
     "rollup-plugin-replace": "^2.1.0",
     "rollup-plugin-terser": "^4.0.4",
+    "semver": "^7.1.1",
     "serializr": "^1.5.1",
     "shelljs": "^0.8.3",
-    "size-limit": "^1.3.3",
     "tape": "^4.10.1",
     "ts-jest": "^24.0.0",
     "tslib": "^1.9.3",
     "typescript": "^3.3.3333"
   },
-  "dependencies": {},
   "keywords": [
     "mobx",
     "mobservable",
@@ -119,7 +123,7 @@
       "^.+\\.tsx?$": "ts-jest",
       "^.+\\.jsx?$": "babel-jest"
     },
-    "testRegex": "test/base/.*\\.(t|j)sx?$",
+    "testRegex": "test/v[4|5]/base/.*\\.(t|j)sx?$",
     "moduleFileExtensions": [
       "ts",
       "tsx",

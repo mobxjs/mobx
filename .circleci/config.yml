@@ -45,13 +45,13 @@ jobs:
                   paths:
                       - ./*
 
-    test-all:
+    test-check:
         executor: my-executor
         steps:
             - attach_workspace:
                   at: .
 
-            - run: yarn test:all
+            - run: yarn test:check
 
     test-performance:
         executor: my-executor
@@ -60,7 +60,12 @@ jobs:
                   at: .
 
             - run:
-                  command: time node --expose-gc test/perf/index.js
+                  command: time node --expose-gc test/perf/index.js v4
+                  environment:
+                      PERSIST: true
+
+            - run:
+                  command: time node --expose-gc test/perf/index.js v5
                   environment:
                       PERSIST: true
 
@@ -70,19 +75,11 @@ jobs:
             - attach_workspace:
                   at: .
 
-            - run: yarn test -i --coverage
+            - run: yarn test:coverage
             - persist_to_workspace:
                   root: .
                   paths:
                       - ./coverage
-
-    test-webpack:
-        executor: my-executor
-        steps:
-            - attach_workspace:
-                  at: .
-
-            - run: yarn test:webpack
 
     test-size:
         executor: my-executor
@@ -90,7 +87,7 @@ jobs:
             - attach_workspace:
                   at: .
 
-            - run: yarn size
+            - run: yarn test:size
 
     # upload coverage
     upload-coveralls:
@@ -116,20 +113,17 @@ workflows:
     build-and-test:
         jobs:
             - build:
-                filters:
-                    branches:
-                        ignore:
-                            - gh-pages
-            - test-all:
+                  filters:
+                      branches:
+                          ignore:
+                              - gh-pages
+            - test-check:
                   requires:
                       - build
             - test-performance:
                   requires:
                       - build
             - test-coverage:
-                  requires:
-                      - build
-            - test-webpack:
                   requires:
                       - build
             - test-size:
