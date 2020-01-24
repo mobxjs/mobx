@@ -99,7 +99,8 @@ async function main() {
         versions.forEach(ver => {
             run(`git tag ${ver}`)
         })
-        run("git push --follow-tags")
+        run("git push")
+        run("git push --tags")
 
         if (gitUser) {
             run(`GIT_USER=${gitUser} USE_SSH=true yarn docs:publish`)
