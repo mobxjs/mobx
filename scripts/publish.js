@@ -93,10 +93,14 @@ async function main() {
     })
 
     if (npmInfoRet.code === 0) {
-        await Promise.all([execute(4, "mobx4"), execute(5, "latest")])
+        const versions = await Promise.all([execute(4, "mobx4"), execute(5, "latest")])
         await writeJSON(rootPkgPath, { ...rootPkg, version: resp.action })
-        run(`git commit -am --no-verify "Published version ${maskVerWithX(resp.action)}"`)
+        run(`git commit --no-verify -am "Published version ${maskVerWithX(resp.action)}"`)
+        versions.forEach(ver => {
+            run(`git tag ${ver}`)
+        })
         run("git push --follow-tags")
+
         if (gitUser) {
             run(`GIT_USER=${gitUser} USE_SSH=true yarn docs:publish`)
         }
@@ -122,7 +126,7 @@ async function main() {
         await writeJSON(verPkgPath, { ...verPkg, version: nextVersion })
 
         run(`npm publish ${distPath} --tag ${distTag}`)
-        run(`git tag ${nextVersion}`)
+        return nextVersion
     }
 }
 
