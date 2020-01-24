@@ -138,11 +138,11 @@ async function build(version) {
         generateBundledModule(es6Build, version, "mobx.es6.js", "es"),
 
         generateBundledModule(es5Build, version, "mobx.umd.js", "umd"),
-        generateBundledModule(es5Build, version, "mobx.umd.min.js", "umd", "production"),
-
-        copyAssets(versionPath),
-        writePackage(versionPath, version)
+        generateBundledModule(es5Build, version, "mobx.umd.min.js", "umd", "production")
     ])
+
+    await copyAssets(versionPath)
+    await writePackage(versionPath, version)
 }
 
 Promise.all([build("v4"), build("v5")]).catch(e => {
