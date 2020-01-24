@@ -17,6 +17,8 @@ import { allowStateReadsStart, allowStateReadsEnd } from "./derivation"
 // mobx versions
 let currentActionId = 0
 let nextActionId = 1
+const functionNameDescriptor = Object.getOwnPropertyDescriptor(() => {}, "name")
+const isFunctionNameConfigurable = functionNameDescriptor && functionNameDescriptor.configurable
 
 export interface IAction {
     isMobxAction: boolean
@@ -30,6 +32,11 @@ export function createAction(actionName: string, fn: Function): Function & IActi
     }
     const res = function() {
         return executeAction(actionName, fn, this, arguments)
+    }
+    if (process.env.NODE_ENV !== "production") {
+        if (isFunctionNameConfigurable) {
+            Object.defineProperty(res, "name", { value: actionName })
+        }
     }
     ;(res as any).isMobxAction = true
     return res as any
