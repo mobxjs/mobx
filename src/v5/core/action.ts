@@ -17,13 +17,16 @@ import { allowStateReadsStart, allowStateReadsEnd } from "./derivation"
 // mobx versions
 let currentActionId = 0
 let nextActionId = 1
+const isProduction = process.env.NODE_ENV === "production"
+const functionNameDescriptor = Object.getOwnPropertyDescriptor(() => {}, "name")
+const isFunctionNameConfigurable = functionNameDescriptor && functionNameDescriptor.configurable
 
 export interface IAction {
     isMobxAction: boolean
 }
 
 export function createAction(actionName: string, fn: Function, ref?: Object): Function & IAction {
-    if (process.env.NODE_ENV !== "production") {
+    if (!isProduction) {
         invariant(typeof fn === "function", "`action` can only be invoked on functions")
         if (typeof actionName !== "string" || !actionName)
             fail(`actions should have valid names, got: '${actionName}'`)
@@ -32,6 +35,9 @@ export function createAction(actionName: string, fn: Function, ref?: Object): Fu
         return executeAction(actionName, fn, ref || this, arguments)
     }
     ;(res as any).isMobxAction = true
+    if (!isProduction && isFunctionNameConfigurable) {
+        Object.defineProperty(res, "name", { value: actionName })
+    }
     return res as any
 }
 
