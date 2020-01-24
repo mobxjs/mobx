@@ -562,17 +562,17 @@ test("out of order startAction / endAction", () => {
     mobx._endAction(a1)
 })
 
-test.only("given actionName, the action function name should be defined as the actionName", () => {
+test("given actionName, the action function name should be defined as the actionName", () => {
     const a1 = mobx.action("testAction", () => {})
     expect(a1.name).toBe("testAction")
 })
 
-test.only("given anonymous action, the action name should be <unnamed action>", () => {
+test("given anonymous action, the action name should be <unnamed action>", () => {
     const a1 = mobx.action(() => {})
     expect(a1.name).toBe("<unnamed action>")
 })
 
-test.only("given function declaration, the action name should be as the function name", () => {
+test("given function declaration, the action name should be as the function name", () => {
     const a1 = mobx.action(function testAction() {})
     expect(a1.name).toBe("testAction")
 })
