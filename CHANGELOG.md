@@ -1,3 +1,7 @@
+# 5.15.3 / 4.15.3
+
+-   Define action name to be as the function name [#2262](https://github.com/mobxjs/mobx/pull/2262) by [@nadavkaner](https://github.com/nadavkaner)
+
 # 5.15.2 / 4.15.2
 
 -   Fixed [#2230](https://github.com/mobxjs/mobx/issue/2230) computedvalue: throw error object instead of string when options is empty [#2243](https://github.com/mobxjs/mobx/pull/2243) by [@ramkumarvenkat](https://github.com/ramkumarvenkat)
