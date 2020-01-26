@@ -789,3 +789,104 @@ test("#1858 Map should not be inherited", () => {
         mobx.observable.map(map)
     }).toThrow("Cannot initialize from classes that inherit from Map: MyMap")
 })
+
+test("#2253 Map replace method with intercept", () => {
+    const data = {
+        prop1: 1,
+        propIgnored: 2,
+        prop2: 3
+    }
+    const observedMap = map({})
+
+    intercept(observedMap, change => (change.name === "propIgnored" ? null : change))
+    observedMap.replace(data)
+
+    expect(observedMap.size).toEqual(2)
+    expect(observedMap._keys.slice()).toEqual(["prop1", "prop2"])
+    expect(observedMap.toJSON()).toEqual({ prop1: 1, prop2: 3 })
+})
+
+test("#2253 filled Map replace method with intercept", () => {
+    let interceptCount = 0
+    const data = {
+        propIgnored1: "ignored",
+        prop4: 4,
+        propIgnored2: "ignored",
+        prop5: 5,
+        prop6: 6,
+        propIgnored3: "ignored"
+    }
+    const observedMap = map({ prop1: 1, prop2: 2, prop3: 3 })
+
+    intercept(observedMap, change => {
+        if (change.name.match("propIgnored")) {
+            interceptCount++
+            return null
+        }
+        return change
+    })
+    observedMap.replace(data)
+
+    expect(interceptCount).toEqual(3)
+    expect(observedMap.size).toEqual(3)
+    expect(observedMap._keys.slice()).toEqual(["prop4", "prop5", "prop6"])
+    expect(observedMap.toJSON()).toEqual({ prop4: 4, prop5: 5, prop6: 6 })
+})
+
+test("#2253 filled Map replace method with intercept 2", () => {
+    let interceptCount = 0
+    const data = {
+        5: 5,
+        2: 20
+    }
+
+    const observedMap = map({ 1: 1, 2: 2, 3: 3, 4: 4 })
+    // debugger
+    intercept(observedMap, change => {
+        if (change.type === "delete") {
+            if (change.name === "1" || change.name === "4") {
+                ++interceptCount
+                return null
+            }
+            ++interceptCount
+            return change
+        }
+        if (change.type === "add" || change.type === "update") {
+            ++interceptCount
+            return change
+        }
+        console.log(change)
+    })
+    observedMap.replace(data)
+
+    expect(interceptCount).toEqual(4)
+    expect(observedMap.size).toEqual(4)
+    expect(observedMap._keys.slice()).toEqual(["1", "2", "4", "5"])
+    expect(observedMap.toJSON()).toEqual({ 1: 1, 2: 20, 4: 4, 5: 5 })
+})
+
+test("#2253 filled Map replace method with intercept 3", () => {
+    let interceptCount = 0
+    const data = {
+        3: 3,
+        2: 2,
+        1: 1
+    }
+
+    const observedMap = map({ 1: 1, 2: 2, 3: 3 })
+
+    intercept(observedMap, change => {
+        console.log(change.type, change.name)
+        if (change.name === "1") {
+            ++interceptCount
+            return null
+        }
+        return change
+    })
+    observedMap.replace(data)
+
+    expect(interceptCount).toEqual(1)
+    expect(observedMap.size).toEqual(3)
+    expect(observedMap._keys.slice()).toEqual(["3", "2"])
+    expect(observedMap.toJSON()).toEqual({ 3: 3, 2: 2 })
+})

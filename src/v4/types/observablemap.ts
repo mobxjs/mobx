@@ -328,19 +328,23 @@ export class ObservableMap<K = any, V = any>
     replace(values: ObservableMap<K, V> | IKeyValueMap<V> | any): ObservableMap<K, V> {
         transaction(() => {
             const replacementMap = convertToMap(values)
-            const oldKeys = this._keys
+            // this._keys is an observableArray it will be update at each addition by 'set'
+            const keys = this._keys
             const newKeys: Array<any> = Array.from(replacementMap.keys())
             let keysChanged = false
-            for (let i = 0; i < oldKeys.length; i++) {
-                const oldKey = oldKeys[i]
+            for (let i = 0; i < keys.length; i++) {
+                const key = keys[i]
                 // key order change
-                if (oldKeys.length === newKeys.length && oldKey !== newKeys[i]) {
-                    keysChanged = true
-                }
+                // if (oldKeys.length === newKeys.length && oldKey !== newKeys[i]) {
+                //     keysChanged = true
+                // }
                 // deleted key
-                if (!replacementMap.has(oldKey)) {
-                    keysChanged = true
-                    this.delete(oldKey)
+                if (!replacementMap.has(key)) {
+                    this.delete(key)
+                    const keyHasBeenDelete = this._data.has(key)
+                    if (!keyHasBeenDelete) {
+                        keysChanged = true
+                    }
                 }
             }
             replacementMap.forEach((value, key) => {
@@ -351,7 +355,13 @@ export class ObservableMap<K = any, V = any>
                 this.set(key, value)
             })
             if (keysChanged) {
-                this._keys.replace(newKeys)
+                let keysToReplace: Array<K> = []
+                if (keys.length > 0) {
+                    keysToReplace = keys
+                } else {
+                    keysToReplace = newKeys
+                }
+                this._keys.replace(keysToReplace)
             }
         })
         return this
