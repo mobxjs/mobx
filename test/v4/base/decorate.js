@@ -16,8 +16,6 @@ import {
 
 import { serializable, primitive, serialize, deserialize } from "serializr"
 
-import { serializable, primitive, serialize, deserialize } from "serializr"
-
 test("decorate should work", function() {
     class Box {
         // @ts-ignore

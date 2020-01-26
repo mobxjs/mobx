@@ -618,52 +618,9 @@ test("issue 1243, .replace should not trigger change on unchanged values", () =>
 
     expect(() => {
         m.replace("not-an-object")
-    }).toThrow(/Cannot convert to map from 'not-an-object'/)
+    }).toThrow(/Cannot get keys from 'not-an-object'/)
 
     d()
-})
-
-test("#1980 .replace should not breaks entities order!", () => {
-    const original = mobx.observable.map([["a", "first"], ["b", "second"]])
-    const replacement = new Map([["b", "first"], ["a", "second"]])
-    original.replace(replacement)
-    const newKeys = Array.from(replacement)
-    const originalKeys = Array.from(replacement)
-    for (let i = 0; i < newKeys.length; i++) {
-        expect(newKeys[i]).toEqual(originalKeys[i])
-    }
-})
-
-test("#1980 .replace should should invoke autorun", () => {
-    const original = mobx.observable.map({ a: "a", b: "b" })
-    const replacement = { b: "b", a: "a" }
-    let numOfInvokes = 0
-    autorun(() => {
-        numOfInvokes = numOfInvokes + 1
-        return original.entries().next()
-    })
-    original.replace(replacement)
-    const orgKeys = Array.from(original.keys())
-    const newKeys = Object.keys(replacement)
-    for (let i = 0; i < newKeys.length; i++) {
-        expect(newKeys[i]).toEqual(orgKeys[i])
-    }
-    expect(numOfInvokes).toBe(2)
-})
-
-test("#1980 .replace should not report changed unnecessarily", () => {
-    const mapArray = [["swappedA", "swappedA"], ["swappedB", "swappedB"], ["removed", "removed"]]
-    const replacementArray = [mapArray[1], mapArray[0], ["added", "added"]]
-    const map = mobx.observable.map(mapArray)
-    let autorunInvocationCount = 0
-    autorun(() => {
-        map.get("swappedA")
-        map.get("swappedB")
-        autorunInvocationCount++
-    })
-    map.replace(replacementArray)
-    expect(Array.from(map.entries())).toEqual(replacementArray)
-    expect(autorunInvocationCount).toBe(1)
 })
 
 test("#1258 cannot replace maps anymore", () => {
