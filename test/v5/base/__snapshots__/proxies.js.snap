@@ -1,0 +1,106 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`decorate proxies 1`] = `
+Object {
+  "b": Object {
+    "configurable": true,
+    "enumerable": true,
+    "get": [Function],
+    "set": [Function],
+  },
+  "double": Object {
+    "configurable": true,
+    "enumerable": false,
+    "value": [Function],
+    "writable": true,
+  },
+  "x": Object {
+    "configurable": true,
+    "enumerable": true,
+    "get": [Function],
+    "set": [Function],
+  },
+  "y": Object {
+    "configurable": false,
+    "enumerable": false,
+    "get": [Function],
+    "set": [Function],
+  },
+  Symbol(mobx administration): Object {
+    "configurable": true,
+    "enumerable": false,
+    "value": "(omitted)",
+    "writable": true,
+  },
+}
+`;
+
+exports[`extend proxies 1`] = `
+Object {
+  "b": Object {
+    "configurable": true,
+    "enumerable": true,
+    "get": [Function],
+    "set": [Function],
+  },
+  "double": Object {
+    "configurable": true,
+    "enumerable": false,
+    "value": [Function],
+    "writable": true,
+  },
+  "x": Object {
+    "configurable": true,
+    "enumerable": true,
+    "get": [Function],
+    "set": [Function],
+  },
+  "y": Object {
+    "configurable": false,
+    "enumerable": false,
+    "get": [Function],
+    "set": [Function],
+  },
+  Symbol(mobx administration): Object {
+    "configurable": true,
+    "enumerable": false,
+    "value": "(omitted)",
+    "writable": true,
+  },
+}
+`;
+
+exports[`non-proxied object 1`] = `
+Object {
+  "b": Object {
+    "configurable": true,
+    "enumerable": true,
+    "value": 4,
+    "writable": true,
+  },
+  "double": Object {
+    "configurable": true,
+    "enumerable": false,
+    "value": [Function],
+    "writable": true,
+  },
+  "x": Object {
+    "configurable": true,
+    "enumerable": true,
+    "get": [Function],
+    "set": [Function],
+  },
+  "y": Object {
+    "configurable": false,
+    "enumerable": false,
+    "get": [Function],
+    "set": [Function],
+  },
+  Symbol(mobx administration): Object {
+    "configurable": true,
+    "enumerable": false,
+    "value": "(omitted)",
+    "writable": true,
+  },
+}
+`;

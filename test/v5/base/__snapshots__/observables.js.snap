@@ -1,0 +1,175 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`delay autorun until end of transaction 1`] = `
+Array [
+  Object {
+    "key": "a",
+    "name": "ObservableObject@1",
+    "newValue": 3,
+    "oldValue": 2,
+    "spyReportStart": true,
+    "type": "update",
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+  Object {
+    "key": "a",
+    "name": "ObservableObject@1",
+    "newValue": 4,
+    "oldValue": 3,
+    "spyReportStart": true,
+    "type": "update",
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+  "end1",
+  Object {
+    "key": "a",
+    "name": "ObservableObject@1",
+    "newValue": 5,
+    "oldValue": 4,
+    "spyReportStart": true,
+    "type": "update",
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+  "end2",
+  Object {
+    "name": "test",
+    "spyReportStart": true,
+    "type": "reaction",
+  },
+  "auto",
+  Object {
+    "name": "ObservableObject@1.b",
+    "type": "compute",
+  },
+  "calc y",
+  Object {
+    "spyReportEnd": true,
+  },
+  "post trans1",
+  Object {
+    "key": "a",
+    "name": "ObservableObject@1",
+    "newValue": 6,
+    "oldValue": 5,
+    "spyReportStart": true,
+    "type": "update",
+  },
+  Object {
+    "name": "ObservableObject@1.b",
+    "type": "compute",
+  },
+  "calc y",
+  Object {
+    "name": "test",
+    "spyReportStart": true,
+    "type": "reaction",
+  },
+  "auto",
+  Object {
+    "spyReportEnd": true,
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+  "post trans2",
+  Object {
+    "key": "a",
+    "name": "ObservableObject@1",
+    "newValue": 3,
+    "oldValue": 6,
+    "spyReportStart": true,
+    "type": "update",
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+  "post trans3",
+]
+`;
+
+exports[`issue 50 1`] = `
+Array [
+  "auto",
+  "calc c",
+  "transstart",
+  Object {
+    "key": "a",
+    "name": "ObservableObject@1",
+    "newValue": false,
+    "oldValue": true,
+    "spyReportStart": true,
+    "type": "update",
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+  Object {
+    "key": "b",
+    "name": "ObservableObject@1",
+    "newValue": true,
+    "oldValue": false,
+    "spyReportStart": true,
+    "type": "update",
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+  "transpreend",
+  Object {
+    "name": "ar",
+    "spyReportStart": true,
+    "type": "reaction",
+  },
+  "auto",
+  Object {
+    "name": "ObservableObject@1.c",
+    "type": "compute",
+  },
+  "calc c",
+  Object {
+    "spyReportEnd": true,
+  },
+  "transpostend",
+]
+`;
+
+exports[`verify transaction events 1`] = `
+Array [
+  "auto",
+  "calc c",
+  "transstart",
+  Object {
+    "key": "b",
+    "name": "ObservableObject@1",
+    "newValue": 2,
+    "oldValue": 1,
+    "spyReportStart": true,
+    "type": "update",
+  },
+  Object {
+    "spyReportEnd": true,
+  },
+  "transpreend",
+  Object {
+    "name": "ObservableObject@1.c",
+    "type": "compute",
+  },
+  "calc c",
+  Object {
+    "name": "ar",
+    "spyReportStart": true,
+    "type": "reaction",
+  },
+  "auto",
+  Object {
+    "spyReportEnd": true,
+  },
+  "transpostend",
+]
+`;

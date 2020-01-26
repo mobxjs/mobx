@@ -1,0 +1,177 @@
+body, html {
+    padding: 0;
+    margin: 0;
+    height: 100%;
+	font-family: 'PT Serif', serif;
+}
+.root {
+    height: 100vh;
+    width: 100%;
+    border-spacing: 0px;
+}
+.left, .right {
+    padding: 0px;
+    width: 50%;
+    vertical-align: top;
+}
+.left-content-wrapper {
+    height:100vh;
+    overflow: scroll;
+}
+.left-content {
+	margin-left: auto;
+	margin-right: 0;
+}
+.right {
+	background: #3B64AF;
+	color: white;
+}
+.right-content, .left-content {
+	max-width: 600px;
+	padding: 40px;
+}
+.right-content {
+}
+h1,h2,h3,h4 {
+	font-weight: bold;
+    font-size: 2em;
+}
+h1 {
+	size: 40pt;
+}
+hr {
+	border: none;
+	border-top: 1px dotted #999;
+	width: 30%;
+}
+
+#project_title {
+	font-size: 60pt;
+}
+#project_tagline {
+	clear: left;
+	font-family: 'arial';
+	font-size: 18pt;
+	text-align: center;
+}
+
+textarea, body .CodeMirror {
+    width: 560px;
+}
+
+textarea {
+    border-style: none;
+    white-space: pre;
+    overflow: auto;
+    padding: 20px;
+    font-family: courier new;
+    color: #333;
+    font-size: 10pt;
+    text-shadow: #fff 1px 1px;
+    margin: 30px 0 20px;
+}
+body .CodeMirror {
+	border: 1px solid #999;
+    height: auto;
+    font-size: 10pt;
+    font-family: courier new;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    padding: 14px;
+}
+code {
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+    color: #007edf;
+    font-family: 'courier new';
+    font-size: 11pt;
+    background: none;
+}
+.right li {
+	color: white;
+    padding-left: 10px;
+}
+button {
+    cursor: pointer;
+}
+.btn-run {
+    margin-left: 8px;
+    float: right;
+    position: relative;
+    padding: 4px 10px;
+    top: -22px;
+    left: 7px;
+}
+.btn-run:hover {
+	outline: 2px solid #ff9955;
+}
+.right h3 {
+	margin-bottom: 4px;
+}
+#reactjs-app {
+    margin-left: -20px;
+    padding: 20px;
+    width: 100%;
+}
+#consoleout div {
+    border-bottom: 1px solid #ccc;
+    padding: 4px 0;
+    font-family: courier new;
+    font-size: 10pt;
+}
+.render-counter {
+    position: relative;
+    float: right;
+    border-radius: 8px;
+    background-color: #bbb;
+    font-family: arial;
+    font-size: 8pt;
+    font-weight: bold;
+    text-align: center;
+    display: inline-block;
+    padding: 1px 5px;
+    color: white;
+    top: 2px;
+}
+@keyframes blink1 {
+    0% { background-color : #bbb}
+    50% { background-color : #ff9955}
+    100% { background-color : #bbb}
+}
+@keyframes blink2 {
+    0% { background-color : #bbb}
+    50% { background-color : #ff9955}
+    100% { background-color : #bbb}
+}
+.render-counter.odd {
+    animation: blink1 1s ease;
+}
+.render-counter.even {
+    animation: blink2 1s ease;
+}
+small {
+    color: #999;
+    font-size: 10pt;
+    font-style: italic;
+}
+#reactjs-app {
+    font-size: 16pt;
+}
+#reactjs-app small {
+    color: white;
+    padding-left: 10px;
+}
+
+body .github-fork-ribbon {
+    background-color: cornflowerblue;
+}
+
+#devtools {
+    color: black;
+}
+
+pre {
+    background-color: #e9e9e9;
+    padding: 20px;
+}

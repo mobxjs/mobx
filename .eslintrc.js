@@ -3,7 +3,7 @@ module.exports = {
     plugins: ["@typescript-eslint"],
     extends: "eslint:recommended",
     env: {
-        // es6: true
+        es6: true
     },
     parserOptions: {
         ecmaVersion: 6,

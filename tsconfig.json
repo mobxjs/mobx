@@ -1,21 +1,21 @@
 {
     "compilerOptions": {
-        "target": "es5",
+        "target": "es6",
+        "module": "esnext",
+        "moduleResolution": "node",
+        "lib": ["es6"],
         "rootDir": "src",
-        "outDir": "lib",
+        "downlevelIteration": true,
+        "alwaysStrict": true,
         "sourceMap": false,
         "declaration": true,
-        "module": "commonjs",
         "removeComments": false,
-        "strictNullChecks": true,
+        "strict": true,
         "noImplicitReturns": true,
-        "noImplicitUseStrict": true,
         "noUnusedLocals": true,
         "noImplicitAny": false,
-        "downlevelIteration": true,
         "noImplicitThis": false,
-        "experimentalDecorators": true,
-        "lib": ["es6"]
+        "experimentalDecorators": true
     },
     "include": ["src/**/*.ts"]
 }

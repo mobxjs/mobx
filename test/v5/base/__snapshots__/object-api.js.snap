@@ -1,0 +1,48 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`observe & intercept 1`] = `
+Array [
+  Object {
+    "intercept": Object {
+      "name": "b",
+      "newValue": Object {
+        "title": "get tea",
+      },
+      "object": "skip",
+      "type": "add",
+    },
+  },
+  Object {
+    "intercept": Object {
+      "name": "a",
+      "object": "skip",
+      "type": "remove",
+    },
+  },
+]
+`;
+
+exports[`observe & intercept 2`] = `
+Array [
+  Object {
+    "observe": Object {
+      "name": "b",
+      "newValue": Object {
+        "title": "get tea",
+      },
+      "object": "skip",
+      "type": "add",
+    },
+  },
+  Object {
+    "observe": Object {
+      "name": "a",
+      "object": "skip",
+      "oldValue": Object {
+        "title": "get coffee",
+      },
+      "type": "remove",
+    },
+  },
+]
+`;
