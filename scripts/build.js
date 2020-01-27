@@ -55,23 +55,16 @@ function runTypeScriptBuild(outDir, version, target, declarations) {
     }
 }
 
-async function generateBundledModule(inputPath, version, outputFile, format, env = "development") {
+async function generateBundledModule(inputPath, version, outputFile, format, env) {
     console.log(`Generating ${version} ${outputFile} ${env} bundle.`)
+
+    const replaceEnv = env && replacePlugin({ "process.env.NODE_ENV": JSON.stringify(env) })
 
     let plugins
     if (env === "production") {
-        plugins = [
-            resolvePlugin(),
-            replacePlugin({ "process.env.NODE_ENV": JSON.stringify("production") }),
-            terserPlugin(),
-            filesizePlugin()
-        ]
+        plugins = [resolvePlugin(), replaceEnv, terserPlugin(), filesizePlugin()]
     } else {
-        plugins = [
-            resolvePlugin(),
-            replacePlugin({ "process.env.NODE_ENV": JSON.stringify(env) }),
-            filesizePlugin()
-        ]
+        plugins = [resolvePlugin(), replaceEnv, filesizePlugin()]
     }
 
     const bundle = await rollup({
@@ -104,7 +97,7 @@ const pkg = require("../package.json")
 function writePackage(versionPath, version) {
     // replace `0.y.z` with `v.y.z`, strip `v` prefix
     const pkgVersion = pkg.version.replace(/^0/, version.replace("v", ""))
-    return fs.writeFile(
+    fs.writeFileSync(
         path.resolve(versionPath, "package.json"),
         JSON.stringify(
             {
@@ -121,6 +114,19 @@ function writePackage(versionPath, version) {
     )
 }
 
+function writeIndex(versionPath) {
+    fs.writeFileSync(
+        path.resolve(versionPath, "lib", "index.js"),
+        `
+if (typeof process !== 'undefined' && process.env.NODE_ENV === 'production') {
+    module.exports = require('./mobx.min.js');
+} else {
+    module.exports = require('./mobx.js');
+}
+        `
+    )
+}
+
 async function build(version) {
     const distPath = "dist"
     const es5Build = path.join(distPath, ".build.es5")
@@ -131,18 +137,20 @@ async function build(version) {
     runTypeScriptBuild(es6Build, version, ts.ScriptTarget.ES2015, false)
 
     await Promise.all([
-        generateBundledModule(es5Build, version, "mobx.js", "cjs"),
+        generateBundledModule(es5Build, version, "mobx.js", "cjs", "development"),
         generateBundledModule(es5Build, version, "mobx.min.js", "cjs", "production"),
 
         generateBundledModule(es5Build, version, "mobx.module.js", "es"),
         generateBundledModule(es6Build, version, "mobx.es6.js", "es"),
 
         generateBundledModule(es5Build, version, "mobx.umd.js", "umd"),
-        generateBundledModule(es5Build, version, "mobx.umd.min.js", "umd", "production")
+        generateBundledModule(es5Build, version, "mobx.umd.min.js", "umd", "production"),
+
+        copyAssets(versionPath)
     ])
 
-    await copyAssets(versionPath)
-    await writePackage(versionPath, version)
+    writeIndex(versionPath)
+    writePackage(versionPath, version)
 }
 
 Promise.all([build("v4"), build("v5")]).catch(e => {
