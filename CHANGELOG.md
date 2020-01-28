@@ -1,3 +1,7 @@
+# 5.15.4 / 4.15.4
+
+-   Fix process.env replacement in build [#2267](https://github.com/mobxjs/mobx/pull/2267) by [@fredyc](https://github.com/fredyc)
+
 # 5.15.3 / 4.15.3
 
 -   Define action name to be as the function name [#2262](https://github.com/mobxjs/mobx/pull/2262) by [@nadavkaner](https://github.com/nadavkaner)
