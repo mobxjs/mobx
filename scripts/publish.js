@@ -12,7 +12,7 @@ function run(command, options) {
     const continueOnErrors = options && options.continueOnErrors
     const ret = shell.exec(command, options)
     if (!continueOnErrors && ret.code !== 0) {
-        shell.exit(1)
+        exit(1)
     }
     return ret
 }
@@ -35,6 +35,7 @@ function writeJSON(path, obj) {
 }
 
 function maskVerWithX(ver) {
+    // simply replace initial 0 in version with X letter to avoid confusion
     return ver.replace(/^0/, "X")
 }
 
@@ -45,8 +46,8 @@ async function main() {
     }
 
     const rootPath = path.resolve(__dirname, "..")
-    const rootPkgPath = path.join(rootPath, "package.json")
-    const rootPkg = require(rootPkgPath)
+    const rootPkgFile = path.join(rootPath, "package.json")
+    const rootPkg = require(rootPkgFile)
 
     const nextPatch = semver.inc(rootPkg.version, "patch")
     const nextMinor = semver.inc(rootPkg.version, "minor")
@@ -94,18 +95,26 @@ async function main() {
 
     if (npmInfoRet.code === 0) {
         const versions = await Promise.all([execute(4, "mobx4"), execute(5, "latest")])
-        await writeJSON(rootPkgPath, { ...rootPkg, version: resp.action })
-        run(`git commit --no-verify -am "Published version ${maskVerWithX(resp.action)}"`)
+
+        await writeJSON(rootPkgFile, { ...rootPkg, version: resp.action })
+
+        run(`git add ${rootPkgFile}`)
+        run(`git commit --no-verify -m "Published version ${maskVerWithX(resp.action)}"`)
+        run("git push")
+
         versions.forEach(ver => {
             run(`git tag ${ver}`)
         })
-        run("git push")
         run("git push --tags")
 
+        console.log("Pushed updated version & tags to git")
+
         if (gitUser) {
+            console.log("Publishing docs...")
             run(`GIT_USER=${gitUser} USE_SSH=true yarn docs:publish`)
+            console.log("Docs published")
         }
-        console.log("Published!")
+
         exit(0)
     }
 
@@ -122,11 +131,13 @@ async function main() {
         console.log(`Starting publish of ${nextVersion}...`)
 
         const distPath = path.resolve(__dirname, "..", "dist", `v${major}`)
-        const verPkgPath = path.join(distPath, "package.json")
-        const verPkg = require(verPkgPath)
-        await writeJSON(verPkgPath, { ...verPkg, version: nextVersion })
+        const verPkgFile = path.join(distPath, "package.json")
+        const verPkg = require(verPkgFile)
+        await writeJSON(verPkgFile, { ...verPkg, version: nextVersion })
 
         run(`npm publish ${distPath} --tag ${distTag}`)
+        console.log(`Published ${nextVersion} to NPM with distTag ${distTag}`)
+
         return nextVersion
     }
 }
