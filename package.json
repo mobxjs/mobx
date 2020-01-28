@@ -2,11 +2,11 @@
   "name": "mobx",
   "version": "0.15.3",
   "description": "Simple, scalable state management.",
-  "main": "lib/mobx.js",
+  "main": "lib/index.js",
   "umd:main": "lib/mobx.umd.js",
   "module": "lib/mobx.module.js",
   "browser": {
-    "./lib/mobx.js": "./lib/mobx.js",
+    "./lib/mobx.js": "./lib/mobx.min.js",
     "./lib/mobx.module.js": "./lib/mobx.module.js"
   },
   "unpkg": "lib/mobx.umd.min.js",
@@ -29,6 +29,7 @@
     "_prepublish": "yarn small-build",
     "quick-build": "tsc --pretty",
     "small-build": "node scripts/build.js",
+    "build": "node scripts/build.js",
     "release": "node scripts/publish.js",
     "publish-script": "yarn release",
     "docs:build": "yarn --cwd website build",
