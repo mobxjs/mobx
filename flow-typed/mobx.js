@@ -3,31 +3,45 @@
 export type IObservableMapInitialValues<K, V> = IMapEntries<K, V> | KeyValueMap<V> | IMap<K, V>
 
 export interface IMobxConfigurationOptions {
-    +enforceActions?: boolean | "strict" | "never" | "always" | "observed",
-    computedRequiresReaction?: boolean,
-    isolateGlobalState?: boolean,
-    disableErrorBoundaries?: boolean,
-    arrayBuffer?: number,
-    reactionScheduler?: (f: () => void) => void
+    +enforceActions?: boolean | "strict" | "never" | "always" | "observed";
+    computedRequiresReaction?: boolean;
+    /**
+     * (Experimental)
+     * Warn if you try to create to derivation / reactive context without accessing any observable.
+     */
+    reactionRequiresObservable?: boolean;
+    /**
+     * (Experimental)
+     * Warn if observables are accessed outside a reactive context
+     */
+    observableRequiresReaction?: boolean;
+    isolateGlobalState?: boolean;
+    disableErrorBoundaries?: boolean;
+    arrayBuffer?: number;
+    reactionScheduler?: (f: () => void) => void;
 }
 
 declare export function configure(options: IMobxConfigurationOptions): void
 
 export interface IAutorunOptions {
-    delay?: number,
-    name?: string,
-    scheduler?: (callback: () => void) => any,
-    onError?: (error: any) => void
+    delay?: number;
+    name?: string;
+    /**
+     *  warn if the derivation has no dependencies after creation/update
+     */
+    requiresObservable?: boolean;
+    scheduler?: (callback: () => void) => any;
+    onError?: (error: any) => void;
 }
 
 export interface IReactionOptions extends IAutorunOptions {
-    fireImmediately?: boolean,
-    equals?: IEqualsComparer<any>
+    fireImmediately?: boolean;
+    equals?: IEqualsComparer<any>;
 }
 
 export interface IInterceptable<T> {
-    interceptors: IInterceptor<T>[] | any,
-    intercept(handler: IInterceptor<T>): Lambda
+    interceptors: IInterceptor<T>[] | any;
+    intercept(handler: IInterceptor<T>): Lambda;
 }
 
 export type IEqualsComparer<T> = (a: T, b: T) => boolean
@@ -39,130 +53,138 @@ export type IMapEntry<K, V> = [K, V]
 export type IMapEntries<K, V> = IMapEntry<K, V>[]
 
 export interface IMap<K, V> {
-    clear(): void,
-    delete(key: K): boolean,
-    forEach(callbackfn: (value: V, index: K, map: IMap<K, V>) => void, thisArg?: any): void,
-    get(key: K): V | any,
-    has(key: K): boolean,
-    set(key: K, value?: V): any,
-    size: number
+    clear(): void;
+    delete(key: K): boolean;
+    forEach(callbackfn: (value: V, index: K, map: IMap<K, V>) => void, thisArg?: any): void;
+    get(key: K): V | any;
+    has(key: K): boolean;
+    set(key: K, value?: V): any;
+    size: number;
 }
 
 declare export function isObservableMap(x: any): boolean
 
 export interface IComputedValueOptions<T> {
-    get?: () => T,
-    set?: (value: T) => void,
-    name?: string,
-    equals?: IEqualsComparer<T>,
-    context?: any
+    get?: () => T;
+    set?: (value: T) => void;
+    name?: string;
+    equals?: IEqualsComparer<T>;
+    context?: any;
 }
 
-declare type PropertyDescriptor = any
+type PropertyDescriptor<T> = {
+    enumerable?: boolean,
+    configurable?: boolean,
+    writable?: boolean,
+    value?: T,
+    get?: () => T,
+    set?: (value: T) => void
+}
 
 export interface IComputed {
-    <T>(func: () => T, setter?: (value: T) => void): IComputedValue<T>,
-    <T>(func: () => T, options: IComputedValueOptions<T>): IComputedValue<T>,
-    (target: Object, key: string, baseDescriptor?: PropertyDescriptor): void,
-    struct(target: Object, key: string, baseDescriptor?: PropertyDescriptor): void
+    <T>(func: () => T, setter?: (value: T) => void): IComputedValue<T>;
+    <T>(func: () => T, options: IComputedValueOptions<T>): IComputedValue<T>;
+    (target: Object, key: string, baseDescriptor?: PropertyDescriptor<*>): void;
+    struct(target: Object, key: string, baseDescriptor?: PropertyDescriptor<*>): void;
 }
 
 export interface IDependencyTree {
-    name: string,
-    dependencies?: IDependencyTree[]
+    name: string;
+    dependencies?: IDependencyTree[];
 }
 
 export interface IObserverTree {
-    name: string,
-    observers?: IObserverTree[]
+    name: string;
+    observers?: IObserverTree[];
 }
 
 export interface IAtom {
-    reportObserved: () => void,
-    reportChanged: () => void
+    reportObserved: () => void;
+    reportChanged: () => void;
 }
 
 export interface IComputedValue<T> {
-    get(): T,
-    set(value: T): void,
-    observe(listener: (newValue: T, oldValue: T) => void, fireImmediately?: boolean): Lambda
+    get(): T;
+    set(value: T): void;
+    observe(listener: (newValue: T, oldValue: T) => void, fireImmediately?: boolean): Lambda;
 }
 
 export interface IObservable {}
 
 export interface IDepTreeNode {
-    name: string,
-    observing?: IObservable[]
+    name: string;
+    observing?: IObservable[];
 }
 
 export interface IDerivation {
-    name: string
+    name: string;
 }
 
 export interface IReactionPublic {
-    dispose: () => void,
-    trace: (enterBreakPoint?: boolean) => void
+    dispose: () => void;
+    trace: (enterBreakPoint?: boolean) => void;
 }
 
 declare export class IListenable {
-    observe(handler: (change: any, oldValue?: any) => void, fireImmediately?: boolean): Lambda
+    observe(handler: (change: any, oldValue?: any) => void, fireImmediately?: boolean): Lambda;
 }
 
 export interface IObservableArray<T> extends Array<T> {
-    spliceWithArray(index: number, deleteCount?: number, newItems?: T[]): T[],
+    spliceWithArray(index: number, deleteCount?: number, newItems?: T[]): T[];
     observe(
         listener: (changeData: IArrayChange<T> | IArraySplice<T>) => void,
         fireImmediately?: boolean
-    ): Lambda,
-    intercept(handler: IInterceptor<IArrayWillChange<T> | IArrayWillSplice<T>>): Lambda,
-    intercept(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda,
-    intercept<T>(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda,
-    clear(): T[],
-    replace(newItems: T[]): T[],
+    ): Lambda;
+    intercept(handler: IInterceptor<IArrayWillChange<T> | IArrayWillSplice<T>>): Lambda;
+    intercept(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda; // TODO: remove in 4.0
+    intercept<T>(handler: IInterceptor<IArrayChange<T> | IArraySplice<T>>): Lambda; // TODO: remove in 4.0
+    clear(): T[];
+    peek(): T[];
+    replace(newItems: T[]): T[];
     find(
-        predicate: (item: T, index: number, array: Array<T>) => boolean,
+        predicate: (item: T, index: number, array: Array<T>) => mixed,
         thisArg?: any,
         fromIndex?: number
-    ): T | any,
+    ): T | any;
     findIndex(
-        predicate: (item: T, index: number, array: Array<T>) => boolean,
+        predicate: (item: T, index: number, array: Array<T>) => mixed,
         thisArg?: any,
         fromIndex?: number
-    ): number,
-    remove(value: T): boolean
+    ): number;
+    remove(value: T): boolean;
 }
 
 export interface IArrayChange<T> {
-    type: "update",
-    object: IObservableArray<T>,
-    index: number,
-    newValue: T,
-    oldValue: T
+    type: "update";
+    object: IObservableArray<T>;
+    index: number;
+    newValue: T;
+    oldValue: T;
 }
 
 export interface IArraySplice<T> {
-    type: "splice",
-    object: IObservableArray<T>,
-    index: number,
-    added: T[],
-    addedCount: number,
-    removed: T[],
-    removedCount: number
+    type: "splice";
+    object: IObservableArray<T>;
+    index: number;
+    added: T[];
+    addedCount: number;
+    removed: T[];
+    removedCount: number;
 }
 
 export interface IArrayWillChange<T> {
-    type: "update",
-    object: IObservableArray<T>,
-    index: number,
-    newValue: T
+    type: "update";
+    object: IObservableArray<T>;
+    index: number;
+    newValue: T;
 }
 
 export interface IArrayWillSplice<T> {
-    type: "splice",
-    object: IObservableArray<T>,
-    index: number,
-    added: T[],
-    removedCount: number
+    type: "splice";
+    object: IObservableArray<T>;
+    index: number;
+    added: T[];
+    removedCount: number;
 }
 
 export type KeyValueMap<V> = {
@@ -170,70 +192,70 @@ export type KeyValueMap<V> = {
 }
 
 export interface IMapChange<K, T> {
-    object: ObservableMap<K, T>,
-    type: "update" | "add" | "delete",
-    name: K,
-    newValue?: any,
-    oldValue?: any
+    object: ObservableMap<K, T>;
+    type: "update" | "add" | "delete";
+    name: K;
+    newValue?: any;
+    oldValue?: any;
 }
 
 export interface IMapWillChange<K, T> {
-    object: ObservableMap<K, T>,
-    type: "update" | "add" | "delete",
-    name: K,
-    newValue?: any
+    object: ObservableMap<K, T>;
+    type: "update" | "add" | "delete";
+    name: K;
+    newValue?: any;
 }
 
 export interface IObservableObject {}
 
 export interface IObjectChange {
-    name: string,
-    object: any,
-    type: "update" | "add" | "remove",
-    oldValue?: any,
-    newValue: any
+    name: string;
+    object: any;
+    type: "update" | "add" | "remove";
+    oldValue?: any;
+    newValue: any;
 }
 
 export interface IObjectWillChange {
-    object: any,
-    type: "update" | "add" | "remove",
-    name: string,
-    newValue: any
+    object: any;
+    type: "update" | "add" | "remove";
+    name: string;
+    newValue: any;
 }
 
 export interface IValueWillChange<T> {
-    object: any,
-    type: "update",
-    newValue: T
+    object: any;
+    type: "update";
+    newValue: T;
 }
 
 export interface IValueDidChange<T> extends IValueWillChange<T> {
-    oldValue: ?T
+    oldValue: ?T;
 }
 
 export interface IObservableValue<T> {
-    get(): T,
-    set(value: T): void,
-    intercept(handler: IInterceptor<IValueWillChange<T>>): Lambda,
-    observe(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda
+    get(): T;
+    set(value: T): void;
+    intercept(handler: IInterceptor<IValueWillChange<T>>): Lambda;
+    observe(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda;
 }
 
 export interface IEnhancer<T> {
-    (newValue: T, oldValue: T | void, name: string): T
+    (newValue: T, oldValue: T | void, name: string): T;
 }
 
 export interface IObservableFactory {
     // observable overloads
-    (target: Object, key: string, baseDescriptor?: PropertyDescriptor): any,
-    <T>(value: Array<T>): IObservableArray<T>,
-    <T>(value: null | void): IObservableValue<T>,
-    (value: null | void): IObservableValue<any>,
-    <T>(value: IMap<string | number | boolean, T>): ObservableMap<T>,
-    <T: Object>(value: T): T
+    (target: Object, key: string, baseDescriptor?: PropertyDescriptor<*>): any;
+    <T>(value: Array<T>): IObservableArray<T>;
+    <T>(value: null | void): IObservableValue<T>;
+    (value: null | void): IObservableValue<any>;
+    <T>(value: IMap<string | number | boolean, T>): ObservableMap<T>;
+    <T: Object>(value: T): T;
 }
 
 export type IObservableDecorator = {
-    (target: Object, property: string, descriptor?: PropertyDescriptor): void,
+    (target: Object, property: string, descriptor?: PropertyDescriptor<*>): void,
     enhancer: IEnhancer<any>
 }
 
@@ -244,58 +266,66 @@ export type CreateObservableOptions = {
 }
 
 declare export class IObservableFactories {
-    box<T>(value?: T, options?: CreateObservableOptions): IObservableValue<T>,
-    array<T>(initialValues?: T[], options?: CreateObservableOptions): IObservableArray<T>,
+    box<T>(value?: T, options?: CreateObservableOptions): IObservableValue<T>;
+    array<T>(initialValues?: T[], options?: CreateObservableOptions): IObservableArray<T>;
     map<K, V>(
         initialValues?: IObservableMapInitialValues<K, V>,
         options?: CreateObservableOptions
-    ): ObservableMap<K, V>,
-    object<T>(props: T, options?: CreateObservableOptions): T & IObservableObject,
-    ref(target: Object, property?: string, descriptor?: PropertyDescriptor): IObservableDecorator,
+    ): ObservableMap<K, V>;
+    object<T>(props: T, options?: CreateObservableOptions): T & IObservableObject;
+    ref(
+        target: Object,
+        property?: string,
+        descriptor?: PropertyDescriptor<*>
+    ): IObservableDecorator;
     shallow(
         target: Object,
         property?: string,
-        descriptor?: PropertyDescriptor
-    ): IObservableDecorator,
-    deep(target: Object, property?: string, descriptor?: PropertyDescriptor): IObservableDecorator
+        descriptor?: PropertyDescriptor<*>
+    ): IObservableDecorator;
+    deep(
+        target: Object,
+        property?: string,
+        descriptor?: PropertyDescriptor<*>
+    ): IObservableDecorator;
 }
 
 export interface Lambda {
-    (): void,
-    name?: string
+    (): void;
+    name?: string;
 }
 
 export interface IActionFactory {
-    (a1: any, a2?: any, a3?: any, a4?: any, a6?: any): any,
-    bound(target: Object, propertyKey: string, descriptor?: PropertyDescriptor): void
+    (a1: any, a2?: any, a3?: any, a4?: any, a6?: any): any;
+    bound(target: Object, propertyKey: string, descriptor?: PropertyDescriptor<*>): void;
 }
 
 declare export class ObservableMap<K, V> {
-    constructor(initialData?: IMapEntries<K, V> | KeyValueMap<V>, valueModeFunc?: Function): this,
-    has(key: K): boolean,
-    set(key: K, value: V): void,
-    delete(key: K): boolean,
-    get(key: K): V,
-    keys(): Iterator<K>,
-    values(): Iterator<V>,
-    entries(): IMapEntries<K, V> & Iterator<IMapEntry<K, V>>,
-    forEach(callback: (value: V, key: K, object: KeyValueMap<K, V>) => void, thisArg?: any): void,
-    merge(other: ObservableMap<K, V> | KeyValueMap<K, V>): ObservableMap<K, V>,
-    clear(): void,
-    replace(other: ObservableMap<K, V> | KeyValueMap<K, V>): ObservableMap<K, V>,
-    size: number,
-    toJS(): Map<K, V>,
-    toPOJO(): KeyValueMap<V>,
-    toJSON(): KeyValueMap<V>,
-    toString(): string,
-    observe(listener: (changes: IMapChange<K, V>) => void, fireImmediately?: boolean): Lambda,
-    intercept(handler: IInterceptor<IMapWillChange<K, V>>): Lambda
+    constructor(initialData?: IMapEntries<K, V> | KeyValueMap<V>, valueModeFunc?: Function): this;
+    has(key: K): boolean;
+    set(key: K, value: V): void;
+    delete(key: K): boolean;
+    get(key: K): V;
+    keys(): Iterator<K>;
+    values(): Iterator<V>;
+    entries(): IMapEntries<K, V> & Iterator<IMapEntry<K, V>>;
+    forEach(callback: (value: V, key: K, object: KeyValueMap<K, V>) => void, thisArg?: any): void;
+    merge(other: ObservableMap<K, V> | KeyValueMap<K, V>): ObservableMap<K, V>;
+    clear(): void;
+    replace(other: ObservableMap<K, V> | KeyValueMap<K, V>): ObservableMap<K, V>;
+    size: number;
+    toJS(): Map<K, V>;
+    toPOJO(): KeyValueMap<V>;
+    toJSON(): KeyValueMap<V>;
+    toString(): string;
+    observe(listener: (changes: IMapChange<K, V>) => void, fireImmediately?: boolean): Lambda;
+    intercept(handler: IInterceptor<IMapWillChange<K, V>>): Lambda;
 }
 
 declare export function action(
     targetOrName: any,
     propertyKeyOrFuc?: any,
-    descriptor?: PropertyDescriptor
+    descriptor?: PropertyDescriptor<*>
 ): any
 declare export function action<T>(name: string, func: T): T
 declare export function action<T>(func: T): T
@@ -311,25 +341,29 @@ declare export function reaction<T>(
     expression: (r: IReactionPublic) => T,
     effect: (arg: T, r: IReactionPublic) => void,
     opts?: IReactionOptions
-): () => void
+): () => mixed
 
 export interface IWhenOptions {
-    name?: string,
-    timeout?: number,
-    onError?: (error: any) => void
+    name?: string;
+    timeout?: number;
+    onError?: (error: any) => void;
+    /**
+     *  warn if the derivation has no dependencies after creation/update
+     */
+    requiresObservable?: boolean;
 }
 
 declare export function when(
     cond: () => boolean,
     effect: Lambda,
     options?: IWhenOptions
-): () => void
+): () => mixed
 declare export function when(cond: () => boolean, options?: IWhenOptions): Promise<any>
 
 declare export function computed<T>(
     target: any,
     key?: string,
-    baseDescriptor?: PropertyDescriptor
+    baseDescriptor?: PropertyDescriptor<*>
 ): any
 
 declare export function extendObservable<A, B>(
@@ -401,8 +435,8 @@ declare export function observe(
 ): Lambda
 
 export interface ToJSOptions {
-    detectCycles?: boolean,
-    exportMapsAsObjects?: boolean
+    detectCycles?: boolean;
+    exportMapsAsObjects?: boolean;
 }
 
 declare export function toJS<T>(source: T, options?: ToJSOptions): T
@@ -420,18 +454,18 @@ declare export function isObservableObject<T>(thing: T): boolean
 declare export function isArrayLike(x: any): boolean
 
 declare export class Reaction {
-    name: string,
-    isDisposed: boolean,
-    constructor(name: string, onInvalidate: () => void): this,
-    schedule(): void,
-    isScheduled(): boolean,
-    track(fn: () => void): void,
-    dispose(): void,
+    name: string;
+    isDisposed: boolean;
+    constructor(name: string, onInvalidate: () => void): this;
+    schedule(): void;
+    isScheduled(): boolean;
+    track(fn: () => void): void;
+    dispose(): void;
     getDisposer(): Lambda & {
         $mosbservable: Reaction
-    },
-    toString(): string,
-    trace(enterBreakPoint?: boolean): void
+    };
+    toString(): string;
+    trace(enterBreakPoint?: boolean): void;
 }
 
 declare export function createAtom(
@@ -442,11 +476,62 @@ declare export function createAtom(
 
 declare export function decorate<T>(target: T, decorators: any): T
 
-declare export function flow<T>(fn: (...args: any[]) => T): (...args: any[]) => Promise<T>
+export type CancellablePromise<T> = Promise<T> & { cancel: () => void }
+
 declare export function flow<T>(
-    name: string,
-    fn: (...args: any[]) => T
-): (...args: any[]) => Promise<T>
+    fn: () => Generator<any, T | Promise<T>, any> | AsyncGenerator<any, T | Promise<T>, any>
+): () => CancellablePromise<T>
+declare export function flow<T, A>(
+    fn: (A) => Generator<any, T | Promise<T>, any> | AsyncGenerator<any, T | Promise<T>, any>
+): A => CancellablePromise<T>
+declare export function flow<T, A, B>(
+    fn: (A, B) => Generator<any, T | Promise<T>, any> | AsyncGenerator<any, T | Promise<T>, any>
+): (A, B) => CancellablePromise<T>
+declare export function flow<T, A, B, C>(
+    fn: (A, B, C) => Generator<any, T | Promise<T>, any> | AsyncGenerator<any, T | Promise<T>, any>
+): (A, B, C) => CancellablePromise<T>
+declare export function flow<T, A, B, C, D>(
+    fn: (
+        A,
+        B,
+        C,
+        D
+    ) => Generator<any, T | Promise<T>, any> | AsyncGenerator<any, T | Promise<T>, any>
+): (A, B, C, D) => CancellablePromise<T>
+declare export function flow<T, A, B, C, D, E>(
+    fn: (
+        A,
+        B,
+        C,
+        D,
+        E
+    ) => Generator<any, T | Promise<T>, any> | AsyncGenerator<any, T | Promise<T>, any>
+): (A, B, C, D, E) => CancellablePromise<T>
+declare export function flow<T, A, B, C, D, E, F>(
+    fn: (
+        A,
+        B,
+        C,
+        D,
+        E,
+        F
+    ) => Generator<any, T | Promise<T>, any> | AsyncGenerator<any, T | Promise<T>, any>
+): (A, B, C, D, E, F) => CancellablePromise<T>
+declare export function flow<T, A, B, C, D, E, F, G, H>(
+    fn: (
+        A,
+        B,
+        C,
+        D,
+        E,
+        F,
+        G,
+        H
+    ) => Generator<any, T | Promise<T>, any> | AsyncGenerator<any, T | Promise<T>, any>
+): (A, B, C, D, E, F, G, H) => CancellablePromise<T>
+
+declare export function isFlowCancellationError(error: Error): boolean
+declare export class FlowCancellationError extends Error {}
 
 declare export function keys<K>(map: ObservableMap<K, any>): K[]
 declare export function keys(obj: any): string[]

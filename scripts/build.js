@@ -1,30 +1,25 @@
-const rollup = require("rollup")
+const { rollup } = require("rollup")
+const resolvePlugin = require("rollup-plugin-node-resolve")
+const filesizePlugin = require("rollup-plugin-filesize")
+const replacePlugin = require("rollup-plugin-replace")
+const terserPlugin = require("rollup-plugin-terser").terser
+
 const fs = require("fs-extra")
 const path = require("path")
 const ts = require("typescript")
-const shell = require("shelljs")
-const exec = shell.exec
-
-// exit upon first error
-shell.set("-e")
-
-const binFolder = path.resolve("node_modules/.bin/")
-
-function getCmd(cmd) {
-    if (process.platform === "win32") {
-        return path.join(binFolder, cmd + ".cmd")
-    }
-    return cmd
-}
 
 // make sure we're in the right folder
 process.chdir(path.resolve(__dirname, ".."))
 
-fs.removeSync("lib")
-fs.removeSync(".build.cjs")
-fs.removeSync(".build.es")
+fs.removeSync("dist")
 
-function runTypeScriptBuild(outDir, target, declarations) {
+// these are just to clear out previous way of building so there is no confusion
+// can be removed after a while (few months?)
+fs.removeSync("lib")
+fs.removeSync(".build.es5")
+fs.removeSync(".build.es6")
+
+function runTypeScriptBuild(outDir, version, target, declarations) {
     console.log(`Running typescript build (target: ${ts.ScriptTarget[target]}) in ${outDir}/`)
 
     const tsConfig = path.resolve("tsconfig.json")
@@ -32,16 +27,17 @@ function runTypeScriptBuild(outDir, target, declarations) {
 
     const { options } = ts.parseJsonConfigFileContent(json.config, ts.sys, path.dirname(tsConfig))
 
+    options.rootDir = path.resolve("src", version)
     options.target = target
-    options.outDir = outDir
+    options.outDir = path.resolve(outDir, version)
     options.declaration = declarations
 
-    options.module = ts.ModuleKind.ES2015
+    options.module = ts.ModuleKind.ESNext
     options.importHelpers = true
     options.noEmitHelpers = true
-    if (declarations) options.declarationDir = path.resolve(".", "lib")
+    if (declarations) options.declarationDir = path.resolve("dist", version, "lib")
 
-    const rootFile = path.resolve("src", "mobx.ts")
+    const rootFile = path.resolve(options.rootDir, "mobx.ts")
     const host = ts.createCompilerHost(options, true)
     const prog = ts.createProgram([rootFile], options, host)
     const result = prog.emit()
@@ -59,89 +55,105 @@ function runTypeScriptBuild(outDir, target, declarations) {
     }
 }
 
-const rollupPlugins = [require("rollup-plugin-node-resolve")(), require("rollup-plugin-filesize")()]
+async function generateBundledModule(inputPath, version, outputFile, format, env) {
+    console.log(`Generating ${version} ${outputFile} ${env} bundle.`)
 
-function generateBundledModule(inputFile, outputFile, format) {
-    console.log(`Generating ${outputFile} bundle.`)
+    const replaceEnv = env && replacePlugin({ "process.env.NODE_ENV": JSON.stringify(env) })
 
-    return rollup
-        .rollup({
-            entry: inputFile,
-            plugins: rollupPlugins
-        })
-        .then(bundle =>
-            bundle.write({
-                dest: outputFile,
-                format,
-                banner: "/** MobX - (c) Michel Weststrate 2015 - 2018 - MIT Licensed */",
-                exports: "named"
-            })
-        )
-}
-
-function generateUmd() {
-    console.log("Generating mobx.umd.js")
-    exec("browserify -s mobx -e lib/mobx.js -o lib/mobx.umd.js")
-}
-
-function generateMinified() {
-    const prodEnv = {
-        ...process.env,
-        NODE_ENV: "production"
+    let plugins
+    if (env === "production") {
+        plugins = [resolvePlugin(), replaceEnv, terserPlugin(), filesizePlugin()]
+    } else {
+        plugins = [resolvePlugin(), replaceEnv, filesizePlugin()]
     }
 
-    console.log("Generating mobx.min.js and mobx.umd.min.js")
-    exec(`${getCmd(`envify`)} lib/mobx.js > lib/mobx.prod.js`, { env: prodEnv })
-    exec(
-        `${getCmd(
-            "uglifyjs"
-        )} --toplevel -m -c warnings=false --preamble "/** MobX - (c) Michel Weststrate 2015 - 2018 - MIT Licensed */" --source-map -o lib/mobx.min.js lib/mobx.prod.js`
-    )
-    exec(`${getCmd(`envify`)} lib/mobx.umd.js > lib/mobx.prod.umd.js`, {
-        env: prodEnv
+    const bundle = await rollup({
+        input: path.join(inputPath, version, "mobx.js"),
+        plugins
     })
-    exec(
-        `${getCmd(
-            `uglifyjs`
-        )} --toplevel -m -c warnings=false --preamble "/** MobX - (c) Michel Weststrate 2015 - 2018 - MIT Licensed */" --source-map -o lib/mobx.umd.min.js lib/mobx.prod.umd.js`
-    )
-    shell.rm("lib/mobx.prod.js", "lib/mobx.prod.umd.js")
+
+    await bundle.write({
+        file: path.join("dist", version, "lib", outputFile),
+        format,
+        banner: "/** MobX - (c) Michel Weststrate 2015 - 2020 - MIT Licensed */",
+        exports: "named",
+        name: format === "umd" ? "mobx" : undefined
+    })
+
+    console.log(`Generation of ${version} ${outputFile} bundle finished.`)
 }
 
-function copyFlowDefinitions() {
-    console.log("Copying flowtype definitions")
-    exec(`${getCmd(`ncp`)} flow-typed/mobx.js lib/mobx.js.flow`)
-}
-
-function build() {
-    runTypeScriptBuild(".build.es5", ts.ScriptTarget.ES5, true)
-    runTypeScriptBuild(".build.es6", ts.ScriptTarget.ES2015, false)
+function copyAssets(outPath) {
+    console.log(`Copying assets ${outPath}`)
     return Promise.all([
-        generateBundledModule(
-            path.resolve(".build.es5", "mobx.js"),
-            path.resolve("lib", "mobx.js"),
-            "cjs"
-        ),
-
-        generateBundledModule(
-            path.resolve(".build.es5", "mobx.js"),
-            path.resolve("lib", "mobx.module.js"),
-            "es"
-        ),
-
-        generateBundledModule(
-            path.resolve(".build.es6", "mobx.js"),
-            path.resolve("lib", "mobx.es6.js"),
-            "es"
-        )
-    ]).then(() => {
-        generateUmd()
-        generateMinified()
-        copyFlowDefinitions()
-    })
+        fs.copyFile("flow-typed/mobx.js", path.resolve(outPath, "lib", "mobx.js.flow")),
+        fs.copyFile("LICENSE", path.resolve(outPath, "LICENSE")),
+        fs.copyFile("README.md", path.resolve(outPath, "README.md")),
+        fs.copyFile("CHANGELOG.md", path.resolve(outPath, "CHANGELOG.md"))
+    ])
 }
 
-build().catch(e => {
+const pkg = require("../package.json")
+function writePackage(versionPath, version) {
+    // replace `0.y.z` with `v.y.z`, strip `v` prefix
+    const pkgVersion = pkg.version.replace(/^0/, version.replace("v", ""))
+    fs.writeFileSync(
+        path.resolve(versionPath, "package.json"),
+        JSON.stringify(
+            {
+                ...pkg,
+                version: pkgVersion,
+                scripts: {},
+                devDependencies: {},
+                jest: undefined,
+                husky: undefined
+            },
+            null,
+            2
+        )
+    )
+}
+
+function writeIndex(versionPath) {
+    fs.writeFileSync(
+        path.resolve(versionPath, "lib", "index.js"),
+        `
+if (typeof process !== 'undefined' && process.env.NODE_ENV === 'production') {
+    module.exports = require('./mobx.min.js');
+} else {
+    module.exports = require('./mobx.js');
+}
+        `
+    )
+}
+
+async function build(version) {
+    const distPath = "dist"
+    const es5Build = path.join(distPath, ".build.es5")
+    const es6Build = path.join(distPath, ".build.es6")
+    const versionPath = path.join(distPath, version)
+
+    runTypeScriptBuild(es5Build, version, ts.ScriptTarget.ES5, true)
+    runTypeScriptBuild(es6Build, version, ts.ScriptTarget.ES2015, false)
+
+    await Promise.all([
+        generateBundledModule(es5Build, version, "mobx.js", "cjs", "development"),
+        generateBundledModule(es5Build, version, "mobx.min.js", "cjs", "production"),
+
+        generateBundledModule(es5Build, version, "mobx.module.js", "es"),
+        generateBundledModule(es6Build, version, "mobx.es6.js", "es"),
+
+        generateBundledModule(es5Build, version, "mobx.umd.js", "umd"),
+        generateBundledModule(es5Build, version, "mobx.umd.min.js", "umd", "production"),
+
+        copyAssets(versionPath)
+    ])
+
+    writeIndex(versionPath)
+    writePackage(versionPath, version)
+}
+
+Promise.all([build("v4"), build("v5")]).catch(e => {
     console.error(e)
     if (e.frame) {
         console.error(e.frame)

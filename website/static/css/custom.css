@@ -1,0 +1,42 @@
+/* your custom css */
+
+
+/* 
+Docusaurus's default displays img tags as block. 
+Numerous images in the main README.md relied on default (inline-block) img tag styling
+when this project was migrated initially.
+
+Override that style here
+*/
+article p img {
+  display: inline-block;
+}
+
+@media only screen and (min-device-width: 360px) and (max-device-width: 736px) {
+}
+
+@media only screen and (min-width: 1024px) {
+}
+
+@media only screen and (max-width: 1023px) {
+}
+
+@media only screen and (min-width: 1400px) {
+}
+
+@media only screen and (min-width: 1500px) {
+}
+
+/* Transform Github link. Lifted from Redux's CSS */
+/* https://github.com/reduxjs/redux/blob/master/website/static/css/custom.css#L134 */
+
+.navigationSlider .slidingNav ul a[href*="github"] {
+  font-size: 0;
+}
+
+.navigationSlider .slidingNav ul a[href*="github"]::before {
+  content : "";
+  width : 32px;
+  height : 32px;
+  background: url("/img/github-brand.svg");
+}

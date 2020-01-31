@@ -1,0 +1,51 @@
+{
+  "docs": {
+    "Introduction": [
+      "README",
+      "intro/concepts",
+      "intro/overview"
+    ],
+    "Making things observable": [
+      "refguide/observable",
+      "refguide/observable-decorator",
+      "refguide/object",
+      "refguide/array",
+      "refguide/map"
+    ],
+    "Reacting to observables": [
+      "refguide/observer-component",
+      "refguide/computed-decorator",
+      "refguide/autorun",
+      "refguide/when",
+      "refguide/reaction",
+      "best/react"
+    ],
+    "Updating observables": [
+      "refguide/action",
+      "best/actions",
+      "refguide/object-api"
+    ],
+    "Utilities": [
+      "refguide/api",
+      "refguide/boxed",
+      "refguide/modifiers",
+      "refguide/tojson",
+      "refguide/inject",
+      "refguide/extend-observable",
+      "refguide/extending",
+      "refguide/observe",
+      "refguide/create-transformer",
+      "refguide/expr",
+      "refguide/mobx-utils"
+    ],
+    "Tips & Tricks": [
+      "faq/faq",
+      "best/pitfalls",
+      "best/decorators",
+      "best/trace",
+      "best/store",
+      "best/react-performance",
+      "refguide/spy"
+    ]
+  }
+}

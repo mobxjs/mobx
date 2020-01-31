@@ -4,15 +4,13 @@ node_modules
 npm-debug.log
 coverage
 notes.md
-lib
 test/babel-tests.js
 test/typescript/typescript-tests.js
-test/perf/perf.txt
 dist/
-.build*/
 .idea
 .wp-build*/
 *.iml
 *.ipr
 *.iws
 yarn-error.log
+build/

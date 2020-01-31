@@ -1,0 +1,9 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "module": "commonjs",
+        "lib": ["esnext"],
+        "noUnusedLocals": false
+    },
+    "include": ["src/**/*.ts", "test/**/*.ts"]
+}

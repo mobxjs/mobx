@@ -1,8 +1,13 @@
-var start = Date.now()
+const start = Date.now()
+
+const ver = process.argv[2]
+if (!ver || !ver.startsWith("v")) {
+    throw new Error("specify version to perf test as v(4|5)")
+}
 
 if (process.env.PERSIST) {
-    var fs = require("fs")
-    var logFile = __dirname + "/perf.txt"
+    const fs = require("fs")
+    const logFile = `${__dirname}/perf_${ver}.txt`
     // clear previous results
     if (fs.existsSync(logFile)) fs.unlinkSync(logFile)
 
@@ -16,7 +21,8 @@ if (process.env.PERSIST) {
     }
 }
 
-require("./perf.js")
+const perf = require("./perf.js")
+perf(ver)
 
 // This test runs last..
 require("tape")(t => {
