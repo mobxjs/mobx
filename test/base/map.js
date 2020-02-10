@@ -573,6 +573,14 @@ test("issue 940, should not be possible to change maps outside strict mode", () 
             m.set("x", 1)
         }).toThrowError(/Since strict-mode is enabled/)
 
+        expect(() => {
+            m.set("x", 2)
+        }).toThrowError(/Since strict-mode is enabled/)
+
+        expect(() => {
+            m.delete("x")
+        }).toThrowError(/Since strict-mode is enabled/)
+
         d()
     } finally {
         mobx.configure({ enforceActions: "never" })
