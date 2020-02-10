@@ -26,6 +26,7 @@ MobX is proudly sponsored by Mendix, Coinbase, Facebook Open Source, Canva, Algo
 <a href="https://www.codefirst.co.uk/"><img src="docs/assets/codefirst.png" align="center" width="100" title="CodeFirst" alt="CodeFirst"/></a>
 <a href="https://blokt.com/"><img src="docs/assets/blokt.jpg" align="center" width="100" title="Blokt" alt="Blokt"/></a>
 <a href="https://www.bugsnag.com/platforms/react-error-reporting?utm_source=MobX&utm_medium=Website&utm_content=open-source&utm_campaign=2019-community&utm_term=20190913"><img src="docs/assets/bugsnag.jpg" align="center" width="100" title="Bugsnag" alt="Bugsnag"/></a>
+<a href="https://curology.com/blog/tech"><img src="docs/assets/curology.png" align="center" width="100" title="Curology" alt="Curology"/></a>
 
 **🥉Bronze sponsors (\$500+ total contributions):**<br/>
 <a href="https://coinbase.com/"><img src="docs/assets/coinbase.jpeg" align="center" width="100" title="Coinbase" alt="Coinbase" /></a>
