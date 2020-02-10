@@ -6,7 +6,7 @@ hide_title: true
 
 ## FAQ
 
-<div id='codefund' ></div>
+<div id='codefund' ></div><div class="re_2020"><a class="re_2020_link" href="https://www.react-europe.org/#slot-2149-workshop-typescript-for-react-and-graphql-devs-with-michel-weststrate" target="_blank" rel="sponsored noopener"><div><div class="re_2020_ad" >Ad</div></div><img src="/img/reacteurope.svg"><span>Join the author of MobX at <b>ReactEurope</b> to learn how to use <span class="link">TypeScript with React</span></span></a></div>
 
 ##### Which browsers are supported?
 
@@ -15,8 +15,9 @@ See the [browser support](https://mobx.js.org/README.html#browser-support).
 ##### While using Typescript I get `error TS2304: Cannot find name 'AsyncGenerator'`
 
 Edit your `tsconfig.json` and ensure your `lib` section array includes `es2018.asynciterable` or one of its super-sets (e.g. `es2018` or `esnext`). Note that this won't affect code generation in anyway, it just affects the standard type definitions the Typescript compiler will use, which should be a safe change. If your `tsconfig.json` does not include a lib section the defaults are:
-* ES5 target: DOM,ES5,ScriptHost
-* ES6 target: DOM,ES6,DOM.Iterable,ScriptHost
+
+-   ES5 target: DOM,ES5,ScriptHost
+-   ES6 target: DOM,ES6,DOM.Iterable,ScriptHost
 
 So you'd need to add `es2018.asynciterable` to those defaults in this particular case.
 

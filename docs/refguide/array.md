@@ -6,7 +6,7 @@ hide_title: true
 
 ## Observable Arrays
 
-<div id='codefund' ></div>
+<div id='codefund' ></div><div class="re_2020"><a class="re_2020_link" href="https://www.react-europe.org/#slot-2149-workshop-typescript-for-react-and-graphql-devs-with-michel-weststrate" target="_blank" rel="sponsored noopener"><div><div class="re_2020_ad" >Ad</div></div><img src="/img/reacteurope.svg"><span>Join the author of MobX at <b>ReactEurope</b> to learn how to use <span class="link">TypeScript with React</span></span></a></div>
 
 Similar to objects, arrays can be made observable using `observable.array(values?)` or by passing an array to `observable`.
 This works recursively as well, so all (future) values of the array will also be observable.

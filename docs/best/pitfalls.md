@@ -6,7 +6,7 @@ hide_title: true
 
 # Common pitfalls & best practices
 
-<div id='codefund' ></div>
+<div id='codefund' ></div><div class="re_2020"><a class="re_2020_link" href="https://www.react-europe.org/#slot-2149-workshop-typescript-for-react-and-graphql-devs-with-michel-weststrate" target="_blank" rel="sponsored noopener"><div><div class="re_2020_ad" >Ad</div></div><img src="/img/reacteurope.svg"><span>Join the author of MobX at <b>ReactEurope</b> to learn how to use <span class="link">TypeScript with React</span></span></a></div>
 
 Stuck with MobX? This section contains a list of common issues people new to MobX might run into.
 
@@ -58,26 +58,29 @@ For more info see [what will MobX react to?](https://mobx.js.org/best/react.html
 `@observer` only enhances the component you are decorating, not the components used inside it.
 So usually all your components should be decorated. Don't worry, this is not inefficient, in contrast, more `observer` components make rendering more efficient.
 
-### `@inject('store')` before `@observer` will cause MobX to not trigger 
+### `@inject('store')` before `@observer` will cause MobX to not trigger
 
 The effect with React is that the it will never render on observable changes.
 
 This is wrong
+
 ```typescript
 @observer
 @inject('store')
 ```
-It must be 
+
+It must be
+
 ```typescript
 @inject('store')
 @observer
 ```
 
 You'll notice a warning
+
 ```
 Mobx observer: You are trying to use 'observer' on a component that already has 'inject'. Please apply 'observer' before applying 'inject'
 ```
-
 
 ### Don't copy observables properties and store them locally
 
