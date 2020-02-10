@@ -328,7 +328,7 @@ export class ObservableMap<K = any, V = any>
     replace(values: ObservableMap<K, V> | IKeyValueMap<V> | any): ObservableMap<K, V> {
         transaction(() => {
             const replacementMap = convertToMap(values)
-            const oldKeys = this._keys
+            const oldKeys = this._keys.slice()
             const newKeys: Array<any> = Array.from(replacementMap.keys())
             let keysChanged = false
             for (let i = 0; i < oldKeys.length; i++) {
