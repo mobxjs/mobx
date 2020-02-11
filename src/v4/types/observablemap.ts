@@ -369,7 +369,7 @@ export class ObservableMap<K = any, V = any>
      */
     toPOJO(): IKeyValueMap<V> {
         const res: IKeyValueMap<V> = {}
-        this._data.forEach(
+        this.forEach(
             (_, key) =>
                 (res[typeof key === "symbol" ? <any>key : stringifyKey(key)] = this.get(key)!)
         )

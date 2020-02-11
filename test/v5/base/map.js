@@ -831,6 +831,54 @@ test(".entries() subscribes for key changes", () => {
     expect(autorunInvocationCount).toBe(4)
 })
 
+test(".toPOJO() subscribes for key changes", () => {
+    const map = mobx.observable.map()
+    let autorunInvocationCount = 0
+
+    autorun(() => {
+        autorunInvocationCount++
+        map.toPOJO()
+    })
+
+    map.set(1, 1)
+    map.set(2, 2)
+    map.delete(1)
+
+    expect(autorunInvocationCount).toBe(4)
+})
+
+test(".toJS() subscribes for key changes", () => {
+    const map = mobx.observable.map()
+    let autorunInvocationCount = 0
+
+    autorun(() => {
+        autorunInvocationCount++
+        map.toJS()
+    })
+
+    map.set(1, 1)
+    map.set(2, 2)
+    map.delete(1)
+
+    expect(autorunInvocationCount).toBe(4)
+})
+
+test(".toJSON() subscribes for key changes", () => {
+    const map = mobx.observable.map()
+    let autorunInvocationCount = 0
+
+    autorun(() => {
+        autorunInvocationCount++
+        map.toJSON()
+    })
+
+    map.set(1, 1)
+    map.set(2, 2)
+    map.delete(1)
+
+    expect(autorunInvocationCount).toBe(4)
+})
+
 test(".entries() subscribes for value changes", () => {
     const map = mobx.observable.map([[1, 1], [2, 2], [3, 3]])
     let autorunInvocationCount = 0
@@ -872,6 +920,54 @@ test(".forEach() subscribes for value changes", () => {
     autorun(() => {
         autorunInvocationCount++
         map.forEach(_ => {})
+    })
+
+    map.set(1, 11)
+    map.set(2, 22)
+    map.set(3, 33)
+
+    expect(autorunInvocationCount).toBe(4)
+})
+
+test(".toPOJO() subscribes for value changes", () => {
+    const map = mobx.observable.map([[1, 1], [2, 2], [3, 3]])
+    let autorunInvocationCount = 0
+
+    autorun(() => {
+        autorunInvocationCount++
+        map.toPOJO()
+    })
+
+    map.set(1, 11)
+    map.set(2, 22)
+    map.set(3, 33)
+
+    expect(autorunInvocationCount).toBe(4)
+})
+
+test(".toJS() subscribes for value changes", () => {
+    const map = mobx.observable.map([[1, 1], [2, 2], [3, 3]])
+    let autorunInvocationCount = 0
+
+    autorun(() => {
+        autorunInvocationCount++
+        map.toJS()
+    })
+
+    map.set(1, 11)
+    map.set(2, 22)
+    map.set(3, 33)
+
+    expect(autorunInvocationCount).toBe(4)
+})
+
+test(".toJSON() subscribes for value changes", () => {
+    const map = mobx.observable.map([[1, 1], [2, 2], [3, 3]])
+    let autorunInvocationCount = 0
+
+    autorun(() => {
+        autorunInvocationCount++
+        map.toJSON()
     })
 
     map.set(1, 11)
