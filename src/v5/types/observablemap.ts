@@ -148,6 +148,7 @@ export class ObservableMap<K = any, V = any>
     }
 
     delete(key: K): boolean {
+        checkIfStateModificationsAreAllowed(this._keysAtom)
         if (hasInterceptors(this)) {
             const change = interceptChange<IMapWillChange<K, V>>(this, {
                 type: "delete",
