@@ -297,7 +297,8 @@ export class ObservableMap<K = any, V = any>
     }
 
     forEach(callback: (value: V, key: K, object: Map<K, V>) => void, thisArg?) {
-        for (const [key, value] of this) callback.call(thisArg, value, key, this)
+        this._keysAtom.reportObserved()
+        this._data.forEach((_, key) => callback.call(thisArg, this.get(key)!, key, this))
     }
 
     /** Merge another object into this object, returns this. */
@@ -323,7 +324,9 @@ export class ObservableMap<K = any, V = any>
     clear() {
         transaction(() => {
             untracked(() => {
-                for (const key of this.keys()) this.delete(key)
+                // Note we are concurrently reading/deleting the same keys
+                // forEach handles this properly
+                this._data.forEach((_, key) => this.delete(key))
             })
         })
     }
@@ -366,10 +369,10 @@ export class ObservableMap<K = any, V = any>
      */
     toPOJO(): IKeyValueMap<V> {
         const res: IKeyValueMap<V> = {}
-        for (const [key, value] of this) {
-            // We lie about symbol key types due to https://github.com/Microsoft/TypeScript/issues/1863
-            res[typeof key === "symbol" ? <any>key : stringifyKey(key)] = value
-        }
+        this._data.forEach(
+            (_, key) =>
+                (res[typeof key === "symbol" ? <any>key : stringifyKey(key)] = this.get(key)!)
+        )
         return res
     }
 

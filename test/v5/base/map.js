@@ -763,3 +763,158 @@ test("#2274", () => {
     expect(Array.from(myMap._data.keys())).toEqual([4, 5, 6])
     expect(myMap.has(2)).toBe(false)
 })
+
+test(".forEach() subscribes for key changes", () => {
+    const map = mobx.observable.map()
+    let autorunInvocationCount = 0
+
+    autorun(() => {
+        autorunInvocationCount++
+        map.forEach(_ => {})
+    })
+
+    map.set(1, 1)
+    map.set(2, 2)
+    map.delete(1)
+
+    expect(autorunInvocationCount).toBe(4)
+})
+
+test(".keys() subscribes for key changes", () => {
+    const map = mobx.observable.map()
+    let autorunInvocationCount = 0
+
+    autorun(() => {
+        autorunInvocationCount++
+        for (const _ of map.keys()) {
+        }
+    })
+
+    map.set(1, 1)
+    map.set(2, 2)
+    map.delete(1)
+
+    expect(autorunInvocationCount).toBe(4)
+})
+
+test(".values() subscribes for key changes", () => {
+    const map = mobx.observable.map()
+    let autorunInvocationCount = 0
+
+    autorun(() => {
+        autorunInvocationCount++
+        for (const _ of map.values()) {
+        }
+    })
+
+    map.set(1, 1)
+    map.set(2, 2)
+    map.delete(1)
+
+    expect(autorunInvocationCount).toBe(4)
+})
+
+test(".entries() subscribes for key changes", () => {
+    const map = mobx.observable.map()
+    let autorunInvocationCount = 0
+
+    autorun(() => {
+        autorunInvocationCount++
+        for (const _ of map.entries()) {
+        }
+    })
+
+    map.set(1, 1)
+    map.set(2, 2)
+    map.delete(1)
+
+    expect(autorunInvocationCount).toBe(4)
+})
+
+test(".entries() subscribes for value changes", () => {
+    const map = mobx.observable.map([[1, 1], [2, 2], [3, 3]])
+    let autorunInvocationCount = 0
+
+    autorun(() => {
+        autorunInvocationCount++
+        for (const _ of map.entries()) {
+        }
+    })
+
+    map.set(1, 11)
+    map.set(2, 22)
+    map.set(3, 33)
+
+    expect(autorunInvocationCount).toBe(4)
+})
+
+test(".values() subscribes for value changes", () => {
+    const map = mobx.observable.map([[1, 1], [2, 2], [3, 3]])
+    let autorunInvocationCount = 0
+
+    autorun(() => {
+        autorunInvocationCount++
+        for (const _ of map.values()) {
+        }
+    })
+
+    map.set(1, 11)
+    map.set(2, 22)
+    map.set(3, 33)
+
+    expect(autorunInvocationCount).toBe(4)
+})
+
+test(".forEach() subscribes for value changes", () => {
+    const map = mobx.observable.map([[1, 1], [2, 2], [3, 3]])
+    let autorunInvocationCount = 0
+
+    autorun(() => {
+        autorunInvocationCount++
+        map.forEach(_ => {})
+    })
+
+    map.set(1, 11)
+    map.set(2, 22)
+    map.set(3, 33)
+
+    expect(autorunInvocationCount).toBe(4)
+})
+
+test(".keys() does NOT subscribe for value changes", () => {
+    const map = mobx.observable.map([[1, 1], [2, 2], [3, 3]])
+    let autorunInvocationCount = 0
+
+    autorun(() => {
+        autorunInvocationCount++
+        for (const _ of map.keys()) {
+        }
+    })
+
+    map.set(1, 11)
+    map.set(2, 22)
+    map.set(3, 33)
+
+    expect(autorunInvocationCount).toBe(1)
+})
+
+test("noop mutations does NOT reportChanges", () => {
+    const map = mobx.observable.map([[1, 1], [2, 2], [3, 3]])
+    let autorunInvocationCount = 0
+
+    autorun(() => {
+        autorunInvocationCount++
+        map.forEach(_ => {})
+    })
+
+    map.set(1, 1)
+    map.set(2, 2)
+    map.set(3, 3)
+    map.delete("NOT IN MAP")
+    map.merge([])
+    map.merge([[1, 1], [3, 3]])
+    map.merge([[1, 1], [2, 2], [3, 3]])
+    map.replace([[1, 1], [2, 2], [3, 3]])
+
+    expect(autorunInvocationCount).toBe(1)
+})
