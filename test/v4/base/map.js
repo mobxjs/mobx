@@ -949,7 +949,7 @@ test(".keys() does NOT subscribe for value changes", () => {
     expect(autorunInvocationCount).toBe(1)
 })
 
-test("noop mutations does NOT reportChanges", () => {
+test("noop mutations do NOT reportChanges", () => {
     const map = mobx.observable.map([[1, 1], [2, 2], [3, 3]])
     let autorunInvocationCount = 0
 
