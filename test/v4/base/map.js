@@ -573,6 +573,14 @@ test("issue 940, should not be possible to change maps outside strict mode", () 
             m.set("x", 1)
         }).toThrowError(/Since strict-mode is enabled/)
 
+        expect(() => {
+            m.set("x", 2)
+        }).toThrowError(/Since strict-mode is enabled/)
+
+        expect(() => {
+            m.delete("x")
+        }).toThrowError(/Since strict-mode is enabled/)
+
         d()
     } finally {
         mobx.configure({ enforceActions: "never" })
@@ -788,4 +796,21 @@ test("#1858 Map should not be inherited", () => {
     expect(() => {
         mobx.observable.map(map)
     }).toThrow("Cannot initialize from classes that inherit from Map: MyMap")
+})
+
+test("#2274", () => {
+    const myMap = mobx.observable.map()
+    myMap.set(1, 1)
+    myMap.set(2, 1)
+    myMap.set(3, 1)
+
+    const newMap = mobx.observable.map()
+    newMap.set(4, 1)
+    newMap.set(5, 1)
+    newMap.set(6, 1)
+
+    myMap.replace(newMap)
+
+    expect(Array.from(myMap._data.keys())).toEqual([4, 5, 6])
+    expect(myMap.has(2)).toBe(false)
 })
