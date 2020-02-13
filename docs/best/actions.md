@@ -204,7 +204,7 @@ class Store {
         } catch (error) {
             this.state = "error"
         }
-    })
+    }).bind(this)
 }
 ```
 
