@@ -54,7 +54,7 @@ class Timer extends React.Component {
 ReactDOM.render(<Timer timerData={timerData} />, document.body)
 ```
 
-Because `observer` automatically tracks any observables that are used (and none more), the `Timer` component above will automatically re-render whever `timerData.secondsPassed` is updated, since it is declared as an observable.
+Because `observer` automatically tracks any observables that are used (and none more), the `Timer` component above will automatically re-render whenever `timerData.secondsPassed` is updated, since it is declared as an observable.
 
 Note that `observer` _only_ subscribes to observables used during the _own_ render of the component. So if observables are passed to child components, those have to be marked as `observer` as well. This also holds for any callback based components.
 
