@@ -26,7 +26,7 @@ export function keys(obj: any): any {
         return ((obj as any) as IIsObservableObject).$mobx.getKeys()
     }
     if (isObservableMap(obj)) {
-        return (obj as any)._keys.slice()
+        return iteratorToArray(obj.keys())
     }
     if (isObservableSet(obj)) {
         return iteratorToArray(obj.keys())
