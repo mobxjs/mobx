@@ -1,11 +1,4 @@
-import {
-    ObservableMap,
-    globalState,
-    IObservableArray,
-    isObservableArray,
-    IKeyValueMap,
-    isObservableMap
-} from "../internal"
+import { globalState, IObservableArray, isObservableArray, isObservableMap } from "../internal"
 
 declare const Symbol: any
 

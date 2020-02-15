@@ -1,11 +1,4 @@
-import {
-    IKeyValueMap,
-    IObservableArray,
-    ObservableMap,
-    globalState,
-    isObservableArray,
-    isObservableMap
-} from "../internal"
+import { IObservableArray, globalState, isObservableArray, isObservableMap } from "../internal"
 
 export const OBFUSCATED_ERROR =
     "An invariant failed, however the error is obfuscated because this is a production build."
