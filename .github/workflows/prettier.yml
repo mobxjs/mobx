@@ -1,0 +1,19 @@
+name: "Run Prettier on master"
+on:
+    push:
+        branches: [master]
+
+jobs:
+    prettier:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Cloning the repository
+              uses: actions/checkout@v2
+            - name: Prettify the code & docs
+              uses: creyD/prettier_action@master
+              with:
+                  prettier_options: "--write **/*.js **/*.ts docs/**/*.md"
+                  branch: master
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
