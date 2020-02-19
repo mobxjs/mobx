@@ -1,11 +1,4 @@
-import {
-    ObservableMap,
-    globalState,
-    IObservableArray,
-    isObservableArray,
-    IKeyValueMap,
-    isObservableMap
-} from "../internal"
+import { globalState, IObservableArray, isObservableArray, isObservableMap } from "../internal"
 
 declare const Symbol: any
 
@@ -108,13 +101,17 @@ export function isPlainObject(value) {
     return proto === Object.prototype || proto === null
 }
 
-export function convertToMap(dataStructure) {
+export function convertToMap(dataStructure: any): Map<any, any> {
     if (isES6Map(dataStructure) || isObservableMap(dataStructure)) {
         return dataStructure
     } else if (Array.isArray(dataStructure)) {
         return new Map(dataStructure)
     } else if (isPlainObject(dataStructure)) {
-        return new Map(Object.entries(dataStructure))
+        const map = new Map()
+        for (const key in dataStructure) {
+            map.set(key, dataStructure[key])
+        }
+        return map
     } else {
         return fail(`Cannot convert to map from '${dataStructure}'`)
     }
@@ -187,15 +184,6 @@ export function isES6Set(thing): thing is Set<any> {
     return thing instanceof Set
 }
 
-export function getMapLikeKeys<K, V>(map: ObservableMap<K, V>): ReadonlyArray<K>
-export function getMapLikeKeys<V>(map: IKeyValueMap<V> | any): ReadonlyArray<string>
-export function getMapLikeKeys(map: any): any {
-    if (isPlainObject(map)) return Object.keys(map)
-    if (Array.isArray(map)) return map.map(([key]) => key)
-    if (isES6Map(map) || isObservableMap(map)) return iteratorToArray(map.keys())
-    return fail(`Cannot get keys from '${map}'`)
-}
-
 // use Array.from in Mobx 5
 export function iteratorToArray<T>(it: Iterator<T>): Array<T> {
     const res: T[] = []
@@ -214,4 +202,13 @@ export function primitiveSymbol() {
 
 export function toPrimitive(value) {
     return value === null ? null : typeof value === "object" ? "" + value : value
+}
+
+// Use "for of" in V5
+export function forOf<T>(iter: Iterator<T>, callback: (entry: T) => void): void {
+    let next = iter.next()
+    while (!next.done) {
+        callback(next.value)
+        next = iter.next()
+    }
 }

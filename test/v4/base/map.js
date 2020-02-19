@@ -325,12 +325,12 @@ test("map modifier with modifier", () => {
     x.set("b", { d: 4 })
     expect(mobx.isObservableObject(x.get("b"))).toBe(true)
 
-    x = mobx.observable.shallowMap({ a: { c: 3 } })
+    x = mobx.observable.map({ a: { c: 3 } }, { deep: false })
     expect(mobx.isObservableObject(x.get("a"))).toBe(false)
     x.set("b", { d: 4 })
     expect(mobx.isObservableObject(x.get("b"))).toBe(false)
 
-    x = mobx.observable({ a: mobx.observable.shallowMap({ b: {} }) })
+    x = mobx.observable({ a: mobx.observable.map({ b: {} }, { deep: false }) })
     expect(mobx.isObservableObject(x)).toBe(true)
     expect(mobx.isObservableMap(x.a)).toBe(true)
     expect(mobx.isObservableObject(x.a.get("b"))).toBe(false)
@@ -502,7 +502,6 @@ test("798, cannot return observable map from computed prop", () => {
 
     expect(() => {
         Object.assign({}, cs.customerSearchType)
-        // console.log(x)
     }).not.toThrow()
 })
 
@@ -642,7 +641,7 @@ test("#1980 .replace should not breaks entities order!", () => {
     }
 })
 
-test("#1980 .replace should should invoke autorun", () => {
+test("#1980 .replace should invoke autorun", () => {
     const original = mobx.observable.map({ a: "a", b: "b" })
     const replacement = { b: "b", a: "a" }
     let numOfInvokes = 0
@@ -1064,4 +1063,60 @@ test("noop mutations do NOT reportChanges", () => {
     map.replace([[1, 1], [2, 2], [3, 3]])
 
     expect(autorunInvocationCount).toBe(1)
+})
+
+test(".replace() calls and respects interceptors", () => {
+    const map = mobx.observable.map([[0, 0], [1, 1], [2, 2], [3, 3]])
+    const replacementMap = [[3, 33], [4, 44], [5, 55], [0, 0]]
+    const expectedMap = [[2, 2], [3, 3], [5, 55], [0, 0]]
+
+    mobx.intercept(map, change => {
+        // cancel delete 2
+        if (change.type === "delete" && change.name === 2) {
+            return null
+        }
+        // cancel update 3
+        if (change.type === "update" && change.name === 3) {
+            return null
+        }
+        // cancel add 4
+        if (change.type === "add" && change.name === 4) {
+            return null
+        }
+        return change
+    })
+
+    map.replace(replacementMap)
+
+    expect(Array.from(map)).toEqual(expectedMap)
+})
+
+test(".replace() should reportChanged on key order change", () => {
+    const map = mobx.observable.map([[1, 1], [2, 2], [3, 3]])
+    const replacementMap = [[4, 44], [3, 33], [2, 22]]
+    const expectedMap = [[1, 1], [3, 33], [2, 22]]
+    let autorunInvocationCount = 0
+
+    mobx.intercept(map, change => {
+        // cancel delete 1
+        if (change.type === "delete" && change.name === 1) {
+            return null
+        }
+        // cancel add 4
+        if (change.type === "add" && change.name === 4) {
+            return null
+        }
+        return change
+    })
+
+    autorun(() => {
+        autorunInvocationCount++
+        for (const _ of map.keys()) {
+        }
+    })
+
+    map.replace(replacementMap)
+
+    expect(Array.from(map)).toEqual(expectedMap)
+    expect(autorunInvocationCount).toBe(2)
 })

@@ -1,11 +1,4 @@
-import {
-    IKeyValueMap,
-    IObservableArray,
-    ObservableMap,
-    globalState,
-    isObservableArray,
-    isObservableMap
-} from "../internal"
+import { IObservableArray, globalState, isObservableArray, isObservableMap } from "../internal"
 
 export const OBFUSCATED_ERROR =
     "An invariant failed, however the error is obfuscated because this is a production build."
@@ -88,6 +81,22 @@ export function isPlainObject(value) {
     return proto === Object.prototype || proto === null
 }
 
+export function convertToMap(dataStructure: any): Map<any, any> {
+    if (isES6Map(dataStructure) || isObservableMap(dataStructure)) {
+        return dataStructure
+    } else if (Array.isArray(dataStructure)) {
+        return new Map(dataStructure)
+    } else if (isPlainObject(dataStructure)) {
+        const map = new Map()
+        for (const key in dataStructure) {
+            map.set(key, dataStructure[key])
+        }
+        return map
+    } else {
+        return fail(`Cannot convert to map from '${dataStructure}'`)
+    }
+}
+
 export function makeNonEnumerable(object: any, propNames: PropertyKey[]) {
     for (let i = 0; i < propNames.length; i++) {
         addHiddenProp(object, propNames[i], object[propNames[i]])
@@ -167,15 +176,6 @@ export function getPlainObjectKeys(object) {
 export function stringifyKey(key: any): string {
     if (key && key.toString) return key.toString()
     else return new String(key).toString()
-}
-
-export function getMapLikeKeys<K, V>(map: ObservableMap<K, V>): ReadonlyArray<K>
-export function getMapLikeKeys<V>(map: IKeyValueMap<V> | any): ReadonlyArray<string>
-export function getMapLikeKeys(map: any): any {
-    if (isPlainObject(map)) return Object.keys(map)
-    if (Array.isArray(map)) return map.map(([key]) => key)
-    if (isES6Map(map) || isObservableMap(map)) return Array.from(map.keys())
-    return fail(`Cannot get keys from '${map}'`)
 }
 
 export function toPrimitive(value) {
