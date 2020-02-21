@@ -267,33 +267,30 @@ export class ObservableMap<K = any, V = any>
 
     values(): IterableIterator<V> {
         const self = this
-        let nextIndex = 0
-        const keys = Array.from(this.keys())
-        return makeIterable<V>({
+        const keys = this.keys()
+        return makeIterable({
             next() {
-                return nextIndex < keys.length
-                    ? { value: self.get(keys[nextIndex++]), done: false }
-                    : { done: true }
+                const { done, value } = keys.next()
+                return {
+                    done,
+                    value: done ? (undefined as any) : self.get(value)
+                }
             }
-        } as any)
+        })
     }
 
     entries(): IterableIterator<IMapEntry<K, V>> {
         const self = this
-        let nextIndex = 0
-        const keys = Array.from(this.keys())
+        const keys = this.keys()
         return makeIterable({
-            next: function() {
-                if (nextIndex < keys.length) {
-                    const key = keys[nextIndex++]
-                    return {
-                        value: [key, self.get(key)!] as [K, V],
-                        done: false
-                    }
+            next() {
+                const { done, value } = keys.next()
+                return {
+                    done,
+                    value: done ? (undefined as any) : ([value, self.get(value)!] as [K, V])
                 }
-                return { done: true }
             }
-        } as any)
+        })
     }
 
     [Symbol.iterator]() {

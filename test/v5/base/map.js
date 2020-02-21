@@ -1120,3 +1120,23 @@ test(".replace() should reportChanged on key order change", () => {
     expect(Array.from(map)).toEqual(expectedMap)
     expect(autorunInvocationCount).toBe(2)
 })
+
+test("#2112 - iterators should be resilient to concurrent delete operation", () => {
+    function testIterator(method) {
+        const map = mobx.observable.map([[1, 1], [2, 2], [3, 3]])
+        const expectedMap = mobx.observable.map(map)
+        for (const entry of map[method]()) {
+            const key = Array.isArray(entry) ? entry[0] : entry
+            const deleted1 = map.delete(key)
+            const deleted2 = expectedMap.delete(key)
+            expect(deleted1).toBe(true)
+            expect(deleted2).toBe(true)
+            expect(map.size).toBe(expectedMap.size)
+            expect(Array.from(map)).toEqual(Array.from(expectedMap))
+        }
+    }
+
+    testIterator("keys")
+    testIterator("values")
+    testIterator("entries")
+})
