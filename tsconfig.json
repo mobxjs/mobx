@@ -15,7 +15,9 @@
         "noUnusedLocals": true,
         "noImplicitAny": false,
         "noImplicitThis": false,
-        "experimentalDecorators": true
+        "noEmit": true,
+        "experimentalDecorators": true,
+        // "useDefineForClassFields": true
     },
     "include": ["src/**/*.ts"]
 }
