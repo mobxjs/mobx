@@ -223,7 +223,7 @@ observableTodoStore.todos[0].task = "grok MobX tutorial";
                         <button onClick="runCode(['#code1', '#code3', '#code4'])" class="btn-run">Run code</button>
 
                         <p>Pure fun, right? The <code>report</code> did print automatically, synchronously and without leaking
-                            intermediate values. If you investigate the log carefully, you will see that the fourth line
+                            intermediate values. If you investigate the log carefully, you will see that the fifth line
                             didn't result in a new log-line. Because the report did not <em>actually</em> change as a result
                             of the rename, although the backing data did. On the other hand, changing the name of the first
                             todo did update the report, since that name is actively used in the report.
