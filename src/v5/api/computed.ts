@@ -9,11 +9,11 @@ import {
 } from "../internal"
 
 export interface IComputed {
-    <T>(options: IComputedValueOptions<T>): any // decorator
-    <T>(func: () => T, setter: (v: T) => void): IComputedValue<T> // normal usage
-    <T>(func: () => T, options?: IComputedValueOptions<T>): IComputedValue<T> // normal usage
-    (target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): void // decorator
-    struct(target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): void // decorator
+    <T>(options: IComputedValueOptions<T>): any // decorator // TODO: remove
+    <T>(func: () => T, setter: (v: T) => void): T // normal usage // introduce computed.box?
+    <T>(func: () => T, options?: IComputedValueOptions<T>): T // normal usage // TODO: introduce computed.box?
+    (target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): void // decorator // TODO: remove
+    struct(target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): void // decorator // TODO: remove
 }
 
 export const computedDecorator = createPropDecorator(

@@ -38,6 +38,8 @@ Import size report for mobx:
 [ ] Todo: check how important array of decorators is, see original issue -> This will be breaking issue, as we are going to treat action etc different?
 [ ] tests for redefining properties
 [ ] extract utils for getOwnPropertyDescriptor and defineProperty
+[ ] introduce observable.box
+[ ] add test for initializers that refer to other props
 
 General class solutions
 - call extendObservable in constructor
@@ -85,8 +87,7 @@ Things fixed:
 or, new package: mobx.next? no spy and intercept either?
 
 To Document:
-- `class X extends Observable(base){}` vs `const X = Observable(base)`. P.s.: can also use `const X = Observable(constructorFunction) `, but has worse typings
-- Observable(decs, class X extends Base))
+-  height = observable<20>(20)
 
 Breaking changes:
 - no generic decorators or lists anymore for extendObservable?

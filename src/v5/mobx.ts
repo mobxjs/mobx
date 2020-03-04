@@ -40,7 +40,8 @@ try {
     if (
         testCodeMinification.name !== "testCodeMinification" &&
         process.env.NODE_ENV !== "production" &&
-        typeof process !== 'undefined' && process.env.IGNORE_MOBX_MINIFY_WARNING !== "true"
+        typeof process !== "undefined" &&
+        process.env.IGNORE_MOBX_MINIFY_WARNING !== "true"
     ) {
         // trick so it doesn't get replaced
         const varName = ["process", "env", "NODE_ENV"].join(".")
@@ -158,7 +159,8 @@ export {
     _startAction,
     _endAction,
     allowStateReadsStart as _allowStateReadsStart,
-    allowStateReadsEnd as _allowStateReadsEnd
+    allowStateReadsEnd as _allowStateReadsEnd,
+    initializeObservables
 } from "./internal"
 
 // Devtools support

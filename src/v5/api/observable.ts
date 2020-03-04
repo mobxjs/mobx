@@ -78,7 +78,7 @@ function getEnhancerFromOptions(options: CreateObservableOptions): IEnhancer<any
  * @param v the value which should become observable.
  */
 function createObservable(v: any, arg2?: any, arg3?: any) {
-    // @observable someProp;
+    // @observable someProp; TODO delete
     if (typeof arguments[1] === "string" || typeof arguments[1] === "symbol") {
         return deepDecorator.apply(null, arguments as any)
     }
@@ -99,18 +99,22 @@ function createObservable(v: any, arg2?: any, arg3?: any) {
 
     // this value could be converted to a new observable data structure, return it
     if (res !== v) return res
-
-    // otherwise, just box it
-    fail(
-        process.env.NODE_ENV !== "production" &&
-            `The provided value could not be converted into an observable. If you want just create an observable reference to the object use 'observable.box(value)'`
-    )
+    return observable.box(v)
 }
 
+type Primitive = number | string | null | undefined | boolean
+
 export interface IObservableFactory {
+    // types only relevant for unboxing
+    // TODO: is there something cleaner for this?
+    (value: string): string
+    (value: number): number
+    (value: boolean): boolean
+    (value: undefined): undefined
+    (value: null): null
+    <T extends Primitive>(value: T): T // useful to explicitly define a type, e.g. shape = observable<"round" | "square">("round")
     // observable overloads
-    (value: number | string | null | undefined | boolean): never // Nope, not supported, use box
-    (target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): any // decorator
+    (target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): any // decorator TODO delete
     <T = any>(value: T[], options?: CreateObservableOptions): IObservableArray<T>
     <T = any>(value: Set<T>, options?: CreateObservableOptions): ObservableSet<T>
     <K = any, V = any>(value: Map<K, V>, options?: CreateObservableOptions): ObservableMap<K, V>
