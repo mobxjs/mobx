@@ -55,6 +55,179 @@ const t = {
     }
 }
 
+test("ts - class basic - 1", function() {
+    class Box extends Observable(
+        {
+            height: observable
+        },
+        class {
+            height = 20
+        }
+    ) {}
+
+    const box = new Box()
+    box.height
+    const h: number[] = []
+    autorun(() => {
+        h.push(box.height)
+    })
+    box.height = 25
+    expect(h).toEqual([20, 25])
+
+    expect(new Box().height).toBe(20)
+    expect(box.height).toBe(25)
+})
+
+test("ts - class const basic - 1", function() {
+    const Box = Observable(
+        {
+            height: observable
+        },
+        class {
+            height = 20
+        }
+    )
+
+    const box = new Box()
+    box.height
+    const h: number[] = []
+    autorun(() => {
+        h.push(box.height)
+    })
+    box.height = 25
+    expect(h).toEqual([20, 25])
+
+    expect(new Box().height).toBe(20)
+    expect(box.height).toBe(25)
+})
+
+test("ts - fn based class const basic - 1", function() {
+    const Box = Observable(
+        {
+            height: observable
+        },
+        function() {
+            this.height = 20
+        } as any
+    )
+
+    const box = new Box()
+    box.height
+    const h: number[] = []
+    autorun(() => {
+        h.push(box.height)
+    })
+    box.height = 25
+    expect(h).toEqual([20, 25])
+
+    expect(new Box().height).toBe(20)
+    expect(box.height).toBe(25)
+})
+
+test("ts - class basic - 2", function() {
+    class BaseClass {
+        width = 30
+    }
+
+    const Box = Observable(
+        {
+            height: observable
+        },
+        class extends BaseClass {
+            height = 20
+        }
+    )
+
+    const box = new Box()
+    box.height
+    box.width
+    const h: number[] = []
+    autorun(() => {
+        h.push(box.height)
+    })
+    box.height = 25
+    expect(h).toEqual([20, 25])
+
+    expect(new Box().height).toBe(20)
+    expect(box.height).toBe(25)
+    expect(box.width).toBe(30)
+})
+
+test("ts - class basic - 3", function() {
+    class Box extends Observable(
+        {
+            height: observable,
+            width: computed
+        },
+        class {
+            static bla() {}
+
+            height = 20
+
+            get width() {
+                return this.height + this.getSomeConstant()
+            }
+
+            getSomeConstant() {
+                return 5
+            }
+        }
+    ) {}
+
+    const box = new Box()
+    Box.bla()
+    box.height
+    box.width
+    const h: number[] = []
+    autorun(() => {
+        h.push(box.height)
+    })
+    box.height = 25
+    expect(h).toEqual([20, 25])
+
+    expect(new Box().height).toBe(20)
+    expect(box.height).toBe(25)
+    // TODO: expect(box.width).toBe(30)
+})
+
+test("ts - class basic - 3", function() {
+    // TODO: or class Box extends Observable for better handling of circular deps
+    const Box = Observable(
+        {
+            height: observable,
+            width: computed
+        },
+        class {
+            static bla() {}
+
+            height = 20
+
+            get width() {
+                return this.height + this.getSomeConstant()
+            }
+
+            getSomeConstant() {
+                return 5
+            }
+        }
+    )
+
+    const box = new Box()
+    Box.bla()
+    box.height
+    box.width
+    const h: number[] = []
+    autorun(() => {
+        h.push(box.height)
+    })
+    box.height = 25
+    expect(h).toEqual([20, 25])
+
+    expect(new Box().height).toBe(20)
+    expect(box.height).toBe(25)
+    // TODO: expect(box.width).toBe(30)
+})
+
 test("decorators", () => {
     class Order {
         @observable price: number = 3
