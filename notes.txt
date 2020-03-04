@@ -22,4 +22,72 @@ Import size report for mobx:
 [ ] update tsconfig, no decorators, yes define
 [ ] in v5 next minor: warn if decorators are used
 [ ] gotcha: in subclasses don't redefine fields, (test: mbox should refuse to re-decorate a field)
-[ ] autoDecorate(this)
+[ ] decorate(this, { "*": true })
+[ ] decorate(this)
+[ ] use normal imports in tests
+[ ] think about alternative syntaxes
+[ ] code mod, run on v4 tests?
+[ ] check errors *if* decorators are used
+[ ] alternative syntax: `x = decorate.observable(y)`?
+[ ] backport tests and code to v4(6)
+[ ] macro transform
+[ ] codemod TS
+[ ] codemod babel
+[ ] combine with ES5?
+[ ] get rid of all that pending decorators shizzle
+[ ] Todo: check how important array of decorators is, see original issue -> This will be breaking issue, as we are going to treat action etc different?
+[ ] tests for redefining properties
+[ ] extract utils for getOwnPropertyDescriptor and defineProperty
+
+General class solutions
+- call extendObservable in constructor
+  - works always
+  - untyped
+- call decorate in constructor
+  - works always
+  - typesafe
+  - little verbose
+- X class Box extends Observable({ x: 3 }) { }
+  - short
+  - this in props is often not typed
+  - cannot refer forward to funcions defined in the class
+- X class Box extends Observable(class { x: 3 })
+  - no way to opt out of non-observable members, distinguish utility functions from actions
+- class Box extends Observable(class, decorators) {}
+  - works with statics 
+  - can use const Box = Observable(class, decorators) to make it shorter
+- Utility members: [obervable()] height = 20
+  - typescript doesn't allow dynamic expressions or duplicate decorators that way
+  - would work fine in javascript :'(
+- [decorators.observable] = params field = value
+  - works!
+  - breaks if deconstructed
+  - breaks without defineFieldAsProperties
+  - has implicit any type...
+  - looks weird with semicolons enabled
+  - http://www.typescriptlang.org/play/?useDefineForClassFields=true&target=2#code/DYUwLgBAlhC8EAYDcAoAxgewHYGdIBMRMAnAQzA2JzggG8UJGIBzcCDAIxxGIDdSOoABQBKAFwQARJ258BoSXQZMVAelUQAAmBwBaKMyyUQylY2LgArsSxSZPfoJAB9RQGpobt6YgBfFP7owKQ41ABCGAAeSioA2oQk5JQ4AHT2ck4Auqgq0fAAzDlM8USUSVRpXA7yINk+AJ40hQFAA
+- [util properties] like x$ = computed.observable
+  - verify at runtime
+  - show up public api
+  - can use never type
+
+Things fixed:
+- initialization in babel
+- babel setup
+- forward compatible with new field initialzers (in babel / ts flag)
+- CRA setup out of the box
+- size reduction
+- maintainability
+- migration:
+  - codemod
+  - babel macro / transform
+
+or, new package: mobx.next? no spy and intercept either?
+
+To Document:
+- `class X extends Observable(base){}` vs `const X = Observable(base)`. P.s.: can also use `const X = Observable(constructorFunction) `, but has worse typings
+- Observable(decs, class X extends Base))
+
+Breaking changes:
+- no generic decorators or lists anymore for extendObservable?
+- removed `decorate()`

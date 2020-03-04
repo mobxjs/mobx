@@ -16,8 +16,8 @@
         "noImplicitAny": false,
         "noImplicitThis": false,
         "noEmit": true,
-        "experimentalDecorators": true,
-        // "useDefineForClassFields": true
+        "experimentalDecorators": false,
+        "useDefineForClassFields": true
     },
     "include": ["src/**/*.ts"]
 }
