@@ -40,6 +40,7 @@ Import size report for mobx:
 [ ] extract utils for getOwnPropertyDescriptor and defineProperty
 [ ] introduce observable.box
 [ ] add test for initializers that refer to other props
+[ ] create warning when box is accessed without constructor call (e.g. when reading a primtive from observable() rather than observable.box())
 
 General class solutions
 - call extendObservable in constructor

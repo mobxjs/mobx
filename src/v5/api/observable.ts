@@ -107,11 +107,12 @@ type Primitive = number | string | null | undefined | boolean
 export interface IObservableFactory {
     // types only relevant for unboxing
     // TODO: is there something cleaner for this?
+    (value: undefined): any
+    (value: null): any
     (value: string): string
     (value: number): number
     (value: boolean): boolean
-    (value: undefined): undefined
-    (value: null): null
+    <T extends Function>(value: T): T
     <T extends Primitive>(value: T): T // useful to explicitly define a type, e.g. shape = observable<"round" | "square">("round")
     // observable overloads
     (target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): any // decorator TODO delete

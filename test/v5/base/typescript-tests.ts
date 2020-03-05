@@ -108,221 +108,234 @@ test("ts - class basic - 3", function() {
     expect(box.width).toBe(30)
 })
 
-// test("decorators", () => {
-//     class Order {
-//         @observable price: number = 3
-//         @observable amount: number = 2
-//         @observable orders: string[] = []
-//         @observable aFunction = testFunction
+test("decorators", () => {
+    class Order {
+        price: number = observable(3)
+        amount: number = observable(2)
+        orders: string[] = observable([])
+        aFunction = observable(testFunction)
 
-//         @computed
-//         get total() {
-//             return this.amount * this.price * (1 + this.orders.length)
-//         }
+        total = computed(() => {
+            return this.amount * this.price * (1 + this.orders.length)
+        })
 
-//         // Typescript classes cannot be defined inside functions,
-//         // but if the next line is enabled it should throw...
-//         // @observable hoepie() { return 3; }
-//     }
+        constructor() {
+            initializeObservables(this)
+        }
+        // Typescript classes cannot be defined inside functions,
+        // but if the next line is enabled it should throw...
+        // @observable hoepie() { return 3; }
+    }
 
-//     const o = new Order()
-//     t.equal(isObservableObject(o), true)
-//     t.equal(isObservableProp(o, "amount"), true)
-//     t.equal(isObservableProp(o, "total"), true)
+    const o = new Order()
+    t.equal(isObservableObject(o), true)
+    t.equal(isObservableProp(o, "amount"), true)
+    t.equal(isObservableProp(o, "total"), true)
 
-//     const events: any[] = []
-//     const d1 = observe(o, (ev: IObjectDidChange) => events.push(ev.name, (ev as any).oldValue))
-//     const d2 = observe(o, "price", ev => events.push(ev.newValue, ev.oldValue))
-//     const d3 = observe(o, "total", ev => events.push(ev.newValue, ev.oldValue))
+    const events: any[] = []
+    const d1 = observe(o, (ev: IObjectDidChange) => events.push(ev.name, (ev as any).oldValue))
+    const d2 = observe(o, "price", ev => events.push(ev.newValue, ev.oldValue))
+    const d3 = observe(o, "total", ev => events.push(ev.newValue, ev.oldValue))
 
-//     o.price = 4
+    o.price = 4
 
-//     d1()
-//     d2()
-//     d3()
+    d1()
+    d2()
+    d3()
 
-//     o.price = 5
+    o.price = 5
 
-//     t.deepEqual(events, [
-//         8, // new total
-//         6, // old total
-//         4, // new price
-//         3, // old price
-//         "price", // event name
-//         3 // event oldValue
-//     ])
-// })
+    t.deepEqual(events, [
+        8, // new total
+        6, // old total
+        4, // new price
+        3, // old price
+        "price", // event name
+        3 // event oldValue
+    ])
+})
 
-// test("observable", () => {
-//     const a = observable.box(3)
-//     const b = computed(() => a.get() * 2)
-//     t.equal(b.get(), 6)
-// })
+test("observable", () => {
+    const a = observable.box(3)
+    const b = computed.box(() => a.get() * 2)
+    t.equal(b.get(), 6)
+})
 
-// test("annotations", () => {
-//     class Order {
-//         @observable price: number = 3
-//         @observable amount: number = 2
-//         @observable orders: string[] = []
-//         @observable aFunction = testFunction
+test("annotations", () => {
+    class Order {
+        price: number = observable(3)
+        amount: number = observable(2)
+        orders: string[] = observable([])
+        aFunction = observable(testFunction)
 
-//         @computed
-//         get total() {
-//             return this.amount * this.price * (1 + this.orders.length)
-//         }
-//     }
+        total = computed(() => this.amount * this.price * (1 + this.orders.length))
 
-//     const order1totals: number[] = []
-//     const order1 = new Order()
-//     const order2 = new Order()
+        constructor() {
+            initializeObservables(this)
+        }
+    }
 
-//     const disposer = autorun(() => {
-//         order1totals.push(order1.total)
-//     })
+    const order1totals: number[] = []
+    const order1 = new Order()
+    const order2 = new Order()
 
-//     order2.price = 4
-//     order1.amount = 1
+    const disposer = autorun(() => {
+        order1totals.push(order1.total)
+    })
 
-//     t.equal(order1.price, 3)
-//     t.equal(order1.total, 3)
-//     t.equal(order2.total, 8)
-//     order2.orders.push("bla")
-//     t.equal(order2.total, 16)
+    order2.price = 4
+    order1.amount = 1
 
-//     order1.orders.splice(0, 0, "boe", "hoi")
-//     t.deepEqual(order1totals, [6, 3, 9])
+    t.equal(order1.price, 3)
+    t.equal(order1.total, 3)
+    t.equal(order2.total, 8)
+    order2.orders.push("bla")
+    t.equal(order2.total, 16)
 
-//     disposer()
-//     order1.orders.pop()
-//     t.equal(order1.total, 6)
-//     t.deepEqual(order1totals, [6, 3, 9])
+    order1.orders.splice(0, 0, "boe", "hoi")
+    t.deepEqual(order1totals, [6, 3, 9])
 
-//     t.equal(order1.aFunction, testFunction)
-//     const x = function() {
-//         return 3
-//     }
-//     order1.aFunction = x
-//     t.equal(order1.aFunction, x)
-// })
+    disposer()
+    order1.orders.pop()
+    t.equal(order1.total, 6)
+    t.deepEqual(order1totals, [6, 3, 9])
 
-// test("scope", () => {
-//     const x = observable({
-//         y: 3,
-//         // this wo't work here.
-//         get z() {
-//             return 2 * this.y
-//         }
-//     })
+    t.equal(order1.aFunction, testFunction)
+    const x = function() {
+        return 3
+    }
+    order1.aFunction = x
+    t.equal(order1.aFunction, x)
+})
 
-//     t.equal(x.z, 6)
-//     x.y = 4
-//     t.equal(x.z, 8)
+test("scope", () => {
+    const x = observable({
+        y: 3,
+        // this wo't work here.
+        get z() {
+            return 2 * this.y
+        }
+    })
 
-//     interface IThing {
-//         z: number
-//         y: number
-//     }
+    t.equal(x.z, 6)
+    x.y = 4
+    t.equal(x.z, 8)
 
-//     const Thing = function(this: any) {
-//         extendObservable(this, {
-//             y: 3,
-//             // this will work here
-//             get z() {
-//                 return 2 * this.y
-//             }
-//         })
-//     }
+    interface IThing {
+        z: number
+        y: number
+    }
 
-//     const x3: IThing = new (<any>Thing)()
-//     t.equal(x3.z, 6)
-//     x3.y = 4
-//     t.equal(x3.z, 8)
-// })
+    const Thing = function(this: any) {
+        extendObservable(this, {
+            y: 3,
+            // this will work here
+            get z() {
+                return 2 * this.y
+            }
+        })
+    }
 
-// test("typing", () => {
-//     const ar: IObservableArray<number> = observable([1, 2])
-//     ar.intercept((c: IArrayWillChange<number> | IArrayWillSplice<number>) => {
-//         // console.log(c.type)
-//         return null
-//     })
-//     ar.observe((d: IArrayChange<number> | IArraySplice<number>) => {
-//         // console.log(d.type)
-//     })
+    const x3: IThing = new (<any>Thing)()
+    t.equal(x3.z, 6)
+    x3.y = 4
+    t.equal(x3.z, 8)
+})
 
-//     const ar2: IObservableArray<number> = observable([1, 2])
-//     ar2.intercept((c: IArrayWillChange<number> | IArrayWillSplice<number>) => {
-//         // console.log(c.type)
-//         return null
-//     })
-//     ar2.observe((d: IArrayChange<number> | IArraySplice<number>) => {
-//         // console.log(d.type)
-//     })
+test("typing", () => {
+    const ar: IObservableArray<number> = observable([1, 2])
+    ar.intercept((c: IArrayWillChange<number> | IArrayWillSplice<number>) => {
+        // console.log(c.type)
+        return null
+    })
+    ar.observe((d: IArrayChange<number> | IArraySplice<number>) => {
+        // console.log(d.type)
+    })
 
-//     const x: IObservableValue<number> = observable.box(3)
-// })
+    const ar2: IObservableArray<number> = observable([1, 2])
+    ar2.intercept((c: IArrayWillChange<number> | IArrayWillSplice<number>) => {
+        // console.log(c.type)
+        return null
+    })
+    ar2.observe((d: IArrayChange<number> | IArraySplice<number>) => {
+        // console.log(d.type)
+    })
 
-// const state: any = observable({
-//     authToken: null
-// })
+    const x: IObservableValue<number> = observable.box(3)
+})
 
-// test("box", () => {
-//     class Box {
-//         @observable uninitialized: any
-//         @observable height = 20
-//         @observable sizes = [2]
-//         @observable
-//         someFunc = function() {
-//             return 2
-//         }
-//         @computed
-//         get width() {
-//             return this.height * this.sizes.length * this.someFunc() * (this.uninitialized ? 2 : 1)
-//         }
-//         @action
-//         addSize() {
-//             this.sizes.push(3)
-//             this.sizes.push(4)
-//         }
-//     }
+const state: any = observable({
+    authToken: null
+})
 
-//     const box = new Box()
+test("box", () => {
+    class Box {
+        uninitialized = observable<boolean>(undefined as any)
+        height = observable(20)
+        sizes = observable([2])
 
-//     const ar: number[] = []
+        someFunc = observable(function(): number {
+            return 2
+        })
 
-//     autorun(() => {
-//         ar.push(box.width)
-//     })
+        width = computed(() => {
+            return this.height * this.sizes.length * this.someFunc() * (this.uninitialized ? 2 : 1)
+        })
 
-//     t.deepEqual(ar.slice(), [40])
-//     box.height = 10
-//     t.deepEqual(ar.slice(), [40, 20])
-//     box.sizes.push(3, 4)
-//     t.deepEqual(ar.slice(), [40, 20, 60])
-//     box.someFunc = () => 7
-//     t.deepEqual(ar.slice(), [40, 20, 60, 210])
-//     box.uninitialized = true
-//     t.deepEqual(ar.slice(), [40, 20, 60, 210, 420])
-//     box.addSize()
-//     expect(ar.slice()).toEqual([40, 20, 60, 210, 420, 700])
-// })
+        constructor() {
+            initializeObservables(this)
+        }
 
-// test("computed setter should succeed", () => {
-//     class Bla {
-//         @observable a = 3
-//         @computed
-//         get propX() {
-//             return this.a * 2
-//         }
-//         set propX(v) {
-//             this.a = v
-//         }
-//     }
+        addSize() {
+            this.sizes.push(3)
+            this.sizes.push(4)
+        }
+    }
+    Box.prototype.addSize = action(Box.prototype.addSize)
 
-//     const b = new Bla()
-//     t.equal(b.propX, 6)
-//     b.propX = 4
-//     t.equal(b.propX, 8)
-// })
+    const box = new Box()
+
+    const ar: number[] = []
+
+    autorun(() => {
+        ar.push(box.width)
+    })
+
+    t.deepEqual(ar.slice(), [40])
+    box.height = 10
+    t.deepEqual(ar.slice(), [40, 20])
+    box.sizes.push(3, 4)
+    t.deepEqual(ar.slice(), [40, 20, 60])
+    box.someFunc = () => 7
+    t.deepEqual(ar.slice(), [40, 20, 60, 210])
+    box.uninitialized = true
+    t.deepEqual(ar.slice(), [40, 20, 60, 210, 420])
+    box.addSize()
+    expect(ar.slice()).toEqual([40, 20, 60, 210, 420, 700])
+})
+
+test("computed setter should succeed", () => {
+    class Bla {
+        constructor() {
+            initializeObservables(this)
+        }
+
+        a = observable(3)
+        propX = computed(
+            () => {
+                return this.a * 2
+            },
+            v => {
+                this.a = v
+            }
+        )
+    }
+
+    const b = new Bla()
+    t.equal(b.propX, 6)
+    b.propX = 4
+    t.equal(b.propX, 8)
+})
 
 // test("atom clock example", done => {
 //     let ticks = 0
@@ -399,14 +412,14 @@ test("ts - class basic - 3", function() {
 // })
 
 // test("typescript: parameterized computed decorator", () => {
-//     class TestClass {
-//         @observable x = 3
-//         @observable y = 3
-//         @computed.struct
-//         get boxedSum() {
-//             return { sum: Math.round(this.x) + Math.round(this.y) }
-//         }
+// class TestClass {
+//     @observable x = 3
+//     @observable y = 3
+//     @computed.struct
+//     get boxedSum() {
+//         return { sum: Math.round(this.x) + Math.round(this.y) }
 //     }
+// }
 
 //     const t1 = new TestClass()
 //     const changes: { sum: number }[] = []

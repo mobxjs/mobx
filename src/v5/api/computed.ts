@@ -10,10 +10,14 @@ import {
 
 export interface IComputed {
     <T>(options: IComputedValueOptions<T>): any // decorator // TODO: remove
-    <T>(func: () => T, setter: (v: T) => void): T // normal usage // introduce computed.box?
-    <T>(func: () => T, options?: IComputedValueOptions<T>): T // normal usage // TODO: introduce computed.box?
+    <T>(func: () => T, setter: (v: T) => void): T // field
+    <T>(func: () => T, options?: IComputedValueOptions<T>): T // field
     (target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): void // decorator // TODO: remove
-    struct(target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): void // decorator // TODO: remove
+    struct(target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): void // field
+    box: {
+        <T>(func: () => T, setter: (v: T) => void): IComputedValue<T>
+        <T>(func: () => T, options?: IComputedValueOptions<T>): IComputedValue<T>
+    }
 }
 
 export const computedDecorator = createPropDecorator(
@@ -72,3 +76,4 @@ export const computed: IComputed = function computed(arg1, arg2, arg3) {
 } as any
 
 computed.struct = computedStructDecorator
+computed.box = computed
