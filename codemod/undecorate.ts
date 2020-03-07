@@ -6,7 +6,9 @@ import {
     ASTPath,
     ClassProperty,
     Node,
-    ClassDeclaration
+    ClassDeclaration,
+    MethodDefinition,
+    ClassMethod
 } from "jscodeshift"
 
 const validDecorators = ["action", "observable", "computed"]
@@ -98,7 +100,7 @@ export default function tranform(fileInfo: FileInfo, api: API, options: any) {
     function createConstructor(clazz: ClassDeclaration) {
         const needsSuper = !!clazz.superClass
         let constructorIndex = clazz.body.body.findIndex(
-            member => j.MethodDefinition.check(member) && member.kind === "constructor"
+            member => j.ClassMethod.check(member) && member.kind === "constructor"
         )
         // create a constructor
         if (constructorIndex === -1) {
@@ -123,13 +125,23 @@ export default function tranform(fileInfo: FileInfo, api: API, options: any) {
             )
 
             const firstMethodIndex = clazz.body.body.findIndex(member =>
-                j.MethodDefinition.check(member)
+                j.ClassMethod.check(member)
             )
             if (firstMethodIndex === -1) {
                 clazz.body.body.push(constructorDecl)
             } else {
                 clazz.body.body.splice(firstMethodIndex, 0, constructorDecl)
             }
+        } else {
+            const c: ClassMethod = clazz.body.body[constructorIndex] as any
+            j.ClassMethod.assert(c)
+            const firstStatement = c.body.body[0]
+            const hasSuper =
+                firstStatement &&
+                j.ExpressionStatement.check(firstStatement) &&
+                j.CallExpression.check(firstStatement.expression) &&
+                j.Super.check(firstStatement.expression.callee)
+            c.body.body.splice(hasSuper ? 1 : 0, 0, initializeObservablesCall)
         }
     }
 
