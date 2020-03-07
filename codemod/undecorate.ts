@@ -8,23 +8,21 @@ import {
     Node,
     ClassDeclaration,
     MethodDefinition,
-    ClassMethod
+    ClassMethod,
+    ImportDeclaration
 } from "jscodeshift"
 
 const validDecorators = ["action", "observable", "computed"]
 
 export const parser = "babylon"
 
-export default function tranform(fileInfo: FileInfo, api: API, options: any) {
+export default function tranform(fileInfo: FileInfo, api: API, options: any): any {
     const j = api.jscodeshift
-
     const superCall = j.expressionStatement(j.callExpression(j.super(), []))
     const initializeObservablesCall = j.expressionStatement(
         j.callExpression(j.identifier("initializeObservables"), [j.thisExpression()])
     )
-
     const source = j(fileInfo.source)
-
     let changed = false
     let needsInitializeImport = false
     const decoratorsUsed = new Set<String>()
@@ -41,7 +39,6 @@ export default function tranform(fileInfo: FileInfo, api: API, options: any) {
             })
         }
     })
-
     source.find(j.ClassDeclaration).forEach(clazzPath => {
         const clazz = clazzPath.value
         let needsConstructor = false
@@ -57,9 +54,22 @@ export default function tranform(fileInfo: FileInfo, api: API, options: any) {
             needsInitializeImport = true
         }
     })
-
     if (needsInitializeImport) {
-        // TODO: create import for initializeObservables
+        // @ts-ignore
+        const mobxImport = source
+            .find(j.ImportDeclaration)
+            .filter(im => im.value.source.value === "mobx")
+            .nodes()[0]
+        if (!mobxImport.specifiers) {
+            mobxImport.specifiers = []
+        }
+        mobxImport.specifiers.push(j.importSpecifier(j.identifier("initializeObservables")))
+    }
+    if (!decoratorsUsed.size) {
+        return // no mobx in this file
+    }
+    if (changed) {
+        return source.toSource()
     }
 
     function handleProperty(property: ClassProperty & { decorators: Decorator[] }): boolean {
@@ -69,31 +79,52 @@ export default function tranform(fileInfo: FileInfo, api: API, options: any) {
         }
         if (decorators.length > 1) {
             console.warn("Found multiple decorators, skipping..")
-        }
-        const decorator = decorators[0]
-        const expr = decorator.expression
-        if (!j.Identifier.check(expr) || !decoratorsUsed.has(expr.name)) {
-            warn(`Found unknown decorator `, property)
             return false
         }
-        //@x = y
-        if (!property.computed && !property.static) {
+        const decorator = decorators[0]
+        if (!j.Decorator.check(decorator)) {
+            return false
+        }
+        const expr = decorator.expression
+        if (j.Identifier.check(expr) && !decoratorsUsed.has(expr.name)) {
+            warn(`Found non-mobx decorator @${expr.name}`, property)
+            return false
+        }
+        if (property.static) {
+            warn(`Static properties are not supported ${property.key.loc?.source}`, property)
+            return false
+        }
+
+        //@action m()
+        //@action("x") m()
+        //@action.bound("x") m()
+        //@action x = y
+        //@action("x") = y
+        //@action.bound("x") = y
+        // methods (note that super method wrapping doesn't need an initializeObservables!)
+
+        //@observable f = y
+        //@observable.x f = y
+        if (!property.computed) {
             changed = true
             // decorator.remove()
 
             // only identifier expression atm
             const wrappedExpression = j.Identifier.check(decorator.expression)
-                ? j.callExpression(j.identifier(decorator.expression.name), [property.value])
+                ? j.callExpression(j.identifier(decorator.expression.name), [property.value!])
                 : null // TODO call expression, property access expression
 
             property.decorators.splice(0)
             property.value = wrappedExpression
             return true
         }
-        // if (decorator.parent)
-        // fields
-        // methods (note that super method wrapping doesn't need an initializeObservables!)
-        // getters
+
+        //@computed get m()
+        //@computed get m() set m()
+        //@computed(options) get m()
+        //@computed(options) get m() set m()
+        //@computed.struct get m()
+        //@computed.struct get m() set m()
         return false
     }
 
@@ -106,7 +137,7 @@ export default function tranform(fileInfo: FileInfo, api: API, options: any) {
         if (constructorIndex === -1) {
             if (needsSuper) {
                 warn(
-                    "Generated new constructor for class. But since the class does have a base class, it might be needed to revisit the arguments that are passed to `super()`",
+                    `Generated new constructor for class ${clazz.id?.name}. But since the class does have a base class, it might be needed to revisit the arguments that are passed to \`super()\``,
                     clazz
                 )
             }
@@ -145,21 +176,11 @@ export default function tranform(fileInfo: FileInfo, api: API, options: any) {
         }
     }
 
-    if (!decoratorsUsed.size) {
-        return // no mobx in this file
-    }
-
-    // TODO: update import statement
-
-    if (changed) {
-        return source.toSource()
-    }
-
     function warn(msg, node: Node) {
         console.warn(
-            `[mobx:undecorate] ${msg} ${fileInfo.path}@${node.loc.start.line}:${
-                node.loc.start.column
-            }`
+            `[mobx:undecorate] ${msg} \n\tat (${fileInfo.path}:${node.loc!.start.line}:${
+                node.loc!.start.column
+            })`
         )
     }
 }
