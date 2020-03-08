@@ -174,7 +174,7 @@ Note that the `legacy` mode is important (as is putting the decorators proposal 
 
 ---
 
-## Disclamer: Limitations of decorator syntax:
+## Disclaimer: Limitations of decorator syntax:
 
 _The current transpiler implementations of decorator syntax are quite limited and don't behave exactly the same.
 Also, many compositional patterns are currently not possible with decorators, until the stage-2 proposal has been implemented by all transpilers.
