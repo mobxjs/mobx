@@ -49,6 +49,7 @@ export function configure(options: {
                 break
             case false:
             case "useMicrotasks":
+                globalState.queueReportChangedEndBatchAsMicrotask = true
             case "never":
                 ea = false
                 break
@@ -63,7 +64,6 @@ export function configure(options: {
         }
         globalState.enforceActions = ea
         globalState.allowStateChanges = ea === true || ea === "strict" ? false : true
-        globalState.queueReportChangedEndBatchAsMicrotask = true
     }
     if (computedRequiresReaction !== undefined) {
         globalState.computedRequiresReaction = !!computedRequiresReaction
