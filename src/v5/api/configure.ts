@@ -7,7 +7,7 @@ import {
 } from "../internal"
 
 export function configure(options: {
-    enforceActions?: boolean | "strict" | "never" | "always" | "observed"
+    enforceActions?: boolean | "strict" | "never" | "always" | "observed" | "useMicrotasks"
     computedRequiresReaction?: boolean
     /**
      * (Experimental)
@@ -48,6 +48,7 @@ export function configure(options: {
                 ea = true
                 break
             case false:
+            case "useMicrotasks":
             case "never":
                 ea = false
                 break
@@ -57,11 +58,12 @@ export function configure(options: {
                 break
             default:
                 fail(
-                    `Invalid value for 'enforceActions': '${enforceActions}', expected 'never', 'always' or 'observed'`
+                    `Invalid value for 'enforceActions': '${enforceActions}', expected 'never', 'always', 'observed' or 'useMicrotasks'`
                 )
         }
         globalState.enforceActions = ea
         globalState.allowStateChanges = ea === true || ea === "strict" ? false : true
+        globalState.queueReportChangedEndBatchAsMicrotask = true
     }
     if (computedRequiresReaction !== undefined) {
         globalState.computedRequiresReaction = !!computedRequiresReaction

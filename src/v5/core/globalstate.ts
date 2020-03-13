@@ -139,6 +139,12 @@ export class MobXGlobals {
      * they are not the cause, see: https://github.com/mobxjs/mobx/issues/1836
      */
     suppressReactionErrors = false
+
+    /*
+     * Queues the endBatch call in reportChanged in a microtask. This allows automatic batching of multiple
+     * observable changes that originate outside of an action.
+     */
+    queueReportChangedEndBatchAsMicrotask = false
 }
 
 declare const window: any

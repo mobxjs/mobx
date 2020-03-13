@@ -10,7 +10,8 @@ import {
     onBecomeUnobserved,
     propagateChanged,
     reportObserved,
-    startBatch
+    startBatch,
+    globalState
 } from "../internal"
 import { Lambda } from "../utils/utils"
 
@@ -64,7 +65,13 @@ export class Atom implements IAtom {
     public reportChanged() {
         startBatch()
         propagateChanged(this)
-        endBatch()
+        if (globalState.queueReportChangedEndBatchAsMicrotask) {
+            Promise.resolve().then(() => {
+                endBatch()
+            })
+        } else {
+            endBatch()
+        }
     }
 
     toString() {
