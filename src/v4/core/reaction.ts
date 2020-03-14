@@ -211,6 +211,9 @@ export function onReactionError(handler: (error: any, derivation: IDerivation) =
  */
 const MAX_REACTION_ITERATIONS = 100
 
+const REACTIONS_IN_MICROTASK_LOOP_WARN_THRESHOLD = 20
+let curMicrotaskReactionCount = 0
+
 let reactionScheduler: (fn: () => void) => void = f => f()
 
 export function runReactions() {
@@ -223,6 +226,22 @@ function runReactionsHelper() {
     globalState.isRunningReactions = true
     const allReactions = globalState.pendingReactions
     let iterations = 0
+
+    // Calculate how many times the reaction helper is triggered
+    //  inside a single microtask, and warn if it is too many.
+    if (allReactions.length > 0) {
+        if (curMicrotaskReactionCount === 0) {
+            Promise.resolve().then(() => {
+                if (curMicrotaskReactionCount > REACTIONS_IN_MICROTASK_LOOP_WARN_THRESHOLD) {
+                    console.warn(
+                        `MOBX WARNING, a sigle microtask loop had ${curMicrotaskReactionCount} reactions (which are caused by changes to observables). Batch these actions with @action or runInAction to gain up to a ${curMicrotaskReactionCount}X performance boost!`
+                    )
+                }
+                curMicrotaskReactionCount = 0
+            })
+        }
+        curMicrotaskReactionCount++
+    }
 
     // While running reactions, new reactions might be triggered.
     // Hence we work with two variables and check whether
