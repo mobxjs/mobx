@@ -212,7 +212,7 @@ export function onReactionError(handler: (error: any, derivation: IDerivation) =
 const MAX_REACTION_ITERATIONS = 100
 
 const REACTIONS_IN_MICROTASK_LOOP_WARN_THRESHOLD = 20
-let curMicrotaskReactionCount = 0
+let currentMicrotaskReactionCount = 0
 
 let reactionScheduler: (fn: () => void) => void = f => f()
 
@@ -229,18 +229,20 @@ function runReactionsHelper() {
 
     // Calculate how many times the reaction helper is triggered
     //  inside a single microtask, and warn if it is too many.
-    if (allReactions.length > 0) {
-        if (curMicrotaskReactionCount === 0) {
+    if (process.env.NODE_ENV !== "production" && allReactions.length > 0) {
+        if (currentMicrotaskReactionCount === 0) {
             Promise.resolve().then(() => {
-                if (curMicrotaskReactionCount > REACTIONS_IN_MICROTASK_LOOP_WARN_THRESHOLD) {
+                if (currentMicrotaskReactionCount > REACTIONS_IN_MICROTASK_LOOP_WARN_THRESHOLD) {
                     console.warn(
-                        `MOBX WARNING, a single microtask loop had ${curMicrotaskReactionCount} reactions (which are caused by changes to observables). Batch these actions with @action or runInAction to gain up to a ${curMicrotaskReactionCount}X performance boost!`
+                        `MOBX WARNING, a single microtask loop had ${currentMicrotaskReactionCount} reactions` +
+                            ` (which are caused by changes to observables). Batch these actions with @action or ` +
+                            `runInAction to gain up to a ${currentMicrotaskReactionCount}X performance boost!`
                     )
                 }
-                curMicrotaskReactionCount = 0
+                currentMicrotaskReactionCount = 0
             })
         }
-        curMicrotaskReactionCount++
+        currentMicrotaskReactionCount += 1
     }
 
     // While running reactions, new reactions might be triggered.
