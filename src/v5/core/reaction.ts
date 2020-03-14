@@ -243,7 +243,7 @@ function runReactionsHelper() {
             Promise.resolve().then(() => {
                 if (curMicrotaskReactionCount > REACTIONS_IN_MICROTASK_LOOP_WARN_THRESHOLD) {
                     console.warn(
-                        `MOBX WARNING, a sigle microtask loop had ${curMicrotaskReactionCount} reactions (which are caused by changes to observables). Batch these actions with @action or runInAction to gain up to a ${curMicrotaskReactionCount}X performance boost!`
+                        `MOBX WARNING, a single microtask loop had ${curMicrotaskReactionCount} reactions (which are caused by changes to observables). Batch these actions with @action or runInAction to gain up to a ${curMicrotaskReactionCount}X performance boost!`
                     )
                 }
                 curMicrotaskReactionCount = 0
