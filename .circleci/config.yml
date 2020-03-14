@@ -81,6 +81,14 @@ jobs:
                   paths:
                       - ./coverage
 
+    test-codemod:
+        executor: my-executor
+        steps:
+            - attach_workspace:
+                  at: .
+
+            - run: yarn test:codemod
+
     test-size:
         executor: my-executor
         steps:
