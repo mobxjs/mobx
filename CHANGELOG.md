@@ -3,6 +3,7 @@
 # 5.15.4 / 4.15.4
 
 -   Fix process.env replacement in build [#2267](https://github.com/mobxjs/mobx/pull/2267) by [@fredyc](https://github.com/fredyc)
+-   Add warning when too many reactions are triggered within one microtask loop, as suggested in [#2311](https://github.com/mobxjs/mobx/pull/2311) by [@spion](https://github.com/spion) and submitted in [#2312](https://github.com/mobxjs/mobx/pull/2312) by [@sliftist](https://github.com/sliftist)
 
 # 5.15.3 / 4.15.3
 
