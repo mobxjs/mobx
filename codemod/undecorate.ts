@@ -12,7 +12,9 @@ import {
     ImportDeclaration,
     CallExpression,
     MemberExpression,
-    Identifier
+    Identifier,
+    FunctionExpression,
+    ArrowFunctionExpression
 } from "jscodeshift"
 
 const validDecorators = ["action", "observable", "computed"]
@@ -116,31 +118,34 @@ export default function tranform(fileInfo: FileInfo, api: API, options: any): an
             // those return false, since for actions we don't need to run initializeObservables again
             switch (true) {
                 //@action.bound("x") = y
-                case propInfo.type === "field" &&
-                    propInfo.subDecorator === "bound" &&
-                    !!propInfo.callArg:
-                    property.value = fnCall(["action", "bound"], propInfo.callArg, property.value)
+                //@action.bound = y
+                case propInfo.type === "field" && propInfo.subDecorator === "bound": {
+                    const arrowFn = toArrowFn(property.value as any)
+                    property.value = fnCall(
+                        // special case: if it was a generator function, it will still be a function expression, so still requires bound
+                        ["action", j.FunctionExpression.check(arrowFn) && "bound"],
+                        [propInfo.callArg, arrowFn]
+                    )
                     return property
+                }
                 //@action.bound("x") m()
-                case propInfo.type === "method" &&
-                    propInfo.subDecorator === "bound" &&
-                    !!propInfo.callArg:
+                //@action.bound m()
+                case propInfo.type === "method" && propInfo.subDecorator === "bound": {
+                    const arrowFn = toArrowFn(propInfo.expr as any)
                     return j.classProperty(
                         property.key,
                         fnCall(
-                            ["action", "bound"],
-                            propInfo.callArg,
-                            toArrowFn(propInfo.expr as any)
+                            // special case: if it was a generator function, it will still be a function expression, so still requires bound
+                            ["action", j.FunctionExpression.check(arrowFn) && "bound"],
+                            [propInfo.callArg, arrowFn]
                         )
                     )
+                }
                 //@action("x") = y
-                // case propInfo.type === "field" && !propInfo.subDecorator && !!propInfo.callArg:
-                //     property.value = fnCall(["action"], propInfo.callArg, property.value)
-                //     return false
-                // //@action x = y
-                // case propInfo.type === "field" && !propInfo.subDecorator:
-                //     property.value = fnCall(["action"], property.value)
-                //     return false
+                //@action x = y
+                case propInfo.type === "field" && !propInfo.subDecorator:
+                    property.value = fnCall(["action"], [propInfo.callArg, property.value])
+                    return property
                 // //@action("x") m()
                 // //@action m()
                 // case propInfo.type === "method":
@@ -156,22 +161,22 @@ export default function tranform(fileInfo: FileInfo, api: API, options: any): an
 
         //@observable f = y
         //@observable.x f = y
-        if (!property.computed) {
-            changed = true
-            // decorator.remove()
+        // if (!property.computed) {
+        //     changed = true
+        //     // decorator.remove()
 
-            // only identifier expression atm
-            const wrappedExpression = j.Identifier.check(decorator.expression)
-                ? j.callExpression(j.identifier(decorator.expression.name), [
-                      (property as any).value!
-                  ])
-                : null // TODO call expression, property access expression
+        //     // only identifier expression atm
+        //     const wrappedExpression = j.Identifier.check(decorator.expression)
+        //         ? j.callExpression(j.identifier(decorator.expression.name), [
+        //               (property as any).value!
+        //           ])
+        //         : null // TODO call expression, property access expression
 
-            property.decorators.splice(0)
-            property.value = wrappedExpression
-            effects.needsConstructor = true
-            return property
-        }
+        //     property.decorators.splice(0)
+        //     property.value = wrappedExpression
+        //     effects.needsConstructor = true
+        //     return property
+        // }
 
         //@computed get m() // rewrite to this!
         //@computed get m() set m()
@@ -185,7 +190,7 @@ export default function tranform(fileInfo: FileInfo, api: API, options: any): an
     function parseProperty(
         p: (ClassProperty | MethodDefinition) & { decorators: Decorator[] }
     ): {
-        isCallExpression: boolean
+        isCallExpression: boolean // TODO: not used?
         baseDecorator: "action" | "observable" | "computed"
         subDecorator: string
         type: "field" | "method" | "getter"
@@ -198,26 +203,38 @@ export default function tranform(fileInfo: FileInfo, api: API, options: any): an
         let baseDecorator = ""
         let subDecorator = ""
         let callArg: any
-        // console.dir(p)
-        if (isCallExpression) {
-            if (j.MemberExpression.check((decExpr as CallExpression).callee)) {
-                const me = (decExpr as CallExpression).callee
-                if (
-                    j.MemberExpression.check(me) &&
-                    j.Identifier.check(me.object) &&
-                    j.Identifier.check(me.property)
-                ) {
-                    baseDecorator = me.object.name
-                    subDecorator = me.property.name
-                } else {
-                    warn(`Decorator expression too complex, please convert manually`, decExpr)
-                }
+        // console.dir(decExpr)
+        if (isCallExpression && j.MemberExpression.check((decExpr as CallExpression).callee)) {
+            const me = (decExpr as CallExpression).callee
+            if (
+                j.MemberExpression.check(me) &&
+                j.Identifier.check(me.object) &&
+                j.Identifier.check(me.property)
+            ) {
+                baseDecorator = me.object.name
+                subDecorator = me.property.name
+            } else {
+                warn(`Decorator expression too complex, please convert manually`, decExpr)
             }
-            if ((decExpr as CallExpression).arguments.length !== 1) {
-                warn(`Expected exactly one argument`, decExpr)
-            }
-            callArg = (decExpr as CallExpression).arguments[0]
+        } else if (isCallExpression && j.Identifier.check((decExpr as CallExpression).callee)) {
+            baseDecorator = ((decExpr as CallExpression).callee as Identifier).name
+        } else if (
+            j.MemberExpression.check(decExpr) &&
+            j.Identifier.check(decExpr.object) &&
+            j.Identifier.check(decExpr.property)
+        ) {
+            baseDecorator = decExpr.object.name
+            subDecorator = decExpr.property.name
+        } else if (j.Identifier.check(decExpr)) {
+            baseDecorator = decExpr.name
+        } else {
+            warn(`Decorator expression too complex, please convert manually`, decExpr)
         }
+
+        if (isCallExpression && (decExpr as CallExpression).arguments.length !== 1) {
+            warn(`Expected exactly one argument`, decExpr)
+        }
+        callArg = isCallExpression && (decExpr as CallExpression).arguments[0]
 
         return {
             isCallExpression,
@@ -278,16 +295,20 @@ export default function tranform(fileInfo: FileInfo, api: API, options: any): an
         }
     }
 
-    function fnCall(name: [string] | [string, string], ...args: any) {
+    function fnCall(name: [string] | [string, string | false], args: any[]) {
         return j.callExpression(
-            name.length === 2
-                ? j.memberExpression(j.identifier(name[0]), j.identifier(name[1]))
+            name.filter(Boolean).length === 2
+                ? j.memberExpression(j.identifier(name[0]), j.identifier(name[1] as any))
                 : j.identifier(name[0]),
-            args
+            args.filter(Boolean)
         )
     }
 
-    function toArrowFn(m: ClassMethod) {
+    function toArrowFn(m: ClassMethod): FunctionExpression | ArrowFunctionExpression {
+        if (j.ArrowFunctionExpression.check(m) || !j.ClassMethod.check(m)) {
+            // leave arrow funcs (and everything not a method at all) alone
+            return m
+        }
         const res = m.generator
             ? j.functionExpression(null, m.params, m.body, true)
             : j.arrowFunctionExpression(m.params, m.body)
