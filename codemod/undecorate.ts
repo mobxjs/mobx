@@ -53,7 +53,7 @@ export default function tranform(fileInfo: FileInfo, api: API, options: any): an
         clazz.body.body = clazz.body.body
             .map(prop => {
                 if (j.ClassProperty.check(prop) || j.ClassMethod.check(prop)) {
-                    return handleProperty(prop as any, effects)
+                    return handleProperty(prop as any, effects, clazzPath)
                 }
                 return prop
             })
@@ -86,14 +86,15 @@ export default function tranform(fileInfo: FileInfo, api: API, options: any): an
         property: ClassProperty /* | or ClassMethod */ & { decorators: Decorator[] },
         effects: {
             needsConstructor: boolean
-        }
+        },
+        clazzPath: ASTPath<ClassDeclaration>
     ): ClassProperty | ClassMethod {
         const decorators = property.decorators
         if (decorators.length === 0) {
             return property
         }
         if (decorators.length > 1) {
-            console.warn("Found multiple decorators, skipping..")
+            warn("Found multiple decorators, skipping..", property)
             return property
         }
         const decorator = decorators[0]
@@ -113,6 +114,8 @@ export default function tranform(fileInfo: FileInfo, api: API, options: any): an
         const propInfo = parseProperty(property)
         // console.dir(propInfo)
         property.decorators.splice(0)
+
+        // ACTIONS
         if (propInfo.baseDecorator === "action") {
             changed = true
             // those return false, since for actions we don't need to run initializeObservables again
@@ -148,11 +151,10 @@ export default function tranform(fileInfo: FileInfo, api: API, options: any): an
                     return property
                 // //@action("x") m()
                 // //@action m()
-                // case propInfo.type === "method":
-                //     // TODO: after class change prototype
-                //     // TODO: based on propInfo.callArg, first arg changes
-                //     return false
-
+                case propInfo.type === "method": {
+                    generateActionInitializationOnPrototype(clazzPath, property, propInfo)
+                    return property
+                }
                 default:
                     warn("Uknown case for undecorate action ", property)
                     return property
@@ -161,6 +163,7 @@ export default function tranform(fileInfo: FileInfo, api: API, options: any): an
 
         //@observable f = y
         //@observable.x f = y
+        //@observable ['x'] = y
         // if (!property.computed) {
         //     changed = true
         //     // decorator.remove()
@@ -185,6 +188,48 @@ export default function tranform(fileInfo: FileInfo, api: API, options: any): an
         //@computed.struct get m()
         //@computed.struct get m() set m()
         return property
+    }
+
+    function generateActionInitializationOnPrototype(
+        clazzPath: ASTPath<ClassDeclaration>,
+        property: ClassProperty,
+        propInfo: ReturnType<typeof parseProperty>
+    ) {
+        // N.B. this is not a transformation that one would write manually,
+        // e.g. m = action(fn) would be way more straight forward,
+        // but this transformation better preserves the old semantics, like sharing the action
+        // on the prototype, which saves a lot of memory allocations, which some existing apps
+        // might depend upon
+        const clazzId = clazzPath.value.id
+        const isComputedName = !j.Identifier.check(property.key)
+        if (!clazzId) {
+            warn(`Cannot transform action of anonymous class`, property)
+        } else {
+            // Bla.prototype.x = action(Bla.prototype.x)
+            clazzPath.insertAfter(
+                j.expressionStatement(
+                    j.assignmentExpression(
+                        "=",
+                        j.memberExpression(
+                            j.memberExpression(clazzId, j.identifier("prototype")),
+                            property.key,
+                            isComputedName
+                        ),
+                        fnCall(
+                            ["action"],
+                            [
+                                propInfo.callArg,
+                                j.memberExpression(
+                                    j.memberExpression(clazzId, j.identifier("prototype")),
+                                    property.key,
+                                    isComputedName
+                                )
+                            ]
+                        )
+                    )
+                )
+            )
+        }
     }
 
     function parseProperty(
@@ -240,7 +285,7 @@ export default function tranform(fileInfo: FileInfo, api: API, options: any): an
             isCallExpression,
             baseDecorator: baseDecorator as any,
             subDecorator,
-            type: p.computed ? "getter" : j.ClassMethod.check(p) ? "method" : "field",
+            type: j.ClassMethod.check(p) ? (p.kind === "get" ? "getter" : "method") : "field",
             expr: j.ClassMethod.check(p) ? p : p.value,
             callArg,
             setterExpr: undefined
@@ -318,7 +363,7 @@ export default function tranform(fileInfo: FileInfo, api: API, options: any): an
         return res
     }
 
-    function warn(msg, node: Node) {
+    function warn(msg: string, node: Node) {
         console.warn(
             `[mobx:undecorate] ${msg} \n\tat (${fileInfo.path}:${node.loc!.start.line}:${
                 node.loc!.start.column
