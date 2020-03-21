@@ -10,6 +10,7 @@ import {
 
 export interface IComputed {
     <T>(options: IComputedValueOptions<T>): any // decorator // TODO: remove
+    // TODO: add overload (get, set, options)
     <T>(func: () => T, setter: (v: T) => void): T // field
     <T>(func: () => T, options?: IComputedValueOptions<T>): T // field
     (target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): void // decorator // TODO: remove

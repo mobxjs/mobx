@@ -16,6 +16,7 @@ import {
     FunctionExpression,
     ArrowFunctionExpression
 } from "jscodeshift"
+import { resolveSoa } from "dns"
 
 const validDecorators = ["action", "observable", "computed"]
 
@@ -47,7 +48,8 @@ export default function tranform(fileInfo: FileInfo, api: API, options: any): an
     source.find(j.ClassDeclaration).forEach(clazzPath => {
         const clazz = clazzPath.value
         const effects = {
-            needsConstructor: false
+            needsConstructor: false,
+            membersToRemove: [] as any[]
         }
 
         clazz.body.body = clazz.body.body
@@ -57,7 +59,8 @@ export default function tranform(fileInfo: FileInfo, api: API, options: any): an
                 }
                 return prop
             })
-            .filter(Boolean) as any
+            .filter(Boolean)
+            .filter(elem => !effects.membersToRemove.includes(elem))
 
         if (effects.needsConstructor) {
             createConstructor(clazz)
@@ -86,11 +89,12 @@ export default function tranform(fileInfo: FileInfo, api: API, options: any): an
         property: ClassProperty /* | or ClassMethod */ & { decorators: Decorator[] },
         effects: {
             needsConstructor: boolean
+            membersToRemove: any[]
         },
         clazzPath: ASTPath<ClassDeclaration>
     ): ClassProperty | ClassMethod {
         const decorators = property.decorators
-        if (decorators.length === 0) {
+        if (!decorators || decorators.length === 0) {
             return property
         }
         if (decorators.length > 1) {
@@ -111,7 +115,7 @@ export default function tranform(fileInfo: FileInfo, api: API, options: any): an
             return property
         }
 
-        const propInfo = parseProperty(property)
+        const propInfo = parseProperty(property, clazzPath)
         // console.dir(propInfo)
         property.decorators.splice(0)
 
@@ -135,7 +139,7 @@ export default function tranform(fileInfo: FileInfo, api: API, options: any): an
                 //@action.bound m()
                 case propInfo.type === "method" && propInfo.subDecorator === "bound": {
                     const arrowFn = toArrowFn(propInfo.expr as any)
-                    return j.classProperty(
+                    const res = j.classProperty(
                         property.key,
                         fnCall(
                             // special case: if it was a generator function, it will still be a function expression, so still requires bound
@@ -143,6 +147,8 @@ export default function tranform(fileInfo: FileInfo, api: API, options: any): an
                             [propInfo.callArg, arrowFn]
                         )
                     )
+                    res.comments = property.comments
+                    return res
                 }
                 //@action("x") = y
                 //@action x = y
@@ -161,32 +167,42 @@ export default function tranform(fileInfo: FileInfo, api: API, options: any): an
             }
         }
 
-        //@observable f = y
-        //@observable.x f = y
-        //@observable ['x'] = y
-        // if (!property.computed) {
-        //     changed = true
-        //     // decorator.remove()
+        // OBSERVABLE
+        if (propInfo.baseDecorator === "observable") {
+            //@observable f = y
+            //@observable.x f = y
+            //@observable ['x'] = y
+            changed = true
+            effects.needsConstructor = true
+            property.value = fnCall(["observable", propInfo.subDecorator], [property.value])
+            return property
+        }
 
-        //     // only identifier expression atm
-        //     const wrappedExpression = j.Identifier.check(decorator.expression)
-        //         ? j.callExpression(j.identifier(decorator.expression.name), [
-        //               (property as any).value!
-        //           ])
-        //         : null // TODO call expression, property access expression
-
-        //     property.decorators.splice(0)
-        //     property.value = wrappedExpression
-        //     effects.needsConstructor = true
-        //     return property
-        // }
-
-        //@computed get m() // rewrite to this!
-        //@computed get m() set m()
-        //@computed(options) get m()
-        //@computed(options) get m() set m()
-        //@computed.struct get m()
-        //@computed.struct get m() set m()
+        // COMPUTED
+        if (propInfo.baseDecorator === "computed") {
+            //@computed get m() // rewrite to this!
+            //@computed get m() set m()
+            //@computed(options) get m()
+            //@computed(options) get m() set m()
+            //@computed.struct get m()
+            //@computed.struct get m() set m()
+            changed = true
+            effects.needsConstructor = true
+            const res = j.classProperty(
+                property.key,
+                fnCall(
+                    ["computed", propInfo.subDecorator],
+                    [
+                        toArrowFn(propInfo.expr),
+                        propInfo.setterExpr ? toArrowFn(propInfo.setterExpr) : undefined,
+                        propInfo.callArg
+                    ]
+                )
+            )
+            res.comments = property.comments
+            if (propInfo.setterExpr) effects.membersToRemove.push(propInfo.setterExpr)
+            return res
+        }
         return property
     }
 
@@ -233,7 +249,8 @@ export default function tranform(fileInfo: FileInfo, api: API, options: any): an
     }
 
     function parseProperty(
-        p: (ClassProperty | MethodDefinition) & { decorators: Decorator[] }
+        p: (ClassProperty | MethodDefinition) & { decorators: Decorator[] },
+        clazzPath: ASTPath<ClassDeclaration>
     ): {
         isCallExpression: boolean // TODO: not used?
         baseDecorator: "action" | "observable" | "computed"
@@ -281,6 +298,15 @@ export default function tranform(fileInfo: FileInfo, api: API, options: any): an
         }
         callArg = isCallExpression && (decExpr as CallExpression).arguments[0]
 
+        const setterExpr = clazzPath.value.body.body.find(
+            m =>
+                j.ClassMethod.check(m) &&
+                m.kind === "set" &&
+                j.Identifier.check(m.key) &&
+                j.Identifier.check(p.key) &&
+                m.key.name === p.key.name
+        )
+
         return {
             isCallExpression,
             baseDecorator: baseDecorator as any,
@@ -288,7 +314,7 @@ export default function tranform(fileInfo: FileInfo, api: API, options: any): an
             type: j.ClassMethod.check(p) ? (p.kind === "get" ? "getter" : "method") : "field",
             expr: j.ClassMethod.check(p) ? p : p.value,
             callArg,
-            setterExpr: undefined
+            setterExpr
         }
     }
 
