@@ -11,6 +11,7 @@ import {
     isObservableProp,
     isComputedProp,
     spy,
+    decorate,
     isAction,
     configure
 } from "../../../src/v5/mobx.ts"
@@ -1073,7 +1074,7 @@ test("computed comparer works with decorate (babel)", () => {
             return { hour: this.hour, minute: this.minute }
         }
     }
-    mobx.decorate(Time, {
+    decorate(Time, {
         hour: observable,
         minute: observable,
         time: computed({ equals: sameTime })
@@ -1307,7 +1308,7 @@ test("computed setter problem - 2", () => {
         }
     }
 
-    mobx.decorate(Contact, {
+    decorate(Contact, {
         fullName: computed({
             // This doesn't work
             set: function(value) {

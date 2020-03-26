@@ -1568,16 +1568,16 @@ test("typescript - decorate works with objects", () => {
 })
 
 test("typescript - decorate works with Object.create", () => {
-    const Box = {
+    const BoxObj = {
         height: 2
     }
 
-    decorate(Box, {
+    decorate(BoxObj, {
         height: observable
         // size: observable // MWE: enabling this should give type error!
     })
 
-    const b = Object.create(Box)
+    const b = Object.create(BoxObj)
     expect(mobx.isObservableProp(b, "height")).toBe(true)
     expect(b.height).toBe(2)
 })

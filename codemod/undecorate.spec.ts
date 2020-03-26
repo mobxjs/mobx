@@ -18,18 +18,18 @@ describe("general", () => {
       field /*2 */ = /*3*/ 1 /*4*/
   }`)
         ).toMatchInlineSnapshot(`
-                                                                                                                                                                                                                                                                                                            "import { observable, initializeObservables } from \\"mobx\\";
-                                                                                                                                                                                                                                                                                                            
-                                                                                                                                                                                                                                                                                                            class Box {
-                                                                                                                                                                                                                                                                                                                /*0*/
-                                                                                                                                                                                                                                                                                                                /*1*/
-                                                                                                                                                                                                                                                                                                                field /*2 */ = observable(/*3*/ 1); /*4*/
-                                                                                                                                                                                                                                                                                                            
-                                                                                                                                                                                                                                                                                                                constructor() {
-                                                                                                                                                                                                                                                                                                                    initializeObservables(this);
-                                                                                                                                                                                                                                                                                                                }
-                                                                                                                                                                                                                                                                                                            }"
-                                                                                                                                                                                                    `)
+                                                                                                                                                                                                                                                                                                                                    "import { observable, initializeObservables } from \\"mobx\\";
+                                                                                                                                                                                                                                                                                                                                    
+                                                                                                                                                                                                                                                                                                                                    class Box {
+                                                                                                                                                                                                                                                                                                                                        /*0*/
+                                                                                                                                                                                                                                                                                                                                        /*1*/
+                                                                                                                                                                                                                                                                                                                                        field /*2 */ = observable(/*3*/ 1); /*4*/
+                                                                                                                                                                                                                                                                                                                                    
+                                                                                                                                                                                                                                                                                                                                        constructor() {
+                                                                                                                                                                                                                                                                                                                                            initializeObservables(this);
+                                                                                                                                                                                                                                                                                                                                        }
+                                                                                                                                                                                                                                                                                                                                    }"
+                                                                                                                                                                                                                    `)
     })
 
     test("class with method and extends", () => {
@@ -47,22 +47,22 @@ describe("general", () => {
           }
         `)
         ).toMatchInlineSnapshot(`
-                                                                                                                                                                                                                                                                                                            "import { observable, initializeObservables } from \\"mobx\\";
-                                                                                                                                                                                                                                                                                                            
-                                                                                                                                                                                                                                                                                                            class ExtendsHasMethod extends Box {
-                                                                                                                                                                                                                                                                                                                x = observable(1);
-                                                                                                                                                                                                                                                                                                            
-                                                                                                                                                                                                                                                                                                                constructor() {
-                                                                                                                                                                                                                                                                                                                    super();
-                                                                                                                                                                                                                                                                                                                    initializeObservables(this);
-                                                                                                                                                                                                                                                                                                                }
-                                                                                                                                                                                                                                                                                                            
-                                                                                                                                                                                                                                                                                                                // test
-                                                                                                                                                                                                                                                                                                                method() {
-                                                                                                                                                                                                                                                                                                                    console.log(\\"hi\\")
-                                                                                                                                                                                                                                                                                                                }
-                                                                                                                                                                                                                                                                                                            }"
-                                                                                                                                                                                                    `)
+                                                                                                                                                                                                                                                                                                                                    "import { observable, initializeObservables } from \\"mobx\\";
+                                                                                                                                                                                                                                                                                                                                    
+                                                                                                                                                                                                                                                                                                                                    class ExtendsHasMethod extends Box {
+                                                                                                                                                                                                                                                                                                                                        x = observable(1);
+                                                                                                                                                                                                                                                                                                                                    
+                                                                                                                                                                                                                                                                                                                                        constructor() {
+                                                                                                                                                                                                                                                                                                                                            super();
+                                                                                                                                                                                                                                                                                                                                            initializeObservables(this);
+                                                                                                                                                                                                                                                                                                                                        }
+                                                                                                                                                                                                                                                                                                                                    
+                                                                                                                                                                                                                                                                                                                                        // test
+                                                                                                                                                                                                                                                                                                                                        method() {
+                                                                                                                                                                                                                                                                                                                                            console.log(\\"hi\\")
+                                                                                                                                                                                                                                                                                                                                        }
+                                                                                                                                                                                                                                                                                                                                    }"
+                                                                                                                                                                                                                    `)
     })
 
     test("class with constructor", () => {
@@ -78,17 +78,17 @@ describe("general", () => {
               }
           }`)
         ).toMatchInlineSnapshot(`
-                                                                                                                                                                                                                                                                                                            "import { observable, initializeObservables } from \\"mobx\\";
-                                                                                                                                                                                                                                                                                                            
-                                                                                                                                                                                                                                                                                                            class ExtendsHasConstructor {
-                                                                                                                                                                                                                                                                                                                x = observable(1);
-                                                                                                                                                                                                                                                                                                            
-                                                                                                                                                                                                                                                                                                                constructor() {
-                                                                                                                                                                                                                                                                                                                    initializeObservables(this);
-                                                                                                                                                                                                                                                                                                                    console.log(\\"hi\\")
-                                                                                                                                                                                                                                                                                                                }
-                                                                                                                                                                                                                                                                                                            }"
-                                                                                                                                                                                                    `)
+                                                                                                                                                                                                                                                                                                                                    "import { observable, initializeObservables } from \\"mobx\\";
+                                                                                                                                                                                                                                                                                                                                    
+                                                                                                                                                                                                                                                                                                                                    class ExtendsHasConstructor {
+                                                                                                                                                                                                                                                                                                                                        x = observable(1);
+                                                                                                                                                                                                                                                                                                                                    
+                                                                                                                                                                                                                                                                                                                                        constructor() {
+                                                                                                                                                                                                                                                                                                                                            initializeObservables(this);
+                                                                                                                                                                                                                                                                                                                                            console.log(\\"hi\\")
+                                                                                                                                                                                                                                                                                                                                        }
+                                                                                                                                                                                                                                                                                                                                    }"
+                                                                                                                                                                                                                    `)
     })
 
     test("extended class with constructor", () => {
@@ -106,18 +106,18 @@ describe("general", () => {
           }
         `)
         ).toMatchInlineSnapshot(`
-                                                                                                                                                                                                                                                                                                            "import { observable, initializeObservables } from \\"mobx\\";
-                                                                                                                                                                                                                                                                                                            
-                                                                                                                                                                                                                                                                                                            class ExtendsHasConstructorSuper extends Box {
-                                                                                                                                                                                                                                                                                                                x = observable(1);
-                                                                                                                                                                                                                                                                                                            
-                                                                                                                                                                                                                                                                                                                constructor() {
-                                                                                                                                                                                                                                                                                                                    super()
-                                                                                                                                                                                                                                                                                                                    initializeObservables(this);
-                                                                                                                                                                                                                                                                                                                    console.log(\\"hi\\")
-                                                                                                                                                                                                                                                                                                                }
-                                                                                                                                                                                                                                                                                                            }"
-                                                                                                                                                                                                    `)
+                                                                                                                                                                                                                                                                                                                                    "import { observable, initializeObservables } from \\"mobx\\";
+                                                                                                                                                                                                                                                                                                                                    
+                                                                                                                                                                                                                                                                                                                                    class ExtendsHasConstructorSuper extends Box {
+                                                                                                                                                                                                                                                                                                                                        x = observable(1);
+                                                                                                                                                                                                                                                                                                                                    
+                                                                                                                                                                                                                                                                                                                                        constructor() {
+                                                                                                                                                                                                                                                                                                                                            super()
+                                                                                                                                                                                                                                                                                                                                            initializeObservables(this);
+                                                                                                                                                                                                                                                                                                                                            console.log(\\"hi\\")
+                                                                                                                                                                                                                                                                                                                                        }
+                                                                                                                                                                                                                                                                                                                                    }"
+                                                                                                                                                                                                                    `)
     })
 })
 
@@ -135,14 +135,14 @@ describe("action", () => {
             }
             `)
         ).toMatchInlineSnapshot(`
-                                                                                                                                                                                                            "import { action } from \\"mobx\\"
-                                                                                                                                                                                                            
-                                                                                                                                                                                                            class Box {
-                                                                                                                                                                                                                x = action(\\"test\\", (arg: number) => {
-                                                                                                                                                                                                                    console.log('hi')
-                                                                                                                                                                                                                });
-                                                                                                                                                                                                            }"
-                                                                                                                                        `)
+                                                                                                                                                                                                                                    "import { action } from \\"mobx\\"
+                                                                                                                                                                                                                                    
+                                                                                                                                                                                                                                    class Box {
+                                                                                                                                                                                                                                        x = action(\\"test\\", (arg: number) => {
+                                                                                                                                                                                                                                            console.log('hi')
+                                                                                                                                                                                                                                        });
+                                                                                                                                                                                                                                    }"
+                                                                                                                                                        `)
     })
 
     test("method - bound - named", () => {
@@ -159,15 +159,15 @@ describe("action", () => {
             }
             `)
         ).toMatchInlineSnapshot(`
-                                                                                                                                                                                                            "import { action } from \\"mobx\\"
-                                                                                                                                                                                                            
-                                                                                                                                                                                                            class Box {
-                                                                                                                                                                                                                x = action(\\"test\\", async (arg: number): boolean => {
-                                                                                                                                                                                                                    console.log('hi')
-                                                                                                                                                                                                                    return true
-                                                                                                                                                                                                                });
-                                                                                                                                                                                                            }"
-                                                                                                                                        `)
+                                                                                                                                                                                                                                    "import { action } from \\"mobx\\"
+                                                                                                                                                                                                                                    
+                                                                                                                                                                                                                                    class Box {
+                                                                                                                                                                                                                                        x = action(\\"test\\", async (arg: number): boolean => {
+                                                                                                                                                                                                                                            console.log('hi')
+                                                                                                                                                                                                                                            return true
+                                                                                                                                                                                                                                        });
+                                                                                                                                                                                                                                    }"
+                                                                                                                                                        `)
     })
 
     test("method - bound - named - generator", () => {
@@ -184,15 +184,15 @@ describe("action", () => {
             }
             `)
         ).toMatchInlineSnapshot(`
-                                                                                                                                                                                                                                                            "import { action } from \\"mobx\\"
-                                                                                                                                                                                                                                                            
-                                                                                                                                                                                                                                                            class Box {
-                                                                                                                                                                                                                                                                x = action.bound(\\"test\\", function*(arg: number): boolean {
-                                                                                                                                                                                                                                                                    console.log('hi')
-                                                                                                                                                                                                                                                                    return true
-                                                                                                                                                                                                                                                                });
-                                                                                                                                                                                                                                                            }"
-                                                                                                                                                                        `)
+                                                                                                                                                                                                                                                                                    "import { action } from \\"mobx\\"
+                                                                                                                                                                                                                                                                                    
+                                                                                                                                                                                                                                                                                    class Box {
+                                                                                                                                                                                                                                                                                        x = action.bound(\\"test\\", function*(arg: number): boolean {
+                                                                                                                                                                                                                                                                                            console.log('hi')
+                                                                                                                                                                                                                                                                                            return true
+                                                                                                                                                                                                                                                                                        });
+                                                                                                                                                                                                                                                                                    }"
+                                                                                                                                                                                        `)
     })
 
     test("field - named", () => {
@@ -209,15 +209,15 @@ describe("action", () => {
             }
             `)
         ).toMatchInlineSnapshot(`
-                                                                                                                                                                                                                        "import { action } from \\"mobx\\"
-                                                                                                                                                                                                                        
-                                                                                                                                                                                                                        class Box {
-                                                                                                                                                                                                                            x = action(\\"test\\", async (arg: number): boolean => {
-                                                                                                                                                                                                                                console.log('hi')
-                                                                                                                                                                                                                                return true
-                                                                                                                                                                                                                            });
-                                                                                                                                                                                                                        }"
-                                                                                                                                                `)
+                                                                                                                                                                                                                                                "import { action } from \\"mobx\\"
+                                                                                                                                                                                                                                                
+                                                                                                                                                                                                                                                class Box {
+                                                                                                                                                                                                                                                    x = action(\\"test\\", async (arg: number): boolean => {
+                                                                                                                                                                                                                                                        console.log('hi')
+                                                                                                                                                                                                                                                        return true
+                                                                                                                                                                                                                                                    });
+                                                                                                                                                                                                                                                }"
+                                                                                                                                                                `)
     })
 
     test("field - unnamed", () => {
@@ -234,15 +234,15 @@ describe("action", () => {
             }
             `)
         ).toMatchInlineSnapshot(`
-                                                                                                                                                                                                                        "import { action } from \\"mobx\\"
-                                                                                                                                                                                                                        
-                                                                                                                                                                                                                        class Box {
-                                                                                                                                                                                                                            x = action((arg: number): boolean => {
-                                                                                                                                                                                                                                console.log('hi')
-                                                                                                                                                                                                                                return true
-                                                                                                                                                                                                                            });
-                                                                                                                                                                                                                        }"
-                                                                                                                                                `)
+                                                                                                                                                                                                                                                "import { action } from \\"mobx\\"
+                                                                                                                                                                                                                                                
+                                                                                                                                                                                                                                                class Box {
+                                                                                                                                                                                                                                                    x = action((arg: number): boolean => {
+                                                                                                                                                                                                                                                        console.log('hi')
+                                                                                                                                                                                                                                                        return true
+                                                                                                                                                                                                                                                    });
+                                                                                                                                                                                                                                                }"
+                                                                                                                                                                `)
     })
 
     test("method - bound - unnamed", () => {
@@ -259,15 +259,15 @@ describe("action", () => {
             }
             `)
         ).toMatchInlineSnapshot(`
-                                                                                                                                                                                                                        "import { action } from \\"mobx\\"
-                                                                                                                                                                                                                        
-                                                                                                                                                                                                                        class Box {
-                                                                                                                                                                                                                            x = action((arg: number): boolean => {
-                                                                                                                                                                                                                                console.log('hi')
-                                                                                                                                                                                                                                return true
-                                                                                                                                                                                                                            });
-                                                                                                                                                                                                                        }"
-                                                                                                                                                `)
+                                                                                                                                                                                                                                                "import { action } from \\"mobx\\"
+                                                                                                                                                                                                                                                
+                                                                                                                                                                                                                                                class Box {
+                                                                                                                                                                                                                                                    x = action((arg: number): boolean => {
+                                                                                                                                                                                                                                                        console.log('hi')
+                                                                                                                                                                                                                                                        return true
+                                                                                                                                                                                                                                                    });
+                                                                                                                                                                                                                                                }"
+                                                                                                                                                                `)
     })
 
     test("method - unbound - named", () => {
@@ -284,16 +284,16 @@ describe("action", () => {
             }
             `)
         ).toMatchInlineSnapshot(`
-                                                                                                                                                                                    "import { action } from \\"mobx\\"
-                                                                                                                                                                                    
-                                                                                                                                                                                    class Box {
-                                                                                                                                                                                        x(arg: number): boolean {
-                                                                                                                                                                                            console.log('hi')
-                                                                                                                                                                                            return true
-                                                                                                                                                                                        }
-                                                                                                                                                                                    }
-                                                                                                                                                                                    Box.prototype.x = action(\\"test\\", Box.prototype.x);"
-                                                                                                                        `)
+                                                                                                                                                                                                            "import { action } from \\"mobx\\"
+                                                                                                                                                                                                            
+                                                                                                                                                                                                            class Box {
+                                                                                                                                                                                                                x(arg: number): boolean {
+                                                                                                                                                                                                                    console.log('hi')
+                                                                                                                                                                                                                    return true
+                                                                                                                                                                                                                }
+                                                                                                                                                                                                            }
+                                                                                                                                                                                                            Box.prototype.x = action(\\"test\\", Box.prototype.x);"
+                                                                                                                                        `)
     })
 
     test("method - unbound - unnamed", () => {
@@ -310,16 +310,16 @@ describe("action", () => {
             }
             `)
         ).toMatchInlineSnapshot(`
-                                                                                                                                                                                                "import { action } from \\"mobx\\"
-                                                                                                                                                                                                
-                                                                                                                                                                                                class Box {
-                                                                                                                                                                                                    x(arg: number): boolean {
-                                                                                                                                                                                                        console.log('hi')
-                                                                                                                                                                                                        return true
-                                                                                                                                                                                                    }
-                                                                                                                                                                                                }
-                                                                                                                                                                                                Box.prototype.x = action(Box.prototype.x);"
-                                                                                                                                `)
+                                                                                                                                                                                                                        "import { action } from \\"mobx\\"
+                                                                                                                                                                                                                        
+                                                                                                                                                                                                                        class Box {
+                                                                                                                                                                                                                            x(arg: number): boolean {
+                                                                                                                                                                                                                                console.log('hi')
+                                                                                                                                                                                                                                return true
+                                                                                                                                                                                                                            }
+                                                                                                                                                                                                                        }
+                                                                                                                                                                                                                        Box.prototype.x = action(Box.prototype.x);"
+                                                                                                                                                `)
     })
 
     test("method - unbound - computed name", () => {
@@ -336,16 +336,16 @@ describe("action", () => {
             }
             `)
         ).toMatchInlineSnapshot(`
-                                                                                                                                                                                                "import { action } from \\"mobx\\"
-                                                                                                                                                                                                
-                                                                                                                                                                                                class Box {
-                                                                                                                                                                                                    ['x'](arg: number): boolean {
-                                                                                                                                                                                                        console.log('hi')
-                                                                                                                                                                                                        return true
-                                                                                                                                                                                                    }
-                                                                                                                                                                                                }
-                                                                                                                                                                                                Box.prototype['x'] = action(Box.prototype['x']);"
-                                                                                                                                `)
+                                                                                                                                                                                                                        "import { action } from \\"mobx\\"
+                                                                                                                                                                                                                        
+                                                                                                                                                                                                                        class Box {
+                                                                                                                                                                                                                            ['x'](arg: number): boolean {
+                                                                                                                                                                                                                                console.log('hi')
+                                                                                                                                                                                                                                return true
+                                                                                                                                                                                                                            }
+                                                                                                                                                                                                                        }
+                                                                                                                                                                                                                        Box.prototype['x'] = action(Box.prototype['x']);"
+                                                                                                                                                `)
     })
 })
 
@@ -360,16 +360,16 @@ describe("observable", () => {
       }
     `)
         ).toMatchInlineSnapshot(`
-                                                                                                                                                                        "import { observable, initializeObservables } from \\"mobx\\";
-                                                                                                                                                                        
-                                                                                                                                                                        class Box {
-                                                                                                                                                                            x = observable(1);
-                                                                                                                                                                        
-                                                                                                                                                                            constructor() {
-                                                                                                                                                                                initializeObservables(this);
-                                                                                                                                                                            }
-                                                                                                                                                                        }"
-                                                                                                                `)
+                                                                                                                                                                                                "import { observable, initializeObservables } from \\"mobx\\";
+                                                                                                                                                                                                
+                                                                                                                                                                                                class Box {
+                                                                                                                                                                                                    x = observable(1);
+                                                                                                                                                                                                
+                                                                                                                                                                                                    constructor() {
+                                                                                                                                                                                                        initializeObservables(this);
+                                                                                                                                                                                                    }
+                                                                                                                                                                                                }"
+                                                                                                                                `)
     })
 
     test("observable - shallow ", () => {
@@ -382,16 +382,16 @@ describe("observable", () => {
         }
         `)
         ).toMatchInlineSnapshot(`
-                                                                                                                                                                        "import { observable, initializeObservables } from \\"mobx\\";
-                                                                                                                                                                        
-                                                                                                                                                                              class Box {
-                                                                                                                                                                                x = observable.shallow(1);
-                                                                                                                                                                        
-                                                                                                                                                                                constructor() {
-                                                                                                                                                                                  initializeObservables(this);
-                                                                                                                                                                                }
-                                                                                                                                                                              }"
-                                                                                                                `)
+                                                                                                                                                                                                "import { observable, initializeObservables } from \\"mobx\\";
+                                                                                                                                                                                                
+                                                                                                                                                                                                      class Box {
+                                                                                                                                                                                                        x = observable.shallow(1);
+                                                                                                                                                                                                
+                                                                                                                                                                                                        constructor() {
+                                                                                                                                                                                                          initializeObservables(this);
+                                                                                                                                                                                                        }
+                                                                                                                                                                                                      }"
+                                                                                                                                `)
     })
 
     test("observable - shallow - computed name ", () => {
@@ -404,16 +404,16 @@ describe("observable", () => {
             }
             `)
         ).toMatchInlineSnapshot(`
-                                                                                                                                                                        "import { observable, initializeObservables } from \\"mobx\\";
-                                                                                                                                                                        
-                                                                                                                                                                              class Box {
-                                                                                                                                                                                ['x'] = observable.shallow(1);
-                                                                                                                                                                        
-                                                                                                                                                                                constructor() {
-                                                                                                                                                                                  initializeObservables(this);
-                                                                                                                                                                                }
-                                                                                                                                                                              }"
-                                                                                                                `)
+                                                                                                                                                                                                "import { observable, initializeObservables } from \\"mobx\\";
+                                                                                                                                                                                                
+                                                                                                                                                                                                      class Box {
+                                                                                                                                                                                                        ['x'] = observable.shallow(1);
+                                                                                                                                                                                                
+                                                                                                                                                                                                        constructor() {
+                                                                                                                                                                                                          initializeObservables(this);
+                                                                                                                                                                                                        }
+                                                                                                                                                                                                      }"
+                                                                                                                                `)
     })
 })
 
@@ -430,18 +430,18 @@ describe("computed", () => {
       }
     `)
         ).toMatchInlineSnapshot(`
-                                                                                    "import { computed, initializeObservables } from \\"mobx\\";
-                                                                                    
-                                                                                    class Box {
-                                                                                        x = computed(() => {
-                                                                                            return 1;
-                                                                                        });
-                                                                                    
-                                                                                        constructor() {
-                                                                                            initializeObservables(this);
-                                                                                        }
-                                                                                    }"
-                                                        `)
+                                                                                                            "import { computed, initializeObservables } from \\"mobx\\";
+                                                                                                            
+                                                                                                            class Box {
+                                                                                                                x = computed(() => {
+                                                                                                                    return 1;
+                                                                                                                });
+                                                                                                            
+                                                                                                                constructor() {
+                                                                                                                    initializeObservables(this);
+                                                                                                                }
+                                                                                                            }"
+                                                                        `)
     })
 
     test("computed - setter", () => {
@@ -459,20 +459,20 @@ describe("computed", () => {
       }
     `)
         ).toMatchInlineSnapshot(`
-                                                                                    "import { computed, initializeObservables } from \\"mobx\\";
-                                                                                    
-                                                                                    class Box {
-                                                                                        x = computed(() => {
-                                                                                            return 1;
-                                                                                        }, v => {
-                                                                                            console.log(v)
-                                                                                        });
-                                                                                    
-                                                                                        constructor() {
-                                                                                            initializeObservables(this);
-                                                                                        }
-                                                                                    }"
-                                                        `)
+                                                                                                            "import { computed, initializeObservables } from \\"mobx\\";
+                                                                                                            
+                                                                                                            class Box {
+                                                                                                                x = computed(() => {
+                                                                                                                    return 1;
+                                                                                                                }, v => {
+                                                                                                                    console.log(v)
+                                                                                                                });
+                                                                                                            
+                                                                                                                constructor() {
+                                                                                                                    initializeObservables(this);
+                                                                                                                }
+                                                                                                            }"
+                                                                        `)
     })
 
     test("computed - setter - options", () => {
@@ -493,24 +493,24 @@ describe("computed", () => {
       }
     `)
         ).toMatchInlineSnapshot(`
-                                                                                    "import { computed, initializeObservables } from \\"mobx\\";
-                                                                                    
-                                                                                    class Box {
-                                                                                        x = computed(() => {
-                                                                                            return 1;
-                                                                                        }, v => {
-                                                                                            console.log(v)
-                                                                                        }, { name: \\"test\\" });
-                                                                                    
-                                                                                        constructor() {
-                                                                                            initializeObservables(this);
-                                                                                        }
-                                                                                    
-                                                                                        set y(z) {
-                                                                                            console.log(\\"wrong\\");
-                                                                                        }
-                                                                                    }"
-                                                        `)
+                                                                                                            "import { computed, initializeObservables } from \\"mobx\\";
+                                                                                                            
+                                                                                                            class Box {
+                                                                                                                x = computed(() => {
+                                                                                                                    return 1;
+                                                                                                                }, v => {
+                                                                                                                    console.log(v)
+                                                                                                                }, { name: \\"test\\" });
+                                                                                                            
+                                                                                                                constructor() {
+                                                                                                                    initializeObservables(this);
+                                                                                                                }
+                                                                                                            
+                                                                                                                set y(z) {
+                                                                                                                    console.log(\\"wrong\\");
+                                                                                                                }
+                                                                                                            }"
+                                                                        `)
     })
 
     test("computed - setter - struct", () => {
@@ -528,20 +528,20 @@ describe("computed", () => {
       }
     `)
         ).toMatchInlineSnapshot(`
-                                                                        "import { computed, initializeObservables } from \\"mobx\\";
-                                                                        
-                                                                        class Box {
-                                                                            x = computed.struct(() => {
-                                                                                return 1;
-                                                                            }, v => {
-                                                                                console.log(v)
-                                                                            });
-                                                                        
-                                                                            constructor() {
-                                                                                initializeObservables(this);
-                                                                            }
-                                                                        }"
-                                                `)
+                                                                                                "import { computed, initializeObservables } from \\"mobx\\";
+                                                                                                
+                                                                                                class Box {
+                                                                                                    x = computed.struct(() => {
+                                                                                                        return 1;
+                                                                                                    }, v => {
+                                                                                                        console.log(v)
+                                                                                                    });
+                                                                                                
+                                                                                                    constructor() {
+                                                                                                        initializeObservables(this);
+                                                                                                    }
+                                                                                                }"
+                                                                `)
     })
 })
 
@@ -574,29 +574,29 @@ describe("decorate", () => {
             })
         `)
         ).toMatchInlineSnapshot(`
-                        "import { observable, decorate, computed, action, initializeObservables } from \\"mobx\\";
-                        
-                            class Box {
-                                width = observable(3);
-                                height = observable.shallow(2);
-                        
-                                // gets the size of the thing
-                                size = computed(() => {
-                                    return this.width * this.height
-                                });
-                        
-                                constructor() {
-                                    initializeObservables(this);
-                                }
-                        
-                                // make it twice as large
-                                double() {
-                                    this.width *= 2;
-                                }
-                            }
-                        
-                            Box.prototype.double = action(Box.prototype.double);"
-                `)
+            "import { observable, computed, action, initializeObservables } from \\"mobx\\"
+            
+                class Box {
+                    width = observable(3);
+                    height = observable.shallow(2);
+            
+                    // gets the size of the thing
+                    size = computed(() => {
+                        return this.width * this.height
+                    });
+            
+                    constructor() {
+                        initializeObservables(this);
+                    }
+            
+                    // make it twice as large
+                    double() {
+                        this.width *= 2;
+                    }
+                }
+            
+                Box.prototype.double = action(Box.prototype.double);"
+        `)
     })
 
     test("multiple targets", () => {
@@ -625,7 +625,7 @@ describe("decorate", () => {
             })
         `)
         ).toMatchInlineSnapshot(`
-            "import { observable, decorate, computed, action, initializeObservables } from \\"mobx\\";
+            "import { observable, computed, action, initializeObservables } from \\"mobx\\"
                 
                     test(\\"a\\", () => {
                         class Box {
@@ -644,6 +644,34 @@ describe("decorate", () => {
             
                         Box.prototype.method = action(Box.prototype.method);
                     })"
+        `)
+    })
+
+    test("handle undeclared observable members", () => {
+        expect(
+            convert(`
+            import { observable, decorate, computed, action } from "mobx"
+        
+            class Box {
+                
+            }
+
+            decorate(Box, {
+                width: observable,
+                height: observable.shallow,
+            })
+        `)
+        ).toMatchInlineSnapshot(`
+            "import { observable, computed, action, initializeObservables } from \\"mobx\\"
+            
+                class Box {
+                    width = observable();
+                    height = observable.shallow();
+            
+                    constructor() {
+                        initializeObservables(this);
+                    }
+                }"
         `)
     })
 })

@@ -42,6 +42,7 @@ Import size report for mobx:
 [ ] add test for initializers that refer to other props
 [ ] create warning when box is accessed without constructor call (e.g. when reading a primtive from observable() rather than observable.box())
 [ ] migrate decorate calls as well
+[ ] figure out what to do with decorate(object, stuff). Use extendObservable / observable instead?
 
 General class solutions
 - call extendObservable in constructor

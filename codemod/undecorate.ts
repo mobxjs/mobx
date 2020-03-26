@@ -76,7 +76,8 @@ export default function tranform(
 
     source.find(j.ImportDeclaration).forEach(im => {
         if (im.value.source.value === "mobx") {
-            im.value.specifiers.forEach(specifier => {
+            let decorateIndex = -1
+            im.value.specifiers.forEach((specifier, idx) => {
                 // imported decorator
                 if (
                     j.ImportSpecifier.check(specifier) &&
@@ -86,90 +87,119 @@ export default function tranform(
                 }
                 // imported decorate call
                 if (j.ImportSpecifier.check(specifier) && specifier.imported.name === "decorate") {
-                    usesDecorate
+                    usesDecorate = true
+                    decorateIndex = idx
                 }
             })
+            if (decorateIndex !== -1) {
+                im.value.specifiers.splice(decorateIndex, 1)
+            }
         }
     })
 
     // rewrite all decorate calls to class decorators
-    source
-        .find(j.CallExpression)
-        .filter(
-            callPath =>
-                j.Identifier.check(callPath.value.callee) &&
-                callPath.value.callee.name === "decorate"
-        )
-        .forEach(callPath => {
-            if (callPath.value.arguments.length !== 2) {
-                warn("Expected a decorate call with two arguments", callPath.value)
-                return
-            }
-            const target = callPath.value.arguments[0]
-            const decorators = callPath.value.arguments[1]
-            if (!j.Identifier.check(target)) {
-                warn("Expected an identifier as first argument to decorate", callPath.value)
-                return
-            }
-            if (!j.ObjectExpression.check(decorators)) {
-                warn("Expected a plan object as second argument to decorate", callPath.value)
-                return
-            }
-            // Find that class
-            let declarations = source
-                .find(j.ClassDeclaration)
-                .filter(
-                    declPath =>
-                        j.Identifier.check(declPath.value.id) &&
-                        declPath.value.id.name === target.name
-                )
-            if (declarations.length === 0) {
-                warn(
-                    `Expected exactly one declaration of '${target.name}' but found ${declarations.length}`,
-                    callPath.value
-                )
-                return
-            }
-            // if there are multiple declarations, find the one that seems the closest
-            const bestDeclarations = declarations.filter(
-                dec => dec.parent === callPath.parent.parent
+    if (usesDecorate) {
+        source
+            .find(j.CallExpression)
+            .filter(
+                callPath =>
+                    j.Identifier.check(callPath.value.callee) &&
+                    callPath.value.callee.name === "decorate"
             )
-            const clazz: ClassDeclaration = bestDeclarations.length
-                ? bestDeclarations.nodes()[0]
-                : declarations.nodes()[0]
-            // Iterate the properties
-            decorators.properties.forEach(prop => {
-                if (
-                    !j.ObjectProperty.check(prop) ||
+            .forEach(callPath => {
+                let canRemoveDecorateCall = true
+                if (callPath.value.arguments.length !== 2) {
+                    warn("Expected a decorate call with two arguments", callPath.value)
+                    return
+                }
+                const target = callPath.value.arguments[0]
+                const decorators = callPath.value.arguments[1]
+                if (!j.Identifier.check(target)) {
+                    warn("Expected an identifier as first argument to decorate", callPath.value)
+                    return
+                }
+                if (!j.ObjectExpression.check(decorators)) {
+                    warn("Expected a plan object as second argument to decorate", callPath.value)
+                    return
+                }
+                // Find that class
+                let declarations = source
+                    .find(j.ClassDeclaration)
+                    .filter(
+                        declPath =>
+                            j.Identifier.check(declPath.value.id) &&
+                            declPath.value.id.name === target.name
+                    )
+                if (declarations.nodes().length === 0) {
+                    warn(
+                        `Expected exactly one declaration of '${target.name}' but found ${declarations.length}`,
+                        callPath.value
+                    )
+                    return
+                }
+                // if there are multiple declarations, find the one that seems the closest
+                const bestDeclarations = declarations.filter(
+                    dec => dec.parent.value === callPath.parent.parent.value
+                )
+                const clazz: ClassDeclaration = bestDeclarations.length
+                    ? bestDeclarations.nodes()[0]
+                    : declarations.nodes()[0]
+
+                let insertedMemberOffset = 0
+                // Iterate the properties
+                decorators.properties.forEach(prop => {
+                    if (
+                        !j.ObjectProperty.check(prop) ||
+                        // @ts-ignore
+                        prop.method ||
+                        prop.shorthand ||
+                        prop.computed ||
+                        !j.Identifier.check(prop.key)
+                    ) {
+                        warn("Expected plain property definition", prop)
+                        console.dir(prop)
+                        canRemoveDecorateCall = false
+                        return
+                    }
+                    const name = prop.key.name
+                    let propDeclaration = clazz.body.body.filter(
+                        member =>
+                            (j.ClassProperty.check(member) || j.ClassMethod.check(member)) &&
+                            j.Identifier.check(member.key) &&
+                            member.key.name === name
+                    )[0]
+                    if (!propDeclaration) {
+                        // for observables that are not declared yet, create new members
+                        if (
+                            (j.Identifier.check(prop.value) && prop.value.name === "observable") ||
+                            (j.MemberExpression.check(prop.value) &&
+                                j.Identifier.check(prop.value.object) &&
+                                prop.value.object.name === "observable")
+                        ) {
+                            clazz.body.body.splice(
+                                insertedMemberOffset++,
+                                0,
+                                // TODO: ideally we'd find private / public modifiers in the constructor arguments
+                                // and copy them over
+                                (propDeclaration = j.classProperty(prop.key, null))
+                            )
+                        } else {
+                            canRemoveDecorateCall = false
+                            warn(`Failed to find member '${name}' in class '${target.name}'`, prop)
+                            return
+                        }
+                    }
                     // @ts-ignore
-                    prop.method ||
-                    prop.shorthand ||
-                    prop.computed ||
-                    !j.Identifier.check(prop.key)
-                ) {
-                    warn("Expected plain property definition", prop)
-                    console.dir(prop)
-                    return
+                    // rewrite it as decorator, since that is rewritten anyway in the next step :)
+                    propDeclaration.decorators = [j.decorator(prop.value)]
+                })
+                // Remove the callPath (and wrapping expressionStatement)
+                if (canRemoveDecorateCall) {
+                    callPath.parent.prune()
                 }
-                const name = prop.key.name
-                const propDeclaration = clazz.body.body.filter(
-                    member =>
-                        (j.ClassProperty.check(member) || j.ClassMethod.check(member)) &&
-                        j.Identifier.check(member.key) &&
-                        member.key.name === name
-                )[0]
-                if (!propDeclaration) {
-                    warn(`Failed to find member '${name}' in class '${target.name}'`, prop)
-                    return
-                }
-                // @ts-ignore
-                // rewrite it as decorator, since that is rewritten anyway in the next step :)
-                propDeclaration.decorators = [j.decorator(prop.value)]
+                changed = true
             })
-            // Remove the callPath (and wrapping expressionStatement)
-            callPath.parent.prune()
-            changed = true
-        })
+    }
 
     // rewrite all class decorators
     source.find(j.ClassDeclaration).forEach(clazzPath => {
