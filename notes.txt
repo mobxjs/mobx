@@ -94,3 +94,17 @@ To Document:
 Breaking changes:
 - no generic decorators or lists anymore for extendObservable?
 - removed `decorate()`
+
+Running codemod
+
+yarn jscodeshift -d -p -t codemod/undecorate.ts test/v5/base/typescript-tests.ts --ignoreImports=true
+
+Blog post:
+
+Less dev ergonomics. But
+- unblocks future lang compatiblity (define semantics)
+- easier to adopt (this benefits everyone!)
+- compatiblity with CRA, eslint, etc etc out of the box
+- reduce library size
+- not two ways to learn everything
+- ease to re-decorate once decorators are standardized, still working on that!

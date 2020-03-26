@@ -1,6 +1,5 @@
 import {
     API,
-    ImportSpecifier,
     FileInfo,
     Decorator,
     ASTPath,
@@ -9,20 +8,61 @@ import {
     ClassDeclaration,
     MethodDefinition,
     ClassMethod,
-    ImportDeclaration,
     CallExpression,
-    MemberExpression,
     Identifier,
     FunctionExpression,
     ArrowFunctionExpression
 } from "jscodeshift"
-import { resolveSoa } from "dns"
 
 const validDecorators = ["action", "observable", "computed"]
 
-export const parser = "babylon"
+const babylon = require("@babel/parser")
 
-export default function tranform(fileInfo: FileInfo, api: API, options: any): any {
+const defaultOptions = {
+    sourceType: "module",
+    allowImportExportEverywhere: true,
+    allowReturnOutsideFunction: true,
+    startLine: 1,
+    tokens: true,
+    plugins: [
+        // "estree",
+        "asyncGenerators",
+        "bigInt",
+        "classProperties",
+        "classPrivateProperties",
+        "classPrivateMethods",
+        ["decorators", { decoratorsBeforeExport: true }],
+        "legacy-decorators",
+        "doExpressions",
+        "dynamicImport",
+        "exportDefaultFrom",
+        "exportNamespaceFrom",
+        "functionBind",
+        "functionSent",
+        "importMeta",
+        "logicalAssignment",
+        "nullishCoalescingOperator",
+        "numericSeparator",
+        "objectRestSpread",
+        "optionalCatchBinding",
+        "optionalChaining",
+        ["pipelineOperator", { proposal: "minimal" }],
+        "throwExpressions",
+        "typescript"
+    ]
+}
+
+export const parser = {
+    parse(code) {
+        return babylon.parse(code, defaultOptions)
+    }
+}
+
+export default function tranform(
+    fileInfo: FileInfo,
+    api: API,
+    options?: { ignoreImports: boolean }
+): any {
     const j = api.jscodeshift
     const superCall = j.expressionStatement(j.callExpression(j.super(), []))
     const initializeObservablesCall = j.expressionStatement(
@@ -31,8 +71,8 @@ export default function tranform(fileInfo: FileInfo, api: API, options: any): an
     const source = j(fileInfo.source)
     let changed = false
     let needsInitializeImport = false
-    const decoratorsUsed = new Set<String>()
-    let usesDecorate = false
+    const decoratorsUsed = new Set<String>(options?.ignoreImports ? validDecorators : [])
+    let usesDecorate = options?.ignoreImports ? true : false
 
     source.find(j.ImportDeclaration).forEach(im => {
         if (im.value.source.value === "mobx") {
@@ -154,12 +194,19 @@ export default function tranform(fileInfo: FileInfo, api: API, options: any): an
             .find(j.ImportDeclaration)
             .filter(im => im.value.source.value === "mobx")
             .nodes()[0]
-        if (!mobxImport.specifiers) {
-            mobxImport.specifiers = []
+        if (!mobxImport) {
+            console.warn(
+                "Failed to find mobx import, can't add initializeObservables as dependency in " +
+                    fileInfo.path
+            )
+        } else {
+            if (!mobxImport.specifiers) {
+                mobxImport.specifiers = []
+            }
+            mobxImport.specifiers.push(j.importSpecifier(j.identifier("initializeObservables")))
         }
-        mobxImport.specifiers.push(j.importSpecifier(j.identifier("initializeObservables")))
     }
-    if (!decoratorsUsed.size) {
+    if (!decoratorsUsed.size && !usesDecorate) {
         return // no mobx in this file
     }
     if (changed) {

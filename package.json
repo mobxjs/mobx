@@ -63,6 +63,7 @@
     "@babel/plugin-proposal-decorators": "^7.3.0",
     "@babel/plugin-transform-runtime": "^7.3.4",
     "@babel/preset-env": "^7.3.4",
+    "@babel/preset-typescript": "^7.9.0",
     "@babel/runtime": "^7.3.4",
     "@size-limit/preset-big-lib": "^3.0.0",
     "@types/jest": "^24.0.11",
