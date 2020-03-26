@@ -18,14 +18,16 @@ import { serializable, primitive, serialize, deserialize } from "serializr"
 
 test("decorate should work", function() {
     class Box {
+        undeclared = observable()
         // @ts-ignore
-        uninitialized
-        height = 20
-        sizes = [2]
-        someFunc = function() {
+        uninitialized = observable()
+        height = observable(20)
+        sizes = observable([2])
+        someFunc = observable(function() {
             return 2
-        }
-        get width() {
+        })
+
+        width = computed(() => {
             return (
                 this.undeclared *
                 this.height *
@@ -33,7 +35,8 @@ test("decorate should work", function() {
                 this.someFunc() *
                 (this.uninitialized ? 2 : 1)
             )
-        }
+        })
+
         addSize() {
             // @ts-ignore
             this.sizes.push([3])
@@ -41,19 +44,12 @@ test("decorate should work", function() {
             this.sizes.push([4])
         }
         constructor() {
+            initializeObservables(this)
             this.undeclared = 1
         }
     }
 
-    decorate(Box, {
-        uninitialized: observable.ref,
-        undeclared: observable,
-        height: observable,
-        sizes: observable,
-        someFunc: observable,
-        width: computed,
-        addSize: action
-    })
+    Box.prototype.addSize = action(Box.prototype.addSize)
 
     const box = new Box()
     expect(isObservableObject(box)).toBe(true)
@@ -184,16 +180,6 @@ test("decorate should work with Object.create", function() {
             this.sizes.push([4])
         }
     }
-
-    decorate(Box, {
-        uninitialized: observable,
-        undeclared: observable,
-        height: observable,
-        sizes: observable,
-        someFunc: observable,
-        width: computed,
-        addSize: action
-    })
 
     const box = Object.create(Box)
     box.undeclared = 1
@@ -339,17 +325,15 @@ test("decorate should work with inheritance through Object.create", () => {
 
 test("decorate should work with ES6 constructor", () => {
     class Todo {
+        finished = observable()
+        title = observable()
         constructor() {
+            initializeObservables(this)
             this.finished = false
             this.id = Math.random()
             this.title = ""
         }
     }
-
-    decorate(Todo, {
-        finished: observable,
-        title: observable
-    })
 })
 
 test("decorate should not allow @observable on getter", function() {

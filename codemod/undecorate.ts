@@ -132,7 +132,7 @@ export default function tranform(
                     )
                 if (declarations.nodes().length === 0) {
                     warn(
-                        `Expected exactly one declaration of '${target.name}' but found ${declarations.length}`,
+                        `Expected exactly one class declaration for '${target.name}' but found ${declarations.length}`,
                         callPath.value
                     )
                     return
@@ -157,7 +157,11 @@ export default function tranform(
                         !j.Identifier.check(prop.key)
                     ) {
                         warn("Expected plain property definition", prop)
-                        console.dir(prop)
+                        canRemoveDecorateCall = false
+                        return
+                    }
+                    if (j.ArrayExpression.check(prop.value)) {
+                        warn("Cannot undecorate composed decorators", prop)
                         canRemoveDecorateCall = false
                         return
                     }
