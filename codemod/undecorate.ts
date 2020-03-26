@@ -69,6 +69,7 @@ export default function tranform(
         j.callExpression(j.identifier("initializeObservables"), [j.thisExpression()])
     )
     const source = j(fileInfo.source)
+    const lines = fileInfo.source.split("\n")
     let changed = false
     let needsInitializeImport = false
     const decoratorsUsed = new Set<String>(options?.ignoreImports ? validDecorators : [])
@@ -115,11 +116,11 @@ export default function tranform(
                 const target = callPath.value.arguments[0]
                 const decorators = callPath.value.arguments[1]
                 if (!j.Identifier.check(target)) {
-                    warn("Expected an identifier as first argument to decorate", callPath.value)
+                    warn("Expected an identifier as first argument to decorate", target)
                     return
                 }
                 if (!j.ObjectExpression.check(decorators)) {
-                    warn("Expected a plan object as second argument to decorate", callPath.value)
+                    warn("Expected a plain object as second argument to decorate", decorators)
                     return
                 }
                 // Find that class
@@ -133,7 +134,7 @@ export default function tranform(
                 if (declarations.nodes().length === 0) {
                     warn(
                         `Expected exactly one class declaration for '${target.name}' but found ${declarations.length}`,
-                        callPath.value
+                        target
                     )
                     return
                 }
@@ -161,7 +162,7 @@ export default function tranform(
                         return
                     }
                     if (j.ArrayExpression.check(prop.value)) {
-                        warn("Cannot undecorate composed decorators", prop)
+                        warn("Cannot undecorate composed decorators", prop.value)
                         canRemoveDecorateCall = false
                         return
                     }
@@ -266,7 +267,7 @@ export default function tranform(
             return property
         }
         if (decorators.length > 1) {
-            warn("Found multiple decorators, skipping..", property)
+            warn("Found multiple decorators, skipping..", property.decorators[0])
             return property
         }
         const decorator = decorators[0]
@@ -275,7 +276,7 @@ export default function tranform(
         }
         const expr = decorator.expression
         if (j.Identifier.check(expr) && !decoratorsUsed.has(expr.name)) {
-            warn(`Found non-mobx decorator @${expr.name}`, property)
+            warn(`Found non-mobx decorator @${expr.name}`, decorator)
             return property
         }
         if (property.static) {
@@ -558,10 +559,15 @@ export default function tranform(
     }
 
     function warn(msg: string, node: Node) {
+        const line = lines[node.loc!.start.line - 1]
+        const shortline = line.replace(/^\s*/, "")
         console.warn(
-            `[mobx:undecorate] ${msg} \n\tat (${fileInfo.path}:${node.loc!.start.line}:${
+            `[mobx:undecorate] ${msg} at (${fileInfo.path}:${node.loc!.start.line}:${
                 node.loc!.start.column
-            })`
+            }):\n\t${shortline}\n\t${"^".padStart(
+                node.loc!.start.column + 1 - line.indexOf(shortline),
+                " "
+            )}\n`
         )
     }
 }
