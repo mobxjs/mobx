@@ -116,21 +116,27 @@ export default function tranform(
                 return
             }
             // Find that class
-            const declarations = source
+            let declarations = source
                 .find(j.ClassDeclaration)
                 .filter(
                     declPath =>
                         j.Identifier.check(declPath.value.id) &&
                         declPath.value.id.name === target.name
                 )
-            if (declarations.length !== 1) {
+            if (declarations.length === 0) {
                 warn(
                     `Expected exactly one declaration of '${target.name}' but found ${declarations.length}`,
                     callPath.value
                 )
                 return
             }
-            const clazz: ClassDeclaration = declarations.nodes()[0]
+            // if there are multiple declarations, find the one that seems the closest
+            const bestDeclarations = declarations.filter(
+                dec => dec.parent === callPath.parent.parent
+            )
+            const clazz: ClassDeclaration = bestDeclarations.length
+                ? bestDeclarations.nodes()[0]
+                : declarations.nodes()[0]
             // Iterate the properties
             decorators.properties.forEach(prop => {
                 if (
