@@ -1365,17 +1365,19 @@ test("@computed.equals (TS)", () => {
 test("computed comparer works with decorate (TS)", () => {
     const sameTime = (from: Time, to: Time) => from.hour === to.hour && from.minute === to.minute
     class Time {
-        constructor(public hour: number, public minute: number) {}
-
-        get time() {
-            return { hour: this.hour, minute: this.minute }
+        hour = observable()
+        minute = observable()
+        constructor(public hour: number, public minute: number) {
+            initializeObservables(this)
         }
+
+        time = computed(
+            () => {
+                return { hour: this.hour, minute: this.minute }
+            },
+            { equals: sameTime }
+        )
     }
-    decorate(Time, {
-        hour: observable,
-        minute: observable,
-        time: computed({ equals: sameTime })
-    })
     const time = new Time(9, 0)
 
     const changes: Array<{ hour: number; minute: number }> = []
@@ -1404,17 +1406,19 @@ test("computed comparer works with decorate (TS)", () => {
 test("computed comparer works with decorate (TS)", () => {
     const sameTime = (from: Time, to: Time) => from.hour === to.hour && from.minute === to.minute
     class Time {
-        constructor(public hour: number, public minute: number) {}
-
-        get time() {
-            return { hour: this.hour, minute: this.minute }
+        hour = observable()
+        minute = observable()
+        constructor(public hour: number, public minute: number) {
+            initializeObservables(this)
         }
+
+        time = computed(
+            () => {
+                return { hour: this.hour, minute: this.minute }
+            },
+            { equals: sameTime }
+        )
     }
-    decorate(Time, {
-        hour: observable,
-        minute: observable,
-        time: computed({ equals: sameTime })
-    })
     const time = new Time(9, 0)
 
     const changes: Array<{ hour: number; minute: number }> = []
@@ -1541,13 +1545,13 @@ test("1072 - @observable without initial value and observe before first access",
 
 test("typescript - decorate works with classes", () => {
     class Box {
-        height: number = 2
+        height: number = observable(2)
+
+        constructor() {
+            initializeObservables(this)
+        }
     }
 
-    decorate(Box, {
-        height: observable
-        // size: observable // MWE: enabling this should give type error!
-    })
     const b = new Box()
     expect(b.height).toBe(2)
     expect(mobx.isObservableProp(b, "height")).toBe(true)

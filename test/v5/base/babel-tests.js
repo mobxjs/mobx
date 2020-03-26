@@ -1065,20 +1065,21 @@ test("@computed.equals (Babel)", () => {
 test("computed comparer works with decorate (babel)", () => {
     const sameTime = (from, to) => from.hour === to.hour && from.minute === to.minute
     class Time {
+        hour = observable()
+        minute = observable()
         constructor(hour, minute) {
+            initializeObservables(this)
             this.hour = hour
             this.minute = minute
         }
 
-        get time() {
-            return { hour: this.hour, minute: this.minute }
-        }
+        time = computed(
+            () => {
+                return { hour: this.hour, minute: this.minute }
+            },
+            { equals: sameTime }
+        )
     }
-    decorate(Time, {
-        hour: observable,
-        minute: observable,
-        time: computed({ equals: sameTime })
-    })
     const time = new Time(9, 0)
 
     const changes = []
@@ -1301,25 +1302,25 @@ test("computed setter problem - 2", () => {
 
         constructor() {
             initializeObservables(this)
+            initializeObservables(this)
         }
 
-        get fullName() {
-            return `${this.firstName} ${this.lastName}`
-        }
-    }
-
-    decorate(Contact, {
-        fullName: computed({
-            // This doesn't work
-            set: function(value) {
-                const [firstName, lastName] = value.split(" ")
-
-                this.firstName = firstName
-                this.lastName = lastName
+        fullName = computed(
+            () => {
+                return `${this.firstName} ${this.lastName}`
             },
-            equals: mobx.comparer.identity
-        })
-    })
+            {
+                // This doesn't work
+                set: function(value) {
+                    const [firstName, lastName] = value.split(" ")
+
+                    this.firstName = firstName
+                    this.lastName = lastName
+                },
+                equals: mobx.comparer.identity
+            }
+        )
+    }
 
     const c = new Contact()
 
