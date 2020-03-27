@@ -1,5 +1,7 @@
 # UNPUBLISHED (keep this here and add unpublished changes)
 
+-   Add error when computed value declared for unspecified getter [#1867](https://github.com/mobxjs/mobx/issues/1867) by [@berrunder](https://github.com/berrunder)
+
 # 5.15.4 / 4.15.4
 
 -   Fix process.env replacement in build [#2267](https://github.com/mobxjs/mobx/pull/2267) by [@fredyc](https://github.com/fredyc)
