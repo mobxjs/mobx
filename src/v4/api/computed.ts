@@ -25,6 +25,12 @@ export const computedDecorator = createPropDecorator(
         decoratorTarget: any,
         decoratorArgs: any[]
     ) => {
+        if (process.env.NODE_ENV !== "production") {
+            invariant(
+                descriptor && descriptor.get,
+                `Trying to declare a computed value for unspecified getter '${propertyName}'`
+            )
+        }
         const { get, set } = descriptor // initialValue is the descriptor for get / set props
         // Optimization: faster on decorator target or instance? Assuming target
         // Optimization: find out if declaring on instance isn't just faster. (also makes the property descriptor simpler). But, more memory usage..
