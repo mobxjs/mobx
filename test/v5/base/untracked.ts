@@ -1,22 +1,17 @@
-const m = require("../../../src/v5/mobx.ts")
+import { autorun, observable, computed, untracked } from "../../../src/v5/mobx"
 
 test("untracked 1", function() {
     let cCalcs = 0,
         dCalcs = 0
-    const a = m.observable.box(1)
-    const b = m.observable.box(2)
-    const c = m.computed(function() {
+    const a = observable.box(1)
+    const b = observable.box(2)
+    const c = computed(() => {
         cCalcs++
-        return (
-            a.get() +
-            m.untracked(function() {
-                return b.get()
-            })
-        )
+        return a.get() + untracked(() => b.get())
     })
     let result
 
-    m.autorun(function() {
+    autorun(function() {
         dCalcs++
         result = c.get()
     })
