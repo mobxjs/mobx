@@ -1,6 +1,6 @@
 import { autorun, observable, computed, untracked } from "../../../src/v5/mobx"
 
-test("untracked 1", function() {
+test("untracked 1", () => {
     let cCalcs = 0,
         dCalcs = 0
     const a = observable.box(1)
@@ -11,7 +11,7 @@ test("untracked 1", function() {
     })
     let result
 
-    autorun(function() {
+    autorun(() => {
         dCalcs++
         result = c.get()
     })

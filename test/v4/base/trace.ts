@@ -1,13 +1,13 @@
 "use strict"
 
-const mobx = require("../../../src/v4/mobx.ts")
-const utils = require("../utils/test-utils")
+import * as mobx from "../../../src/v4/mobx"
+import * as utils from "../utils/test-utils"
 
 test("trace", () => {
     mobx._resetGlobalState()
     const baselog = console.log
     try {
-        const lines = []
+        const lines: any[] = []
         console.log = function() {
             lines.push(arguments)
         }
