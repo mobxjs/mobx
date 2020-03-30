@@ -169,7 +169,7 @@ The `@computed` decorator does not take arguments. If you want to to create a co
 
 ## Built-in comparers
 
-MobX provides three built-in `comparer`s which should cover most needs:
+MobX provides four built-in `comparer`s which should cover most needs:
 
 -   `comparer.identity`: Uses the identity (`===`) operator to determine if two values are the same.
 -   `comparer.default`: The same as `comparer.identity`, but also considers `NaN` to be equal to `NaN`.
