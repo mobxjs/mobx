@@ -12,6 +12,7 @@ _Simple, scalable state management_
 [![OpenCollective](https://opencollective.com/mobx/backers/badge.svg)](#backers)
 [![OpenCollective](https://opencollective.com/mobx/sponsors/badge.svg)](#sponsors)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
+[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/mobxjs/mobx)
 
 MobX is proudly sponsored by Mendix, Coinbase, Facebook Open Source, Canva, Algolia, Guilded, Auction Frontier, Mantro and TalentPlot for 100\$/month or more! And beyond that by many [individual backers](#backers) and through [one time contributions](https://github.com/mobxjs/mobx/blob/master/sponsors.md).
 
@@ -346,6 +347,12 @@ And finally, kudos to all the people that believed in, tried, validated and even
 -   Use `yarn test:ci` for the test suite with coverage.
 -   and `yarn test:performance` for the performance tests.
 -   Please note that if you want to backport a feature / fix to MobX 4 a second PR needs to be opened to the mobx4-master branch.
+
+## Online one-click setup for contributing
+
+You can use Gitpod (a free online VS Code-like IDE) for working on issues and making PRs. With a single click it will launch a ready to code workspace with everything setup so that you can start straight away.
+
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/from-referrer/)
 
 # MobX 4 vs MobX 5
 
