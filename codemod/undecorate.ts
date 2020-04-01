@@ -123,28 +123,15 @@ export default function tranform(
                     warn("Expected a plain object as second argument to decorate", decorators)
                     return
                 }
-                // Find that class
-                let declarations = source
-                    .find(j.ClassDeclaration)
-                    .filter(
-                        declPath =>
-                            j.Identifier.check(declPath.value.id) &&
-                            declPath.value.id.name === target.name
-                    )
-                if (declarations.nodes().length === 0) {
+                const declarations = callPath.scope.getBindings()[target.name]
+                if (declarations.length === 0) {
                     warn(
                         `Expected exactly one class declaration for '${target.name}' but found ${declarations.length}`,
                         target
                     )
                     return
                 }
-                // if there are multiple declarations, find the one that seems the closest
-                const bestDeclarations = declarations.filter(
-                    dec => dec.parent.value === callPath.parent.parent.value
-                )
-                const clazz: ClassDeclaration = bestDeclarations.length
-                    ? bestDeclarations.nodes()[0]
-                    : declarations.nodes()[0]
+                const clazz: ClassDeclaration = declarations[0].parentPath.value
 
                 let insertedMemberOffset = 0
                 // Iterate the properties
