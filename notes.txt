@@ -50,6 +50,7 @@ Import size report for mobx:
 [ ] optimization tip: hoist the mapping constant
 [ ] document: uncoditional map
 [ ] handle conversion of decorate objects
+[ ] autoConversion, reflect meta data, very strict typing of makeObservabel
 
 General class solutions
 - call extendObservable in constructor

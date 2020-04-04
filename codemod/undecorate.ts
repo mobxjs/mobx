@@ -11,7 +11,8 @@ import {
     CallExpression,
     Identifier,
     FunctionExpression,
-    ArrowFunctionExpression
+    ArrowFunctionExpression,
+    ObjectExpression
 } from "jscodeshift"
 
 const validDecorators = ["action", "observable", "computed"]
@@ -137,64 +138,9 @@ export default function tranform(
                     return
                 }
                 const clazz: ClassDeclaration = targetDeclaration
+                // @ts-ignore
+                createConstructor(clazz, decorators)
 
-                if (!j.ObjectExpression.check(decorators)) {
-                    warn("Expected a plain object as second argument to decorate", decorators)
-                    return
-                }
-
-                let insertedMemberOffset = 0
-                // Iterate the properties
-                decorators.properties.forEach(prop => {
-                    if (
-                        !j.ObjectProperty.check(prop) ||
-                        // @ts-ignore
-                        prop.method ||
-                        prop.shorthand ||
-                        prop.computed ||
-                        !j.Identifier.check(prop.key)
-                    ) {
-                        warn("Expected plain property definition", prop)
-                        canRemoveDecorateCall = false
-                        return
-                    }
-                    if (j.ArrayExpression.check(prop.value)) {
-                        warn("Cannot undecorate composed decorators", prop.value)
-                        canRemoveDecorateCall = false
-                        return
-                    }
-                    const name = prop.key.name
-                    let propDeclaration = clazz.body.body.filter(
-                        member =>
-                            (j.ClassProperty.check(member) || j.ClassMethod.check(member)) &&
-                            j.Identifier.check(member.key) &&
-                            member.key.name === name
-                    )[0]
-                    if (!propDeclaration) {
-                        // for observables that are not declared yet, create new members
-                        if (
-                            (j.Identifier.check(prop.value) && prop.value.name === "observable") ||
-                            (j.MemberExpression.check(prop.value) &&
-                                j.Identifier.check(prop.value.object) &&
-                                prop.value.object.name === "observable")
-                        ) {
-                            clazz.body.body.splice(
-                                insertedMemberOffset++,
-                                0,
-                                // TODO: ideally we'd find private / public modifiers in the constructor arguments
-                                // and copy them over
-                                (propDeclaration = j.classProperty(prop.key, null))
-                            )
-                        } else {
-                            canRemoveDecorateCall = false
-                            warn(`Failed to find member '${name}' in class '${target.name}'`, prop)
-                            return
-                        }
-                    }
-                    // @ts-ignore
-                    // rewrite it as decorator, since that is rewritten anyway in the next step :)
-                    propDeclaration.decorators = [j.decorator(prop.value)]
-                })
                 // Remove the callPath (and wrapping expressionStatement)
                 if (canRemoveDecorateCall) {
                     callPath.parent.prune()
@@ -219,7 +165,17 @@ export default function tranform(
 
         if (effects.membersMap.length) {
             changed = true
-            createConstructor(clazz, effects.membersMap)
+            const members = j.objectExpression(
+                effects.membersMap.map(([key, value, computed]) => {
+                    // loose the comments, as they are already in the field definition
+                    const { comments, ...k } = key
+                    const { comments: comments2, ...v } = value
+                    const prop = j.objectProperty(k, v)
+                    prop.computed = !!computed
+                    return prop
+                })
+            )
+            createConstructor(clazz, members)
             needsInitializeImport = true
         }
     })
@@ -283,20 +239,10 @@ export default function tranform(
         return property
     }
 
-    function createConstructor(clazz: ClassDeclaration, memberMap: [[any, any, boolean]]) {
+    function createConstructor(clazz: ClassDeclaration, members: ObjectExpression) {
         // makeObservable(this, { members })
-        const argsMap = j.objectExpression(
-            memberMap.map(([key, value, computed]) => {
-                // loose the comments, as they are already in the field definition
-                const { comments, ...k } = key
-                const { comments: comments2, ...v } = value
-                const prop = j.objectProperty(k, v)
-                prop.computed = !!computed
-                return prop
-            })
-        )
         const initializeObservablesCall = j.expressionStatement(
-            j.callExpression(j.identifier("makeObservable"), [j.thisExpression(), argsMap])
+            j.callExpression(j.identifier("makeObservable"), [j.thisExpression(), members])
         )
 
         const needsSuper = !!clazz.superClass
