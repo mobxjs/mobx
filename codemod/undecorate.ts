@@ -128,7 +128,15 @@ export default function tranform(
                     )
                     return
                 }
-                const clazz: ClassDeclaration = declarations[0].parentPath.value
+                const targetDeclaration = declarations[0].parentPath.value
+                if (!j.ClassDeclaration.check(targetDeclaration)) {
+                    // not targetting a class, just swap it with makeObservable
+                    changed = true
+                    // @ts-ignore
+                    callPath.value.callee.name = "makeObservable"
+                    return
+                }
+                const clazz: ClassDeclaration = targetDeclaration
 
                 let insertedMemberOffset = 0
                 // Iterate the properties

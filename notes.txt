@@ -49,6 +49,7 @@ Import size report for mobx:
 [ ] figure out what to do with decorate(object, stuff). Use extendObservable / observable instead?
 [ ] optimization tip: hoist the mapping constant
 [ ] document: uncoditional map
+[ ] handle conversion of decorate objects
 
 General class solutions
 - call extendObservable in constructor
