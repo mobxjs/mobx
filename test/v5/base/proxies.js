@@ -343,21 +343,26 @@ test("predictable 'this' - 1", () => {
 
 test("predictable 'this' - 2", () => {
     class A {
+        constructor() {
+            makeObservable(this, {
+                a1: action,
+                a2: action.bound,
+                computed: computed
+            })
+        }
+
         a0() {
             return this
         }
 
-        @action
         a1() {
             return this
         }
 
-        @action.bound
         a2() {
             return this
         }
 
-        @computed
         get computed() {
             return this
         }

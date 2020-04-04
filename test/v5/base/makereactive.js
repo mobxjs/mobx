@@ -228,7 +228,11 @@ test("observable5", function() {
         return 3
     }
     x.nonReactive = three
-    expect(b.toArray()).toEqual([[17, f, 17], [18, f, 18], [18, three, 3]])
+    expect(b.toArray()).toEqual([
+        [17, f, 17],
+        [18, f, 18],
+        [18, three, 3]
+    ])
 })
 
 test("flat array", function() {
@@ -727,9 +731,13 @@ test("jest object equals issue - reference", () => {
 
 test("jest object equals issue", () => {
     class Store {
-        @mobx.observable x = 2
+        x = 2
 
         constructor() {
+            makeObservable(this, {
+                x: mobx.observable
+            })
+
             this.x = 3
         }
     }
@@ -740,7 +748,13 @@ test("jest object equals issue", () => {
 
 test("jest array equals issue", () => {
     class Store {
-        @mobx.observable things = []
+        things = []
+
+        constructor() {
+            makeObservable(this, {
+                things: mobx.observable
+            })
+        }
     }
 
     const store = new Store()

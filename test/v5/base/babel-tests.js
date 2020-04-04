@@ -19,18 +19,27 @@ import * as mobx from "../../../src/v5/mobx.ts"
 
 test("babel", function() {
     class Box {
-        @observable uninitialized
-        @observable height = 20
-        @observable sizes = [2]
-        @observable
+        uninitialized
+        height = 20
+        sizes = [2]
         someFunc = function() {
             return 2
         }
-        @computed
+
+        constructor() {
+            makeObservable(this, {
+                uninitialized: observable,
+                height: observable,
+                sizes: observable,
+                someFunc: observable,
+                width: computed,
+                addSize: action
+            })
+        }
+
         get width() {
             return this.height * this.sizes.length * this.someFunc() * (this.uninitialized ? 2 : 1)
         }
-        @action
         addSize() {
             this.sizes.push(3)
             this.sizes.push(4)
@@ -65,7 +74,12 @@ test("babel", function() {
 test("should not be possible to use @action with getters", () => {
     expect(() => {
         class A {
-            @action
+            constructor() {
+                makeObservable(this, {
+                    Test: action
+                })
+            }
+
             get Test() {}
         }
         A // just to avoid the linter warning
@@ -76,9 +90,17 @@ test("should not be possible to use @action with getters", () => {
 
 test("babel: parameterized computed decorator", () => {
     class TestClass {
-        @observable x = 3
-        @observable y = 3
-        @computed.struct
+        x = 3
+        y = 3
+
+        constructor() {
+            makeObservable(this, {
+                x: observable,
+                y: observable,
+                boxedSum: computed.struct
+            })
+        }
+
         get boxedSum() {
             return { sum: Math.round(this.x) + Math.round(this.y) }
         }
@@ -106,9 +128,16 @@ test("babel: parameterized computed decorator", () => {
 
 test("computed value should be the same around changing which was considered equivalent", () => {
     class TestClass {
-        @observable c = null
+        c = null
         defaultCollection = []
-        @computed.struct
+
+        constructor() {
+            makeObservable(this, {
+                c: observable,
+                collection: computed.struct
+            })
+        }
+
         get collection() {
             return this.c || this.defaultCollection
         }
@@ -128,12 +157,21 @@ test("computed value should be the same around changing which was considered equ
 })
 
 class Order {
-    @observable price = 3
-    @observable amount = 2
-    @observable orders = []
-    @observable aFunction = function() {}
+    price = 3
+    amount = 2
+    orders = []
+    aFunction = function() {}
 
-    @computed
+    constructor() {
+        makeObservable(this, {
+            price: observable,
+            amount: observable,
+            orders: observable,
+            aFunction: observable,
+            total: computed
+        })
+    }
+
     get total() {
         return this.amount * this.price * (1 + this.orders.length)
     }
@@ -171,8 +209,15 @@ test("decorators", function() {
 
 test("issue 191 - shared initializers (babel)", function() {
     class Test {
-        @observable obj = { a: 1 }
-        @observable array = [2]
+        obj = { a: 1 }
+        array = [2]
+
+        constructor() {
+            makeObservable(this, {
+                obj: observable,
+                array: observable
+            })
+        }
     }
 
     const t1 = new Test()
@@ -197,12 +242,20 @@ test("705 - setter undoing caching (babel)", () => {
     let autoruns = 0
 
     class Person {
-        @observable name
-        @observable title
+        name
+        title
+
+        constructor() {
+            makeObservable(this, {
+                name: observable,
+                title: observable,
+                fullName: computed
+            })
+        }
+
         set fullName(val) {
             // Noop
         }
-        @computed
         get fullName() {
             recomputes++
             return this.title + " " + this.name
@@ -248,10 +301,13 @@ function normalizeSpyEvents(events) {
 test("action decorator (babel)", function() {
     class Store {
         constructor(multiplier) {
+            makeObservable(this, {
+                add: action
+            })
+
             this.multiplier = multiplier
         }
 
-        @action
         add(a, b) {
             return (a + b) * this.multiplier
         }
@@ -280,10 +336,13 @@ test("action decorator (babel)", function() {
 test("custom action decorator (babel)", function() {
     class Store {
         constructor(multiplier) {
+            makeObservable(this, {
+                add: action("zoem zoem")
+            })
+
             this.multiplier = multiplier
         }
 
-        @action("zoem zoem")
         add(a, b) {
             return (a + b) * this.multiplier
         }
@@ -330,10 +389,13 @@ test("custom action decorator (babel)", function() {
 test("action decorator on field (babel)", function() {
     class Store {
         constructor(multiplier) {
+            makeObservable(this, {
+                add: action
+            })
+
             this.multiplier = multiplier
         }
 
-        @action
         add = (a, b) => {
             return (a + b) * this.multiplier
         }
@@ -363,10 +425,13 @@ test("action decorator on field (babel)", function() {
 test("custom action decorator on field (babel)", function() {
     class Store {
         constructor(multiplier) {
+            makeObservable(this, {
+                add: action("zoem zoem")
+            })
+
             this.multiplier = multiplier
         }
 
-        @action("zoem zoem")
         add = (a, b) => {
             return (a + b) * this.multiplier
         }
@@ -415,7 +480,13 @@ test("267 (babel) should be possible to declare properties observable outside st
     configure({ enforceActions: "observed" })
 
     class Store {
-        @observable timer
+        timer
+
+        constructor() {
+            makeObservable(this, {
+                timer: observable
+            })
+        }
     }
     Store // just to avoid linter warning
 
@@ -424,7 +495,13 @@ test("267 (babel) should be possible to declare properties observable outside st
 
 test("288 atom not detected for object property", () => {
     class Store {
-        @mobx.observable foo = ""
+        foo = ""
+
+        constructor() {
+            makeObservable(this, {
+                foo: mobx.observable
+            })
+        }
     }
 
     const store = new Store()
@@ -445,10 +522,19 @@ test.skip("observable performance", () => {
     const AMOUNT = 100000
 
     class A {
-        @observable a = 1
-        @observable b = 2
-        @observable c = 3
-        @computed
+        a = 1
+        b = 2
+        c = 3
+
+        constructor() {
+            makeObservable(this, {
+                a: observable,
+                b: observable,
+                c: observable,
+                d: computed
+            })
+        }
+
         get d() {
             return this.a + this.b + this.c
         }
@@ -476,12 +562,18 @@ test.skip("observable performance", () => {
 
 test("unbound methods", () => {
     class A {
+        constructor() {
+            makeObservable(this, {
+                m1: action,
+                m2: action
+            })
+        }
+
         // shared across all instances
-        @action
         m1() {}
 
         // per instance
-        @action m2 = () => {}
+        m2 = () => {}
     }
 
     const a1 = new A()
@@ -497,12 +589,27 @@ test("unbound methods", () => {
 
 test("inheritance", () => {
     class A {
-        @observable a = 2
+        a = 2
+
+        constructor() {
+            makeObservable(this, {
+                a: observable
+            })
+        }
     }
 
     class B extends A {
-        @observable b = 3
-        @computed
+        b = 3
+
+        constructor() {
+            super()
+
+            makeObservable(this, {
+                b: observable,
+                c: computed
+            })
+        }
+
         get c() {
             return this.a + this.b
         }
@@ -523,13 +630,29 @@ test("inheritance", () => {
 
 test("inheritance overrides observable", () => {
     class A {
-        @observable a = 2
+        a = 2
+
+        constructor() {
+            makeObservable(this, {
+                a: observable
+            })
+        }
     }
 
     class B extends A {
-        @observable a = 5
-        @observable b = 3
-        @computed
+        a = 5
+        b = 3
+
+        constructor() {
+            super()
+
+            makeObservable(this, {
+                a: observable,
+                b: observable,
+                c: computed
+            })
+        }
+
         get c() {
             return this.a + this.b
         }
@@ -550,13 +673,21 @@ test("inheritance overrides observable", () => {
 
 test("reusing initializers", () => {
     class A {
-        @observable a = 3
-        @observable b = this.a + 2
-        @computed
+        a = 3
+        b = this.a + 2
+
+        constructor() {
+            makeObservable(this, {
+                a: observable,
+                b: observable,
+                c: computed,
+                d: computed
+            })
+        }
+
         get c() {
             return this.a + this.b
         }
-        @computed
         get d() {
             return this.c + 1
         }
@@ -572,15 +703,24 @@ test("reusing initializers", () => {
 
 test("enumerability", () => {
     class A {
-        @observable a = 1 // enumerable, on proto
-        @observable a2 = 2
-        @computed
+        a = 1 // enumerable, on proto
+        a2 = 2
+
+        constructor() {
+            makeObservable(this, {
+                a: observable,
+                a2: observable,
+                b: computed,
+                m: action,
+                m2: action
+            })
+        }
+
         get b() {
             return this.a
         } // non-enumerable, (and, ideally, on proto)
-        @action
         m() {} // non-enumerable, on proto
-        @action m2 = () => {} // non-enumerable, on self
+        m2 = () => {} // non-enumerable, on self
     }
 
     const a = new A()
@@ -632,17 +772,23 @@ test("enumerability", () => {
 
 test("enumerability - workaround", () => {
     class A {
-        @observable a = 1 // enumerable, on proto
-        @observable a2 = 2
-        @computed
+        a = 1 // enumerable, on proto
+        a2 = 2
         get b() {
             return this.a
         } // non-enumerable, (and, ideally, on proto)
-        @action
         m() {} // non-enumerable, on proto
-        @action m2 = () => {} // non-enumerable, on self
+        m2 = () => {} // non-enumerable, on self
 
         constructor() {
+            makeObservable(this, {
+                a: observable,
+                a2: observable,
+                b: computed,
+                m: action,
+                m2: action
+            })
+
             this.a = 1
             this.a2 = 2
         }
@@ -674,10 +820,16 @@ test("issue 285 (babel)", () => {
 
     class Todo {
         id = 1
-        @observable title
-        @observable finished = false
-        @observable childThings = [1, 2, 3]
+        title
+        finished = false
+        childThings = [1, 2, 3]
         constructor(title) {
+            makeObservable(this, {
+                title: observable,
+                finished: observable,
+                childThings: observable
+            })
+
             this.title = title
         }
     }
@@ -694,8 +846,15 @@ test("issue 285 (babel)", () => {
 
 test("verify object assign (babel)", () => {
     class Todo {
-        @observable title = "test"
-        @computed
+        title = "test"
+
+        constructor() {
+            makeObservable(this, {
+                title: observable,
+                upperCase: computed
+            })
+        }
+
         get upperCase() {
             return this.title.toUpperCase()
         }
@@ -715,21 +874,40 @@ test("verify object assign (babel)", () => {
 
 test("379, inheritable actions (babel)", () => {
     class A {
-        @action
+        constructor() {
+            makeObservable(this, {
+                method: action
+            })
+        }
+
         method() {
             return 42
         }
     }
 
     class B extends A {
-        @action
+        constructor() {
+            super()
+
+            makeObservable(this, {
+                method: action
+            })
+        }
+
         method() {
             return super.method() * 2
         }
     }
 
     class C extends B {
-        @action
+        constructor() {
+            super()
+
+            makeObservable(this, {
+                method: action
+            })
+        }
+
         method() {
             return super.method() + 3
         }
@@ -750,21 +928,40 @@ test("379, inheritable actions (babel)", () => {
 
 test("379, inheritable actions - 2 (babel)", () => {
     class A {
-        @action("a method")
+        constructor() {
+            makeObservable(this, {
+                method: action("a method")
+            })
+        }
+
         method() {
             return 42
         }
     }
 
     class B extends A {
-        @action("b method")
+        constructor() {
+            super()
+
+            makeObservable(this, {
+                method: action("b method")
+            })
+        }
+
         method() {
             return super.method() * 2
         }
     }
 
     class C extends B {
-        @action("c method")
+        constructor() {
+            super()
+
+            makeObservable(this, {
+                method: action("c method")
+            })
+        }
+
         method() {
             return super.method() + 3
         }
@@ -786,15 +983,27 @@ test("379, inheritable actions - 2 (babel)", () => {
 test("505, don't throw when accessing subclass fields in super constructor (babel)", () => {
     const values = {}
     class A {
-        @observable a = 1
+        a = 1
         constructor() {
+            makeObservable(this, {
+                a: observable
+            })
+
             values.b = this.b
             values.a = this.a
         }
     }
 
     class B extends A {
-        @observable b = 2
+        b = 2
+
+        constructor() {
+            super()
+
+            makeObservable(this, {
+                b: observable
+            })
+        }
     }
 
     new B()
@@ -803,8 +1012,15 @@ test("505, don't throw when accessing subclass fields in super constructor (babe
 
 test("computed setter should succeed (babel)", function() {
     class Bla {
-        @observable a = 3
-        @computed
+        a = 3
+
+        constructor() {
+            makeObservable(this, {
+                a: observable,
+                propX: computed
+            })
+        }
+
         get propX() {
             return this.a * 2
         }
@@ -841,7 +1057,13 @@ test("computed getter / setter for plan objects should succeed (babel)", functio
 
 test("issue #701", () => {
     class Model {
-        @observable a = 5
+        a = 5
+
+        constructor() {
+            makeObservable(this, {
+                a: observable
+            })
+        }
     }
 
     const model = new Model()
@@ -853,7 +1075,13 @@ test("issue #701", () => {
 
 test("@observable.ref (Babel)", () => {
     class A {
-        @observable.ref ref = { a: 3 }
+        ref = { a: 3 }
+
+        constructor() {
+            makeObservable(this, {
+                ref: observable.ref
+            })
+        }
     }
 
     const a = new A()
@@ -864,7 +1092,13 @@ test("@observable.ref (Babel)", () => {
 
 test("@observable.shallow (Babel)", () => {
     class A {
-        @observable.shallow arr = [{ todo: 1 }]
+        arr = [{ todo: 1 }]
+
+        constructor() {
+            makeObservable(this, {
+                arr: observable.shallow
+            })
+        }
     }
 
     const a = new A()
@@ -879,7 +1113,13 @@ test("@observable.shallow (Babel)", () => {
 
 test("@observable.deep (Babel)", () => {
     class A {
-        @observable.deep arr = [{ todo: 1 }]
+        arr = [{ todo: 1 }]
+
+        constructor() {
+            makeObservable(this, {
+                arr: observable.deep
+            })
+        }
     }
 
     const a = new A()
@@ -896,8 +1136,15 @@ test("@observable.deep (Babel)", () => {
 
 test("action.bound binds (Babel)", () => {
     class A {
-        @observable x = 0
-        @action.bound
+        x = 0
+
+        constructor() {
+            makeObservable(this, {
+                x: observable,
+                inc: action.bound
+            })
+        }
+
         inc(value) {
             this.x += value
         }
@@ -914,14 +1161,19 @@ test("@computed.equals (Babel)", () => {
     const sameTime = (from, to) => from.hour === to.hour && from.minute === to.minute
     class Time {
         constructor(hour, minute) {
+            makeObservable(this, {
+                hour: observable,
+                minute: observable,
+                time: computed({ equals: sameTime })
+            })
+
             this.hour = hour
             this.minute = minute
         }
 
-        @observable hour
-        @observable minute
+        hour
+        minute
 
-        @computed({ equals: sameTime })
         get time() {
             return { hour: this.hour, minute: this.minute }
         }
@@ -955,6 +1207,12 @@ test("computed comparer works with decorate (babel)", () => {
     const sameTime = (from, to) => from.hour === to.hour && from.minute === to.minute
     class Time {
         constructor(hour, minute) {
+            makeObservable(this, {
+                hour: observable,
+                minute: observable,
+                time: computed({ equals: sameTime })
+            })
+
             this.hour = hour
             this.minute = minute
         }
@@ -963,11 +1221,6 @@ test("computed comparer works with decorate (babel)", () => {
             return { hour: this.hour, minute: this.minute }
         }
     }
-    decorate(Time, {
-        hour: observable,
-        minute: observable,
-        time: computed({ equals: sameTime })
-    })
     const time = new Time(9, 0)
 
     const changes = []
@@ -1078,12 +1331,19 @@ test("computed comparer works with decorate (babel) - 3", () => {
 test("actions are reassignable", () => {
     // See #1398, make actions reassignable to support stubbing
     class A {
-        @action
+        constructor() {
+            makeObservable(this, {
+                m1: action,
+                m2: action,
+                m3: action.bound,
+                m4: action.bound
+            })
+        }
+
         m1() {}
-        @action m2 = () => {}
-        @action.bound
+        m2 = () => {}
         m3() {}
-        @action.bound m4 = () => {}
+        m4 = () => {}
     }
 
     const a = new A()
@@ -1105,7 +1365,7 @@ test("it should support asyncAction (babel)", async () => {
     mobx.configure({ enforceActions: "observed" })
 
     class X {
-        @observable a = 1
+        a = 1
 
         f = mobx.flow(function* f(initial) {
             this.a = initial // this runs in action
@@ -1113,6 +1373,12 @@ test("it should support asyncAction (babel)", async () => {
             this.a = this.a * 2
             return this.a
         })
+
+        constructor() {
+            makeObservable(this, {
+                a: observable
+            })
+        }
     }
 
     const x = new X()
@@ -1122,9 +1388,14 @@ test("it should support asyncAction (babel)", async () => {
 
 test("toJS bug #1413 (babel)", () => {
     class X {
-        @observable
         test = {
             test1: 1
+        }
+
+        constructor() {
+            makeObservable(this, {
+                test: observable
+            })
         }
     }
 
@@ -1136,17 +1407,25 @@ test("toJS bug #1413 (babel)", () => {
 
 test("computed setter problem", () => {
     class Contact {
-        @observable firstName = ""
-        @observable lastName = ""
+        firstName = ""
+        lastName = ""
 
-        @computed({
-            set(value) {
-                const [firstName, lastName] = value.split(" ")
+        constructor() {
+            makeObservable(this, {
+                firstName: observable,
+                lastName: observable,
 
-                this.firstName = firstName
-                this.lastName = lastName
-            }
-        })
+                fullName: computed({
+                    set(value) {
+                        const [firstName, lastName] = value.split(" ")
+
+                        this.firstName = firstName
+                        this.lastName = lastName
+                    }
+                })
+            })
+        }
+
         get fullName() {
             return `${this.firstName} ${this.lastName}`
         }
@@ -1173,26 +1452,35 @@ test("computed setter problem", () => {
 
 test("computed setter problem - 2", () => {
     class Contact {
-        @observable firstName = ""
-        @observable lastName = ""
+        firstName = ""
+        lastName = ""
+
+        constructor() {
+            makeObservable(this, {
+                fullName: computed({
+                    // This doesn't work
+                    set: function(value) {
+                        const [firstName, lastName] = value.split(" ")
+
+                        this.firstName = firstName
+                        this.lastName = lastName
+                    },
+                    equals: mobx.comparer.identity
+                })
+            })
+        }
+
+        constructor() {
+            makeObservable(this, {
+                firstName: observable,
+                lastName: observable
+            })
+        }
 
         get fullName() {
             return `${this.firstName} ${this.lastName}`
         }
     }
-
-    decorate(Contact, {
-        fullName: computed({
-            // This doesn't work
-            set: function(value) {
-                const [firstName, lastName] = value.split(" ")
-
-                this.firstName = firstName
-                this.lastName = lastName
-            },
-            equals: mobx.comparer.identity
-        })
-    })
 
     const c = new Contact()
 
@@ -1209,13 +1497,16 @@ test("computed setter problem - 2", () => {
 test("#1740, combining extendObservable & decorators", () => {
     class AppState {
         constructor(id) {
+            makeObservable(this, {
+                foo: computed
+            })
+
             extendObservable(this, {
                 id
             })
             expect(this.foo).toBe(id)
         }
 
-        @computed
         get foo() {
             return this.id
         }

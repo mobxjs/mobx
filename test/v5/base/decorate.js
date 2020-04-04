@@ -41,19 +41,19 @@ test("decorate should work", function() {
             this.sizes.push([4])
         }
         constructor() {
+            makeObservable(this, {
+                uninitialized: observable.ref,
+                undeclared: observable,
+                height: observable,
+                sizes: observable,
+                someFunc: observable,
+                width: computed,
+                addSize: action
+            })
+
             this.undeclared = 1
         }
     }
-
-    decorate(Box, {
-        uninitialized: observable.ref,
-        undeclared: observable,
-        height: observable,
-        sizes: observable,
-        someFunc: observable,
-        width: computed,
-        addSize: action
-    })
 
     const box = new Box()
     expect(isObservableObject(box)).toBe(true)
@@ -117,7 +117,7 @@ test("decorate should work with plain object", function() {
         }
     }
 
-    decorate(box, {
+    makeObservable(box, {
         uninitialized: observable,
         undeclared: observable,
         height: observable,
@@ -185,7 +185,7 @@ test("decorate should work with Object.create", function() {
         }
     }
 
-    decorate(Box, {
+    makeObservable(Box, {
         uninitialized: observable,
         undeclared: observable,
         height: observable,
@@ -263,7 +263,7 @@ test("decorate should work with constructor function", function() {
             this.sizes.push([3])
             this.sizes.push([4])
         }
-        decorate(this, {
+        makeObservable(this, {
             uninitialized: observable,
             undeclared: observable,
             height: observable,
@@ -322,7 +322,7 @@ test("decorate should work with inheritance through Object.create", () => {
     const P = {
         x: 3
     }
-    decorate(P, {
+    makeObservable(P, {
         x: observable
     })
 
@@ -340,16 +340,16 @@ test("decorate should work with inheritance through Object.create", () => {
 test("decorate should work with ES6 constructor", () => {
     class Todo {
         constructor() {
+            makeObservable(this, {
+                finished: observable,
+                title: observable
+            })
+
             this.finished = false
             this.id = Math.random()
             this.title = ""
         }
     }
-
-    decorate(Todo, {
-        finished: observable,
-        title: observable
-    })
 })
 
 test("decorate should not allow @observable on getter", function() {
@@ -360,7 +360,7 @@ test("decorate should not allow @observable on getter", function() {
         }
     }
 
-    decorate(obj, {
+    makeObservable(obj, {
         x: observable,
         y: observable
     })
@@ -390,12 +390,14 @@ test("decorate a function property with two decorators", function() {
     }
 
     class Obj {
+        constructor() {
+            makeObservable(this, {
+                fn: [action("fn"), countFunctionCallsDecorator]
+            })
+        }
+
         fn() {}
     }
-
-    decorate(Obj, {
-        fn: [action("fn"), countFunctionCallsDecorator]
-    })
 
     const obj = new Obj()
 
@@ -419,11 +421,13 @@ test("decorate a property with two decorators", function() {
 
     class Obj {
         x = null
-    }
 
-    decorate(Obj, {
-        x: [serializable(primitive()), observable]
-    })
+        constructor() {
+            makeObservable(this, {
+                x: [serializable(primitive()), observable]
+            })
+        }
+    }
 
     const obj = deserialize(Obj, {
         x: 0

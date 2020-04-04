@@ -1794,6 +1794,7 @@ test("computed comparer works with decorate (plain)", () => {
             return { hour: this.hour, minute: this.minute }
         }
     })
+    // TODO: this is codemodded wrong
     decorate(Time, {
         hour: observable,
         minute: observable,
@@ -1947,8 +1948,15 @@ test("keeping computed properties alive does not run before access", () => {
 test("(for objects) keeping computed properties alive does not run before access", () => {
     let calcs = 0
     class Foo {
-        @observable x = 1
-        @computed({ keepAlive: true })
+        x = 1
+
+        constructor() {
+            makeObservable(this, {
+                x: observable,
+                y: computed({ keepAlive: true })
+            })
+        }
+
         get y() {
             calcs++
             return this.x * 2
@@ -2047,8 +2055,15 @@ test("keeping computed properties alive recalculates when accessing it dirty", (
 test("(for objects) keeping computed properties alive recalculates when accessing it dirty", () => {
     let calcs = 0
     class Foo {
-        @observable x = 1
-        @computed({ keepAlive: true })
+        x = 1
+
+        constructor() {
+            makeObservable(this, {
+                x: observable,
+                y: computed({ keepAlive: true })
+            })
+        }
+
         get y() {
             calcs++
             return this.x * 2
