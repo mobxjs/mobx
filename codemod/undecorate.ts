@@ -112,12 +112,12 @@ export default function tranform(
                 }
                 const target = callPath.value.arguments[0]
                 const decorators = callPath.value.arguments[1]
+
                 if (!j.Identifier.check(target)) {
-                    warn("Expected an identifier as first argument to decorate", target)
-                    return
-                }
-                if (!j.ObjectExpression.check(decorators)) {
-                    warn("Expected a plain object as second argument to decorate", decorators)
+                    // not targetting a class, just swap it with makeObservable
+                    changed = true
+                    // @ts-ignore
+                    callPath.value.callee.name = "makeObservable"
                     return
                 }
                 const declarations = callPath.scope.getBindings()[target.name]
@@ -137,6 +137,11 @@ export default function tranform(
                     return
                 }
                 const clazz: ClassDeclaration = targetDeclaration
+
+                if (!j.ObjectExpression.check(decorators)) {
+                    warn("Expected a plain object as second argument to decorate", decorators)
+                    return
+                }
 
                 let insertedMemberOffset = 0
                 // Iterate the properties

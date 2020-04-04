@@ -105,7 +105,7 @@ Breaking changes:
 
 Running codemod
 
-yarn jscodeshift -d -p -t codemod/undecorate.ts test/v5/base/typescript-tests.ts --ignoreImports=true
+yarn jscodeshift -t codemod/undecorate.ts test/v5/base/typescript-tests.ts --ignoreImports=true
 
 Blog post:
 

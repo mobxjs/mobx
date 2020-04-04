@@ -793,4 +793,24 @@ describe("decorate", () => {
                 })"
         `)
     })
+
+    test("handle non-classes", () => {
+        expect(
+            convert(`
+            import { observable, decorate, computed, action } from "mobx"
+
+            decorate({}, {
+                width: observable,
+                height: observable.shallow,
+            })
+        `)
+        ).toMatchInlineSnapshot(`
+            "import { observable, computed, action } from \\"mobx\\";
+  
+                makeObservable({}, {
+                    width: observable,
+                    height: observable.shallow,
+                })"
+        `)
+    })
 })
