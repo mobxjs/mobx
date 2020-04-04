@@ -1947,18 +1947,11 @@ test("keeping computed properties alive does not run before access", () => {
 test("(for objects) keeping computed properties alive does not run before access", () => {
     let calcs = 0
     class Foo {
-        x = observable(1)
-
-        y = computed(
-            () => {
-                calcs++
-                return this.x * 2
-            },
-            { keepAlive: true }
-        )
-
-        constructor() {
-            initializeObservables(this)
+        @observable x = 1
+        @computed({ keepAlive: true })
+        get y() {
+            calcs++
+            return this.x * 2
         }
     }
     new Foo()
@@ -2054,18 +2047,11 @@ test("keeping computed properties alive recalculates when accessing it dirty", (
 test("(for objects) keeping computed properties alive recalculates when accessing it dirty", () => {
     let calcs = 0
     class Foo {
-        x = observable(1)
-
-        y = computed(
-            () => {
-                calcs++
-                return this.x * 2
-            },
-            { keepAlive: true }
-        )
-
-        constructor() {
-            initializeObservables(this)
+        @observable x = 1
+        @computed({ keepAlive: true })
+        get y() {
+            calcs++
+            return this.x * 2
         }
     }
     const x = new Foo()

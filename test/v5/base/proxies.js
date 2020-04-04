@@ -343,28 +343,25 @@ test("predictable 'this' - 1", () => {
 
 test("predictable 'this' - 2", () => {
     class A {
-        constructor() {
-            initializeObservables(this)
-        }
-
         a0() {
             return this
         }
 
+        @action
         a1() {
             return this
         }
 
-        a2 = action(() => {
+        @action.bound
+        a2() {
             return this
-        })
+        }
 
-        computed = computed(() => {
+        @computed
+        get computed() {
             return this
-        })
+        }
     }
-
-    A.prototype.a1 = action(A.prototype.a1)
 
     const a = new A()
 

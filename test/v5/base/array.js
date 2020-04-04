@@ -580,11 +580,8 @@ test("reproduce #2021", () => {
         }
 
         class Test {
-            data = observable(null)
-
-            constructor() {
-                initializeObservables(this)
-            }
+            @observable
+            data = null
         }
 
         const test = new Test()
