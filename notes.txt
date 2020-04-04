@@ -32,7 +32,11 @@ Import size report for mobx:
 [ ] backport tests and code to v4(6)
 [ ] macro transform
 [ ] codemod TS
+[ ] keep decorate calls?
 [ ] codemod babel
+[ ] codemod leave decorators
+[ ] reflect metadata
+[ ] instruct using TS / Babel decorators
 [ ] combine with ES5?
 [ ] get rid of all that pending decorators shizzle
 [ ] Todo: check how important array of decorators is, see original issue -> This will be breaking issue, as we are going to treat action etc different?
@@ -43,6 +47,8 @@ Import size report for mobx:
 [ ] create warning when box is accessed without constructor call (e.g. when reading a primtive from observable() rather than observable.box())
 [ ] migrate decorate calls as well
 [ ] figure out what to do with decorate(object, stuff). Use extendObservable / observable instead?
+[ ] optimization tip: hoist the mapping constant
+[ ] document: uncoditional map
 
 General class solutions
 - call extendObservable in constructor

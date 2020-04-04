@@ -65,9 +65,6 @@ export default function tranform(
 ): any {
     const j = api.jscodeshift
     const superCall = j.expressionStatement(j.callExpression(j.super(), []))
-    const initializeObservablesCall = j.expressionStatement(
-        j.callExpression(j.identifier("initializeObservables"), [j.thisExpression()])
-    )
     const source = j(fileInfo.source)
     const lines = fileInfo.source.split("\n")
     let changed = false
@@ -197,22 +194,19 @@ export default function tranform(
     source.find(j.ClassDeclaration).forEach(clazzPath => {
         const clazz = clazzPath.value
         const effects = {
-            needsConstructor: false,
-            membersToRemove: [] as any[]
+            membersMap: [] as any
         }
 
-        clazz.body.body = clazz.body.body
-            .map(prop => {
-                if (j.ClassProperty.check(prop) || j.ClassMethod.check(prop)) {
-                    return handleProperty(prop as any, effects, clazzPath)
-                }
-                return prop
-            })
-            .filter(Boolean)
-            .filter(elem => !effects.membersToRemove.includes(elem))
+        clazz.body.body = clazz.body.body.map(prop => {
+            if (j.ClassProperty.check(prop) || j.ClassMethod.check(prop)) {
+                return handleProperty(prop as any, effects, clazzPath)
+            }
+            return prop
+        })
 
-        if (effects.needsConstructor) {
-            createConstructor(clazz)
+        if (effects.membersMap.length) {
+            changed = true
+            createConstructor(clazz, effects.membersMap)
             needsInitializeImport = true
         }
     })
@@ -224,14 +218,14 @@ export default function tranform(
             .nodes()[0]
         if (!mobxImport) {
             console.warn(
-                "Failed to find mobx import, can't add initializeObservables as dependency in " +
+                "Failed to find mobx import, can't add makeObservable as dependency in " +
                     fileInfo.path
             )
         } else {
             if (!mobxImport.specifiers) {
                 mobxImport.specifiers = []
             }
-            mobxImport.specifiers.push(j.importSpecifier(j.identifier("initializeObservables")))
+            mobxImport.specifiers.push(j.importSpecifier(j.identifier("makeObservable")))
         }
     }
     if (!decoratorsUsed.size && !usesDecorate) {
@@ -244,8 +238,7 @@ export default function tranform(
     function handleProperty(
         property: ClassProperty /* | or ClassMethod */ & { decorators: Decorator[] },
         effects: {
-            needsConstructor: boolean
-            membersToRemove: any[]
+            membersMap: [[any, any, boolean]]
         },
         clazzPath: ASTPath<ClassDeclaration>
     ): ClassProperty | ClassMethod {
@@ -271,214 +264,33 @@ export default function tranform(
             return property
         }
 
-        const propInfo = parseProperty(property, clazzPath)
-        // console.dir(propInfo)
         property.decorators.splice(0)
 
-        // ACTIONS
-        if (propInfo.baseDecorator === "action") {
-            changed = true
-            // those return false, since for actions we don't need to run initializeObservables again
-            switch (true) {
-                //@action.bound("x") = y
-                //@action.bound = y
-                case propInfo.type === "field" && propInfo.subDecorator === "bound": {
-                    const arrowFn = toArrowFn(property.value as any)
-                    property.value = fnCall(
-                        // special case: if it was a generator function, it will still be a function expression, so still requires bound
-                        ["action", j.FunctionExpression.check(arrowFn) && "bound"],
-                        [propInfo.callArg, arrowFn]
-                    )
-                    return property
-                }
-                //@action.bound("x") m()
-                //@action.bound m()
-                case propInfo.type === "method" && propInfo.subDecorator === "bound": {
-                    const arrowFn = toArrowFn(propInfo.expr as any)
-                    const res = j.classProperty(
-                        property.key,
-                        fnCall(
-                            // special case: if it was a generator function, it will still be a function expression, so still requires bound
-                            ["action", j.FunctionExpression.check(arrowFn) && "bound"],
-                            [propInfo.callArg, arrowFn]
-                        )
-                    )
-                    res.comments = property.comments
-                    return res
-                }
-                //@action("x") = y
-                //@action x = y
-                case propInfo.type === "field" && !propInfo.subDecorator:
-                    property.value = fnCall(["action"], [propInfo.callArg, property.value])
-                    return property
-                // //@action("x") m()
-                // //@action m()
-                case propInfo.type === "method": {
-                    generateActionInitializationOnPrototype(clazzPath, property, propInfo)
-                    return property
-                }
-                default:
-                    warn("Uknown case for undecorate action ", property)
-                    return property
-            }
-        }
-
-        // OBSERVABLE
-        if (propInfo.baseDecorator === "observable") {
-            //@observable f = y
-            //@observable.x f = y
-            //@observable ['x'] = y
-            changed = true
-            effects.needsConstructor = true
-            property.value = fnCall(["observable", propInfo.subDecorator], [property.value])
-            return property
-        }
-
-        // COMPUTED
-        if (propInfo.baseDecorator === "computed") {
-            //@computed get m() // rewrite to this!
-            //@computed get m() set m()
-            //@computed(options) get m()
-            //@computed(options) get m() set m()
-            //@computed.struct get m()
-            //@computed.struct get m() set m()
-            changed = true
-            effects.needsConstructor = true
-            const res = j.classProperty(
-                property.key,
-                fnCall(
-                    ["computed", propInfo.subDecorator],
-                    [
-                        toArrowFn(propInfo.expr),
-                        propInfo.setterExpr ? toArrowFn(propInfo.setterExpr) : undefined,
-                        propInfo.callArg
-                    ]
-                )
-            )
-            res.comments = property.comments
-            if (propInfo.setterExpr) effects.membersToRemove.push(propInfo.setterExpr)
-            return res
-        }
+        effects.membersMap.push([property.key, expr, property.computed])
         return property
     }
 
-    function generateActionInitializationOnPrototype(
-        clazzPath: ASTPath<ClassDeclaration>,
-        property: ClassProperty,
-        propInfo: ReturnType<typeof parseProperty>
-    ) {
-        // N.B. this is not a transformation that one would write manually,
-        // e.g. m = action(fn) would be way more straight forward,
-        // but this transformation better preserves the old semantics, like sharing the action
-        // on the prototype, which saves a lot of memory allocations, which some existing apps
-        // might depend upon
-        const clazzId = clazzPath.value.id
-        const isComputedName = !j.Identifier.check(property.key)
-        if (!clazzId) {
-            warn(`Cannot transform action of anonymous class`, property)
-        } else {
-            // Bla.prototype.x = action(Bla.prototype.x)
-            clazzPath.insertAfter(
-                j.expressionStatement(
-                    j.assignmentExpression(
-                        "=",
-                        j.memberExpression(
-                            j.memberExpression(clazzId, j.identifier("prototype")),
-                            property.key,
-                            isComputedName
-                        ),
-                        fnCall(
-                            ["action"],
-                            [
-                                propInfo.callArg,
-                                j.memberExpression(
-                                    j.memberExpression(clazzId, j.identifier("prototype")),
-                                    property.key,
-                                    isComputedName
-                                )
-                            ]
-                        )
-                    )
-                )
-            )
-        }
-    }
-
-    function parseProperty(
-        p: (ClassProperty | MethodDefinition) & { decorators: Decorator[] },
-        clazzPath: ASTPath<ClassDeclaration>
-    ): {
-        isCallExpression: boolean // TODO: not used?
-        baseDecorator: "action" | "observable" | "computed"
-        subDecorator: string
-        type: "field" | "method" | "getter"
-        expr: any
-        callArg: any
-        setterExpr: any
-    } {
-        const decExpr = p.decorators[0].expression
-        const isCallExpression = j.CallExpression.check(decExpr)
-        let baseDecorator = ""
-        let subDecorator = ""
-        let callArg: any
-        // console.dir(decExpr)
-        if (isCallExpression && j.MemberExpression.check((decExpr as CallExpression).callee)) {
-            const me = (decExpr as CallExpression).callee
-            if (
-                j.MemberExpression.check(me) &&
-                j.Identifier.check(me.object) &&
-                j.Identifier.check(me.property)
-            ) {
-                baseDecorator = me.object.name
-                subDecorator = me.property.name
-            } else {
-                warn(`Decorator expression too complex, please convert manually`, decExpr)
-            }
-        } else if (isCallExpression && j.Identifier.check((decExpr as CallExpression).callee)) {
-            baseDecorator = ((decExpr as CallExpression).callee as Identifier).name
-        } else if (
-            j.MemberExpression.check(decExpr) &&
-            j.Identifier.check(decExpr.object) &&
-            j.Identifier.check(decExpr.property)
-        ) {
-            baseDecorator = decExpr.object.name
-            subDecorator = decExpr.property.name
-        } else if (j.Identifier.check(decExpr)) {
-            baseDecorator = decExpr.name
-        } else {
-            warn(`Decorator expression too complex, please convert manually`, decExpr)
-        }
-
-        if (isCallExpression && (decExpr as CallExpression).arguments.length !== 1) {
-            warn(`Expected exactly one argument`, decExpr)
-        }
-        callArg = isCallExpression && (decExpr as CallExpression).arguments[0]
-
-        const setterExpr = clazzPath.value.body.body.find(
-            m =>
-                j.ClassMethod.check(m) &&
-                m.kind === "set" &&
-                j.Identifier.check(m.key) &&
-                j.Identifier.check(p.key) &&
-                m.key.name === p.key.name
+    function createConstructor(clazz: ClassDeclaration, memberMap: [[any, any, boolean]]) {
+        // makeObservable(this, { members })
+        const argsMap = j.objectExpression(
+            memberMap.map(([key, value, computed]) => {
+                // loose the comments, as they are already in the field definition
+                const { comments, ...k } = key
+                const { comments: comments2, ...v } = value
+                const prop = j.objectProperty(k, v)
+                prop.computed = !!computed
+                return prop
+            })
+        )
+        const initializeObservablesCall = j.expressionStatement(
+            j.callExpression(j.identifier("makeObservable"), [j.thisExpression(), argsMap])
         )
 
-        return {
-            isCallExpression,
-            baseDecorator: baseDecorator as any,
-            subDecorator,
-            type: j.ClassMethod.check(p) ? (p.kind === "get" ? "getter" : "method") : "field",
-            expr: j.ClassMethod.check(p) ? p : p.value,
-            callArg,
-            setterExpr
-        }
-    }
-
-    function createConstructor(clazz: ClassDeclaration) {
         const needsSuper = !!clazz.superClass
         let constructorIndex = clazz.body.body.findIndex(
             member => j.ClassMethod.check(member) && member.kind === "constructor"
         )
+
         // create a constructor
         if (constructorIndex === -1) {
             if (needsSuper) {
@@ -487,6 +299,7 @@ export default function tranform(
                     clazz
                 )
             }
+
             const constructorDecl = j.methodDefinition(
                 "constructor",
                 j.identifier("constructor"),
@@ -520,29 +333,6 @@ export default function tranform(
                 j.Super.check(firstStatement.expression.callee)
             c.body.body.splice(hasSuper ? 1 : 0, 0, initializeObservablesCall)
         }
-    }
-
-    function fnCall(name: [string] | [string, string | false], args: any[]) {
-        return j.callExpression(
-            name.filter(Boolean).length === 2
-                ? j.memberExpression(j.identifier(name[0]), j.identifier(name[1] as any))
-                : j.identifier(name[0]),
-            args.filter(Boolean)
-        )
-    }
-
-    function toArrowFn(m: ClassMethod): FunctionExpression | ArrowFunctionExpression {
-        if (j.ArrowFunctionExpression.check(m) || !j.ClassMethod.check(m)) {
-            // leave arrow funcs (and everything not a method at all) alone
-            return m
-        }
-        const res = m.generator
-            ? j.functionExpression(null, m.params, m.body, true)
-            : j.arrowFunctionExpression(m.params, m.body)
-        res.returnType = m.returnType
-        // res.comments = m.comments
-        res.async = m.async
-        return res
     }
 
     function warn(msg: string, node: Node) {
