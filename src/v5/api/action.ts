@@ -8,6 +8,7 @@ import {
     invariant,
     namedActionDecorator
 } from "../internal"
+import { Decorator } from "./makeObservable"
 
 export interface IActionFactory {
     // nameless actions
@@ -16,20 +17,24 @@ export interface IActionFactory {
     <T extends Function | null | undefined>(name: string, fn: T): T & IAction
 
     // named decorator
-    (customName: string): (
-        target: Object,
-        key: string | symbol,
-        baseDescriptor?: PropertyDescriptor
-    ) => void
+    (customName: string): {
+        (target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): void
+        decoratorType: "action"
+    }
 
     // unnamed decorator
     (target: Object, propertyKey: string | symbol, descriptor?: PropertyDescriptor): void
 
     // @action.bound decorator
-    bound(target: Object, propertyKey: string | symbol, descriptor?: PropertyDescriptor): void
+    bound: {
+        decoratorType: "action.bound"
+        (target: Object, propertyKey: string | symbol, descriptor?: PropertyDescriptor): {
+            decoratorType: "action.bound"
+        }
+    }
 }
 
-export const action: IActionFactory = function action(arg1, arg2?, arg3?, arg4?): any {
+export const action: IActionFactory & Decorator = function action(arg1, arg2?, arg3?, arg4?): any {
     // action(fn() {})
     if (arguments.length === 1 && typeof arg1 === "function")
         return createAction(arg1.name || "<unnamed action>", arg1)
@@ -47,6 +52,7 @@ export const action: IActionFactory = function action(arg1, arg2?, arg3?, arg4?)
         return namedActionDecorator(arg2).apply(null, arguments as any)
     }
 } as any
+action.decoratorType = "action"
 
 action.bound = boundActionDecorator as any
 

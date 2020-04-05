@@ -51,6 +51,8 @@ Import size report for mobx:
 [ ] document: uncoditional map
 [ ] handle conversion of decorate objects
 [ ] autoConversion, reflect meta data, very strict typing of makeObservabel
+[ ] observable / extendObservable use decorators args
+[ ] observable; support `false` as argument
 
 General class solutions
 - call extendObservable in constructor
@@ -67,7 +69,7 @@ General class solutions
 - X class Box extends Observable(class { x: 3 })
   - no way to opt out of non-observable members, distinguish utility functions from actions
 - class Box extends Observable(class, decorators) {}
-  - works with statics 
+  - works with statics
   - can use const Box = Observable(class, decorators) to make it shorter
 - Utility members: [obervable()] height = 20
   - typescript doesn't allow dynamic expressions or duplicate decorators that way

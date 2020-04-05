@@ -181,3 +181,7 @@ export function getMapLikeKeys(map: any): any {
 export function toPrimitive(value) {
     return value === null ? null : typeof value === "object" ? "" + value : value
 }
+
+export function hasProp(target: Object, prop: PropertyKey): boolean {
+    return Object.prototype.hasOwnProperty.call(target, prop)
+}

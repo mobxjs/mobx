@@ -22,12 +22,13 @@ import {
     spy,
     configure,
     isAction,
-    decorate,
+    makeObservable,
     IAtom,
     createAtom,
     runInAction
 } from "../../../src/v5/mobx"
 import * as mobx from "../../../src/v5/mobx"
+// @ts-ignore
 import { assert, IsExact } from "conditional-type-checks"
 
 const v = observable.box(3)
@@ -1649,7 +1650,7 @@ test("typescript - decorate works with classes", () => {
 })
 
 test("typescript - decorate works with objects", () => {
-    const b = makeObservable(
+    const b = observable(
         {
             height: 2
         },

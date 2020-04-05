@@ -3,7 +3,8 @@
     "compilerOptions": {
         "module": "commonjs",
         "lib": ["esnext"],
-        "noUnusedLocals": false
+        "noUnusedLocals": false,
+        "moduleResolution": "node"
     },
     "include": ["src/**/*.ts", "test/**/*.ts"]
 }

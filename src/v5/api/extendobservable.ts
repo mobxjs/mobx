@@ -14,15 +14,16 @@ import {
     refDecorator,
     startBatch,
     stringifyKey,
-    initializeInstance
+    initializeInstance,
+    Decorators,
+    IObservableDecorator,
+    isPlainObject
 } from "../internal"
-import { IObservableDecorator } from "./observabledecorator"
-import { isPlainObject } from "../utils/utils"
 
 export function extendObservable<A extends Object, B extends Object>(
     target: A,
     properties?: B,
-    decorators?: { [K in keyof B]?: Function },
+    decorators?: Decorators<B>,
     options?: CreateObservableOptions
 ): A & B {
     if (process.env.NODE_ENV !== "production") {

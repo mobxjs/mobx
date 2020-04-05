@@ -118,7 +118,7 @@ export default function tranform(
                     // not targetting a class, just swap it with makeObservable
                     changed = true
                     // @ts-ignore
-                    callPath.value.callee.name = "makeObservable"
+                    callPath.value.callee.name = "observable"
                     return
                 }
                 const declarations = callPath.scope.getBindings()[target.name]
@@ -134,7 +134,7 @@ export default function tranform(
                     // not targetting a class, just swap it with makeObservable
                     changed = true
                     // @ts-ignore
-                    callPath.value.callee.name = "makeObservable"
+                    callPath.value.callee.name = "observable"
                     return
                 }
                 const clazz: ClassDeclaration = targetDeclaration

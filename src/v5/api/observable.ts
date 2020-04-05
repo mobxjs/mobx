@@ -24,8 +24,10 @@ import {
     referenceEnhancer,
     shallowEnhancer,
     getDefaultDecoratorFromObjectOptions,
-    extendObservableObjectWithProperties
+    extendObservableObjectWithProperties,
+    Decorator
 } from "../internal"
+import { Decorators, DecoratorExclusions } from "./makeObservable"
 
 export type CreateObservableOptions = {
     name?: string
@@ -101,6 +103,7 @@ function createObservable(v: any, arg2?: any, arg3?: any) {
     if (res !== v) return res
     return observable.box(v)
 }
+createObservable.decoratorType = "observable"
 
 type Primitive = number | string | null | undefined | boolean
 
@@ -121,12 +124,12 @@ export interface IObservableFactory {
     <K = any, V = any>(value: Map<K, V>, options?: CreateObservableOptions): ObservableMap<K, V>
     <T extends Object>(
         value: T,
-        decorators?: { [K in keyof T]?: Function },
+        decorators?: DecoratorExclusions<T>,
         options?: CreateObservableOptions
     ): T & IObservableObject
 }
 
-export interface IObservableFactories {
+export interface IObservableFactories extends Decorator {
     box<T = any>(value?: T, options?: CreateObservableOptions): IObservableValue<T>
     array<T = any>(initialValues?: T[], options?: CreateObservableOptions): IObservableArray<T>
     set<T = any>(
@@ -139,7 +142,7 @@ export interface IObservableFactories {
     ): ObservableMap<K, V>
     object<T = any>(
         props: T,
-        decorators?: { [K in keyof T]?: Function },
+        decorators?: DecoratorExclusions<T>,
         options?: CreateObservableOptions
     ): T & IObservableObject
 
@@ -153,6 +156,7 @@ export interface IObservableFactories {
     shallow: IObservableDecorator
     deep: IObservableDecorator
     struct: IObservableDecorator
+    decoratorType: "observable"
 }
 
 const observableFactories: IObservableFactories = {
@@ -184,13 +188,14 @@ const observableFactories: IObservableFactories = {
     },
     object<T = any>(
         props: T,
-        decorators?: { [K in keyof T]: Function },
+        decorators?: DecoratorExclusions<T>,
         options?: CreateObservableOptions
     ): T & IObservableObject {
         if (typeof arguments[1] === "string") incorrectlyUsedAsDecorator("object")
         const o = asCreateObservableOptions(options)
         if (o.proxy === false) {
-            return extendObservable({}, props, decorators, o) as any
+            // TODO: remove any
+            return extendObservable({}, props, decorators as any, o) as any
         } else {
             const defaultDecorator = getDefaultDecoratorFromObjectOptions(o)
             const base = extendObservable({}, undefined, undefined, o) as any

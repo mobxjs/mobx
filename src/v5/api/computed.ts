@@ -5,16 +5,22 @@ import {
     asObservableObject,
     comparer,
     createPropDecorator,
-    invariant
+    invariant,
+    Decorator
 } from "../internal"
 
 export interface IComputed {
-    <T>(options: IComputedValueOptions<T>): any // decorator // TODO: remove
+    <T>(options: IComputedValueOptions<T>): {
+        decoratorType: "computed"
+    }
     // TODO: add overload (get, set, options)
-    <T>(func: () => T, setter: (v: T) => void): T // field
-    <T>(func: () => T, options?: IComputedValueOptions<T>): T // field
+    <T>(func: () => T, setter: (v: T) => void): ComputedValue<T>
+    <T>(func: () => T, options?: IComputedValueOptions<T>): ComputedValue<T>
     (target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): void // decorator // TODO: remove
-    struct(target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): void // field
+    struct: {
+        (target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): void // field
+        decoratorType: "computed.struct"
+    }
     box: {
         <T>(func: () => T, setter: (v: T) => void): IComputedValue<T>
         <T>(func: () => T, options?: IComputedValueOptions<T>): IComputedValue<T>
@@ -50,7 +56,7 @@ const computedStructDecorator = computedDecorator({ equals: comparer.structural 
  * Decorator for class properties: @computed get value() { return expr; }.
  * For legacy purposes also invokable as ES5 observable created: `computed(() => expr)`;
  */
-export const computed: IComputed = function computed(arg1, arg2, arg3) {
+export const computed: IComputed & Decorator = function computed(arg1, arg2, arg3) {
     if (typeof arg2 === "string") {
         // @computed
         return computedDecorator.apply(null, arguments)
@@ -75,6 +81,7 @@ export const computed: IComputed = function computed(arg1, arg2, arg3) {
 
     return new ComputedValue(opts)
 } as any
+computed.decoratorType = "computed"
 
 computed.struct = computedStructDecorator
 computed.box = computed

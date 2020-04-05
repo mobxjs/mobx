@@ -5,12 +5,14 @@ import {
     createPropDecorator,
     fail,
     invariant,
-    stringifyKey
+    stringifyKey,
+    Decorator
 } from "../internal"
 
 export type IObservableDecorator = {
     (target: Object, property: string | symbol, descriptor?: PropertyDescriptor): void
     enhancer: IEnhancer<any>
+    decoratorType: Decorator["decoratorType"]
 }
 
 export function createDecoratorForEnhancer(enhancer: IEnhancer<any>): IObservableDecorator {
