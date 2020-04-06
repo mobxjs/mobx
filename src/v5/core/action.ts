@@ -20,11 +20,7 @@ let nextActionId = 1
 const functionNameDescriptor = Object.getOwnPropertyDescriptor(() => {}, "name")
 const isFunctionNameConfigurable = functionNameDescriptor && functionNameDescriptor.configurable
 
-export interface IAction {
-    isMobxAction: boolean
-}
-
-export function createAction(actionName: string, fn: Function, ref?: Object): Function & IAction {
+export function createAction(actionName: string, fn: Function, ref?: Object): Function {
     if (process.env.NODE_ENV !== "production") {
         invariant(typeof fn === "function", "`action` can only be invoked on functions")
         if (typeof actionName !== "string" || !actionName)

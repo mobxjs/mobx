@@ -2,7 +2,6 @@ import {
     IEnhancer,
     IEqualsComparer,
     IObservableArray,
-    IObservableDecorator,
     IObservableMapInitialValues,
     IObservableSetInitialValues,
     IObservableObject,
@@ -10,7 +9,6 @@ import {
     ObservableMap,
     ObservableSet,
     ObservableValue,
-    createDecoratorForEnhancer,
     createDynamicObservableObject,
     createObservableArray,
     deepEnhancer,
@@ -20,20 +18,19 @@ import {
     isES6Set,
     isObservable,
     isPlainObject,
-    refStructEnhancer,
     referenceEnhancer,
+    Annotation,
     shallowEnhancer,
-    getDefaultDecoratorFromObjectOptions,
-    extendObservableObjectWithProperties,
-    Decorator
+    refStructEnhancer
 } from "../internal"
-import { Decorators, DecoratorExclusions } from "./makeObservable"
+import { makeObservable, makeAutoObservable } from "./makeObservable"
+import { AnnotationsMap } from "./annotation"
 
 export type CreateObservableOptions = {
     name?: string
     equals?: IEqualsComparer<any>
     deep?: boolean
-    defaultDecorator?: IObservableDecorator
+    defaultDecorator?: Annotation
     proxy?: boolean
 }
 
@@ -62,17 +59,22 @@ export function asCreateObservableOptions(thing: any): CreateObservableOptions {
     return thing as CreateObservableOptions
 }
 
-export const deepDecorator = createDecoratorForEnhancer(deepEnhancer)
-const shallowDecorator = createDecoratorForEnhancer(shallowEnhancer)
-export const refDecorator = createDecoratorForEnhancer(referenceEnhancer)
-const refStructDecorator = createDecoratorForEnhancer(refStructEnhancer)
-
-function getEnhancerFromOptions(options: CreateObservableOptions): IEnhancer<any> {
-    return options.defaultDecorator
-        ? options.defaultDecorator.enhancer
-        : options.deep === false
-        ? referenceEnhancer
-        : deepEnhancer
+export function getEnhancerFromAnnotation(annotation?: Annotation): IEnhancer<any> {
+    if (!annotation) {
+        return deepEnhancer
+    }
+    switch (annotation.annotationType) {
+        case "observable":
+            return deepEnhancer
+        case "observable.ref":
+            return referenceEnhancer
+        case "observable.shallow":
+            return shallowEnhancer
+        case "observable.struct":
+            return refStructEnhancer
+        default:
+            return fail(`Invalid annotation: '${annotation.annotationType}'`)
+    }
 }
 
 /**
@@ -82,7 +84,8 @@ function getEnhancerFromOptions(options: CreateObservableOptions): IEnhancer<any
 function createObservable(v: any, arg2?: any, arg3?: any) {
     // @observable someProp; TODO delete
     if (typeof arguments[1] === "string" || typeof arguments[1] === "symbol") {
-        return deepDecorator.apply(null, arguments as any)
+        // TODO:
+        return fail("not yet implemented")
     }
 
     // it is an observable already, done
@@ -105,31 +108,16 @@ function createObservable(v: any, arg2?: any, arg3?: any) {
 }
 createObservable.decoratorType = "observable"
 
-type Primitive = number | string | null | undefined | boolean
-
-export interface IObservableFactory {
-    // types only relevant for unboxing
-    // TODO: is there something cleaner for this?
-    (value: undefined): any
-    (value: null): any
-    (value: string): string
-    (value: number): number
-    (value: boolean): boolean
-    <T extends Function>(value: T): T
-    <T extends Primitive>(value: T): T // useful to explicitly define a type, e.g. shape = observable<"round" | "square">("round")
-    // observable overloads
-    (target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): any // decorator TODO delete
+export interface IObservableFactory extends Annotation, PropertyDecorator {
     <T = any>(value: T[], options?: CreateObservableOptions): IObservableArray<T>
     <T = any>(value: Set<T>, options?: CreateObservableOptions): ObservableSet<T>
     <K = any, V = any>(value: Map<K, V>, options?: CreateObservableOptions): ObservableMap<K, V>
     <T extends Object>(
         value: T,
-        decorators?: DecoratorExclusions<T>,
+        decorators?: AnnotationsMap<T>,
         options?: CreateObservableOptions
     ): T & IObservableObject
-}
 
-export interface IObservableFactories extends Decorator {
     box<T = any>(value?: T, options?: CreateObservableOptions): IObservableValue<T>
     array<T = any>(initialValues?: T[], options?: CreateObservableOptions): IObservableArray<T>
     set<T = any>(
@@ -142,85 +130,91 @@ export interface IObservableFactories extends Decorator {
     ): ObservableMap<K, V>
     object<T = any>(
         props: T,
-        decorators?: DecoratorExclusions<T>,
+        decorators?: AnnotationsMap<T>,
         options?: CreateObservableOptions
     ): T & IObservableObject
 
     /**
      * Decorator that creates an observable that only observes the references, but doesn't try to turn the assigned value into an observable.ts.
      */
-    ref: IObservableDecorator
+    ref: Annotation
     /**
      * Decorator that creates an observable converts its value (objects, maps or arrays) into a shallow observable structure
      */
-    shallow: IObservableDecorator
-    deep: IObservableDecorator
-    struct: IObservableDecorator
-    decoratorType: "observable"
+    shallow: Annotation
+    deep: Annotation
+    struct: Annotation
 }
 
-const observableFactories: IObservableFactories = {
+const observableFactories: IObservableFactory = {
     box<T = any>(value?: T, options?: CreateObservableOptions): IObservableValue<T> {
-        if (arguments.length > 2) incorrectlyUsedAsDecorator("box")
         const o = asCreateObservableOptions(options)
-        return new ObservableValue(value, getEnhancerFromOptions(o), o.name, true, o.equals)
+        return new ObservableValue(
+            value,
+            getEnhancerFromAnnotation(o.defaultDecorator),
+            o.name,
+            true,
+            o.equals
+        )
     },
     array<T = any>(initialValues?: T[], options?: CreateObservableOptions): IObservableArray<T> {
-        if (arguments.length > 2) incorrectlyUsedAsDecorator("array")
         const o = asCreateObservableOptions(options)
-        return createObservableArray(initialValues, getEnhancerFromOptions(o), o.name) as any
+        return createObservableArray(
+            initialValues,
+            getEnhancerFromAnnotation(o.defaultDecorator),
+            o.name
+        ) as any
     },
     map<K = any, V = any>(
         initialValues?: IObservableMapInitialValues<K, V>,
         options?: CreateObservableOptions
     ): ObservableMap<K, V> {
-        if (arguments.length > 2) incorrectlyUsedAsDecorator("map")
         const o = asCreateObservableOptions(options)
-        return new ObservableMap<K, V>(initialValues, getEnhancerFromOptions(o), o.name)
+        return new ObservableMap<K, V>(
+            initialValues,
+            getEnhancerFromAnnotation(o.defaultDecorator),
+            o.name
+        )
     },
     set<T = any>(
         initialValues?: IObservableSetInitialValues<T>,
         options?: CreateObservableOptions
     ): ObservableSet<T> {
-        if (arguments.length > 2) incorrectlyUsedAsDecorator("set")
         const o = asCreateObservableOptions(options)
-        return new ObservableSet<T>(initialValues, getEnhancerFromOptions(o), o.name)
+        return new ObservableSet<T>(
+            initialValues,
+            getEnhancerFromAnnotation(o.defaultDecorator),
+            o.name
+        )
     },
     object<T = any>(
         props: T,
-        decorators?: DecoratorExclusions<T>,
+        decorators?: AnnotationsMap<T>,
         options?: CreateObservableOptions
     ): T & IObservableObject {
-        if (typeof arguments[1] === "string") incorrectlyUsedAsDecorator("object")
         const o = asCreateObservableOptions(options)
         if (o.proxy === false) {
-            // TODO: remove any
-            return extendObservable({}, props, decorators as any, o) as any
+            return extendObservable({}, props, decorators, o) as any
         } else {
-            const defaultDecorator = getDefaultDecoratorFromObjectOptions(o)
-            const base = extendObservable({}, undefined, undefined, o) as any
+            // TODO; is this still correct?
+            const base = extendObservable({}, props, decorators, o) as any
             const proxy = createDynamicObservableObject(base)
-            extendObservableObjectWithProperties(proxy, props, decorators, defaultDecorator)
             return proxy
         }
     },
-    ref: refDecorator,
-    shallow: shallowDecorator,
-    deep: deepDecorator,
-    struct: refStructDecorator
+    ref: {
+        // TODO: make these decorators as well
+        annotationType: "observable.ref"
+    },
+    shallow: {
+        annotationType: "observable.shallow"
+    },
+    deep: {
+        annotationType: "observable.deep"
+    },
+    struct: {
+        annotationType: "observable.struct"
+    }
 } as any
 
-export const observable: IObservableFactory &
-    IObservableFactories & {
-        enhancer: IEnhancer<any>
-    } = createObservable as any
-
-// weird trick to keep our typings nicely with our funcs, and still extend the observable function
-Object.keys(observableFactories).forEach(name => (observable[name] = observableFactories[name]))
-
-function incorrectlyUsedAsDecorator(methodName) {
-    fail(
-        // process.env.NODE_ENV !== "production" &&
-        `Expected one or two arguments to observable.${methodName}. Did you accidentally try to use observable.${methodName} as decorator?`
-    )
-}
+export const observable: IObservableFactory = Object.assign(createObservable, observableFactories)

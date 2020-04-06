@@ -1,60 +1,56 @@
 import {
-    IAction,
     addHiddenProp,
-    boundActionDecorator,
     createAction,
     executeAction,
     fail,
     invariant,
-    namedActionDecorator
+    Annotation
 } from "../internal"
-import { Decorator } from "./makeObservable"
 
-export interface IActionFactory {
+export interface IActionFactory extends Annotation, PropertyDecorator {
     // nameless actions
-    <T extends Function | null | undefined>(fn: T): T & IAction
+    <T extends Function>(fn: T): T
     // named actions
-    <T extends Function | null | undefined>(name: string, fn: T): T & IAction
+    <T extends Function>(name: string, fn: T): T
 
-    // named decorator
-    (customName: string): {
-        (target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): void
-        decoratorType: "action"
-    }
+    // named
+    (customName: string): Annotation
 
-    // unnamed decorator
-    (target: Object, propertyKey: string | symbol, descriptor?: PropertyDescriptor): void
-
-    // @action.bound decorator
-    bound: {
-        decoratorType: "action.bound"
-        (target: Object, propertyKey: string | symbol, descriptor?: PropertyDescriptor): {
-            decoratorType: "action.bound"
-        }
-    }
+    bound: IBoundActionFactory
 }
 
-export const action: IActionFactory & Decorator = function action(arg1, arg2?, arg3?, arg4?): any {
+interface IBoundActionFactory extends Annotation, PropertyDecorator {
+    (name: string): Annotation & PropertyDecorator
+}
+
+export const action: IActionFactory = function action(arg1, arg2?, arg3?): any {
     // action(fn() {})
     if (arguments.length === 1 && typeof arg1 === "function")
         return createAction(arg1.name || "<unnamed action>", arg1)
     // action("name", fn() {})
     if (arguments.length === 2 && typeof arg2 === "function") return createAction(arg1, arg2)
 
-    // @action("name") fn() {}
-    if (arguments.length === 1 && typeof arg1 === "string") return namedActionDecorator(arg1)
+    // Annation: action("name")
+    if (arguments.length === 1 && typeof arg1 === "string") {
+        // TODO: merge with decorator function
+        return {
+            annotationType: "action",
+            arg: arg1
+        } as Annotation
+    }
 
-    // @action fn() {}
-    if (arg4 === true) {
-        // apply to instance immediately
-        addHiddenProp(arg1, arg2, createAction(arg1.name || arg2, arg3.value, this))
-    } else {
-        return namedActionDecorator(arg2).apply(null, arguments as any)
+    fail("Invalid arguments to action")
+} as any
+action.annotationType = "action"
+
+action.bound = function bound(name: string) {
+    // TODO: merge with decorator function
+    return {
+        annotationType: "action.bound",
+        arg: name
     }
 } as any
-action.decoratorType = "action"
-
-action.bound = boundActionDecorator as any
+action.bound.annotationType = "action.bound"
 
 export function runInAction<T>(block: () => T): T
 export function runInAction<T>(name: string, block: () => T): T

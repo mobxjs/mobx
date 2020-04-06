@@ -17,7 +17,6 @@ import {
     getNextId,
     hasInterceptors,
     hasListeners,
-    initializeInstance,
     interceptChange,
     invariant,
     isObject,
@@ -371,11 +370,9 @@ export function generateObservablePropConfig(propName) {
 }
 
 function getAdministrationForComputedPropOwner(owner: any): ObservableObjectAdministration {
+    // TODO: what again does this function?
     const adm = owner[$mobx]
     if (!adm) {
-        // because computed props are declared on proty,
-        // the current instance might not have been initialized yet
-        initializeInstance(owner)
         return owner[$mobx]
     }
     return adm
@@ -404,8 +401,6 @@ const isObservableObjectAdministration = createInstanceofPredicate(
 
 export function isObservableObject(thing: any): thing is IObservableObject {
     if (isObject(thing)) {
-        // Initializers run lazily when transpiling to babel, so make sure they are run...
-        initializeInstance(thing)
         return isObservableObjectAdministration((thing as any)[$mobx])
     }
     return false
