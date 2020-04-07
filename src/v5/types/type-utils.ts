@@ -2,7 +2,6 @@ import {
     $mobx,
     IDepTreeNode,
     fail,
-    initializeInstance,
     isAtom,
     isComputedValue,
     isObservableArray,
@@ -38,8 +37,6 @@ export function getAtom(thing: any, property?: string): IDepTreeNode {
                 )
             return observable
         }
-        // Initializers run lazily when transpiling to babel, so make sure they are run...
-        initializeInstance(thing)
         if (property && !thing[$mobx]) thing[property] // See #1072
         if (isObservableObject(thing)) {
             if (!property)
@@ -71,8 +68,6 @@ export function getAdministration(thing: any, property?: string) {
     if (property !== undefined) return getAdministration(getAtom(thing, property))
     if (isAtom(thing) || isComputedValue(thing) || isReaction(thing)) return thing
     if (isObservableMap(thing) || isObservableSet(thing)) return thing
-    // Initializers run lazily when transpiling to babel, so make sure they are run...
-    initializeInstance(thing)
     if (thing[$mobx]) return thing[$mobx]
     fail(process.env.NODE_ENV !== "production" && "Cannot obtain administration from " + thing)
 }

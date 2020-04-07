@@ -1,7 +1,7 @@
 "use strict"
 
 const mobx = require("../../../src/v5/mobx.ts")
-const { observable, when, _getAdministration, reaction } = mobx
+const { observable, when, _getAdministration, reaction, makeObservable } = mobx
 const iterall = require("iterall")
 
 test("test1", function() {
@@ -563,12 +563,12 @@ describe("extended array prototype", () => {
     })
 
     test("creating an observable should work", () => {
-        const a = mobx.observable({ b: "b" })
+        mobx.observable({ b: "b" })
     })
 
     test("extending an observable should work", () => {
         const a = { b: "b" }
-        const c = mobx.extendObservable(a, {})
+        mobx.extendObservable(a, {})
     })
 })
 

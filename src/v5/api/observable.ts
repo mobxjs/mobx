@@ -106,7 +106,7 @@ function createObservable(v: any, arg2?: any, arg3?: any) {
     if (res !== v) return res
     return observable.box(v)
 }
-createObservable.decoratorType = "observable"
+createObservable.annotationType = "observable"
 
 export interface IObservableFactory extends Annotation, PropertyDecorator {
     <T = any>(value: T[], options?: CreateObservableOptions): IObservableArray<T>
@@ -210,7 +210,7 @@ const observableFactories: IObservableFactory = {
         annotationType: "observable.shallow"
     },
     deep: {
-        annotationType: "observable.deep"
+        annotationType: "observable"
     },
     struct: {
         annotationType: "observable.struct"

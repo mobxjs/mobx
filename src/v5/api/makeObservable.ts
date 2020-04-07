@@ -15,6 +15,7 @@ import {
     startBatch,
     CreateObservableOptions
 } from "../internal"
+import { isComputedProp } from "../../v4/mobx"
 
 function getDecoratorsFromMetaData<T extends Object>(target: T): AnnotationsMap<T> {
     fail("not implemented yet")
@@ -43,14 +44,24 @@ function getInferredAnnotation(
     return defaultAnnotation ?? observable.deep
 }
 
+function getDescriptor(target: Object, prop: PropertyKey): [PropertyDescriptor, Object] {
+    let current = target
+    while (current && current !== Object.prototype) {
+        // TODO: cache meta data, especially for members from prototypes?
+        const desc = Object.getOwnPropertyDescriptor(current, prop)
+        if (desc) {
+            return [desc, current]
+        }
+        current = Object.getPrototypeOf(current)
+    }
+    fail(`Property is not defined: '${prop.toString()}'`)
+}
+
 export function makeObservable<T extends Object>(
     target: T,
     annotations: AnnotationsMap<T> = getDecoratorsFromMetaData(target),
     options?: CreateObservableOptions
 ) {
-    // TODO: store meta data?
-    const isPlain = isPlainObject(target)
-    const proto = isPlain ? target : Object.getPrototypeOf(target)
     const adm = asObservableObject(
         target,
         options?.name,
@@ -66,57 +77,43 @@ export function makeObservable<T extends Object>(
             if (annotation === true) {
                 annotation = adm.defaultEnhancer
             }
-            switch (annotation.decoratorType) {
+            const [desc, owner] = getDescriptor(target, key)
+            switch (annotation.annotationType) {
                 case "action":
-                    if (hasProp(target, key)) {
-                        makeAction(target, key, annotation.options, target[key])
-                    } else if (!isPlain && hasProp(proto, key)) {
-                        if (!isAction(proto[key]))
-                            makeAction(proto, key, annotation.options, proto[key])
+                    if (owner !== target) {
+                        if (!isAction(owner[key]))
+                            makeAction(owner, key, annotation.arg, desc.value)
                     } else {
-                        notFound(key)
+                        makeAction(target, key, annotation.arg, desc.value)
                     }
                     break
                 case "action.bound":
-                    if (hasProp(target, key)) {
-                        makeAction(target, key, annotation.options, target[key].bind(target))
-                    } else if (!isPlain && hasProp(proto, key)) {
-                        makeAction(target, key, annotation.options, proto[key].bind(target))
-                    } else {
-                        notFound(key)
-                    }
+                    makeAction(target, key, annotation.arg, desc.value.bind(target))
                     break
                 case "computed.struct":
                 case "computed": {
-                    const descriptor = Object.getOwnPropertyDescriptor(proto, key)
-                    if (!descriptor) {
-                        notFound(key)
-                    } else {
-                        // TODO: can be done cleaner?
-                        adm.addComputedProp(proto, key, {
-                            get: descriptor.get,
-                            set: descriptor.set,
-                            compareStructural: annotation.decoratorType === "computed.struct",
-                            ...annotation.options
-                        })
-                    }
+                    // TODO: add to target or proto?
+                    adm.addComputedProp(target, key, {
+                        get: desc.get,
+                        set: desc.set,
+                        compareStructural: annotation.annotationType === "computed.struct",
+                        ...annotation.arg
+                    })
                     break
                 }
                 case "observable":
                 case "observable.ref":
                 case "observable.shallow":
                 case "observable.struct": {
-                    const descriptor = Object.getOwnPropertyDescriptor(proto, key)
-                    if (!descriptor) {
-                        notFound(key)
-                    } else {
-                        const enhancer = getEnhancerFromAnnotation(annotation)
-                        adm.addObservableProp(key, descriptor.value, enhancer)
-                    }
+                    const enhancer = getEnhancerFromAnnotation(annotation)
+                    adm.addObservableProp(key, desc.value, enhancer)
                     break
                 }
                 default:
-                    fail("invalid decorator for " + key)
+                    fail(
+                        `invalid decorator '${annotation.annotationType ??
+                            annotation}' for '${key}'`
+                    )
             }
         })
     } finally {

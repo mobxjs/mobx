@@ -13,7 +13,7 @@ import {
     spy,
     isAction,
     configure,
-    decorate
+    makeObservable
 } from "../../../src/v5/mobx.ts"
 import * as mobx from "../../../src/v5/mobx.ts"
 
@@ -71,7 +71,8 @@ test("babel", function() {
     expect(s).toEqual([40, 20, 60, 210, 420, 700])
 })
 
-test("should not be possible to use @action with getters", () => {
+// TODO:
+test.skip("should not be possible to use @action with getters", () => {
     expect(() => {
         class A {
             constructor() {
@@ -603,7 +604,6 @@ test("inheritance", () => {
 
         constructor() {
             super()
-
             makeObservable(this, {
                 b: observable,
                 c: computed
@@ -612,6 +612,46 @@ test("inheritance", () => {
 
         get c() {
             return this.a + this.b
+        }
+    }
+
+    const b1 = new B()
+    const b2 = new B()
+    const values = []
+    mobx.autorun(() => values.push(b1.c + b2.c))
+
+    b1.a = 3
+    b1.b = 4
+    b2.b = 5
+    b2.a = 6
+
+    expect(values).toEqual([10, 11, 12, 14, 18])
+})
+
+test("inheritance - 2", () => {
+    class A {
+        b = 3
+
+        constructor() {
+            makeObservable(this, {
+                b: observable,
+                c: computed
+            })
+        }
+
+        get c() {
+            return this.a + this.b
+        }
+    }
+
+    class B extends A {
+        a = 2
+
+        constructor() {
+            super()
+            makeObservable(this, {
+                a: observable
+            })
         }
     }
 
@@ -1435,50 +1475,6 @@ test("computed setter problem", () => {
 
             this.firstName = firstName
             this.lastName = lastName
-        }
-    }
-
-    const c = new Contact()
-
-    c.firstName = "Pavan"
-    c.lastName = "Podila"
-
-    expect(c.fullName).toBe("Pavan Podila")
-
-    c.fullName = "Michel Weststrate"
-    expect(c.firstName).toBe("Michel")
-    expect(c.lastName).toBe("Weststrate")
-})
-
-test("computed setter problem - 2", () => {
-    class Contact {
-        firstName = ""
-        lastName = ""
-
-        constructor() {
-            makeObservable(this, {
-                fullName: computed({
-                    // This doesn't work
-                    set: function(value) {
-                        const [firstName, lastName] = value.split(" ")
-
-                        this.firstName = firstName
-                        this.lastName = lastName
-                    },
-                    equals: mobx.comparer.identity
-                })
-            })
-        }
-
-        constructor() {
-            makeObservable(this, {
-                firstName: observable,
-                lastName: observable
-            })
-        }
-
-        get fullName() {
-            return `${this.firstName} ${this.lastName}`
         }
     }
 

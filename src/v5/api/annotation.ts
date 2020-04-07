@@ -8,7 +8,7 @@ export type Annotation = {
         | "computed.struct"
         | "action"
         | "action.bound"
-    options?: any
+    arg?: any
 }
 
 export type AnnotationsMap<T> = {
