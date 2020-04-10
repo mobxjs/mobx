@@ -125,7 +125,6 @@ export {
     remove,
     has,
     get,
-    decorate,
     configure,
     onBecomeObserved,
     onBecomeUnobserved,

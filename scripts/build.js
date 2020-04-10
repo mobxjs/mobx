@@ -1,5 +1,5 @@
 const { rollup } = require("rollup")
-const resolvePlugin = require("rollup-plugin-node-resolve")
+const resolvePlugin = require("@rollup/plugin-node-resolve")
 const filesizePlugin = require("rollup-plugin-filesize")
 const replacePlugin = require("rollup-plugin-replace")
 const terserPlugin = require("rollup-plugin-terser").terser

@@ -536,7 +536,6 @@ test("798, cannot return observable map from computed prop", () => {
 
     expect(() => {
         Object.assign({}, cs.customerSearchType)
-        // console.log(x)
     }).not.toThrow()
 })
 
@@ -660,9 +659,62 @@ test("issue 1243, .replace should not trigger change on unchanged values", () =>
 
     expect(() => {
         m.replace("not-an-object")
-    }).toThrow(/Cannot get keys from 'not-an-object'/)
+    }).toThrow("[mobx] Cannot convert to map from 'not-an-object'")
 
     d()
+})
+
+test("#1980 .replace should not breaks entities order!", () => {
+    const original = mobx.observable.map([
+        ["a", "first"],
+        ["b", "second"]
+    ])
+    const replacement = new Map([
+        ["b", "first"],
+        ["a", "second"]
+    ])
+    original.replace(replacement)
+    const newKeys = Array.from(replacement)
+    const originalKeys = Array.from(replacement)
+    for (let i = 0; i < newKeys.length; i++) {
+        expect(newKeys[i]).toEqual(originalKeys[i])
+    }
+})
+
+test("#1980 .replace should invoke autorun", () => {
+    const original = mobx.observable.map({ a: "a", b: "b" })
+    const replacement = { b: "b", a: "a" }
+    let numOfInvokes = 0
+    autorun(() => {
+        numOfInvokes = numOfInvokes + 1
+        return original.entries().next()
+    })
+    original.replace(replacement)
+    const orgKeys = Array.from(original.keys())
+    const newKeys = Object.keys(replacement)
+    for (let i = 0; i < newKeys.length; i++) {
+        expect(newKeys[i]).toEqual(orgKeys[i])
+    }
+    expect(numOfInvokes).toBe(2)
+})
+
+test("#1980 .replace should not report changed unnecessarily", () => {
+    const mapArray = [
+        ["swappedA", "swappedA"],
+        ["swappedB", "swappedB"],
+        ["removed", "removed"]
+    ]
+    const replacementArray = [mapArray[1], mapArray[0], ["added", "added"]]
+    const map = mobx.observable.map(mapArray)
+    let autorunInvocationCount = 0
+    autorun(() => {
+        map.get("swappedA")
+        map.get("swappedB")
+        autorunInvocationCount++
+    })
+    map.replace(replacementArray)
+    expect(Array.from(map.entries())).toEqual(replacementArray)
+    expect(autorunInvocationCount).toBe(1)
 })
 
 test("#1258 cannot replace maps anymore", () => {
@@ -1137,4 +1189,111 @@ test("noop mutations do NOT reportChanges", () => {
     ])
 
     expect(autorunInvocationCount).toBe(1)
+})
+
+test(".replace() calls and respects interceptors", () => {
+    const map = mobx.observable.map([
+        [0, 0],
+        [1, 1],
+        [2, 2],
+        [3, 3]
+    ])
+    const replacementMap = [
+        [3, 33],
+        [4, 44],
+        [5, 55],
+        [0, 0]
+    ]
+    const expectedMap = [
+        [2, 2],
+        [3, 3],
+        [5, 55],
+        [0, 0]
+    ]
+
+    mobx.intercept(map, change => {
+        // cancel delete 2
+        if (change.type === "delete" && change.name === 2) {
+            return null
+        }
+        // cancel update 3
+        if (change.type === "update" && change.name === 3) {
+            return null
+        }
+        // cancel add 4
+        if (change.type === "add" && change.name === 4) {
+            return null
+        }
+        return change
+    })
+
+    map.replace(replacementMap)
+
+    expect(Array.from(map)).toEqual(expectedMap)
+})
+
+test(".replace() should reportChanged on key order change", () => {
+    const map = mobx.observable.map([
+        [1, 1],
+        [2, 2],
+        [3, 3]
+    ])
+    const replacementMap = [
+        [4, 44],
+        [3, 33],
+        [2, 22]
+    ]
+    const expectedMap = [
+        [1, 1],
+        [3, 33],
+        [2, 22]
+    ]
+    let autorunInvocationCount = 0
+
+    mobx.intercept(map, change => {
+        // cancel delete 1
+        if (change.type === "delete" && change.name === 1) {
+            return null
+        }
+        // cancel add 4
+        if (change.type === "add" && change.name === 4) {
+            return null
+        }
+        return change
+    })
+
+    autorun(() => {
+        autorunInvocationCount++
+        for (const _ of map.keys()) {
+        }
+    })
+
+    map.replace(replacementMap)
+
+    expect(Array.from(map)).toEqual(expectedMap)
+    expect(autorunInvocationCount).toBe(2)
+})
+
+test("#2112 - iterators should be resilient to concurrent delete operation", () => {
+    function testIterator(method) {
+        const map = mobx.observable.map([
+            [1, 1],
+            [2, 2],
+            [3, 3]
+        ])
+        const expectedMap = mobx.observable.map(map)
+        for (const entry of map[method]()) {
+            const key = Array.isArray(entry) ? entry[0] : entry
+            const deleted1 = map.delete(key)
+            const deleted2 = expectedMap.delete(key)
+            expect(deleted1).toBe(true)
+            expect(deleted2).toBe(true)
+            expect(map.size).toBe(expectedMap.size)
+            expect(Array.from(map)).toEqual(Array.from(expectedMap))
+        }
+    }
+
+    testIterator("keys")
+    testIterator("values")
+    testIterator("entries")
 })

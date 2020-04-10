@@ -47,7 +47,7 @@ function getDescriptor(target: Object, prop: PropertyKey): [PropertyDescriptor, 
         }
         current = Object.getPrototypeOf(current)
     }
-    fail(`Property is not defined: '${prop.toString()}'`)
+    fail(`Cannot decorate undefined property: '${prop.toString()}'`)
 }
 
 export function makeProperty(

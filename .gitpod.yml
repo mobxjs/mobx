@@ -1,0 +1,33 @@
+tasks:
+    - name: Docs
+      init: yarn install && yarn build && gp sync-done yarn
+      command: yarn docs:start
+    - name: Tests
+      init: gp sync-await yarn
+      command: yarn watch
+    - name: Perf
+      init: gp sync-await yarn
+      command: yarn run perf
+      openMode: split-right
+
+ports:
+    - port: 3000
+      onOpen: open-preview
+
+vscode:
+    extensions:
+        - esbenp.prettier-vscode@3.20.0:37/f4uBlE287wUjENFq1aA==
+        - EditorConfig.EditorConfig@0.14.4:EjFaoTaOf8wRmwR0LNY51A==
+        - dbaeumer.vscode-eslint@2.1.1:DO6k4GCpqhwZcKo+jY9xjQ==
+        - yzhang.markdown-all-in-one@2.7.0:5+DmuGcePw8L9PtfgOAAHg==
+
+github:
+    prebuilds:
+        master: true
+        branches: true
+        pullRequests: true
+        pullRequestsFromForks: true
+        addCheck: true
+        addComment: true
+        addBadge: true
+        addLabel: false

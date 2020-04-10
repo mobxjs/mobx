@@ -11,7 +11,6 @@ import {
     createInstanceofPredicate,
     deepEnhancer,
     fail,
-    getMapLikeKeys,
     getNextId,
     getPlainObjectKeys,
     hasInterceptors,
@@ -32,7 +31,8 @@ import {
     transaction,
     untracked,
     onBecomeUnobserved,
-    globalState
+    globalState,
+    convertToMap
 } from "../internal"
 
 export interface IKeyValueMap<V = any> {
@@ -267,33 +267,30 @@ export class ObservableMap<K = any, V = any>
 
     values(): IterableIterator<V> {
         const self = this
-        let nextIndex = 0
-        const keys = Array.from(this.keys())
-        return makeIterable<V>({
+        const keys = this.keys()
+        return makeIterable({
             next() {
-                return nextIndex < keys.length
-                    ? { value: self.get(keys[nextIndex++]), done: false }
-                    : { done: true }
+                const { done, value } = keys.next()
+                return {
+                    done,
+                    value: done ? (undefined as any) : self.get(value)
+                }
             }
-        } as any)
+        })
     }
 
     entries(): IterableIterator<IMapEntry<K, V>> {
         const self = this
-        let nextIndex = 0
-        const keys = Array.from(this.keys())
+        const keys = this.keys()
         return makeIterable({
-            next: function() {
-                if (nextIndex < keys.length) {
-                    const key = keys[nextIndex++]
-                    return {
-                        value: [key, self.get(key)!] as [K, V],
-                        done: false
-                    }
+            next() {
+                const { done, value } = keys.next()
+                return {
+                    done,
+                    value: done ? (undefined as any) : ([value, self.get(value)!] as [K, V])
                 }
-                return { done: true }
             }
-        } as any)
+        })
     }
 
     [Symbol.iterator]() {
@@ -332,15 +329,79 @@ export class ObservableMap<K = any, V = any>
     }
 
     replace(values: ObservableMap<K, V> | IKeyValueMap<V> | any): ObservableMap<K, V> {
+        // Implementation requirements:
+        // - respect ordering of replacement map
+        // - allow interceptors to run and potentially prevent individual operations
+        // - don't recreate observables that already exist in original map (so we don't destroy existing subscriptions)
+        // - don't _keysAtom.reportChanged if the keys of resulting map are indentical (order matters!)
+        // - note that result map may differ from replacement map due to the interceptors
         transaction(() => {
-            // grab all the keys that are present in the new map but not present in the current map
-            // and delete them from the map, then merge the new map
-            // this will cause reactions only on changed values
-            const newKeys = (getMapLikeKeys(values) as any) as K[]
-            const oldKeys = Array.from(this.keys())
-            const missingKeys = oldKeys.filter(k => newKeys.indexOf(k) === -1)
-            missingKeys.forEach(k => this.delete(k))
-            this.merge(values)
+            // Convert to map so we can do quick key lookups
+            const replacementMap = convertToMap(values)
+            const orderedData = new Map()
+            // Used for optimization
+            let keysReportChangedCalled = false
+            // Delete keys that don't exist in replacement map
+            // if the key deletion is prevented by interceptor
+            // add entry at the beginning of the result map
+            for (const key of this._data.keys()) {
+                // Concurrently iterating/deleting keys
+                // iterator should handle this correctly
+                if (!replacementMap.has(key)) {
+                    const deleted = this.delete(key)
+                    // Was the key removed?
+                    if (deleted) {
+                        // _keysAtom.reportChanged() was already called
+                        keysReportChangedCalled = true
+                    } else {
+                        // Delete prevented by interceptor
+                        const value = this._data.get(key)
+                        orderedData.set(key, value)
+                    }
+                }
+            }
+            // Merge entries
+            for (const [key, value] of replacementMap.entries()) {
+                // We will want to know whether a new key is added
+                const keyExisted = this._data.has(key)
+                // Add or update value
+                this.set(key, value)
+                // The addition could have been prevent by interceptor
+                if (this._data.has(key)) {
+                    // The update could have been prevented by interceptor
+                    // and also we want to preserve existing values
+                    // so use value from _data map (instead of replacement map)
+                    const value = this._data.get(key)
+                    orderedData.set(key, value)
+                    // Was a new key added?
+                    if (!keyExisted) {
+                        // _keysAtom.reportChanged() was already called
+                        keysReportChangedCalled = true
+                    }
+                }
+            }
+            // Check for possible key order change
+            if (!keysReportChangedCalled) {
+                if (this._data.size !== orderedData.size) {
+                    // If size differs, keys are definitely modified
+                    this._keysAtom.reportChanged()
+                } else {
+                    const iter1 = this._data.keys()
+                    const iter2 = orderedData.keys()
+                    let next1 = iter1.next()
+                    let next2 = iter2.next()
+                    while (!next1.done) {
+                        if (next1.value !== next2.value) {
+                            this._keysAtom.reportChanged()
+                            break
+                        }
+                        next1 = iter1.next()
+                        next2 = iter2.next()
+                    }
+                }
+            }
+            // Use correctly ordered map
+            this._data = orderedData
         })
         return this
     }

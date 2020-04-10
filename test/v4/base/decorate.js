@@ -444,3 +444,20 @@ test("decorate a property with two decorators", function() {
 
     d()
 })
+
+test("expect warning for missing decorated getter", () => {
+    const obj = {
+        x: 0,
+        get y() {
+            return 1
+        }
+    }
+
+    decorate(obj, {
+        x: observable,
+        y: computed,
+        z: computed
+    })
+
+    expect(() => obj.z).toThrow(/Trying to declare a computed value for unspecified getter 'z'/)
+})

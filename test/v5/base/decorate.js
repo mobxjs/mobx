@@ -28,7 +28,9 @@ test("throws on undeclared prop", () => {
 
     expect(() => {
         new Box()
-    }).toThrowErrorMatchingInlineSnapshot(`"[mobx] Property is not defined: 'notExisting'"`)
+    }).toThrowErrorMatchingInlineSnapshot(
+        `"[mobx] Cannot decorate undefined property: 'notExisting'"`
+    )
 })
 
 test("decorate should work", function() {
@@ -408,4 +410,21 @@ test("decorate a property with two decorators", function() {
     expect(serialize(obj).x).toEqual(1)
 
     d()
+})
+
+test("expect warning for missing decorated getter", () => {
+    const obj = {
+        x: 0,
+        get y() {
+            return 1
+        }
+    }
+
+    expect(() => {
+        makeObservable(obj, {
+            x: observable,
+            y: computed,
+            z: computed
+        })
+    }).toThrowErrorMatchingInlineSnapshot(`"[mobx] Cannot decorate undefined property: 'z'"`)
 })

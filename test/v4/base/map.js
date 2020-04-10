@@ -40,8 +40,20 @@ test("map crud", function() {
 
     expect(mobx.keys(m)).toEqual(["1", 1, k, s])
     expect(mobx.values(m)).toEqual(["aa", "b", "arrVal", "symbol-value"])
-    expect(Array.from(m)).toEqual([["1", "aa"], [1, "b"], [k, "arrVal"], [s, "symbol-value"]])
-    expect(m.toJS()).toEqual(new Map([["1", "aa"], [1, "b"], [k, "arrVal"], [s, "symbol-value"]]))
+    expect(Array.from(m)).toEqual([
+        ["1", "aa"],
+        [1, "b"],
+        [k, "arrVal"],
+        [s, "symbol-value"]
+    ])
+    expect(m.toJS()).toEqual(
+        new Map([
+            ["1", "aa"],
+            [1, "b"],
+            [k, "arrVal"],
+            [s, "symbol-value"]
+        ])
+    )
     expect(m.toPOJO()).toEqual({ "1": "b", arr: "arrVal", [s]: "symbol-value" })
     expect(JSON.stringify(m)).toEqual('{"1":"b","arr":"arrVal"}')
     expect(m.toString()).toBe(
@@ -130,8 +142,14 @@ test("observe value", function() {
 
 test("initialize with entries", function() {
     const thing = [{ x: 3 }]
-    const a = map([["a", 1], [thing, 2]])
-    expect(Array.from(a)).toEqual([["a", 1], [thing, 2]])
+    const a = map([
+        ["a", 1],
+        [thing, 2]
+    ])
+    expect(Array.from(a)).toEqual([
+        ["a", 1],
+        [thing, 2]
+    ])
 })
 
 test("initialize with empty value", function() {
@@ -183,12 +201,18 @@ test("observe collections", function() {
     x.set("b", 3)
     expect(keys).toEqual(["a", "b"])
     expect(values).toEqual([2, 3])
-    expect(entries).toEqual([["a", 2], ["b", 3]])
+    expect(entries).toEqual([
+        ["a", 2],
+        ["b", 3]
+    ])
 
     x.has("c")
     expect(keys).toEqual(["a", "b"])
     expect(values).toEqual([2, 3])
-    expect(entries).toEqual([["a", 2], ["b", 3]])
+    expect(entries).toEqual([
+        ["a", 2],
+        ["b", 3]
+    ])
 
     x.delete("a")
     expect(keys).toEqual(["b"])
@@ -325,12 +349,12 @@ test("map modifier with modifier", () => {
     x.set("b", { d: 4 })
     expect(mobx.isObservableObject(x.get("b"))).toBe(true)
 
-    x = mobx.observable.shallowMap({ a: { c: 3 } })
+    x = mobx.observable.map({ a: { c: 3 } }, { deep: false })
     expect(mobx.isObservableObject(x.get("a"))).toBe(false)
     x.set("b", { d: 4 })
     expect(mobx.isObservableObject(x.get("b"))).toBe(false)
 
-    x = mobx.observable({ a: mobx.observable.shallowMap({ b: {} }) })
+    x = mobx.observable({ a: mobx.observable.map({ b: {} }, { deep: false }) })
     expect(mobx.isObservableObject(x)).toBe(true)
     expect(mobx.isObservableMap(x.a)).toBe(true)
     expect(mobx.isObservableObject(x.a.get("b"))).toBe(false)
@@ -419,9 +443,15 @@ test("map should support iterall / iterable ", () => {
 
     expect(iterall.isIterable(a)).toBe(true)
 
-    expect(leech(iterall.getIterator(a))).toEqual([["a", 1], ["b", 2]])
+    expect(leech(iterall.getIterator(a))).toEqual([
+        ["a", 1],
+        ["b", 2]
+    ])
 
-    expect(leech(a.entries())).toEqual([["a", 1], ["b", 2]])
+    expect(leech(a.entries())).toEqual([
+        ["a", 1],
+        ["b", 2]
+    ])
 
     expect(leech(a.keys())).toEqual(["a", "b"])
     expect(leech(a.values())).toEqual([1, 2])
@@ -434,7 +464,10 @@ test("support for ES6 Map", () => {
 
     const m = mobx.observable(x)
     expect(mobx.isObservableMap(m)).toBe(true)
-    expect(Array.from(m)).toEqual([["x", 3], ["y", 2]])
+    expect(Array.from(m)).toEqual([
+        ["x", 3],
+        ["y", 2]
+    ])
 
     const x2 = new Map()
     x2.set("y", 4)
@@ -502,7 +535,6 @@ test("798, cannot return observable map from computed prop", () => {
 
     expect(() => {
         Object.assign({}, cs.customerSearchType)
-        // console.log(x)
     }).not.toThrow()
 })
 
@@ -632,8 +664,14 @@ test("issue 1243, .replace should not trigger change on unchanged values", () =>
 })
 
 test("#1980 .replace should not breaks entities order!", () => {
-    const original = mobx.observable.map([["a", "first"], ["b", "second"]])
-    const replacement = new Map([["b", "first"], ["a", "second"]])
+    const original = mobx.observable.map([
+        ["a", "first"],
+        ["b", "second"]
+    ])
+    const replacement = new Map([
+        ["b", "first"],
+        ["a", "second"]
+    ])
     original.replace(replacement)
     const newKeys = Array.from(replacement)
     const originalKeys = Array.from(replacement)
@@ -642,7 +680,7 @@ test("#1980 .replace should not breaks entities order!", () => {
     }
 })
 
-test("#1980 .replace should should invoke autorun", () => {
+test("#1980 .replace should invoke autorun", () => {
     const original = mobx.observable.map({ a: "a", b: "b" })
     const replacement = { b: "b", a: "a" }
     let numOfInvokes = 0
@@ -660,7 +698,11 @@ test("#1980 .replace should should invoke autorun", () => {
 })
 
 test("#1980 .replace should not report changed unnecessarily", () => {
-    const mapArray = [["swappedA", "swappedA"], ["swappedB", "swappedB"], ["removed", "removed"]]
+    const mapArray = [
+        ["swappedA", "swappedA"],
+        ["swappedB", "swappedB"],
+        ["removed", "removed"]
+    ]
     const replacementArray = [mapArray[1], mapArray[0], ["added", "added"]]
     const map = mobx.observable.map(mapArray)
     let autorunInvocationCount = 0
@@ -682,11 +724,22 @@ test("#1258 cannot replace maps anymore", () => {
 test("can iterate maps", () => {
     const x = mobx.observable.map()
     const y = []
-    const d = mobx.reaction(() => Array.from(x), items => y.push(items), { fireImmediately: true })
+    const d = mobx.reaction(
+        () => Array.from(x),
+        items => y.push(items),
+        { fireImmediately: true }
+    )
 
     x.set("a", "A")
     x.set("b", "B")
-    expect(y).toEqual([[], [["a", "A"]], [["a", "A"], ["b", "B"]]])
+    expect(y).toEqual([
+        [],
+        [["a", "A"]],
+        [
+            ["a", "A"],
+            ["b", "B"]
+        ]
+    ])
     d()
 })
 
@@ -706,22 +759,37 @@ function iteratorToArray(it) {
 test("can iterate map - entries", () => {
     const x = mobx.observable.map()
     const y = []
-    const d = mobx.reaction(() => iteratorToArray(x.entries()), items => y.push(items), {
-        fireImmediately: true
-    })
+    const d = mobx.reaction(
+        () => iteratorToArray(x.entries()),
+        items => y.push(items),
+        {
+            fireImmediately: true
+        }
+    )
 
     x.set("a", "A")
     x.set("b", "B")
-    expect(y).toEqual([[], [["a", "A"]], [["a", "A"], ["b", "B"]]])
+    expect(y).toEqual([
+        [],
+        [["a", "A"]],
+        [
+            ["a", "A"],
+            ["b", "B"]
+        ]
+    ])
     d()
 })
 
 test("can iterate map - keys", () => {
     const x = mobx.observable.map()
     const y = []
-    const d = mobx.reaction(() => iteratorToArray(x.keys()), items => y.push(items), {
-        fireImmediately: true
-    })
+    const d = mobx.reaction(
+        () => iteratorToArray(x.keys()),
+        items => y.push(items),
+        {
+            fireImmediately: true
+        }
+    )
 
     x.set("a", "A")
     x.set("b", "B")
@@ -732,9 +800,13 @@ test("can iterate map - keys", () => {
 test("can iterate map - values", () => {
     const x = mobx.observable.map()
     const y = []
-    const d = mobx.reaction(() => iteratorToArray(x.values()), items => y.push(items), {
-        fireImmediately: true
-    })
+    const d = mobx.reaction(
+        () => iteratorToArray(x.values()),
+        items => y.push(items),
+        {
+            fireImmediately: true
+        }
+    )
 
     x.set("a", "A")
     x.set("b", "B")
@@ -754,7 +826,10 @@ test("NaN as map key", function() {
 
 test("maps.values, keys and maps.entries are iterables", () => {
     const x = mobx.observable.map({ x: 1, y: 2 })
-    expect(Array.from(x.entries())).toEqual([["x", 1], ["y", 2]])
+    expect(Array.from(x.entries())).toEqual([
+        ["x", 1],
+        ["y", 2]
+    ])
     expect(Array.from(x.values())).toEqual([1, 2])
     expect(Array.from(x.keys())).toEqual(["x", "y"])
 })
@@ -931,7 +1006,11 @@ test(".toJSON() subscribes for key changes", () => {
 })
 
 test(".entries() subscribes for value changes", () => {
-    const map = mobx.observable.map([[1, 1], [2, 2], [3, 3]])
+    const map = mobx.observable.map([
+        [1, 1],
+        [2, 2],
+        [3, 3]
+    ])
     let autorunInvocationCount = 0
 
     autorun(() => {
@@ -948,7 +1027,11 @@ test(".entries() subscribes for value changes", () => {
 })
 
 test(".values() subscribes for value changes", () => {
-    const map = mobx.observable.map([[1, 1], [2, 2], [3, 3]])
+    const map = mobx.observable.map([
+        [1, 1],
+        [2, 2],
+        [3, 3]
+    ])
     let autorunInvocationCount = 0
 
     autorun(() => {
@@ -965,7 +1048,11 @@ test(".values() subscribes for value changes", () => {
 })
 
 test(".forEach() subscribes for value changes", () => {
-    const map = mobx.observable.map([[1, 1], [2, 2], [3, 3]])
+    const map = mobx.observable.map([
+        [1, 1],
+        [2, 2],
+        [3, 3]
+    ])
     let autorunInvocationCount = 0
 
     autorun(() => {
@@ -981,7 +1068,11 @@ test(".forEach() subscribes for value changes", () => {
 })
 
 test(".toPOJO() subscribes for value changes", () => {
-    const map = mobx.observable.map([[1, 1], [2, 2], [3, 3]])
+    const map = mobx.observable.map([
+        [1, 1],
+        [2, 2],
+        [3, 3]
+    ])
     let autorunInvocationCount = 0
 
     autorun(() => {
@@ -997,7 +1088,11 @@ test(".toPOJO() subscribes for value changes", () => {
 })
 
 test(".toJS() subscribes for value changes", () => {
-    const map = mobx.observable.map([[1, 1], [2, 2], [3, 3]])
+    const map = mobx.observable.map([
+        [1, 1],
+        [2, 2],
+        [3, 3]
+    ])
     let autorunInvocationCount = 0
 
     autorun(() => {
@@ -1013,7 +1108,11 @@ test(".toJS() subscribes for value changes", () => {
 })
 
 test(".toJSON() subscribes for value changes", () => {
-    const map = mobx.observable.map([[1, 1], [2, 2], [3, 3]])
+    const map = mobx.observable.map([
+        [1, 1],
+        [2, 2],
+        [3, 3]
+    ])
     let autorunInvocationCount = 0
 
     autorun(() => {
@@ -1029,7 +1128,11 @@ test(".toJSON() subscribes for value changes", () => {
 })
 
 test(".keys() does NOT subscribe for value changes", () => {
-    const map = mobx.observable.map([[1, 1], [2, 2], [3, 3]])
+    const map = mobx.observable.map([
+        [1, 1],
+        [2, 2],
+        [3, 3]
+    ])
     let autorunInvocationCount = 0
 
     autorun(() => {
@@ -1046,7 +1149,11 @@ test(".keys() does NOT subscribe for value changes", () => {
 })
 
 test("noop mutations do NOT reportChanges", () => {
-    const map = mobx.observable.map([[1, 1], [2, 2], [3, 3]])
+    const map = mobx.observable.map([
+        [1, 1],
+        [2, 2],
+        [3, 3]
+    ])
     let autorunInvocationCount = 0
 
     autorun(() => {
@@ -1059,9 +1166,127 @@ test("noop mutations do NOT reportChanges", () => {
     map.set(3, 3)
     map.delete("NOT IN MAP")
     map.merge([])
-    map.merge([[1, 1], [3, 3]])
-    map.merge([[1, 1], [2, 2], [3, 3]])
-    map.replace([[1, 1], [2, 2], [3, 3]])
+    map.merge([
+        [1, 1],
+        [3, 3]
+    ])
+    map.merge([
+        [1, 1],
+        [2, 2],
+        [3, 3]
+    ])
+    map.replace([
+        [1, 1],
+        [2, 2],
+        [3, 3]
+    ])
 
     expect(autorunInvocationCount).toBe(1)
+})
+
+test(".replace() calls and respects interceptors", () => {
+    const map = mobx.observable.map([
+        [0, 0],
+        [1, 1],
+        [2, 2],
+        [3, 3]
+    ])
+    const replacementMap = [
+        [3, 33],
+        [4, 44],
+        [5, 55],
+        [0, 0]
+    ]
+    const expectedMap = [
+        [2, 2],
+        [3, 3],
+        [5, 55],
+        [0, 0]
+    ]
+
+    mobx.intercept(map, change => {
+        // cancel delete 2
+        if (change.type === "delete" && change.name === 2) {
+            return null
+        }
+        // cancel update 3
+        if (change.type === "update" && change.name === 3) {
+            return null
+        }
+        // cancel add 4
+        if (change.type === "add" && change.name === 4) {
+            return null
+        }
+        return change
+    })
+
+    map.replace(replacementMap)
+
+    expect(Array.from(map)).toEqual(expectedMap)
+})
+
+test(".replace() should reportChanged on key order change", () => {
+    const map = mobx.observable.map([
+        [1, 1],
+        [2, 2],
+        [3, 3]
+    ])
+    const replacementMap = [
+        [4, 44],
+        [3, 33],
+        [2, 22]
+    ]
+    const expectedMap = [
+        [1, 1],
+        [3, 33],
+        [2, 22]
+    ]
+    let autorunInvocationCount = 0
+
+    mobx.intercept(map, change => {
+        // cancel delete 1
+        if (change.type === "delete" && change.name === 1) {
+            return null
+        }
+        // cancel add 4
+        if (change.type === "add" && change.name === 4) {
+            return null
+        }
+        return change
+    })
+
+    autorun(() => {
+        autorunInvocationCount++
+        for (const _ of map.keys()) {
+        }
+    })
+
+    map.replace(replacementMap)
+
+    expect(Array.from(map)).toEqual(expectedMap)
+    expect(autorunInvocationCount).toBe(2)
+})
+
+test("#2112 - iterators should be resilient to concurrent delete operation", () => {
+    function testIterator(method) {
+        const map = mobx.observable.map([
+            [1, 1],
+            [2, 2],
+            [3, 3]
+        ])
+        const expectedMap = mobx.observable.map(map)
+        for (const entry of map[method]()) {
+            const key = Array.isArray(entry) ? entry[0] : entry
+            const deleted1 = map.delete(key)
+            const deleted2 = expectedMap.delete(key)
+            expect(deleted1).toBe(true)
+            expect(deleted2).toBe(true)
+            expect(map.size).toBe(expectedMap.size)
+            expect(Array.from(map)).toEqual(Array.from(expectedMap))
+        }
+    }
+
+    testIterator("keys")
+    testIterator("values")
+    testIterator("entries")
 })

@@ -33,7 +33,8 @@ import {
     declareIterator,
     onBecomeUnobserved,
     convertToMap,
-    iteratorToArray
+    iteratorToArray,
+    forOf
 } from "../internal"
 
 export interface IKeyValueMap<V = any> {
@@ -267,33 +268,30 @@ export class ObservableMap<K = any, V = any>
 
     values(): IterableIterator<V> {
         const self = this
-        let nextIndex = 0
-        const keys = iteratorToArray(this.keys())
+        const keys = this.keys()
         return makeIterable({
             next() {
-                return nextIndex < keys.length
-                    ? { value: self.get(keys[nextIndex++])!, done: false }
-                    : { value: undefined as any, done: true }
+                const { done, value } = keys.next()
+                return {
+                    done,
+                    value: done ? (undefined as any) : self.get(value)
+                }
             }
         })
     }
 
     entries(): IterableIterator<IMapEntry<K, V>> {
         const self = this
-        let nextIndex = 0
-        const keys = iteratorToArray(this.keys())
+        const keys = this.keys()
         return makeIterable({
-            next: function() {
-                if (nextIndex < keys.length) {
-                    const key = keys[nextIndex++]
-                    return {
-                        value: [key, self.get(key)!] as [K, V],
-                        done: false
-                    }
+            next() {
+                const { done, value } = keys.next()
+                return {
+                    done,
+                    value: done ? (undefined as any) : ([value, self.get(value)!] as [K, V])
                 }
-                return { done: true }
             }
-        } as any)
+        })
     }
 
     forEach(callback: (value: V, key: K, object: Map<K, V>) => void, thisArg?) {
@@ -332,26 +330,78 @@ export class ObservableMap<K = any, V = any>
     }
 
     replace(values: ObservableMap<K, V> | IKeyValueMap<V> | any): ObservableMap<K, V> {
+        // Implementation requirements:
+        // - respect ordering of replacement map
+        // - allow interceptors to run and potentially prevent individual operations
+        // - don't recreate observables that already exist in original map (so we don't destroy existing subscriptions)
+        // - don't _keysAtom.reportChanged if the keys of resulting map are indentical (order matters!)
+        // - note that result map may differ from replacement map due to the interceptors
         transaction(() => {
+            // Convert to map so we can do quick key lookups
             const replacementMap = convertToMap(values)
             const orderedData = new Map()
-            const oldKeys = iteratorToArray(this.keys())
-            const newKeys: Array<any> = iteratorToArray(replacementMap.keys())
-            for (let i = 0; i < oldKeys.length; i++) {
-                const oldKey = oldKeys[i]
-                // key order change
-                if (oldKeys.length === newKeys.length && oldKey !== newKeys[i]) {
-                    this._keysAtom.reportChanged()
+            // Used for optimization
+            let keysReportChangedCalled = false
+            // Delete keys that don't exist in replacement map
+            // if the key deletion is prevented by interceptor
+            // add entry at the beginning of the result map
+            forOf(this._data.keys(), key => {
+                // Concurrently iterating/deleting keys
+                // iterator should handle this correctly
+                if (!replacementMap.has(key)) {
+                    const deleted = this.delete(key)
+                    // Was the key removed?
+                    if (deleted) {
+                        // _keysAtom.reportChanged() was already called
+                        keysReportChangedCalled = true
+                    } else {
+                        // Delete prevented by interceptor
+                        const value = this._data.get(key)
+                        orderedData.set(key, value)
+                    }
                 }
-                // deleted key
-                if (!replacementMap.has(oldKey)) {
-                    this.delete(oldKey)
+            })
+            // Merge entries
+            forOf(replacementMap.entries(), ([key, value]) => {
+                // We will want to know whether a new key is added
+                const keyExisted = this._data.has(key)
+                // Add or update value
+                this.set(key, value)
+                // The addition could have been prevent by interceptor
+                if (this._data.has(key)) {
+                    // The update could have been prevented by interceptor
+                    // and also we want to preserve existing values
+                    // so use value from _data map (instead of replacement map)
+                    const value = this._data.get(key)
+                    orderedData.set(key, value)
+                    // Was a new key added?
+                    if (!keyExisted) {
+                        // _keysAtom.reportChanged() was already called
+                        keysReportChangedCalled = true
+                    }
+                }
+            })
+            // Check for possible key order change
+            if (!keysReportChangedCalled) {
+                if (this._data.size !== orderedData.size) {
+                    // If size differs, keys are definitely modified
+                    this._keysAtom.reportChanged()
+                } else {
+                    const iter1 = this._data.keys()
+                    const iter2 = orderedData.keys()
+                    let next1 = iter1.next()
+                    let next2 = iter2.next()
+                    while (!next1.done) {
+                        if (next1.value !== next2.value) {
+                            this._keysAtom.reportChanged()
+                            break
+                        }
+                        next1 = iter1.next()
+                        next2 = iter2.next()
+                    }
                 }
             }
-            replacementMap.forEach((value, key) => {
-                this.set(key, value)
-                orderedData.set(key, this._data.get(key))
-            })
+            // Use correctly ordered map
             this._data = orderedData
         })
         return this
