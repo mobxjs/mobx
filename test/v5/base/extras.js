@@ -2,6 +2,7 @@ const mobx = require("../../../src/v5/mobx.ts")
 const m = mobx
 
 const { $mobx } = mobx
+const { makeObservable } = mobx
 
 test("treeD", function() {
     m._resetGlobalState()
@@ -231,7 +232,6 @@ test("get debug name", function() {
     const e = mobx.computed(() => 3)
     const f = mobx.autorun(() => c.has("b"))
     const g = new Clazz()
-    const h = mobx.observable({ b: function() {}, c() {} })
 
     function name(thing, prop) {
         return mobx.getDebugName(thing, prop)
@@ -259,9 +259,6 @@ test("get debug name", function() {
 
     expect(name(g)).toBe("Clazz@9")
     expect(name(g, "a")).toBe("Clazz@9.a")
-
-    expect(name(h, "b")).toBe("ObservableObject@10.b")
-    expect(name(h, "c")).toBe("ObservableObject@10.c")
 
     f()
 })
@@ -340,7 +337,10 @@ test("onBecome(Un)Observed simple", () => {
     x.set(4)
     expect(events.length).toBe(0) // nothing happened yet
 
-    const d5 = mobx.reaction(() => x.get(), () => {})
+    const d5 = mobx.reaction(
+        () => x.get(),
+        () => {}
+    )
     expect(events.length).toBe(1)
     expect(events).toEqual(["x observed"])
 
@@ -376,11 +376,17 @@ test("onBecome(Un)Observed - less simple", () => {
 
     expect(events.length).toBe(0) // nothing happened yet
 
-    const d5 = mobx.reaction(() => x.b, () => {})
+    const d5 = mobx.reaction(
+        () => x.b,
+        () => {}
+    )
     expect(events.length).toBe(2)
     expect(events).toEqual(["b observed", "a observed"])
 
-    const d6 = mobx.reaction(() => x.b, () => {})
+    const d6 = mobx.reaction(
+        () => x.b,
+        () => {}
+    )
     expect(events.length).toBe(2)
 
     d5()
@@ -394,7 +400,10 @@ test("onBecome(Un)Observed - less simple", () => {
     d3()
     d4()
     events.splice(0)
-    const d7 = mobx.reaction(() => x.b, () => {})
+    const d7 = mobx.reaction(
+        () => x.b,
+        () => {}
+    )
     d7()
     expect(events.length).toBe(0)
 })
@@ -409,7 +418,10 @@ test("onBecomeObserved correctly disposes second listener #1537", () => {
         events.push("b observed")
     })
     d1()
-    mobx.reaction(() => x.get(), () => {})
+    mobx.reaction(
+        () => x.get(),
+        () => {}
+    )
     expect(events.length).toBe(1)
     expect(events).toEqual(["b observed"])
 })
@@ -424,12 +436,18 @@ test("onBecomeObserved correctly disposes second listener #1537", () => {
         events.push("b observed")
     })
     d1()
-    const d3 = mobx.reaction(() => x.get(), () => {})
+    const d3 = mobx.reaction(
+        () => x.get(),
+        () => {}
+    )
     d3()
     expect(events.length).toBe(1)
     expect(events).toEqual(["b observed"])
     d2()
-    mobx.reaction(() => x.get(), () => {})
+    mobx.reaction(
+        () => x.get(),
+        () => {}
+    )
     expect(events).toEqual(["b observed"])
 })
 
@@ -443,12 +461,18 @@ test("onBecomeUnobserved correctly disposes second listener #1537", () => {
         events.push("b unobserved")
     })
     d1()
-    const d3 = mobx.reaction(() => x.get(), () => {})
+    const d3 = mobx.reaction(
+        () => x.get(),
+        () => {}
+    )
     d3()
     expect(events.length).toBe(1)
     expect(events).toEqual(["b unobserved"])
     d2()
-    mobx.reaction(() => x.get(), () => {})
+    mobx.reaction(
+        () => x.get(),
+        () => {}
+    )
     expect(events).toEqual(["b unobserved"])
 })
 
@@ -634,28 +658,220 @@ test("comparer.shallow should work", () => {
     expect(sh(obs(new Set([{}])), obs(new Set([{}])))).toBe(false)
 
     // Map tests
-    expect(sh(new Map([["a", 1], ["b", 2]]), new Map([["a", 1], ["b", 2]]))).toBe(true)
+    expect(
+        sh(
+            new Map([
+                ["a", 1],
+                ["b", 2]
+            ]),
+            new Map([
+                ["a", 1],
+                ["b", 2]
+            ])
+        )
+    ).toBe(true)
 
-    expect(sh(new Map([["a", 1], ["b", 2]]), new Map([["b", 2], ["a", 1]]))).toBe(false) // order matters
-    expect(sh(new Map([["a", 1], ["b", 2]]), new Map([["c", 1], ["b", 2]]))).toBe(false)
-    expect(sh(new Map([["a", 1], ["b", 2]]), new Map([["a", 3], ["b", 2]]))).toBe(false)
-    expect(sh(new Map([["a", 1], ["b", 2]]), new Map([["a", 1], ["c", 2]]))).toBe(false)
-    expect(sh(new Map([["a", 1], ["b", 2]]), new Map([["a", 1], ["b", 3]]))).toBe(false)
-    expect(sh(new Map([["a", 1], ["b", 2]]), new Map([["a", 1]]))).toBe(false)
-    expect(sh(new Map([["a", 1]]), new Map([["a", 1], ["b", 2]]))).toBe(false)
+    expect(
+        sh(
+            new Map([
+                ["a", 1],
+                ["b", 2]
+            ]),
+            new Map([
+                ["b", 2],
+                ["a", 1]
+            ])
+        )
+    ).toBe(false) // order matters
+    expect(
+        sh(
+            new Map([
+                ["a", 1],
+                ["b", 2]
+            ]),
+            new Map([
+                ["c", 1],
+                ["b", 2]
+            ])
+        )
+    ).toBe(false)
+    expect(
+        sh(
+            new Map([
+                ["a", 1],
+                ["b", 2]
+            ]),
+            new Map([
+                ["a", 3],
+                ["b", 2]
+            ])
+        )
+    ).toBe(false)
+    expect(
+        sh(
+            new Map([
+                ["a", 1],
+                ["b", 2]
+            ]),
+            new Map([
+                ["a", 1],
+                ["c", 2]
+            ])
+        )
+    ).toBe(false)
+    expect(
+        sh(
+            new Map([
+                ["a", 1],
+                ["b", 2]
+            ]),
+            new Map([
+                ["a", 1],
+                ["b", 3]
+            ])
+        )
+    ).toBe(false)
+    expect(
+        sh(
+            new Map([
+                ["a", 1],
+                ["b", 2]
+            ]),
+            new Map([["a", 1]])
+        )
+    ).toBe(false)
+    expect(
+        sh(
+            new Map([["a", 1]]),
+            new Map([
+                ["a", 1],
+                ["b", 2]
+            ])
+        )
+    ).toBe(false)
     expect(sh(new Map([[{}, 1]]), new Map([[{}, 1]]))).toBe(false)
     expect(sh(new Map([["a", {}]]), new Map([["a", {}]]))).toBe(false)
 
     // ObservableMap tests
-    expect(sh(obs(new Map([["a", 1], ["b", 2]])), obs(new Map([["a", 1], ["b", 2]])))).toBe(true)
+    expect(
+        sh(
+            obs(
+                new Map([
+                    ["a", 1],
+                    ["b", 2]
+                ])
+            ),
+            obs(
+                new Map([
+                    ["a", 1],
+                    ["b", 2]
+                ])
+            )
+        )
+    ).toBe(true)
 
-    expect(sh(obs(new Map([["a", 1], ["b", 2]])), obs(new Map([["b", 2], ["a", 1]])))).toBe(false) // order matters
-    expect(sh(obs(new Map([["a", 1], ["b", 2]])), obs(new Map([["c", 1], ["b", 2]])))).toBe(false)
-    expect(sh(obs(new Map([["a", 1], ["b", 2]])), obs(new Map([["a", 3], ["b", 2]])))).toBe(false)
-    expect(sh(obs(new Map([["a", 1], ["b", 2]])), obs(new Map([["a", 1], ["c", 2]])))).toBe(false)
-    expect(sh(obs(new Map([["a", 1], ["b", 2]])), obs(new Map([["a", 1], ["b", 3]])))).toBe(false)
-    expect(sh(obs(new Map([["a", 1], ["b", 2]])), obs(new Map([["a", 1]])))).toBe(false)
-    expect(sh(obs(new Map([["a", 1]])), obs(new Map([["a", 1], ["b", 2]])))).toBe(false)
+    expect(
+        sh(
+            obs(
+                new Map([
+                    ["a", 1],
+                    ["b", 2]
+                ])
+            ),
+            obs(
+                new Map([
+                    ["b", 2],
+                    ["a", 1]
+                ])
+            )
+        )
+    ).toBe(false) // order matters
+    expect(
+        sh(
+            obs(
+                new Map([
+                    ["a", 1],
+                    ["b", 2]
+                ])
+            ),
+            obs(
+                new Map([
+                    ["c", 1],
+                    ["b", 2]
+                ])
+            )
+        )
+    ).toBe(false)
+    expect(
+        sh(
+            obs(
+                new Map([
+                    ["a", 1],
+                    ["b", 2]
+                ])
+            ),
+            obs(
+                new Map([
+                    ["a", 3],
+                    ["b", 2]
+                ])
+            )
+        )
+    ).toBe(false)
+    expect(
+        sh(
+            obs(
+                new Map([
+                    ["a", 1],
+                    ["b", 2]
+                ])
+            ),
+            obs(
+                new Map([
+                    ["a", 1],
+                    ["c", 2]
+                ])
+            )
+        )
+    ).toBe(false)
+    expect(
+        sh(
+            obs(
+                new Map([
+                    ["a", 1],
+                    ["b", 2]
+                ])
+            ),
+            obs(
+                new Map([
+                    ["a", 1],
+                    ["b", 3]
+                ])
+            )
+        )
+    ).toBe(false)
+    expect(
+        sh(
+            obs(
+                new Map([
+                    ["a", 1],
+                    ["b", 2]
+                ])
+            ),
+            obs(new Map([["a", 1]]))
+        )
+    ).toBe(false)
+    expect(
+        sh(
+            obs(new Map([["a", 1]])),
+            obs(
+                new Map([
+                    ["a", 1],
+                    ["b", 2]
+                ])
+            )
+        )
+    ).toBe(false)
     expect(sh(obs(new Map([[{}, 1]])), obs(new Map([[{}, 1]])))).toBe(false)
     expect(sh(obs(new Map([["a", {}]])), obs(new Map([["a", {}]])))).toBe(false)
 })

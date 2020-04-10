@@ -4,6 +4,7 @@ const mobx = require("../../../src/v5/mobx.ts")
 const map = mobx.observable.map
 const autorun = mobx.autorun
 const iterall = require("iterall")
+const { makeObservable } = mobx
 
 test("map crud", function() {
     mobx._getGlobalState().mobxGuid = 0 // hmm dangerous reset?

@@ -9,12 +9,27 @@ import {
     isObservable,
     isObservableProp,
     isComputedProp,
-    spy,
     isAction,
     makeObservable
 } from "../../../src/v5/mobx"
 
-import { serializable, primitive, serialize, deserialize } from "serializr"
+// @ts-ignore
+import { primitive, serialize, deserialize, createModelSchema } from "serializr"
+
+test("throws on undeclared prop", () => {
+    class Box {
+        constructor() {
+            makeObservable(this, {
+                // @ts-ignore
+                notExisting: true
+            })
+        }
+    }
+
+    expect(() => {
+        new Box()
+    }).toThrowErrorMatchingInlineSnapshot(`"[mobx] Property is not defined: 'notExisting'"`)
+})
 
 test("decorate should work", function() {
     class Box {
@@ -43,7 +58,6 @@ test("decorate should work", function() {
         constructor() {
             makeObservable(this, {
                 uninitialized: observable.ref,
-                undeclared: observable,
                 height: observable,
                 sizes: observable,
                 someFunc: observable,
@@ -84,8 +98,8 @@ test("decorate should work", function() {
     expect(ar.slice()).toEqual([40, 20, 60, 210, 420])
     box.addSize()
     expect(ar.slice()).toEqual([40, 20, 60, 210, 420, 700])
-    box.undeclared = 2
-    expect(ar.slice()).toEqual([40, 20, 60, 210, 420, 700, 1400])
+    box.undeclared = 2 // not observable, doesn't trigger anything
+    expect(ar.slice()).toEqual([40, 20, 60, 210, 420, 700])
 
     const box2 = new Box()
     expect(box2.width).toBe(40) // no shared state!
@@ -119,7 +133,6 @@ test("decorate should work with plain object", function() {
 
     makeObservable(box, {
         uninitialized: observable,
-        undeclared: observable,
         height: observable,
         sizes: observable,
         someFunc: observable,
@@ -156,8 +169,8 @@ test("decorate should work with plain object", function() {
     expect(ar.slice()).toEqual([40, 20, 60, 210, 420])
     box.addSize()
     expect(ar.slice()).toEqual([40, 20, 60, 210, 420, 700])
-    box.undeclared = 2
-    expect(ar.slice()).toEqual([40, 20, 60, 210, 420, 700, 1400])
+    box.undeclared = 2 // not observable, doesn't trigger anything
+    expect(ar.slice()).toEqual([40, 20, 60, 210, 420, 700])
 })
 
 test("decorate should work with Object.create", function() {
@@ -185,17 +198,15 @@ test("decorate should work with Object.create", function() {
         }
     }
 
-    makeObservable(Box, {
+    const box = Object.create(Box)
+    makeObservable(box, {
         uninitialized: observable,
-        undeclared: observable,
         height: observable,
         sizes: observable,
         someFunc: observable,
         width: computed,
         addSize: action
     })
-
-    const box = Object.create(Box)
     box.undeclared = 1
 
     expect(isObservableObject(box)).toBe(true)
@@ -226,12 +237,8 @@ test("decorate should work with Object.create", function() {
     expect(ar.slice()).toEqual([40, 20, 60, 210, 420])
     box.addSize()
     expect(ar.slice()).toEqual([40, 20, 60, 210, 420, 700])
-    box.undeclared = 2
-    expect(ar.slice()).toEqual([40, 20, 60, 210, 420, 700, 1400])
-
-    const box2 = Object.create(Box)
-    box2.undeclared = 1
-    expect(box2.width).toBe(40) // no shared state!
+    box.undeclared = 2 // not observable, doesn't trigger anything
+    expect(ar.slice()).toEqual([40, 20, 60, 210, 420, 700])
 })
 
 test("decorate should work with constructor function", function() {
@@ -265,7 +272,6 @@ test("decorate should work with constructor function", function() {
         }
         makeObservable(this, {
             uninitialized: observable,
-            undeclared: observable,
             height: observable,
             sizes: observable,
             someFunc: observable,
@@ -307,9 +313,6 @@ test("decorate should work with constructor function", function() {
     expect(ar.slice()).toEqual([40, 20, 60, 210, 420])
     box.addSize()
     expect(ar.slice()).toEqual([40, 20, 60, 210, 420, 700])
-    // @ts-ignore
-    box.undeclared = 2
-    expect(ar.slice()).toEqual([40, 20, 60, 210, 420, 700, 1400])
 
     const box2 = new Box()
     // @ts-ignore
@@ -318,7 +321,8 @@ test("decorate should work with constructor function", function() {
     expect(box2.width).toBe(40) // no shared state!
 })
 
-test("decorate should work with inheritance through Object.create", () => {
+// TODO: find decent behavior here, for example die because the `this` on the observable setter is not the owning instance?
+test.skip("decorate should work with inheritance through Object.create", () => {
     const P = {
         x: 3
     }
@@ -337,21 +341,6 @@ test("decorate should work with inheritance through Object.create", () => {
     expect(child1.x).toBe(4)
 })
 
-test("decorate should work with ES6 constructor", () => {
-    class Todo {
-        constructor() {
-            makeObservable(this, {
-                finished: observable,
-                title: observable
-            })
-
-            this.finished = false
-            this.id = Math.random()
-            this.title = ""
-        }
-    }
-})
-
 test("decorate should not allow @observable on getter", function() {
     const obj = {
         x: 0,
@@ -360,60 +349,29 @@ test("decorate should not allow @observable on getter", function() {
         }
     }
 
-    makeObservable(obj, {
-        x: observable,
-        y: observable
-    })
+    expect(() => {
+        makeObservable(obj, {
+            x: computed
+        })
+    }).toThrowErrorMatchingInlineSnapshot(
+        `"[mobx] Cannot decorate 'x': computed can only be used on getter properties."`
+    )
 
-    expect(() => obj.x).toThrow(/"y"/)
-    expect(() => obj.y).toThrow()
-})
+    expect(() => {
+        makeObservable(obj, {
+            x: action
+        })
+    }).toThrowErrorMatchingInlineSnapshot(
+        `"[mobx] Cannot decorate 'x': action can only be used on properties with a function value."`
+    )
 
-test("decorate a function property with two decorators", function() {
-    let callsCount = 0
-    let spyCount = 0
-    const spyDisposer = spy(ev => {
-        if (ev.type === "action" && ev.name === "fn") spyCount++
-    })
-
-    const countFunctionCallsDecorator = (target, key, descriptor) => {
-        const func = descriptor.value
-        descriptor.value = function wrapper(...args) {
-            const result = func.call(this, ...args)
-            callsCount++
-            return result
-        }
-        for (const key in func) {
-            descriptor.value[key] = func[key]
-        }
-        return descriptor
-    }
-
-    class Obj {
-        constructor() {
-            makeObservable(this, {
-                fn: [action("fn"), countFunctionCallsDecorator]
-            })
-        }
-
-        fn() {}
-    }
-
-    const obj = new Obj()
-
-    expect(isAction(obj.fn)).toBe(true)
-
-    obj.fn()
-
-    expect(callsCount).toEqual(1)
-    expect(spyCount).toEqual(1)
-
-    obj.fn()
-
-    expect(callsCount).toEqual(2)
-    expect(spyCount).toEqual(2)
-
-    spyDisposer()
+    expect(() => {
+        makeObservable(obj, {
+            y: observable
+        })
+    }).toThrowErrorMatchingInlineSnapshot(
+        `"[mobx] Cannot decorate 'y': observable cannot be used on setter / getter properties."`
+    )
 })
 
 test("decorate a property with two decorators", function() {
@@ -424,10 +382,13 @@ test("decorate a property with two decorators", function() {
 
         constructor() {
             makeObservable(this, {
-                x: [serializable(primitive()), observable]
+                x: observable
             })
         }
     }
+    createModelSchema(Obj, {
+        x: primitive()
+    })
 
     const obj = deserialize(Obj, {
         x: 0

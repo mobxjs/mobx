@@ -21,10 +21,10 @@ import {
     referenceEnhancer,
     Annotation,
     shallowEnhancer,
-    refStructEnhancer
+    refStructEnhancer,
+    AnnotationsMap,
+    asObservableObject
 } from "../internal"
-import { makeObservable, makeAutoObservable } from "./makeObservable"
-import { AnnotationsMap } from "./annotation"
 
 export type CreateObservableOptions = {
     name?: string
@@ -183,13 +183,13 @@ const observableFactories: IObservableFactory = {
         options?: CreateObservableOptions
     ): T & IObservableObject {
         const o = asCreateObservableOptions(options)
-        const base = extendObservable({}, props, decorators, o) as any
-        if (o.proxy === false) {
-            return base
-        } else {
-            const proxy = createDynamicObservableObject(base)
-            return proxy
-        }
+        const base = {}
+        asObservableObject(base, options?.name, getEnhancerFromOption(o))
+        return extendObservable(
+            o.proxy === false ? base : createDynamicObservableObject(base),
+            props,
+            decorators
+        )
     },
     ref: {
         // TODO: make these decorators as well

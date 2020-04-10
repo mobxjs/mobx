@@ -55,7 +55,10 @@ test("object - set, remove, values are reactive", () => {
     const todos = observable({})
     const snapshots = []
 
-    reaction(() => values(todos), values => snapshots.push(values))
+    reaction(
+        () => values(todos),
+        values => snapshots.push(values)
+    )
 
     expect("x" in todos).toBe(false)
     expect(todos.x).toBe(undefined)
@@ -74,7 +77,10 @@ test("object - set, remove, entries are reactive", () => {
     const todos = observable({})
     const snapshots = []
 
-    reaction(() => entries(todos), entries => snapshots.push(entries))
+    reaction(
+        () => entries(todos),
+        entries => snapshots.push(entries)
+    )
 
     expect("x" in todos).toBe(false)
     expect(todos.x).toBe(undefined)
@@ -86,14 +92,28 @@ test("object - set, remove, entries are reactive", () => {
     todos.x = 5
     delete todos.z
 
-    expect(snapshots).toEqual([[["x", 3]], [["x", 3], ["z", 4]], [["x", 5], ["z", 4]], [["x", 5]]])
+    expect(snapshots).toEqual([
+        [["x", 3]],
+        [
+            ["x", 3],
+            ["z", 4]
+        ],
+        [
+            ["x", 5],
+            ["z", 4]
+        ],
+        [["x", 5]]
+    ])
 })
 
 test("object - set, remove, keys are reactive", () => {
     const todos = observable({ a: 3 })
     const snapshots = []
 
-    reaction(() => Object.keys(todos), keys => snapshots.push(keys))
+    reaction(
+        () => Object.keys(todos),
+        keys => snapshots.push(keys)
+    )
 
     todos.x = 3
     delete todos.y
@@ -106,6 +126,7 @@ test("object - set, remove, keys are reactive", () => {
 })
 
 test("dynamically adding properties should preserve the original modifiers of an object", () => {
+    debugger
     const todos = observable.object(
         {
             a: { title: "get coffee" }

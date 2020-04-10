@@ -77,7 +77,7 @@ export class ObservableObjectAdministration
     keysAtom: IAtom
     changeListeners
     interceptors
-    private proxy: any
+    proxy: any
     private pendingKeys: undefined | Map<PropertyKey, ObservableValue<boolean>>
 
     constructor(
@@ -194,7 +194,7 @@ export class ObservableObjectAdministration
     ) {
         const { target } = this
         options.name = options.name || `${this.name}.${stringifyKey(propName)}`
-        options.context = target
+        options.context = this.proxy || target
         this.values.set(propName, new ComputedValue(options))
         if (propertyOwner === target || isPropertyConfigurable(propertyOwner, propName))
             Object.defineProperty(propertyOwner, propName, generateComputedPropConfig(propName))

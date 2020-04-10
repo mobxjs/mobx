@@ -1,7 +1,5 @@
 import {
     asObservableObject,
-    isPlainObject,
-    hasProp,
     addHiddenProp,
     action,
     fail,
@@ -14,9 +12,9 @@ import {
     endBatch,
     startBatch,
     CreateObservableOptions,
-    ObservableObjectAdministration,
-    isComputedProp
+    ObservableObjectAdministration
 } from "../internal"
+import { invariant } from "../../v4/internal"
 
 function getDecoratorsFromMetaData<T extends Object>(target: T): AnnotationsMap<T> {
     fail("not implemented yet")
@@ -28,17 +26,14 @@ function makeAction(target, key, name, fn) {
     addHiddenProp(target, key, action(name || key, fn))
 }
 
-function notFound(key): never {
-    fail(`Cannot decorate unknown member '${key}'`)
-}
-
 function getInferredAnnotation(
     desc: PropertyDescriptor,
     defaultAnnotation: Annotation | undefined
 ): Annotation | boolean {
     if (desc.get) return computed
-    if (desc.set) return false // ignore those
-    if (typeof desc.value === "function") return action.bound
+    if (desc.set) return false // ignore pure setters
+    // if already wrapped in action, don't do that another time, but assume it is already set up properly
+    if (typeof desc.value === "function") return isAction(desc.value) ? false : action.bound
     return defaultAnnotation ?? observable.deep
 }
 
@@ -65,6 +60,7 @@ export function makeProperty(
 ): void {
     const { target } = adm
     const defaultAnnotation: Annotation | undefined = observable // TODO: grap this from adm instead!
+    const origAnnotation = annotation
     if (annotation === true) {
         annotation = getInferredAnnotation(descriptor, defaultAnnotation)
     }
@@ -82,18 +78,34 @@ export function makeProperty(
         )
     }
     switch (annotation.annotationType) {
-        case "action":
+        case "action": {
+            const fn = descriptor.value
+            invariant(
+                typeof fn === "function",
+                `Cannot decorate '${key.toString()}': action can only be used on properties with a function value.`
+            )
             if (owner !== target && !forceCopy) {
-                if (!isAction(owner[key])) makeAction(owner, key, annotation.arg, descriptor.value)
+                if (!isAction(owner[key])) makeAction(owner, key, annotation.arg, fn)
             } else {
-                makeAction(target, key, annotation.arg, descriptor.value)
+                makeAction(target, key, annotation.arg, fn)
             }
             break
-        case "action.bound":
-            makeAction(target, key, annotation.arg, descriptor.value.bind(target))
+        }
+        case "action.bound": {
+            const fn = descriptor.value
+            invariant(
+                typeof fn === "function",
+                `Cannot decorate '${key.toString()}': action can only be used on properties with a function value.`
+            )
+            makeAction(target, key, annotation.arg, fn.bind(adm.proxy || target))
             break
+        }
         case "computed.struct":
         case "computed": {
+            invariant(
+                descriptor.get,
+                `Cannot decorate '${key.toString()}': computed can only be used on getter properties.`
+            )
             // TODO: add to target or proto?
             adm.addComputedProp(target, key, {
                 get: descriptor.get,
@@ -107,7 +119,15 @@ export function makeProperty(
         case "observable.ref":
         case "observable.shallow":
         case "observable.struct": {
-            const enhancer = getEnhancerFromAnnotation(annotation)
+            invariant(
+                "value" in descriptor,
+                `Cannot decorate '${key.toString()}': observable cannot be used on setter / getter properties.`
+            )
+            // if the origAnnotation was true, preferred the adm's default enhancer over the inferred one
+            const enhancer =
+                origAnnotation === true
+                    ? adm.defaultEnhancer
+                    : getEnhancerFromAnnotation(annotation)
             adm.addObservableProp(key, descriptor.value, enhancer)
             break
         }

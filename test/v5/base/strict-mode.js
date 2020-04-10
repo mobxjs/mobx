@@ -3,6 +3,7 @@
  */
 const mobx = require("../../../src/v5/mobx.ts")
 const utils = require("../utils/test-utils")
+const { makeObservable } = mobx
 
 const strictError = /Since strict-mode is enabled, changing observed observable values outside actions is not allowed. Please wrap the code in an `action` if this change is intended. Tried to modify: /
 
@@ -402,7 +403,10 @@ describe("reactionRequiresObservable", function() {
             mobx.configure({ reactionRequiresObservable: true })
 
             utils.consoleWarn(() => {
-                const dispose = mobx.reaction(() => "plain value", newValue => newValue)
+                const dispose = mobx.reaction(
+                    () => "plain value",
+                    newValue => newValue
+                )
 
                 dispose()
             }, /is created\/updated without reading any observable value/)
@@ -430,7 +434,7 @@ test("allow overwriting computed if configured", function() {
                 return x * 2
             }
         })
-        mobx.decorate(x, { multiplied: mobx.computed })
+        mobx.makeObservable(x, { multiplied: mobx.computed })
 
         expect(() => {
             Object.defineProperty(x, "multiplied", {

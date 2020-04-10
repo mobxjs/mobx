@@ -51,7 +51,10 @@ test("object - set, remove, values are reactive", () => {
     const todos = observable({})
     const snapshots = []
 
-    reaction(() => values(todos), values => snapshots.push(values))
+    reaction(
+        () => values(todos),
+        values => snapshots.push(values)
+    )
 
     expect(has(todos, "x")).toBe(false)
     expect(get(todos, "x")).toBe(undefined)
@@ -73,7 +76,10 @@ test("object with symbol keys - set, remove, values are reactive", () => {
     const y = Symbol()
     const z = Symbol("z")
 
-    reaction(() => values(todos), values => snapshots.push(values))
+    reaction(
+        () => values(todos),
+        values => snapshots.push(values)
+    )
 
     expect(has(todos, x)).toBe(false)
     expect(get(todos, x)).toBe(undefined)
@@ -92,7 +98,10 @@ test("object - set, remove, entries are reactive", () => {
     const todos = observable({})
     const snapshots = []
 
-    reaction(() => entries(todos), entries => snapshots.push(entries))
+    reaction(
+        () => entries(todos),
+        entries => snapshots.push(entries)
+    )
 
     expect(has(todos, "x")).toBe(false)
     expect(get(todos, "x")).toBe(undefined)
@@ -104,7 +113,18 @@ test("object - set, remove, entries are reactive", () => {
     set(todos, "x", 5)
     remove(todos, "z")
 
-    expect(snapshots).toEqual([[["x", 3]], [["x", 3], ["z", 4]], [["x", 5], ["z", 4]], [["x", 5]]])
+    expect(snapshots).toEqual([
+        [["x", 3]],
+        [
+            ["x", 3],
+            ["z", 4]
+        ],
+        [
+            ["x", 5],
+            ["z", 4]
+        ],
+        [["x", 5]]
+    ])
 })
 
 test("object with symbols - set, remove, entries are reactive", () => {
@@ -114,7 +134,10 @@ test("object with symbols - set, remove, entries are reactive", () => {
     const y = Symbol()
     const z = Symbol("z")
 
-    reaction(() => entries(todos), entries => snapshots.push(entries))
+    reaction(
+        () => entries(todos),
+        entries => snapshots.push(entries)
+    )
 
     expect(has(todos, x)).toBe(false)
     expect(get(todos, x)).toBe(undefined)
@@ -126,14 +149,28 @@ test("object with symbols - set, remove, entries are reactive", () => {
     set(todos, x, 5)
     remove(todos, z)
 
-    expect(snapshots).toEqual([[[x, 3]], [[x, 3], [z, 4]], [[x, 5], [z, 4]], [[x, 5]]])
+    expect(snapshots).toEqual([
+        [[x, 3]],
+        [
+            [x, 3],
+            [z, 4]
+        ],
+        [
+            [x, 5],
+            [z, 4]
+        ],
+        [[x, 5]]
+    ])
 })
 
 test("object - set, remove, keys are reactive", () => {
     const todos = observable({ a: 3 })
     const snapshots = []
 
-    reaction(() => keys(todos), keys => snapshots.push(keys))
+    reaction(
+        () => keys(todos),
+        keys => snapshots.push(keys)
+    )
 
     set(todos, "x", 3)
     remove(todos, "y")
@@ -145,15 +182,19 @@ test("object - set, remove, keys are reactive", () => {
     expect(snapshots).toEqual([["a", "x"], ["a", "x", "z"], ["a", "x"], ["x"]])
 })
 
-test("object with symbol keys - set, remove, keys are reactive", () => {
+test.only("object with symbol keys - set, remove, keys are reactive", () => {
     const snapshots = []
     const x = Symbol()
     const y = Symbol()
     const z = Symbol("z")
     const a = Symbol()
+    debugger
     const todos = observable({ [a]: 3 })
 
-    reaction(() => keys(todos), keys => snapshots.push(keys))
+    reaction(
+        () => keys(todos),
+        keys => snapshots.push(keys)
+    )
 
     set(todos, x, 3)
     remove(todos, y)
@@ -169,7 +210,10 @@ test("map - set, remove, values are reactive", () => {
     const todos = observable.map({})
     const snapshots = []
 
-    reaction(() => values(todos), values => snapshots.push(values))
+    reaction(
+        () => values(todos),
+        values => snapshots.push(values)
+    )
 
     expect(has(todos, "x")).toBe(false)
     expect(get(todos, "x")).toBe(undefined)
@@ -191,7 +235,10 @@ test("map with symbol keys - set, remove, values are reactive", () => {
     const y = Symbol()
     const z = Symbol("z")
 
-    reaction(() => values(todos), values => snapshots.push(values))
+    reaction(
+        () => values(todos),
+        values => snapshots.push(values)
+    )
 
     expect(has(todos, x)).toBe(false)
     expect(get(todos, x)).toBe(undefined)
@@ -210,7 +257,10 @@ test("map - set, remove, entries are reactive", () => {
     const todos = observable.map({})
     const snapshots = []
 
-    reaction(() => entries(todos), entries => snapshots.push(entries))
+    reaction(
+        () => entries(todos),
+        entries => snapshots.push(entries)
+    )
 
     expect(has(todos, "x")).toBe(false)
     expect(get(todos, "x")).toBe(undefined)
@@ -222,7 +272,18 @@ test("map - set, remove, entries are reactive", () => {
     set(todos, "x", 5)
     remove(todos, "z")
 
-    expect(snapshots).toEqual([[["x", 3]], [["x", 3], ["z", 4]], [["x", 5], ["z", 4]], [["x", 5]]])
+    expect(snapshots).toEqual([
+        [["x", 3]],
+        [
+            ["x", 3],
+            ["z", 4]
+        ],
+        [
+            ["x", 5],
+            ["z", 4]
+        ],
+        [["x", 5]]
+    ])
 })
 
 test("map with symbol keys - set, remove, entries are reactive", () => {
@@ -232,7 +293,10 @@ test("map with symbol keys - set, remove, entries are reactive", () => {
     const y = Symbol()
     const z = Symbol("z")
 
-    reaction(() => entries(todos), entries => snapshots.push(entries))
+    reaction(
+        () => entries(todos),
+        entries => snapshots.push(entries)
+    )
 
     expect(has(todos, x)).toBe(false)
     expect(get(todos, x)).toBe(undefined)
@@ -244,14 +308,28 @@ test("map with symbol keys - set, remove, entries are reactive", () => {
     set(todos, x, 5)
     remove(todos, z)
 
-    expect(snapshots).toEqual([[[x, 3]], [[x, 3], [z, 4]], [[x, 5], [z, 4]], [[x, 5]]])
+    expect(snapshots).toEqual([
+        [[x, 3]],
+        [
+            [x, 3],
+            [z, 4]
+        ],
+        [
+            [x, 5],
+            [z, 4]
+        ],
+        [[x, 5]]
+    ])
 })
 
 test("map - set, remove, keys are reactive", () => {
     const todos = observable.map({ a: 3 })
     const snapshots = []
 
-    reaction(() => keys(todos), keys => snapshots.push(keys))
+    reaction(
+        () => keys(todos),
+        keys => snapshots.push(keys)
+    )
 
     set(todos, "x", 3)
     remove(todos, "y")
@@ -271,7 +349,10 @@ test("map with symbol keys - set, remove, keys are reactive", () => {
     const a = Symbol()
     const todos = observable.map({ [a]: 3 })
 
-    reaction(() => keys(todos), keys => snapshots.push(keys))
+    reaction(
+        () => keys(todos),
+        keys => snapshots.push(keys)
+    )
 
     set(todos, x, 3)
     remove(todos, y)
@@ -287,7 +368,10 @@ test("array - set, remove, values are reactive", () => {
     const todos = observable.array()
     const snapshots = []
 
-    reaction(() => values(todos), values => snapshots.push(values))
+    reaction(
+        () => values(todos),
+        values => snapshots.push(values)
+    )
 
     expect(has(todos, 0)).toBe(false)
     expect(get(todos, 0)).toBe(undefined)
@@ -315,7 +399,10 @@ test("array - set, remove, entries are reactive", () => {
     const todos = observable.array()
     const snapshots = []
 
-    reaction(() => entries(todos), entries => snapshots.push(entries))
+    reaction(
+        () => entries(todos),
+        entries => snapshots.push(entries)
+    )
 
     expect(has(todos, 0)).toBe(false)
     expect(get(todos, 0)).toBe(undefined)
@@ -331,11 +418,31 @@ test("array - set, remove, entries are reactive", () => {
 
     expect(snapshots).toEqual([
         [[0, 2]],
-        [[0, 2], [1, 4]],
-        [[0, 2], [1, 4], [2, undefined], [3, 4]],
-        [[0, 2], [1, 3], [2, undefined], [3, 4]],
-        [[0, 2], [1, 3], [2, 4]],
-        [[0, 3], [1, 4]]
+        [
+            [0, 2],
+            [1, 4]
+        ],
+        [
+            [0, 2],
+            [1, 4],
+            [2, undefined],
+            [3, 4]
+        ],
+        [
+            [0, 2],
+            [1, 3],
+            [2, undefined],
+            [3, 4]
+        ],
+        [
+            [0, 2],
+            [1, 3],
+            [2, 4]
+        ],
+        [
+            [0, 3],
+            [1, 4]
+        ]
     ])
 })
 
@@ -343,7 +450,10 @@ test("array - set, remove, keys are reactive", () => {
     const todos = observable.array()
     const snapshots = []
 
-    reaction(() => keys(todos), keys => snapshots.push(keys))
+    reaction(
+        () => keys(todos),
+        keys => snapshots.push(keys)
+    )
 
     set(todos, 0, 2)
     set(todos, "1", 4)
@@ -471,7 +581,10 @@ test("set - set, remove, keys are reactive", () => {
     const todos = observable.set([1])
     const snapshots = []
 
-    reaction(() => keys(todos), keys => snapshots.push(keys))
+    reaction(
+        () => keys(todos),
+        keys => snapshots.push(keys)
+    )
 
     set(todos, 2)
     remove(todos, 2)

@@ -9,7 +9,8 @@ import {
     asObservableObject,
     isPlainObject,
     asCreateObservableOptions,
-    getEnhancerFromOption
+    getEnhancerFromOption,
+    isObservable
 } from "../internal"
 
 export function extendObservable<A extends Object, B extends Object>(
@@ -35,6 +36,10 @@ export function extendObservable<A extends Object, B extends Object>(
             isPlainObject(properties),
             `'extendObservabe' only accepts plain objects as second argument`
         )
+        invariant(
+            !isObservable(properties) && !isObservable(annotations),
+            `Extending an object with another observable (object) is not supported`
+        )
         if (annotations && properties)
             Object.keys(annotations).forEach(prop => {
                 invariant(
@@ -48,7 +53,7 @@ export function extendObservable<A extends Object, B extends Object>(
     startBatch()
     try {
         const descs = Object.getOwnPropertyDescriptors(properties)
-        Object.keys(descs).forEach(key => {
+        const maker = key => {
             makeProperty(
                 adm,
                 properties || target /* TODO or target? */,
@@ -57,7 +62,9 @@ export function extendObservable<A extends Object, B extends Object>(
                 !annotations ? true : key in annotations ? annotations[key] : true,
                 true
             )
-        })
+        }
+        Object.getOwnPropertyNames(descs).forEach(maker)
+        Object.getOwnPropertySymbols(descs).forEach(maker)
     } finally {
         endBatch()
     }

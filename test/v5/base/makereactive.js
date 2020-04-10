@@ -1,6 +1,7 @@
 const mobx = require("../../../src/v5/mobx.ts")
 const m = mobx
 const o = mobx.observable
+const { makeObservable } = mobx
 
 function buffer() {
     const b = []
@@ -210,13 +211,18 @@ test("observable5", function() {
     f = function() {
         return this.price
     }
-    x = m.observable({
-        price: 17,
-        get reactive() {
-            return this.price
+    x = m.observable(
+        {
+            price: 17,
+            get reactive() {
+                return this.price
+            },
+            nonReactive: f
         },
-        nonReactive: f
-    })
+        {
+            nonReactive: false
+        }
+    )
 
     const b = buffer()
     m.autorun(function() {
@@ -498,11 +504,12 @@ test("ES5 non reactive props - 2", function() {
     })
     // should skip non-configurable / writable props when using `observable`
     expect(() => {
-        m.decorate(te, { nonConfigurable: m.observable })
-    }).toThrow(/Cannot redefine property: nonConfigurable/)
+        makeObservable(te, { nonConfigurable: m.observable })
+    }).toThrow(/Cannot make property 'nonConfigurable' observable/)
 })
 
-test("exceptions", function() {
+// TODO: re-enable once decorators are implemented
+test.skip("exceptions", function() {
     expect(function() {
         m.observable.ref(m.observable.shallow(3))
     }).toThrow(/@observable decorator doesn't expect any arguments/)
@@ -522,9 +529,11 @@ test("540 - extendobservable should not report cycles", function() {
     }
 
     objWrapper.value = obj
-    expect(() => mobx.extendObservable(objWrapper, objWrapper.value)).toThrowError(
-        /Extending an object with another observable \(object\) is not supported/
-    )
+    expect(mobx.isObservable(objWrapper.value)).toBeTruthy()
+    expect(() => {
+        debugger
+        mobx.extendObservable(objWrapper, objWrapper.value)
+    }).toThrowError(/Extending an object with another observable \(object\) is not supported/)
 })
 
 test("mobx 3", () => {
