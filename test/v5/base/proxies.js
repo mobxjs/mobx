@@ -8,7 +8,8 @@ import {
     action,
     reaction,
     extendObservable,
-    keys
+    keys,
+    makeObservable
 } from "../../../src/v5/mobx.ts"
 
 import { stripAdminFromDescriptors } from "../utils/test-utils"

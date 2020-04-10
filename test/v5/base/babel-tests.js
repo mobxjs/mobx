@@ -743,7 +743,7 @@ test("reusing initializers", () => {
 
 test("enumerability", () => {
     class A {
-        a = 1 // enumerable, on proto
+        a = 1
         a2 = 2
 
         constructor() {
@@ -770,15 +770,13 @@ test("enumerability", () => {
     let props = []
     for (const key in a) props.push(key)
 
-    expect(ownProps).toEqual([
-        // should have a, not supported yet in babel...
-    ])
+    expect(ownProps).toEqual(["a", "a2"])
 
     expect(props).toEqual(["a", "a2"])
 
     expect("a" in a).toBe(true)
-    expect(a.hasOwnProperty("a")).toBe(false)
-    expect(a.hasOwnProperty("b")).toBe(false) // true would be more consistent, see below
+    expect(a.hasOwnProperty("a")).toBe(true)
+    expect(a.hasOwnProperty("b")).toBe(true) // false could be ok as well
     expect(a.hasOwnProperty("m")).toBe(false)
     expect(a.hasOwnProperty("m2")).toBe(true)
 
@@ -901,12 +899,6 @@ test("verify object assign (babel)", () => {
     }
 
     const todo = new Todo()
-    expect(Object.assign({}, todo)).toEqual({
-        //		Should be:	title: "test"!
-    })
-
-    todo.title // lazy initialization :'(
-
     expect(Object.assign({}, todo)).toEqual({
         title: "test"
     })
@@ -1047,7 +1039,7 @@ test("505, don't throw when accessing subclass fields in super constructor (babe
     }
 
     new B()
-    expect(values).toEqual({ a: 1, b: 2 }) // In the TS test b is undefined, which is actually the expected behavior?
+    expect(values).toEqual({ a: 1, b: undefined })
 })
 
 test("computed setter should succeed (babel)", function() {
@@ -1246,6 +1238,9 @@ test("@computed.equals (Babel)", () => {
 test("computed comparer works with decorate (babel)", () => {
     const sameTime = (from, to) => from.hour === to.hour && from.minute === to.minute
     class Time {
+        hour
+        minute
+
         constructor(hour, minute) {
             makeObservable(this, {
                 hour: observable,

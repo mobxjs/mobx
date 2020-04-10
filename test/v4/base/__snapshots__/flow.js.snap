@@ -23,7 +23,7 @@ Array [
   },
   Object {
     "key": "a",
-    "name": "ObservableObject@10",
+    "name": "ObservableObject@9",
     "newValue": 2,
     "oldValue": 1,
     "spyReportStart": true,
@@ -45,7 +45,7 @@ Array [
   },
   Object {
     "key": "a",
-    "name": "ObservableObject@10",
+    "name": "ObservableObject@9",
     "newValue": 5,
     "oldValue": 2,
     "spyReportStart": true,
@@ -56,7 +56,7 @@ Array [
   },
   Object {
     "key": "a",
-    "name": "ObservableObject@10",
+    "name": "ObservableObject@9",
     "newValue": 4,
     "oldValue": 5,
     "spyReportStart": true,
@@ -78,7 +78,7 @@ Array [
   },
   Object {
     "key": "a",
-    "name": "ObservableObject@10",
+    "name": "ObservableObject@9",
     "newValue": 3,
     "oldValue": 4,
     "spyReportStart": true,

@@ -1,5 +1,10 @@
 import * as mobx from "../../../src/v5/mobx.ts"
-import { flow, FlowCancellationError, isFlowCancellationError } from "../../../src/v5/mobx"
+import {
+    flow,
+    FlowCancellationError,
+    isFlowCancellationError,
+    makeObservable
+} from "../../../src/v5/mobx"
 
 function delay(time, value, shouldThrow = false) {
     return new Promise((resolve, reject) => {
@@ -14,7 +19,11 @@ test("it should support async generator actions", done => {
     mobx.configure({ enforceActions: "observed" })
     const values = []
     const x = mobx.observable({ a: 1 })
-    mobx.reaction(() => x.a, v => values.push(v), { fireImmediately: true })
+    mobx.reaction(
+        () => x.a,
+        v => values.push(v),
+        { fireImmediately: true }
+    )
 
     const f = mobx.flow(function*(initial) {
         x.a = initial // this runs in action
@@ -38,7 +47,11 @@ test("it should support try catch in async generator", done => {
     mobx.configure({ enforceActions: "observed" })
     const values = []
     const x = mobx.observable({ a: 1 })
-    mobx.reaction(() => x.a, v => values.push(v), { fireImmediately: true })
+    mobx.reaction(
+        () => x.a,
+        v => values.push(v),
+        { fireImmediately: true }
+    )
 
     const f = mobx.flow(function*(initial) {
         x.a = initial // this runs in action
@@ -110,13 +123,19 @@ test("it should support asyncAction in classes", done => {
             }
             return this.a
         })
+        constructor() {
+            makeObservable(this, {
+                a: true
+            })
+        }
     }
-    mobx.decorate(X, {
-        a: mobx.observable
-    })
 
     const x = new X()
-    mobx.reaction(() => x.a, v => values.push(v), { fireImmediately: true })
+    mobx.reaction(
+        () => x.a,
+        v => values.push(v),
+        { fireImmediately: true }
+    )
 
     setTimeout(() => {
         x.f(2).then(v => {
@@ -234,7 +253,10 @@ test("flows can be cancelled - 2 - finally clauses are run", done => {
 
 test("flows can be cancelled - 3 - throw in finally should be caught", done => {
     const counter = mobx.observable({ counter: 0 })
-    const d = mobx.reaction(() => counter.counter, () => {})
+    const d = mobx.reaction(
+        () => counter.counter,
+        () => {}
+    )
     mobx.configure({ enforceActions: "observed" })
 
     const start = flow(function*() {

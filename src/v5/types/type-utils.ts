@@ -45,7 +45,7 @@ export function getAtom(thing: any, property?: string): IDepTreeNode {
             if (!observable)
                 fail(
                     process.env.NODE_ENV !== "production" &&
-                        `no observable property '${property}' found on the observable object '${getDebugName(
+                        `no observable property '${property.toString()}' found on the observable object '${getDebugName(
                             thing
                         )}'`
                 )

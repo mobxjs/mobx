@@ -53,6 +53,9 @@ Import size report for mobx:
 [ ] autoConversion, reflect meta data, very strict typing of makeObservabel
 [ ] observable / extendObservable use decorators args
 [ ] observable; support `false` as argument
+[ ] breaking: function are now actions by default!
+[ ] verify: action called from computed throws?
+[ ] document `true` and `false` as annotations
 
 General class solutions
 - call extendObservable in constructor

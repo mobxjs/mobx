@@ -59,6 +59,14 @@ export function asCreateObservableOptions(thing: any): CreateObservableOptions {
     return thing as CreateObservableOptions
 }
 
+export function getEnhancerFromOption(options: CreateObservableOptions): IEnhancer<any> {
+    return options.deep === true
+        ? deepEnhancer
+        : options.deep === false
+        ? referenceEnhancer
+        : getEnhancerFromAnnotation(options.defaultDecorator)
+}
+
 export function getEnhancerFromAnnotation(annotation?: Annotation): IEnhancer<any> {
     if (!annotation) {
         return deepEnhancer
@@ -149,43 +157,25 @@ export interface IObservableFactory extends Annotation, PropertyDecorator {
 const observableFactories: IObservableFactory = {
     box<T = any>(value?: T, options?: CreateObservableOptions): IObservableValue<T> {
         const o = asCreateObservableOptions(options)
-        return new ObservableValue(
-            value,
-            getEnhancerFromAnnotation(o.defaultDecorator),
-            o.name,
-            true,
-            o.equals
-        )
+        return new ObservableValue(value, getEnhancerFromOption(o), o.name, true, o.equals)
     },
     array<T = any>(initialValues?: T[], options?: CreateObservableOptions): IObservableArray<T> {
         const o = asCreateObservableOptions(options)
-        return createObservableArray(
-            initialValues,
-            getEnhancerFromAnnotation(o.defaultDecorator),
-            o.name
-        ) as any
+        return createObservableArray(initialValues, getEnhancerFromOption(o), o.name) as any
     },
     map<K = any, V = any>(
         initialValues?: IObservableMapInitialValues<K, V>,
         options?: CreateObservableOptions
     ): ObservableMap<K, V> {
         const o = asCreateObservableOptions(options)
-        return new ObservableMap<K, V>(
-            initialValues,
-            getEnhancerFromAnnotation(o.defaultDecorator),
-            o.name
-        )
+        return new ObservableMap<K, V>(initialValues, getEnhancerFromOption(o), o.name)
     },
     set<T = any>(
         initialValues?: IObservableSetInitialValues<T>,
         options?: CreateObservableOptions
     ): ObservableSet<T> {
         const o = asCreateObservableOptions(options)
-        return new ObservableSet<T>(
-            initialValues,
-            getEnhancerFromAnnotation(o.defaultDecorator),
-            o.name
-        )
+        return new ObservableSet<T>(initialValues, getEnhancerFromOption(o), o.name)
     },
     object<T = any>(
         props: T,
@@ -193,11 +183,10 @@ const observableFactories: IObservableFactory = {
         options?: CreateObservableOptions
     ): T & IObservableObject {
         const o = asCreateObservableOptions(options)
+        const base = extendObservable({}, props, decorators, o) as any
         if (o.proxy === false) {
-            return extendObservable({}, props, decorators, o) as any
+            return base
         } else {
-            // TODO; is this still correct?
-            const base = extendObservable({}, props, decorators, o) as any
             const proxy = createDynamicObservableObject(base)
             return proxy
         }

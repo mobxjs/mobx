@@ -3,8 +3,13 @@ import {
     invariant,
     isObservableMap,
     AnnotationsMap,
-    makeObservable,
-    extractAnnotationsFromObject
+    makeProperty,
+    startBatch,
+    endBatch,
+    asObservableObject,
+    isPlainObject,
+    asCreateObservableOptions,
+    getEnhancerFromOption
 } from "../internal"
 
 export function extendObservable<A extends Object, B extends Object>(
@@ -26,10 +31,35 @@ export function extendObservable<A extends Object, B extends Object>(
             !isObservableMap(target),
             "'extendObservable' should not be used on maps, use map.merge instead"
         )
+        invariant(
+            isPlainObject(properties),
+            `'extendObservabe' only accepts plain objects as second argument`
+        )
+        if (annotations && properties)
+            Object.keys(annotations).forEach(prop => {
+                invariant(
+                    prop in properties,
+                    `Trying to declare a decorator for unspecified property '${prop}'`
+                )
+            })
     }
-
-    const inferredAnnotations = { ...annotations }
-    extractAnnotationsFromObject(properties, inferredAnnotations, options)
-    makeObservable(Object.assign(target, properties), inferredAnnotations, options)
+    const o = asCreateObservableOptions(options)
+    const adm = asObservableObject(target, o.name, getEnhancerFromOption(o))
+    startBatch()
+    try {
+        const descs = Object.getOwnPropertyDescriptors(properties)
+        Object.keys(descs).forEach(key => {
+            makeProperty(
+                adm,
+                properties || target /* TODO or target? */,
+                key,
+                descs[key],
+                !annotations ? true : key in annotations ? annotations[key] : true,
+                true
+            )
+        })
+    } finally {
+        endBatch()
+    }
     return target as any
 }

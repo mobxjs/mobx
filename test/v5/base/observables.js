@@ -2,7 +2,16 @@
 
 const mobx = require("../../../src/v5/mobx")
 const m = mobx
-const { $mobx, observable, computed, transaction, autorun, extendObservable, decorate } = mobx
+const {
+    $mobx,
+    observable,
+    computed,
+    transaction,
+    autorun,
+    extendObservable,
+    decorate,
+    makeObservable
+} = mobx
 const utils = require("../utils/test-utils")
 
 const voidObserver = function() {}
@@ -1764,27 +1773,17 @@ test("Issue 1120 - isComputed should return false for a non existing property", 
     expect(mobx.isComputedProp(observable({}), "x")).toBe(false)
 })
 
-test("extendObservable should not be able to set a computed property", () => {
-    expect(() => {
-        observable({
-            a: computed(
-                function() {
-                    return this.b * 2
-                },
-                function(val) {
-                    this.b += val
-                }
-            ),
-            b: 2
-        })
-    }).toThrow(/Passing a 'computed' as initial property value is no longer supported/)
-})
-
 test("computed comparer works with decorate (plain)", () => {
+    // TODO: this test was codemodded wrong
     const sameTime = (from, to) => from.hour === to.hour && from.minute === to.minute
     function Time(hour, minute) {
         this.hour = hour
         this.minute = minute
+        makeObservable(this, {
+            hour: observable,
+            minute: observable,
+            time: computed({ equals: sameTime })
+        })
     }
 
     Object.defineProperty(Time.prototype, "time", {
@@ -1793,12 +1792,6 @@ test("computed comparer works with decorate (plain)", () => {
         get() {
             return { hour: this.hour, minute: this.minute }
         }
-    })
-    // TODO: this is codemodded wrong
-    decorate(Time, {
-        hour: observable,
-        minute: observable,
-        time: computed({ equals: sameTime })
     })
     const time = new Time(9, 0)
 

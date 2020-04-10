@@ -13,9 +13,10 @@ import {
     getEnhancerFromAnnotation,
     endBatch,
     startBatch,
-    CreateObservableOptions
+    CreateObservableOptions,
+    ObservableObjectAdministration,
+    isComputedProp
 } from "../internal"
-import { isComputedProp } from "../../v4/mobx"
 
 function getDecoratorsFromMetaData<T extends Object>(target: T): AnnotationsMap<T> {
     fail("not implemented yet")
@@ -32,12 +33,9 @@ function notFound(key): never {
 }
 
 function getInferredAnnotation(
-    target: any,
-    prop: string,
+    desc: PropertyDescriptor,
     defaultAnnotation: Annotation | undefined
 ): Annotation | boolean {
-    const desc = Object.getOwnPropertyDescriptor(target, prop)
-    if (!desc) return notFound(prop)
     if (desc.get) return computed
     if (desc.set) return false // ignore those
     if (typeof desc.value === "function") return action.bound
@@ -57,6 +55,70 @@ function getDescriptor(target: Object, prop: PropertyKey): [PropertyDescriptor, 
     fail(`Property is not defined: '${prop.toString()}'`)
 }
 
+export function makeProperty(
+    adm: ObservableObjectAdministration,
+    owner: Object,
+    key: PropertyKey,
+    descriptor: PropertyDescriptor,
+    annotation: Annotation | boolean,
+    forceCopy: boolean // extend observable will copy even unannotated properties
+): void {
+    const { target } = adm
+    const defaultAnnotation: Annotation | undefined = observable // TODO: grap this from adm instead!
+    if (annotation === true) {
+        annotation = getInferredAnnotation(descriptor, defaultAnnotation)
+    }
+    if (annotation === false) {
+        if (forceCopy) {
+            Object.defineProperty(target, key, descriptor)
+        }
+        return
+    }
+    if (!annotation || annotation === true || !annotation.annotationType) {
+        return fail(
+            // @ts-ignore
+            `invalid decorator '${annotation?.annotationType ??
+                annotation}' for '${key.toString()}'`
+        )
+    }
+    switch (annotation.annotationType) {
+        case "action":
+            if (owner !== target && !forceCopy) {
+                if (!isAction(owner[key])) makeAction(owner, key, annotation.arg, descriptor.value)
+            } else {
+                makeAction(target, key, annotation.arg, descriptor.value)
+            }
+            break
+        case "action.bound":
+            makeAction(target, key, annotation.arg, descriptor.value.bind(target))
+            break
+        case "computed.struct":
+        case "computed": {
+            // TODO: add to target or proto?
+            adm.addComputedProp(target, key, {
+                get: descriptor.get,
+                set: descriptor.set,
+                compareStructural: annotation.annotationType === "computed.struct",
+                ...annotation.arg
+            })
+            break
+        }
+        case "observable":
+        case "observable.ref":
+        case "observable.shallow":
+        case "observable.struct": {
+            const enhancer = getEnhancerFromAnnotation(annotation)
+            adm.addObservableProp(key, descriptor.value, enhancer)
+            break
+        }
+        default:
+            fail(
+                `invalid decorator '${annotation.annotationType ??
+                    annotation}' for '${key.toString()}'`
+            )
+    }
+}
+
 export function makeObservable<T extends Object>(
     target: T,
     annotations: AnnotationsMap<T> = getDecoratorsFromMetaData(target),
@@ -69,53 +131,13 @@ export function makeObservable<T extends Object>(
     )
     startBatch()
     try {
-        Object.getOwnPropertyNames(annotations).forEach(key => {
+        const make = key => {
             let annotation = annotations[key]
-            if (annotation === false) {
-                return
-            }
-            if (annotation === true) {
-                annotation = adm.defaultEnhancer
-            }
             const [desc, owner] = getDescriptor(target, key)
-            switch (annotation.annotationType) {
-                case "action":
-                    if (owner !== target) {
-                        if (!isAction(owner[key]))
-                            makeAction(owner, key, annotation.arg, desc.value)
-                    } else {
-                        makeAction(target, key, annotation.arg, desc.value)
-                    }
-                    break
-                case "action.bound":
-                    makeAction(target, key, annotation.arg, desc.value.bind(target))
-                    break
-                case "computed.struct":
-                case "computed": {
-                    // TODO: add to target or proto?
-                    adm.addComputedProp(target, key, {
-                        get: desc.get,
-                        set: desc.set,
-                        compareStructural: annotation.annotationType === "computed.struct",
-                        ...annotation.arg
-                    })
-                    break
-                }
-                case "observable":
-                case "observable.ref":
-                case "observable.shallow":
-                case "observable.struct": {
-                    const enhancer = getEnhancerFromAnnotation(annotation)
-                    adm.addObservableProp(key, desc.value, enhancer)
-                    break
-                }
-                default:
-                    fail(
-                        `invalid decorator '${annotation.annotationType ??
-                            annotation}' for '${key}'`
-                    )
-            }
-        })
+            makeProperty(adm, owner, key, desc, annotation, false)
+        }
+        Object.getOwnPropertyNames(annotations).forEach(make)
+        Object.getOwnPropertySymbols(annotations).forEach(make) // TODO: check if available everywhere
     } finally {
         endBatch()
     }
@@ -132,7 +154,7 @@ export function makeAutoObservable<T extends Object>(
     makeObservable(target, annotations, options)
 }
 
-export function extractAnnotationsFromObject(
+function extractAnnotationsFromObject(
     target,
     collector: AnnotationsMap<any>,
     options: CreateObservableOptions | undefined
@@ -140,9 +162,9 @@ export function extractAnnotationsFromObject(
     const defaultAnnotation: Annotation = options?.deep
         ? observable.deep
         : options?.defaultDecorator ?? observable.deep
-    Object.keys(target).forEach(key => {
+    Object.entries(Object.getOwnPropertyDescriptors(target)).forEach(([key, descriptor]) => {
         if (key in collector) return
-        collector[key] = getInferredAnnotation(target, key, defaultAnnotation)
+        collector[key] = getInferredAnnotation(descriptor, defaultAnnotation)
     })
 }
 

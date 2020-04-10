@@ -4,7 +4,6 @@ import {
     IIsObservableObject,
     ObservableObjectAdministration,
     fail,
-    mobxDidRunLazyInitializersSymbol,
     set
 } from "../internal"
 
@@ -20,8 +19,7 @@ function isPropertyKey(val) {
 // and skip either the internal values map, or the base object with its property descriptors!
 const objectProxyTraps: ProxyHandler<any> = {
     has(target: IIsObservableObject, name: PropertyKey) {
-        if (name === $mobx || name === "constructor" || name === mobxDidRunLazyInitializersSymbol)
-            return true
+        if (name === $mobx || name === "constructor") return true
         const adm = getAdm(target)
         // MWE: should `in` operator be reactive? If not, below code path will be faster / more memory efficient
         // TODO: check performance stats!
@@ -30,8 +28,7 @@ const objectProxyTraps: ProxyHandler<any> = {
         return (name as any) in target
     },
     get(target: IIsObservableObject, name: PropertyKey) {
-        if (name === $mobx || name === "constructor" || name === mobxDidRunLazyInitializersSymbol)
-            return target[name]
+        if (name === $mobx || name === "constructor") return target[name]
         const adm = getAdm(target)
         const observable = adm.values.get(name)
         if (observable instanceof Atom) {

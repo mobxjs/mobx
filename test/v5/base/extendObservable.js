@@ -146,7 +146,6 @@ test("extendObservable should apply specified decorators", function() {
     }
 
     box.undeclared = 1
-
     extendObservable(
         box,
         {
