@@ -1,4 +1,11 @@
-import { ComputedValue, IComputedValueOptions, invariant, Annotation } from "../internal"
+import {
+    ComputedValue,
+    IComputedValueOptions,
+    invariant,
+    Annotation,
+    storeDecorator,
+    createDecoratorAndAnnotation
+} from "../internal"
 
 export interface IComputedFactory extends Annotation, PropertyDecorator {
     <T>(options: IComputedValueOptions<T>): Annotation & PropertyDecorator
@@ -16,16 +23,11 @@ export interface IComputedFactory extends Annotation, PropertyDecorator {
 export const computed: IComputedFactory = function computed(arg1, arg2, arg3) {
     if (typeof arg2 === "string") {
         // @computed
-        // TODO: implement
-        return fail("not implemented yet")
+        return storeDecorator(arg1, arg2, "computed")
     }
     if (arg1 !== null && typeof arg1 === "object" && arguments.length === 1) {
         // @computed({ options })
-        // TODO: merge with decorator function
-        return {
-            annotationType: "computed",
-            arg: arg1
-        }
+        return createDecoratorAndAnnotation("computed", arg1)
     }
 
     // computed(expr, options?)
@@ -46,8 +48,8 @@ export const computed: IComputedFactory = function computed(arg1, arg2, arg3) {
 computed.annotationType = "computed"
 
 computed.struct = Object.assign(
-    function() {
-        // TODO: implement decorator
+    function(target, property) {
+        storeDecorator(target, property, "computed.struct")
     },
     {
         annotationType: "computed.struct" as const

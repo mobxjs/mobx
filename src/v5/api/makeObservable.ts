@@ -13,14 +13,9 @@ import {
     startBatch,
     CreateObservableOptions,
     ObservableObjectAdministration,
-    invariant
+    invariant,
+    applyDecorators
 } from "../internal"
-
-function getDecoratorsFromMetaData<T extends Object>(target: T): AnnotationsMap<T> {
-    fail("not implemented yet")
-    // TODO: implement, if not available, throw
-    return {}
-}
 
 function makeAction(target, key, name, fn) {
     addHiddenProp(target, key, action(name || key, fn))
@@ -141,7 +136,7 @@ export function makeProperty(
 
 export function makeObservable<T extends Object>(
     target: T,
-    annotations: AnnotationsMap<T> = getDecoratorsFromMetaData(target),
+    annotations?: AnnotationsMap<T>,
     options?: CreateObservableOptions
 ) {
     const adm = asObservableObject(
@@ -151,6 +146,14 @@ export function makeObservable<T extends Object>(
     )
     startBatch()
     try {
+        if (!annotations) {
+            const didDecorate = applyDecorators(target)
+            invariant(
+                didDecorate,
+                `No annotations were passed to makeObservable, but no decorator members have been found either`
+            )
+            return
+        }
         const make = key => {
             let annotation = annotations[key]
             const [desc, owner] = getDescriptor(target, key)

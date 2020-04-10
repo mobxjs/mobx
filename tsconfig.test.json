@@ -4,7 +4,8 @@
         "module": "commonjs",
         "lib": ["esnext"],
         "noUnusedLocals": false,
-        "moduleResolution": "node"
+        "moduleResolution": "node",
+        "experimentalDecorators": true
     },
     "include": ["src/**/*.ts", "test/**/*.ts"]
 }

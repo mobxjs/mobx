@@ -23,7 +23,9 @@ import {
     shallowEnhancer,
     refStructEnhancer,
     AnnotationsMap,
-    asObservableObject
+    asObservableObject,
+    storeDecorator,
+    createDecorator
 } from "../internal"
 
 export type CreateObservableOptions = {
@@ -92,8 +94,8 @@ export function getEnhancerFromAnnotation(annotation?: Annotation): IEnhancer<an
 function createObservable(v: any, arg2?: any, arg3?: any) {
     // @observable someProp; TODO delete
     if (typeof arguments[1] === "string" || typeof arguments[1] === "symbol") {
-        // TODO:
-        return fail("not yet implemented")
+        storeDecorator(v, arg2, "observable")
+        return
     }
 
     // it is an observable already, done
@@ -145,13 +147,13 @@ export interface IObservableFactory extends Annotation, PropertyDecorator {
     /**
      * Decorator that creates an observable that only observes the references, but doesn't try to turn the assigned value into an observable.ts.
      */
-    ref: Annotation
+    ref: Annotation & PropertyDecorator
     /**
      * Decorator that creates an observable converts its value (objects, maps or arrays) into a shallow observable structure
      */
-    shallow: Annotation
-    deep: Annotation
-    struct: Annotation
+    shallow: Annotation & PropertyDecorator
+    deep: Annotation & PropertyDecorator
+    struct: Annotation & PropertyDecorator
 }
 
 const observableFactories: IObservableFactory = {
@@ -191,19 +193,10 @@ const observableFactories: IObservableFactory = {
             decorators
         )
     },
-    ref: {
-        // TODO: make these decorators as well
-        annotationType: "observable.ref"
-    },
-    shallow: {
-        annotationType: "observable.shallow"
-    },
-    deep: {
-        annotationType: "observable"
-    },
-    struct: {
-        annotationType: "observable.struct"
-    }
+    ref: createDecorator("observable.ref"),
+    shallow: createDecorator("observable.shallow"),
+    deep: createDecorator("observable"),
+    struct: createDecorator("observable.struct")
 } as any
 
 export const observable: IObservableFactory = Object.assign(createObservable, observableFactories)

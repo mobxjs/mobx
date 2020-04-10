@@ -4,7 +4,10 @@ import {
     executeAction,
     fail,
     invariant,
-    Annotation
+    Annotation,
+    createDecorator,
+    createDecoratorAndAnnotation,
+    storeDecorator
 } from "../internal"
 
 export interface IActionFactory extends Annotation, PropertyDecorator {
@@ -14,7 +17,7 @@ export interface IActionFactory extends Annotation, PropertyDecorator {
     <T extends Function>(name: string, fn: T): T
 
     // named
-    (customName: string): Annotation
+    (customName: string): PropertyDecorator & Annotation
 
     bound: IBoundActionFactory
 }
@@ -30,27 +33,21 @@ export const action: IActionFactory = function action(arg1, arg2?, arg3?): any {
     // action("name", fn() {})
     if (arguments.length === 2 && typeof arg2 === "function") return createAction(arg1, arg2)
 
-    // Annation: action("name")
+    // @action
+    if (arguments.length >= 2 && (typeof arg2 === "string" || typeof arg2 === "symbol")) {
+        return storeDecorator(arg1, arg2, "action")
+    }
+
+    // Annation: action("name") & @action("name")
     if (arguments.length === 1 && typeof arg1 === "string") {
-        // TODO: merge with decorator function
-        return {
-            annotationType: "action",
-            arg: arg1
-        } as Annotation
+        return createDecoratorAndAnnotation("action", arg1)
     }
 
     fail("Invalid arguments to action")
 } as any
 action.annotationType = "action"
 
-action.bound = function bound(name: string) {
-    // TODO: merge with decorator function
-    return {
-        annotationType: "action.bound",
-        arg: name
-    }
-} as any
-action.bound.annotationType = "action.bound"
+action.bound = createDecorator<string>("action.bound")
 
 export function runInAction<T>(block: () => T): T
 export function runInAction<T>(name: string, block: () => T): T
