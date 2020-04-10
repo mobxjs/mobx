@@ -12,9 +12,9 @@ import {
     endBatch,
     startBatch,
     CreateObservableOptions,
-    ObservableObjectAdministration
+    ObservableObjectAdministration,
+    invariant
 } from "../internal"
-import { invariant } from "../../v4/internal"
 
 function getDecoratorsFromMetaData<T extends Object>(target: T): AnnotationsMap<T> {
     fail("not implemented yet")
@@ -163,11 +163,13 @@ export function makeObservable<T extends Object>(
     }
 }
 
+// TODO: add tests
 export function makeAutoObservable<T extends Object>(
     target: T,
     excludes: AnnotationsMap<T>,
     options: CreateObservableOptions
 ) {
+    // TODO: die on things with superclass
     let annotations = { ...excludes }
     extractAnnotationsFromObject(target, annotations, options)
     extractAnnotationsFromProto(target, annotations)

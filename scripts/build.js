@@ -35,6 +35,7 @@ function runTypeScriptBuild(outDir, version, target, declarations) {
     options.module = ts.ModuleKind.ESNext
     options.importHelpers = true
     options.noEmitHelpers = true
+    options.noEmit = false
     if (declarations) options.declarationDir = path.resolve("dist", version, "lib")
 
     const rootFile = path.resolve(options.rootDir, "mobx.ts")
@@ -153,7 +154,7 @@ async function build(version) {
     writePackage(versionPath, version)
 }
 
-Promise.all([build("v4"), build("v5")]).catch(e => {
+Promise.all([/* TODO: build("v4"), */ build("v5")]).catch(e => {
     console.error(e)
     if (e.frame) {
         console.error(e.frame)
