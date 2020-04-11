@@ -73,6 +73,8 @@ Import size report for mobx:
 [ ] verify: action called from computed throws?
 [ ] document `true` and `false` as annotations
 [ ] breaking: can no longer re-decorate fields already decorated by a superclass
+[ ] make sure legacy array implementation is opt in
+[ ] compare mobx.configure options between v4 and v5
 
 General class solutions
 - call extendObservable in constructor

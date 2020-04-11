@@ -24,10 +24,12 @@ import {
     spyReportEnd,
     spyReportStart,
     allowStateChangesStart,
-    allowStateChangesEnd
+    allowStateChangesEnd,
+    reserveArrayBuffer,
+    OBSERVABLE_ARRAY_BUFFER_SIZE
 } from "../internal"
 
-const MAX_SPLICE_SIZE = 10000 // See e.g. https://github.com/mobxjs/mobx/issues/859
+export const MAX_SPLICE_SIZE = 10000 // See e.g. https://github.com/mobxjs/mobx/issues/859
 
 export interface IObservableArray<T = any> extends Array<T> {
     spliceWithArray(index: number, deleteCount?: number, newItems?: T[]): T[]
@@ -43,7 +45,6 @@ export interface IObservableArray<T = any> extends Array<T> {
     toJSON(): T[]
 }
 
-// In 3.0, change to IArrayDidChange
 export interface IArrayChange<T = any> {
     type: "update"
     object: IObservableArray<T>
@@ -52,7 +53,6 @@ export interface IArrayChange<T = any> {
     oldValue: T
 }
 
-// In 3.0, change to IArrayDidSplice
 export interface IArraySplice<T = any> {
     type: "splice"
     object: IObservableArray<T>
@@ -88,6 +88,7 @@ const arrayTraps = {
         if (typeof name === "string" && !isNaN(name as any)) {
             return arrayExtensions.get.call(target, parseInt(name))
         }
+        // TODO: reuse util
         if (arrayExtensions.hasOwnProperty(name)) {
             return arrayExtensions[name]
         }
@@ -120,7 +121,7 @@ export function createObservableArray<T>(
     name = "ObservableArray@" + getNextId(),
     owned = false
 ): IObservableArray<T> {
-    const adm = new ObservableArrayAdministration(name, enhancer, owned)
+    const adm = new ObservableArrayAdministration(name, enhancer, owned, false)
     addHiddenFinalProp(adm.values, $mobx, adm)
     const proxy = new Proxy(adm.values, arrayTraps) as any
     adm.proxy = proxy
@@ -132,7 +133,7 @@ export function createObservableArray<T>(
     return proxy
 }
 
-class ObservableArrayAdministration
+export class ObservableArrayAdministration
     implements IInterceptable<IArrayWillChange<any> | IArrayWillSplice<any>>, IListenable {
     atom: IAtom
     values: any[] = []
@@ -143,7 +144,7 @@ class ObservableArrayAdministration
     proxy: any[] = undefined as any
     lastKnownLength = 0
 
-    constructor(name, enhancer: IEnhancer<any>, public owned: boolean) {
+    constructor(name, enhancer: IEnhancer<any>, public owned: boolean, public legacyMode: boolean) {
         this.atom = new Atom(name || "ObservableArray@" + getNextId())
         this.enhancer = (newV, oldV) => enhancer(newV, oldV, name + "[..]")
     }
@@ -204,6 +205,8 @@ class ObservableArrayAdministration
                 "[mobx] Modification exception: the internal structure of an observable array was changed."
             )
         this.lastKnownLength += delta
+        if (this.legacyMode && delta > 0 && oldLength + delta + 1 > OBSERVABLE_ARRAY_BUFFER_SIZE)
+            reserveArrayBuffer(oldLength + delta + 1)
     }
 
     spliceWithArray(index: number, deleteCount?: number, newItems?: any[]): any[] {
@@ -234,7 +237,7 @@ class ObservableArrayAdministration
         }
 
         newItems = newItems.length === 0 ? newItems : newItems.map(v => this.enhancer(v, undefined))
-        if (process.env.NODE_ENV !== "production") {
+        if (this.legacyMode || process.env.NODE_ENV !== "production") {
             const lengthDelta = newItems.length - deleteCount
             this.updateArrayLength(length, lengthDelta) // checks if internal array wasn't modified
         }
@@ -304,7 +307,7 @@ class ObservableArrayAdministration
     }
 }
 
-const arrayExtensions = {
+export const arrayExtensions = {
         intercept(handler: IInterceptor<IArrayWillChange<any> | IArrayWillSplice<any>>): Lambda {
             return this[$mobx].intercept(handler)
         },
@@ -426,9 +429,7 @@ const arrayExtensions = {
                     return adm.dehanceValue(adm.values[index])
                 }
                 console.warn(
-                    `[mobx.array] Attempt to read an array index (${index}) that is out of bounds (${
-                        adm.values.length
-                    }). Please check length first. Out of bound indices will not be tracked by MobX`
+                    `[mobx.array] Attempt to read an array index (${index}) that is out of bounds (${adm.values.length}). Please check length first. Out of bound indices will not be tracked by MobX`
                 )
             }
             return undefined
