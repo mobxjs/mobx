@@ -1,5 +1,5 @@
 /**
- * (c) Michel Weststrate 2015 - 2018
+ * (c) Michel Weststrate 2015 - 2020
  * MIT Licensed
  *
  * Welcome to the mobx sources! To get an global overview of how MobX internally works,

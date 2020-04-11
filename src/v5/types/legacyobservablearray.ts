@@ -11,7 +11,8 @@ import {
     ObservableArrayAdministration,
     $mobx,
     arrayExtensions,
-    IEnhancer
+    IEnhancer,
+    isObservableArray
 } from "../internal"
 
 // Detects bug in safari 9.1.1 (or iOS 9 safari mobile). See #364
@@ -109,7 +110,7 @@ export class LegacyObservableArray<T> extends StubArray {
         this[$mobx].atom.reportObserved()
         return Array.prototype.concat.apply(
             (this as any).peek(),
-            // @ts-ignore
+            //@ts-ignore
             arrays.map(a => (isObservableArray(a) ? a.peek() : a))
         )
     }
@@ -268,7 +269,7 @@ const ENTRY_0 = createArrayEntryDescriptor(0)
 function createArrayEntryDescriptor(index: number) {
     return {
         enumerable: false,
-        configurable: false,
+        configurable: true,
         get: function() {
             return this.get(index)
         },

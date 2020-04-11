@@ -1,7 +1,7 @@
 "use strict"
 
 const mobx = require("../../../src/v4/mobx.ts")
-const { observable, _getAdministration, reaction } = mobx
+const { observable, _getAdministration, reaction, makeObservable } = mobx
 const iterall = require("iterall")
 
 test("test1", function() {
@@ -322,17 +322,6 @@ test("observes when stringified to locale", function() {
     expect(c).toBe(2)
 })
 
-test("peek", function() {
-    const x = mobx.observable([1, 2, 3])
-    expect(x.peek()).toEqual([1, 2, 3])
-    expect(x.$mobx.values).toBe(x.peek())
-
-    x.peek().push(4) //noooo!
-    expect(function() {
-        x.push(5) // detect alien change
-    }).toThrow(/the internal structure of an observable array was changed/)
-})
-
 test("react to sort changes", function() {
     const x = mobx.observable([4, 2, 3])
     const sortedX = mobx.computed(function() {
@@ -386,56 +375,6 @@ test("isArrayLike", () => {
     expect(isArrayLike({})).toBe(false)
 })
 
-test(".move throws on invalid indices", () => {
-    const arr = [0, 1, 2]
-    const observableArr = observable(arr)
-
-    expect(() => observableArr.move(-1, 0)).toThrowError(/Index out of bounds: -1 is negative/)
-    expect(() => observableArr.move(3, 0)).toThrowError(
-        /Index out of bounds: 3 is not smaller than 3/
-    )
-    expect(() => observableArr.move(0, -1)).toThrowError(/Index out of bounds: -1 is negative/)
-    expect(() => observableArr.move(0, 3)).toThrowError(
-        /Index out of bounds: 3 is not smaller than 3/
-    )
-})
-
-test(".move(i, i) does nothing", () => {
-    const arr = [0, 1, 2]
-    const observableArr = observable(arr)
-    let changesCount = 0
-    observableArr.observe(changes => ++changesCount)
-
-    observableArr.move(0, 0)
-
-    expect(0).toBe(changesCount)
-})
-
-test(".move works correctly", () => {
-    const arr = [0, 1, 2, 3]
-
-    function checkMove(fromIndex, toIndex, expected) {
-        const oa = observable(arr)
-        let changesCount = 0
-        oa.observe(changes => ++changesCount)
-        oa.move(fromIndex, toIndex)
-        expect(oa.slice()).toEqual(expected)
-        expect(changesCount).toBe(1)
-    }
-
-    checkMove(0, 1, [1, 0, 2, 3])
-    checkMove(0, 2, [1, 2, 0, 3])
-    checkMove(1, 2, [0, 2, 1, 3])
-    checkMove(2, 3, [0, 1, 3, 2])
-    checkMove(0, 3, [1, 2, 3, 0])
-
-    checkMove(1, 0, [1, 0, 2, 3])
-    checkMove(2, 0, [2, 0, 1, 3])
-    checkMove(2, 1, [0, 2, 1, 3])
-    checkMove(3, 1, [0, 3, 1, 2])
-    checkMove(3, 0, [3, 0, 1, 2])
-})
-
 test("accessing out of bound values throws", () => {
     const a = mobx.observable([])
 
@@ -472,7 +411,11 @@ test("replace can handle large arrays", () => {
 test("can iterate arrays", () => {
     const x = mobx.observable([])
     const y = []
-    const d = mobx.reaction(() => Array.from(x), items => y.push(items), { fireImmediately: true })
+    const d = mobx.reaction(
+        () => Array.from(x),
+        items => y.push(items),
+        { fireImmediately: true }
+    )
 
     x.push("a")
     x.push("b")
@@ -609,8 +552,13 @@ test("reproduce #2021", () => {
         }
 
         class Test {
-            @observable
             data = null
+
+            constructor() {
+                makeObservable(this, {
+                    data: observable
+                })
+            }
         }
 
         const test = new Test()
