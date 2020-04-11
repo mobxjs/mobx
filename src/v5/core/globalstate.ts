@@ -13,7 +13,8 @@ const persistentKeys: (keyof MobXGlobals)[] = [
     "allowStateReads",
     "disableErrorBoundaries",
     "runId",
-    "UNCHANGED"
+    "UNCHANGED",
+    "useProxies"
 ]
 
 export type IUNCHANGED = {}
@@ -139,6 +140,8 @@ export class MobXGlobals {
      * they are not the cause, see: https://github.com/mobxjs/mobx/issues/1836
      */
     suppressReactionErrors = false
+
+    useProxies = true
 }
 
 declare const window: any

@@ -23,6 +23,7 @@ export function configure(options: {
     isolateGlobalState?: boolean
     disableErrorBoundaries?: boolean
     reactionScheduler?: (f: () => void) => void
+    useProxies: "always" | "never" | "ifavailable"
 }): void {
     const {
         enforceActions,
@@ -31,10 +32,20 @@ export function configure(options: {
         disableErrorBoundaries,
         reactionScheduler,
         reactionRequiresObservable,
-        observableRequiresReaction
+        observableRequiresReaction,
+        useProxies
     } = options
     if (options.isolateGlobalState === true) {
         isolateGlobalState()
+    }
+    if (useProxies !== undefined) {
+        // TODO: if ES5 impl loaded?
+        globalState.useProxies =
+            useProxies === "always"
+                ? true
+                : useProxies === "never"
+                ? false
+                : typeof Proxy !== "undefined"
     }
     if (enforceActions !== undefined) {
         if (typeof enforceActions === "boolean" || enforceActions === "strict")

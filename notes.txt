@@ -75,6 +75,8 @@ Import size report for mobx:
 [ ] breaking: can no longer re-decorate fields already decorated by a superclass
 [ ] make sure legacy array implementation is opt in
 [ ] compare mobx.configure options between v4 and v5
+[ ] optionally include legacy stuff
+[ ] observable.array now supports proxy:false option
 
 General class solutions
 - call extendObservable in constructor

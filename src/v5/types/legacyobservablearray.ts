@@ -75,7 +75,7 @@ if (Object.isFrozen(Array)) {
 
 export class LegacyObservableArray<T> extends StubArray {
     // @ts-ignore addHiddenFinalProp not recognized here
-    private $mobx: ObservableArrayAdministration<T>
+    private [$mobx]: ObservableArrayAdministration<T>
 
     constructor(
         initialValues: T[] | undefined,
@@ -87,7 +87,7 @@ export class LegacyObservableArray<T> extends StubArray {
 
         const adm = new ObservableArrayAdministration(name, enhancer, owned, true)
         adm.proxy = this as any
-        addHiddenFinalProp(this, "$mobx", adm)
+        addHiddenFinalProp(this, $mobx, adm)
 
         if (initialValues && initialValues.length) {
             const prev = allowStateChangesStart(true)

@@ -25,7 +25,9 @@ import {
     AnnotationsMap,
     asObservableObject,
     storeDecorator,
-    createDecorator
+    createDecorator,
+    LegacyObservableArray,
+    globalState
 } from "../internal"
 
 export type CreateObservableOptions = {
@@ -163,6 +165,9 @@ const observableFactories: IObservableFactory = {
     },
     array<T = any>(initialValues?: T[], options?: CreateObservableOptions): IObservableArray<T> {
         const o = asCreateObservableOptions(options)
+        if (globalState.useProxies === false || o.proxy === false) {
+            return new LegacyObservableArray(initialValues, getEnhancerFromOption(o), o.name) as any
+        }
         return createObservableArray(initialValues, getEnhancerFromOption(o), o.name) as any
     },
     map<K = any, V = any>(
@@ -188,7 +193,9 @@ const observableFactories: IObservableFactory = {
         const base = {}
         asObservableObject(base, options?.name, getEnhancerFromOption(o))
         return extendObservable(
-            o.proxy === false ? base : createDynamicObservableObject(base),
+            globalState.useProxies === false || o.proxy === false
+                ? base
+                : createDynamicObservableObject(base),
             props,
             decorators
         )
