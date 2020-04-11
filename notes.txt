@@ -78,6 +78,7 @@ Import size report for mobx:
 [ ] optionally include legacy stuff
 [ ] observable.array now supports proxy:false option
 [ ] at startup, test presence of Map, Symbol ownPropertySymboles and other globals!
+[ ]  apply deprecation of find and findIndex error
 
 General class solutions
 - call extendObservable in constructor
