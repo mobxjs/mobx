@@ -130,28 +130,6 @@ test("test action should be untracked", () => {
     d()
 })
 
-test("should be possible to create autorun in action", () => {
-    const a = mobx.observable.box(1)
-    const values = []
-
-    const adder = mobx.action(inc => {
-        return mobx.autorun(() => {
-            values.push(a.get() + inc)
-        })
-    })
-
-    const d1 = adder(2)
-    a.set(3)
-    const d2 = adder(17)
-    a.set(24)
-    d1()
-    a.set(11)
-    d2()
-    a.set(100)
-
-    expect(values).toEqual([3, 5, 20, 41, 26, 28])
-})
-
 test("should be possible to change unobserved state in an action called from computed", () => {
     const a = mobx.observable.box(2)
 
@@ -425,7 +403,8 @@ test("extendObservable respects action decorators", () => {
         },
         {
             a1: mobx.action,
-            a2: mobx.action.bound
+            a2: mobx.action.bound,
+            a3: false
         }
     )
     expect(mobx.isAction(x.a1)).toBe(true)
@@ -448,7 +427,7 @@ test("extendObservable respects action decorators", () => {
 test("expect warning for invalid decorator", () => {
     expect(() => {
         mobx.observable({ x: 1 }, { x: undefined })
-    }).toThrow(/Not a valid decorator for 'x', got: undefined/)
+    }).toThrowErrorMatchingInlineSnapshot(`"[mobx] invalid decorator 'undefined' for 'x'"`)
 })
 
 test("expect warning superfluos decorator", () => {

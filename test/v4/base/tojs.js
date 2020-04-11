@@ -3,6 +3,7 @@
 const mobx = require("../../../src/v4/mobx.ts")
 const m = mobx
 const observable = mobx.observable
+const { makeObservable } = mobx
 
 test("json1", function() {
     mobx._resetGlobalState()
@@ -108,7 +109,10 @@ test("json2", function() {
             }
         ]
     })
-    expect(ab).toEqual([[2, "here"], [2, "ba"]])
+    expect(ab).toEqual([
+        [2, "here"],
+        [2, "ba"]
+    ])
     expect(tb).toEqual(["react,frp,mweh", "reactjs,frp,mweh", "reactjs,frp,mweh,pff"])
     ab = []
     tb = []
@@ -346,6 +350,7 @@ test("map to JS", () => {
         @observable meta = new Map()
 
         constructor(props) {
+            makeObservable(this)
             this.meta.set("test", { abc: "def", ghi: "jkl" })
 
             expect(mobx.toJS(this.meta).constructor.name).toBe("Object")

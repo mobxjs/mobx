@@ -1,6 +1,7 @@
 const mobx = require("../../../src/v4/mobx.ts")
 const m = mobx
 const o = mobx.observable
+const { makeObservable } = mobx
 
 function buffer() {
     const b = []
@@ -64,7 +65,6 @@ test("isBoxedObservable", function() {
     expect(m.isBoxedObservable(m.observable.box(3))).toBe(true)
     expect(m.isBoxedObservable(m.observable.box(3))).toBe(true)
     expect(m.isBoxedObservable(m.observable.box({}))).toBe(true)
-    expect(m.isBoxedObservable(m.observable.shallowBox({}))).toBe(true)
 })
 
 test("observable1", function() {
@@ -210,13 +210,18 @@ test("observable5", function() {
     f = function() {
         return this.price
     }
-    x = m.observable({
-        price: 17,
-        get reactive() {
-            return this.price
+    x = m.observable(
+        {
+            price: 17,
+            get reactive() {
+                return this.price
+            },
+            nonReactive: f
         },
-        nonReactive: f
-    })
+        {
+            nonReactive: m.observable
+        }
+    )
 
     const b = buffer()
     m.autorun(function() {
@@ -228,7 +233,11 @@ test("observable5", function() {
         return 3
     }
     x.nonReactive = three
-    expect(b.toArray()).toEqual([[17, f, 17], [18, f, 18], [18, three, 3]])
+    expect(b.toArray()).toEqual([
+        [17, f, 17],
+        [18, f, 18],
+        [18, three, 3]
+    ])
 })
 
 test("flat array", function() {
@@ -479,26 +488,6 @@ test("ES5 non reactive props", function() {
     expect(m.extendObservable(te, { bla: 3 }).bla).toBe(3)
 })
 
-test("ES5 non reactive props - 2", function() {
-    const te = {}
-    Object.defineProperty(te, "nonConfigurable", {
-        enumerable: true,
-        configurable: false,
-        writable: true,
-        value: "static"
-    })
-    // should skip non-configurable / writable props when using `observable`
-    expect(() => {
-        m.decorate(te, { nonConfigurable: m.observable })
-    }).toThrow(/Cannot redefine property: nonConfigurable/)
-})
-
-test("exceptions", function() {
-    expect(function() {
-        m.observable.ref(m.observable.shallow(3))
-    }).toThrow(/@observable decorator doesn't expect any arguments/)
-})
-
 test("540 - extendobservable should not report cycles", function() {
     expect(() => m.extendObservable(Object.freeze({}), {})).toThrowError(
         /Cannot make the designated object observable/
@@ -516,18 +505,6 @@ test("540 - extendobservable should not report cycles", function() {
     expect(() => mobx.extendObservable(objWrapper, objWrapper.value)).toThrowError(
         /Extending an object with another observable \(object\) is not supported/
     )
-})
-
-test("mobx 3", () => {
-    const x = mobx.observable({ a: 1 })
-
-    expect(x === mobx.observable(x)).toBeTruthy()
-
-    const y = mobx.observable.shallowBox(null)
-    const obj = { a: 2 }
-    y.set(obj)
-    expect(y.get() === obj).toBeTruthy()
-    expect(mobx.isObservable(y.get())).toBe(false)
 })
 
 test("computed value", () => {
@@ -691,6 +668,7 @@ test("yest object equals issue", () => {
         @mobx.observable x = 2
 
         constructor() {
+            makeObservable(this)
             this.x = 3
         }
     }
@@ -702,6 +680,10 @@ test("yest object equals issue", () => {
 test("yest array equals issue", () => {
     class Store {
         @mobx.observable things = []
+
+        constructor() {
+            makeObservable(this)
+        }
     }
 
     const store = new Store()

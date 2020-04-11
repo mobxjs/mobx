@@ -77,6 +77,7 @@ Import size report for mobx:
 [ ] compare mobx.configure options between v4 and v5
 [ ] optionally include legacy stuff
 [ ] observable.array now supports proxy:false option
+[ ] at startup, test presence of Map, Symbol ownPropertySymboles and other globals!
 
 General class solutions
 - call extendObservable in constructor

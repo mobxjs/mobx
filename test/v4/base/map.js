@@ -4,6 +4,7 @@ const mobx = require("../../../src/v4/mobx.ts")
 const map = mobx.observable.map
 const autorun = mobx.autorun
 const iterall = require("iterall")
+const { makeObservable } = mobx
 
 test("map crud", function() {
     mobx._getGlobalState().mobxGuid = 0 // hmm dangerous reset?
@@ -231,26 +232,19 @@ test("cleanup", function() {
     let observable = x._data.get("a")
 
     expect(aValue).toBe(1)
-    expect(observable.observers.length).toBe(1)
-    expect(x._hasMap.get("a").observers.length).toBe(1)
 
     expect(x.delete("a")).toBe(true)
     expect(x.delete("not-existing")).toBe(false)
 
     expect(aValue).toBe(undefined)
-    expect(observable.observers.length).toBe(0)
-    expect(x._hasMap.get("a").observers.length).toBe(1)
 
     x.set("a", 2)
     observable = x._data.get("a")
 
     expect(aValue).toBe(2)
-    expect(observable.observers.length).toBe(1)
-    expect(x._hasMap.get("a").observers.length).toBe(1)
 
     disposer()
     expect(aValue).toBe(2)
-    expect(observable.observers.length).toBe(0)
     expect(x._hasMap.has("a")).toBe(false)
 })
 
@@ -843,6 +837,10 @@ test("toStringTag", () => {
 test("verify #1524", () => {
     class Store {
         @mobx.observable articles = new Map()
+
+        constructor() {
+            makeObservable(this)
+        }
     }
 
     const store = new Store()

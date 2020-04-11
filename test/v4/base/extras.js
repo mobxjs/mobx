@@ -1,5 +1,6 @@
 const mobx = require("../../../src/v4/mobx.ts")
 const m = mobx
+const { $mobx } = mobx
 
 test("treeD", function() {
     m._resetGlobalState()
@@ -21,7 +22,7 @@ test("treeD", function() {
 
     const c = m.autorun(() => b.get())
     const cName = "Autorun@4"
-    expect(dtree(c.$mobx)).toEqual({
+    expect(dtree(c[$mobx])).toEqual({
         name: cName,
         dependencies: [
             {
@@ -59,7 +60,7 @@ test("treeD", function() {
         x.has("absent")
     })
 
-    expect(m.getDependencyTree(d.$mobx)).toEqual({
+    expect(m.getDependencyTree(d[$mobx])).toEqual({
         name: "Autorun@7",
         dependencies: [
             {
@@ -76,56 +77,6 @@ test("treeD", function() {
             }
         ]
     })
-})
-
-test("names", function() {
-    m._resetGlobalState()
-    mobx._getGlobalState().mobxGuid = 0
-
-    const struct = {
-        x: "ObservableValue@1",
-        y: {
-            z: 7
-        },
-        ar: [
-            4,
-            {
-                w: 5
-            }
-        ]
-    }
-
-    const rstruct = m.observable(struct)
-    m.extendObservable(rstruct.y, { a: { b: 2 } })
-    rstruct.ar.push({ b: 2 })
-    rstruct.ar.push([])
-    expect(rstruct.$mobx.values.x.name).toBe("ObservableObject@1.x")
-    expect(rstruct.$mobx.values.y.name).toBe("ObservableObject@1.y")
-    expect(rstruct.y.$mobx.values.z.name).toBe("ObservableObject@1.y.z")
-    expect(rstruct.$mobx.values.ar.name).toBe("ObservableObject@1.ar")
-    expect(rstruct.ar.$mobx.atom.name).toBe("ObservableObject@1.ar")
-    expect(rstruct.ar[1].$mobx.values.w.name).toBe("ObservableObject@1.ar[..].w")
-    expect(rstruct.y.a.$mobx.values.b.name).toBe("ObservableObject@1.y.a.b")
-    expect(rstruct.ar[2].$mobx.values.b.name).toBe("ObservableObject@1.ar[..].b")
-
-    const d = m.autorun(function() {})
-    expect(d.$mobx.name).toBeTruthy()
-
-    expect(m.autorun(function namedFunction() {}).$mobx.name).toBe("namedFunction")
-
-    expect(m.computed(function() {})).toBeTruthy()
-
-    expect(m.computed(function namedFunction() {}).name).toBe("namedFunction")
-
-    function Task() {
-        m.extendObservable(this, {
-            title: "test"
-        })
-    }
-
-    const task = new Task()
-    expect(task.$mobx.name).toBe("Task@8")
-    expect(task.$mobx.values.title.name).toBe("Task@8.title")
 })
 
 function stripTrackerOutput(output) {
@@ -229,7 +180,6 @@ test("get debug name", function() {
     const e = mobx.computed(() => 3)
     const f = mobx.autorun(() => c.has("b"))
     const g = new Clazz()
-    const h = mobx.observable({ b: function() {}, c() {} })
 
     function name(thing, prop) {
         return mobx.getDebugName(thing, prop)
@@ -257,9 +207,6 @@ test("get debug name", function() {
 
     expect(name(g)).toBe("Clazz@9")
     expect(name(g, "a")).toBe("Clazz@9.a")
-
-    expect(name(h, "b")).toBe("ObservableObject@10.b")
-    expect(name(h, "c")).toBe("ObservableObject@10.c")
 
     f()
 })
@@ -292,7 +239,7 @@ test("get administration", function() {
     expect(adm(a)).toBe(ovClassName)
 
     expect(adm(b, "a")).toBe(ovClassName)
-    expect(adm(b)).toBe(b.$mobx.constructor.name)
+    expect(adm(b)).toBe(b[$mobx].constructor.name)
     expect(() => adm(b, "b")).toThrowError(
         /no observable property 'b' found on the observable object 'ObservableObject@2'/
     )
@@ -304,13 +251,13 @@ test("get administration", function() {
         /the entry 'c' does not exist in the observable map 'ObservableMap@3'/
     )
 
-    expect(adm(d)).toBe(d.$mobx.constructor.name)
+    expect(adm(d)).toBe(d[$mobx].constructor.name)
     expect(() => adm(d, 0)).toThrowError(/It is not possible to get index atoms from arrays/)
 
     expect(adm(e)).toBe(mobx.computed(() => {}).constructor.name)
     expect(adm(f)).toBe(mobx.Reaction.name)
 
-    expect(adm(g)).toBe(b.$mobx.constructor.name)
+    expect(adm(g)).toBe(b[$mobx].constructor.name)
     expect(adm(g, "a")).toBe(ovClassName)
 
     f()
@@ -333,7 +280,10 @@ test("onBecome(Un)Observed simple", () => {
     x.set(4)
     expect(events.length).toBe(0) // nothing happened yet
 
-    const d5 = mobx.reaction(() => x.get(), () => {})
+    const d5 = mobx.reaction(
+        () => x.get(),
+        () => {}
+    )
     expect(events.length).toBe(1)
     expect(events).toEqual(["x observed"])
 
@@ -369,11 +319,17 @@ test("onBecome(Un)Observed - less simple", () => {
 
     expect(events.length).toBe(0) // nothing happened yet
 
-    const d5 = mobx.reaction(() => x.b, () => {})
+    const d5 = mobx.reaction(
+        () => x.b,
+        () => {}
+    )
     expect(events.length).toBe(2)
     expect(events).toEqual(["b observed", "a observed"])
 
-    const d6 = mobx.reaction(() => x.b, () => {})
+    const d6 = mobx.reaction(
+        () => x.b,
+        () => {}
+    )
     expect(events.length).toBe(2)
 
     d5()
@@ -387,7 +343,10 @@ test("onBecome(Un)Observed - less simple", () => {
     d3()
     d4()
     events.splice(0)
-    const d7 = mobx.reaction(() => x.b, () => {})
+    const d7 = mobx.reaction(
+        () => x.b,
+        () => {}
+    )
     d7()
     expect(events.length).toBe(0)
 })
