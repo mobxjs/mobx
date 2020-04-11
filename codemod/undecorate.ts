@@ -6,12 +6,7 @@ import {
     ClassProperty,
     Node,
     ClassDeclaration,
-    MethodDefinition,
     ClassMethod,
-    CallExpression,
-    Identifier,
-    FunctionExpression,
-    ArrowFunctionExpression,
     ObjectExpression
 } from "jscodeshift"
 
@@ -62,7 +57,7 @@ export const parser = {
 export default function tranform(
     fileInfo: FileInfo,
     api: API,
-    options?: { ignoreImports: boolean }
+    options?: { ignoreImports: boolean; keepDecorators: boolean }
 ): any {
     const j = api.jscodeshift
     const superCall = j.expressionStatement(j.callExpression(j.super(), []))
@@ -233,7 +228,7 @@ export default function tranform(
             return property
         }
 
-        property.decorators.splice(0)
+        if (options?.keepDecorators !== true) property.decorators.splice(0)
 
         effects.membersMap.push([property.key, expr, property.computed])
         return property
@@ -242,7 +237,10 @@ export default function tranform(
     function createConstructor(clazz: ClassDeclaration, members: ObjectExpression) {
         // makeObservable(this, { members })
         const initializeObservablesCall = j.expressionStatement(
-            j.callExpression(j.identifier("makeObservable"), [j.thisExpression(), members])
+            j.callExpression(
+                j.identifier("makeObservable"),
+                options?.keepDecorators ? [j.thisExpression()] : [j.thisExpression(), members]
+            )
         )
 
         const needsSuper = !!clazz.superClass

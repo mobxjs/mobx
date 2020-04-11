@@ -14,7 +14,8 @@ import {
     CreateObservableOptions,
     ObservableObjectAdministration,
     invariant,
-    applyDecorators
+    applyDecorators,
+    isObservableProp
 } from "../internal"
 
 function makeAction(target, key, name, fn) {
@@ -114,6 +115,11 @@ export function makeProperty(
         case "observable.ref":
         case "observable.shallow":
         case "observable.struct": {
+            // TODO: wrap in __DEV__
+            invariant(
+                !isObservableProp(target, key as any),
+                `Cannot decorate '${key.toString()}': the property is already decorated as observable.`
+            )
             invariant(
                 "value" in descriptor,
                 `Cannot decorate '${key.toString()}': observable cannot be used on setter / getter properties.`

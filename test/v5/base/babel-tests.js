@@ -686,11 +686,15 @@ test("inheritance overrides observable", () => {
         constructor() {
             super()
 
-            makeObservable(this, {
-                a: observable,
-                b: observable,
-                c: computed
-            })
+            expect(() => {
+                makeObservable(this, {
+                    a: observable,
+                    b: observable,
+                    c: computed
+                })
+            }).toThrowErrorMatchingInlineSnapshot(
+                `"[mobx] Cannot decorate 'a': the property is already decorated as observable."`
+            )
         }
 
         get c() {
@@ -699,16 +703,6 @@ test("inheritance overrides observable", () => {
     }
 
     const b1 = new B()
-    const b2 = new B()
-    const values = []
-    mobx.autorun(() => values.push(b1.c + b2.c))
-
-    b1.a = 3
-    b1.b = 4
-    b2.b = 5
-    b2.a = 6
-
-    expect(values).toEqual([16, 14, 15, 17, 18])
 })
 
 test("reusing initializers", () => {

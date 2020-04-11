@@ -7,7 +7,7 @@
                 "regenerator": true
             }
         ],
-        // ["@babel/plugin-proposal-decorators", { "legacy": true }], // TODO: drop
-        ["@babel/plugin-proposal-class-properties", { "loose": false }] // TODO: false
+        ["@babel/plugin-proposal-decorators", { "legacy": true }],
+        ["@babel/plugin-proposal-class-properties", { "loose": false }]
     ]
 }

@@ -45,7 +45,7 @@ export function isObservable(value: any): boolean {
 }
 
 export function isObservableProp(value: any, propName: string): boolean {
-    if (typeof propName !== "string")
+    if (typeof propName !== "string" && typeof propName !== "symbol")
         return fail(
             process.env.NODE_ENV !== "production" && `expected a property name as second argument`
         )

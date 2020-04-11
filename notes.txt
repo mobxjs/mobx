@@ -72,6 +72,7 @@ Import size report for mobx:
 [ ] breaking: function are now actions by default!
 [ ] verify: action called from computed throws?
 [ ] document `true` and `false` as annotations
+[ ] breaking: can no longer re-decorate fields already decorated by a superclass
 
 General class solutions
 - call extendObservable in constructor
