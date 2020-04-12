@@ -17,6 +17,7 @@ import {
     applyDecorators,
     isObservableProp
 } from "../internal"
+import { isPlainObject } from "../utils/utils"
 
 function makeAction(target, key, name, fn) {
     addHiddenProp(target, key, action(name || key, fn))
@@ -175,13 +176,20 @@ export function makeObservable<T extends Object>(
 // TODO: add tests
 export function makeAutoObservable<T extends Object>(
     target: T,
-    excludes: AnnotationsMap<T>,
-    options: CreateObservableOptions
+    excludes?: AnnotationsMap<T>,
+    options?: CreateObservableOptions
 ) {
-    // TODO: die on things with superclass
+    const proto = Object.getPrototypeOf(target)
+    const isPlain = proto == null || proto === Object.prototype
+    invariant(
+        isPlain || isPlainObject(proto),
+        `'makeAutoObservable' can only be used for classes that don't have a superclass`
+    )
     let annotations = { ...excludes }
     extractAnnotationsFromObject(target, annotations, options)
-    extractAnnotationsFromProto(target, annotations)
+    if (!isPlain) {
+        extractAnnotationsFromProto(proto, annotations)
+    }
     makeObservable(target, annotations, options)
 }
 
@@ -199,16 +207,15 @@ function extractAnnotationsFromObject(
     })
 }
 
-function extractAnnotationsFromProto(target: any, collector: AnnotationsMap<any>) {
-    const proto = Object.getPrototypeOf(target)
-    if (!proto || proto === Object.prototype) return
-    Object.keys(proto).forEach(key => {
+function extractAnnotationsFromProto(proto: any, collector: AnnotationsMap<any>) {
+    // TODO: make a utility for this
+    ;[...Object.getOwnPropertyNames(proto), ...Object.getOwnPropertySymbols(proto)].forEach(key => {
         if (key in collector) return
         const prop = Object.getOwnPropertyDescriptor(proto, key)!
         if (prop.get) {
-            collector[key] = computed
+            collector[key as any] = computed
         } else if (typeof prop.value === "function") {
-            collector[key] = action.bound
+            collector[key as any] = action.bound
         }
     })
 }

@@ -3,7 +3,6 @@
 node_modules
 npm-debug.log
 coverage
-notes.md
 test/babel-tests.js
 test/typescript/typescript-tests.js
 dist/
