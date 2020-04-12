@@ -1,59 +1,59 @@
 ## Feature work
 
-[ ] Build process
-[ ] kill v4 / v5 separation
-[ ] TSDX build process
-[ ] Smaller build
-[ ] minimal dev errors
-[ ] invariant system from immer
-[ ] extract utils for getOwnPropertyDescriptor and defineProperty
-[ ] configure property mangling like in Immer. Will it save anything?
-[ ] code mod
-[x] code mod, run on v4 tests?
-[x] codemod TS
-[x] codemod babel
-[x] codemod leave decorators
-[x] migrate decorate calls as well
-[ ] unit tests for `ignoreImports`
-[ ] unit tests for `keepDecorators`
-[ ] ES5 support
-[x] combine with ES5?
-[x] backport tests and code to v4(6)
-[ ] make sure legacy array implementation is opt in
-[ ] map / set as opt-in as well?
-[ ] compare mobx.configure options between v4 and v5
-[ ] two or 3 modes for configure useProxies? If two, kill `deep` option to observable?
-[ ] annotations instead of decorators
-[ ] get rid of all that pending decorators shizzle
-[x] Todo: check how important array of decorators is, see original issue -> This will be breaking issue, as we are going to treat action etc different?
-[ ] Optimize: cache meta data
-[x] observable / extendObservable use decorators args
-[x] observable; support `false` as argument
-[ ] misc
-[ ] at startup, test presence of Map, Symbol ownPropertySymboles and other globals!
-[ ] verify: action called from computed throws?
-[ ] apply deprecation of find and findIndex error
-[ ] verify perf / memory changes
+-   [ ] Build process
+    -   [ ] kill v4 / v5 separation
+    -   [ ] TSDX build process
+-   [ ] Smaller build
+    -   [ ] minimal dev errors
+    -   [ ] invariant system from immer
+    -   [ ] extract utils for getOwnPropertyDescriptor and defineProperty
+    -   [ ] configure property mangling like in Immer. Will it save anything?
+-   [ ] code mod
+    -   [x] code mod, run on v4 tests?
+    -   [x] codemod TS
+    -   [x] codemod babel
+    -   [x] codemod leave decorators
+    -   [x] migrate decorate calls as well
+    -   [ ] unit tests for `ignoreImports`
+    -   [ ] unit tests for `keepDecorators`
+-   [ ] ES5 support
+    -   [x] combine with ES5?
+    -   [x] backport tests and code to v4(6)
+    -   [ ] make sure legacy array implementation is opt in
+    -   [ ] map / set as opt-in as well?
+    -   [ ] compare mobx.configure options between v4 and v5
+    -   [ ] two or 3 modes for configure useProxies? If two, kill `deep` option to observable?
+-   [ ] annotations instead of decorators
+    -   [ ] get rid of all that pending decorators shizzle
+    -   [x] Todo: check how important array of decorators is, see original issue -> This will be breaking issue, as we are going to treat action etc different?
+    -   [ ] Optimize: cache meta data
+    -   [x] observable / extendObservable use decorators args
+    -   [x] observable; support `false` as argument
+-   [ ] misc
+    -   [ ] at startup, test presence of Map, Symbol ownPropertySymboles and other globals!
+    -   [ ] verify: action called from computed throws?
+    -   [ ] apply deprecation of find and findIndex error
+    -   [ ] verify perf / memory changes
 
 ## Docs / migration guide
 
-[ ] Host old docs somewhere? Figure out how docusaurus can support a second version
-[ ] Using the codemod
-[ ] update tsconfig, no decorators, yes define
-[ ] update docs for non-default decoratres
-[ ] instruct using TS / Babel decorators
-[ ] Breaking: can no longer re-decorate fields already decorated by a superclass
-[ ] Breaking: methods will be actions by default in `extendObservabe` / `observable`
-[ ] Breaking: `decorate` has been removed
-[ ] optimization tip: hoist the mapping constant
-[ ] document: uncoditional map
-[ ] document `true` and `false` as annotations
-[ ] how to enable ES5 support
-[ ] observable.array now supports proxy:false option
-[ ] migration: migrate mobx4 to mobx5 first, don't test on old browsers, then go to 6
-[ ] Breaking: no generic decorators or lists anymore for extendObservable?
+-   [ ] Host old docs somewhere? Figure out how docusaurus can support a second version
+-   [ ] Using the codemod
+-   [ ] update tsconfig, no decorators, yes define
+-   [ ] update docs for non-default decoratres
+-   [ ] instruct using TS / Babel decorators
+-   [ ] Breaking: can no longer re-decorate fields already decorated by a superclass
+-   [ ] Breaking: methods will be actions by default in `extendObservabe` / `observable`
+-   [ ] Breaking: `decorate` has been removed
+-   [ ] optimization tip: hoist the mapping constant
+-   [ ] document: uncoditional map
+-   [ ] document `true` and `false` as annotations
+-   [ ] how to enable ES5 support
+-   [ ] observable.array now supports proxy:false option
+-   [ ] migration: migrate mobx4 to mobx5 first, don't test on old browsers, then go to 6
+-   [ ] Breaking: no generic decorators or lists anymore for extendObservable?
 
-[ ] Running codemod: yarn jscodeshift -t codemod/undecorate.ts test/v5/base/typescript-tests.ts --ignoreImports=true
+-   [ ] Running codemod: yarn jscodeshift -t codemod/undecorate.ts test/v5/base/typescript-tests.ts --ignoreImports=true
 
 ## Blog
 
