@@ -80,7 +80,7 @@ async function main() {
     gitUser = resp.gitUser
 
     console.log("Starting build...")
-    run("npm run small-build")
+    run("npm run build")
     console.log("Build is done")
 
     // Check registry data

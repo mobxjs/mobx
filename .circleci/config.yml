@@ -38,7 +38,7 @@ jobs:
                   paths:
                       - node_modules
 
-            - run: yarn small-build
+            - run: yarn build
 
             - persist_to_workspace:
                   root: .

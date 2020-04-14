@@ -470,7 +470,6 @@ export class ObservableMap<K = any, V = any>
     }
 }
 
-/* 'var' fixes small-build issue */
 export const isObservableMap = createInstanceofPredicate("ObservableMap", ObservableMap) as (
     thing: any
 ) => thing is ObservableMap<any, any>
