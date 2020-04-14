@@ -1,4 +1,4 @@
-import { autorun, observable, computed, untracked } from "../../../src/v5/mobx"
+import { autorun, observable, computed, untracked } from "../../../src/mobx"
 
 test("untracked 1", () => {
     let cCalcs = 0,

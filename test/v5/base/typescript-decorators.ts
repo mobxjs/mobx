@@ -26,8 +26,8 @@ import {
     createAtom,
     runInAction,
     makeObservable
-} from "../../../src/v5/mobx"
-import * as mobx from "../../../src/v5/mobx"
+} from "../../../src/mobx"
+import * as mobx from "../../../src/mobx"
 
 const testFunction = function(a: any) {}
 

@@ -23,7 +23,7 @@ export function configure(options: {
     isolateGlobalState?: boolean
     disableErrorBoundaries?: boolean
     reactionScheduler?: (f: () => void) => void
-    useProxies: "always" | "never" | "ifavailable"
+    useProxies?: "always" | "never" | "ifavailable"
 }): void {
     const {
         enforceActions,

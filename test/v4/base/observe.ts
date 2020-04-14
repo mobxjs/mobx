@@ -1,4 +1,4 @@
-import { observable, observe, computed } from "../../../src/v4/mobx"
+import { observable, observe, computed } from "../mobx4"
 
 test("observe object and map properties", function() {
     const map = observable.map({ a: 1 })

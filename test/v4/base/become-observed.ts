@@ -1,4 +1,4 @@
-import { autorun, onBecomeObserved, observable } from "../../../src/v4/mobx"
+import { autorun, onBecomeObserved, observable } from "../mobx4"
 
 describe("become-observed", () => {
     it("work on map with number as key", () => {

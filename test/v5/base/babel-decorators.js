@@ -14,8 +14,8 @@ import {
     isAction,
     configure,
     makeObservable
-} from "../../../src/v5/mobx.ts"
-import * as mobx from "../../../src/v5/mobx.ts"
+} from "../../../src/mobx"
+import * as mobx from "../../../src/mobx"
 
 test("babel", function() {
     class Box {

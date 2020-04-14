@@ -10,7 +10,7 @@ import {
     extendObservable,
     keys,
     makeObservable
-} from "../../../src/v5/mobx.ts"
+} from "../../../src/mobx"
 
 import { stripAdminFromDescriptors } from "../utils/test-utils"
 

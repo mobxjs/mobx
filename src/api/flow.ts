@@ -25,9 +25,10 @@ export function flow<R, Args extends any[]>(
         const ctx = this
         const args = arguments
         const runId = ++generatorId
-        const gen = action(`${name} - runid: ${runId} - init`, generator as (
-            ...args: Args
-        ) => Generator<any, R, any>).apply(ctx, (args as any) as Args)
+        const gen = action(
+            `${name} - runid: ${runId} - init`,
+            generator as (...args: Args) => Generator<any, R, any>
+        ).apply(ctx, (args as any) as Args)
         let rejector: (error: any) => void
         let pendingPromise: CancellablePromise<any> | undefined = undefined
 

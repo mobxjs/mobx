@@ -150,9 +150,7 @@ export function checkIfStateModificationsAreAllowed(atom: IAtom) {
     if (globalState.computationDepth > 0 && hasObservers)
         fail(
             process.env.NODE_ENV !== "production" &&
-                `Computed values are not allowed to cause side effects by changing observables that are already being observed. Tried to modify: ${
-                    atom.name
-                }`
+                `Computed values are not allowed to cause side effects by changing observables that are already being observed. Tried to modify: ${atom.name}`
         )
     // Should not be possible to change observed state outside strict mode, except during initialization, see #563
     if (!globalState.allowStateChanges && (hasObservers || globalState.enforceActions === "strict"))
@@ -217,9 +215,7 @@ function warnAboutDerivationWithoutDependencies(derivation: IDerivation) {
 
     if (globalState.reactionRequiresObservable || derivation.requiresObservable) {
         console.warn(
-            `[mobx] Derivation ${
-                derivation.name
-            } is created/updated without reading any observable value`
+            `[mobx] Derivation ${derivation.name} is created/updated without reading any observable value`
         )
     }
 }

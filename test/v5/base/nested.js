@@ -1,12 +1,6 @@
 "use strict"
 
-import {
-    extendObservable,
-    observable,
-    autorun,
-    computed,
-    runInAction
-} from "../../../src/v5/mobx.ts"
+import { extendObservable, observable, autorun, computed, runInAction } from "../../../src/mobx"
 
 test("nested computeds should not run unnecessary", () => {
     function Item(name) {

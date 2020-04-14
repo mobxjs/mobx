@@ -8,7 +8,7 @@ import {
     isComputedProp,
     isAction,
     makeAutoObservable
-} from "../../../src/v5/mobx"
+} from "../../../src/mobx"
 
 test("makeObservable picks up decorators", () => {
     class Test {

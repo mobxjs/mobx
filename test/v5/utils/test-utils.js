@@ -1,4 +1,4 @@
-import { $mobx } from "../../../src/v5/mobx.ts"
+import { $mobx } from "../../../src/mobx"
 
 export function consoleError(block, regex) {
     let messages = ""

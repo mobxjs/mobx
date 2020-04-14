@@ -11,7 +11,7 @@ import {
     isComputedProp,
     isAction,
     makeObservable
-} from "../../../src/v5/mobx"
+} from "../../../src/mobx"
 
 // @ts-ignore
 import { primitive, serialize, deserialize, createModelSchema } from "serializr"

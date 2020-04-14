@@ -1,7 +1,7 @@
 /**
  * @type {typeof import("./../../../src/v5/mobx")}
  */
-const mobx = require("../../../src/v5/mobx.ts")
+const mobx = require("../../../src/mobx.ts")
 const reaction = mobx.reaction
 const utils = require("../utils/test-utils")
 
@@ -319,7 +319,11 @@ test("#278 do not rerun if expr output doesn't change structurally", () => {
     d()
     users[1].name = "w00t"
 
-    expect(values).toEqual([["JAN", "PIET"], ["JOHN", "PIET"], ["JOHN", "JOHAN"]])
+    expect(values).toEqual([
+        ["JAN", "PIET"],
+        ["JOHN", "PIET"],
+        ["JOHN", "JOHAN"]
+    ])
 })
 
 test("do not rerun if prev & next expr output is NaN", () => {
@@ -410,7 +414,10 @@ test("reaction equals function only invoked when necessary", () => {
         // Transition from exception in the expression will cause a comparison with the last valid value
         left.set("D")
         right.set("E")
-        expect(comparisons).toEqual([{ from: "ab", to: "cb" }, { from: "cb", to: "de" }])
+        expect(comparisons).toEqual([
+            { from: "ab", to: "cb" },
+            { from: "cb", to: "de" }
+        ])
 
         // Another value change will cause a comparison
         right.set("F")
@@ -620,9 +627,13 @@ test("Introduce custom onError for - when - 2", () => {
 describe("reaction opts requiresObservable", () => {
     test("warn when no observable", () => {
         utils.consoleWarn(() => {
-            const disposer = mobx.reaction(() => 2, () => 1, {
-                requiresObservable: true
-            })
+            const disposer = mobx.reaction(
+                () => 2,
+                () => 1,
+                {
+                    requiresObservable: true
+                }
+            )
 
             disposer()
         }, /is created\/updated without reading any observable value/)
@@ -634,9 +645,13 @@ describe("reaction opts requiresObservable", () => {
         })
 
         const messages = utils.supressConsole(() => {
-            const disposer = mobx.reaction(() => obsr.x, () => 1, {
-                requiresObservable: true
-            })
+            const disposer = mobx.reaction(
+                () => obsr.x,
+                () => 1,
+                {
+                    requiresObservable: true
+                }
+            )
 
             disposer()
         })

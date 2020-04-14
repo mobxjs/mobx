@@ -1,6 +1,6 @@
 "use strict"
 
-const mobx = require("../../../src/v4/mobx")
+const mobx = require("../mobx4")
 const m = mobx
 const { $mobx, makeObservable, observable, computed, transaction, autorun, extendObservable } = mobx
 const utils = require("../utils/test-utils")
@@ -1559,6 +1559,7 @@ test("603 - transaction should not kill reactions", () => {
     expect(b).toBe(2)
     a.set(3)
     expect(b).toBe(3)
+    d()
 })
 
 test("#561 test toPrimitive() of observable objects", function() {

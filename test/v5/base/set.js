@@ -1,6 +1,6 @@
 "use strict"
 
-const mobx = require("../../../src/v5/mobx.ts")
+const mobx = require("../../../src/mobx.ts")
 const set = mobx.observable.set
 const autorun = mobx.autorun
 const iterall = require("iterall")
@@ -23,7 +23,10 @@ test("set crud", function() {
     expect(s.size).toBe(2)
     expect(mobx.keys(s)).toEqual([1, "2"])
     expect(mobx.values(s)).toEqual([1, "2"])
-    expect(mobx.entries(s)).toEqual([[1, 1], ["2", "2"]])
+    expect(mobx.entries(s)).toEqual([
+        [1, 1],
+        ["2", "2"]
+    ])
     expect(Array.from(s)).toEqual([1, "2"])
     expect(s.toJS()).toEqual(new Set([1, "2"]))
     expect(s.toString()).toBe("ObservableSet@1[ 1, 2 ]")
@@ -138,7 +141,10 @@ test("observe collections", function() {
     x.add("b")
     expect(keys).toEqual(["a", "b"])
     expect(values).toEqual(["a", "b"])
-    expect(entries).toEqual([["a", "a"], ["b", "b"]])
+    expect(entries).toEqual([
+        ["a", "a"],
+        ["b", "b"]
+    ])
 
     x.delete("a")
     expect(keys).toEqual(["b"])
@@ -188,7 +194,10 @@ test("set should support iterall / iterable ", () => {
 
     expect(leech(iterall.getIterator(a))).toEqual([1, 2])
 
-    expect(leech(a.entries())).toEqual([[1, 1], [2, 2]])
+    expect(leech(a.entries())).toEqual([
+        [1, 1],
+        [2, 2]
+    ])
 
     expect(leech(a.keys())).toEqual([1, 2])
     expect(leech(a.values())).toEqual([1, 2])

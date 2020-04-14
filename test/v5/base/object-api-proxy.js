@@ -1,4 +1,4 @@
-const mobx = require("../../../src/v5/mobx")
+const mobx = require("../../../src/mobx")
 const { has, autorun, when, values, runInAction, entries, reaction, observable } = mobx
 
 test("keys should be observable when extending", () => {
@@ -126,7 +126,6 @@ test("object - set, remove, keys are reactive", () => {
 })
 
 test("dynamically adding properties should preserve the original modifiers of an object", () => {
-    debugger
     const todos = observable.object(
         {
             a: { title: "get coffee" }

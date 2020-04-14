@@ -1,7 +1,7 @@
 /**
  * @type {typeof import("../../../src/v5/mobx")}
  */
-const mobx = require("../../../src/v5/mobx.ts")
+const mobx = require("../../../src/mobx.ts")
 
 const utils = require("../utils/test-utils")
 
@@ -233,40 +233,62 @@ test("autorunAsync warns when passed an action", function() {
 test("whenWithTimeout should operate normally", done => {
     const a = mobx.observable.box(1)
 
-    mobx.when(() => a.get() === 2, () => done(), {
-        timeout: 500,
-        onError: () => done.fail("error triggered")
-    })
+    mobx.when(
+        () => a.get() === 2,
+        () => done(),
+        {
+            timeout: 500,
+            onError: () => done.fail("error triggered")
+        }
+    )
 
-    setTimeout(mobx.action(() => a.set(2)), 200)
+    setTimeout(
+        mobx.action(() => a.set(2)),
+        200
+    )
 })
 
 test("whenWithTimeout should timeout", done => {
     const a = mobx.observable.box(1)
 
-    mobx.when(() => a.get() === 2, () => done.fail("should have timed out"), {
-        timeout: 500,
-        onError: e => {
-            expect("" + e).toMatch(/WHEN_TIMEOUT/)
-            done()
+    mobx.when(
+        () => a.get() === 2,
+        () => done.fail("should have timed out"),
+        {
+            timeout: 500,
+            onError: e => {
+                expect("" + e).toMatch(/WHEN_TIMEOUT/)
+                done()
+            }
         }
-    })
+    )
 
-    setTimeout(mobx.action(() => a.set(2)), 1000)
+    setTimeout(
+        mobx.action(() => a.set(2)),
+        1000
+    )
 })
 
 test("whenWithTimeout should dispose", done => {
     const a = mobx.observable.box(1)
 
-    const d1 = mobx.when(() => a.get() === 2, () => done.fail("1 should not finsih"), {
-        timeout: 100,
-        onError: () => done.fail("1 should not timeout")
-    })
+    const d1 = mobx.when(
+        () => a.get() === 2,
+        () => done.fail("1 should not finsih"),
+        {
+            timeout: 100,
+            onError: () => done.fail("1 should not timeout")
+        }
+    )
 
-    const d2 = mobx.when(() => a.get() === 2, () => t.fail("2 should not finsih"), {
-        timeout: 200,
-        onError: () => done.fail("2 should not timeout")
-    })
+    const d2 = mobx.when(
+        () => a.get() === 2,
+        () => t.fail("2 should not finsih"),
+        {
+            timeout: 200,
+            onError: () => done.fail("2 should not timeout")
+        }
+    )
 
     d1()
     d2()

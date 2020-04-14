@@ -1,4 +1,4 @@
-const mobx = require("../../../src/v5/mobx")
+const mobx = require("../../../src/mobx")
 const { autorun, keys, when, set, remove, values, entries, reaction, observable, has, get } = mobx
 
 test("keys should be observable when extending", () => {
@@ -188,7 +188,6 @@ test.only("object with symbol keys - set, remove, keys are reactive", () => {
     const y = Symbol()
     const z = Symbol("z")
     const a = Symbol()
-    debugger
     const todos = observable({ [a]: 3 })
 
     reaction(

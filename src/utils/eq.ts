@@ -83,7 +83,7 @@ function eq(a: any, b: any, depth: number, aStack?: any[], bStack?: any[]) {
                 typeof bCtor === "function" &&
                 bCtor instanceof bCtor
             ) &&
-            ("constructor" in a && "constructor" in b)
+            "constructor" in a && "constructor" in b
         ) {
             return false
         }

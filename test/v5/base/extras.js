@@ -1,4 +1,4 @@
-const mobx = require("../../../src/v5/mobx.ts")
+const mobx = require("../../../src/mobx.ts")
 const m = mobx
 
 const { $mobx } = mobx

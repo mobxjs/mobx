@@ -1,6 +1,6 @@
 "use strict"
 
-const mobx = require("../../../src/v4/mobx.ts")
+const mobx = require("../mobx4")
 const m = mobx
 const observable = mobx.observable
 const { makeObservable } = mobx

@@ -1,4 +1,4 @@
-const mobx = require("../../../src/v5/mobx.ts")
+const mobx = require("../../../src/mobx.ts")
 const m = mobx
 const utils = require("../utils/test-utils")
 
@@ -146,7 +146,10 @@ test("deny state changes in views", function() {
         y.get() // modifying unobserved values in computeds is allowed, so that new observables can be created and returned
     }).not.toThrow()
 
-    m.reaction(() => z.get(), () => {})
+    m.reaction(
+        () => z.get(),
+        () => {}
+    )
     expect(() => {
         y.get()
     }).toThrow(/Computed values are not allowed to cause side effects/)
@@ -185,7 +188,10 @@ test("deny array change in view", function(done) {
     expect(function() {
         y.get() // modifying z is allowed if nobody is observing
     }).not.toThrow()
-    m.reaction(() => z.length, () => {})
+    m.reaction(
+        () => z.length,
+        () => {}
+    )
 
     expect(function() {
         y.get()

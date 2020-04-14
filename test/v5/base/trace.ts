@@ -1,6 +1,6 @@
 "use strict"
 
-import * as mobx from "../../../src/v5/mobx"
+import * as mobx from "../../../src/mobx"
 import * as utils from "../utils/test-utils"
 
 test("trace", () => {
@@ -16,8 +16,8 @@ test("trace", () => {
             firstname: "Michel",
             lastname: "Weststrate",
             get fullname() {
-                /* test multi line comment 
-                    (run this unit test from VS code, and pass 'true'  as third argument to trace below to verify) 
+                /* test multi line comment
+                    (run this unit test from VS code, and pass 'true'  as third argument to trace below to verify)
                 */
                 const res = this.firstname + " " + this.lastname
                 mobx.trace(this, "fullname")
@@ -64,8 +64,8 @@ test("1850", () => {
             firstname: "Michel",
             lastname: "Weststrate",
             get fullname() {
-                /* test multi line comment 
-                    (run this unit test from VS code, to manually verify serialization) 
+                /* test multi line comment
+                    (run this unit test from VS code, to manually verify serialization)
                 */
                 const res = this.firstname + " " + this.lastname
                 mobx.trace(this, "fullname", true)

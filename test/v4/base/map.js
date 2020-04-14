@@ -1,6 +1,6 @@
 "use strict"
 
-const mobx = require("../../../src/v4/mobx.ts")
+const mobx = require("../mobx4")
 const map = mobx.observable.map
 const autorun = mobx.autorun
 const iterall = require("iterall")

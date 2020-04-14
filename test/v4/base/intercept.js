@@ -1,4 +1,4 @@
-const m = require("../../../src/v4/mobx.ts")
+const m = require("../mobx4")
 const intercept = m.intercept
 
 test("intercept observable value", () => {

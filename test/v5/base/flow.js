@@ -1,10 +1,10 @@
-import * as mobx from "../../../src/v5/mobx.ts"
+import * as mobx from "../../../src/mobx"
 import {
     flow,
     FlowCancellationError,
     isFlowCancellationError,
     makeObservable
-} from "../../../src/v5/mobx"
+} from "../../../src/mobx"
 
 function delay(time, value, shouldThrow = false) {
     return new Promise((resolve, reject) => {

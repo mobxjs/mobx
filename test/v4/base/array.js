@@ -1,6 +1,6 @@
 "use strict"
 
-const mobx = require("../../../src/v4/mobx.ts")
+const mobx = require("../mobx4")
 const { observable, _getAdministration, reaction, makeObservable } = mobx
 const iterall = require("iterall")
 

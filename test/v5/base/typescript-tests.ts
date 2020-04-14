@@ -26,8 +26,8 @@ import {
     IAtom,
     createAtom,
     runInAction
-} from "../../../src/v5/mobx"
-import * as mobx from "../../../src/v5/mobx"
+} from "../../../src/mobx"
+import * as mobx from "../../../src/mobx"
 // @ts-ignore
 import { assert, IsExact } from "conditional-type-checks"
 
@@ -1967,7 +1967,6 @@ test("#2159 - computed property keys", () => {
         [testString] = "original string value"
 
         constructor() {
-            debugger
             makeObservable(this, {
                 [testSymbol]: observable,
                 [testString]: observable
