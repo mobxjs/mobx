@@ -96,6 +96,39 @@ const orderLine = observable.object({
 })
 ```
 
+## Computed values are not getters
+The previous computed examples use the `get` keyword however, they generally should not be accessed directly as a getter. This can be a source of confusion to users new to Mobx from other derived cascading data layers like Reselect. As long as a computed value is not used by a reaction, it is not memoized and so it executes everytime it is accessed just like a normal eager evaluating function. This can cause preformance degredation if a computed value is read high frequency loop like `requestAnimationFrame`.  MobX can be configured to report an error when computeds are being access directly by using the `computedRequiresReaction` value
+
+```javascript
+configure({
+  computedRequiresReaction: true
+});
+```
+
+### Computed memoization
+A computed value should always be read by a reaction. Reading a computed value directly will cause it to recompute which can be expensive depending on the how complex the derived result is. The following code uses the previous `OrderLine` class example and memoizes the `total` value so that it can be read directly.
+
+```javascript
+class OrderLine {
+    @observable price = 0
+    @observable amount = 1
+
+    constructor(price) {
+        this.price = price
+        // When computed total changes
+        // cache value to this.total
+        autorun(() => {
+            this.total = this.computedTotal
+        })
+    }
+
+    @computed get computeTotal() {
+        return this.price * this.amount
+    }
+}
+```
+
+
 ## Setters for computed values
 
 It is possible to define a setter for computed values as well. Note that these setters cannot be used to alter the value of the computed property directly,
