@@ -89,7 +89,7 @@ const arrayTraps = {
             return arrayExtensions.get.call(target, parseInt(name))
         }
         // TODO: reuse util
-        if (arrayExtensions.hasOwnProperty(name)) {
+        if (Object.prototype.hasOwnProperty.call(arrayExtensions, name)) {
             return arrayExtensions[name]
         }
         return target[name]

@@ -34,6 +34,8 @@
     -   [ ] verify: action called from computed throws?
     -   [ ] apply deprecation of find and findIndex error
     -   [ ] verify perf / memory changes
+    -   [ ] investigate skipped tests
+    -   [ ] process TODO's
 
 ## Docs / migration guide
 

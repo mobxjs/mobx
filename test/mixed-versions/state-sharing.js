@@ -19,13 +19,13 @@ function testOutput(cmd, expected) {
     })
 }
 
-describe.skip("it should handle multiple instances with the correct warnings", () => {
+describe("it should handle multiple instances with the correct warnings", () => {
     testOutput(
-        'require("../../");global.__mobxGlobals.version = -1; require("../../lib/mobx.umd.js")',
+        'require("../../dist");global.__mobxGlobals.version = -1; require("../../dist/lib/mobx.umd.js")',
         "There are multiple, different versions of MobX active. Make sure MobX is loaded only once"
     )
     testOutput(
-        'const m = require("../../"); global.__mobxGlobals.version = -1; m.configure({isolateGlobalState: true});require("../../lib/mobx.umd.js").configure({isolateGlobalState: true})',
+        'const m = require("../../dist/"); global.__mobxGlobals.version = -1; m.configure({isolateGlobalState: true});require("../../dist/lib/mobx.umd.js").configure({isolateGlobalState: true})',
         ""
     )
     // testOutput(
@@ -33,7 +33,7 @@ describe.skip("it should handle multiple instances with the correct warnings", (
     //     ""
     // )
     testOutput(
-        'const m = require("../../");global.__mobxGlobals.version = -1;m.configure({isolateGlobalState: true});require("../../lib/mobx.umd.js")',
+        'const m = require("../../dist/");global.__mobxGlobals.version = -1;m.configure({isolateGlobalState: true});require("../../dist/lib/mobx.umd.js")',
         ""
     )
 })

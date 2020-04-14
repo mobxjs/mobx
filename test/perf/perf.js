@@ -18,7 +18,10 @@ results of this test:
 186/113 after remove filter/length call to detect whether depencies are stable. 300 times faster. w00t.
 
 */
-    const mobx = require(`../../dist/${version}`)
+    const mobx = require(`../../dist/lib/mobx.min.js`)
+    if (version === "legacy") {
+        mobx.configure({ useProxies: false })
+    }
     const observable = mobx.observable
     const computed = mobx.computed
 

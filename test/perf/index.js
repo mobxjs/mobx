@@ -1,8 +1,8 @@
 const start = Date.now()
 
 const ver = process.argv[2]
-if (!ver || !ver.startsWith("v")) {
-    throw new Error("specify version to perf test as v(4|5)")
+if (!ver || !ver.match(/legacy|proxy/)) {
+    throw new Error("specify version to perf test as (legacy|proxy)")
 }
 
 if (process.env.PERSIST) {

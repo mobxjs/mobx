@@ -34,11 +34,6 @@ function writeJSON(path, obj) {
     })
 }
 
-function maskVerWithX(ver) {
-    // simply replace initial 0 in version with X letter to avoid confusion
-    return ver.replace(/^0/, "X")
-}
-
 async function main() {
     const status = run("git status --porcelain -uno", { silent: true })
     if (status.stdout.length > 0) {
@@ -51,6 +46,7 @@ async function main() {
 
     const nextPatch = semver.inc(rootPkg.version, "patch")
     const nextMinor = semver.inc(rootPkg.version, "minor")
+    const nextMajor = semver.inc(rootPkg.version, "major")
 
     let gitUser = process.env.GIT_USER
 
@@ -62,9 +58,9 @@ async function main() {
                 message: "What do you want to publish?",
                 choices: [
                     { title: "Nothing, abort this", value: null },
-                    { title: `Patch version (${maskVerWithX(nextPatch)})`, value: nextPatch },
-                    { title: `Minor version (${maskVerWithX(nextMinor)})`, value: nextMinor },
-                    { title: "Major version - not possible", disable: true }
+                    { title: `Patch version ${nextPatch}`, value: nextPatch },
+                    { title: `Minor version ${nextMinor}`, value: nextMinor },
+                    { title: `Major version ${nextMajor}`, value: nextMajor }
                 ],
                 initial: null
             },
@@ -94,12 +90,12 @@ async function main() {
     })
 
     if (npmInfoRet.code === 0) {
-        const versions = await Promise.all([execute(4, "mobx4"), execute(5, "latest")])
+        const versions = await execute("latest")
 
         await writeJSON(rootPkgFile, { ...rootPkg, version: resp.action })
 
         run(`git add ${rootPkgFile}`)
-        run(`git commit --no-verify -m "Published version ${maskVerWithX(resp.action)}"`)
+        run(`git commit --no-verify -m "Published version ${resp.action}"`)
         run("git push")
 
         versions.forEach(ver => {
@@ -118,9 +114,8 @@ async function main() {
         exit(0)
     }
 
-    async function execute(major, distTag) {
+    async function execute(distTag) {
         const nextVersionParsed = semver.coerce(resp.action)
-        nextVersionParsed.major = major
         const nextVersion = nextVersionParsed.format()
 
         const publishedPackageInfo = JSON.parse(npmInfoRet.stdout)
@@ -130,7 +125,7 @@ async function main() {
 
         console.log(`Starting publish of ${nextVersion}...`)
 
-        const distPath = path.resolve(__dirname, "..", "dist", `v${major}`)
+        const distPath = path.resolve(__dirname, "..", "dist")
         const verPkgFile = path.join(distPath, "package.json")
         const verPkg = require(verPkgFile)
         await writeJSON(verPkgFile, { ...verPkg, version: nextVersion })
