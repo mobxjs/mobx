@@ -150,6 +150,25 @@ setInterval(() => {
 }, 60);
 ```
 
+#### KeepAlive Computeds
+
+A computed may be passed the `keepAlive` flag. keepAlive will cause the computed to act as though it is observed by a reaction. This is a convience method and is synoymous with the `autorun` pattern demonstrated above.
+
+``` javascript
+class OrderLine {
+    @observable price = 0
+    @observable amount = 1
+
+    constructor(price) {
+        this.price = price
+    }
+
+    @computed({keepAlive: true})
+    get total() {
+        return this.price * this.amount
+    }
+}
+```
 
 ## Setters for computed values
 
