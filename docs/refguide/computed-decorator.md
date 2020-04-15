@@ -97,7 +97,20 @@ const orderLine = observable.object({
 ```
 
 ## Computed values are not getters
-The previous computed examples use the `get` keyword however, they generally should not be accessed directly as a getter. This can be a source of confusion to users new to Mobx from other derived cascading data layers like Reselect. As long as a computed value is not used by a reaction, it is not memoized and so it executes everytime it is accessed just like a normal eager evaluating function. This can cause performance degredation if a computed value is read high in a frequency loop like `requestAnimationFrame`.  MobX can be configured to report an error when computeds are being access directly by using the `computedRequiresReaction` value
+The previous computed examples use the `get` keyword however, they generally should not be accessed directly as a getter. This can be a source of confusion to users new to Mobx from other derived cascading data layers like Reselect. The following code demonsrates issue.
+
+```
+const Ol = new OrderLine(2.00)
+
+// don't do this.
+// avoid accessing Ol.total directly
+// it will recompute everytime.
+setInterval(() => {
+  console.log(Ol.total);
+}, 60);
+```
+
+As long as a computed value is not used by a reaction, it is not memoized and so it executes everytime it is accessed just like a normal eager evaluating function. This can cause performance degredation if a computed value is read high in a frequency loop like `requestAnimationFrame`.  MobX can be configured to report an error when computeds are being access directly by using the `computedRequiresReaction` value
 
 ```javascript
 configure({
@@ -126,6 +139,15 @@ class OrderLine {
         return this.price * this.amount
     }
 }
+
+const Ol = new OrderLine(2.00)
+
+// this is now ok
+// because total will be cached from computeTotal
+// when its dependencies are updated
+setInterval(() => {
+  console.log(Ol.total);
+}, 60);
 ```
 
 
