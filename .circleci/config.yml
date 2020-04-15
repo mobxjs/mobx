@@ -60,12 +60,12 @@ jobs:
                   at: .
 
             - run:
-                  command: time node --expose-gc test/perf/index.js v4
+                  command: time node --expose-gc test/perf/index.js legacy
                   environment:
                       PERSIST: true
 
             - run:
-                  command: time node --expose-gc test/perf/index.js v5
+                  command: time node --expose-gc test/perf/index.js proxy
                   environment:
                       PERSIST: true
 
