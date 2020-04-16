@@ -97,7 +97,7 @@ const orderLine = observable.object({
 ```
 
 ## Computed values are not getters
-The previous computed examples use the `get` keyword however, they generally should not be accessed directly as a getter. This can be a source of confusion to users new to Mobx from other derived cascading data layers like Reselect. The following code demonsrates issue.
+The previous computed examples in the `OrderLine` class use the `get` keyword however, they generally should not be accessed directly as a getter. This can be a source of confusion to users new to Mobx from other derived cascading data layers like Reselect. The following code demonsrates the issue.
 
 ```
 const Ol = new OrderLine(2.00)
@@ -110,7 +110,7 @@ setInterval(() => {
 }, 60);
 ```
 
-As long as a computed value is not used by a reaction, it is not memoized and so it executes everytime it is accessed just like a normal eager evaluating function. This can cause performance degredation if a computed value is read high in a frequency loop like `requestAnimationFrame`.  MobX can be configured to report an error when computeds are being access directly by using the `computedRequiresReaction` value
+As long as a computed value is not used by a reaction, it is not memoized and so it executes everytime it is accessed just like a normal eager evaluating function. This can cause performance degredation if a computed value is read high in a frequency loop like `requestAnimationFrame`.  MobX can be configured to report an error when computeds are being access directly by using the `computedRequiresReaction` option
 
 ```javascript
 configure({
@@ -118,7 +118,9 @@ configure({
 });
 ```
 
-### Computed memoization
+Though this restriction is confusing and contradictory Computeds can be altered to work in a direct access manner with some of the following methods...
+
+### Computed memoization with reactions
 A computed value should always be read by a reaction. Reading a computed value directly will cause it to recompute which can be expensive, depending on the how complex the derived result is. The following code uses the previous `OrderLine` class example and memoizes the `total` value so that it can be read directly.
 
 ```javascript
@@ -150,9 +152,9 @@ setInterval(() => {
 }, 60);
 ```
 
-#### KeepAlive Computeds
+### Computed KeepAlive
 
-A computed may be passed the `keepAlive` flag. keepAlive will cause the computed to act as though it is observed by a reaction. This is a convience method and is synoymous with the `autorun` pattern demonstrated above.
+A computed may be initalized with the `keepAlive` flag. `keepAlive` will cause the computed to act as though it is observed by a reaction. This is a convience method and `keepAlive` does the same as the autorun in example above, but it does it a lot more efficient (it can for example keep the computed alive, but defer computation until somebody actually reads the value, something the autorun can't do).
 
 ``` javascript
 class OrderLine {
@@ -169,6 +171,9 @@ class OrderLine {
     }
 }
 ```
+
+### Autorun computeds vs keepalives
+The only case where autorun would be more beneficial than a `keepAlive` computed, is during a manual managment case in which you call the returned disposer to nicely clean up the computed value if it is no longer used typically you would do that in a destructor of a class for example.
 
 ## Setters for computed values
 
