@@ -172,7 +172,7 @@ class OrderLine {
 }
 ```
 
-### Autorun computeds vs keepalives
+### Autorun vs keepAlive
 The only case where autorun would be more beneficial than a `keepAlive` computed, is during a manual managment case in which you call the returned disposer to nicely clean up the computed value if it is no longer used typically you would do that in a destructor of a class for example.
 
 ## Setters for computed values
