@@ -36,36 +36,36 @@ export interface IObservableObject {
     "observable-object": IObservableObject
 }
 
-export type IObjectDidChange =
+export type IObjectDidChange<T = any> =
     | {
           name: string
-          object: any
+          object: T
           type: "add"
           newValue: any
       }
     | {
           name: string
-          object: any
+          object: T
           type: "update"
           oldValue: any
           newValue: any
       }
     | {
           name: string
-          object: any
+          object: T
           type: "remove"
           oldValue: any
       }
 
-export type IObjectWillChange =
+export type IObjectWillChange<T = any> =
     | {
-          object: any
+          object: T
           type: "update" | "add"
           name: string
           newValue: any
       }
     | {
-          object: any
+          object: T
           type: "remove"
           name: string
       }
