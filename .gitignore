@@ -7,7 +7,8 @@ notes.md
 test/babel-tests.js
 test/typescript/typescript-tests.js
 dist/
-.idea
+**/.idea/*
+!/.idea/icon.png
 .wp-build*/
 *.iml
 *.ipr
