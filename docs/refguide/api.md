@@ -368,7 +368,7 @@ Returns a disposer function to cancel the side effect.
 **options**
 
 -   **`name?: string`**: A name for easier identification and debugging
--   **`delay?: number`**: the sideEffect will be delayed and debounced with the given `delay`. Defaults to `0`.
+-   **`delay?: number`**: the sideEffect will be delayed and throttled with the given `delay`. Defaults to `0`.
 -   **`onError?: (error) => void`**: error handler that will be triggered if the autorun function throws an exception
 -   **`scheduler?: (callback) => void`**: Set a custom scheduler to determine how re-running the autorun function should be scheduled
 -   **`requiresObservable?: boolean`** Enables [`reactionRequiresObservable`](#reactionrequiresobservable-boolean) locally for the autorun
@@ -400,14 +400,14 @@ Usage: `reaction(() => data, data => { sideEffect }, options)`.
 A variation on `autorun` that gives more fine-grained control on which observables that will be tracked.
 It takes two function, the first one is tracked and returns data that is used as input for the second one, the side effect.
 Unlike `autorun` the side effect won't be run initially, and any observables that are accessed while executing the side effect will not be tracked.
-The side effect can be debounced, just like `autorunAsync`.
+The side effect can be throttled, just like `autorunAsync`.
 
 [&laquo;details&raquo;](reaction.md)
 
 **options**
 
 -   **`fireImmediately?: boolean`**: Wait for a change before firing the _effect function_. Defaults to `false`.
--   **`delay?: number`**: the sideEffect will be delayed and debounced with the given `delay`. Defaults to `0`.
+-   **`delay?: number`**: the sideEffect will be delayed and throttled with the given `delay`. Defaults to `0`.
 -   **`equals`**: Custom equality function to determine whether the expr function differed from it's previous result, and hence should fire effect. Accepts the same options as the equals option of `computed`.
 -   Also accepts all of the options from [`autorun`](#autorun)
 -   **`requiresObservable?: boolean`** Enables [`reactionRequiresObservable`](#reactionrequiresobservable-boolean) locally for the reaction
