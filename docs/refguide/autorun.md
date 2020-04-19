@@ -62,7 +62,7 @@ numbers.push(5)
 
 Autorun accepts as the second argument an options object with the following optional options:
 
--   `delay`: Number in milliseconds that can be used to debounce the effect function. If zero (the default), no debouncing will happen.
+-   `delay`: Number in milliseconds that can be used to throttle the effect function. If zero (the default), no throttling will happen.
 -   `name`: String that is used as name for this reaction in for example [`spy`](spy.md) events.
 -   `onError`: function that will handle the errors of this reaction, rather then propagating them.
 -   `scheduler`: Set a custom scheduler to determine how re-running the autorun function should be scheduled. It takes a function that should be invoked at some point in the future, for example: `{ scheduler: run => { setTimeout(run, 1000) }}`
