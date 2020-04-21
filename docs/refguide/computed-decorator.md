@@ -137,7 +137,7 @@ class OrderLine {
         })
     }
 
-    @computed get computeTotal() {
+    @computed get computedTotal() {
         return this.price * this.amount
     }
 }
