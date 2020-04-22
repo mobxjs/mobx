@@ -4,7 +4,6 @@ daysUntilStale: 14
 daysUntilClose: 4
 # Issues with these labels will never be considered stale
 exemptLabels:
-  - bug
   - has PR
   - discuss
   - enhancement
@@ -13,7 +12,6 @@ exemptLabels:
   - ready-to-be-implemented-by-volunteer
   - needs investigation
   - breaking-change
-  - bug
   - help wanted
   - pinned
   - waiting-for-standardized-decorators
