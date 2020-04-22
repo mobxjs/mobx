@@ -107,6 +107,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
     }
 
     forEach(callbackFn: (value: T, value2: T, set: Set<T>) => void, thisArg?: any) {
+        this._atom.reportObserved()
         this._data.forEach(value => {
             callbackFn.call(thisArg, value, value, this)
         })

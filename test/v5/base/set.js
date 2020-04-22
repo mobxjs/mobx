@@ -267,3 +267,17 @@ test("toJS", () => {
     expect(z.x).not.toBe(x)
     expect(mobx.isObservable(z.x)).toBeFalsy()
 })
+
+test("set.forEach is reactive", () => {
+    let c = 0
+    const s = set()
+
+    autorun(() => {
+        s.forEach(() => {})
+        c++
+    })
+
+    s.add(1)
+    s.add(2)
+    expect(c).toBe(3)
+})
