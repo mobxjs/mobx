@@ -24,7 +24,8 @@ import {
     untracked,
     makeIterable,
     transaction,
-    isES6Set
+    isES6Set,
+    IAtom
 } from "../internal"
 
 const ObservableSetMarker = {}
@@ -58,7 +59,7 @@ export type ISetWillChange<T = any> =
 export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillChange>, IListenable {
     [$mobx] = ObservableSetMarker
     private _data: Set<any> = new Set()
-    private _atom = createAtom(this.name)
+    private _atom: IAtom
     changeListeners
     interceptors
     dehancer: any
@@ -74,9 +75,8 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
                 "mobx.set requires Set polyfill for the current browser. Check babel-polyfill or core-js/es6/set.js"
             )
         }
-
+        this._atom = createAtom(this.name)
         this.enhancer = (newV, oldV) => enhancer(newV, oldV, name)
-
         if (initialData) {
             this.replace(initialData)
         }
@@ -264,6 +264,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
     [Symbol.toStringTag]: "Set" = "Set"
 }
 
-export const isObservableSet = createInstanceofPredicate("ObservableSet", ObservableSet) as (
+// eslint-disable-next-line
+export var isObservableSet = createInstanceofPredicate("ObservableSet", ObservableSet) as (
     thing: any
 ) => thing is ObservableSet<any>

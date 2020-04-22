@@ -264,7 +264,8 @@ makeNonEnumerable(LegacyObservableArray.prototype, [
 ])
 
 // See #364
-const ENTRY_0 = createArrayEntryDescriptor(0)
+// eslint-disable-next-line
+var ENTRY_0 = createArrayEntryDescriptor(0)
 
 function createArrayEntryDescriptor(index: number) {
     return {

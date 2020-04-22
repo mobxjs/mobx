@@ -49,7 +49,8 @@ function _when(predicate: () => boolean, effect: Lambda, opts: IWhenOptions): IR
 
     opts.name = opts.name || "When@" + getNextId()
     const effectAction = createAction(opts.name + "-effect", effect as Function)
-    const disposer = autorun(r => {
+    // eslint-disable-next-line
+    var disposer = autorun(r => {
         if (predicate()) {
             r.dispose()
             if (timeoutHandle) clearTimeout(timeoutHandle)

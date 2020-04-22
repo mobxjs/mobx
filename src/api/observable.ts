@@ -206,4 +206,5 @@ const observableFactories: IObservableFactory = {
     struct: createDecorator("observable.struct")
 } as any
 
-export const observable: IObservableFactory = Object.assign(createObservable, observableFactories)
+// eslint-disable-next-line
+export var observable: IObservableFactory = Object.assign(createObservable, observableFactories)

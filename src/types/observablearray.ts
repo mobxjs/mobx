@@ -115,24 +115,6 @@ const arrayTraps = {
     }
 }
 
-export function createObservableArray<T>(
-    initialValues: any[] | undefined,
-    enhancer: IEnhancer<T>,
-    name = "ObservableArray@" + getNextId(),
-    owned = false
-): IObservableArray<T> {
-    const adm = new ObservableArrayAdministration(name, enhancer, owned, false)
-    addHiddenFinalProp(adm.values, $mobx, adm)
-    const proxy = new Proxy(adm.values, arrayTraps) as any
-    adm.proxy = proxy
-    if (initialValues && initialValues.length) {
-        const prev = allowStateChangesStart(true)
-        adm.spliceWithArray(0, 0, initialValues)
-        allowStateChangesEnd(prev)
-    }
-    return proxy
-}
-
 export class ObservableArrayAdministration
     implements IInterceptable<IArrayWillChange<any> | IArrayWillSplice<any>>, IListenable {
     atom: IAtom
@@ -307,7 +289,26 @@ export class ObservableArrayAdministration
     }
 }
 
-export const arrayExtensions = {
+export function createObservableArray<T>(
+    initialValues: any[] | undefined,
+    enhancer: IEnhancer<T>,
+    name = "ObservableArray@" + getNextId(),
+    owned = false
+): IObservableArray<T> {
+    const adm = new ObservableArrayAdministration(name, enhancer, owned, false)
+    addHiddenFinalProp(adm.values, $mobx, adm)
+    const proxy = new Proxy(adm.values, arrayTraps) as any
+    adm.proxy = proxy
+    if (initialValues && initialValues.length) {
+        const prev = allowStateChangesStart(true)
+        adm.spliceWithArray(0, 0, initialValues)
+        allowStateChangesEnd(prev)
+    }
+    return proxy
+}
+
+// eslint-disable-next-line
+export var arrayExtensions = {
         intercept(handler: IInterceptor<IArrayWillChange<any> | IArrayWillSplice<any>>): Lambda {
             return this[$mobx].intercept(handler)
         },

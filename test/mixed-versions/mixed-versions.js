@@ -1,14 +1,14 @@
 const fs = require("fs")
 const child_process = require("child_process")
 
-if (!fs.existsSync(__dirname + "/../../dist/lib/mobx.umd.min.js")) {
+if (!fs.existsSync(__dirname + "/../../dist/mobx.umd.development.js")) {
     // make sure the minified build exists
     child_process.execSync("yarn build", { stdio: "inherit" })
 }
 
 const mobx1 = require("../../dist")
 /* istanbul ignore next */
-const mobx2 = require("../../dist/lib/mobx.umd.min.js")
+const mobx2 = require("../../dist/mobx.umd.development.js")
 
 test("two versions should not work together by default", () => {
     expect(global.__mobxInstanceCount).toBe(2)

@@ -34,6 +34,7 @@ import {
     globalState,
     convertToMap
 } from "../internal"
+import { IAtom } from "../core/atom"
 
 export interface IKeyValueMap<V = any> {
     [key: string]: V
@@ -84,7 +85,7 @@ export class ObservableMap<K = any, V = any>
     [$mobx] = ObservableMapMarker
     private _data: Map<K, ObservableValue<V>>
     private _hasMap: Map<K, ObservableValue<boolean>> // hasMap, not hashMap >-).
-    private _keysAtom = createAtom(`${this.name}.keys()`)
+    private _keysAtom: IAtom
     interceptors
     changeListeners
     dehancer: any
@@ -99,6 +100,7 @@ export class ObservableMap<K = any, V = any>
                 "mobx.map requires Map polyfill for the current browser. Check babel-polyfill or core-js/es6/map.js"
             )
         }
+        this._keysAtom = createAtom(`${this.name}.keys()`)
         this._data = new Map()
         this._hasMap = new Map()
         this.merge(initialData)
@@ -470,6 +472,7 @@ export class ObservableMap<K = any, V = any>
     }
 }
 
-export const isObservableMap = createInstanceofPredicate("ObservableMap", ObservableMap) as (
+// eslint-disable-next-line
+export var isObservableMap = createInstanceofPredicate("ObservableMap", ObservableMap) as (
     thing: any
 ) => thing is ObservableMap<any, any>

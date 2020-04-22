@@ -1,14 +1,15 @@
 {
   "name": "mobx",
-  "version": "6.0.0",
+  "version": "6.0.0-rc.0",
   "description": "Simple, scalable state management.",
-  "main": "lib/index.js",
-  "umd:main": "lib/mobx.umd.js",
-  "module": "lib/mobx.module.js",
-  "unpkg": "lib/mobx.umd.min.js",
-  "jsnext:main": "lib/mobx.module.js",
-  "react-native": "lib/mobx.module.js",
-  "typings": "lib/mobx.d.ts",
+  "main": "dist/index.js",
+  "module": "dist/mobx.esm.js",
+  "umd:main": "dist/mobx.umd.production.min.js",
+  "unpkg": "dist/mobx.umd.production.min.js",
+  "jsnext:main": "dist/mobx.esm.js",
+  "react-native": "dist/mobx.esm.js",
+  "source": "src/mobx.ts",
+  "typings": "dist/mobx.d.ts",
   "sideEffects": false,
   "scripts": {
     "test": "jest",
@@ -21,10 +22,12 @@
     "test:flow": "node_modules/.bin/flow check",
     "test:coverage": "yarn test -i --coverage",
     "test:performance": "PERSIST=true time node --expose-gc test/perf/index.js",
-    "test:size": "yarn build && yarn import-size --report ./dist/ observable computed autorun action enableDecorators",
+    "test:size": "yarn build && yarn import-size --report . observable computed autorun action enableDecorators",
     "test:codemod": "yarn jest --testRegex 'codemod/.*spec' codemod/undecorate.spec.ts",
     "prettier": "prettier \"**/*.js\" \"**/*.ts\" \"docs/**/*.md\"",
-    "build": "node scripts/build.js",
+    "prebuild": "rimraf lib",
+    "build": "tsdx build --name mobx --format esm,cjs,umd",
+    "postbuild": "cp flow-typed/mobx.js dist/index.js.flow",
     "release": "node scripts/publish.js",
     "publish-script": "yarn release",
     "docs:build": "yarn --cwd website build",
@@ -47,8 +50,9 @@
     "url": "https://github.com/mobxjs/mobx/issues"
   },
   "files": [
-    "lib",
-    "LICENSE"
+    "dist",
+    "LICENSE",
+    "README.md"
   ],
   "homepage": "https://mobx.js.org/",
   "dependencies": {},
@@ -93,6 +97,7 @@
     "size-limit": "^4.0.2",
     "tape": "^4.10.1",
     "ts-jest": "^24.0.0",
+    "tsdx": "^0.13.2",
     "tslib": "^1.9.3",
     "typescript": "^3.8.3"
   },
