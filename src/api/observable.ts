@@ -56,7 +56,7 @@ function assertValidOption(key: string) {
 export function asCreateObservableOptions(thing: any): CreateObservableOptions {
     if (thing === null || thing === undefined) return defaultCreateObservableOptions
     if (typeof thing === "string") return { name: thing, deep: true, proxy: true }
-    if (process.env.NODE_ENV !== "production") {
+    if (__DEV__) {
         if (typeof thing !== "object") return fail("expected options object")
         Object.keys(thing).forEach(assertValidOption)
     }

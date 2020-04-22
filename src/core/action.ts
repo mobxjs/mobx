@@ -21,7 +21,7 @@ const functionNameDescriptor = Object.getOwnPropertyDescriptor(() => {}, "name")
 const isFunctionNameConfigurable = functionNameDescriptor && functionNameDescriptor.configurable
 
 export function createAction(actionName: string, fn: Function, ref?: Object): Function {
-    if (process.env.NODE_ENV !== "production") {
+    if (__DEV__) {
         invariant(typeof fn === "function", "`action` can only be invoked on functions")
         if (typeof actionName !== "string" || !actionName)
             fail(`actions should have valid names, got: '${actionName}'`)
@@ -30,7 +30,7 @@ export function createAction(actionName: string, fn: Function, ref?: Object): Fu
         return executeAction(actionName, fn, ref || this, arguments)
     }
     ;(res as any).isMobxAction = true
-    if (process.env.NODE_ENV !== "production") {
+    if (__DEV__) {
         if (isFunctionNameConfigurable) {
             Object.defineProperty(res, "name", { value: actionName })
         }
@@ -64,7 +64,7 @@ export interface IActionRunInfo {
 export function _startAction(actionName: string, scope: any, args?: IArguments): IActionRunInfo {
     const notifySpy = isSpyEnabled() && !!actionName
     let startTime: number = 0
-    if (notifySpy && process.env.NODE_ENV !== "production") {
+    if (notifySpy && __DEV__) {
         startTime = Date.now()
         const l = (args && args.length) || 0
         const flattendArgs = new Array(l)
@@ -106,7 +106,7 @@ export function _endAction(runInfo: IActionRunInfo) {
     allowStateReadsEnd(runInfo.prevAllowStateReads)
     endBatch()
     untrackedEnd(runInfo.prevDerivation)
-    if (runInfo.notifySpy && process.env.NODE_ENV !== "production") {
+    if (runInfo.notifySpy && __DEV__) {
         spyReportEnd({ time: Date.now() - runInfo.startTime })
     }
     globalState.suppressReactionErrors = false

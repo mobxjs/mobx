@@ -99,11 +99,7 @@ export class Reaction implements IDerivation, IReactionPublic {
 
                 try {
                     this.onInvalidate()
-                    if (
-                        this._isTrackPending &&
-                        isSpyEnabled() &&
-                        process.env.NODE_ENV !== "production"
-                    ) {
+                    if (this._isTrackPending && isSpyEnabled() && __DEV__) {
                         // onInvalidate didn't trigger track right away..
                         spyReport({
                             name: this.name,
@@ -126,7 +122,7 @@ export class Reaction implements IDerivation, IReactionPublic {
         startBatch()
         const notify = isSpyEnabled()
         let startTime
-        if (notify && process.env.NODE_ENV !== "production") {
+        if (notify && __DEV__) {
             startTime = Date.now()
             spyReportStart({
                 name: this.name,
@@ -142,7 +138,7 @@ export class Reaction implements IDerivation, IReactionPublic {
             clearObserving(this)
         }
         if (isCaughtException(result)) this.reportExceptionInDerivation(result.cause)
-        if (notify && process.env.NODE_ENV !== "production") {
+        if (notify && __DEV__) {
             spyReportEnd({
                 time: Date.now() - startTime
             })

@@ -14,7 +14,7 @@ export function _isComputed(value, property?: string): boolean {
 export function isComputed(value: any): boolean {
     if (arguments.length > 1)
         return fail(
-            process.env.NODE_ENV !== "production" &&
+            __DEV__ &&
                 `isComputed expects only 1 argument. Use isObservableProp to inspect the observability of a property`
         )
     return _isComputed(value)
@@ -22,9 +22,6 @@ export function isComputed(value: any): boolean {
 
 export function isComputedProp(value: any, propName: string): boolean {
     if (typeof propName !== "string")
-        return fail(
-            process.env.NODE_ENV !== "production" &&
-                `isComputed expected a property name as second argument`
-        )
+        return fail(__DEV__ && `isComputed expected a property name as second argument`)
     return _isComputed(value, propName)
 }

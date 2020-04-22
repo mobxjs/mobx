@@ -13,10 +13,7 @@ import {
 function _isObservable(value, property?: string): boolean {
     if (value === null || value === undefined) return false
     if (property !== undefined) {
-        if (
-            process.env.NODE_ENV !== "production" &&
-            (isObservableMap(value) || isObservableArray(value))
-        )
+        if (__DEV__ && (isObservableMap(value) || isObservableArray(value)))
             return fail(
                 "isObservable(object, propertyName) is not supported for arrays and maps. Use map.has or array.length instead."
             )
@@ -38,7 +35,7 @@ function _isObservable(value, property?: string): boolean {
 export function isObservable(value: any): boolean {
     if (arguments.length !== 1)
         fail(
-            process.env.NODE_ENV !== "production" &&
+            __DEV__ &&
                 `isObservable expects only 1 argument. Use isObservableProp to inspect the observability of a property`
         )
     return _isObservable(value)
@@ -46,8 +43,6 @@ export function isObservable(value: any): boolean {
 
 export function isObservableProp(value: any, propName: string): boolean {
     if (typeof propName !== "string" && typeof propName !== "symbol")
-        return fail(
-            process.env.NODE_ENV !== "production" && `expected a property name as second argument`
-        )
+        return fail(__DEV__ && `expected a property name as second argument`)
     return _isObservable(value, propName)
 }

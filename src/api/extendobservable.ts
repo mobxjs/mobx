@@ -19,7 +19,7 @@ export function extendObservable<A extends Object, B extends Object>(
     annotations?: AnnotationsMap<B>,
     options?: CreateObservableOptions
 ): A & B {
-    if (process.env.NODE_ENV !== "production") {
+    if (__DEV__) {
         invariant(
             arguments.length >= 2 && arguments.length <= 4,
             "'extendObservable' expected 2-4 arguments"

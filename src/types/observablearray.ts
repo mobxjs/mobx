@@ -219,7 +219,7 @@ export class ObservableArrayAdministration
         }
 
         newItems = newItems.length === 0 ? newItems : newItems.map(v => this.enhancer(v, undefined))
-        if (this.legacyMode || process.env.NODE_ENV !== "production") {
+        if (this.legacyMode || __DEV__) {
             const lengthDelta = newItems.length - deleteCount
             this.updateArrayLength(length, lengthDelta) // checks if internal array wasn't modified
         }
@@ -257,11 +257,10 @@ export class ObservableArrayAdministration
 
         // The reason why this is on right hand side here (and not above), is this way the uglifier will drop it, but it won't
         // cause any runtime overhead in development mode without NODE_ENV set, unless spying is enabled
-        if (notifySpy && process.env.NODE_ENV !== "production")
-            spyReportStart({ ...change, name: this.atom.name })
+        if (notifySpy && __DEV__) spyReportStart({ ...change, name: this.atom.name })
         this.atom.reportChanged()
         if (notify) notifyListeners(this, change)
-        if (notifySpy && process.env.NODE_ENV !== "production") spyReportEnd()
+        if (notifySpy && __DEV__) spyReportEnd()
     }
 
     notifyArraySplice(index: number, added: any[], removed: any[]) {
@@ -280,12 +279,11 @@ export class ObservableArrayAdministration
                   }
                 : null
 
-        if (notifySpy && process.env.NODE_ENV !== "production")
-            spyReportStart({ ...change, name: this.atom.name })
+        if (notifySpy && __DEV__) spyReportStart({ ...change, name: this.atom.name })
         this.atom.reportChanged()
         // conform: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
         if (notify) notifyListeners(this, change)
-        if (notifySpy && process.env.NODE_ENV !== "production") spyReportEnd()
+        if (notifySpy && __DEV__) spyReportEnd()
     }
 }
 
@@ -391,7 +389,7 @@ export var arrayExtensions = {
             // reverse by default mutates in place before returning the result
             // which makes it both a 'derivation' and a 'mutation'.
             // so we deviate from the default and just make it an dervitation
-            if (process.env.NODE_ENV !== "production") {
+            if (__DEV__) {
                 console.warn(
                     "[mobx] `observableArray.reverse()` will not update the array in place. Use `observableArray.slice().reverse()` to suppress this warning and perform the operation on a copy, or `observableArray.replace(observableArray.slice().reverse())` to reverse & update in place"
                 )
@@ -403,7 +401,7 @@ export var arrayExtensions = {
         sort(compareFn?: (a: any, b: any) => number): any[] {
             // sort by default mutates in place before returning the result
             // which goes against all good practices. Let's not change the array in place!
-            if (process.env.NODE_ENV !== "production") {
+            if (__DEV__) {
                 console.warn(
                     "[mobx] `observableArray.sort()` will not update the array in place. Use `observableArray.slice().sort()` to suppress this warning and perform the operation on a copy, or `observableArray.replace(observableArray.slice().sort())` to sort & update in place"
                 )

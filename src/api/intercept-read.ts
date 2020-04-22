@@ -40,20 +40,15 @@ export function interceptReads(thing, propOrHandler?, handler?): Lambda {
     } else if (isObservableObject(thing)) {
         if (typeof propOrHandler !== "string")
             return fail(
-                process.env.NODE_ENV !== "production" &&
+                __DEV__ &&
                     `InterceptReads can only be used with a specific property, not with an object in general`
             )
         target = getAdministration(thing, propOrHandler)
     } else {
-        return fail(
-            process.env.NODE_ENV !== "production" &&
-                `Expected observable map, object or array as first array`
-        )
+        return fail(__DEV__ && `Expected observable map, object or array as first array`)
     }
     if (target.dehancer !== undefined)
-        return fail(
-            process.env.NODE_ENV !== "production" && `An intercept reader was already established`
-        )
+        return fail(__DEV__ && `An intercept reader was already established`)
     target.dehancer = typeof propOrHandler === "function" ? propOrHandler : handler
     return () => {
         target.dehancer = undefined

@@ -172,8 +172,7 @@ export class ObservableMap<K = any, V = any>
                       }
                     : null
 
-            if (notifySpy && process.env.NODE_ENV !== "production")
-                spyReportStart({ ...change, name: this.name, key })
+            if (notifySpy && __DEV__) spyReportStart({ ...change, name: this.name, key })
             transaction(() => {
                 this._keysAtom.reportChanged()
                 this._updateHasMapEntry(key, false)
@@ -182,7 +181,7 @@ export class ObservableMap<K = any, V = any>
                 this._data.delete(key)
             })
             if (notify) notifyListeners(this, change)
-            if (notifySpy && process.env.NODE_ENV !== "production") spyReportEnd()
+            if (notifySpy && __DEV__) spyReportEnd()
             return true
         }
         return false
@@ -211,11 +210,10 @@ export class ObservableMap<K = any, V = any>
                           newValue
                       }
                     : null
-            if (notifySpy && process.env.NODE_ENV !== "production")
-                spyReportStart({ ...change, name: this.name, key })
+            if (notifySpy && __DEV__) spyReportStart({ ...change, name: this.name, key })
             observable.setNewValue(newValue as V)
             if (notify) notifyListeners(this, change)
-            if (notifySpy && process.env.NODE_ENV !== "production") spyReportEnd()
+            if (notifySpy && __DEV__) spyReportEnd()
         }
     }
 
@@ -244,10 +242,9 @@ export class ObservableMap<K = any, V = any>
                       newValue
                   }
                 : null
-        if (notifySpy && process.env.NODE_ENV !== "production")
-            spyReportStart({ ...change, name: this.name, key })
+        if (notifySpy && __DEV__) spyReportStart({ ...change, name: this.name, key })
         if (notify) notifyListeners(this, change)
-        if (notifySpy && process.env.NODE_ENV !== "production") spyReportEnd()
+        if (notifySpy && __DEV__) spyReportEnd()
     }
 
     get(key: K): V | undefined {
@@ -459,7 +456,7 @@ export class ObservableMap<K = any, V = any>
      * for callback details
      */
     observe(listener: (changes: IMapDidChange<K, V>) => void, fireImmediately?: boolean): Lambda {
-        process.env.NODE_ENV !== "production" &&
+        __DEV__ &&
             invariant(
                 fireImmediately !== true,
                 "`observe` doesn't support fireImmediately=true in combination with maps."

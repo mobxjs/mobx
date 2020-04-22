@@ -39,7 +39,7 @@ const deprecatedMessages: string[] = []
 export function deprecated(msg: string): boolean
 export function deprecated(thing: string, replacement: string): boolean
 export function deprecated(msg: string, thing?: string): boolean {
-    if (process.env.NODE_ENV === "production") return false
+    if (!__DEV__) return false
     if (thing) {
         return deprecated(`'${msg}', use '${thing}' instead.`)
     }
@@ -127,7 +127,7 @@ export function isPropertyConfigurable(object: any, prop: PropertyKey): boolean 
 }
 
 export function assertPropertyConfigurable(object: any, prop: PropertyKey) {
-    if (process.env.NODE_ENV !== "production" && !isPropertyConfigurable(object, prop))
+    if (__DEV__ && !isPropertyConfigurable(object, prop))
         fail(
             `Cannot make property '${prop.toString()}' observable, it is not configurable and writable in the target object`
         )

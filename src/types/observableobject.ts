@@ -129,11 +129,10 @@ export class ObservableObjectAdministration
                       }
                     : null
 
-            if (notifySpy && process.env.NODE_ENV !== "production")
-                spyReportStart({ ...change, name: this.name, key })
+            if (notifySpy && __DEV__) spyReportStart({ ...change, name: this.name, key })
             ;(observable as ObservableValue<any>).setNewValue(newValue)
             if (notify) notifyListeners(this, change)
-            if (notifySpy && process.env.NODE_ENV !== "production") spyReportEnd()
+            if (notifySpy && __DEV__) spyReportEnd()
         }
     }
 
@@ -236,10 +235,9 @@ export class ObservableObjectAdministration
                           name: key
                       }
                     : null
-            if (notifySpy && process.env.NODE_ENV !== "production")
-                spyReportStart({ ...change, name: this.name, key })
+            if (notifySpy && __DEV__) spyReportStart({ ...change, name: this.name, key })
             if (notify) notifyListeners(this, change)
-            if (notifySpy && process.env.NODE_ENV !== "production") spyReportEnd()
+            if (notifySpy && __DEV__) spyReportEnd()
         } finally {
             endBatch()
         }
@@ -276,7 +274,7 @@ export class ObservableObjectAdministration
      * for callback details
      */
     observe(callback: (changes: IObjectDidChange) => void, fireImmediately?: boolean): Lambda {
-        process.env.NODE_ENV !== "production" &&
+        __DEV__ &&
             invariant(
                 fireImmediately !== true,
                 "`observe` doesn't support the fire immediately property for observable objects."
@@ -301,10 +299,9 @@ export class ObservableObjectAdministration
                   }
                 : null
 
-        if (notifySpy && process.env.NODE_ENV !== "production")
-            spyReportStart({ ...change, name: this.name, key })
+        if (notifySpy && __DEV__) spyReportStart({ ...change, name: this.name, key })
         if (notify) notifyListeners(this, change)
-        if (notifySpy && process.env.NODE_ENV !== "production") spyReportEnd()
+        if (notifySpy && __DEV__) spyReportEnd()
         if (this.pendingKeys) {
             const entry = this.pendingKeys.get(key)
             if (entry) entry.set(true)
@@ -332,7 +329,7 @@ export function asObservableObject(
 ): ObservableObjectAdministration {
     if (Object.prototype.hasOwnProperty.call(target, $mobx)) return target[$mobx]
 
-    process.env.NODE_ENV !== "production" &&
+    __DEV__ &&
         invariant(
             Object.isExtensible(target),
             "Cannot make the designated object observable; it is not extensible"

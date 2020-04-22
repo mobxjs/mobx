@@ -149,13 +149,13 @@ export function checkIfStateModificationsAreAllowed(atom: IAtom) {
     // Should never be possible to change an observed observable from inside computed, see #798
     if (globalState.computationDepth > 0 && hasObservers)
         fail(
-            process.env.NODE_ENV !== "production" &&
+            __DEV__ &&
                 `Computed values are not allowed to cause side effects by changing observables that are already being observed. Tried to modify: ${atom.name}`
         )
     // Should not be possible to change observed state outside strict mode, except during initialization, see #563
     if (!globalState.allowStateChanges && (hasObservers || globalState.enforceActions === "strict"))
         fail(
-            process.env.NODE_ENV !== "production" &&
+            __DEV__ &&
                 (globalState.enforceActions
                     ? "Since strict-mode is enabled, changing observed observable values outside actions is not allowed. Please wrap the code in an `action` if this change is intended. Tried to modify: "
                     : "Side effects like changing state are not allowed at this point. Are you trying to modify state from, for example, the render function of a React component? Tried to modify: ") +
@@ -164,11 +164,7 @@ export function checkIfStateModificationsAreAllowed(atom: IAtom) {
 }
 
 export function checkIfStateReadsAreAllowed(observable: IObservable) {
-    if (
-        process.env.NODE_ENV !== "production" &&
-        !globalState.allowStateReads &&
-        globalState.observableRequiresReaction
-    ) {
+    if (__DEV__ && !globalState.allowStateReads && globalState.observableRequiresReaction) {
         console.warn(`[mobx] Observable ${observable.name} being read outside a reactive context`)
     }
 }
@@ -209,7 +205,7 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T, con
 }
 
 function warnAboutDerivationWithoutDependencies(derivation: IDerivation) {
-    if (process.env.NODE_ENV === "production") return
+    if (!__DEV__) return
 
     if (derivation.observing.length !== 0) return
 

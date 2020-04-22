@@ -60,8 +60,7 @@ function interceptHook(hook: "onBecomeObserved" | "onBecomeUnobserved", thing, a
     }
 
     const orig = atom[hook]
-    if (typeof orig !== "function")
-        return fail(process.env.NODE_ENV !== "production" && "Not an atom that can be (un)observed")
+    if (typeof orig !== "function") return fail(__DEV__ && "Not an atom that can be (un)observed")
 
     return function() {
         const hookListeners = atom[listenersKey]

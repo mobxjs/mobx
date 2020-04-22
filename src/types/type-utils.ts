@@ -15,10 +15,7 @@ export function getAtom(thing: any, property?: string): IDepTreeNode {
     if (typeof thing === "object" && thing !== null) {
         if (isObservableArray(thing)) {
             if (property !== undefined)
-                fail(
-                    process.env.NODE_ENV !== "production" &&
-                        "It is not possible to get index atoms from arrays"
-                )
+                fail(__DEV__ && "It is not possible to get index atoms from arrays")
             return (thing as any)[$mobx].atom
         }
         if (isObservableSet(thing)) {
@@ -30,7 +27,7 @@ export function getAtom(thing: any, property?: string): IDepTreeNode {
             const observable = anyThing._data.get(property) || anyThing._hasMap.get(property)
             if (!observable)
                 fail(
-                    process.env.NODE_ENV !== "production" &&
+                    __DEV__ &&
                         `the entry '${property}' does not exist in the observable map '${getDebugName(
                             thing
                         )}'`
@@ -39,12 +36,11 @@ export function getAtom(thing: any, property?: string): IDepTreeNode {
         }
         if (property && !thing[$mobx]) thing[property] // See #1072
         if (isObservableObject(thing)) {
-            if (!property)
-                return fail(process.env.NODE_ENV !== "production" && `please specify a property`)
+            if (!property) return fail(__DEV__ && `please specify a property`)
             const observable = (thing as any)[$mobx].values.get(property)
             if (!observable)
                 fail(
-                    process.env.NODE_ENV !== "production" &&
+                    __DEV__ &&
                         `no observable property '${property.toString()}' found on the observable object '${getDebugName(
                             thing
                         )}'`
@@ -60,7 +56,7 @@ export function getAtom(thing: any, property?: string): IDepTreeNode {
             return thing[$mobx]
         }
     }
-    return fail(process.env.NODE_ENV !== "production" && "Cannot obtain atom from " + thing)
+    return fail(__DEV__ && "Cannot obtain atom from " + thing)
 }
 
 export function getAdministration(thing: any, property?: string) {
@@ -69,7 +65,7 @@ export function getAdministration(thing: any, property?: string) {
     if (isAtom(thing) || isComputedValue(thing) || isReaction(thing)) return thing
     if (isObservableMap(thing) || isObservableSet(thing)) return thing
     if (thing[$mobx]) return thing[$mobx]
-    fail(process.env.NODE_ENV !== "production" && "Cannot obtain administration from " + thing)
+    fail(__DEV__ && "Cannot obtain administration from " + thing)
 }
 
 export function getDebugName(thing: any, property?: string): string {

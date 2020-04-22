@@ -55,7 +55,7 @@ export function runInAction(arg1, arg2?) {
     const actionName = typeof arg1 === "string" ? arg1 : arg1.name || "<unnamed action>"
     const fn = typeof arg1 === "function" ? arg1 : arg2
 
-    if (process.env.NODE_ENV !== "production") {
+    if (__DEV__) {
         invariant(
             typeof fn === "function" && fn.length === 0,
             "`runInAction` expects a function without arguments"

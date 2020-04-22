@@ -64,7 +64,7 @@ function whenPromise(
     predicate: () => boolean,
     opts?: IWhenOptions
 ): Promise<void> & { cancel(): void } {
-    if (process.env.NODE_ENV !== "production" && opts && opts.onError)
+    if (__DEV__ && opts && opts.onError)
         return fail(`the options 'onError' and 'promise' cannot be combined`)
     let cancel
     const res = new Promise((resolve, reject) => {

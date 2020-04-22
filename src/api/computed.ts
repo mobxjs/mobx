@@ -31,7 +31,7 @@ export const computed: IComputedFactory = function computed(arg1, arg2, arg3) {
     }
 
     // computed(expr, options?)
-    if (process.env.NODE_ENV !== "production") {
+    if (__DEV__) {
         invariant(
             typeof arg1 === "function",
             "First argument to `computed` should be an expression."

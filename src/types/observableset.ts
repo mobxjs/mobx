@@ -135,9 +135,9 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
                           newValue: value
                       }
                     : null
-            if (notifySpy && process.env.NODE_ENV !== "production") spyReportStart(change)
+            if (notifySpy && __DEV__) spyReportStart(change)
             if (notify) notifyListeners(this, change)
-            if (notifySpy && process.env.NODE_ENV !== "production") spyReportEnd()
+            if (notifySpy && __DEV__) spyReportEnd()
         }
 
         return this
@@ -164,14 +164,13 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
                       }
                     : null
 
-            if (notifySpy && process.env.NODE_ENV !== "production")
-                spyReportStart({ ...change, name: this.name })
+            if (notifySpy && __DEV__) spyReportStart({ ...change, name: this.name })
             transaction(() => {
                 this._atom.reportChanged()
                 this._data.delete(value)
             })
             if (notify) notifyListeners(this, change)
-            if (notifySpy && process.env.NODE_ENV !== "production") spyReportEnd()
+            if (notifySpy && __DEV__) spyReportEnd()
             return true
         }
         return false
@@ -237,7 +236,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
 
     observe(listener: (changes: ISetDidChange<T>) => void, fireImmediately?: boolean): Lambda {
         // TODO 'fireImmediately' can be true?
-        process.env.NODE_ENV !== "production" &&
+        __DEV__ &&
             invariant(
                 fireImmediately !== true,
                 "`observe` doesn't support fireImmediately=true in combination with sets."

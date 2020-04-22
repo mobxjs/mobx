@@ -33,10 +33,7 @@ export function keys(obj: any): any {
     if (isObservableArray(obj)) {
         return obj.map((_, index) => index)
     }
-    return fail(
-        process.env.NODE_ENV !== "production" &&
-            "'keys()' can only be used on observable objects, arrays, sets and maps"
-    )
+    return fail(__DEV__ && "'keys()' can only be used on observable objects, arrays, sets and maps")
 }
 
 export function values<K, T>(map: ObservableMap<K, T>): ReadonlyArray<T>
@@ -57,8 +54,7 @@ export function values(obj: any): string[] {
         return obj.slice()
     }
     return fail(
-        process.env.NODE_ENV !== "production" &&
-            "'values()' can only be used on observable objects, arrays, sets and maps"
+        __DEV__ && "'values()' can only be used on observable objects, arrays, sets and maps"
     )
 }
 
@@ -81,10 +77,7 @@ export function entries(obj: any): any {
     if (isObservableArray(obj)) {
         return obj.map((key, index) => [index, key])
     }
-    return fail(
-        process.env.NODE_ENV !== "production" &&
-            "'entries()' can only be used on observable objects, arrays and maps"
-    )
+    return fail(__DEV__ && "'entries()' can only be used on observable objects, arrays and maps")
 }
 
 export function set<V>(obj: ObservableMap<PropertyKey, V>, values: { [key: string]: V })
@@ -124,10 +117,7 @@ export function set(obj: any, key: any, value?: any): void {
         obj[key] = value
         endBatch()
     } else {
-        return fail(
-            process.env.NODE_ENV !== "production" &&
-                "'set()' can only be used on observable objects, arrays and maps"
-        )
+        return fail(__DEV__ && "'set()' can only be used on observable objects, arrays and maps")
     }
 }
 
@@ -147,10 +137,7 @@ export function remove(obj: any, key: any): void {
         invariant(key >= 0, `Not a valid index: '${key}'`)
         obj.splice(key, 1)
     } else {
-        return fail(
-            process.env.NODE_ENV !== "production" &&
-                "'remove()' can only be used on observable objects, arrays and maps"
-        )
+        return fail(__DEV__ && "'remove()' can only be used on observable objects, arrays and maps")
     }
 }
 
@@ -170,10 +157,7 @@ export function has(obj: any, key: any): boolean {
     } else if (isObservableArray(obj)) {
         return key >= 0 && key < obj.length
     } else {
-        return fail(
-            process.env.NODE_ENV !== "production" &&
-                "'has()' can only be used on observable objects, arrays and maps"
-        )
+        return fail(__DEV__ && "'has()' can only be used on observable objects, arrays and maps")
     }
 }
 
@@ -189,9 +173,6 @@ export function get(obj: any, key: any): any {
     } else if (isObservableArray(obj)) {
         return obj[key]
     } else {
-        return fail(
-            process.env.NODE_ENV !== "production" &&
-                "'get()' can only be used on observable objects, arrays and maps"
-        )
+        return fail(__DEV__ && "'get()' can only be used on observable objects, arrays and maps")
     }
 }

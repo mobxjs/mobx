@@ -16,8 +16,8 @@ export type CancellablePromise<T> = Promise<T> & { cancel(): void }
 export function flow<R, Args extends any[]>(
     generator: (...args: Args) => Generator<any, R, any> | AsyncGenerator<any, R, any>
 ): (...args: Args) => CancellablePromise<R> {
-    if (arguments.length !== 1)
-        fail(!!process.env.NODE_ENV && `Flow expects 1 argument and cannot be used as decorator`)
+    if (__DEV__ && arguments.length !== 1)
+        fail(!`Flow expects 1 argument and cannot be used as decorator`)
     const name = generator.name || "<unnamed flow>"
 
     // Implementation based on https://github.com/tj/co/blob/master/index.js

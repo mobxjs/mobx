@@ -9,7 +9,7 @@ export function trace(...args: any[]): void {
     const derivation = getAtomFromArgs(args)
     if (!derivation) {
         return fail(
-            process.env.NODE_ENV !== "production" &&
+            __DEV__ &&
                 `'trace(break?)' can only be used inside a tracked computed value or a Reaction. Consider passing in the computed value or reaction explicitly`
         )
     }

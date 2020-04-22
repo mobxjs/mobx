@@ -59,7 +59,7 @@ export class ObservableValue<T> extends Atom
     ) {
         super(name)
         this.value = enhancer(value, undefined, name)
-        if (notifySpy && isSpyEnabled() && process.env.NODE_ENV !== "production") {
+        if (notifySpy && isSpyEnabled() && __DEV__) {
             // only notify spy if this is a stand-alone observable
             spyReport({ type: "create", name: this.name, newValue: "" + this.value })
         }
@@ -75,7 +75,7 @@ export class ObservableValue<T> extends Atom
         newValue = this.prepareNewValue(newValue) as any
         if (newValue !== globalState.UNCHANGED) {
             const notifySpy = isSpyEnabled()
-            if (notifySpy && process.env.NODE_ENV !== "production") {
+            if (notifySpy && __DEV__) {
                 spyReportStart({
                     type: "update",
                     name: this.name,
@@ -84,7 +84,7 @@ export class ObservableValue<T> extends Atom
                 })
             }
             this.setNewValue(newValue)
-            if (notifySpy && process.env.NODE_ENV !== "production") spyReportEnd()
+            if (notifySpy && __DEV__) spyReportEnd()
         }
     }
 

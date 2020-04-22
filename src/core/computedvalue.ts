@@ -182,13 +182,13 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         } else
             invariant(
                 false,
-                process.env.NODE_ENV !== "production" &&
+                __DEV__ &&
                     `[ComputedValue '${this.name}'] It is not possible to assign a new value to a computed value.`
             )
     }
 
     private trackAndCompute(): boolean {
-        if (isSpyEnabled() && process.env.NODE_ENV !== "production") {
+        if (isSpyEnabled() && __DEV__) {
             spyReport({
                 object: this.scope,
                 type: "compute",
@@ -263,7 +263,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     }
 
     warnAboutUntrackedRead() {
-        if (process.env.NODE_ENV === "production") return
+        if (!__DEV__) return
         if (this.requiresReaction === true) {
             fail(`[mobx] Computed value ${this.name} is read outside a reactive context`)
         }

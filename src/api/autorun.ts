@@ -34,7 +34,7 @@ export function autorun(
     view: (r: IReactionPublic) => any,
     opts: IAutorunOptions = EMPTY_OBJECT
 ): IReactionDisposer {
-    if (process.env.NODE_ENV !== "production") {
+    if (__DEV__) {
         invariant(typeof view === "function", "Autorun expects a function as first argument")
         invariant(
             isAction(view) === false,
@@ -105,7 +105,7 @@ export function reaction<T>(
     effect: (arg: T, r: IReactionPublic) => void,
     opts: IReactionOptions = EMPTY_OBJECT
 ): IReactionDisposer {
-    if (process.env.NODE_ENV !== "production") {
+    if (__DEV__) {
         invariant(
             typeof expression === "function",
             "First argument to reaction should be a function"

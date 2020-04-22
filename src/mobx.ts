@@ -16,7 +16,7 @@
  *
  */
 
-import { getGlobal, spy, getDebugName, $mobx } from "./internal"
+import { spy, getDebugName, $mobx } from "./internal"
 
 if (typeof Proxy === "undefined" || typeof Symbol === "undefined") {
     throw new Error(
@@ -24,29 +24,11 @@ if (typeof Proxy === "undefined" || typeof Symbol === "undefined") {
     )
 }
 
-try {
-    // define process.env if needed
-    // if this is not a production build in the first place
-    // (in which case the expression below would be substituted with 'production')
-    process.env.NODE_ENV
-} catch (e) {
-    const g = getGlobal()
-    if (typeof process === "undefined") g.process = {}
-    g.process.env = {}
-}
-
 ;(() => {
     function testCodeMinification() {}
-    if (
-        testCodeMinification.name !== "testCodeMinification" &&
-        process.env.NODE_ENV !== "production" &&
-        typeof process !== "undefined" &&
-        process.env.IGNORE_MOBX_MINIFY_WARNING !== "true"
-    ) {
-        // trick so it doesn't get replaced
-        const varName = ["process", "env", "NODE_ENV"].join(".")
+    if (__DEV__ && testCodeMinification.name !== "testCodeMinification") {
         console.warn(
-            `[mobx] you are running a minified build, but '${varName}' was not set to 'production' in your bundler. This results in an unnecessarily large and slow bundle`
+            `[mobx] you are running a minified build, but NODE_ENV was not set to 'production' in your bundler. This results in an unnecessarily large and slow bundle`
         )
     }
 })()
