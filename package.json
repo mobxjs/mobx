@@ -64,8 +64,6 @@
     "@babel/preset-env": "^7.8.4",
     "@babel/preset-typescript": "^7.9.0",
     "@babel/runtime": "^7.8.4",
-    "@rollup/plugin-node-resolve": "^7.1.1",
-    "@size-limit/preset-big-lib": "^4.0.2",
     "@types/jest": "^24.0.11",
     "@types/jscodeshift": "^0.6.3",
     "@types/node": "^11.11.3",
@@ -87,10 +85,6 @@
     "prettier": "^1.19.1",
     "pretty-quick": "2.0.1",
     "prompts": "^2.3.0",
-    "rollup": "^1.31.1",
-    "rollup-plugin-filesize": "^6.2.1",
-    "rollup-plugin-replace": "^2.1.0",
-    "rollup-plugin-terser": "^5.2.0",
     "semver": "^7.1.3",
     "serializr": "^1.5.1",
     "shelljs": "^0.8.3",
@@ -98,7 +92,6 @@
     "tape": "^4.10.1",
     "ts-jest": "^24.0.0",
     "tsdx": "^0.13.2",
-    "tslib": "^1.9.3",
     "typescript": "^3.8.3"
   },
   "keywords": [
