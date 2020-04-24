@@ -94,7 +94,7 @@ export class MobXGlobals {
     /**
      * If strict mode is enabled, state changes are by default not allowed
      */
-    enforceActions: boolean | "strict" = false
+    enforceActions: boolean | "strict" = true
 
     /**
      * Spy callbacks
@@ -142,6 +142,11 @@ export class MobXGlobals {
     suppressReactionErrors = false
 
     useProxies = true
+    /*
+     * print warnings about code that would fail if proxies weren't available
+     */
+    // TODO: add tests for this
+    verifyProxies = false
 }
 
 declare const window: any

@@ -3,19 +3,18 @@ import {
     isolateGlobalState,
     setReactionScheduler,
     fail,
-    deprecated
+    deprecated,
+    assertES5
 } from "../internal"
 
 export function configure(options: {
     enforceActions?: boolean | "strict" | "never" | "always" | "observed"
     computedRequiresReaction?: boolean
     /**
-     * (Experimental)
      * Warn if you try to create to derivation / reactive context without accessing any observable.
      */
     reactionRequiresObservable?: boolean
     /**
-     * (Experimental)
      * Warn if observables are accessed outside a reactive context
      */
     observableRequiresReaction?: boolean
@@ -39,7 +38,9 @@ export function configure(options: {
         isolateGlobalState()
     }
     if (useProxies !== undefined) {
-        // TODO: if ES5 impl loaded?
+        if (useProxies !== "always") {
+            assertES5()
+        }
         globalState.useProxies =
             useProxies === "always"
                 ? true
@@ -48,21 +49,14 @@ export function configure(options: {
                 : typeof Proxy !== "undefined"
     }
     if (enforceActions !== undefined) {
-        if (typeof enforceActions === "boolean" || enforceActions === "strict")
-            deprecated(
-                `Deprecated value for 'enforceActions', use 'false' => '"never"', 'true' => '"observed"', '"strict"' => "'always'" instead`
-            )
         let ea
         switch (enforceActions) {
-            case true:
             case "observed":
                 ea = true
                 break
-            case false:
             case "never":
                 ea = false
                 break
-            case "strict":
             case "always":
                 ea = "strict"
                 break

@@ -26,8 +26,9 @@ import {
     asObservableObject,
     storeDecorator,
     createDecorator,
-    LegacyObservableArray,
-    globalState
+    legacyArrayApi,
+    globalState,
+    assertES5
 } from "../internal"
 
 export type CreateObservableOptions = {
@@ -166,7 +167,12 @@ const observableFactories: IObservableFactory = {
     array<T = any>(initialValues?: T[], options?: CreateObservableOptions): IObservableArray<T> {
         const o = asCreateObservableOptions(options)
         if (globalState.useProxies === false || o.proxy === false) {
-            return new LegacyObservableArray(initialValues, getEnhancerFromOption(o), o.name) as any
+            assertES5()
+            return new legacyArrayApi!.LegacyObservableArray(
+                initialValues,
+                getEnhancerFromOption(o),
+                o.name
+            ) as any
         }
         return createObservableArray(initialValues, getEnhancerFromOption(o), o.name) as any
     },

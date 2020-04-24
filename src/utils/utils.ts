@@ -14,6 +14,25 @@ export interface Lambda {
     name?: string
 }
 
+const hasProxy = typeof Proxy !== "undefined"
+
+export function assertProxies() {
+    if (!hasProxy) {
+        fail(
+            "`Proxy` objects are not available in the current environment. Please configure MobX to enable  a fallback implementation using `enableES5()`"
+        )
+    }
+}
+
+export function warnAboutProxyRequirement() {
+    if (globalState.verifyProxies) {
+        // TODO: add relevant URL at the end of this warning
+        console.warn(
+            "MobX is currently configured to be able to allow running ES5 mode, however, this line of code will not work on ES5 environments. For details see: "
+        )
+    }
+}
+
 export function getNextId() {
     return ++globalState.mobxGuid
 }

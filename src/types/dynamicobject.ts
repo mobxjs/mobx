@@ -4,7 +4,9 @@ import {
     IIsObservableObject,
     ObservableObjectAdministration,
     fail,
-    set
+    set,
+    warnAboutProxyRequirement,
+    assertProxies
 } from "../internal"
 
 function getAdm(target): ObservableObjectAdministration {
@@ -20,6 +22,7 @@ function isPropertyKey(val) {
 const objectProxyTraps: ProxyHandler<any> = {
     has(target: IIsObservableObject, name: PropertyKey) {
         if (name === $mobx || name === "constructor") return true
+        if (__DEV__) warnAboutProxyRequirement() // TODO: is this correct?
         const adm = getAdm(target)
         // MWE: should `in` operator be reactive? If not, below code path will be faster / more memory efficient
         // TODO: check performance stats!
@@ -48,16 +51,21 @@ const objectProxyTraps: ProxyHandler<any> = {
     },
     set(target: IIsObservableObject, name: PropertyKey, value: any) {
         if (!isPropertyKey(name)) return false
+        if (__DEV__ && !getAdm(target).values.has(name)) {
+            warnAboutProxyRequirement()
+        }
         set(target, name, value)
         return true
     },
     deleteProperty(target: IIsObservableObject, name: PropertyKey) {
+        if (__DEV__) warnAboutProxyRequirement()
         if (!isPropertyKey(name)) return false
         const adm = getAdm(target)
         adm.remove(name)
         return true
     },
     ownKeys(target: IIsObservableObject) {
+        if (__DEV__) warnAboutProxyRequirement()
         const adm = getAdm(target)
         adm.keysAtom.reportObserved()
         return Reflect.ownKeys(target)
@@ -69,6 +77,7 @@ const objectProxyTraps: ProxyHandler<any> = {
 }
 
 export function createDynamicObservableObject(base) {
+    assertProxies()
     const proxy = new Proxy(base, objectProxyTraps)
     base[$mobx].proxy = proxy
     return proxy

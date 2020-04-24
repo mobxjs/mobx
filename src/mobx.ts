@@ -18,21 +18,6 @@
 
 import { spy, getDebugName, $mobx } from "./internal"
 
-if (typeof Proxy === "undefined" || typeof Symbol === "undefined") {
-    throw new Error(
-        "[mobx] MobX 5+ requires Proxy and Symbol objects. If your environment doesn't support Symbol or Proxy objects, please downgrade to MobX 4. For React Native Android, consider upgrading JSCore."
-    )
-}
-
-;(() => {
-    function testCodeMinification() {}
-    if (__DEV__ && testCodeMinification.name !== "testCodeMinification") {
-        console.warn(
-            `[mobx] you are running a minified build, but NODE_ENV was not set to 'production' in your bundler. This results in an unnecessarily large and slow bundle`
-        )
-    }
-})()
-
 export {
     IObservable,
     IDepTreeNode,
@@ -139,7 +124,8 @@ export {
     allowStateReadsStart as _allowStateReadsStart,
     allowStateReadsEnd as _allowStateReadsEnd,
     makeObservable,
-    makeAutoObservable
+    makeAutoObservable,
+    enableES5
 } from "./internal"
 
 // Devtools support

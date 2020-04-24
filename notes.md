@@ -52,6 +52,8 @@
 -   [ ] Breaking: can no longer re-decorate fields already decorated by a superclass
 -   [ ] Breaking: methods will be actions by default in `extendObservabe` / `observable`
 -   [ ] Breaking: `decorate` has been removed
+-   [ ] Breaking: `observableRequiresReaction` is now the default
+-   [ ] Breaking: `enforceActions` is now defaulted to `observed`, but now generates a warning rather than an error
 -   [ ] optimization tip: hoist the mapping constant
 -   [ ] document: uncoditional map
 -   [ ] document `true` and `false` as annotations
@@ -62,6 +64,7 @@
 
 -   [ ] Running codemod: yarn jscodeshift -t codemod/undecorate.ts test/v5/base/typescript-tests.ts --ignoreImports=true
 -   [ ] killed: IGNORE_MOBX_MINIFY_WARNING
+-   [ ] Document: recommended settings for prod versus experimentation
 
 ## Blog
 
