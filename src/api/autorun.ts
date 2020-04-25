@@ -9,7 +9,9 @@ import {
     comparer,
     getNextId,
     invariant,
-    isAction
+    isAction,
+    isFunction,
+    isPlainObject
 } from "../internal"
 
 export interface IAutorunOptions {
@@ -35,7 +37,7 @@ export function autorun(
     opts: IAutorunOptions = EMPTY_OBJECT
 ): IReactionDisposer {
     if (__DEV__) {
-        invariant(typeof view === "function", "Autorun expects a function as first argument")
+        invariant(isFunction(view), "Autorun expects a function as first argument")
         invariant(
             isAction(view) === false,
             "Autorun does not accept actions since actions are untrackable"
@@ -107,10 +109,10 @@ export function reaction<T>(
 ): IReactionDisposer {
     if (__DEV__) {
         invariant(
-            typeof expression === "function",
-            "First argument to reaction should be a function"
+            isFunction(expression) && isFunction(effect),
+            "First and second argument to reaction should be functions"
         )
-        invariant(typeof opts === "object", "Third argument of reactions should be an object")
+        invariant(isPlainObject(opts), "Third argument of reactions should be an object")
     }
     const name = opts.name || "Reaction@" + getNextId()
     const effectAction = action(
@@ -143,7 +145,7 @@ export function reaction<T>(
     )
 
     function reactionRunner() {
-        isScheduled = false // Q: move into reaction runner?
+        isScheduled = false
         if (r.isDisposed) return
         let changed = false
         r.track(() => {

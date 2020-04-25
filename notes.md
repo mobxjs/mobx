@@ -5,7 +5,7 @@
     -   [ ] TSDX build process
 -   [ ] Smaller build
     -   [x] fixup build, restore asset bundling
-    -   [ ] create prod esm build
+    -   [ ] create prod esm build?
     -   [ ] minimal dev errors
     -   [ ] invariant system from immer
     -   [ ] extract utils for getOwnPropertyDescriptor and defineProperty
@@ -16,17 +16,19 @@
     -   [x] codemod babel
     -   [x] codemod leave decorators
     -   [x] migrate decorate calls as well
+    -   [ ] migrate privates correctly
     -   [ ] unit tests for `ignoreImports`
     -   [ ] unit tests for `keepDecorators`
 -   [ ] ES5 support
     -   [x] combine with ES5?
     -   [x] backport tests and code to v4(6)
-    -   [ ] make sure legacy array implementation is opt in
+    -   [x] make sure legacy array implementation is opt in
     -   [ ] map / set as opt-in as well?
-    -   [ ] compare mobx.configure options between v4 and v5
+    -   [x] compare mobx.configure options between v4 and v5
     -   [ ] two or 3 modes for configure useProxies? If two, kill `deep` option to observable?
 -   [ ] annotations instead of decorators
-    -   [ ] get rid of all that pending decorators shizzle
+    -   [ ] update typings for makeObservable with private keys
+    -   [x] get rid of all that pending decorators shizzle
     -   [x] Todo: check how important array of decorators is, see original issue -> This will be breaking issue, as we are going to treat action etc different?
     -   [ ] Optimize: cache meta data
     -   [x] observable / extendObservable use decorators args
@@ -41,8 +43,13 @@
     -   [ ] weakmap for hasMaps in Map (and Set?)
     -   [ ] add a solution for keepAlive computeds like https://github.com/mobxjs/mobx/issues/2309#issuecomment-598707584
     -   [ ] update useLocalStore in mobx-react-lite to use makeObservable
+    -   [ ] include #2343
+    -   [ ] default observable requires reaction?
+    -   [ ] kill globalstate options?
 
 ## Docs / migration guide
+
+PHilosophy: one thing to do things
 
 -   [ ] Host old docs somewhere? Figure out how docusaurus can support a second version
 -   [ ] Using the codemod
@@ -54,6 +61,9 @@
 -   [ ] Breaking: `decorate` has been removed
 -   [ ] Breaking: `observableRequiresReaction` is now the default
 -   [ ] Breaking: `enforceActions` is now defaulted to `observed`, but now generates a warning rather than an error
+-   [ ] Breaking: `runInAction` now longer supports a name as first argument. Use an action or named function instead
+-   [ ] Breaking: `computed` doesn not accept setter function as second argument anymore, use `options.set` instead
+-   [ ] Breaking: option `computedConfigurable` was dropped and is the default now
 -   [ ] optimization tip: hoist the mapping constant
 -   [ ] document: uncoditional map
 -   [ ] document `true` and `false` as annotations
@@ -65,6 +75,8 @@
 -   [ ] Running codemod: yarn jscodeshift -t codemod/undecorate.ts test/v5/base/typescript-tests.ts --ignoreImports=true
 -   [ ] killed: IGNORE_MOBX_MINIFY_WARNING
 -   [ ] Document: recommended settings for prod versus experimentation
+-   [ ] Migration: document switching from 4 to 5: configure( ) with proxies, requiresReqction, enforceActions
+-   [ ] makeObservable + private members in TypeScript (second call? computed name? tsignore?)
 
 ## Blog
 

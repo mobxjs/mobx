@@ -1,20 +1,25 @@
-import { Annotation, addHiddenProp, fail, AnnotationsMap, makeObservable } from "../internal"
+import {
+    Annotation,
+    addHiddenProp,
+    fail,
+    AnnotationsMap,
+    makeObservable,
+    assign
+} from "../internal"
 
 export const mobxDecoratorsSymbol = Symbol("mobx-decoratorators")
 
 export function createDecorator<ArgType>(
     type: Annotation["annotationType"]
 ): Annotation & PropertyDecorator & ((arg: ArgType) => PropertyDecorator & Annotation) {
-    return Object.assign(
+    return assign(
         function(target: any, property?: PropertyKey): any {
-            if (arguments.length === 1) {
+            if (property === undefined) {
                 // @decorator(arg) member
                 createDecoratorAndAnnotation(type, target)
-            } else if (arguments.length === 2 || arguments.length === 3) {
+            } else {
                 // @decorator member
                 storeDecorator(target, property!, type)
-            } else {
-                fail(`Invalid decorator call`)
             }
         },
         {
@@ -27,7 +32,7 @@ export function createDecoratorAndAnnotation(
     type: Annotation["annotationType"],
     arg?: any
 ): PropertyDecorator & Annotation {
-    return Object.assign(
+    return assign(
         function(target, property) {
             storeDecorator(target, property, type, arg)
         },
@@ -44,8 +49,7 @@ export function storeDecorator(
     type: Annotation["annotationType"],
     arg?: any
 ) {
-    // TODO: add bunch of assertions
-    const desc = Object.getOwnPropertyDescriptor(target, mobxDecoratorsSymbol)
+    const desc = getDescriptor(target, mobxDecoratorsSymbol)
     let map: any
     if (desc) {
         map = desc.value
@@ -62,7 +66,7 @@ export function applyDecorators(target: Object): boolean {
     // (then we can remove the weird short circuiting as well..)
     let annotations: AnnotationsMap<any>[] = []
     while (current && current !== Object.prototype) {
-        const desc = Object.getOwnPropertyDescriptor(current, mobxDecoratorsSymbol)
+        const desc = getDescriptor(current, mobxDecoratorsSymbol)
         if (desc) {
             if (!annotations.length) {
                 for (let key in desc.value) {

@@ -2,13 +2,18 @@ import {
     addHiddenProp,
     createAction,
     executeAction,
-    fail,
-    invariant,
     Annotation,
     createDecorator,
     createDecoratorAndAnnotation,
-    storeDecorator
+    storeDecorator,
+    die,
+    isFunction,
+    isStringish
 } from "../internal"
+
+const ACTION = "action"
+const ACTION_BOUND = "action.bound"
+const ACTION_UNNAMED = "<unnamed action>"
 
 export interface IActionFactory extends Annotation, PropertyDecorator {
     // nameless actions
@@ -16,9 +21,10 @@ export interface IActionFactory extends Annotation, PropertyDecorator {
     // named actions
     <T extends Function>(name: string, fn: T): T
 
-    // named
+    // named decorator
     (customName: string): PropertyDecorator & Annotation
 
+    // (named?) decorator
     bound: IBoundActionFactory
 }
 
@@ -26,49 +32,32 @@ interface IBoundActionFactory extends Annotation, PropertyDecorator {
     (name: string): Annotation & PropertyDecorator
 }
 
-export const action: IActionFactory = function action(arg1, arg2?, arg3?): any {
+export const action: IActionFactory = function action(arg1, arg2?): any {
     // action(fn() {})
-    if (arguments.length === 1 && typeof arg1 === "function")
-        return createAction(arg1.name || "<unnamed action>", arg1)
+    if (isFunction(arg1)) return createAction(arg1.name || ACTION_UNNAMED, arg1)
     // action("name", fn() {})
-    if (arguments.length === 2 && typeof arg2 === "function") return createAction(arg1, arg2)
-
+    if (isFunction(arg2)) return createAction(arg1, arg2)
     // @action
-    if (arguments.length >= 2 && (typeof arg2 === "string" || typeof arg2 === "symbol")) {
-        return storeDecorator(arg1, arg2, "action")
+    if (isStringish(arg2)) {
+        return storeDecorator(arg1, arg2, ACTION)
     }
-
     // Annation: action("name") & @action("name")
-    if (arguments.length === 1 && typeof arg1 === "string") {
-        return createDecoratorAndAnnotation("action", arg1)
+    if (isStringish(arg1)) {
+        return createDecoratorAndAnnotation(ACTION, arg1)
     }
 
-    fail("Invalid arguments to action")
+    if (__DEV__) die("Invalid arguments for `action`")
 } as any
-action.annotationType = "action"
+action.annotationType = ACTION
 
-action.bound = createDecorator<string>("action.bound")
+action.bound = createDecorator<string>(ACTION_BOUND)
 
-export function runInAction<T>(block: () => T): T
-export function runInAction<T>(name: string, block: () => T): T
-export function runInAction(arg1, arg2?) {
-    const actionName = typeof arg1 === "string" ? arg1 : arg1.name || "<unnamed action>"
-    const fn = typeof arg1 === "function" ? arg1 : arg2
-
-    if (__DEV__) {
-        invariant(
-            typeof fn === "function" && fn.length === 0,
-            "`runInAction` expects a function without arguments"
-        )
-        if (typeof actionName !== "string" || !actionName)
-            fail(`actions should have valid names, got: '${actionName}'`)
-    }
-
-    return executeAction(actionName, fn, this, undefined)
+export function runInAction<T>(fn: () => T): T {
+    return executeAction(fn.name || ACTION_UNNAMED, fn, this, undefined)
 }
 
 export function isAction(thing: any) {
-    return typeof thing === "function" && thing.isMobxAction === true
+    return isFunction(thing) && thing.isMobxAction === true
 }
 
 export function defineBoundAction(target: any, propertyName: string, fn: Function) {

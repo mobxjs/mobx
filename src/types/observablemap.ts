@@ -31,8 +31,7 @@ import {
     transaction,
     untracked,
     onBecomeUnobserved,
-    globalState,
-    convertToMap
+    globalState
 } from "../internal"
 import { IAtom } from "../core/atom"
 
@@ -473,3 +472,19 @@ export class ObservableMap<K = any, V = any>
 export var isObservableMap = createInstanceofPredicate("ObservableMap", ObservableMap) as (
     thing: any
 ) => thing is ObservableMap<any, any>
+
+function convertToMap(dataStructure: any): Map<any, any> {
+    if (isES6Map(dataStructure) || isObservableMap(dataStructure)) {
+        return dataStructure
+    } else if (Array.isArray(dataStructure)) {
+        return new Map(dataStructure)
+    } else if (isPlainObject(dataStructure)) {
+        const map = new Map()
+        for (const key in dataStructure) {
+            map.set(key, dataStructure[key])
+        }
+        return map
+    } else {
+        return fail(`Cannot convert to map from '${dataStructure}'`)
+    }
+}

@@ -15,9 +15,11 @@ import {
     ObservableObjectAdministration,
     invariant,
     applyDecorators,
-    isObservableProp
+    isObservableProp,
+    getDescriptor,
+    isPlainObject,
+    isObservableObject
 } from "../internal"
-import { isPlainObject } from "../utils/utils"
 
 function makeAction(target, key, name, fn) {
     addHiddenProp(target, key, action(name || key, fn))
@@ -34,11 +36,11 @@ function getInferredAnnotation(
     return defaultAnnotation ?? observable.deep
 }
 
-function getDescriptor(target: Object, prop: PropertyKey): [PropertyDescriptor, Object] {
+function getDescriptorInChain(target: Object, prop: PropertyKey): [PropertyDescriptor, Object] {
     let current = target
     while (current && current !== Object.prototype) {
         // TODO: cache meta data, especially for members from prototypes?
-        const desc = Object.getOwnPropertyDescriptor(current, prop)
+        const desc = getDescriptor(current, prop)
         if (desc) {
             return [desc, current]
         }
@@ -141,9 +143,9 @@ export function makeProperty(
     }
 }
 
-export function makeObservable<T extends Object>(
+export function makeObservable<T extends Object, AdditionalKeys extends PropertyKey = never>(
     target: T,
-    annotations?: AnnotationsMap<T>,
+    annotations?: AnnotationsMap<T, AdditionalKeys>,
     options?: CreateObservableOptions
 ) {
     const adm = asObservableObject(
@@ -163,7 +165,7 @@ export function makeObservable<T extends Object>(
         }
         const make = key => {
             let annotation = annotations[key]
-            const [desc, owner] = getDescriptor(target, key)
+            const [desc, owner] = getDescriptorInChain(target, key)
             makeProperty(adm, owner, key, desc, annotation, false)
         }
         Object.getOwnPropertyNames(annotations).forEach(make)
@@ -171,31 +173,34 @@ export function makeObservable<T extends Object>(
     } finally {
         endBatch()
     }
+    return target
 }
 
 // TODO: add tests
-export function makeAutoObservable<T extends Object>(
+export function makeAutoObservable<T extends Object, AdditionalKeys extends PropertyKey = never>(
     target: T,
-    excludes?: AnnotationsMap<T>,
+    excludes?: AnnotationsMap<T, AdditionalKeys>,
     options?: CreateObservableOptions
-) {
+): T {
     const proto = Object.getPrototypeOf(target)
     const isPlain = proto == null || proto === Object.prototype
     invariant(
         isPlain || isPlainObject(proto),
         `'makeAutoObservable' can only be used for classes that don't have a superclass`
     )
+    invariant(!isObservableObject(target), `TODO`)
     let annotations = { ...excludes }
     extractAnnotationsFromObject(target, annotations, options)
     if (!isPlain) {
         extractAnnotationsFromProto(proto, annotations)
     }
     makeObservable(target, annotations, options)
+    return target
 }
 
 function extractAnnotationsFromObject(
     target,
-    collector: AnnotationsMap<any>,
+    collector: AnnotationsMap<any, any>,
     options: CreateObservableOptions | undefined
 ) {
     const defaultAnnotation: Annotation = options?.deep
@@ -207,11 +212,11 @@ function extractAnnotationsFromObject(
     })
 }
 
-function extractAnnotationsFromProto(proto: any, collector: AnnotationsMap<any>) {
+function extractAnnotationsFromProto(proto: any, collector: AnnotationsMap<any, any>) {
     // TODO: make a utility for this
     ;[...Object.getOwnPropertyNames(proto), ...Object.getOwnPropertySymbols(proto)].forEach(key => {
         if (key in collector) return
-        const prop = Object.getOwnPropertyDescriptor(proto, key)!
+        const prop = getDescriptor(proto, key)!
         if (prop.get) {
             collector[key as any] = computed
         } else if (typeof prop.value === "function") {

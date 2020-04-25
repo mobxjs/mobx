@@ -29,6 +29,7 @@ export function createAction(actionName: string, fn: Function, ref?: Object): Fu
     function res() {
         return executeAction(actionName, fn, ref || this, arguments)
     }
+    // TODO: can be optimized by recyclig objects?
     return Object.defineProperties(res, {
         ...(isFunctionNameConfigurable && { name: { value: actionName } }),
         isMobxAction: { value: true }

@@ -3,7 +3,8 @@ import {
     isObservableArray,
     isObservableMap,
     isES6Set,
-    isObservableSet
+    isObservableSet,
+    hasProp
 } from "../internal"
 
 declare const Symbol
@@ -133,7 +134,7 @@ function eq(a: any, b: any, depth: number, aStack?: any[], bStack?: any[]) {
         while (length--) {
             // Deep compare each member
             key = keys[length]
-            if (!(has(b, key) && eq(a[key], b[key], depth - 1, aStack, bStack))) return false
+            if (!(hasProp(b, key) && eq(a[key], b[key], depth - 1, aStack, bStack))) return false
         }
     }
     // Remove the first object from the stack of traversed objects.
@@ -147,8 +148,4 @@ function unwrap(a: any) {
     if (isES6Map(a) || isObservableMap(a)) return Array.from(a.entries())
     if (isES6Set(a) || isObservableSet(a)) return Array.from(a.entries())
     return a
-}
-
-function has(a: any, key: string) {
-    return Object.prototype.hasOwnProperty.call(a, key)
 }

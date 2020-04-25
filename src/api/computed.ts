@@ -4,13 +4,20 @@ import {
     invariant,
     Annotation,
     storeDecorator,
-    createDecoratorAndAnnotation
+    createDecoratorAndAnnotation,
+    isStringish,
+    isPlainObject,
+    isFunction,
+    assign
 } from "../internal"
 
-export interface IComputedFactory extends Annotation, PropertyDecorator {
-    <T>(options: IComputedValueOptions<T>): Annotation & PropertyDecorator
+const COMPUTED = "computed"
+const COMPUTED_STRUCT = "computed.struct"
 
-    <T>(func: () => T, setter: (v: T) => void): ComputedValue<T> // TODO: does this overload actually exist?
+export interface IComputedFactory extends Annotation, PropertyDecorator {
+    // @computed(opts)
+    <T>(options: IComputedValueOptions<T>): Annotation & PropertyDecorator
+    // computed(fn, opts)
     <T>(func: () => T, options?: IComputedValueOptions<T>): ComputedValue<T>
 
     struct: Annotation & PropertyDecorator
@@ -21,37 +28,32 @@ export interface IComputedFactory extends Annotation, PropertyDecorator {
  * For legacy purposes also invokable as ES5 observable created: `computed(() => expr)`;
  */
 export const computed: IComputedFactory = function computed(arg1, arg2, arg3) {
-    if (typeof arg2 === "string") {
+    if (isStringish(arg2)) {
         // @computed
-        return storeDecorator(arg1, arg2, "computed")
+        return storeDecorator(arg1, arg2, COMPUTED)
     }
-    if (arg1 !== null && typeof arg1 === "object" && arguments.length === 1) {
+    if (isPlainObject(arg1)) {
         // @computed({ options })
-        return createDecoratorAndAnnotation("computed", arg1)
+        return createDecoratorAndAnnotation(COMPUTED, arg1)
     }
 
     // computed(expr, options?)
     if (__DEV__) {
-        invariant(
-            typeof arg1 === "function",
-            "First argument to `computed` should be an expression."
-        )
-        invariant(arguments.length < 3, "Computed takes one or two arguments if used as function")
+        invariant(isFunction(arg1), "First argument to `computed` should be an expression.")
     }
-    const opts: IComputedValueOptions<any> = typeof arg2 === "object" ? arg2 : {}
+    const opts: IComputedValueOptions<any> = isPlainObject(arg2) ? arg2 : {}
     opts.get = arg1
-    opts.set = typeof arg2 === "function" ? arg2 : opts.set
     opts.name = opts.name || arg1.name || "" /* for generated name */
 
     return new ComputedValue(opts)
 } as any
-computed.annotationType = "computed"
+computed.annotationType = COMPUTED
 
-computed.struct = Object.assign(
+computed.struct = assign(
     function(target, property) {
-        storeDecorator(target, property, "computed.struct")
+        storeDecorator(target, property, COMPUTED_STRUCT)
     },
     {
-        annotationType: "computed.struct" as const
-    }
+        annotationType: COMPUTED_STRUCT
+    } as const
 )

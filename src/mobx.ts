@@ -15,6 +15,13 @@
  * - utils/   Utility stuff.
  *
  */
+import { dieHard } from "./errors"
+;["Symbol", "Map", "Set"].forEach(m => {
+    // TODO: add more, support `.` notation
+    if (typeof global[m] === "undefined") {
+        dieHard(`MobX requires global '${m}' to be available or polyfilled`)
+    }
+})
 
 import { spy, getDebugName, $mobx } from "./internal"
 

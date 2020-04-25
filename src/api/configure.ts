@@ -1,14 +1,12 @@
-import {
-    globalState,
-    isolateGlobalState,
-    setReactionScheduler,
-    fail,
-    deprecated,
-    assertES5
-} from "../internal"
+import { globalState, isolateGlobalState, setReactionScheduler, assertES5 } from "../internal"
+
+const NEVER = "never"
+const ALWAYS = "always"
+const OBSERVED = "observed"
+// const IF_AVAILABLE = "ifavailable"
 
 export function configure(options: {
-    enforceActions?: boolean | "strict" | "never" | "always" | "observed"
+    enforceActions?: "never" | "always" | "observed"
     computedRequiresReaction?: boolean
     /**
      * Warn if you try to create to derivation / reactive context without accessing any observable.
@@ -24,72 +22,41 @@ export function configure(options: {
     reactionScheduler?: (f: () => void) => void
     useProxies?: "always" | "never" | "ifavailable"
 }): void {
-    const {
-        enforceActions,
-        computedRequiresReaction,
-        computedConfigurable,
-        disableErrorBoundaries,
-        reactionScheduler,
-        reactionRequiresObservable,
-        observableRequiresReaction,
-        useProxies
-    } = options
     if (options.isolateGlobalState === true) {
         isolateGlobalState()
     }
+    const { useProxies, enforceActions } = options
     if (useProxies !== undefined) {
-        if (useProxies !== "always") {
+        if (useProxies !== ALWAYS) {
             assertES5()
         }
         globalState.useProxies =
-            useProxies === "always"
+            useProxies === ALWAYS
                 ? true
-                : useProxies === "never"
+                : useProxies === NEVER
                 ? false
                 : typeof Proxy !== "undefined"
     }
     if (enforceActions !== undefined) {
-        let ea
-        switch (enforceActions) {
-            case "observed":
-                ea = true
-                break
-            case "never":
-                ea = false
-                break
-            case "always":
-                ea = "strict"
-                break
-            default:
-                fail(
-                    `Invalid value for 'enforceActions': '${enforceActions}', expected 'never', 'always' or 'observed'`
-                )
-        }
+        const ea = enforceActions === ALWAYS ? ALWAYS : enforceActions === OBSERVED
         globalState.enforceActions = ea
-        globalState.allowStateChanges = ea === true || ea === "strict" ? false : true
+        globalState.allowStateChanges = ea === true || ea === ALWAYS ? false : true
     }
-    if (computedRequiresReaction !== undefined) {
-        globalState.computedRequiresReaction = !!computedRequiresReaction
+    ;[
+        "computedRequiresReaction",
+        "reactionRequiresObservable",
+        "observableRequiresReaction",
+        "disableErrorBoundaries"
+    ].forEach(key => {
+        if (key in options) globalState[key] = !!options[key]
+    })
+    globalState.allowStateReads = !globalState.observableRequiresReaction
+    if (__DEV__ && globalState.disableErrorBoundaries === true) {
+        console.warn(
+            "WARNING: Debug feature only. MobX will NOT recover from errors when `disableErrorBoundaries` is enabled."
+        )
     }
-    if (reactionRequiresObservable !== undefined) {
-        globalState.reactionRequiresObservable = !!reactionRequiresObservable
-    }
-    if (observableRequiresReaction !== undefined) {
-        globalState.observableRequiresReaction = !!observableRequiresReaction
-
-        globalState.allowStateReads = !globalState.observableRequiresReaction
-    }
-    if (computedConfigurable !== undefined) {
-        globalState.computedConfigurable = !!computedConfigurable
-    }
-    if (disableErrorBoundaries !== undefined) {
-        if (disableErrorBoundaries === true)
-            console.warn(
-                "WARNING: Debug feature only. MobX will NOT recover from errors when `disableErrorBoundaries` is enabled."
-            )
-        globalState.disableErrorBoundaries = !!disableErrorBoundaries
-    }
-    if (reactionScheduler) {
-        setReactionScheduler(reactionScheduler)
+    if (options.reactionScheduler) {
+        setReactionScheduler(options.reactionScheduler)
     }
 }

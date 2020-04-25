@@ -28,7 +28,8 @@ import {
     createDecorator,
     legacyArrayApi,
     globalState,
-    assertES5
+    assertES5,
+    assign
 } from "../internal"
 
 export type CreateObservableOptions = {
@@ -213,4 +214,4 @@ const observableFactories: IObservableFactory = {
 } as any
 
 // eslint-disable-next-line
-export var observable: IObservableFactory = Object.assign(createObservable, observableFactories)
+export var observable: IObservableFactory = assign(createObservable, observableFactories)

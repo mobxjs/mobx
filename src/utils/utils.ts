@@ -1,7 +1,4 @@
-import { IObservableArray, globalState, isObservableArray, isObservableMap } from "../internal"
-
-export const OBFUSCATED_ERROR =
-    "An invariant failed, however the error is obfuscated because this is a production build."
+import { IObservableArray, globalState, isObservableArray } from "../internal"
 
 export const EMPTY_ARRAY = []
 Object.freeze(EMPTY_ARRAY)
@@ -37,37 +34,6 @@ export function getNextId() {
     return ++globalState.mobxGuid
 }
 
-export function fail(message: string | boolean): never {
-    invariant(false, message)
-    throw "X" // unreachable
-}
-
-export function invariant(check: false, message?: string | boolean): never
-export function invariant(check: true, message?: string | boolean): void
-export function invariant(check: any, message?: string | boolean): void
-export function invariant(check: boolean, message?: string | boolean) {
-    if (!check) throw new Error("[mobx] " + (message || OBFUSCATED_ERROR))
-}
-
-/**
- * Prints a deprecation message, but only one time.
- * Returns false if the deprecated message was already printed before
- */
-const deprecatedMessages: string[] = []
-
-export function deprecated(msg: string): boolean
-export function deprecated(thing: string, replacement: string): boolean
-export function deprecated(msg: string, thing?: string): boolean {
-    if (!__DEV__) return false
-    if (thing) {
-        return deprecated(`'${msg}', use '${thing}' instead.`)
-    }
-    if (deprecatedMessages.indexOf(msg) !== -1) return false
-    deprecatedMessages.push(msg)
-    console.error("[mobx] Deprecated: " + msg)
-    return true
-}
-
 /**
  * Makes sure that the provided function is invoked at most once.
  */
@@ -82,39 +48,33 @@ export function once(func: Lambda): Lambda {
 
 export const noop = () => {}
 
-export function unique<T>(list: T[]): T[] {
-    const res: T[] = []
-    list.forEach(item => {
-        if (res.indexOf(item) === -1) res.push(item)
-    })
-    return res
+export function isFunction(fn: any): fn is Function {
+    return typeof fn === "function"
 }
 
-export function isObject(value: any): boolean {
+export function isStringish(value: any): value is string | number | symbol {
+    const t = typeof value
+    switch (t) {
+        case "string":
+        case "symbol":
+        case "number":
+            return true
+    }
+    return false
+}
+
+export function isObject(value: any): value is Object {
     return value !== null && typeof value === "object"
 }
 
 export function isPlainObject(value) {
-    if (value === null || typeof value !== "object") return false
+    if (!isObject(value)) return false
     const proto = Object.getPrototypeOf(value)
     return proto === Object.prototype || proto === null
 }
 
-export function convertToMap(dataStructure: any): Map<any, any> {
-    if (isES6Map(dataStructure) || isObservableMap(dataStructure)) {
-        return dataStructure
-    } else if (Array.isArray(dataStructure)) {
-        return new Map(dataStructure)
-    } else if (isPlainObject(dataStructure)) {
-        const map = new Map()
-        for (const key in dataStructure) {
-            map.set(key, dataStructure[key])
-        }
-        return map
-    } else {
-        return fail(`Cannot convert to map from '${dataStructure}'`)
-    }
-}
+export const assign = Object.assign
+export const getDescriptor = Object.getOwnPropertyDescriptor
 
 export function makeNonEnumerable(object: any, propNames: PropertyKey[]) {
     for (let i = 0; i < propNames.length; i++) {
@@ -141,7 +101,7 @@ export function addHiddenFinalProp(object: any, propName: PropertyKey, value: an
 }
 
 export function isPropertyConfigurable(object: any, prop: PropertyKey): boolean {
-    const descriptor = Object.getOwnPropertyDescriptor(object, prop)
+    const descriptor = getDescriptor(object, prop)
     return !descriptor || (descriptor.configurable !== false && descriptor.writable !== false)
 }
 
@@ -178,18 +138,18 @@ export function isES6Set(thing): thing is Set<any> {
     return thing instanceof Set
 }
 
+const hasGetOwnPropertySymbols = typeof Object.getOwnPropertySymbols !== "undefined"
+
 /**
  * Returns the following: own keys, prototype keys & own symbol keys, if they are enumerable.
  */
 export function getPlainObjectKeys(object) {
-    const enumerables = new Set<PropertyKey>()
-    for (let key in object) enumerables.add(key) // *all* enumerables
-    Object.getOwnPropertySymbols(object).forEach(k => {
-        if (Object.getOwnPropertyDescriptor(object, k)!.enumerable) enumerables.add(k)
-    }) // *own* symbols
-    // Note: this implementation is missing enumerable, inherited, symbolic property names! That would however pretty expensive to add,
-    // as there is no efficient iterator that returns *all* properties
-    return Array.from(enumerables)
+    const keys = Object.keys(object)
+    // Not supported in IE, so there are not going to be symbol props anyway...
+    if (hasGetOwnPropertySymbols) return keys
+    const symbols = Object.getOwnPropertySymbols(object)
+    if (!symbols.length) return keys
+    return [...keys, symbols.filter(s => Object.prototype.propertyIsEnumerable.call(object, s))]
 }
 
 export function stringifyKey(key: any): string {

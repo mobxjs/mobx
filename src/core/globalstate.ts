@@ -28,7 +28,7 @@ export class MobXGlobals {
      * N.B: this version is unrelated to the package version of MobX, and is only the version of the
      * internal state storage of MobX, and can be the same across many different package versions
      */
-    version = 5
+    version = 6
 
     /**
      * globally unique token to signal unchanged
@@ -94,7 +94,7 @@ export class MobXGlobals {
     /**
      * If strict mode is enabled, state changes are by default not allowed
      */
-    enforceActions: boolean | "strict" = true
+    enforceActions: boolean | "always" = true
 
     /**
      * Spy callbacks
@@ -122,12 +122,6 @@ export class MobXGlobals {
      * Warn if observables are accessed outside a reactive context
      */
     observableRequiresReaction = false
-
-    /**
-     * Allows overwriting of computed properties, useful in tests but not prod as it can cause
-     * memory leaks. See https://github.com/mobxjs/mobx/issues/1867
-     */
-    computedConfigurable = false
 
     /*
      * Don't catch and rethrow exceptions. This is useful for inspecting the state of
