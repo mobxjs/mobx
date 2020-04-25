@@ -15,7 +15,7 @@
     "test": "jest",
     "lint": "eslint src/**/*.ts",
     "watch": "jest --watch",
-    "perf": "yarn test:performance proxy && yarn test:performance legacy",
+    "perf": "yarn build && yarn test:performance proxy && yarn test:performance legacy",
     "test:mixed-versions": "jest --testRegex mixed-versions",
     "test:check": "yarn test:types && yarn lint",
     "test:types": "yarn tsc --noEmit && yarn test:flow",
