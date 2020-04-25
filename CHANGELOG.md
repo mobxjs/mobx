@@ -1,6 +1,9 @@
 # UNPUBLISHED (keep this here and add unpublished changes)
 
 -   Add error when computed value declared for unspecified getter [#1867](https://github.com/mobxjs/mobx/issues/1867) by [@berrunder](https://github.com/berrunder)
+-   Don't omit action name in production [#2263](https://github.com/mobxjs/mobx/issues/2263) by [@elektronik2k5](https://github.com/elektronik2k5)
+-   Update readme to reflect correct scripts by [@elektronik2k5](https://github.com/elektronik2k5)
+-   `prettier` related tweaks by [@elektronik2k5](https://github.com/elektronik2k5)
 
 # 5.15.4 / 4.15.4
 
