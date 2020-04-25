@@ -18,7 +18,7 @@ import { allowStateReadsStart, allowStateReadsEnd } from "./derivation"
 let currentActionId = 0
 let nextActionId = 1
 const functionNameDescriptor = Object.getOwnPropertyDescriptor(() => {}, "name")
-const isFunctionNameConfigurable = functionNameDescriptor && functionNameDescriptor.configurable
+const isFunctionNameConfigurable = functionNameDescriptor?.configurable ?? false
 
 export function createAction(actionName: string, fn: Function, ref?: Object): Function {
     if (__DEV__) {
@@ -26,16 +26,13 @@ export function createAction(actionName: string, fn: Function, ref?: Object): Fu
         if (typeof actionName !== "string" || !actionName)
             fail(`actions should have valid names, got: '${actionName}'`)
     }
-    const res = function() {
+    function res() {
         return executeAction(actionName, fn, ref || this, arguments)
     }
-    ;(res as any).isMobxAction = true
-    if (__DEV__) {
-        if (isFunctionNameConfigurable) {
-            Object.defineProperty(res, "name", { value: actionName })
-        }
-    }
-    return res as any
+    return Object.defineProperties(res, {
+        ...(isFunctionNameConfigurable && { name: { value: actionName } }),
+        isMobxAction: { value: true }
+    })
 }
 
 export function executeAction(actionName: string, fn: Function, scope?: any, args?: IArguments) {
