@@ -78,7 +78,7 @@ type PropertyDescriptor<T> = {
     writable?: boolean,
     value?: T,
     get?: () => T,
-    set?: (value: T) => void
+    set?: (value: T) => void,
 }
 
 export interface IComputed {
@@ -188,7 +188,7 @@ export interface IArrayWillSplice<T> {
 }
 
 export type KeyValueMap<V> = {
-    [key: string]: V
+    [key: string]: V,
 }
 
 export interface IMapChange<K, T> {
@@ -256,13 +256,13 @@ export interface IObservableFactory {
 
 export type IObservableDecorator = {
     (target: Object, property: string, descriptor?: PropertyDescriptor<*>): void,
-    enhancer: IEnhancer<any>
+    enhancer: IEnhancer<any>,
 }
 
 export type CreateObservableOptions = {
     name?: string,
     deep?: boolean,
-    defaultDecorator?: IObservableDecorator
+    defaultDecorator?: IObservableDecorator,
 }
 
 declare export class IObservableFactories {
@@ -388,17 +388,17 @@ declare export function isObservableProp(value: any, property: string): boolean
 declare export var comparer: {
     identity: IEqualsComparer<any>,
     structural: IEqualsComparer<any>,
-    default: IEqualsComparer<any>
+    default: IEqualsComparer<any>,
 }
 
 declare export var observable: IObservableFactory &
     IObservableFactories & {
         deep: {
-            struct<T>(initialValue?: T): T
+            struct<T>(initialValue?: T): T,
         },
         ref: {
-            struct<T>(initialValue?: T): T
-        }
+            struct<T>(initialValue?: T): T,
+        },
     }
 
 declare export function observe<T>(
@@ -462,7 +462,7 @@ declare export class Reaction {
     track(fn: () => void): void;
     dispose(): void;
     getDisposer(): Lambda & {
-        $mosbservable: Reaction
+        $mosbservable: Reaction,
     };
     toString(): string;
     trace(enterBreakPoint?: boolean): void;
@@ -483,7 +483,7 @@ declare export function flow<T>(
 ): () => CancellablePromise<T>
 declare export function flow<T, A>(
     fn: (A) => Generator<any, T | Promise<T>, any> | AsyncGenerator<any, T | Promise<T>, any>
-): A => CancellablePromise<T>
+): (A) => CancellablePromise<T>
 declare export function flow<T, A, B>(
     fn: (A, B) => Generator<any, T | Promise<T>, any> | AsyncGenerator<any, T | Promise<T>, any>
 ): (A, B) => CancellablePromise<T>
