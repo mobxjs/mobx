@@ -1,2 +1,4 @@
 /**/package.json
 website/**/*
+dist/
+docs/assets/
