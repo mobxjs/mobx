@@ -344,8 +344,8 @@ And finally, kudos to all the people that believed in, tried, validated and even
 
 -   Feel free to send small pull requests. Please discuss new features or big changes in a GitHub issue first.
 -   Use `yarn test` to run the basic test suite.
--   Use `yarn test:ci` for the test suite with coverage.
--   and `yarn test:performance` for the performance tests.
+-   Use `yarn test:coverage` for the test suite with coverage.
+-   and `yarn perf` for the performance tests.
 -   Please note that if you want to backport a feature / fix to MobX 4 a second PR needs to be opened to the mobx4-master branch.
 
 ## Online one-click setup for contributing
