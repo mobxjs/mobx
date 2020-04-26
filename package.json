@@ -87,7 +87,7 @@
     "semver": "^7.3.2",
     "serializr": "^2.0.3",
     "shelljs": "^0.8.4",
-    "tape": "^4.13.2",
+    "tape": "^5.0.0",
     "ts-jest": "^24.3.0",
     "tsdx": "^0.13.2",
     "typescript": "^3.8.3"
