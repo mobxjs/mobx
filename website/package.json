@@ -8,7 +8,22 @@
     "version": "docusaurus-version",
     "rename-version": "docusaurus-rename-version"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mobxjs/mobx.git"
+  },
+  "author": "Michel Weststrate",
+  "license": "MIT",
+    "funding": {
+    "type": "opencollective",
+    "url": "https://opencollective.com/mobx"
+  },
+  "bugs": {
+    "url": "https://github.com/mobxjs/mobx/issues"
+  },
+  "homepage": "https://mobx.js.org/",
+
   "devDependencies": {
-    "docusaurus": "^1.12.0"
+    "docusaurus": "^1.14.4"
   }
 }
