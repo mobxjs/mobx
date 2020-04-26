@@ -22,7 +22,7 @@ const sum: IComputedValue<number> = mobx.computed(() => {
 })
 
 const observableObject = mobx.observable({
-    a: true,
+    a: true
 })
 // $ExpectError
 observableObject.a = 12
@@ -40,7 +40,7 @@ disposer()
 const emptyArray = observable([])
 const arr = observable([1])
 const object = observable.map({
-    nestedValue: arr,
+    nestedValue: arr
 })
 
 object.get("nestedValue").push(1)
