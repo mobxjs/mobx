@@ -10,7 +10,7 @@ hide_title: true
 
 <a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-connect-mobx-observer-components-to-the-store-with-the-react-provider">egghead.io lesson 8: inject stores with Provider</a>
 
-_Warning: It is recommended to use `React.createContext` instead! It provides generally the same functionality, and Provider / inject is mostly around for legacy reasons_
+_Warning: It is recommended to use [`React.createContext`](https://mobx-react.js.org/recipes-context) instead! It provides generally the same functionality, and Provider / inject is mostly around for legacy reasons_
 
 The `mobx-react` package provides the `Provider` component that can be used to pass down stores using React's context mechanism.
 To connect to those stores, pass a list of store names to `inject`, which will make the stores available as props.
