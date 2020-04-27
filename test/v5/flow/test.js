@@ -37,7 +37,8 @@ const x: string = extendedObservableObject.a
 const disposer = mobx.autorun(() => console.log(sum.get()))
 disposer()
 
-const arr: IObservableArray<number> = observable([])
+const emptyArray = observable([])
+const arr = observable([1])
 const object = observable.map({
     nestedValue: arr
 })
