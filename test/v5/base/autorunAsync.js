@@ -3,7 +3,7 @@
  */
 const mobx = require("../../../src/mobx.ts")
 
-const utils = require("../utils/test-utils")
+const utils = require("../../v5/utils/test-utils")
 
 const { $mobx } = mobx
 

@@ -122,16 +122,9 @@ test("find(findIndex) and remove", function() {
     expect(a.find(predicate)).toBe(20)
     expect(idx).toBe(1)
     expect(a.findIndex(predicate)).toBe(1)
-    expect(a.find(predicate, null, 1)).toBe(20)
+    expect(a.find(predicate, null)).toBe(20)
     expect(idx).toBe(1)
-    expect(a.findIndex(predicate, null, 1)).toBe(1)
-    expect(a.find(predicate, null, 2)).toBe(20)
-    expect(idx).toBe(2)
-    expect(a.findIndex(predicate, null, 2)).toBe(2)
     idx = -1
-    expect(a.find(predicate, null, 3)).toBe(undefined)
-    expect(idx).toBe(-1)
-    expect(a.findIndex(predicate, null, 3)).toBe(-1)
 
     expect(a.remove(20)).toBe(true)
     expect(a.find(predicate)).toBe(20)
@@ -535,12 +528,12 @@ describe("extended array prototype", () => {
     })
 
     test("creating an observable should work", () => {
-        const a = mobx.observable({ b: "b" })
+        mobx.observable({ b: "b" })
     })
 
     test("extending an observable should work", () => {
         const a = { b: "b" }
-        const c = mobx.extendObservable(a, {})
+        mobx.extendObservable(a, {})
     })
 })
 

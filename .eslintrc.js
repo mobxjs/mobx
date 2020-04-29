@@ -16,7 +16,8 @@ module.exports = {
         "no-console": "off",
         "no-var": "error",
         "no-undef": "off",
-        "no-extra-semi": "off" // doesn't get along well with prettier
+        "no-extra-semi": "off", // doesn't get along well with prettier
+        "no-unused-vars": "off" // got typescript for that
     },
     globals: {
         process: "readable",

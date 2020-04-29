@@ -464,9 +464,7 @@ test("ES5 non reactive props", function() {
     // should skip non-configurable / writable props when using `observable`
     expect(() => {
         te = m.set(te, te)
-    }).toThrow(
-        /Cannot make property 'nonConfigurable' observable, it is not configurable and writable in the target object/
-    )
+    }).toThrow(/Cannot make property 'nonConfigurable' observable/)
     const d1 = Object.getOwnPropertyDescriptor(te, "nonConfigurable")
     expect(d1.value).toBe("static")
 

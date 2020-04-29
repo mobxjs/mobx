@@ -306,7 +306,9 @@ export class ObservableMap<K = any, V = any>
         }
         transaction(() => {
             if (isPlainObject(other))
-                getPlainObjectKeys(other).forEach(key => this.set((key as any) as K, other[key]))
+                getPlainObjectKeys(other).forEach((key: any) =>
+                    this.set((key as any) as K, other[key])
+                )
             else if (Array.isArray(other)) other.forEach(([key, value]) => this.set(key, value))
             else if (isES6Map(other)) {
                 if (other.constructor !== Map)

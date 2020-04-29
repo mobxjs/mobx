@@ -2,7 +2,7 @@
  * @type {typeof import("./../../../src/v5/mobx")}
  */
 const mobx = require("../../../src/mobx.ts")
-const utils = require("../utils/test-utils")
+const utils = require("../../v5/utils/test-utils")
 
 test("autorun passes Reaction as an argument to view function", function() {
     const a = mobx.observable.box(1)

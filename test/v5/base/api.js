@@ -1,4 +1,3 @@
-import * as fs from "fs"
 const mobx = require("../../../src/mobx.ts")
 
 test("correct api should be exposed", function() {
@@ -19,6 +18,7 @@ test("correct api should be exposed", function() {
             "computed",
             "configure",
             "createAtom",
+            "enableES5",
             "extendObservable",
             "flow",
             "FlowCancellationError",

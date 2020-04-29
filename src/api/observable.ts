@@ -26,9 +26,8 @@ import {
     asObservableObject,
     storeDecorator,
     createDecorator,
-    legacyArrayApi,
+    createLegacyArray,
     globalState,
-    assertES5,
     assign
 } from "../internal"
 
@@ -128,7 +127,7 @@ export interface IObservableFactory extends Annotation, PropertyDecorator {
     <K = any, V = any>(value: Map<K, V>, options?: CreateObservableOptions): ObservableMap<K, V>
     <T extends Object>(
         value: T,
-        decorators?: AnnotationsMap<T>,
+        decorators?: AnnotationsMap<T, never>,
         options?: CreateObservableOptions
     ): T & IObservableObject
 
@@ -144,7 +143,7 @@ export interface IObservableFactory extends Annotation, PropertyDecorator {
     ): ObservableMap<K, V>
     object<T = any>(
         props: T,
-        decorators?: AnnotationsMap<T>,
+        decorators?: AnnotationsMap<T, never>,
         options?: CreateObservableOptions
     ): T & IObservableObject
 
@@ -167,15 +166,9 @@ const observableFactories: IObservableFactory = {
     },
     array<T = any>(initialValues?: T[], options?: CreateObservableOptions): IObservableArray<T> {
         const o = asCreateObservableOptions(options)
-        if (globalState.useProxies === false || o.proxy === false) {
-            assertES5()
-            return new legacyArrayApi!.LegacyObservableArray(
-                initialValues,
-                getEnhancerFromOption(o),
-                o.name
-            ) as any
-        }
-        return createObservableArray(initialValues, getEnhancerFromOption(o), o.name) as any
+        return (globalState.useProxies === false || o.proxy === false
+            ? createLegacyArray
+            : createObservableArray)(initialValues, getEnhancerFromOption(o), o.name)
     },
     map<K = any, V = any>(
         initialValues?: IObservableMapInitialValues<K, V>,
@@ -193,7 +186,7 @@ const observableFactories: IObservableFactory = {
     },
     object<T = any>(
         props: T,
-        decorators?: AnnotationsMap<T>,
+        decorators?: AnnotationsMap<T, never>,
         options?: CreateObservableOptions
     ): T & IObservableObject {
         const o = asCreateObservableOptions(options)

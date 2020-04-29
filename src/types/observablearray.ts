@@ -25,9 +25,9 @@ import {
     spyReportStart,
     allowStateChangesStart,
     allowStateChangesEnd,
-    assertProxies
+    assertProxies,
+    reserveArrayBuffer
 } from "../internal"
-import { legacyArrayApi } from "./legacyobservablearray"
 
 export const MAX_SPLICE_SIZE = 10000 // See e.g. https://github.com/mobxjs/mobx/issues/859
 
@@ -187,7 +187,7 @@ export class ObservableArrayAdministration
                 "[mobx] Modification exception: the internal structure of an observable array was changed."
             )
         this.lastKnownLength += delta
-        if (this.legacyMode && delta > 0) legacyArrayApi!.reserveArrayBuffer(oldLength + delta + 1)
+        if (this.legacyMode && delta > 0) reserveArrayBuffer(oldLength + delta + 1)
     }
 
     spliceWithArray(index: number, deleteCount?: number, newItems?: any[]): any[] {
@@ -287,7 +287,7 @@ export class ObservableArrayAdministration
 }
 
 export function createObservableArray<T>(
-    initialValues: any[] | undefined,
+    initialValues: T[] | undefined,
     enhancer: IEnhancer<T>,
     name = "ObservableArray@" + getNextId(),
     owned = false

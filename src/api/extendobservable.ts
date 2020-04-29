@@ -16,7 +16,7 @@ import {
 export function extendObservable<A extends Object, B extends Object>(
     target: A,
     properties?: B,
-    annotations?: AnnotationsMap<B>,
+    annotations?: AnnotationsMap<B, never>,
     options?: CreateObservableOptions
 ): A & B {
     if (__DEV__) {
@@ -63,6 +63,7 @@ export function extendObservable<A extends Object, B extends Object>(
                 true
             )
         }
+        // TODO: replace with Object.keys(descs).forEach(maker)
         Object.getOwnPropertyNames(descs).forEach(maker)
         Object.getOwnPropertySymbols(descs).forEach(maker)
     } finally {

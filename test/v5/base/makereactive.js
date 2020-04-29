@@ -531,7 +531,6 @@ test("540 - extendobservable should not report cycles", function() {
     objWrapper.value = obj
     expect(mobx.isObservable(objWrapper.value)).toBeTruthy()
     expect(() => {
-        debugger
         mobx.extendObservable(objWrapper, objWrapper.value)
     }).toThrowError(/Extending an object with another observable \(object\) is not supported/)
 })

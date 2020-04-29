@@ -729,9 +729,13 @@ test("enumerability", () => {
     ])
 
     t.equal("a" in a, true)
+    // eslint-disable-next-line
     t.equal(a.hasOwnProperty("a"), true)
+    // eslint-disable-next-line
     t.equal(a.hasOwnProperty("b"), true) // false would be slightly better, true also ok-ish, and, see #1777
+    // eslint-disable-next-line
     t.equal(a.hasOwnProperty("m"), false)
+    // eslint-disable-next-line
     t.equal(a.hasOwnProperty("m2"), true)
 
     t.equal(mobx.isAction(a.m), true)
@@ -752,9 +756,13 @@ test("enumerability", () => {
     t.deepEqual(props, ["a"])
 
     t.equal("a" in a, true)
+    // eslint-disable-next-line
     t.equal(a.hasOwnProperty("a"), true)
+    // eslint-disable-next-line
     t.equal(a.hasOwnProperty("b"), true) // false would be slightly better, true also ok-ish, and, see #1777
+    // eslint-disable-next-line
     t.equal(a.hasOwnProperty("m"), false)
+    // eslint-disable-next-line
     t.equal(a.hasOwnProperty("m2"), true)
 })
 

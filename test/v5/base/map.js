@@ -5,6 +5,7 @@ const map = mobx.observable.map
 const autorun = mobx.autorun
 const iterall = require("iterall")
 const { makeObservable } = mobx
+import { grabConsole } from "../../v5/utils/test-utils"
 
 test("map crud", function() {
     mobx._getGlobalState().mobxGuid = 0 // hmm dangerous reset?
@@ -602,17 +603,29 @@ test("issue 940, should not be possible to change maps outside strict mode", () 
         const m = mobx.observable.map()
         const d = mobx.autorun(() => mobx.values(m))
 
-        expect(() => {
-            m.set("x", 1)
-        }).toThrowError(/Since strict-mode is enabled/)
+        expect(
+            grabConsole(() => {
+                m.set("x", 1)
+            })
+        ).toMatchInlineSnapshot(
+            `"<STDOUT> Since strict-mode is enabled, changing observed observable values outside actions is not allowed. Please wrap the code in an \`action\` if this change is intended. Tried to modify: ObservableMap@69.keys()"`
+        )
 
-        expect(() => {
-            m.set("x", 2)
-        }).toThrowError(/Since strict-mode is enabled/)
+        expect(
+            grabConsole(() => {
+                m.set("x", 2)
+            })
+        ).toMatchInlineSnapshot(
+            `"<STDOUT> Since strict-mode is enabled, changing observed observable values outside actions is not allowed. Please wrap the code in an \`action\` if this change is intended. Tried to modify: ObservableMap@69.x"`
+        )
 
-        expect(() => {
-            m.delete("x")
-        }).toThrowError(/Since strict-mode is enabled/)
+        expect(
+            grabConsole(() => {
+                m.delete("x")
+            })
+        ).toMatchInlineSnapshot(
+            `"<STDOUT> Since strict-mode is enabled, changing observed observable values outside actions is not allowed. Please wrap the code in an \`action\` if this change is intended. Tried to modify: ObservableMap@69.keys()"`
+        )
 
         d()
     } finally {
@@ -920,6 +933,7 @@ test(".keys() subscribes for key changes", () => {
     autorun(() => {
         autorunInvocationCount++
         for (const _ of map.keys()) {
+            // empty
         }
     })
 
@@ -937,6 +951,7 @@ test(".values() subscribes for key changes", () => {
     autorun(() => {
         autorunInvocationCount++
         for (const _ of map.values()) {
+            // empty
         }
     })
 
@@ -954,6 +969,7 @@ test(".entries() subscribes for key changes", () => {
     autorun(() => {
         autorunInvocationCount++
         for (const _ of map.entries()) {
+            // empty
         }
     })
 
@@ -1023,6 +1039,7 @@ test(".entries() subscribes for value changes", () => {
     autorun(() => {
         autorunInvocationCount++
         for (const _ of map.entries()) {
+            // empty
         }
     })
 
@@ -1044,6 +1061,7 @@ test(".values() subscribes for value changes", () => {
     autorun(() => {
         autorunInvocationCount++
         for (const _ of map.values()) {
+            // empty
         }
     })
 
@@ -1145,6 +1163,7 @@ test(".keys() does NOT subscribe for value changes", () => {
     autorun(() => {
         autorunInvocationCount++
         for (const _ of map.keys()) {
+            // empty
         }
     })
 
@@ -1265,6 +1284,7 @@ test(".replace() should reportChanged on key order change", () => {
     autorun(() => {
         autorunInvocationCount++
         for (const _ of map.keys()) {
+            // empty
         }
     })
 

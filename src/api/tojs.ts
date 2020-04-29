@@ -7,17 +7,17 @@ import {
     isObservableSet,
     getPlainObjectKeys
 } from "../internal"
+import { die } from "../errors"
 
 export type ToJSOptions = {
     detectCycles?: boolean
     exportMapsAsObjects?: boolean
-    recurseEverything?: boolean
 }
 
+// TODO: kill all optoins?
 const defaultOptions: ToJSOptions = {
     detectCycles: true,
-    exportMapsAsObjects: true,
-    recurseEverything: false
+    exportMapsAsObjects: true // TODO: kill this option and make default false
 }
 
 function cache<K, V>(map: Map<any, any>, key: K, value: V, options: ToJSOptions): V {
@@ -26,7 +26,7 @@ function cache<K, V>(map: Map<any, any>, key: K, value: V, options: ToJSOptions)
 }
 
 function toJSHelper(source, options: ToJSOptions, __alreadySeen: Map<any, any>) {
-    if (!options.recurseEverything && !isObservable(source)) return source
+    if (!isObservable(source)) return source
 
     if (typeof source !== "object") return source
 
@@ -46,7 +46,7 @@ function toJSHelper(source, options: ToJSOptions, __alreadySeen: Map<any, any>) 
     if (detectCycles && source !== null && __alreadySeen.has(source)) {
         return __alreadySeen.get(source)
     }
-
+    // TODO: remove second cond
     if (isObservableArray(source) || Array.isArray(source)) {
         const res = cache(__alreadySeen, source, [] as any, options)
         const toAdd = source.map(value => toJSHelper(value, options!, __alreadySeen))
@@ -54,7 +54,7 @@ function toJSHelper(source, options: ToJSOptions, __alreadySeen: Map<any, any>) 
         for (let i = 0, l = toAdd.length; i < l; i++) res[i] = toAdd[i]
         return res
     }
-
+    // TODO: remove second cond
     if (isObservableSet(source) || Object.getPrototypeOf(source) === Set.prototype) {
         if (options.exportMapsAsObjects === false) {
             const res = cache(__alreadySeen, source, new Set(), options)
@@ -70,7 +70,7 @@ function toJSHelper(source, options: ToJSOptions, __alreadySeen: Map<any, any>) 
             return res
         }
     }
-
+    // TODO: reuse Object.getPrototypeOf? alsoe remove second cond
     if (isObservableMap(source) || Object.getPrototypeOf(source) === Map.prototype) {
         if (options.exportMapsAsObjects === false) {
             const res = cache(__alreadySeen, source, new Map(), options)
@@ -89,7 +89,7 @@ function toJSHelper(source, options: ToJSOptions, __alreadySeen: Map<any, any>) 
 
     // Fallback to the situation that source is an ObservableObject or a plain object
     const res = cache(__alreadySeen, source, {}, options)
-    getPlainObjectKeys(source).forEach(key => {
+    getPlainObjectKeys(source).forEach((key: any) => {
         res[key] = toJSHelper(source[key], options!, __alreadySeen)
     })
 
@@ -104,12 +104,12 @@ export function toJS(source: any, options?: ToJSOptions): any
 export function toJS(source, options: ToJSOptions) // internal overload
 export function toJS(source, options?: ToJSOptions) {
     // backward compatibility
+
+    if (__DEV__ && options && (options as any).recurseEverything)
+        die("The recurseEverything option is no longer supported")
     if (typeof options === "boolean") options = { detectCycles: options }
     if (!options) options = defaultOptions
-    options.detectCycles =
-        options.detectCycles === undefined
-            ? options.recurseEverything === true
-            : options.detectCycles === true
+    options.detectCycles = !!options.detectCycles
 
     let __alreadySeen
     if (options.detectCycles) __alreadySeen = new Map()

@@ -3,7 +3,7 @@
  */
 const mobx = require("../../../src/mobx.ts")
 const reaction = mobx.reaction
-const utils = require("../utils/test-utils")
+const utils = require("../../v5/utils/test-utils")
 
 test("basic", () => {
     const a = mobx.observable.box(1)

@@ -1,6 +1,6 @@
 const mobx = require("../../../src/mobx.ts")
 const m = mobx
-const utils = require("../utils/test-utils")
+const utils = require("../../v5/utils/test-utils")
 
 const { observable, computed, $mobx } = mobx
 
@@ -150,9 +150,13 @@ test("deny state changes in views", function() {
         () => z.get(),
         () => {}
     )
-    expect(() => {
-        y.get()
-    }).toThrow(/Computed values are not allowed to cause side effects/)
+    expect(
+        utils.grabConsole(() => {
+            y.get()
+        })
+    ).toMatchInlineSnapshot(
+        `"<STDOUT> Computed values are not allowed to cause side effects by changing observables that are already being observed. Tried to modify: ObservableValue@26"`
+    )
 
     checkGlobalState()
 })
@@ -193,11 +197,15 @@ test("deny array change in view", function(done) {
         () => {}
     )
 
-    expect(function() {
-        y.get()
-    }).toThrow(/Computed values are not allowed to cause side effects by changing observables/)
+    expect(
+        utils.grabConsole(function() {
+            y.get()
+        })
+    ).toMatchInlineSnapshot(
+        `"<STDOUT> Computed values are not allowed to cause side effects by changing observables that are already being observed. Tried to modify: ObservableArray@36"`
+    )
 
-    expect(z.slice()).toEqual([3])
+    expect(z.slice()).toEqual([3, 3])
     expect(mobx._isComputingDerivation()).toBe(false)
 
     checkGlobalState()

@@ -33,6 +33,7 @@ function getInferredAnnotation(
     if (desc.set) return false // ignore pure setters
     // if already wrapped in action, don't do that another time, but assume it is already set up properly
     if (typeof desc.value === "function") return isAction(desc.value) ? false : action.bound
+    // if (!desc.configurable || !desc.writable) return false
     return defaultAnnotation ?? observable.deep
 }
 

@@ -3,7 +3,6 @@ import {
     IDepTreeNode,
     IObservable,
     addObserver,
-    fail,
     globalState,
     isComputedValue,
     removeObserver
@@ -151,11 +150,13 @@ export function checkIfStateModificationsAreAllowed(atom: IAtom) {
     const hasObservers = atom.observers.size > 0
     // Should never be possible to change an observed observable from inside computed, see #798
     if (globalState.computationDepth > 0 && hasObservers)
+        // TODO: prefix with mobx
         console.warn(
             `Computed values are not allowed to cause side effects by changing observables that are already being observed. Tried to modify: ${atom.name}`
         )
     // Should not be possible to change observed state outside strict mode, except during initialization, see #563
-    if (!globalState.allowStateChanges && (hasObservers || globalState.enforceActions === "strict"))
+    if (!globalState.allowStateChanges && (hasObservers || globalState.enforceActions === "always"))
+        // TODO: prefix with mobx
         console.warn(
             (globalState.enforceActions
                 ? "Since strict-mode is enabled, changing observed observable values outside actions is not allowed. Please wrap the code in an `action` if this change is intended. Tried to modify: "

@@ -63,7 +63,10 @@ PHilosophy: one thing to do things
 -   [ ] Breaking: `enforceActions` is now defaulted to `observed`, but now generates a warning rather than an error
 -   [ ] Breaking: `runInAction` now longer supports a name as first argument. Use an action or named function instead
 -   [ ] Breaking: `computed` doesn not accept setter function as second argument anymore, use `options.set` instead
+-   [ ] Breaking: the `findIndex` / `find` offset argument (third) on onbservable arrays is no longer supported, in consistentcy with ES arrays
 -   [ ] Breaking: option `computedConfigurable` was dropped and is the default now
+-   [ ] Breaking: a setter function as second argument to `computed` is no longer supported, use `computed(getter, { set: setter })` instead
+-   [ ] Breaking: toJS no longer supports the `recurseEverything` option
 -   [ ] optimization tip: hoist the mapping constant
 -   [ ] document: uncoditional map
 -   [ ] document `true` and `false` as annotations

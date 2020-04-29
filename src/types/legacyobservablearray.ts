@@ -3,7 +3,6 @@ import {
     addHiddenFinalProp,
     allowStateChangesStart,
     allowStateChangesEnd,
-    deprecated,
     makeIterable,
     addHiddenProp,
     invariant,
@@ -16,7 +15,7 @@ import {
 } from "../internal"
 import { IObservableArray } from "./observablearray"
 
-export let legacyArrayApi:
+let legacyArrayApi:
     | undefined
     | {
           reserveArrayBuffer(max: number)
@@ -141,13 +140,8 @@ export function enableES5() {
         // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
         find(
             predicate: (item: T, index: number, array: LegacyObservableArray<T>) => boolean,
-            thisArg?,
-            fromIndex = 0
+            thisArg?
         ): T | undefined {
-            if (arguments.length === 3)
-                deprecated(
-                    "The array.find fromIndex argument to find will not be supported anymore in the next major"
-                )
             const idx = this.findIndex.apply(this, arguments as any)
             // @ts-ignore
             return idx === -1 ? undefined : this.get(idx)
@@ -156,17 +150,11 @@ export function enableES5() {
         // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findIndex
         findIndex(
             predicate: (item: T, index: number, array: LegacyObservableArray<T>) => boolean,
-            thisArg?,
-            fromIndex = 0
+            thisArg?
         ): number {
-            if (arguments.length === 3)
-                deprecated(
-                    "The array.findIndex fromIndex argument to find will not be supported anymore in the next major"
-                )
             const items = this.peek(),
                 l = items.length
-            for (let i = fromIndex; i < l; i++)
-                if (predicate.call(thisArg, items[i], i, this)) return i
+            for (let i = 0; i < l; i++) if (predicate.call(thisArg, items[i], i, this)) return i
             return -1
         }
 
@@ -329,4 +317,18 @@ export function assertES5() {
         fail(
             "ES5 implementation was not loaded. Please call `enableES5()` during app initialization in environments that do not support Proxy"
         )
+}
+
+export function reserveArrayBuffer(max: number) {
+    assertES5()
+    legacyArrayApi!.reserveArrayBuffer(max)
+}
+
+export function createLegacyArray<T>(
+    initialValues: T[] | undefined,
+    enhancer: IEnhancer<T>,
+    name?: string
+): IObservableArray<T> {
+    assertES5()
+    return new legacyArrayApi!.LegacyObservableArray(initialValues, enhancer, name) as any
 }

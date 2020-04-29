@@ -1,7 +1,7 @@
 "use strict"
 
 import * as mobx from "../mobx4"
-import * as utils from "../utils/test-utils"
+import * as utils from "../../v5/utils/test-utils"
 
 test("trace", () => {
     mobx._resetGlobalState()

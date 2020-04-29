@@ -42,10 +42,10 @@ export function supressConsole(block) {
     const { warn, error } = console
     Object.assign(console, {
         warn(e) {
-            messages.push("[warn] " + e)
+            messages.push("<STDOUT> " + e)
         },
         error(e) {
-            messages.push("[error] " + e)
+            messages.push("<STDERR> " + e)
         }
     })
     try {
@@ -60,4 +60,8 @@ export function stripAdminFromDescriptors(snapshot) {
     const mobxProperty = snapshot[$mobx]
     expect(mobxProperty).toBeTruthy()
     return { ...snapshot, [$mobx]: { ...mobxProperty, value: "(omitted)" } }
+}
+
+export function grabConsole(block) {
+    return supressConsole(block).join("\n")
 }

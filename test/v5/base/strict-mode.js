@@ -2,7 +2,7 @@
  * @type {typeof import("../../../src/v5/mobx")}
  */
 const mobx = require("../../../src/mobx.ts")
-const utils = require("../utils/test-utils")
+const utils = require("../../v5/utils/test-utils")
 const { makeObservable } = mobx
 
 const strictError = /Since strict-mode is enabled, changing observed observable values outside actions is not allowed. Please wrap the code in an `action` if this change is intended. Tried to modify: /
@@ -16,7 +16,7 @@ test("strict mode should not allow changes outside action", () => {
 
     const d = mobx.autorun(() => a.get())
     // not-allowed, a is observed
-    expect(() => a.set(3)).toThrowError(strictError)
+    expect(utils.grabConsole(() => a.set(3))).toMatch(strictError)
     d()
 
     mobx.configure({ enforceActions: "never" })
@@ -61,10 +61,12 @@ test("reactions cannot modify state in strict mode", () => {
     })
 
     let d = mobx.autorun(() => {
-        expect(() => {
-            a.get()
-            b.set(3)
-        }).toThrowError(strictError)
+        expect(
+            utils.grabConsole(() => {
+                a.get()
+                b.set(3)
+            })
+        ).toMatch(strictError)
     })
 
     d = mobx.autorun(() => {
@@ -73,7 +75,7 @@ test("reactions cannot modify state in strict mode", () => {
 
     mobx.action(() => a.set(4))() // ok
 
-    expect(() => a.set(5)).toThrowError(strictError)
+    expect(utils.grabConsole(() => a.set(5))).toMatch(strictError)
 
     mobx.configure({ enforceActions: "never" })
     d()
@@ -94,7 +96,7 @@ test("action inside reaction in strict mode can modify state", () => {
     const d = mobx.autorun(() => {
         if (a.get() % 2 === 0) act()
         if (a.get() == 16) {
-            expect(() => b.set(55)).toThrowError(strictError)
+            expect(utils.grabConsole(() => b.set(55))).toMatch(strictError)
         }
     })
 
@@ -105,7 +107,7 @@ test("action inside reaction in strict mode can modify state", () => {
     setA(5)
     expect(b.get()).toBe(3)
     setA(16)
-    expect(b.get()).toBe(4)
+    expect(b.get()).toBe(55)
 
     mobx.configure({ enforceActions: "never" })
     bd()
@@ -180,11 +182,13 @@ test("strict mode checks", function() {
         x.set(7)
     })
 
-    expect(function() {
-        mobx._allowStateChanges(false, function() {
-            x.set(4)
+    expect(
+        utils.grabConsole(function() {
+            mobx._allowStateChanges(false, function() {
+                x.set(4)
+            })
         })
-    }).toThrowError(/Side effects like changing state are not allowed at this point/)
+    ).toMatch(/Side effects like changing state are not allowed at this point/)
 
     mobx._resetGlobalState()
     d()
@@ -201,12 +205,16 @@ test("enforceActions 'strict' does not allow changing unobserved observables", (
             x.a
         })
 
-        expect(() => {
-            x.a = 2
-        }).toThrow(/Since strict-mode is enabled/)
-        expect(() => {
-            x.b = 2
-        }).toThrow(/Since strict-mode is enabled/)
+        expect(
+            utils.grabConsole(() => {
+                x.a = 2
+            })
+        ).toMatch(/Since strict-mode is enabled/)
+        expect(
+            utils.grabConsole(() => {
+                x.b = 2
+            })
+        ).toMatch(/Since strict-mode is enabled/)
 
         d()
     } finally {
@@ -419,9 +427,11 @@ describe("reactionRequiresObservable", function() {
 test("#1869", function() {
     const x = mobx.observable.box(3)
     mobx.configure({ enforceActions: "always", isolateGlobalState: true })
-    expect(() => {
-        x.set(4)
-    }).toThrow("Since strict-mode is enabled")
+    expect(
+        utils.grabConsole(() => {
+            x.set(4)
+        })
+    ).toMatch("Since strict-mode is enabled")
     mobx._resetGlobalState() // should preserve strict mode
 })
 

@@ -21,7 +21,7 @@ Object {
     "set": [Function],
   },
   "y": Object {
-    "configurable": false,
+    "configurable": true,
     "enumerable": false,
     "get": [Function],
     "set": [Function],
@@ -56,7 +56,7 @@ Object {
     "set": [Function],
   },
   "y": Object {
-    "configurable": false,
+    "configurable": true,
     "enumerable": false,
     "get": [Function],
     "set": [Function],
@@ -91,7 +91,7 @@ Object {
     "set": [Function],
   },
   "y": Object {
-    "configurable": false,
+    "configurable": true,
     "enumerable": false,
     "get": [Function],
     "set": [Function],

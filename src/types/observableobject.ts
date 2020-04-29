@@ -380,7 +380,7 @@ export function generateComputedPropConfig(propName) {
     return (
         computedPropertyConfigs[propName] ||
         (computedPropertyConfigs[propName] = {
-            configurable: globalState.computedConfigurable,
+            configurable: true,
             enumerable: false,
             get() {
                 return getAdministrationForComputedPropOwner(this).read(propName)

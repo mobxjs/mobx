@@ -1,4 +1,4 @@
-import { IObservableArray, globalState, isObservableArray } from "../internal"
+import { IObservableArray, globalState, isObservableArray, fail } from "../internal"
 
 export const EMPTY_ARRAY = []
 Object.freeze(EMPTY_ARRAY)
@@ -108,7 +108,9 @@ export function isPropertyConfigurable(object: any, prop: PropertyKey): boolean 
 export function assertPropertyConfigurable(object: any, prop: PropertyKey) {
     if (__DEV__ && !isPropertyConfigurable(object, prop))
         fail(
-            `Cannot make property '${prop.toString()}' observable, it is not configurable and writable in the target object`
+            `Cannot make property '${stringifyKey(
+                prop
+            )}' observable, it is not configurable and writable in the target object`
         )
 }
 
@@ -146,15 +148,16 @@ const hasGetOwnPropertySymbols = typeof Object.getOwnPropertySymbols !== "undefi
 export function getPlainObjectKeys(object) {
     const keys = Object.keys(object)
     // Not supported in IE, so there are not going to be symbol props anyway...
-    if (hasGetOwnPropertySymbols) return keys
+    if (!hasGetOwnPropertySymbols) return keys
     const symbols = Object.getOwnPropertySymbols(object)
     if (!symbols.length) return keys
-    return [...keys, symbols.filter(s => Object.prototype.propertyIsEnumerable.call(object, s))]
+    return [...keys, ...symbols.filter(s => Object.prototype.propertyIsEnumerable.call(object, s))]
 }
 
 export function stringifyKey(key: any): string {
-    if (key && key.toString) return key.toString()
-    else return new String(key).toString()
+    if (typeof key === "string") return key
+    if (typeof key === "symbol") return key.toString()
+    return new String(key).toString()
 }
 
 export function toPrimitive(value) {

@@ -2,7 +2,6 @@ const mobx = require("../../../src/mobx.ts")
 const m = mobx
 
 const { $mobx } = mobx
-const { makeObservable } = mobx
 
 test("treeD", function() {
     m._resetGlobalState()

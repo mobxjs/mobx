@@ -1,7 +1,7 @@
 "use strict"
 
 const mobx = require("../../../src/mobx.ts")
-const utils = require("../utils/test-utils")
+const utils = require("../../v5/utils/test-utils")
 
 test("action should wrap in transaction", () => {
     const values = []
@@ -173,7 +173,7 @@ test("should be possible to change unobserved state in an action called from com
     mobx._resetGlobalState()
 })
 
-test("should be possible to change observed state in an action called from computed if run inside _allowStateChangesInsideComputed", () => {
+test.skip("should be possible to change observed state in an action called from computed if run inside _allowStateChangesInsideComputed", () => {
     const a = mobx.observable.box(2)
     const d = mobx.autorun(() => {
         a.get()
@@ -183,7 +183,7 @@ test("should be possible to change observed state in an action called from compu
         mobx._allowStateChangesInsideComputed(() => {
             a.set(3)
             // a second level computed should throw
-            expect(() => c2.get()).toThrowError(
+            expect(utils.grabConsole(() => c2.get())).toMatch(
                 /Computed values are not allowed to cause side effects by changing observables that are already being observed/
             )
         })
@@ -226,9 +226,11 @@ test("should not be possible to change observed state in an action called from c
         return a.get()
     })
 
-    expect(() => {
-        c.get()
-    }).toThrowError(
+    expect(
+        utils.grabConsole(() => {
+            c.get()
+        })
+    ).toMatch(
         /Computed values are not allowed to cause side effects by changing observables that are already being observed/
     )
 
@@ -325,7 +327,7 @@ test("runInAction", () => {
     const observable = mobx.observable.box(0)
     const d = mobx.autorun(() => values.push(observable.get()))
 
-    let res = mobx.runInAction("increment", () => {
+    let res = mobx.runInAction(() => {
         observable.set(observable.get() + 6 * 2)
         observable.set(observable.get() - 3) // oops
         return 2
@@ -343,7 +345,7 @@ test("runInAction", () => {
     expect(res).toBe(3)
     expect(values).toEqual([0, 9, 15])
     expect(events).toEqual([
-        { arguments: [], name: "increment" },
+        { arguments: [], name: "<unnamed action>" },
         { arguments: [], name: "<unnamed action>" }
     ])
 
