@@ -6,7 +6,9 @@ coverage
 test/babel-tests.js
 test/typescript/typescript-tests.js
 dist/
-.idea
+**/.idea/*
+!/.idea/icon.png
+!/.idea/vcs.xml
 .wp-build*/
 *.iml
 *.ipr
