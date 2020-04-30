@@ -6,7 +6,7 @@ hide_title: true
 
 # (@)computed
 
-<div id='codefund'></div><div class="re_2020"><a class="re_2020_link" href="https://www.react-europe.org/#slot-2149-workshop-typescript-for-react-and-graphql-devs-with-michel-weststrate" target="_blank" rel="sponsored noopener"><div><div class="re_2020_ad" >Ad</div></div><img src="/img/reacteurope.svg"><span>Join the author of MobX at <b>ReactEurope</b> to learn how to use <span class="link">TypeScript with React</span></span></a></div>
+<div id='codefund'></div>
 
 <details>
     <summary style="color: white; background:green;padding:5px;margin:5px;border-radius:2px">egghead.io lesson 3: computed values</summary>
@@ -97,6 +97,7 @@ const orderLine = observable.object({
 ```
 
 ## Computed values are not getters
+
 The previous computed examples in the `OrderLine` class use the `get` keyword however, they generally should not be accessed directly as a getter. This can be a source of confusion to users new to Mobx from other derived cascading data layers like Reselect. The following code demonsrates the issue.
 
 ```
@@ -110,17 +111,18 @@ setInterval(() => {
 }, 60);
 ```
 
-As long as a computed value is not used by a reaction, it is not memoized and so it executes everytime it is accessed just like a normal eager evaluating function. This can cause performance degredation if a computed value is read high in a frequency loop like `requestAnimationFrame`.  MobX can be configured to report an error when computeds are being access directly by using the `computedRequiresReaction` option
+As long as a computed value is not used by a reaction, it is not memoized and so it executes everytime it is accessed just like a normal eager evaluating function. This can cause performance degredation if a computed value is read high in a frequency loop like `requestAnimationFrame`. MobX can be configured to report an error when computeds are being access directly by using the `computedRequiresReaction` option
 
 ```javascript
 configure({
-  computedRequiresReaction: true
-});
+    computedRequiresReaction: true
+})
 ```
 
 Though this restriction is confusing and contradictory Computeds can be altered to work in a direct access manner with some of the following methods...
 
 ### Computed memoization with reactions
+
 A computed value should always be read by a reaction. Reading a computed value directly will cause it to recompute which can be expensive, depending on the how complex the derived result is. The following code uses the previous `OrderLine` class example and memoizes the `total` value so that it can be read directly.
 
 ```javascript
@@ -142,21 +144,21 @@ class OrderLine {
     }
 }
 
-const Ol = new OrderLine(2.00)
+const Ol = new OrderLine(2.0)
 
 // this is now ok
 // because total will be cached from computeTotal
 // when its dependencies are updated
 setInterval(() => {
-  console.log(Ol.total);
-}, 60);
+    console.log(Ol.total)
+}, 60)
 ```
 
 ### Computed KeepAlive
 
 A computed may be initalized with the `keepAlive` flag. `keepAlive` will cause the computed to act as though it is observed by a reaction. This is a convience method and `keepAlive` does the same as the autorun in example above, but it does it a lot more efficient (it can for example keep the computed alive, but defer computation until somebody actually reads the value, something the autorun can't do).
 
-``` javascript
+```javascript
 class OrderLine {
     @observable price = 0
     @observable amount = 1
@@ -165,7 +167,7 @@ class OrderLine {
         this.price = price
     }
 
-    @computed({keepAlive: true})
+    @computed({ keepAlive: true })
     get total() {
         return this.price * this.amount
     }
@@ -173,6 +175,7 @@ class OrderLine {
 ```
 
 ### Autorun vs keepAlive
+
 The only case where autorun would be more beneficial than a `keepAlive` computed, is during a manual managment case in which you call the returned disposer to nicely clean up the computed value if it is no longer used typically you would do that in a destructor of a class for example.
 
 ## Setters for computed values

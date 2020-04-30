@@ -6,7 +6,7 @@ hide_title: true
 
 # Common pitfalls & best practices
 
-<div id='codefund'></div><div class="re_2020"><a class="re_2020_link" href="https://www.react-europe.org/#slot-2149-workshop-typescript-for-react-and-graphql-devs-with-michel-weststrate" target="_blank" rel="sponsored noopener"><div><div class="re_2020_ad" >Ad</div></div><img src="/img/reacteurope.svg"><span>Join the author of MobX at <b>ReactEurope</b> to learn how to use <span class="link">TypeScript with React</span></span></a></div>
+<div id='codefund'></div>
 
 Stuck with MobX? This section contains a list of common issues people new to MobX might run into.
 
@@ -209,7 +209,9 @@ export const MyComponent = observer(props => <div>hi</div>)
 myComponent.displayName = "MyComponent"
 
 // 2 (MobX infers component name from function name)
-export const MyComponent = observer(function MyComponent(props) { return <div>hi</div> })
+export const MyComponent = observer(function MyComponent(props) {
+    return <div>hi</div>
+})
 
 // 3 (transpiler will infer component name from variable name)
 const _MyComponent = props => <div>hi</div>

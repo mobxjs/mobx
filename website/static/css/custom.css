@@ -1,15 +1,14 @@
 /* your custom css */
 
-
-/* 
-Docusaurus's default displays img tags as block. 
+/*
+Docusaurus's default displays img tags as block.
 Numerous images in the main README.md relied on default (inline-block) img tag styling
 when this project was migrated initially.
 
 Override that style here
 */
 article p img {
-  display: inline-block;
+    display: inline-block;
 }
 
 @media only screen and (min-device-width: 360px) and (max-device-width: 736px) {
@@ -31,54 +30,12 @@ article p img {
 /* https://github.com/reduxjs/redux/blob/master/website/static/css/custom.css#L134 */
 
 .navigationSlider .slidingNav ul a[href*="github"] {
-  font-size: 0;
+    font-size: 0;
 }
 
 .navigationSlider .slidingNav ul a[href*="github"]::before {
-  content : "";
-  width : 32px;
-  height : 32px;
-  background: url("/img/github-brand.svg");
-}
-
-.re_2020 {
-  font-size: 14px;
-  box-sizing: border-box;
-  width: 100%;
-  line-height: 1.5;
-  display: block;
-  padding: 12px 11px;
-  text-align: left;
-  margin: 12px 0;
-  background-color: #f8f8f8;  
-  font-family: Helvetica Neue,Helvetica,Arial,sans-serif;
-}
-
-.re_2020_link {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-
-.re_2020 img {
-  margin-left: 8px;
-  margin-right: 8px;
-}
-
-.re_2020 span {
-  color: rgba(0,0,0,.6);
-}
-
-.re_2020_ad {
-  display: inline;
-  background-color: #4caf50;
-  color: #fff;
-  margin-right: 4px;
-  padding: 2px 6px;
-  border-radius: 3px;
-}
-
-.re_2020_link .link {
-  color: #2c6ac7;
-  text-decoration: underline;
+    content: "";
+    width: 32px;
+    height: 32px;
+    background: url("/img/github-brand.svg");
 }

@@ -6,7 +6,7 @@ hide_title: true
 
 # Optimizing rendering React components
 
-<div id='codefund'></div><div class="re_2020"><a class="re_2020_link" href="https://www.react-europe.org/#slot-2149-workshop-typescript-for-react-and-graphql-devs-with-michel-weststrate" target="_blank" rel="sponsored noopener"><div><div class="re_2020_ad" >Ad</div></div><img src="/img/reacteurope.svg"><span>Join the author of MobX at <b>ReactEurope</b> to learn how to use <span class="link">TypeScript with React</span></span></a></div>
+<div id='codefund'></div>
 
 MobX is very fast, [often even faster than Redux](https://twitter.com/mweststrate/status/718444275239882753). But here are some tips to get most out of React and MobX. Note that most tips apply to React in general and are not specific for MobX.
 

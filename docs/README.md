@@ -18,7 +18,7 @@ _Simple, scalable state management_
 [![OpenCollective](https://opencollective.com/mobx/sponsors/badge.svg)](#sponsors)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 
-<div id='codefund'></div><div class="re_2020"><a class="re_2020_link" href="https://www.react-europe.org/#slot-2149-workshop-typescript-for-react-and-graphql-devs-with-michel-weststrate" target="_blank" rel="sponsored noopener"><div><div class="re_2020_ad" >Ad</div></div><img src="/img/reacteurope.svg"><span>Join the author of MobX at <b>ReactEurope</b> to learn how to use <span class="link">TypeScript with React</span></span></a></div>
+<div id='codefund'></div>
 
 MobX is proudly sponsored by Mendix, Coinbase, Facebook Open Source, Canva, Algolia, Guilded, Auction Frontier, Mantro and TalentPlot for 100\$/month or more! And beyond that by many [individual backers](#backers) and through [one time contributions](https://github.com/mobxjs/mobx/blob/master/sponsors.md).
 
