@@ -79,7 +79,7 @@ test("should not be possible to use @action with getters", () => {
     expect(() => {
         new A()
     }).toThrowErrorMatchingInlineSnapshot(
-        `"[mobx] Cannot decorate 'Test': action can only be used on properties with a function value."`
+        `"[MobX] Cannot decorate 'Test': action can only be used on properties with a function value."`
     )
 
     mobx._resetGlobalState()
@@ -574,7 +574,7 @@ test("inheritance overrides observable", () => {
             expect(() => {
                 makeObservable(this)
             }).toThrowErrorMatchingInlineSnapshot(
-                `"[mobx] Cannot decorate 'a': the property is already decorated as observable."`
+                `"[MobX] Cannot decorate 'a': the property is already decorated as observable."`
             )
         }
 

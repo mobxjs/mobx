@@ -1,7 +1,6 @@
-import { $mobx, fail, getAtom, isComputedValue, isObservableObject } from "../internal"
+import { $mobx, getAtom, isComputedValue, isObservableObject, die, isStringish } from "../internal"
 
 export function _isComputed(value, property?: string): boolean {
-    if (value === null || value === undefined) return false
     if (property !== undefined) {
         if (isObservableObject(value) === false) return false
         if (!value[$mobx].values.has(property)) return false
@@ -12,16 +11,15 @@ export function _isComputed(value, property?: string): boolean {
 }
 
 export function isComputed(value: any): boolean {
-    if (arguments.length > 1)
-        return fail(
-            __DEV__ &&
-                `isComputed expects only 1 argument. Use isObservableProp to inspect the observability of a property`
+    if (__DEV__ && arguments.length > 1)
+        return die(
+            `isComputed expects only 1 argument. Use isComputedProp to inspect the observability of a property`
         )
     return _isComputed(value)
 }
 
 export function isComputedProp(value: any, propName: string): boolean {
-    if (typeof propName !== "string")
-        return fail(__DEV__ && `isComputed expected a property name as second argument`)
+    if (__DEV__ && !isStringish(propName))
+        return die(`isComputed expected a property name as second argument`)
     return _isComputed(value, propName)
 }

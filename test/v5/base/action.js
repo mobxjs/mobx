@@ -451,7 +451,7 @@ test("extendObservable respects action decorators", () => {
 test("expect warning for invalid decorator", () => {
     expect(() => {
         mobx.observable({ x: 1 }, { x: undefined })
-    }).toThrow(/invalid decorator 'undefined' for 'x'/)
+    }).toThrow(/invalid decorator for 'x'/)
 })
 
 test("expect warning superfluos decorator", () => {

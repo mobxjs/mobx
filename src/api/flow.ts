@@ -1,4 +1,4 @@
-import { action, fail, noop } from "../internal"
+import { action, fail, noop, die, isFunction } from "../internal"
 
 let generatorId = 0
 
@@ -17,7 +17,7 @@ export function flow<R, Args extends any[]>(
     generator: (...args: Args) => Generator<any, R, any> | AsyncGenerator<any, R, any>
 ): (...args: Args) => CancellablePromise<R> {
     if (__DEV__ && arguments.length !== 1)
-        fail(!`Flow expects 1 argument and cannot be used as decorator`)
+        die(`Flow expects 1 argument and cannot be used as decorator`)
     const name = generator.name || "<unnamed flow>"
 
     // Implementation based on https://github.com/tj/co/blob/master/index.js
@@ -66,7 +66,7 @@ export function flow<R, Args extends any[]>(
             }
 
             function next(ret: any) {
-                if (ret && typeof ret.then === "function") {
+                if (isFunction(ret?.then)) {
                     // an async iterator
                     ret.then(next, reject)
                     return
@@ -99,5 +99,5 @@ export function flow<R, Args extends any[]>(
 }
 
 function cancelPromise(promise) {
-    if (typeof promise.cancel === "function") promise.cancel()
+    if (isFunction(promise.cancel)) promise.cancel()
 }

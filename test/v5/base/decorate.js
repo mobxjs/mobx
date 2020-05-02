@@ -29,7 +29,7 @@ test("throws on undeclared prop", () => {
     expect(() => {
         new Box()
     }).toThrowErrorMatchingInlineSnapshot(
-        `"[mobx] Cannot decorate undefined property: 'notExisting'"`
+        `"[MobX] Cannot decorate undefined property: 'notExisting'"`
     )
 })
 
@@ -356,7 +356,7 @@ test("decorate should not allow @observable on getter", function() {
             x: computed
         })
     }).toThrowErrorMatchingInlineSnapshot(
-        `"[mobx] Cannot decorate 'x': computed can only be used on getter properties."`
+        `"[MobX] Cannot decorate 'x': computed can only be used on getter properties."`
     )
 
     expect(() => {
@@ -364,7 +364,7 @@ test("decorate should not allow @observable on getter", function() {
             x: action
         })
     }).toThrowErrorMatchingInlineSnapshot(
-        `"[mobx] Cannot decorate 'x': action can only be used on properties with a function value."`
+        `"[MobX] Cannot decorate 'x': action can only be used on properties with a function value."`
     )
 
     expect(() => {
@@ -372,7 +372,7 @@ test("decorate should not allow @observable on getter", function() {
             y: observable
         })
     }).toThrowErrorMatchingInlineSnapshot(
-        `"[mobx] Cannot decorate 'y': observable cannot be used on setter / getter properties."`
+        `"[MobX] Cannot decorate 'y': observable cannot be used on setter / getter properties."`
     )
 })
 
@@ -426,5 +426,5 @@ test("expect warning for missing decorated getter", () => {
             y: computed,
             z: computed
         })
-    }).toThrowErrorMatchingInlineSnapshot(`"[mobx] Cannot decorate undefined property: 'z'"`)
+    }).toThrowErrorMatchingInlineSnapshot(`"[MobX] Cannot decorate undefined property: 'z'"`)
 })

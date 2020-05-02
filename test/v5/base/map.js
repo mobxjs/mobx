@@ -672,7 +672,7 @@ test("issue 1243, .replace should not trigger change on unchanged values", () =>
 
     expect(() => {
         m.replace("not-an-object")
-    }).toThrow("[mobx] Cannot convert to map from 'not-an-object'")
+    }).toThrow("[MobX] Cannot convert to map from 'not-an-object'")
 
     d()
 })

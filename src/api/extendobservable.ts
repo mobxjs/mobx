@@ -10,7 +10,8 @@ import {
     isPlainObject,
     asCreateObservableOptions,
     getEnhancerFromOption,
-    isObservable
+    isObservable,
+    getPlainObjectKeys
 } from "../internal"
 
 export function extendObservable<A extends Object, B extends Object>(
@@ -53,19 +54,16 @@ export function extendObservable<A extends Object, B extends Object>(
     startBatch()
     try {
         const descs = Object.getOwnPropertyDescriptors(properties)
-        const maker = key => {
+        getPlainObjectKeys(descs).forEach(key => {
             makeProperty(
                 adm,
-                properties || target /* TODO or target? */,
+                target,
                 key,
-                descs[key],
+                descs[key as any],
                 !annotations ? true : key in annotations ? annotations[key] : true,
                 true
             )
-        }
-        // TODO: replace with Object.keys(descs).forEach(maker)
-        Object.getOwnPropertyNames(descs).forEach(maker)
-        Object.getOwnPropertySymbols(descs).forEach(maker)
+        })
     } finally {
         endBatch()
     }

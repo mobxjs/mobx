@@ -11,8 +11,8 @@ import {
     isStringish
 } from "../internal"
 
-const ACTION = "action"
-const ACTION_BOUND = "action.bound"
+export const ACTION = "action"
+export const ACTION_BOUND = "action.bound"
 const ACTION_UNNAMED = "<unnamed action>"
 
 export interface IActionFactory extends Annotation, PropertyDecorator {

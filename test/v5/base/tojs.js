@@ -365,7 +365,7 @@ test("json cycles when exporting maps as maps", function() {
 describe("recurseEverything set to true", function() {
     test("recurseEverything is no longer supported", () => {
         expect(() => mobx.toJS({}, { recurseEverything: true })).toThrowErrorMatchingInlineSnapshot(
-            `"[MobX] unknown error nr: The recurseEverything option is no longer supported"`
+            `"[MobX] The recurseEverything option is no longer supported"`
         )
     })
 })

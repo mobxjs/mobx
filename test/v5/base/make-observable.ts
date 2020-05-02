@@ -212,6 +212,14 @@ test("makeAutoObservable cannot be used on subclasses", () => {
     expect(() => {
         new B()
     }).toThrowErrorMatchingInlineSnapshot(
-        `"[mobx] 'makeAutoObservable' can only be used for classes that don't have a superclass"`
+        `"[MobX] 'makeAutoObservable' can only be used for classes that don't have a superclass"`
+    )
+})
+
+test("makeAutoObservable cannot be used on observable objects", () => {
+    expect(() => {
+        makeAutoObservable(observable({ x: 3 }))
+    }).toThrowErrorMatchingInlineSnapshot(
+        `"[MobX] makeAutoObservable can only be used on objects not already made observable"`
     )
 })

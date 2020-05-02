@@ -2,7 +2,6 @@ import {
     asObservableObject,
     addHiddenProp,
     action,
-    fail,
     isAction,
     computed,
     observable,
@@ -18,7 +17,17 @@ import {
     isObservableProp,
     getDescriptor,
     isPlainObject,
-    isObservableObject
+    isObservableObject,
+    isFunction,
+    die,
+    ACTION,
+    ACTION_BOUND,
+    COMPUTED,
+    COMPUTED_STRUCT,
+    OBSERVABLE,
+    OBSERVABLE_REF,
+    OBSERVABLE_SHALLOW,
+    OBSERVABLE_STRUCT
 } from "../internal"
 
 function makeAction(target, key, name, fn) {
@@ -32,7 +41,7 @@ function getInferredAnnotation(
     if (desc.get) return computed
     if (desc.set) return false // ignore pure setters
     // if already wrapped in action, don't do that another time, but assume it is already set up properly
-    if (typeof desc.value === "function") return isAction(desc.value) ? false : action.bound
+    if (isFunction(desc.value)) return isAction(desc.value) ? false : action.bound
     // if (!desc.configurable || !desc.writable) return false
     return defaultAnnotation ?? observable.deep
 }
@@ -47,7 +56,7 @@ function getDescriptorInChain(target: Object, prop: PropertyKey): [PropertyDescr
         }
         current = Object.getPrototypeOf(current)
     }
-    fail(`Cannot decorate undefined property: '${prop.toString()}'`)
+    die(1, prop)
 }
 
 export function makeProperty(
@@ -66,24 +75,18 @@ export function makeProperty(
     }
     if (annotation === false) {
         if (forceCopy) {
+            // TODO: create util?
             Object.defineProperty(target, key, descriptor)
         }
         return
     }
     if (!annotation || annotation === true || !annotation.annotationType) {
-        return fail(
-            // @ts-ignore
-            `invalid decorator '${annotation?.annotationType ??
-                annotation}' for '${key.toString()}'`
-        )
+        return die(2, key)
     }
     switch (annotation.annotationType) {
-        case "action": {
+        case ACTION: {
             const fn = descriptor.value
-            invariant(
-                typeof fn === "function",
-                `Cannot decorate '${key.toString()}': action can only be used on properties with a function value.`
-            )
+            if (!isFunction(fn)) die(3, key)
             if (owner !== target && !forceCopy) {
                 if (!isAction(owner[key])) makeAction(owner, key, annotation.arg, fn)
             } else {
@@ -91,43 +94,36 @@ export function makeProperty(
             }
             break
         }
-        case "action.bound": {
+        case ACTION_BOUND: {
             const fn = descriptor.value
-            invariant(
-                typeof fn === "function",
-                `Cannot decorate '${key.toString()}': action can only be used on properties with a function value.`
-            )
+            if (!isFunction(fn)) die(3, key)
             makeAction(target, key, annotation.arg, fn.bind(adm.proxy || target))
             break
         }
-        case "computed.struct":
-        case "computed": {
-            invariant(
-                descriptor.get,
-                `Cannot decorate '${key.toString()}': computed can only be used on getter properties.`
-            )
+        case COMPUTED:
+        case COMPUTED_STRUCT: {
+            if (!descriptor.get) die(4, key)
             // TODO: add to target or proto?
             adm.addComputedProp(target, key, {
                 get: descriptor.get,
                 set: descriptor.set,
-                compareStructural: annotation.annotationType === "computed.struct",
+                compareStructural: annotation.annotationType === COMPUTED_STRUCT,
                 ...annotation.arg
             })
             break
         }
-        case "observable":
-        case "observable.ref":
-        case "observable.shallow":
-        case "observable.struct": {
-            // TODO: wrap in __DEV__
-            invariant(
-                !isObservableProp(target, key as any),
-                `Cannot decorate '${key.toString()}': the property is already decorated as observable.`
-            )
-            invariant(
-                "value" in descriptor,
-                `Cannot decorate '${key.toString()}': observable cannot be used on setter / getter properties.`
-            )
+        case OBSERVABLE:
+        case OBSERVABLE_REF:
+        case OBSERVABLE_SHALLOW:
+        case OBSERVABLE_STRUCT: {
+            if (__DEV__ && isObservableProp(target, key as any))
+                die(
+                    `Cannot decorate '${key.toString()}': the property is already decorated as observable.`
+                )
+            if (__DEV__ && !("value" in descriptor))
+                die(
+                    `Cannot decorate '${key.toString()}': observable cannot be used on setter / getter properties.`
+                )
             // if the origAnnotation was true, preferred the adm's default enhancer over the inferred one
             const enhancer =
                 origAnnotation === true
@@ -137,10 +133,11 @@ export function makeProperty(
             break
         }
         default:
-            fail(
-                `invalid decorator '${annotation.annotationType ??
-                    annotation}' for '${key.toString()}'`
-            )
+            if (__DEV__)
+                die(
+                    `invalid decorator '${annotation.annotationType ??
+                        annotation}' for '${key.toString()}'`
+                )
     }
 }
 
@@ -185,11 +182,16 @@ export function makeAutoObservable<T extends Object, AdditionalKeys extends Prop
 ): T {
     const proto = Object.getPrototypeOf(target)
     const isPlain = proto == null || proto === Object.prototype
-    invariant(
-        isPlain || isPlainObject(proto),
-        `'makeAutoObservable' can only be used for classes that don't have a superclass`
-    )
-    invariant(!isObservableObject(target), `TODO`)
+    if (__DEV__)
+        invariant(
+            isPlain || isPlainObject(proto),
+            `'makeAutoObservable' can only be used for classes that don't have a superclass`
+        )
+    if (__DEV__)
+        invariant(
+            !isObservableObject(target),
+            `makeAutoObservable can only be used on objects not already made observable`
+        )
     let annotations = { ...excludes }
     extractAnnotationsFromObject(target, annotations, options)
     if (!isPlain) {
@@ -207,20 +209,20 @@ function extractAnnotationsFromObject(
     const defaultAnnotation: Annotation = options?.deep
         ? observable.deep
         : options?.defaultDecorator ?? observable.deep
+    // TODO: util for getOwnDescriptors?
     Object.entries(Object.getOwnPropertyDescriptors(target)).forEach(([key, descriptor]) => {
-        if (key in collector) return
+        if (key in collector || key === "constructor") return
         collector[key] = getInferredAnnotation(descriptor, defaultAnnotation)
     })
 }
 
 function extractAnnotationsFromProto(proto: any, collector: AnnotationsMap<any, any>) {
-    // TODO: make a utility for this
-    ;[...Object.getOwnPropertyNames(proto), ...Object.getOwnPropertySymbols(proto)].forEach(key => {
-        if (key in collector) return
-        const prop = getDescriptor(proto, key)!
+    // TODO: for this combo, craeate a utility, looks same as above
+    Object.entries(Object.getOwnPropertyDescriptors(proto)).forEach(([key, prop]) => {
+        if (key in collector || key === "constructor") return
         if (prop.get) {
             collector[key as any] = computed
-        } else if (typeof prop.value === "function") {
+        } else if (isFunction(prop.value)) {
             collector[key as any] = action.bound
         }
     })

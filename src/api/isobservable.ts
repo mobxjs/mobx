@@ -7,18 +7,20 @@ import {
     isObservableArray,
     isObservableMap,
     isObservableObject,
-    isReaction
+    isReaction,
+    die
 } from "../internal"
+import { isStringish } from "../utils/utils"
 
 function _isObservable(value, property?: string): boolean {
-    if (value === null || value === undefined) return false
+    if (!value) return false
     if (property !== undefined) {
         if (__DEV__ && (isObservableMap(value) || isObservableArray(value)))
-            return fail(
+            return die(
                 "isObservable(object, propertyName) is not supported for arrays and maps. Use map.has or array.length instead."
             )
         if (isObservableObject(value)) {
-            return (<ObservableObjectAdministration>(value as any)[$mobx]).values.has(property)
+            return value[$mobx].values.has(property)
         }
         return false
     }
@@ -42,7 +44,7 @@ export function isObservable(value: any): boolean {
 }
 
 export function isObservableProp(value: any, propName: string): boolean {
-    if (typeof propName !== "string" && typeof propName !== "symbol")
+    if (!isStringish(propName))
         return fail(__DEV__ && `expected a property name as second argument`)
     return _isObservable(value, propName)
 }

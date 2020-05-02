@@ -693,7 +693,7 @@ test("inheritance overrides observable", () => {
                     c: computed
                 })
             }).toThrowErrorMatchingInlineSnapshot(
-                `"[mobx] Cannot decorate 'a': the property is already decorated as observable."`
+                `"[MobX] Cannot decorate 'a': the property is already decorated as observable."`
             )
         }
 

@@ -10,9 +10,10 @@ import {
     isFunction,
     assign
 } from "../internal"
+import { die } from "../errors"
 
-const COMPUTED = "computed"
-const COMPUTED_STRUCT = "computed.struct"
+export const COMPUTED = "computed"
+export const COMPUTED_STRUCT = "computed.struct"
 
 export interface IComputedFactory extends Annotation, PropertyDecorator {
     // @computed(opts)
@@ -40,6 +41,9 @@ export const computed: IComputedFactory = function computed(arg1, arg2, arg3) {
     // computed(expr, options?)
     if (__DEV__) {
         invariant(isFunction(arg1), "First argument to `computed` should be an expression.")
+    }
+    if (__DEV__ && isFunction(arg2)) {
+        die("A setter as second argument is no longer supported, use `{set: fn }` option instead")
     }
     const opts: IComputedValueOptions<any> = isPlainObject(arg2) ? arg2 : {}
     opts.get = arg1

@@ -11,7 +11,8 @@ import {
     ObservableMap,
     getAdministration,
     ObservableSet,
-    ISetWillChange
+    ISetWillChange,
+    isFunction
 } from "../internal"
 
 export function intercept<T>(
@@ -42,7 +43,7 @@ export function intercept<T extends Object, K extends keyof T>(
     handler: IInterceptor<IValueWillChange<any>>
 ): Lambda
 export function intercept(thing, propOrHandler?, handler?): Lambda {
-    if (typeof handler === "function") return interceptProperty(thing, propOrHandler, handler)
+    if (isFunction(handler)) return interceptProperty(thing, propOrHandler, handler)
     else return interceptInterceptable(thing, propOrHandler)
 }
 

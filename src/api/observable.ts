@@ -31,6 +31,11 @@ import {
     assign
 } from "../internal"
 
+export const OBSERVABLE = "observable"
+export const OBSERVABLE_REF = "observable.ref"
+export const OBSERVABLE_SHALLOW = "observable.shallow"
+export const OBSERVABLE_STRUCT = "observable.struct"
+
 export type CreateObservableOptions = {
     name?: string
     equals?: IEqualsComparer<any>
