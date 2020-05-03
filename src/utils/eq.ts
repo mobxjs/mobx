@@ -4,7 +4,8 @@ import {
     isObservableMap,
     isES6Set,
     isObservableSet,
-    hasProp
+    hasProp,
+    isFunction
 } from "../internal"
 
 declare const Symbol
@@ -26,7 +27,7 @@ function eq(a: any, b: any, depth: number, aStack?: any[], bStack?: any[]) {
     if (a !== a) return b !== b
     // Exhaust primitive checks
     const type = typeof a
-    if (type !== "function" && type !== "object" && typeof b != "object") return false
+    if (!isFunction(type) && type !== "object" && typeof b != "object") return false
 
     // Compare `[[Class]]` names.
     const className = toString.call(a)
@@ -79,9 +80,9 @@ function eq(a: any, b: any, depth: number, aStack?: any[], bStack?: any[]) {
         if (
             aCtor !== bCtor &&
             !(
-                typeof aCtor === "function" &&
+                isFunction(aCtor) &&
                 aCtor instanceof aCtor &&
-                typeof bCtor === "function" &&
+                isFunction(bCtor) &&
                 bCtor instanceof bCtor
             ) &&
             "constructor" in a &&

@@ -1,4 +1,4 @@
-import { isFunction } from "util"
+import { isFunction } from "./internal"
 
 const niceErrors = {
     0: `Invalid value for configuration 'enforceActions', expected 'never', 'always' or 'observed'`,
@@ -13,7 +13,17 @@ const niceErrors = {
     },
     4(prop) {
         return `Cannot decorate '${prop.toString()}': computed can only be used on getter properties.`
-    }
+    },
+    5: "'keys()' can only be used on observable objects, arrays, sets and maps",
+    6: "'values()' can only be used on observable objects, arrays, sets and maps",
+    7: "'entries()' can only be used on observable objects, arrays and maps",
+    8: "'set()' can only be used on observable objects, arrays and maps",
+    9: "'remove()' can only be used on observable objects, arrays and maps",
+    10: "'has()' can only be used on observable objects, arrays and maps",
+    11: "'get()' can only be used on observable objects, arrays and maps",
+    12: `Invalid annotation`,
+    13: `Dynamic observable objects cannot be frozen`,
+    14: "Intercept handlers should return nothing or a change object"
 } as const
 
 const errors: typeof niceErrors = __DEV__ ? niceErrors : ({} as any)
@@ -42,18 +52,10 @@ export function dieHard(error: string): never {
 
 // TODO: remove this func
 export function fail(message: string | boolean): never {
-    invariant(false, message)
+    invariant(false, message as any)
     throw "X" // unreachable
 }
 
-// TODO: kill, reuse the above
-export const OBFUSCATED_ERROR =
-    "An invariant failed, however the error is obfuscated because this is a production build."
-
-// TODO: revisit this func
-export function invariant(check: false, message?: string | boolean): never
-export function invariant(check: true, message?: string | boolean): void
-export function invariant(check: any, message?: string | boolean): void
-export function invariant(check: boolean, message?: string | boolean) {
-    if (!check) throw new Error("[MobX] " + (message || OBFUSCATED_ERROR))
+export function invariant(check: any, message?: string | keyof typeof errors) {
+    if (!check) die(message as any)
 }

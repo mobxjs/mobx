@@ -33,10 +33,7 @@ export function interceptChange<T>(
         const interceptors = [...(interceptable.interceptors || [])]
         for (let i = 0, l = interceptors.length; i < l; i++) {
             change = interceptors[i](change)
-            invariant(
-                !change || (change as any).type,
-                "Intercept handlers should return nothing or a change object"
-            )
+            invariant(!change || (change as any).type, 14)
             if (!change) break
         }
         return change

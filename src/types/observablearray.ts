@@ -307,10 +307,12 @@ export function createObservableArray<T>(
 
 // eslint-disable-next-line
 export var arrayExtensions = {
+        // TODO: remove?
         intercept(handler: IInterceptor<IArrayWillChange<any> | IArrayWillSplice<any>>): Lambda {
             return this[$mobx].intercept(handler)
         },
 
+        // TODO: remove?
         observe(
             listener: (changeData: IArrayChange<any> | IArraySplice<any>) => void,
             fireImmediately = false
@@ -328,6 +330,7 @@ export var arrayExtensions = {
             return adm.spliceWithArray(0, adm.values.length, newItems)
         },
 
+        // TODO: remove?
         /**
          * Converts this array back to a (shallow) javascript structure.
          * For a deep clone use mobx.toJS
@@ -336,6 +339,7 @@ export var arrayExtensions = {
             return (this as any).slice()
         },
 
+        // TODO: remove?
         toJSON(): any[] {
             // Used by JSON.stringify
             return this.toJS()
@@ -420,6 +424,7 @@ export var arrayExtensions = {
             return false
         },
 
+        // TODO: remove?
         get(index: number): any | undefined {
             const adm: ObservableArrayAdministration = this[$mobx]
             if (adm) {
@@ -434,6 +439,7 @@ export var arrayExtensions = {
             return undefined
         },
 
+        // TODO: remove?
         set(index: number, newValue: any) {
             const adm: ObservableArrayAdministration = this[$mobx]
             const values = adm.values

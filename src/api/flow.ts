@@ -1,4 +1,4 @@
-import { action, fail, noop, die, isFunction } from "../internal"
+import { action, noop, die, isFunction } from "../internal"
 
 let generatorId = 0
 

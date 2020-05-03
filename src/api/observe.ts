@@ -11,7 +11,8 @@ import {
     ObservableMap,
     getAdministration,
     ObservableSet,
-    ISetDidChange
+    ISetDidChange,
+    isFunction
 } from "../internal"
 
 export function observe<T>(
@@ -52,7 +53,7 @@ export function observe<T, K extends keyof T>(
     fireImmediately?: boolean
 ): Lambda
 export function observe(thing, propOrCb?, cbOrFire?, fireImmediately?): Lambda {
-    if (typeof cbOrFire === "function")
+    if (isFunction(cbOrFire))
         return observeObservableProperty(thing, propOrCb, cbOrFire, fireImmediately)
     else return observeObservable(thing, propOrCb, cbOrFire)
 }

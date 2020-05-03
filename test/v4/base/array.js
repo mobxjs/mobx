@@ -214,7 +214,7 @@ test("serialize", function() {
     const m = mobx.observable(a)
 
     expect(JSON.stringify(m)).toEqual(JSON.stringify(a))
-    expect(a).toEqual(m.peek())
+    expect(a).toEqual(m.slice())
 
     a = [4]
     m.replace(a)

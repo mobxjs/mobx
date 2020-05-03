@@ -187,7 +187,7 @@ test("json2", function() {
 
     o.todos[1].details = mobx.observable({ url: "google" })
     o.todos[1].tags = ["foo", "bar"]
-    expect(mobx.toJS(o, false)).toEqual({
+    expect(mobx.toJS(o)).toEqual({
         todos: [
             {
                 title: "write blog",
@@ -209,7 +209,7 @@ test("json2", function() {
             }
         ]
     })
-    expect(mobx.toJS(o, true)).toEqual(mobx.toJS(o, false))
+    expect(mobx.toJS(o, { detectCycles: true })).toEqual(mobx.toJS(o))
     expect(ab).toEqual([[3, "google"]])
     expect(tb).toEqual(["reactjs,frp,foo,bar,x"])
 })
@@ -238,7 +238,7 @@ test("json cycles", function() {
     a.d.set("d", a.d)
     a.d.set("c", a.c)
 
-    const cloneA = mobx.toJS(a, true)
+    const cloneA = mobx.toJS(a, { detectCycles: true })
     const cloneC = cloneA.c
     const cloneD = cloneA.d
 

@@ -52,6 +52,10 @@ export function isFunction(fn: any): fn is Function {
     return typeof fn === "function"
 }
 
+export function isString(value: any): value is string {
+    return typeof value === "string"
+}
+
 export function isStringish(value: any): value is string | number | symbol {
     const t = typeof value
     switch (t) {
@@ -75,12 +79,6 @@ export function isPlainObject(value) {
 
 export const assign = Object.assign
 export const getDescriptor = Object.getOwnPropertyDescriptor
-
-export function makeNonEnumerable(object: any, propNames: PropertyKey[]) {
-    for (let i = 0; i < propNames.length; i++) {
-        addHiddenProp(object, propNames[i], object[propNames[i]])
-    }
-}
 
 export function addHiddenProp(object: any, propName: PropertyKey, value: any) {
     Object.defineProperty(object, propName, {
@@ -146,6 +144,7 @@ const hasGetOwnPropertySymbols = typeof Object.getOwnPropertySymbols !== "undefi
  * Returns the following: own keys, prototype keys & own symbol keys, if they are enumerable.
  */
 export function getPlainObjectKeys(object) {
+    // TODO: use Reflect.ownKeys!
     const keys = Object.keys(object)
     // Not supported in IE, so there are not going to be symbol props anyway...
     if (!hasGetOwnPropertySymbols) return keys

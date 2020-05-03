@@ -22,7 +22,7 @@
     "test:flow": "yarn build && flow check",
     "test:coverage": "yarn test -i --coverage",
     "test:performance": "PERSIST=true time node --expose-gc test/perf/index.js",
-    "test:size": "yarn build && yarn import-size --report . observable computed autorun action enableDecorators",
+    "test:size": "yarn build && yarn import-size --report . observable computed autorun action",
     "test:codemod": "jest --testRegex 'codemod/.*spec' codemod/undecorate.spec.ts",
     "prettier": "prettier --write '**/*.{js,ts,md}'",
     "prebuild": "rimraf lib",

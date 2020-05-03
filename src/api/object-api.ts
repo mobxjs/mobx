@@ -6,14 +6,14 @@ import {
     ObservableSet,
     ObservableObjectAdministration,
     endBatch,
-    fail,
     getAdministration,
     invariant,
     isObservableArray,
     isObservableMap,
     isObservableSet,
     isObservableObject,
-    startBatch
+    startBatch,
+    die
 } from "../internal"
 
 export function keys<K>(map: ObservableMap<K, any>): ReadonlyArray<K>
@@ -24,16 +24,13 @@ export function keys(obj: any): any {
     if (isObservableObject(obj)) {
         return ((obj as any) as IIsObservableObject)[$mobx].getKeys()
     }
-    if (isObservableMap(obj)) {
-        return Array.from(obj.keys())
-    }
-    if (isObservableSet(obj)) {
+    if (isObservableMap(obj) || isObservableSet(obj)) {
         return Array.from(obj.keys())
     }
     if (isObservableArray(obj)) {
         return obj.map((_, index) => index)
     }
-    return fail(__DEV__ && "'keys()' can only be used on observable objects, arrays, sets and maps")
+    die(5)
 }
 
 export function values<K, T>(map: ObservableMap<K, T>): ReadonlyArray<T>
@@ -53,9 +50,7 @@ export function values(obj: any): string[] {
     if (isObservableArray(obj)) {
         return obj.slice()
     }
-    return fail(
-        __DEV__ && "'values()' can only be used on observable objects, arrays, sets and maps"
-    )
+    die(6)
 }
 
 export function entries<K, T>(map: ObservableMap<K, T>): ReadonlyArray<[K, T]>
@@ -77,7 +72,7 @@ export function entries(obj: any): any {
     if (isObservableArray(obj)) {
         return obj.map((key, index) => [index, key])
     }
-    return fail(__DEV__ && "'entries()' can only be used on observable objects, arrays and maps")
+    die(7)
 }
 
 export function set<V>(obj: ObservableMap<PropertyKey, V>, values: { [key: string]: V })
@@ -111,14 +106,12 @@ export function set(obj: any, key: any, value?: any): void {
         obj.add(key)
     } else if (isObservableArray(obj)) {
         if (typeof key !== "number") key = parseInt(key, 10)
-        invariant(key >= 0, `Not a valid index: '${key}'`)
+        if (key < 0) die(`Invalid index: '${key}'`)
         startBatch()
         if (key >= obj.length) obj.length = key + 1
         obj[key] = value
         endBatch()
-    } else {
-        return fail(__DEV__ && "'set()' can only be used on observable objects, arrays and maps")
-    }
+    } else die(8)
 }
 
 export function remove<K, V>(obj: ObservableMap<K, V>, key: K)
@@ -137,7 +130,7 @@ export function remove(obj: any, key: any): void {
         invariant(key >= 0, `Not a valid index: '${key}'`)
         obj.splice(key, 1)
     } else {
-        return fail(__DEV__ && "'remove()' can only be used on observable objects, arrays and maps")
+        die(9)
     }
 }
 
@@ -156,9 +149,8 @@ export function has(obj: any, key: any): boolean {
         return obj.has(key)
     } else if (isObservableArray(obj)) {
         return key >= 0 && key < obj.length
-    } else {
-        return fail(__DEV__ && "'has()' can only be used on observable objects, arrays and maps")
     }
+    die(10)
 }
 
 export function get<K, V>(obj: ObservableMap<K, V>, key: K): V | undefined
@@ -172,7 +164,6 @@ export function get(obj: any, key: any): any {
         return obj.get(key)
     } else if (isObservableArray(obj)) {
         return obj[key]
-    } else {
-        return fail(__DEV__ && "'get()' can only be used on observable objects, arrays and maps")
     }
+    die(11)
 }

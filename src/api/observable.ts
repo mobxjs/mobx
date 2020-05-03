@@ -28,8 +28,11 @@ import {
     createDecorator,
     createLegacyArray,
     globalState,
-    assign
+    assign,
+    die,
+    isString
 } from "../internal"
+import { isStringish } from "../utils/utils"
 
 export const OBSERVABLE = "observable"
 export const OBSERVABLE_REF = "observable.ref"
@@ -56,12 +59,12 @@ Object.freeze(defaultCreateObservableOptions)
 
 function assertValidOption(key: string) {
     if (!/^(deep|name|equals|defaultDecorator|proxy)$/.test(key))
-        fail(`invalid option for (extend)observable: ${key}`)
+        die(`invalid option for (extend)observable: ${key}`)
 }
 
 export function asCreateObservableOptions(thing: any): CreateObservableOptions {
-    if (thing === null || thing === undefined) return defaultCreateObservableOptions
-    if (typeof thing === "string") return { name: thing, deep: true, proxy: true }
+    if (thing == null) return defaultCreateObservableOptions
+    if (isString(thing)) return { name: "" + thing, deep: true, proxy: true }
     if (__DEV__) {
         if (typeof thing !== "object") return fail("expected options object")
         Object.keys(thing).forEach(assertValidOption)
@@ -77,22 +80,15 @@ export function getEnhancerFromOption(options: CreateObservableOptions): IEnhanc
         : getEnhancerFromAnnotation(options.defaultDecorator)
 }
 
+const annotationToEnhancer = {
+    [OBSERVABLE]: deepEnhancer,
+    [OBSERVABLE_REF]: referenceEnhancer,
+    [OBSERVABLE_SHALLOW]: shallowEnhancer,
+    [OBSERVABLE_STRUCT]: refStructEnhancer
+}
+
 export function getEnhancerFromAnnotation(annotation?: Annotation): IEnhancer<any> {
-    if (!annotation) {
-        return deepEnhancer
-    }
-    switch (annotation.annotationType) {
-        case "observable":
-            return deepEnhancer
-        case "observable.ref":
-            return referenceEnhancer
-        case "observable.shallow":
-            return shallowEnhancer
-        case "observable.struct":
-            return refStructEnhancer
-        default:
-            return fail(`Invalid annotation: '${annotation.annotationType}'`)
-    }
+    return !annotation ? deepEnhancer : annotationToEnhancer[annotation.annotationType] ?? die(12)
 }
 
 /**
@@ -101,8 +97,8 @@ export function getEnhancerFromAnnotation(annotation?: Annotation): IEnhancer<an
  */
 function createObservable(v: any, arg2?: any, arg3?: any) {
     // @observable someProp; TODO delete
-    if (typeof arguments[1] === "string" || typeof arguments[1] === "symbol") {
-        storeDecorator(v, arg2, "observable")
+    if (isStringish(arg2)) {
+        storeDecorator(v, arg2, OBSERVABLE)
         return
     }
 
@@ -124,7 +120,7 @@ function createObservable(v: any, arg2?: any, arg3?: any) {
     if (res !== v) return res
     return observable.box(v)
 }
-createObservable.annotationType = "observable"
+createObservable.annotationType = OBSERVABLE
 
 export interface IObservableFactory extends Annotation, PropertyDecorator {
     <T = any>(value: T[], options?: CreateObservableOptions): IObservableArray<T>
@@ -205,10 +201,10 @@ const observableFactories: IObservableFactory = {
             decorators
         )
     },
-    ref: createDecorator("observable.ref"),
-    shallow: createDecorator("observable.shallow"),
-    deep: createDecorator("observable"),
-    struct: createDecorator("observable.struct")
+    ref: createDecorator(OBSERVABLE_REF),
+    shallow: createDecorator(OBSERVABLE_SHALLOW),
+    deep: createDecorator(OBSERVABLE),
+    struct: createDecorator(OBSERVABLE_STRUCT)
 } as any
 
 // eslint-disable-next-line

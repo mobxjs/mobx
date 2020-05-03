@@ -30,6 +30,7 @@ import {
     untrackedEnd,
     untrackedStart
 } from "../internal"
+import { die } from "../errors"
 
 export interface IComputedValue<T> {
     get(): T
@@ -179,11 +180,9 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
             } finally {
                 this.isRunningSetter = false
             }
-        } else
-            invariant(
-                false,
-                __DEV__ &&
-                    `[ComputedValue '${this.name}'] It is not possible to assign a new value to a computed value.`
+        } else if (__DEV__)
+            die(
+                `[ComputedValue '${this.name}'] It is not possible to assign a new value to a computed value.`
             )
     }
 

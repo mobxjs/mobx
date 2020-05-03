@@ -1,6 +1,5 @@
 import {
     $mobx,
-    ObservableObjectAdministration,
     fail,
     isAtom,
     isComputedValue,

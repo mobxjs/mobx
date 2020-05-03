@@ -31,6 +31,7 @@ export function deepEnhancer(v, _, name) {
 
 export function shallowEnhancer(v, _, name): any {
     if (v === undefined || v === null) return v
+    // TODO: lets make sure isObservableObject become a bit smarter by setting some flag or something...
     if (isObservableObject(v) || isObservableArray(v) || isObservableMap(v) || isObservableSet(v))
         return v
     if (Array.isArray(v)) return observable.array(v, { name, deep: false })

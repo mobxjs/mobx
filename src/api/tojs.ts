@@ -5,9 +5,9 @@ import {
     isObservableValue,
     isObservableMap,
     isObservableSet,
-    getPlainObjectKeys
+    getPlainObjectKeys,
+    die
 } from "../internal"
-import { die } from "../errors"
 
 export type ToJSOptions = {
     detectCycles?: boolean
@@ -26,15 +26,13 @@ function cache<K, V>(map: Map<any, any>, key: K, value: V, options: ToJSOptions)
 }
 
 function toJSHelper(source, options: ToJSOptions, __alreadySeen: Map<any, any>) {
-    if (!isObservable(source)) return source
-
-    if (typeof source !== "object") return source
-
-    // Directly return null if source is null
-    if (source === null) return null
-
-    // Directly return the Date object itself if contained in the observable
-    if (source instanceof Date) return source
+    if (
+        source == null ||
+        typeof source !== "object" ||
+        source instanceof Date ||
+        !isObservable(source)
+    )
+        return source
 
     if (isObservableValue(source)) return toJSHelper(source.get(), options!, __alreadySeen)
 
@@ -43,15 +41,15 @@ function toJSHelper(source, options: ToJSOptions, __alreadySeen: Map<any, any>) 
 
     const detectCycles = options.detectCycles === true
 
-    if (detectCycles && source !== null && __alreadySeen.has(source)) {
+    if (detectCycles && __alreadySeen.has(source)) {
         return __alreadySeen.get(source)
     }
     // TODO: remove second cond
     if (isObservableArray(source) || Array.isArray(source)) {
-        const res = cache(__alreadySeen, source, [] as any, options)
-        const toAdd = source.map(value => toJSHelper(value, options!, __alreadySeen))
-        res.length = toAdd.length
-        for (let i = 0, l = toAdd.length; i < l; i++) res[i] = toAdd[i]
+        const res = cache(__alreadySeen, source, new Array(source.length), options)
+        source.forEach((value, idx) => {
+            res[idx] = toJSHelper(value, options!, __alreadySeen)
+        })
         return res
     }
     // TODO: remove second cond
@@ -63,6 +61,7 @@ function toJSHelper(source, options: ToJSOptions, __alreadySeen: Map<any, any>) 
             })
             return res
         } else {
+            // TODO: remove else branch
             const res = cache(__alreadySeen, source, [] as any[], options)
             source.forEach(value => {
                 res.push(toJSHelper(value, options!, __alreadySeen))
@@ -79,6 +78,7 @@ function toJSHelper(source, options: ToJSOptions, __alreadySeen: Map<any, any>) 
             })
             return res
         } else {
+            // TODO: remove else branch
             const res = cache(__alreadySeen, source, {}, options)
             source.forEach((value, key) => {
                 res[key] = toJSHelper(value, options!, __alreadySeen)
@@ -102,13 +102,13 @@ function toJSHelper(source, options: ToJSOptions, __alreadySeen: Map<any, any>) 
 export function toJS<T>(source: T, options?: ToJSOptions): T
 export function toJS(source: any, options?: ToJSOptions): any
 export function toJS(source, options: ToJSOptions) // internal overload
-export function toJS(source, options?: ToJSOptions) {
+export function toJS(source, options: ToJSOptions = defaultOptions) {
     // backward compatibility
 
     if (__DEV__ && options && (options as any).recurseEverything)
         die("The recurseEverything option is no longer supported")
-    if (typeof options === "boolean") options = { detectCycles: options }
-    if (!options) options = defaultOptions
+    if (__DEV__ && typeof options === "boolean")
+        die("passing a boolean as second argument to toJS is no longer supported")
     options.detectCycles = !!options.detectCycles
 
     let __alreadySeen

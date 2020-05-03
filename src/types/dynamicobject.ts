@@ -3,31 +3,29 @@ import {
     Atom,
     IIsObservableObject,
     ObservableObjectAdministration,
-    fail,
     set,
     warnAboutProxyRequirement,
-    assertProxies
+    assertProxies,
+    die,
+    isStringish
 } from "../internal"
 
 function getAdm(target): ObservableObjectAdministration {
     return target[$mobx]
 }
 
-function isPropertyKey(val) {
-    return typeof val === "string" || typeof val === "number" || typeof val === "symbol"
-}
-
 // Optimization: we don't need the intermediate objects and could have a completely custom administration for DynamicObjects,
 // and skip either the internal values map, or the base object with its property descriptors!
 const objectProxyTraps: ProxyHandler<any> = {
     has(target: IIsObservableObject, name: PropertyKey) {
+        // TODO: introduce isConstructor
         if (name === $mobx || name === "constructor") return true
         if (__DEV__) warnAboutProxyRequirement() // TODO: is this correct?
         const adm = getAdm(target)
         // MWE: should `in` operator be reactive? If not, below code path will be faster / more memory efficient
         // TODO: check performance stats!
         // if (adm.values.get(name as string)) return true
-        if (isPropertyKey(name)) return adm.has(name)
+        if (isStringish(name)) return adm.has(name)
         return (name as any) in target
     },
     get(target: IIsObservableObject, name: PropertyKey) {
@@ -46,11 +44,11 @@ const objectProxyTraps: ProxyHandler<any> = {
         }
         // make sure we start listening to future keys
         // note that we only do this here for optimization
-        if (isPropertyKey(name)) adm.has(name)
+        if (isStringish(name)) adm.has(name)
         return target[name]
     },
     set(target: IIsObservableObject, name: PropertyKey, value: any) {
-        if (!isPropertyKey(name)) return false
+        if (!isStringish(name)) return false
         if (__DEV__ && !getAdm(target).values.has(name)) {
             warnAboutProxyRequirement()
         }
@@ -59,7 +57,7 @@ const objectProxyTraps: ProxyHandler<any> = {
     },
     deleteProperty(target: IIsObservableObject, name: PropertyKey) {
         if (__DEV__) warnAboutProxyRequirement()
-        if (!isPropertyKey(name)) return false
+        if (!isStringish(name)) return false
         const adm = getAdm(target)
         adm.remove(name)
         return true
@@ -71,8 +69,7 @@ const objectProxyTraps: ProxyHandler<any> = {
         return Reflect.ownKeys(target)
     },
     preventExtensions(target) {
-        fail(`Dynamic observable objects cannot be frozen`)
-        return false
+        die(13)
     }
 }
 

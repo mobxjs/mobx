@@ -4,8 +4,8 @@ import {
     Lambda,
     autorun,
     createAction,
-    fail,
-    getNextId
+    getNextId,
+    die
 } from "../internal"
 
 export interface IWhenOptions {
@@ -29,6 +29,7 @@ export function when(
     opts?: IWhenOptions
 ): IReactionDisposer
 export function when(predicate: any, arg1?: any, arg2?: any): any {
+    // TODO: arglen and isObject utility?
     if (arguments.length === 1 || (arg1 && typeof arg1 === "object"))
         return whenPromise(predicate, arg1)
     return _when(predicate, arg1, arg2 || {})
@@ -65,7 +66,7 @@ function whenPromise(
     opts?: IWhenOptions
 ): Promise<void> & { cancel(): void } {
     if (__DEV__ && opts && opts.onError)
-        return fail(`the options 'onError' and 'promise' cannot be combined`)
+        return die(`the options 'onError' and 'promise' cannot be combined`)
     let cancel
     const res = new Promise((resolve, reject) => {
         let disposer = _when(predicate, resolve, { ...opts, onError: reject })
