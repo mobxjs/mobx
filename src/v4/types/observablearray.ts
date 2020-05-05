@@ -629,21 +629,7 @@ addHiddenProp(ObservableArray.prototype, toStringTagSymbol(), "Array")
 /**
  * Wrap function from prototype
  */
-;[
-    //"every",
-    //"filter",
-    //"forEach",
-    "indexOf",
-    "join",
-    "lastIndexOf",
-    //"map",
-    //"reduce",
-    //"reduceRight",
-    "slice",
-    //"some",
-    "toString",
-    "toLocaleString"
-].forEach(funcName => {
+;["indexOf", "join", "lastIndexOf", "slice", "toString", "toLocaleString"].forEach(funcName => {
     const baseFunc = Array.prototype[funcName]
     invariant(
         typeof baseFunc === "function",
