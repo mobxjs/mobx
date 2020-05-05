@@ -401,7 +401,11 @@ test("replace can handle large arrays", () => {
 test("can iterate arrays", () => {
     const x = mobx.observable([])
     const y = []
-    const d = mobx.reaction(() => Array.from(x), items => y.push(items), { fireImmediately: true })
+    const d = mobx.reaction(
+        () => Array.from(x),
+        items => y.push(items),
+        { fireImmediately: true }
+    )
 
     x.push("a")
     x.push("b")
@@ -439,7 +443,10 @@ test("slice works", () => {
 test("slice is reactive", () => {
     const a = mobx.observable([1, 2, 3])
     let ok = false
-    when(() => a.slice().length === 4, () => (ok = true))
+    when(
+        () => a.slice().length === 4,
+        () => (ok = true)
+    )
     expect(ok).toBe(false)
     a.push(1)
     expect(ok).toBe(true)
@@ -587,4 +594,25 @@ test("reproduce #2021", () => {
     } finally {
         delete Array.prototype.extension
     }
+})
+
+test("correct array should be passed to callbacks #2326", () => {
+    const array = observable([1, 2, 3])
+
+    function callback() {
+        const lastArg = arguments[arguments.length - 1]
+        expect(lastArg).toBe(array)
+    }
+    ;[
+        "every",
+        "filter",
+        "find",
+        "findIndex",
+        "flatMap",
+        "forEach",
+        "map",
+        "reduce",
+        "reduceRight",
+        "some"
+    ].forEach(method => array[method](callback))
 })

@@ -545,9 +545,7 @@ export class ObservableArray<T> extends StubArray {
                 return impl.dehanceValue(impl.values[index])
             }
             console.warn(
-                `[mobx.array] Attempt to read an array index (${index}) that is out of bounds (${
-                    impl.values.length
-                }). Please check length first. Out of bound indices will not be tracked by MobX`
+                `[mobx.array] Attempt to read an array index (${index}) that is out of bounds (${impl.values.length}). Please check length first. Out of bound indices will not be tracked by MobX`
             )
         }
         return undefined
@@ -632,17 +630,17 @@ addHiddenProp(ObservableArray.prototype, toStringTagSymbol(), "Array")
  * Wrap function from prototype
  */
 ;[
-    "every",
-    "filter",
-    "forEach",
+    //"every",
+    //"filter",
+    //"forEach",
     "indexOf",
     "join",
     "lastIndexOf",
-    "map",
-    "reduce",
-    "reduceRight",
+    //"map",
+    //"reduce",
+    //"reduceRight",
     "slice",
-    "some",
+    //"some",
     "toString",
     "toLocaleString"
 ].forEach(funcName => {
@@ -653,6 +651,42 @@ addHiddenProp(ObservableArray.prototype, toStringTagSymbol(), "Array")
     )
     addHiddenProp(ObservableArray.prototype, funcName, function() {
         return baseFunc.apply(this.peek(), arguments)
+    })
+})
+
+/**
+ * Make sure callbacks recieve correct array arg #2326
+ * Impl assumes that callback's last 3 arguments are:
+ * element, index, array
+ */
+;[
+    "every",
+    "filter",
+    //"find", // implemented individually (IE support)
+    //"findIndex", // implemented individually (IE support)
+    //"flatMap", // not supported
+    "forEach",
+    "map",
+    "reduce",
+    "reduceRight",
+    "some"
+].forEach(funcName => {
+    const baseFunc = Array.prototype[funcName]
+    invariant(
+        typeof baseFunc === "function",
+        `Base function not defined on Array prototype: '${funcName}'`
+    )
+    addHiddenProp(ObservableArray.prototype, funcName, function(callback, thisArg) {
+        //return baseFunc.apply(this.peek(), arguments)
+        const adm = this.$mobx
+        adm.atom.reportObserved()
+        return adm.values[funcName]((...args) => {
+            // replace last arg (the array) with observable array
+            args[args.length - 1] = this
+            // replace last but two arg (the element) with dehanced value
+            args[args.length - 3] = adm.dehanceValue(args[args.length - 3])
+            return callback.apply(thisArg, args)
+        }, thisArg)
     })
 })
 

@@ -2,6 +2,7 @@
 
 -   Fixed ObservableSet.prototype.forEach not being reactive in 4.x [#2341](https://github.com/mobxjs/mobx/pull/2341) by [@melnikov-s](https://github.com/melnikov-s)
 -   Add error when computed value declared for unspecified getter [#1867](https://github.com/mobxjs/mobx/issues/1867) by [@berrunder](https://github.com/berrunder)
+-   Fixed [#2326](https://github.com/mobxjs/mobx/issues/2326) correct array is passed to callbacks by [@urugator](https://github.com/urugator)
 
 # 5.15.4 / 4.15.4
 
