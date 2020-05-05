@@ -472,34 +472,33 @@ const arrayExtensions = {
      * Without this, everything works as well, but this works
      * faster as everything works on unproxied values
      */
-;["concat", "indexOf", "join", "lastIndexOf", "slice", "toString", "toLocaleString"].forEach(
-    funcName => {
-        arrayExtensions[funcName] = function() {
-            const adm: ObservableArrayAdministration = this[$mobx]
-            adm.atom.reportObserved()
-            const res = adm.dehanceValues(adm.values)
-            return res[funcName].apply(res, arguments)
-        }
+;[
+    "concat",
+    "flat",
+    "includes",
+    "indexOf",
+    "join",
+    "lastIndexOf",
+    "slice",
+    "toString",
+    "toLocaleString"
+].forEach(funcName => {
+    // Feature detection (eg flat may not be available)
+    if (typeof Array.prototype[funcName] !== "function") {
+        return
     }
-)
+    arrayExtensions[funcName] = function() {
+        const adm: ObservableArrayAdministration = this[$mobx]
+        adm.atom.reportObserved()
+        const res = adm.dehanceValues(adm.values)
+        return res[funcName].apply(res, arguments)
+    }
+})
 
 /**
  * Make sure callbacks recieve correct array arg #2326
- * Impl assumes that callback's last 3 arguments are:
- * element, index, array
  */
-;[
-    "every",
-    "filter",
-    "find",
-    "findIndex",
-    "flatMap",
-    "forEach",
-    "map",
-    "reduce",
-    "reduceRight",
-    "some"
-].forEach(funcName => {
+;["every", "filter", "find", "findIndex", "flatMap", "forEach", "map", "some"].forEach(funcName => {
     // Feature detection (eg flatMap may not be available)
     if (typeof Array.prototype[funcName] !== "function") {
         return
@@ -507,13 +506,20 @@ const arrayExtensions = {
     arrayExtensions[funcName] = function(callback, thisArg) {
         const adm: ObservableArrayAdministration = this[$mobx]
         adm.atom.reportObserved()
-        return adm.values[funcName]((...args) => {
-            // replace last arg (the array) with observable array
-            args[args.length - 1] = this
-            // replace last but two arg (the element) with dehanced value
-            args[args.length - 3] = adm.dehanceValue(args[args.length - 3])
-            return callback.apply(thisArg, args)
+        return adm.values[funcName]((element, index) => {
+            element = adm.dehanceValue(element)
+            return callback.call(thisArg, element, index, this)
         }, thisArg)
+    }
+})
+;["reduce", "reduceRight"].forEach(funcName => {
+    arrayExtensions[funcName] = function(callback, initialValue) {
+        const adm: ObservableArrayAdministration = this[$mobx]
+        adm.atom.reportObserved()
+        return adm.values[funcName]((accumulator, currentValue, index) => {
+            currentValue = adm.dehanceValue(currentValue)
+            return callback(accumulator, currentValue, index, this)
+        }, initialValue)
     }
 })
 
