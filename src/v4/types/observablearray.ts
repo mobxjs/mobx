@@ -663,7 +663,6 @@ addHiddenProp(ObservableArray.prototype, toStringTagSymbol(), "Array")
         `Base function not defined on Array prototype: '${funcName}'`
     )
     addHiddenProp(ObservableArray.prototype, funcName, function(callback, thisArg) {
-        //return baseFunc.apply(this.peek(), arguments)
         const adm = this.$mobx
         adm.atom.reportObserved()
         return adm.values[funcName]((...args) => {
