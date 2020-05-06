@@ -85,7 +85,7 @@ export function extendObservableObjectWithProperties(
             const descriptor = Object.getOwnPropertyDescriptor(properties, key)!
             if (process.env.NODE_ENV !== "production") {
                 if (!isPlainObject(properties))
-                    fail(`'extendObservabe' only accepts plain objects as second argument`)
+                    fail(`'extendObservable' only accepts plain objects as second argument`)
                 if (isComputed(descriptor.value))
                     fail(
                         `Passing a 'computed' as initial property value is no longer supported by extendObservable. Use a getter or decorator instead`

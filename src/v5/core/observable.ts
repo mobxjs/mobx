@@ -122,7 +122,7 @@ export function endBatch() {
                 }
                 if (observable instanceof ComputedValue) {
                     // computed values are automatically teared down when the last observer leaves
-                    // this process happens recursively, this computed might be the last observabe of another, etc..
+                    // this process happens recursively, this computed might be the last observable of another, etc..
                     observable.suspend()
                 }
             }
