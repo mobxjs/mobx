@@ -7,7 +7,6 @@ import {
     ObservableObjectAdministration,
     endBatch,
     getAdministration,
-    invariant,
     isObservableArray,
     isObservableMap,
     isObservableSet,
@@ -127,7 +126,6 @@ export function remove(obj: any, key: any): void {
         obj.delete(key)
     } else if (isObservableArray(obj)) {
         if (typeof key !== "number") key = parseInt(key, 10)
-        invariant(key >= 0, `Not a valid index: '${key}'`)
         obj.splice(key, 1)
     } else {
         die(9)

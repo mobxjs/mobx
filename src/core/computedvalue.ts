@@ -13,10 +13,8 @@ import {
     createAction,
     createInstanceofPredicate,
     endBatch,
-    fail,
     getNextId,
     globalState,
-    invariant,
     isCaughtException,
     isSpyEnabled,
     propagateChangeConfirmed,
@@ -28,7 +26,8 @@ import {
     toPrimitive,
     trackDerivedFunction,
     untrackedEnd,
-    untrackedStart
+    untrackedStart,
+    UPDATE
 } from "../internal"
 import { die } from "../errors"
 
@@ -47,6 +46,8 @@ export interface IComputedValueOptions<T> {
     requiresReaction?: boolean
     keepAlive?: boolean
 }
+
+const COMPUTE = "compute"
 
 /**
  * A node in the state dependency root that observes other nodes, and can be observed itself.
@@ -106,7 +107,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
      * This is useful for working with vectors, mouse coordinates etc.
      */
     constructor(options: IComputedValueOptions<T>) {
-        invariant(options.get, "missing option for computed: get")
+        if (!options.get) die(31)
         this.derivation = options.get!
         this.name = options.name || "ComputedValue@" + getNextId()
         if (options.set) this.setter = createAction(this.name + "-setter", options.set) as any
@@ -144,7 +145,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
      * Will evaluate its computation first if needed.
      */
     public get(): T {
-        if (this.isComputing) fail(`Cycle detected in computation ${this.name}: ${this.derivation}`)
+        if (this.isComputing) die(32, this.name, this.derivation)
         if (globalState.inBatch === 0 && this.observers.size === 0 && !this.keepAlive) {
             if (shouldCompute(this)) {
                 this.warnAboutUntrackedRead()
@@ -170,27 +171,21 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 
     public set(value: T) {
         if (this.setter) {
-            invariant(
-                !this.isRunningSetter,
-                `The setter of computed value '${this.name}' is trying to update itself. Did you intend to update an _observable_ value, instead of the computed property?`
-            )
+            if (this.isRunningSetter) die(33, this.name)
             this.isRunningSetter = true
             try {
                 this.setter.call(this.scope, value)
             } finally {
                 this.isRunningSetter = false
             }
-        } else if (__DEV__)
-            die(
-                `[ComputedValue '${this.name}'] It is not possible to assign a new value to a computed value.`
-            )
+        } else die(34, this.name)
     }
 
     private trackAndCompute(): boolean {
-        if (isSpyEnabled() && __DEV__) {
+        if (__DEV__ && isSpyEnabled()) {
             spyReport({
                 object: this.scope,
-                type: "compute",
+                type: COMPUTE,
                 name: this.name
             })
         }
@@ -249,7 +244,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
             if (!firstTime || fireImmediately) {
                 const prevU = untrackedStart()
                 listener({
-                    type: "update",
+                    type: UPDATE,
                     object: this,
                     newValue,
                     oldValue: prevValue
@@ -264,7 +259,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     warnAboutUntrackedRead() {
         if (!__DEV__) return
         if (this.requiresReaction === true) {
-            fail(`[mobx] Computed value ${this.name} is read outside a reactive context`)
+            die(`[mobx] Computed value ${this.name} is read outside a reactive context`)
         }
         if (this.isTracing !== TraceMode.NONE) {
             console.log(
@@ -276,10 +271,6 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
                 `[mobx] Computed value ${this.name} is being read outside a reactive context. Doing a full recompute`
             )
         }
-    }
-
-    toJSON() {
-        return this.get()
     }
 
     toString() {

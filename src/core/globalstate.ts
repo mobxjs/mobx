@@ -1,4 +1,5 @@
-import { IDerivation, IObservable, Reaction, fail } from "../internal"
+import { IDerivation, IObservable, Reaction } from "../internal"
+import { die } from "../errors"
 
 /**
  * These values will persist if global state is reset
@@ -143,30 +144,12 @@ export class MobXGlobals {
     verifyProxies = false
 }
 
-declare const window: any
-declare const self: any
-
-const mockGlobal = {}
-
-export function getGlobal() {
-    if (typeof window !== "undefined") {
-        return window
-    }
-    if (typeof global !== "undefined") {
-        return global
-    }
-    if (typeof self !== "undefined") {
-        return self
-    }
-    return mockGlobal
-}
-
 let canMergeGlobalState = true
 let isolateCalled = false
 
-export let globalState: MobXGlobals = (function() {
-    const global = getGlobal()
+declare const global: any
 
+export let globalState: MobXGlobals = (function() {
     if (global.__mobxInstanceCount > 0 && !global.__mobxGlobals) canMergeGlobalState = false
     if (global.__mobxGlobals && global.__mobxGlobals.version !== new MobXGlobals().version)
         canMergeGlobalState = false
@@ -174,9 +157,7 @@ export let globalState: MobXGlobals = (function() {
     if (!canMergeGlobalState) {
         setTimeout(() => {
             if (!isolateCalled) {
-                fail(
-                    "There are multiple, different versions of MobX active. Make sure MobX is loaded only once or use `configure({ isolateGlobalState: true })`"
-                )
+                die(35)
             }
         }, 1)
         return new MobXGlobals()
@@ -196,10 +177,10 @@ export function isolateGlobalState() {
         globalState.inBatch ||
         globalState.isRunningReactions
     )
-        fail("isolateGlobalState should be called before MobX is running any reactions")
+        die(36)
     isolateCalled = true
     if (canMergeGlobalState) {
-        if (--getGlobal().__mobxInstanceCount === 0) getGlobal().__mobxGlobals = undefined
+        if (--global.__mobxInstanceCount === 0) global.__mobxGlobals = undefined
         globalState = new MobXGlobals()
     }
 }

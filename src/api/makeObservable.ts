@@ -12,7 +12,6 @@ import {
     startBatch,
     CreateObservableOptions,
     ObservableObjectAdministration,
-    invariant,
     applyDecorators,
     isObservableProp,
     getDescriptor,
@@ -155,10 +154,10 @@ export function makeObservable<T extends Object, AdditionalKeys extends Property
     try {
         if (!annotations) {
             const didDecorate = applyDecorators(target)
-            invariant(
-                didDecorate,
-                `No annotations were passed to makeObservable, but no decorator members have been found either`
-            )
+            if (__DEV__ && !didDecorate)
+                die(
+                    `No annotations were passed to makeObservable, but no decorator members have been found either`
+                )
             return
         }
         const make = key => {
@@ -182,16 +181,12 @@ export function makeAutoObservable<T extends Object, AdditionalKeys extends Prop
 ): T {
     const proto = Object.getPrototypeOf(target)
     const isPlain = proto == null || proto === Object.prototype
-    if (__DEV__)
-        invariant(
-            isPlain || isPlainObject(proto),
-            `'makeAutoObservable' can only be used for classes that don't have a superclass`
-        )
-    if (__DEV__)
-        invariant(
-            !isObservableObject(target),
-            `makeAutoObservable can only be used on objects not already made observable`
-        )
+    if (__DEV__) {
+        if (!isPlain && !isPlainObject(proto))
+            die(`'makeAutoObservable' can only be used for classes that don't have a superclass`)
+        if (isObservableObject(target))
+            die(`makeAutoObservable can only be used on objects not already made observable`)
+    }
     let annotations = { ...excludes }
     extractAnnotationsFromObject(target, annotations, options)
     if (!isPlain) {

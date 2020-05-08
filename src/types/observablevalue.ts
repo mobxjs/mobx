@@ -24,6 +24,7 @@ import {
     globalState,
     IUNCHANGED
 } from "../internal"
+import { UPDATE } from "./observablearray"
 
 export interface IValueWillChange<T> {
     object: any
@@ -42,6 +43,8 @@ export interface IObservableValue<T> {
     observe(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda
 }
 
+const CREATE = "create"
+
 export class ObservableValue<T> extends Atom
     implements IObservableValue<T>, IInterceptable<IValueWillChange<T>>, IListenable {
     hasUnreportedChange = false
@@ -59,9 +62,9 @@ export class ObservableValue<T> extends Atom
     ) {
         super(name)
         this.value = enhancer(value, undefined, name)
-        if (notifySpy && isSpyEnabled() && __DEV__) {
+        if (__DEV__ && notifySpy && isSpyEnabled()) {
             // only notify spy if this is a stand-alone observable
-            spyReport({ type: "create", name: this.name, newValue: "" + this.value })
+            spyReport({ type: CREATE, name: this.name, newValue: "" + this.value })
         }
     }
 
@@ -75,16 +78,16 @@ export class ObservableValue<T> extends Atom
         newValue = this.prepareNewValue(newValue) as any
         if (newValue !== globalState.UNCHANGED) {
             const notifySpy = isSpyEnabled()
-            if (notifySpy && __DEV__) {
+            if (__DEV__ && notifySpy) {
                 spyReportStart({
-                    type: "update",
+                    type: UPDATE,
                     name: this.name,
                     newValue,
                     oldValue
                 })
             }
             this.setNewValue(newValue)
-            if (notifySpy && __DEV__) spyReportEnd()
+            if (__DEV__ && notifySpy) spyReportEnd()
         }
     }
 
@@ -93,7 +96,7 @@ export class ObservableValue<T> extends Atom
         if (hasInterceptors(this)) {
             const change = interceptChange<IValueWillChange<T>>(this, {
                 object: this,
-                type: "update",
+                type: UPDATE,
                 newValue
             })
             if (!change) return globalState.UNCHANGED
@@ -110,7 +113,7 @@ export class ObservableValue<T> extends Atom
         this.reportChanged()
         if (hasListeners(this)) {
             notifyListeners(this, {
-                type: "update",
+                type: UPDATE,
                 object: this,
                 newValue,
                 oldValue
@@ -123,10 +126,12 @@ export class ObservableValue<T> extends Atom
         return this.dehanceValue(this.value)
     }
 
+    // TODO: kill?
     public intercept(handler: IInterceptor<IValueWillChange<T>>): Lambda {
         return registerInterceptor(this, handler)
     }
 
+    // TODO: kill?
     public observe(
         listener: (change: IValueDidChange<T>) => void,
         fireImmediately?: boolean
@@ -134,7 +139,7 @@ export class ObservableValue<T> extends Atom
         if (fireImmediately)
             listener({
                 object: this,
-                type: "update",
+                type: UPDATE,
                 newValue: this.value,
                 oldValue: undefined
             })

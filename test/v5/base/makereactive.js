@@ -551,7 +551,7 @@ test("computed value", () => {
     mobx._getGlobalState().mobxGuid = 0
     const c = mobx.computed(() => 3)
 
-    expect(c.toJSON()).toBe(3)
+    expect(0 + c).toBe(3)
     expect(mobx.isComputed(c)).toBe(true)
     expect(c.toString()).toMatchSnapshot()
 })
@@ -665,12 +665,14 @@ test("double declare property", () => {
     expect(() => {
         mobx.extendObservable(
             o,
-            {},
+            { a: 2 },
             {
                 a: mobx.observable.ref
             }
         )
-    }).toThrow(/Trying to declare a decorator for unspecified property/)
+    }).toThrowErrorMatchingInlineSnapshot(
+        `"[MobX] Cannot decorate 'a': the property is already decorated as observable."`
+    )
 })
 
 test("structural collections", () => {

@@ -10,13 +10,11 @@ import {
     createAtom,
     createInstanceofPredicate,
     deepEnhancer,
-    fail,
     getNextId,
     getPlainObjectKeys,
     hasInterceptors,
     hasListeners,
     interceptChange,
-    invariant,
     isES6Map,
     isPlainObject,
     isSpyEnabled,
@@ -31,9 +29,12 @@ import {
     transaction,
     untracked,
     onBecomeUnobserved,
-    globalState
+    globalState,
+    die,
+    isFunction,
+    UPDATE,
+    IAtom
 } from "../internal"
-import { IAtom } from "../core/atom"
 
 export interface IKeyValueMap<V = any> {
     [key: string]: V
@@ -72,6 +73,9 @@ export interface IMapWillChange<K = any, V = any> {
 
 const ObservableMapMarker = {}
 
+export const ADD = "add"
+export const DELETE = "delete"
+
 export type IObservableMapInitialValues<K = any, V = any> =
     | IMapEntries<K, V>
     | IKeyValueMap<V>
@@ -94,10 +98,8 @@ export class ObservableMap<K = any, V = any>
         public enhancer: IEnhancer<V> = deepEnhancer,
         public name = "ObservableMap@" + getNextId()
     ) {
-        if (typeof Map !== "function") {
-            throw new Error(
-                "mobx.map requires Map polyfill for the current browser. Check babel-polyfill or core-js/es6/map.js"
-            )
+        if (!isFunction(Map)) {
+            die(18)
         }
         this._keysAtom = createAtom(`${this.name}.keys()`)
         this._data = new Map()
@@ -132,7 +134,7 @@ export class ObservableMap<K = any, V = any>
         const hasKey = this._has(key)
         if (hasInterceptors(this)) {
             const change = interceptChange<IMapWillChange<K, V>>(this, {
-                type: hasKey ? "update" : "add",
+                type: hasKey ? UPDATE : ADD,
                 object: this,
                 newValue: value,
                 name: key
@@ -152,7 +154,7 @@ export class ObservableMap<K = any, V = any>
         checkIfStateModificationsAreAllowed(this._keysAtom)
         if (hasInterceptors(this)) {
             const change = interceptChange<IMapWillChange<K, V>>(this, {
-                type: "delete",
+                type: DELETE,
                 object: this,
                 name: key
             })
@@ -164,14 +166,14 @@ export class ObservableMap<K = any, V = any>
             const change =
                 notify || notifySpy
                     ? <IMapDidChange<K, V>>{
-                          type: "delete",
+                          type: DELETE,
                           object: this,
                           oldValue: (<any>this._data.get(key)).value,
                           name: key
                       }
                     : null
 
-            if (notifySpy && __DEV__) spyReportStart({ ...change, name: this.name, key })
+            if (__DEV__ && notifySpy) spyReportStart({ ...change, name: this.name, key })
             transaction(() => {
                 this._keysAtom.reportChanged()
                 this._updateHasMapEntry(key, false)
@@ -180,7 +182,7 @@ export class ObservableMap<K = any, V = any>
                 this._data.delete(key)
             })
             if (notify) notifyListeners(this, change)
-            if (notifySpy && __DEV__) spyReportEnd()
+            if (__DEV__ && notifySpy) spyReportEnd()
             return true
         }
         return false
@@ -202,17 +204,17 @@ export class ObservableMap<K = any, V = any>
             const change =
                 notify || notifySpy
                     ? <IMapDidChange<K, V>>{
-                          type: "update",
+                          type: UPDATE,
                           object: this,
                           oldValue: (observable as any).value,
                           name: key,
                           newValue
                       }
                     : null
-            if (notifySpy && __DEV__) spyReportStart({ ...change, name: this.name, key })
+            if (__DEV__ && notifySpy) spyReportStart({ ...change, name: this.name, key })
             observable.setNewValue(newValue as V)
             if (notify) notifyListeners(this, change)
-            if (notifySpy && __DEV__) spyReportEnd()
+            if (__DEV__ && notifySpy) spyReportEnd()
         }
     }
 
@@ -235,15 +237,15 @@ export class ObservableMap<K = any, V = any>
         const change =
             notify || notifySpy
                 ? <IMapDidChange<K, V>>{
-                      type: "add",
+                      type: ADD,
                       object: this,
                       name: key,
                       newValue
                   }
                 : null
-        if (notifySpy && __DEV__) spyReportStart({ ...change, name: this.name, key })
+        if (__DEV__ && notifySpy) spyReportStart({ ...change, name: this.name, key })
         if (notify) notifyListeners(this, change)
-        if (notifySpy && __DEV__) spyReportEnd()
+        if (__DEV__ && notifySpy) spyReportEnd()
     }
 
     get(key: K): V | undefined {
@@ -302,7 +304,7 @@ export class ObservableMap<K = any, V = any>
     /** Merge another object into this object, returns this. */
     merge(other: ObservableMap<K, V> | IKeyValueMap<V> | any): ObservableMap<K, V> {
         if (isObservableMap(other)) {
-            other = other.toJS()
+            other = new Map(other)
         }
         transaction(() => {
             if (isPlainObject(other))
@@ -311,11 +313,9 @@ export class ObservableMap<K = any, V = any>
                 )
             else if (Array.isArray(other)) other.forEach(([key, value]) => this.set(key, value))
             else if (isES6Map(other)) {
-                if (other.constructor !== Map)
-                    fail("Cannot initialize from classes that inherit from Map: " + other.constructor.name) // prettier-ignore
+                if (other.constructor !== Map) die(19, other)
                 other.forEach((value, key) => this.set(key, value))
-            } else if (other !== null && other !== undefined)
-                fail("Cannot initialize map from " + other)
+            } else if (other !== null && other !== undefined) die(20, other)
         })
         return this
     }
@@ -411,60 +411,31 @@ export class ObservableMap<K = any, V = any>
         return this._data.size
     }
 
-    /**
-     * Returns a plain object that represents this map.
-     * Note that all the keys being stringified.
-     * If there are duplicating keys after converting them to strings, behaviour is undetermined.
-     */
-    toPOJO(): IKeyValueMap<V> {
-        const res: IKeyValueMap<V> = {}
-        for (const [key, value] of this) {
-            // We lie about symbol key types due to https://github.com/Microsoft/TypeScript/issues/1863
-            res[typeof key === "symbol" ? <any>key : stringifyKey(key)] = value
-        }
-        return res
-    }
-
-    /**
-     * Returns a shallow non observable object clone of this map.
-     * Note that the values migth still be observable. For a deep clone use mobx.toJS.
-     */
-    toJS(): Map<K, V> {
-        return new Map(this)
-    }
-
-    toJSON(): IKeyValueMap<V> {
-        // Used by JSON.stringify
-        return this.toPOJO()
-    }
-
     toString(): string {
-        return (
-            this.name +
-            "[{ " +
-            Array.from(this.keys())
-                .map(key => `${stringifyKey(key)}: ${"" + this.get(key)}`)
-                .join(", ") +
-            " }]"
-        )
+        return "[object ObservableMap]"
     }
 
-    [Symbol.toStringTag]: "Map" = "Map"
+    toJSON(): [K, V][] {
+        return Array.from(this)
+    }
+
+    get [Symbol.toStringTag]() {
+        return "Map"
+    }
 
     /**
      * Observes this object. Triggers for the events 'add', 'update' and 'delete'.
      * See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe
      * for callback details
      */
+    // TODO: kill
     observe(listener: (changes: IMapDidChange<K, V>) => void, fireImmediately?: boolean): Lambda {
-        __DEV__ &&
-            invariant(
-                fireImmediately !== true,
-                "`observe` doesn't support fireImmediately=true in combination with maps."
-            )
+        if (__DEV__ && fireImmediately === true)
+            die("`observe` doesn't support fireImmediately=true in combination with maps.")
         return registerListener(this, listener)
     }
 
+    // TODO: kill
     intercept(handler: IInterceptor<IMapWillChange<K, V>>): Lambda {
         return registerInterceptor(this, handler)
     }
@@ -487,6 +458,6 @@ function convertToMap(dataStructure: any): Map<any, any> {
         }
         return map
     } else {
-        return fail(`Cannot convert to map from '${dataStructure}'`)
+        return die(21, dataStructure)
     }
 }

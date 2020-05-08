@@ -57,7 +57,7 @@ test("intercept observable value", () => {
 test("intercept array", () => {
     const a = m.observable([1, 2])
 
-    let d = a.intercept(() => null)
+    let d = m.intercept(a, () => null)
     a.push(2)
     expect(a.slice()).toEqual([1, 2])
 

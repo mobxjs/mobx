@@ -131,8 +131,7 @@ export {
     allowStateReadsStart as _allowStateReadsStart,
     allowStateReadsEnd as _allowStateReadsEnd,
     makeObservable,
-    makeAutoObservable,
-    enableES5
+    makeAutoObservable
 } from "./internal"
 
 // Devtools support

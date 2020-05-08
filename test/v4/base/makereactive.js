@@ -509,7 +509,7 @@ test("computed value", () => {
     mobx._getGlobalState().mobxGuid = 0
     const c = mobx.computed(() => 3)
 
-    expect(c.toJSON()).toBe(3)
+    expect(0 + c).toBe(3)
     expect(mobx.isComputed(c)).toBe(true)
     expect(c.toString()).toMatchSnapshot()
 })
@@ -613,22 +613,6 @@ test("compare structurally, ref", () => {
     expect(changed).toBe(3)
 
     d()
-})
-
-test("double declare property", () => {
-    const o = {}
-    mobx.extendObservable(o, {
-        a: 5
-    })
-    expect(() => {
-        mobx.extendObservable(
-            o,
-            {},
-            {
-                a: mobx.observable.ref
-            }
-        )
-    }).toThrow(/Trying to declare a decorator for unspecified property/)
 })
 
 test("structural collections", () => {

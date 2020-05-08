@@ -207,20 +207,20 @@ test("scope", () => {
 
 test("typing", () => {
     const ar: IObservableArray<number> = observable([1, 2])
-    ar.intercept((c: IArrayWillChange<number> | IArrayWillSplice<number>) => {
+    mobx.intercept(ar, (c: IArrayWillChange<number> | IArrayWillSplice<number>) => {
         // console.log(c.type)
         return null
     })
-    ar.observe((d: IArrayChange<number> | IArraySplice<number>) => {
+    mobx.observe(ar, (d: IArrayChange<number> | IArraySplice<number>) => {
         // console.log(d.type)
     })
 
     const ar2: IObservableArray<number> = observable([1, 2])
-    ar2.intercept((c: IArrayWillChange<number> | IArrayWillSplice<number>) => {
+    mobx.intercept(ar2, (c: IArrayWillChange<number> | IArrayWillSplice<number>) => {
         // console.log(c.type)
         return null
     })
-    ar2.observe((d: IArrayChange<number> | IArraySplice<number>) => {
+    mobx.observe(ar2, (d: IArrayChange<number> | IArraySplice<number>) => {
         // console.log(d.type)
     })
 

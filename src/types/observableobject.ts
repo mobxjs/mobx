@@ -18,7 +18,6 @@ import {
     hasInterceptors,
     hasListeners,
     interceptChange,
-    invariant,
     isObject,
     isPlainObject,
     isPropertyConfigurable,
@@ -31,9 +30,13 @@ import {
     spyReportStart,
     startBatch,
     stringifyKey,
-    globalState
+    globalState,
+    ADD
 } from "../internal"
+import { UPDATE } from "./observablearray"
+import { die } from "../errors"
 
+// TODO: kill
 export interface IObservableObject {
     "observable-object": IObservableObject
 }
@@ -72,6 +75,8 @@ export type IObjectWillChange<T = any> =
           name: PropertyKey
       }
 
+const REMOVE = "remove"
+
 export class ObservableObjectAdministration
     implements IInterceptable<IObjectWillChange>, IListenable {
     keysAtom: IAtom
@@ -104,7 +109,7 @@ export class ObservableObjectAdministration
         // intercept
         if (hasInterceptors(this)) {
             const change = interceptChange<IObjectWillChange>(this, {
-                type: "update",
+                type: UPDATE,
                 object: this.proxy || instance,
                 name: key,
                 newValue
@@ -117,11 +122,11 @@ export class ObservableObjectAdministration
         // notify spy & observers
         if (newValue !== globalState.UNCHANGED) {
             const notify = hasListeners(this)
-            const notifySpy = isSpyEnabled()
+            const notifySpy = __DEV__ && isSpyEnabled()
             const change =
                 notify || notifySpy
                     ? {
-                          type: "update",
+                          type: UPDATE,
                           object: this.proxy || instance,
                           oldValue: (observable as any).value,
                           name: key,
@@ -129,10 +134,10 @@ export class ObservableObjectAdministration
                       }
                     : null
 
-            if (notifySpy && __DEV__) spyReportStart({ ...change, name: this.name, key })
+            if (__DEV__ && notifySpy) spyReportStart({ ...change, name: this.name, key })
             ;(observable as ObservableValue<any>).setNewValue(newValue)
             if (notify) notifyListeners(this, change)
-            if (notifySpy && __DEV__) spyReportEnd()
+            if (__DEV__ && notifySpy) spyReportEnd()
         }
     }
 
@@ -167,7 +172,7 @@ export class ObservableObjectAdministration
             const change = interceptChange<IObjectWillChange>(this, {
                 object: this.proxy || target,
                 name: propName,
-                type: "add",
+                type: ADD,
                 newValue
             })
             if (!change) return
@@ -196,6 +201,7 @@ export class ObservableObjectAdministration
         options.context = this.proxy || target
         this.values.set(propName, new ComputedValue(options))
         if (propertyOwner === target || isPropertyConfigurable(propertyOwner, propName))
+            // TODO: extract util?
             Object.defineProperty(propertyOwner, propName, generateComputedPropConfig(propName))
     }
 
@@ -206,14 +212,14 @@ export class ObservableObjectAdministration
             const change = interceptChange<IObjectWillChange>(this, {
                 object: this.proxy || target,
                 name: key,
-                type: "remove"
+                type: REMOVE
             })
             if (!change) return
         }
         try {
             startBatch()
             const notify = hasListeners(this)
-            const notifySpy = isSpyEnabled()
+            const notifySpy = __DEV__ && isSpyEnabled()
             const oldObservable = this.values.get(key)
             const oldValue = oldObservable && oldObservable.get()
             oldObservable && oldObservable.set(undefined)
@@ -229,20 +235,21 @@ export class ObservableObjectAdministration
             const change =
                 notify || notifySpy
                     ? {
-                          type: "remove",
+                          type: REMOVE,
                           object: this.proxy || target,
                           oldValue: oldValue,
                           name: key
                       }
                     : null
-            if (notifySpy && __DEV__) spyReportStart({ ...change, name: this.name, key })
+            if (__DEV__ && notifySpy) spyReportStart({ ...change, name: this.name, key })
             if (notify) notifyListeners(this, change)
-            if (notifySpy && __DEV__) spyReportEnd()
+            if (__DEV__ && notifySpy) spyReportEnd()
         } finally {
             endBatch()
         }
     }
 
+    // TODO: is this still needed?
     illegalAccess(owner, propName) {
         /**
          * This happens if a property is accessed through the prototype chain, but the property was
@@ -263,9 +270,10 @@ export class ObservableObjectAdministration
          *
          * When using decorate, the property will always be redeclared as own property on the actual instance
          */
-        console.warn(
-            `Property '${propName}' of '${owner}' was accessed through the prototype chain. Use 'decorate' instead to declare the prop or access it statically through it's owner`
-        )
+        __DEV__ &&
+            console.warn(
+                `Property '${propName}' of '${owner}' was accessed through the prototype chain. Use 'decorate' instead to declare the prop or access it statically through it's owner`
+            )
     }
 
     /**
@@ -274,11 +282,8 @@ export class ObservableObjectAdministration
      * for callback details
      */
     observe(callback: (changes: IObjectDidChange) => void, fireImmediately?: boolean): Lambda {
-        __DEV__ &&
-            invariant(
-                fireImmediately !== true,
-                "`observe` doesn't support the fire immediately property for observable objects."
-            )
+        if (__DEV__ && fireImmediately === true)
+            die("`observe` doesn't support the fire immediately property for observable objects.")
         return registerListener(this, callback)
     }
 
@@ -288,20 +293,20 @@ export class ObservableObjectAdministration
 
     notifyPropertyAddition(key: PropertyKey, newValue) {
         const notify = hasListeners(this)
-        const notifySpy = isSpyEnabled()
+        const notifySpy = __DEV__ && isSpyEnabled()
         const change =
             notify || notifySpy
                 ? {
-                      type: "add",
+                      type: ADD,
                       object: this.proxy || this.target,
                       name: key,
                       newValue
                   }
                 : null
 
-        if (notifySpy && __DEV__) spyReportStart({ ...change, name: this.name, key })
+        if (__DEV__ && notifySpy) spyReportStart({ ...change, name: this.name, key })
         if (notify) notifyListeners(this, change)
-        if (notifySpy && __DEV__) spyReportEnd()
+        if (__DEV__ && notifySpy) spyReportEnd()
         if (this.pendingKeys) {
             const entry = this.pendingKeys.get(key)
             if (entry) entry.set(true)
@@ -329,11 +334,8 @@ export function asObservableObject(
 ): ObservableObjectAdministration {
     if (Object.prototype.hasOwnProperty.call(target, $mobx)) return target[$mobx]
 
-    __DEV__ &&
-        invariant(
-            Object.isExtensible(target),
-            "Cannot make the designated object observable; it is not extensible"
-        )
+    if (__DEV__ && !Object.isExtensible(target))
+        die("Cannot make the designated object observable; it is not extensible")
     if (!isPlainObject(target))
         name = (target.constructor.name || "ObservableObject") + "@" + getNextId()
     if (!name) name = "ObservableObject@" + getNextId()
@@ -392,6 +394,7 @@ export function generateComputedPropConfig(propName) {
     )
 }
 
+// TODO: extract constant for "ObservableObject ?
 const isObservableObjectAdministration = createInstanceofPredicate(
     "ObservableObjectAdministration",
     ObservableObjectAdministration

@@ -71,9 +71,13 @@ test("action modifications should be picked up 3", () => {
 
     const doubler = mobx.computed(() => a.get() * 2)
 
-    doubler.observe(() => {
-        b = doubler.get()
-    }, true)
+    mobx.observe(
+        doubler,
+        () => {
+            b = doubler.get()
+        },
+        true
+    )
 
     expect(b).toBe(2)
 
@@ -452,12 +456,6 @@ test("expect warning for invalid decorator", () => {
     expect(() => {
         mobx.observable({ x: 1 }, { x: undefined })
     }).toThrow(/invalid decorator for 'x'/)
-})
-
-test("expect warning superfluos decorator", () => {
-    expect(() => {
-        mobx.observable({ x() {} }, { y: mobx.action })
-    }).toThrow(/Trying to declare a decorator for unspecified property 'y'/)
 })
 
 test("bound actions bind", () => {

@@ -1,4 +1,5 @@
-import { Lambda, invariant, once, untrackedEnd, untrackedStart } from "../internal"
+import { Lambda, once, untrackedEnd, untrackedStart } from "../internal"
+import { die } from "../errors"
 
 export type IInterceptor<T> = (change: T) => T | null
 
@@ -33,7 +34,7 @@ export function interceptChange<T>(
         const interceptors = [...(interceptable.interceptors || [])]
         for (let i = 0, l = interceptors.length; i < l; i++) {
             change = interceptors[i](change)
-            invariant(!change || (change as any).type, 14)
+            if (change && !(change as any).type) die(14)
             if (!change) break
         }
         return change

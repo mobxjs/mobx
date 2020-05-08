@@ -128,17 +128,6 @@ export function shouldCompute(derivation: IDerivation): boolean {
     }
 }
 
-// function invariantShouldCompute(derivation: IDerivation) {
-//     const newDepState = (derivation as any).dependenciesState
-
-//     if (
-//         process.env.NODE_ENV === "production" &&
-//         (newDepState === IDerivationState.POSSIBLY_STALE ||
-//             newDepState === IDerivationState.NOT_TRACKING)
-//     )
-//         fail("Illegal dependency state")
-// }
-
 export function isComputingDerivation() {
     return globalState.trackingDerivation !== null // filter out actions inside computations
 }

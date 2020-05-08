@@ -144,9 +144,13 @@ test("concat should automatically slice observable arrays, #260", () => {
 test("observe", function() {
     const ar = mobx.observable([1, 4])
     const buf = []
-    const disposer = ar.observe(function(changes) {
-        buf.push(changes)
-    }, true)
+    const disposer = mobx.observe(
+        ar,
+        function(changes) {
+            buf.push(changes)
+        },
+        true
+    )
 
     ar[1] = 3 // 1,3
     ar[2] = 0 // 1, 3, 0
@@ -336,7 +340,7 @@ test("react to sort changes", function() {
 test("autoextend buffer length", function() {
     const ar = observable(new Array(1000))
     let changesCount = 0
-    ar.observe(() => ++changesCount)
+    mobx.observe(ar, () => ++changesCount)
 
     ar[ar.length] = 0
     ar.push(0)

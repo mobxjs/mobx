@@ -1,6 +1,5 @@
 import {
     $mobx,
-    fail,
     isAtom,
     isComputedValue,
     isObservableArray,
@@ -34,16 +33,14 @@ function _isObservable(value, property?: string): boolean {
 }
 
 export function isObservable(value: any): boolean {
-    if (arguments.length !== 1)
-        fail(
-            __DEV__ &&
-                `isObservable expects only 1 argument. Use isObservableProp to inspect the observability of a property`
+    if (__DEV__ && arguments.length !== 1)
+        die(
+            `isObservable expects only 1 argument. Use isObservableProp to inspect the observability of a property`
         )
     return _isObservable(value)
 }
 
 export function isObservableProp(value: any, propName: string): boolean {
-    if (!isStringish(propName))
-        return fail(__DEV__ && `expected a property name as second argument`)
+    if (__DEV__ && !isStringish(propName)) return die(`expected a property name as second argument`)
     return _isObservable(value, propName)
 }

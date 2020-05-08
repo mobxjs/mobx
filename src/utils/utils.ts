@@ -1,4 +1,4 @@
-import { IObservableArray, globalState, isObservableArray, fail } from "../internal"
+import { IObservableArray, globalState, isObservableArray, die } from "../internal"
 
 export const EMPTY_ARRAY = []
 Object.freeze(EMPTY_ARRAY)
@@ -15,14 +15,16 @@ const hasProxy = typeof Proxy !== "undefined"
 
 export function assertProxies() {
     if (!hasProxy) {
-        fail(
-            "`Proxy` objects are not available in the current environment. Please configure MobX to enable  a fallback implementation using `enableES5()`"
+        die(
+            __DEV__
+                ? "`Proxy` objects are not available in the current environment. Please configure MobX to enable a fallback implementation.`"
+                : "Proxy not available"
         )
     }
 }
 
 export function warnAboutProxyRequirement() {
-    if (globalState.verifyProxies) {
+    if (__DEV__ && globalState.verifyProxies) {
         // TODO: add relevant URL at the end of this warning
         console.warn(
             "MobX is currently configured to be able to allow running ES5 mode, however, this line of code will not work on ES5 environments. For details see: "
@@ -105,7 +107,7 @@ export function isPropertyConfigurable(object: any, prop: PropertyKey): boolean 
 
 export function assertPropertyConfigurable(object: any, prop: PropertyKey) {
     if (__DEV__ && !isPropertyConfigurable(object, prop))
-        fail(
+        die(
             `Cannot make property '${stringifyKey(
                 prop
             )}' observable, it is not configurable and writable in the target object`

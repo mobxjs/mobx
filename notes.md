@@ -8,6 +8,9 @@
     -   [ ] create prod esm build?
     -   [ ] minimal dev errors
     -   [ ] invariant system from immer
+    -   [ ] check all calls to top-level
+            build, tree-shakeable etc?
+    -   [ ] add **PURE** annotations?
     -   [ ] extract utils for getOwnPropertyDescriptor and defineProperty
     -   [ ] configure property mangling like in Immer. Will it save anything?
 -   [ ] code mod
@@ -34,6 +37,7 @@
     -   [x] observable / extendObservable use decorators args
     -   [x] observable; support `false` as argument
 -   [ ] misc
+    -   [ ] revisit safety model
     -   [ ] at startup, test presence of Map, Symbol ownPropertySymboles and other globals!
     -   [ ] verify: action called from computed throws?
     -   [ ] apply deprecation of find and findIndex error
@@ -46,6 +50,8 @@
     -   [ ] include #2343
     -   [ ] default observable requires reaction?
     -   [ ] kill globalstate options?
+    -   [ ] no auto lifting? https://twitter.com/getify/status/1258137826241241088
+    -   [ ] flow types
 
 ## Docs / migration guide
 
@@ -74,12 +80,18 @@ PHilosophy: one thing to do things
 -   [ ] observable.array now supports proxy:false option
 -   [ ] migration: migrate mobx4 to mobx5 first, don't test on old browsers, then go to 6
 -   [ ] Breaking: no generic decorators or lists anymore for extendObservable?
-
+-   [ ] Breaking: dropped `intercept` and `observe` as array & map methods, use the mobx utilities instead
+-   [ ] Breaking: dropped array.toJS, use .slice() instead
+-   [ ] Breaking dropped Map.toPOJO / toJS / toJSON , use new Map(map) instead
+-   [ ] Breaking: Map.toJSON now returns the entries array
+-   [ ] Breaking dropped Set.toJS, use new Set(observableSet) instead
+-   [ ] Breaking Set.toJSON returns an array now
 -   [ ] Running codemod: yarn jscodeshift -t codemod/undecorate.ts test/v5/base/typescript-tests.ts --ignoreImports=true
 -   [ ] killed: IGNORE_MOBX_MINIFY_WARNING
 -   [ ] Document: recommended settings for prod versus experimentation
 -   [ ] Migration: document switching from 4 to 5: configure( ) with proxies, requiresReqction, enforceActions
 -   [ ] makeObservable + private members in TypeScript (second call? computed name? tsignore?)
+-   [ ] print deprecation warnings for all old apis in mobx 4/5
 
 ## Blog
 

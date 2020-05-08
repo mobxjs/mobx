@@ -7,10 +7,8 @@ import {
     isSpyEnabled,
     hasListeners,
     IListenable,
-    invariant,
     registerListener,
     Lambda,
-    fail,
     spyReportStart,
     notifyListeners,
     spyReportEnd,
@@ -25,7 +23,11 @@ import {
     makeIterable,
     transaction,
     isES6Set,
-    IAtom
+    IAtom,
+    DELETE,
+    ADD,
+    die,
+    isFunction
 } from "../internal"
 
 const ObservableSetMarker = {}
@@ -70,10 +72,8 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
         enhancer: IEnhancer<T> = deepEnhancer,
         public name = "ObservableSet@" + getNextId()
     ) {
-        if (typeof Set !== "function") {
-            throw new Error(
-                "mobx.set requires Set polyfill for the current browser. Check babel-polyfill or core-js/es6/set.js"
-            )
+        if (!isFunction(Set)) {
+            die(22)
         }
         this._atom = createAtom(this.name)
         this.enhancer = (newV, oldV) => enhancer(newV, oldV, name)
@@ -112,7 +112,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
         checkIfStateModificationsAreAllowed(this._atom)
         if (hasInterceptors(this)) {
             const change = interceptChange<ISetWillChange<T>>(this, {
-                type: "add",
+                type: ADD,
                 object: this,
                 newValue: value
             })
@@ -125,12 +125,12 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
                 this._data.add(this.enhancer(value, undefined))
                 this._atom.reportChanged()
             })
-            const notifySpy = isSpyEnabled()
+            const notifySpy = __DEV__ && isSpyEnabled()
             const notify = hasListeners(this)
             const change =
                 notify || notifySpy
                     ? <ISetDidChange<T>>{
-                          type: "add",
+                          type: ADD,
                           object: this,
                           newValue: value
                       }
@@ -146,19 +146,19 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
     delete(value: any) {
         if (hasInterceptors(this)) {
             const change = interceptChange<ISetWillChange<T>>(this, {
-                type: "delete",
+                type: DELETE,
                 object: this,
                 oldValue: value
             })
             if (!change) return false
         }
         if (this.has(value)) {
-            const notifySpy = isSpyEnabled()
+            const notifySpy = __DEV__ && isSpyEnabled()
             const notify = hasListeners(this)
             const change =
                 notify || notifySpy
                     ? <ISetDidChange<T>>{
-                          type: "delete",
+                          type: DELETE,
                           object: this,
                           oldValue: value
                       }
@@ -216,7 +216,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
 
     replace(other: ObservableSet<T> | IObservableSetInitialValues<T>): ObservableSet<T> {
         if (isObservableSet(other)) {
-            other = other.toJS()
+            other = new Set(other)
         }
 
         transaction(() => {
@@ -227,40 +227,41 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
                 this.clear()
                 other.forEach(value => this.add(value))
             } else if (other !== null && other !== undefined) {
-                fail("Cannot initialize set from " + other)
+                die("Cannot initialize set from " + other)
             }
         })
 
         return this
     }
 
+    // TODO: kill
     observe(listener: (changes: ISetDidChange<T>) => void, fireImmediately?: boolean): Lambda {
         // TODO 'fireImmediately' can be true?
-        __DEV__ &&
-            invariant(
-                fireImmediately !== true,
-                "`observe` doesn't support fireImmediately=true in combination with sets."
-            )
+        if (__DEV__ && fireImmediately === true)
+            die("`observe` doesn't support fireImmediately=true in combination with sets.")
         return registerListener(this, listener)
     }
 
+    // TODO: kill
     intercept(handler: IInterceptor<ISetWillChange<T>>): Lambda {
         return registerInterceptor(this, handler)
     }
 
-    toJS(): Set<T> {
-        return new Set(this)
+    toJSON(): T[] {
+        return Array.from(this)
     }
 
     toString(): string {
-        return this.name + "[ " + Array.from(this).join(", ") + " ]"
+        return "[object ObservableSet]"
     }
 
     [Symbol.iterator]() {
         return this.values()
     }
 
-    [Symbol.toStringTag]: "Set" = "Set"
+    get [Symbol.toStringTag]() {
+        return "Set"
+    }
 }
 
 // eslint-disable-next-line

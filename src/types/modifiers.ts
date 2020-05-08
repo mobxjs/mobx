@@ -1,6 +1,5 @@
 import {
     deepEqual,
-    fail,
     isES6Map,
     isES6Set,
     isObservable,
@@ -9,7 +8,8 @@ import {
     isObservableSet,
     isObservableObject,
     isPlainObject,
-    observable
+    observable,
+    die
 } from "../internal"
 
 export interface IEnhancer<T> {
@@ -39,10 +39,10 @@ export function shallowEnhancer(v, _, name): any {
     if (isES6Map(v)) return observable.map(v, { name, deep: false })
     if (isES6Set(v)) return observable.set(v, { name, deep: false })
 
-    return fail(
-        __DEV__ &&
+    if (__DEV__)
+        die(
             "The shallow modifier / decorator can only used in combination with arrays, objects, maps and sets"
-    )
+        )
 }
 
 export function referenceEnhancer(newValue?) {
@@ -50,9 +50,9 @@ export function referenceEnhancer(newValue?) {
     return newValue
 }
 
-export function refStructEnhancer(v, oldValue, name): any {
+export function refStructEnhancer(v, oldValue): any {
     if (__DEV__ && isObservable(v))
-        throw `observable.struct should not be used with observable values`
+        die(`observable.struct should not be used with observable values`)
     if (deepEqual(v, oldValue)) return oldValue
     return v
 }

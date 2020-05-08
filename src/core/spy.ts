@@ -1,5 +1,6 @@
 import { Lambda, globalState, once } from "../internal"
 
+// TODO: check if all calls are prefixed with __DEV__ in this file
 export function isSpyEnabled() {
     return __DEV__ && !!globalState.spyListeners.length
 }

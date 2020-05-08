@@ -13,7 +13,6 @@ import {
     createObservableArray,
     deepEnhancer,
     extendObservable,
-    fail,
     isES6Map,
     isES6Set,
     isObservable,
@@ -66,7 +65,7 @@ export function asCreateObservableOptions(thing: any): CreateObservableOptions {
     if (thing == null) return defaultCreateObservableOptions
     if (isString(thing)) return { name: "" + thing, deep: true, proxy: true }
     if (__DEV__) {
-        if (typeof thing !== "object") return fail("expected options object")
+        if (typeof thing !== "object") return die("expected options object")
         Object.keys(thing).forEach(assertValidOption)
     }
     return thing as CreateObservableOptions

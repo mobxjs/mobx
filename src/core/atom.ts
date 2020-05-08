@@ -10,9 +10,9 @@ import {
     onBecomeUnobserved,
     propagateChanged,
     reportObserved,
-    startBatch
+    startBatch,
+    Lambda
 } from "../internal"
-import { Lambda } from "../utils/utils"
 
 export const $mobx = Symbol("mobx administration")
 

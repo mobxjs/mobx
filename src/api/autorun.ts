@@ -8,11 +8,11 @@ import {
     action,
     comparer,
     getNextId,
-    invariant,
     isAction,
     isFunction,
     isPlainObject
 } from "../internal"
+import { die } from "../errors"
 
 export interface IAutorunOptions {
     delay?: number
@@ -37,11 +37,8 @@ export function autorun(
     opts: IAutorunOptions = EMPTY_OBJECT
 ): IReactionDisposer {
     if (__DEV__) {
-        invariant(isFunction(view), "Autorun expects a function as first argument")
-        invariant(
-            isAction(view) === false,
-            "Autorun does not accept actions since actions are untrackable"
-        )
+        if (!isFunction(view)) die("Autorun expects a function as first argument")
+        if (isAction(view)) die("Autorun does not accept actions since actions are untrackable")
     }
 
     const name: string = (opts && opts.name) || (view as any).name || "Autorun@" + getNextId()
@@ -108,11 +105,9 @@ export function reaction<T>(
     opts: IReactionOptions = EMPTY_OBJECT
 ): IReactionDisposer {
     if (__DEV__) {
-        invariant(
-            isFunction(expression) && isFunction(effect),
-            "First and second argument to reaction should be functions"
-        )
-        invariant(isPlainObject(opts), "Third argument of reactions should be an object")
+        if (!isFunction(expression) || !isFunction(effect))
+            die("First and second argument to reaction should be functions")
+        if (!isPlainObject(opts)) die("Third argument of reactions should be an object")
     }
     const name = opts.name || "Reaction@" + getNextId()
     const effectAction = action(

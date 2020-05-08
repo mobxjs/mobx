@@ -189,7 +189,7 @@ export function propagateChanged(observable: IObservable) {
     // Ideally we use for..of here, but the downcompiled version is really slow...
     observable.observers.forEach(d => {
         if (d.dependenciesState === IDerivationState.UP_TO_DATE) {
-            if (d.isTracing !== TraceMode.NONE) {
+            if (__DEV__ && d.isTracing !== TraceMode.NONE) {
                 logTraceInfo(d, observable)
             }
             d.onBecomeStale()
@@ -225,7 +225,7 @@ export function propagateMaybeChanged(observable: IObservable) {
     observable.observers.forEach(d => {
         if (d.dependenciesState === IDerivationState.UP_TO_DATE) {
             d.dependenciesState = IDerivationState.POSSIBLY_STALE
-            if (d.isTracing !== TraceMode.NONE) {
+            if (__DEV__ && d.isTracing !== TraceMode.NONE) {
                 logTraceInfo(d, observable)
             }
             d.onBecomeStale()

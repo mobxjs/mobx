@@ -99,7 +99,7 @@ export class Reaction implements IDerivation, IReactionPublic {
 
                 try {
                     this.onInvalidate()
-                    if (this._isTrackPending && isSpyEnabled() && __DEV__) {
+                    if (__DEV__ && this._isTrackPending && isSpyEnabled()) {
                         // onInvalidate didn't trigger track right away..
                         spyReport({
                             name: this.name,
@@ -122,7 +122,7 @@ export class Reaction implements IDerivation, IReactionPublic {
         startBatch()
         const notify = isSpyEnabled()
         let startTime
-        if (notify && __DEV__) {
+        if (__DEV__ && notify) {
             startTime = Date.now()
             spyReportStart({
                 name: this.name,
@@ -138,7 +138,7 @@ export class Reaction implements IDerivation, IReactionPublic {
             clearObserving(this)
         }
         if (isCaughtException(result)) this.reportExceptionInDerivation(result.cause)
-        if (notify && __DEV__) {
+        if (__DEV__ && notify) {
             spyReportEnd({
                 time: Date.now() - startTime
             })
@@ -154,15 +154,15 @@ export class Reaction implements IDerivation, IReactionPublic {
 
         if (globalState.disableErrorBoundaries) throw error
 
-        const message = `[mobx] Encountered an uncaught exception that was thrown by a reaction or observer component, in: '${this}'`
-        if (globalState.suppressReactionErrors) {
-            console.warn(`[mobx] (error in reaction '${this.name}' suppressed, fix error of causing action below)`) // prettier-ignore
-        } else {
+        const message = __DEV__
+            ? `[mobx] Encountered an uncaught exception that was thrown by a reaction or observer component, in: '${this}'`
+            : `[mobx] uncaught error in '${this}'`
+        if (!globalState.suppressReactionErrors) {
             console.error(message, error)
             /** If debugging brought you here, please, read the above message :-). Tnx! */
-        }
+        } else if (__DEV__) console.warn(`[mobx] (error in reaction '${this.name}' suppressed, fix error of causing action below)`) // prettier-ignore
 
-        if (isSpyEnabled()) {
+        if (__DEV__ && isSpyEnabled()) {
             spyReport({
                 type: "error",
                 name: this.name,
@@ -235,8 +235,10 @@ function runReactionsHelper() {
     while (allReactions.length > 0) {
         if (++iterations === MAX_REACTION_ITERATIONS) {
             console.error(
-                `Reaction doesn't converge to a stable state after ${MAX_REACTION_ITERATIONS} iterations.` +
-                    ` Probably there is a cycle in the reactive function: ${allReactions[0]}`
+                __DEV__
+                    ? `Reaction doesn't converge to a stable state after ${MAX_REACTION_ITERATIONS} iterations.` +
+                          ` Probably there is a cycle in the reactive function: ${allReactions[0]}`
+                    : `[mobx] cycle in reaction: ${allReactions[0]}`
             )
             allReactions.splice(0) // clear reactions
         }

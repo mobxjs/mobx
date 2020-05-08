@@ -1,17 +1,20 @@
 import {
     IDerivation,
     endBatch,
-    fail,
     globalState,
-    invariant,
     isSpyEnabled,
     spyReportEnd,
     spyReportStart,
     startBatch,
     untrackedEnd,
-    untrackedStart
+    untrackedStart,
+    isFunction,
+    allowStateReadsStart,
+    allowStateReadsEnd,
+    ACTION,
+    EMPTY_ARRAY
 } from "../internal"
-import { allowStateReadsStart, allowStateReadsEnd } from "./derivation"
+import { die } from "../errors"
 
 // we don't use globalState for these in order to avoid possible issues with multiple
 // mobx versions
@@ -22,14 +25,14 @@ const isFunctionNameConfigurable = functionNameDescriptor?.configurable ?? false
 
 export function createAction(actionName: string, fn: Function, ref?: Object): Function {
     if (__DEV__) {
-        invariant(typeof fn === "function", "`action` can only be invoked on functions")
+        if (!isFunction(fn)) die("`action` can only be invoked on functions")
         if (typeof actionName !== "string" || !actionName)
-            fail(`actions should have valid names, got: '${actionName}'`)
+            die(`actions should have valid names, got: '${actionName}'`)
     }
     function res() {
         return executeAction(actionName, fn, ref || this, arguments)
     }
-    // TODO: can be optimized by recyclig objects?
+    // TODO: can be optimized by recyclig objects? // TODO: and check if fn.name !== actionName
     return Object.defineProperties(res, {
         ...(isFunctionNameConfigurable && { name: { value: actionName } }),
         isMobxAction: { value: true }
@@ -60,15 +63,13 @@ export interface IActionRunInfo {
 }
 
 export function _startAction(actionName: string, scope: any, args?: IArguments): IActionRunInfo {
-    const notifySpy = isSpyEnabled() && !!actionName
+    const notifySpy = __DEV__ && isSpyEnabled() && !!actionName
     let startTime: number = 0
-    if (notifySpy && __DEV__) {
+    if (__DEV__ && notifySpy) {
         startTime = Date.now()
-        const l = (args && args.length) || 0
-        const flattendArgs = new Array(l)
-        if (l > 0) for (let i = 0; i < l; i++) flattendArgs[i] = args![i]
+        const flattendArgs = args ? Array.from(args) : EMPTY_ARRAY
         spyReportStart({
-            type: "action",
+            type: ACTION,
             name: actionName,
             object: scope,
             arguments: flattendArgs
@@ -93,7 +94,7 @@ export function _startAction(actionName: string, scope: any, args?: IArguments):
 
 export function _endAction(runInfo: IActionRunInfo) {
     if (currentActionId !== runInfo.actionId) {
-        fail("invalid action stack. did you forget to finish an action?")
+        die(30)
     }
     currentActionId = runInfo.parentActionId
 
@@ -104,7 +105,7 @@ export function _endAction(runInfo: IActionRunInfo) {
     allowStateReadsEnd(runInfo.prevAllowStateReads)
     endBatch()
     untrackedEnd(runInfo.prevDerivation)
-    if (runInfo.notifySpy && __DEV__) {
+    if (__DEV__ && runInfo.notifySpy) {
         spyReportEnd({ time: Date.now() - runInfo.startTime })
     }
     globalState.suppressReactionErrors = false

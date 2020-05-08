@@ -11,7 +11,6 @@ import {
     addHiddenFinalProp,
     checkIfStateModificationsAreAllowed,
     createInstanceofPredicate,
-    fail,
     getNextId,
     hasInterceptors,
     hasListeners,
@@ -26,9 +25,13 @@ import {
     allowStateChangesStart,
     allowStateChangesEnd,
     assertProxies,
-    reserveArrayBuffer
+    reserveArrayBuffer,
+    hasProp,
+    die
 } from "../internal"
 
+const SPLICE = "splice"
+export const UPDATE = "update"
 export const MAX_SPLICE_SIZE = 10000 // See e.g. https://github.com/mobxjs/mobx/issues/859
 
 export interface IObservableArray<T = any> extends Array<T> {
@@ -88,8 +91,7 @@ const arrayTraps = {
         if (typeof name === "string" && !isNaN(name as any)) {
             return arrayExtensions.get.call(target, parseInt(name))
         }
-        // TODO: reuse util
-        if (Object.prototype.hasOwnProperty.call(arrayExtensions, name)) {
+        if (hasProp(arrayExtensions, name)) {
             return arrayExtensions[name]
         }
         return target[name]
@@ -109,9 +111,8 @@ const arrayTraps = {
         }
         return true
     },
-    preventExtensions(target) {
-        fail(`Observable arrays cannot be frozen`)
-        return false
+    preventExtensions() {
+        die(15)
     }
 }
 
@@ -170,8 +171,7 @@ export class ObservableArrayAdministration
     }
 
     setArrayLength(newLength: number) {
-        if (typeof newLength !== "number" || newLength < 0)
-            throw new Error("[mobx.array] Out of range: " + newLength)
+        if (typeof newLength !== "number" || newLength < 0) die("Out of range: " + newLength)
         let currentLength = this.values.length
         if (newLength === currentLength) return
         else if (newLength > currentLength) {
@@ -182,10 +182,7 @@ export class ObservableArrayAdministration
     }
 
     updateArrayLength(oldLength: number, delta: number) {
-        if (oldLength !== this.lastKnownLength)
-            throw new Error(
-                "[mobx] Modification exception: the internal structure of an observable array was changed."
-            )
+        if (oldLength !== this.lastKnownLength) die(16)
         this.lastKnownLength += delta
         if (this.legacyMode && delta > 0) reserveArrayBuffer(oldLength + delta + 1)
     }
@@ -207,7 +204,7 @@ export class ObservableArrayAdministration
         if (hasInterceptors(this)) {
             const change = interceptChange<IArrayWillSplice<any>>(this as any, {
                 object: this.proxy as any,
-                type: "splice",
+                type: SPLICE,
                 index,
                 removedCount: deleteCount,
                 added: newItems
@@ -247,7 +244,7 @@ export class ObservableArrayAdministration
             notify || notifySpy
                 ? {
                       object: this.proxy,
-                      type: "update",
+                      type: UPDATE,
                       index,
                       newValue,
                       oldValue
@@ -256,10 +253,10 @@ export class ObservableArrayAdministration
 
         // The reason why this is on right hand side here (and not above), is this way the uglifier will drop it, but it won't
         // cause any runtime overhead in development mode without NODE_ENV set, unless spying is enabled
-        if (notifySpy && __DEV__) spyReportStart({ ...change, name: this.atom.name })
+        if (__DEV__ && notifySpy) spyReportStart({ ...change, name: this.atom.name })
         this.atom.reportChanged()
         if (notify) notifyListeners(this, change)
-        if (notifySpy && __DEV__) spyReportEnd()
+        if (__DEV__ && notifySpy) spyReportEnd()
     }
 
     notifyArraySplice(index: number, added: any[], removed: any[]) {
@@ -269,7 +266,7 @@ export class ObservableArrayAdministration
             notify || notifySpy
                 ? {
                       object: this.proxy,
-                      type: "splice",
+                      type: SPLICE,
                       index,
                       removed,
                       added,
@@ -278,11 +275,11 @@ export class ObservableArrayAdministration
                   }
                 : null
 
-        if (notifySpy && __DEV__) spyReportStart({ ...change, name: this.atom.name })
+        if (__DEV__ && notifySpy) spyReportStart({ ...change, name: this.atom.name })
         this.atom.reportChanged()
         // conform: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
         if (notify) notifyListeners(this, change)
-        if (notifySpy && __DEV__) spyReportEnd()
+        if (__DEV__ && notifySpy) spyReportEnd()
     }
 }
 
@@ -307,20 +304,6 @@ export function createObservableArray<T>(
 
 // eslint-disable-next-line
 export var arrayExtensions = {
-        // TODO: remove?
-        intercept(handler: IInterceptor<IArrayWillChange<any> | IArrayWillSplice<any>>): Lambda {
-            return this[$mobx].intercept(handler)
-        },
-
-        // TODO: remove?
-        observe(
-            listener: (changeData: IArrayChange<any> | IArraySplice<any>) => void,
-            fireImmediately = false
-        ): Lambda {
-            const adm: ObservableArrayAdministration = this[$mobx]
-            return adm.observe(listener, fireImmediately)
-        },
-
         clear(): any[] {
             return this.splice(0)
         },
@@ -330,19 +313,9 @@ export var arrayExtensions = {
             return adm.spliceWithArray(0, adm.values.length, newItems)
         },
 
-        // TODO: remove?
-        /**
-         * Converts this array back to a (shallow) javascript structure.
-         * For a deep clone use mobx.toJS
-         */
-        toJS(): any[] {
-            return (this as any).slice()
-        },
-
-        // TODO: remove?
+        // Used by JSON.stringify
         toJSON(): any[] {
-            // Used by JSON.stringify
-            return this.toJS()
+            return this.slice()
         },
 
         /*
@@ -402,7 +375,7 @@ export var arrayExtensions = {
             return clone.reverse.apply(clone, arguments)
         },
 
-        sort(compareFn?: (a: any, b: any) => number): any[] {
+        sort(): any[] {
             // sort by default mutates in place before returning the result
             // which goes against all good practices. Let's not change the array in place!
             if (__DEV__) {
@@ -411,7 +384,7 @@ export var arrayExtensions = {
                 )
             }
             const clone = (<any>this).slice()
-            return clone.sort.apply(clone, arguments)
+            return this.slice().sort.apply(clone, arguments)
         },
 
         remove(value: any): boolean {
@@ -424,7 +397,7 @@ export var arrayExtensions = {
             return false
         },
 
-        // TODO: remove?
+        // TODO: move to array administration
         get(index: number): any | undefined {
             const adm: ObservableArrayAdministration = this[$mobx]
             if (adm) {
@@ -433,13 +406,15 @@ export var arrayExtensions = {
                     return adm.dehanceValue(adm.values[index])
                 }
                 console.warn(
-                    `[mobx.array] Attempt to read an array index (${index}) that is out of bounds (${adm.values.length}). Please check length first. Out of bound indices will not be tracked by MobX`
+                    __DEV__
+                        ? `[mobx] Out of bounds read: ${index}`
+                        : `[mobx.array] Attempt to read an array index (${index}) that is out of bounds (${adm.values.length}). Please check length first. Out of bound indices will not be tracked by MobX`
                 )
             }
             return undefined
         },
 
-        // TODO: remove?
+        // TODO: move to array administration
         set(index: number, newValue: any) {
             const adm: ObservableArrayAdministration = this[$mobx]
             const values = adm.values
@@ -449,7 +424,7 @@ export var arrayExtensions = {
                 const oldValue = values[index]
                 if (hasInterceptors(adm)) {
                     const change = interceptChange<IArrayWillChange<any>>(adm as any, {
-                        type: "update",
+                        type: UPDATE,
                         object: adm.proxy as any, // since "this" is the real array we need to pass its proxy
                         index,
                         newValue
@@ -468,7 +443,7 @@ export var arrayExtensions = {
                 adm.spliceWithArray(index, 0, [newValue])
             } else {
                 // out of bounds
-                fail(`[mobx.array] Index out of bounds, ${index} is larger than ${values.length}`)
+                die(17, index, values.length)
             }
         }
     }

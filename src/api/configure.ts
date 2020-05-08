@@ -1,4 +1,4 @@
-import { globalState, isolateGlobalState, setReactionScheduler, assertES5 } from "../internal"
+import { globalState, isolateGlobalState, setReactionScheduler } from "../internal"
 
 const NEVER = "never"
 const ALWAYS = "always"
@@ -27,9 +27,6 @@ export function configure(options: {
     }
     const { useProxies, enforceActions } = options
     if (useProxies !== undefined) {
-        if (useProxies !== ALWAYS) {
-            assertES5()
-        }
         globalState.useProxies =
             useProxies === ALWAYS
                 ? true

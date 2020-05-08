@@ -18,7 +18,6 @@ test("correct api should be exposed", function() {
             "computed",
             "configure",
             "createAtom",
-            "enableES5",
             "extendObservable",
             "flow",
             "FlowCancellationError",
