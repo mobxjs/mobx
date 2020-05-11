@@ -1,5 +1,5 @@
 export type Annotation = {
-    annotationType:
+    annotationType_:
         | "observable"
         | "observable.ref"
         | "observable.shallow"
@@ -8,7 +8,7 @@ export type Annotation = {
         | "computed.struct"
         | "action"
         | "action.bound"
-    arg?: any
+    arg_?: any
 }
 
 export type AnnotationMapEntry =

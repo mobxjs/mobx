@@ -84,7 +84,7 @@ export interface IArrayWillSplice<T = any> {
 const arrayTraps = {
     get(target, name) {
         if (name === $mobx) return target[$mobx]
-        if (name === "length") return target[$mobx].getArrayLength()
+        if (name === "length") return target[$mobx].getArrayLength_()
         if (typeof name === "number") {
             return arrayExtensions.get.call(target, name)
         }
@@ -98,7 +98,7 @@ const arrayTraps = {
     },
     set(target, name, value): boolean {
         if (name === "length") {
-            target[$mobx].setArrayLength(value)
+            target[$mobx].setArrayLength_(value)
         }
         if (typeof name === "number") {
             arrayExtensions.set.call(target, name, value)
@@ -118,31 +118,37 @@ const arrayTraps = {
 
 export class ObservableArrayAdministration
     implements IInterceptable<IArrayWillChange<any> | IArrayWillSplice<any>>, IListenable {
-    atom: IAtom
-    values: any[] = []
+    atom_: IAtom
+    values_: any[] = []
     interceptors
     changeListeners
-    enhancer: (newV: any, oldV: any | undefined) => any
+    enhancer_: (newV: any, oldV: any | undefined) => any
     dehancer: any
-    proxy: any[] = undefined as any
-    lastKnownLength = 0
+    proxy_: any[] = undefined as any
+    lastKnownLength_ = 0
 
-    constructor(name, enhancer: IEnhancer<any>, public owned: boolean, public legacyMode: boolean) {
-        this.atom = new Atom(name || "ObservableArray@" + getNextId())
-        this.enhancer = (newV, oldV) => enhancer(newV, oldV, name + "[..]")
+    constructor(
+        name,
+        enhancer: IEnhancer<any>,
+        public owned_: boolean,
+        public legacyMode_: boolean
+    ) {
+        this.atom_ = new Atom(name || "ObservableArray@" + getNextId())
+        this.enhancer_ = (newV, oldV) => enhancer(newV, oldV, name + "[..]")
     }
 
-    dehanceValue(value: any): any {
+    dehanceValue_(value: any): any {
         if (this.dehancer !== undefined) return this.dehancer(value)
         return value
     }
 
-    dehanceValues(values: any[]): any[] {
+    dehanceValues_(values: any[]): any[] {
         if (this.dehancer !== undefined && values.length > 0)
             return values.map(this.dehancer) as any
         return values
     }
 
+    // TODO: rename
     intercept(handler: IInterceptor<IArrayWillChange<any> | IArrayWillSplice<any>>): Lambda {
         return registerInterceptor<IArrayWillChange<any> | IArrayWillSplice<any>>(this, handler)
     }
@@ -153,11 +159,11 @@ export class ObservableArrayAdministration
     ): Lambda {
         if (fireImmediately) {
             listener(<IArraySplice<any>>{
-                object: this.proxy as any,
+                object: this.proxy_ as any,
                 type: "splice",
                 index: 0,
-                added: this.values.slice(),
-                addedCount: this.values.length,
+                added: this.values_.slice(),
+                addedCount: this.values_.length,
                 removed: [],
                 removedCount: 0
             })
@@ -165,31 +171,31 @@ export class ObservableArrayAdministration
         return registerListener(this, listener)
     }
 
-    getArrayLength(): number {
-        this.atom.reportObserved()
-        return this.values.length
+    getArrayLength_(): number {
+        this.atom_.reportObserved()
+        return this.values_.length
     }
 
-    setArrayLength(newLength: number) {
+    setArrayLength_(newLength: number) {
         if (typeof newLength !== "number" || newLength < 0) die("Out of range: " + newLength)
-        let currentLength = this.values.length
+        let currentLength = this.values_.length
         if (newLength === currentLength) return
         else if (newLength > currentLength) {
             const newItems = new Array(newLength - currentLength)
             for (let i = 0; i < newLength - currentLength; i++) newItems[i] = undefined // No Array.fill everywhere...
-            this.spliceWithArray(currentLength, 0, newItems)
-        } else this.spliceWithArray(newLength, currentLength - newLength)
+            this.spliceWithArray_(currentLength, 0, newItems)
+        } else this.spliceWithArray_(newLength, currentLength - newLength)
     }
 
-    updateArrayLength(oldLength: number, delta: number) {
-        if (oldLength !== this.lastKnownLength) die(16)
-        this.lastKnownLength += delta
-        if (this.legacyMode && delta > 0) reserveArrayBuffer(oldLength + delta + 1)
+    updateArrayLength_(oldLength: number, delta: number) {
+        if (oldLength !== this.lastKnownLength_) die(16)
+        this.lastKnownLength_ += delta
+        if (this.legacyMode_ && delta > 0) reserveArrayBuffer(oldLength + delta + 1)
     }
 
-    spliceWithArray(index: number, deleteCount?: number, newItems?: any[]): any[] {
-        checkIfStateModificationsAreAllowed(this.atom)
-        const length = this.values.length
+    spliceWithArray_(index: number, deleteCount?: number, newItems?: any[]): any[] {
+        checkIfStateModificationsAreAllowed(this.atom_)
+        const length = this.values_.length
 
         if (index === undefined) index = 0
         else if (index > length) index = length
@@ -203,7 +209,7 @@ export class ObservableArrayAdministration
 
         if (hasInterceptors(this)) {
             const change = interceptChange<IArrayWillSplice<any>>(this as any, {
-                object: this.proxy as any,
+                object: this.proxy_ as any,
                 type: SPLICE,
                 index,
                 removedCount: deleteCount,
@@ -214,36 +220,38 @@ export class ObservableArrayAdministration
             newItems = change.added
         }
 
-        newItems = newItems.length === 0 ? newItems : newItems.map(v => this.enhancer(v, undefined))
-        if (this.legacyMode || __DEV__) {
+        newItems =
+            newItems.length === 0 ? newItems : newItems.map(v => this.enhancer_(v, undefined))
+        if (this.legacyMode_ || __DEV__) {
             const lengthDelta = newItems.length - deleteCount
-            this.updateArrayLength(length, lengthDelta) // checks if internal array wasn't modified
+            this.updateArrayLength_(length, lengthDelta) // checks if internal array wasn't modified
         }
-        const res = this.spliceItemsIntoValues(index, deleteCount, newItems)
+        const res = this.spliceItemsIntoValues_(index, deleteCount, newItems)
 
-        if (deleteCount !== 0 || newItems.length !== 0) this.notifyArraySplice(index, newItems, res)
-        return this.dehanceValues(res)
+        if (deleteCount !== 0 || newItems.length !== 0)
+            this.notifyArraySplice_(index, newItems, res)
+        return this.dehanceValues_(res)
     }
 
-    spliceItemsIntoValues(index, deleteCount, newItems: any[]): any[] {
+    spliceItemsIntoValues_(index, deleteCount, newItems: any[]): any[] {
         if (newItems.length < MAX_SPLICE_SIZE) {
-            return this.values.splice(index, deleteCount, ...newItems)
+            return this.values_.splice(index, deleteCount, ...newItems)
         } else {
-            const res = this.values.slice(index, index + deleteCount)
-            this.values = this.values
+            const res = this.values_.slice(index, index + deleteCount)
+            this.values_ = this.values_
                 .slice(0, index)
-                .concat(newItems, this.values.slice(index + deleteCount))
+                .concat(newItems, this.values_.slice(index + deleteCount))
             return res
         }
     }
 
-    notifyArrayChildUpdate(index: number, newValue: any, oldValue: any) {
-        const notifySpy = !this.owned && isSpyEnabled()
+    notifyArrayChildUpdate_(index: number, newValue: any, oldValue: any) {
+        const notifySpy = !this.owned_ && isSpyEnabled()
         const notify = hasListeners(this)
         const change =
             notify || notifySpy
                 ? {
-                      object: this.proxy,
+                      object: this.proxy_,
                       type: UPDATE,
                       index,
                       newValue,
@@ -253,19 +261,19 @@ export class ObservableArrayAdministration
 
         // The reason why this is on right hand side here (and not above), is this way the uglifier will drop it, but it won't
         // cause any runtime overhead in development mode without NODE_ENV set, unless spying is enabled
-        if (__DEV__ && notifySpy) spyReportStart({ ...change, name: this.atom.name })
-        this.atom.reportChanged()
+        if (__DEV__ && notifySpy) spyReportStart({ ...change, name: this.atom_.name_ })
+        this.atom_.reportChanged()
         if (notify) notifyListeners(this, change)
         if (__DEV__ && notifySpy) spyReportEnd()
     }
 
-    notifyArraySplice(index: number, added: any[], removed: any[]) {
-        const notifySpy = !this.owned && isSpyEnabled()
+    notifyArraySplice_(index: number, added: any[], removed: any[]) {
+        const notifySpy = !this.owned_ && isSpyEnabled()
         const notify = hasListeners(this)
         const change =
             notify || notifySpy
                 ? {
-                      object: this.proxy,
+                      object: this.proxy_,
                       type: SPLICE,
                       index,
                       removed,
@@ -275,8 +283,8 @@ export class ObservableArrayAdministration
                   }
                 : null
 
-        if (__DEV__ && notifySpy) spyReportStart({ ...change, name: this.atom.name })
-        this.atom.reportChanged()
+        if (__DEV__ && notifySpy) spyReportStart({ ...change, name: this.atom_.name_ })
+        this.atom_.reportChanged()
         // conform: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
         if (notify) notifyListeners(this, change)
         if (__DEV__ && notifySpy) spyReportEnd()
@@ -291,12 +299,12 @@ export function createObservableArray<T>(
 ): IObservableArray<T> {
     assertProxies()
     const adm = new ObservableArrayAdministration(name, enhancer, owned, false)
-    addHiddenFinalProp(adm.values, $mobx, adm)
-    const proxy = new Proxy(adm.values, arrayTraps) as any
-    adm.proxy = proxy
+    addHiddenFinalProp(adm.values_, $mobx, adm)
+    const proxy = new Proxy(adm.values_, arrayTraps) as any
+    adm.proxy_ = proxy
     if (initialValues && initialValues.length) {
         const prev = allowStateChangesStart(true)
-        adm.spliceWithArray(0, 0, initialValues)
+        adm.spliceWithArray_(0, 0, initialValues)
         allowStateChangesEnd(prev)
     }
     return proxy
@@ -310,7 +318,7 @@ export var arrayExtensions = {
 
         replace(newItems: any[]) {
             const adm: ObservableArrayAdministration = this[$mobx]
-            return adm.spliceWithArray(0, adm.values.length, newItems)
+            return adm.spliceWithArray_(0, adm.values_.length, newItems)
         },
 
         // Used by JSON.stringify
@@ -330,26 +338,29 @@ export var arrayExtensions = {
                 case 0:
                     return []
                 case 1:
-                    return adm.spliceWithArray(index)
+                    return adm.spliceWithArray_(index)
                 case 2:
-                    return adm.spliceWithArray(index, deleteCount)
+                    return adm.spliceWithArray_(index, deleteCount)
             }
-            return adm.spliceWithArray(index, deleteCount, newItems)
+            return adm.spliceWithArray_(index, deleteCount, newItems)
         },
 
         spliceWithArray(index: number, deleteCount?: number, newItems?: any[]): any[] {
-            const adm: ObservableArrayAdministration = this[$mobx]
-            return adm.spliceWithArray(index, deleteCount, newItems)
+            return (this[$mobx] as ObservableArrayAdministration).spliceWithArray_(
+                index,
+                deleteCount,
+                newItems
+            )
         },
 
         push(...items: any[]): number {
             const adm: ObservableArrayAdministration = this[$mobx]
-            adm.spliceWithArray(adm.values.length, 0, items)
-            return adm.values.length
+            adm.spliceWithArray_(adm.values_.length, 0, items)
+            return adm.values_.length
         },
 
         pop() {
-            return this.splice(Math.max(this[$mobx].values.length - 1, 0), 1)[0]
+            return this.splice(Math.max(this[$mobx].values_.length - 1, 0), 1)[0]
         },
 
         shift() {
@@ -357,9 +368,9 @@ export var arrayExtensions = {
         },
 
         unshift(...items: any[]): number {
-            const adm = this[$mobx]
-            adm.spliceWithArray(0, 0, items)
-            return adm.values.length
+            const adm: ObservableArrayAdministration = this[$mobx]
+            adm.spliceWithArray_(0, 0, items)
+            return adm.values_.length
         },
 
         reverse(): any[] {
@@ -389,7 +400,7 @@ export var arrayExtensions = {
 
         remove(value: any): boolean {
             const adm: ObservableArrayAdministration = this[$mobx]
-            const idx = adm.dehanceValues(adm.values).indexOf(value)
+            const idx = adm.dehanceValues_(adm.values_).indexOf(value)
             if (idx > -1) {
                 this.splice(idx, 1)
                 return true
@@ -401,14 +412,14 @@ export var arrayExtensions = {
         get(index: number): any | undefined {
             const adm: ObservableArrayAdministration = this[$mobx]
             if (adm) {
-                if (index < adm.values.length) {
-                    adm.atom.reportObserved()
-                    return adm.dehanceValue(adm.values[index])
+                if (index < adm.values_.length) {
+                    adm.atom_.reportObserved()
+                    return adm.dehanceValue_(adm.values_[index])
                 }
                 console.warn(
                     __DEV__
                         ? `[mobx] Out of bounds read: ${index}`
-                        : `[mobx.array] Attempt to read an array index (${index}) that is out of bounds (${adm.values.length}). Please check length first. Out of bound indices will not be tracked by MobX`
+                        : `[mobx.array] Attempt to read an array index (${index}) that is out of bounds (${adm.values_.length}). Please check length first. Out of bound indices will not be tracked by MobX`
                 )
             }
             return undefined
@@ -417,30 +428,30 @@ export var arrayExtensions = {
         // TODO: move to array administration
         set(index: number, newValue: any) {
             const adm: ObservableArrayAdministration = this[$mobx]
-            const values = adm.values
+            const values = adm.values_
             if (index < values.length) {
                 // update at index in range
-                checkIfStateModificationsAreAllowed(adm.atom)
+                checkIfStateModificationsAreAllowed(adm.atom_)
                 const oldValue = values[index]
                 if (hasInterceptors(adm)) {
                     const change = interceptChange<IArrayWillChange<any>>(adm as any, {
                         type: UPDATE,
-                        object: adm.proxy as any, // since "this" is the real array we need to pass its proxy
+                        object: adm.proxy_ as any, // since "this" is the real array we need to pass its proxy
                         index,
                         newValue
                     })
                     if (!change) return
                     newValue = change.newValue
                 }
-                newValue = adm.enhancer(newValue, oldValue)
+                newValue = adm.enhancer_(newValue, oldValue)
                 const changed = newValue !== oldValue
                 if (changed) {
                     values[index] = newValue
-                    adm.notifyArrayChildUpdate(index, newValue, oldValue)
+                    adm.notifyArrayChildUpdate_(index, newValue, oldValue)
                 }
             } else if (index === values.length) {
                 // add a new item
-                adm.spliceWithArray(index, 0, [newValue])
+                adm.spliceWithArray_(index, 0, [newValue])
             } else {
                 // out of bounds
                 die(17, index, values.length)
@@ -471,8 +482,8 @@ export var arrayExtensions = {
 ].forEach(funcName => {
     arrayExtensions[funcName] = function() {
         const adm: ObservableArrayAdministration = this[$mobx]
-        adm.atom.reportObserved()
-        const res = adm.dehanceValues(adm.values)
+        adm.atom_.reportObserved()
+        const res = adm.dehanceValues_(adm.values_)
         return res[funcName].apply(res, arguments)
     }
 })

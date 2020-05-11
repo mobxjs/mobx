@@ -22,19 +22,20 @@ export interface IAtom extends IObservable {
 }
 
 export class Atom implements IAtom {
-    isPendingUnobservation = false // for effective unobserving. BaseAtom has true, for extra optimization, so its onBecomeUnobserved never gets called, because it's not needed
-    isBeingObserved = false
-    observers = new Set<IDerivation>()
+    isPendingUnobservation_ = false // for effective unobserving. BaseAtom has true, for extra optimization, so its onBecomeUnobserved never gets called, because it's not needed
+    isBeingObserved_ = false
+    observers_ = new Set<IDerivation>()
 
-    diffValue = 0
-    lastAccessedBy = 0
-    lowestObserverState = IDerivationState.NOT_TRACKING
+    diffValue_ = 0
+    lastAccessedBy_ = 0
+    lowestObserverState_ = IDerivationState.NOT_TRACKING
     /**
      * Create a new atom. For debugging purposes it is recommended to give it a name.
      * The onBecomeObserved and onBecomeUnobserved callbacks can be used for resource management.
      */
-    constructor(public name = "Atom@" + getNextId()) {}
+    constructor(public name_ = "Atom@" + getNextId()) {}
 
+    // TODO: rename?
     public onBecomeObservedListeners: Set<Lambda> | undefined
     public onBecomeUnobservedListeners: Set<Lambda> | undefined
 
@@ -68,7 +69,7 @@ export class Atom implements IAtom {
     }
 
     toString() {
-        return this.name
+        return this.name_
     }
 }
 

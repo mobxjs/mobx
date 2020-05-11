@@ -58,31 +58,32 @@ export type ISetWillChange<T = any> =
           newValue: T
       }
 
+// TODO: introduce IObservableSet, and make ObservableSet constructor non public
 export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillChange>, IListenable {
     [$mobx] = ObservableSetMarker
-    private _data: Set<any> = new Set()
-    private _atom: IAtom
+    private data_: Set<any> = new Set()
+    private atom_: IAtom
     changeListeners
     interceptors
     dehancer: any
-    enhancer: (newV: any, oldV: any | undefined) => any
+    enhancer_: (newV: any, oldV: any | undefined) => any
 
     constructor(
         initialData?: IObservableSetInitialValues<T>,
         enhancer: IEnhancer<T> = deepEnhancer,
-        public name = "ObservableSet@" + getNextId()
+        public name_ = "ObservableSet@" + getNextId()
     ) {
         if (!isFunction(Set)) {
             die(22)
         }
-        this._atom = createAtom(this.name)
-        this.enhancer = (newV, oldV) => enhancer(newV, oldV, name)
+        this.atom_ = createAtom(this.name_)
+        this.enhancer_ = (newV, oldV) => enhancer(newV, oldV, name_)
         if (initialData) {
             this.replace(initialData)
         }
     }
 
-    private dehanceValue<X extends T | undefined>(value: X): X {
+    private dehanceValue_<X extends T | undefined>(value: X): X {
         if (this.dehancer !== undefined) {
             return this.dehancer(value)
         }
@@ -92,7 +93,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
     clear() {
         transaction(() => {
             untracked(() => {
-                for (const value of this._data.values()) this.delete(value)
+                for (const value of this.data_.values()) this.delete(value)
             })
         })
     }
@@ -104,12 +105,12 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
     }
 
     get size() {
-        this._atom.reportObserved()
-        return this._data.size
+        this.atom_.reportObserved()
+        return this.data_.size
     }
 
     add(value: T) {
-        checkIfStateModificationsAreAllowed(this._atom)
+        checkIfStateModificationsAreAllowed(this.atom_)
         if (hasInterceptors(this)) {
             const change = interceptChange<ISetWillChange<T>>(this, {
                 type: ADD,
@@ -122,8 +123,8 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
         }
         if (!this.has(value)) {
             transaction(() => {
-                this._data.add(this.enhancer(value, undefined))
-                this._atom.reportChanged()
+                this.data_.add(this.enhancer_(value, undefined))
+                this.atom_.reportChanged()
             })
             const notifySpy = __DEV__ && isSpyEnabled()
             const notify = hasListeners(this)
@@ -164,10 +165,10 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
                       }
                     : null
 
-            if (notifySpy && __DEV__) spyReportStart({ ...change, name: this.name })
+            if (notifySpy && __DEV__) spyReportStart({ ...change, name: this.name_ })
             transaction(() => {
-                this._atom.reportChanged()
-                this._data.delete(value)
+                this.atom_.reportChanged()
+                this.data_.delete(value)
             })
             if (notify) notifyListeners(this, change)
             if (notifySpy && __DEV__) spyReportEnd()
@@ -177,8 +178,8 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
     }
 
     has(value: any) {
-        this._atom.reportObserved()
-        return this._data.has(this.dehanceValue(value))
+        this.atom_.reportObserved()
+        return this.data_.has(this.dehanceValue_(value))
     }
 
     entries() {
@@ -201,14 +202,14 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
     }
 
     values(): IterableIterator<T> {
-        this._atom.reportObserved()
+        this.atom_.reportObserved()
         const self = this
         let nextIndex = 0
-        const observableValues = Array.from(this._data.values())
+        const observableValues = Array.from(this.data_.values())
         return makeIterable<T>({
             next() {
                 return nextIndex < observableValues.length
-                    ? { value: self.dehanceValue(observableValues[nextIndex++]), done: false }
+                    ? { value: self.dehanceValue_(observableValues[nextIndex++]), done: false }
                     : { done: true }
             }
         } as any)

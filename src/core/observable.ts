@@ -12,24 +12,24 @@ import {
 } from "../internal"
 
 export interface IDepTreeNode {
-    name: string
-    observing?: IObservable[]
+    name_: string
+    observing_?: IObservable[]
 }
 
 export interface IObservable extends IDepTreeNode {
-    diffValue: number
+    diffValue_: number
     /**
      * Id of the derivation *run* that last accessed this observable.
      * If this id equals the *run* id of the current derivation,
      * the dependency is already established
      */
-    lastAccessedBy: number
-    isBeingObserved: boolean
+    lastAccessedBy_: number
+    isBeingObserved_: boolean
 
-    lowestObserverState: IDerivationState // Used to avoid redundant propagations
-    isPendingUnobservation: boolean // Used to push itself to global.pendingUnobservations at most once per batch.
+    lowestObserverState_: IDerivationState // Used to avoid redundant propagations
+    isPendingUnobservation_: boolean // Used to push itself to global.pendingUnobservations at most once per batch.
 
-    observers: Set<IDerivation>
+    observers_: Set<IDerivation>
 
     onBecomeUnobserved(): void
     onBecomeObserved(): void
@@ -39,11 +39,11 @@ export interface IObservable extends IDepTreeNode {
 }
 
 export function hasObservers(observable: IObservable): boolean {
-    return observable.observers && observable.observers.size > 0
+    return observable.observers_ && observable.observers_.size > 0
 }
 
 export function getObservers(observable: IObservable): Set<IDerivation> {
-    return observable.observers
+    return observable.observers_
 }
 
 // function invariantObservers(observable: IObservable) {
@@ -68,9 +68,9 @@ export function addObserver(observable: IObservable, node: IDerivation) {
     // invariant(observable._observers.indexOf(node) === -1, "INTERNAL ERROR add already added node");
     // invariantObservers(observable);
 
-    observable.observers.add(node)
-    if (observable.lowestObserverState > node.dependenciesState)
-        observable.lowestObserverState = node.dependenciesState
+    observable.observers_.add(node)
+    if (observable.lowestObserverState_ > node.dependenciesState_)
+        observable.lowestObserverState_ = node.dependenciesState_
 
     // invariantObservers(observable);
     // invariant(observable._observers.indexOf(node) !== -1, "INTERNAL ERROR didn't add node");
@@ -80,8 +80,8 @@ export function removeObserver(observable: IObservable, node: IDerivation) {
     // invariant(globalState.inBatch > 0, "INTERNAL ERROR, remove should be called only inside batch");
     // invariant(observable._observers.indexOf(node) !== -1, "INTERNAL ERROR remove already removed node");
     // invariantObservers(observable);
-    observable.observers.delete(node)
-    if (observable.observers.size === 0) {
+    observable.observers_.delete(node)
+    if (observable.observers_.size === 0) {
         // deleting last observer
         queueForUnobservation(observable)
     }
@@ -90,9 +90,9 @@ export function removeObserver(observable: IObservable, node: IDerivation) {
 }
 
 export function queueForUnobservation(observable: IObservable) {
-    if (observable.isPendingUnobservation === false) {
+    if (observable.isPendingUnobservation_ === false) {
         // invariant(observable._observers.length === 0, "INTERNAL ERROR, should only queue for unobservation unobserved observables");
-        observable.isPendingUnobservation = true
+        observable.isPendingUnobservation_ = true
         globalState.pendingUnobservations.push(observable)
     }
 }
@@ -113,17 +113,17 @@ export function endBatch() {
         const list = globalState.pendingUnobservations
         for (let i = 0; i < list.length; i++) {
             const observable = list[i]
-            observable.isPendingUnobservation = false
-            if (observable.observers.size === 0) {
-                if (observable.isBeingObserved) {
+            observable.isPendingUnobservation_ = false
+            if (observable.observers_.size === 0) {
+                if (observable.isBeingObserved_) {
                     // if this observable had reactive observers, trigger the hooks
-                    observable.isBeingObserved = false
+                    observable.isBeingObserved_ = false
                     observable.onBecomeUnobserved()
                 }
                 if (observable instanceof ComputedValue) {
                     // computed values are automatically teared down when the last observer leaves
                     // this process happens recursively, this computed might be the last observabe of another, etc..
-                    observable.suspend()
+                    observable.suspend_()
                 }
             }
         }
@@ -141,17 +141,17 @@ export function reportObserved(observable: IObservable): boolean {
          * Check if last time this observable was accessed the same runId is used
          * if this is the case, the relation is already known
          */
-        if (derivation.runId !== observable.lastAccessedBy) {
-            observable.lastAccessedBy = derivation.runId
+        if (derivation.runId_ !== observable.lastAccessedBy_) {
+            observable.lastAccessedBy_ = derivation.runId_
             // Tried storing newObserving, or observing, or both as Set, but performance didn't come close...
-            derivation.newObserving![derivation.unboundDepsCount++] = observable
-            if (!observable.isBeingObserved) {
-                observable.isBeingObserved = true
+            derivation.newObserving_![derivation.unboundDepsCount_++] = observable
+            if (!observable.isBeingObserved_) {
+                observable.isBeingObserved_ = true
                 observable.onBecomeObserved()
             }
         }
         return true
-    } else if (observable.observers.size === 0 && globalState.inBatch > 0) {
+    } else if (observable.observers_.size === 0 && globalState.inBatch > 0) {
         queueForUnobservation(observable)
     }
 
@@ -183,18 +183,18 @@ export function reportObserved(observable: IObservable): boolean {
 // Called by Atom when its value changes
 export function propagateChanged(observable: IObservable) {
     // invariantLOS(observable, "changed start");
-    if (observable.lowestObserverState === IDerivationState.STALE) return
-    observable.lowestObserverState = IDerivationState.STALE
+    if (observable.lowestObserverState_ === IDerivationState.STALE) return
+    observable.lowestObserverState_ = IDerivationState.STALE
 
     // Ideally we use for..of here, but the downcompiled version is really slow...
-    observable.observers.forEach(d => {
-        if (d.dependenciesState === IDerivationState.UP_TO_DATE) {
-            if (__DEV__ && d.isTracing !== TraceMode.NONE) {
+    observable.observers_.forEach(d => {
+        if (d.dependenciesState_ === IDerivationState.UP_TO_DATE) {
+            if (__DEV__ && d.isTracing_ !== TraceMode.NONE) {
                 logTraceInfo(d, observable)
             }
-            d.onBecomeStale()
+            d.onBecomeStale_()
         }
-        d.dependenciesState = IDerivationState.STALE
+        d.dependenciesState_ = IDerivationState.STALE
     })
     // invariantLOS(observable, "changed end");
 }
@@ -202,16 +202,16 @@ export function propagateChanged(observable: IObservable) {
 // Called by ComputedValue when it recalculate and its value changed
 export function propagateChangeConfirmed(observable: IObservable) {
     // invariantLOS(observable, "confirmed start");
-    if (observable.lowestObserverState === IDerivationState.STALE) return
-    observable.lowestObserverState = IDerivationState.STALE
+    if (observable.lowestObserverState_ === IDerivationState.STALE) return
+    observable.lowestObserverState_ = IDerivationState.STALE
 
-    observable.observers.forEach(d => {
-        if (d.dependenciesState === IDerivationState.POSSIBLY_STALE)
-            d.dependenciesState = IDerivationState.STALE
+    observable.observers_.forEach(d => {
+        if (d.dependenciesState_ === IDerivationState.POSSIBLY_STALE)
+            d.dependenciesState_ = IDerivationState.STALE
         else if (
-            d.dependenciesState === IDerivationState.UP_TO_DATE // this happens during computing of `d`, just keep lowestObserverState up to date.
+            d.dependenciesState_ === IDerivationState.UP_TO_DATE // this happens during computing of `d`, just keep lowestObserverState up to date.
         )
-            observable.lowestObserverState = IDerivationState.UP_TO_DATE
+            observable.lowestObserverState_ = IDerivationState.UP_TO_DATE
     })
     // invariantLOS(observable, "confirmed end");
 }
@@ -219,16 +219,16 @@ export function propagateChangeConfirmed(observable: IObservable) {
 // Used by computed when its dependency changed, but we don't wan't to immediately recompute.
 export function propagateMaybeChanged(observable: IObservable) {
     // invariantLOS(observable, "maybe start");
-    if (observable.lowestObserverState !== IDerivationState.UP_TO_DATE) return
-    observable.lowestObserverState = IDerivationState.POSSIBLY_STALE
+    if (observable.lowestObserverState_ !== IDerivationState.UP_TO_DATE) return
+    observable.lowestObserverState_ = IDerivationState.POSSIBLY_STALE
 
-    observable.observers.forEach(d => {
-        if (d.dependenciesState === IDerivationState.UP_TO_DATE) {
-            d.dependenciesState = IDerivationState.POSSIBLY_STALE
-            if (__DEV__ && d.isTracing !== TraceMode.NONE) {
+    observable.observers_.forEach(d => {
+        if (d.dependenciesState_ === IDerivationState.UP_TO_DATE) {
+            d.dependenciesState_ = IDerivationState.POSSIBLY_STALE
+            if (__DEV__ && d.isTracing_ !== TraceMode.NONE) {
                 logTraceInfo(d, observable)
             }
-            d.onBecomeStale()
+            d.onBecomeStale_()
         }
     })
     // invariantLOS(observable, "maybe end");
@@ -236,9 +236,9 @@ export function propagateMaybeChanged(observable: IObservable) {
 
 function logTraceInfo(derivation: IDerivation, observable: IObservable) {
     console.log(
-        `[mobx.trace] '${derivation.name}' is invalidated due to a change in: '${observable.name}'`
+        `[mobx.trace] '${derivation.name_}' is invalidated due to a change in: '${observable.name_}'`
     )
-    if (derivation.isTracing === TraceMode.BREAK) {
+    if (derivation.isTracing_ === TraceMode.BREAK) {
         const lines = []
         printDepTree(getDependencyTree(derivation), lines, 1)
 
@@ -246,13 +246,13 @@ function logTraceInfo(derivation: IDerivation, observable: IObservable) {
         new Function(
 `debugger;
 /*
-Tracing '${derivation.name}'
+Tracing '${derivation.name_}'
 
-You are entering this break point because derivation '${derivation.name}' is being traced and '${observable.name}' is now forcing it to update.
+You are entering this break point because derivation '${derivation.name_}' is being traced and '${observable.name_}' is now forcing it to update.
 Just follow the stacktrace you should now see in the devtools to see precisely what piece of your code is causing this update
 The stackframe you are looking for is at least ~6-8 stack-frames up.
 
-${derivation instanceof ComputedValue ? derivation.derivation.toString().replace(/[*]\//g, "/") : ""}
+${derivation instanceof ComputedValue ? derivation.derivation_.toString().replace(/[*]\//g, "/") : ""}
 
 The dependencies for this derivation are:
 

@@ -107,7 +107,7 @@ test("autorun should not result in loop", function(done) {
         expect(autoRunsCalled).toBe(1)
         done()
 
-        expect(d[$mobx].name).toBe("named async")
+        expect(d[$mobx].name_).toBe("named async")
         d()
     }, 100)
 })

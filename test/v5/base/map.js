@@ -235,30 +235,30 @@ test("cleanup", function() {
         aValue = x.get("a")
     })
 
-    let observable = x._data.get("a")
+    let observable = x.data_.get("a")
 
     expect(aValue).toBe(1)
-    expect(observable.observers.size).toBe(1)
-    expect(x._hasMap.get("a").observers.size).toBe(1)
+    expect(observable.observers_.size).toBe(1)
+    expect(x.hasMap_.get("a").observers_.size).toBe(1)
 
     expect(x.delete("a")).toBe(true)
     expect(x.delete("not-existing")).toBe(false)
 
     expect(aValue).toBe(undefined)
-    expect(observable.observers.size).toBe(0)
-    expect(x._hasMap.get("a").observers.size).toBe(1)
+    expect(observable.observers_.size).toBe(0)
+    expect(x.hasMap_.get("a").observers_.size).toBe(1)
 
     x.set("a", 2)
-    observable = x._data.get("a")
+    observable = x.data_.get("a")
 
     expect(aValue).toBe(2)
-    expect(observable.observers.size).toBe(1)
-    expect(x._hasMap.get("a").observers.size).toBe(1)
+    expect(observable.observers_.size).toBe(1)
+    expect(x.hasMap_.get("a").observers_.size).toBe(1)
 
     disposer()
     expect(aValue).toBe(2)
-    expect(observable.observers.size).toBe(0)
-    expect(x._hasMap.has("a")).toBe(false)
+    expect(observable.observers_.size).toBe(0)
+    expect(x.hasMap_.has("a")).toBe(false)
 })
 
 test("getAtom encapsulation leak test", function() {
@@ -272,14 +272,14 @@ test("getAtom encapsulation leak test", function() {
 
     disposer()
 
-    expect(x._hasMap.get("a")).toBe(undefined)
+    expect(x.hasMap_.get("a")).toBe(undefined)
 
     disposer = autorun(function() {
         x.has("a")
         atom && atom.reportObserved()
     })
 
-    expect(x._hasMap.get("a")).not.toBe(atom)
+    expect(x.hasMap_.get("a")).not.toBe(atom)
 })
 
 test("strict", function() {
@@ -959,7 +959,7 @@ test("#2274", () => {
 
     myMap.replace(newMap)
 
-    expect(Array.from(myMap._data.keys())).toEqual([4, 5, 6])
+    expect(Array.from(myMap.data_.keys())).toEqual([4, 5, 6])
     expect(myMap.has(2)).toBe(false)
 })
 

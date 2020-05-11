@@ -13,10 +13,10 @@ export function trace(...args: any[]): void {
             `'trace(break?)' can only be used inside a tracked computed value or a Reaction. Consider passing in the computed value or reaction explicitly`
         )
     }
-    if (derivation.isTracing === TraceMode.NONE) {
-        console.log(`[mobx.trace] '${derivation.name}' tracing enabled`)
+    if (derivation.isTracing_ === TraceMode.NONE) {
+        console.log(`[mobx.trace] '${derivation.name_}' tracing enabled`)
     }
-    derivation.isTracing = enterBreakPoint ? TraceMode.BREAK : TraceMode.LOG
+    derivation.isTracing_ = enterBreakPoint ? TraceMode.BREAK : TraceMode.LOG
 }
 
 function getAtomFromArgs(args): any {

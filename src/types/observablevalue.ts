@@ -47,24 +47,24 @@ const CREATE = "create"
 
 export class ObservableValue<T> extends Atom
     implements IObservableValue<T>, IInterceptable<IValueWillChange<T>>, IListenable {
-    hasUnreportedChange = false
+    hasUnreportedChange_ = false
     interceptors
     changeListeners
-    value
+    value_
     dehancer: any
 
     constructor(
         value: T,
         public enhancer: IEnhancer<T>,
-        public name = "ObservableValue@" + getNextId(),
+        public name_ = "ObservableValue@" + getNextId(),
         notifySpy = true,
         private equals: IEqualsComparer<any> = comparer.default
     ) {
-        super(name)
-        this.value = enhancer(value, undefined, name)
+        super(name_)
+        this.value_ = enhancer(value, undefined, name_)
         if (__DEV__ && notifySpy && isSpyEnabled()) {
             // only notify spy if this is a stand-alone observable
-            spyReport({ type: CREATE, name: this.name, newValue: "" + this.value })
+            spyReport({ type: CREATE, name: this.name_, newValue: "" + this.value_ })
         }
     }
 
@@ -74,24 +74,24 @@ export class ObservableValue<T> extends Atom
     }
 
     public set(newValue: T) {
-        const oldValue = this.value
-        newValue = this.prepareNewValue(newValue) as any
+        const oldValue = this.value_
+        newValue = this.prepareNewValue_(newValue) as any
         if (newValue !== globalState.UNCHANGED) {
             const notifySpy = isSpyEnabled()
             if (__DEV__ && notifySpy) {
                 spyReportStart({
                     type: UPDATE,
-                    name: this.name,
+                    name: this.name_,
                     newValue,
                     oldValue
                 })
             }
-            this.setNewValue(newValue)
+            this.setNewValue_(newValue)
             if (__DEV__ && notifySpy) spyReportEnd()
         }
     }
 
-    private prepareNewValue(newValue): T | IUNCHANGED {
+    private prepareNewValue_(newValue): T | IUNCHANGED {
         checkIfStateModificationsAreAllowed(this)
         if (hasInterceptors(this)) {
             const change = interceptChange<IValueWillChange<T>>(this, {
@@ -103,13 +103,13 @@ export class ObservableValue<T> extends Atom
             newValue = change.newValue
         }
         // apply modifier
-        newValue = this.enhancer(newValue, this.value, this.name)
-        return this.equals(this.value, newValue) ? globalState.UNCHANGED : newValue
+        newValue = this.enhancer(newValue, this.value_, this.name_)
+        return this.equals(this.value_, newValue) ? globalState.UNCHANGED : newValue
     }
 
-    setNewValue(newValue: T) {
-        const oldValue = this.value
-        this.value = newValue
+    setNewValue_(newValue: T) {
+        const oldValue = this.value_
+        this.value_ = newValue
         this.reportChanged()
         if (hasListeners(this)) {
             notifyListeners(this, {
@@ -123,7 +123,7 @@ export class ObservableValue<T> extends Atom
 
     public get(): T {
         this.reportObserved()
-        return this.dehanceValue(this.value)
+        return this.dehanceValue(this.value_)
     }
 
     // TODO: kill?
@@ -140,7 +140,7 @@ export class ObservableValue<T> extends Atom
             listener({
                 object: this,
                 type: UPDATE,
-                newValue: this.value,
+                newValue: this.value_,
                 oldValue: undefined
             })
         return registerListener(this, listener)
@@ -151,7 +151,7 @@ export class ObservableValue<T> extends Atom
     }
 
     toString() {
-        return `${this.name}[${this.value}]`
+        return `${this.name_}[${this.value_}]`
     }
 
     valueOf(): T {

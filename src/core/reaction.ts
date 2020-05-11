@@ -51,63 +51,63 @@ export interface IReactionDisposer {
 }
 
 export class Reaction implements IDerivation, IReactionPublic {
-    observing: IObservable[] = [] // nodes we are looking at. Our value depends on these nodes
-    newObserving: IObservable[] = []
-    dependenciesState = IDerivationState.NOT_TRACKING
-    diffValue = 0
-    runId = 0
-    unboundDepsCount = 0
-    __mapid = "#" + getNextId()
-    isDisposed = false
-    _isScheduled = false
-    _isTrackPending = false
-    _isRunning = false
-    isTracing: TraceMode = TraceMode.NONE
+    observing_: IObservable[] = [] // nodes we are looking at. Our value depends on these nodes
+    newObserving_: IObservable[] = []
+    dependenciesState_ = IDerivationState.NOT_TRACKING
+    diffValue_ = 0
+    runId_ = 0
+    unboundDepsCount_ = 0
+    mapid_ = "#" + getNextId()
+    isDisposed_ = false
+    isScheduled_ = false
+    isTrackPending_ = false
+    isRunning_ = false
+    isTracing_: TraceMode = TraceMode.NONE
 
     constructor(
-        public name: string = "Reaction@" + getNextId(),
-        private onInvalidate: () => void,
-        private errorHandler?: (error: any, derivation: IDerivation) => void,
-        public requiresObservable = false
+        public name_: string = "Reaction@" + getNextId(),
+        private onInvalidate_: () => void,
+        private errorHandler_?: (error: any, derivation: IDerivation) => void,
+        public requiresObservable_ = false
     ) {}
 
-    onBecomeStale() {
-        this.schedule()
+    onBecomeStale_() {
+        this.schedule_()
     }
 
-    schedule() {
-        if (!this._isScheduled) {
-            this._isScheduled = true
+    schedule_() {
+        if (!this.isScheduled_) {
+            this.isScheduled_ = true
             globalState.pendingReactions.push(this)
             runReactions()
         }
     }
 
     isScheduled() {
-        return this._isScheduled
+        return this.isScheduled_
     }
 
     /**
      * internal, use schedule() if you intend to kick off a reaction
      */
-    runReaction() {
-        if (!this.isDisposed) {
+    runReaction_() {
+        if (!this.isDisposed_) {
             startBatch()
-            this._isScheduled = false
+            this.isScheduled_ = false
             if (shouldCompute(this)) {
-                this._isTrackPending = true
+                this.isTrackPending_ = true
 
                 try {
-                    this.onInvalidate()
-                    if (__DEV__ && this._isTrackPending && isSpyEnabled()) {
+                    this.onInvalidate_()
+                    if (__DEV__ && this.isTrackPending_ && isSpyEnabled()) {
                         // onInvalidate didn't trigger track right away..
                         spyReport({
-                            name: this.name,
+                            name: this.name_,
                             type: "scheduled-reaction"
                         })
                     }
                 } catch (e) {
-                    this.reportExceptionInDerivation(e)
+                    this.reportExceptionInDerivation_(e)
                 }
             }
             endBatch()
@@ -115,7 +115,7 @@ export class Reaction implements IDerivation, IReactionPublic {
     }
 
     track(fn: () => void) {
-        if (this.isDisposed) {
+        if (this.isDisposed_) {
             return
             // console.warn("Reaction already disposed") // Note: Not a warning / error in mobx 4 either
         }
@@ -125,19 +125,19 @@ export class Reaction implements IDerivation, IReactionPublic {
         if (__DEV__ && notify) {
             startTime = Date.now()
             spyReportStart({
-                name: this.name,
+                name: this.name_,
                 type: "reaction"
             })
         }
-        this._isRunning = true
+        this.isRunning_ = true
         const result = trackDerivedFunction(this, fn, undefined)
-        this._isRunning = false
-        this._isTrackPending = false
-        if (this.isDisposed) {
+        this.isRunning_ = false
+        this.isTrackPending_ = false
+        if (this.isDisposed_) {
             // disposed during last run. Clean up everything that was bound after the dispose call.
             clearObserving(this)
         }
-        if (isCaughtException(result)) this.reportExceptionInDerivation(result.cause)
+        if (isCaughtException(result)) this.reportExceptionInDerivation_(result.cause)
         if (__DEV__ && notify) {
             spyReportEnd({
                 time: Date.now() - startTime
@@ -146,9 +146,9 @@ export class Reaction implements IDerivation, IReactionPublic {
         endBatch()
     }
 
-    reportExceptionInDerivation(error: any) {
-        if (this.errorHandler) {
-            this.errorHandler(error, this)
+    reportExceptionInDerivation_(error: any) {
+        if (this.errorHandler_) {
+            this.errorHandler_(error, this)
             return
         }
 
@@ -160,12 +160,12 @@ export class Reaction implements IDerivation, IReactionPublic {
         if (!globalState.suppressReactionErrors) {
             console.error(message, error)
             /** If debugging brought you here, please, read the above message :-). Tnx! */
-        } else if (__DEV__) console.warn(`[mobx] (error in reaction '${this.name}' suppressed, fix error of causing action below)`) // prettier-ignore
+        } else if (__DEV__) console.warn(`[mobx] (error in reaction '${this.name_}' suppressed, fix error of causing action below)`) // prettier-ignore
 
         if (__DEV__ && isSpyEnabled()) {
             spyReport({
                 type: "error",
-                name: this.name,
+                name: this.name_,
                 message,
                 error: "" + error
             })
@@ -175,9 +175,9 @@ export class Reaction implements IDerivation, IReactionPublic {
     }
 
     dispose() {
-        if (!this.isDisposed) {
-            this.isDisposed = true
-            if (!this._isRunning) {
+        if (!this.isDisposed_) {
+            this.isDisposed_ = true
+            if (!this.isRunning_) {
                 // if disposed while running, clean up later. Maybe not optimal, but rare case
                 startBatch()
                 clearObserving(this)
@@ -186,14 +186,14 @@ export class Reaction implements IDerivation, IReactionPublic {
         }
     }
 
-    getDisposer(): IReactionDisposer {
+    getDisposer_(): IReactionDisposer {
         const r = this.dispose.bind(this) as IReactionDisposer
         r[$mobx] = this
         return r
     }
 
     toString() {
-        return `Reaction[${this.name}]`
+        return `Reaction[${this.name_}]`
     }
 
     trace(enterBreakPoint: boolean = false) {
@@ -244,7 +244,7 @@ function runReactionsHelper() {
         }
         let remainingReactions = allReactions.splice(0)
         for (let i = 0, l = remainingReactions.length; i < l; i++)
-            remainingReactions[i].runReaction()
+            remainingReactions[i].runReaction_()
     }
     globalState.isRunningReactions = false
 }

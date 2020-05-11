@@ -48,7 +48,7 @@ export const action: IActionFactory = function action(arg1, arg2?): any {
 
     if (__DEV__) die("Invalid arguments for `action`")
 } as any
-action.annotationType = ACTION
+action.annotationType_ = ACTION
 
 action.bound = createDecorator<string>(ACTION_BOUND)
 

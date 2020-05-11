@@ -243,7 +243,7 @@ test("batch", function() {
         a.set(2)
         b.set(3)
         a.set(6)
-        expect(d.value).toBe(100) // not updated; in transaction
+        expect(d.value_).toBe(100) // not updated; in transaction
         expect(d.get()).toBe(54) // consistent due to inspection
         return 2
     })
@@ -853,7 +853,7 @@ test("when 2", function() {
     x.set(3)
     expect(called).toBe(1)
 
-    expect(d[$mobx].name).toBe("when x is 3")
+    expect(d[$mobx].name_).toBe("when x is 3")
 })
 
 function stripSpyOutput(events) {
@@ -1156,7 +1156,7 @@ test("forcefully tracked reaction should still yield valid results", function() 
     const a = new mobx.Reaction("test", function() {
         this.track(identity)
     })
-    a.runReaction()
+    a.runReaction_()
 
     expect(z).toBe(3)
     expect(runCount).toBe(1)
@@ -1205,8 +1205,8 @@ test("autoruns created in autoruns should kick off", function() {
     })
 
     // a should be observed by the inner autorun, not the outer
-    expect(a[$mobx].observing.length).toBe(0)
-    expect(d[$mobx].observing.length).toBe(1)
+    expect(a[$mobx].observing_.length).toBe(0)
+    expect(d[$mobx].observing_.length).toBe(1)
 
     x.set(4)
     expect(x2).toEqual([6, 8])

@@ -79,28 +79,28 @@ const REMOVE = "remove"
 
 export class ObservableObjectAdministration
     implements IInterceptable<IObjectWillChange>, IListenable {
-    keysAtom: IAtom
+    keysAtom_: IAtom
     changeListeners
     interceptors
-    proxy: any
-    private pendingKeys: undefined | Map<PropertyKey, ObservableValue<boolean>>
+    proxy_: any
+    private pendingKeys_: undefined | Map<PropertyKey, ObservableValue<boolean>>
 
     constructor(
-        public target: any,
-        public values = new Map<PropertyKey, ObservableValue<any> | ComputedValue<any>>(),
-        public name: string,
-        public defaultEnhancer: IEnhancer<any>
+        public target_: any,
+        public values_ = new Map<PropertyKey, ObservableValue<any> | ComputedValue<any>>(),
+        public name_: string,
+        public defaultEnhancer_: IEnhancer<any>
     ) {
-        this.keysAtom = new Atom(name + ".keys")
+        this.keysAtom_ = new Atom(name_ + ".keys")
     }
 
-    read(key: PropertyKey) {
-        return this.values.get(key)!.get()
+    read_(key: PropertyKey) {
+        return this.values_.get(key)!.get()
     }
 
-    write(key: PropertyKey, newValue) {
-        const instance = this.target
-        const observable = this.values.get(key)
+    write_(key: PropertyKey, newValue) {
+        const instance = this.target_
+        const observable = this.values_.get(key)
         if (observable instanceof ComputedValue) {
             observable.set(newValue)
             return
@@ -110,14 +110,14 @@ export class ObservableObjectAdministration
         if (hasInterceptors(this)) {
             const change = interceptChange<IObjectWillChange>(this, {
                 type: UPDATE,
-                object: this.proxy || instance,
+                object: this.proxy_ || instance,
                 name: key,
                 newValue
             })
             if (!change) return
             newValue = (change as any).newValue
         }
-        newValue = (observable as any).prepareNewValue(newValue)
+        newValue = (observable as any).prepareNewValue_(newValue)
 
         // notify spy & observers
         if (newValue !== globalState.UNCHANGED) {
@@ -127,32 +127,32 @@ export class ObservableObjectAdministration
                 notify || notifySpy
                     ? {
                           type: UPDATE,
-                          object: this.proxy || instance,
-                          oldValue: (observable as any).value,
+                          object: this.proxy_ || instance,
+                          oldValue: (observable as any).value_,
                           name: key,
                           newValue
                       }
                     : null
 
-            if (__DEV__ && notifySpy) spyReportStart({ ...change, name: this.name, key })
-            ;(observable as ObservableValue<any>).setNewValue(newValue)
+            if (__DEV__ && notifySpy) spyReportStart({ ...change, name: this.name_, key })
+            ;(observable as ObservableValue<any>).setNewValue_(newValue)
             if (notify) notifyListeners(this, change)
             if (__DEV__ && notifySpy) spyReportEnd()
         }
     }
 
-    has(key: PropertyKey) {
-        const map = this.pendingKeys || (this.pendingKeys = new Map())
+    has_(key: PropertyKey) {
+        const map = this.pendingKeys_ || (this.pendingKeys_ = new Map())
         let entry = map.get(key)
         if (entry) return entry.get()
         else {
-            const exists = !!this.values.get(key)
+            const exists = !!this.values_.get(key)
             // Possible optimization: Don't have a separate map for non existing keys,
             // but store them in the values map instead, using a special symbol to denote "not existing"
             entry = new ObservableValue(
                 exists,
                 referenceEnhancer,
-                `${this.name}.${stringifyKey(key)}?`,
+                `${this.name_}.${stringifyKey(key)}?`,
                 false
             )
             map.set(key, entry)
@@ -160,17 +160,17 @@ export class ObservableObjectAdministration
         }
     }
 
-    addObservableProp(
+    addObservableProp_(
         propName: PropertyKey,
         newValue,
-        enhancer: IEnhancer<any> = this.defaultEnhancer
+        enhancer: IEnhancer<any> = this.defaultEnhancer_
     ) {
-        const { target } = this
+        const { target_: target } = this
         assertPropertyConfigurable(target, propName)
 
         if (hasInterceptors(this)) {
             const change = interceptChange<IObjectWillChange>(this, {
-                object: this.proxy || target,
+                object: this.proxy_ || target,
                 name: propName,
                 type: ADD,
                 newValue
@@ -181,36 +181,36 @@ export class ObservableObjectAdministration
         const observable = new ObservableValue(
             newValue,
             enhancer,
-            `${this.name}.${stringifyKey(propName)}`,
+            `${this.name_}.${stringifyKey(propName)}`,
             false
         )
-        this.values.set(propName, observable)
-        newValue = (observable as any).value // observableValue might have changed it
+        this.values_.set(propName, observable)
+        newValue = (observable as any).value_ // observableValue might have changed it
 
         Object.defineProperty(target, propName, generateObservablePropConfig(propName))
-        this.notifyPropertyAddition(propName, newValue)
+        this.notifyPropertyAddition_(propName, newValue)
     }
 
-    addComputedProp(
+    addComputedProp_(
         propertyOwner: any, // where is the property declared?
         propName: PropertyKey,
         options: IComputedValueOptions<any>
     ) {
-        const { target } = this
-        options.name = options.name || `${this.name}.${stringifyKey(propName)}`
-        options.context = this.proxy || target
-        this.values.set(propName, new ComputedValue(options))
+        const { target_: target } = this
+        options.name = options.name || `${this.name_}.${stringifyKey(propName)}`
+        options.context = this.proxy_ || target
+        this.values_.set(propName, new ComputedValue(options))
         if (propertyOwner === target || isPropertyConfigurable(propertyOwner, propName))
             // TODO: extract util?
             Object.defineProperty(propertyOwner, propName, generateComputedPropConfig(propName))
     }
 
-    remove(key: PropertyKey) {
-        if (!this.values.has(key)) return
-        const { target } = this
+    remove_(key: PropertyKey) {
+        if (!this.values_.has(key)) return
+        const { target_: target } = this
         if (hasInterceptors(this)) {
             const change = interceptChange<IObjectWillChange>(this, {
-                object: this.proxy || target,
+                object: this.proxy_ || target,
                 name: key,
                 type: REMOVE
             })
@@ -220,28 +220,28 @@ export class ObservableObjectAdministration
             startBatch()
             const notify = hasListeners(this)
             const notifySpy = __DEV__ && isSpyEnabled()
-            const oldObservable = this.values.get(key)
+            const oldObservable = this.values_.get(key)
             const oldValue = oldObservable && oldObservable.get()
             oldObservable && oldObservable.set(undefined)
             // notify key and keyset listeners
-            this.keysAtom.reportChanged()
-            this.values.delete(key)
-            if (this.pendingKeys) {
-                const entry = this.pendingKeys.get(key)
+            this.keysAtom_.reportChanged()
+            this.values_.delete(key)
+            if (this.pendingKeys_) {
+                const entry = this.pendingKeys_.get(key)
                 if (entry) entry.set(false)
             }
             // delete the prop
-            delete this.target[key]
+            delete this.target_[key]
             const change =
                 notify || notifySpy
                     ? {
                           type: REMOVE,
-                          object: this.proxy || target,
+                          object: this.proxy_ || target,
                           oldValue: oldValue,
                           name: key
                       }
                     : null
-            if (__DEV__ && notifySpy) spyReportStart({ ...change, name: this.name, key })
+            if (__DEV__ && notifySpy) spyReportStart({ ...change, name: this.name_, key })
             if (notify) notifyListeners(this, change)
             if (__DEV__ && notifySpy) spyReportEnd()
         } finally {
@@ -250,7 +250,7 @@ export class ObservableObjectAdministration
     }
 
     // TODO: is this still needed?
-    illegalAccess(owner, propName) {
+    illegalAccess_(owner, propName) {
         /**
          * This happens if a property is accessed through the prototype chain, but the property was
          * declared directly as own property on the prototype.
@@ -291,34 +291,34 @@ export class ObservableObjectAdministration
         return registerInterceptor(this, handler)
     }
 
-    notifyPropertyAddition(key: PropertyKey, newValue) {
+    notifyPropertyAddition_(key: PropertyKey, newValue) {
         const notify = hasListeners(this)
         const notifySpy = __DEV__ && isSpyEnabled()
         const change =
             notify || notifySpy
                 ? {
                       type: ADD,
-                      object: this.proxy || this.target,
+                      object: this.proxy_ || this.target_,
                       name: key,
                       newValue
                   }
                 : null
 
-        if (__DEV__ && notifySpy) spyReportStart({ ...change, name: this.name, key })
+        if (__DEV__ && notifySpy) spyReportStart({ ...change, name: this.name_, key })
         if (notify) notifyListeners(this, change)
         if (__DEV__ && notifySpy) spyReportEnd()
-        if (this.pendingKeys) {
-            const entry = this.pendingKeys.get(key)
+        if (this.pendingKeys_) {
+            const entry = this.pendingKeys_.get(key)
             if (entry) entry.set(true)
         }
-        this.keysAtom.reportChanged()
+        this.keysAtom_.reportChanged()
     }
 
-    getKeys(): PropertyKey[] {
-        this.keysAtom.reportObserved()
+    getKeys_(): PropertyKey[] {
+        this.keysAtom_.reportObserved()
         // return Reflect.ownKeys(this.values) as any
         const res: PropertyKey[] = []
-        for (const [key, value] of this.values) if (value instanceof ObservableValue) res.push(key)
+        for (const [key, value] of this.values_) if (value instanceof ObservableValue) res.push(key)
         return res
     }
 }
@@ -360,10 +360,10 @@ export function generateObservablePropConfig(propName) {
             configurable: true,
             enumerable: true,
             get() {
-                return this[$mobx].read(propName)
+                return this[$mobx].read_(propName)
             },
             set(v) {
-                this[$mobx].write(propName, v)
+                this[$mobx].write_(propName, v)
             }
         })
     )
@@ -385,10 +385,10 @@ export function generateComputedPropConfig(propName) {
             configurable: true,
             enumerable: false,
             get() {
-                return getAdministrationForComputedPropOwner(this).read(propName)
+                return getAdministrationForComputedPropOwner(this).read_(propName)
             },
             set(v) {
-                getAdministrationForComputedPropOwner(this).write(propName, v)
+                getAdministrationForComputedPropOwner(this).write_(propName, v)
             }
         })
     )

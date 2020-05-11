@@ -66,7 +66,7 @@ export function makeProperty(
     annotation: Annotation | boolean,
     forceCopy: boolean // extend observable will copy even unannotated properties
 ): void {
-    const { target } = adm
+    const { target_: target } = adm
     const defaultAnnotation: Annotation | undefined = observable // TODO: grap this from adm instead!
     const origAnnotation = annotation
     if (annotation === true) {
@@ -79,35 +79,35 @@ export function makeProperty(
         }
         return
     }
-    if (!annotation || annotation === true || !annotation.annotationType) {
+    if (!annotation || annotation === true || !annotation.annotationType_) {
         return die(2, key)
     }
-    switch (annotation.annotationType) {
+    switch (annotation.annotationType_) {
         case ACTION: {
             const fn = descriptor.value
             if (!isFunction(fn)) die(3, key)
             if (owner !== target && !forceCopy) {
-                if (!isAction(owner[key])) makeAction(owner, key, annotation.arg, fn)
+                if (!isAction(owner[key])) makeAction(owner, key, annotation.arg_, fn)
             } else {
-                makeAction(target, key, annotation.arg, fn)
+                makeAction(target, key, annotation.arg_, fn)
             }
             break
         }
         case ACTION_BOUND: {
             const fn = descriptor.value
             if (!isFunction(fn)) die(3, key)
-            makeAction(target, key, annotation.arg, fn.bind(adm.proxy || target))
+            makeAction(target, key, annotation.arg_, fn.bind(adm.proxy_ || target))
             break
         }
         case COMPUTED:
         case COMPUTED_STRUCT: {
             if (!descriptor.get) die(4, key)
             // TODO: add to target or proto?
-            adm.addComputedProp(target, key, {
+            adm.addComputedProp_(target, key, {
                 get: descriptor.get,
                 set: descriptor.set,
-                compareStructural: annotation.annotationType === COMPUTED_STRUCT,
-                ...annotation.arg
+                compareStructural: annotation.annotationType_ === COMPUTED_STRUCT,
+                ...annotation.arg_
             })
             break
         }
@@ -126,15 +126,15 @@ export function makeProperty(
             // if the origAnnotation was true, preferred the adm's default enhancer over the inferred one
             const enhancer =
                 origAnnotation === true
-                    ? adm.defaultEnhancer
+                    ? adm.defaultEnhancer_
                     : getEnhancerFromAnnotation(annotation)
-            adm.addObservableProp(key, descriptor.value, enhancer)
+            adm.addObservableProp_(key, descriptor.value, enhancer)
             break
         }
         default:
             if (__DEV__)
                 die(
-                    `invalid decorator '${annotation.annotationType ??
+                    `invalid decorator '${annotation.annotationType_ ??
                         annotation}' for '${key.toString()}'`
                 )
     }

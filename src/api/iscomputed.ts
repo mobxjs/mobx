@@ -3,7 +3,7 @@ import { $mobx, getAtom, isComputedValue, isObservableObject, die, isStringish }
 export function _isComputed(value, property?: string): boolean {
     if (property !== undefined) {
         if (isObservableObject(value) === false) return false
-        if (!value[$mobx].values.has(property)) return false
+        if (!value[$mobx].values_.has(property)) return false
         const atom = getAtom(value, property)
         return isComputedValue(atom)
     }

@@ -47,7 +47,7 @@ class LegacyObservableArray<T> extends StubArray {
         super()
 
         const adm = new ObservableArrayAdministration(name, enhancer, owned, true)
-        adm.proxy = this as any
+        adm.proxy_ = this as any
         addHiddenFinalProp(this, $mobx, adm)
 
         if (initialValues && initialValues.length) {
@@ -59,7 +59,7 @@ class LegacyObservableArray<T> extends StubArray {
     }
 
     concat(...arrays: T[][]): T[] {
-        this[$mobx].atom.reportObserved()
+        ;(this[$mobx] as ObservableArrayAdministration).atom_.reportObserved()
         return Array.prototype.concat.apply(
             (this as any).slice(),
             //@ts-ignore
@@ -68,11 +68,11 @@ class LegacyObservableArray<T> extends StubArray {
     }
 
     get length(): number {
-        return this[$mobx].getArrayLength()
+        return (this[$mobx] as ObservableArrayAdministration).getArrayLength_()
     }
 
     set length(newLength: number) {
-        this[$mobx].setArrayLength(newLength)
+        ;(this[$mobx] as ObservableArrayAdministration).setArrayLength_(newLength)
     }
 
     get [Symbol.toStringTag]() {
@@ -102,6 +102,7 @@ function createArrayEntryDescriptor(index: number) {
         enumerable: false,
         configurable: true,
         get: function() {
+            // TODO: redirect to the administraiton
             return this.get(index)
         },
         set: function(value) {

@@ -39,7 +39,7 @@ function _when(predicate: () => boolean, effect: Lambda, opts: IWhenOptions): IR
     let timeoutHandle: any
     if (typeof opts.timeout === "number") {
         timeoutHandle = setTimeout(() => {
-            if (!disposer[$mobx].isDisposed) {
+            if (!disposer[$mobx].isDisposed_) {
                 disposer()
                 const error = new Error("WHEN_TIMEOUT")
                 if (opts.onError) opts.onError(error)

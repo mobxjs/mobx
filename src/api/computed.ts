@@ -51,13 +51,13 @@ export const computed: IComputedFactory = function computed(arg1, arg2, arg3) {
 
     return new ComputedValue(opts)
 } as any
-computed.annotationType = COMPUTED
+computed.annotationType_ = COMPUTED
 
 computed.struct = assign(
     function(target, property) {
         storeDecorator(target, property, COMPUTED_STRUCT)
     },
     {
-        annotationType: COMPUTED_STRUCT
+        annotationType_: COMPUTED_STRUCT
     } as const
 )

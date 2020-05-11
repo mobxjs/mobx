@@ -39,26 +39,26 @@ export enum TraceMode {
  * See https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.xvbh6qd74
  */
 export interface IDerivation extends IDepTreeNode {
-    observing: IObservable[]
-    newObserving: null | IObservable[]
-    dependenciesState: IDerivationState
+    observing_: IObservable[]
+    newObserving_: null | IObservable[]
+    dependenciesState_: IDerivationState
     /**
      * Id of the current run of a derivation. Each time the derivation is tracked
      * this number is increased by one. This number is globally unique
      */
-    runId: number
+    runId_: number
     /**
      * amount of dependencies used by the derivation in this run, which has not been bound yet.
      */
-    unboundDepsCount: number
-    __mapid: string
-    onBecomeStale(): void
-    isTracing: TraceMode
+    unboundDepsCount_: number
+    mapid_: string
+    onBecomeStale_(): void
+    isTracing_: TraceMode
 
     /**
      *  warn if the derivation has no dependencies after creation/update
      */
-    requiresObservable?: boolean
+    requiresObservable_?: boolean
 }
 
 export class CaughtException {
@@ -83,7 +83,7 @@ export function isCaughtException(e: any): e is CaughtException {
  * up until accessing x-th dependency.
  */
 export function shouldCompute(derivation: IDerivation): boolean {
-    switch (derivation.dependenciesState) {
+    switch (derivation.dependenciesState_) {
         case IDerivationState.UP_TO_DATE:
             return false
         case IDerivationState.NOT_TRACKING:
@@ -93,7 +93,7 @@ export function shouldCompute(derivation: IDerivation): boolean {
             // state propagation can occur outside of action/reactive context #2195
             const prevAllowStateReads = allowStateReadsStart(true)
             const prevUntracked = untrackedStart() // no need for those computeds to be reported, they will be picked up in trackDerivedFunction.
-            const obs = derivation.observing,
+            const obs = derivation.observing_,
                 l = obs.length
             for (let i = 0; i < l; i++) {
                 const obj = obs[i]
@@ -113,7 +113,7 @@ export function shouldCompute(derivation: IDerivation): boolean {
                     // if ComputedValue `obj` actually changed it will be computed and propagated to its observers.
                     // and `derivation` is an observer of `obj`
                     // invariantShouldCompute(derivation)
-                    if ((derivation.dependenciesState as any) === IDerivationState.STALE) {
+                    if ((derivation.dependenciesState_ as any) === IDerivationState.STALE) {
                         untrackedEnd(prevUntracked)
                         allowStateReadsEnd(prevAllowStateReads)
                         return true
@@ -136,12 +136,12 @@ export function checkIfStateModificationsAreAllowed(atom: IAtom) {
     if (!__DEV__) {
         return
     }
-    const hasObservers = atom.observers.size > 0
+    const hasObservers = atom.observers_.size > 0
     // Should never be possible to change an observed observable from inside computed, see #798
     if (globalState.computationDepth > 0 && hasObservers)
         // TODO: prefix with mobx
         console.warn(
-            `Computed values are not allowed to cause side effects by changing observables that are already being observed. Tried to modify: ${atom.name}`
+            `Computed values are not allowed to cause side effects by changing observables that are already being observed. Tried to modify: ${atom.name_}`
         )
     // Should not be possible to change observed state outside strict mode, except during initialization, see #563
     if (!globalState.allowStateChanges && (hasObservers || globalState.enforceActions === "always"))
@@ -150,13 +150,13 @@ export function checkIfStateModificationsAreAllowed(atom: IAtom) {
             (globalState.enforceActions
                 ? "Since strict-mode is enabled, changing observed observable values outside actions is not allowed. Please wrap the code in an `action` if this change is intended. Tried to modify: "
                 : "Side effects like changing state are not allowed at this point. Are you trying to modify state from, for example, the render function of a React component? Tried to modify: ") +
-                atom.name
+                atom.name_
         )
 }
 
 export function checkIfStateReadsAreAllowed(observable: IObservable) {
     if (__DEV__ && !globalState.allowStateReads && globalState.observableRequiresReaction) {
-        console.warn(`[mobx] Observable ${observable.name} being read outside a reactive context`)
+        console.warn(`[mobx] Observable ${observable.name_} being read outside a reactive context`)
     }
 }
 
@@ -170,9 +170,9 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T, con
     // pre allocate array allocation + room for variation in deps
     // array will be trimmed by bindDependencies
     changeDependenciesStateTo0(derivation)
-    derivation.newObserving = new Array(derivation.observing.length + 100)
-    derivation.unboundDepsCount = 0
-    derivation.runId = ++globalState.runId
+    derivation.newObserving_ = new Array(derivation.observing_.length + 100)
+    derivation.unboundDepsCount_ = 0
+    derivation.runId_ = ++globalState.runId
     const prevTracking = globalState.trackingDerivation
     globalState.trackingDerivation = derivation
     let result
@@ -198,11 +198,11 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T, con
 function warnAboutDerivationWithoutDependencies(derivation: IDerivation) {
     if (!__DEV__) return
 
-    if (derivation.observing.length !== 0) return
+    if (derivation.observing_.length !== 0) return
 
-    if (globalState.reactionRequiresObservable || derivation.requiresObservable) {
+    if (globalState.reactionRequiresObservable || derivation.requiresObservable_) {
         console.warn(
-            `[mobx] Derivation ${derivation.name} is created/updated without reading any observable value`
+            `[mobx] Derivation ${derivation.name_} is created/updated without reading any observable value`
         )
     }
 }
@@ -214,32 +214,32 @@ function warnAboutDerivationWithoutDependencies(derivation: IDerivation) {
  */
 function bindDependencies(derivation: IDerivation) {
     // invariant(derivation.dependenciesState !== IDerivationState.NOT_TRACKING, "INTERNAL ERROR bindDependencies expects derivation.dependenciesState !== -1");
-    const prevObserving = derivation.observing
-    const observing = (derivation.observing = derivation.newObserving!)
+    const prevObserving = derivation.observing_
+    const observing = (derivation.observing_ = derivation.newObserving_!)
     let lowestNewObservingDerivationState = IDerivationState.UP_TO_DATE
 
     // Go through all new observables and check diffValue: (this list can contain duplicates):
     //   0: first occurrence, change to 1 and keep it
     //   1: extra occurrence, drop it
     let i0 = 0,
-        l = derivation.unboundDepsCount
+        l = derivation.unboundDepsCount_
     for (let i = 0; i < l; i++) {
         const dep = observing[i]
-        if (dep.diffValue === 0) {
-            dep.diffValue = 1
+        if (dep.diffValue_ === 0) {
+            dep.diffValue_ = 1
             if (i0 !== i) observing[i0] = dep
             i0++
         }
 
         // Upcast is 'safe' here, because if dep is IObservable, `dependenciesState` will be undefined,
         // not hitting the condition
-        if (((dep as any) as IDerivation).dependenciesState > lowestNewObservingDerivationState) {
-            lowestNewObservingDerivationState = ((dep as any) as IDerivation).dependenciesState
+        if (((dep as any) as IDerivation).dependenciesState_ > lowestNewObservingDerivationState) {
+            lowestNewObservingDerivationState = ((dep as any) as IDerivation).dependenciesState_
         }
     }
     observing.length = i0
 
-    derivation.newObserving = null // newObserving shouldn't be needed outside tracking (statement moved down to work around FF bug, see #614)
+    derivation.newObserving_ = null // newObserving shouldn't be needed outside tracking (statement moved down to work around FF bug, see #614)
 
     // Go through all old observables and check diffValue: (it is unique after last bindDependencies)
     //   0: it's not in new observables, unobserve it
@@ -247,10 +247,10 @@ function bindDependencies(derivation: IDerivation) {
     l = prevObserving.length
     while (l--) {
         const dep = prevObserving[l]
-        if (dep.diffValue === 0) {
+        if (dep.diffValue_ === 0) {
             removeObserver(dep, derivation)
         }
-        dep.diffValue = 0
+        dep.diffValue_ = 0
     }
 
     // Go through all new observables and check diffValue: (now it should be unique)
@@ -258,8 +258,8 @@ function bindDependencies(derivation: IDerivation) {
     //   1: it wasn't observed, let's observe it. set back to 0
     while (i0--) {
         const dep = observing[i0]
-        if (dep.diffValue === 1) {
-            dep.diffValue = 0
+        if (dep.diffValue_ === 1) {
+            dep.diffValue_ = 0
             addObserver(dep, derivation)
         }
     }
@@ -267,19 +267,19 @@ function bindDependencies(derivation: IDerivation) {
     // Some new observed derivations may become stale during this derivation computation
     // so they have had no chance to propagate staleness (#916)
     if (lowestNewObservingDerivationState !== IDerivationState.UP_TO_DATE) {
-        derivation.dependenciesState = lowestNewObservingDerivationState
-        derivation.onBecomeStale()
+        derivation.dependenciesState_ = lowestNewObservingDerivationState
+        derivation.onBecomeStale_()
     }
 }
 
 export function clearObserving(derivation: IDerivation) {
     // invariant(globalState.inBatch > 0, "INTERNAL ERROR clearObserving should be called only inside batch");
-    const obs = derivation.observing
-    derivation.observing = []
+    const obs = derivation.observing_
+    derivation.observing_ = []
     let i = obs.length
     while (i--) removeObserver(obs[i], derivation)
 
-    derivation.dependenciesState = IDerivationState.NOT_TRACKING
+    derivation.dependenciesState_ = IDerivationState.NOT_TRACKING
 }
 
 export function untracked<T>(action: () => T): T {
@@ -316,10 +316,10 @@ export function allowStateReadsEnd(prev: boolean) {
  *
  */
 export function changeDependenciesStateTo0(derivation: IDerivation) {
-    if (derivation.dependenciesState === IDerivationState.UP_TO_DATE) return
-    derivation.dependenciesState = IDerivationState.UP_TO_DATE
+    if (derivation.dependenciesState_ === IDerivationState.UP_TO_DATE) return
+    derivation.dependenciesState_ = IDerivationState.UP_TO_DATE
 
-    const obs = derivation.observing
+    const obs = derivation.observing_
     let i = obs.length
-    while (i--) obs[i].lowestObserverState = IDerivationState.UP_TO_DATE
+    while (i--) obs[i].lowestObserverState_ = IDerivationState.UP_TO_DATE
 }

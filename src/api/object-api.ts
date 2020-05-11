@@ -21,7 +21,9 @@ export function keys<T>(set: ObservableSet<T>): ReadonlyArray<T>
 export function keys<T extends Object>(obj: T): ReadonlyArray<PropertyKey>
 export function keys(obj: any): any {
     if (isObservableObject(obj)) {
-        return ((obj as any) as IIsObservableObject)[$mobx].getKeys()
+        return (((obj as any) as IIsObservableObject)[
+            $mobx
+        ] as ObservableObjectAdministration).getKeys_()
     }
     if (isObservableMap(obj) || isObservableSet(obj)) {
         return Array.from(obj.keys())
@@ -92,12 +94,12 @@ export function set(obj: any, key: any, value?: any): void {
         return
     }
     if (isObservableObject(obj)) {
-        const adm = ((obj as any) as IIsObservableObject)[$mobx]
-        const existingObservable = adm.values.get(key)
+        const adm: ObservableObjectAdministration = ((obj as any) as IIsObservableObject)[$mobx]
+        const existingObservable = adm.values_.get(key)
         if (existingObservable) {
-            adm.write(key, value)
+            adm.write_(key, value)
         } else {
-            adm.addObservableProp(key, value, adm.defaultEnhancer)
+            adm.addObservableProp_(key, value, adm.defaultEnhancer_)
         }
     } else if (isObservableMap(obj)) {
         obj.set(key, value)
@@ -119,7 +121,7 @@ export function remove<T>(obj: IObservableArray<T>, index: number)
 export function remove<T extends Object>(obj: T, key: string)
 export function remove(obj: any, key: any): void {
     if (isObservableObject(obj)) {
-        ;((obj as any) as IIsObservableObject)[$mobx].remove(key)
+        ;((obj as any) as IIsObservableObject)[$mobx].remove_(key)
     } else if (isObservableMap(obj)) {
         obj.delete(key)
     } else if (isObservableSet(obj)) {
@@ -139,8 +141,7 @@ export function has<T extends Object>(obj: T, key: string): boolean
 export function has(obj: any, key: any): boolean {
     if (isObservableObject(obj)) {
         // return keys(obj).indexOf(key) >= 0
-        const adm = getAdministration(obj) as ObservableObjectAdministration
-        return adm.has(key)
+        return (getAdministration(obj) as ObservableObjectAdministration).has_(key)
     } else if (isObservableMap(obj)) {
         return obj.has(key)
     } else if (isObservableSet(obj)) {

@@ -44,7 +44,7 @@ export function executeAction(actionName: string, fn: Function, scope?: any, arg
     try {
         return fn.apply(scope, args)
     } catch (err) {
-        runInfo.error = err
+        runInfo.error_ = err
         throw err
     } finally {
         _endAction(runInfo)
@@ -52,21 +52,21 @@ export function executeAction(actionName: string, fn: Function, scope?: any, arg
 }
 
 export interface IActionRunInfo {
-    prevDerivation: IDerivation | null
-    prevAllowStateChanges: boolean
-    prevAllowStateReads: boolean
-    notifySpy: boolean
-    startTime: number
-    error?: any
-    parentActionId: number
-    actionId: number
+    prevDerivation_: IDerivation | null
+    prevAllowStateChanges_: boolean
+    prevAllowStateReads_: boolean
+    notifySpy_: boolean
+    startTime_: number
+    error_?: any
+    parentActionId_: number
+    actionId_: number
 }
 
 export function _startAction(actionName: string, scope: any, args?: IArguments): IActionRunInfo {
-    const notifySpy = __DEV__ && isSpyEnabled() && !!actionName
-    let startTime: number = 0
-    if (__DEV__ && notifySpy) {
-        startTime = Date.now()
+    const notifySpy_ = __DEV__ && isSpyEnabled() && !!actionName
+    let startTime_: number = 0
+    if (__DEV__ && notifySpy_) {
+        startTime_ = Date.now()
         const flattendArgs = args ? Array.from(args) : EMPTY_ARRAY
         spyReportStart({
             type: ACTION,
@@ -75,38 +75,38 @@ export function _startAction(actionName: string, scope: any, args?: IArguments):
             arguments: flattendArgs
         })
     }
-    const prevDerivation = untrackedStart()
+    const prevDerivation_ = untrackedStart()
     startBatch()
-    const prevAllowStateChanges = allowStateChangesStart(true)
-    const prevAllowStateReads = allowStateReadsStart(true)
+    const prevAllowStateChanges_ = allowStateChangesStart(true)
+    const prevAllowStateReads_ = allowStateReadsStart(true)
     const runInfo = {
-        prevDerivation,
-        prevAllowStateChanges,
-        prevAllowStateReads,
-        notifySpy,
-        startTime,
-        actionId: nextActionId++,
-        parentActionId: currentActionId
+        prevDerivation_,
+        prevAllowStateChanges_,
+        prevAllowStateReads_,
+        notifySpy_,
+        startTime_,
+        actionId_: nextActionId++,
+        parentActionId_: currentActionId
     }
-    currentActionId = runInfo.actionId
+    currentActionId = runInfo.actionId_
     return runInfo
 }
 
 export function _endAction(runInfo: IActionRunInfo) {
-    if (currentActionId !== runInfo.actionId) {
+    if (currentActionId !== runInfo.actionId_) {
         die(30)
     }
-    currentActionId = runInfo.parentActionId
+    currentActionId = runInfo.parentActionId_
 
-    if (runInfo.error !== undefined) {
+    if (runInfo.error_ !== undefined) {
         globalState.suppressReactionErrors = true
     }
-    allowStateChangesEnd(runInfo.prevAllowStateChanges)
-    allowStateReadsEnd(runInfo.prevAllowStateReads)
+    allowStateChangesEnd(runInfo.prevAllowStateChanges_)
+    allowStateReadsEnd(runInfo.prevAllowStateReads_)
     endBatch()
-    untrackedEnd(runInfo.prevDerivation)
-    if (__DEV__ && runInfo.notifySpy) {
-        spyReportEnd({ time: Date.now() - runInfo.startTime })
+    untrackedEnd(runInfo.prevDerivation_)
+    if (__DEV__ && runInfo.notifySpy_) {
+        spyReportEnd({ time: Date.now() - runInfo.startTime_ })
     }
     globalState.suppressReactionErrors = false
 }

@@ -11,7 +11,7 @@ import {
 export const mobxDecoratorsSymbol = Symbol("mobx-decoratorators")
 
 export function createDecorator<ArgType>(
-    type: Annotation["annotationType"]
+    type: Annotation["annotationType_"]
 ): Annotation & PropertyDecorator & ((arg: ArgType) => PropertyDecorator & Annotation) {
     return assign(
         function(target: any, property?: PropertyKey): any {
@@ -24,22 +24,22 @@ export function createDecorator<ArgType>(
             }
         },
         {
-            annotationType: type
+            annotationType_: type
         }
     ) as any
 }
 
 export function createDecoratorAndAnnotation(
-    type: Annotation["annotationType"],
-    arg?: any
+    type: Annotation["annotationType_"],
+    arg_?: any
 ): PropertyDecorator & Annotation {
     return assign(
         function(target, property) {
-            storeDecorator(target, property, type, arg)
+            storeDecorator(target, property, type, arg_)
         },
         {
-            annotationType: type,
-            arg
+            annotationType_: type,
+            arg_
         }
     )
 }
@@ -47,8 +47,8 @@ export function createDecoratorAndAnnotation(
 export function storeDecorator(
     target: any,
     property: PropertyKey,
-    type: Annotation["annotationType"],
-    arg?: any
+    type: Annotation["annotationType_"],
+    arg_?: any
 ) {
     const desc = getDescriptor(target, mobxDecoratorsSymbol)
     let map: any
@@ -58,7 +58,7 @@ export function storeDecorator(
         map = {}
         addHiddenProp(target, mobxDecoratorsSymbol, map)
     }
-    map[property] = { annotationType: type, arg } as Annotation
+    map[property] = { annotationType_: type, arg_ } as Annotation
 }
 
 export function applyDecorators(target: Object): boolean {

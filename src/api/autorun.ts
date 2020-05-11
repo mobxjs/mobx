@@ -67,7 +67,7 @@ export function autorun(
                     isScheduled = true
                     scheduler(() => {
                         isScheduled = false
-                        if (!reaction.isDisposed) reaction.track(reactionRunner)
+                        if (!reaction.isDisposed_) reaction.track(reactionRunner)
                     })
                 }
             },
@@ -80,8 +80,8 @@ export function autorun(
         view(reaction)
     }
 
-    reaction.schedule()
-    return reaction.getDisposer()
+    reaction.schedule_()
+    return reaction.getDisposer_()
 }
 
 export type IReactionOptions = IAutorunOptions & {
@@ -141,7 +141,7 @@ export function reaction<T>(
 
     function reactionRunner() {
         isScheduled = false
-        if (r.isDisposed) return
+        if (r.isDisposed_) return
         let changed = false
         r.track(() => {
             const nextValue = expression(r)
@@ -153,8 +153,8 @@ export function reaction<T>(
         if (firstTime) firstTime = false
     }
 
-    r.schedule()
-    return r.getDisposer()
+    r.schedule_()
+    return r.getDisposer_()
 }
 
 function wrapErrorHandler(errorHandler, baseFn) {

@@ -87,7 +87,7 @@ const annotationToEnhancer = {
 }
 
 export function getEnhancerFromAnnotation(annotation?: Annotation): IEnhancer<any> {
-    return !annotation ? deepEnhancer : annotationToEnhancer[annotation.annotationType] ?? die(12)
+    return !annotation ? deepEnhancer : annotationToEnhancer[annotation.annotationType_] ?? die(12)
 }
 
 /**
@@ -119,7 +119,7 @@ function createObservable(v: any, arg2?: any, arg3?: any) {
     if (res !== v) return res
     return observable.box(v)
 }
-createObservable.annotationType = OBSERVABLE
+createObservable.annotationType_ = OBSERVABLE
 
 export interface IObservableFactory extends Annotation, PropertyDecorator {
     <T = any>(value: T[], options?: CreateObservableOptions): IObservableArray<T>

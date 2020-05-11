@@ -6,9 +6,9 @@ import {
     isObservableMap,
     isObservableObject,
     isReaction,
-    die
+    die,
+    isStringish
 } from "../internal"
-import { isStringish } from "../utils/utils"
 
 function _isObservable(value, property?: string): boolean {
     if (!value) return false
@@ -18,7 +18,7 @@ function _isObservable(value, property?: string): boolean {
                 "isObservable(object, propertyName) is not supported for arrays and maps. Use map.has or array.length instead."
             )
         if (isObservableObject(value)) {
-            return value[$mobx].values.has(property)
+            return value[$mobx].values_.has(property)
         }
         return false
     }

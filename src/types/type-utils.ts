@@ -16,22 +16,21 @@ export function getAtom(thing: any, property?: string): IDepTreeNode {
     if (typeof thing === "object" && thing !== null) {
         if (isObservableArray(thing)) {
             if (property !== undefined) die(23)
-            return (thing as any)[$mobx].atom
+            return (thing as any)[$mobx].atom_
         }
         if (isObservableSet(thing)) {
             return (thing as any)[$mobx]
         }
         if (isObservableMap(thing)) {
-            const anyThing = thing as any
-            if (property === undefined) return anyThing._keysAtom
-            const observable = anyThing._data.get(property) || anyThing._hasMap.get(property)
+            if (property === undefined) return thing.keysAtom_
+            const observable = thing.data_.get(property) || thing.hasMap_.get(property)
             if (!observable) die(25, property, getDebugName(thing))
             return observable
         }
         if (property && !thing[$mobx]) thing[property] // See #1072
         if (isObservableObject(thing)) {
             if (!property) return die(26)
-            const observable = (thing as any)[$mobx].values.get(property)
+            const observable = (thing as any)[$mobx].values_.get(property)
             if (!observable) die(27, property, getDebugName(thing))
             return observable
         }
@@ -62,5 +61,5 @@ export function getDebugName(thing: any, property?: string): string {
     else if (isObservableObject(thing) || isObservableMap(thing) || isObservableSet(thing))
         named = getAdministration(thing)
     else named = getAtom(thing) // valid for arrays as well
-    return named.name
+    return named.name_
 }

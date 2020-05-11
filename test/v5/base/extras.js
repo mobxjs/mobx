@@ -101,23 +101,23 @@ test("names", function() {
     m.extendObservable(rstruct.y, { a: { b: 2 } })
     rstruct.ar.push({ b: 2 })
     rstruct.ar.push([])
-    expect(rstruct[$mobx].values.get("x").name).toBe("ObservableObject@1.x")
-    expect(rstruct[$mobx].values.get("y").name).toBe("ObservableObject@1.y")
-    expect(rstruct.y[$mobx].values.get("z").name).toBe("ObservableObject@1.y.z")
-    expect(rstruct[$mobx].values.get("ar").name).toBe("ObservableObject@1.ar")
-    expect(rstruct.ar[$mobx].atom.name).toBe("ObservableObject@1.ar")
-    expect(rstruct.ar[1][$mobx].values.get("w").name).toBe("ObservableObject@1.ar[..].w")
-    expect(rstruct.y.a[$mobx].values.get("b").name).toBe("ObservableObject@1.y.a.b")
-    expect(rstruct.ar[2][$mobx].values.get("b").name).toBe("ObservableObject@1.ar[..].b")
+    expect(rstruct[$mobx].values_.get("x").name_).toBe("ObservableObject@1.x")
+    expect(rstruct[$mobx].values_.get("y").name_).toBe("ObservableObject@1.y")
+    expect(rstruct.y[$mobx].values_.get("z").name_).toBe("ObservableObject@1.y.z")
+    expect(rstruct[$mobx].values_.get("ar").name_).toBe("ObservableObject@1.ar")
+    expect(rstruct.ar[$mobx].atom_.name_).toBe("ObservableObject@1.ar")
+    expect(rstruct.ar[1][$mobx].values_.get("w").name_).toBe("ObservableObject@1.ar[..].w")
+    expect(rstruct.y.a[$mobx].values_.get("b").name_).toBe("ObservableObject@1.y.a.b")
+    expect(rstruct.ar[2][$mobx].values_.get("b").name_).toBe("ObservableObject@1.ar[..].b")
 
     const d = m.autorun(function() {})
-    expect(d[$mobx].name).toBeTruthy()
+    expect(d[$mobx].name_).toBeTruthy()
 
-    expect(m.autorun(function namedFunction() {})[$mobx].name).toBe("namedFunction")
+    expect(m.autorun(function namedFunction() {})[$mobx].name_).toBe("namedFunction")
 
     expect(m.computed(function() {})).toBeTruthy()
 
-    expect(m.computed(function namedFunction() {}).name).toBe("namedFunction")
+    expect(m.computed(function namedFunction() {}).name_).toBe("namedFunction")
 
     function Task() {
         m.extendObservable(this, {
@@ -126,8 +126,8 @@ test("names", function() {
     }
 
     const task = new Task()
-    expect(task[$mobx].name).toBe("Task@8")
-    expect(task[$mobx].values.get("title").name).toBe("Task@8.title")
+    expect(task[$mobx].name_).toBe("Task@8")
+    expect(task[$mobx].values_.get("title").name_).toBe("Task@8.title")
 })
 
 function stripTrackerOutput(output) {
@@ -180,12 +180,12 @@ test("get atom", function() {
     const g = new Clazz()
 
     function atom(thing, prop) {
-        return mobx.getAtom(thing, prop).constructor.name
+        return mobx.getAtom(thing, prop).constructor.name_
     }
 
-    const ovClassName = mobx.observable.box(3).constructor.name
-    const atomClassName = mobx.createAtom("test").constructor.name
-    // const reactionClassName = mobx.Reaction.name
+    const ovClassName = mobx.observable.box(3).constructor.name_
+    const atomClassName = mobx.createAtom("test").constructor.name_
+    // const reactionClassName = mobx.Reaction.name_
 
     expect(atom(a)).toBe(ovClassName)
 
@@ -205,8 +205,8 @@ test("get atom", function() {
     expect(atom(d)).toBe(atomClassName)
     expect(() => atom(d, 0)).toThrowError(/It is not possible to get index atoms from arrays/)
 
-    expect(atom(e)).toBe(mobx.computed(() => {}).constructor.name)
-    expect(atom(f)).toBe(mobx.Reaction.name)
+    expect(atom(e)).toBe(mobx.computed(() => {}).constructor.name_)
+    expect(atom(f)).toBe(mobx.Reaction.name_)
 
     expect(() => atom(g)).toThrowError(/please specify a property/)
     expect(atom(g, "a")).toBe(ovClassName)
@@ -283,21 +283,21 @@ test("get administration", function() {
     mobx.extendObservable(h, { a: 3 })
 
     function adm(thing, prop) {
-        return mobx._getAdministration(thing, prop).constructor.name
+        return mobx._getAdministration(thing, prop).constructor.name_
     }
 
-    const ovClassName = mobx.observable.box(3).constructor.name
-    const mapClassName = mobx.observable.map().constructor.name
+    const ovClassName = mobx.observable.box(3).constructor.name_
+    const mapClassName = mobx.observable.map().constructor.name_
 
     expect(adm(a)).toBe(ovClassName)
 
     expect(adm(b, "a")).toBe(ovClassName)
-    expect(adm(b)).toBe(b[$mobx].constructor.name)
+    expect(adm(b)).toBe(b[$mobx].constructor.name_)
     expect(() => adm(b, "b")).toThrowError(
         /no observable property 'b' found on the observable object 'ObservableObject@2'/
     )
     expect(adm(h, "a")).toBe(ovClassName)
-    expect(adm(h)).toBe(h[$mobx].constructor.name)
+    expect(adm(h)).toBe(h[$mobx].constructor.name_)
     expect(() => adm(h, "b")).toThrowError(
         /no observable property 'b' found on the observable object 'ObservableObject@10'/
     )
@@ -309,13 +309,13 @@ test("get administration", function() {
         /the entry 'c' does not exist in the observable map 'ObservableMap@3'/
     )
 
-    expect(adm(d)).toBe(d[$mobx].constructor.name)
+    expect(adm(d)).toBe(d[$mobx].constructor.name_)
     expect(() => adm(d, 0)).toThrowError(/It is not possible to get index atoms from arrays/)
 
-    expect(adm(e)).toBe(mobx.computed(() => {}).constructor.name)
-    expect(adm(f)).toBe(mobx.Reaction.name)
+    expect(adm(e)).toBe(mobx.computed(() => {}).constructor.name_)
+    expect(adm(f)).toBe(mobx.Reaction.name_)
 
-    expect(adm(g)).toBe(h[$mobx].constructor.name)
+    expect(adm(g)).toBe(h[$mobx].constructor.name_)
     expect(adm(g, "a")).toBe(ovClassName)
 })
 
