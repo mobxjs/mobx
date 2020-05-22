@@ -8,24 +8,24 @@ import {
     removeObserver
 } from "../internal"
 
-export enum IDerivationState {
+export enum IDerivationState_ {
     // before being run or (outside batch and not being observed)
     // at this point derivation is not holding any data about dependency tree
-    NOT_TRACKING = -1,
+    NOT_TRACKING_ = -1,
     // no shallow dependency changed since last computation
     // won't recalculate derivation
     // this is what makes mobx fast
-    UP_TO_DATE = 0,
+    UP_TO_DATE_ = 0,
     // some deep dependency changed, but don't know if shallow dependency changed
     // will require to check first if UP_TO_DATE or POSSIBLY_STALE
     // currently only ComputedValue will propagate POSSIBLY_STALE
     //
     // having this state is second big optimization:
     // don't have to recompute on every dependency change, but only when it's needed
-    POSSIBLY_STALE = 1,
+    POSSIBLY_STALE_ = 1,
     // A shallow dependency has changed since last computation and the derivation
     // will need to recompute when it's needed next.
-    STALE = 2
+    STALE_ = 2
 }
 
 export enum TraceMode {
@@ -41,7 +41,7 @@ export enum TraceMode {
 export interface IDerivation extends IDepTreeNode {
     observing_: IObservable[]
     newObserving_: null | IObservable[]
-    dependenciesState_: IDerivationState
+    dependenciesState_: IDerivationState_
     /**
      * Id of the current run of a derivation. Each time the derivation is tracked
      * this number is increased by one. This number is globally unique
@@ -84,12 +84,12 @@ export function isCaughtException(e: any): e is CaughtException {
  */
 export function shouldCompute(derivation: IDerivation): boolean {
     switch (derivation.dependenciesState_) {
-        case IDerivationState.UP_TO_DATE:
+        case IDerivationState_.UP_TO_DATE_:
             return false
-        case IDerivationState.NOT_TRACKING:
-        case IDerivationState.STALE:
+        case IDerivationState_.NOT_TRACKING_:
+        case IDerivationState_.STALE_:
             return true
-        case IDerivationState.POSSIBLY_STALE: {
+        case IDerivationState_.POSSIBLY_STALE_: {
             // state propagation can occur outside of action/reactive context #2195
             const prevAllowStateReads = allowStateReadsStart(true)
             const prevUntracked = untrackedStart() // no need for those computeds to be reported, they will be picked up in trackDerivedFunction.
@@ -113,7 +113,7 @@ export function shouldCompute(derivation: IDerivation): boolean {
                     // if ComputedValue `obj` actually changed it will be computed and propagated to its observers.
                     // and `derivation` is an observer of `obj`
                     // invariantShouldCompute(derivation)
-                    if ((derivation.dependenciesState_ as any) === IDerivationState.STALE) {
+                    if ((derivation.dependenciesState_ as any) === IDerivationState_.STALE_) {
                         untrackedEnd(prevUntracked)
                         allowStateReadsEnd(prevAllowStateReads)
                         return true
@@ -216,7 +216,7 @@ function bindDependencies(derivation: IDerivation) {
     // invariant(derivation.dependenciesState !== IDerivationState.NOT_TRACKING, "INTERNAL ERROR bindDependencies expects derivation.dependenciesState !== -1");
     const prevObserving = derivation.observing_
     const observing = (derivation.observing_ = derivation.newObserving_!)
-    let lowestNewObservingDerivationState = IDerivationState.UP_TO_DATE
+    let lowestNewObservingDerivationState = IDerivationState_.UP_TO_DATE_
 
     // Go through all new observables and check diffValue: (this list can contain duplicates):
     //   0: first occurrence, change to 1 and keep it
@@ -266,7 +266,7 @@ function bindDependencies(derivation: IDerivation) {
 
     // Some new observed derivations may become stale during this derivation computation
     // so they have had no chance to propagate staleness (#916)
-    if (lowestNewObservingDerivationState !== IDerivationState.UP_TO_DATE) {
+    if (lowestNewObservingDerivationState !== IDerivationState_.UP_TO_DATE_) {
         derivation.dependenciesState_ = lowestNewObservingDerivationState
         derivation.onBecomeStale_()
     }
@@ -279,7 +279,7 @@ export function clearObserving(derivation: IDerivation) {
     let i = obs.length
     while (i--) removeObserver(obs[i], derivation)
 
-    derivation.dependenciesState_ = IDerivationState.NOT_TRACKING
+    derivation.dependenciesState_ = IDerivationState_.NOT_TRACKING_
 }
 
 export function untracked<T>(action: () => T): T {
@@ -316,10 +316,10 @@ export function allowStateReadsEnd(prev: boolean) {
  *
  */
 export function changeDependenciesStateTo0(derivation: IDerivation) {
-    if (derivation.dependenciesState_ === IDerivationState.UP_TO_DATE) return
-    derivation.dependenciesState_ = IDerivationState.UP_TO_DATE
+    if (derivation.dependenciesState_ === IDerivationState_.UP_TO_DATE_) return
+    derivation.dependenciesState_ = IDerivationState_.UP_TO_DATE_
 
     const obs = derivation.observing_
     let i = obs.length
-    while (i--) obs[i].lowestObserverState_ = IDerivationState.UP_TO_DATE
+    while (i--) obs[i].lowestObserverState_ = IDerivationState_.UP_TO_DATE_
 }

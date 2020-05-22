@@ -16,9 +16,9 @@ module.exports = {
                         unsafe: true
                     },
                     mangle: {
-                        // properties: {
-                        // 	regex: /_$/
-                        // }
+                        properties: {
+                            regex: /_$/
+                        }
                     }
                 })
             )

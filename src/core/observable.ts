@@ -3,7 +3,7 @@ import {
     ComputedValue,
     IDependencyTree,
     IDerivation,
-    IDerivationState,
+    IDerivationState_,
     TraceMode,
     getDependencyTree,
     globalState,
@@ -26,7 +26,7 @@ export interface IObservable extends IDepTreeNode {
     lastAccessedBy_: number
     isBeingObserved_: boolean
 
-    lowestObserverState_: IDerivationState // Used to avoid redundant propagations
+    lowestObserverState_: IDerivationState_ // Used to avoid redundant propagations
     isPendingUnobservation_: boolean // Used to push itself to global.pendingUnobservations at most once per batch.
 
     observers_: Set<IDerivation>
@@ -183,18 +183,18 @@ export function reportObserved(observable: IObservable): boolean {
 // Called by Atom when its value changes
 export function propagateChanged(observable: IObservable) {
     // invariantLOS(observable, "changed start");
-    if (observable.lowestObserverState_ === IDerivationState.STALE) return
-    observable.lowestObserverState_ = IDerivationState.STALE
+    if (observable.lowestObserverState_ === IDerivationState_.STALE_) return
+    observable.lowestObserverState_ = IDerivationState_.STALE_
 
     // Ideally we use for..of here, but the downcompiled version is really slow...
     observable.observers_.forEach(d => {
-        if (d.dependenciesState_ === IDerivationState.UP_TO_DATE) {
+        if (d.dependenciesState_ === IDerivationState_.UP_TO_DATE_) {
             if (__DEV__ && d.isTracing_ !== TraceMode.NONE) {
                 logTraceInfo(d, observable)
             }
             d.onBecomeStale_()
         }
-        d.dependenciesState_ = IDerivationState.STALE
+        d.dependenciesState_ = IDerivationState_.STALE_
     })
     // invariantLOS(observable, "changed end");
 }
@@ -202,16 +202,16 @@ export function propagateChanged(observable: IObservable) {
 // Called by ComputedValue when it recalculate and its value changed
 export function propagateChangeConfirmed(observable: IObservable) {
     // invariantLOS(observable, "confirmed start");
-    if (observable.lowestObserverState_ === IDerivationState.STALE) return
-    observable.lowestObserverState_ = IDerivationState.STALE
+    if (observable.lowestObserverState_ === IDerivationState_.STALE_) return
+    observable.lowestObserverState_ = IDerivationState_.STALE_
 
     observable.observers_.forEach(d => {
-        if (d.dependenciesState_ === IDerivationState.POSSIBLY_STALE)
-            d.dependenciesState_ = IDerivationState.STALE
+        if (d.dependenciesState_ === IDerivationState_.POSSIBLY_STALE_)
+            d.dependenciesState_ = IDerivationState_.STALE_
         else if (
-            d.dependenciesState_ === IDerivationState.UP_TO_DATE // this happens during computing of `d`, just keep lowestObserverState up to date.
+            d.dependenciesState_ === IDerivationState_.UP_TO_DATE_ // this happens during computing of `d`, just keep lowestObserverState up to date.
         )
-            observable.lowestObserverState_ = IDerivationState.UP_TO_DATE
+            observable.lowestObserverState_ = IDerivationState_.UP_TO_DATE_
     })
     // invariantLOS(observable, "confirmed end");
 }
@@ -219,12 +219,12 @@ export function propagateChangeConfirmed(observable: IObservable) {
 // Used by computed when its dependency changed, but we don't wan't to immediately recompute.
 export function propagateMaybeChanged(observable: IObservable) {
     // invariantLOS(observable, "maybe start");
-    if (observable.lowestObserverState_ !== IDerivationState.UP_TO_DATE) return
-    observable.lowestObserverState_ = IDerivationState.POSSIBLY_STALE
+    if (observable.lowestObserverState_ !== IDerivationState_.UP_TO_DATE_) return
+    observable.lowestObserverState_ = IDerivationState_.POSSIBLY_STALE_
 
     observable.observers_.forEach(d => {
-        if (d.dependenciesState_ === IDerivationState.UP_TO_DATE) {
-            d.dependenciesState_ = IDerivationState.POSSIBLY_STALE
+        if (d.dependenciesState_ === IDerivationState_.UP_TO_DATE_) {
+            d.dependenciesState_ = IDerivationState_.POSSIBLY_STALE_
             if (__DEV__ && d.isTracing_ !== TraceMode.NONE) {
                 logTraceInfo(d, observable)
             }

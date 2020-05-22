@@ -1,5 +1,5 @@
 import {
-    IDerivationState,
+    IDerivationState_,
     IObservable,
     IDerivation,
     createInstanceofPredicate,
@@ -28,7 +28,7 @@ export class Atom implements IAtom {
 
     diffValue_ = 0
     lastAccessedBy_ = 0
-    lowestObserverState_ = IDerivationState.NOT_TRACKING
+    lowestObserverState_ = IDerivationState_.NOT_TRACKING_
     /**
      * Create a new atom. For debugging purposes it is recommended to give it a name.
      * The onBecomeObserved and onBecomeUnobserved callbacks can be used for resource management.

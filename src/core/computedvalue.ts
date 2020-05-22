@@ -1,7 +1,7 @@
 import {
     CaughtException,
     IDerivation,
-    IDerivationState,
+    IDerivationState_,
     IEqualsComparer,
     IObservable,
     IValueDidChange,
@@ -69,7 +69,7 @@ const COMPUTE = "compute"
  * If at any point it's outside batch and it isn't observed: reset everything and go to 1.
  */
 export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDerivation {
-    dependenciesState_ = IDerivationState.NOT_TRACKING
+    dependenciesState_ = IDerivationState_.NOT_TRACKING_
     observing_: IObservable[] = [] // nodes we are looking at. Our value depends on these nodes
     newObserving_ = null // during tracking it's an array with new observed observers
     isBeingObserved_ = false
@@ -78,7 +78,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     diffValue_ = 0
     runId_ = 0
     lastAccessedBy_ = 0
-    lowestObserverState_ = IDerivationState.UP_TO_DATE
+    lowestObserverState_ = IDerivationState_.UP_TO_DATE_
     unboundDepsCount_ = 0
     mapid_ = "#" + getNextId()
     protected value_: T | undefined | CaughtException = new CaughtException(null)
@@ -193,7 +193,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         }
         const oldValue = this.value_
         const wasSuspended =
-            /* see #1208 */ this.dependenciesState_ === IDerivationState.NOT_TRACKING
+            /* see #1208 */ this.dependenciesState_ === IDerivationState_.NOT_TRACKING_
         const newValue = this.computeValue_(true)
 
         const changed =
