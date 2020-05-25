@@ -115,8 +115,8 @@ class Todo {
 }
 ```
 
-Using `observable` is like turning a property of an object into a spreadsheet cell.
-But unlike spreadsheets, these values can be not only primitive values, but also references, objects and arrays.
+Using `observable` is like turning a property of an object into a spreadsheet cell that when modified may cause other cells to automatically recalculate, a graph to be re-rendered, or trigger other interesting reactions. 
+Unlike spreadsheet cells, `observable` values can be not only primitive values, but also references, objects and arrays.
 
 If your environment doesn't support decorator syntax, don't worry.
 You can read [here](http://mobxjs.github.io/mobx/best/decorators.html) about how to set them up.
