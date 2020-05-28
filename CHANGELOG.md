@@ -1,5 +1,6 @@
 # UNPUBLISHED (keep this here and add unpublished changes)
 
+-   Improve computed "get" error message [#1940](https://github.com/mobxjs/mobx/issues/1940) by [@ivandotv](https://github.com/ivandotv)
 -   Fixed ObservableSet.prototype.forEach not being reactive in 4.x [#2341](https://github.com/mobxjs/mobx/pull/2341) by [@melnikov-s](https://github.com/melnikov-s)
 -   Add error when computed value declared for unspecified getter [#1867](https://github.com/mobxjs/mobx/issues/1867) by [@berrunder](https://github.com/berrunder)
 
