@@ -362,7 +362,7 @@ The difference between MobX 4 and MobX 5 is that the latter uses Proxies to do p
 The most notable limitations of MobX 4:
 
 -   Observable arrays are not real arrays, so they won't pass the `Array.isArray()` check. The practical consequence is that you often need to `.slice()` the array first (to get a real array shallow copy) before passing to third party libraries.
--   Adding properties to existing observable objects after creation is not automatically picked up. Instead, either use observable maps or use the the built-in [utility functions](https://mobx.js.org/refguide/object-api.html) to read / write / iterate objects that you want to dynamically add properties to.
+-   Adding properties to existing observable objects after creation is not automatically picked up. Instead, either use observable maps or use the built-in [utility functions](https://mobx.js.org/refguide/object-api.html) to read / write / iterate objects that you want to dynamically add properties to.
 
 For more details see the [caveats page](https://mobx.js.org/best/pitfalls.html).
 
