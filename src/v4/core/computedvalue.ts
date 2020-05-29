@@ -107,9 +107,9 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
      * This is useful for working with vectors, mouse coordinates etc.
      */
     constructor(options: IComputedValueOptions<T>) {
-        invariant(options.get, `missing option for computed ${options.name}: get`)
-        this.derivation = options.get!
         this.name = options.name || "ComputedValue@" + getNextId()
+        invariant(options.get, `missing option for computed ${this.name}: get`)
+        this.derivation = options.get!
         if (options.set) this.setter = createAction(this.name + "-setter", options.set) as any
         this.equals =
             options.equals ||
@@ -162,9 +162,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         if (this.setter) {
             invariant(
                 !this.isRunningSetter,
-                `The setter of computed value '${
-                    this.name
-                }' is trying to update itself. Did you intend to update an _observable_ value, instead of the computed property?`
+                `The setter of computed value '${this.name}' is trying to update itself. Did you intend to update an _observable_ value, instead of the computed property?`
             )
             this.isRunningSetter = true
             try {
@@ -176,9 +174,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
             invariant(
                 false,
                 process.env.NODE_ENV !== "production" &&
-                    `[ComputedValue '${
-                        this.name
-                    }'] It is not possible to assign a new value to a computed value.`
+                    `[ComputedValue '${this.name}'] It is not possible to assign a new value to a computed value.`
             )
     }
 
@@ -264,16 +260,12 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         }
         if (this.isTracing !== TraceMode.NONE) {
             console.log(
-                `[mobx.trace] '${
-                    this.name
-                }' is being read outside a reactive context. Doing a full recompute`
+                `[mobx.trace] '${this.name}' is being read outside a reactive context. Doing a full recompute`
             )
         }
         if (globalState.computedRequiresReaction) {
             console.warn(
-                `[mobx] Computed value ${
-                    this.name
-                } is being read outside a reactive context. Doing a full recompute`
+                `[mobx] Computed value ${this.name} is being read outside a reactive context. Doing a full recompute`
             )
         }
     }
