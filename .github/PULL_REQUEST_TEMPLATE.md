@@ -1,17 +1,19 @@
 <!--
-    Thanks for taking the effort to create a PR!
--->
+    Thanks for taking the effort to create a PR! 🙌
 
-## Making a change to documentation only? Delete the rest of the template and go ahead.
+    🚨🚨🚨 IMPORTANT NOTICE 🚨🚨🚨
 
-<!--
-    If you are creating an extensive PR, you might want to open an issue with your idea first in case there is a chance for rejecting it.
+    Next major of MobX V6 is under development. Try to direct all changes toward `mobx6` branch instead of `master`.
+    
+    🚨🚨🚨 IMPORTANT NOTICE 🚨🚨🚨
 
-    If you intend to work on PR over several days, please, create [draft pull requests](https://github.blog/2019-02-14-introducing-draft-pull-requests/).
+    👋 Are you making a change to documentation only? Delete the rest of the template and go ahead.
 
-    Keep in mind we are maintaining MobX 4 & 5 in the repo. If applicable, change both.
+    👋 If you are creating an extensive PR, you might want to open an issue with your idea first in case there is a chance for rejecting it.
 
-    Please look at the following checklist to ensure that your PR can be accepted quickly:
+    👋 If you intend to work on PR over several days, please, create [draft pull requests](https://github.blog/2019-02-14-introducing-draft-pull-requests/) instead.
+
+    👇 Please look at the following checklist to ensure that your PR can be accepted quickly:
 -->
 
 ### Code change checklist
