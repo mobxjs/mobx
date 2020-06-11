@@ -426,9 +426,7 @@ const arrayExtensions = {
                     return adm.dehanceValue(adm.values[index])
                 }
                 console.warn(
-                    `[mobx.array] Attempt to read an array index (${index}) that is out of bounds (${
-                        adm.values.length
-                    }). Please check length first. Out of bound indices will not be tracked by MobX`
+                    `[mobx.array] Attempt to read an array index (${index}) that is out of bounds (${adm.values.length}). Please check length first. Out of bound indices will not be tracked by MobX`
                 )
             }
             return undefined
@@ -476,25 +474,52 @@ const arrayExtensions = {
      */
 ;[
     "concat",
-    "every",
-    "filter",
-    "forEach",
+    "flat",
+    "includes",
     "indexOf",
     "join",
     "lastIndexOf",
-    "map",
-    "reduce",
-    "reduceRight",
     "slice",
-    "some",
     "toString",
     "toLocaleString"
 ].forEach(funcName => {
+    // Feature detection (eg flat may not be available)
+    if (typeof Array.prototype[funcName] !== "function") {
+        return
+    }
     arrayExtensions[funcName] = function() {
         const adm: ObservableArrayAdministration = this[$mobx]
         adm.atom.reportObserved()
         const res = adm.dehanceValues(adm.values)
         return res[funcName].apply(res, arguments)
+    }
+})
+
+/**
+ * Make sure callbacks recieve correct array arg #2326
+ */
+;["every", "filter", "find", "findIndex", "flatMap", "forEach", "map", "some"].forEach(funcName => {
+    // Feature detection (eg flatMap may not be available)
+    if (typeof Array.prototype[funcName] !== "function") {
+        return
+    }
+    arrayExtensions[funcName] = function(callback, thisArg) {
+        const adm: ObservableArrayAdministration = this[$mobx]
+        adm.atom.reportObserved()
+        return adm.values[funcName]((element, index) => {
+            element = adm.dehanceValue(element)
+            return callback.call(thisArg, element, index, this)
+        }, thisArg)
+    }
+})
+;["reduce", "reduceRight"].forEach(funcName => {
+    arrayExtensions[funcName] = function(callback, initialValue) {
+        const adm: ObservableArrayAdministration = this[$mobx]
+        adm.atom.reportObserved()
+        return adm.values[funcName]((accumulator, currentValue, index) => {
+            currentValue = adm.dehanceValue(currentValue)
+            return callback(accumulator, currentValue, index, this)
+        }, initialValue)
     }
 })
 
