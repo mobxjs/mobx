@@ -312,181 +312,219 @@ export function createObservableArray<T>(
 
 // eslint-disable-next-line
 export var arrayExtensions = {
-        clear(): any[] {
-            return this.splice(0)
-        },
+    clear(): any[] {
+        return this.splice(0)
+    },
 
-        replace(newItems: any[]) {
-            const adm: ObservableArrayAdministration = this[$mobx]
-            return adm.spliceWithArray_(0, adm.values_.length, newItems)
-        },
+    replace(newItems: any[]) {
+        const adm: ObservableArrayAdministration = this[$mobx]
+        return adm.spliceWithArray_(0, adm.values_.length, newItems)
+    },
 
-        // Used by JSON.stringify
-        toJSON(): any[] {
-            return this.slice()
-        },
+    // Used by JSON.stringify
+    toJSON(): any[] {
+        return this.slice()
+    },
 
-        /*
-         * functions that do alter the internal structure of the array, (based on lib.es6.d.ts)
-         * since these functions alter the inner structure of the array, the have side effects.
-         * Because the have side effects, they should not be used in computed function,
-         * and for that reason the do not call dependencyState.notifyObserved
-         */
-        splice(index: number, deleteCount?: number, ...newItems: any[]): any[] {
-            const adm: ObservableArrayAdministration = this[$mobx]
-            switch (arguments.length) {
-                case 0:
-                    return []
-                case 1:
-                    return adm.spliceWithArray_(index)
-                case 2:
-                    return adm.spliceWithArray_(index, deleteCount)
-            }
-            return adm.spliceWithArray_(index, deleteCount, newItems)
-        },
+    /*
+     * functions that do alter the internal structure of the array, (based on lib.es6.d.ts)
+     * since these functions alter the inner structure of the array, the have side effects.
+     * Because the have side effects, they should not be used in computed function,
+     * and for that reason the do not call dependencyState.notifyObserved
+     */
+    splice(index: number, deleteCount?: number, ...newItems: any[]): any[] {
+        const adm: ObservableArrayAdministration = this[$mobx]
+        switch (arguments.length) {
+            case 0:
+                return []
+            case 1:
+                return adm.spliceWithArray_(index)
+            case 2:
+                return adm.spliceWithArray_(index, deleteCount)
+        }
+        return adm.spliceWithArray_(index, deleteCount, newItems)
+    },
 
-        spliceWithArray(index: number, deleteCount?: number, newItems?: any[]): any[] {
-            return (this[$mobx] as ObservableArrayAdministration).spliceWithArray_(
-                index,
-                deleteCount,
-                newItems
+    spliceWithArray(index: number, deleteCount?: number, newItems?: any[]): any[] {
+        return (this[$mobx] as ObservableArrayAdministration).spliceWithArray_(
+            index,
+            deleteCount,
+            newItems
+        )
+    },
+
+    push(...items: any[]): number {
+        const adm: ObservableArrayAdministration = this[$mobx]
+        adm.spliceWithArray_(adm.values_.length, 0, items)
+        return adm.values_.length
+    },
+
+    pop() {
+        return this.splice(Math.max(this[$mobx].values_.length - 1, 0), 1)[0]
+    },
+
+    shift() {
+        return this.splice(0, 1)[0]
+    },
+
+    unshift(...items: any[]): number {
+        const adm: ObservableArrayAdministration = this[$mobx]
+        adm.spliceWithArray_(0, 0, items)
+        return adm.values_.length
+    },
+
+    reverse(): any[] {
+        // reverse by default mutates in place before returning the result
+        // which makes it both a 'derivation' and a 'mutation'.
+        // so we deviate from the default and just make it an dervitation
+        if (__DEV__) {
+            console.warn(
+                "[mobx] `observableArray.reverse()` will not update the array in place. Use `observableArray.slice().reverse()` to suppress this warning and perform the operation on a copy, or `observableArray.replace(observableArray.slice().reverse())` to reverse & update in place"
             )
-        },
+        }
+        const clone = (<any>this).slice()
+        return clone.reverse.apply(clone, arguments)
+    },
 
-        push(...items: any[]): number {
-            const adm: ObservableArrayAdministration = this[$mobx]
-            adm.spliceWithArray_(adm.values_.length, 0, items)
-            return adm.values_.length
-        },
+    sort(): any[] {
+        // sort by default mutates in place before returning the result
+        // which goes against all good practices. Let's not change the array in place!
+        if (__DEV__) {
+            console.warn(
+                "[mobx] `observableArray.sort()` will not update the array in place. Use `observableArray.slice().sort()` to suppress this warning and perform the operation on a copy, or `observableArray.replace(observableArray.slice().sort())` to sort & update in place"
+            )
+        }
+        const clone = (<any>this).slice()
+        return this.slice().sort.apply(clone, arguments)
+    },
 
-        pop() {
-            return this.splice(Math.max(this[$mobx].values_.length - 1, 0), 1)[0]
-        },
+    remove(value: any): boolean {
+        const adm: ObservableArrayAdministration = this[$mobx]
+        const idx = adm.dehanceValues_(adm.values_).indexOf(value)
+        if (idx > -1) {
+            this.splice(idx, 1)
+            return true
+        }
+        return false
+    },
 
-        shift() {
-            return this.splice(0, 1)[0]
-        },
-
-        unshift(...items: any[]): number {
-            const adm: ObservableArrayAdministration = this[$mobx]
-            adm.spliceWithArray_(0, 0, items)
-            return adm.values_.length
-        },
-
-        reverse(): any[] {
-            // reverse by default mutates in place before returning the result
-            // which makes it both a 'derivation' and a 'mutation'.
-            // so we deviate from the default and just make it an dervitation
-            if (__DEV__) {
-                console.warn(
-                    "[mobx] `observableArray.reverse()` will not update the array in place. Use `observableArray.slice().reverse()` to suppress this warning and perform the operation on a copy, or `observableArray.replace(observableArray.slice().reverse())` to reverse & update in place"
-                )
+    // TODO: move to array administration
+    get(index: number): any | undefined {
+        const adm: ObservableArrayAdministration = this[$mobx]
+        if (adm) {
+            if (index < adm.values_.length) {
+                adm.atom_.reportObserved()
+                return adm.dehanceValue_(adm.values_[index])
             }
-            const clone = (<any>this).slice()
-            return clone.reverse.apply(clone, arguments)
-        },
+            console.warn(
+                __DEV__
+                    ? `[mobx] Out of bounds read: ${index}`
+                    : `[mobx.array] Attempt to read an array index (${index}) that is out of bounds (${adm.values_.length}). Please check length first. Out of bound indices will not be tracked by MobX`
+            )
+        }
+        return undefined
+    },
 
-        sort(): any[] {
-            // sort by default mutates in place before returning the result
-            // which goes against all good practices. Let's not change the array in place!
-            if (__DEV__) {
-                console.warn(
-                    "[mobx] `observableArray.sort()` will not update the array in place. Use `observableArray.slice().sort()` to suppress this warning and perform the operation on a copy, or `observableArray.replace(observableArray.slice().sort())` to sort & update in place"
-                )
+    // TODO: move to array administration
+    set(index: number, newValue: any) {
+        const adm: ObservableArrayAdministration = this[$mobx]
+        const values = adm.values_
+        if (index < values.length) {
+            // update at index in range
+            checkIfStateModificationsAreAllowed(adm.atom_)
+            const oldValue = values[index]
+            if (hasInterceptors(adm)) {
+                const change = interceptChange<IArrayWillChange<any>>(adm as any, {
+                    type: UPDATE,
+                    object: adm.proxy_ as any, // since "this" is the real array we need to pass its proxy
+                    index,
+                    newValue
+                })
+                if (!change) return
+                newValue = change.newValue
             }
-            const clone = (<any>this).slice()
-            return this.slice().sort.apply(clone, arguments)
-        },
-
-        remove(value: any): boolean {
-            const adm: ObservableArrayAdministration = this[$mobx]
-            const idx = adm.dehanceValues_(adm.values_).indexOf(value)
-            if (idx > -1) {
-                this.splice(idx, 1)
-                return true
+            newValue = adm.enhancer_(newValue, oldValue)
+            const changed = newValue !== oldValue
+            if (changed) {
+                values[index] = newValue
+                adm.notifyArrayChildUpdate_(index, newValue, oldValue)
             }
-            return false
-        },
-
-        // TODO: move to array administration
-        get(index: number): any | undefined {
-            const adm: ObservableArrayAdministration = this[$mobx]
-            if (adm) {
-                if (index < adm.values_.length) {
-                    adm.atom_.reportObserved()
-                    return adm.dehanceValue_(adm.values_[index])
-                }
-                console.warn(
-                    __DEV__
-                        ? `[mobx] Out of bounds read: ${index}`
-                        : `[mobx.array] Attempt to read an array index (${index}) that is out of bounds (${adm.values_.length}). Please check length first. Out of bound indices will not be tracked by MobX`
-                )
-            }
-            return undefined
-        },
-
-        // TODO: move to array administration
-        set(index: number, newValue: any) {
-            const adm: ObservableArrayAdministration = this[$mobx]
-            const values = adm.values_
-            if (index < values.length) {
-                // update at index in range
-                checkIfStateModificationsAreAllowed(adm.atom_)
-                const oldValue = values[index]
-                if (hasInterceptors(adm)) {
-                    const change = interceptChange<IArrayWillChange<any>>(adm as any, {
-                        type: UPDATE,
-                        object: adm.proxy_ as any, // since "this" is the real array we need to pass its proxy
-                        index,
-                        newValue
-                    })
-                    if (!change) return
-                    newValue = change.newValue
-                }
-                newValue = adm.enhancer_(newValue, oldValue)
-                const changed = newValue !== oldValue
-                if (changed) {
-                    values[index] = newValue
-                    adm.notifyArrayChildUpdate_(index, newValue, oldValue)
-                }
-            } else if (index === values.length) {
-                // add a new item
-                adm.spliceWithArray_(index, 0, [newValue])
-            } else {
-                // out of bounds
-                die(17, index, values.length)
-            }
+        } else if (index === values.length) {
+            // add a new item
+            adm.spliceWithArray_(index, 0, [newValue])
+        } else {
+            // out of bounds
+            die(17, index, values.length)
         }
     }
+}
 
-    /**
-     * Wrap function from prototype
-     * Without this, everything works as well, but this works
-     * faster as everything works on unproxied values
-     */
-;[
-    "concat",
-    "every",
-    "filter",
-    "forEach",
-    "indexOf",
-    "join",
-    "lastIndexOf",
-    "map",
-    "reduce",
-    "reduceRight",
-    "slice",
-    "some",
-    "toString",
-    "toLocaleString"
-].forEach(funcName => {
-    arrayExtensions[funcName] = function() {
+/**
+ * Wrap function from prototype
+ * Without this, everything works as well, but this works
+ * faster as everything works on unproxied values
+ */
+addArrayExtension("concat", simpleFunc)
+addArrayExtension("flat", simpleFunc)
+addArrayExtension("includes", simpleFunc)
+addArrayExtension("indexOf", simpleFunc)
+addArrayExtension("join", simpleFunc)
+addArrayExtension("lastIndexOf", simpleFunc)
+addArrayExtension("slice", simpleFunc)
+addArrayExtension("toString", simpleFunc)
+addArrayExtension("toLocaleString", simpleFunc)
+// map
+addArrayExtension("every", mapLikeFunc)
+addArrayExtension("filter", mapLikeFunc)
+addArrayExtension("find", mapLikeFunc)
+addArrayExtension("findIndex", mapLikeFunc)
+addArrayExtension("flatMap", mapLikeFunc)
+addArrayExtension("forEach", mapLikeFunc)
+addArrayExtension("map", mapLikeFunc)
+addArrayExtension("some", mapLikeFunc)
+// reduce
+addArrayExtension("reduce", reduceLikeFunc)
+addArrayExtension("reduceRight", reduceLikeFunc)
+
+function addArrayExtension(funcName, funcFactory) {
+    if (Array.prototype[funcName] === "function") {
+        arrayExtensions[funcName] = funcFactory(funcName)
+    }
+}
+
+// Report and delegate to dehanced array
+function simpleFunc(funcName) {
+    return function () {
         const adm: ObservableArrayAdministration = this[$mobx]
         adm.atom_.reportObserved()
         const res = adm.dehanceValues_(adm.values_)
         return res[funcName].apply(res, arguments)
     }
-})
+}
+
+// Make sure callbacks recieve correct array arg #2326
+function mapLikeFunc(funcName) {
+    return function (callback, thisArg) {
+        const adm: ObservableArrayAdministration = this[$mobx]
+        adm.atom_.reportObserved()
+        return adm.values_[funcName]((element, index) => {
+            element = adm.dehanceValue_(element)
+            return callback.call(thisArg, element, index, this)
+        })
+    }
+}
+
+// Make sure callbacks recieve correct array arg #2326
+function reduceLikeFunc(funcName) {
+    return function (callback, initialValue) {
+        const adm: ObservableArrayAdministration = this[$mobx]
+        adm.atom_.reportObserved()
+        return adm.values_[funcName]((accumulator, currentValue, index) => {
+            currentValue = adm.dehanceValue_(currentValue)
+            return callback(accumulator, currentValue, index, this)
+        }, initialValue)
+    }
+}
 
 const isObservableArrayAdministration = createInstanceofPredicate(
     "ObservableArrayAdministration",
