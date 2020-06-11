@@ -76,4 +76,4 @@ _Note: don't use *action.bound* with arrow functions; arrow functions are alread
 
 ## `runInAction(name?, thunk)`
 
-`runInAction` is a simple utility that takes an code block and executes in an (anonymous) action. This is useful to create and execute actions on the fly, for example inside an asynchronous process. `runInAction(f)` is sugar for `action(f)()`
+`runInAction` is a simple utility that takes a code block and executes in an (anonymous) action. This is useful to create and execute actions on the fly, for example inside an asynchronous process. `runInAction(f)` is sugar for `action(f)()`
