@@ -625,3 +625,14 @@ test("correct array should be passed to callbacks #2326", () => {
         "some"
     ].forEach(method => array[method](callback))
 })
+
+test("very long arrays can be safely passed to nativeArray.concat #2379", () => {
+    const nativeArray = ["a", "b"]
+    const longNativeArray = [...Array(10_000).keys()] // MAX_SPLICE_SIZE seems to be the threshold
+    const longObservableArray = observable(longNativeArray)
+
+    const expectedArray = nativeArray.concat(longNativeArray)
+    const actualArray = nativeArray.concat(longObservableArray)
+
+    expect(actualArray).toEqual(expectedArray)
+})
