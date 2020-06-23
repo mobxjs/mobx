@@ -46,7 +46,8 @@ MobX is proudly sponsored by Mendix, Coinbase, Facebook Open Source, Canva, Algo
 
 # Installation
 
--   Installation: `npm install mobx --save`. React bindings: `npm install mobx-react --save`. To enable ESNext decorators (optional), see below.
+-   Installation: `npm install mobx --save`. React bindings: `npm install mobx-react --save`. To enable ESNext decorators (optional): `npm install mobx-decorators --save`.
+
 -   CDN:
 
 *   https://unpkg.com/mobx/lib/mobx.umd.js
@@ -54,10 +55,10 @@ MobX is proudly sponsored by Mendix, Coinbase, Facebook Open Source, Canva, Algo
 
 # Browser support
 
--   MobX >=5 runs on any browser with [ES6 proxy support](https://kangax.github.io/compat-table/es6/#test-Proxy). It will throw an error on startup on older environments such as IE11, Node.js <6 or React Native Android on old JavaScriptCore [how-to-upgrade](https://github.com/react-community/jsc-android-buildscripts#how-to-use-it-with-my-react-native-app).
--   MobX 4 runs on any ES5 browser and will be actively maintained. The MobX 4 and 5 api's are the same and semantically can achieve the same, but MobX 4 has some [limitations](#mobx-4-vs-mobx-5).
+-   MobX >=6 runs on any ES5 browser. If your browser does not have [ES6 proxy support](https://kangax.github.io/compat-table/es6/#test-Proxy) you have to configure it
+    to use compatibile property tracking, which does have some [limitations](#limitations-without-proxy-support).
 
-_Tip: the main entry point of the MobX 5 package ships with ES5 code for backward compatibility with all build tools. But since MobX 5 runs only on modern browsers anyway, consider using the faster and smaller ES6 build: `lib/mobx.es6.js`. For example by setting up a webpack alias: `resolve: { alias: { mobx: __dirname + "/node_modules/mobx/lib/mobx.es6.js" }}`_
+_Tip: the main entry point of the MobX 6 package ships with ES5 code for backward compatibility. But if you only intend to run MobX 6 on modern browsers, consider using consider using the faster and smaller ES6 build: `lib/mobx.es6.js`. For example by setting up a webpack alias: `resolve: { alias: { mobx: __dirname + "/node_modules/mobx/lib/mobx.es6.js" }}`_
 
 ## Translations
 
@@ -100,103 +101,96 @@ MobX has only a few core concepts. The following snippets can be tried online us
 
 ### Observable state
 
-<i><a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/javascript-sync-the-ui-with-the-app-state-using-mobx-observable-and-observer-in-react">Egghead.io lesson 1: observable & observer</a></i>
-
 MobX adds observable capabilities to existing data structures like objects, arrays and class instances.
-This can simply be done by annotating your class properties with the [@observable](http://mobxjs.github.io/mobx/refguide/observable-decorator.html) decorator (ES.Next).
+This can simply be done by using `makeObservable` in its constructor to annotate your class properties as `observable`.
 
 ```javascript
-import { observable } from "mobx"
+import { makeObservable, observable, action } from "mobx"
 
 class Todo {
     id = Math.random()
-    @observable title = ""
-    @observable finished = false
+    title = ""
+    finished = false
+
+    constructor() {
+        makeObservable(this, {
+            title: observable,
+            finished: observable,
+            toggle: action
+        })
+    }
+
+    toggle() {
+        this.finished = !finished
+    }
 }
 ```
 
 Using `observable` is like turning a property of an object into a spreadsheet cell.
 But unlike spreadsheets, these values can be not only primitive values, but also references, objects and arrays.
 
-If your environment doesn't support decorator syntax, don't worry.
-You can read [here](http://mobxjs.github.io/mobx/best/decorators.html) about how to set them up.
-Or you can skip them altogether, as MobX can be used fine without decorator _syntax_, by leveraging the _decorate_ utility.
-Many MobX users do prefer the decorator syntax though, as it is slightly more concise.
+But what about `toggle`, which we marked `action`?
 
-```javascript
-import { decorate, observable } from "mobx"
+### Actions
 
-class Todo {
-    id = Math.random()
-    title = ""
-    finished = false
-}
-decorate(Todo, {
-    title: observable,
-    finished: observable
-})
-```
+In the `Todo` model you can see that we have a method `toggle` that changes the value of `finished`. `finished` is marked as `observable`.
+MobX requires that you mark any code that changes an `observable` as an [`action`](https://mobxjs.github.io/mobx/refguide/action.html).
+
+MobX enforces this as it helps you structure your code and prevents you from inadvertantly changing state when you don't want to.
 
 ### Computed values
 
-<i><a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/javascript-derive-computed-values-and-manage-side-effects-with-mobx-reactions">Egghead.io lesson 3: computed values</a></i>
-
-With MobX you can define values that will be derived automatically when relevant data is modified.
-By using the [`@computed`](http://mobxjs.github.io/mobx/refguide/computed-decorator.html) decorator or by using getter / setter functions when using `(extend)Observable` (Of course, you can use `decorate` here again as alternative to the `@` syntax).
+With MobX you can define values that will be derived automatically when relevant data is modified. You do this by defining a property using a JS getter function (`get`) and then marking it with `computed` with `makeObservable`.
 
 ```javascript
+import { makeObservable, observable, computed } from "mobx"
+
 class TodoList {
-    @observable todos = []
-    @computed get unfinishedTodoCount() {
+    todos = []
+    get unfinishedTodoCount() {
         return this.todos.filter(todo => !todo.finished).length
+    }
+    constructor() {
+        makeObservable(this, {
+            todos: observable,
+            unfinishedTodoCount: computed
+        })
     }
 }
 ```
 
 MobX will ensure that `unfinishedTodoCount` is updated automatically when a todo is added or when one of the `finished` properties is modified.
-Computations like these resemble formulas in spreadsheet programs like MS Excel. They update automatically and only when required.
+Computations like these resemble formulas in spreadsheet programs like MS Excel. They update automatically, and only when required.
 
 ### Reactions
-
-<i><a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-write-custom-mobx-reactions-with-when-and-autorun">Egghead.io lesson 9: custom reactions</a></i>
 
 Reactions are similar to a computed value, but instead of producing a new value, a reaction produces a side effect for things like printing to the console, making network requests, incrementally updating the React component tree to patch the DOM, etc.
 In short, reactions bridge [reactive](https://en.wikipedia.org/wiki/Reactive_programming) and [imperative](https://en.wikipedia.org/wiki/Imperative_programming) programming.
 
 #### React components
 
-<i><a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/courses/manage-complex-state-in-react-apps-with-mobx">Egghead.io lesson 1: observable & observer</a></i>
-
-If you are using React, you can turn your (stateless function) components into reactive components by simply adding the [`observer`](http://mobxjs.github.io/mobx/refguide/observer-component.html) function / decorator from the `mobx-react` package onto them.
+If you are using React, you can turn your (stateless function) components into reactive components by wrapping it with the `observer` function
+from the `mobx-react` package.
 
 ```javascript
-import React, { Component } from "react"
+import React from "react"
 import ReactDOM from "react-dom"
 import { observer } from "mobx-react"
 
-@observer
-class TodoListView extends Component {
-    render() {
-        return (
-            <div>
-                <ul>
-                    {this.props.todoList.todos.map(todo => (
-                        <TodoView todo={todo} key={todo.id} />
-                    ))}
-                </ul>
-                Tasks left: {this.props.todoList.unfinishedTodoCount}
-            </div>
-        )
-    }
-}
+const TodoListView = observer(({ todoList }) => (
+    <div>
+        <ul>
+            {todoList.todos.map(todo => (
+                <TodoView todo={todo} key={todo.id} />
+            ))}
+        </ul>
+        Tasks left: {todoList.unfinishedTodoCount}
+    </div>
+))
 
 const TodoView = observer(({ todo }) => (
     <li>
-        <input
-            type="checkbox"
-            checked={todo.finished}
-            onClick={() => (todo.finished = !todo.finished)}
-        />
+        <input type="checkbox" checked={todo.finished} onClick={() => todo.toggle()} />
         {todo.title}
     </li>
 ))
@@ -207,7 +201,7 @@ ReactDOM.render(<TodoListView todoList={store} />, document.getElementById("moun
 
 `observer` turns React (function) components into derivations of the data they render.
 When using MobX there are no smart or dumb components.
-All components render smartly but are defined in a dumb manner. MobX will simply make sure the components are always re-rendered whenever needed, but also no more than that. So the `onClick` handler in the above example will force the proper `TodoView` to render, and it will cause the `TodoListView` to render if the number of unfinished tasks has changed.
+All components render smartly but are defined in a dumb manner. MobX will simply make sure the components are always re-rendered whenever needed, but also no more than that. So the `onClick` handler in the above example will force the proper `TodoView` to render as it uses the `toggle` action, and it will cause the `TodoListView` to render if the number of unfinished tasks has changed.
 However, if you would remove the `Tasks left` line (or put it into a separate component), the `TodoListView` will no longer re-render when ticking a box. You can verify this yourself by changing the [JSFiddle](https://jsfiddle.net/mweststrate/wv3yopo0/).
 
 #### Custom reactions
@@ -230,31 +224,6 @@ Why does a new message get printed each time the `unfinishedTodoCount` is change
 _MobX reacts to any existing observable property that is read during the execution of a tracked function._
 
 For an in-depth explanation about how MobX determines to which observables needs to be reacted, check [understanding what MobX reacts to](https://mobx.js.org/best/react.html).
-
-### Actions
-
-<i><a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/react-use-mobx-actions-to-change-and-guard-state">Egghead.io lesson 5: actions</a></i>
-
-Unlike many flux frameworks, MobX is unopinionated about how user events should be handled.
-
--   This can be done in a Flux like manner.
--   Or by processing events using RxJS.
--   Or by simply handling events in the most straightforward way possible, as demonstrated in the above `onClick` handler.
-
-In the end it all boils down to: Somehow the state should be updated.
-
-After updating the state `MobX` will take care of the rest in an efficient, glitch-free manner. So simple statements, like below, are enough to automatically update the user interface.
-
-There is no technical need for firing events, calling a dispatcher or what more. A React component in the end is nothing more than a fancy representation of your state. A derivation that will be managed by MobX.
-
-```javascript
-store.todos.push(new Todo("Get Coffee"), new Todo("Write simpler code"))
-store.todos[0].finished = true
-```
-
-Nonetheless, MobX has an optional built-in concept of [`actions`](https://mobxjs.github.io/mobx/refguide/action.html).
-Read this section as well if you want to know more about writing asynchronous actions. It's easy!
-Use them to your advantage; they will help you to structure your code better and make wise decisions about when and where state should be modified.
 
 ## MobX: Simple and scalable
 
@@ -335,28 +304,15 @@ And finally kudos for all the people that believed in, tried, validated and even
 
 -   Feel free to send small pull requests. Please discuss new features or big changes in a GitHub issue first.
 -   Use `npm test` to run the basic test suite, `npm run coverage` for the test suite with coverage and `npm run test:performance` for the performance tests.
--   Please note that if you want to backport a feature / fix to MobX 4 a second PR needs to be opened to the mobx4-master branch.
 
-# MobX 4 vs MobX 5
+# Limitations without Proxy support
 
-The difference between MobX 4 and MobX 5 is that the latter uses Proxies to do property tracking. As a consequence MobX 5 only runs on Proxy supporting browsers, in contrast to MobX 4 that runs on any ES 5 environment.
-
-The most noteable limitations of MobX 4:
+MobX 6 is works on any ES 5 environment, but if your environment or browser does not have Proxy support, there are some limitations:
 
 -   Observable arrays are not real arrays, so they won't pass the `Array.isArray()` check. The practical consequence is that you often need to `.slice()` the array first (to get a real array shallow copy) before passing to third party libraries.
 -   Adding properties to existing observable objects after creation is not automatically picked up. Either use observable maps instead, or use the the build in [utility functions](https://mobx.js.org/refguide/object-api.html) to read / write / iterate objects that you want to dynamically add properties to.
 
 For more details see the [caveats page](https://mobx.js.org/best/pitfalls.html).
-
-## Flow support
-
-MobX ships with [flow typings](https://github.com/mobxjs/mobx/blob/master/flow-typed/mobx.js). Flow will automatically include them when you import mobx modules. Although you **do not** need to import the types explicitly, you can still do it like this: `import type { ... } from 'mobx'`.
-
-To use the [flow typings](https://github.com/mobxjs/mobx/blob/master/flow-typed/mobx.js) shipped with MobX:
-
--   In `.flowconfig`, you **cannot** ignore `node_modules`.
--   In `.flowconfig`, you **cannot** import it explicitly in the `[libs]` section.
--   You **do not** need to install library definition using [flow-typed](https://github.com/flowtype/flow-typed).
 
 ## Donating
 
