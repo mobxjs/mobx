@@ -90,7 +90,8 @@ setInterval(() => {
 const appState = new AppState()
 ```
 
-These methods, `increaseTimer` and `resetTimer` are just like you would write them without MobX. You can use them anywhere -- from React event handlers or in `setInterval`, for instance. The only thing you need to do is to mark them as `action` with `makeObservable`.
+These methods, `increaseTimer` and `resetTimer` are just like you would write them without MobX. You can use them anywhere -- from React event handlers or in `setInterval`, for instance. The only thing you need to do is to mark them as `action` with `makeObservable`. By marking methods this way you make MobX automatically
+apply transactions for optimal performance.
 
 **_MobX helps you do things in a simple straightforward way_**.
 
