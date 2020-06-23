@@ -31,3 +31,10 @@ Questions:
 
 -   When we introduce actions we need a link to an actions section that describes
     how to turn off strict state reinforcing.
+
+-   What's the codemod all about?
+
+-   There are a lot of references to external documentation resources. They can probably use
+    a pruning.
+
+-   In 'Concepts and Principles' 'observable' is used. Should we rewrite that to 'makeObservable'?
