@@ -6,11 +6,9 @@ hide_title: true
 
 # Concepts & Principles
 
-<div id='codefund'></div><div class="re_2020"><a class="re_2020_link" href="https://www.react-europe.org/#slot-2149-workshop-typescript-for-react-and-graphql-devs-with-michel-weststrate" target="_blank" rel="sponsored noopener"><div><div class="re_2020_ad" >Ad</div></div><img src="/img/reacteurope.svg"><span>Join the author of MobX at <b>ReactEurope</b> to learn how to use <span class="link">TypeScript with React</span></span></a></div>
-
 ## Concepts
 
-MobX distinguishes the following concepts in your application. You saw them in the previous gist, but let's dive into them in a bit more detail.
+MobX distinguishes the following concepts in your application. You saw them in the one page summary, but let's dive into them in a bit more detail.
 
 ### 1. State
 
@@ -42,8 +40,8 @@ Back to the spreadsheet analogy, formulas are derivations that _compute_ a value
 An _action_ is any piece of code that changes the _state_. User events, backend data pushes, scheduled events, etc.
 An action is like a user that enters a new value in a spreadsheet cell.
 
-Actions can be defined explicitly in MobX to help you to structure code more clearly.
-If MobX is used in [_strict mode_](../refguide/api##-enforceactions-), MobX will enforce that no state can be modified outside actions.
+Actions are defined explicitly in MobX to help you to structure code more clearly. This is the default behavior and is recommended.
+You can however loosen [_strict mode_](../refguide/api##-enforceactions-) to allow you to modify state outside actions as well.
 
 ## Principles
 
@@ -78,7 +76,7 @@ var todoStore = observable({
 })
 
 /* a function that observes the state */
-autorun(function() {
+autorun(function () {
     console.log("Completed %d of %d items", todoStore.completedCount, todoStore.todos.length)
 })
 
