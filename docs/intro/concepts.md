@@ -63,17 +63,46 @@ All _Computed values_ should be **pure**. They are not supposed to change _state
 The following listing illustrates the above concepts and principles:
 
 ```javascript
-import { observable, autorun } from "mobx"
+import { makeObservable, autorun, action, computed, observable } from "mobx"
 
-var todoStore = observable({
+class Todo {
+    title = ""
+    completed = false
+
+    constructor(title, completed) {
+        this.title = title
+        this.completed = completed
+        makeObservable(this, {
+            title: observable,
+            completed: observable,
+            complete: action
+        })
+    }
+    complete() {
+        this.completed = true
+    }
+}
+
+class TodoStore {
     /* some observable state */
-    todos: [],
+    todos = []
+
+    constructor() {
+        makeObservable(this, {
+            todos: observable,
+            completedCount: computed
+        })
+    }
+
+    add(title, completed) {
+        this.todos.push(new Todo(title, completed))
+    }
 
     /* a derived value */
     get completedCount() {
         return this.todos.filter(todo => todo.completed).length
     }
-})
+}
 
 /* a function that observes the state */
 autorun(function () {
@@ -81,13 +110,10 @@ autorun(function () {
 })
 
 /* ..and some actions that modify the state */
-todoStore.todos[0] = {
-    title: "Take a walk",
-    completed: false
-}
+todoStore.add("Take a walk", false)
 // -> synchronously prints 'Completed 0 of 1 items'
 
-todoStore.todos[0].completed = true
+todoStore.todos[0].complete()
 // -> synchronously prints 'Completed 1 of 1 items'
 ```
 
