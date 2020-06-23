@@ -37,4 +37,9 @@ Questions:
 -   There are a lot of references to external documentation resources. They can probably use
     a pruning.
 
--   In 'Concepts and Principles' 'observable' is used. Should we rewrite that to 'makeObservable'?
+-   In many examples, such as 'Concepts and Principles' and 'Getting Started' 'observable' is used to make a JS object observable. Should we rewrite that to 'makeObservable'? I've opted to do so to be more consistent in examples and to better fit the strict actions are required world of MobX 6. Is that the right way forward?
+
+-   What to do with the 'Getting started tutorial'? It's maintained separately from  
+    the documentation - should we attempt to integrate it? The problem with
+    that it is has live code. Docusaurus can run React snippets but the HTML
+    page has very fancy animations. Update it as is?
