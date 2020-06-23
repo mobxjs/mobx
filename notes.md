@@ -63,7 +63,7 @@ Philosophy: one thing to do things
 -   [ ] update docs for non-default decorators
 -   [ ] instruct using TS / Babel decorators
 -   [ ] Breaking: can no longer re-decorate fields already decorated by a superclass
--   [ ] Breaking: methods will be actions by default in `extendObservabe` / `observable`
+-   [ ] Breaking: methods will be actions by default in `extendObservable` / `observable`
 -   [ ] Breaking: `decorate` has been removed
 -   [ ] Breaking: `observableRequiresReaction` is now the default
 -   [ ] Breaking: `enforceActions` is now defaulted to `observed`, but now generates a warning rather than an error
