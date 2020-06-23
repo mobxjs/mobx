@@ -55,7 +55,7 @@
 
 ## Docs / migration guide
 
-Philosophy: one thing to do things
+Philosophy: one way to do things
 
 -   [ ] Host old docs somewhere? Figure out how docusaurus can support a second version
 -   [ ] Using the codemod
