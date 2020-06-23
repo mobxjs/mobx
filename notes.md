@@ -55,12 +55,12 @@
 
 ## Docs / migration guide
 
-PHilosophy: one thing to do things
+Philosophy: one thing to do things
 
 -   [ ] Host old docs somewhere? Figure out how docusaurus can support a second version
 -   [ ] Using the codemod
 -   [ ] update tsconfig, no decorators, yes define
--   [ ] update docs for non-default decoratres
+-   [ ] update docs for non-default decorators
 -   [ ] instruct using TS / Babel decorators
 -   [ ] Breaking: can no longer re-decorate fields already decorated by a superclass
 -   [ ] Breaking: methods will be actions by default in `extendObservabe` / `observable`
@@ -68,13 +68,13 @@ PHilosophy: one thing to do things
 -   [ ] Breaking: `observableRequiresReaction` is now the default
 -   [ ] Breaking: `enforceActions` is now defaulted to `observed`, but now generates a warning rather than an error
 -   [ ] Breaking: `runInAction` now longer supports a name as first argument. Use an action or named function instead
--   [ ] Breaking: `computed` doesn not accept setter function as second argument anymore, use `options.set` instead
--   [ ] Breaking: the `findIndex` / `find` offset argument (third) on onbservable arrays is no longer supported, in consistentcy with ES arrays
+-   [ ] Breaking: `computed` does not accept setter function as second argument anymore, use `options.set` instead
+-   [ ] Breaking: the `findIndex` / `find` offset argument (third) on observable arrays is no longer supported, to be consistent with ES arrays
 -   [ ] Breaking: option `computedConfigurable` was dropped and is the default now
 -   [ ] Breaking: a setter function as second argument to `computed` is no longer supported, use `computed(getter, { set: setter })` instead
 -   [ ] Breaking: toJS no longer supports the `recurseEverything` option
 -   [ ] optimization tip: hoist the mapping constant
--   [ ] document: uncoditional map
+-   [ ] document: unconditional map
 -   [ ] document `true` and `false` as annotations
 -   [ ] how to enable ES5 support
 -   [ ] observable.array now supports proxy:false option
@@ -99,7 +99,7 @@ PHilosophy: one thing to do things
     Things fixed:
 -   initialization in babel
 -   babel setup
--   forward compatible with new field initialzers (in babel / ts flag)
+-   forward compatible with new field initializers (in babel / ts flag)
 -   CRA setup out of the box
 -   size reduction
 -   maintainability
@@ -107,7 +107,7 @@ PHilosophy: one thing to do things
     -   codemod
     -   babel macro / transform
         Less dev ergonomics. But
--   unblocks future lang compatiblity (define semantics)
+-   unblocks future lang compatibility (define semantics)
 -   easier to adopt (this benefits everyone!)
 -   compatiblity with CRA, eslint, etc etc out of the box
 -   reduce library size
