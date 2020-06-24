@@ -93,6 +93,8 @@ PHilosophy: one thing to do things
 -   [ ] makeObservable + private members in TypeScript (second call? computed name? tsignore?)
 -   [ ] print deprecation warnings for all old apis in mobx 4/5
 -   [ ] Breaking: it is no longer safe to call action from autorun. Use effect or reaction instead.
+-   [ ] \_allowStateChangesINComputation is no longer needed, us `runInAction` instead.
+-   [ ] Breaking: in computed, the when predicate, and reaction predicate it is never allowed to directly change state. State changes should be wrapped in action.
 
 ## NOTES
 

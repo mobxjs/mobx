@@ -155,7 +155,7 @@ test("deny state changes in views", function() {
             y.get()
         })
     ).toMatchInlineSnapshot(
-        `"<STDOUT> Computed values are not allowed to cause side effects by changing observables that are already being observed. Tried to modify: ObservableValue@26"`
+        `"<STDOUT> [MobX] Side effects like changing state are not allowed at this point. Are you trying to modify state from, for example, a computed value or the render function of a React component? You can wrap side effects in 'runInAction' if needed but we recommend to investigate if the value you are trying to update can be derived instead. Tried to modify: ObservableValue@26"`
     )
 
     checkGlobalState()
@@ -202,7 +202,7 @@ test("deny array change in view", function(done) {
             y.get()
         })
     ).toMatchInlineSnapshot(
-        `"<STDOUT> Computed values are not allowed to cause side effects by changing observables that are already being observed. Tried to modify: ObservableArray@36"`
+        `"<STDOUT> [MobX] Side effects like changing state are not allowed at this point. Are you trying to modify state from, for example, a computed value or the render function of a React component? You can wrap side effects in 'runInAction' if needed but we recommend to investigate if the value you are trying to update can be derived instead. Tried to modify: ObservableArray@36"`
     )
 
     expect(z.slice()).toEqual([3, 3])

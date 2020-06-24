@@ -13,6 +13,7 @@ import {
     isPlainObject,
     die
 } from "../internal"
+import { allowStateChanges } from "../core/action"
 
 export interface IAutorunOptions {
     delay?: number
@@ -144,7 +145,7 @@ export function reaction<T>(
         if (r.isDisposed_) return
         let changed = false
         r.track(() => {
-            const nextValue = expression(r)
+            const nextValue = allowStateChanges(false, () => expression(r))
             changed = firstTime || !equals(value, nextValue)
             value = nextValue
         })

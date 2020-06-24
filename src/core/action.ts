@@ -12,9 +12,9 @@ import {
     allowStateReadsStart,
     allowStateReadsEnd,
     ACTION,
-    EMPTY_ARRAY
+    EMPTY_ARRAY,
+    die
 } from "../internal"
-import { die } from "../errors"
 
 // we don't use globalState for these in order to avoid possible issues with multiple
 // mobx versions
@@ -94,9 +94,12 @@ export function _startAction(
     }
     const prevDerivation_ = globalState.trackingDerivation
     const runAsAction = !canRunAsDeriviation || !prevDerivation_
-    if (runAsAction) untrackedStart()
     startBatch()
-    const prevAllowStateChanges_ = allowStateChangesStart(runAsAction)
+    let prevAllowStateChanges_ = globalState.allowStateChanges // by default preserve previous allow
+    if (runAsAction) {
+        untrackedStart()
+        prevAllowStateChanges_ = allowStateChangesStart(true)
+    }
     const prevAllowStateReads_ = allowStateReadsStart(true)
     const runInfo = {
         runAsAction_: runAsAction,
@@ -133,13 +136,11 @@ export function _endAction(runInfo: IActionRunInfo) {
 
 export function allowStateChanges<T>(allowStateChanges: boolean, func: () => T): T {
     const prev = allowStateChangesStart(allowStateChanges)
-    let res: T
     try {
-        res = func()
+        return func()
     } finally {
         allowStateChangesEnd(prev)
     }
-    return res
 }
 
 export function allowStateChangesStart(allowStateChanges: boolean) {
@@ -150,17 +151,4 @@ export function allowStateChangesStart(allowStateChanges: boolean) {
 
 export function allowStateChangesEnd(prev: boolean) {
     globalState.allowStateChanges = prev
-}
-
-// TODO: kill and make the default
-export function allowStateChangesInsideComputed<T>(func: () => T): T {
-    const prev = globalState.computationDepth
-    globalState.computationDepth = 0
-    let res: T
-    try {
-        res = func()
-    } finally {
-        globalState.computationDepth = prev
-    }
-    return res
 }

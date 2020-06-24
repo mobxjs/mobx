@@ -7,6 +7,7 @@ import {
     getNextId,
     die
 } from "../internal"
+import { allowStateChanges } from "../core/action"
 
 export interface IWhenOptions {
     name?: string
@@ -52,7 +53,9 @@ function _when(predicate: () => boolean, effect: Lambda, opts: IWhenOptions): IR
     const effectAction = createAction(opts.name + "-effect", effect as Function)
     // eslint-disable-next-line
     var disposer = autorun(r => {
-        if (predicate()) {
+        // predicate should not change state
+        let cond = allowStateChanges(false, predicate)
+        if (cond) {
             r.dispose()
             if (timeoutHandle) clearTimeout(timeoutHandle)
             effectAction()
