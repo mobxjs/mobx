@@ -10,9 +10,9 @@ import {
     getNextId,
     isAction,
     isFunction,
-    isPlainObject
+    isPlainObject,
+    die
 } from "../internal"
-import { die } from "../errors"
 
 export interface IAutorunOptions {
     delay?: number

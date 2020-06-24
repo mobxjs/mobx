@@ -44,6 +44,11 @@ export class MobXGlobals {
 
     /**
      * Are we running a computation currently? (not a reaction)
+     * Note that generally we check trackingDerivation, to see if
+     * we are in a derivation (and not in an effect for example).
+     *
+     * computationDepth can be used to see if we have any computation in the stack
+     * // TODO: remove?
      */
     computationDepth = 0
 

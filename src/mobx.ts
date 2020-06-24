@@ -129,7 +129,8 @@ export {
     allowStateReadsStart as _allowStateReadsStart,
     allowStateReadsEnd as _allowStateReadsEnd,
     makeObservable,
-    makeAutoObservable
+    makeAutoObservable,
+    autoAction as _autoAction
 } from "./internal"
 
 // Devtools support

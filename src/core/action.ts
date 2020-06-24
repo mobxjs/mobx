@@ -23,14 +23,19 @@ let nextActionId = 1
 const functionNameDescriptor = Object.getOwnPropertyDescriptor(() => {}, "name")
 const isFunctionNameConfigurable = functionNameDescriptor?.configurable ?? false
 
-export function createAction(actionName: string, fn: Function, ref?: Object): Function {
+export function createAction(
+    actionName: string,
+    fn: Function,
+    autoAction: boolean = false,
+    ref?: Object
+): Function {
     if (__DEV__) {
         if (!isFunction(fn)) die("`action` can only be invoked on functions")
         if (typeof actionName !== "string" || !actionName)
             die(`actions should have valid names, got: '${actionName}'`)
     }
     function res() {
-        return executeAction(actionName, fn, ref || this, arguments)
+        return executeAction(actionName, autoAction, fn, ref || this, arguments)
     }
     // TODO: can be optimized by recyclig objects? // TODO: and check if fn.name !== actionName
     return Object.defineProperties(res, {
@@ -39,8 +44,14 @@ export function createAction(actionName: string, fn: Function, ref?: Object): Fu
     })
 }
 
-export function executeAction(actionName: string, fn: Function, scope?: any, args?: IArguments) {
-    const runInfo = _startAction(actionName, scope, args)
+export function executeAction(
+    actionName: string,
+    canRunAsDeriviation: boolean,
+    fn: Function,
+    scope?: any,
+    args?: IArguments
+) {
+    const runInfo = _startAction(actionName, canRunAsDeriviation, scope, args)
     try {
         return fn.apply(scope, args)
     } catch (err) {
@@ -60,9 +71,15 @@ export interface IActionRunInfo {
     error_?: any
     parentActionId_: number
     actionId_: number
+    runAsAction_?: boolean
 }
 
-export function _startAction(actionName: string, scope: any, args?: IArguments): IActionRunInfo {
+export function _startAction(
+    actionName: string,
+    canRunAsDeriviation: boolean, // true for autoAction
+    scope: any,
+    args?: IArguments
+): IActionRunInfo {
     const notifySpy_ = __DEV__ && isSpyEnabled() && !!actionName
     let startTime_: number = 0
     if (__DEV__ && notifySpy_) {
@@ -75,11 +92,14 @@ export function _startAction(actionName: string, scope: any, args?: IArguments):
             arguments: flattendArgs
         })
     }
-    const prevDerivation_ = untrackedStart()
+    const prevDerivation_ = globalState.trackingDerivation
+    const runAsAction = !canRunAsDeriviation || !prevDerivation_
+    if (runAsAction) untrackedStart()
     startBatch()
-    const prevAllowStateChanges_ = allowStateChangesStart(true)
+    const prevAllowStateChanges_ = allowStateChangesStart(runAsAction)
     const prevAllowStateReads_ = allowStateReadsStart(true)
     const runInfo = {
+        runAsAction_: runAsAction,
         prevDerivation_,
         prevAllowStateChanges_,
         prevAllowStateReads_,
@@ -104,7 +124,7 @@ export function _endAction(runInfo: IActionRunInfo) {
     allowStateChangesEnd(runInfo.prevAllowStateChanges_)
     allowStateReadsEnd(runInfo.prevAllowStateReads_)
     endBatch()
-    untrackedEnd(runInfo.prevDerivation_)
+    if (runInfo.runAsAction_) untrackedEnd(runInfo.prevDerivation_)
     if (__DEV__ && runInfo.notifySpy_) {
         spyReportEnd({ time: Date.now() - runInfo.startTime_ })
     }
@@ -132,6 +152,7 @@ export function allowStateChangesEnd(prev: boolean) {
     globalState.allowStateChanges = prev
 }
 
+// TODO: kill and make the default
 export function allowStateChangesInsideComputed<T>(func: () => T): T {
     const prev = globalState.computationDepth
     globalState.computationDepth = 0

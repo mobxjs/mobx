@@ -53,7 +53,7 @@ action.annotationType_ = ACTION
 action.bound = createDecorator<string>(ACTION_BOUND)
 
 export function runInAction<T>(fn: () => T): T {
-    return executeAction(fn.name || ACTION_UNNAMED, fn, this, undefined)
+    return executeAction(fn.name || ACTION_UNNAMED, false, fn, this, undefined)
 }
 
 export function isAction(thing: any) {
@@ -62,4 +62,14 @@ export function isAction(thing: any) {
 
 export function defineBoundAction(target: any, propertyName: string, fn: Function) {
     addHiddenProp(target, propertyName, createAction(propertyName, fn.bind(target)))
+}
+
+export function autoAction<T extends Function>(fn: T): T
+export function autoAction<T extends Function>(name: string, fn: T): T
+export function autoAction(arg1, arg2?): any {
+    // action(fn() {})
+    if (isFunction(arg1)) return createAction(arg1.name || ACTION_UNNAMED, arg1, true)
+    // action("name", fn() {})
+    if (isFunction(arg2)) return createAction(arg1, arg2, true)
+    if (__DEV__) die("Invalid arguments for `autoAction`")
 }
