@@ -195,6 +195,56 @@ class TodoList {
 
 As you can see this is more compact; the only thing you need to do to make instances of a class become observable is `makeAutoObservable`. In our original `Todo` class `id` was not observable, and we've specified the same behavior here by listing it as an exception in the second argument to `makeAutoObservable`.
 
+### Decorators
+
+MobX before version 6 encouraged the use of ES.next decorators to mark things as observable, computed and actions. Decorators are not currently a ES standard however, and the process of standardization is taking a long time. In MobX6 we have chosen to move away from them, and use `makeObservable()`/`makeAutoObservable()` instead.
+
+But many existing code bases that use MobX still use them, and a lot of the documentation material online uses them as well. And you can still use them in MobX 6 and above. The equivalent of the above code using decorators looks like this:
+
+```javascript
+import { makeObservable, observable, computed, action } from "mobx"
+
+class Todo {
+    id = Math.random()
+    @observable title = ""
+    @observable finished = false
+
+    constructor() {
+        makeObservable(this)
+    }
+
+    @action
+    toggle() {
+        this.finished = !finished
+    }
+}
+
+class TodoList {
+    @observable todos = []
+
+    @computed
+    get unfinishedTodoCount() {
+        return this.todos.filter(todo => !todo.finished).length
+    }
+
+    constructor() {
+        makeObservable(this)
+    }
+}
+```
+
+Here is the gist on decorator support in MobX 6:
+
+-   You can still use `observable`, `computed` and `action` as decorators to mark code.
+
+-   But in order to have them be picked up, you now need to use `makeObservable(this)`,
+    without the second argument as this information is automatically deduced from
+    the decorators.
+
+-   There are code mods to help you upgrade existing code to be compliant with MobX 6.
+
+The [decorators guide](best/decorators.md) has more information.
+
 ### Reactions
 
 Reactions are similar to a computed value, but instead of producing a new value, a reaction produces a side effect for things like printing to the console, making network requests, incrementally updating the React component tree to patch the DOM, etc.
