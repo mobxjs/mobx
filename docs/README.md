@@ -132,8 +132,7 @@ But what about `toggle`, which we marked `action`?
 
 ### Actions
 
-In the `Todo` model you can see that we have a method `toggle` that changes the value of `finished`. `finished` is marked as `observable`.
-MobX requires that you mark any code that changes an `observable` as an [`action`](https://mobxjs.github.io/mobx/refguide/action.html).
+In the `Todo` model you can see that we have a method `toggle` that changes the value of `finished`. `finished` is marked as `observable`. MobX requires that you mark any code that changes an `observable` as an [`action`](https://mobxjs.github.io/mobx/refguide/action.html).
 
 MobX enforces this as it helps you structure your code and prevents you from inadvertantly changing state when you don't want to.
 
@@ -160,6 +159,40 @@ class TodoList {
 
 MobX will ensure that `unfinishedTodoCount` is updated automatically when a todo is added or when one of the `finished` properties is modified.
 Computations like these resemble formulas in spreadsheet programs like MS Excel. They update automatically, and only when required.
+
+### makeAutoObservable
+
+The above code can be simplified using `makeAutoObservable`, as MobX can infer automatically that properties are observable, `get` properties are computed, and other methods are actions.
+
+```javascript
+import { makeAutoObservable } from "mobx"
+
+class Todo {
+    id = Math.random()
+    title = ""
+    finished = false
+
+    constructor() {
+        makeAutoObservable(this, ["id"])
+    }
+
+    toggle() {
+        this.finished = !finished
+    }
+}
+
+class TodoList {
+    todos = []
+    get unfinishedTodoCount() {
+        return this.todos.filter(todo => !todo.finished).length
+    }
+    constructor() {
+        makeAutoObservable(this)
+    }
+}
+```
+
+As you can see this is more compact; the only thing you need to do to make instances of a class become observable is `makeAutoObservable`. In our original `Todo` class `id` was not observable, and we've specified the same behavior here by listing it as an exception in the second argument to `makeAutoObservable`.
 
 ### Reactions
 
