@@ -162,7 +162,8 @@ Computations like these resemble formulas in spreadsheet programs like MS Excel.
 
 ### makeAutoObservable
 
-The above code can be simplified using `makeAutoObservable`, as MobX can infer automatically that properties are observable, `get` properties are computed, and other methods are actions.
+The above code can be simplified using `makeAutoObservable`. With this, MobX
+automatically declares normal properties as `observable`, getter properties (`unfinishedTodoCount`) as `computed`, and other methods (`toggle`) as `action`.
 
 ```javascript
 import { makeAutoObservable } from "mobx"
