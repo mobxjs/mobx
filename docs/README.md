@@ -338,15 +338,6 @@ And finally kudos for all the people that believed in, tried, validated and even
 -   Feel free to send small pull requests. Please discuss new features or big changes in a GitHub issue first.
 -   Use `npm test` to run the basic test suite, `npm run coverage` for the test suite with coverage and `npm run test:performance` for the performance tests.
 
-# Limitations without Proxy support
-
-MobX 6 is works on any ES 5 environment, but if your environment or browser does not have Proxy support, there are some limitations:
-
--   Observable arrays are not real arrays, so they won't pass the `Array.isArray()` check. The practical consequence is that you often need to `.slice()` the array first (to get a real array shallow copy) before passing to third party libraries.
--   Adding properties to existing observable objects after creation is not automatically picked up. Either use observable maps instead, or use the the build in [utility functions](https://mobx.js.org/refguide/object-api.html) to read / write / iterate objects that you want to dynamically add properties to.
-
-For more details see the [caveats page](https://mobx.js.org/best/pitfalls.html).
-
 ## Donating
 
 Was MobX key in making your project a success?

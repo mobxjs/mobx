@@ -17,6 +17,10 @@
         "title": "MobX + React DevTools",
         "sidebar_label": "MobX + React DevTools"
       },
+      "best/limitations-without-proxies": {
+        "title": "Limitations without Proxy support",
+        "sidebar_label": "Limitations without Proxy support"
+      },
       "best/pitfalls": {
         "title": "Common pitfalls & best practices",
         "sidebar_label": "Common Pitfalls & Best Practices"

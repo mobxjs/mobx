@@ -41,6 +41,7 @@
     "Tips & Tricks": [
       "faq/faq",
       "best/pitfalls",
+      "best/limitations-without-proxies",
       "best/decorators",
       "best/trace",
       "best/store",
