@@ -90,7 +90,8 @@ class TodoStore {
     constructor() {
         makeObservable(this, {
             todos: observable,
-            completedCount: computed
+            completedCount: computed,
+            add: action
         })
     }
 
