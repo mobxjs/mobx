@@ -96,3 +96,29 @@ apply transactions for optimal performance.
 **_MobX helps you do things in a simple straightforward way_**.
 
 Feel free to try this example on [JSFiddle](http://jsfiddle.net/mweststrate/wgbe4guu/) or by cloning the [MobX boilerplate project](https://github.com/mobxjs/mobx-react-boilerplate)
+
+## 4. Automating `makeObservable` with `makeAutoObservable`
+
+MobX has a function `makeAutoObservable` that automatically marks properties
+as `observable` and methods as `action` (and getters as `computed`). We
+could have used this instead to simplify the `AppState` class:
+
+```javascript
+import { makeAutoObservable } from "mobx"
+
+class AppState {
+    timer = 0
+
+    constructor() {
+        makeAutoObservable(this)
+    }
+
+    increaseTimer() {
+        this.timer += 1
+    }
+
+    resetTimer() {
+        this.timer = 0
+    }
+}
+```
