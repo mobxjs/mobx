@@ -46,7 +46,7 @@ MobX is proudly sponsored by Mendix, Coinbase, Facebook Open Source, Canva, Algo
 
 # Installation
 
--   Installation: `npm install mobx --save`. React bindings: `npm install mobx-react --save`. To enable ESNext decorators (optional): `npm install mobx-decorators --save`.
+-   Installation: `npm install mobx --save`. React bindings: `npm install mobx-react --save`.
 
 -   CDN:
 
