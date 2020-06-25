@@ -2,6 +2,7 @@ import {
     asObservableObject,
     addHiddenProp,
     action,
+    autoAction,
     isAction,
     computed,
     observable,
@@ -21,6 +22,8 @@ import {
     die,
     ACTION,
     ACTION_BOUND,
+    AUTOACTION,
+    AUTOACTION_BOUND,
     COMPUTED,
     COMPUTED_STRUCT,
     OBSERVABLE,
@@ -29,8 +32,8 @@ import {
     OBSERVABLE_STRUCT
 } from "../internal"
 
-function makeAction(target, key, name, fn) {
-    addHiddenProp(target, key, action(name || key, fn))
+function makeAction(target, key, name, fn, asAutoAction) {
+    addHiddenProp(target, key, asAutoAction ? autoAction(name || key, fn) : action(name || key, fn))
 }
 
 function getInferredAnnotation(
@@ -40,7 +43,7 @@ function getInferredAnnotation(
     if (desc.get) return computed
     if (desc.set) return false // ignore pure setters
     // if already wrapped in action, don't do that another time, but assume it is already set up properly
-    if (isFunction(desc.value)) return isAction(desc.value) ? false : action.bound
+    if (isFunction(desc.value)) return isAction(desc.value) ? false : autoAction.bound
     // if (!desc.configurable || !desc.writable) return false
     return defaultAnnotation ?? observable.deep
 }
@@ -82,21 +85,31 @@ export function makeProperty(
     if (!annotation || annotation === true || !annotation.annotationType_) {
         return die(2, key)
     }
-    switch (annotation.annotationType_) {
+    const type = annotation.annotationType_
+    switch (type) {
+        case AUTOACTION:
         case ACTION: {
             const fn = descriptor.value
             if (!isFunction(fn)) die(3, key)
             if (owner !== target && !forceCopy) {
-                if (!isAction(owner[key])) makeAction(owner, key, annotation.arg_, fn)
+                if (!isAction(owner[key]))
+                    makeAction(owner, key, annotation.arg_, fn, type === AUTOACTION)
             } else {
-                makeAction(target, key, annotation.arg_, fn)
+                makeAction(target, key, annotation.arg_, fn, type === AUTOACTION)
             }
             break
         }
+        case AUTOACTION_BOUND:
         case ACTION_BOUND: {
             const fn = descriptor.value
             if (!isFunction(fn)) die(3, key)
-            makeAction(target, key, annotation.arg_, fn.bind(adm.proxy_ || target))
+            makeAction(
+                target,
+                key,
+                annotation.arg_,
+                fn.bind(adm.proxy_ || target),
+                type === AUTOACTION_BOUND
+            )
             break
         }
         case COMPUTED:
@@ -218,7 +231,7 @@ function extractAnnotationsFromProto(proto: any, collector: AnnotationsMap<any, 
         if (prop.get) {
             collector[key as any] = computed
         } else if (isFunction(prop.value)) {
-            collector[key as any] = action.bound
+            collector[key as any] = autoAction.bound
         }
     })
 }

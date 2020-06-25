@@ -28,7 +28,9 @@ import {
     untrackedEnd,
     untrackedStart,
     UPDATE,
-    die
+    die,
+    allowStateChangesStart,
+    allowStateChangesEnd
 } from "../internal"
 
 export interface IComputedValue<T> {
@@ -211,7 +213,8 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 
     computeValue_(track: boolean) {
         this.isComputing_ = true
-        globalState.computationDepth++
+        // don't allow state changes during computation
+        const prev = allowStateChangesStart(false)
         let res: T | CaughtException
         if (track) {
             res = trackDerivedFunction(this, this.derivation_, this.scope_)
@@ -226,7 +229,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
                 }
             }
         }
-        globalState.computationDepth--
+        allowStateChangesEnd(prev)
         this.isComputing_ = false
         return res
     }

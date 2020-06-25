@@ -1,5 +1,4 @@
-import { IDerivation, IObservable, Reaction } from "../internal"
-import { die } from "../errors"
+import { IDerivation, IObservable, Reaction, die } from "../internal"
 
 /**
  * These values will persist if global state is reset
@@ -41,11 +40,6 @@ export class MobXGlobals {
      * Currently running derivation
      */
     trackingDerivation: IDerivation | null = null
-
-    /**
-     * Are we running a computation currently? (not a reaction)
-     */
-    computationDepth = 0
 
     /**
      * Each time a derivation is tracked, it is assigned a unique run-id

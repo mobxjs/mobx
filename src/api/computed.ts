@@ -7,9 +7,9 @@ import {
     isStringish,
     isPlainObject,
     isFunction,
-    assign
+    assign,
+    die
 } from "../internal"
-import { die } from "../errors"
 
 export const COMPUTED = "computed"
 export const COMPUTED_STRUCT = "computed.struct"

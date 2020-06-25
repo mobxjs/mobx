@@ -137,19 +137,14 @@ export function checkIfStateModificationsAreAllowed(atom: IAtom) {
         return
     }
     const hasObservers = atom.observers_.size > 0
-    // Should never be possible to change an observed observable from inside computed, see #798
-    if (globalState.computationDepth > 0 && hasObservers)
-        // TODO: prefix with mobx
-        console.warn(
-            `Computed values are not allowed to cause side effects by changing observables that are already being observed. Tried to modify: ${atom.name_}`
-        )
     // Should not be possible to change observed state outside strict mode, except during initialization, see #563
     if (!globalState.allowStateChanges && (hasObservers || globalState.enforceActions === "always"))
         // TODO: prefix with mobx
         console.warn(
-            (globalState.enforceActions
-                ? "Since strict-mode is enabled, changing observed observable values outside actions is not allowed. Please wrap the code in an `action` if this change is intended. Tried to modify: "
-                : "Side effects like changing state are not allowed at this point. Are you trying to modify state from, for example, the render function of a React component? Tried to modify: ") +
+            "[MobX] " +
+                (globalState.enforceActions
+                    ? "Since strict-mode is enabled, changing observed observable values outside actions is not allowed. Please wrap the code in an `runInAction` if this change is intended. Tried to modify: "
+                    : "Side effects like changing state are not allowed at this point. Are you trying to modify state from, for example, a computed value or the render function of a React component? You can wrap side effects in 'runInAction' if needed but we recommend to investigate if the value you are trying to update can be derived instead. Tried to modify: ") +
                 atom.name_
         )
 }

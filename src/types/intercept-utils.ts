@@ -1,5 +1,4 @@
-import { Lambda, once, untrackedEnd, untrackedStart } from "../internal"
-import { die } from "../errors"
+import { Lambda, once, untrackedEnd, untrackedStart, die } from "../internal"
 
 export type IInterceptor<T> = (change: T) => T | null
 

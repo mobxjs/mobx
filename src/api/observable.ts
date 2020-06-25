@@ -29,9 +29,9 @@ import {
     globalState,
     assign,
     die,
-    isString
+    isString,
+    isStringish
 } from "../internal"
-import { isStringish } from "../utils/utils"
 
 export const OBSERVABLE = "observable"
 export const OBSERVABLE_REF = "observable.ref"

@@ -9,9 +9,9 @@ import {
     isObservableObject,
     isObservableValue,
     ObservableSet,
-    die
+    die,
+    isStringish
 } from "../internal"
-import { isStringish } from "../utils/utils"
 
 export type ReadInterceptor<T> = (value: any) => T
 

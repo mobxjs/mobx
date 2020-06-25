@@ -7,7 +7,8 @@ import {
     isObservableProp,
     isComputedProp,
     isAction,
-    makeAutoObservable
+    makeAutoObservable,
+    autorun
 } from "../../../src/mobx"
 
 test("makeObservable picks up decorators", () => {
@@ -222,4 +223,60 @@ test("makeAutoObservable cannot be used on observable objects", () => {
     }).toThrowErrorMatchingInlineSnapshot(
         `"[MobX] makeAutoObservable can only be used on objects not already made observable"`
     )
+})
+
+test("makeAutoObservable actions can be used for state updaters and state readers", () => {
+    class A {
+        x = 1
+
+        constructor() {
+            makeAutoObservable(this)
+        }
+
+        double() {
+            return this.x * 2
+        }
+
+        addTwo() {
+            this.x++
+            this.x++
+        }
+    }
+
+    const events: number[] = []
+    const a = new A()
+    const d = autorun(() => {
+        events.push(a.double())
+    })
+
+    a.addTwo()
+
+    // tracked and batched!
+    expect(events).toEqual([2, 6])
+
+    d()
+})
+
+test("observable actions can be used for state updaters and state readers", () => {
+    const events: number[] = []
+    const a = observable({
+        x: 1,
+        double() {
+            return this.x * 2
+        },
+        addTwo() {
+            this.x++
+            this.x++
+        }
+    })
+    const d = autorun(() => {
+        events.push(a.double())
+    })
+
+    a.addTwo()
+
+    // tracked and batched!
+    expect(events).toEqual([2, 6])
+
+    d()
 })

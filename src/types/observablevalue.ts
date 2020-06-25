@@ -22,9 +22,9 @@ import {
     spyReportStart,
     toPrimitive,
     globalState,
-    IUNCHANGED
+    IUNCHANGED,
+    UPDATE
 } from "../internal"
-import { UPDATE } from "./observablearray"
 
 export interface IValueWillChange<T> {
     object: any
