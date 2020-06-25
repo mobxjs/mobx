@@ -33,7 +33,9 @@ import {
     globalState,
     ADD,
     UPDATE,
-    die
+    die,
+    defineProperty,
+    hasProp
 } from "../internal"
 
 // TODO: kill
@@ -187,7 +189,7 @@ export class ObservableObjectAdministration
         this.values_.set(propName, observable)
         newValue = (observable as any).value_ // observableValue might have changed it
 
-        Object.defineProperty(target, propName, generateObservablePropConfig(propName))
+        defineProperty(target, propName, generateObservablePropConfig(propName))
         this.notifyPropertyAddition_(propName, newValue)
     }
 
@@ -201,8 +203,7 @@ export class ObservableObjectAdministration
         options.context = this.proxy_ || target
         this.values_.set(propName, new ComputedValue(options))
         if (propertyOwner === target || isPropertyConfigurable(propertyOwner, propName))
-            // TODO: extract util?
-            Object.defineProperty(propertyOwner, propName, generateComputedPropConfig(propName))
+            defineProperty(propertyOwner, propName, generateComputedPropConfig(propName))
     }
 
     remove_(key: PropertyKey) {
@@ -332,7 +333,7 @@ export function asObservableObject(
     name: PropertyKey = "",
     defaultEnhancer: IEnhancer<any> = deepEnhancer
 ): ObservableObjectAdministration {
-    if (Object.prototype.hasOwnProperty.call(target, $mobx)) return target[$mobx]
+    if (hasProp(target, $mobx)) return target[$mobx]
 
     if (__DEV__ && !Object.isExtensible(target))
         die("Cannot make the designated object observable; it is not extensible")

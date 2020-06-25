@@ -29,8 +29,11 @@ import {
     OBSERVABLE,
     OBSERVABLE_REF,
     OBSERVABLE_SHALLOW,
-    OBSERVABLE_STRUCT
+    OBSERVABLE_STRUCT,
+    getOwnPropertyDescriptors,
+    defineProperty
 } from "../internal"
+import { ownKeys, objectPrototype } from "../utils/utils"
 
 function makeAction(target, key, name, fn, asAutoAction) {
     addHiddenProp(target, key, asAutoAction ? autoAction(name || key, fn) : action(name || key, fn))
@@ -50,7 +53,7 @@ function getInferredAnnotation(
 
 function getDescriptorInChain(target: Object, prop: PropertyKey): [PropertyDescriptor, Object] {
     let current = target
-    while (current && current !== Object.prototype) {
+    while (current && current !== objectPrototype) {
         // TODO: cache meta data, especially for members from prototypes?
         const desc = getDescriptor(current, prop)
         if (desc) {
@@ -77,8 +80,7 @@ export function makeProperty(
     }
     if (annotation === false) {
         if (forceCopy) {
-            // TODO: create util?
-            Object.defineProperty(target, key, descriptor)
+            defineProperty(target, key, descriptor)
         }
         return
     }
@@ -178,8 +180,7 @@ export function makeObservable<T extends Object, AdditionalKeys extends Property
             const [desc, owner] = getDescriptorInChain(target, key)
             makeProperty(adm, owner, key, desc, annotation, false)
         }
-        Object.getOwnPropertyNames(annotations).forEach(make)
-        Object.getOwnPropertySymbols(annotations).forEach(make) // TODO: check if available everywhere
+        ownKeys(annotations).forEach(make)
     } finally {
         endBatch()
     }
@@ -193,7 +194,7 @@ export function makeAutoObservable<T extends Object, AdditionalKeys extends Prop
     options?: CreateObservableOptions
 ): T {
     const proto = Object.getPrototypeOf(target)
-    const isPlain = proto == null || proto === Object.prototype
+    const isPlain = proto == null || proto === objectPrototype
     if (__DEV__) {
         if (!isPlain && !isPlainObject(proto))
             die(`'makeAutoObservable' can only be used for classes that don't have a superclass`)
@@ -217,16 +218,14 @@ function extractAnnotationsFromObject(
     const defaultAnnotation: Annotation = options?.deep
         ? observable.deep
         : options?.defaultDecorator ?? observable.deep
-    // TODO: util for getOwnDescriptors?
-    Object.entries(Object.getOwnPropertyDescriptors(target)).forEach(([key, descriptor]) => {
+    Object.entries(getOwnPropertyDescriptors(target)).forEach(([key, descriptor]) => {
         if (key in collector || key === "constructor") return
         collector[key] = getInferredAnnotation(descriptor, defaultAnnotation)
     })
 }
 
 function extractAnnotationsFromProto(proto: any, collector: AnnotationsMap<any, any>) {
-    // TODO: for this combo, craeate a utility, looks same as above
-    Object.entries(Object.getOwnPropertyDescriptors(proto)).forEach(([key, prop]) => {
+    Object.entries(getOwnPropertyDescriptors(proto)).forEach(([key, prop]) => {
         if (key in collector || key === "constructor") return
         if (prop.get) {
             collector[key as any] = computed

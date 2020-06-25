@@ -5,7 +5,8 @@ import {
     makeObservable,
     assign,
     getDescriptor,
-    hasProp
+    hasProp,
+    objectPrototype
 } from "../internal"
 
 export const mobxDecoratorsSymbol = Symbol("mobx-decoratorators")
@@ -66,7 +67,7 @@ export function applyDecorators(target: Object): boolean {
     // TODO optimization: this can be cached per prototype!
     // (then we can remove the weird short circuiting as well..)
     let annotations: AnnotationsMap<any, any>[] = []
-    while (current && current !== Object.prototype) {
+    while (current && current !== objectPrototype) {
         const desc = getDescriptor(current, mobxDecoratorsSymbol)
         if (desc) {
             if (!annotations.length) {

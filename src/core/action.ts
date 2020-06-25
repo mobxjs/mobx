@@ -13,14 +13,15 @@ import {
     allowStateReadsEnd,
     ACTION,
     EMPTY_ARRAY,
-    die
+    die,
+    getDescriptor
 } from "../internal"
 
 // we don't use globalState for these in order to avoid possible issues with multiple
 // mobx versions
 let currentActionId = 0
 let nextActionId = 1
-const functionNameDescriptor = Object.getOwnPropertyDescriptor(() => {}, "name")
+const functionNameDescriptor = getDescriptor(() => {}, "name")
 const isFunctionNameConfigurable = functionNameDescriptor?.configurable ?? false
 
 export function createAction(

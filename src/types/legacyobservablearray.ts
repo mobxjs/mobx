@@ -10,7 +10,8 @@ import {
     arrayExtensions,
     IEnhancer,
     isObservableArray,
-    IObservableArray
+    IObservableArray,
+    defineProperty
 } from "../internal"
 
 /**
@@ -112,11 +113,7 @@ function createArrayEntryDescriptor(index: number) {
 }
 
 function createArrayBufferItem(index: number) {
-    Object.defineProperty(
-        LegacyObservableArray.prototype,
-        "" + index,
-        createArrayEntryDescriptor(index)
-    )
+    defineProperty(LegacyObservableArray.prototype, "" + index, createArrayEntryDescriptor(index))
 }
 
 export function reserveArrayBuffer(max: number) {

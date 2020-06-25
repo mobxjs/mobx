@@ -11,7 +11,8 @@ import {
     getEnhancerFromOption,
     isObservable,
     getPlainObjectKeys,
-    die
+    die,
+    getOwnPropertyDescriptors
 } from "../internal"
 
 export function extendObservable<A extends Object, B extends Object>(
@@ -35,7 +36,7 @@ export function extendObservable<A extends Object, B extends Object>(
     const adm = asObservableObject(target, o.name, getEnhancerFromOption(o))
     startBatch()
     try {
-        const descs = Object.getOwnPropertyDescriptors(properties)
+        const descs = getOwnPropertyDescriptors(properties)
         getPlainObjectKeys(descs).forEach(key => {
             makeProperty(
                 adm,

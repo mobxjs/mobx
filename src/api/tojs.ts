@@ -44,16 +44,14 @@ function toJSHelper(source, options: ToJSOptions, __alreadySeen: Map<any, any>) 
     if (detectCycles && __alreadySeen.has(source)) {
         return __alreadySeen.get(source)
     }
-    // TODO: remove second cond
-    if (isObservableArray(source) || Array.isArray(source)) {
+    if (isObservableArray(source)) {
         const res = cache(__alreadySeen, source, new Array(source.length), options)
         source.forEach((value, idx) => {
             res[idx] = toJSHelper(value, options!, __alreadySeen)
         })
         return res
     }
-    // TODO: remove second cond
-    if (isObservableSet(source) || Object.getPrototypeOf(source) === Set.prototype) {
+    if (isObservableSet(source)) {
         if (options.exportMapsAsObjects === false) {
             const res = cache(__alreadySeen, source, new Set(), options)
             source.forEach(value => {
@@ -69,8 +67,7 @@ function toJSHelper(source, options: ToJSOptions, __alreadySeen: Map<any, any>) 
             return res
         }
     }
-    // TODO: reuse Object.getPrototypeOf? alsoe remove second cond
-    if (isObservableMap(source) || Object.getPrototypeOf(source) === Map.prototype) {
+    if (isObservableMap(source)) {
         if (options.exportMapsAsObjects === false) {
             const res = cache(__alreadySeen, source, new Map(), options)
             source.forEach((value, key) => {

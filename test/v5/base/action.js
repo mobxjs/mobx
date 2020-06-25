@@ -194,7 +194,7 @@ test("should be possible to change observed state in an action called from compu
                 a.set(4)
             })
         ).toMatchInlineSnapshot(
-            `"<STDOUT> [MobX] Side effects like changing state are not allowed at this point. Are you trying to modify state from, for example, a computed value or the render function of a React component? You can wrap side effects in 'runInAction' if needed but we recommend to investigate if the value you are trying to update can be derived instead. Tried to modify: ObservableValue@29"`
+            `"<STDOUT> [MobX] Side effects like changing state are not allowed at this point. Are you trying to modify state from, for example, a computed value or the render function of a React component? You can wrap side effects in 'runInAction' (or decorate functions with 'action') if needed. Tried to modify: ObservableValue@29"`
         )
         expect(a.get()).toBe(4)
         testAction()
@@ -617,7 +617,7 @@ test("auto action should not update state from inside a derivation", async () =>
                 double()
             })
         ).toMatchInlineSnapshot(
-            `"<STDOUT> [MobX] Side effects like changing state are not allowed at this point. Are you trying to modify state from, for example, a computed value or the render function of a React component? You can wrap side effects in 'runInAction' if needed but we recommend to investigate if the value you are trying to update can be derived instead. Tried to modify: ObservableValue@79"`
+            `"<STDOUT> [MobX] Side effects like changing state are not allowed at this point. Are you trying to modify state from, for example, a computed value or the render function of a React component? You can wrap side effects in 'runInAction' (or decorate functions with 'action') if needed. Tried to modify: ObservableValue@79"`
         )
         return a.get() === 2
     })

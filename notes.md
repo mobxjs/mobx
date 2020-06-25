@@ -1,18 +1,18 @@
 ## Feature work
 
 -   [ ] Build process
-    -   [ ] kill v4 / v5 separation
-    -   [ ] TSDX build process
+    -   [x] kill v4 / v5 separation
+    -   [x] TSDX build process
 -   [ ] Smaller build
     -   [x] fixup build, restore asset bundling
-    -   [ ] create prod esm build?
-    -   [ ] minimal dev errors
-    -   [ ] invariant system from immer
-    -   [ ] check all calls to top-level
+    -   ~[ ] create prod esm build?~
+    -   [x] minimal dev errors
+    -   [x] invariant system from immer
+    -   [x] check all calls to top-level
             build, tree-shakeable etc?
-    -   [ ] add **PURE** annotations?
-    -   [ ] extract utils for getOwnPropertyDescriptor and defineProperty
-    -   [ ] configure property mangling like in Immer. Will it save anything?
+    -   [x] add **PURE** annotations?
+    -   [x] extract utils for getOwnPropertyDescriptor and defineProperty
+    -   [x] configure property mangling like in Immer. Will it save anything?
 -   [ ] code mod
     -   [x] code mod, run on v4 tests?
     -   [x] codemod TS
@@ -37,21 +37,22 @@
     -   [x] observable / extendObservable use decorators args
     -   [x] observable; support `false` as argument
 -   [ ] misc
-    -   [ ] revisit safety model
+    -   [x] revisit safety model
     -   [ ] at startup, test presence of Map, Symbol ownPropertySymboles and other globals!
-    -   [ ] verify: action called from computed throws?
+    -   [x] verify: action called from computed throws?
     -   [ ] apply deprecation of find and findIndex error
     -   [ ] verify perf / memory changes
     -   [ ] investigate skipped tests
     -   [ ] process TODO's
     -   [ ] weakmap for hasMaps in Map (and Set?)
     -   [ ] add a solution for keepAlive computeds like https://github.com/mobxjs/mobx/issues/2309#issuecomment-598707584
-    -   [ ] update useLocalStore in mobx-react-lite to use makeObservable
+    -   [ ] update useLocalStore in mobx-react-lite to use autoMakeObservable
     -   [ ] include #2343
     -   [ ] default observable requires reaction?
     -   [ ] kill globalstate options?
     -   [ ] no auto lifting? https://twitter.com/getify/status/1258137826241241088
     -   [ ] flow types
+    -   [ ] Would be awesome, but no idea how to go about that :) We could maybe at random places (e.g in observableValue) check in DEV mode if a value is a class instance with decorators, but with undecorated members. Might be a bit of a performance bummer though.
 
 ## Docs / migration guide
 
