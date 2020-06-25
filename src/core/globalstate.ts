@@ -1,5 +1,4 @@
-import { IDerivation, IObservable, Reaction } from "../internal"
-import { die } from "../errors"
+import { IDerivation, IObservable, Reaction, die } from "../internal"
 
 /**
  * These values will persist if global state is reset

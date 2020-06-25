@@ -31,10 +31,10 @@ import {
     startBatch,
     stringifyKey,
     globalState,
-    ADD
+    ADD,
+    UPDATE,
+    die
 } from "../internal"
-import { UPDATE } from "./observablearray"
-import { die } from "../errors"
 
 // TODO: kill
 export interface IObservableObject {

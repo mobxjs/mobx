@@ -28,9 +28,10 @@ import {
     untrackedEnd,
     untrackedStart,
     UPDATE,
-    die
+    die,
+    allowStateChangesStart,
+    allowStateChangesEnd
 } from "../internal"
-import { allowStateChangesStart, allowStateChangesEnd } from "./action"
 
 export interface IComputedValue<T> {
     get(): T

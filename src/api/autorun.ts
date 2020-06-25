@@ -11,9 +11,9 @@ import {
     isAction,
     isFunction,
     isPlainObject,
-    die
+    die,
+    allowStateChanges
 } from "../internal"
-import { allowStateChanges } from "../core/action"
 
 export interface IAutorunOptions {
     delay?: number

@@ -8,6 +8,8 @@ export type Annotation = {
         | "computed.struct"
         | "action"
         | "action.bound"
+        | "autoAction"
+        | "autoAction.bound"
     arg_?: any
 }
 

@@ -5,9 +5,9 @@ import {
     autorun,
     createAction,
     getNextId,
-    die
+    die,
+    allowStateChanges
 } from "../internal"
-import { allowStateChanges } from "../core/action"
 
 export interface IWhenOptions {
     name?: string
