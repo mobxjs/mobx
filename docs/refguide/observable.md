@@ -27,7 +27,6 @@ hide_title: true
 Usage:
 
 -   `observable(value)`
--   `@observable classProperty = value`
 
 Observable values can be JS primitives, references, plain objects, class instances, arrays and maps.
 The following conversion rules are applied, but can be fine-tuned by using _modifiers_. See below.
@@ -42,7 +41,6 @@ These rules might seem complicated at first sight, but you will notice that in p
 Some notes:
 
 -   By default, making a data structure observable is _infective_; that means that `observable` is applied automatically to any value that is contained by the data structure, or will be contained by the data structure in the future. This behavior can be changed by using _modifiers_.
--   To use the `@observable` decorator, make sure that [decorators are enabled](observable-decorator.md) in your transpiler (babel or typescript).
 -   _[Environments without Proxy support]_ To create **dynamically keyed objects** use an [Observable Map](map.md)! Only initially existing properties on an object will be made observable, although new ones can be added using `extendObservable`.
 
 Some examples:
