@@ -32,7 +32,7 @@ Questions:
 -   When we introduce actions we need a link to an actions section that describes
     how to turn off strict state reinforcing.
 
--   What's the codemod all about?
+-   Codemods. The jscodeshift command uses `yarn`. What's the `npm` equivalent (as we use npm elsewhere in examples)? Does `mobx/codemod/undecorate.ts` work? Should we specify -extensions=js,js,ts,tsx as well to include typescript?
 
 -   There are a lot of references to external documentation resources. They can probably use
     a pruning.

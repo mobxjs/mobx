@@ -10,8 +10,8 @@
         "sidebar_label": "async actions & flows"
       },
       "best/decorators": {
-        "title": "How to (not) use decorators",
-        "sidebar_label": "How to (not) use decorator syntax"
+        "title": "Decorators in MobX",
+        "sidebar_label": "Decorators in MobX"
       },
       "best/devtools": {
         "title": "MobX + React DevTools",

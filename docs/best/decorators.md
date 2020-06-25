@@ -1,155 +1,92 @@
 ---
-sidebar_label: How to (not) use decorator syntax
-title: How to (not) use decorators
+sidebar_label: Decorators in MobX
+title: Decorators in MobX
 hide_title: true
 ---
 
-# How to (not) use decorators
+# Decorators in MobX
 
-<div id='codefund'></div><div class="re_2020"><a class="re_2020_link" href="https://www.react-europe.org/#slot-2149-workshop-typescript-for-react-and-graphql-devs-with-michel-weststrate" target="_blank" rel="sponsored noopener"><div><div class="re_2020_ad" >Ad</div></div><img src="/img/reacteurope.svg"><span>Join the author of MobX at <b>ReactEurope</b> to learn how to use <span class="link">TypeScript with React</span></span></a></div>
+MobX before version 6 encouraged the use of ES.next decorators to mark things as observable, computed and action. Decorators are not currently a ES standard however, and the process of standardization is taking a long time. In MobX6 in the interest of compatibility we have chosen to move away from them, and use `makeObservable()`/`makeAutoObservable()` instead.
 
-Using ES.next decorators in MobX is optional. This section explains how to use them, or how to avoid them.
-
-Advantages of using decorator syntax:
-
--   Minimizes boilerplate, declarative.
--   Easy to use and read. A majority of the MobX users use them.
-
-Disadvantages of using decorator syntax:
-
--   Stage-2 ES.next feature
--   Requires a little setup and transpilation, only supported with Babel / Typescript transpilation so far
-
-You can approach using decorators in two ways in MobX
-
-1.  Enable the currently experimental decorator syntax in your compiler (read on)
-2.  Don't enable decorator syntax, but leverage the MobX built-in utility `decorate` to apply decorators to your classes / objects.
-
-Using decorator syntax:
+But many existing code bases that use MobX still use them, and a lot of the documentation material online uses them as well. You can still use them with MobX 6 too! So let's examine what they look like:
 
 ```javascript
-import { observable, computed, action } from "mobx"
-
-class Timer {
-    @observable start = Date.now()
-    @observable current = Date.now()
-
-    @computed
-    get elapsedTime() {
-        return this.current - this.start + "milliseconds"
-    }
-
-    @action
-    tick() {
-        this.current = Date.now()
-    }
-}
-```
-
-Using the `decorate` utility:
-
-```javascript
-import { observable, computed, action, decorate } from "mobx"
-
-class Timer {
-    start = Date.now()
-    current = Date.now()
-
-    get elapsedTime() {
-        return this.current - this.start + "milliseconds"
-    }
-
-    tick() {
-        this.current = Date.now()
-    }
-}
-decorate(Timer, {
-    start: observable,
-    current: observable,
-    elapsedTime: computed,
-    tick: action
-})
-```
-
-For applying multiple decorators on a single property, you can pass an array of decorators. The decorators application order is from right to left.
-
-```javascript
-import { decorate, observable } from "mobx"
-import { serializable, primitive } from "serializr"
-import persist from "mobx-persist"
+import { makeObservable, observable, computed, action } from "mobx"
 
 class Todo {
     id = Math.random()
-    title = ""
-    finished = false
-}
-decorate(Todo, {
-    title: [serializable(primitive), persist("object"), observable],
-    finished: [serializable(primitive), observable]
-})
-```
+    @observable title = ""
+    @observable finished = false
 
-Note: Not all decorators can be composed together, and this functionality is just best-effort. Some decorators affect the instance directly and can 'hide' the effect of other decorators that only change the prototype.
+    constructor() {
+        makeObservable(this)
+    }
 
----
-
-The `observer` function from `mobx-react` is both a decorator and a function, that means that all these syntax variants will work:
-
-```javascript
-@observer
-class Timer extends React.Component {
-	/* ... */
+    @action
+    toggle() {
+        this.finished = !finished
+    }
 }
 
-const Timer = observer(class Timer extends React.Component {
-	/* ... */
-})
+class TodoList {
+    @observable todos = []
 
-const Timer = observer((props) => (
-	/* rendering */
-))
+    @computed
+    get unfinishedTodoCount() {
+        return this.todos.filter(todo => !todo.finished).length
+    }
+
+    constructor() {
+        makeObservable(this)
+    }
+}
 ```
 
-## Enabling decorator syntax
+MobX before version 6 did not require the `makeObservable(this)` call in the constructor, but because it makes the implementation of decorator simpler and more compatible, MobX now does. This instructs MobX to make the instances observable following the information in the decorators -- the decorators take the place of the second argument to `makeObservable`.
 
-If you want to use decorators follow the following steps.
+## Upgrading using the `undecorate` codemod
 
-**TypeScript**
+If you are a MobX user you have code that uses a lot of decorators, or the equivalent calls to `decorate`.
+
+You can convert your project using [jscodeshift](https://github.com/facebook/jscodeshift), which
+is a dev dependency of MobX.
+
+Convert all files in directory `src`. This gets rid of all uses of MobX decorators and
+replaces them with the equivalent `makeObservable(this, {...})` invocation:
+
+```shell
+yarn jscodeshift -t mobx/codemod/undecorator.ts --extensions=js,jsx,ts,tsx src
+```
+
+If you want to retain decorators and only introduce `makeObservable(this)` where you
+required, you can use the `--keepDecorators` option:
+
+```shell
+yarn jscodeshift -t mobx/codemod/undecorate.ts --extensions=js,jsx,ts,tsx src --keepDecorators=true
+```
+
+Convert single file and everything it imports:
+
+```shell
+yarn jscodeshift -t mobx/codemod/undecorate.ts myfile.js
+```
+
+Convert an individual file, leaving any imports unchanged using `--ignoreImports`:
+
+```shell
+yarn jscodeshift -t mobx/codemod/undecorate.ts myfile.js --ignoreImports=true
+```
+
+## How to enable decorator support
+
+We do not recommend new codebases that use MobX use decorators until such point as they become
+an official part of the language, but you can still use them. It does require setup for transpilation: you have to use Babel or TypeScript.
+
+### TypeScript
 
 Enable the compiler option `"experimentalDecorators": true` in your `tsconfig.json`.
 
-**Babel 6: using `babel-preset-mobx`**
-
-A more convenient way to setup Babel for usage with mobx is to use the [`mobx`](https://github.com/zwhitchcox/babel-preset-mobx) preset, that incorporates decorators and several other plugins typically used with mobx:
-
-```
-npm install --save-dev babel-preset-mobx
-```
-
-.babelrc:
-
-```json
-{
-    "presets": ["mobx"]
-}
-```
-
-**Babel 6: manually enabling decorators**
-
-To enable support for decorators without using the mobx preset, follow the following steps.
-Install support for decorators: `npm i --save-dev babel-plugin-transform-decorators-legacy`. And enable it in your `.babelrc` file:
-
-```json
-{
-    "presets": ["es2015", "stage-1"],
-    "plugins": ["transform-decorators-legacy"]
-}
-```
-
-Note that the order of plugins is important: `transform-decorators-legacy` should be listed _first_.
-Having issues with the babel setup? Check this [issue](https://github.com/mobxjs/mobx/issues/105) first.
-
-**Babel 7**
+### Babel 7
 
 Install support for decorators: `npm i --save-dev @babel/plugin-proposal-class-properties @babel/plugin-proposal-decorators`. And enable it in your `.babelrc` file:
 
@@ -162,17 +99,30 @@ Install support for decorators: `npm i --save-dev @babel/plugin-proposal-class-p
 }
 ```
 
-Note that the `legacy` mode is important (as is putting the decorators proposal first). Non-legacy mode is [WIP](https://github.com/mobxjs/mobx/pull/1732).
+Note that the `legacy` mode is important (as is putting the decorators proposal first).
 
-## Decorator syntax and Create React App (v1)
+### Decorator syntax and Create React App (v2)
 
--   Decorators are not supported out of the box in `create-react-app@1.*`. To fix this, you can either use the `decorate` utility, eject, or use the [react-app-rewired](https://github.com/timarney/react-app-rewired/tree/master/packages/react-app-rewire-mobx) package.
+-   Decorators are only supported out of the box when using TypeScript in `create-react-app@^2.1.1` and newer. In older versions or when using vanilla JavaScript use eject, or the [customize-cra](https://github.com/arackaf/customize-cra) package.
 
-## Decorator syntax and Create React App (v2)
+### Using `observer` from `mobx-react`
 
--   Decorators are only supported out of the box when using TypeScript in `create-react-app@^2.1.1`. In older versions or when using vanilla JavaScript use either the `decorate` utility, eject, or the [customize-cra](https://github.com/arackaf/customize-cra) package.
+The `observer` function from `mobx-react` is both a decorator and a function, that means that all these syntax variants will work:
 
----
+```javascript
+const Timer = observer((props) => (
+	/* rendering */
+))
+
+const Timer = observer(class Timer extends React.Component {
+	/* ... */
+})
+
+@observer
+class Timer extends React.Component {
+	/* ... */
+}
+```
 
 ## Disclaimer: Limitations of decorator syntax:
 

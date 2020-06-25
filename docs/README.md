@@ -162,8 +162,7 @@ Computations like these resemble formulas in spreadsheet programs like MS Excel.
 
 ### makeAutoObservable
 
-The above code can be simplified using `makeAutoObservable`. With this, MobX
-automatically declares normal properties as `observable`, getter properties (`unfinishedTodoCount`) as `computed`, and other methods (`toggle`) as `action`.
+The above code can be simplified using `makeAutoObservable`. With this, MobX automatically declares normal properties as `observable`, getter properties (`unfinishedTodoCount`) as `computed`, and other methods (`toggle`) as `action`.
 
 ```javascript
 import { makeAutoObservable } from "mobx"
@@ -174,7 +173,7 @@ class Todo {
     finished = false
 
     constructor() {
-        makeAutoObservable(this, ["id"])
+        makeAutoObservable(this, { id: false })
     }
 
     toggle() {
@@ -193,45 +192,11 @@ class TodoList {
 }
 ```
 
-As you can see this is more compact; the only thing you need to do to make instances of a class become observable is `makeAutoObservable`. In our original `Todo` class `id` was not observable, and we've specified the same behavior here by listing it as an exception in the second argument to `makeAutoObservable`.
+As you can see this is more compact; the only thing you need to do to make instances of a class become observable is `makeAutoObservable`. In our original `Todo` class `id` was not observable, and we've specified the same behavior here by telling `makeAutoObservable` not to do anything with it.
 
 ### Decorators
 
-MobX before version 6 encouraged the use of ES.next decorators to mark things as observable, computed and actions. Decorators are not currently a ES standard however, and the process of standardization is taking a long time. In MobX6 we have chosen to move away from them, and use `makeObservable()`/`makeAutoObservable()` instead.
-
-But many existing code bases that use MobX still use them, and a lot of the documentation material online uses them as well. And you can still use them in MobX 6 and above. The equivalent of the above code using decorators looks like this:
-
-```javascript
-import { makeObservable, observable, computed, action } from "mobx"
-
-class Todo {
-    id = Math.random()
-    @observable title = ""
-    @observable finished = false
-
-    constructor() {
-        makeObservable(this)
-    }
-
-    @action
-    toggle() {
-        this.finished = !finished
-    }
-}
-
-class TodoList {
-    @observable todos = []
-
-    @computed
-    get unfinishedTodoCount() {
-        return this.todos.filter(todo => !todo.finished).length
-    }
-
-    constructor() {
-        makeObservable(this)
-    }
-}
-```
+Wait! Didn't MobX use decorators for this? That's true, but in MobX 6 we have chosen to move away from them.
 
 Here is the gist on decorator support in MobX 6:
 
