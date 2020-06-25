@@ -5,7 +5,7 @@ const mobx = require("../../../src/mobx.ts")
 const utils = require("../../v5/utils/test-utils")
 const { makeObservable } = mobx
 
-const strictError = /Since strict-mode is enabled, changing observed observable values outside actions is not allowed. Please wrap the code in an `action` if this change is intended. Tried to modify: /
+const strictError = /Since strict-mode is enabled, changing observed observable values outside actions is not allowed./
 
 test("strict mode should not allow changes outside action", () => {
     const a = mobx.observable.box(2)

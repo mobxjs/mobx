@@ -177,45 +177,37 @@ test("should be possible to change unobserved state in an action called from com
     mobx._resetGlobalState()
 })
 
-test.skip("should be possible to change observed state in an action called from computed if run inside _allowStateChangesInsideComputed", () => {
+test("should be possible to change observed state in an action called from computed", () => {
     const a = mobx.observable.box(2)
     const d = mobx.autorun(() => {
         a.get()
     })
 
     const testAction = mobx.action(() => {
-        mobx._allowStateChangesInsideComputed(() => {
-            a.set(3)
-            // a second level computed should throw
-            expect(utils.grabConsole(() => c2.get())).toMatch(
-                /Computed values are not allowed to cause side effects by changing observables that are already being observed/
-            )
-        })
-        expect(a.get()).toBe(3)
-        expect(() => {
-            a.set(4)
-        }).toThrowError(
-            /Computed values are not allowed to cause side effects by changing observables that are already being observed/
-        )
+        a.set(5) // this is fine
+        expect(a.get()).toBe(5)
     })
 
     const c = mobx.computed(() => {
+        expect(
+            utils.grabConsole(() => {
+                a.set(4)
+            })
+        ).toMatchInlineSnapshot(
+            `"<STDOUT> [MobX] Side effects like changing state are not allowed at this point. Are you trying to modify state from, for example, a computed value or the render function of a React component? You can wrap side effects in 'runInAction' if needed but we recommend to investigate if the value you are trying to update can be derived instead. Tried to modify: ObservableValue@29"`
+        )
+        expect(a.get()).toBe(4)
         testAction()
         return a.get()
     })
 
-    const c2 = mobx.computed(() => {
-        a.set(6)
-        return a.get()
-    })
-
-    c.get()
+    expect(c.get()).toBe(5)
 
     mobx._resetGlobalState()
     d()
 })
 
-test("should not be possible to change observed state in an action called from computed", () => {
+test("should be possible to change observed state in an action called from computed", () => {
     const a = mobx.observable.box(2)
     const d = mobx.autorun(() => {
         a.get()
@@ -234,9 +226,7 @@ test("should not be possible to change observed state in an action called from c
         utils.grabConsole(() => {
             c.get()
         })
-    ).toMatch(
-        /Computed values are not allowed to cause side effects by changing observables that are already being observed/
-    )
+    ).toBe("")
 
     mobx._resetGlobalState()
     d()
@@ -576,4 +566,85 @@ test("given anonymous action, the action name should be <unnamed action>", () =>
 test("given function declaration, the action name should be as the function name", () => {
     const a1 = mobx.action(function testAction() {})
     expect(a1.name).toBe("testAction")
+})
+
+test("auto action can be used in a derivation and is tracked", () => {
+    const a = mobx.observable(1)
+    const events = []
+
+    const double = mobx._autoAction(() => {
+        return a.get() * 2
+    })
+
+    const d = mobx.autorun(() => {
+        events.push(double())
+    })
+
+    a.set(2)
+    expect(events).toEqual([2, 4])
+    d()
+})
+
+test("auto action can be used to update and is batched", () => {
+    const a = mobx.observable(1)
+    const events = []
+
+    const d = mobx.autorun(() => {
+        events.push(a.get() * 2)
+    })
+
+    mobx._autoAction(() => {
+        a.set(2)
+        a.set(3)
+    })()
+
+    expect(events).toEqual([2, 6]) // No 4!
+    d()
+})
+
+test("auto action should not update state from inside a derivation", async () => {
+    const a = mobx.observable(1)
+
+    const d = mobx.autorun(() => a.get()) // observe
+
+    const double = mobx._autoAction(() => {
+        a.set(a.get() * 2)
+    })
+
+    await mobx.when(() => {
+        expect(
+            utils.grabConsole(() => {
+                double()
+            })
+        ).toMatchInlineSnapshot(
+            `"<STDOUT> [MobX] Side effects like changing state are not allowed at this point. Are you trying to modify state from, for example, a computed value or the render function of a React component? You can wrap side effects in 'runInAction' if needed but we recommend to investigate if the value you are trying to update can be derived instead. Tried to modify: ObservableValue@79"`
+        )
+        return a.get() === 2
+    })
+    d()
+})
+
+test("auto action should not update state from inside a derivation", async () => {
+    const a = mobx.observable(1)
+
+    const d = mobx.autorun(() => a.get()) // observe
+
+    const double = mobx._autoAction(() => {
+        a.set(a.get() * 2)
+    })
+
+    await mobx.when(() => {
+        expect(
+            utils.grabConsole(() => {
+                mobx.runInAction(() => {
+                    // extra nesting, just in case
+                    mobx._autoAction(() => {
+                        double()
+                    })()
+                })
+            })
+        ).toBe("")
+        return a.get() === 2
+    })
+    d()
 })

@@ -115,7 +115,7 @@ export {
     getAtom,
     getAdministration as _getAdministration,
     allowStateChanges as _allowStateChanges,
-    allowStateChangesInsideComputed as _allowStateChangesInsideComputed,
+    runInAction as _allowStateChangesInsideComputed, // This has become the default behavior in Mobx 6
     Lambda,
     isArrayLike,
     $mobx,
@@ -129,7 +129,8 @@ export {
     allowStateReadsStart as _allowStateReadsStart,
     allowStateReadsEnd as _allowStateReadsEnd,
     makeObservable,
-    makeAutoObservable
+    makeAutoObservable,
+    autoAction as _autoAction
 } from "./internal"
 
 // Devtools support
