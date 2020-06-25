@@ -132,7 +132,7 @@ But what about `toggle`, which we marked `action`?
 
 ### Actions
 
-In the `Todo` model you can see that we have a method `toggle` that changes the value of `finished`. `finished` is marked as `observable`. MobX requires that you mark any code that changes an `observable` as an [`action`](https://mobxjs.github.io/mobx/refguide/action.html).
+In the `Todo` model you can see that we have a method `toggle` that changes the value of `finished`. `finished` is marked as `observable`. MobX requires that you mark any code that changes an `observable` as an [`action`](../refguide/action.html).
 
 MobX enforces this as it helps you structure your code and prevents you from inadvertantly changing state when you don't want to.
 
@@ -289,8 +289,8 @@ However, if you would remove the `Tasks left` line (or put it into a separate co
 
 #### Custom reactions
 
-Custom reactions can simply be created using the [`autorun`](http://mobxjs.github.io/mobx/refguide/autorun.html),
-[`reaction`](http://mobxjs.github.io/mobx/refguide/reaction.html) or [`when`](http://mobxjs.github.io/mobx/refguide/when.html) functions to fit your specific situations.
+Custom reactions can simply be created using the [`autorun`](../refguide/autorun.html),
+[`reaction`](../refguide/reaction.html) or [`when`](../refguide/when.html) functions to fit your specific situations.
 
 For example the following `autorun` prints a log message each time the amount of `unfinishedTodoCount` changes:
 
@@ -306,7 +306,7 @@ Why does a new message get printed each time the `unfinishedTodoCount` is change
 
 _MobX reacts to any existing observable property that is read during the execution of a tracked function._
 
-For an in-depth explanation about how MobX determines to which observables needs to be reacted, check [understanding what MobX reacts to](https://mobx.js.org/best/react.html).
+For an in-depth explanation about how MobX determines to which observables needs to be reacted, check [understanding what MobX reacts to](../best/react.html).
 
 ## MobX: Simple and scalable
 
