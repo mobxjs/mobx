@@ -5,7 +5,7 @@
     -   [x] TSDX build process
 -   [ ] Smaller build
     -   [x] fixup build, restore asset bundling
-    -   ~[ ] create prod esm build?~
+    -   [x] ~create prod esm build?~
     -   [x] minimal dev errors
     -   [x] invariant system from immer
     -   [x] check all calls to top-level
@@ -26,7 +26,7 @@
     -   [x] combine with ES5?
     -   [x] backport tests and code to v4(6)
     -   [x] make sure legacy array implementation is opt in
-    -   [ ] map / set as opt-in as well?
+    -   [x] ~map / set as opt-in as well?~
     -   [x] compare mobx.configure options between v4 and v5
     -   [ ] two or 3 modes for configure useProxies? If two, kill `deep` option to observable?
 -   [ ] annotations instead of decorators
@@ -56,7 +56,7 @@
 
 ## Docs / migration guide
 
-PHilosophy: one thing to do things
+PHilosophy: one way to do things
 
 -   [ ] Host old docs somewhere? Figure out how docusaurus can support a second version
 -   [ ] Using the codemod
@@ -96,6 +96,7 @@ PHilosophy: one thing to do things
 -   [ ] Breaking: it is no longer safe to call action from autorun. Use effect or reaction instead.
 -   [ ] \_allowStateChangesINComputation is no longer needed, us `runInAction` instead.
 -   [ ] Breaking: in computed, the when predicate, and reaction predicate it is never allowed to directly change state. State changes should be wrapped in action.
+-   [ ] Breaking: `toJS` no longer takes action, and no longer converts Maps and Sets to plain data structures. Serializing data structures is out of scope for the MobX project, and write custom serialization methods are much more sustainable. You might even leverage @computed to serialize state.
 
 ## NOTES
 

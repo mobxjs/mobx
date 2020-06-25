@@ -267,7 +267,7 @@ test("toJS", () => {
     const y = set([x, 1])
 
     const z = mobx.toJS(y)
-    expect(z).toEqual([{ x: 1 }, 1])
+    expect(z).toEqual(new Set([{ x: 1 }, 1]))
     expect(z.x).not.toBe(x)
     expect(mobx.isObservable(z.x)).toBeFalsy()
 })

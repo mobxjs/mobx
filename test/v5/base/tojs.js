@@ -208,7 +208,7 @@ test("json2", function() {
             }
         ]
     })
-    expect(mobx.toJS(o, { detectCycles: true })).toEqual(mobx.toJS(o))
+    expect(mobx.toJS(o)).toEqual(mobx.toJS(o))
     expect(ab).toEqual([[3, "google"]])
     expect(tb).toEqual(["reactjs,frp,foo,bar,x"])
 })
@@ -238,7 +238,7 @@ test("toJS handles symbol keys in objects and maps", () => {
     })
 
     const y = mobx.toJS(x)
-    expect(y[key]).toBe(43)
+    expect(y.get(key)).toBe(43)
 })
 
 test("json cycles", function() {
@@ -255,7 +255,7 @@ test("json cycles", function() {
     a.d.set("d", a.d)
     a.d.set("c", a.c)
 
-    const cloneA = mobx.toJS(a, { detectCycles: true })
+    const cloneA = mobx.toJS(a)
     const cloneC = cloneA.c
     const cloneD = cloneA.d
 
@@ -263,9 +263,9 @@ test("json cycles", function() {
     expect(cloneA.c[0]).toBe(2)
     expect(cloneA.c[1]).toBe(cloneA)
     expect(cloneA.c[2]).toBe(cloneD)
-    expect(cloneD.f).toBe(cloneA)
-    expect(cloneD.d).toBe(cloneD)
-    expect(cloneD.c).toBe(cloneC)
+    expect(cloneD.get("f")).toBe(cloneA)
+    expect(cloneD.get("d")).toBe(cloneD)
+    expect(cloneD.get("c")).toBe(cloneC)
     expect(cloneA.e).toBe(cloneA)
 })
 
@@ -347,7 +347,7 @@ test("json cycles when exporting maps as maps", function() {
     a.d.set("d", a.d)
     a.d.set("c", a.c)
 
-    const cloneA = mobx.toJS(a, { exportMapsAsObjects: false, detectCycles: true })
+    const cloneA = mobx.toJS(a)
     const cloneC = cloneA.c
     const cloneD = cloneA.d
 
@@ -365,7 +365,7 @@ test("json cycles when exporting maps as maps", function() {
 describe("recurseEverything set to true", function() {
     test("recurseEverything is no longer supported", () => {
         expect(() => mobx.toJS({}, { recurseEverything: true })).toThrowErrorMatchingInlineSnapshot(
-            `"[MobX] The recurseEverything option is no longer supported"`
+            `"[MobX] toJS no longer supports options"`
         )
     })
 })

@@ -598,7 +598,7 @@ test("using deep map", () => {
     expect(observed).toBe(1)
 })
 
-test.skip("using deep map - toJS", () => {
+test("using deep map - toJS", () => {
     const store = {
         map_deep: mobx.observable(new Map())
     }
@@ -615,20 +615,24 @@ test.skip("using deep map - toJS", () => {
 
     store.map_deep.set("shoes", [])
     expect(observed).toBe(1)
-    expect(seen).toEqual([[], [["shoes", []]]])
+    expect(seen).toEqual([new Map(), new Map([["shoes", []]])])
 
+    debugger
     store.map_deep.get("shoes").push({ color: "black" })
-    expect(seen).toEqual([[], [["shoes", []]], [["shoes", [{ color: "black" }]]]])
+    expect(seen).toEqual([
+        new Map([]),
+        new Map([["shoes", []]]),
+        new Map([["shoes", [{ color: "black" }]]])
+    ])
 
     expect(observed).toBe(2)
-
     store.map_deep.get("shoes")[0].color = "red"
     // see above comment
     expect(seen).toEqual([
-        [],
-        [["shoes", []]],
-        [["shoes", [{ color: "black" }]]],
-        [["shoes", [{ color: "red" }]]]
+        new Map([]),
+        new Map([["shoes", []]]),
+        new Map([["shoes", [{ color: "black" }]]]),
+        new Map([["shoes", [{ color: "red" }]]])
     ])
     expect(observed).toBe(3)
 })
@@ -660,7 +664,7 @@ test("issue 940, should not be possible to change maps outside strict mode", () 
                 m.set("x", 1)
             })
         ).toMatchInlineSnapshot(
-            `"<STDOUT> [MobX] Since strict-mode is enabled, changing observed observable values outside actions is not allowed. Please wrap the code in an \`runInAction\` if this change is intended. Tried to modify: ObservableMap@69.keys()"`
+            `"<STDOUT> [MobX] Since strict-mode is enabled, changing observed observable values outside actions is not allowed. Please wrap the code in an \`runInAction\` if this change is intended. Tried to modify: ObservableMap@72.keys()"`
         )
 
         expect(
@@ -668,7 +672,7 @@ test("issue 940, should not be possible to change maps outside strict mode", () 
                 m.set("x", 2)
             })
         ).toMatchInlineSnapshot(
-            `"<STDOUT> [MobX] Since strict-mode is enabled, changing observed observable values outside actions is not allowed. Please wrap the code in an \`runInAction\` if this change is intended. Tried to modify: ObservableMap@69.x"`
+            `"<STDOUT> [MobX] Since strict-mode is enabled, changing observed observable values outside actions is not allowed. Please wrap the code in an \`runInAction\` if this change is intended. Tried to modify: ObservableMap@72.x"`
         )
 
         expect(
@@ -676,7 +680,7 @@ test("issue 940, should not be possible to change maps outside strict mode", () 
                 m.delete("x")
             })
         ).toMatchInlineSnapshot(
-            `"<STDOUT> [MobX] Since strict-mode is enabled, changing observed observable values outside actions is not allowed. Please wrap the code in an \`runInAction\` if this change is intended. Tried to modify: ObservableMap@69.keys()"`
+            `"<STDOUT> [MobX] Since strict-mode is enabled, changing observed observable values outside actions is not allowed. Please wrap the code in an \`runInAction\` if this change is intended. Tried to modify: ObservableMap@72.keys()"`
         )
 
         d()
