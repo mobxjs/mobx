@@ -53,6 +53,10 @@
         "title": "Concepts & Principles",
         "sidebar_label": "Concepts & Principles"
       },
+      "intro/installation": {
+        "title": "Installation",
+        "sidebar_label": "Installation"
+      },
       "intro/overview": {
         "title": "The gist of MobX",
         "sidebar_label": "The gist of MobX"
@@ -62,7 +66,7 @@
       },
       "README": {
         "title": "Introduction",
-        "sidebar_label": "One page summary"
+        "sidebar_label": "Introduction"
       },
       "refguide/action": {
         "title": "action",
@@ -166,7 +170,7 @@
       "Github": "Github"
     },
     "categories": {
-      "Introduction": "Introduction",
+      "Basics": "Basics",
       "Making things observable": "Making things observable",
       "Reacting to observables": "Reacting to observables",
       "Updating observables": "Updating observables",

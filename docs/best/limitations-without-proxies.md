@@ -6,7 +6,7 @@ hide_title: true
 
 # Limitations without Proxy support
 
-MobX 6 works on any ES 5 environment, but if your environment or browser does not have [Proxy support](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy), there are some limitations:
+MobX 6 works on any ES 5 environment, but if your environment or browser does not have [Proxy support](https://kangax.github.io/compat-table/es6/#test-Proxy), there are some limitations:
 
 -   Observable arrays are not real arrays, so they won't pass the `Array.isArray()` check. The practical consequence is that you often need to `.slice()` the array first (to get a real array shallow copy) before passing to third party libraries.
 -   Adding properties to existing observable objects after creation is not automatically picked up. Either use observable maps instead, or use the the build in [utility functions](https://mobx.js.org/refguide/object-api.html) to read / write / iterate objects that you want to dynamically add properties to.

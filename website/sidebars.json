@@ -1,7 +1,8 @@
 {
   "docs": {
-    "Introduction": [
+    "Basics": [
       "README",
+      "intro/installation",
       "intro/concepts",
       "intro/overview"
     ],

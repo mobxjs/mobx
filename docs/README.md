@@ -1,6 +1,6 @@
 ---
 title: Introduction
-sidebar_label: One page summary
+sidebar_label: Introduction
 hide_title: true
 ---
 
@@ -44,18 +44,11 @@ MobX is proudly sponsored by Mendix, Coinbase, Facebook Open Source, Canva, Algo
 
 # Installation
 
--   Installation: `npm install mobx --save`. React bindings: `npm install mobx-react --save`.
+MobX >=6 runs in any ES5 environment, which includes web browsers and NodeJS.
 
--   CDN:
+Installation: `npm install mobx --save`. React bindings: `npm install mobx-react --save`.
 
-*   https://unpkg.com/mobx/lib/mobx.umd.js
-*   https://cdnjs.com/libraries/mobx
-
-# Environment support
-
--   MobX >=6 runs in any ES5 environment, which includes web browsers and node. If your environment does not have [ES6 proxy support](https://kangax.github.io/compat-table/es6/#test-Proxy) you have to configure it to use compatibile property tracking, which does have some [limitations](#limitations-without-proxy-support).
-
-_Tip: the main entry point of the MobX 6 package ships with ES5 code for backward compatibility. But if you only intend to run MobX 6 on modern browsers, consider using consider using the faster and smaller ES6 build: `lib/mobx.es6.js`. For example by setting up a webpack alias: `resolve: { alias: { mobx: __dirname + "/node_modules/mobx/lib/mobx.es6.js" }}`_
+[More about installing MobX](http://mobxjs.github.io/mobx/intro/installation.html)
 
 ## Translations
 
@@ -190,7 +183,7 @@ Here is the gist on decorator support in MobX 6:
 
 -   There are code mods to help you upgrade existing code to be compliant with MobX 6.
 
-The [decorators guide](best/decorators.md) has more information.
+The [decorators guide](http://mobxjs.github.io/mobx/best/decorators.html) has more information.
 
 ### Reactions
 
