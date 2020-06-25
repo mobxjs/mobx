@@ -323,8 +323,7 @@ test("decorate should work with constructor function", function() {
     expect(box2.width).toBe(40) // no shared state!
 })
 
-// TODO: find decent behavior here, for example die because the `this` on the observable setter is not the owning instance?
-test.skip("decorate should work with inheritance through Object.create", () => {
+test("decorate should work with inheritance through Object.create", () => {
     const P = {
         x: 3
     }
@@ -333,14 +332,14 @@ test.skip("decorate should work with inheritance through Object.create", () => {
     })
 
     const child1 = Object.create(P)
-    expect(child1.x).toBe(3) // now an own property
-    child1.x = 4
+    expect(child1.x).toBe(3)
+    child1.x = 4 // this modifies the prop on P, since that is what was made observable
     expect(child1.x).toBe(4)
     const child2 = Object.create(P)
-    expect(child2.x).toBe(3)
+    expect(child2.x).toBe(4)
     child2.x = 5
     expect(child2.x).toBe(5)
-    expect(child1.x).toBe(4)
+    expect(child1.x).toBe(5)
 })
 
 test("decorate should not allow @observable on getter", function() {

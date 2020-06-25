@@ -508,13 +508,6 @@ test("ES5 non reactive props - 2", function() {
     }).toThrow(/Cannot make property 'nonConfigurable' observable/)
 })
 
-// TODO: re-enable once decorators are implemented
-test.skip("exceptions", function() {
-    expect(function() {
-        m.observable.ref(m.observable.shallow(3))
-    }).toThrow(/@observable decorator doesn't expect any arguments/)
-})
-
 test("540 - extendobservable should not report cycles", function() {
     expect(() => m.extendObservable(Object.freeze({}), {})).toThrowError(
         /Cannot make the designated object observable/

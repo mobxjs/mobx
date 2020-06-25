@@ -71,8 +71,7 @@ test("babel", function() {
     expect(s).toEqual([40, 20, 60, 210, 420, 700])
 })
 
-// TODO:
-test.skip("should not be possible to use @action with getters", () => {
+test("should not be possible to use @action with getters", () => {
     expect(() => {
         class A {
             constructor() {
@@ -83,8 +82,10 @@ test.skip("should not be possible to use @action with getters", () => {
 
             get Test() {}
         }
-        A // just to avoid the linter warning
-    }).toThrowError(/@action cannot be used with getters/)
+        return new A()
+    }).toThrowErrorMatchingInlineSnapshot(
+        `"[MobX] Cannot decorate 'Test': action can only be used on properties with a function value."`
+    )
 
     mobx._resetGlobalState()
 })
@@ -519,7 +520,7 @@ test("288 atom not detected for object property", () => {
     expect(changed).toBe(true)
 })
 
-test.skip("observable performance", () => {
+test.skip("observable performance - babel", () => {
     const AMOUNT = 100000
 
     class A {

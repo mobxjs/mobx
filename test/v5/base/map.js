@@ -598,7 +598,6 @@ test("using deep map", () => {
     expect(observed).toBe(1)
 })
 
-// TODO: restore
 test.skip("using deep map - toJS", () => {
     const store = {
         map_deep: mobx.observable(new Map())

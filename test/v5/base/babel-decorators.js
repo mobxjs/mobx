@@ -457,7 +457,7 @@ test("288 atom not detected for object property", () => {
     expect(changed).toBe(true)
 })
 
-test.skip("observable performance", () => {
+test.skip("observable performance - babel - decorators", () => {
     const AMOUNT = 100000
 
     class A {

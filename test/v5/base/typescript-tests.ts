@@ -737,7 +737,7 @@ test("288 atom not detected for object property", () => {
     )
 })
 
-test.skip("observable performance", () => {
+test.skip("observable performance - ts", () => {
     const AMOUNT = 100000
 
     class A {
