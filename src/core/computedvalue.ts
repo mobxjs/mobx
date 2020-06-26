@@ -36,7 +36,7 @@ import {
 export interface IComputedValue<T> {
     get(): T
     set(value: T): void
-    observe(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda
+    observe_(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda
 }
 
 export interface IComputedValueOptions<T> {
@@ -233,7 +233,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         }
     }
 
-    observe(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda {
+    observe_(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda {
         let firstTime = true
         let prevValue: T | undefined = undefined
         return autorun(() => {

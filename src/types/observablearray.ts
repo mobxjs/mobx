@@ -36,15 +36,9 @@ export const MAX_SPLICE_SIZE = 10000 // See e.g. https://github.com/mobxjs/mobx/
 
 export interface IObservableArray<T = any> extends Array<T> {
     spliceWithArray(index: number, deleteCount?: number, newItems?: T[]): T[]
-    observe(
-        listener: (changeData: IArrayChange<T> | IArraySplice<T>) => void,
-        fireImmediately?: boolean
-    ): Lambda
-    intercept(handler: IInterceptor<IArrayWillChange<T> | IArrayWillSplice<T>>): Lambda
     clear(): T[]
     replace(newItems: T[]): T[]
     remove(value: T): boolean
-    toJS(): T[]
     toJSON(): T[]
 }
 
@@ -120,8 +114,8 @@ export class ObservableArrayAdministration
     implements IInterceptable<IArrayWillChange<any> | IArrayWillSplice<any>>, IListenable {
     atom_: IAtom
     values_: any[] = []
-    interceptors
-    changeListeners
+    interceptors_
+    changeListeners_
     enhancer_: (newV: any, oldV: any | undefined) => any
     dehancer: any
     proxy_: any[] = undefined as any
@@ -149,11 +143,11 @@ export class ObservableArrayAdministration
     }
 
     // TODO: rename
-    intercept(handler: IInterceptor<IArrayWillChange<any> | IArrayWillSplice<any>>): Lambda {
+    intercept_(handler: IInterceptor<IArrayWillChange<any> | IArrayWillSplice<any>>): Lambda {
         return registerInterceptor<IArrayWillChange<any> | IArrayWillSplice<any>>(this, handler)
     }
 
-    observe(
+    observe_(
         listener: (changeData: IArrayChange<any> | IArraySplice<any>) => void,
         fireImmediately = false
     ): Lambda {

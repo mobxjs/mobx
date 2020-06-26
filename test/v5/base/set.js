@@ -9,7 +9,7 @@ test("set crud", function() {
     const events = []
     const s = set([1])
 
-    s.observe(changes => {
+    mobx.observe(s, changes => {
         events.push(changes)
     })
 

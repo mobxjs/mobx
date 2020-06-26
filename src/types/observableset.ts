@@ -63,8 +63,8 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
     [$mobx] = ObservableSetMarker
     private data_: Set<any> = new Set()
     private atom_: IAtom
-    changeListeners
-    interceptors
+    changeListeners_
+    interceptors_
     dehancer: any
     enhancer_: (newV: any, oldV: any | undefined) => any
 
@@ -236,7 +236,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
     }
 
     // TODO: kill
-    observe(listener: (changes: ISetDidChange<T>) => void, fireImmediately?: boolean): Lambda {
+    observe_(listener: (changes: ISetDidChange<T>) => void, fireImmediately?: boolean): Lambda {
         // TODO 'fireImmediately' can be true?
         if (__DEV__ && fireImmediately === true)
             die("`observe` doesn't support fireImmediately=true in combination with sets.")
@@ -244,7 +244,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
     }
 
     // TODO: kill
-    intercept(handler: IInterceptor<ISetWillChange<T>>): Lambda {
+    intercept_(handler: IInterceptor<ISetWillChange<T>>): Lambda {
         return registerInterceptor(this, handler)
     }
 

@@ -88,6 +88,8 @@ PHilosophy: one way to do things
 -   [ ] Breaking: Map.toJSON now returns the entries array
 -   [ ] Breaking dropped Set.toJS, use new Set(observableSet) instead
 -   [ ] Breaking Set.toJSON returns an array now
+-   [ ] Breaking: dropped Array.toJS, use .toJSON instead
+-   [ ] Breaking: dropped .observe and .intercept on types, use the {observe, intercept} from 'mobx' instead
 -   [ ] Running codemod: yarn jscodeshift -t codemod/undecorate.ts test/v5/base/typescript-tests.ts --ignoreImports=true
 -   [ ] killed: IGNORE_MOBX_MINIFY_WARNING
 -   [ ] Document: recommended settings for prod versus experimentation

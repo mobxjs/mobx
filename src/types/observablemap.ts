@@ -90,8 +90,8 @@ export class ObservableMap<K = any, V = any>
     data_: Map<K, ObservableValue<V>>
     hasMap_: Map<K, ObservableValue<boolean>> // hasMap, not hashMap >-).
     keysAtom_: IAtom
-    interceptors
-    changeListeners
+    interceptors_
+    changeListeners_
     dehancer: any
 
     constructor(
@@ -430,14 +430,14 @@ export class ObservableMap<K = any, V = any>
      * for callback details
      */
     // TODO: kill
-    observe(listener: (changes: IMapDidChange<K, V>) => void, fireImmediately?: boolean): Lambda {
+    observe_(listener: (changes: IMapDidChange<K, V>) => void, fireImmediately?: boolean): Lambda {
         if (__DEV__ && fireImmediately === true)
             die("`observe` doesn't support fireImmediately=true in combination with maps.")
         return registerListener(this, listener)
     }
 
     // TODO: kill
-    intercept(handler: IInterceptor<IMapWillChange<K, V>>): Lambda {
+    intercept_(handler: IInterceptor<IMapWillChange<K, V>>): Lambda {
         return registerInterceptor(this, handler)
     }
 }

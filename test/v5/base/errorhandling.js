@@ -245,7 +245,7 @@ test("cycle1", function() {
         return p.get() * 2
     }) // thats a cycle!
     utils.consoleError(() => {
-        p.observe(voidObserver, true)
+        mobx.observe(p, voidObserver, true)
     }, /Cycle detected/)
     checkGlobalState()
 })

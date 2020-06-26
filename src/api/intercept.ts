@@ -48,9 +48,9 @@ export function intercept(thing, propOrHandler?, handler?): Lambda {
 }
 
 function interceptInterceptable(thing, handler) {
-    return getAdministration(thing).intercept(handler)
+    return getAdministration(thing).intercept_(handler)
 }
 
 function interceptProperty(thing, property, handler) {
-    return getAdministration(thing, property).intercept(handler)
+    return getAdministration(thing, property).intercept_(handler)
 }

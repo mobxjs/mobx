@@ -39,8 +39,8 @@ export interface IValueDidChange<T> extends IValueWillChange<T> {
 export interface IObservableValue<T> {
     get(): T
     set(value: T): void
-    intercept(handler: IInterceptor<IValueWillChange<T>>): Lambda
-    observe(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda
+    intercept_(handler: IInterceptor<IValueWillChange<T>>): Lambda
+    observe_(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda
 }
 
 const CREATE = "create"
@@ -48,8 +48,8 @@ const CREATE = "create"
 export class ObservableValue<T> extends Atom
     implements IObservableValue<T>, IInterceptable<IValueWillChange<T>>, IListenable {
     hasUnreportedChange_ = false
-    interceptors
-    changeListeners
+    interceptors_
+    changeListeners_
     value_
     dehancer: any
 
@@ -127,12 +127,12 @@ export class ObservableValue<T> extends Atom
     }
 
     // TODO: kill?
-    public intercept(handler: IInterceptor<IValueWillChange<T>>): Lambda {
+    public intercept_(handler: IInterceptor<IValueWillChange<T>>): Lambda {
         return registerInterceptor(this, handler)
     }
 
     // TODO: kill?
-    public observe(
+    public observe_(
         listener: (change: IValueDidChange<T>) => void,
         fireImmediately?: boolean
     ): Lambda {

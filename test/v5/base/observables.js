@@ -1071,7 +1071,7 @@ test("computed values believe deep NaN === deep NaN when using compareStructural
     )
 
     const buf = new buffer()
-    c.observe(newValue => {
+    c.observe_(newValue => {
         buf(newValue)
     })
 

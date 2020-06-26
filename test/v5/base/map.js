@@ -12,7 +12,7 @@ test("map crud", function() {
 
     const events = []
     const m = map({ "1": "a" })
-    m.observe(function(changes) {
+    mobx.observe(m, function(changes) {
         events.push(changes)
     })
 
@@ -295,7 +295,6 @@ test("issue 100", function() {
         myMap: map()
     })
     expect(mobx.isObservableMap(that.myMap)).toBe(true)
-    expect(typeof that.myMap.observe).toBe("function")
 })
 
 test("issue 119 - unobserve before delete", function() {
@@ -908,21 +907,6 @@ test("toStringTag", () => {
     const x = mobx.observable.map({ x: 1, y: 2 })
     expect(x[Symbol.toStringTag]).toBe("Map")
     expect(Object.prototype.toString.call(x)).toBe("[object Map]")
-})
-
-test("verify #1524", () => {
-    class Store {
-        articles = new Map()
-
-        constructor() {
-            makeObservable(this, {
-                articles: mobx.observable
-            })
-        }
-    }
-
-    const store = new Store()
-    expect(typeof store.articles.observe === "function").toBe(true)
 })
 
 test("#1583 map.size not reactive", () => {

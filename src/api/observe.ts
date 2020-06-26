@@ -59,9 +59,9 @@ export function observe(thing, propOrCb?, cbOrFire?, fireImmediately?): Lambda {
 }
 
 function observeObservable(thing, listener, fireImmediately: boolean) {
-    return getAdministration(thing).observe(listener, fireImmediately)
+    return getAdministration(thing).observe_(listener, fireImmediately)
 }
 
 function observeObservableProperty(thing, property, listener, fireImmediately: boolean) {
-    return getAdministration(thing, property).observe(listener, fireImmediately)
+    return getAdministration(thing, property).observe_(listener, fireImmediately)
 }

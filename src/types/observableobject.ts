@@ -82,8 +82,8 @@ const REMOVE = "remove"
 export class ObservableObjectAdministration
     implements IInterceptable<IObjectWillChange>, IListenable {
     keysAtom_: IAtom
-    changeListeners
-    interceptors
+    changeListeners_
+    interceptors_
     proxy_: any
     private pendingKeys_: undefined | Map<PropertyKey, ObservableValue<boolean>>
 
@@ -282,13 +282,13 @@ export class ObservableObjectAdministration
      * See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe
      * for callback details
      */
-    observe(callback: (changes: IObjectDidChange) => void, fireImmediately?: boolean): Lambda {
+    observe_(callback: (changes: IObjectDidChange) => void, fireImmediately?: boolean): Lambda {
         if (__DEV__ && fireImmediately === true)
             die("`observe` doesn't support the fire immediately property for observable objects.")
         return registerListener(this, callback)
     }
 
-    intercept(handler): Lambda {
+    intercept_(handler): Lambda {
         return registerInterceptor(this, handler)
     }
 
