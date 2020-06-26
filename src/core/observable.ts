@@ -31,11 +31,11 @@ export interface IObservable extends IDepTreeNode {
 
     observers_: Set<IDerivation>
 
-    onBecomeUnobserved(): void
-    onBecomeObserved(): void
+    onBUO(): void
+    onBO(): void
 
-    onBecomeUnobservedListeners: Set<Lambda> | undefined
-    onBecomeObservedListeners: Set<Lambda> | undefined
+    onBUOL: Set<Lambda> | undefined
+    onBOL: Set<Lambda> | undefined
 }
 
 export function hasObservers(observable: IObservable): boolean {
@@ -118,7 +118,7 @@ export function endBatch() {
                 if (observable.isBeingObserved_) {
                     // if this observable had reactive observers, trigger the hooks
                     observable.isBeingObserved_ = false
-                    observable.onBecomeUnobserved()
+                    observable.onBUO()
                 }
                 if (observable instanceof ComputedValue) {
                     // computed values are automatically teared down when the last observer leaves
@@ -147,7 +147,7 @@ export function reportObserved(observable: IObservable): boolean {
             derivation.newObserving_![derivation.unboundDepsCount_++] = observable
             if (!observable.isBeingObserved_) {
                 observable.isBeingObserved_ = true
-                observable.onBecomeObserved()
+                observable.onBO()
             }
         }
         return true
