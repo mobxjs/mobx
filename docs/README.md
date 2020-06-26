@@ -69,183 +69,55 @@ React and MobX together are a powerful combination. React renders the applicatio
 
 Both React and MobX provide an optimal and unique solutions to common problems in application development. React provides mechanisms to optimally render UI by using a virtual DOM that reduces the number of costly DOM mutations. MobX provides mechanisms to optimally synchronize application state with your React components by using a reactive virtual dependency state graph that is only updated when strictly needed and is never stale.
 
-## Core concepts
+## Example
 
-MobX has only a few core concepts. The following snippets can be tried online using [codesandbox example](https://codesandbox.io/s/v3v0my2370).
-
-### Observable state
-
-MobX adds observable capabilities to existing data structures like objects, arrays and class instances.
-This can simply be done by using `makeObservable` in its constructor to annotate your class properties as `observable`.
-
-```javascript
-import { makeObservable, observable, action } from "mobx"
-
-class Todo {
-    id = Math.random()
-    title = ""
-    finished = false
-
-    constructor() {
-        makeObservable(this, {
-            title: observable,
-            finished: observable,
-            toggle: action
-        })
-    }
-
-    toggle() {
-        this.finished = !finished
-    }
-}
-```
-
-Using `observable` is like turning a property of an object into a spreadsheet cell.
-But unlike spreadsheets, these values can be not only primitive values, but also references, objects and arrays.
-
-But what about `toggle`, which we marked `action`?
-
-### Actions
-
-In the `Todo` model you can see that we have a method `toggle` that changes the value of `finished`. `finished` is marked as `observable`. MobX requires that you mark any code that changes an `observable` as an [`action`](http://mobxjs.github.io/mobx/refguide/action.html).
-
-MobX enforces this as it helps you structure your code and prevents you from inadvertantly changing state when you don't want to.
-
-### Computed values
-
-With MobX you can define values that will be derived automatically when relevant data is modified. You do this by defining a property using a JS getter function (`get`) and then marking it with `computed` with `makeObservable`.
-
-```javascript
-import { makeObservable, observable, computed } from "mobx"
-
-class TodoList {
-    todos = []
-    get unfinishedTodoCount() {
-        return this.todos.filter(todo => !todo.finished).length
-    }
-    constructor() {
-        makeObservable(this, {
-            todos: observable,
-            unfinishedTodoCount: computed
-        })
-    }
-}
-```
-
-MobX will ensure that `unfinishedTodoCount` is updated automatically when a todo is added or when one of the `finished` properties is modified.
-Computations like these resemble formulas in spreadsheet programs like MS Excel. They update automatically, and only when required.
-
-### makeAutoObservable
-
-The above code can be simplified using `makeAutoObservable`. With this, MobX automatically declares normal properties as `observable`, getter properties (`unfinishedTodoCount`) as `computed`, and other methods (`toggle`) as `action`.
-
-```javascript
-import { makeAutoObservable } from "mobx"
-
-class Todo {
-    id = Math.random()
-    title = ""
-    finished = false
-
-    constructor() {
-        makeAutoObservable(this, { id: false })
-    }
-
-    toggle() {
-        this.finished = !finished
-    }
-}
-
-class TodoList {
-    todos = []
-    get unfinishedTodoCount() {
-        return this.todos.filter(todo => !todo.finished).length
-    }
-    constructor() {
-        makeAutoObservable(this)
-    }
-}
-```
-
-As you can see this is more compact; the only thing you need to do to make instances of a class become observable is `makeAutoObservable`. In our original `Todo` class `id` was not observable, and we've specified the same behavior here by telling `makeAutoObservable` not to do anything with it.
-
-### Decorators
-
-Wait! Didn't MobX use decorators for this? That's true, but in MobX 6 we have chosen to move away from them.
-
-Here is the gist on decorator support in MobX 6:
-
--   You can still use `observable`, `computed` and `action` as decorators to mark code.
-
--   But in order to have them be picked up, you now need to use `makeObservable(this)`,
-    without the second argument as this information is automatically deduced from
-    the decorators.
-
--   There are code mods to help you upgrade existing code to be compliant with MobX 6.
-
-The [decorators guide](http://mobxjs.github.io/mobx/best/decorators.html) has more information.
-
-### Reactions
-
-Reactions are similar to a computed value, but instead of producing a new value, a reaction produces a side effect for things like printing to the console, making network requests, incrementally updating the React component tree to patch the DOM, etc.
-In short, reactions bridge [reactive](https://en.wikipedia.org/wiki/Reactive_programming) and [imperative](https://en.wikipedia.org/wiki/Imperative_programming) programming.
-
-#### React components
-
-If you are using React, you can turn your (stateless function) components into reactive components by wrapping it with the [`observer`](http://mobxjs.github.io/mobx/refguide/observer-component.html) function from the `mobx-react` package.
+So what does code that uses MobX look like?
 
 ```javascript
 import React from "react"
 import ReactDOM from "react-dom"
+import { makeAutoObservable } from "mobx"
 import { observer } from "mobx-react"
 
-const TodoListView = observer(({ todoList }) => (
-    <div>
-        <ul>
-            {todoList.todos.map(todo => (
-                <TodoView todo={todo} key={todo.id} />
-            ))}
-        </ul>
-        Tasks left: {todoList.unfinishedTodoCount}
-    </div>
-))
+class AppState {
+    timer = 0
 
-const TodoView = observer(({ todo }) => (
-    <li>
-        <input type="checkbox" checked={todo.finished} onClick={() => todo.toggle()} />
-        {todo.title}
-    </li>
-))
+    constructor() {
+        makeAutoObservable(this)
+    }
 
-const store = new TodoList()
-ReactDOM.render(<TodoListView todoList={store} />, document.getElementById("mount"))
+    increaseTimer() {
+        this.timer += 1
+    }
+
+    resetTimer() {
+        this.timer = 0
+    }
+}
+
+setInterval(() => {
+    appState.increaseTimer()
+}, 1000)
+
+const appState = new AppState()
+
+const TimerView = observer(({ appState }) => (
+    <button onClick={() => appState.resetTimer()}>Seconds passed: {appState.timer}</button>
+))
+ReactDOM.render(<TimerView appState={appState} />, document.body)
 ```
 
-`observer` turns React (function) components into derivations of the data they render.
-When using MobX there are no smart or dumb components.
-All components render smartly but are defined in a dumb manner. MobX will simply make sure the components are always re-rendered whenever needed, but also no more than that. So the `onClick` handler in the above example will force the proper `TodoView` to render as it uses the `toggle` action, and it will cause the `TodoListView` to render if the number of unfinished tasks has changed.
-However, if you would remove the `Tasks left` line (or put it into a separate component), the `TodoListView` will no longer re-render when ticking a box. You can verify this yourself by changing the [JSFiddle](https://jsfiddle.net/mweststrate/wv3yopo0/).
+To get more detail about this example, see [the gist of MobX](http://mobxjs.github.io/mobx/intro/overview.html).
 
-#### Custom reactions
+To learn about the underlying concepts together with a larger example, please read [Concepts & Principles](http://mobxjs.github.io/mobx/intro/concepts.html)
 
-Custom reactions can simply be created using the [`autorun`](http://mobxjs.github.io/mobx/refguide/autorun.html),
-[`reaction`](http://mobxjs.github.io/mobx/refguide/reaction.html) or [`when`](http://mobxjs.github.io/mobx/refguide/when.html) functions to fit your specific situations.
+### MobX and Decorators
 
-For example the following `autorun` prints a log message each time the amount of `unfinishedTodoCount` changes:
+Wait! This example doesn't use decorators. Haven't you seen MobX code before that uses them? In MobX 6 we have chosen to move away from them for maximum compatibility with standard JavaScript.
 
-```javascript
-autorun(() => {
-    console.log("Tasks left: " + todos.unfinishedTodoCount)
-})
-```
+There is a codemod available to help you upgrade existing code to be compliant with MobX 6.
 
-### What will MobX react to?
-
-Why does a new message get printed each time the `unfinishedTodoCount` is changed? The answer is this rule of thumb:
-
-_MobX reacts to any existing observable property that is read during the execution of a tracked function._
-
-For an in-depth explanation about how MobX determines to which observables needs to be reacted, check [understanding what MobX reacts to](http://mobxjs.github.io/mobx/best/react.html).
+The [decorators guide](http://mobxjs.github.io/mobx/best/decorators.html) has more information.
 
 ## MobX: Simple and scalable
 

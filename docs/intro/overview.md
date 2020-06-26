@@ -12,18 +12,16 @@ So far it all might sound a bit fancy, but making an app reactive using MobX boi
 
 Store state in any data structure you like; objects, array, classes.
 Cyclic data structures, references, it doesn't matter.
-Just make sure that all properties that you want to change over time are marked by `mobx` to make them observable.
+Just make sure that all properties that you want to change over time are marked by MobX to make them observable.
 
 ```javascript
-import { makeObservable, observable } from "mobx"
+import { makeAutoObservable } from "mobx"
 
 class AppState {
     timer = 0
 
     constructor() {
-        makeObservable(this, {
-            timer: observable
-        })
+        makeAutoObservable(this)
     }
 }
 
@@ -61,17 +59,13 @@ Let's alter the timer every second, and see that the UI will update automaticall
 Here's the new `AppState` model with a few methods added that modify state:
 
 ```javascript
-import { makeObservable, observable, action } from "mobx"
+import { makeAutoObservable } from "mobx"
 
 class AppState {
     timer = 0
 
     constructor() {
-        makeObservable(this, {
-            timer: observable,
-            resetTimer: action,
-            increaseTimer: action
-        })
+        makeAutoObservable(this)
     }
 
     increaseTimer() {
@@ -90,35 +84,8 @@ setInterval(() => {
 const appState = new AppState()
 ```
 
-These methods, `increaseTimer` and `resetTimer` are just like you would write them without MobX. You can use them anywhere -- from React event handlers or in `setInterval`, for instance. The only thing you need to do is to mark them as `action` with `makeObservable`. By marking methods this way you make MobX automatically
-apply transactions for optimal performance.
+These methods, `increaseTimer` and `resetTimer` are just like you would write them without MobX. You can use them anywhere -- from React event handlers or in `setInterval`, for instance.
 
 **_MobX helps you do things in a simple straightforward way_**.
 
 Feel free to try this example on [JSFiddle](http://jsfiddle.net/mweststrate/wgbe4guu/) or by cloning the [MobX boilerplate project](https://github.com/mobxjs/mobx-react-boilerplate)
-
-## 4. Automating `makeObservable` with `makeAutoObservable`
-
-MobX has a function `makeAutoObservable` that automatically marks properties
-as `observable` and methods as `action` (and getters as `computed`). We
-could have used this instead to simplify the `AppState` class:
-
-```javascript
-import { makeAutoObservable } from "mobx"
-
-class AppState {
-    timer = 0
-
-    constructor() {
-        makeAutoObservable(this)
-    }
-
-    increaseTimer() {
-        this.timer += 1
-    }
-
-    resetTimer() {
-        this.timer = 0
-    }
-}
-```

@@ -8,15 +8,58 @@ hide_title: true
 
 ## Concepts
 
-MobX distinguishes the following concepts in your application. You saw them in the one page summary, but let's dive into them in a bit more detail.
+MobX distinguishes the following concepts in your application.
+
+We show example code to illustrate these concepts. For clarity of explanation we don't use the convenience function `makeAutoObservable` yet in this code. In the [10 minute introduction to MobX and React](https://mobx.js.org/getting-started) you can dive deeper into this example and build a user interface using [React](https://facebook.github.io/react/) around it.
 
 ### 1. State
 
 _State_ is the data that drives your application.
 Usually there is _domain specific state_ like a list of todo items and there is _view state_ such as the currently selected element.
-Remember, state is like spreadsheets cells that hold a value.
+State is like spreadsheets cells that hold a value.
 
-### 2. Derivations
+MobX adds observable capabilities to existing data structures like objects, arrays and class instances.
+This can simply be done by using `makeObservable` in its constructor to annotate your class properties as `observable`.
+
+```javascript
+import { makeObservable, observable, action } from "mobx"
+
+class Todo {
+    id = Math.random()
+    title = ""
+    finished = false
+
+    constructor() {
+        makeObservable(this, {
+            title: observable,
+            finished: observable,
+            toggle: action
+        })
+    }
+
+    toggle() {
+        this.finished = !finished
+    }
+}
+```
+
+Using `observable` is like turning a property of an object into a spreadsheet cell.
+But unlike spreadsheets, these values can be not only primitive values, but also references, objects and arrays.
+
+But what about `toggle`, which we marked `action`?
+
+### 2. Actions
+
+An _action_ is any piece of code that changes the _state_. User events, backend data pushes, scheduled events, etc.
+An action is like a user that enters a new value in a spreadsheet cell.
+
+In the `Todo` model you can see that we have a method `toggle` that changes the value of `finished`. `finished` is marked as `observable`. MobX requires that you mark any code that changes an `observable` as an [`action`](../refguide/action.md).
+By marking methods this way you make MobX automatically apply transactions for optimal performance.
+
+This helps you structure your code and prevents you from inadvertantly changing state when you don't want to. This is the default behavior and is recommended.
+You can however loosen [_strict mode_](../refguide/api##-enforceactions-) to allow you to modify state outside actions as well.
+
+### 3. Derivations
 
 _Anything_ that can be derived from the _state_ without any further interaction is a derivation.
 Derivations exist in many forms:
@@ -33,15 +76,92 @@ MobX distinguishes two kind of derivations:
 People starting with MobX tend to use reactions too often.
 The golden rule is: if you want to create a value based on the current state, use `computed`.
 
-Back to the spreadsheet analogy, formulas are derivations that _compute_ a value. But for you as a user to be able to see it on the screen a _reaction_ is needed that repaints part of the GUI.
+#### Computed
 
-### 3. Actions
+You created a computed value by defining a property using a JS getter function (`get`) and then marking it with `computed` with `makeObservable`.
 
-An _action_ is any piece of code that changes the _state_. User events, backend data pushes, scheduled events, etc.
-An action is like a user that enters a new value in a spreadsheet cell.
+```javascript
+import { makeObservable, observable, computed } from "mobx"
 
-Actions are defined explicitly in MobX to help you to structure code more clearly. This is the default behavior and is recommended.
-You can however loosen [_strict mode_](../refguide/api##-enforceactions-) to allow you to modify state outside actions as well.
+class TodoList {
+    todos = []
+    get unfinishedTodoCount() {
+        return this.todos.filter(todo => !todo.finished).length
+    }
+    constructor() {
+        makeObservable(this, {
+            todos: observable,
+            unfinishedTodoCount: computed
+        })
+    }
+}
+```
+
+MobX will ensure that `unfinishedTodoCount` is updated automatically when a todo is added or when one of the `finished` properties is modified.
+
+Computations like these resemble formulas in spreadsheet programs like MS Excel. They update automatically, and only when required.
+
+#### Reactions
+
+For you as a user to be able to see a change in state or computed values on the screen a _reaction_ is needed that repaints part of the GUI.
+
+Reactions are similar to a computed value, but instead of producing a new value, a reaction produces a side effect for things like printing to the console, making network requests, incrementally updating the React component tree to patch the DOM, etc.
+In short, reactions bridge [reactive](https://en.wikipedia.org/wiki/Reactive_programming) and [imperative](https://en.wikipedia.org/wiki/Imperative_programming) programming.
+
+##### React components
+
+If you are using React, you can turn your (stateless function) components into reactive components by wrapping it with the [`observer`](http://mobxjs.github.io/mobx/refguide/observer-component.html) function from the `mobx-react` package.
+
+```javascript
+import React from "react"
+import ReactDOM from "react-dom"
+import { observer } from "mobx-react"
+
+const TodoListView = observer(({ todoList }) => (
+    <div>
+        <ul>
+            {todoList.todos.map(todo => (
+                <TodoView todo={todo} key={todo.id} />
+            ))}
+        </ul>
+        Tasks left: {todoList.unfinishedTodoCount}
+    </div>
+))
+
+const TodoView = observer(({ todo }) => (
+    <li>
+        <input type="checkbox" checked={todo.finished} onClick={() => todo.toggle()} />
+        {todo.title}
+    </li>
+))
+
+const store = new TodoList()
+ReactDOM.render(<TodoListView todoList={store} />, document.getElementById("mount"))
+```
+
+`observer` turns React (function) components into derivations of the data they render.
+When using MobX there are no smart or dumb components.
+All components render smartly but are defined in a dumb manner. MobX will simply make sure the components are always re-rendered whenever needed, but also no more than that. So the `onClick` handler in the above example will force the proper `TodoView` to render as it uses the `toggle` action, and it will cause the `TodoListView` to render if the number of unfinished tasks has changed.
+However, if you would remove the `Tasks left` line (or put it into a separate component), the `TodoListView` will no longer re-render when ticking a box. You can verify this yourself by changing the [JSFiddle](https://jsfiddle.net/mweststrate/wv3yopo0/).
+
+##### Custom reactions
+
+Custom reactions can simply be created using the [`autorun`](../refguide/autorun.md),
+[`reaction`](../refguide/reaction.md) or [`when`](../refguide/when.md) functions to fit your specific situations.
+
+For example the following `autorun` prints a log message each time the amount of `unfinishedTodoCount` changes:
+
+```javascript
+autorun(() => {
+    console.log("Tasks left: " + todos.unfinishedTodoCount)
+})
+```
+
+Why does a new message get printed each time the `unfinishedTodoCount` is changed? The answer is this rule of thumb:
+
+_MobX reacts to any existing observable property that is read during the execution of a tracked function._
+
+For an in-depth explanation about how MobX determines to which observables needs to be reacted, check [understanding what MobX reacts to](../best/react.md).
 
 ## Principles
 
@@ -57,65 +177,3 @@ _Computed values_ are updated **lazily**. Any computed value that is not activel
 If a view is no longer in use it will be garbage collected automatically.
 
 All _Computed values_ should be **pure**. They are not supposed to change _state_.
-
-## Illustration
-
-The following listing illustrates the above concepts and principles:
-
-```javascript
-import { makeObservable, autorun, action, computed, observable } from "mobx"
-
-class Todo {
-    title = ""
-    completed = false
-
-    constructor(title, completed) {
-        this.title = title
-        this.completed = completed
-        makeObservable(this, {
-            title: observable,
-            completed: observable,
-            complete: action
-        })
-    }
-    complete() {
-        this.completed = true
-    }
-}
-
-class TodoStore {
-    /* some observable state */
-    todos = []
-
-    constructor() {
-        makeObservable(this, {
-            todos: observable,
-            completedCount: computed,
-            add: action
-        })
-    }
-
-    add(title, completed) {
-        this.todos.push(new Todo(title, completed))
-    }
-
-    /* a derived value */
-    get completedCount() {
-        return this.todos.filter(todo => todo.completed).length
-    }
-}
-
-/* a function that observes the state */
-autorun(function () {
-    console.log("Completed %d of %d items", todoStore.completedCount, todoStore.todos.length)
-})
-
-/* ..and some actions that modify the state */
-todoStore.add("Take a walk", false)
-// -> synchronously prints 'Completed 0 of 1 items'
-
-todoStore.todos[0].complete()
-// -> synchronously prints 'Completed 1 of 1 items'
-```
-
-In the [10 minute introduction to MobX and React](https://mobx.js.org/getting-started) you can dive deeper into this example and build a user interface using [React](https://facebook.github.io/react/) around it.

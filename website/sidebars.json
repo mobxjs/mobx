@@ -3,8 +3,8 @@
     "Basics": [
       "README",
       "intro/installation",
-      "intro/concepts",
-      "intro/overview"
+      "intro/overview",
+      "intro/concepts"
     ],
     "Making things observable": [
       "refguide/observable",

@@ -112,6 +112,9 @@
         "title": "provider_inject",
         "sidebar_label": "Provider / inject"
       },
+      "refguide/make-auto-observable": {
+        "title": "refguide/make-auto-observable"
+      },
       "refguide/map": {
         "title": "Observable Maps",
         "sidebar_label": "maps"
