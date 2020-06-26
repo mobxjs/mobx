@@ -49,3 +49,7 @@ Questions:
     is the default. So I've rewritten it with that in mind.
 
 -   The https://github.com/mobxjs/mobx-react-boilerplate project needs updating.
+
+Todo
+
+-   [ ] Netlify preview for docs PR.
