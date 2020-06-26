@@ -88,4 +88,6 @@ These methods, `increaseTimer` and `resetTimer` are just like you would write th
 
 **_MobX helps you do things in a simple straightforward way_**.
 
-Feel free to try this example on [JSFiddle](http://jsfiddle.net/mweststrate/wgbe4guu/) or by cloning the [MobX boilerplate project](https://github.com/mobxjs/mobx-react-boilerplate)
+Feel free to try this example on [JSFiddle](http://jsfiddle.net/mweststrate/wgbe4guu/).
+
+To learn more about the concepts and principles underlying MobX, together with a more worked out example, read [Concepts & Principles](concepts.md).
