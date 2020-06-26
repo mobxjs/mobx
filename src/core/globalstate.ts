@@ -19,7 +19,6 @@ const persistentKeys: (keyof MobXGlobals)[] = [
 
 export type IUNCHANGED = {}
 
-// TODO: can we minify certain members?
 export class MobXGlobals {
     /**
      * MobXGlobals version.

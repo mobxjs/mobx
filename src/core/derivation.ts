@@ -139,7 +139,6 @@ export function checkIfStateModificationsAreAllowed(atom: IAtom) {
     const hasObservers = atom.observers_.size > 0
     // Should not be possible to change observed state outside strict mode, except during initialization, see #563
     if (!globalState.allowStateChanges && (hasObservers || globalState.enforceActions === "always"))
-        // TODO: prefix with mobx
         console.warn(
             "[MobX] " +
                 (globalState.enforceActions

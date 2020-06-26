@@ -103,11 +103,10 @@ function createArrayEntryDescriptor(index: number) {
         enumerable: false,
         configurable: true,
         get: function() {
-            // TODO: redirect to the administraiton
-            return this.get(index)
+            return this[$mobx].get_(index)
         },
         set: function(value) {
-            this.set(index, value)
+            this[$mobx].set_(index, value)
         }
     }
 }

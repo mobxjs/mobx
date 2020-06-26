@@ -77,13 +77,14 @@ export interface IArrayWillSplice<T = any> {
 
 const arrayTraps = {
     get(target, name) {
-        if (name === $mobx) return target[$mobx]
-        if (name === "length") return target[$mobx].getArrayLength_()
+        const adm: ObservableArrayAdministration = target[$mobx]
+        if (name === $mobx) return adm
+        if (name === "length") return adm.getArrayLength_()
         if (typeof name === "number") {
-            return arrayExtensions.get.call(target, name)
+            adm.get_(name)
         }
         if (typeof name === "string" && !isNaN(name as any)) {
-            return arrayExtensions.get.call(target, parseInt(name))
+            adm.get_(parseInt(name))
         }
         if (hasProp(arrayExtensions, name)) {
             return arrayExtensions[name]
@@ -91,17 +92,18 @@ const arrayTraps = {
         return target[name]
     },
     set(target, name, value): boolean {
+        const adm: ObservableArrayAdministration = target[$mobx]
         if (name === "length") {
-            target[$mobx].setArrayLength_(value)
+            adm.setArrayLength_(value)
         }
         if (typeof name === "number") {
-            arrayExtensions.set.call(target, name, value)
+            adm.set_(name, value)
         }
         if (typeof name === "symbol" || isNaN(name)) {
             target[name] = value
         } else {
             // numeric string
-            arrayExtensions.set.call(target, parseInt(name), value)
+            adm.set_(parseInt(name), value)
         }
         return true
     },
@@ -283,6 +285,49 @@ export class ObservableArrayAdministration
         if (notify) notifyListeners(this, change)
         if (__DEV__ && notifySpy) spyReportEnd()
     }
+
+    get_(index: number): any | undefined {
+        if (index < this.values_.length) {
+            this.atom_.reportObserved()
+            return this.dehanceValue_(this.values_[index])
+        }
+        console.warn(
+            __DEV__
+                ? `[mobx] Out of bounds read: ${index}`
+                : `[mobx.array] Attempt to read an array index (${index}) that is out of bounds (${this.values_.length}). Please check length first. Out of bound indices will not be tracked by MobX`
+        )
+    }
+
+    set_(index: number, newValue: any) {
+        const values = this.values_
+        if (index < values.length) {
+            // update at index in range
+            checkIfStateModificationsAreAllowed(this.atom_)
+            const oldValue = values[index]
+            if (hasInterceptors(this)) {
+                const change = interceptChange<IArrayWillChange<any>>(this as any, {
+                    type: UPDATE,
+                    object: this.proxy_ as any, // since "this" is the real array we need to pass its proxy
+                    index,
+                    newValue
+                })
+                if (!change) return
+                newValue = change.newValue
+            }
+            newValue = this.enhancer_(newValue, oldValue)
+            const changed = newValue !== oldValue
+            if (changed) {
+                values[index] = newValue
+                this.notifyArrayChildUpdate_(index, newValue, oldValue)
+            }
+        } else if (index === values.length) {
+            // add a new item
+            this.spliceWithArray_(index, 0, [newValue])
+        } else {
+            // out of bounds
+            die(17, index, values.length)
+        }
+    }
 }
 
 export function createObservableArray<T>(
@@ -400,56 +445,6 @@ export var arrayExtensions = {
                 return true
             }
             return false
-        },
-
-        // TODO: move to array administration
-        get(index: number): any | undefined {
-            const adm: ObservableArrayAdministration = this[$mobx]
-            if (adm) {
-                if (index < adm.values_.length) {
-                    adm.atom_.reportObserved()
-                    return adm.dehanceValue_(adm.values_[index])
-                }
-                console.warn(
-                    __DEV__
-                        ? `[mobx] Out of bounds read: ${index}`
-                        : `[mobx.array] Attempt to read an array index (${index}) that is out of bounds (${adm.values_.length}). Please check length first. Out of bound indices will not be tracked by MobX`
-                )
-            }
-            return undefined
-        },
-
-        // TODO: move to array administration
-        set(index: number, newValue: any) {
-            const adm: ObservableArrayAdministration = this[$mobx]
-            const values = adm.values_
-            if (index < values.length) {
-                // update at index in range
-                checkIfStateModificationsAreAllowed(adm.atom_)
-                const oldValue = values[index]
-                if (hasInterceptors(adm)) {
-                    const change = interceptChange<IArrayWillChange<any>>(adm as any, {
-                        type: UPDATE,
-                        object: adm.proxy_ as any, // since "this" is the real array we need to pass its proxy
-                        index,
-                        newValue
-                    })
-                    if (!change) return
-                    newValue = change.newValue
-                }
-                newValue = adm.enhancer_(newValue, oldValue)
-                const changed = newValue !== oldValue
-                if (changed) {
-                    values[index] = newValue
-                    adm.notifyArrayChildUpdate_(index, newValue, oldValue)
-                }
-            } else if (index === values.length) {
-                // add a new item
-                adm.spliceWithArray_(index, 0, [newValue])
-            } else {
-                // out of bounds
-                die(17, index, values.length)
-            }
         }
     }
 

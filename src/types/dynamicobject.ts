@@ -18,12 +18,11 @@ function getAdm(target): ObservableObjectAdministration {
 // and skip either the internal values map, or the base object with its property descriptors!
 const objectProxyTraps: ProxyHandler<any> = {
     has(target: IIsObservableObject, name: PropertyKey) {
-        // TODO: introduce isConstructor
         if (name === $mobx || name === "constructor") return true
         if (__DEV__) warnAboutProxyRequirement() // TODO: is this correct?
         const adm = getAdm(target)
         // MWE: should `in` operator be reactive? If not, below code path will be faster / more memory efficient
-        // TODO: check performance stats!
+        // check performance stats!
         // if (adm.values.get(name as string)) return true
         if (isStringish(name)) return adm.has_(name)
         return (name as any) in target
