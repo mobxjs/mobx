@@ -20,6 +20,7 @@
     -   [x] codemod leave decorators
     -   [x] migrate decorate calls as well
     -   [ ] migrate privates correctly
+    -   [ ] migrate `@observer` calls
     -   [ ] unit tests for `ignoreImports`
     -   [ ] unit tests for `keepDecorators`
 -   [ ] ES5 support
@@ -38,7 +39,7 @@
     -   [x] observable; support `false` as argument
 -   [ ] misc
     -   [x] revisit safety model
-    -   [ ] at startup, test presence of Map, Symbol ownPropertySymboles and other globals!
+    -   [x] at startup, test presence of Map, Symbol ownPropertySymboles and other globals!
     -   [x] verify: action called from computed throws?
     -   [ ] apply deprecation of find and findIndex error
     -   [ ] verify perf / memory changes

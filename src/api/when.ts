@@ -30,7 +30,6 @@ export function when(
     opts?: IWhenOptions
 ): IReactionDisposer
 export function when(predicate: any, arg1?: any, arg2?: any): any {
-    // TODO: arglen and isObject utility?
     if (arguments.length === 1 || (arg1 && typeof arg1 === "object"))
         return whenPromise(predicate, arg1)
     return _when(predicate, arg1, arg2 || {})

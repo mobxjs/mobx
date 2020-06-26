@@ -127,7 +127,6 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         propagateMaybeChanged(this)
     }
 
-    // TODO: rename?
     public onBecomeObservedListeners: Set<Lambda> | undefined
     public onBecomeUnobservedListeners: Set<Lambda> | undefined
 
@@ -164,13 +163,6 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 
         if (isCaughtException(result)) throw result.cause
         return result
-    }
-
-    // TODO: kill?
-    public peek(): T {
-        const res = this.computeValue_(false)
-        if (isCaughtException(res)) throw res.cause
-        return res
     }
 
     public set(value: T) {
@@ -241,7 +233,6 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         }
     }
 
-    // TODO: rename
     observe(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda {
         let firstTime = true
         let prevValue: T | undefined = undefined

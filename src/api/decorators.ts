@@ -72,7 +72,6 @@ export function applyDecorators(target: Object): boolean {
         if (desc) {
             if (!annotations.length) {
                 for (let key in desc.value) {
-                    // Todo: make 'hasOwnProp' utility
                     // second conditions is to recognize actions
                     if (!hasProp(target, key) && !hasProp(current, key)) {
                         // not all fields are defined yet, so we are in the makeObservable call of some super class,

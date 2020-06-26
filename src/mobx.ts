@@ -16,8 +16,7 @@
  *
  */
 import { dieHard } from "./errors"
-;["Symbol", "Map", "Set"].forEach(m => {
-    // TODO: add more, support `.` notation
+;["Symbol", "Map", "Set", "Symbol"].forEach(m => {
     if (typeof global[m] === "undefined") {
         dieHard(`MobX requires global '${m}' to be available or polyfilled`)
     }

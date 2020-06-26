@@ -95,7 +95,7 @@ export function getEnhancerFromAnnotation(annotation?: Annotation): IEnhancer<an
  * @param v the value which should become observable.
  */
 function createObservable(v: any, arg2?: any, arg3?: any) {
-    // @observable someProp; TODO delete
+    // @observable someProp;
     if (isStringish(arg2)) {
         storeDecorator(v, arg2, OBSERVABLE)
         return

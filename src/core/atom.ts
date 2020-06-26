@@ -35,7 +35,6 @@ export class Atom implements IAtom {
      */
     constructor(public name_ = "Atom@" + getNextId()) {}
 
-    // TODO: rename?
     public onBecomeObservedListeners: Set<Lambda> | undefined
     public onBecomeUnobservedListeners: Set<Lambda> | undefined
 

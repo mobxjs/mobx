@@ -73,7 +73,7 @@ export function makeProperty(
     forceCopy: boolean // extend observable will copy even unannotated properties
 ): void {
     const { target_: target } = adm
-    const defaultAnnotation: Annotation | undefined = observable // TODO: grap this from adm instead!
+    const defaultAnnotation: Annotation | undefined = observable // ideally grap this from adm's defaultEnahncer instead!
     const origAnnotation = annotation
     if (annotation === true) {
         annotation = getInferredAnnotation(descriptor, defaultAnnotation)
@@ -117,7 +117,6 @@ export function makeProperty(
         case COMPUTED:
         case COMPUTED_STRUCT: {
             if (!descriptor.get) die(4, key)
-            // TODO: add to target or proto?
             adm.addComputedProp_(target, key, {
                 get: descriptor.get,
                 set: descriptor.set,

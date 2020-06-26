@@ -9,7 +9,6 @@ import {
     isFunction
 } from "../internal"
 
-// TODO: can we minify those?
 const ON_BECOME_OBSERVED = "onBecomeObserved"
 const ON_BECOME_UNOBSERVED = "onBecomeUnobserved"
 
