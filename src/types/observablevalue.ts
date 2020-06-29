@@ -126,16 +126,11 @@ export class ObservableValue<T> extends Atom
         return this.dehanceValue(this.value_)
     }
 
-    // TODO: kill?
-    public intercept_(handler: IInterceptor<IValueWillChange<T>>): Lambda {
+    intercept_(handler: IInterceptor<IValueWillChange<T>>): Lambda {
         return registerInterceptor(this, handler)
     }
 
-    // TODO: kill?
-    public observe_(
-        listener: (change: IValueDidChange<T>) => void,
-        fireImmediately?: boolean
-    ): Lambda {
+    observe_(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda {
         if (fireImmediately)
             listener({
                 object: this,

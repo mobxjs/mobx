@@ -38,11 +38,6 @@ import {
     hasProp
 } from "../internal"
 
-// TODO: kill
-export interface IObservableObject {
-    "observable-object": IObservableObject
-}
-
 export type IObjectDidChange<T = any> =
     | {
           name: PropertyKey
@@ -250,33 +245,6 @@ export class ObservableObjectAdministration
         }
     }
 
-    // TODO: is this still needed?
-    illegalAccess_(owner, propName) {
-        /**
-         * This happens if a property is accessed through the prototype chain, but the property was
-         * declared directly as own property on the prototype.
-         *
-         * E.g.:
-         * class A {
-         * }
-         * extendObservable(A.prototype, { x: 1 })
-         *
-         * classB extens A {
-         * }
-         * console.log(new B().x)
-         *
-         * It is unclear whether the property should be considered 'static' or inherited.
-         * Either use `console.log(A.x)`
-         * or: decorate(A, { x: observable })
-         *
-         * When using decorate, the property will always be redeclared as own property on the actual instance
-         */
-        __DEV__ &&
-            console.warn(
-                `Property '${propName}' of '${owner}' was accessed through the prototype chain. Use 'decorate' instead to declare the prop or access it statically through it's owner`
-            )
-    }
-
     /**
      * Observes this object. Triggers for the events 'add', 'update' and 'delete'.
      * See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe
@@ -370,15 +338,6 @@ export function generateObservablePropConfig(propName) {
     )
 }
 
-function getAdministrationForComputedPropOwner(owner: any): ObservableObjectAdministration {
-    // TODO: what again does this function?
-    const adm = owner[$mobx]
-    if (!adm) {
-        return owner[$mobx]
-    }
-    return adm
-}
-
 export function generateComputedPropConfig(propName) {
     return (
         computedPropertyConfigs[propName] ||
@@ -386,22 +345,21 @@ export function generateComputedPropConfig(propName) {
             configurable: true,
             enumerable: false,
             get() {
-                return getAdministrationForComputedPropOwner(this).read_(propName)
+                return this[$mobx].read_(propName)
             },
             set(v) {
-                getAdministrationForComputedPropOwner(this).write_(propName, v)
+                this[$mobx].write_(propName, v)
             }
         })
     )
 }
 
-// TODO: extract constant for "ObservableObject ?
 const isObservableObjectAdministration = createInstanceofPredicate(
     "ObservableObjectAdministration",
     ObservableObjectAdministration
 )
 
-export function isObservableObject(thing: any): thing is IObservableObject {
+export function isObservableObject(thing: any): boolean {
     if (isObject(thing)) {
         return isObservableObjectAdministration((thing as any)[$mobx])
     }

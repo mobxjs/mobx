@@ -1,7 +1,7 @@
 "use strict"
 
 const mobx = require("../../../src/mobx.ts")
-const { observable, when, _getAdministration, reaction, makeObservable } = mobx
+const { observable, when, _getAdministration, reaction, computed, makeObservable, autorun } = mobx
 const iterall = require("iterall")
 
 test("test1", function() {
@@ -69,20 +69,59 @@ test("test1", function() {
     expect(sum.get()).toBe(3)
     expect(a.slice()).toEqual([1, 2])
 
-    expect(a.slice().reverse()).toEqual([2, 1])
-    expect(a.slice()).toEqual([1, 2])
+    expect(a.reverse()).toEqual([2, 1])
+    expect(a).toEqual([2, 1])
+    expect(a.slice()).toEqual([2, 1])
 
     a.unshift(3)
-    expect(a.slice().sort()).toEqual([1, 2, 3])
-    expect(a.slice()).toEqual([3, 1, 2])
+    expect(a.sort()).toEqual([1, 2, 3])
+    expect(a).toEqual([1, 2, 3])
+    expect(a.slice()).toEqual([1, 2, 3])
 
-    expect(JSON.stringify(a)).toBe("[3,1,2]")
+    expect(JSON.stringify(a)).toBe("[1,2,3]")
 
-    expect(a[1]).toBe(1)
+    expect(a[1]).toBe(2)
     a[2] = 4
     expect(a[2]).toBe(4)
 
-    expect(Object.keys(a)).toEqual(["0", "1", "2"]) // ideally....
+    expect(Object.keys(a)).toEqual(["0", "1", "2"])
+})
+
+test("cannot reverse or sort an array in a derivation", () => {
+    const ar = observable([3, 2, 1])
+    reaction(
+        () => {
+            expect(() => {
+                ar.sort()
+            }).toThrowErrorMatchingInlineSnapshot(
+                `"[MobX] [mobx] \`observableArray.sort()\` mutates the array in-place, which is not allowed inside a derivation. Use \`array.slice().sort()\` instead"`
+            )
+        },
+        () => {}
+    )()
+    reaction(
+        () => {
+            expect(() => {
+                ar.reverse()
+            }).toThrowErrorMatchingInlineSnapshot(
+                `"[MobX] [mobx] \`observableArray.reverse()\` mutates the array in-place, which is not allowed inside a derivation. Use \`array.slice().reverse()\` instead"`
+            )
+        },
+        () => {}
+    )()
+
+    const c = computed(() => {
+        ar.sort()
+    })
+    autorun(() => {
+        expect(() => {
+            c.get()
+        }).toThrowErrorMatchingInlineSnapshot(
+            `"[MobX] [mobx] \`observableArray.sort()\` mutates the array in-place, which is not allowed inside a derivation. Use \`array.slice().sort()\` instead"`
+        )
+    })()
+
+    expect(ar).toEqual([3, 2, 1])
 })
 
 test("array should support iterall / iterable ", () => {

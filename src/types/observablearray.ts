@@ -29,6 +29,7 @@ import {
     hasProp,
     die
 } from "../internal"
+import { globalState } from "../core/globalstate"
 
 const SPLICE = "splice"
 export const UPDATE = "update"
@@ -144,7 +145,6 @@ export class ObservableArrayAdministration
         return values
     }
 
-    // TODO: rename
     intercept_(handler: IInterceptor<IArrayWillChange<any> | IArrayWillSplice<any>>): Lambda {
         return registerInterceptor<IArrayWillChange<any> | IArrayWillSplice<any>>(this, handler)
     }
@@ -415,26 +415,23 @@ export var arrayExtensions = {
         reverse(): any[] {
             // reverse by default mutates in place before returning the result
             // which makes it both a 'derivation' and a 'mutation'.
-            // so we deviate from the default and just make it an dervitation
-            if (__DEV__) {
-                console.warn(
-                    "[mobx] `observableArray.reverse()` will not update the array in place. Use `observableArray.slice().reverse()` to suppress this warning and perform the operation on a copy, or `observableArray.replace(observableArray.slice().reverse())` to reverse & update in place"
-                )
+            if (globalState.trackingDerivation) {
+                die(37, "reverse")
             }
-            const clone = (<any>this).slice()
-            return clone.reverse.apply(clone, arguments)
+            this.replace(this.slice().reverse())
+            return this
         },
 
         sort(): any[] {
             // sort by default mutates in place before returning the result
             // which goes against all good practices. Let's not change the array in place!
-            if (__DEV__) {
-                console.warn(
-                    "[mobx] `observableArray.sort()` will not update the array in place. Use `observableArray.slice().sort()` to suppress this warning and perform the operation on a copy, or `observableArray.replace(observableArray.slice().sort())` to sort & update in place"
-                )
+            if (globalState.trackingDerivation) {
+                die(37, "sort")
             }
-            const clone = (<any>this).slice()
-            return this.slice().sort.apply(clone, arguments)
+            const copy = this.slice()
+            copy.sort.apply(copy, arguments)
+            this.replace(copy)
+            return this
         },
 
         remove(value: any): boolean {

@@ -101,6 +101,9 @@ PHilosophy: one way to do things
 -   [ ] Breaking: in computed, the when predicate, and reaction predicate it is never allowed to directly change state. State changes should be wrapped in action.
 -   [ ] Breaking: `toJS` no longer takes action, and no longer converts Maps and Sets to plain data structures. Serializing data structures is out of scope for the MobX project, and write custom serialization methods are much more sustainable. You might even leverage @computed to serialize state.
 -   [ ] Breaking: directly calling .get() / .set() on an observable array is no longer supported
+-   [ ] Breaking: killed IObservableObject interface.
+-   [ ] Breaking: sorting or reversing an array in an derivation will now throw rather than warn.
+-   [ ] Breaking: sorting or reversing an array in an actino will no sort or reverse the source array rather than shallow copy.
 
 ## NOTES
 

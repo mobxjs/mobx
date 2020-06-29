@@ -2,7 +2,6 @@ import { Lambda, once, untrackedEnd, untrackedStart } from "../internal"
 
 export interface IListenable {
     changeListeners_: Function[] | undefined
-    observe_(handler: (change: any, oldValue?: any) => void, fireImmediately?: boolean): Lambda
 }
 
 export function hasListeners(listenable: IListenable) {

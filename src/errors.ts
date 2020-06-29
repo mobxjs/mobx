@@ -65,7 +65,10 @@ const niceErrors = {
         return `[ComputedValue '${name}'] It is not possible to assign a new value to a computed value.`
     },
     35: "There are multiple, different versions of MobX active. Make sure MobX is loaded only once or use `configure({ isolateGlobalState: true })`",
-    36: "isolateGlobalState should be called before MobX is running any reactions"
+    36: "isolateGlobalState should be called before MobX is running any reactions",
+    37(method) {
+        return `[mobx] \`observableArray.${method}()\` mutates the array in-place, which is not allowed inside a derivation. Use \`array.slice().${method}()\` instead`
+    }
 } as const
 
 const errors: typeof niceErrors = __DEV__ ? niceErrors : ({} as any)

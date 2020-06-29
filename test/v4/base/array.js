@@ -70,15 +70,16 @@ test("test1", function() {
     expect(a.slice()).toEqual([1, 2])
 
     expect(a.reverse()).toEqual([2, 1])
-    expect(a.slice()).toEqual([1, 2])
+    expect(a).toEqual([2, 1])
+    expect(a.slice()).toEqual([2, 1])
 
     a.unshift(3)
     expect(a.sort()).toEqual([1, 2, 3])
-    expect(a.slice()).toEqual([3, 1, 2])
+    expect(a.slice()).toEqual([1, 2, 3])
 
-    expect(JSON.stringify(a)).toBe("[3,1,2]")
+    expect(JSON.stringify(a)).toBe("[1,2,3]")
 
-    expect(a[1]).toBe(1)
+    expect(a[1]).toBe(2)
     a[2] = 4
     expect(a[2]).toBe(4)
 

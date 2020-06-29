@@ -4,7 +4,6 @@ export type IInterceptor<T> = (change: T) => T | null
 
 export interface IInterceptable<T> {
     interceptors_: IInterceptor<T>[] | undefined
-    intercept_(handler: IInterceptor<T>): Lambda
 }
 
 export function hasInterceptors(interceptable: IInterceptable<any>) {

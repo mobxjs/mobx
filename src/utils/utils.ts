@@ -149,7 +149,6 @@ const hasGetOwnPropertySymbols = typeof Object.getOwnPropertySymbols !== "undefi
  * Returns the following: own keys, prototype keys & own symbol keys, if they are enumerable.
  */
 export function getPlainObjectKeys(object) {
-    // TODO: use Reflect.ownKeys!
     const keys = Object.keys(object)
     // Not supported in IE, so there are not going to be symbol props anyway...
     if (!hasGetOwnPropertySymbols) return keys
