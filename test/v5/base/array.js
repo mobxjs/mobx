@@ -643,3 +643,50 @@ test("reproduce #2021", () => {
         delete Array.prototype.extension
     }
 })
+
+test("correct array should be passed to callbacks #2326", () => {
+    const array = observable([1, 2, 3])
+
+    function callback() {
+        const lastArg = arguments[arguments.length - 1]
+        expect(lastArg).toBe(array)
+    }
+    ;[
+        "every",
+        "filter",
+        "find",
+        "findIndex",
+        "flatMap",
+        "forEach",
+        "map",
+        "reduce",
+        "reduceRight",
+        "some"
+    ].forEach(method => {
+        if (Array.prototype[method]) array[method](callback)
+        else console.warn("SKIPPING: " + method)
+    })
+})
+
+test("very long arrays can be safely passed to nativeArray.concat #2379", () => {
+    const nativeArray = ["a", "b"]
+    const longNativeArray = [...Array(10000).keys()] // MAX_SPLICE_SIZE seems to be the threshold
+    const longObservableArray = observable(longNativeArray)
+    expect(longObservableArray.length).toBe(10000)
+    expect(longObservableArray).toEqual(longNativeArray)
+    expect(longObservableArray[9000]).toBe(longNativeArray[9000])
+    expect(longObservableArray[9999]).toBe(longNativeArray[9999])
+    expect(longObservableArray[10000]).toBe(longNativeArray[10000])
+
+    const expectedArray = nativeArray.concat(longNativeArray)
+    const actualArray = nativeArray.concat(longObservableArray)
+
+    expect(actualArray).toEqual(expectedArray)
+
+    const anotherArray = [0, 1, 2, 3, 4, 5]
+    const observableArray = observable(anotherArray)
+    const r1 = anotherArray.splice(2, 2, ...longNativeArray)
+    const r2 = observableArray.splice(2, 2, ...longNativeArray)
+    expect(r2).toEqual(r1)
+    expect(observableArray).toEqual(anotherArray)
+})
