@@ -184,7 +184,6 @@ results of this test:
             return a.get() * b.get() * c.get()
         })
         t.equal(d.get(), 126)
-        t.equal(d.dependenciesState, -1)
         const start = now()
         for (let i = 0; i < 10000; i++) {
             c.set(i)
