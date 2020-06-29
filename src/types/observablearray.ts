@@ -116,7 +116,7 @@ const arrayTraps = {
 export class ObservableArrayAdministration
     implements IInterceptable<IArrayWillChange<any> | IArrayWillSplice<any>>, IListenable {
     atom_: IAtom
-    values_: any[] = []
+    readonly values_: any[] = [] // this is the prop that gets proxied, so can't replace it!
     interceptors_
     changeListeners_
     enhancer_: (newV: any, oldV: any | undefined) => any
@@ -229,14 +229,16 @@ export class ObservableArrayAdministration
         return this.dehanceValues_(res)
     }
 
-    spliceItemsIntoValues_(index, deleteCount, newItems: any[]): any[] {
+    spliceItemsIntoValues_(index: number, deleteCount: number, newItems: any[]): any[] {
         if (newItems.length < MAX_SPLICE_SIZE) {
             return this.values_.splice(index, deleteCount, ...newItems)
         } else {
             const res = this.values_.slice(index, index + deleteCount)
-            this.values_ = this.values_
-                .slice(0, index)
-                .concat(newItems, this.values_.slice(index + deleteCount))
+            let oldItems = this.values_.slice(index + deleteCount)
+            this.values_.length = index + newItems.length - deleteCount
+            for (let i = 0; i < newItems.length; i++) this.values_[index + i] = newItems[i]
+            for (let i = 0; i < oldItems.length; i++)
+                this.values_[index + newItems.length + i] = oldItems[i]
             return res
         }
     }
@@ -351,128 +353,166 @@ export function createObservableArray<T>(
 
 // eslint-disable-next-line
 export var arrayExtensions = {
-        clear(): any[] {
-            return this.splice(0)
-        },
+    clear(): any[] {
+        return this.splice(0)
+    },
 
-        replace(newItems: any[]) {
-            const adm: ObservableArrayAdministration = this[$mobx]
-            return adm.spliceWithArray_(0, adm.values_.length, newItems)
-        },
+    replace(newItems: any[]) {
+        const adm: ObservableArrayAdministration = this[$mobx]
+        return adm.spliceWithArray_(0, adm.values_.length, newItems)
+    },
 
-        // Used by JSON.stringify
-        toJSON(): any[] {
-            return this.slice()
-        },
+    // Used by JSON.stringify
+    toJSON(): any[] {
+        return this.slice()
+    },
 
-        /*
-         * functions that do alter the internal structure of the array, (based on lib.es6.d.ts)
-         * since these functions alter the inner structure of the array, the have side effects.
-         * Because the have side effects, they should not be used in computed function,
-         * and for that reason the do not call dependencyState.notifyObserved
-         */
-        splice(index: number, deleteCount?: number, ...newItems: any[]): any[] {
-            const adm: ObservableArrayAdministration = this[$mobx]
-            switch (arguments.length) {
-                case 0:
-                    return []
-                case 1:
-                    return adm.spliceWithArray_(index)
-                case 2:
-                    return adm.spliceWithArray_(index, deleteCount)
-            }
-            return adm.spliceWithArray_(index, deleteCount, newItems)
-        },
-
-        spliceWithArray(index: number, deleteCount?: number, newItems?: any[]): any[] {
-            return (this[$mobx] as ObservableArrayAdministration).spliceWithArray_(
-                index,
-                deleteCount,
-                newItems
-            )
-        },
-
-        push(...items: any[]): number {
-            const adm: ObservableArrayAdministration = this[$mobx]
-            adm.spliceWithArray_(adm.values_.length, 0, items)
-            return adm.values_.length
-        },
-
-        pop() {
-            return this.splice(Math.max(this[$mobx].values_.length - 1, 0), 1)[0]
-        },
-
-        shift() {
-            return this.splice(0, 1)[0]
-        },
-
-        unshift(...items: any[]): number {
-            const adm: ObservableArrayAdministration = this[$mobx]
-            adm.spliceWithArray_(0, 0, items)
-            return adm.values_.length
-        },
-
-        reverse(): any[] {
-            // reverse by default mutates in place before returning the result
-            // which makes it both a 'derivation' and a 'mutation'.
-            if (globalState.trackingDerivation) {
-                die(37, "reverse")
-            }
-            this.replace(this.slice().reverse())
-            return this
-        },
-
-        sort(): any[] {
-            // sort by default mutates in place before returning the result
-            // which goes against all good practices. Let's not change the array in place!
-            if (globalState.trackingDerivation) {
-                die(37, "sort")
-            }
-            const copy = this.slice()
-            copy.sort.apply(copy, arguments)
-            this.replace(copy)
-            return this
-        },
-
-        remove(value: any): boolean {
-            const adm: ObservableArrayAdministration = this[$mobx]
-            const idx = adm.dehanceValues_(adm.values_).indexOf(value)
-            if (idx > -1) {
-                this.splice(idx, 1)
-                return true
-            }
-            return false
-        }
-    }
-
-    /**
-     * Wrap function from prototype
-     * Without this, everything works as well, but this works
-     * faster as everything works on unproxied values
+    /*
+     * functions that do alter the internal structure of the array, (based on lib.es6.d.ts)
+     * since these functions alter the inner structure of the array, the have side effects.
+     * Because the have side effects, they should not be used in computed function,
+     * and for that reason the do not call dependencyState.notifyObserved
      */
-;[
-    "concat",
-    "every",
-    "filter",
-    "forEach",
-    "indexOf",
-    "join",
-    "lastIndexOf",
-    "map",
-    "reduce",
-    "reduceRight",
-    "slice",
-    "some",
-    "toString",
-    "toLocaleString"
-].forEach(funcName => {
-    arrayExtensions[funcName] = function() {
+    splice(index: number, deleteCount?: number, ...newItems: any[]): any[] {
+        const adm: ObservableArrayAdministration = this[$mobx]
+        switch (arguments.length) {
+            case 0:
+                return []
+            case 1:
+                return adm.spliceWithArray_(index)
+            case 2:
+                return adm.spliceWithArray_(index, deleteCount)
+        }
+        return adm.spliceWithArray_(index, deleteCount, newItems)
+    },
+
+    spliceWithArray(index: number, deleteCount?: number, newItems?: any[]): any[] {
+        return (this[$mobx] as ObservableArrayAdministration).spliceWithArray_(
+            index,
+            deleteCount,
+            newItems
+        )
+    },
+
+    push(...items: any[]): number {
+        const adm: ObservableArrayAdministration = this[$mobx]
+        adm.spliceWithArray_(adm.values_.length, 0, items)
+        return adm.values_.length
+    },
+
+    pop() {
+        return this.splice(Math.max(this[$mobx].values_.length - 1, 0), 1)[0]
+    },
+
+    shift() {
+        return this.splice(0, 1)[0]
+    },
+
+    unshift(...items: any[]): number {
+        const adm: ObservableArrayAdministration = this[$mobx]
+        adm.spliceWithArray_(0, 0, items)
+        return adm.values_.length
+    },
+
+    reverse(): any[] {
+        // reverse by default mutates in place before returning the result
+        // which makes it both a 'derivation' and a 'mutation'.
+        if (globalState.trackingDerivation) {
+            die(37, "reverse")
+        }
+        this.replace(this.slice().reverse())
+        return this
+    },
+
+    sort(): any[] {
+        // sort by default mutates in place before returning the result
+        // which goes against all good practices. Let's not change the array in place!
+        if (globalState.trackingDerivation) {
+            die(37, "sort")
+        }
+        const copy = this.slice()
+        copy.sort.apply(copy, arguments)
+        this.replace(copy)
+        return this
+    },
+
+    remove(value: any): boolean {
+        const adm: ObservableArrayAdministration = this[$mobx]
+        const idx = adm.dehanceValues_(adm.values_).indexOf(value)
+        if (idx > -1) {
+            this.splice(idx, 1)
+            return true
+        }
+        return false
+    }
+}
+
+/**
+ * Wrap function from prototype
+ * Without this, everything works as well, but this works
+ * faster as everything works on unproxied values
+ */
+addArrayExtension("concat", simpleFunc)
+addArrayExtension("flat", simpleFunc)
+addArrayExtension("includes", simpleFunc)
+addArrayExtension("indexOf", simpleFunc)
+addArrayExtension("join", simpleFunc)
+addArrayExtension("lastIndexOf", simpleFunc)
+addArrayExtension("slice", simpleFunc)
+addArrayExtension("toString", simpleFunc)
+addArrayExtension("toLocaleString", simpleFunc)
+// map
+addArrayExtension("every", mapLikeFunc)
+addArrayExtension("filter", mapLikeFunc)
+addArrayExtension("find", mapLikeFunc)
+addArrayExtension("findIndex", mapLikeFunc)
+addArrayExtension("flatMap", mapLikeFunc)
+addArrayExtension("forEach", mapLikeFunc)
+addArrayExtension("map", mapLikeFunc)
+addArrayExtension("some", mapLikeFunc)
+// reduce
+addArrayExtension("reduce", reduceLikeFunc)
+addArrayExtension("reduceRight", reduceLikeFunc)
+
+function addArrayExtension(funcName, funcFactory) {
+    if (Array.prototype[funcName] === "function") {
+        arrayExtensions[funcName] = funcFactory(funcName)
+    }
+}
+
+// Report and delegate to dehanced array
+function simpleFunc(funcName) {
+    return function() {
         const adm: ObservableArrayAdministration = this[$mobx]
         adm.atom_.reportObserved()
         const res = adm.dehanceValues_(adm.values_)
         return res[funcName].apply(res, arguments)
     }
-})
+}
+
+// Make sure callbacks recieve correct array arg #2326
+function mapLikeFunc(funcName) {
+    return function(callback, thisArg) {
+        const adm: ObservableArrayAdministration = this[$mobx]
+        adm.atom_.reportObserved()
+        return adm.values_[funcName]((element, index) => {
+            element = adm.dehanceValue_(element)
+            return callback.call(thisArg, element, index, this)
+        })
+    }
+}
+
+// Make sure callbacks recieve correct array arg #2326
+function reduceLikeFunc(funcName) {
+    return function(callback, initialValue) {
+        const adm: ObservableArrayAdministration = this[$mobx]
+        adm.atom_.reportObserved()
+        return adm.values_[funcName]((accumulator, currentValue, index) => {
+            currentValue = adm.dehanceValue_(currentValue)
+            return callback(accumulator, currentValue, index, this)
+        }, initialValue)
+    }
+}
 
 const isObservableArrayAdministration = createInstanceofPredicate(
     "ObservableArrayAdministration",

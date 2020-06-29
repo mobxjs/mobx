@@ -104,28 +104,10 @@ PHilosophy: one way to do things
 -   [ ] Breaking: killed IObservableObject interface.
 -   [ ] Breaking: sorting or reversing an array in an derivation will now throw rather than warn.
 -   [ ] Breaking: sorting or reversing an array in an actino will no sort or reverse the source array rather than shallow copy.
+-   Fixed #2326
+-   Fixed #2379
 
 ## NOTES
-
-### New state changes model:
-
-action
-
--   enter batching,
--   state updates allowed, only if not tracking -or- in effect
-
-effect
-
--   disable tracking + action
-
-track
-
--   enable tracking
--   disable updates
-
-Side effects like state changes are not allowed inside derivations. You can explicitly suppress this message by using 'effect', at your own risk.
-
-State changes are not allowed outside actions.
 
 ## Blog
 
