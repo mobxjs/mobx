@@ -112,7 +112,7 @@ In short, reactions bridge [reactive](https://en.wikipedia.org/wiki/Reactive_pro
 
 ##### React components
 
-If you are using React, you can turn your (stateless function) components into reactive components by wrapping it with the [`observer`](http://mobxjs.github.io/mobx/refguide/observer-component.html) function from the `mobx-react` package.
+If you are using React, you can turn your (stateless function) components into reactive components by wrapping it with the [`observer`](http://mobxjs.github.io/mobx/react/react-integration.html) function from the `mobx-react` package.
 
 ```javascript
 import React from "react"

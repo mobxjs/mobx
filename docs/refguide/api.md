@@ -324,7 +324,7 @@ async function* someNumbers() {
     yield Promise.resolve(3)
 }
 
-const count = mobx.flow(async function*() {
+const count = mobx.flow(async function* () {
     // use for await to loop async iterators
     for await (const number of someNumbers()) {
         total += number
@@ -348,7 +348,7 @@ Can be used as higher order component around a React component.
 The component will then automatically re-render if any of the observables used in the `render` function of the component has changed.
 Note that `observer` is provided by the `"mobx-react"` package and not by `"mobx"` itself.
 
-[&laquo;details&raquo;](observer-component.md)
+[&laquo;details&raquo;](../react/reactintegration.md)
 
 Usage:
 
@@ -522,7 +522,7 @@ export class City {
         clearInterval(this.interval)
     }
 
-    fetchTemperature = flow(function*() {
+    fetchTemperature = flow(function* () {
         // data fetching logic
     })
 }
