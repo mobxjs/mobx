@@ -28,7 +28,7 @@ export function spyReportEnd(change?) {
 export function spy(listener: (change: any) => void): Lambda {
     if (!__DEV__) {
         console.warn(`[mobx.spy] Is a no-op in production builds`)
-        return function() {}
+        return function () {}
     } else {
         globalState.spyListeners.push(listener)
         return once(() => {

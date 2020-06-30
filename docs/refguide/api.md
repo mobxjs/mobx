@@ -324,7 +324,7 @@ async function* someNumbers() {
     yield Promise.resolve(3)
 }
 
-const count = mobx.flow(async function*() {
+const count = mobx.flow(async function* () {
     // use for await to loop async iterators
     for await (const number of someNumbers()) {
         total += number
@@ -522,7 +522,7 @@ export class City {
         clearInterval(this.interval)
     }
 
-    fetchTemperature = flow(function*() {
+    fetchTemperature = flow(function* () {
         // data fetching logic
     })
 }

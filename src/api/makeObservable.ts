@@ -148,8 +148,9 @@ export function makeProperty(
         default:
             if (__DEV__)
                 die(
-                    `invalid decorator '${annotation.annotationType_ ??
-                        annotation}' for '${key.toString()}'`
+                    `invalid decorator '${
+                        annotation.annotationType_ ?? annotation
+                    }' for '${key.toString()}'`
                 )
     }
 }

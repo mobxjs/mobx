@@ -191,7 +191,7 @@ class Store {
     @observable githubProjects = []
     @observable state = "pending"
 
-    fetchProjects = flow(function*() {
+    fetchProjects = flow(function* () {
         // <- note the star, this a generator function!
         this.githubProjects = []
         this.state = "pending"

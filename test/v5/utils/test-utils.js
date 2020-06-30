@@ -3,7 +3,7 @@ import { $mobx } from "../../../src/mobx"
 export function consoleError(block, regex) {
     let messages = ""
     const orig = console.error
-    console.error = function() {
+    console.error = function () {
         Object.keys(arguments).forEach(key => {
             messages += ", " + arguments[key]
         })
@@ -22,7 +22,7 @@ export function consoleError(block, regex) {
 export function consoleWarn(block, regex) {
     let messages = ""
     const orig = console.warn
-    console.warn = function() {
+    console.warn = function () {
         Object.keys(arguments).forEach(key => {
             messages += ", " + arguments[key]
         })

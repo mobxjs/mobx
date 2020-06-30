@@ -29,7 +29,7 @@ import {
 } from "../../../src/mobx"
 import * as mobx from "../../../src/mobx"
 
-const testFunction = function(a: any) {}
+const testFunction = function (a: any) {}
 
 // lazy wrapper around yest
 
@@ -137,7 +137,7 @@ test("annotations", () => {
     t.deepEqual(order1totals, [6, 3, 9])
 
     t.equal(order1.aFunction, testFunction)
-    const x = function() {
+    const x = function () {
         return 3
     }
     order1.aFunction = x
@@ -150,7 +150,7 @@ test("box", () => {
         @observable height = 20
         @observable sizes = [2]
         @observable
-        someFunc = function() {
+        someFunc = function () {
             return 2
         }
         @computed

@@ -25,16 +25,16 @@ results of this test:
     const observable = mobx.observable
     const computed = mobx.computed
 
-    test(`${version} - one observes ten thousand that observe one`, function(t) {
+    test(`${version} - one observes ten thousand that observe one`, function (t) {
         gc()
         const a = observable.box(2)
 
         // many observers that listen to one..
         const observers = []
         for (let i = 0; i < 10000; i++) {
-            ;(function(idx) {
+            ;(function (idx) {
                 observers.push(
-                    computed(function() {
+                    computed(function () {
                         return a.get() * idx
                     })
                 )
@@ -43,7 +43,7 @@ results of this test:
 
         // let bCalcs = 0
         // one observers that listens to many..
-        const b = computed(function() {
+        const b = computed(function () {
             let res = 0
             for (let i = 0; i < observers.length; i++) res += observers[i].get()
             // bCalcs += 1
@@ -71,13 +71,13 @@ results of this test:
         t.end()
     })
 
-    test(`${version} - five hundrend properties that observe their sibling`, function(t) {
+    test(`${version} - five hundrend properties that observe their sibling`, function (t) {
         gc()
         const observables = [observable.box(1)]
         for (let i = 0; i < 500; i++) {
-            ;(function(idx) {
+            ;(function (idx) {
                 observables.push(
-                    computed(function() {
+                    computed(function () {
                         return observables[idx].get() + 1
                     })
                 )
@@ -105,12 +105,12 @@ results of this test:
         t.end()
     })
 
-    test(`${version} - late dependency change`, function(t) {
+    test(`${version} - late dependency change`, function (t) {
         gc()
         const values = []
         for (let i = 0; i < 100; i++) values.push(observable.box(0))
 
-        const sum = computed(function() {
+        const sum = computed(function () {
             let sum = 0
             for (let i = 0; i < 100; i++) sum += values[i].get()
             return sum
@@ -127,16 +127,16 @@ results of this test:
         t.end()
     })
 
-    test(`${version} - lots of unused computables`, function(t) {
+    test(`${version} - lots of unused computables`, function (t) {
         gc()
         const a = observable.box(1)
 
         // many observers that listen to one..
         const observers = []
         for (let i = 0; i < 10000; i++) {
-            ;(function(idx) {
+            ;(function (idx) {
                 observers.push(
-                    computed(function() {
+                    computed(function () {
                         return a.get() * idx
                     })
                 )
@@ -144,7 +144,7 @@ results of this test:
         }
 
         // one observers that listens to many..
-        const b = computed(function() {
+        const b = computed(function () {
             let res = 0
             for (let i = 0; i < observers.length; i++) res += observers[i].get()
             return res
@@ -153,7 +153,7 @@ results of this test:
         let sum = 0
         const subscription = mobx.observe(
             b,
-            function(e) {
+            function (e) {
                 sum = e.newValue
             },
             true
@@ -175,12 +175,12 @@ results of this test:
         t.end()
     })
 
-    test(`${version} - many unreferenced observables`, function(t) {
+    test(`${version} - many unreferenced observables`, function (t) {
         gc()
         const a = observable.box(3)
         const b = observable.box(6)
         const c = observable.box(7)
-        const d = computed(function() {
+        const d = computed(function () {
             return a.get() * b.get() * c.get()
         })
         t.equal(d.get(), 126)
@@ -196,15 +196,15 @@ results of this test:
         t.end()
     })
 
-    test(`${version} - array reduce`, function(t) {
+    test(`${version} - array reduce`, function (t) {
         gc()
         let aCalc = 0
         const ar = observable([])
         const b = observable.box(1)
 
-        const sum = computed(function() {
+        const sum = computed(function () {
             aCalc++
-            return ar.reduce(function(a, c) {
+            return ar.reduce(function (a, c) {
                 return a + c * b.get()
             }, 0)
         })
@@ -238,12 +238,12 @@ results of this test:
         t.end()
     })
 
-    test(`${version} - array classic loop`, function(t) {
+    test(`${version} - array classic loop`, function (t) {
         gc()
         const ar = observable([])
         let aCalc = 0
         const b = observable.box(1)
-        const sum = computed(function() {
+        const sum = computed(function () {
             let s = 0
             aCalc++
             for (let i = 0; i < ar.length; i++) s += ar[i] * b.get()
@@ -282,7 +282,7 @@ results of this test:
         const orders = observable([])
         const vat = observable.box(2)
 
-        const totalAmount = computed(function() {
+        const totalAmount = computed(function () {
             let sum = 0,
                 l = orders.length
             for (let i = 0; i < l; i++) sum += orders[i].total.get()
@@ -293,7 +293,7 @@ results of this test:
             this.price = observable.box(price)
             this.amount = observable.box(amount)
             this.total = computed(
-                function() {
+                function () {
                     return order.vat.get() * this.price.get() * this.amount.get()
                 },
                 { context: this }
@@ -305,7 +305,7 @@ results of this test:
             this.lines = observable([])
 
             this.vat = computed(
-                function() {
+                function () {
                     if (this.includeVat.get()) return vat.get()
                     return 1
                 },
@@ -313,8 +313,8 @@ results of this test:
             )
 
             this.total = computed(
-                function() {
-                    return this.lines.reduce(function(acc, order) {
+                function () {
+                    return this.lines.reduce(function (acc, order) {
                         return acc + order.total.get()
                     }, 0)
                 },
@@ -370,23 +370,23 @@ results of this test:
         t.end()
     }
 
-    test(`${version} - order system observed`, function(t) {
+    test(`${version} - order system observed`, function (t) {
         order_system_helper(t, false, true)
     })
 
-    test(`${version} - order system batched observed`, function(t) {
+    test(`${version} - order system batched observed`, function (t) {
         order_system_helper(t, true, true)
     })
 
-    test(`${version} - order system lazy`, function(t) {
+    test(`${version} - order system lazy`, function (t) {
         order_system_helper(t, false, false)
     })
 
-    test(`${version} - order system batched lazy`, function(t) {
+    test(`${version} - order system batched lazy`, function (t) {
         order_system_helper(t, true, false)
     })
 
-    test(`${version} - create array`, function(t) {
+    test(`${version} - create array`, function (t) {
         gc()
         const a = []
         for (let i = 0; i < 1000; i++) a.push(i)
@@ -396,7 +396,7 @@ results of this test:
         t.end()
     })
 
-    test(`${version} - create array (fast)`, function(t) {
+    test(`${version} - create array (fast)`, function (t) {
         gc()
         const a = []
         for (let i = 0; i < 1000; i++) a.push(i)
@@ -517,7 +517,7 @@ results of this test:
         t.end()
     })
 
-    test(`${version} - Map: initializing`, function(t) {
+    test(`${version} - Map: initializing`, function (t) {
         gc()
         const iterationsCount = 100000
         let i
@@ -531,7 +531,7 @@ results of this test:
         t.end()
     })
 
-    test(`${version} - Map: looking up properties`, function(t) {
+    test(`${version} - Map: looking up properties`, function (t) {
         gc()
         const iterationsCount = 1000
         const propertiesCount = 100
@@ -563,7 +563,7 @@ results of this test:
         t.end()
     })
 
-    test(`${version} - Map: setting and deleting properties`, function(t) {
+    test(`${version} - Map: setting and deleting properties`, function (t) {
         gc()
         const iterationsCount = 1000
         const propertiesCount = 100

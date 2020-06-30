@@ -5,16 +5,16 @@ const { makeObservable } = mobx
 
 function buffer() {
     const b = []
-    const res = function(x) {
+    const res = function (x) {
         b.push(x)
     }
-    res.toArray = function() {
+    res.toArray = function () {
         return b
     }
     return res
 }
 
-test("isObservable", function() {
+test("isObservable", function () {
     function Order() {}
 
     function ReactiveOrder(price) {
@@ -27,12 +27,12 @@ test("isObservable", function() {
 
     expect(m.isObservable(m.observable([]))).toBe(true)
     expect(m.isObservable(m.observable({}))).toBe(true)
-    expect(m.isObservable(m.observable.box(function() {}))).toBe(true)
-    expect(m.isObservable(m.computed(function() {}))).toBe(true)
+    expect(m.isObservable(m.observable.box(function () {}))).toBe(true)
+    expect(m.isObservable(m.computed(function () {}))).toBe(true)
 
     expect(m.isObservable([])).toBe(false)
     expect(m.isObservable({})).toBe(false)
-    expect(m.isObservable(function() {})).toBe(false)
+    expect(m.isObservable(function () {})).toBe(false)
 
     expect(m.isObservable(new Order())).toBe(false)
     expect(m.isObservable(m.observable.box(new Order()))).toBe(true)
@@ -43,8 +43,8 @@ test("isObservable", function() {
     const obj = {}
     expect(m.isObservable(obj)).toBe(false)
 
-    expect(m.isObservable(m.observable.box(function() {}))).toBe(true)
-    expect(m.isObservable(m.autorun(function() {}))).toBe(true)
+    expect(m.isObservable(m.observable.box(function () {}))).toBe(true)
+    expect(m.isObservable(m.autorun(function () {}))).toBe(true)
 
     expect(m.isObservableProp(m.observable({ a: 1 }), "a")).toBe(true)
     expect(m.isObservableProp(m.observable({ a: 1 }), "b")).toBe(false)
@@ -59,7 +59,7 @@ test("isObservable", function() {
     expect(m.isObservableProp(obs, "a")).toBe(true)
 })
 
-test("isBoxedObservable", function() {
+test("isBoxedObservable", function () {
     expect(m.isBoxedObservable(m.observable({}))).toBe(false)
     expect(m.isBoxedObservable(m.computed(() => 3))).toBe(false)
     expect(m.isBoxedObservable(m.observable.box(3))).toBe(true)
@@ -68,7 +68,7 @@ test("isBoxedObservable", function() {
     expect(m.isBoxedObservable(m.observable.box({}, { deep: false }))).toBe(true)
 })
 
-test("observable1", function() {
+test("observable1", function () {
     m._resetGlobalState()
 
     // recursive structure
@@ -80,7 +80,7 @@ test("observable1", function() {
         }
     })
     const b = buffer()
-    m.autorun(function() {
+    m.autorun(function () {
         b(x.a.b.c)
     })
     x.a = { b: { c: 4 } }
@@ -107,7 +107,7 @@ test("observable1", function() {
     expect(m.isObservable(x2.a.b)).toBe(false)
 
     const b2 = buffer()
-    m.autorun(function() {
+    m.autorun(function () {
         b2(x2.a.b.c)
     })
     x2.a = { b: { c: 4 } }
@@ -127,7 +127,7 @@ test("observable1", function() {
         { deep: false }
     )
     const b3 = buffer()
-    m.autorun(function() {
+    m.autorun(function () {
         b3(x3.a.b.c)
     })
     x3.a = { b: { c: 4 } }
@@ -135,7 +135,7 @@ test("observable1", function() {
     expect(b3.toArray()).toEqual([3, 4])
 })
 
-test("observable3", function() {
+test("observable3", function () {
     function Order(price) {
         this.price = price
     }
@@ -145,7 +145,7 @@ test("observable3", function() {
     })
 
     const b = buffer()
-    m.autorun(function() {
+    m.autorun(function () {
         b(x.orders.length)
     })
 
@@ -158,13 +158,13 @@ test("observable3", function() {
     expect(b.toArray()).toEqual([2, 3, 0, 1])
 })
 
-test("observable4", function() {
+test("observable4", function () {
     const x = m.observable([{ x: 1 }, { x: 2 }])
 
     const b = buffer()
     m.observe(
-        m.computed(function() {
-            return x.map(function(d) {
+        m.computed(function () {
+            return x.map(function (d) {
                 return d.x
             })
         }),
@@ -182,8 +182,8 @@ test("observable4", function() {
 
     const b2 = buffer()
     m.observe(
-        m.computed(function() {
-            return x2.map(function(d) {
+        m.computed(function () {
+            return x2.map(function (d) {
                 return d.x
             })
         }),
@@ -197,18 +197,18 @@ test("observable4", function() {
     expect(b2.toArray()).toEqual([[1, 2], [2], [2, 5]])
 })
 
-test("observable5", function() {
-    let x = m.computed(function() {})
-    expect(function() {
+test("observable5", function () {
+    let x = m.computed(function () {})
+    expect(function () {
         x.set(7) // set not allowed
     }).toThrow(/It is not possible to assign a new value to a computed value/)
 
-    let f = function() {}
+    let f = function () {}
     const x2 = m.observable.box(f)
     expect(x2.get()).toBe(f)
     x2.set(null) // allowed
 
-    f = function() {
+    f = function () {
         return this.price
     }
     x = m.observable(
@@ -225,12 +225,12 @@ test("observable5", function() {
     )
 
     const b = buffer()
-    m.autorun(function() {
+    m.autorun(function () {
         b([x.reactive, x.nonReactive, x.nonReactive()])
     })
 
     x.price = 18
-    const three = function() {
+    const three = function () {
         return 3
     }
     x.nonReactive = three
@@ -241,7 +241,7 @@ test("observable5", function() {
     ])
 })
 
-test("flat array", function() {
+test("flat array", function () {
     const x = m.observable.object(
         {
             x: [
@@ -255,7 +255,7 @@ test("flat array", function() {
 
     let result
     let updates = 0
-    m.autorun(function() {
+    m.autorun(function () {
         updates++
         result = JSON.stringify(mobx.toJS(x))
     })
@@ -280,7 +280,7 @@ test("flat array", function() {
     expect(updates).toBe(3)
 })
 
-test("flat object", function() {
+test("flat object", function () {
     const y = m.observable.object(
         {
             x: { z: 3 }
@@ -291,7 +291,7 @@ test("flat object", function() {
 
     let result
     let updates = 0
-    m.autorun(function() {
+    m.autorun(function () {
         updates++
         result = JSON.stringify(mobx.toJS(y))
     })
@@ -312,7 +312,7 @@ test("flat object", function() {
     expect(updates).toBe(2)
 })
 
-test("as structure", function() {
+test("as structure", function () {
     const x = m.observable.object(
         {
             x: null
@@ -323,7 +323,7 @@ test("as structure", function() {
     )
 
     let changed = 0
-    const dis = m.autorun(function() {
+    const dis = m.autorun(function () {
         changed++
         JSON.stringify(x)
     })
@@ -408,7 +408,7 @@ test("as structure", function() {
     dis()
 })
 
-test("as structure view", function() {
+test("as structure view", function () {
     const x = m.observable.object(
         {
             a: 1,
@@ -428,14 +428,14 @@ test("as structure view", function() {
     )
 
     let bc = 0
-    m.autorun(function() {
+    m.autorun(function () {
         x.b
         bc++
     })
     expect(bc).toBe(1)
 
     let cc = 0
-    m.autorun(function() {
+    m.autorun(function () {
         x.c
         cc++
     })
@@ -455,7 +455,7 @@ test("as structure view", function() {
 // will break the invariants of proxies (when trying to determine keys)
 // which is not unfixiable in itself,
 // but definitely a pattern we don't want to encourage
-test("ES5 non reactive props", function() {
+test("ES5 non reactive props", function () {
     let te = m.observable({})
     Object.defineProperty(te, "nonConfigurable", {
         enumerable: true,
@@ -464,7 +464,7 @@ test("ES5 non reactive props", function() {
         value: "static"
     })
     // should throw if trying to reconfigure an existing non-configurable prop
-    expect(function() {
+    expect(function () {
         m.extendObservable(te2, { notConfigurable: 1 })
     }).toThrow(/'extendObservable' expects an object as first argument/)
     // should skip non-configurable / writable props when using `observable`
@@ -484,7 +484,7 @@ test("ES5 non reactive props", function() {
         value: "static"
     })
     // should throw if trying to reconfigure an existing non-writable prop
-    expect(function() {
+    expect(function () {
         m.set(te2, { notWritable: 1 })
     }).toThrow(/Cannot make property 'notWritable' observable/)
     const d2 = Object.getOwnPropertyDescriptor(te2, "notWritable")
@@ -494,7 +494,7 @@ test("ES5 non reactive props", function() {
     expect(m.extendObservable(te, { bla: 3 }).bla).toBe(3)
 })
 
-test("ES5 non reactive props - 2", function() {
+test("ES5 non reactive props - 2", function () {
     const te = {}
     Object.defineProperty(te, "nonConfigurable", {
         enumerable: true,
@@ -508,7 +508,7 @@ test("ES5 non reactive props - 2", function() {
     }).toThrow(/Cannot make property 'nonConfigurable' observable/)
 })
 
-test("540 - extendobservable should not report cycles", function() {
+test("540 - extendobservable should not report cycles", function () {
     expect(() => m.extendObservable(Object.freeze({}), {})).toThrowError(
         /Cannot make the designated object observable/
     )

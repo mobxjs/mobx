@@ -25,7 +25,7 @@ test("it should support async generator actions", done => {
         { fireImmediately: true }
     )
 
-    const f = mobx.flow(function*(initial) {
+    const f = mobx.flow(function* (initial) {
         x.a = initial // this runs in action
         x.a = yield delay(100, 3) // and this as well!
         yield delay(100, 0)
@@ -53,7 +53,7 @@ test("it should support try catch in async generator", done => {
         { fireImmediately: true }
     )
 
-    const f = mobx.flow(function*(initial) {
+    const f = mobx.flow(function* (initial) {
         x.a = initial // this runs in action
         try {
             x.a = yield delay(100, 5, true) // and this as well!
@@ -76,7 +76,7 @@ test("it should support try catch in async generator", done => {
 })
 
 test("it should support throw from async generator", done => {
-    mobx.flow(function*() {
+    mobx.flow(function* () {
         yield "a"
         throw 7
     })().then(
@@ -91,7 +91,7 @@ test("it should support throw from async generator", done => {
 })
 
 test("it should support throw from yielded promise generator", done => {
-    mobx.flow(function*() {
+    mobx.flow(function* () {
         return yield delay(10, 7, true)
     })().then(
         () => {
@@ -112,7 +112,7 @@ test("it should support asyncAction in classes", done => {
     class X {
         a = 1
 
-        f = mobx.flow(function*(initial) {
+        f = mobx.flow(function* (initial) {
             this.a = initial // this runs in action
             try {
                 this.a = yield delay(100, 5, true) // and this as well!
@@ -180,7 +180,7 @@ function stripEvents(events) {
 }
 
 test("flows are cancelled with an instance of FlowCancellationError", async () => {
-    const start = flow(function*() {
+    const start = flow(function* () {
         yield Promise.resolve()
     })
 
@@ -204,7 +204,7 @@ test("isFlowCancellationError returns true iff the argument is a FlowCancellatio
 
 test("flows can be cancelled - 1 - uncaught cancellation", done => {
     let steps = 0
-    const start = flow(function*() {
+    const start = flow(function* () {
         steps = 1
         yield Promise.resolve()
         steps = 2
@@ -227,7 +227,7 @@ test("flows can be cancelled - 1 - uncaught cancellation", done => {
 test("flows can be cancelled - 2 - finally clauses are run", done => {
     let steps = 0
     let finallyHandled = false
-    const start = flow(function*() {
+    const start = flow(function* () {
         steps = 1
         try {
             yield Promise.resolve()
@@ -259,7 +259,7 @@ test("flows can be cancelled - 3 - throw in finally should be caught", done => {
     )
     mobx.configure({ enforceActions: "observed" })
 
-    const start = flow(function*() {
+    const start = flow(function* () {
         counter.counter = 1
         try {
             yield Promise.resolve()
@@ -287,7 +287,7 @@ test("flows can be cancelled - 3 - throw in finally should be caught", done => {
 
 test("flows can be cancelled - 4 - pending Promise will be ignored", done => {
     let steps = 0
-    const start = flow(function*() {
+    const start = flow(function* () {
         steps = 1
         yield Promise.reject("This won't be caught anywhere!") // cancel will resolve this flow before this one is throw, so this promise goes uncaught
         steps = 2
@@ -307,7 +307,7 @@ test("flows can be cancelled - 4 - pending Promise will be ignored", done => {
 
 test("flows can be cancelled - 5 - return before cancel", done => {
     // eslint-disable-next-line require-yield
-    const start = flow(function*() {
+    const start = flow(function* () {
         return Promise.resolve(2) // cancel will be to late..
     })
 
@@ -328,7 +328,7 @@ test("flows can be cancelled - 5 - flows cancel recursively", done => {
     let flow2cancelled = false
     let stepsReached = 0
 
-    const flow1 = flow(function*() {
+    const flow1 = flow(function* () {
         try {
             yield Promise.resolve()
             stepsReached++
@@ -337,7 +337,7 @@ test("flows can be cancelled - 5 - flows cancel recursively", done => {
         }
     })
 
-    const flow2 = flow(function*() {
+    const flow2 = flow(function* () {
         try {
             yield flow1()
             stepsReached++
@@ -361,7 +361,7 @@ test("flows can be cancelled - 5 - flows cancel recursively", done => {
 })
 
 test("flows yield anything", async () => {
-    const start = flow(function*() {
+    const start = flow(function* () {
         const x = yield 2
         return x
     })
@@ -371,7 +371,7 @@ test("flows yield anything", async () => {
 })
 
 test("cancelled flow should not result in runaway reject", async () => {
-    const start = flow(function*() {
+    const start = flow(function* () {
         try {
             const x = yield 2
             return x

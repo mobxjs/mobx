@@ -482,7 +482,7 @@ function addArrayExtension(funcName, funcFactory) {
 
 // Report and delegate to dehanced array
 function simpleFunc(funcName) {
-    return function() {
+    return function () {
         const adm: ObservableArrayAdministration = this[$mobx]
         adm.atom_.reportObserved()
         const res = adm.dehanceValues_(adm.values_)
@@ -492,7 +492,7 @@ function simpleFunc(funcName) {
 
 // Make sure callbacks recieve correct array arg #2326
 function mapLikeFunc(funcName) {
-    return function(callback, thisArg) {
+    return function (callback, thisArg) {
         const adm: ObservableArrayAdministration = this[$mobx]
         adm.atom_.reportObserved()
         return adm.values_[funcName]((element, index) => {
@@ -504,7 +504,7 @@ function mapLikeFunc(funcName) {
 
 // Make sure callbacks recieve correct array arg #2326
 function reduceLikeFunc(funcName) {
-    return function(callback, initialValue) {
+    return function (callback, initialValue) {
         const adm: ObservableArrayAdministration = this[$mobx]
         adm.atom_.reportObserved()
         return adm.values_[funcName]((accumulator, currentValue, index) => {

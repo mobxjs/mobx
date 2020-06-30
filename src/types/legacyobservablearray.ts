@@ -102,10 +102,10 @@ function createArrayEntryDescriptor(index: number) {
     return {
         enumerable: false,
         configurable: true,
-        get: function() {
+        get: function () {
             return this[$mobx].get_(index)
         },
-        set: function(value) {
+        set: function (value) {
             this[$mobx].set_(index, value)
         }
     }

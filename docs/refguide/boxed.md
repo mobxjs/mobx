@@ -43,7 +43,7 @@ const cityName = observable.box("Vienna")
 console.log(cityName.get())
 // prints 'Vienna'
 
-cityName.observe(function(change) {
+cityName.observe(function (change) {
     console.log(change.oldValue, "->", change.newValue)
 })
 

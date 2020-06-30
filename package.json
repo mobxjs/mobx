@@ -24,7 +24,7 @@
     "test:performance": "PERSIST=true time node --expose-gc test/perf/index.js",
     "test:size": "yarn build && yarn import-size --report . observable computed autorun action",
     "test:codemod": "jest --testRegex 'codemod/.*spec' codemod/undecorate.spec.ts",
-    "prettier": "prettier --write '**/*.{js,ts,md}'",
+    "prettier": "prettier --write **/*.{js,ts,md}",
     "prebuild": "rimraf lib",
     "build": "tsdx build --name mobx --format esm,cjs,umd",
     "postbuild": "cp flow-typed/mobx.js dist/index.js.flow",

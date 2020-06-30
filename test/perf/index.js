@@ -11,12 +11,12 @@ if (process.env.PERSIST) {
     // clear previous results
     if (fs.existsSync(logFile)) fs.unlinkSync(logFile)
 
-    exports.logMeasurement = function(msg) {
+    exports.logMeasurement = function (msg) {
         console.log(msg)
         fs.appendFileSync(logFile, "\n" + msg, "utf8")
     }
 } else {
-    exports.logMeasurement = function(msg) {
+    exports.logMeasurement = function (msg) {
         console.log(msg)
     }
 }
