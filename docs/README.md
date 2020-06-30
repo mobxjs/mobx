@@ -79,32 +79,33 @@ import ReactDOM from "react-dom"
 import { makeAutoObservable } from "mobx"
 import { observer } from "mobx-react"
 
-class AppState {
-    timer = 0
+// define application state
+class Timer {
+    secondsPassed = 0
 
     constructor() {
         makeAutoObservable(this)
     }
 
     increaseTimer() {
-        this.timer += 1
+        this.secondsPassed += 1
     }
 
     resetTimer() {
-        this.timer = 0
+        this.secondsPassed = 0
     }
 }
 
+const myTimer = new Timer()
+
 setInterval(() => {
-    appState.increaseTimer()
+    myTimer.increaseTimer()
 }, 1000)
 
-const appState = new AppState()
-
-const TimerView = observer(({ appState }) => (
-    <button onClick={() => appState.resetTimer()}>Seconds passed: {appState.timer}</button>
+const TimerView = observer(({ timer }) => (
+    <button onClick={() => timer.resetTimer()}>Seconds passed: {timer.secondsPassed}</button>
 ))
-ReactDOM.render(<TimerView appState={appState} />, document.body)
+ReactDOM.render(<TimerView timer={myTimer} />, document.body)
 ```
 
 To get more detail about this example, see [the gist of MobX](http://mobxjs.github.io/mobx/intro/overview.html).

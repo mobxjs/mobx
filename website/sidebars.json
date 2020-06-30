@@ -6,6 +6,10 @@
       "intro/overview",
       "intro/concepts"
     ],
+    "MobX and React": [
+      "react/react-integration",
+      "react/react-class-components"
+    ],
     "Making things observable": [
       "refguide/observable",
       "refguide/observable-decorator",
@@ -14,7 +18,6 @@
       "refguide/map"
     ],
     "Reacting to observables": [
-      "refguide/observer-component",
       "refguide/computed-decorator",
       "refguide/autorun",
       "refguide/when",

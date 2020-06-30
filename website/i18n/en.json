@@ -64,6 +64,14 @@
       "LINKS": {
         "title": "LINKS"
       },
+      "react/react-class-components": {
+        "title": "React class components",
+        "sidebar_label": "React based components"
+      },
+      "react/react-integration": {
+        "title": "React integration",
+        "sidebar_label": "React integration"
+      },
       "README": {
         "title": "Introduction",
         "sidebar_label": "Introduction"
@@ -113,7 +121,8 @@
         "sidebar_label": "Provider / inject"
       },
       "refguide/make-auto-observable": {
-        "title": "refguide/make-auto-observable"
+        "title": "refguide/make-auto-observable",
+        "sidebar_label": "makeAutoObservable"
       },
       "refguide/map": {
         "title": "Observable Maps",
@@ -147,10 +156,6 @@
         "title": "Intercept & Observe",
         "sidebar_label": "intercept & observe"
       },
-      "refguide/observer-component": {
-        "title": "(@)observer components",
-        "sidebar_label": "(@)observer components"
-      },
       "refguide/reaction": {
         "title": "reaction",
         "sidebar_label": "reaction"
@@ -174,6 +179,7 @@
     },
     "categories": {
       "Basics": "Basics",
+      "MobX and React": "MobX and React",
       "Making things observable": "Making things observable",
       "Reacting to observables": "Reacting to observables",
       "Updating observables": "Updating observables",

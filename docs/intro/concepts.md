@@ -10,7 +10,9 @@ hide_title: true
 
 MobX distinguishes the following concepts in your application.
 
-We show example code to illustrate these concepts. For clarity of explanation we don't use the convenience function `makeAutoObservable` yet in this code. In the [10 minute introduction to MobX and React](https://mobx.js.org/getting-started) you can dive deeper into this example and build a user interface using [React](https://facebook.github.io/react/) around it.
+We show example code to illustrate these concepts. For clarity we don't use the convenience function `makeAutoObservable` yet in this code.
+
+In the [10 minute introduction to MobX and React](https://mobx.js.org/getting-started) you can dive deeper into this example and build a user interface using [React](https://facebook.github.io/react/) around it.
 
 ### 1. State
 
@@ -143,6 +145,8 @@ ReactDOM.render(<TodoListView todoList={store} />, document.getElementById("moun
 When using MobX there are no smart or dumb components.
 All components render smartly but are defined in a dumb manner. MobX will simply make sure the components are always re-rendered whenever needed, but also no more than that. So the `onClick` handler in the above example will force the proper `TodoView` to render as it uses the `toggle` action, and it will cause the `TodoListView` to render if the number of unfinished tasks has changed.
 However, if you would remove the `Tasks left` line (or put it into a separate component), the `TodoListView` will no longer re-render when ticking a box. You can verify this yourself by changing the [JSFiddle](https://jsfiddle.net/mweststrate/wv3yopo0/).
+
+To learn more about how React works with MobX, read [React integration](../react/react-integration.md).
 
 ##### Custom reactions
 

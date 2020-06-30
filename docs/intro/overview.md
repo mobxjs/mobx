@@ -17,21 +17,21 @@ Just make sure that all properties that you want to change over time are marked 
 ```javascript
 import { makeAutoObservable } from "mobx"
 
-class AppState {
-    timer = 0
+class Timer {
+    secondsPassed = 0
 
     constructor() {
         makeAutoObservable(this)
     }
 }
 
-const appState = new AppState()
+const myTimer = new Timer()
 ```
 
 ## 2. Create a view that responds to changes in the State
 
-We didn't make our `AppState` observable for nothing;
-you can now create views that automatically update whenever relevant data in the `appState` changes.
+We didn't make our `Timer` observable for nothing;
+you can now create views that automatically update whenever relevant data in a `Timer` instance changes.
 MobX will find the minimal way to update your views.
 This single fact saves you tons of boilerplate and is [wickedly efficient](https://mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/).
 
@@ -39,12 +39,14 @@ Generally speaking any function can become a reactive view that observes its dat
 But here is an (ES6) example of a view in the form of a React component.
 
 ```javascript
+import React from "react"
+import ReactDOM from "react-dom"
 import { observer } from "mobx-react"
 
-const TimerView = observer(({ appState }) => (
-    <button onClick={() => appState.resetTimer()}>Seconds passed: {appState.timer}</button>
+const TimerView = observer(({ timer }) => (
+    <button onClick={() => timer.resetTimer()}>Seconds passed: {timer.secondsPassed}</button>
 ))
-ReactDOM.render(<TimerView appState={appState} />, document.body)
+ReactDOM.render(<TimerView timer={myTimer} />, document.body)
 ```
 
 (For the implementation of `resetTimer` method see the next section)
@@ -56,32 +58,32 @@ That is what your app is all about after all.
 
 Let's alter the timer every second, and see that the UI will update automatically when needed. Let's also implement that `resetTimer` method.
 
-Here's the new `AppState` model with a few methods added that modify state:
+Here's the new `Timer` model with a few methods added that modify state:
 
 ```javascript
 import { makeAutoObservable } from "mobx"
 
-class AppState {
-    timer = 0
+class Timer {
+    secondsPassed = 0
 
     constructor() {
         makeAutoObservable(this)
     }
 
     increaseTimer() {
-        this.timer += 1
+        this.secondsPassed += 1
     }
 
     resetTimer() {
-        this.timer = 0
+        this.secondsPassed = 0
     }
 }
 
-setInterval(() => {
-    appState.increaseTimer()
-}, 1000)
+const myTimer = new Timer()
 
-const appState = new AppState()
+setInterval(() => {
+    myTimer.increaseTimer()
+}, 1000)
 ```
 
 These methods, `increaseTimer` and `resetTimer` are just like you would write them without MobX. You can use them anywhere -- from React event handlers or in `setInterval`, for instance.
@@ -90,4 +92,5 @@ These methods, `increaseTimer` and `resetTimer` are just like you would write th
 
 Feel free to try this example on [JSFiddle](http://jsfiddle.net/mweststrate/wgbe4guu/).
 
-To learn more about the concepts and principles underlying MobX, together with a more worked out example, read [Concepts & Principles](concepts.md).
+To learn more about the concepts and principles underlying MobX, together with a more worked out example, read [Concepts & Principles](concepts.md). To learn more
+about how to use MobX with React, read [React integration](../react/react-integration.md).
