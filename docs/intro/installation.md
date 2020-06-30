@@ -8,7 +8,7 @@ hide_title: true
 
 MobX works in any ES5 environment, which includes browsers and NodeJS:
 
--   Yarn: `yarn add immer`. React bindings: `yarn add mobx-react`
+-   Yarn: `yarn add mobx`. React bindings: `yarn add mobx-react`
 
 -   NPM: `npm install mobx --save`. React bindings: `npm install mobx-react --save`.
 
