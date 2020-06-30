@@ -43,6 +43,7 @@ Array [
           "title": "get tea",
         },
       },
+      "observableKind": "object",
       "type": "add",
     },
   },
@@ -54,6 +55,7 @@ Array [
           "title": "get tea",
         },
       },
+      "observableKind": "object",
       "oldValue": Object {
         "title": "get coffee",
       },
