@@ -1,12 +1,12 @@
 ---
 title: React class components
-sidebar_label: React based components
+sidebar_label: React class components
 hide_title: true
 ---
 
 # React class components
 
-[react-integration](React integration) discusses the basic patterns for
+[React integration](react-integration.md) discusses the basic patterns for
 using MobX with React function components. But MobX also works with React class components.
 
 ## Using `observer` with a class component

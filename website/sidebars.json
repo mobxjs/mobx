@@ -8,6 +8,7 @@
     ],
     "MobX and React": [
       "react/react-integration",
+      "react/react-performance",
       "react/react-class-components"
     ],
     "Making things observable": [
@@ -49,7 +50,6 @@
       "best/decorators",
       "best/trace",
       "best/store",
-      "best/react-performance",
       "refguide/spy"
     ]
   }

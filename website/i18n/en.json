@@ -25,10 +25,6 @@
         "title": "Common pitfalls & best practices",
         "sidebar_label": "Common Pitfalls & Best Practices"
       },
-      "best/react-performance": {
-        "title": "Optimizing rendering React components",
-        "sidebar_label": "Optimizing React components"
-      },
       "best/react": {
         "title": "What does MobX react to?",
         "sidebar_label": "Understanding what MobX reacts to"
@@ -66,11 +62,15 @@
       },
       "react/react-class-components": {
         "title": "React class components",
-        "sidebar_label": "React based components"
+        "sidebar_label": "React class components"
       },
       "react/react-integration": {
         "title": "React integration",
         "sidebar_label": "React integration"
+      },
+      "react/react-performance": {
+        "title": "Optimizing rendering React components",
+        "sidebar_label": "Optimizing React components"
       },
       "README": {
         "title": "Introduction",

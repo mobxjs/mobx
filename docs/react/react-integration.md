@@ -178,7 +178,7 @@ const TimerView = ({ timer }) => (
 
 #### How can I further optimize my React components?
 
-See the relevant [React performance section](../best/react-performance.md).
+See the relevant [React performance section](react-performance.md).
 
 #### When combining `observer` with other higher-order-components, apply `observer` first
 
