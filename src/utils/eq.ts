@@ -5,11 +5,12 @@ import {
     isES6Set,
     isObservableSet,
     hasProp,
-    isFunction
+    isFunction,
+    objectPrototype
 } from "../internal"
 
 declare const Symbol
-const toString = Object.prototype.toString
+const toString = objectPrototype.toString
 
 export function deepEqual(a: any, b: any, depth: number = -1): boolean {
     return eq(a, b, depth)

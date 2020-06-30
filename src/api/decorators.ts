@@ -5,7 +5,8 @@ import {
     makeObservable,
     assign,
     getDescriptor,
-    hasProp
+    hasProp,
+    objectPrototype
 } from "../internal"
 
 export const mobxDecoratorsSymbol = Symbol("mobx-decoratorators")
@@ -14,7 +15,7 @@ export function createDecorator<ArgType>(
     type: Annotation["annotationType_"]
 ): Annotation & PropertyDecorator & ((arg: ArgType) => PropertyDecorator & Annotation) {
     return assign(
-        function(target: any, property?: PropertyKey): any {
+        function (target: any, property?: PropertyKey): any {
             if (property === undefined) {
                 // @decorator(arg) member
                 createDecoratorAndAnnotation(type, target)
@@ -34,7 +35,7 @@ export function createDecoratorAndAnnotation(
     arg_?: any
 ): PropertyDecorator & Annotation {
     return assign(
-        function(target, property) {
+        function (target, property) {
             storeDecorator(target, property, type, arg_)
         },
         {
@@ -66,12 +67,11 @@ export function applyDecorators(target: Object): boolean {
     // TODO optimization: this can be cached per prototype!
     // (then we can remove the weird short circuiting as well..)
     let annotations: AnnotationsMap<any, any>[] = []
-    while (current && current !== Object.prototype) {
+    while (current && current !== objectPrototype) {
         const desc = getDescriptor(current, mobxDecoratorsSymbol)
         if (desc) {
             if (!annotations.length) {
                 for (let key in desc.value) {
-                    // Todo: make 'hasOwnProp' utility
                     // second conditions is to recognize actions
                     if (!hasProp(target, key) && !hasProp(current, key)) {
                         // not all fields are defined yet, so we are in the makeObservable call of some super class,

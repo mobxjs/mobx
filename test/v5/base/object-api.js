@@ -182,7 +182,7 @@ test("object - set, remove, keys are reactive", () => {
     expect(snapshots).toEqual([["a", "x"], ["a", "x", "z"], ["a", "x"], ["x"]])
 })
 
-test.only("object with symbol keys - set, remove, keys are reactive", () => {
+test("object with symbol keys - set, remove, keys are reactive", () => {
     const snapshots = []
     const x = Symbol()
     const y = Symbol()

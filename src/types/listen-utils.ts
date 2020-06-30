@@ -1,16 +1,15 @@
 import { Lambda, once, untrackedEnd, untrackedStart } from "../internal"
 
 export interface IListenable {
-    changeListeners: Function[] | undefined
-    observe(handler: (change: any, oldValue?: any) => void, fireImmediately?: boolean): Lambda
+    changeListeners_: Function[] | undefined
 }
 
 export function hasListeners(listenable: IListenable) {
-    return listenable.changeListeners !== undefined && listenable.changeListeners.length > 0
+    return listenable.changeListeners_ !== undefined && listenable.changeListeners_.length > 0
 }
 
 export function registerListener(listenable: IListenable, handler: Function): Lambda {
-    const listeners = listenable.changeListeners || (listenable.changeListeners = [])
+    const listeners = listenable.changeListeners_ || (listenable.changeListeners_ = [])
     listeners.push(handler)
     return once(() => {
         const idx = listeners.indexOf(handler)
@@ -20,7 +19,7 @@ export function registerListener(listenable: IListenable, handler: Function): La
 
 export function notifyListeners<T>(listenable: IListenable, change: T) {
     const prevU = untrackedStart()
-    let listeners = listenable.changeListeners
+    let listeners = listenable.changeListeners_
     if (!listeners) return
     listeners = listeners.slice()
     for (let i = 0, l = listeners.length; i < l; i++) {

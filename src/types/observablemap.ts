@@ -83,15 +83,14 @@ export type IObservableMapInitialValues<K = any, V = any> =
 
 // just extend Map? See also https://gist.github.com/nestharus/13b4d74f2ef4a2f4357dbd3fc23c1e54
 // But: https://github.com/mobxjs/mobx/issues/1556
-// TODO: introduce IObservableMap, and make ObservableMap constructor non public
 export class ObservableMap<K = any, V = any>
     implements Map<K, V>, IInterceptable<IMapWillChange<K, V>>, IListenable {
     [$mobx] = ObservableMapMarker
     data_: Map<K, ObservableValue<V>>
     hasMap_: Map<K, ObservableValue<boolean>> // hasMap, not hashMap >-).
     keysAtom_: IAtom
-    interceptors
-    changeListeners
+    interceptors_
+    changeListeners_
     dehancer: any
 
     constructor(
@@ -117,7 +116,7 @@ export class ObservableMap<K = any, V = any>
 
         let entry = this.hasMap_.get(key)
         if (!entry) {
-            // todo: replace with atom (breaking change)
+            // TODO: replace with atom (breaking change)
             const newEntry = (entry = new ObservableValue(
                 this.has_(key),
                 referenceEnhancer,
@@ -429,15 +428,13 @@ export class ObservableMap<K = any, V = any>
      * See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe
      * for callback details
      */
-    // TODO: kill
-    observe(listener: (changes: IMapDidChange<K, V>) => void, fireImmediately?: boolean): Lambda {
+    observe_(listener: (changes: IMapDidChange<K, V>) => void, fireImmediately?: boolean): Lambda {
         if (__DEV__ && fireImmediately === true)
             die("`observe` doesn't support fireImmediately=true in combination with maps.")
         return registerListener(this, listener)
     }
 
-    // TODO: kill
-    intercept(handler: IInterceptor<IMapWillChange<K, V>>): Lambda {
+    intercept_(handler: IInterceptor<IMapWillChange<K, V>>): Lambda {
         return registerInterceptor(this, handler)
     }
 }

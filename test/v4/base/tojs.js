@@ -5,7 +5,7 @@ const m = mobx
 const observable = mobx.observable
 const { makeObservable } = mobx
 
-test("json1", function() {
+test("json1", function () {
     mobx._resetGlobalState()
 
     const todos = observable([
@@ -18,9 +18,9 @@ test("json1", function() {
     ])
 
     let output
-    mobx.autorun(function() {
+    mobx.autorun(function () {
         output = todos
-            .map(function(todo) {
+            .map(function (todo) {
                 return todo.title
             })
             .join(", ")
@@ -32,7 +32,7 @@ test("json1", function() {
     expect(output).toBe("write blog, improve coverage, take a nap")
 })
 
-test("json2", function() {
+test("json2", function () {
     const source = {
         todos: [
             {
@@ -56,13 +56,13 @@ test("json2", function() {
 
     expect(mobx.toJS(o)).toEqual(source)
 
-    const analyze = mobx.computed(function() {
+    const analyze = mobx.computed(function () {
         return [o.todos.length, o.todos[1].details.url]
     })
 
-    const alltags = mobx.computed(function() {
+    const alltags = mobx.computed(function () {
         return o.todos
-            .map(function(todo) {
+            .map(function (todo) {
                 return todo.tags.join(",")
             })
             .join(",")
@@ -73,14 +73,14 @@ test("json2", function() {
 
     m.observe(
         analyze,
-        function(d) {
+        function (d) {
             ab.push(d.newValue)
         },
         true
     )
     m.observe(
         alltags,
-        function(d) {
+        function (d) {
             tb.push(d.newValue)
         },
         true
@@ -209,7 +209,7 @@ test("json2", function() {
             }
         ]
     })
-    expect(mobx.toJS(o, { detectCycles: true })).toEqual(mobx.toJS(o))
+    expect(mobx.toJS(o)).toEqual(mobx.toJS(o))
     expect(ab).toEqual([[3, "google"]])
     expect(tb).toEqual(["reactjs,frp,foo,bar,x"])
 })
@@ -224,7 +224,7 @@ test("toJS handles dates", () => {
     expect(a.d === b.d).toBe(true)
 })
 
-test("json cycles", function() {
+test("json cycles", function () {
     const a = observable({
         b: 1,
         c: [2],
@@ -238,7 +238,7 @@ test("json cycles", function() {
     a.d.set("d", a.d)
     a.d.set("c", a.c)
 
-    const cloneA = mobx.toJS(a, { detectCycles: true })
+    const cloneA = mobx.toJS(a)
     const cloneC = cloneA.c
     const cloneD = cloneA.d
 
@@ -246,9 +246,9 @@ test("json cycles", function() {
     expect(cloneA.c[0]).toBe(2)
     expect(cloneA.c[1]).toBe(cloneA)
     expect(cloneA.c[2]).toBe(cloneD)
-    expect(cloneD.f).toBe(cloneA)
-    expect(cloneD.d).toBe(cloneD)
-    expect(cloneD.c).toBe(cloneC)
+    expect(cloneD.get("f")).toBe(cloneA)
+    expect(cloneD.get("d")).toBe(cloneD)
+    expect(cloneD.get("c")).toBe(cloneC)
     expect(cloneA.e).toBe(cloneA)
 })
 
@@ -316,7 +316,7 @@ test("verify already seen", () => {
     expect(res.x === a).toBeFalsy()
 })
 
-test("json cycles when exporting maps as maps", function() {
+test("json cycles when exporting maps as maps", function () {
     const a = observable({
         b: 1,
         c: [2],
@@ -330,7 +330,7 @@ test("json cycles when exporting maps as maps", function() {
     a.d.set("d", a.d)
     a.d.set("c", a.c)
 
-    const cloneA = mobx.toJS(a, { exportMapsAsObjects: false, detectCycles: true })
+    const cloneA = mobx.toJS(a)
     const cloneC = cloneA.c
     const cloneD = cloneA.d
 
@@ -353,7 +353,7 @@ test("map to JS", () => {
             makeObservable(this)
             this.meta.set("test", { abc: "def", ghi: "jkl" })
 
-            expect(mobx.toJS(this.meta).constructor.name).toBe("Object")
+            expect(mobx.toJS(this.meta).constructor.name).toBe("Map")
         }
     }
     new MyClass()

@@ -13,15 +13,24 @@ import {
     allowStateReadsEnd,
     ACTION,
     EMPTY_ARRAY,
-    die
+    die,
+    getDescriptor
 } from "../internal"
+import { addHiddenProp } from "../utils/utils"
 
 // we don't use globalState for these in order to avoid possible issues with multiple
 // mobx versions
 let currentActionId = 0
 let nextActionId = 1
-const functionNameDescriptor = Object.getOwnPropertyDescriptor(() => {}, "name")
-const isFunctionNameConfigurable = functionNameDescriptor?.configurable ?? false
+const isFunctionNameConfigurable = getDescriptor(() => {}, "name")?.configurable ?? false
+
+// we can safely recycle this object
+const tmpNameDescriptor: PropertyDescriptor = {
+    value: "action",
+    configurable: true,
+    writable: false,
+    enumerable: false
+}
 
 export function createAction(
     actionName: string,
@@ -37,11 +46,12 @@ export function createAction(
     function res() {
         return executeAction(actionName, autoAction, fn, ref || this, arguments)
     }
-    // TODO: can be optimized by recyclig objects? // TODO: and check if fn.name !== actionName
-    return Object.defineProperties(res, {
-        ...(isFunctionNameConfigurable && { name: { value: actionName } }),
-        isMobxAction: { value: true }
-    })
+    res.isMobxAction = true
+    if (isFunctionNameConfigurable) {
+        tmpNameDescriptor.value = actionName
+        Object.defineProperty(res, "name", tmpNameDescriptor)
+    }
+    return res
 }
 
 export function executeAction(

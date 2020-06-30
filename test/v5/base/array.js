@@ -1,10 +1,10 @@
 "use strict"
 
 const mobx = require("../../../src/mobx.ts")
-const { observable, when, _getAdministration, reaction, makeObservable } = mobx
+const { observable, when, _getAdministration, reaction, computed, makeObservable, autorun } = mobx
 const iterall = require("iterall")
 
-test("test1", function() {
+test("test1", function () {
     const a = observable.array([])
     expect(a.length).toBe(0)
     expect(Object.keys(a)).toEqual([])
@@ -18,10 +18,10 @@ test("test1", function() {
     expect(a.length).toBe(2)
     expect(a.slice()).toEqual([1, 2])
 
-    const sum = mobx.computed(function() {
+    const sum = mobx.computed(function () {
         return (
             -1 +
-            a.reduce(function(a, b) {
+            a.reduce(function (a, b) {
                 return a + b
             }, 1)
         )
@@ -69,20 +69,59 @@ test("test1", function() {
     expect(sum.get()).toBe(3)
     expect(a.slice()).toEqual([1, 2])
 
-    expect(a.slice().reverse()).toEqual([2, 1])
-    expect(a.slice()).toEqual([1, 2])
+    expect(a.reverse()).toEqual([2, 1])
+    expect(a).toEqual([2, 1])
+    expect(a.slice()).toEqual([2, 1])
 
     a.unshift(3)
-    expect(a.slice().sort()).toEqual([1, 2, 3])
-    expect(a.slice()).toEqual([3, 1, 2])
+    expect(a.sort()).toEqual([1, 2, 3])
+    expect(a).toEqual([1, 2, 3])
+    expect(a.slice()).toEqual([1, 2, 3])
 
-    expect(JSON.stringify(a)).toBe("[3,1,2]")
+    expect(JSON.stringify(a)).toBe("[1,2,3]")
 
-    expect(a.get(1)).toBe(1)
-    a.set(2, 4)
-    expect(a.get(2)).toBe(4)
+    expect(a[1]).toBe(2)
+    a[2] = 4
+    expect(a[2]).toBe(4)
 
-    expect(Object.keys(a)).toEqual(["0", "1", "2"]) // ideally....
+    expect(Object.keys(a)).toEqual(["0", "1", "2"])
+})
+
+test("cannot reverse or sort an array in a derivation", () => {
+    const ar = observable([3, 2, 1])
+    reaction(
+        () => {
+            expect(() => {
+                ar.sort()
+            }).toThrowErrorMatchingInlineSnapshot(
+                `"[MobX] [mobx] \`observableArray.sort()\` mutates the array in-place, which is not allowed inside a derivation. Use \`array.slice().sort()\` instead"`
+            )
+        },
+        () => {}
+    )()
+    reaction(
+        () => {
+            expect(() => {
+                ar.reverse()
+            }).toThrowErrorMatchingInlineSnapshot(
+                `"[MobX] [mobx] \`observableArray.reverse()\` mutates the array in-place, which is not allowed inside a derivation. Use \`array.slice().reverse()\` instead"`
+            )
+        },
+        () => {}
+    )()
+
+    const c = computed(() => {
+        ar.sort()
+    })
+    autorun(() => {
+        expect(() => {
+            c.get()
+        }).toThrowErrorMatchingInlineSnapshot(
+            `"[MobX] [mobx] \`observableArray.sort()\` mutates the array in-place, which is not allowed inside a derivation. Use \`array.slice().sort()\` instead"`
+        )
+    })()
+
+    expect(ar).toEqual([3, 2, 1])
 })
 
 test("array should support iterall / iterable ", () => {
@@ -107,7 +146,7 @@ test("array should support iterall / iterable ", () => {
     expect(iter.next()).toEqual({ value: undefined, done: true })
 })
 
-test("find(findIndex) and remove", function() {
+test("find(findIndex) and remove", function () {
     const a = mobx.observable([10, 20, 20])
     let idx = -1
     function predicate(item, index) {
@@ -141,12 +180,12 @@ test("concat should automatically slice observable arrays, #260", () => {
     expect(a1.concat(a2)).toEqual([1, 2, 3, 4])
 })
 
-test("observe", function() {
+test("observe", function () {
     const ar = mobx.observable([1, 4])
     const buf = []
     const disposer = mobx.observe(
         ar,
-        function(changes) {
+        function (changes) {
             buf.push(changes)
         },
         true
@@ -165,7 +204,7 @@ test("observe", function() {
     ar.pop() // does not fire anything
 
     // check the object param
-    buf.forEach(function(change) {
+    buf.forEach(function (change) {
         expect(change.object).toBe(ar)
         delete change.object
     })
@@ -202,14 +241,14 @@ test("observe", function() {
     expect(buf).toEqual(result)
 })
 
-test("array modification1", function() {
+test("array modification1", function () {
     const a = mobx.observable([1, 2, 3])
     const r = a.splice(-10, 5, 4, 5, 6)
     expect(a.slice()).toEqual([4, 5, 6])
     expect(r).toEqual([1, 2, 3])
 })
 
-test("serialize", function() {
+test("serialize", function () {
     let a = [1, 2, 3]
     const m = mobx.observable(a)
 
@@ -223,11 +262,11 @@ test("serialize", function() {
     expect(a).toEqual(m.toJSON())
 })
 
-test("array modification functions", function() {
+test("array modification functions", function () {
     const ars = [[], [1, 2, 3]]
     const funcs = ["push", "pop", "shift", "unshift"]
-    funcs.forEach(function(f) {
-        ars.forEach(function(ar) {
+    funcs.forEach(function (f) {
+        ars.forEach(function (ar) {
             const a = ar.slice()
             const b = mobx.observable(a)
             const res1 = a[f](4)
@@ -238,7 +277,7 @@ test("array modification functions", function() {
     })
 })
 
-test("array modifications", function() {
+test("array modifications", function () {
     const a2 = mobx.observable([])
     const inputs = [undefined, -10, -4, -3, -1, 0, 1, 3, 4, 10]
     const arrays = [
@@ -274,7 +313,7 @@ test("array modifications", function() {
                 }
 })
 
-test("is array", function() {
+test("is array", function () {
     const x = mobx.observable([])
     expect(x instanceof Array).toBe(true)
 
@@ -282,7 +321,7 @@ test("is array", function() {
     expect(Array.isArray(x)).toBe(true)
 })
 
-test("stringifies same as ecma array", function() {
+test("stringifies same as ecma array", function () {
     const x = mobx.observable([])
     expect(x instanceof Array).toBe(true)
 
@@ -294,10 +333,10 @@ test("stringifies same as ecma array", function() {
     expect(x.toLocaleString()).toBe("1,2")
 })
 
-test("observes when stringified", function() {
+test("observes when stringified", function () {
     const x = mobx.observable([])
     let c = 0
-    mobx.autorun(function() {
+    mobx.autorun(function () {
         x.toString()
         c++
     })
@@ -305,10 +344,10 @@ test("observes when stringified", function() {
     expect(c).toBe(2)
 })
 
-test("observes when stringified to locale", function() {
+test("observes when stringified to locale", function () {
     const x = mobx.observable([])
     let c = 0
-    mobx.autorun(function() {
+    mobx.autorun(function () {
         x.toLocaleString()
         c++
     })
@@ -316,14 +355,14 @@ test("observes when stringified to locale", function() {
     expect(c).toBe(2)
 })
 
-test("react to sort changes", function() {
+test("react to sort changes", function () {
     const x = mobx.observable([4, 2, 3])
-    const sortedX = mobx.computed(function() {
+    const sortedX = mobx.computed(function () {
         return x.slice().sort()
     })
     let sorted
 
-    mobx.autorun(function() {
+    mobx.autorun(function () {
         sorted = sortedX.get()
     })
 
@@ -337,7 +376,7 @@ test("react to sort changes", function() {
     expect(sorted).toEqual([1, 2, 3])
 })
 
-test("autoextend buffer length", function() {
+test("autoextend buffer length", function () {
     const ar = observable(new Array(1000))
     let changesCount = 0
     mobx.observe(ar, () => ++changesCount)
@@ -466,7 +505,7 @@ test("can define properties on arrays", () => {
     Object.defineProperty(ar, "toString", {
         enumerable: false,
         configurable: true,
-        value: function() {
+        value: function () {
             return "hoi"
         }
     })
@@ -579,7 +618,7 @@ describe("extended array prototype", () => {
 test("reproduce #2021", () => {
     expect.assertions(1)
     try {
-        Array.prototype.extension = function() {
+        Array.prototype.extension = function () {
             console.log("I'm the extension!", this.length)
         }
 
@@ -603,4 +642,51 @@ test("reproduce #2021", () => {
     } finally {
         delete Array.prototype.extension
     }
+})
+
+test("correct array should be passed to callbacks #2326", () => {
+    const array = observable([1, 2, 3])
+
+    function callback() {
+        const lastArg = arguments[arguments.length - 1]
+        expect(lastArg).toBe(array)
+    }
+    ;[
+        "every",
+        "filter",
+        "find",
+        "findIndex",
+        "flatMap",
+        "forEach",
+        "map",
+        "reduce",
+        "reduceRight",
+        "some"
+    ].forEach(method => {
+        if (Array.prototype[method]) array[method](callback)
+        else console.warn("SKIPPING: " + method)
+    })
+})
+
+test("very long arrays can be safely passed to nativeArray.concat #2379", () => {
+    const nativeArray = ["a", "b"]
+    const longNativeArray = [...Array(10000).keys()] // MAX_SPLICE_SIZE seems to be the threshold
+    const longObservableArray = observable(longNativeArray)
+    expect(longObservableArray.length).toBe(10000)
+    expect(longObservableArray).toEqual(longNativeArray)
+    expect(longObservableArray[9000]).toBe(longNativeArray[9000])
+    expect(longObservableArray[9999]).toBe(longNativeArray[9999])
+    expect(longObservableArray[10000]).toBe(longNativeArray[10000])
+
+    const expectedArray = nativeArray.concat(longNativeArray)
+    const actualArray = nativeArray.concat(longObservableArray)
+
+    expect(actualArray).toEqual(expectedArray)
+
+    const anotherArray = [0, 1, 2, 3, 4, 5]
+    const observableArray = observable(anotherArray)
+    const r1 = anotherArray.splice(2, 2, ...longNativeArray)
+    const r2 = observableArray.splice(2, 2, ...longNativeArray)
+    expect(r2).toEqual(r1)
+    expect(observableArray).toEqual(anotherArray)
 })

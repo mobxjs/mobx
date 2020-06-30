@@ -1,18 +1,18 @@
 ## Feature work
 
 -   [ ] Build process
-    -   [ ] kill v4 / v5 separation
-    -   [ ] TSDX build process
+    -   [x] kill v4 / v5 separation
+    -   [x] TSDX build process
 -   [ ] Smaller build
     -   [x] fixup build, restore asset bundling
-    -   [ ] create prod esm build?
-    -   [ ] minimal dev errors
-    -   [ ] invariant system from immer
-    -   [ ] check all calls to top-level
+    -   [x] ~create prod esm build?~
+    -   [x] minimal dev errors
+    -   [x] invariant system from immer
+    -   [x] check all calls to top-level
             build, tree-shakeable etc?
-    -   [ ] add **PURE** annotations?
-    -   [ ] extract utils for getOwnPropertyDescriptor and defineProperty
-    -   [ ] configure property mangling like in Immer. Will it save anything?
+    -   [x] add **PURE** annotations?
+    -   [x] extract utils for getOwnPropertyDescriptor and defineProperty
+    -   [x] configure property mangling like in Immer. Will it save anything?
 -   [ ] code mod
     -   [x] code mod, run on v4 tests?
     -   [x] codemod TS
@@ -20,13 +20,14 @@
     -   [x] codemod leave decorators
     -   [x] migrate decorate calls as well
     -   [ ] migrate privates correctly
+    -   [ ] migrate `@observer` calls
     -   [ ] unit tests for `ignoreImports`
     -   [ ] unit tests for `keepDecorators`
 -   [ ] ES5 support
     -   [x] combine with ES5?
     -   [x] backport tests and code to v4(6)
     -   [x] make sure legacy array implementation is opt in
-    -   [ ] map / set as opt-in as well?
+    -   [x] ~map / set as opt-in as well?~
     -   [x] compare mobx.configure options between v4 and v5
     -   [ ] two or 3 modes for configure useProxies? If two, kill `deep` option to observable?
 -   [ ] annotations instead of decorators
@@ -37,21 +38,22 @@
     -   [x] observable / extendObservable use decorators args
     -   [x] observable; support `false` as argument
 -   [ ] misc
-    -   [ ] revisit safety model
-    -   [ ] at startup, test presence of Map, Symbol ownPropertySymboles and other globals!
-    -   [ ] verify: action called from computed throws?
+    -   [x] revisit safety model
+    -   [x] at startup, test presence of Map, Symbol ownPropertySymboles and other globals!
+    -   [x] verify: action called from computed throws?
     -   [ ] apply deprecation of find and findIndex error
     -   [ ] verify perf / memory changes
     -   [ ] investigate skipped tests
     -   [ ] process TODO's
     -   [ ] weakmap for hasMaps in Map (and Set?)
     -   [ ] add a solution for keepAlive computeds like https://github.com/mobxjs/mobx/issues/2309#issuecomment-598707584
-    -   [ ] update useLocalStore in mobx-react-lite to use makeObservable
+    -   [ ] update useLocalStore in mobx-react-lite to use autoMakeObservable
     -   [ ] include #2343
     -   [ ] default observable requires reaction?
     -   [ ] kill globalstate options?
     -   [ ] no auto lifting? https://twitter.com/getify/status/1258137826241241088
     -   [ ] flow types
+    -   [ ] Would be awesome, but no idea how to go about that :) We could maybe at random places (e.g in observableValue) check in DEV mode if a value is a class instance with decorators, but with undecorated members. Might be a bit of a performance bummer though.
 
 ## Docs / migration guide
 
@@ -86,6 +88,8 @@ Philosophy: one way to do things
 -   [ ] Breaking: Map.toJSON now returns the entries array
 -   [ ] Breaking dropped Set.toJS, use new Set(observableSet) instead
 -   [ ] Breaking Set.toJSON returns an array now
+-   [ ] Breaking: dropped Array.toJS, use .toJSON instead
+-   [ ] Breaking: dropped .observe and .intercept on types, use the {observe, intercept} from 'mobx' instead
 -   [ ] Running codemod: yarn jscodeshift -t codemod/undecorate.ts test/v5/base/typescript-tests.ts --ignoreImports=true
 -   [ ] killed: IGNORE_MOBX_MINIFY_WARNING
 -   [ ] Document: recommended settings for prod versus experimentation
@@ -95,28 +99,15 @@ Philosophy: one way to do things
 -   [ ] Breaking: it is no longer safe to call action from autorun. Use effect or reaction instead.
 -   [ ] \_allowStateChangesINComputation is no longer needed, us `runInAction` instead.
 -   [ ] Breaking: in computed, the when predicate, and reaction predicate it is never allowed to directly change state. State changes should be wrapped in action.
+-   [ ] Breaking: `toJS` no longer takes action, and no longer converts Maps and Sets to plain data structures. Serializing data structures is out of scope for the MobX project, and write custom serialization methods are much more sustainable. You might even leverage @computed to serialize state.
+-   [ ] Breaking: directly calling .get() / .set() on an observable array is no longer supported
+-   [ ] Breaking: killed IObservableObject interface.
+-   [ ] Breaking: sorting or reversing an array in an derivation will now throw rather than warn.
+-   [ ] Breaking: sorting or reversing an array in an actino will no sort or reverse the source array rather than shallow copy.
+-   Fixed #2326
+-   Fixed #2379
 
 ## NOTES
-
-### New state changes model:
-
-action
-
--   enter batching,
--   state updates allowed, only if not tracking -or- in effect
-
-effect
-
--   disable tracking + action
-
-track
-
--   enable tracking
--   disable updates
-
-Side effects like state changes are not allowed inside derivations. You can explicitly suppress this message by using 'effect', at your own risk.
-
-State changes are not allowed outside actions.
 
 ## Blog
 

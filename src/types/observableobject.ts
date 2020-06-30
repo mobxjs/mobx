@@ -33,13 +33,10 @@ import {
     globalState,
     ADD,
     UPDATE,
-    die
+    die,
+    defineProperty,
+    hasProp
 } from "../internal"
-
-// TODO: kill
-export interface IObservableObject {
-    "observable-object": IObservableObject
-}
 
 export type IObjectDidChange<T = any> =
     | {
@@ -80,8 +77,8 @@ const REMOVE = "remove"
 export class ObservableObjectAdministration
     implements IInterceptable<IObjectWillChange>, IListenable {
     keysAtom_: IAtom
-    changeListeners
-    interceptors
+    changeListeners_
+    interceptors_
     proxy_: any
     private pendingKeys_: undefined | Map<PropertyKey, ObservableValue<boolean>>
 
@@ -187,7 +184,7 @@ export class ObservableObjectAdministration
         this.values_.set(propName, observable)
         newValue = (observable as any).value_ // observableValue might have changed it
 
-        Object.defineProperty(target, propName, generateObservablePropConfig(propName))
+        defineProperty(target, propName, generateObservablePropConfig(propName))
         this.notifyPropertyAddition_(propName, newValue)
     }
 
@@ -201,8 +198,7 @@ export class ObservableObjectAdministration
         options.context = this.proxy_ || target
         this.values_.set(propName, new ComputedValue(options))
         if (propertyOwner === target || isPropertyConfigurable(propertyOwner, propName))
-            // TODO: extract util?
-            Object.defineProperty(propertyOwner, propName, generateComputedPropConfig(propName))
+            defineProperty(propertyOwner, propName, generateComputedPropConfig(propName))
     }
 
     remove_(key: PropertyKey) {
@@ -249,45 +245,18 @@ export class ObservableObjectAdministration
         }
     }
 
-    // TODO: is this still needed?
-    illegalAccess_(owner, propName) {
-        /**
-         * This happens if a property is accessed through the prototype chain, but the property was
-         * declared directly as own property on the prototype.
-         *
-         * E.g.:
-         * class A {
-         * }
-         * extendObservable(A.prototype, { x: 1 })
-         *
-         * classB extens A {
-         * }
-         * console.log(new B().x)
-         *
-         * It is unclear whether the property should be considered 'static' or inherited.
-         * Either use `console.log(A.x)`
-         * or: decorate(A, { x: observable })
-         *
-         * When using decorate, the property will always be redeclared as own property on the actual instance
-         */
-        __DEV__ &&
-            console.warn(
-                `Property '${propName}' of '${owner}' was accessed through the prototype chain. Use 'decorate' instead to declare the prop or access it statically through it's owner`
-            )
-    }
-
     /**
      * Observes this object. Triggers for the events 'add', 'update' and 'delete'.
      * See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe
      * for callback details
      */
-    observe(callback: (changes: IObjectDidChange) => void, fireImmediately?: boolean): Lambda {
+    observe_(callback: (changes: IObjectDidChange) => void, fireImmediately?: boolean): Lambda {
         if (__DEV__ && fireImmediately === true)
             die("`observe` doesn't support the fire immediately property for observable objects.")
         return registerListener(this, callback)
     }
 
-    intercept(handler): Lambda {
+    intercept_(handler): Lambda {
         return registerInterceptor(this, handler)
     }
 
@@ -332,7 +301,7 @@ export function asObservableObject(
     name: PropertyKey = "",
     defaultEnhancer: IEnhancer<any> = deepEnhancer
 ): ObservableObjectAdministration {
-    if (Object.prototype.hasOwnProperty.call(target, $mobx)) return target[$mobx]
+    if (hasProp(target, $mobx)) return target[$mobx]
 
     if (__DEV__ && !Object.isExtensible(target))
         die("Cannot make the designated object observable; it is not extensible")
@@ -369,15 +338,6 @@ export function generateObservablePropConfig(propName) {
     )
 }
 
-function getAdministrationForComputedPropOwner(owner: any): ObservableObjectAdministration {
-    // TODO: what again does this function?
-    const adm = owner[$mobx]
-    if (!adm) {
-        return owner[$mobx]
-    }
-    return adm
-}
-
 export function generateComputedPropConfig(propName) {
     return (
         computedPropertyConfigs[propName] ||
@@ -385,22 +345,21 @@ export function generateComputedPropConfig(propName) {
             configurable: true,
             enumerable: false,
             get() {
-                return getAdministrationForComputedPropOwner(this).read_(propName)
+                return this[$mobx].read_(propName)
             },
             set(v) {
-                getAdministrationForComputedPropOwner(this).write_(propName, v)
+                this[$mobx].write_(propName, v)
             }
         })
     )
 }
 
-// TODO: extract constant for "ObservableObject ?
 const isObservableObjectAdministration = createInstanceofPredicate(
     "ObservableObjectAdministration",
     ObservableObjectAdministration
 )
 
-export function isObservableObject(thing: any): thing is IObservableObject {
+export function isObservableObject(thing: any): boolean {
     if (isObject(thing)) {
         return isObservableObjectAdministration((thing as any)[$mobx])
     }

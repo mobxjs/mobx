@@ -1,5 +1,11 @@
 import { IObservableArray, globalState, isObservableArray, die } from "../internal"
 
+// We shorten anything used > 5 times
+export const assign = Object.assign
+export const getDescriptor = Object.getOwnPropertyDescriptor
+export const defineProperty = Object.defineProperty
+export const objectPrototype = Object.prototype
+
 export const EMPTY_ARRAY = []
 Object.freeze(EMPTY_ARRAY)
 
@@ -41,7 +47,7 @@ export function getNextId() {
  */
 export function once(func: Lambda): Lambda {
     let invoked = false
-    return function() {
+    return function () {
         if (invoked) return
         invoked = true
         return (func as any).apply(this, arguments)
@@ -76,14 +82,11 @@ export function isObject(value: any): value is Object {
 export function isPlainObject(value) {
     if (!isObject(value)) return false
     const proto = Object.getPrototypeOf(value)
-    return proto === Object.prototype || proto === null
+    return proto === objectPrototype || proto === null
 }
 
-export const assign = Object.assign
-export const getDescriptor = Object.getOwnPropertyDescriptor
-
 export function addHiddenProp(object: any, propName: PropertyKey, value: any) {
-    Object.defineProperty(object, propName, {
+    defineProperty(object, propName, {
         enumerable: false,
         writable: true,
         configurable: true,
@@ -92,7 +95,7 @@ export function addHiddenProp(object: any, propName: PropertyKey, value: any) {
 }
 
 export function addHiddenFinalProp(object: any, propName: PropertyKey, value: any) {
-    Object.defineProperty(object, propName, {
+    defineProperty(object, propName, {
         enumerable: false,
         writable: false,
         configurable: true,
@@ -120,7 +123,7 @@ export function createInstanceofPredicate<T>(
 ): (x: any) => x is T {
     const propName = "isMobX" + name
     clazz.prototype[propName] = true
-    return function(x) {
+    return function (x) {
         return isObject(x) && x[propName] === true
     } as any
 }
@@ -146,14 +149,22 @@ const hasGetOwnPropertySymbols = typeof Object.getOwnPropertySymbols !== "undefi
  * Returns the following: own keys, prototype keys & own symbol keys, if they are enumerable.
  */
 export function getPlainObjectKeys(object) {
-    // TODO: use Reflect.ownKeys!
     const keys = Object.keys(object)
     // Not supported in IE, so there are not going to be symbol props anyway...
     if (!hasGetOwnPropertySymbols) return keys
     const symbols = Object.getOwnPropertySymbols(object)
     if (!symbols.length) return keys
-    return [...keys, ...symbols.filter(s => Object.prototype.propertyIsEnumerable.call(object, s))]
+    return [...keys, ...symbols.filter(s => objectPrototype.propertyIsEnumerable.call(object, s))]
 }
+
+// From Immer utils
+// Returns all own keys, including non-enumerable and symbolic
+export const ownKeys: (target: any) => PropertyKey[] =
+    typeof Reflect !== "undefined" && Reflect.ownKeys
+        ? Reflect.ownKeys
+        : hasGetOwnPropertySymbols
+        ? obj => Object.getOwnPropertyNames(obj).concat(Object.getOwnPropertySymbols(obj) as any)
+        : /* istanbul ignore next */ Object.getOwnPropertyNames
 
 export function stringifyKey(key: any): string {
     if (typeof key === "string") return key
@@ -166,5 +177,18 @@ export function toPrimitive(value) {
 }
 
 export function hasProp(target: Object, prop: PropertyKey): boolean {
-    return Object.prototype.hasOwnProperty.call(target, prop)
+    return objectPrototype.hasOwnProperty.call(target, prop)
 }
+
+// From Immer utils
+export const getOwnPropertyDescriptors =
+    Object.getOwnPropertyDescriptors ||
+    function getOwnPropertyDescriptors(target: any) {
+        // Polyfill needed for Hermes and IE, see https://github.com/facebook/hermes/issues/274
+        const res: any = {}
+        // Note: without polyfill for ownKeys, symbols won't be picked up
+        ownKeys(target).forEach(key => {
+            res[key] = getDescriptor(target, key)
+        })
+        return res
+    }

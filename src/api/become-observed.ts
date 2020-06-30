@@ -9,9 +9,8 @@ import {
     isFunction
 } from "../internal"
 
-// TODO: can we minify those?
-const ON_BECOME_OBSERVED = "onBecomeObserved"
-const ON_BECOME_UNOBSERVED = "onBecomeUnobserved"
+const ON_BECOME_OBSERVED = "onBO"
+const ON_BECOME_UNOBSERVED = "onBUO"
 
 export function onBecomeObserved(
     value:
@@ -49,13 +48,11 @@ export function onBecomeUnobserved(thing, arg2, arg3?): Lambda {
     return interceptHook(ON_BECOME_UNOBSERVED, thing, arg2, arg3)
 }
 
-function interceptHook(hook: "onBecomeObserved" | "onBecomeUnobserved", thing, arg2, arg3) {
+function interceptHook(hook: "onBO" | "onBUO", thing, arg2, arg3) {
     const atom: IObservable =
         typeof arg3 === "function" ? getAtom(thing, arg2) : (getAtom(thing) as any)
     const cb = isFunction(arg3) ? arg3 : arg2
-    const listenersKey = `${hook}Listeners` as
-        | "onBecomeObservedListeners"
-        | "onBecomeUnobservedListeners"
+    const listenersKey = `${hook}L` as "onBOL" | "onBUOL"
 
     if (atom[listenersKey]) {
         atom[listenersKey]!.add(cb)
@@ -63,7 +60,7 @@ function interceptHook(hook: "onBecomeObserved" | "onBecomeUnobserved", thing, a
         atom[listenersKey] = new Set<Lambda>([cb])
     }
 
-    return function() {
+    return function () {
         const hookListeners = atom[listenersKey]
         if (hookListeners) {
             hookListeners.delete(cb)

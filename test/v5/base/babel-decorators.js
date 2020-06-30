@@ -17,13 +17,13 @@ import {
 } from "../../../src/mobx"
 import * as mobx from "../../../src/mobx"
 
-test("babel", function() {
+test("babel", function () {
     class Box {
         @observable uninitialized
         @observable height = 20
         @observable sizes = [2]
         @observable
-        someFunc = function() {
+        someFunc = function () {
             return 2
         }
 
@@ -152,7 +152,7 @@ class Order {
     @observable price = 3
     @observable amount = 2
     @observable orders = []
-    @observable aFunction = function() {}
+    @observable aFunction = function () {}
 
     constructor() {
         makeObservable(this)
@@ -164,7 +164,7 @@ class Order {
     }
 }
 
-test("issue 191 - shared initializers (babel)", function() {
+test("issue 191 - shared initializers (babel)", function () {
     class Test {
         @observable obj = { a: 1 }
         @observable array = [2]
@@ -249,7 +249,7 @@ function normalizeSpyEvents(events) {
     return events
 }
 
-test("action decorator (babel)", function() {
+test("action decorator (babel)", function () {
     class Store {
         constructor(multiplier) {
             makeObservable(this)
@@ -282,7 +282,7 @@ test("action decorator (babel)", function() {
     d()
 })
 
-test("custom action decorator (babel)", function() {
+test("custom action decorator (babel)", function () {
     class Store {
         constructor(multiplier) {
             makeObservable(this)
@@ -333,7 +333,7 @@ test("custom action decorator (babel)", function() {
     d()
 })
 
-test("action decorator on field (babel)", function() {
+test("action decorator on field (babel)", function () {
     class Store {
         constructor(multiplier) {
             makeObservable(this)
@@ -367,7 +367,7 @@ test("action decorator on field (babel)", function() {
     d()
 })
 
-test("custom action decorator on field (babel)", function() {
+test("custom action decorator on field (babel)", function () {
     class Store {
         constructor(multiplier) {
             makeObservable(this)
@@ -457,7 +457,7 @@ test("288 atom not detected for object property", () => {
     expect(changed).toBe(true)
 })
 
-test.skip("observable performance", () => {
+test.skip("observable performance - babel - decorators", () => {
     const AMOUNT = 100000
 
     class A {
@@ -883,7 +883,7 @@ test("505, don't throw when accessing subclass fields in super constructor (babe
     expect(values).toEqual({ a: 1, b: undefined })
 })
 
-test("computed setter should succeed (babel)", function() {
+test("computed setter should succeed (babel)", function () {
     class Bla {
         @observable a = 3
 

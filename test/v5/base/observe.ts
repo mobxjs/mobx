@@ -42,7 +42,7 @@ test("observe computed values", () => {
     const f = observable.box(0)
     const c = computed(() => v.get())
 
-    c.observe(e => {
+    c.observe_(e => {
         v.get()
         f.get()
         events.push([e.newValue, e.oldValue])

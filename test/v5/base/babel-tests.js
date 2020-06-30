@@ -17,12 +17,12 @@ import {
 } from "../../../src/mobx"
 import * as mobx from "../../../src/mobx"
 
-test("babel", function() {
+test("babel", function () {
     class Box {
         uninitialized
         height = 20
         sizes = [2]
-        someFunc = function() {
+        someFunc = function () {
             return 2
         }
 
@@ -71,8 +71,7 @@ test("babel", function() {
     expect(s).toEqual([40, 20, 60, 210, 420, 700])
 })
 
-// TODO:
-test.skip("should not be possible to use @action with getters", () => {
+test("should not be possible to use @action with getters", () => {
     expect(() => {
         class A {
             constructor() {
@@ -83,8 +82,10 @@ test.skip("should not be possible to use @action with getters", () => {
 
             get Test() {}
         }
-        A // just to avoid the linter warning
-    }).toThrowError(/@action cannot be used with getters/)
+        return new A()
+    }).toThrowErrorMatchingInlineSnapshot(
+        `"[MobX] Cannot decorate 'Test': action can only be used on properties with a function value."`
+    )
 
     mobx._resetGlobalState()
 })
@@ -161,7 +162,7 @@ class Order {
     price = 3
     amount = 2
     orders = []
-    aFunction = function() {}
+    aFunction = function () {}
 
     constructor() {
         makeObservable(this, {
@@ -178,7 +179,7 @@ class Order {
     }
 }
 
-test("decorators", function() {
+test("decorators", function () {
     const o = new Order()
     expect(isObservableObject(o)).toBe(true)
     expect(isObservableProp(o, "amount")).toBe(true)
@@ -208,7 +209,7 @@ test("decorators", function() {
     ])
 })
 
-test("issue 191 - shared initializers (babel)", function() {
+test("issue 191 - shared initializers (babel)", function () {
     class Test {
         obj = { a: 1 }
         array = [2]
@@ -299,7 +300,7 @@ function normalizeSpyEvents(events) {
     return events
 }
 
-test("action decorator (babel)", function() {
+test("action decorator (babel)", function () {
     class Store {
         constructor(multiplier) {
             makeObservable(this, {
@@ -334,7 +335,7 @@ test("action decorator (babel)", function() {
     d()
 })
 
-test("custom action decorator (babel)", function() {
+test("custom action decorator (babel)", function () {
     class Store {
         constructor(multiplier) {
             makeObservable(this, {
@@ -387,7 +388,7 @@ test("custom action decorator (babel)", function() {
     d()
 })
 
-test("action decorator on field (babel)", function() {
+test("action decorator on field (babel)", function () {
     class Store {
         constructor(multiplier) {
             makeObservable(this, {
@@ -423,7 +424,7 @@ test("action decorator on field (babel)", function() {
     d()
 })
 
-test("custom action decorator on field (babel)", function() {
+test("custom action decorator on field (babel)", function () {
     class Store {
         constructor(multiplier) {
             makeObservable(this, {
@@ -519,7 +520,7 @@ test("288 atom not detected for object property", () => {
     expect(changed).toBe(true)
 })
 
-test.skip("observable performance", () => {
+test.skip("observable performance - babel", () => {
     const AMOUNT = 100000
 
     class A {
@@ -1036,7 +1037,7 @@ test("505, don't throw when accessing subclass fields in super constructor (babe
     expect(values).toEqual({ a: 1, b: undefined })
 })
 
-test("computed setter should succeed (babel)", function() {
+test("computed setter should succeed (babel)", function () {
     class Bla {
         a = 3
 
@@ -1061,7 +1062,7 @@ test("computed setter should succeed (babel)", function() {
     expect(b.propX).toBe(8)
 })
 
-test("computed getter / setter for plan objects should succeed (babel)", function() {
+test("computed getter / setter for plan objects should succeed (babel)", function () {
     const b = observable({
         a: 3,
         get propX() {

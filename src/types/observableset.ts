@@ -58,13 +58,12 @@ export type ISetWillChange<T = any> =
           newValue: T
       }
 
-// TODO: introduce IObservableSet, and make ObservableSet constructor non public
 export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillChange>, IListenable {
     [$mobx] = ObservableSetMarker
     private data_: Set<any> = new Set()
     private atom_: IAtom
-    changeListeners
-    interceptors
+    changeListeners_
+    interceptors_
     dehancer: any
     enhancer_: (newV: any, oldV: any | undefined) => any
 
@@ -118,7 +117,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
                 newValue: value
             })
             if (!change) return this
-            // TODO: ideally, value = change.value would be done here, so that values can be
+            // ideally, value = change.value would be done here, so that values can be
             // changed by interceptor. Same applies for other Set and Map api's.
         }
         if (!this.has(value)) {
@@ -234,17 +233,14 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
 
         return this
     }
-
-    // TODO: kill
-    observe(listener: (changes: ISetDidChange<T>) => void, fireImmediately?: boolean): Lambda {
-        // TODO 'fireImmediately' can be true?
+    observe_(listener: (changes: ISetDidChange<T>) => void, fireImmediately?: boolean): Lambda {
+        // ... 'fireImmediately' could also be true?
         if (__DEV__ && fireImmediately === true)
             die("`observe` doesn't support fireImmediately=true in combination with sets.")
         return registerListener(this, listener)
     }
 
-    // TODO: kill
-    intercept(handler: IInterceptor<ISetWillChange<T>>): Lambda {
+    intercept_(handler: IInterceptor<ISetWillChange<T>>): Lambda {
         return registerInterceptor(this, handler)
     }
 

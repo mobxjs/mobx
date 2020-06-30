@@ -7,12 +7,12 @@ const iterall = require("iterall")
 const { makeObservable } = mobx
 import { grabConsole } from "../../v5/utils/test-utils"
 
-test("map crud", function() {
+test("map crud", function () {
     mobx._getGlobalState().mobxGuid = 0 // hmm dangerous reset?
 
     const events = []
     const m = map({ "1": "a" })
-    m.observe(function(changes) {
+    mobx.observe(m, function (changes) {
         events.push(changes)
     })
 
@@ -87,7 +87,7 @@ test("map crud", function() {
     expect(JSON.stringify(m)).toBe("[]")
 })
 
-test("map merge", function() {
+test("map merge", function () {
     const a = map({ a: 1, b: 2, c: 2 })
     const b = map({ c: 3, d: 4 })
     a.merge(b)
@@ -99,21 +99,21 @@ test("map merge", function() {
     ])
 })
 
-test("observe value", function() {
+test("observe value", function () {
     const a = map()
     let hasX = false
     let valueX = undefined
     let valueY = undefined
 
-    autorun(function() {
+    autorun(function () {
         hasX = a.has("x")
     })
 
-    autorun(function() {
+    autorun(function () {
         valueX = a.get("x")
     })
 
-    autorun(function() {
+    autorun(function () {
         valueY = a.get("y")
     })
 
@@ -147,7 +147,7 @@ test("observe value", function() {
     expect(mobx.keys(a)).toEqual(["y", "z"])
 })
 
-test("initialize with entries", function() {
+test("initialize with entries", function () {
     const thing = [{ x: 3 }]
     const a = map([
         ["a", 1],
@@ -159,7 +159,7 @@ test("initialize with entries", function() {
     ])
 })
 
-test("initialize with empty value", function() {
+test("initialize with empty value", function () {
     const a = map()
     const b = map({})
     const c = map([])
@@ -173,17 +173,17 @@ test("initialize with empty value", function() {
     expect(c.toJSON()).toEqual([["0", 0]])
 })
 
-test("observe collections", function() {
+test("observe collections", function () {
     const x = map()
     let keys, values, entries
 
-    autorun(function() {
+    autorun(function () {
         keys = mobx.keys(x)
     })
-    autorun(function() {
+    autorun(function () {
         values = iteratorToArray(x.values())
     })
-    autorun(function() {
+    autorun(function () {
         entries = iteratorToArray(x.entries())
     })
 
@@ -227,11 +227,11 @@ test("observe collections", function() {
     expect(entries).toEqual([["b", 3]])
 })
 
-test("cleanup", function() {
+test("cleanup", function () {
     const x = map({ a: 1 })
 
     let aValue
-    const disposer = autorun(function() {
+    const disposer = autorun(function () {
         aValue = x.get("a")
     })
 
@@ -261,10 +261,10 @@ test("cleanup", function() {
     expect(x.hasMap_.has("a")).toBe(false)
 })
 
-test("getAtom encapsulation leak test", function() {
+test("getAtom encapsulation leak test", function () {
     const x = map({})
 
-    let disposer = autorun(function() {
+    let disposer = autorun(function () {
         x.has("a")
     })
 
@@ -274,7 +274,7 @@ test("getAtom encapsulation leak test", function() {
 
     expect(x.hasMap_.get("a")).toBe(undefined)
 
-    disposer = autorun(function() {
+    disposer = autorun(function () {
         x.has("a")
         atom && atom.reportObserved()
     })
@@ -282,23 +282,22 @@ test("getAtom encapsulation leak test", function() {
     expect(x.hasMap_.get("a")).not.toBe(atom)
 })
 
-test("strict", function() {
+test("strict", function () {
     const x = map()
-    autorun(function() {
+    autorun(function () {
         x.get("y") // should not throw
     })
 })
 
-test("issue 100", function() {
+test("issue 100", function () {
     const that = {}
     mobx.extendObservable(that, {
         myMap: map()
     })
     expect(mobx.isObservableMap(that.myMap)).toBe(true)
-    expect(typeof that.myMap.observe).toBe("function")
 })
 
-test("issue 119 - unobserve before delete", function() {
+test("issue 119 - unobserve before delete", function () {
     const propValues = []
     const myObservable = mobx.observable({
         myMap: map()
@@ -312,8 +311,8 @@ test("issue 119 - unobserve before delete", function() {
         }
     })
     // the error only happens if the value is observed
-    mobx.autorun(function() {
-        mobx.values(myObservable.myMap).forEach(function(value) {
+    mobx.autorun(function () {
+        mobx.values(myObservable.myMap).forEach(function (value) {
             propValues.push(value.myCalculatedProp)
         })
     })
@@ -322,7 +321,7 @@ test("issue 119 - unobserve before delete", function() {
     expect(propValues).toEqual(["myPropValue calculated"])
 })
 
-test("issue 116 - has should not throw on invalid keys", function() {
+test("issue 116 - has should not throw on invalid keys", function () {
     const x = map()
     expect(x.has(undefined)).toBe(false)
     expect(x.has({})).toBe(false)
@@ -511,22 +510,22 @@ test("798, cannot return observable map from computed prop", () => {
     // MWE: this is an anti pattern, yet should be possible in certain cases nonetheless..?
     // https://jsfiddle.net/7e6Ltscr/
 
-    const form = function() {
+    const form = function () {
         const form = mobx.observable({
             reactPropsMap: mobx.observable.map({
-                onSubmit: function() {}
+                onSubmit: function () {}
             }),
             model: {
                 value: "TEST"
             }
         })
 
-        form.reactPropsMap.set("onSubmit", function() {})
+        form.reactPropsMap.set("onSubmit", function () {})
 
         return form
     }
 
-    const customerSearchStore = function() {
+    const customerSearchStore = function () {
         const customerSearchStore = mobx.observable({
             customerType: "RUBY",
             searchTypeFormStore() {
@@ -571,7 +570,7 @@ test("using deep map", () => {
 
     // Creating autorun triggers one observation, hence -1
     let observed = -1
-    mobx.autorun(function() {
+    mobx.autorun(function () {
         // Use the map, to observe all changes
         seen.push(store.map_deep.toJSON())
         // JSON.stringify(store.map_deep)
@@ -598,8 +597,7 @@ test("using deep map", () => {
     expect(observed).toBe(1)
 })
 
-// TODO: restore
-test.skip("using deep map - toJS", () => {
+test("using deep map - toJS", () => {
     const store = {
         map_deep: mobx.observable(new Map())
     }
@@ -607,7 +605,7 @@ test.skip("using deep map - toJS", () => {
 
     // Creating autorun triggers one observation, hence -1
     let observed = -1
-    mobx.autorun(function() {
+    mobx.autorun(function () {
         // Use the map, to observe all changes
         seen.push(mobx.toJS(store.map_deep))
         // JSON.stringify(store.map_deep)
@@ -616,20 +614,24 @@ test.skip("using deep map - toJS", () => {
 
     store.map_deep.set("shoes", [])
     expect(observed).toBe(1)
-    expect(seen).toEqual([[], [["shoes", []]]])
+    expect(seen).toEqual([new Map(), new Map([["shoes", []]])])
 
+    debugger
     store.map_deep.get("shoes").push({ color: "black" })
-    expect(seen).toEqual([[], [["shoes", []]], [["shoes", [{ color: "black" }]]]])
+    expect(seen).toEqual([
+        new Map([]),
+        new Map([["shoes", []]]),
+        new Map([["shoes", [{ color: "black" }]]])
+    ])
 
     expect(observed).toBe(2)
-
     store.map_deep.get("shoes")[0].color = "red"
     // see above comment
     expect(seen).toEqual([
-        [],
-        [["shoes", []]],
-        [["shoes", [{ color: "black" }]]],
-        [["shoes", [{ color: "red" }]]]
+        new Map([]),
+        new Map([["shoes", []]]),
+        new Map([["shoes", [{ color: "black" }]]]),
+        new Map([["shoes", [{ color: "red" }]]])
     ])
     expect(observed).toBe(3)
 })
@@ -661,7 +663,7 @@ test("issue 940, should not be possible to change maps outside strict mode", () 
                 m.set("x", 1)
             })
         ).toMatchInlineSnapshot(
-            `"<STDOUT> [MobX] Since strict-mode is enabled, changing observed observable values outside actions is not allowed. Please wrap the code in an \`runInAction\` if this change is intended. Tried to modify: ObservableMap@69.keys()"`
+            `"<STDOUT> [MobX] Since strict-mode is enabled, changing observed observable values outside actions is not allowed. Please wrap the code in an \`runInAction\` if this change is intended. Tried to modify: ObservableMap@72.keys()"`
         )
 
         expect(
@@ -669,7 +671,7 @@ test("issue 940, should not be possible to change maps outside strict mode", () 
                 m.set("x", 2)
             })
         ).toMatchInlineSnapshot(
-            `"<STDOUT> [MobX] Since strict-mode is enabled, changing observed observable values outside actions is not allowed. Please wrap the code in an \`runInAction\` if this change is intended. Tried to modify: ObservableMap@69.x"`
+            `"<STDOUT> [MobX] Since strict-mode is enabled, changing observed observable values outside actions is not allowed. Please wrap the code in an \`runInAction\` if this change is intended. Tried to modify: ObservableMap@72.x"`
         )
 
         expect(
@@ -677,7 +679,7 @@ test("issue 940, should not be possible to change maps outside strict mode", () 
                 m.delete("x")
             })
         ).toMatchInlineSnapshot(
-            `"<STDOUT> [MobX] Since strict-mode is enabled, changing observed observable values outside actions is not allowed. Please wrap the code in an \`runInAction\` if this change is intended. Tried to modify: ObservableMap@69.keys()"`
+            `"<STDOUT> [MobX] Since strict-mode is enabled, changing observed observable values outside actions is not allowed. Please wrap the code in an \`runInAction\` if this change is intended. Tried to modify: ObservableMap@72.keys()"`
         )
 
         d()
@@ -881,7 +883,7 @@ test("can iterate map - values", () => {
     d()
 })
 
-test("NaN as map key", function() {
+test("NaN as map key", function () {
     const a = map(new Map([[NaN, 0]]))
     expect(a.has(NaN)).toBe(true)
     expect(a.get(NaN)).toBe(0)
@@ -905,21 +907,6 @@ test("toStringTag", () => {
     const x = mobx.observable.map({ x: 1, y: 2 })
     expect(x[Symbol.toStringTag]).toBe("Map")
     expect(Object.prototype.toString.call(x)).toBe("[object Map]")
-})
-
-test("verify #1524", () => {
-    class Store {
-        articles = new Map()
-
-        constructor() {
-            makeObservable(this, {
-                articles: mobx.observable
-            })
-        }
-    }
-
-    const store = new Store()
-    expect(typeof store.articles.observe === "function").toBe(true)
 })
 
 test("#1583 map.size not reactive", () => {

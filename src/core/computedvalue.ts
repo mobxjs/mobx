@@ -36,7 +36,7 @@ import {
 export interface IComputedValue<T> {
     get(): T
     set(value: T): void
-    observe(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda
+    observe_(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda
 }
 
 export interface IComputedValueOptions<T> {
@@ -127,19 +127,18 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         propagateMaybeChanged(this)
     }
 
-    // TODO: rename?
-    public onBecomeObservedListeners: Set<Lambda> | undefined
-    public onBecomeUnobservedListeners: Set<Lambda> | undefined
+    public onBOL: Set<Lambda> | undefined
+    public onBUOL: Set<Lambda> | undefined
 
-    public onBecomeObserved() {
-        if (this.onBecomeObservedListeners) {
-            this.onBecomeObservedListeners.forEach(listener => listener())
+    public onBO() {
+        if (this.onBOL) {
+            this.onBOL.forEach(listener => listener())
         }
     }
 
-    public onBecomeUnobserved() {
-        if (this.onBecomeUnobservedListeners) {
-            this.onBecomeUnobservedListeners.forEach(listener => listener())
+    public onBUO() {
+        if (this.onBUOL) {
+            this.onBUOL.forEach(listener => listener())
         }
     }
 
@@ -164,13 +163,6 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 
         if (isCaughtException(result)) throw result.cause
         return result
-    }
-
-    // TODO: kill?
-    public peek(): T {
-        const res = this.computeValue_(false)
-        if (isCaughtException(res)) throw res.cause
-        return res
     }
 
     public set(value: T) {
@@ -241,8 +233,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         }
     }
 
-    // TODO: rename
-    observe(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda {
+    observe_(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda {
         let firstTime = true
         let prevValue: T | undefined = undefined
         return autorun(() => {

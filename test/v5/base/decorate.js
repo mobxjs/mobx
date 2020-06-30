@@ -33,13 +33,13 @@ test("throws on undeclared prop", () => {
     )
 })
 
-test("decorate should work", function() {
+test("decorate should work", function () {
     class Box {
         // @ts-ignore
         uninitialized
         height = 20
         sizes = [2]
-        someFunc = function() {
+        someFunc = function () {
             return 2
         }
         get width() {
@@ -107,13 +107,13 @@ test("decorate should work", function() {
     expect(box2.width).toBe(40) // no shared state!
 })
 
-test("decorate should work with plain object", function() {
+test("decorate should work with plain object", function () {
     const box = {
         /** @type {boolean | undefined} */
         uninitialized: undefined,
         height: 20,
         sizes: [2],
-        someFunc: function() {
+        someFunc: function () {
             return 2
         },
         get width() {
@@ -175,12 +175,12 @@ test("decorate should work with plain object", function() {
     expect(ar.slice()).toEqual([40, 20, 60, 210, 420, 700])
 })
 
-test("decorate should work with Object.create", function() {
+test("decorate should work with Object.create", function () {
     const Box = {
         uninitialized: undefined,
         height: 20,
         sizes: [2],
-        someFunc: function() {
+        someFunc: function () {
             return 2
         },
         get width() {
@@ -243,7 +243,7 @@ test("decorate should work with Object.create", function() {
     expect(ar.slice()).toEqual([40, 20, 60, 210, 420, 700])
 })
 
-test("decorate should work with constructor function", function() {
+test("decorate should work with constructor function", function () {
     function Box() {
         this.uninitialized = undefined
         this.height = 20
@@ -265,10 +265,10 @@ test("decorate should work with constructor function", function() {
             }
         })
         this.sizes = [2]
-        this.someFunc = function() {
+        this.someFunc = function () {
             return 2
         }
-        this.addSize = function() {
+        this.addSize = function () {
             this.sizes.push([3])
             this.sizes.push([4])
         }
@@ -323,8 +323,7 @@ test("decorate should work with constructor function", function() {
     expect(box2.width).toBe(40) // no shared state!
 })
 
-// TODO: find decent behavior here, for example die because the `this` on the observable setter is not the owning instance?
-test.skip("decorate should work with inheritance through Object.create", () => {
+test("decorate should work with inheritance through Object.create", () => {
     const P = {
         x: 3
     }
@@ -333,17 +332,17 @@ test.skip("decorate should work with inheritance through Object.create", () => {
     })
 
     const child1 = Object.create(P)
-    expect(child1.x).toBe(3) // now an own property
-    child1.x = 4
+    expect(child1.x).toBe(3)
+    child1.x = 4 // this modifies the prop on P, since that is what was made observable
     expect(child1.x).toBe(4)
     const child2 = Object.create(P)
-    expect(child2.x).toBe(3)
+    expect(child2.x).toBe(4)
     child2.x = 5
     expect(child2.x).toBe(5)
-    expect(child1.x).toBe(4)
+    expect(child1.x).toBe(5)
 })
 
-test("decorate should not allow @observable on getter", function() {
+test("decorate should not allow @observable on getter", function () {
     const obj = {
         x: 0,
         get y() {
@@ -376,7 +375,7 @@ test("decorate should not allow @observable on getter", function() {
     )
 })
 
-test("decorate a property with two decorators", function() {
+test("decorate a property with two decorators", function () {
     let updatedByAutorun
 
     class Obj {
