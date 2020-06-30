@@ -10,9 +10,6 @@ Questions:
 -   What to do about the egghead lessons? They have a reference the decorator
     syntax. -> consolidate into a single page and explain the decorator story on it.
 
--   The README is rather long. Credits, testimonials, and sponsors in multiple
-    places.
-
 -   How to name "compatible property tracking" as opposed to proxy-based?
     How does one configure it, or it is an automatic fallback?
 
@@ -34,6 +31,7 @@ Todo
 -   [ ] Update the 'Getting started tutorial'? It's maintained separately from the documentation - should we attempt to integrate it? The problem with that it is has live code. Docusaurus can run React snippets but the HTML page has very fancy animations. Update it as is?
 -   [ ] Remove reference to the https://github.com/mobxjs/mobx-react-boilerplate projects, modify github README there that it's out of date and retired.
 -   [ ] makeAutoObservable is handy, but you probably shouldn't use it on a React component to make local state observable. We should say that somewhere.
+-   [ ] mweststrate: Only sponsors are needed. For backers / sponsors and sponsoring in general I think we should add an entry in the top menu bar
 
 Fragments
 
