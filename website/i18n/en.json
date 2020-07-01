@@ -6,8 +6,8 @@
     "tagline": "Simple, scalable state management",
     "docs": {
       "best/actions": {
-        "title": "Writing asynchronous actions",
-        "sidebar_label": "async actions & flows"
+        "title": "Asynchronous actions",
+        "sidebar_label": "Asynchronous actions"
       },
       "best/decorators": {
         "title": "Decorators in MobX",

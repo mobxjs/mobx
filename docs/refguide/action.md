@@ -38,7 +38,7 @@ If you use `makeAutoObservable` you have to [exclude these methods explicitly fr
 ## Actions and async code
 
 There are some special rules you have to take into account when you have actions that
-are asynchronous. See [Writing asynchronous actions](../best/actions.md).
+are asynchronous. See [asynchronous actions](../best/actions.md).
 
 ## action.bound
 
