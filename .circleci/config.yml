@@ -137,7 +137,7 @@ workflows:
             - test-size:
                   requires:
                       - build
-
+            - test-codemod:
             - upload-coveralls:
                   requires:
                       - test-coverage
