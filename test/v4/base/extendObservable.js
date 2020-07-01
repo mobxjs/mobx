@@ -10,13 +10,13 @@ import {
     extendObservable
 } from "../mobx4"
 
-test("extendObservable should work", function() {
+test("extendObservable should work", function () {
     class Box {
         // @ts-ignore
         uninitialized
         height = 20
         sizes = [2]
-        someFunc = function() {
+        someFunc = function () {
             return 2
         }
         get width() {
@@ -66,13 +66,13 @@ test("extendObservable should work", function() {
     expect(ar.slice()).toEqual([40])
 })
 
-test("extendObservable should work with plain object", function() {
+test("extendObservable should work with plain object", function () {
     const box = {
         /** @type {boolean | undefined} */
         uninitialized: undefined,
         height: 20,
         sizes: [2],
-        someFunc: function() {
+        someFunc: function () {
             return 2
         },
         get width() {
@@ -119,13 +119,13 @@ test("extendObservable should work with plain object", function() {
     expect(ar.slice()).toEqual([40])
 })
 
-test("extendObservable should apply specified decorators", function() {
+test("extendObservable should apply specified decorators", function () {
     const box = {
         /** @type {boolean | undefined} */
         uninitialized: undefined,
         height: 20,
         sizes: [2],
-        someFunc: function() {
+        someFunc: function () {
             return 2
         },
         get width() {
@@ -150,7 +150,7 @@ test("extendObservable should apply specified decorators", function() {
     extendObservable(
         box,
         {
-            someFunc: function() {
+            someFunc: function () {
                 return 2
             }
         },

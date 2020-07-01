@@ -60,7 +60,7 @@ function interceptHook(hook: "onBO" | "onBUO", thing, arg2, arg3) {
         atom[listenersKey] = new Set<Lambda>([cb])
     }
 
-    return function() {
+    return function () {
         const hookListeners = atom[listenersKey]
         if (hookListeners) {
             hookListeners.delete(cb)

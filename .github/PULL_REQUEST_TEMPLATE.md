@@ -4,7 +4,7 @@
     🚨🚨🚨 IMPORTANT NOTICE 🚨🚨🚨
 
     Next major of MobX V6 is under development. Try to direct all changes toward `mobx6` branch instead of `master`.
-    
+
     🚨🚨🚨 IMPORTANT NOTICE 🚨🚨🚨
 
     👋 Are you making a change to documentation only? Delete the rest of the template and go ahead.

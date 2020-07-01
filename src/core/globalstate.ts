@@ -143,7 +143,7 @@ let isolateCalled = false
 
 declare const global: any
 
-export let globalState: MobXGlobals = (function() {
+export let globalState: MobXGlobals = (function () {
     if (global.__mobxInstanceCount > 0 && !global.__mobxGlobals) canMergeGlobalState = false
     if (global.__mobxGlobals && global.__mobxGlobals.version !== new MobXGlobals().version)
         canMergeGlobalState = false

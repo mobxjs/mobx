@@ -18,7 +18,7 @@ The `decorators` param can be used to override the decorator that will be used f
 Use the `deep: false` option to make the new properties _shallow_. That is, prevent auto conversion of their _values_ to observables.
 
 ```javascript
-var Person = function(firstName, lastName) {
+var Person = function (firstName, lastName) {
     // initialize observable properties on a new instance
     extendObservable(
         this,

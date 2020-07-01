@@ -4,7 +4,7 @@
 const mobx = require("../mobx4")
 const utils = require("../../v5/utils/test-utils")
 
-test("autorun passes Reaction as an argument to view function", function() {
+test("autorun passes Reaction as an argument to view function", function () {
     const a = mobx.observable.box(1)
     const values = []
 
@@ -23,7 +23,7 @@ test("autorun passes Reaction as an argument to view function", function() {
     expect(values).toEqual([1, 2, "pleaseDispose"])
 })
 
-test("autorun can be disposed on first run", function() {
+test("autorun can be disposed on first run", function () {
     const a = mobx.observable.box(1)
     const values = []
 
@@ -37,13 +37,13 @@ test("autorun can be disposed on first run", function() {
     expect(values).toEqual([1])
 })
 
-test("autorun warns when passed an action", function() {
+test("autorun warns when passed an action", function () {
     const action = mobx.action(() => {})
     expect.assertions(1)
     expect(() => mobx.autorun(action)).toThrowError(/Autorun does not accept actions/)
 })
 
-test("autorun batches automatically", function() {
+test("autorun batches automatically", function () {
     let runs = 0
     let a1runs = 0
     let a2runs = 0
@@ -83,7 +83,7 @@ test("autorun batches automatically", function() {
     d2()
 })
 
-test("autorun tracks invalidation of unbound dependencies", function() {
+test("autorun tracks invalidation of unbound dependencies", function () {
     const a = mobx.observable.box(0)
     const b = mobx.observable.box(0)
     const c = mobx.computed(() => a.get() + b.get())
@@ -98,7 +98,7 @@ test("autorun tracks invalidation of unbound dependencies", function() {
     expect(values).toEqual([0, 100, 101])
 })
 
-test("when effect is an action", function(done) {
+test("when effect is an action", function (done) {
     const a = mobx.observable.box(0)
 
     mobx.configure({ enforceActions: "observed" })

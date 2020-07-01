@@ -5,7 +5,7 @@ const set = mobx.observable.set
 const autorun = mobx.autorun
 const iterall = require("iterall")
 
-test("set crud", function() {
+test("set crud", function () {
     const events = []
     const s = set([1])
 
@@ -75,15 +75,15 @@ test("set crud", function() {
     ])
 })
 
-test("observe value", function() {
+test("observe value", function () {
     const s = set()
     let hasX = false
     let hasY = false
 
-    autorun(function() {
+    autorun(function () {
         hasX = s.has("x")
     })
-    autorun(function() {
+    autorun(function () {
         hasY = s.has("y")
     })
 
@@ -101,17 +101,17 @@ test("observe value", function() {
     expect(mobx.values(s)).toEqual(["y"])
 })
 
-test("observe collections", function() {
+test("observe collections", function () {
     const x = set()
     let keys, values, entries
 
-    autorun(function() {
+    autorun(function () {
         keys = mobx.keys(x)
     })
-    autorun(function() {
+    autorun(function () {
         values = Array.from(x.values())
     })
-    autorun(function() {
+    autorun(function () {
         entries = Array.from(x.entries())
     })
 
@@ -157,12 +157,12 @@ test("set modifier", () => {
     expect(mobx.isObservableSet(y.a)).toBe(true)
 })
 
-test("cleanup", function() {
+test("cleanup", function () {
     const s = set(["a"])
 
     let hasA
 
-    autorun(function() {
+    autorun(function () {
         hasA = s.has("a")
     })
 

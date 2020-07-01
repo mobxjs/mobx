@@ -78,7 +78,7 @@ var todoStore = observable({
 })
 
 /* a function that observes the state */
-autorun(function() {
+autorun(function () {
     console.log("Completed %d of %d items", todoStore.completedCount, todoStore.todos.length)
 })
 

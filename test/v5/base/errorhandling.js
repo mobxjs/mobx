@@ -4,7 +4,7 @@ const utils = require("../../v5/utils/test-utils")
 
 const { observable, computed, $mobx } = mobx
 
-const voidObserver = function() {}
+const voidObserver = function () {}
 
 function checkGlobalState() {
     const gs = mobx._getGlobalState()
@@ -15,8 +15,8 @@ function checkGlobalState() {
     expect(gs.pendingUnobservations.length).toBe(0)
 }
 
-test("exception1", function() {
-    const a = computed(function() {
+test("exception1", function () {
+    const a = computed(function () {
         throw "hoi"
     })
     expect(() => a.get()).toThrow(/hoi/)
@@ -134,10 +134,10 @@ test("multiple autoruns with exceptions are handled correctly", () => {
     d3()
 })
 
-test("deny state changes in views", function() {
+test("deny state changes in views", function () {
     const x = observable.box(3)
     const z = observable.box(5)
-    const y = computed(function() {
+    const y = computed(function () {
         z.set(6)
         return x.get() * x.get()
     })
@@ -161,11 +161,11 @@ test("deny state changes in views", function() {
     checkGlobalState()
 })
 
-test("allow state changes in autorun", function() {
+test("allow state changes in autorun", function () {
     const x = observable.box(3)
     const z = observable.box(3)
 
-    m.autorun(function() {
+    m.autorun(function () {
         if (x.get() !== 3) z.set(x.get())
     })
 
@@ -181,15 +181,15 @@ test("allow state changes in autorun", function() {
     checkGlobalState()
 })
 
-test("deny array change in view", function(done) {
+test("deny array change in view", function (done) {
     const x = observable.box(3)
     const z = observable([])
-    const y = computed(function() {
+    const y = computed(function () {
         z.push(3)
         return x.get() * x.get()
     })
 
-    expect(function() {
+    expect(function () {
         y.get() // modifying z is allowed if nobody is observing
     }).not.toThrow()
     m.reaction(
@@ -198,7 +198,7 @@ test("deny array change in view", function(done) {
     )
 
     expect(
-        utils.grabConsole(function() {
+        utils.grabConsole(function () {
             y.get()
         })
     ).toMatchInlineSnapshot(
@@ -212,10 +212,10 @@ test("deny array change in view", function(done) {
     done()
 })
 
-test("allow array change in autorun", function() {
+test("allow array change in autorun", function () {
     const x = observable.box(3)
     const z = observable([])
-    m.autorun(function() {
+    m.autorun(function () {
         if (x.get() > 4) z.push(x.get())
     })
 
@@ -229,9 +229,9 @@ test("allow array change in autorun", function() {
     checkGlobalState()
 })
 
-test("throw error if modification loop", function() {
+test("throw error if modification loop", function () {
     const x = observable.box(3)
-    m.autorun(function() {
+    m.autorun(function () {
         x.set(x.get() + 1) // is allowed to throw, but doesn't as the observables aren't bound yet during first execution
     })
     utils.consoleError(() => {
@@ -240,8 +240,8 @@ test("throw error if modification loop", function() {
     checkGlobalState()
 })
 
-test("cycle1", function() {
-    const p = computed(function() {
+test("cycle1", function () {
+    const p = computed(function () {
         return p.get() * 2
     }) // thats a cycle!
     utils.consoleError(() => {
@@ -250,11 +250,11 @@ test("cycle1", function() {
     checkGlobalState()
 })
 
-test("cycle2", function() {
-    const a = computed(function() {
+test("cycle2", function () {
+    const a = computed(function () {
         return b.get() * 2
     })
-    const b = computed(function() {
+    const b = computed(function () {
         return a.get() * 2
     })
     expect(() => {
@@ -263,8 +263,8 @@ test("cycle2", function() {
     checkGlobalState()
 })
 
-test("cycle3", function() {
-    const p = computed(function() {
+test("cycle3", function () {
+    const p = computed(function () {
         return p.get() * 2
     })
     expect(() => {
@@ -273,12 +273,12 @@ test("cycle3", function() {
     checkGlobalState()
 })
 
-test("cycle4", function() {
+test("cycle4", function () {
     const z = observable.box(true)
-    const a = computed(function() {
+    const a = computed(function () {
         return z.get() ? 1 : b.get() * 2
     })
-    const b = computed(function() {
+    const b = computed(function () {
         return a.get() * 2
     })
 
@@ -311,7 +311,7 @@ test("throws when the max iterations over reactions are done", () => {
     mobx._resetGlobalState()
 })
 
-test("issue 86, converging cycles", function() {
+test("issue 86, converging cycles", function () {
     function findIndex(arr, predicate) {
         for (let i = 0, l = arr.length; i < l; i++) if (predicate(arr[i]) === true) return i
         return -1
@@ -341,7 +341,7 @@ test("issue 86, converging cycles", function() {
     checkGlobalState()
 })
 
-test("slow converging cycle", function() {
+test("slow converging cycle", function () {
     const x = mobx.observable.box(1)
     let res = -1
     mobx.autorun(() => {
@@ -364,7 +364,7 @@ test("slow converging cycle", function() {
     checkGlobalState()
 })
 
-test("error handling assistence ", function(done) {
+test("error handling assistence ", function (done) {
     const baseError = console.error
     const baseWarn = console.warn
     const errors = [] // logged errors
@@ -372,20 +372,20 @@ test("error handling assistence ", function(done) {
     const values = [] // produced errors
     const thrown = [] // list of actually thrown exceptons
 
-    console.error = function(msg) {
+    console.error = function (msg) {
         errors.push(msg)
     }
-    console.warn = function(msg) {
+    console.warn = function (msg) {
         warns.push(msg)
     }
 
     const a = observable.box(3)
-    const b = computed(function() {
+    const b = computed(function () {
         if (a.get() === 42) throw "should not be 42"
         return a.get() * 2
     })
 
-    m.autorun(function() {
+    m.autorun(function () {
         values.push(b.get())
     })
 
@@ -398,7 +398,7 @@ test("error handling assistence ", function(done) {
     a.set(7)
 
     // Test recovery
-    setTimeout(function() {
+    setTimeout(function () {
         a.set(4)
         try {
             a.set(42)
@@ -420,7 +420,7 @@ test("error handling assistence ", function(done) {
 })
 
 test("236 - cycles", () => {
-    const Parent = function() {
+    const Parent = function () {
         m.extendObservable(this, {
             children: [],
             get total0() {
@@ -440,7 +440,7 @@ test("236 - cycles", () => {
         })
     }
 
-    const Child = function(parent, kind) {
+    const Child = function (parent, kind) {
         this.parent = parent
         m.extendObservable(this, {
             kind: kind,
@@ -667,7 +667,7 @@ test("it should be possible to handle exceptions in reaction", () => {
         const errors = []
         const a = mobx.observable.box(1)
         const d = mobx.autorun(
-            function() {
+            function () {
                 throw a.get()
             },
             {
@@ -693,7 +693,7 @@ test("it should be possible to handle global errors in reactions", () => {
         const errors = []
         const d2 = mobx.onReactionError(e => errors.push(e))
 
-        const d = mobx.autorun(function() {
+        const d = mobx.autorun(function () {
             throw a.get()
         })
 
@@ -743,7 +743,7 @@ test("global error handling will be skipped when using disableErrorBoundaries - 
             mobx.observable.box(1)
 
             expect(() => {
-                mobx.autorun(function() {
+                mobx.autorun(function () {
                     throw "OOPS"
                 })
             }).toThrowError(/OOPS/)
