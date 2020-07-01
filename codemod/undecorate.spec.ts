@@ -2,8 +2,15 @@ import { applyTransform } from "jscodeshift/dist/testUtils"
 const dedent = require("dedent-js")
 import * as u from "./undecorate"
 
-function convert(source: string): string {
-    return applyTransform(u, {}, { source: dedent(source), path: "unittest" }, {})
+function convert(
+    source: string,
+    options: {
+        ignoreImports?: boolean
+        keepDecorators?: boolean
+        decoratorsAfterExport?: boolean
+    } = {}
+): string {
+    return applyTransform(u, options, { source: dedent(source), path: "unittest" }, {})
 }
 
 describe("general", () => {
@@ -32,6 +39,59 @@ describe("general", () => {
                                                                 }
                                                             }"
                                         `)
+    })
+
+    test("basic observable - skip imports", () => {
+        expect(
+            convert(
+                `
+  class Box {
+      /*0*/
+      @observable
+      /*1*/
+      field /*2 */ = /*3*/ 1 /*4*/
+  }`,
+                { ignoreImports: true }
+            )
+        ).toMatchInlineSnapshot(`
+            "class Box {
+                /*0*/
+                /*1*/
+                field /*2 */ = /*3*/ 1; /*4*/
+
+                constructor() {
+                    makeObservable(this, {
+                        field: observable
+                    });
+                }
+            }"
+        `)
+    })
+
+    test("basic observable - skip imports - keepDecorators", () => {
+        expect(
+            convert(
+                `
+  class Box {
+      /*0*/
+      @observable
+      /*1*/
+      field /*2 */ = /*3*/ 1 /*4*/
+  }`,
+                { ignoreImports: true, keepDecorators: true }
+            )
+        ).toMatchInlineSnapshot(`
+            "class Box {
+                /*0*/
+                @observable
+                /*1*/
+                field /*2 */ = /*3*/ 1 /*4*/
+
+                constructor() {
+                    makeObservable(this);
+                }
+            }"
+        `)
     })
 
     test("class with method and extends", () => {
@@ -765,7 +825,7 @@ describe("decorate", () => {
         `)
     })
 
-    test("handle non-classes", () => {
+    test("handle non-classes - 1", () => {
         expect(
             convert(`
             import { observable, decorate, computed, action } from "mobx"
@@ -793,7 +853,7 @@ describe("decorate", () => {
                         `)
     })
 
-    test("handle non-classes", () => {
+    test("handle non-classes - 2", () => {
         expect(
             convert(`
             import { observable, decorate, computed, action } from "mobx"
@@ -811,5 +871,158 @@ describe("decorate", () => {
                             height: observable.shallow,
                         })"
                 `)
+    })
+})
+
+test("handle privates in classes", () => {
+    expect(
+        convert(
+            `
+            import { observable, decorate, computed, action } from "mobx"
+
+class TryToGetThis {
+    @observable
+    private privateField1: number = 1
+    @observable
+    protected privateField2 = 1
+    @observable
+    public publicField: string = "test"
+  }
+            `
+        )
+    ).toMatchInlineSnapshot(`
+        "import { observable, computed, action, makeObservable } from \\"mobx\\"
+
+        class TryToGetThis {
+          private privateField1: number = 1;
+          protected privateField2 = 1;
+          public publicField: string = \\"test\\";
+
+          constructor() {
+            makeObservable<TryToGetThis, \\"privateField1\\" | \\"privateField2\\">(this, {
+              privateField1: observable,
+              privateField2: observable,
+              publicField: observable
+            });
+          }
+        }"
+    `)
+})
+
+describe("@observer", () => {
+    test("class comp", () => {
+        expect(
+            convert(`
+        import {observer} from 'mobx-react'
+    
+        /* 1 */
+        @observer /* 2 */ class X extends React.Component {
+
+        }
+    
+        `)
+        ).toMatchInlineSnapshot(`
+            "import {observer} from 'mobx-react'
+
+                /* 1 */
+                const X = observer(class /* 2 */ X extends React.Component {
+
+                });"
+        `)
+    })
+
+    test("class comp with export before", () => {
+        expect(
+            convert(`
+        import {observer} from 'mobx-react-lite'
+
+
+        /* 1 */
+        @observer /* 2 */ export /* 3 */ class X extends React.Component {
+
+        }
+    
+        `)
+        ).toMatchInlineSnapshot(`
+            "import {observer} from 'mobx-react-lite'
+
+
+                /* 1 */
+                export const X = observer(class /* 2 */ /* 3 */ X extends React.Component {
+
+                });"
+        `)
+    })
+
+    test("class comp with export after", () => {
+        expect(
+            convert(
+                `
+        import {observer} from 'mobx-react-lite'
+
+
+        /* 1 */
+        export /* 2 */ @observer /* 3 */ class X extends React.Component {
+
+        }
+    
+        `,
+                { decoratorsAfterExport: true }
+            )
+        ).toMatchInlineSnapshot(`
+            "import {observer} from 'mobx-react-lite'
+
+
+                /* 1 */
+                export const X = observer(class /* 2 */ /* 3 */ X extends React.Component {
+
+                });"
+        `)
+    })
+
+    test("class comp with inject", () => {
+        expect(
+            convert(`
+        import {observer, inject} from 'mobx-react'
+
+
+        /* 1 */
+        @inject("test") /* 2 */ export /* 3 */ class X extends React.Component {
+
+        }
+    
+        `)
+        ).toMatchInlineSnapshot(`
+            "import {observer, inject} from 'mobx-react'
+
+
+                /* 1 */
+                export const X = inject(\\"test\\")(class /* 2 */ /* 3 */ X extends React.Component {
+
+                });"
+        `)
+    })
+
+    test("class comp with inject and observer", () => {
+        expect(
+            convert(`
+        import {observer, inject} from 'mobx-react'
+
+
+        /* 1 */
+        @inject("test") @observer /* 2 */ export /* 3 */ class X extends React.Component {
+
+        }
+    
+        `)
+        ).toMatchInlineSnapshot(`
+            "import {observer, inject} from 'mobx-react'
+
+
+                /* 1 */
+                export const X = inject(\\"test\\")(observer(class /* 2 */ /* 3 */ X extends React.Component {
+
+                }));"
+        `)
     })
 })

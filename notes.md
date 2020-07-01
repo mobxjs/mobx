@@ -1,9 +1,9 @@
 ## Feature work
 
--   [ ] Build process
+-   [x] Build process
     -   [x] kill v4 / v5 separation
     -   [x] TSDX build process
--   [ ] Smaller build
+-   [x] Smaller build
     -   [x] fixup build, restore asset bundling
     -   [x] ~create prod esm build?~
     -   [x] minimal dev errors
@@ -19,10 +19,11 @@
     -   [x] codemod babel
     -   [x] codemod leave decorators
     -   [x] migrate decorate calls as well
-    -   [ ] migrate privates correctly
-    -   [ ] migrate `@observer` calls
-    -   [ ] unit tests for `ignoreImports`
-    -   [ ] unit tests for `keepDecorators`
+    -   [x] migrate privates correctly
+    -   [x] migrate `@observer` calls
+    -   [c] migrate `@inject` calls
+    -   [x] unit tests for `ignoreImports`
+    -   [x] unit tests for `keepDecorators`
     -   [ ] put in separate package
 -   [ ] ES5 support
     -   [x] combine with ES5?

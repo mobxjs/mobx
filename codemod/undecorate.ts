@@ -10,7 +10,8 @@ import {
     ObjectExpression
 } from "jscodeshift"
 
-const validDecorators = ["action", "observable", "computed"]
+const validPackages = ["mobx", "mobx-react", "mobx-react-lite"]
+const validDecorators = ["action", "observable", "computed", "observer", "inject"]
 
 const babylon = require("@babel/parser")
 
@@ -22,12 +23,12 @@ const defaultOptions = {
     tokens: true,
     plugins: [
         // "estree",
+        ["decorators", { decoratorsBeforeExport: true }],
         "asyncGenerators",
         "bigInt",
         "classProperties",
         "classPrivateProperties",
         "classPrivateMethods",
-        ["decorators", { decoratorsBeforeExport: true }],
         "legacy-decorators",
         "doExpressions",
         "dynamicImport",
@@ -50,15 +51,20 @@ const defaultOptions = {
 
 export const parser = {
     parse(code) {
+        // @ts-ignore
+        defaultOptions.plugins[0][1].decoratorsBeforeExport = !!decoratorsBeforeExport
         return babylon.parse(code, defaultOptions)
     }
 }
 
+let decoratorsBeforeExport = true // hack to get the options into the parser
+
 export default function tranform(
     fileInfo: FileInfo,
     api: API,
-    options?: { ignoreImports: boolean; keepDecorators: boolean }
+    options?: { ignoreImports?: boolean; keepDecorators?: boolean; decoratorsAfterExport?: boolean }
 ): any {
+    decoratorsBeforeExport = !options?.decoratorsAfterExport
     const j = api.jscodeshift
     const superCall = j.expressionStatement(j.callExpression(j.super(), []))
     const source = j(fileInfo.source)
@@ -69,7 +75,7 @@ export default function tranform(
     let usesDecorate = options?.ignoreImports ? true : false
 
     source.find(j.ImportDeclaration).forEach(im => {
-        if (im.value.source.value === "mobx") {
+        if (validPackages.includes(im.value.source.value as string)) {
             let decorateIndex = -1
             im.value.specifiers.forEach((specifier, idx) => {
                 // imported decorator
@@ -112,8 +118,8 @@ export default function tranform(
                 if (!j.Identifier.check(target)) {
                     // not targetting a class, just swap it with makeObservable
                     changed = true
-                    // @ts-ignore
-                    callPath.value.callee.name = "observable"
+                    // @ts-ignore // TODO: or "observable" ?
+                    callPath.value.callee.name = "makeObservable"
                     return
                 }
                 const declarations = callPath.scope.getBindings()[target.name]
@@ -128,13 +134,13 @@ export default function tranform(
                 if (!j.ClassDeclaration.check(targetDeclaration)) {
                     // not targetting a class, just swap it with makeObservable
                     changed = true
-                    // @ts-ignore
-                    callPath.value.callee.name = "observable"
+                    // @ts-ignore // TODO: or "observable" ?
+                    callPath.value.callee.name = "makeObservable"
                     return
                 }
                 const clazz: ClassDeclaration = targetDeclaration
                 // @ts-ignore
-                createConstructor(clazz, decorators)
+                createConstructor(clazz, decorators, [])
 
                 // Remove the callPath (and wrapping expressionStatement)
                 if (canRemoveDecorateCall) {
@@ -144,7 +150,7 @@ export default function tranform(
             })
     }
 
-    // rewrite all class decorators
+    // rewrite all class proprty decorators
     source.find(j.ClassDeclaration).forEach(clazzPath => {
         const clazz = clazzPath.value
         const effects = {
@@ -160,21 +166,63 @@ export default function tranform(
 
         if (effects.membersMap.length) {
             changed = true
+            let privates: string[] = []
             const members = j.objectExpression(
-                effects.membersMap.map(([key, value, computed]) => {
+                effects.membersMap.map(([key, value, computed, isPrivate]) => {
                     // loose the comments, as they are already in the field definition
                     const { comments, ...k } = key
                     const { comments: comments2, ...v } = value
                     const prop = j.objectProperty(k, v)
                     prop.computed = !!computed
+                    if (isPrivate) privates.push(k.name)
                     return prop
                 })
             )
-            createConstructor(clazz, members)
+            createConstructor(clazz, members, privates)
             needsInitializeImport = true
         }
     })
-    if (needsInitializeImport) {
+
+    // rewrite all @observer / @inject
+    if (!options?.keepDecorators && decoratorsUsed.has("observer")) {
+        source.find(j.ClassDeclaration).forEach(clazzPath => {
+            const clazz = clazzPath.value
+            // find @observer
+            const observerDecorator = (clazz as any).decorators?.find(
+                dec =>
+                    j.Decorator.check(dec) &&
+                    j.Identifier.check(dec.expression) &&
+                    dec.expression.name === "observer"
+            )
+            // find @inject
+            const injectDecorator = (clazz as any).decorators?.find(
+                dec =>
+                    j.Decorator.check(dec) &&
+                    j.CallExpression.check(dec.expression) &&
+                    j.Identifier.check(dec.expression.callee) &&
+                    dec.expression.callee.name === "inject"
+            )
+            if (!observerDecorator && !injectDecorator) return
+
+            // re-create the class
+            let newClassDefExpr: any = j.classExpression(clazz.id, clazz.body, clazz.superClass)
+            // wrap with observer
+            if (observerDecorator)
+                newClassDefExpr = j.callExpression(j.identifier("observer"), [newClassDefExpr])
+            // wrap with inject
+            if (injectDecorator)
+                newClassDefExpr = j.callExpression(injectDecorator.expression, [newClassDefExpr])
+
+            changed = true
+            const decl = j.variableDeclaration("const", [
+                j.variableDeclarator(j.identifier(clazz.id!.name), newClassDefExpr)
+            ])
+            decl.comments = clazz.comments
+            clazzPath.replace(decl)
+        })
+    }
+
+    if (needsInitializeImport && !options?.ignoreImports) {
         // @ts-ignore
         const mobxImport = source
             .find(j.ImportDeclaration)
@@ -200,9 +248,12 @@ export default function tranform(
     }
 
     function handleProperty(
-        property: ClassProperty & /* | or ClassMethod */ { decorators: Decorator[] },
+        property: ClassProperty & /* | or ClassMethod */ {
+            decorators: Decorator[]
+            accessibility: "private" | "protected" | "public"
+        },
         effects: {
-            membersMap: [[any, any, boolean]]
+            membersMap: [[any, any, boolean, boolean]]
         },
         clazzPath: ASTPath<ClassDeclaration>
     ): ClassProperty | ClassMethod {
@@ -230,11 +281,20 @@ export default function tranform(
 
         if (options?.keepDecorators !== true) property.decorators.splice(0)
 
-        effects.membersMap.push([property.key, expr, property.computed])
+        effects.membersMap.push([
+            property.key,
+            expr,
+            property.computed,
+            property.accessibility === "private" || property.accessibility === "protected"
+        ])
         return property
     }
 
-    function createConstructor(clazz: ClassDeclaration, members: ObjectExpression) {
+    function createConstructor(
+        clazz: ClassDeclaration,
+        members: ObjectExpression,
+        privates: string[]
+    ) {
         // makeObservable(this, { members })
         const initializeObservablesCall = j.expressionStatement(
             j.callExpression(
@@ -242,6 +302,16 @@ export default function tranform(
                 options?.keepDecorators ? [j.thisExpression()] : [j.thisExpression(), members]
             )
         )
+        if (privates.length) {
+            // @ts-ignore
+            initializeObservablesCall.expression.typeArguments = j.tsTypeParameterInstantiation([
+                j.tsTypeReference(j.identifier(clazz.id!.name)),
+                j.tsUnionType(
+                    // @ts-ignore
+                    privates.map(member => j.tsLiteralType(j.stringLiteral(member)))
+                )
+            ])
+        }
 
         const needsSuper = !!clazz.superClass
         let constructorIndex = clazz.body.body.findIndex(

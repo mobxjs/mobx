@@ -148,9 +148,8 @@ export function makeProperty(
         default:
             if (__DEV__)
                 die(
-                    `invalid decorator '${
-                        annotation.annotationType_ ?? annotation
-                    }' for '${key.toString()}'`
+                    `invalid decorator '${annotation.annotationType_ ??
+                        annotation}' for '${key.toString()}'`
                 )
     }
 }
@@ -187,7 +186,6 @@ export function makeObservable<T extends Object, AdditionalKeys extends Property
     return target
 }
 
-// TODO: add tests
 export function makeAutoObservable<T extends Object, AdditionalKeys extends PropertyKey = never>(
     target: T,
     excludes?: AnnotationsMap<T, AdditionalKeys>,
