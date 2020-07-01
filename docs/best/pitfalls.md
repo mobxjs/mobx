@@ -32,26 +32,16 @@ For setup tips and limitations on decorators, check the [decorators](decorators.
 
 #### `Array.isArray(observable([1,2,3])) === false`
 
-_This limitation applies to MobX 4 and lower only_
+If your environment does not support Proxies, then MobX cannot make its observable
+array be a real JS Array.
 
-In ES5 there is no way to reliably inherit from arrays, and hence observable arrays inherit from objects.
-This means that regularly libraries are not able to recognize observable arrays as normal arrays (like lodash, or built-in operations like `Array.concat`).
-This can simply be fixed by passing calling `observable.toJS()` or `observable.slice()` before passing the array to another library.
-As long as the external library has no intent to modify the array, this will further work completely as expected.
-You can use `isObservableArray(observable)` to check whether something is an observable array.
+For more information see (../best/limitations-without-proxies.md).
 
 #### `object.someNewProp = value` is not picked up
 
-_This limitation applies to MobX 4 and lower_
+If your environment does not support Proxies, then MobX cannot observe detect or react to properties that weren't declared observable before. For more information see (../best/limitations-without-proxies.md).
 
-_In MobX 5 this limitation applies to class instances and other objects that were **not** created using `observable()` / `observable.object()`._
-
-MobX observable _objects_ do not detect or react to property assignments that weren't declared observable before.
-So MobX observable objects act as records with predefined keys.
-You can use `extendObservable(target, props)` to introduce new observable properties to an object.
-However object iterators like `for .. in` or `Object.keys()` won't react to this automatically.
-If you need a dynamically keyed object in MobX 4 and lower, for example to store users by id, create observable _maps_ using [`observable.map`](../refguide/map.md) or use the utility methods as exposed by the [Object API](../refguide/object-api.md).
-For more info see [what will MobX react to?](https://mobx.js.org/best/react.html#what-does-mobx-react-to).
+If your environment **does** support Proxies, then MobX can detect this if and only if you create the class instance or object using `observable()` / `observable.object()`.
 
 ### Use `@observer` on all components that render `@observable`s.
 

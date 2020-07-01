@@ -73,3 +73,17 @@ And look at this [Medium article](https://medium.com/@mweststrate/becoming-fully
 ##### Where can I find more MobX resources?
 
 We've compiled a large list of helpful resources of all types in the [official awesome list](https://github.com/mobxjs/awesome-mobx#awesome-mobx). If you feel it's missing something, please open an [issue](https://github.com/mobxjs/awesome-mobx/issues/new) or [pull request](https://github.com/mobxjs/awesome-mobx/compare) to describe what you're looking for or share your added links :).
+
+#### What about TypeScript support?
+
+MobX is written with TypeScript and type definitions is built-in.
+
+#### Does MobX have Flow typing support?
+
+MobX ships with [flow typings](https://github.com/mobxjs/mobx/blob/master/flow-typed/mobx.js). Flow will automatically include them when you import mobx modules. Although you **do not** need to import the types explicitly, you can still do it like this: `import type { ... } from 'mobx'`.
+
+To use the [flow typings](https://github.com/mobxjs/mobx/blob/master/flow-typed/mobx.js) shipped with MobX:
+
+-   In `.flowconfig`, you **cannot** ignore `node_modules`.
+-   In `.flowconfig`, you **cannot** import it explicitly in the `[libs]` section.
+-   You **do not** need to install library definition using [flow-typed](https://github.com/flowtype/flow-typed).

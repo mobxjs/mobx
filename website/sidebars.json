@@ -1,29 +1,34 @@
 {
   "docs": {
-    "Introduction": [
+    "Basics": [
       "README",
-      "intro/concepts",
-      "intro/overview"
+      "intro/installation",
+      "intro/overview",
+      "intro/concepts"
+    ],
+    "MobX and React": [
+      "react/react-integration",
+      "react/react-performance",
+      "react/react-class-components"
     ],
     "Making things observable": [
+      "refguide/make-observable",
       "refguide/observable",
-      "refguide/observable-decorator",
       "refguide/object",
       "refguide/array",
       "refguide/map"
-    ],
-    "Reacting to observables": [
-      "refguide/observer-component",
-      "refguide/computed-decorator",
-      "refguide/autorun",
-      "refguide/when",
-      "refguide/reaction",
-      "best/react"
     ],
     "Updating observables": [
       "refguide/action",
       "best/actions",
       "refguide/object-api"
+    ],
+    "Reacting to observables": [
+      "refguide/computed-decorator",
+      "refguide/autorun",
+      "refguide/when",
+      "refguide/reaction",
+      "best/react"
     ],
     "Utilities": [
       "refguide/api",
@@ -41,10 +46,10 @@
     "Tips & Tricks": [
       "faq/faq",
       "best/pitfalls",
+      "best/limitations-without-proxies",
       "best/decorators",
       "best/trace",
       "best/store",
-      "best/react-performance",
       "refguide/spy"
     ]
   }

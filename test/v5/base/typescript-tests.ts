@@ -35,7 +35,7 @@ observe(v, () => {})
 
 const a = observable([1, 2, 3])
 
-const testFunction = function(a: any) {}
+const testFunction = function (a: any) {}
 
 // lazy wrapper around yest
 
@@ -163,7 +163,7 @@ test("annotations", () => {
     t.deepEqual(order1totals, [6, 3, 9])
 
     t.equal(order1.aFunction, testFunction)
-    const x = function() {
+    const x = function () {
         return 3
     }
     order1.aFunction = x
@@ -188,7 +188,7 @@ test("scope", () => {
         y: number
     }
 
-    const Thing = function(this: any) {
+    const Thing = function (this: any) {
         extendObservable(this, {
             y: 3,
             // this will work here
@@ -235,7 +235,7 @@ test("box", () => {
         uninitialized: any
         height = 20
         sizes = [2]
-        someFunc = function() {
+        someFunc = function () {
             return 2
         }
 
@@ -1395,7 +1395,7 @@ test("803 - action.bound and action preserve type info", () => {
         return { x: "3" } as Object
     }) as () => void
 
-    const bound2 = action(function() {}) as () => void
+    const bound2 = action(function () {}) as () => void
 })
 
 test("@computed.equals (TS)", () => {
@@ -1871,7 +1871,7 @@ test("flow support async generators", async () => {
         yield 3
     }
 
-    const start = mobx.flow(async function*() {
+    const start = mobx.flow(async function* () {
         let total = 0
         for await (const number of someNumbers()) {
             total += number
@@ -1896,7 +1896,7 @@ test("flow support throwing async generators", async () => {
         throw "OOPS"
     }
 
-    const start = mobx.flow(async function*() {
+    const start = mobx.flow(async function* () {
         let total = 0
         for await (const number of someNumbers()) {
             total += number

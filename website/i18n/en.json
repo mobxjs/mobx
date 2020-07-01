@@ -6,24 +6,24 @@
     "tagline": "Simple, scalable state management",
     "docs": {
       "best/actions": {
-        "title": "Writing asynchronous actions",
-        "sidebar_label": "async actions & flows"
+        "title": "Asynchronous actions",
+        "sidebar_label": "Asynchronous actions"
       },
       "best/decorators": {
-        "title": "How to (not) use decorators",
-        "sidebar_label": "How to (not) use decorator syntax"
+        "title": "Decorators in MobX",
+        "sidebar_label": "Decorators in MobX"
       },
       "best/devtools": {
         "title": "MobX + React DevTools",
         "sidebar_label": "MobX + React DevTools"
       },
+      "best/limitations-without-proxies": {
+        "title": "Limitations without Proxy support",
+        "sidebar_label": "Limitations without Proxy support"
+      },
       "best/pitfalls": {
         "title": "Common pitfalls & best practices",
         "sidebar_label": "Common Pitfalls & Best Practices"
-      },
-      "best/react-performance": {
-        "title": "Optimizing rendering React components",
-        "sidebar_label": "Optimizing React components"
       },
       "best/react": {
         "title": "What does MobX react to?",
@@ -49,6 +49,10 @@
         "title": "Concepts & Principles",
         "sidebar_label": "Concepts & Principles"
       },
+      "intro/installation": {
+        "title": "Installation",
+        "sidebar_label": "Installation"
+      },
       "intro/overview": {
         "title": "The gist of MobX",
         "sidebar_label": "The gist of MobX"
@@ -56,9 +60,21 @@
       "LINKS": {
         "title": "LINKS"
       },
+      "react/react-class-components": {
+        "title": "React class components",
+        "sidebar_label": "React class components"
+      },
+      "react/react-integration": {
+        "title": "React integration",
+        "sidebar_label": "React integration"
+      },
+      "react/react-performance": {
+        "title": "Optimizing rendering React components",
+        "sidebar_label": "Optimizing React components"
+      },
       "README": {
         "title": "Introduction",
-        "sidebar_label": "One page summary"
+        "sidebar_label": "Introduction"
       },
       "refguide/action": {
         "title": "action",
@@ -104,6 +120,10 @@
         "title": "provider_inject",
         "sidebar_label": "Provider / inject"
       },
+      "refguide/make-observable": {
+        "title": "makeObservable / makeAutoObservable",
+        "sidebar_label": "makeObservable / makeAutoObservable"
+      },
       "refguide/map": {
         "title": "Observable Maps",
         "sidebar_label": "maps"
@@ -124,10 +144,6 @@
         "title": "Observable Objects",
         "sidebar_label": "objects"
       },
-      "refguide/observable-decorator": {
-        "title": "@observable",
-        "sidebar_label": "@observable"
-      },
       "refguide/observable": {
         "title": "observable",
         "sidebar_label": "observable"
@@ -135,10 +151,6 @@
       "refguide/observe": {
         "title": "Intercept & Observe",
         "sidebar_label": "intercept & observe"
-      },
-      "refguide/observer-component": {
-        "title": "(@)observer components",
-        "sidebar_label": "(@)observer components"
       },
       "refguide/reaction": {
         "title": "reaction",
@@ -162,10 +174,11 @@
       "Github": "Github"
     },
     "categories": {
-      "Introduction": "Introduction",
+      "Basics": "Basics",
+      "MobX and React": "MobX and React",
       "Making things observable": "Making things observable",
-      "Reacting to observables": "Reacting to observables",
       "Updating observables": "Updating observables",
+      "Reacting to observables": "Reacting to observables",
       "Utilities": "Utilities",
       "Tips & Tricks": "Tips & Tricks"
     }

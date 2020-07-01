@@ -42,7 +42,7 @@ autorun(reaction => {
 })
 ```
 
-Just like the [`@observer` decorator/function](./observer-component.md), `autorun` will only observe data that is used during the execution of the provided function.
+Just like the [`@observer` decorator/function](../react/react-integration.md), `autorun` will only observe data that is used during the execution of the provided function.
 
 ```javascript
 var numbers = observable([1, 2, 3])
