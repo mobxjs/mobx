@@ -31,7 +31,7 @@ Questions:
 Todo
 
 -   [ ] Netlify preview for docs PR.
--   [ ] Any code sandbox links need to be updated. jsfiddle as well.
+-   [ ] Any code sandbox links need to be updated. jsfiddle as well, move it to codesandbox.
 -   [ ] Codemod might change to a new package to reduce size. Documentation needs to be updated.
 -   [ ] There are a lot of references to external documentation resources. They can probably use a pruning.
 -   [ ] We can still write a separate document that introduces "observable" and explains you need to wrap things in `action` if you want to modify things. Is that the right way forward?
