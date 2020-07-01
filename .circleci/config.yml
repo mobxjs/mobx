@@ -86,8 +86,12 @@ jobs:
         steps:
             - attach_workspace:
                   at: .
-
-            - run: cd packages/mobx-undecorate && yarn && yarn test
+            - run:
+                  name: run codemod
+                  command: |
+                      cd packages/mobx-undecorate
+                      yarn
+                      yarn test
 
     test-size:
         executor: my-executor
@@ -137,7 +141,9 @@ workflows:
             - test-size:
                   requires:
                       - build
-            - test-codemod
+            - test-codemod:
+                  requires:
+                      - build
             - upload-coveralls:
                   requires:
                       - test-coverage
