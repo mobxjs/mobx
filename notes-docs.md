@@ -58,6 +58,103 @@ https://deploy-preview-2382--mobx-docs.netlify.app/
 -   [ ] mweststrate: Only sponsors are needed. For backers / sponsors and sponsoring in general I think we should add an entry in the top menu bar
 -   [ ] What to do about the egghead lessons? They use the decorator syntax and may not enforce actions by default. -> consolidate into a single page and explain the decorator story and action on it.
 -   [ ] Consider breaking up computed.md into a basic and "advanced" document.
+-   [ ] API overview duplicates a lot of the material already discussed elsewhere. Break it into pieces. Introduce a separate API page which has a one line description and a link to the details?
+
+## Structure thoughts
+
+I've made a start of introducing a new structure. Right now the directories
+are rather flat and filenames don't always reflect the titles. This encourages people to add and modify documentation without regard to structure, which makes it easy to reference things that haven't been introduced yet. I think it would help to adjust the directory structure to reflect the content.
+
+The goal of this structure is: good flow that introduces the most important bits
+first to a typical React developer. In each directory, have the most important
+bits come earlier, the less important or advanced bits later.
+
+Here is a proposed structure:
+
+-   Basics
+
+    -   Introduction
+
+    -   Installation
+
+    -   The gist of MobX (or quickstart?)
+
+    -   Concepts & Principles
+
+    -   FAQ
+
+-   MobX and React
+
+    -   React integration
+
+    -   Optimizing React components
+
+    -   React class components
+
+-   Making things observable
+
+    -   makeObservable / makeAutoObservable
+
+    -   observable
+
+    -   objects
+
+    -   arrays
+
+    -   maps
+
+-   Updating observables
+
+    -   action
+
+    -   Asynchronous actions
+
+-   Computed values
+
+    -   computed
+
+    -   Computed options
+
+-   Organizing your application
+
+    -   Best practices
+
+    -   Defining data stores (mention mobx-state-tree, mobx-keystone)
+
+-   Reacting to observables
+
+    -   Understanding what MobX reacts to
+
+    -   autorun
+
+    -   when
+
+    -   reaction
+
+-   Debugging MobX
+
+    -   toJS
+
+    -   Common Pitfalls
+
+    -   Using trace for debugging
+
+    -   Spy
+
+-   Advanced topics
+
+    -   Decorators in MobX
+
+    -   Limitations without Proxy Support
+
+    -   Boxed values
+
+    -   Object API
+
+Mine the API docs page to deduplicate content and move it into the
+rest of the docs.
+
+API docs page (with one-liners and links) linked somewhere in the page layout.
 
 ## Fragments
 
