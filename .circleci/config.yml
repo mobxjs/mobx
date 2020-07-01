@@ -87,7 +87,7 @@ jobs:
             - attach_workspace:
                   at: .
 
-            - run: yarn test:codemod
+            - run: cd packages/mobx-undecorate && yarn && yarn test
 
     test-size:
         executor: my-executor

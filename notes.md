@@ -13,7 +13,7 @@
     -   [x] add **PURE** annotations?
     -   [x] extract utils for getOwnPropertyDescriptor and defineProperty
     -   [x] configure property mangling like in Immer. Will it save anything?
--   [ ] code mod
+-   [x] code mod
     -   [x] code mod, run on v4 tests?
     -   [x] codemod TS
     -   [x] codemod babel
@@ -24,7 +24,7 @@
     -   [c] migrate `@inject` calls
     -   [x] unit tests for `ignoreImports`
     -   [x] unit tests for `keepDecorators`
-    -   [ ] put in separate package
+    -   [x] put in separate package
 -   [ ] ES5 support
     -   [x] combine with ES5?
     -   [x] backport tests and code to v4(6)

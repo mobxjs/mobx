@@ -1,0 +1,67 @@
+{
+  "name": "mobx-undecorate",
+  "version": "0.0.1",
+  "description": "Migrate MobX 4/5 to MobX 6",
+  "bin": "cli.js",
+  "scripts": {
+    "test": "../../node_modules/.bin/jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mobxjs/mobx.git"
+  },
+  "author": "Michel Weststrate",
+  "license": "MIT",
+  "funding": {
+    "type": "opencollective",
+    "url": "https://opencollective.com/mobx"
+  },
+  "bugs": {
+    "url": "https://github.com/mobxjs/mobx/issues"
+  },
+  "files": [
+    "cli.js",
+    "src",
+    "LICENSE",
+    "README.md"
+  ],
+  "homepage": "https://mobx.js.org/",
+  "dependencies": {
+    "@babel/core": "^7.9.0",
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
+    "@babel/plugin-proposal-decorators": "^7.8.3",
+    "@babel/plugin-transform-runtime": "^7.9.0",
+    "@babel/preset-env": "^7.9.5",
+    "@babel/preset-typescript": "^7.9.0",
+    "@babel/runtime": "^7.9.2",
+    "@types/jest": "^25.2.1",
+    "@types/jscodeshift": "^0.7.0",
+    "@types/node": "^11.15.12",
+    "dedent-js": "^1.0.1",
+    "jscodeshift": "^0.7.0"
+  },
+  "keywords": [
+    "mobx"
+  ],
+  "jest": {
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest",
+      "^.+\\.jsx?$": "babel-jest"
+    },
+    "testRegex": "__tests__/.*\\.(t|j)sx?$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json"
+    ],
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/\\./"
+    ],
+    "watchPathIgnorePatterns": [
+      "<rootDir>/node_modules/"
+    ]
+  }
+}

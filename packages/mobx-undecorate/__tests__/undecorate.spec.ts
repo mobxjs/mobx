@@ -1,6 +1,6 @@
 import { applyTransform } from "jscodeshift/dist/testUtils"
 const dedent = require("dedent-js")
-import * as u from "./undecorate"
+import * as u from "../src/undecorate"
 
 function convert(
     source: string,
