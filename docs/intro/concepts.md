@@ -156,6 +156,7 @@ Custom reactions can simply be created using the [`autorun`](../refguide/autorun
 For example the following `autorun` prints a log message each time the amount of `unfinishedTodoCount` changes:
 
 ```javascript
+/* a function that observes the state */
 autorun(() => {
     console.log("Tasks left: " + todos.unfinishedTodoCount)
 })

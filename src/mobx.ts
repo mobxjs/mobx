@@ -43,7 +43,6 @@ export {
     IListenable,
     IObjectWillChange,
     IObjectDidChange,
-    IObservableObject,
     isObservableObject,
     IValueDidChange,
     IValueWillChange,

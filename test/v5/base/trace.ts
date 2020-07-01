@@ -8,7 +8,7 @@ test("trace", () => {
     const baselog = console.log
     try {
         const lines: any[] = []
-        console.log = function() {
+        console.log = function () {
             lines.push(arguments)
         }
 

@@ -16,7 +16,6 @@ import {
     die,
     getDescriptor
 } from "../internal"
-import { addHiddenProp } from "../utils/utils"
 
 // we don't use globalState for these in order to avoid possible issues with multiple
 // mobx versions

@@ -4,7 +4,6 @@ import {
     IObservableArray,
     IObservableMapInitialValues,
     IObservableSetInitialValues,
-    IObservableObject,
     IObservableValue,
     ObservableMap,
     ObservableSet,
@@ -129,7 +128,7 @@ export interface IObservableFactory extends Annotation, PropertyDecorator {
         value: T,
         decorators?: AnnotationsMap<T, never>,
         options?: CreateObservableOptions
-    ): T & IObservableObject
+    ): T
 
     box<T = any>(value?: T, options?: CreateObservableOptions): IObservableValue<T>
     array<T = any>(initialValues?: T[], options?: CreateObservableOptions): IObservableArray<T>
@@ -145,7 +144,7 @@ export interface IObservableFactory extends Annotation, PropertyDecorator {
         props: T,
         decorators?: AnnotationsMap<T, never>,
         options?: CreateObservableOptions
-    ): T & IObservableObject
+    ): T
 
     /**
      * Decorator that creates an observable that only observes the references, but doesn't try to turn the assigned value into an observable.ts.
@@ -188,7 +187,7 @@ const observableFactories: IObservableFactory = {
         props: T,
         decorators?: AnnotationsMap<T, never>,
         options?: CreateObservableOptions
-    ): T & IObservableObject {
+    ): T {
         const o = asCreateObservableOptions(options)
         const base = {}
         asObservableObject(base, options?.name, getEnhancerFromOption(o))

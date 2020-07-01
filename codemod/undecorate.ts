@@ -200,7 +200,7 @@ export default function tranform(
     }
 
     function handleProperty(
-        property: ClassProperty /* | or ClassMethod */ & { decorators: Decorator[] },
+        property: ClassProperty & /* | or ClassMethod */ { decorators: Decorator[] },
         effects: {
             membersMap: [[any, any, boolean]]
         },

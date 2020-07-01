@@ -1,15 +1,15 @@
 const m = require("../../../src/mobx.ts")
 
-test("cascading active state (form 1)", function() {
-    const Store = function() {
+test("cascading active state (form 1)", function () {
+    const Store = function () {
         m.extendObservable(this, { _activeItem: null })
     }
-    Store.prototype.activeItem = function(item) {
+    Store.prototype.activeItem = function (item) {
         const _this = this
 
         if (arguments.length === 0) return this._activeItem
 
-        m.transaction(function() {
+        m.transaction(function () {
             if (_this._activeItem === item) return
             if (_this._activeItem) _this._activeItem.isActive = false
             _this._activeItem = item
@@ -17,7 +17,7 @@ test("cascading active state (form 1)", function() {
         })
     }
 
-    const Item = function() {
+    const Item = function () {
         m.extendObservable(this, { isActive: false })
     }
 
@@ -44,12 +44,12 @@ test("cascading active state (form 1)", function() {
     expect(item2.isActive).toBe(false)
 })
 
-test("cascading active state (form 2)", function() {
-    const Store = function() {
+test("cascading active state (form 2)", function () {
+    const Store = function () {
         const _this = this
         m.extendObservable(this, { activeItem: null })
 
-        m.autorun(function() {
+        m.autorun(function () {
             if (_this._activeItem === _this.activeItem) return
             if (_this._activeItem) _this._activeItem.isActive = false
             _this._activeItem = _this.activeItem
@@ -57,7 +57,7 @@ test("cascading active state (form 2)", function() {
         })
     }
 
-    const Item = function() {
+    const Item = function () {
         m.extendObservable(this, { isActive: false })
     }
 
@@ -84,27 +84,27 @@ test("cascading active state (form 2)", function() {
     expect(item2.isActive).toBe(false)
 })
 
-test("emulate rendering", function() {
+test("emulate rendering", function () {
     let renderCount = 0
 
-    const Component = function(props) {
+    const Component = function (props) {
         this.props = props
     }
-    Component.prototype.destroy = function() {
+    Component.prototype.destroy = function () {
         if (this.handler) {
             this.handler()
             this.handler = null
         }
     }
 
-    Component.prototype.render = function() {
+    Component.prototype.render = function () {
         const _this = this
 
         if (this.handler) {
             this.handler()
             this.handler = null
         }
-        this.handler = m.autorun(function() {
+        this.handler = m.autorun(function () {
             if (!_this.props.data.title) _this.props.data.title = "HELLO"
             renderCount++
         })
@@ -135,7 +135,7 @@ test("emulate rendering", function() {
     expect(renderCount).toBe(5)
 })
 
-test("efficient selection", function() {
+test("efficient selection", function () {
     function Item(value) {
         m.extendObservable(this, {
             selected: false,
@@ -161,14 +161,14 @@ test("efficient selection", function() {
 
     expect(store.selection).toBe(null)
     expect(
-        store.items.filter(function(i) {
+        store.items.filter(function (i) {
             return i.selected
         }).length
     ).toBe(0)
 
     store.selection = store.items[1]
     expect(
-        store.items.filter(function(i) {
+        store.items.filter(function (i) {
             return i.selected
         }).length
     ).toBe(1)
@@ -177,7 +177,7 @@ test("efficient selection", function() {
 
     store.selection = store.items[2]
     expect(
-        store.items.filter(function(i) {
+        store.items.filter(function (i) {
             return i.selected
         }).length
     ).toBe(1)
@@ -186,7 +186,7 @@ test("efficient selection", function() {
 
     store.selection = null
     expect(
-        store.items.filter(function(i) {
+        store.items.filter(function (i) {
             return i.selected
         }).length
     ).toBe(0)

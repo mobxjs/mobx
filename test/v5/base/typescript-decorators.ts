@@ -7,7 +7,6 @@ import {
     autorun,
     extendObservable,
     action,
-    IObservableObject,
     IObservableArray,
     IArrayChange,
     IArraySplice,

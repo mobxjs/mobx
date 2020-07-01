@@ -23,6 +23,7 @@
     -   [ ] migrate `@observer` calls
     -   [ ] unit tests for `ignoreImports`
     -   [ ] unit tests for `keepDecorators`
+    -   [ ] put in separate package
 -   [ ] ES5 support
     -   [x] combine with ES5?
     -   [x] backport tests and code to v4(6)
@@ -43,14 +44,14 @@
     -   [x] verify: action called from computed throws?
     -   [ ] apply deprecation of find and findIndex error
     -   [ ] verify perf / memory changes
-    -   [ ] investigate skipped tests
+    -   [x] investigate skipped tests
     -   [ ] process TODO's
     -   [ ] weakmap for hasMaps in Map (and Set?)
     -   [ ] add a solution for keepAlive computeds like https://github.com/mobxjs/mobx/issues/2309#issuecomment-598707584
     -   [ ] update useLocalStore in mobx-react-lite to use autoMakeObservable
     -   [ ] include #2343
     -   [ ] default observable requires reaction?
-    -   [ ] kill globalstate options?
+    -   [x] kill globalstate options?
     -   [ ] no auto lifting? https://twitter.com/getify/status/1258137826241241088
     -   [ ] flow types
     -   [ ] Would be awesome, but no idea how to go about that :) We could maybe at random places (e.g in observableValue) check in DEV mode if a value is a class instance with decorators, but with undecorated members. Might be a bit of a performance bummer though.

@@ -7,7 +7,6 @@ import {
     autorun,
     extendObservable,
     action,
-    IObservableObject,
     IObservableArray,
     IArrayChange,
     IArraySplice,
@@ -1222,13 +1221,6 @@ test("computed getter / setter for plan objects should succeed (typescript)", ()
     t.deepEqual(values, [6, 8])
 })
 
-test("484 - observable objects are IObservableObject", () => {
-    const needs_observable_object = (o: IObservableObject): any => null
-    const o = observable({ stuff: "things" })
-
-    needs_observable_object(o)
-})
-
 test("484 - observable objects are still type T", () => {
     const o = observable({ stuff: "things" })
     o.stuff = "new things"
@@ -1240,17 +1232,6 @@ test("484 - isObservableObject type guard includes type T", () => {
         o.stuff = "new things"
     } else {
         throw "failure"
-    }
-})
-
-test("484 - isObservableObject type guard includes type IObservableObject", () => {
-    const requires_observable_object = (o: IObservableObject): void => {}
-    const o = observable({ stuff: "things" })
-
-    if (isObservableObject(o)) {
-        requires_observable_object(o)
-    } else {
-        throw "object should have been IObservableObject"
     }
 })
 
