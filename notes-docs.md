@@ -21,28 +21,29 @@ https://deploy-preview-2382--mobx-docs.netlify.app/
 
 ## Questions
 
--   "The props object and the state object of an observer component are automatically
-    made observable to make it easier to create @computed properties that derive from props inside such a component." - Does the props bit still apply to function
-    component. Though computed doesn't apply anyhow, unless `useLocalStore` is in
-    use.
+-   "The props object and the state object of an observer component are automatically made observable to make it easier to create @computed properties that derive from props inside such a component." Does the props bit still apply to function component. Though computed doesn't apply anyhow, unless `useLocalStore` is in use.
 
-*   How to name "compatible property tracking" as opposed to proxy-based?
-    How does one configure it, or it is an automatic fallback?
+-   How to name "compatible property tracking" as opposed to proxy-based? How does one configure it, or it is an automatic fallback?
 
-*   What to do about translations? They will be out of date.
+-   What to do about translations? They will be out of date.
 
-*   Is there a way to regenerate assets? flow.png for instance uses
-    decorators and needs to be updated.
+-   Is there a way to regenerate assets? flow.png for instance uses decorators and needs to be updated.
 
-*   When we introduce actions we need a link to an actions section that describes
-    how to turn off strict state reinforcing.
+-   When we introduce actions we need a link to an actions section that describes how to turn off strict state reinforcing.
 
-*   How do we document `extendObservable` in the face of the existence of `makeObservable`?
+-   How do we document `extendObservable` in the face of the existence of `makeObservable`?
 
-*   Should peek() be brought back on arrays for non-decorator support? I have assumed
-    it is still gone in the docs.
+-   Should peek() be brought back on arrays for non-decorator support? I have assumed it is still gone in the docs.
 
-*   The async action document instead of offering "one way to do it" offers many different ways to do it. This may be unavoidable, but perhaps there is a way to at least focus this document. runInAction in particular seems like a pattern that doesn't add that much compared to just extracting actions as methods, especially in combination with makeAutoObservable.
+-   The async action document instead of offering "one way to do it" offers many different ways to do it. This may be unavoidable, but perhaps there is a way to at least focus this document. runInAction in particular seems like a pattern that doesn't add that much compared to just extracting actions as methods, especially in combination with makeAutoObservable.
+
+-   Should this `computedRequiresAction` be the default? Or not have it at all?
+
+-   Can you configure `computed` with options when used with `makeObservable`? I assume yes.
+
+-   I am unclear about the order of `makeObservable` / `makeAutoObservable` in the constructor. Does it matter? Is there a good convention? What happens if you don't set a prop and then already talk about it in `makeObservable`? What about `makeAutoObservable`?
+
+-   Does 'makeAutoObservable' work with computedFn? Should we be able to declare this explicitly with `makeObservable`?
 
 ## Todo
 
@@ -56,6 +57,7 @@ https://deploy-preview-2382--mobx-docs.netlify.app/
 -   [ ] makeAutoObservable is handy, but you probably shouldn't use it on a React component to make local state observable. We should say that somewhere.
 -   [ ] mweststrate: Only sponsors are needed. For backers / sponsors and sponsoring in general I think we should add an entry in the top menu bar
 -   [ ] What to do about the egghead lessons? They use the decorator syntax and may not enforce actions by default. -> consolidate into a single page and explain the decorator story and action on it.
+-   [ ] Consider breaking up computed.md into a basic and "advanced" document.
 
 ## Fragments
 

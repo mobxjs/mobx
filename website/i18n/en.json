@@ -97,8 +97,8 @@
         "sidebar_label": "boxed values"
       },
       "refguide/computed": {
-        "title": "(@)computed",
-        "sidebar_label": "(@)computed"
+        "title": "computed",
+        "sidebar_label": "computed"
       },
       "refguide/create-transformer": {
         "title": "createTransformer",

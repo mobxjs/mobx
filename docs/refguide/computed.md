@@ -1,75 +1,48 @@
 ---
-title: (@)computed
-sidebar_label: (@)computed
+title: computed
+sidebar_label: computed
 hide_title: true
 ---
 
-# (@)computed
-
-<div id='codefund'></div><div class="re_2020"><a class="re_2020_link" href="https://www.react-europe.org/#slot-2149-workshop-typescript-for-react-and-graphql-devs-with-michel-weststrate" target="_blank" rel="sponsored noopener"><div><div class="re_2020_ad" >Ad</div></div><img src="/img/reacteurope.svg"><span>Join the author of MobX at <b>ReactEurope</b> to learn how to use <span class="link">TypeScript with React</span></span></a></div>
-
-<details>
-    <summary style="color: white; background:green;padding:5px;margin:5px;border-radius:2px">egghead.io lesson 3: computed values</summary>
-    <br>
-    <div style="padding:5px;">
-        <iframe style="border: none;" width=760 height=427  src="https://egghead.io/lessons/javascript-derive-computed-values-and-manage-side-effects-with-mobx-reactions/embed" ></iframe>
-    </div>
-    <a style="font-style:italic;padding:5px;margin:5px;"  href="https://egghead.io/lessons/javascript-derive-computed-values-and-manage-side-effects-with-mobx-reactions">Hosted on egghead.io</a>
-</details>
+# computed
 
 Computed values are values that can be derived from the existing state or other computed values.
 Conceptually, they are very similar to formulas in spreadsheets.
 Computed values can't be underestimated, as they help you to make your actual modifiable state as small as possible.
 Besides that they are highly optimized, so use them wherever possible.
 
-Don't confuse `computed` with `autorun`. They are both reactively invoked expressions,
-but use `@computed` if you want to reactively produce a _value_ that can be used by other observers and
-`autorun` if you don't want to produce a new value but rather want to achieve an _effect_.
-For example imperative side effects like logging, making network requests etc.
-
 Computed values are automatically derived from your state if any value that affects them changes.
-Computed values can be optimized away in many cases by MobX as they are assumed to be pure.
-For example, a computed property won't re-run if none of the data used in the previous computation changed.
-Nor will a computed property re-run if is not in use by some other computed property or reaction.
-In such cases it will be suspended.
+MobX can optimize the calculation of computed values away in many cases because
+this calculation is assumed to be pure.
+For example, a computed property won't re-run if no observable data used in the previous computation changed.
+Nor will a computed property re-run if is not in use by some other computed property or a reaction. In such cases it is suspended.
 
-This automatic suspension is very convenient. If a computed value is no longer observed, for example the UI in which it was used no longer exists, MobX can automatically garbage collect it. This differs from `autorun`'s values where you must dispose of them yourself.
-It sometimes confuses people new to MobX, that if you create a computed property but don't use it anywhere in a reaction, it will not cache its value and recompute more often than seems necessary.
-However, in real life situations this is by far the best default, and you can always forcefully keep a computed value awake if you need to, by using either [`observe`](observe.md) or [`keepAlive`](https://github.com/mobxjs/mobx-utils#keepalive).
+If a computed value is no longer observed, for example because the UI in which it was used no longer exists, MobX automatically garbage collects it.
 
-Note that `computed` properties are not enumerable. Nor can they be overwritten in an inheritance chain.
+To create a `computed` property, you need to use a JavaScript [getters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get). `computed`
+properties cannot use arguments (though see [computed with arguments](computed.md#computed-with-arguments)).
 
-## `@computed`
+Note that `computed` properties are not [enumerable](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Enumerability_and_ownership_of_properties). Nor can they be overwritten in an inheritance chain.
 
-If you have [decorators enabled](../best/decorators.md) you can use the `@computed` decorator on any getter of a class property to declaratively create computed properties.
+Don't confuse `computed` with [`autorun`](autorun.md). They are both reactively invoked expressions, but use `computed` if you want to reactively produce a _value_ that can be used by other observers and `autorun` if you don't want to produce a new value but rather want to achieve an _effect_. For example imperative side effects like logging, making network requests etc.
 
-```javascript
-import { observable, computed } from "mobx"
+## Declaring a getter as `computed`
 
-class OrderLine {
-    @observable price = 0
-    @observable amount = 1
-
-    constructor(price) {
-        this.price = price
-    }
-
-    @computed get total() {
-        return this.price * this.amount
-    }
-}
-```
-
-Otherwise, use `decorate` to introduce them:
+You can use `makeObservable` to declare a getter as computed:
 
 ```javascript
-import { decorate, observable, computed } from "mobx"
+import { makeObservable, observable, computed } from "mobx"
 
 class OrderLine {
     price = 0
     amount = 1
 
     constructor(price) {
+        makeObservable(this, {
+            price: observable,
+            amount: observable,
+            total: computed
+        })
         this.price = price
     }
 
@@ -77,14 +50,30 @@ class OrderLine {
         return this.price * this.amount
     }
 }
-decorate(OrderLine, {
-    price: observable,
-    amount: observable,
-    total: computed
-})
 ```
 
-Both `observable.object` and `extendObservable` will automatically infer getter properties to be computed properties, so the following suffices:
+If you use `makeAutoObservable`, all getters are automatically declared
+computed:
+
+```javascript
+import { makeAutoObservable } from "mobx"
+
+class OrderLine {
+    price = 0
+    amount = 1
+
+    constructor(price) {
+        makeAutoObservable(this)
+        this.price = price
+    }
+
+    get total() {
+        return this.price * this.amount
+    }
+}
+```
+
+Both `observable.object` and `extendObservable` will automatically infer getter properties to be computed properties as well, so the following suffices:
 
 ```javascript
 const orderLine = observable.object({
@@ -95,113 +84,21 @@ const orderLine = observable.object({
     }
 })
 ```
-
-## Computed values are not getters
-
-The previous computed examples in the `OrderLine` class use the `get` keyword however, they generally should not be accessed directly as a getter. This can be a source of confusion to users new to Mobx from other derived cascading data layers like Reselect. The following code demonsrates the issue.
-
-```
-const Ol = new OrderLine(2.00)
-
-// don't do this.
-// avoid accessing Ol.total directly
-// it will recompute everytime.
-setInterval(() => {
-  console.log(Ol.total);
-}, 60);
-```
-
-As long as a computed value is not used by a reaction, it is not memoized and so it executes everytime it is accessed just like a normal eager evaluating function. This can cause performance degredation if a computed value is read high in a frequency loop like `requestAnimationFrame`. MobX can be configured to report an error when computeds are being access directly by using the `computedRequiresReaction` option
-
-```javascript
-configure({
-    computedRequiresReaction: true
-})
-```
-
-Though this restriction is confusing and contradictory Computeds can be altered to work in a direct access manner with some of the following methods...
-
-### Computed memoization with reactions
-
-A computed value should always be read by a reaction. Reading a computed value directly will cause it to recompute which can be expensive, depending on the how complex the derived result is. The following code uses the previous `OrderLine` class example and memoizes the `total` value so that it can be read directly.
-
-```javascript
-class OrderLine {
-    @observable price = 0
-    @observable amount = 1
-
-    constructor(price) {
-        this.price = price
-        // When computed total changes
-        // cache value to this.total
-        autorun(() => {
-            this.total = this.computedTotal
-        })
-    }
-
-    @computed get computedTotal() {
-        return this.price * this.amount
-    }
-}
-
-const Ol = new OrderLine(2.0)
-
-// this is now ok
-// because total will be cached from computeTotal
-// when its dependencies are updated
-setInterval(() => {
-    console.log(Ol.total)
-}, 60)
-```
-
-### Computed KeepAlive
-
-A computed may be initalized with the `keepAlive` flag. `keepAlive` will cause the computed to act as though it is observed by a reaction. This is a convience method and `keepAlive` does the same as the autorun in example above, but it does it a lot more efficient (it can for example keep the computed alive, but defer computation until somebody actually reads the value, something the autorun can't do).
-
-```javascript
-class OrderLine {
-    @observable price = 0
-    @observable amount = 1
-
-    constructor(price) {
-        this.price = price
-    }
-
-    @computed({ keepAlive: true })
-    get total() {
-        return this.price * this.amount
-    }
-}
-```
-
-### Autorun vs keepAlive
-
-The only case where autorun would be more beneficial than a `keepAlive` computed, is during a manual managment case in which you call the returned disposer to nicely clean up the computed value if it is no longer used typically you would do that in a destructor of a class for example.
 
 ## Setters for computed values
 
-It is possible to define a setter for computed values as well. Note that these setters cannot be used to alter the value of the computed property directly,
+It is possible to define a [setter](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/set) for computed values as well. Note that these setters cannot be used to alter the value of the computed property directly,
 but they can be used as 'inverse' of the derivation. For example:
 
 ```javascript
-const orderLine = observable.object({
-    price: 0,
-    amount: 1,
-    get total() {
-        return this.price * this.amount
-    },
-    set total(total) {
-        this.price = total / this.amount // infer price from total
-    }
-})
-```
-
-And similarly
-
-```javascript
 class Foo {
-    @observable length = 2
-    @computed get squared() {
+    length = 2
+
+    constructor() {
+        makeAutoObservable(this)
+    }
+
+    get squared() {
         return this.length * this.length
     }
     set squared(value) {
@@ -213,10 +110,164 @@ class Foo {
 
 _Note: always define the setter *after* the getter, some TypeScript versions are known to declare two properties with the same name otherwise._
 
+## Options for `computed`
+
+You can pass an `options` argument to `computed`:
+
+-   `name`: String, the debug name used in spy and the MobX devtools
+-   `context`: The `this` that should be used in the provided expression
+-   `set`: The setter function to be used. Without setter it is not possible to assign new values to a computed value. If the options argument passed to `computed` is a function, this is assumed to be a setter.
+-   `equals`: By default `comparer.default`. This acts as a comparison function for comparing the previous value with the next value. If this function considers the previous and next values to be equal, then observers will not be re-evaluated. This is useful when working with structural data, and types from other libraries. For example, a computed [moment](https://momentjs.com/) instance could use `(a, b) => a.isSame(b)`. `comparer.structural` and `comparer.shallow` come in handy if you want to use structural/shallow comparison to determine whether the new value is different from the previous value (and as a result notify observers).
+-   `requiresReaction`: It is recommended to set this one to `true` on very expensive computed values. If you try to read its value, but the value is not being tracked by some observer (in which case MobX won't cache the value), it causes the computed to throw, instead of doing an expensive re-evalution.
+-   `keepAlive`: don't suspend this computed value if it is not observed by anybody. _Be aware, this can lead to memory leaks as it will result in every observable used by this computed value to keep the computed value in memory!_
+
+A shortcut to declare a computed for structural comparison is to use `computed.struct`.
+
+### Built-in comparers
+
+MobX provides four built-in `comparer`s which should cover most needs:
+
+-   `comparer.identity`: Uses the identity (`===`) operator to determine if two values are the same.
+-   `comparer.default`: The same as `comparer.identity`, but also considers `NaN` to be equal to `NaN`.
+-   `comparer.structural`: Performs deep structural comparison to determine if two values are the same.
+-   `comparer.shallow`: Performs shallow structural comparison to determine if two values are the same.
+
+## Error handling
+
+If a computed value throws an exception during its computation, this exception is caught and rethrown each time its value is read. This is what you would expect.
+
+It is strongly recommended to always throw `Error`'s, so that the original stack trace is preserved. E.g.: `throw new Error("Uhoh")` instead of `throw "Uhoh"`.
+Throwing exceptions doesn't break tracking, so it is possible for computed values to recover from exceptions.
+
+Example:
+
+```javascript
+class Divider {
+    constructor(x, y) {
+        this.x = x
+        this.y = y
+        makeAutoObservable(this)
+    }
+
+    recover() {
+        this.y = 1
+    }
+
+    divideByZero() {
+        this.y = 0
+    }
+
+    get divided() {
+        if (this.x === 0) {
+            throw new Error("Division by zero")
+        }
+        return x / y
+    }
+}
+
+const divider = new Divider(3, 1)
+
+divider.divided // returns 3
+
+// trigger action that causes divided to throw
+divider.divideByZero()
+
+divider.divided // Throws: Division by zero
+divider.divided // Throws: Division by zero
+
+// trigger action that makes error go away
+divider.recover()
+
+divided.divided // Recovered; Returns 1.5
+```
+
+## Computed with arguments
+
+Sometimes you might want to have a computed value that takes one or more arguments.
+In such cases mobx-util's [`computedFn`](https://github.com/mobxjs/mobx-utils#computedfn) can be used:
+
+```javascript
+import { observable } from "mobx"
+import { computedFn } from "mobx-utils"
+
+class Todos {
+    todos = []
+
+    constructor() {
+        makeAutoObservable(this)
+    }
+
+    getAllTodosByUser = computedFn(function getAllTodosByUser(userId) {
+        return this.todos.filter(todo => todo.user === userId)
+    })
+}
+```
+
+Note: don't use arrow functions as the `this` would be incorrect.
+
+For further details, check the mobx-utils [docs](https://github.com/mobxjs/mobx-utils#computedfn)
+
+## Accessing computed values outside of reactions
+
+The optimization of `computed` only works if it is observed by some type of reaction, such as [`autorun`](autorun.md), the [`reaction` function](reaction.md) or a [React `observer` component](../react/react-integration.md)).
+
+Reading a computed value directly causes it to recompute which can be expensive, depending on the how complex the derived result is.
+
+It sometimes confuses people new to MobX (perhaps used to a library like [Reselect](https://github.com/reduxjs/reselect)) that if you create a computed property but don't use it anywhere in a reaction, it is not memoized and appears to be recomputed more often than necessary.
+
+It works this way because you expect computed properties to work outside of reactions, but MobX also avoids unnecessarily updating computed values that are not in use.
+
+The following code demonstrates the issue.
+
+```javascript
+const line = new OrderLine(2.0)
+
+// if you access line.total directly it recomputed every time
+// this is not ideal
+setInterval(() => {
+    console.log(line.total)
+}, 60)
+```
+
+This can cause performance degradation if a computed value is read in a high frequency loop like `requestAnimationFrame`.
+
+MobX can be configured to report an error when computeds are being access directly by using the `computedRequiresReaction` option
+
+```javascript
+configure({
+    computedRequiresReaction: true
+})
+```
+
+You can forcefully keep a computed value awake if you need to, by using [`keepAlive`](https://github.com/mobxjs/mobx-utils#keepalive) or by using [`observe`](observe.md).
+
+### Computed `keepAlive`
+
+A computed may be initalized with the `keepAlive` flag. `keepAlive` causes the computed to act as though it is observed by a reaction:
+
+```javascript
+class OrderLine {
+    price = 0
+    amount = 1
+
+    constructor(price) {
+        makeAutoObservable(this, { total: computed({ keepAlive: true }) })
+        this.price = price
+    }
+
+    @computed({ keepAlive: true })
+    get total() {
+        return this.price * this.amount
+    }
+}
+```
+
+_Be aware, this can lead to memory leaks as it will result in every observable used by this computed value to keep the computed value in memory!_
+
 ## `computed(expression)` as function
 
 `computed` can also be invoked directly as function.
-Just like `observable.box(primitive value)` creates a stand-alone observable.
+Just like [`observable.box`](boxed.md) creates a stand-alone observable.
 Use `.get()` on the returned object to get the current value of the computation, or `.observe(callback)` to observe its changes.
 This form of `computed` is not used very often, but in some cases where you need to pass a "boxed" computed value around it might prove useful.
 
@@ -234,80 +285,6 @@ name.set("Dave")
 // prints: 'DAVE'
 ```
 
-## Options for `computed`
-
-When using `computed` as modifier or as box, it accepts a second options argument with the following optional arguments:
-
--   `name`: String, the debug name used in spy and the MobX devtools
--   `context`: The `this` that should be used in the provided expression
--   `set`: The setter function to be used. Without setter it is not possible to assign new values to a computed value. If the second argument passed to `computed` is a function, this is assumed to be a setter.
--   `equals`: By default `comparer.default`. This acts as a comparison function for comparing the previous value with the next value. If this function considers the previous and next values to be equal, then observers will not be re-evaluated. This is useful when working with structural data, and types from other libraries. For example, a computed [moment](https://momentjs.com/) instance could use `(a, b) => a.isSame(b)`. `comparer.structural` and `comparer.shallow` come in handy if you want to use structural/shallow comparison to determine whether the new value is different from the previous value (and as a result notify observers).
--   `requiresReaction`: It is recommended to set this one to `true` on very expensive computed values. If you try to read it's value, but the value is not being tracked by some observer (in which case MobX won't cache the value), it will cause the computed to throw, instead of doing an expensive re-evalution.
--   `keepAlive`: don't suspend this computed value if it is not observed by anybody. _Be aware, this can easily lead to memory leaks as it will result in every observable used by this computed value, keeping the computed value in memory!_
-
-## `@computed.struct` for structural comparison
-
-The `@computed` decorator does not take arguments. If you want to to create a computed property which does structural comparison, use `@computed.struct`.
-
-## Built-in comparers
-
-MobX provides four built-in `comparer`s which should cover most needs:
-
--   `comparer.identity`: Uses the identity (`===`) operator to determine if two values are the same.
--   `comparer.default`: The same as `comparer.identity`, but also considers `NaN` to be equal to `NaN`.
--   `comparer.structural`: Performs deep structural comparison to determine if two values are the same.
--   `comparer.shallow`: Performs shallow structural comparison to determine if two values are the same.
-
 ## Computed values run more often than expected
 
 Please check the [`pitfalls`](https://mobx.js.org/best/pitfalls.html#computed-values-run-more-often-than-expected) section if you experience this.
-
-## Note on error handling
-
-If a computed value throws an exception during its computation, this exception will be caught and rethrown any time its value is read.
-It is strongly recommended to always throw `Error`'s, so that the original stack trace is preserved. E.g.: `throw new Error("Uhoh")` instead of `throw "Uhoh"`.
-Throwing exceptions doesn't break tracking, so it is possible for computed values to recover from exceptions.
-
-Example:
-
-```javascript
-const x = observable(3)
-const y = observable(1)
-const divided = computed(() => {
-    if (y.get() === 0) throw new Error("Division by zero")
-    return x.get() / y.get()
-})
-
-divided.get() // returns 3
-
-y.set(0) // OK
-divided.get() // Throws: Division by zero
-divided.get() // Throws: Division by zero
-
-y.set(2)
-divided.get() // Recovered; Returns 1.5
-```
-
-## Computeds with arguments
-
-Sometimes you might want to have a computed value that takes one or more arguments.
-In such cases mobx-util's [`computedFn`](https://github.com/mobxjs/mobx-utils#computedfn) can be used:
-
-```typescript
-// Parameterized computed views:
-// Create computed's and store them in a cache
-import { observable } from "mobx"
-import { computedFn } from "mobx-utils"
-
-class Todos {
-    @observable todos = []
-
-    getAllTodosByUser = computedFn(function getAllTodosByUser(userId) {
-        return this.todos.filter(todo => todo.user === userId)
-    })
-}
-```
-
-Note: don't use arrow functions as the `this` would be incorrect.
-
-For further details, check the mobx-utils [docs](https://github.com/mobxjs/mobx-utils#computedfn)
