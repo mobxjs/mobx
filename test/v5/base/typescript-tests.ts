@@ -7,7 +7,6 @@ import {
     autorun,
     extendObservable,
     action,
-    IObservableObject,
     IObservableArray,
     IArrayChange,
     IArraySplice,
@@ -36,7 +35,7 @@ observe(v, () => {})
 
 const a = observable([1, 2, 3])
 
-const testFunction = function (a: any) {}
+const testFunction = function(a: any) {}
 
 // lazy wrapper around yest
 
@@ -164,7 +163,7 @@ test("annotations", () => {
     t.deepEqual(order1totals, [6, 3, 9])
 
     t.equal(order1.aFunction, testFunction)
-    const x = function () {
+    const x = function() {
         return 3
     }
     order1.aFunction = x
@@ -189,7 +188,7 @@ test("scope", () => {
         y: number
     }
 
-    const Thing = function (this: any) {
+    const Thing = function(this: any) {
         extendObservable(this, {
             y: 3,
             // this will work here
@@ -236,7 +235,7 @@ test("box", () => {
         uninitialized: any
         height = 20
         sizes = [2]
-        someFunc = function () {
+        someFunc = function() {
             return 2
         }
 
@@ -1222,13 +1221,6 @@ test("computed getter / setter for plan objects should succeed (typescript)", ()
     t.deepEqual(values, [6, 8])
 })
 
-test("484 - observable objects are IObservableObject", () => {
-    const needs_observable_object = (o: IObservableObject): any => null
-    const o = observable({ stuff: "things" })
-
-    needs_observable_object(o)
-})
-
 test("484 - observable objects are still type T", () => {
     const o = observable({ stuff: "things" })
     o.stuff = "new things"
@@ -1240,17 +1232,6 @@ test("484 - isObservableObject type guard includes type T", () => {
         o.stuff = "new things"
     } else {
         throw "failure"
-    }
-})
-
-test("484 - isObservableObject type guard includes type IObservableObject", () => {
-    const requires_observable_object = (o: IObservableObject): void => {}
-    const o = observable({ stuff: "things" })
-
-    if (isObservableObject(o)) {
-        requires_observable_object(o)
-    } else {
-        throw "object should have been IObservableObject"
     }
 })
 
@@ -1414,7 +1395,7 @@ test("803 - action.bound and action preserve type info", () => {
         return { x: "3" } as Object
     }) as () => void
 
-    const bound2 = action(function () {}) as () => void
+    const bound2 = action(function() {}) as () => void
 })
 
 test("@computed.equals (TS)", () => {
@@ -1890,7 +1871,7 @@ test("flow support async generators", async () => {
         yield 3
     }
 
-    const start = mobx.flow(async function* () {
+    const start = mobx.flow(async function*() {
         let total = 0
         for await (const number of someNumbers()) {
             total += number
@@ -1915,7 +1896,7 @@ test("flow support throwing async generators", async () => {
         throw "OOPS"
     }
 
-    const start = mobx.flow(async function* () {
+    const start = mobx.flow(async function*() {
         let total = 0
         for await (const number of someNumbers()) {
             total += number
