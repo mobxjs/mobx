@@ -26,6 +26,8 @@ Questions:
 -   Should peek() be brought back on arrays for non-decorator support? I have assumed
     it is still gone in the docs.
 
+-   The async action document instead of offering "one way to do it" offers many different ways to do it. This may be unavoidable, but perhaps there is a way to at least focus this document. runInAction in particular seems like a pattern that doesn't add that much compared to just extracting actions as methods, especially in combination with makeAutoObservable.
+
 Todo
 
 -   [ ] Netlify preview for docs PR.
