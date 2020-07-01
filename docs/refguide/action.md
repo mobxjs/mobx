@@ -26,7 +26,7 @@ This ensures that intermediate or incomplete values produced during an action ar
 
 `action` also provides useful debugging information in combination with the devtools.
 
-[setters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/set) of [computed properties are automatically actions](computed-decorator.md).
+[setters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/set) of [computed properties are automatically actions](computed.md).
 
 ## When are functions and methods not actions?
 

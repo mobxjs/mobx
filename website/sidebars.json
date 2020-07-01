@@ -23,7 +23,7 @@
       "best/actions"
     ],
     "Reacting to observables": [
-      "refguide/computed-decorator",
+      "refguide/computed",
       "refguide/autorun",
       "refguide/when",
       "refguide/reaction",

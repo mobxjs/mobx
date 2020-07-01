@@ -52,7 +52,7 @@ person.setAge(21)
 Some things to keep in mind when making objects observable:
 
 -   Only plain objects will be made observable. For non-plain objects it is considered the responsibility of the constructor to initialize the observable properties using [`makeObservable` or `makeAutoObservable`](make-observable.md).
--   Property getters will be automatically turned into derived properties, just like declaring it [`computed`](computed-decorator) would do.
+-   Property getters will be automatically turned into derived properties, just like declaring it [`computed`](computed) would do.
 -   `observable` is applied recursively to a whole object graph automatically. Both on instantiation and to any new values that will be assigned to observable properties in the future. Observable will not recurse into non-plain objects.
 -   These defaults are fine in 95% of the cases, but for more fine-grained on how and which properties should be made observable, see the [modifiers](modifiers.md) section.
 -   Pass `{ deep: false }` as 3rd argument to disable the auto conversion of property values.

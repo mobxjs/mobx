@@ -15,7 +15,7 @@ In MobX there is a set of decorators that defines how observable properties will
 -   `observable.ref`: Disables automatic observable conversion, just creates an observable reference instead.
 -   `observable.shallow`: Can only used in combination with collections. Turns any assigned collection into an observable, but the values of that collection will be treated as-is.
 -   `observable.struct`: Like `ref`, but will ignore new values that are structurally equal to the current value
--   `computed`: Creates a derived property, see [`computed`](computed-decorator.md)
+-   `computed`: Creates a derived property, see [`computed`](computed.md)
 -   `computed(options)`: Idem, sets additional options.
 -   `computed.struct`: Same as `computed`, but will only notify any of it's observers when the value produced by the view is _structurally_ different from the previous value
 -   `action`: Creates an action, see [`action`](action.md)

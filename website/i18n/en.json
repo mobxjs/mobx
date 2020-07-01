@@ -96,7 +96,7 @@
         "title": "Boxed Values",
         "sidebar_label": "boxed values"
       },
-      "refguide/computed-decorator": {
+      "refguide/computed": {
         "title": "(@)computed",
         "sidebar_label": "(@)computed"
       },

@@ -244,7 +244,7 @@ There are various `options` that can be used to control the behavior of `compute
 -   **`set: (value) => void`** Override the setter for the computed property
 -   **`keepAlive: boolean`** Set to true to automatically keep computed values alive, rather then suspending then when there are no observers.
 
-[&laquo;details&raquo;](computed-decorator.md)
+[&laquo;details&raquo;](computed.md)
 
 ## Actions
 
