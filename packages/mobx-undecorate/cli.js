@@ -1,15 +1,11 @@
 #!/usr/bin/env node
-import { spawn } from "child_process"
+const { spawn } = require("child_process")
+const { resolve } = require("path")
 
 // this is pretty lame, probably better make a .cmd and .sh file...
 spawn(
-    "node_modules/.bin/codeshift",
-    [
-        "-t",
-        "src/undecorate.ts",
-        process.cwd(),
-        ...process.argv.filter(arg => arg.startsWith("--")).join(" ")
-    ],
+    "node_modules/.bin/jscodeshift",
+    [...process.argv.filter(arg => arg.startsWith("--")), "-t", "src/undecorate.ts", process.cwd()],
     {
         cwd: __dirname,
         stdio: "inherit"
