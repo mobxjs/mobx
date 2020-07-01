@@ -6,9 +6,10 @@ hide_title: true
 
 # Decorators in MobX
 
-MobX before version 6 encouraged the use of ES.next decorators to mark things as `observable`, `computed` and `action`. Decorators are not currently a ES standard however, and the process of standardization is taking a long time. In MobX6 in the interest of compatibility we have chosen to move away from them, and use `makeObservable()`/`makeAutoObservable()` instead.
+MobX before version 6 encouraged the use of ES.next decorators to mark things as `observable`, `computed` and `action`. Decorators are not currently a ES standard however, and the process of standardization is taking a long time. In the interest of compatibility we have chosen to move away from them in MobX 6, and recommend
+the use of [`makeObservable` / `makeAutoObservable`](../refguide/make-observable) instead.
 
-But many existing code bases that use MobX still use them, and a lot of the documentation material online uses them as well. You can still use them with MobX 6 too! So let's examine what they look like:
+But many existing code bases use decorators, and a lot of the documentation and tutorial material online uses them as well. You can still use them with MobX 6 too! So let's examine what they look like:
 
 ```javascript
 import { makeObservable, observable, computed, action } from "mobx"

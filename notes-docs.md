@@ -21,6 +21,11 @@ Questions:
 -   When we introduce actions we need a link to an actions section that describes
     how to turn off strict state reinforcing.
 
+-   How do we document `extendObservable` in the face of the existence of `makeObservable`?
+
+-   Should peek() be brought back on arrays for non-decorator support? I have assumed
+    it is still gone in the docs.
+
 Todo
 
 -   [ ] Netlify preview for docs PR.

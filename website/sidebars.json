@@ -14,7 +14,6 @@
     "Making things observable": [
       "refguide/make-observable",
       "refguide/observable",
-      "refguide/observable-decorator",
       "refguide/object",
       "refguide/array",
       "refguide/map"

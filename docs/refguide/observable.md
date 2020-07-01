@@ -10,6 +10,12 @@ Usage:
 
 -   `observable(value)`
 
+`observable` is a programmatic API to declare objects as observable directly.
+Often you do not invoke it directly but instead use it to declare properties
+observable using [`makeObservable` / `makeAutoObservable`](make-observable.md).
+
+## the rules of `observable`
+
 Observable values can be JS primitives, references, plain objects, class instances, arrays and maps.
 The following conversion rules are applied, but can be fine-tuned by using _modifiers_. See below.
 
@@ -23,9 +29,9 @@ These rules might seem complicated at first sight, but you will notice that in p
 Some notes:
 
 -   By default, making a data structure observable is _infective_; that means that `observable` is applied automatically to any value that is contained by the data structure, or will be contained by the data structure in the future. This behavior can be changed by using _modifiers_.
--   _[Environments without Proxy support]_ To create **dynamically keyed objects** use an [Observable Map](map.md)! Only initially existing properties on an object will be made observable, although new ones can be added using `extendObservable`.
+-   _[Environments without Proxy support]_ To create **dynamically keyed objects** use an [Observable Map](map.md)! Only initially existing properties on an object will be made observable, although new ones can be added using `extendObservable`. See also [limitations without proxies](../best/limitations-without-proxies.md).
 
-Some examples:
+Some examples of the programmatic API:
 
 ```javascript
 const map = observable.map({ key: "value" })
@@ -43,3 +49,5 @@ person.firstName = "C.S."
 const temperature = observable.box(20)
 temperature.set(25)
 ```
+
+For examples of the declarative use of `observable` with `makeObservable`, see [Concepts & Principles](../intro/concepts.md) and [`makeObservable` / `makeAutoObservable`](make-observable.md).

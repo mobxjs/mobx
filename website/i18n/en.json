@@ -121,8 +121,8 @@
         "sidebar_label": "Provider / inject"
       },
       "refguide/make-observable": {
-        "title": "makeObservable and makeAutoObservable",
-        "sidebar_label": "makeObservable and makeAutoObservable"
+        "title": "makeObservable / makeAutoObservable",
+        "sidebar_label": "makeObservable / makeAutoObservable"
       },
       "refguide/map": {
         "title": "Observable Maps",
@@ -143,10 +143,6 @@
       "refguide/object": {
         "title": "Observable Objects",
         "sidebar_label": "objects"
-      },
-      "refguide/observable-decorator": {
-        "title": "@observable",
-        "sidebar_label": "@observable"
       },
       "refguide/observable": {
         "title": "observable",

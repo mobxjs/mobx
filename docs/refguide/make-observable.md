@@ -1,10 +1,10 @@
 ---
-title: makeObservable and makeAutoObservable
-sidebar_label: makeObservable and makeAutoObservable
+title: makeObservable / makeAutoObservable
+sidebar_label: makeObservable / makeAutoObservable
 hide_title: true
 ---
 
-# makeObservable and makeAutoObservable
+# makeObservable / makeAutoObservable
 
 Usage:
 
@@ -44,7 +44,7 @@ Annotation keys are the names of properties and methods.
 
 Possible annotation values are:
 
--   `observable`: Used on a property to declare it observable by MobX. A property can be anything that MobX can track: primitive values, arrays, objects and `Map`. The property cannot be a getter or a setter.
+-   `observable`: Used on a property to declare it observable by MobX. A property can be anything that MobX can track: primitive values, arrays, objects and [Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map). The property cannot be a getter or a setter. See also the rules of [`observable`](observable.md).
 
 -   `computed`: Used on a [getter](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get) to declare it as a derived value from observable state. Should have no side effects and not modify state.
 
@@ -54,8 +54,9 @@ Possible annotation values are:
 
 -   `false`: Explicitly do not annotation this property. Normally only useful with `makeAutoObservable`.
 
-`makeAutoObservable` behaves much the same way, but infers all properties by default.
-You can still use `annotations` to override this behavior, in particular to use `false` to exclude a property or method from being automatically declared.
+## `makeAutoObservable`
+
+`makeAutoObservable` behaves much like `makeObservable`, but infers all properties by default. You can still use `annotations` to override this behavior, in particular to use `false` to exclude a property or method from being automatically declared.
 
 Here is the doubler with `makeAutoObservable`:
 
