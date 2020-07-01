@@ -177,8 +177,8 @@
       "Basics": "Basics",
       "MobX and React": "MobX and React",
       "Making things observable": "Making things observable",
-      "Reacting to observables": "Reacting to observables",
       "Updating observables": "Updating observables",
+      "Reacting to observables": "Reacting to observables",
       "Utilities": "Utilities",
       "Tips & Tricks": "Tips & Tricks"
     }

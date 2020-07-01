@@ -9,6 +9,7 @@ hide_title: true
 Usage:
 
 -   `observable(value)`
+-   `makeObservable(this, {someProperty: observable})`
 
 `observable` is a programmatic API to declare objects as observable directly.
 Often you do not invoke it directly but instead use it to declare properties

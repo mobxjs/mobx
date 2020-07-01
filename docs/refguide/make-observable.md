@@ -46,13 +46,15 @@ Possible annotation values are:
 
 -   `observable`: Used on a property to declare it observable by MobX. A property can be anything that MobX can track: primitive values, arrays, objects and [Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map). The property cannot be a getter or a setter. See also the rules of [`observable`](observable.md).
 
+-   `action`: Used on a method that modifies observable properties. See also [action](action.md).
+
+-   `action.bound`: Like action, but used to bind the method. See [action.bound](action.md#actionbound).
+
 -   `computed`: Used on a [getter](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get) to declare it as a derived value from observable state. Should have no side effects and not modify state.
 
--   `action`: Used on a method that modifies observable properties.
+*   `true`: Infer annotation: getters are `computed`, methods are `action`, any property is `observable`. Usually you would use `makeAutoObservable` to infer.
 
--   `true`: Infer annotation: getters are `computed`, methods are `action`, any property is `observable`. Usually you would use `makeAutoObservable` to infer.
-
--   `false`: Explicitly do not annotation this property. Normally only useful with `makeAutoObservable`.
+*   `false`: Explicitly do not annotate this property. Normally only useful with `makeAutoObservable`.
 
 ## `makeAutoObservable`
 
@@ -81,6 +83,8 @@ class Doubler {
 
 As you can see this is more compact.
 
+### Excluding properties that are not observable
+
 Here is how you can exclude a property from being observable:
 
 ```javascript
@@ -104,3 +108,31 @@ class Todo {
 `id` is not intended to be observable as it does not change after construction.
 We have therefore declared it as `false` in the `exclusions` argument of
 `makeAutoObservable`.
+
+### Excluding methods that are not actions
+
+By default, `makeAutoObservable` considers all methods to be actions. It's common for classes to have methods that are not actions, however, but compute derived information that cannot be getters as they take arguments.
+
+```javascript
+class Zoo {
+    constructor() {
+        this.makeAutoObservable(this, { filterByAnimalClass: false })
+    }
+
+    // this is an action
+    addAnimal(animal) {
+        // ...
+    }
+
+    // this is not an action
+    filterByAnimalClass(animalClass) {
+        // ...
+    }
+}
+```
+
+In this case, the method `filterByAnimalClass` cannot be identified as `computed` as it is not a getter. By default, `makeAutoObservable` would interpret it as an action. We therefore have to exclude it from consideration.
+
+### Bound actions
+
+If you want to automatically bind the action so you can use it as a callback, you can override the behavior of `makeAutoObservable` using [`action.bound`](action.md#actionbound). Alternatively you can define the methods as [arrow function](action.md#bound-arrow-functions).

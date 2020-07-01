@@ -18,17 +18,17 @@
       "refguide/array",
       "refguide/map"
     ],
+    "Updating observables": [
+      "refguide/action",
+      "best/actions",
+      "refguide/object-api"
+    ],
     "Reacting to observables": [
       "refguide/computed-decorator",
       "refguide/autorun",
       "refguide/when",
       "refguide/reaction",
       "best/react"
-    ],
-    "Updating observables": [
-      "refguide/action",
-      "best/actions",
-      "refguide/object-api"
     ],
     "Utilities": [
       "refguide/api",

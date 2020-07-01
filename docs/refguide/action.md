@@ -6,61 +6,58 @@ hide_title: true
 
 # action
 
-<details>
-    <summary style="color: white; background:green;padding:5px;margin:5px;border-radius:2px">egghead.io lesson 5: actions</summary>
-    <br>
-    <div style="padding:5px;">
-        <iframe style="border: none;" width=760 height=427  src="https://egghead.io/lessons/react-use-mobx-actions-to-change-and-guard-state/embed" ></iframe>
-    </div>
-    <a style="font-style:italic;padding:5px;margin:5px;"  href="https://egghead.io/lessons/react-use-mobx-actions-to-change-and-guard-state">Hosted on egghead.io</a>
-</details>
-
 Usage:
 
 -   `action(fn)`
 -   `action(name, fn)`
--   `@action classMethod() {}`
--   `@action(name) classMethod () {}`
--   `@action boundClassMethod = (args) => { body }`
--   `@action(name) boundClassMethod = (args) => { body }`
--   `@action.bound classMethod() {}`
+-   `action.bound(fn)`
+-   `makeObservable(this, {someProperty: action})`
+-   `makeObservable(this, {someProperty: action(name)})`
+-   `makeObservable(this, {someProperty: action.bound})`
 
-Any application has actions. Actions are anything that modify the state.
-With MobX you can make it explicit in your code where your actions live by marking them.
-Actions help you to structure your code better.
+Any application has actions. Actions is code that that modifies the state.
+MobX requires that you declare your actions, though [makeAutoObservable](make-observable.md) can automate much of this job. Actions help you to structure your code better and offer performance benefits.
 
-It takes a function and returns a function with the same signature, but wrapped with [`transaction`](api.md#transaction), [`untracked`](api.md#untracked), and [`allowStateChanges`](api.md#untracked).
+Actions are wrapped with with [`transaction`](api.md#transaction), [`untracked`](api.md#untracked), and [`allowStateChanges`](api.md#untracked).
+
 Especially the fact that [`transaction`](api.md#transaction) is applied automatically yields great performance benefits;
 actions will batch mutations and only notify computed values and reactions after the (outer most) action has finished.
-This makes sure intermediate or incomplete values produced during an action are not visible to the rest of the application until the action has finished.
+This ensures that intermediate or incomplete values produced during an action are not visible to the rest of the application until the action has finished.
 
-It is advised to use `(@)action` on any function that modifies observables or has side effects.
 `action` also provides useful debugging information in combination with the devtools.
 
-Using the `@action` decorator with setters (i.e. `@action set propertyName`) is not supported; however, setters of [computed properties are automatically actions](computed-decorator.md).
+[setters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/set) of [computed properties are automatically actions](computed-decorator.md).
 
-Note: using `action` is mandatory when MobX is configured to require actions to make state changes, see [`enforceActions`](api.md#enforceactions).
-
-## When to use actions?
+## When are functions and methods not actions?
 
 Actions should only, and always, be used on functions that _modify_ state.
 Functions that just perform look-ups, filters etc should _not_ be marked as actions; to allow MobX to track their invocations.
 
-["enforce actions"](api.md#enforceactions) enforces that all state modifications are done by an action. This is a useful best practice in larger, long term code bases.
+If you use `makeAutoObservable` you have to [exclude these methods explicitly from being marked as actions](make-observable.md#excluding-methods-that-are-not-actions).
 
-## Bound actions
+## Actions and async code
 
-The `action` decorator / function follows the normal rules for binding in javascript.
-However, `action.bound` can be used to automatically bind actions to the targeted object.
-Note that unlike `action`, `(@)action.bound` does not take a name parameter, so the name will always be based on the property name to which the action is bound.
+There are some special rules you have to take into account when you have actions that
+are asynchronous. See [Writing asynchronous actions](../best/actions.md).
+
+## action.bound
+
+The `action` function follows the normal rules for binding in JavaScript.
+However, `action.bound` can be used to automatically bind actions to the targeted object. This ensures that `this` points to the right object when you use
+the action as a callback later.
+
+Note that unlike `action`, `action.bound` does not take a name parameter, so the name will always be based on the property name to which the action is bound.
 
 Example:
 
 ```javascript
 class Ticker {
-    @observable tick = 0
+    tick = 0
 
-    @action.bound
+    constructor() {
+        makeObservable(this, { tick: observable, increment: action.bound })
+    }
+
     increment() {
         this.tick++ // 'this' will always be correct
     }
@@ -70,8 +67,29 @@ const ticker = new Ticker()
 setInterval(ticker.increment, 1000)
 ```
 
-_Note: don't use *action.bound* with arrow functions; arrow functions are already bound and cannot be rebound._
+## bound arrow functions
 
-## `runInAction(name?, thunk)`
+You cannot use _action.bound_ with arrow functions; arrow functions are already bound and cannot be rebound. Since arrow functions are already bound, using them is an alternative to `action.bound` in classes. They have the additional benefit that you can use them with `makeAutoObservable` without the need for explicit declaration:
 
-`runInAction` is a simple utility that takes an code block and executes in an (anonymous) action. This is useful to create and execute actions on the fly, for example inside an asynchronous process. `runInAction(f)` is sugar for `action(f)()`
+```javascript
+class Ticker {
+    tick = 0
+
+    constructor() {
+        makeAutoObservable(this)
+    }
+
+    // note declaration as an arrow function
+    increment = () => {
+        this.tick++ // 'this' will always be correct
+    }
+}
+
+const ticker = new Ticker()
+setInterval(ticker.increment, 1000)
+```
+
+## Disabling mandatory actions
+
+By default, MobX 6 and later require that you use actions to make state changes.
+You can however configure MobX to disable this behavior, see [`enforceActions`](api.md#enforceactions).
