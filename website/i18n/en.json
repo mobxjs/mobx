@@ -120,9 +120,9 @@
         "title": "provider_inject",
         "sidebar_label": "Provider / inject"
       },
-      "refguide/make-auto-observable": {
-        "title": "refguide/make-auto-observable",
-        "sidebar_label": "makeAutoObservable"
+      "refguide/make-observable": {
+        "title": "makeObservable and makeAutoObservable",
+        "sidebar_label": "makeObservable and makeAutoObservable"
       },
       "refguide/map": {
         "title": "Observable Maps",
