@@ -6,65 +6,128 @@ hide_title: true
 
 # Autorun
 
-<div id='codefund'></div><div class="re_2020"><a class="re_2020_link" href="https://www.react-europe.org/#slot-2149-workshop-typescript-for-react-and-graphql-devs-with-michel-weststrate" target="_blank" rel="sponsored noopener"><div><div class="re_2020_ad" >Ad</div></div><img src="/img/reacteurope.svg"><span>Join the author of MobX at <b>ReactEurope</b> to learn how to use <span class="link">TypeScript with React</span></span></a></div>
+You pass a function into `autorun` that should run each time anything it observes changes. It also runs once when you create the `autorun`. It only responds to changes in observable state -- so things you marked `observable` or `computed`. It won't
+respond if other observable state changes that it does not in any refer refer
+to in the function.
 
-<details>
-    <summary style="color: white; background:green;padding:5px;margin:5px;border-radius:2px">egghead.io lesson 9: custom reactions</summary>
-    <br>
-    <div style="padding:5px;">
-        <iframe style="border: none;" width=760 height=427  src="https://egghead.io/lessons/react-write-custom-mobx-reactions-with-when-and-autorun/embed" ></iframe>
-    </div>
-    <a style="font-style:italic;padding:5px;margin:5px;"  href="https://egghead.io/lessons/react-write-custom-mobx-reactions-with-when-and-autorun">Hosted on egghead.io</a>
-</details>
+Here's an example:
 
-`mobx.autorun` can be used in those cases where you want to create a reactive function that will never have observers itself.
-This is usually the case when you need to bridge from reactive to imperative code, for example for logging, persistence, or UI-updating code.
-When `autorun` is used, the provided function will always be triggered once immediately and then again each time one of its dependencies changes.
-In contrast, `computed(function)` creates functions that only re-evaluate if it has
-observers on its own, otherwise its value is considered to be irrelevant.
+```javascript
+import { makeAutoObservable, autorun } from "mobx"
+
+class Animal {
+    constructor(name) {
+        this.name = name
+        this.energyLevel = 100
+        makeAutoObservable(this)
+    }
+
+    reduceEnergy() {
+        this.energyLevel -= 10
+    }
+
+    get isHungry() {
+        return this.energyLevel < 50
+    }
+}
+
+const giraffe = new Animal("Gary")
+
+autorun(() => {
+    console.log("Energy level: ", giraffe.energyLevel)
+})
+
+autorun(() => {
+    if (giraffe.isHungry) {
+        console.log("Now I'm hungry!")
+    } else {
+        console.log("I'm not hungry!")
+    }
+})
+
+console.log("Now let's change state!")
+for (let i = 0; i < 10; i++) {
+    giraffe.reduceEnergy()
+}
+```
+
+When you run this code, you get the following output:
+
+```
+Energy level:  100
+I'm not hungry!
+Now let's change state!
+Energy level:  90
+Energy level:  80
+Energy level:  70
+Energy level:  60
+Energy level:  50
+Energy level:  40
+Now I'm hungry!
+Energy level:  30
+Energy level:  20
+Energy level:  10
+Energy level:  0
+```
+
+As you can see, both `autorun` functions run once when they are initialized --
+this is all you would see without the `for` loop. This accounts for the
+first two lines of the output.
+
+Once we run the `for` loop to change the `energyLevel` with the `reduceEnergy`
+action we see a new log entry each time an `autorun` function observes a
+change to its observable state:
+
+-   For the "Energy level" function this is each time the observable property `energyLevel` changes, so 10 times.
+
+-   For the "Now I'm hungry" function it's each time the `isHungry` computed
+    changes; so only once.
+
+## When to use `autorun`
+
+`autorun` is useful when you need to bridge from reactive to imperative code, for
+example for logging, persistence, or UI-updating code. It should not be used to update state that can be derived from other observables; use [`computed`](computed.md) for that.
+
+If you use React, it's like the [`observer` function](../react/react-integration.md); `autorun` only observes data that is used during the execution of the provided function.
+
+It can be used in those cases where you want to create a reactive function that will never have observers itself.
+
+In contrast, [`computed`](computed.md) creates a function that only re-evaluates if it it itself being observed, otherwise its value is considered to be irrelevant.
 As a rule of thumb: use `autorun` if you have a function that should run automatically but that doesn't result in a new value.
 Use `computed` for everything else. Autoruns are about initiating _effects_, not about producing new values.
+
+## Debug name
+
 If a string is passed as first argument to `autorun`, it will be used as debug name.
 
-The return value from autorun is a disposer function, which can be used to dispose of the autorun when you no longer need it. The reaction itself will also be passed as the only argument to the function given to autorun, which allows you to manipulate it from within the autorun function. This means there are two ways you can dispose of the reaction when you no longer need it:
+## Disposing autorun
+
+The return value from autorun is a disposer function, which can be used to dispose of the autorun when you no longer need it:
 
 ```javascript
 const disposer = autorun(reaction => {
     /* do some stuff */
 })
 disposer()
+```
 
-// or
+The reaction itself is also passed as the only argument to the function given to autorun, which allows you to manipulate it from within the autorun function. This
+gives you another way to dispose of the autorun:
 
+```javascript
 autorun(reaction => {
     /* do some stuff */
     reaction.dispose()
 })
 ```
 
-Just like the [`@observer` decorator/function](../react/react-integration.md), `autorun` will only observe data that is used during the execution of the provided function.
-
-```javascript
-var numbers = observable([1, 2, 3])
-var sum = computed(() => numbers.reduce((a, b) => a + b, 0))
-
-var disposer = autorun(() => console.log(sum.get()))
-// prints '6'
-numbers.push(4)
-// prints '10'
-
-disposer()
-numbers.push(5)
-// won't print anything, nor is `sum` re-evaluated
-```
-
 ## Options
 
-Autorun accepts as the second argument an options object with the following optional options:
+Autorun accepts an object as the last argument with the following optional options:
 
--   `delay`: Number in milliseconds that can be used to throttle the effect function. If zero (the default), no throttling will happen.
+-   `delay`: Number in milliseconds that can be used to throttle the effect function. If zero (the default), no throttling happens.
 -   `name`: String that is used as name for this reaction in for example [`spy`](spy.md) events.
--   `onError`: function that will handle the errors of this reaction, rather then propagating them.
+-   `onError`: function that will handle the errors of this reaction, rather than propagating them.
 -   `scheduler`: Set a custom scheduler to determine how re-running the autorun function should be scheduled. It takes a function that should be invoked at some point in the future, for example: `{ scheduler: run => { setTimeout(run, 1000) }}`
 
 ## The `delay` option
@@ -84,20 +147,29 @@ autorun(
 ## The `onError` option
 
 Exceptions thrown in autorun and all other types reactions are caught and logged to the console, but not propagated back to the original causing code.
-This is to make sure that a reaction in one exception does not prevent the scheduled execution of other, possibly unrelated, reactions.
-This also allows reactions to recover from exceptions; throwing an exception does not break the tracking done by MobX,
-so as subsequent run of a reaction might complete normally again if the cause for the exception is removed.
+This is to make sure that an exception in one reaction does not prevent the scheduled execution of other, possibly unrelated, reactions.
+This also allows reactions to recover from exceptions; throwing an exception does not break the tracking done by MobX, so as subsequent run of a reaction might complete normally again if the cause for the exception is removed.
 
-It is possible to override the default logging behavior of Reactions by providing the `onError` option
-Example:
+It is possible to override the default logging behavior of Reactions by providing the `onError` option. For example:
 
 ```javascript
-const age = observable.box(10)
+import { makeAutoObservable, autorun } from "mobx"
+
+class Person {
+    constructor(age) {
+        this.age = age
+        makeAutoObservable(this)
+    }
+}
+
+const person = new Person(10)
 
 const dispose = autorun(
     () => {
-        if (age.get() < 0) throw new Error("Age should not be negative")
-        console.log("Age", age.get())
+        if (person.age. < 0) {
+            throw new Error("Age should not be negative")
+        }
+        console.log("Age", person.age)
     },
     {
         onError(e) {
@@ -107,4 +179,4 @@ const dispose = autorun(
 )
 ```
 
-A global onError handler can be set as well, use `onReactionError(handler)`. This can be useful in tests or for client side error monitoring.
+A global `onError` handler can be set as well with `onReactionError(handler)`. This can be useful in tests or for client side error monitoring.
