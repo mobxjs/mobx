@@ -34,7 +34,7 @@ class Animal {
 const giraffe = new Animal("Gary")
 
 autorun(() => {
-    console.log("Energy level: ", giraffe.energyLevel)
+    console.log("Energy level:", giraffe.energyLevel)
 })
 
 autorun(() => {
@@ -54,20 +54,20 @@ for (let i = 0; i < 10; i++) {
 When you run this code, you get the following output:
 
 ```
-Energy level:  100
+Energy level: 100
 I'm not hungry!
 Now let's change state!
-Energy level:  90
-Energy level:  80
-Energy level:  70
-Energy level:  60
-Energy level:  50
-Energy level:  40
+Energy level: 90
+Energy level: 80
+Energy level: 70
+Energy level: 60
+Energy level: 50
+Energy level: 40
 Now I'm hungry!
-Energy level:  30
-Energy level:  20
-Energy level:  10
-Energy level:  0
+Energy level: 30
+Energy level: 20
+Energy level: 10
+Energy level: 0
 ```
 
 As you can see, both `autorun` functions run once when they are initialized --
@@ -82,6 +82,8 @@ change to its observable state:
 
 -   For the "Now I'm hungry" function it's each time the `isHungry` computed
     changes; so only once.
+
+Compare this with [reaction](reaction.md), which offers more fine-grained control over when the effect runs.
 
 ## When to use `autorun`
 
@@ -100,12 +102,12 @@ Use `computed` for everything else. Autoruns are about initiating _effects_, not
 
 If a string is passed as first argument to `autorun`, it will be used as debug name.
 
-## Disposing autorun
+## Disposing of autorun
 
 The return value from autorun is a disposer function, which can be used to dispose of the autorun when you no longer need it:
 
 ```javascript
-const disposer = autorun(reaction => {
+const disposer = autorun(() => {
     /* do some stuff */
 })
 disposer()

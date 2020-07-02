@@ -27,10 +27,10 @@
        "refguide/computed-options",
        "refguide/computed-behavior"
     ],
-    "Reacting to observables": [
+    "Effects for observables": [
       "refguide/autorun",
-      "refguide/when",
       "refguide/reaction",
+      "refguide/when",
       "best/react"
     ],
     "Utilities": [
