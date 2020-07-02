@@ -89,6 +89,8 @@ Here is a proposed structure:
 
     -   Optimizing React components
 
+    -   React pitfalls
+
     -   React class components
 
 -   Making things observable
@@ -123,13 +125,15 @@ Here is a proposed structure:
 
     -   reaction
 
-    -   Understanding what MobX reacts to
+-   Understanding MobX
+
+    -   What does MobX react to?
+
+    -   Common Pitfalls
 
 -   Debugging MobX
 
     -   toJS
-
-    -   Common Pitfalls
 
     -   Using trace for debugging
 
