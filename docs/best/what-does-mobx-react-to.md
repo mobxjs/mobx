@@ -6,18 +6,16 @@ hide_title: true
 
 # What does MobX react to?
 
-<div id='codefund'></div><div class="re_2020"><a class="re_2020_link" href="https://www.react-europe.org/#slot-2149-workshop-typescript-for-react-and-graphql-devs-with-michel-weststrate" target="_blank" rel="sponsored noopener"><div><div class="re_2020_ad" >Ad</div></div><img src="/img/reacteurope.svg"><span>Join the author of MobX at <b>ReactEurope</b> to learn how to use <span class="link">TypeScript with React</span></span></a></div>
-
 MobX usually reacts to exactly the things you expect it to.
 Which means that in 90% of your use cases mobx "just works".
-However, at some point you will encounter a case where it might not do what you expected.
+However, at some point you will encounter a case where it does not do what you expected.
 At that point it is invaluable to understand how MobX determines what to react to.
 
 > MobX reacts to any _existing_ **observable** _property_ that is read during the execution of a tracked function.
 
--   _"reading"_ is dereferencing an object's property, which can be done through "dotting into" it (eg. `user.name`) or using the bracket notation (eg. `user['name']`).
--   _"tracked functions"_ are the expression of `computed`, the `render()` method of an observer component, and the functions that are passed as the first param to `when`, `reaction` and `autorun`.
--   _"during"_ means that only those observables that are being read while the function is executing are tracked. It doesn't matter whether these values are used directly or indirectly by the tracked function.
+-   _"reading"_ is dereferencing an object's property, which can be done through "dotting into" it (eg. `user.name`) or using the bracket notation (eg. `user['name']`, `todos[3]`).
+-   _"tracked functions"_ are the expression of `computed`, the function of an observer React function component, the `render()` method of an observer React class component, and the functions that are passed as the first param to `autorun`, `reaction` and `when`.
+-   _"during"_ means that only those observables that are read while the function is executing are tracked. It doesn't matter whether these values are used directly or indirectly by the tracked function.
 
 In other words, MobX will not react to:
 
@@ -26,23 +24,30 @@ In other words, MobX will not react to:
 
 ## MobX tracks property access, not values
 
-To elaborate on the above rules with an example, suppose that you have the following observable data structure (`observable` applies itself recursively by default, so all fields in this example are observable):
+To elaborate on the above rules with an example, suppose that you have the following observable instance:
 
 ```javascript
-let message = observable({
-    title: "Foo",
-    author: {
-        name: "Michel"
-    },
-    likes: ["John", "Sara"]
-})
+class Message {
+    constructor(title, author, likes) {
+        this.title = title
+        this.author = author
+        this.likes = likes
+        makeAutoObservable(this)
+    }
+
+    updateTitle(title) {
+        this.title = title
+    }
+}
+
+let message = new Message("Foo", { name: "Michel" }, ["John", "Sara"])
 ```
 
 In memory that looks as follows. The green boxes indicate _observable_ properties. Note that the _values_ themselves are not observable!
 
 ![MobX reacts to changing references](../assets/observed-refs.png)
 
-Now what MobX basically does is recording which _arrows_ you use in your function. After that, it will re-run whenever one of these _arrows_ changes; when they start to refer to something else.
+What MobX basically does is recording which _arrows_ you use in your function. After that, it will re-run whenever one of these _arrows_ changes; when they start to refer to something else.
 
 ## Examples
 
@@ -54,32 +59,38 @@ Let's show that with a bunch of examples (based on the `message` variable define
 autorun(() => {
     console.log(message.title)
 })
-message.title = "Bar"
+message.updateTitle("Bar")
 ```
 
 This will react as expected, the `.title` property was dereferenced by the autorun, and changed afterwards, so this change is detected.
 
-You can verify what MobX will track by calling [`trace()`](../reguide/trace) inside the tracked function. In the case of the above function it will output the following:
+You can verify what MobX will track by calling [`trace()`](../refguide/trace) inside the tracked function. In the case of the above function it outputs the following:
 
 ```javascript
+import { trace } from "mobx"
+
 const disposer = autorun(() => {
     console.log(message.title)
     trace()
 })
-
 // Outputs:
 // [mobx.trace] 'Autorun@2' tracing enabled
 
-message.title = "Hello"
-// [mobx.trace] 'Autorun@2' is invalidated due to a change in: 'ObservableObject@1.title'
+message.updateTitle("Hello")
+// Outputs:
+// [mobx.trace] 'Autorun@2' is invalidated due to a change in: 'Message@1.title'
+Hello
 ```
 
-It is also possible to get the internal dependency (or observer) tree by using the designated utilities for that:
+It is also possible to get the internal dependency (or observer) tree by using `getDependencyTree`:
 
 ```javascript
-getDependencyTree(disposer) // prints the dependency tree of the reaction coupled to the disposer
-// { name: 'Autorun@4',
-//  dependencies: [ { name: 'ObservableObject@1.title' } ] }
+import { getDependencyTree } from "mobx"
+
+// prints the dependency tree of the reaction coupled to the disposer
+console.log(getDependencyTree(disposer))
+// Outputs:
+// { name: 'Autorun@2', dependencies: [ { name: 'Message@1.title' } ] }
 ```
 
 #### Incorrect: changing a non-observable reference
@@ -88,24 +99,22 @@ getDependencyTree(disposer) // prints the dependency tree of the reaction couple
 autorun(() => {
     console.log(message.title)
 })
-message = observable({ title: "Bar" })
+message = new Message("Bar", { name: "Martijn" }, ["Felicia", "Marcus"])
 ```
 
-This will **not** react. `message` was changed, but `message` is not an observable, just a variable which _refers to_ an observable,
-but the variable (reference) itself is not observable.
+This will **not** react. `message` was changed, but `message` is not an observable, just a variable which _refers to_ an observable, but the variable (reference) itself is not observable.
 
 #### Incorrect: dereference outside a tracked function
 
 ```javascript
-var title = message.title
+let title = message.title
 autorun(() => {
     console.log(title)
 })
-message.title = "Bar"
+message.updateMessage("Bar")
 ```
 
-This will **not** react. `message.title` was dereferenced outside the `autorun`, and just contains the value of `message.title` at the moment of dereferencing (the string `"Foo"`).
-`title` is not an observable so `autorun` will never react.
+This will **not** react. `message.title` was dereferenced outside the `autorun`, and just contains the value of `message.title` at the moment of dereferencing (the string `"Foo"`). `title` is not an observable so `autorun` will never react.
 
 #### Correct: dereference inside the tracked function
 
@@ -113,11 +122,19 @@ This will **not** react. `message.title` was dereferenced outside the `autorun`,
 autorun(() => {
     console.log(message.author.name)
 })
-message.author.name = "Sara"
-message.author = { name: "John" }
+
+runInAction(() => {
+    message.author.name = "Sara"
+})
+runInAction(() => {
+    message.author = { name: "John" }
+})
 ```
 
-This will react to both changes. Both `author` and `author.name` are dotted into, allowing MobX to track these references.
+This reacts to both changes. Both `author` and `author.name` are dotted into, allowing MobX to track these references.
+
+Note that we had to use `runInAction` here to be allowed to make changes outside
+of an `action`.
 
 #### Incorrect: store a local reference to an observable object without tracking
 
@@ -126,32 +143,36 @@ const author = message.author
 autorun(() => {
     console.log(author.name)
 })
-message.author.name = "Sara"
-message.author = { name: "John" }
+
+runInAction(() => {
+    message.author.name = "Sara"
+})
+runInAction(() => {
+    message.author = { name: "John" }
+})
 ```
 
 The first change will be picked up, `message.author` and `author` are the same object, and the `.name` property is dereferenced in the autorun.
-However the second change will **not** be picked up, the `message.author` relation is not tracked by the `autorun`. Autorun is still using the "old" `author`.
+However the second change is **not** picked up, because the `message.author` relation is not tracked by the `autorun`. Autorun is still using the "old" `author`.
 
 #### Common pitfall: console.log
 
 ```javascript
-const message = observable({ title: "hello" })
-
 autorun(() => {
     console.log(message)
 })
 
 // Won't trigger a re-run
-message.title = "Hello world"
+message.updateTitle("Hello world")
 ```
 
 In the above example, the updated message title won't be printed, because it is not used inside the autorun.
-The autorun only depends on `message`, which is not an observable, but a constant. In other words, as far as MobX is concerned, `title` is not used in- and hence not relevant for the `autorun`
+The autorun only depends on `message`, which is not an observable, but a variable. In other words, as far as MobX is concerned, `title` is not used in the `autorun`.
 
-The fact that `console.log` will print the message title is misleading here; `console.log` is an asynchronous api that only will format its parameters later in time, for which reason the autorun won't be tracking what data the console.log is accessing. For that reason make sure to always pass immutable data or defensive copies to `console.log`.
+If you use this in a web browser debugging tool, you may be able to find the
+updated value of `title` after all, but this is misleading -- autorun run after all has run once when it was first called. This happens because `console.log` is an asynchronous function and the object is only formatted later in time. This means that if you follow the title in the debugging toolbar, you can find the updated value. But the `autorun` does not track any updates.
 
-The following solutions however, will all react to `message.title`:
+The way to make this work is to make sure to always pass immutable data or defensive copies to `console.log`. So the following solutions all react to chnages in `message.title`:
 
 ```javascript
 autorun(() => {
@@ -193,8 +214,8 @@ autorun(() => {
 message.likes.push("Jennifer")
 ```
 
-This will react with the above sample data, array indexers count as property access. But **only** if the provided `index < length`.
-MobX will not track not-yet-existing indices or object properties (except when using maps).
+This will react with the above sample data because array indexers count as property access. But **only** if the provided `index < length`.
+MobX does not track not-yet-existing array indices.
 So always guard your array index based access with a `.length` check.
 
 #### Correct: access array functions in tracked function
@@ -235,42 +256,45 @@ So in contrast, `messages.likes = ["Jennifer"]` would be picked up; that stateme
 
 ```javascript
 autorun(() => {
-    console.log(message.postDate)
+    console.log(message.author.age)
 })
-message.postDate = new Date()
+
+runInAction(() => {
+    message.author.age = 10
+})
 ```
 
-_MobX 4_
+This **will** react if you run React in an environment that supports Proxy.
+Note that this is only done for objects created with `observable` or `observable.object`. New properties on class instances will not be made observable automatically.
 
-This will **not** react. MobX can only track observable properties, and 'postDate' has not been defined as observable property above.
+_Environments without Proxy support_
+
+This will **not** react. MobX can only track observable properties, and 'age' has not been defined as observable property above.
+
 However, it is possible to use the `get` and `set` methods as exposed by MobX to work around this:
 
 ```javascript
+import { get, set } from "mobx"
+
 autorun(() => {
-    console.log(get(message, "postDate"))
+    console.log(get(message.author, "age"))
 })
-set(message, "postDate", new Date())
+set(message.author, "age", 10)
 ```
 
-_MobX 5_
-
-In MobX 5 this **will** react, as MobX 5 can track not-yet existing properties.
-Note that this is only done for objects created with `observable` or `observable.object`.
-New properties on class instances will not be made observable automatically.
-
-#### [MobX 4 and lower] Incorrect: using not yet existing observable object properties
+#### [Without Proxy support] Incorrect: using not yet existing observable object properties
 
 ```javascript
 autorun(() => {
-    console.log(message.postDate)
+    console.log(message.author.age)
 })
-extendObservable(message, {
-    postDate: new Date()
+extendObservable(message.author, {
+    age: 10
 })
 ```
 
 This will **not** react. MobX will not react to observable properties that did not exist when tracking started.
-If the two statements are swapped, or if any other observable causes the `autorun` to re-run, the `autorun` will start tracking the `postDate` as well.
+If the two statements are swapped, or if any other observable causes the `autorun` to re-run, the `autorun` will start tracking the `age` as well.
 
 #### Correct: using not yet existing map entries
 
@@ -282,17 +306,25 @@ const twitterUrls = observable.map({
 autorun(() => {
     console.log(twitterUrls.get("Sara"))
 })
-twitterUrls.set("Sara", "twitter.com/horsejs")
+
+runInAction(() => {
+    twitterUrls.set("Sara", "twitter.com/horsejs")
+})
 ```
 
 This **will** react. Observable maps support observing entries that may not exist.
 Note that this will initially print `undefined`.
 You can check for the existence of an entry first by using `twitterUrls.has("Sara")`.
-So for dynamically keyed collections, always use observable maps.
+So in an environment without Proxy support for dynamically keyed collections always use observable maps. If you do have Proxy support you can use observable maps as well,
+but you also have the option to use plain objects.
 
-#### Correct: using MobX utilities to read / write to objects
+#### [Without Proxy support] Correct: using MobX utilities to read / write to objects
 
-Since MobX 4 it is also possible to use observable objects as dynamic collection, if they are read / updated by using the mobx apis, so that mobx can keep track of the property changes. The following will react as well:
+If you are in an environment without proxy support and still want to use observable
+objects as a dynamic collection, you can handle them using the MobX `get` and `set`
+API.
+
+The following will react as well:
 
 ```javascript
 import { get, set, observable } from "mobx"
@@ -304,12 +336,15 @@ const twitterUrls = observable.object({
 autorun(() => {
     console.log(get(twitterUrls, "Sara")) // get can track not yet existing properties
 })
-set(twitterUrls, { Sara: "twitter.com/horsejs" })
+
+runInAction(() => {
+    set(twitterUrls, { Sara: "twitter.com/horsejs" })
+})
 ```
 
-See the [object manipulation api](https://mobx.js.org/refguide/api.html#direct-observable-manipulation) for more details
+See the [object manipulation api](../refguide/api.md#direct-observable-manipulation) for more details
 
-## MobX only tracks synchronously accessed data
+## MobX does not track asynchronously accessed data
 
 ```javascript
 function upperCaseAuthorName(author) {
@@ -319,12 +354,13 @@ function upperCaseAuthorName(author) {
 autorun(() => {
     console.log(upperCaseAuthorName(message.author))
 })
-message.author.name = "Chesterton"
+
+runInAction(() => {
+    message.author.name = "Chesterton"
+})
 ```
 
-This will react. Even though `author.name` is not dereferenced by the thunk passed to `autorun` itself,
-MobX will still track the dereferencing that happens in `upperCaseAuthorName`,
-because it happens _during_ the execution of the autorun.
+This will react. Even though `author.name` is not dereferenced by the the function passed to `autorun` itself, MobX will still track the dereferencing that happens in `upperCaseAuthorName`, because it happens _during_ the execution of the autorun.
 
 ---
 
@@ -332,11 +368,15 @@ because it happens _during_ the execution of the autorun.
 autorun(() => {
     setTimeout(() => console.log(message.likes.join(", ")), 10)
 })
-message.likes.push("Jennifer")
+
+runInAction(() => {
+    message.likes.push("Jennifer")
+})
 ```
 
-This will **not** react, during the execution of the `autorun` no observables where accessed, only during the `setTimeout`.
-In general this is quite obvious and rarely causes issues.
+This will **not** react because during the execution of the `autorun` no observables were accessed, only during the `setTimeout`, which is an asynchronous function.
+
+Also see [Asynchronous actions](actions.md).
 
 ## MobX only tracks data accessed for `observer` components if they are directly accessed by `render`
 
