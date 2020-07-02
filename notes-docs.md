@@ -115,7 +115,7 @@ Here is a proposed structure:
 
     -   Computed options
 
--   Reacting to observables
+-   Effects for observables
 
     -   autorun
 
