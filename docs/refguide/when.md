@@ -6,29 +6,23 @@ hide_title: true
 
 # when
 
-<div id='codefund'></div><div class="re_2020"><a class="re_2020_link" href="https://www.react-europe.org/#slot-2149-workshop-typescript-for-react-and-graphql-devs-with-michel-weststrate" target="_blank" rel="sponsored noopener"><div><div class="re_2020_ad" >Ad</div></div><img src="/img/reacteurope.svg"><span>Join the author of MobX at <b>ReactEurope</b> to learn how to use <span class="link">TypeScript with React</span></span></a></div>
+Usage:
 
-<details>
-    <summary style="color: white; background:green;padding:5px;margin:5px;border-radius:2px">egghead.io lesson 9: custom reactions</summary>
-    <br />
-    <div style="padding:5px;">
-        <iframe style="border: none;" width=760 height=427  src="https://egghead.io/lessons/react-write-custom-mobx-reactions-with-when-and-autorun/embed" ></iframe>
-    </div>
-    <a style="font-style:italic;padding:5px;margin:5px;"  href="https://egghead.io/lessons/react-write-custom-mobx-reactions-with-when-and-autorun">Hosted on egghead.io</a>
-</details>
+-   `when(predicate: () => boolean, effect?: () => void, options?)`
+-   `when(predicate: () => boolean): Promise
 
-`when(predicate: () => boolean, effect?: () => void, options?)`
-
-`when` observes & runs the given `predicate` until it returns true.
-Once that happens, the given `effect` is executed and the autorunner is disposed.
-The function returns a disposer to cancel the autorunner prematurely.
+`when` observes and runs the given _predicate_ function until it returns `true`.
+Once that happens, the given _effect_ function is executed and the autorunner is disposed.
 
 This function is really useful to dispose or cancel stuff in a reactive way.
 For example:
 
 ```javascript
+import { when, makeAutoObservable } from "mobx"
+
 class MyResource {
     constructor() {
+        makeAutoObservable(this, { dispose: false })
         when(
             // once...
             () => !this.isVisible,
@@ -37,7 +31,7 @@ class MyResource {
         )
     }
 
-    @computed get isVisible() {
+    get isVisible() {
         // indicate whether this item is visible
     }
 
@@ -47,9 +41,14 @@ class MyResource {
 }
 ```
 
+As soon as `isVisible` becomes `false`, the `dispose` method is called that
+then does some cleanup for `MyResource`.
+
+`when` returns a disposer to allow you to cancel it manually, unless you don't pass in a second `effect` function, in which case it returns a `Promise`.
+
 ## when-promise
 
-If there is no `effect` function provided, `when` will return a `Promise`. This combines nicely with `async / await`
+If no `effect` function is provided, `when` returns a `Promise`. This combines nicely with `async / await` to let you wait for changes in observable state:
 
 ```javascript
 async function() {

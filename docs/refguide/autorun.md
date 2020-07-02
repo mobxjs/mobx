@@ -6,6 +6,10 @@ hide_title: true
 
 # Autorun
 
+Usage:
+
+-   `autorun(effect: (reaction) => void)`
+
 You pass a function into `autorun` that should run each time anything it observes changes. It also runs once when you create the `autorun`. It only responds to changes in observable state -- so things you marked `observable` or `computed`. It won't
 respond if other observable state changes that it does not in any refer refer
 to in the function.
