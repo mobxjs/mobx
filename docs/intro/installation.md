@@ -31,5 +31,4 @@ enableES5()
 
 ## Modern JavaScript environments
 
-The main entry point of the MobX 6 package ships with ES5 code for backward compatibility -- it
-works in any ES5 environment. But if you only intend to run MobX 6 in modern environments, consider using consider using the faster and smaller ES6 build: `lib/mobx.es6.js`. For example by setting up a webpack alias: `resolve: { alias: { mobx: __dirname + "/node_modules/mobx/lib/mobx.es6.js" }}`
+The main entry point of the MobX 6 package ships with ES5 code for backward compatibility -- it works in any ES5 environment. But if you only intend to run MobX 6 in modern environments, consider using consider using the faster and smaller ES6 build: `lib/mobx.es6.js`. For example by setting up a webpack alias: `resolve: { alias: { mobx: __dirname + "/node_modules/mobx/lib/mobx.es6.js" }}`
