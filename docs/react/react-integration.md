@@ -203,11 +203,11 @@ In this snippet only the current value of `myTimer.secondsPassed` is passed to `
 That number value won't change anymore in the future, so `TimerView` will never update. It is the property `secondsPassed` that will change in the future,
 so we need to access it _inside_ the component. One could also say: values need to be passed _by reference_ and not by value.
 
-If the problem is not entirely clear, make sure to study [what does MobX react to?](../best/react.md) first!
+If the problem is not entirely clear, make sure to study [what does MobX react to?](../best/what-does-mobx-react-to.md) first!
 
 ## Troubleshooting
 
 1. Make sure you didn't forget `observer` (yes, this is the most common mistake)
-2. Make sure you grok how tracking works in general: [what will MobX react to](../best/react.md)
+2. Make sure you grok how tracking works in general: [what does MobX react to](../best/what-does-mobx-react-to.md)
 3. Read the [common mistakes](../best/pitfalls.md) section
 4. Use [trace](../best/trace.md) to verify that you are subscribing to the right things or check what MobX is doing in general using [spy](../refguide/spy.md) / the [mobx-logger](https://github.com/winterbe/mobx-logger) package.

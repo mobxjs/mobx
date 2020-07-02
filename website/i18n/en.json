@@ -25,10 +25,6 @@
         "title": "Common pitfalls & best practices",
         "sidebar_label": "Common Pitfalls & Best Practices"
       },
-      "best/react": {
-        "title": "What does MobX react to?",
-        "sidebar_label": "Understanding what MobX reacts to"
-      },
       "best/stateless-HMR": {
         "title": "Hot Module Reloading with Stateless Components",
         "sidebar_label": "Hot Module Reloading with Stateless Components"
@@ -40,6 +36,10 @@
       "best/trace": {
         "title": "Using `trace` for debugging",
         "sidebar_label": "Using trace for debugging"
+      },
+      "best/what-does-mobx-react-to": {
+        "title": "What does MobX react to?",
+        "sidebar_label": "Understanding what MobX reacts to"
       },
       "faq/faq": {
         "title": "FAQ",
