@@ -6,11 +6,9 @@ hide_title: true
 
 # Decorators in MobX
 
-MobX before version 6 encouraged the use of ES.next decorators to mark things as `observable`, `computed` and `action`. Decorators are not currently a ES standard however, and the process of standardization is taking a long time. In the interest of compatibility we have chosen to move away from them in MobX 6, and recommend
-the use of [`makeObservable` / `makeAutoObservable`](../refguide/make-observable) instead.
+MobX before version 6 encouraged the use of ES.next decorators to mark things as `observable`, `computed` and `action`. Decorators are not currently a ES standard however, and the process of standardization is taking a long time. It also looks like the standard will be different from the way decorators were implemented previously. In the interest of compatibility we have chosen to move away from them in MobX 6, and recommend the use of [`makeObservable` / `makeAutoObservable`](../refguide/make-observable) instead.
 
-But many existing code bases use decorators, and a lot of the documentation and tutorial material online uses them as well. The rule is that anything you can
-use as an annotation to `makeObservable`, such as `observable`, `action` and `computed`, you can also use as a decorator. So let's examine what that looks like:
+But many existing code bases use decorators, and a lot of the documentation and tutorial material online uses them as well. The rule is that anything you can use as an annotation to `makeObservable`, such as `observable`, `action` and `computed`, you can also use as a decorator. So let's examine what that looks like:
 
 ```javascript
 import { makeObservable, observable, computed, action } from "mobx"
@@ -44,45 +42,41 @@ class TodoList {
 }
 ```
 
-MobX before version 6 did not require the `makeObservable(this)` call in the constructor, but because it makes the implementation of decorator simpler and more compatible, MobX now does. This instructs MobX to make the instances observable following the information in the decorators -- the decorators take the place of the second argument to `makeObservable`.
+MobX before version 6 did not require the `makeObservable(this)` call in the constructor, but because it makes the implementation of decorator simpler and more compatible, it now does. This instructs MobX to make the instances observable following the information in the decorators -- the decorators take the place of the second argument to `makeObservable`.
 
-## Upgrading using the `undecorate` codemod
+We intend to continue to support decorators in this form.
 
-If you are a MobX user you have code that uses a lot of decorators, or the equivalent calls to `decorate`.
+## Upgrading your code with the `mobx-undecorate` codemod
 
-You can convert your project using [jscodeshift](https://github.com/facebook/jscodeshift), which
-is a dev dependency of MobX.
+If you are an existing MobX user you have code that uses a lot of decorators, or the equivalent calls to `decorate`.
 
-Convert all files in directory `src`. This gets rid of all uses of MobX decorators and
-replaces them with the equivalent `makeObservable(this, {...})` invocation:
+The [`mobx-undecorate`](https://www.npmjs.com/package/mobx-undecorate) package provides a codemod that can automatically update your code to be conformant to MobX 6. There is no need to install it; instead you download and execute it using the [`npx`](https://www.npmjs.com/package/npx) tool which you do need to install if you haven't already.
 
-```shell
-yarn jscodeshift -t mobx/codemod/undecorator.ts --extensions=js,jsx,ts,tsx src
-```
-
-If you want to retain decorators and only introduce `makeObservable(this)` where you
-required, you can use the `--keepDecorators` option:
+To get rid of all uses of MobX decorators and replace them with the equivalent `makeObservable` calls, go to the directory that contains your source code and run:
 
 ```shell
-yarn jscodeshift -t mobx/codemod/undecorate.ts --extensions=js,jsx,ts,tsx src --keepDecorators=true
+npx mobx-undecorate
 ```
 
-Convert single file and everything it imports:
+MobX will continue to support decorators -- so if you want to retain them
+and only introduce `makeObservable(this)` where required, you can use the `--keepDecorators` option:
 
 ```shell
-yarn jscodeshift -t mobx/codemod/undecorate.ts myfile.js
+npx mobx-undecorate --keepDecorators
 ```
 
-Convert an individual file, leaving any imports unchanged using `--ignoreImports`:
+### limitations of `mobx-undecorate`
 
-```shell
-yarn jscodeshift -t mobx/codemod/undecorate.ts myfile.js --ignoreImports=true
-```
+The `mobx-undecorate` command has to introduce a constructor in classes that do not yet have one. If base class of the constructor expects arguments, the codemod cannot introduce these arguments for the subclass being upgraded, and the `super` call won't pass them either. You have to fix these manually.
+
+`mobx-undecorate` outputs warnings for these cases when it's run.
+
+We do have a special case for React class components to do the right thing and
+pass along `props` to the superclass.
 
 ## How to enable decorator support
 
-We do not recommend new codebases that use MobX use decorators until such point as they become
-an official part of the language, but you can still use them. It does require setup for transpilation: you have to use Babel or TypeScript.
+We do not recommend new codebases that use MobX use decorators until the point when they become an official part of the language, but you can still use them. It does require setup for transpilation: you have to use Babel or TypeScript.
 
 ### TypeScript
 
@@ -105,7 +99,7 @@ Note that the `legacy` mode is important (as is putting the decorators proposal 
 
 ### Decorator syntax and Create React App (v2)
 
--   Decorators are only supported out of the box when using TypeScript in `create-react-app@^2.1.1` and newer. In older versions or when using vanilla JavaScript use eject, or the [customize-cra](https://github.com/arackaf/customize-cra) package.
+Decorators are only supported out of the box when using TypeScript in `create-react-app@^2.1.1` and newer. In older versions or when using vanilla JavaScript use eject, or the [customize-cra](https://github.com/arackaf/customize-cra) package.
 
 ### Using `observer` from `mobx-react`
 
