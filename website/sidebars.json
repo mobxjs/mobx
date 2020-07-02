@@ -31,7 +31,7 @@
       "refguide/autorun",
       "refguide/reaction",
       "refguide/when",
-      "best/react"
+      "best/what-does-mobx-react-to"
     ],
     "Utilities": [
       "refguide/api",

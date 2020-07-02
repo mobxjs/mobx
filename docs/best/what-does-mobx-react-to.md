@@ -252,6 +252,62 @@ message.likes.push("Jennifer")
 This will **not** react. Simply because the `likes` array itself is not being used by the `autorun`, only the reference to the array.
 So in contrast, `messages.likes = ["Jennifer"]` would be picked up; that statement does not modify the array, but the `likes` property itself.
 
+#### Correct: using not yet existing map entries
+
+```javascript
+const twitterUrls = observable.map({
+    John: "twitter.com/johnny"
+})
+
+autorun(() => {
+    console.log(twitterUrls.get("Sara"))
+})
+
+runInAction(() => {
+    twitterUrls.set("Sara", "twitter.com/horsejs")
+})
+```
+
+This **will** react. Observable maps support observing entries that may not exist.
+Note that this will initially print `undefined`.
+You can check for the existence of an entry first by using `twitterUrls.has("Sara")`.
+So in an environment without Proxy support for dynamically keyed collections always use observable maps. If you do have Proxy support you can use observable maps as well,
+but you also have the option to use plain objects.
+
+#### MobX does not track asynchronously accessed data
+
+```javascript
+function upperCaseAuthorName(author) {
+    const baseName = author.name
+    return baseName.toUpperCase()
+}
+autorun(() => {
+    console.log(upperCaseAuthorName(message.author))
+})
+
+runInAction(() => {
+    message.author.name = "Chesterton"
+})
+```
+
+This will react. Even though `author.name` is not dereferenced by the the function passed to `autorun` itself, MobX will still track the dereferencing that happens in `upperCaseAuthorName`, because it happens _during_ the execution of the autorun.
+
+---
+
+```javascript
+autorun(() => {
+    setTimeout(() => console.log(message.likes.join(", ")), 10)
+})
+
+runInAction(() => {
+    message.likes.push("Jennifer")
+})
+```
+
+This will **not** react because during the execution of the `autorun` no observables were accessed, only during the `setTimeout`, which is an asynchronous function.
+
+Also see [Asynchronous actions](actions.md).
+
 #### Using non-observable object properties
 
 ```javascript
@@ -296,28 +352,6 @@ extendObservable(message.author, {
 This will **not** react. MobX will not react to observable properties that did not exist when tracking started.
 If the two statements are swapped, or if any other observable causes the `autorun` to re-run, the `autorun` will start tracking the `age` as well.
 
-#### Correct: using not yet existing map entries
-
-```javascript
-const twitterUrls = observable.map({
-    John: "twitter.com/johnny"
-})
-
-autorun(() => {
-    console.log(twitterUrls.get("Sara"))
-})
-
-runInAction(() => {
-    twitterUrls.set("Sara", "twitter.com/horsejs")
-})
-```
-
-This **will** react. Observable maps support observing entries that may not exist.
-Note that this will initially print `undefined`.
-You can check for the existence of an entry first by using `twitterUrls.has("Sara")`.
-So in an environment without Proxy support for dynamically keyed collections always use observable maps. If you do have Proxy support you can use observable maps as well,
-but you also have the option to use plain objects.
-
 #### [Without Proxy support] Correct: using MobX utilities to read / write to objects
 
 If you are in an environment without proxy support and still want to use observable
@@ -343,40 +377,6 @@ runInAction(() => {
 ```
 
 See the [object manipulation api](../refguide/api.md#direct-observable-manipulation) for more details
-
-## MobX does not track asynchronously accessed data
-
-```javascript
-function upperCaseAuthorName(author) {
-    const baseName = author.name
-    return baseName.toUpperCase()
-}
-autorun(() => {
-    console.log(upperCaseAuthorName(message.author))
-})
-
-runInAction(() => {
-    message.author.name = "Chesterton"
-})
-```
-
-This will react. Even though `author.name` is not dereferenced by the the function passed to `autorun` itself, MobX will still track the dereferencing that happens in `upperCaseAuthorName`, because it happens _during_ the execution of the autorun.
-
----
-
-```javascript
-autorun(() => {
-    setTimeout(() => console.log(message.likes.join(", ")), 10)
-})
-
-runInAction(() => {
-    message.likes.push("Jennifer")
-})
-```
-
-This will **not** react because during the execution of the `autorun` no observables were accessed, only during the `setTimeout`, which is an asynchronous function.
-
-Also see [Asynchronous actions](actions.md).
 
 ## MobX only tracks data accessed for `observer` components if they are directly accessed by `render`
 
