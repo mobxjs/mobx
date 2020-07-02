@@ -187,7 +187,7 @@
       "Making things observable": "Making things observable",
       "Updating observables": "Updating observables",
       "Computed values": "Computed values",
-      "Reacting to observables": "Reacting to observables",
+      "Effects for observables": "Effects for observables",
       "Utilities": "Utilities",
       "Tips & Tricks": "Tips & Tricks"
     }
