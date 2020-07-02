@@ -22,8 +22,12 @@
       "refguide/action",
       "best/actions"
     ],
+    "Computed values": [
+       "refguide/computed",
+       "refguide/computed-options",
+       "refguide/computed-behavior"
+    ],
     "Reacting to observables": [
-      "refguide/computed",
       "refguide/autorun",
       "refguide/when",
       "refguide/reaction",

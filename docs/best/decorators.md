@@ -46,6 +46,10 @@ MobX before version 6 did not require the `makeObservable(this)` call in the con
 
 We intend to continue to support decorators in this form.
 
+## Decorator differences
+
+-   You cannot pass (options)[../refguide/computed-options] into `@computed` when `computed` is used as a decorator. `computed.struct` is available to enable strucural comparison.
+
 ## Upgrading your code with the `mobx-undecorate` codemod
 
 If you are an existing MobX user you have code that uses a lot of decorators, or the equivalent calls to `decorate`.

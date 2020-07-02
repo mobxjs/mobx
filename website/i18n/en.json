@@ -96,6 +96,14 @@
         "title": "Boxed Values",
         "sidebar_label": "boxed values"
       },
+      "refguide/computed-behavior": {
+        "title": "How computed works",
+        "sidebar_label": "How computed works"
+      },
+      "refguide/computed-options": {
+        "title": "Options for computed",
+        "sidebar_label": "Options for computed"
+      },
       "refguide/computed": {
         "title": "computed",
         "sidebar_label": "computed"
@@ -178,6 +186,7 @@
       "MobX and React": "MobX and React",
       "Making things observable": "Making things observable",
       "Updating observables": "Updating observables",
+      "Computed values": "Computed values",
       "Reacting to observables": "Reacting to observables",
       "Utilities": "Utilities",
       "Tips & Tricks": "Tips & Tricks"

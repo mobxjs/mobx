@@ -54,18 +54,18 @@ These rules might seem complicated at first sight, but you will notice that in p
 
 **Some notes:**
 
--   To use the `@observable` decorator, make sure that [decorators are enabled](http://mobxjs.github.io/mobx/refguide/observable-decorator.html) in your transpiler (babel or typescript).
+-   To use the `@observable` decorator, make sure that [decorators are enabled](observable.md) in your transpiler (babel or typescript).
 -   By default making a data structure observable is _infective_; that means that `observable` is applied automatically to any value that is contained by the data structure, or will be contained by the data structure in the future. This behavior can be changed by using [_decorators_](#decorators).
 -   _[MobX 4 and below]_ To create dynamically keyed objects, always use maps! Only initially existing properties on an object will be made observable, although new ones can be added using `extendObservable`.
 
-[&laquo;`observable`&raquo;](observable.md) &mdash; [&laquo;`@observable`&raquo;](observable-decorator.md)
+[&laquo;`observable`&raquo;](observable.md) &mdash; [&laquo;`@observable`&raquo;](observable.md)
 
 ### `@observable property = value`
 
 `observable` can also be used as property decorator. It requires [decorators to be enabled](../best/decorators.md) and is syntactic
 sugar for `extendObservable(this, { property: value })`.
 
-[&laquo;`details`&raquo;](observable-decorator.md)
+[&laquo;`details`&raquo;](observable.md)
 
 ### `observable.box(value, options?)`
 
@@ -134,7 +134,7 @@ The following decorators are available:
 -   **`observable.deep`**: This is the default decorator, used by any observable. It converts any assigned, non-primitive value into an observable if it isn't one yet.
 -   **`observable.ref`**: Disables automatic observable conversion, just creates an observable reference instead.
 -   **`observable.shallow`**: Can only be used in combination with collections. Turns any assigned collection into a collection, which is shallowly observable (instead of deep). In other words; the values inside the collection won't become observables automatically.
--   **`computed`**: Creates a derived property, see [`computed`](computed-decorator.md)
+-   **`computed`**: Creates a derived property, see [`computed`](computed.md)
 -   **`action`**: Creates an action, see [`action`](action.md)
 -   **`action.bound`**: Creates a bound action, see [`action`](action.md)
 
@@ -348,7 +348,7 @@ Can be used as higher order component around a React component.
 The component will then automatically re-render if any of the observables used in the `render` function of the component has changed.
 Note that `observer` is provided by the `"mobx-react"` package and not by `"mobx"` itself.
 
-[&laquo;details&raquo;](../react/reactintegration.md)
+[&laquo;details&raquo;](../react/react-integration.md)
 
 Usage:
 
