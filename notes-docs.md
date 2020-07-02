@@ -115,21 +115,15 @@ Here is a proposed structure:
 
     -   Computed options
 
--   Organizing your application
-
-    -   Best practices
-
-    -   Defining data stores (mention mobx-state-tree, mobx-keystone)
-
 -   Reacting to observables
-
-    -   Understanding what MobX reacts to
 
     -   autorun
 
     -   when
 
     -   reaction
+
+    -   Understanding what MobX reacts to
 
 -   Debugging MobX
 
@@ -141,7 +135,13 @@ Here is a proposed structure:
 
     -   Spy
 
--   Advanced topics
+-   Organizing your application
+
+    -   Best practices
+
+    -   Defining data stores (mention mobx-state-tree, mobx-keystone)
+
+-   Additional topics
 
     -   Decorators in MobX
 
