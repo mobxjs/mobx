@@ -110,6 +110,8 @@ Here is a proposed structure:
 
     -   maps
 
+    -   Boxed values
+
 -   Updating observables
 
     -   action
@@ -136,11 +138,15 @@ Here is a proposed structure:
 
 -   Debugging MobX
 
-    -   toJS
-
     -   Using trace for debugging
 
+-   Utilities
+
+    -   toJS
+
     -   Spy
+
+    -   Object API
 
 -   Organizing your application
 
@@ -153,10 +159,6 @@ Here is a proposed structure:
     -   Decorators in MobX
 
     -   Limitations without Proxy Support
-
-    -   Boxed values
-
-    -   Object API
 
 Mine the API docs page to deduplicate content and move it into the
 rest of the docs.

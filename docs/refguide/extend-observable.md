@@ -5,20 +5,41 @@ hide_title: true
 
 # extendObservable
 
-<div id='codefund'></div><div class="re_2020"><a class="re_2020_link" href="https://www.react-europe.org/#slot-2149-workshop-typescript-for-react-and-graphql-devs-with-michel-weststrate" target="_blank" rel="sponsored noopener"><div><div class="re_2020_ad" >Ad</div></div><img src="/img/reacteurope.svg"><span>Join the author of MobX at <b>ReactEurope</b> to learn how to use <span class="link">TypeScript with React</span></span></a></div>
+Usage:
 
-`extendObservable(target, properties, decorators?, options?)`
+-   `extendObservable(target, properties, annotions?, options?)`
 
-ExtendObservable can be used to add observable properties to the existing target objects.
-All key / value pairs in the properties map will result in new observable properties on the target initialized to the given value.
-Any getters in the properties map will be turned into computed properties.
+ExtendObservable can be used to add observable properties to an existing target object.
+All key / value pairs in the `properties` object result in new observable properties on the target initialized to the given value. Any getters in the properties map are turned into computed properties.
 
-The `decorators` param can be used to override the decorator that will be used for a specific property, similar to `decorate` and `observable.object`.
+The `annotations` param can be used to override the declaration that is used for a specific property, similar to [`makeObservable` and `makeAutoObservable`](make-observable.md). The difference between `extendObservable` and `makeAutoObservable` is that `extendObservable` sets properties and declares information about them at the same time.
 
 Use the `deep: false` option to make the new properties _shallow_. That is, prevent auto conversion of their _values_ to observables.
 
+Here we add a new observable property to an alread observable instance:
+
 ```javascript
-var Person = function (firstName, lastName) {
+class Person {
+    constructor(firstName, lastName) {
+        this.firstName = firstName
+        this.lastName = lastName
+        makeAutoObservable(this)
+    }
+}
+
+const matthew = new Person("Matthew", "Henry")
+
+// add a new observable property to an already observable object
+extendObservable(matthew, {
+    age: 353
+})
+```
+
+Here is an example of how you could make factory function that constructs
+observable instances, though normally you would use a class with `makeObservable` or `makeAutoObservable` for this purpose:
+
+```javascript
+class Person = function (firstName, lastName) {
     // initialize observable properties on a new instance
     extendObservable(
         this,
@@ -37,17 +58,8 @@ var Person = function (firstName, lastName) {
         }
     )
 }
-
-var matthew = new Person("Matthew", "Henry")
-
-// add an observable property to an already observable object
-extendObservable(matthew, {
-    age: 353
-})
 ```
 
 Note: `observable.object(object)` is actually an alias for `extendObservable({}, object)`.
-
-Note: `decorate` could be used to introduce observable properties to an object, similar to `extendObservable`. The difference is that `extendObservable` is designed to introduce properties directly on the target instance, where `decorate` introduces them on prototypes; you can either pass it a constructor function (class) directly, or an object that will act as prototype for others.
 
 Note: `extendObservable` can not be used to introduce new properties on observable arrays or objects

@@ -192,6 +192,7 @@
       "Updating observables": "Updating observables",
       "Computed values": "Computed values",
       "Effects for observables": "Effects for observables",
+      "Debugging MobX": "Debugging MobX",
       "Utilities": "Utilities",
       "Tips & Tricks": "Tips & Tricks"
     }

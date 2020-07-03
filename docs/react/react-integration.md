@@ -175,13 +175,6 @@ then no display name will be visible in the DevTools.
 
 The following approaches can be used to fix this:
 
--   set `displayName` explicitly:
-
-    ```javascript
-    export const MyComponent = observer(props => <div>hi</div>)
-    MyComponent.displayName = "MyComponent"
-    ```
-
 -   use `function` with a name instead of an arrow function. `mobx-react` infers component name from function name:
 
     ```javascript
@@ -203,6 +196,15 @@ The following approaches can be used to fix this:
     const MyComponent = props => <div>hi</div>
     export default observer(MyComponent)
     ```
+
+-   [**Broken**] Set `displayName` explicitly:
+
+    ```javascript
+    export const MyComponent = observer(props => <div>hi</div>)
+    MyComponent.displayName = "MyComponent"
+    ```
+
+    This is broken in React at the time of writing; mobx-react `observer` uses a React.memo and runs into this bug: https://github.com/facebook/react/issues/18026
 
 ### Use the `<Observer>` component in cases where you can't use observer
 
