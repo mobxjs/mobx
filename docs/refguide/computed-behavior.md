@@ -9,6 +9,53 @@ hide_title: true
 Here we go into some more details concerning how computed behaves. Since `computed` tries to be tranparent in its behavior you normally do not need to be aware of them,
 but is useful to know if something unexpected happens.
 
+## Computed values run more often than expected
+
+It sometimes confuses people new to MobX (perhaps used to a library like [Reselect](https://github.com/reduxjs/reselect)) that if you create a computed property but don't use it anywhere in a reaction, it is not memoized and appears to be recomputed more often than necessary.
+
+This is because the caching optimization of `computed` only works if it is observed by some type of reaction, such as [`autorun`](autorun.md), the [`reaction` function](reaction.md) or a [React `observer` component](../react/react-integration.md), or if they are used during a transaction (such as in an action).
+
+This allows MobX to automatically suspend computations that are not actively in use,
+to avoid unnecessary updates to computed values that are not being accessed. But if a computed property is _not_ in use by some reaction, computed expressions are evaluated each time their value is requested, so they just behave like a normal property.
+
+So if you fiddle around, computed properties might not seem efficient. But when applied in a project that uses `observer`, `autorun` etc, they become very efficient.
+
+The following code demonstrates the issue.
+
+```javascript
+// OrderLine has a computed property `total`
+const line = new OrderLine(2.0)
+
+// if you access line.total outside of a reaction it is recomputed every time
+setInterval(() => {
+    console.log(line.total)
+}, 60)
+```
+
+This can cause performance degradation if a computed value is read in a high frequency loop like `requestAnimationFrame`.
+
+You can forcefully keep a computed value awake if you need to, by using [`keepAlive`](computed-options.md#computed-keepalive) or by using [`observe`](observe.md), but note that this can potentially create memory leaks.
+
+MobX can be configured to report an error when computeds are accessed directly with the `computedRequiresReaction` option:
+
+```javascript
+configure({
+    computedRequiresReaction: true
+})
+```
+
+## Accessing computed values outside of reactions
+
+The optimization of `computed` only works if it is observed by some type of reaction, such as [`autorun`](autorun.md), the [`reaction` function](reaction.md) or a [React `observer` component](../react/react-integration.md)).
+
+Reading a computed value directly causes it to recompute which can be expensive, depending on the how complex the derived result is.
+
+It sometimes confuses people new to MobX (perhaps used to a library like [Reselect](https://github.com/reduxjs/reselect)) that if you create a computed property but don't use it anywhere in a reaction, it is not memoized and appears to be recomputed more often than necessary.
+
+It works this way because you expect computed properties to work outside of reactions, but MobX also avoids unnecessarily updating computed values that are not in use.
+
+You can forcefully keep a computed value awake if you need to, by using [`keepAlive`](computed-options.md#computed-keepalive) or by using [`observe`](observe.md).
+
 ## Error handling
 
 If a computed value throws an exception during its computation, this exception is caught and rethrown each time its value is read. This is what you would expect.
@@ -58,40 +105,6 @@ divider.recover()
 divided.divided // Recovered; Returns 1.5
 ```
 
-## Accessing computed values outside of reactions
-
-The optimization of `computed` only works if it is observed by some type of reaction, such as [`autorun`](autorun.md), the [`reaction` function](reaction.md) or a [React `observer` component](../react/react-integration.md)).
-
-Reading a computed value directly causes it to recompute which can be expensive, depending on the how complex the derived result is.
-
-It sometimes confuses people new to MobX (perhaps used to a library like [Reselect](https://github.com/reduxjs/reselect)) that if you create a computed property but don't use it anywhere in a reaction, it is not memoized and appears to be recomputed more often than necessary.
-
-It works this way because you expect computed properties to work outside of reactions, but MobX also avoids unnecessarily updating computed values that are not in use.
-
-The following code demonstrates the issue.
-
-```javascript
-const line = new OrderLine(2.0)
-
-// if you access line.total directly it recomputed every time
-// this is not ideal
-setInterval(() => {
-    console.log(line.total)
-}, 60)
-```
-
-This can cause performance degradation if a computed value is read in a high frequency loop like `requestAnimationFrame`.
-
-MobX can be configured to report an error when computeds are being access directly by using the `computedRequiresReaction` option
-
-```javascript
-configure({
-    computedRequiresReaction: true
-})
-```
-
-You can forcefully keep a computed value awake if you need to, by using [`keepAlive`](computed-options.md#computed-keepalive) or by using [`observe`](observe.md).
-
 ## `computed(expression)` as function
 
 `computed` can also be invoked directly as function.
@@ -111,4 +124,8 @@ var disposer = upperCaseName.observe(change => console.log(change.newValue))
 
 name.set("Dave")
 // prints: 'DAVE'
+```
+
+```
+
 ```

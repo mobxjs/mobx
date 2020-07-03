@@ -67,4 +67,7 @@ The `name` option can be used to give the array a friendly debug name, to be use
 
 ## Array limitations in environments without Proxy support
 
-In environments with Proxy support, there are some [limitations](../best/limitations-without-proxies.md) with arrays that you should be aware about.
+If your environment does not support Proxies, then MobX cannot make its observable
+array be a real JS Array.
+
+[More information](../best/limitations-without-proxies.md).

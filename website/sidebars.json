@@ -31,6 +31,7 @@
       "refguide/autorun",
       "refguide/reaction",
       "refguide/when",
+      "best/dispose-reactions",
       "best/what-does-mobx-react-to"
     ],
     "Utilities": [

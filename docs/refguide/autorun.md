@@ -127,6 +127,8 @@ autorun(reaction => {
 })
 ```
 
+[Read more about why it's important to dispose](../best/dispose-reactions).
+
 ## Options
 
 Autorun accepts an object as the last argument with the following optional options:

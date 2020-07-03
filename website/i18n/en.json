@@ -17,6 +17,10 @@
         "title": "MobX + React DevTools",
         "sidebar_label": "MobX + React DevTools"
       },
+      "best/dispose-reactions": {
+        "title": "Always dispose reactions",
+        "sidebar_label": "Always dispose reactions"
+      },
       "best/limitations-without-proxies": {
         "title": "Limitations without Proxy support",
         "sidebar_label": "Limitations without Proxy support"

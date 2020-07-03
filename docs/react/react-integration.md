@@ -125,10 +125,11 @@ In general we recommend not to resort to using MobX observables for local compon
 
 ## When to apply `observer`?
 
-The simple rule of thumb is: _all components that render observable data_. If
-you are in doubt, apply `observer` as using it is cheap.
+The simple rule of thumb is: _all components that render observable data_.
 
-If you don't want to mark a component as observer, for example to reduce the dependencies of a generic component package, make sure you only pass it plain data, for example by converting it to plain data in a parent component, that is an `observer`, using `toJS`.
+`observer` only enhances the component you are decorating, not the components used inside it. So usually all your components should be wrapped by `observer`. Don't worry, this is not inefficient, in contrast, more `observer` components make rendering more efficient.
+
+If you don't want to mark a component as `observer`, for example to reduce the dependencies of a generic component package, make sure you only pass it plain data, for example by converting it to plain data in a parent component, that is an `observer`, using `toJS`.
 
 ## Characteristics of observer components
 
@@ -160,7 +161,50 @@ See [React class components](react-class-components.md) for more information.
 
 ## Tips
 
-#### Use the `<Observer>` component in cases where you can't use observer
+### React DevTools support
+
+[React DevTools](https://reactjs.org/blog/2019/08/15/new-react-devtools.html) uses the display name information of components to properly display the component hierarchy.
+
+If you use:
+
+```javascript
+export const MyComponent = observer(props => <div>hi</div>)
+```
+
+then no display name will be visible in the DevTools.
+
+The following approaches can be used to fix this:
+
+-   set `displayName` explicitly:
+
+    ```javascript
+    export const MyComponent = observer(props => <div>hi</div>)
+    MyComponent.displayName = "MyComponent"
+    ```
+
+-   use `function` with a name instead of an arrow function. `mobx-react` infers component name from function name:
+
+    ```javascript
+    export const MyComponent = observer(function MyComponent(props) {
+        return <div>hi</div>
+    })
+    ```
+
+-   The transpiler (like Babel or TypeScript) infers component name from variable name:
+
+    ```javascript
+    const _MyComponent = props => <div>hi</div>
+    export const MyComponent = observer(_MyComponent)
+    ```
+
+-   Infer from variable name again, using default export:
+
+    ```javascript
+    const MyComponent = props => <div>hi</div>
+    export default observer(MyComponent)
+    ```
+
+### Use the `<Observer>` component in cases where you can't use observer
 
 Sometimes it is hard to apply `observer` to a part of the rendering, for example because you are rendering inside a callback, and you don't want to extract a new component to be able to mark it as `observer`.
 In those cases [`<Observer />`](https://github.com/mobxjs/mobx-react#observer) comes in handy. It takes a callback render function, that is automatically rendered again every time an observable used is changed:
@@ -176,16 +220,12 @@ const TimerView = ({ timer }) => (
 )
 ```
 
-#### How can I further optimize my React components?
-
-See the relevant [React performance section](react-performance.md).
-
-#### When combining `observer` with other higher-order-components, apply `observer` first
+### When combining `observer` with other higher-order-components, apply `observer` first
 
 When `observer` needs to be combined with other decorators or higher-order-components, make sure that `observer` is the innermost (first applied) decorator;
 otherwise it might do nothing at all.
 
-#### Gotcha: dereference values _inside_ your components
+### Dereference values _inside_ your components
 
 MobX can do a lot, but it cannot make primitive values observable (although it can wrap them in an object; see [boxed observables](../refguide/boxed.md)).
 So it is not the _values_ that are observable, but the _properties_ of an object. This means that `observer` actually reacts to the fact that you dereference a value.
@@ -204,6 +244,20 @@ That number value won't change anymore in the future, so `TimerView` will never 
 so we need to access it _inside_ the component. One could also say: values need to be passed _by reference_ and not by value.
 
 If the problem is not entirely clear, make sure to study [what does MobX react to?](../best/what-does-mobx-react-to.md) first!
+
+### Render callbacks are _not_ part of the render method
+
+Because `observer` only applies to exactly the `render` function of the current component; passing a render callback or component to a child component doesn't become reactive automatically.
+
+For more details, see the [what does Mobx react to](https://mobx.js.org/best/react.html#what-does-mobx-react-to) guide.
+
+### Declaring propTypes might cause unnecessary renders in dev mode
+
+See: https://github.com/mobxjs/mobx-react/issues/56
+
+### How can I further optimize my React components?
+
+See the relevant [React performance section](react-performance.md).
 
 ## Troubleshooting
 

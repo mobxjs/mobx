@@ -109,6 +109,8 @@ const disposer = reaction(
 )
 ```
 
+[Read more about why it's important to dispose](../best/dispose-reactions).
+
 ## Options
 
 Reaction accepts a third argument as an options object with the following optional options:

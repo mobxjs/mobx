@@ -138,9 +138,5 @@ For further details, check the mobx-utils [docs](https://github.com/mobxjs/mobx-
 
 ## More about computed
 
-You can pass [options into `computed`](computed-options.md). You can also
-read more about the [detailed behavior of `computed`](computed-behavior.md).
-
-## Computed values run more often than expected
-
-Please check the [`pitfalls`](https://mobx.js.org/best/pitfalls.html#computed-values-run-more-often-than-expected) section if you experience this.
+You can pass [options into `computed`](computed-options.md). If you experience
+unexpected behavior, you can also read more about the [detailed behavior of `computed`](computed-behavior.md).

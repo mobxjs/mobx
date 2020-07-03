@@ -45,6 +45,9 @@ https://deploy-preview-2382--mobx-docs.netlify.app/
 
 -   Does 'makeAutoObservable' work with computedFn? Should we be able to declare this explicitly with `makeObservable`?
 
+-   Should we use `mobx-react-lite` in examples primarily? What's up with the
+    observer batching story though?
+
 ## Todo
 
 -   [ ] Netlify preview for docs PR.
@@ -59,6 +62,8 @@ https://deploy-preview-2382--mobx-docs.netlify.app/
 -   [ ] What to do about the egghead lessons? They use the decorator syntax and may not enforce actions by default. -> consolidate into a single page and explain the decorator story and action on it.
 -   [ ] Consider breaking up computed.md into a basic and "advanced" document.
 -   [ ] API overview duplicates a lot of the material already discussed elsewhere. Break it into pieces. Introduce a separate API page which has a one line description and a link to the details?
+-   [ ] There seems to a bug so that displayName is not picked up for functional components for the devtools, and the docs do recommend it. Create an issue that reproduces this behavior for mobx-react.
+-   [ ] The debugging information for `observer` components in the React devtools does not match the screenshot in the mobx-react readme anymore.
 
 ## Structure thoughts
 
@@ -125,11 +130,9 @@ Here is a proposed structure:
 
     -   reaction
 
--   Understanding MobX
+    -   always dispose reactions
 
     -   What does MobX react to?
-
-    -   Common Pitfalls
 
 -   Debugging MobX
 
