@@ -62,8 +62,8 @@ https://deploy-preview-2382--mobx-docs.netlify.app/
 -   [ ] What to do about the egghead lessons? They use the decorator syntax and may not enforce actions by default. -> consolidate into a single page and explain the decorator story and action on it.
 -   [ ] Consider breaking up computed.md into a basic and "advanced" document.
 -   [ ] API overview duplicates a lot of the material already discussed elsewhere. Break it into pieces. Introduce a separate API page which has a one line description and a link to the details?
--   [ ] There seems to a bug so that displayName is not picked up for functional components for the devtools, and the docs do recommend it. Create an issue that reproduces this behavior for mobx-react.
--   [ ] The debugging information for `observer` components in the React devtools does not match the screenshot in the mobx-react readme anymore.
+-   [ ] The broken displayName issue with React.memo and thus with observer. Now marked as broken in the docs, but should be updated once fixed.
+-   [ ] The debugging information for `observer` components in the React devtools does not match the screenshot in the mobx-react readme anymore. It does seem to work as intended according to the issue though.
 
 ## Structure thoughts
 
