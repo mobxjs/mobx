@@ -6,8 +6,6 @@ hide_title: true
 
 # Using `trace` for debugging
 
-<div id='codefund'></div><div class="re_2020"><a class="re_2020_link" href="https://www.react-europe.org/#slot-2149-workshop-typescript-for-react-and-graphql-devs-with-michel-weststrate" target="_blank" rel="sponsored noopener"><div><div class="re_2020_ad" >Ad</div></div><img src="/img/reacteurope.svg"><span>Join the author of MobX at <b>ReactEurope</b> to learn how to use <span class="link">TypeScript with React</span></span></a></div>
-
 Trace is a small utility that helps to find out why your computed values, reactions or components are re-evaluating.
 
 It can be used by simply importing `import { trace } from "mobx"`, and then put it inside a reaction or computed value.
@@ -37,20 +35,17 @@ There are different ways of calling `trace()`, some examples:
 import { observer } from "mobx-react"
 import { trace } from "mobx"
 
-@observer
-class MyComponent extends React.Component {
-    render() {
-        trace(true) // enter the debugger whenever an observable value causes this component to re-run
-        return <div>{this.props.user.name}</name>
-    }
-}
+const MyComponent = observer(() => {
+    trace(true) // enter the debugger whenever an observable value causes this component to re-run
+    return <div>{this.props.user.name}</name>
+})
 ```
 
 Enable trace by using the `reaction` argument of an reaction / autorun:
 
 ```javascript
-mobx.autorun("loggerzz", r => {
-    r.trace()
+mobx.autorun("loggerzz", reaction => {
+    reaction.trace()
     console.log(user.fullname)
 })
 ```
