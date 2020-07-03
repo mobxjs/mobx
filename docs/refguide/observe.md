@@ -6,8 +6,6 @@ hide_title: true
 
 # Intercept & Observe
 
-<div id='codefund'></div><div class="re_2020"><a class="re_2020_link" href="https://www.react-europe.org/#slot-2149-workshop-typescript-for-react-and-graphql-devs-with-michel-weststrate" target="_blank" rel="sponsored noopener"><div><div class="re_2020_ad" >Ad</div></div><img src="/img/reacteurope.svg"><span>Join the author of MobX at <b>ReactEurope</b> to learn how to use <span class="link">TypeScript with React</span></span></a></div>
-
 `observe` and `intercept` can be used to monitor the changes of a single observable (they **_don't_** track nested observables).
 `intercept` can be used to detect and modify mutations before they are applied to the observable.
 `observe` allows you to intercept changes after they have been made.
@@ -18,7 +16,7 @@ Usage: `intercept(target, propertyName?, interceptor)`
 
 -   `target`: the observable to guard
 -   `propertyName`: optional parameter to specify a specific property to intercept. Note that `intercept(user.name, interceptor)` is fundamentally different from `intercept(user, "name", interceptor)`. The first tries to add an interceptor to the _current_ `value` inside `user.name` (which might not be an observable at all), the latter intercepts changes to the `name` _property_ of `user`.
--   `interceptor`: callback that will be invoked for _each_ change that is made to the observable. Receives a single change object describing the mutation.
+-   `interceptor`: callback that is invoked for _each_ change that is made to the observable. Receives a single change object describing the mutation.
 
 The `intercept` should tell MobX what needs to happen with the current change.
 Therefore it should do one of the following things:

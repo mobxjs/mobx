@@ -21,20 +21,21 @@
       "refguide/boxed"
     ],
     "Updating observables": [
-      "refguide/action",
-      "best/actions"
+        "refguide/action",
+        "best/actions"
     ],
     "Computed values": [
-      "refguide/computed",
-      "refguide/computed-options",
-      "refguide/computed-behavior"
+        "refguide/computed",
+        "refguide/computed-options",
+        "refguide/computed-behavior"
     ],
     "Effects for observables": [
-      "refguide/autorun",
-      "refguide/reaction",
-      "refguide/when",
-      "best/dispose-reactions",
-      "best/what-does-mobx-react-to"
+        "refguide/autorun",
+        "refguide/reaction",
+        "refguide/when",
+        "refguide/observe",
+        "best/dispose-reactions",
+        "best/what-does-mobx-react-to"
     ],
     "Debugging MobX": [
       "best/trace"
@@ -43,7 +44,6 @@
       "refguide/api",
       "refguide/tojson",
       "refguide/spy",
-      "refguide/observe",
       "refguide/inject",
       "refguide/object-api",
       "refguide/mobx-utils",
