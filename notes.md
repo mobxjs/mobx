@@ -35,14 +35,14 @@
     -   [x] compare mobx.configure options between v4 and v5
     -   [ ] two or 3 modes for configure useProxies? If two, kill `deep` option to observable?
 -   [ ] annotations instead of decorators
-    -   [ ] update typings for makeObservable with private keys
+    -   [x] update typings for makeObservable with private keys
     -   [x] get rid of all that pending decorators shizzle
     -   [x] Todo: check how important array of decorators is, see original issue -> This will be breaking issue, as we are going to treat action etc different?
     -   [ ] Optimize: cache meta data
     -   [x] observable / extendObservable use decorators args
     -   [x] observable; support `false` as argument
-    -   [ ] makeObservable don't warn about missing fields?
-    -   [ ] test late initialization (after declaring props)
+    -   [x] ~makeObservable don't warn about missing fields?~ use extendObservable instead
+    -   [x] test late initialization (after declaring props)
 -   [ ] misc
     -   [x] revisit safety model
     -   [x] at startup, test presence of Map, Symbol ownPropertySymboles and other globals!
@@ -61,6 +61,7 @@
     -   [ ] kill / fix flow types
     -   [ ] enable search on docs
     -   [ ] Would be awesome, but no idea how to go about that :) We could maybe at random places (e.g in observableValue) check in DEV mode if a value is a class instance with decorators, but with undecorated members. Might be a bit of a performance bummer though.
+    -   [ ] displayname for observer components facebook/react#18026
 
 ## Docs / migration guide
 

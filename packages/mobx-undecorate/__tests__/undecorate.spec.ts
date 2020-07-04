@@ -109,25 +109,26 @@ describe("general", () => {
           }
         `)
         ).toMatchInlineSnapshot(`
-                                                                        "import { observable, makeObservable } from \\"mobx\\";
-                                                                        
-                                                                        class ExtendsHasMethod extends Box {
-                                                                            x = 1;
-                                                                        
-                                                                            constructor() {
-                                                                                super();
-                                                                        
-                                                                                makeObservable(this, {
-                                                                                    x: observable
-                                                                                });
-                                                                            }
-                                                                        
-                                                                            // test
-                                                                            method() {
-                                                                                console.log(\\"hi\\")
-                                                                            }
-                                                                        }"
-                                                `)
+            "import { observable, makeObservable } from \\"mobx\\";
+
+            class ExtendsHasMethod extends Box {
+                x = 1;
+
+                constructor() {
+                    // TODO: [mobx-undecorate] verify the constructor arguments and the arguments of this automatically generated super call
+                    super();
+
+                    makeObservable(this, {
+                        x: observable
+                    });
+                }
+
+                // test
+                method() {
+                    console.log(\\"hi\\")
+                }
+            }"
+        `)
     })
 
     test("class with constructor", () => {
@@ -1023,6 +1024,105 @@ describe("@observer", () => {
                 export const X = inject(\\"test\\")(observer(class /* 2 */ /* 3 */ X extends React.Component {
 
                 }));"
+        `)
+    })
+
+    test("class comp with local fields - 1", () => {
+        expect(
+            convert(
+                `
+        import {observer, inject} from 'mobx-react'
+        import {observable} from "mobx"
+        import {Component} from "react"
+
+        @observer class X extends React.Component {
+            @observable field =  1
+        }
+    
+        `,
+                { keepDecorators: false }
+            )
+        ).toMatchInlineSnapshot(`
+            "import {observer, inject} from 'mobx-react'
+                import { observable, makeObservable } from \\"mobx\\";
+                import {Component} from \\"react\\"
+
+                const X = observer(class X extends React.Component {
+                    field = 1;
+
+                    constructor(props) {
+                        super(props);
+
+                        makeObservable(this, {
+                            field: observable
+                        });
+                    }
+                });"
+        `)
+    })
+
+    test("class comp with local fields preserves Props generic", () => {
+        expect(
+            convert(
+                `
+        import {observer, inject} from 'mobx-react'
+        import {observable} from "mobx"
+        import {PureComponent} from "react"
+
+        @observer class X extends PureComponent<{x: boolean}> {
+            @observable field =  1
+        }
+    
+        `,
+                { keepDecorators: false }
+            )
+        ).toMatchInlineSnapshot(`
+            "import {observer, inject} from 'mobx-react'
+                import { observable, makeObservable } from \\"mobx\\";
+                import {PureComponent} from \\"react\\"
+
+                const X = observer(class X extends PureComponent<{x: boolean}> {
+                    field = 1;
+
+                    constructor(props: {x: boolean}) {
+                        super(props);
+
+                        makeObservable(this, {
+                            field: observable
+                        });
+                    }
+                });"
+        `)
+    })
+
+    test("class comp with local fields preserves Props generic", () => {
+        expect(
+            convert(
+                `
+        import {observer, inject} from 'mobx-react'
+        import {observable} from "mobx"
+        import {PureComponent} from "react"
+
+        @observer class X extends PureComponent<{x: boolean}> {
+            @observable field =  1
+        }
+    
+        `,
+                { keepDecorators: true }
+            )
+        ).toMatchInlineSnapshot(`
+            "import {observer, inject} from 'mobx-react'
+                import { observable, makeObservable } from \\"mobx\\";
+                import {PureComponent} from \\"react\\"
+
+                @observer class X extends PureComponent<{x: boolean}> {
+                    @observable field =  1
+
+                    constructor(props: {x: boolean}) {
+                        super(props);
+                        makeObservable(this);
+                    }
+                }"
         `)
     })
 })

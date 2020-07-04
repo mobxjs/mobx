@@ -67,14 +67,24 @@ export default function tranform(
     decoratorsBeforeExport = !options?.decoratorsAfterExport
     const j = api.jscodeshift
     const superCall = j.expressionStatement(j.callExpression(j.super(), []))
+    superCall.comments = [
+        j.commentLine(
+            " TODO: [mobx-undecorate] verify the constructor arguments and the arguments of this automatically generated super call"
+        )
+    ]
+    const reactSuperCall = j.expressionStatement(
+        j.callExpression(j.super(), [j.identifier("props")])
+    )
     const source = j(fileInfo.source)
     const lines = fileInfo.source.split("\n")
     let changed = false
     let needsInitializeImport = false
     const decoratorsUsed = new Set<String>(options?.ignoreImports ? validDecorators : [])
     let usesDecorate = options?.ignoreImports ? true : false
+    let hasReact = options?.ignoreImports ? true : false
 
     source.find(j.ImportDeclaration).forEach(im => {
+        if (im.value.source.value === "react") hasReact = true
         if (validPackages.includes(im.value.source.value as string)) {
             let decorateIndex = -1
             im.value.specifiers.forEach((specifier, idx) => {
@@ -181,46 +191,12 @@ export default function tranform(
             createConstructor(clazz, members, privates)
             needsInitializeImport = true
         }
+
+        // rewrite all @observer / @inject
+        if (!options?.keepDecorators && decoratorsUsed.has("observer")) {
+            handleObserverAndInject(clazzPath)
+        }
     })
-
-    // rewrite all @observer / @inject
-    if (!options?.keepDecorators && decoratorsUsed.has("observer")) {
-        source.find(j.ClassDeclaration).forEach(clazzPath => {
-            const clazz = clazzPath.value
-            // find @observer
-            const observerDecorator = (clazz as any).decorators?.find(
-                dec =>
-                    j.Decorator.check(dec) &&
-                    j.Identifier.check(dec.expression) &&
-                    dec.expression.name === "observer"
-            )
-            // find @inject
-            const injectDecorator = (clazz as any).decorators?.find(
-                dec =>
-                    j.Decorator.check(dec) &&
-                    j.CallExpression.check(dec.expression) &&
-                    j.Identifier.check(dec.expression.callee) &&
-                    dec.expression.callee.name === "inject"
-            )
-            if (!observerDecorator && !injectDecorator) return
-
-            // re-create the class
-            let newClassDefExpr: any = j.classExpression(clazz.id, clazz.body, clazz.superClass)
-            // wrap with observer
-            if (observerDecorator)
-                newClassDefExpr = j.callExpression(j.identifier("observer"), [newClassDefExpr])
-            // wrap with inject
-            if (injectDecorator)
-                newClassDefExpr = j.callExpression(injectDecorator.expression, [newClassDefExpr])
-
-            changed = true
-            const decl = j.variableDeclaration("const", [
-                j.variableDeclarator(j.identifier(clazz.id!.name), newClassDefExpr)
-            ])
-            decl.comments = clazz.comments
-            clazzPath.replace(decl)
-        })
-    }
 
     if (needsInitializeImport && !options?.ignoreImports) {
         // @ts-ignore
@@ -245,6 +221,45 @@ export default function tranform(
     }
     if (changed) {
         return source.toSource()
+    }
+
+    function handleObserverAndInject(clazzPath: ASTPath<ClassDeclaration>) {
+        const clazz = clazzPath.value
+        // find @observer
+        const observerDecorator = (clazz as any).decorators?.find(
+            dec =>
+                j.Decorator.check(dec) &&
+                j.Identifier.check(dec.expression) &&
+                dec.expression.name === "observer"
+        )
+        // find @inject
+        const injectDecorator = (clazz as any).decorators?.find(
+            dec =>
+                j.Decorator.check(dec) &&
+                j.CallExpression.check(dec.expression) &&
+                j.Identifier.check(dec.expression.callee) &&
+                dec.expression.callee.name === "inject"
+        )
+        if (!observerDecorator && !injectDecorator) return
+
+        // re-create the class
+        let newClassDefExpr: any = j.classExpression(clazz.id, clazz.body, clazz.superClass)
+        newClassDefExpr.superTypeParameters = clazz.superTypeParameters
+        newClassDefExpr.typeParameters = clazz.typeParameters
+        newClassDefExpr.implements = clazz.implements
+        // wrap with observer
+        if (observerDecorator)
+            newClassDefExpr = j.callExpression(j.identifier("observer"), [newClassDefExpr])
+        // wrap with inject
+        if (injectDecorator)
+            newClassDefExpr = j.callExpression(injectDecorator.expression, [newClassDefExpr])
+
+        changed = true
+        const decl = j.variableDeclaration("const", [
+            j.variableDeclarator(j.identifier(clazz.id!.name), newClassDefExpr)
+        ])
+        decl.comments = clazz.comments
+        clazzPath.replace(decl)
     }
 
     function handleProperty(
@@ -327,15 +342,34 @@ export default function tranform(
                 )
             }
 
+            let superClassName = j.Identifier.check(clazz.superClass)
+                ? clazz.superClass.name
+                : j.MemberExpression.check(clazz.superClass)
+                ? j.Identifier.check(clazz.superClass.property)
+                    ? clazz.superClass.property.name
+                    : ""
+                : ""
+
+            // if this clazz is a react component, we now that the constructor and super call have one argument, the props
+            let isReactComponent =
+                hasReact && ["Component", "PureComponent"].includes(superClassName)
+            let propsType = isReactComponent && clazz.superTypeParameters?.params[0]
+            const propsParam = j.identifier("props")
+            // reuse the generic if we found it
+            if (propsType) propsParam.typeAnnotation = j.tsTypeAnnotation(propsType as any)
+            // create the constructor
             const constructorDecl = j.methodDefinition(
                 "constructor",
                 j.identifier("constructor"),
                 j.functionExpression(
                     null,
-                    [],
+                    isReactComponent ? [propsParam] : [],
                     j.blockStatement(
                         needsSuper
-                            ? [superCall, initializeObservablesCall]
+                            ? [
+                                  isReactComponent ? reactSuperCall : superCall,
+                                  initializeObservablesCall
+                              ]
                             : [initializeObservablesCall]
                     )
                 )
