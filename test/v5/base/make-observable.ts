@@ -8,7 +8,8 @@ import {
     isComputedProp,
     isAction,
     makeAutoObservable,
-    autorun
+    autorun,
+    extendObservable
 } from "../../../src/mobx"
 
 test("makeObservable picks up decorators", () => {
@@ -279,4 +280,75 @@ test("observable actions can be used for state updaters and state readers", () =
     expect(events).toEqual([2, 6])
 
     d()
+})
+
+test("makeObservable can be used late and support non-enumerable getters", () => {
+    function MyClass() {
+        this.x = 1
+        Object.defineProperty(this, "double", {
+            get() {
+                return this.x
+            },
+            configurable: true,
+            enumerable: false
+        })
+        this.inc = function () {
+            this.x++
+        }
+        makeObservable(this, {
+            x: observable,
+            double: computed,
+            inc: action
+        })
+    }
+    const i = new MyClass()
+
+    expect(isObservableProp(i, "x")).toBe(true)
+    expect(isComputedProp(i, "double")).toBe(true)
+    expect(isAction(i.inc)).toBe(true)
+})
+
+test("makeAutoObservable can be used late and support non-enumerable getters", () => {
+    function MyClass() {
+        this.x = 1
+        Object.defineProperty(this, "double", {
+            get() {
+                return this.x
+            },
+            configurable: true,
+            enumerable: false
+        })
+        this.inc = function () {
+            this.x++
+        }
+        makeAutoObservable(this)
+    }
+    const i = new MyClass()
+
+    expect(isObservableProp(i, "x")).toBe(true)
+    expect(isComputedProp(i, "double")).toBe(true)
+    expect(isAction(i.inc)).toBe(true)
+})
+
+test("extendObservable can be used late and support non-enumerable getters #2386", () => {
+    function MyClass() {
+        const args = {
+            x: 1,
+            inc() {
+                this.x++
+            }
+        }
+        Object.defineProperty(args, "double", {
+            get() {
+                return this.x
+            },
+            enumerable: false
+        })
+        extendObservable(this, args)
+    }
+    const i = new MyClass()
+
+    expect(isObservableProp(i, "x")).toBe(true)
+    expect(isComputedProp(i, "double")).toBe(true)
+    expect(isAction(i.inc)).toBe(true)
 })
