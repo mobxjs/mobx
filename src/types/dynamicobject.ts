@@ -9,6 +9,7 @@ import {
     die,
     isStringish
 } from "../internal"
+import { globalState } from "../core/globalstate"
 
 function getAdm(target): ObservableObjectAdministration {
     return target[$mobx]
@@ -19,7 +20,10 @@ function getAdm(target): ObservableObjectAdministration {
 const objectProxyTraps: ProxyHandler<any> = {
     has(target: IIsObservableObject, name: PropertyKey) {
         if (name === $mobx || name === "constructor") return true
-        if (__DEV__) warnAboutProxyRequirement() // TODO: is this correct?
+        if (__DEV__ && globalState.trackingDerivation)
+            warnAboutProxyRequirement(
+                "detect new properties using the 'in' operator. Use 'has' from 'mobx' instead."
+            )
         const adm = getAdm(target)
         // MWE: should `in` operator be reactive? If not, below code path will be faster / more memory efficient
         // check performance stats!
@@ -50,20 +54,28 @@ const objectProxyTraps: ProxyHandler<any> = {
     set(target: IIsObservableObject, name: PropertyKey, value: any) {
         if (!isStringish(name)) return false
         if (__DEV__ && !getAdm(target).values_.has(name)) {
-            warnAboutProxyRequirement()
+            warnAboutProxyRequirement(
+                "add a new observable property through direct assignment. Use 'set' from 'mobx' instead."
+            )
         }
         set(target, name, value)
         return true
     },
     deleteProperty(target: IIsObservableObject, name: PropertyKey) {
-        if (__DEV__) warnAboutProxyRequirement()
+        if (__DEV__)
+            warnAboutProxyRequirement(
+                "delete properties from an observable object. Use 'remove' from 'mobx' instead."
+            )
         if (!isStringish(name)) return false
         const adm = getAdm(target)
         adm.remove_(name)
         return true
     },
     ownKeys(target: IIsObservableObject) {
-        if (__DEV__) warnAboutProxyRequirement()
+        if (__DEV__ && globalState.trackingDerivation)
+            warnAboutProxyRequirement(
+                "iterate keys to detect added / removed properties. Use `keys` from 'mobx' instead."
+            )
         const adm = getAdm(target)
         adm.keysAtom_.reportObserved()
         return Reflect.ownKeys(target)

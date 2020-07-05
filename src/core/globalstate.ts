@@ -134,7 +134,6 @@ export class MobXGlobals {
     /*
      * print warnings about code that would fail if proxies weren't available
      */
-    // TODO: add tests for this
     verifyProxies = false
 }
 

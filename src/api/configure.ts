@@ -34,6 +34,7 @@ export function configure(options: {
                 ? false
                 : typeof Proxy !== "undefined"
     }
+    if (useProxies === "ifavailable") globalState.verifyProxies = true
     if (enforceActions !== undefined) {
         const ea = enforceActions === ALWAYS ? ALWAYS : enforceActions === OBSERVED
         globalState.enforceActions = ea

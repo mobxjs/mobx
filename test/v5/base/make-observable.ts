@@ -323,6 +323,11 @@ test("makeAutoObservable can be used late and support non-enumerable getters", (
         }
         makeAutoObservable(this)
     }
+    // check if annotations are cached
+    expect(Object.getOwnPropertySymbols(MyClass.prototype).length).toBe(0)
+    const x = new MyClass()
+    expect(Object.getOwnPropertySymbols(MyClass.prototype).length).toBe(1)
+
     const i = new MyClass()
 
     expect(isObservableProp(i, "x")).toBe(true)

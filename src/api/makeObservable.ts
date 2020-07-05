@@ -31,9 +31,13 @@ import {
     OBSERVABLE_SHALLOW,
     OBSERVABLE_STRUCT,
     getOwnPropertyDescriptors,
-    defineProperty
+    defineProperty,
+    ownKeys,
+    objectPrototype,
+    hasProp
 } from "../internal"
-import { ownKeys, objectPrototype } from "../utils/utils"
+
+const CACHED_ANNOTATIONS = Symbol("mobx-cached-annotations")
 
 function makeAction(target, key, name, fn, asAutoAction) {
     addHiddenProp(target, key, asAutoAction ? autoAction(name || key, fn) : action(name || key, fn))
@@ -54,7 +58,7 @@ function getInferredAnnotation(
 function getDescriptorInChain(target: Object, prop: PropertyKey): [PropertyDescriptor, Object] {
     let current = target
     while (current && current !== objectPrototype) {
-        // TODO: cache meta data, especially for members from prototypes?
+        // Optimization: cache meta data, especially for members from prototypes?
         const desc = getDescriptor(current, prop)
         if (desc) {
             return [desc, current]
@@ -148,8 +152,9 @@ export function makeProperty(
         default:
             if (__DEV__)
                 die(
-                    `invalid decorator '${annotation.annotationType_ ??
-                        annotation}' for '${key.toString()}'`
+                    `invalid decorator '${
+                        annotation.annotationType_ ?? annotation
+                    }' for '${key.toString()}'`
                 )
     }
 }
@@ -199,10 +204,17 @@ export function makeAutoObservable<T extends Object, AdditionalKeys extends Prop
         if (isObservableObject(target))
             die(`makeAutoObservable can only be used on objects not already made observable`)
     }
-    let annotations = { ...excludes }
-    extractAnnotationsFromObject(target, annotations, options)
-    if (!isPlain) {
-        extractAnnotationsFromProto(proto, annotations)
+    let annotations: AnnotationsMap<any, any>
+    if (!isPlain && hasProp(proto, CACHED_ANNOTATIONS)) {
+        // shortcut, reuse inferred annotations for this type from the previous time
+        annotations = proto[CACHED_ANNOTATIONS] as any
+    } else {
+        annotations = { ...excludes }
+        extractAnnotationsFromObject(target, annotations, options)
+        if (!isPlain) {
+            extractAnnotationsFromProto(proto, annotations)
+            addHiddenProp(proto, CACHED_ANNOTATIONS, annotations)
+        }
     }
     makeObservable(target, annotations, options)
     return target

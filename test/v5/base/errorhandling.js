@@ -2,7 +2,7 @@ const mobx = require("../../../src/mobx.ts")
 const m = mobx
 const utils = require("../../v5/utils/test-utils")
 
-const { observable, computed, $mobx } = mobx
+const { observable, computed, $mobx, autorun } = mobx
 
 const voidObserver = function () {}
 
@@ -794,3 +794,76 @@ test("error in effect of when is properly cleaned up", () => {
 
     checkGlobalState()
 })
+
+describe("es5 compat warnings", () => {
+    beforeEach(() => {
+        mobx.configure({
+            useProxies: "ifavailable"
+        })
+    })
+
+    test("adding / deleting property", () => {
+        const x = observable({
+            z: 0
+        })
+
+        expect(() => {
+            x.y = 2
+        }).toThrowErrorMatchingInlineSnapshot(
+            `"[MobX] MobX is currently configured to be able to run in ES5 mode, but in ES5 MobX won't be able to add a new observable property through direct assignment. Use 'set' from 'mobx' instead."`
+        )
+
+        expect(() => {
+            delete x.z
+        }).toThrowErrorMatchingInlineSnapshot(
+            `"[MobX] MobX is currently configured to be able to run in ES5 mode, but in ES5 MobX won't be able to delete properties from an observable object. Use 'remove' from 'mobx' instead."`
+        )
+    })
+
+    test("iterating props", () => {
+        const x = observable({
+            z: 0
+        })
+
+        expect(() => {
+            "z" in x
+        }).not.toThrowError()
+
+        let e
+        autorun(() => {
+            try {
+                "z" in x
+            } catch (err) {
+                e = err
+            }
+        })
+        expect(e).toMatchInlineSnapshot(
+            `[Error: [MobX] MobX is currently configured to be able to run in ES5 mode, but in ES5 MobX won't be able to detect new properties using the 'in' operator. Use 'has' from 'mobx' instead.]`
+        )
+
+        e = undefined
+
+        expect(() => {
+            Object.getOwnPropertyNames(x)
+        }).not.toThrowError()
+        autorun(() => {
+            try {
+                Object.getOwnPropertyNames(x)
+            } catch (err) {
+                e = err
+            }
+        })
+        expect(e).toMatchInlineSnapshot(
+            `[Error: [MobX] MobX is currently configured to be able to run in ES5 mode, but in ES5 MobX won't be able to iterate keys to detect added / removed properties. Use \`keys\` from 'mobx' instead.]`
+        )
+    })
+
+    afterEach(() => {
+        mobx._resetGlobalState()
+        mobx.configure({
+            useProxies: "always"
+        })
+    })
+})
+
+test("should throw when adding properties in ES5 compat mode", () => {})

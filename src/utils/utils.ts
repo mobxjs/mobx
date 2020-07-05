@@ -29,11 +29,11 @@ export function assertProxies() {
     }
 }
 
-export function warnAboutProxyRequirement() {
+export function warnAboutProxyRequirement(msg: string) {
     if (__DEV__ && globalState.verifyProxies) {
-        // TODO: add relevant URL at the end of this warning
-        console.warn(
-            "MobX is currently configured to be able to allow running ES5 mode, however, this line of code will not work on ES5 environments. For details see: "
+        die(
+            "MobX is currently configured to be able to run in ES5 mode, but in ES5 MobX won't be able to " +
+                msg
         )
     }
 }
