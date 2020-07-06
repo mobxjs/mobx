@@ -48,10 +48,11 @@
     -   [x] at startup, test presence of Map, Symbol ownPropertySymboles and other globals!
     -   [x] verify: action called from computed throws?
     -   [x] apply deprecation of find and findIndex error
-    -   [ ] verify perf / memory changes
+    -   [x] verify perf / memory changes -> general perf is similar (< 10% slower, class instanation is twice as slow...!?). Not sure if that is a problem or the result of difference in babel config in the first place (e.g. define props)
     -   [x] investigate skipped tests
-    -   [ ] process TODO's
-    -   [ ] weakmap for hasMaps in Map (and Set?)
+    -   [x] process TODO's
+    -   [ ] // TODO: support chrome formatter https://www.mattzeunert.com/2016/02/19/custom-chrome-devtools-object-formatters.html
+    -   [x] ~weakmap for hasMaps in Map (and Set?)~ no: that would only works for objectish keys which is an exception and would require separate map collection
     -   [ ] add a solution for keepAlive computeds like https://github.com/mobxjs/mobx/issues/2309#issuecomment-598707584
     -   [ ] include #2343
     -   [ ] default observable requires reaction?

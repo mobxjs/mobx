@@ -111,6 +111,9 @@
         "tsConfig": "tsconfig.test.json"
       }
     },
+    "setupFilesAfterEnv": [
+      "<rootDir>/test/setup.js"
+    ],
     "transform": {
       "^.+\\.tsx?$": "ts-jest",
       "^.+\\.jsx?$": "babel-jest"

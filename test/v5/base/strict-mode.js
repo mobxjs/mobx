@@ -7,6 +7,10 @@ const { makeObservable } = mobx
 
 const strictError = /Since strict-mode is enabled, changing observed observable values outside actions is not allowed./
 
+beforeEach(() => {
+    mobx.configure({ enforceActions: "observed" })
+})
+
 test("strict mode should not allow changes outside action", () => {
     const a = mobx.observable.box(2)
     mobx.configure({ enforceActions: "observed" })
@@ -166,11 +170,12 @@ test("can create objects in strict mode with action", () => {
         map.set("b", 4)
         map.delete("a")
     })()
-
-    mobx.configure({ enforceActions: "never" })
 })
 
 test("strict mode checks", function () {
+    mobx.configure({
+        enforceActions: "never"
+    })
     const x = mobx.observable.box(3)
     const d = mobx.autorun(() => x.get())
 
@@ -323,7 +328,7 @@ describe("observableRequiresReaction", function () {
     test("don't warn on autorun tracks invalidation of unbound dependencies", function () {
         // #2195
         try {
-            mobx.configure({ observableRequiresReaction: true })
+            mobx.configure({ observableRequiresReaction: true, enforceActions: "never" })
             const a = mobx.observable.box(0)
             const b = mobx.observable.box(0)
             const c = mobx.computed(() => a.get() + b.get())
@@ -347,7 +352,7 @@ describe("observableRequiresReaction", function () {
     test("don't warn on autorun tracks invalidation of unbound dependencies - also with action", function () {
         // #2195
         try {
-            mobx.configure({ observableRequiresReaction: true })
+            mobx.configure({ observableRequiresReaction: true, enforceActions: "never" })
             const a = mobx.observable.box(0)
             const b = mobx.observable.box(0)
             const c = mobx.computed(() => a.get() + b.get())

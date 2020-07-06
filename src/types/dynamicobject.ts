@@ -31,7 +31,6 @@ const objectProxyTraps: ProxyHandler<any> = {
         if (isStringish(name)) return adm.has_(name)
         return (name as any) in target
     },
-    // TODO: support chrome formatter https://www.mattzeunert.com/2016/02/19/custom-chrome-devtools-object-formatters.html
     get(target: IIsObservableObject, name: PropertyKey) {
         if (name === $mobx || name === "constructor") return target[name]
         const adm = getAdm(target)

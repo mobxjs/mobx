@@ -64,7 +64,7 @@ export function storeDecorator(
 
 export function applyDecorators(target: Object): boolean {
     let current = target
-    // TODO optimization: this can be cached per prototype!
+    // optimization: this could be cached per prototype!
     // (then we can remove the weird short circuiting as well..)
     let annotations: AnnotationsMap<any, any>[] = []
     while (current && current !== objectPrototype) {

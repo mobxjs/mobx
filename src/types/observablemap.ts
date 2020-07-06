@@ -116,7 +116,6 @@ export class ObservableMap<K = any, V = any>
 
         let entry = this.hasMap_.get(key)
         if (!entry) {
-            // TODO: replace with atom (breaking change)
             const newEntry = (entry = new ObservableValue(
                 this.has_(key),
                 referenceEnhancer,
