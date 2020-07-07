@@ -85,6 +85,48 @@ class Doubler {
 
 As you can see this is more compact.
 
+### When you call makeAutoObservable
+
+When you call `makeAutoObservable` all properties you want to be observable
+_must_ exist on the instance already.
+
+In the example above you see we have declared `value` as a [public instance
+field](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/Public_class_fields)
+in the class body. This ensures the property exists on the instance even before
+`constructor` is called, so you can use `makeAutoObservable` at the start of
+your constructor.
+
+Class field declarations are a [stage 3 language feature for
+JS](https://github.com/tc39/proposal-class-fields), so while this feature is
+close to standardization it's not officially part of JavaScript yet. It's
+widely used though. Babel supports it with a
+[plugin](https://babeljs.io/docs/en/babel-plugin-proposal-class-properties) and
+`create-react-app` supports it out of the box. You can use this syntax in
+TypeScript too, where it's used very widely for type declaration.
+
+In JavaScript a public class field looks rather redundant if you only end up setting its value in the constructor. `makeAutoObservable` also works without
+public class fields, but you have to call it at the end of the constructor in this case:
+
+```javascript
+import { makeAutoObservable } from "mobx"
+
+class Doubler {
+    constructor(value) {
+        this.value = value
+        // ensure all properties exist before calling makeAutoObservable
+        makeAutoObservable(this)
+    }
+
+    get double() {
+        return this.value * 2
+    }
+
+    increment() {
+        this.value++
+    }
+}
+```
+
 ### Excluding properties that are not observable
 
 Here is how you can exclude a property from being observable:
