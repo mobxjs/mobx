@@ -38,6 +38,25 @@ Functions that just perform look-ups, filters etc should _not_ be marked as acti
 
 If you use `makeAutoObservable` you have to [exclude these methods explicitly from being marked as actions](make-observable.md#excluding-methods-that-are-not-actions).
 
+## `runInAction`
+
+Usage:
+
+-   `runInAction(name? fn)`
+
+It can be useful to have just a small snippet of code run as an action,
+without having to declare a method. This can be especially useful in [async code](../best/actions.md).
+
+`runInAction(name?, fn)` is a convenience to write `action(name, fn)()`.
+
+For example, to change the observable property `message.name` outside of an explicit action, write:
+
+```javascript
+runInAction(() => {
+    message.name = "Sara"
+})
+```
+
 ## Actions and async code
 
 There are some special rules you have to take into account when you have actions that

@@ -15,17 +15,18 @@
     "Making things observable": [
       "refguide/make-observable",
       "refguide/observable",
-      "refguide/object",
       "refguide/array",
       "refguide/map",
       "refguide/set",
+      "refguide/object",
       "refguide/modifiers",
       "refguide/extend-observable",
       "refguide/boxed"
     ],
-    "Updating observables": [
+    "Updating observables with actions": [
         "refguide/action",
-        "best/actions"
+        "best/actions",
+        "refguide/flow"
     ],
     "Computed values": [
         "refguide/computed",

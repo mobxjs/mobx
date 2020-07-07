@@ -126,9 +126,7 @@ class Store {
 
 ### The `runInAction` utility
 
-A downside of inline actions in combination with TypeScript is that TypeScript does
-not apply type inference on them, so you would have type all your callbacks.
-Instead of creating an action for the entire callback, you can also run only the state modifying part of the callback in an action.
+Instead of creating an action for the entire callback, you can also run only the state modifying part of the callback in an action with `runInAction`. This is especially useful with TypeScript, as you can avoid having to manually type your callbacks.
 
 `runInAction` requires you to structure your code so that state modifications happen at the end of the process as much as possible:
 
@@ -166,7 +164,7 @@ class Store {
 }
 ```
 
-Note that `runInAction` can also be given a name as first argument. `runInAction(f)` is in fact just sugar for `action(f)()`
+See also [`runInAction`](../refguide/action.md#runinaction).
 
 ## async / await
 
@@ -282,9 +280,7 @@ class Store {
 
 ## flow instead of async/await
 
-An alternative approach is to use the built-in concept of `flow`. `flow`
-works in the same way as `async` / `await` but is based around generators
-instead. The rules are:
+An alternative approach is to use the built-in concept of [`flow`](../refguide/flow.md). `flow` works in the same way as `async` / `await` but is based around generators instead. The rules are:
 
 -   Wrap `flow` around your asynchronous function.
 
@@ -295,6 +291,8 @@ instead. The rules are:
 The advantage of `flow` is that it is syntactically very close to `async` / `await` (with different keywords), and no manually action wrapping is required for async parts.
 
 `flow` also integrates neatly with MobX development tools, so that it is easy to trace the process of the async function.
+
+Here is our example rewritten to use `flow`:
 
 ```javascript
 import { flow } from "mobx"
@@ -308,7 +306,7 @@ class Store {
     }
 
     // note the star, this a generator function!
-    fetchProjects = flow(function* () {
+    fetchProjects = flow(function* fetchProjects() {
         this.githubProjects = []
         this.state = "pending"
         try {
@@ -323,9 +321,3 @@ class Store {
     })
 }
 ```
-
-### Flows can be cancelled
-
-Flows are cancellable which means you can call `cancel()` on the returned promise. This stops the generator immediately, but any `finally` clause is still processed. The returned promise itself rejects with an instance of `FlowCancellationError` whose message is `FLOW_CANCELLED`.
-
-If you want to write code that catches `FlowCancellationError` you can import it from the `mobx` package. Also exported is a `isFlowCancellationError(error)` helper that returns `true` if and only if the provided argument is a `FlowCancellationError`.

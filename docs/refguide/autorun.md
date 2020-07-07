@@ -10,6 +10,8 @@ Usage:
 
 -   `autorun(effect: (reaction) => void)`
 
+Autorun is a type of _reaction_. Reactions are **side effects** that react automatically to state changes. Reactions _can_ be used to ensure that a certain side effect (mainly I/O) is automatically executed when relevant state changes, like logging, network requests etc.
+
 You pass a function into `autorun` that should run each time anything it observes changes. It also runs once when you create the `autorun`. It only responds to changes in observable state -- so things you marked `observable` or `computed`. It won't
 respond if other observable state changes that it does not in any refer refer
 to in the function.

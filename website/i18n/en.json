@@ -132,6 +132,10 @@
         "title": "refguide/extending",
         "sidebar_label": "createAtom"
       },
+      "refguide/flow": {
+        "title": "flow",
+        "sidebar_label": "flow"
+      },
       "refguide/inject": {
         "title": "provider_inject",
         "sidebar_label": "Provider / inject"
@@ -197,7 +201,7 @@
       "Basics": "Basics",
       "MobX and React": "MobX and React",
       "Making things observable": "Making things observable",
-      "Updating observables": "Updating observables",
+      "Updating observables with actions": "Updating observables with actions",
       "Computed values": "Computed values",
       "Effects for observables": "Effects for observables",
       "Debugging MobX": "Debugging MobX",

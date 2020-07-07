@@ -15,6 +15,19 @@ _These are the most important MobX API's._
 
 ## Creating observables
 
+### `makeObservable`
+
+Declare observables, computeds and actions in the class
+constructor.
+
+[&laquo;`details`&raquo;](make-observable.md)
+
+### `makeAutoObservable`
+
+Automatically derive observables, computeds and actions in the class constructor.
+
+[&laquo;`details`&raquo;](make-observable.md)
+
 ### `observable`
 
 Mark a property as observable.
@@ -26,12 +39,6 @@ Mark a property as observable.
 Make a value observable.
 
 [&laquo;`details`&raquo;](observable.md)
-
-### `observable.box(value, options?)`
-
-Creates an observable _box_ that stores an observable reference to a value.
-
-[&laquo;`details`&raquo;](boxed.md)
 
 ### `observable.object(value, decorators?, options?)`
 
@@ -57,311 +64,83 @@ Create a new observable Set based on the provided value.
 
 [&laquo;`details`&raquo;](set.md)
 
-### `extendObservable`
+### `observable` modifiers
 
-Usage: `extendObservable(target, properties, decorators?, options?)`.
-
-For each key/value pair in each `properties` a (new) observable property will be introduced on the target object if the property does not already exist on the target object. If the property does exist, it will be made observable.
-This can be used in constructor functions to introduce observable properties without using decorators.
-If a value of the `properties` is a getter function, a _computed_ property will be introduced.
-
-Use `extendObservable(target, properties, decorators?, {deep: false})` if the new properties should not be infective (that is; newly assigned values should not be turned into observables automatically).
-Note that `extendObservable` enhances existing objects, unlike `observable.object` which creates a new object.
-
-[&laquo;details&raquo;](extend-observable.md)
-
-### Decorators
-
-Use decorators to fine tune the observability of properties defined via `observable`, `extendObservable` and `observable.object`. They can also control the auto-conversion rules for specific properties.
-
-The following decorators are available:
-
--   **`observable.deep`**: This is the default decorator, used by any observable. It converts any assigned, non-primitive value into an observable if it isn't one yet.
--   **`observable.ref`**: Disables automatic observable conversion, just creates an observable reference instead.
--   **`observable.shallow`**: Can only be used in combination with collections. Turns any assigned collection into a collection, which is shallowly observable (instead of deep). In other words; the values inside the collection won't become observables automatically.
--   **`computed`**: Creates a derived property, see [`computed`](computed.md)
--   **`action`**: Creates an action, see [`action`](action.md)
--   **`action.bound`**: Creates a bound action, see [`action`](action.md)
-
-You can apply these decorators using the _@decorator_ syntax:
-
-```javascript
-import { observable, action } from "mobx"
-
-class TaskStore {
-    @observable.shallow tasks = []
-    @action addTask(task) {
-        /* ... */
-    }
-}
-```
-
-Or by passing in property decorators via `observable.object` / `observable.extendObservable` or [`decorate()`](#decorate).
-Note that decorators always 'stick' to the property. So they will remain in effect even if a new value is assigned.
-
-```javascript
-import { observable, action } from "mobx"
-
-const taskStore = observable(
-    {
-        tasks: [],
-        addTask(task) {
-            /* ... */
-        }
-    },
-    {
-        tasks: observable.shallow,
-        addTask: action
-    }
-)
-```
+Modify observable behavior.
 
 [&laquo;details&raquo;](modifiers.md)
 
-### `decorate`
+### `extendObservable`
 
-Usage: `decorate(object, decorators)`
-This is a convenience method to apply observability [decorators](#decorators) to the properties of a plain object or class instance. The second argument is an object with properties set to certain decorators.
+Make an existing object observable.
 
-Use this if you cannot use the _@decorator_ syntax or need more control over setting observability.
+[&laquo;details&raquo;](extend-observable.md)
 
-```js
-class TodoList {
-    todos = {}
-    get unfinishedTodoCount() {
-        return values(this.todos).filter(todo => !todo.finished).length
-    }
-    addTodo() {
-        const t = new Todo()
-        t.title = "Test_" + Math.random()
-        set(this.todos, t.id, t)
-    }
-}
+### `observable.box(value, options?)`
 
-decorate(TodoList, {
-    todos: observable,
-    unfinishedTodoCount: computed,
-    addTodo: action.bound
-})
-```
+Creates an observable _box_ that stores an observable reference to a value.
 
-For applying multiple decorators on a single property, you can pass an array of decorators. The decorators application order is from right to left.
+[&laquo;`details`&raquo;](boxed.md)
 
-```javascript
-import { decorate, observable } from "mobx"
-import { serializable, primitive } from "serializr"
-import persist from "mobx-persist"
+## `computed`
 
-class Todo {
-    id = Math.random()
-    title = ""
-    finished = false
-}
-
-decorate(Todo, {
-    title: [serializable(primitive), persist("object"), observable],
-    finished: [serializable(primitive), observable]
-})
-```
-
-Note: Not all decorators can be composed together, and this functionality is just best-effort. Some decorators affect the instance directly and can 'hide' the effect of other decorators that only change the prototype.
-
-## Computed values
-
-Usage:
-
--   `computed(() => expression)`
--   `computed(() => expression, (newValue) => void)`
--   `computed(() => expression, options)`
--   `@computed get classProperty() { return expression; }`
--   `@computed({equals: compareFn}) get classProperty() { return expression; }`
--   `@computed.struct get classProperty() { return expression; }`
-
-Creates a computed property. The `expression` should not have side effects but return a value.
-The expression will automatically be re-evaluated if any observables it uses changes, but only if it is in use by some _reaction_.
-
-There are various `options` that can be used to control the behavior of `computed`. These include:
-
--   **`equals: (value, value) => boolean`** Comparison method can be used to override the default detection on when something is changed. Built-in comparers are: `comparer.identity`, `comparer.default`, `comparer.structural`, `comparer.shallow`.
--   **`name: string`** Provide a debug name to this computed property
--   **`requiresReaction: boolean`** Wait for a change in value of the tracked observables, before recomputing the derived property
--   **`get: () => value)`** Override the getter for the computed property.
--   **`set: (value) => void`** Override the setter for the computed property
--   **`keepAlive: boolean`** Set to true to automatically keep computed values alive, rather then suspending then when there are no observers.
+Computed values derived from observables and other computeds.
 
 [&laquo;details&raquo;](computed.md)
 
 ## Actions
 
-Any application has actions. Actions are anything that modify the state.
+Actions are anything that modify the state.
 
-With MobX you can make it explicit in your code where your actions live by marking them.
-Actions helps you to structure your code better.
-It is advised to use them on any function that modifies observables or has side effects.
-`action` also provides useful debugging information in combination with the devtools.
-Note: using `action` is mandatory when _strict mode_ is enabled, see `enforceActions`.
 [&laquo;details&raquo;](action.md)
 
-Usage:
+### `runInAction`
 
--   `action(fn)`
--   `action(name, fn)`
--   `@action classMethod`
--   `@action(name) classMethod`
--   `@action boundClassMethod = (args) => { body }`
--   `@action.bound boundClassMethod(args) { body }`
+One-time actions.
 
-For one-time-actions `runInAction(name?, fn)` can be used, which is sugar for `action(name, fn)()`.
+[&laquo;details&raquo;](action.md#runinaction)
 
 ### Flow
 
-Usage: `flow(function* (args) { })`
+MobX friendly replacement for `async` / `await`.
 
-`flow()` takes a generator function as its only input
+[&laquo;details&raquo;](flow.md)
 
-When dealing with _async actions_, the code that executes in the callback is not wrapped by `action`. This means the observable state that you are mutating, will fail the [`enforceActions`](#configure) check. An easy way to retain the action semantics is by wrapping the async function with flow. This will ensure to wrap all your callbacks in `action()`.
-
-Note that the async function must be a _generator_ and you must only _yield_ to promises inside. `flow` gives you back a promise that you can `cancel()` if you want.
-
-```js
-import { configure } from "mobx"
-
-// don't allow state modifications outside actions
-configure({ enforceActions: "always" })
-
-class Store {
-    @observable githubProjects = []
-    @observable state = "pending" // "pending" / "done" / "error"
-
-    fetchProjects = flow(function* fetchProjects() {
-        // <- note the star, this a generator function!
-        this.githubProjects = []
-        this.state = "pending"
-        try {
-            const projects = yield fetchGithubProjectsSomehow() // yield instead of await
-            const filteredProjects = somePreprocessing(projects)
-
-            // the asynchronous blocks will automatically be wrapped actions
-            this.state = "done"
-            this.githubProjects = filteredProjects
-        } catch (error) {
-            this.state = "error"
-        }
-    })
-}
-```
-
-_Tip: it is recommended to give the generator function a name, this is the name that will show up in dev tools and such_
-
-**Flows can be cancelled**
-
-Flows are canceallable, that means that you can call `cancel()` on the returned promise. This will stop the generator immediately, but any `finally` clause will still be processed.
-The returned promise itself will reject with `FLOW_CANCELLED`
-
-**Flows support async iterators**
-
-Flows support async iterators, that means you can use async generators:
-
-```javascript
-async function* someNumbers() {
-    yield Promise.resolve(1)
-    yield Promise.resolve(2)
-    yield Promise.resolve(3)
-}
-
-const count = mobx.flow(async function* () {
-    // use for await to loop async iterators
-    for await (const number of someNumbers()) {
-        total += number
-    }
-    return total
-})
-
-const res = await count() // 6
-```
-
-## Reactions & Derivations
-
-_Computed values_ are **values** that react automatically to state changes.
-_Reactions_ are **side effects** that react automatically to state changes.
-Reactions _can_ be used to ensure that a certain side effect (mainly I/O) is automatically executed when relevant state changes, like logging, network requests etc.
-The most commonly used reaction is the `observer` decorator for React components (see below).
+## React integration
 
 ### `observer`
 
-Can be used as higher order component around a React component.
-The component will then automatically re-render if any of the observables used in the `render` function of the component has changed.
-Note that `observer` is provided by the `"mobx-react"` package and not by `"mobx"` itself.
+A higher order component you can use to make a React component re-render when observables change.
+
+Is part of the `mobx-react` package.
 
 [&laquo;details&raquo;](../react/react-integration.md)
 
-Usage:
-
--   `observer(React.createClass({ ... }))`
--   `observer((props, context) => ReactElement)`
--   `observer(class MyComponent extends React.Component { ... })`
--   `@observer class MyComponent extends React.Component { ... }`
+## Reactions & Derivations
 
 ### `autorun`
 
-Usage: `autorun(() => { sideEffect }, options)`. Autorun runs the provided `sideEffect` and tracks which observable state is accessed while running the side effect.
-Whenever one of the used observables is changed in the future, the same sideEffect will be run again.
-Returns a disposer function to cancel the side effect.
+Rerun a function each time anything it observes changes.
 
 [&laquo;details&raquo;](autorun.md)
 
-**options**
-
--   **`name?: string`**: A name for easier identification and debugging
--   **`delay?: number`**: the sideEffect will be delayed and throttled with the given `delay`. Defaults to `0`.
--   **`onError?: (error) => void`**: error handler that will be triggered if the autorun function throws an exception
--   **`scheduler?: (callback) => void`**: Set a custom scheduler to determine how re-running the autorun function should be scheduled
--   **`requiresObservable?: boolean`** Enables [`reactionRequiresObservable`](#reactionrequiresobservable-boolean) locally for the autorun
-
-### `when`
-
-Usage: `when(() => condition, () => { sideEffect }, options)`.
-The condition expression will react automatically to any observables it uses.
-As soon as the expression returns true the sideEffect function will be invoked, but only once.
-
-**Note:** the _effect-function_ (second argument) is actually optional. If no effect-function is provided, it will return a cancelable promise (i.e. having a `cancel()` method on the promise)
-
-`when` returns a disposer to prematurely cancel the whole thing.
-
-If no effect function is passed to `when`, it will return a promise that can be awaited until the condition settles.
-
-[&laquo;details&raquo;](when.md).
-
-**options**
-
--   **`name?: string`**: A name for easier identification and debugging
--   **`onError?: (error) => void`**: error handler that will be triggered if the _predicate-function_ or the _effect-function_ throws an exception
--   **`timeout: number`** a timeout in milliseconds, after which the `onError` handler will be triggered to signal the condition not being met within a certain time
--   **`requiresObservable?: boolean`** Enables [`reactionRequiresObservable`](#reactionrequiresobservable-boolean) locally for the when
-
 ### `reaction`
 
-Usage: `reaction(() => data, data => { sideEffect }, options)`.
-A variation on `autorun` that gives more fine-grained control on which observables that will be tracked.
-It takes two function, the first one is tracked and returns data that is used as input for the second one, the side effect.
-Unlike `autorun` the side effect won't be run initially, and any observables that are accessed while executing the side effect will not be tracked.
-The side effect can be throttled, just like `autorunAsync`.
+Rerun a side-effect when data it observes changes.
 
 [&laquo;details&raquo;](reaction.md)
 
-**options**
+### `when`
 
--   **`fireImmediately?: boolean`**: Wait for a change before firing the _effect function_. Defaults to `false`.
--   **`delay?: number`**: the sideEffect will be delayed and throttled with the given `delay`. Defaults to `0`.
--   **`equals`**: Custom equality function to determine whether the expr function differed from it's previous result, and hence should fire effect. Accepts the same options as the equals option of `computed`.
--   Also accepts all of the options from [`autorun`](#autorun)
--   **`requiresObservable?: boolean`** Enables [`reactionRequiresObservable`](#reactionrequiresobservable-boolean) locally for the reaction
+Execute a side-effect once when a observable condition becomes true.
+
+[&laquo;details&raquo;](when.md).
 
 ### `onReactionError`
 
 Usage: `onReactionError(handler: (error: any, derivation) => void)`
 
-This method attaches a global error listener, which is invoked for every error that is thrown from a _reaction_.
+This function attaches a global error listener, which is invoked for every error that is thrown from a _reaction_.
 This can be used for monitoring or test purposes.
 
 ---
