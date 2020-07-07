@@ -1,18 +1,10 @@
 ---
-title: MobX Api Reference
+title: MobX API Reference
 sidebar_label: API overview
 hide_title: true
 ---
 
-# MobX Api Reference
-
-<div id='codefund'></div><div class="re_2020"><a class="re_2020_link" href="https://www.react-europe.org/#slot-2149-workshop-typescript-for-react-and-graphql-devs-with-michel-weststrate" target="_blank" rel="sponsored noopener"><div><div class="re_2020_ad" >Ad</div></div><img src="/img/reacteurope.svg"><span>Join the author of MobX at <b>ReactEurope</b> to learn how to use <span class="link">TypeScript with React</span></span></a></div>
-
-**Applies to MobX 4 and higher**
-
--   Using Mobx 3? Use this [migration guide](https://github.com/mobxjs/mobx/wiki/Migrating-from-mobx-3-to-mobx-4) to switch gears.
--   [MobX 3 documentation](https://github.com/mobxjs/mobx/blob/54557dc319b04e92e31cb87427bef194ec1c549c/docs/refguide/api.md)
--   For MobX 2, the old documentation is still available on [github](https://github.com/mobxjs/mobx/blob/7c9e7c86e0c6ead141bb0539d33143d0e1f576dd/docs/refguide/api.md).
+# MobX API Reference
 
 # Core API
 
@@ -23,66 +15,27 @@ _These are the most important MobX API's._
 
 ## Creating observables
 
+### `observable`
+
+Mark a property as observable.
+
+[&laquo;`details`&raquo;](make-observable.md)
+
 ### `observable(value)`
 
-Usage:
-
--   `observable(value)`
--   `@observable classProperty = value`
-
-Observable values can be JS primitives, references, plain objects, class instances, arrays and maps.
-
-**Note:** `observable(value)` is a convenience API that will succeed only if it can be made into
-an observable data structure (_Array_, _Map_, or _observable-object_). For all other values, no conversion will be performed.
-
-You can also directly create the desired observable type, see below.
-
-The following conversion rules are applied, but can be fine-tuned by using [_decorators_](#decorators). See below.
-
-1. If _value_ is an instance of an [ES6 Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map): a new [Observable Map](map.md) will be returned. Observable maps are very useful if you don't want to react just to the change of a specific entry, but also to the addition or removal of entries.
-1. If _value_ is an array, a new [Observable Array](array.md) will be returned.
-1. If _value_ is an object _without_ prototype or its prototype is `Object.prototype`, the object will be cloned and all its current properties will be made observable. See [Observable Object](object.md)
-1. If _value_ is an object _with_ a prototype, a JavaScript primitive or function, there will be no change made to the value. If you do need a [Boxed Observable](boxed.md), you can do one of the following:
-    - Call `observable.box(value)` explicitly
-    - Use `@observable` in the class definition
-    - Call [`decorate()`](#decorate)
-    - Use `extendObservable()` to introduce properties on a class definition
-
-MobX will not make objects with a prototype automatically observable; as that is the responsibility of its constructor function. Use `extendObservable` in the constructor, or `@observable` in its class definition instead.
-
-These rules might seem complicated at first sight, but you will notice that in practice they are very intuitive to work with.
-
-**Some notes:**
-
--   To use the `@observable` decorator, make sure that [decorators are enabled](observable.md) in your transpiler (babel or typescript).
--   By default making a data structure observable is _infective_; that means that `observable` is applied automatically to any value that is contained by the data structure, or will be contained by the data structure in the future. This behavior can be changed by using [_decorators_](#decorators).
--   _[MobX 4 and below]_ To create dynamically keyed objects, always use maps! Only initially existing properties on an object will be made observable, although new ones can be added using `extendObservable`.
-
-[&laquo;`observable`&raquo;](observable.md) &mdash; [&laquo;`@observable`&raquo;](observable.md)
-
-### `@observable property = value`
-
-`observable` can also be used as property decorator. It requires [decorators to be enabled](../best/decorators.md) and is syntactic
-sugar for `extendObservable(this, { property: value })`.
+Make a value observable.
 
 [&laquo;`details`&raquo;](observable.md)
 
 ### `observable.box(value, options?)`
 
-Creates an observable _box_ that stores an observable reference to a value. Use `get()` to get the current value of the box, and `set()` to update it.
-This is the foundation on which all other observables are built, but in practice you will use it rarely.
-
-Normal boxes will automatically try to turn any new value into an observable if it isn't already. Use the `{deep: false}` option to disable this behavior.
+Creates an observable _box_ that stores an observable reference to a value.
 
 [&laquo;`details`&raquo;](boxed.md)
 
 ### `observable.object(value, decorators?, options?)`
 
 Creates a clone of the provided object and makes all its properties observable.
-By default any values in those properties will be made observable as well, but when using the `{deep: false}` options, only the properties will be made into observable
-references, leaving the values untouched. (This holds also for any values assigned in the future).
-
-The second argument in `observable.object()` can be used to fine tune the observability with [`decorators`](#decorators).
 
 [&laquo;`details`&raquo;](object.md)
 
@@ -90,27 +43,19 @@ The second argument in `observable.object()` can be used to fine tune the observ
 
 Creates a new observable array based on the provided value.
 
-Use the `{deep: false}` option if the values in the array should not be turned into observables.
-
 [&laquo;`details`&raquo;](array.md)
 
 ### `observable.map(value, options?)`
 
-Creates a new observable map based on the provided value. Use the `{deep: false}` option if the values in the map should not be turned into observables.
-
-Use `map` whenever you want to create a dynamically keyed collections and the addition / removal of keys needs to be observed.
-Since this uses the full-blown _ES6 Map_ internally, you are free to use any type for the key and _not limited_ to string keys.
+Creates a new observable Map based on the provided value.
 
 [&laquo;`details`&raquo;](map.md)
 
 ### `observable.set(value, options?)`
 
-Creates a new observable map based on the provided value. Use the `{deep: false}` option if the values in the map should not be turned into observables.
+Create a new observable Set based on the provided value.
 
-Use `set` whenever you want to create a dynamic set where the addition / removal of values needs to be observed, and where values can appear only once in the collection.
-Note that your browser needs to support ES6 sets, or polyfill them, to make sets work.
-
-The api is further the same as the [ES6 set api](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set)
+[&laquo;`details`&raquo;](set.md)
 
 ### `extendObservable`
 

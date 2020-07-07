@@ -18,6 +18,7 @@
       "refguide/object",
       "refguide/array",
       "refguide/map",
+      "refguide/set",
       "refguide/modifiers",
       "refguide/extend-observable",
       "refguide/boxed"

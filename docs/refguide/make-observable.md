@@ -13,9 +13,7 @@ Usage:
 
 In `makeObservable`, a JavaScript object (including class instance) is passed into `target`. In `annotations` you can declare properties observable, getters as computed and methods as actions.
 
-Typically `makeObservable` is used in the constructor of a class, and
-its first argument is `this`. The `annotations` argument is a mapping with
-declarations about properties and methods:
+Typically `makeObservable` is used in the constructor of a class, and its first argument is `this`. The `annotations` argument is a mapping with declarations about properties and methods:
 
 ```javascript
 import { makeObservable, observable, computed, action } from "mobx"
@@ -58,6 +56,10 @@ Possible annotation values are:
 
 -   `false`: Explicitly do not annotate this property. Normally only useful with `makeAutoObservable`.
 
+## `makeObservable` and decorators
+
+You can also use `makeObservable` with [decorators](../best/decorators.md). In this case you can leave out the annotations argument and instead declare observables, computed and actions using decorator syntax. Using decorators requires special compiler support.
+
 ## `makeAutoObservable`
 
 `makeAutoObservable` behaves much like `makeObservable`, but infers all properties by default. You can still use `annotations` to override this behavior, in particular to use `false` to exclude a property or method from being automatically declared.
@@ -85,7 +87,7 @@ class Doubler {
 }
 ```
 
-As you can see this is more compact.
+This can be more compact and easy to maintain than using `makeObservable`.
 
 ### When you call makeAutoObservable
 

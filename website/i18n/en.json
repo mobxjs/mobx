@@ -89,7 +89,7 @@
         "sidebar_label": "action"
       },
       "refguide/api": {
-        "title": "MobX Api Reference",
+        "title": "MobX API Reference",
         "sidebar_label": "API overview"
       },
       "refguide/array": {
@@ -171,6 +171,10 @@
       "refguide/reaction": {
         "title": "reaction",
         "sidebar_label": "reaction"
+      },
+      "refguide/set": {
+        "title": "Observable Sets",
+        "sidebar_label": "sets"
       },
       "refguide/spy": {
         "title": "Spy",

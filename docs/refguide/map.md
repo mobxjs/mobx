@@ -17,6 +17,8 @@ Optionally takes an object, entries array or string keyed [ES6 map](https://deve
 
 Using ES6 Map constructor you can initialize observable map using `observable(new Map())` or for class properties with `makeObservable` using `map = new Map()`.
 
+Since this uses the full-blown _ES6 Map_ internally, you are free to use any type for the key and _not limited_ to string keys.
+
 The following methods are exposed according to the [ES6 Map spec](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map):
 
 -   `has(key)` Returns whether this map has an entry with the provided key. Note that the presence of a key is an observable fact in itself.
