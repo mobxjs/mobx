@@ -18,6 +18,7 @@
       "refguide/object",
       "refguide/array",
       "refguide/map",
+      "refguide/modifiers",
       "refguide/extend-observable",
       "refguide/boxed"
     ],
@@ -48,7 +49,6 @@
       "refguide/inject",
       "refguide/object-api",
       "refguide/mobx-utils",
-      "refguide/modifiers",
       "refguide/extending",
       "refguide/create-transformer",
       "refguide/expr"

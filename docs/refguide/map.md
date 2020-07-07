@@ -44,7 +44,8 @@ The following functions are not in the ES6 spec but are available in MobX:
 ### `observable.map(values, { deep: false })`
 
 Any values assigned to an observable map will be default passed through [`observable`](observable.md) to make them observable.
-Create a shallow map to disable this behavior and store are values as-is. See also [modifiers](modifiers.md) for more details on this mechanism.
+Create a shallow map to disable this behavior and store are values as-is. You
+can also use `observable.shallow` for this; see also [modifiers](modifiers.md).
 
 ### `observable.map(values, { name: "my map" })`
 

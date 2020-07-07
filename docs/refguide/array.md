@@ -59,7 +59,8 @@ Unlike the built-in implementation of the functions `sort` and `reverse`, `obser
 ## `observable.array(values, { deep: false })`
 
 Any values assigned to an observable array will be default passed through [`observable`](observable.md) to make them observable.
-Create a shallow array to disable this behavior and store a values as-is. See also [modifiers](modifiers.md) for more details on this mechanism.
+Create a shallow array to disable this behavior and store a values as-is. You
+can also use `observable.shallow` for this; see also [modifiers](modifiers.md).
 
 ## `observable.array(values, { name: "my array" })`
 

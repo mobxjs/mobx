@@ -26,6 +26,9 @@ This ensures that intermediate or incomplete values produced during an action ar
 
 `action` also provides useful debugging information in combination with the devtools.
 
+By passing in `name` you can control the name of the action, otherwise it
+is derived from the function or method that is wrapped.
+
 [setters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/set) of [computed properties are automatically actions](computed.md).
 
 ## When are functions and methods not actions?
