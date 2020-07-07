@@ -66,6 +66,8 @@ Here is the doubler with `makeAutoObservable`:
 import { makeAutoObservable } from "mobx"
 
 class Doubler {
+    value
+
     constructor(value) {
         makeAutoObservable(this)
         this.value = value

@@ -22,8 +22,9 @@ Example:
 
 ```javascript
 class Vat {
+    value = 1.2
+
     constructor() {
-        this.value = 1.2
         makeAutoObservable(this)
     }
 }

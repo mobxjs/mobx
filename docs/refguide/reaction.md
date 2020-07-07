@@ -27,6 +27,9 @@ Here is an example:
 import { makeAutoObservable, reaction } from "mobx"
 
 class Animal {
+    name
+    energyLevel
+
     constructor(name) {
         this.name = name
         this.energyLevel = 100

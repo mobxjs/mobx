@@ -20,6 +20,9 @@ Here we add a new observable property to an alread observable instance:
 
 ```javascript
 class Person {
+    firstName
+    lastName
+
     constructor(firstName, lastName) {
         this.firstName = firstName
         this.lastName = lastName

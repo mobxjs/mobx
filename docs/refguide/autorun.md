@@ -20,6 +20,9 @@ Here's an example:
 import { makeAutoObservable, autorun } from "mobx"
 
 class Animal {
+    name
+    energyLevel
+
     constructor(name) {
         this.name = name
         this.energyLevel = 100
@@ -164,6 +167,8 @@ It is possible to override the default logging behavior of Reactions by providin
 import { makeAutoObservable, autorun } from "mobx"
 
 class Person {
+    age
+
     constructor(age) {
         this.age = age
         makeAutoObservable(this)

@@ -76,6 +76,8 @@ import { makeAutoObservable, makeObservable, observable, action } from "mobx"
 import { observer } from "mobx-react"
 
 class User {
+    name
+
     constructor(name) {
         this.name = name
         makeAutoObservable(this)
