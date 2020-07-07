@@ -251,7 +251,7 @@ If the problem is not entirely clear, make sure to study [what does MobX react t
 
 Because `observer` only applies to exactly the `render` function of the current component; passing a render callback or component to a child component doesn't become reactive automatically.
 
-For more details, see the [what does Mobx react to](https://mobx.js.org/best/react.html#what-does-mobx-react-to) guide.
+For more details, see [MobX and React pitfalls](react-pitfalls.md).
 
 ### Declaring propTypes might cause unnecessary renders in dev mode
 
@@ -265,5 +265,5 @@ See the relevant [React performance section](react-performance.md).
 
 1. Make sure you didn't forget `observer` (yes, this is the most common mistake)
 2. Make sure you grok how tracking works in general: [what does MobX react to](../best/what-does-mobx-react-to.md)
-3. Read the [common mistakes](../best/pitfalls.md) section
+3. Read the [common mistakes](react-pitfalls.md) section
 4. Use [trace](../best/trace.md) to verify that you are subscribing to the right things or check what MobX is doing in general using [spy](../refguide/spy.md) / the [mobx-logger](https://github.com/winterbe/mobx-logger) package.

@@ -76,6 +76,10 @@
         "title": "Optimizing rendering React components",
         "sidebar_label": "Optimizing React components"
       },
+      "react/react-pitfalls": {
+        "title": "MobX and React pitfalls",
+        "sidebar_label": "MobX and React pitfalls"
+      },
       "README": {
         "title": "Introduction",
         "sidebar_label": "Introduction"

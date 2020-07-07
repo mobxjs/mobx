@@ -8,6 +8,7 @@
     ],
     "MobX and React": [
       "react/react-integration",
+      "react/react-pitfalls",
       "react/react-performance",
       "react/react-class-components"
     ],
