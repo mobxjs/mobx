@@ -46,15 +46,17 @@ Possible annotation values are:
 
 -   `observable`: Used on a property to declare it observable by MobX. A property can be anything that MobX can track: primitive values, arrays, objects and [Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map). The property cannot be a getter or a setter. See also the rules of [`observable`](observable.md).
 
+-   For more fine-grained control of observability you can use a selection of [modifiers](modifiers.md).
+
 -   `action`: Used on a method that modifies observable properties. See also [action](action.md).
 
 -   `action.bound`: Like action, but used to bind the method. See [action.bound](action.md#actionbound).
 
--   `computed`: Used on a [getter](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get) to declare it as a derived value from observable state. Should have no side effects and not modify state.
+-   `computed`: Used on a [getter](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get) to declare it as a derived value from observable state. Should have no side effects and not modify state. For more read [computed](computed.md).
 
-*   `true`: Infer annotation: getters are `computed`, methods are `action`, any property is `observable`. Usually you would use `makeAutoObservable` to infer.
+-   `true`: Infer annotation: getters are `computed`, methods are `action`, any property is `observable`. Usually you would use `makeAutoObservable` to infer.
 
-*   `false`: Explicitly do not annotate this property. Normally only useful with `makeAutoObservable`.
+-   `false`: Explicitly do not annotate this property. Normally only useful with `makeAutoObservable`.
 
 ## `makeAutoObservable`
 

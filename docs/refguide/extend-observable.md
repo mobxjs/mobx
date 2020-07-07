@@ -12,7 +12,7 @@ Usage:
 ExtendObservable can be used to add observable properties to an existing target object.
 All key / value pairs in the `properties` object result in new observable properties on the target initialized to the given value. Any getters in the properties map are turned into computed properties.
 
-The `annotations` param can be used to override the declaration that is used for a specific property, similar to [`makeObservable` and `makeAutoObservable`](make-observable.md). The difference between `extendObservable` and `makeAutoObservable` is that `extendObservable` sets properties and declares information about them at the same time.
+The `annotations` param can be used to override the declaration that is used for a specific property, like [`makeObservable` and `makeAutoObservable`](make-observable.md). The difference between `extendObservable` and `makeAutoObservable` is that `extendObservable` sets properties and declares information about them at the same time.
 
 Use the `deep: false` option to make the new properties _shallow_. That is, prevent auto conversion of their _values_ to observables.
 

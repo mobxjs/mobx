@@ -149,8 +149,8 @@
         "sidebar_label": "MobX-utils"
       },
       "refguide/modifiers": {
-        "title": "Modifiers",
-        "sidebar_label": "Modifiers"
+        "title": "Observable modifiers",
+        "sidebar_label": "Observable modifiers"
       },
       "refguide/object-api": {
         "title": "Object api",

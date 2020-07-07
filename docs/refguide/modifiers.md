@@ -1,6 +1,6 @@
 ---
-title: Modifiers
-sidebar_label: Modifiers
+title: Observable modifiers
+sidebar_label: Observable modifiers
 hide_title: true
 ---
 
