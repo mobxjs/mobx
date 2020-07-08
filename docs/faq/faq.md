@@ -33,6 +33,31 @@ We've compiled a large list of helpful resources of all types in the [official a
 
 It works out of the box. MobX is written with TypeScript and type definitions are built-in.
 
+##### While using Typescript I get `error TS2304: Cannot find name 'AsyncGenerator'`
+
+Edit your `tsconfig.json` and ensure your `lib` section array includes `es2018.asynciterable` or one of its super-sets (e.g. `es2018` or `esnext`). Note that this won't affect code generation in anyway, it just affects the standard type definitions the Typescript compiler will use, which should be a safe change. If your `tsconfig.json` does not include a lib section the defaults are:
+
+-   ES5 target: DOM,ES5,ScriptHost
+-   ES6 target: DOM,ES6,DOM.Iterable,ScriptHost
+
+So you'd need to add `es2018.asynciterable` to those defaults in this particular case.
+
+#### Importing from wrong location
+
+Because MobX ships with typescript typings out of the box, some import autocompleting tools (at least in VSCode) have the habit of auto completing with a wrong import, like
+
+```javascript
+// wrong
+import { observable } from "mobx/lib/mobx"
+```
+
+This is incorrect but will not always immediately lead to runtime errors. So be aware. The only correct way of importing anything from the `mobx` package is:
+
+```javascript
+// correct
+import { observable } from "mobx"
+```
+
 #### Does MobX have Flow typing support?
 
 MobX ships with [flow typings](https://github.com/mobxjs/mobx/blob/master/flow-typed/mobx.js). Flow will automatically include them when you import mobx modules. Although you **do not** need to import the types explicitly, you can still do it like this: `import type { ... } from 'mobx'`.
@@ -85,28 +110,3 @@ MobX works just as well server side, and is already combined with jQuery (see th
 
 [⚛️] Sure, join the [gitter chat](https://gitter.im/mobxjs/mobx) or check out the code. Or, submit an issue to motivate me to make some nice drawings :).
 And look at this [Medium article](https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254).
-
-##### While using Typescript I get `error TS2304: Cannot find name 'AsyncGenerator'`
-
-Edit your `tsconfig.json` and ensure your `lib` section array includes `es2018.asynciterable` or one of its super-sets (e.g. `es2018` or `esnext`). Note that this won't affect code generation in anyway, it just affects the standard type definitions the Typescript compiler will use, which should be a safe change. If your `tsconfig.json` does not include a lib section the defaults are:
-
--   ES5 target: DOM,ES5,ScriptHost
--   ES6 target: DOM,ES6,DOM.Iterable,ScriptHost
-
-So you'd need to add `es2018.asynciterable` to those defaults in this particular case.
-
-#### Importing from wrong location
-
-Because MobX ships with typescript typings out of the box, some import autocompleting tools (at least in VSCode) have the habit of auto completing with a wrong import, like
-
-```javascript
-// wrong
-import { observable } from "mobx/lib/mobx"
-```
-
-This is incorrect but will not always immediately lead to runtime errors. So be aware. The only correct way of importing anything from the `mobx` package is:
-
-```javascript
-// correct
-import { observable } from "mobx"
-```
