@@ -109,8 +109,8 @@
         "sidebar_label": "computed"
       },
       "refguide/configure": {
-        "title": "configure",
-        "sidebar_label": "configure"
+        "title": "Configuring MobX",
+        "sidebar_label": "Configuring MobX"
       },
       "refguide/extend-observable": {
         "title": "refguide/extend-observable",

@@ -1,10 +1,10 @@
 ---
-title: configure
-sidebar_label: configure
+title: Configuring MobX
+sidebar_label: Configuring MobX
 hide_title: true
 ---
 
-# `configure`
+# Configuring MobX
 
 Usage:
 
