@@ -129,8 +129,8 @@
         "sidebar_label": "extendObservable"
       },
       "refguide/extending": {
-        "title": "refguide/extending",
-        "sidebar_label": "createAtom"
+        "title": "Creating new observable types",
+        "sidebar_label": "Creating new observable types"
       },
       "refguide/flow": {
         "title": "flow",
@@ -139,6 +139,14 @@
       "refguide/inject": {
         "title": "provider_inject",
         "sidebar_label": "Provider / inject"
+      },
+      "refguide/internals": {
+        "title": "Internal functions",
+        "sidebar_label": "Internal functions"
+      },
+      "refguide/introspection-utils": {
+        "title": "Introspection APIs",
+        "sidebar_label": "Introspection APIs"
       },
       "refguide/make-observable": {
         "title": "makeObservable / makeAutoObservable",
@@ -210,7 +218,8 @@
       "Effects for observables": "Effects for observables",
       "Debugging MobX": "Debugging MobX",
       "Utilities": "Utilities",
-      "Tips & Tricks": "Tips & Tricks"
+      "Tips & Tricks": "Tips & Tricks",
+      "Extending MobX": "Extending MobX"
     }
   },
   "pages-strings": {

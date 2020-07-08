@@ -45,7 +45,7 @@
     ],
     "Debugging MobX": [
       "best/trace",
-      "best/devtools"
+      "refguide/introspection-utils"
     ],
     "Utilities": [
       "refguide/api",
@@ -65,6 +65,10 @@
       "best/limitations-without-proxies",
       "best/decorators",
       "best/store"
+    ],
+    "Extending MobX": [
+        "refguide/extending",
+        "refguide/internals"
     ]
   }
 }

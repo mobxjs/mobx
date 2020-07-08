@@ -15,6 +15,8 @@ _These are the most important MobX API's._
 
 ## Creating observables
 
+_Making things observable_
+
 ### `makeObservable`
 
 Declare observables, computeds and actions in the class
@@ -82,15 +84,13 @@ Creates an observable _box_ that stores an observable reference to a value.
 
 [&laquo;`details`&raquo;](boxed.md)
 
-## `computed`
-
-Computed values derived from observables and other computeds.
-
-[&laquo;details&raquo;](computed.md)
-
 ## Actions
 
-Actions are anything that modify the state.
+_Actions are anything that modify the state._
+
+### `action`
+
+Marking things as action.
 
 [&laquo;details&raquo;](action.md)
 
@@ -106,7 +106,19 @@ MobX friendly replacement for `async` / `await`.
 
 [&laquo;details&raquo;](flow.md)
 
+## Computed
+
+_Computed values derived from observables and other computeds._
+
+### `computed`
+
+Marking things as computed.
+
+[&laquo;details&raquo;](computed.md)
+
 ## React integration
+
+From the `mobx-react` package.
 
 ### `observer`
 
@@ -116,17 +128,19 @@ Is part of the `mobx-react` package.
 
 [&laquo;details&raquo;](../react/react-integration.md)
 
-### `Provider` (`mobx-react` package)
+### `Provider`
 
 [*Deprecated*] Can be used to pass stores to child components using React's context mechanism. Use the [React context mechanism](https://reactjs.org/docs/context.html) instead.
 
 See the [`mobx-react` docs](https://github.com/mobxjs/mobx-react#provider-experimental).
 
-### `inject` (`mobx-react` package)
+### `inject`
 
 [*Deprecated*] Higher order component and counterpart of `Provider`. Use the [React context mechanism](https://reactjs.org/docs/context.html) instead.
 
-## Reactions & Derivations
+## Reactions
+
+Side-effects for observables.
 
 ### `autorun`
 
@@ -153,87 +167,6 @@ Usage: `onReactionError(handler: (error: any, derivation) => void)`
 This function attaches a global error listener, which is invoked for every error that is thrown from a _reaction_.
 This can be used for monitoring or test purposes.
 
----
-
-# Utilities
-
-_Here are some utilities that might make working with observable objects or computed values more convenient.
-More, less trivial utilities can be found in the \* [mobx-utils](https://github.com/mobxjs/mobx-utils) package._
-
-### `toJS`
-
-Converts observable data structures back to plain javascript objects, ignoring computed values.
-
-[&laquo;details&raquo;](tojson.md)
-
-## `isObservable`
-
-Is a value observable?
-
-[&laquo;details&raquo;](observable.md#isobservable)
-
-## `isObservableProp`
-
-Is a property observable?
-
-[&laquo;details&raquo;](observable.md#isobservableprop)
-
-## `isObservableArray`
-
-Is value an observable array?
-
-[&laquo;details&raquo;](array.md#isobservablearray)
-
-## `isObservableMap`
-
-Is value an observable map?
-
-[&laquo;details&raquo;](map.md#isobservablemap)
-
-## `isObservableSet`
-
-Is value an observable set?
-
-[&laquo;details&raquo;](set.md#isobservableset)
-
-## `isObservableObject`
-
-Is value an observable object?
-
-[&laquo;details&raquo;](object.md#isobservableobject)
-
-## `isBoxedObservable`
-
-Is value an observable box?
-
-[&laquo;details&raquo;](boxed.md#isboxedobservable)
-
-## `isArrayLike`
-
-[Without Proxy support]
-
-Is this an array of some type, observable or not?
-
-[&laquo;details&raquo;](array.md#isarraylike)
-
-### `isAction`
-
-Is this an action?
-
-[&laquo;details&raquo;](action.md#isaction)
-
-### `isComputed`
-
-Is this a boxed computed value?
-
-[&laquo;details&raquo;](computed.md#iscomputed)
-
-### `isComputedProp`
-
-Is this a computed property?
-
-[&laquo;details&raquo;](computed.md#iscomputedprop)
-
 ### `intercept`
 
 Intercept changes before they are applied to an observable api.
@@ -257,6 +190,27 @@ Hook for when something becomes observed.
 Hook for when something stops being observed.
 
 [&laquo;details&raquo;](on-become-observed.md)
+
+## Utilities
+
+Here are some utilities that might make working with observable objects or computed values more convenient.
+More, less trivial utilities can be found in the [mobx-utils](https://github.com/mobxjs/mobx-utils) package.
+
+### `toJS`
+
+Converts observable data structures back to plain javascript objects, ignoring computed values.
+
+[&laquo;details&raquo;](tojson.md)
+
+### `isArrayLike`
+
+[Without Proxy support]
+
+Is this an array of some type, observable or not?
+
+[&laquo;details&raquo;](array.md#isarraylike)
+
+## Configuration
 
 ### `configure`
 
@@ -301,9 +255,69 @@ Get value from collection with key.
 
 [&laquo;details&raquo;](object-api.md)
 
-# Development utilities
+## Introspection utilities
 
-_The following api's might come in handy if you want to build cool tools on top of MobX or if you want to inspect the internal state of MobX_
+The following APIs might come in handy if you want to inspect the internal state of MobX or want to build cool tools on top of MobX.
+
+### `isObservable`
+
+Is a value observable?
+
+[&laquo;details&raquo;](observable.md#isobservable)
+
+### `isObservableProp`
+
+Is a property observable?
+
+[&laquo;details&raquo;](observable.md#isobservableprop)
+
+### `isObservableArray`
+
+Is value an observable array?
+
+[&laquo;details&raquo;](array.md#isobservablearray)
+
+### `isObservableMap`
+
+Is value an observable map?
+
+[&laquo;details&raquo;](map.md#isobservablemap)
+
+### `isObservableSet`
+
+Is value an observable set?
+
+[&laquo;details&raquo;](set.md#isobservableset)
+
+### `isObservableObject`
+
+Is value an observable object?
+
+[&laquo;details&raquo;](object.md#isobservableobject)
+
+### `isBoxedObservable`
+
+Is value an observable box?
+
+[&laquo;details&raquo;](boxed.md#isboxedobservable)
+
+### `isAction`
+
+Is this an action?
+
+[&laquo;details&raquo;](action.md#isaction)
+
+### `isComputed`
+
+Is this a boxed computed value?
+
+[&laquo;details&raquo;](computed.md#iscomputed)
+
+### `isComputedProp`
+
+Is this a computed property?
+
+[&laquo;details&raquo;](computed.md#iscomputedprop)
 
 ### `trace`
 
@@ -317,99 +331,48 @@ Registers a global spy listener that listens to all events that happen in MobX.
 
 [&laquo;trace&raquo;](spy.md)
 
-### `getAtom`
-
-Usage: `getAtom(thing, property?)`.
-Returns the backing _Atom_ of a given observable object, property, reaction etc.
-
 ### `getDebugName`
 
-Usage: `getDebugName(thing, property?)`
-Returns a (generated) friendly debug name of an observable object, property, reaction etc. Used by for example the [MobX developer tools](https://github.com/mobxjs/mobx-devtools).
+Returns a (generated) friendly debug name
+
+[&laquo;trace&raquo;](introspection-utils.md#getdebugname)
 
 ### `getDependencyTree`
 
-Usage: `getDependencyTree(thing, property?)`.
 Returns a tree structure with all observables the given reaction / computation currently depends upon.
+
+[&laquo;trace&raquo;](introspection-utils.md#getdependencytree)
 
 ### `getObserverTree`
 
-Usage: `getObserverTree(thing, property?)`.
 Returns a tree structure with all reactions / computations that are observing the given observable.
 
-### `"mobx-react"` development hooks
+[&laquo;trace&raquo;](introspection-utils.md#getobservertree)
 
-The `mobx-react` package exposes the following additional api's that are used by the `mobx-react-devtools`:
+## Extending MobX
 
--   `trackComponents()`: enables the tracking of `observer` based React components
--   `renderReporter.on(callback)`: callback will be invoked on each rendering of an `observer` enabled React component, with timing information etc
--   `componentByNodeRegistery`: ES6 WeakMap that maps from DOMNode to a `observer` based React component instance
+In the rare case you want to extend MobX itself.
 
-# Internal functions
+### `createAtom`
 
-_The following methods are all used internally by MobX, and might come in handy in rare cases. But usually MobX offers more declarative alternatives to tackle the same problem. They might come in handy though if you try to extend MobX_
+Utility function that can be used to create your own observable data structures and hook them up to MobX. Used internally by all observable data types.
+
+[&laquo;details&raquo;](extending.md)
+
+### `getAtom`
+
+Returns the backing atom.
+
+[&laquo;trace&raquo;](introspection-utils.md#getatom)
 
 ### `transaction`
 
-_Transaction is a low-level api, it is recommended to use actions instead_
+Wrap code in a transaction.
 
-`transaction(worker: () => void)` can be used to batch a bunch of updates without notifying any observers until the end of the transaction.
-`transaction` takes a single, parameterless `worker` function as argument and runs it.
-No observers are notified until this function has completed.
-`transaction` returns any value that was returned by the `worker` function.
-Note that `transaction` runs completely synchronously.
-Transactions can be nested. Only after completing the outermost `transaction` pending reactions will be run.
-
-```javascript
-import { observable, transaction, autorun } from "mobx"
-
-const numbers = observable([])
-
-autorun(() => console.log(numbers.length, "numbers!"))
-// Prints: '0 numbers!'
-
-transaction(() => {
-    transaction(() => {
-        numbers.push(1)
-        numbers.push(2)
-    })
-    numbers.push(3)
-})
-// Prints: '3 numbers!'
-```
+[&laquo;trace&raquo;](internals.md#transaction)
 
 ### `untracked`
 
 Untracked allows you to run a piece of code without establishing observers.
-Like `transaction`, `untracked` is automatically applied by `(@)action`, so usually it makes more sense to use actions than to use `untracked` directly.
-Example:
 
-```javascript
-const person = observable({
-    firstName: "Michel",
-    lastName: "Weststrate"
-})
-
-autorun(() => {
-    console.log(
-        person.lastName,
-        ",",
-        // this untracked block will return the person's firstName without establishing a dependency
-        untracked(() => person.firstName)
-    )
-})
-// prints: Weststrate, Michel
-
-person.firstName = "G.K."
-// doesn't print!
-
-person.lastName = "Chesterton"
-// prints: Chesterton, G.K.
-```
-
-### `createAtom`
-
-Utility function that can be used to create your own observable data structures and hook them up to MobX.
-Used internally by all observable data types.
-
-[&laquo;details&raquo;](extending.md)
+[&laquo;trace&raquo;](internals.md#untracked)

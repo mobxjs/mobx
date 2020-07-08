@@ -4,7 +4,7 @@ sidebar_label: arrays
 hide_title: true
 ---
 
-## Observable Arrays
+# Observable Arrays
 
 Usage:
 
