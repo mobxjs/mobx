@@ -5,6 +5,7 @@
       "intro/installation",
       "intro/overview",
       "intro/concepts",
+      "intro/how-to-read",
       "faq/faq"
     ],
     "MobX and React": [

@@ -45,6 +45,10 @@
         "title": "Concepts & Principles",
         "sidebar_label": "Concepts & Principles"
       },
+      "intro/how-to-read": {
+        "title": "How to read this documentation",
+        "sidebar_label": "How to read this documentation"
+      },
       "intro/installation": {
         "title": "Installation",
         "sidebar_label": "Installation"
