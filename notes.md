@@ -53,17 +53,19 @@
     -   [x] process TODO's
     -   [ ] // TODO: support chrome formatter https://www.mattzeunert.com/2016/02/19/custom-chrome-devtools-object-formatters.html
     -   [x] ~weakmap for hasMaps in Map (and Set?)~ no: that would only works for objectish keys which is an exception and would require separate map collection
-    -   [ ] add a solution for keepAlive computeds like https://github.com/mobxjs/mobx/issues/2309#issuecomment-598707584
-    -   [ ] include #2343
+    -   [x] include #2343
     -   [ ] default observable requires reaction?
     -   [x] kill globalstate options?
     -   [ ] no binding by default? https://twitter.com/getify/status/1258137826241241088
-    -   [ ] kill / fix flow types
-    -   [ ] enable search on docs
-    -   [ ] Would be awesome, but no idea how to go about that :) We could maybe at random places (e.g in observableValue) check in DEV mode if a value is a class instance with decorators, but with undecorated members. Might be a bit of a performance bummer though.
+    -   [x] kill / fix flow types
+    -   [x] enable search on docs
+    -   [ ] update ad links
+    -   [ ] fix https://github.com/mobxjs/mobx/issues/2394
 -   [ ] mobx-react
     -   [ ] displayname for observer components facebook/react#18026
     -   [ ] update useLocalStore in mobx-react-lite to use autoMakeObservable
+-   [ ] post 6.0
+    -   [ ] add a solution for keepAlive computeds like https://github.com/mobxjs/mobx/issues/2309#issuecomment-598707584
 
 ## Docs / migration guide
 
@@ -128,6 +130,8 @@ Why declare fields
 *   [ ] Breaking: sorting or reversing an array in an actino will no sort or reverse the source array rather than shallow copy.
 *   Fixed #2326
 *   Fixed #2379
+*   [ ] Breaking: strict mode defaults to observed now
+*   [ ] killed option `computedConfigurable` as it was the default already
 
 ## NOTES
 

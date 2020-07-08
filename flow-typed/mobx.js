@@ -3,7 +3,7 @@
 export type IObservableMapInitialValues<K, V> = IMapEntries<K, V> | KeyValueMap<V> | IMap<K, V>
 
 export interface IMobxConfigurationOptions {
-    +enforceActions?: boolean | "strict" | "never" | "always" | "observed";
+    +enforceActions?: "never" | "always" | "observed";
     computedRequiresReaction?: boolean;
     /**
      * (Experimental)
@@ -17,8 +17,8 @@ export interface IMobxConfigurationOptions {
     observableRequiresReaction?: boolean;
     isolateGlobalState?: boolean;
     disableErrorBoundaries?: boolean;
-    arrayBuffer?: number;
     reactionScheduler?: (f: () => void) => void;
+    useProxies?: "always" | "never" | "ifavailable";
 }
 
 declare export function configure(options: IMobxConfigurationOptions): void
@@ -268,6 +268,7 @@ export type CreateObservableOptions = {
 declare export class IObservableFactories {
     box<T>(value?: T, options?: CreateObservableOptions): IObservableValue<T>;
     array<T>(initialValues?: T[], options?: CreateObservableOptions): IObservableArray<T>;
+    set<V>(initialValues?: V[], options?: CreateObservableOptions): Set<V>;
     map<K, V>(
         initialValues?: IObservableMapInitialValues<K, V>,
         options?: CreateObservableOptions
@@ -284,6 +285,11 @@ declare export class IObservableFactories {
         descriptor?: PropertyDescriptor<*>
     ): IObservableDecorator;
     deep(
+        target: Object,
+        property?: string,
+        descriptor?: PropertyDescriptor<*>
+    ): IObservableDecorator;
+    struct(
         target: Object,
         property?: string,
         descriptor?: PropertyDescriptor<*>
@@ -373,6 +379,10 @@ declare export function extendObservable<A, B>(
     options?: any
 ): A & B
 
+declare export function makeObservable<A>(target: A, annotations?: any, options: any): A
+
+declare export function makeAutoObservable<A>(target: A, exceptions?: any, options: any): A
+
 declare export function intercept(
     object: Object,
     property: string,
@@ -434,12 +444,7 @@ declare export function observe(
     fireImmediately?: boolean
 ): Lambda
 
-export interface ToJSOptions {
-    detectCycles?: boolean;
-    exportMapsAsObjects?: boolean;
-}
-
-declare export function toJS<T>(source: T, options?: ToJSOptions): T
+declare export function toJS<T>(source: T): T
 
 declare export function untracked<T>(action: () => T): T
 

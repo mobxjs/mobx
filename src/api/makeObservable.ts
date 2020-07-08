@@ -163,7 +163,7 @@ export function makeObservable<T extends Object, AdditionalKeys extends Property
     target: T,
     annotations?: AnnotationsMap<T, AdditionalKeys>,
     options?: CreateObservableOptions
-) {
+): T {
     const adm = asObservableObject(
         target,
         options?.name,
@@ -177,7 +177,7 @@ export function makeObservable<T extends Object, AdditionalKeys extends Property
                 die(
                     `No annotations were passed to makeObservable, but no decorator members have been found either`
                 )
-            return
+            return target
         }
         const make = key => {
             let annotation = annotations[key]

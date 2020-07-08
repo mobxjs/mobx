@@ -16,7 +16,6 @@ export function configure(options: {
      * Warn if observables are accessed outside a reactive context
      */
     observableRequiresReaction?: boolean
-    computedConfigurable?: boolean
     isolateGlobalState?: boolean
     disableErrorBoundaries?: boolean
     reactionScheduler?: (f: () => void) => void
