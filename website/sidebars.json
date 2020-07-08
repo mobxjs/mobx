@@ -56,7 +56,6 @@
       "refguide/mobx-utils"
     ],
     "Tips & Tricks": [
-      "best/pitfalls",
       "refguide/configure",
       "best/limitations-without-proxies",
       "best/decorators",

@@ -84,6 +84,22 @@ Edit your `tsconfig.json` and ensure your `lib` section array includes `es2018.a
 
 So you'd need to add `es2018.asynciterable` to those defaults in this particular case.
 
+#### Importing from wrong location
+
+Because MobX ships with typescript typings out of the box, some import autocompleting tools (at least in VSCode) have the habit of auto completing with a wrong import, like
+
+```javascript
+// wrong
+import { observable } from "mobx/lib/mobx"
+```
+
+This is incorrect but will not always immediately lead to runtime errors. So be aware. The only correct way of importing anything from the `mobx` package is:
+
+```javascript
+// correct
+import { observable } from "mobx"
+```
+
 #### Does MobX have Flow typing support?
 
 MobX ships with [flow typings](https://github.com/mobxjs/mobx/blob/master/flow-typed/mobx.js). Flow will automatically include them when you import mobx modules. Although you **do not** need to import the types explicitly, you can still do it like this: `import type { ... } from 'mobx'`.

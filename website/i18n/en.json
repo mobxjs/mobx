@@ -21,10 +21,6 @@
         "title": "Limitations without Proxy support",
         "sidebar_label": "Limitations without Proxy support"
       },
-      "best/pitfalls": {
-        "title": "Common pitfalls & best practices",
-        "sidebar_label": "Common Pitfalls & Best Practices"
-      },
       "best/stateless-HMR": {
         "title": "Hot Module Reloading with Stateless Components",
         "sidebar_label": "Hot Module Reloading with Stateless Components"
