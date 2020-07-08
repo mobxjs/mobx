@@ -138,5 +138,5 @@ configure({
 Accepted values:
 
 -   `"always"` (default): MobX is expected to only run in environments with [`Proxy` support](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy). It is an error if these are not available.
--   `"never"`: Proxies are never used. MobX falls back on non-proxy alternatives. This is compatible with all ES5 environments, but causes various [limitations]((../best/limitations-without-proxy.md).
--   `"ifavailable"`: Proxies are used if they are available, and otherwise MobX falls back to non-proxy alternatives. This causes various [limitations]((../best/limitations-without-proxy.md). You still need to write code taking these limitations into account.
+-   `"never"`: Proxies are never used. MobX falls back on non-proxy alternatives. This is compatible with all ES5 environments, but causes various [limitations](../best/limitations-without-proxies.md).
+-   `"ifavailable"`: Proxies are used if they are available, and otherwise MobX falls back to non-proxy alternatives. This causes various [limitations](../best/limitations-without-proxies.md). You still need to write code taking these limitations into account.
