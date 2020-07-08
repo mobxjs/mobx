@@ -136,10 +136,6 @@
         "title": "flow",
         "sidebar_label": "flow"
       },
-      "refguide/inject": {
-        "title": "provider_inject",
-        "sidebar_label": "Provider / inject"
-      },
       "refguide/internals": {
         "title": "Internal functions",
         "sidebar_label": "Internal functions"
@@ -157,8 +153,8 @@
         "sidebar_label": "maps"
       },
       "refguide/mobx-utils": {
-        "title": "refguide/mobx-utils",
-        "sidebar_label": "MobX-utils"
+        "title": "mobx-utils",
+        "sidebar_label": "mobx-utils"
       },
       "refguide/modifiers": {
         "title": "Observable modifiers",

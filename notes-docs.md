@@ -48,6 +48,9 @@ https://deploy-preview-2382--mobx-docs.netlify.app/
 -   Should we use `mobx-react-lite` in examples primarily? What's up with the
     observer batching story though?
 
+-   createTransformer from mobx-utils is documented in the main docs but NOT
+    in mobx-utils. Should move it to mobx-utils? `expr` is also documented but we can instead directly refer to mobx-utils.
+
 ## Todo
 
 -   [ ] Netlify preview for docs PR.

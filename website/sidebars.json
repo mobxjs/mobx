@@ -45,23 +45,20 @@
     ],
     "Debugging MobX": [
       "best/trace",
-      "refguide/introspection-utils"
+      "refguide/introspection-utils",
+      "refguide/spy"
     ],
     "Utilities": [
       "refguide/api",
       "refguide/tojson",
-      "refguide/configure",
-      "refguide/spy",
-      "refguide/inject",
       "refguide/object-api",
       "refguide/mobx-utils",
-      "refguide/extending",
-      "refguide/create-transformer",
       "refguide/expr"
     ],
     "Tips & Tricks": [
       "faq/faq",
       "best/pitfalls",
+      "refguide/configure",
       "best/limitations-without-proxies",
       "best/decorators",
       "best/store"

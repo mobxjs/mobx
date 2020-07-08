@@ -128,16 +128,6 @@ Is part of the `mobx-react` package.
 
 [&laquo;details&raquo;](../react/react-integration.md)
 
-### `Provider`
-
-[*Deprecated*] Can be used to pass stores to child components using React's context mechanism. Use the [React context mechanism](https://reactjs.org/docs/context.html) instead.
-
-See the [`mobx-react` docs](https://github.com/mobxjs/mobx-react#provider-experimental).
-
-### `inject`
-
-[*Deprecated*] Higher order component and counterpart of `Provider`. Use the [React context mechanism](https://reactjs.org/docs/context.html) instead.
-
 ## Reactions
 
 Side-effects for observables.

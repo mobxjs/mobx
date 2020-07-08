@@ -7,6 +7,7 @@ hide_title: true
 # Introspection APIs
 
 The following APIs might come in handy if you want to inspect the internal state of MobX while debugging, or want to build cool tools on top of MobX.
+Also relevant are [`toJS`](tojson.md) and the various [`isObservable*` APIs](api.md#isobservable).
 
 ### `getDebugName`
 
