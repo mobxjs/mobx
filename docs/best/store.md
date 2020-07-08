@@ -164,7 +164,7 @@ export class Todo {
 
     /**
      * Disposer for the side effect that automatically
-     * stores this Todo, see @dispose.
+     * stores this Todo, see dispose.
      */
     saveHandler = null
 
@@ -173,7 +173,8 @@ export class Todo {
             id: false,
             store: false,
             autoSave: false,
-            saveHandler: false
+            saveHandler: false,
+            dispose: false
         })
         this.store = store
         this.id = id
