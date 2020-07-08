@@ -65,6 +65,8 @@ MobX works just as well server side, and is already combined with jQuery (see th
 
 Yes, see [createTransformer in mobx-utils](https://github.com/mobxjs/mobx-utils)for some examples.
 
+For more advanced frameworks built with MobX that can do this, see [mobx-state-tree](https://mobx-state-tree.js.org/intro/philosophy) and [mobx-keystone](https://mobx-keystone.js.org/).
+
 ##### Can you tell me how it works?
 
 Sure, join the reactiflux channel or checkout the code. Or, submit an issue to motivate me to make some nice drawings :).
