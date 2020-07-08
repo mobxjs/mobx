@@ -52,8 +52,7 @@
       "refguide/api",
       "refguide/tojson",
       "refguide/object-api",
-      "refguide/mobx-utils",
-      "refguide/expr"
+      "refguide/mobx-utils"
     ],
     "Tips & Tricks": [
       "faq/faq",
