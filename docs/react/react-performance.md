@@ -6,7 +6,9 @@ hide_title: true
 
 # Optimizing rendering React components
 
-MobX is very fast, [often even faster than Redux](https://twitter.com/mweststrate/status/718444275239882753). But here are some tips to get most out of React and MobX. Most tips apply to React in general and are not specific for MobX.
+MobX is very fast, [often even faster than Redux](https://twitter.com/mweststrate/status/718444275239882753).
+
+But here are some tips to get most out of React and MobX. Most tips apply to React in general and are not specific for MobX.
 
 Note that while it's good to be aware of these patterns, usually your application
 will be fast enough if you don't worry about them at all. Prioritize performance only

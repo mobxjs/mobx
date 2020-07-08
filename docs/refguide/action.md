@@ -64,7 +64,7 @@ are asynchronous. See [asynchronous actions](../best/actions.md).
 
 ## action.bound
 
-The `action` function follows the normal rules for binding in JavaScript.
+[⚛️] The `action` function follows the normal rules for binding in JavaScript.
 However, `action.bound` can be used to automatically bind actions to the targeted object. This ensures that `this` points to the right object when you use
 the action as a callback later.
 
@@ -91,7 +91,7 @@ setInterval(ticker.increment, 1000)
 
 ## bound arrow functions
 
-You cannot use _action.bound_ with arrow functions; arrow functions are already bound and cannot be rebound. Since arrow functions are already bound, using them is an alternative to `action.bound` in classes. They have the additional benefit that you can use them with `makeAutoObservable` without the need for explicit declaration:
+[⚛️] You cannot use _action.bound_ with arrow functions; arrow functions are already bound and cannot be rebound. Since arrow functions are already bound, using them is an alternative to `action.bound` in classes. They have the additional benefit that you can use them with `makeAutoObservable` without the need for explicit declaration:
 
 ```javascript
 class Ticker {
@@ -121,5 +121,5 @@ Returns `true` if the given function is marked as an `action`.
 
 ## Disabling mandatory actions
 
-By default, MobX 6 and later require that you use actions to make state changes.
+[⚛️] By default, MobX 6 and later require that you use actions to make state changes.
 You can however configure MobX to disable this behavior, see [`enforceActions`](configure.md#enforceactions).

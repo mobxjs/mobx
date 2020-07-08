@@ -6,8 +6,7 @@ hide_title: true
 
 # How `computed` works
 
-Here we go into some more details concerning how computed behaves. Since `computed` tries to be tranparent in its behavior you normally do not need to be aware of them,
-but is useful to know if something unexpected happens.
+[⚛️] Here we go into some more details concerning how computed behaves. Since `computed` tries to be tranparent in its behavior you normally do not need to be aware of them, but is useful to know if something unexpected happens.
 
 ## Computed values run more often than expected
 
@@ -124,8 +123,4 @@ var disposer = upperCaseName.observe(change => console.log(change.newValue))
 
 name.set("Dave")
 // prints: 'DAVE'
-```
-
-```
-
 ```

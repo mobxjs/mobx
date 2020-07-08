@@ -6,7 +6,7 @@ hide_title: true
 
 # Configuring MobX
 
-Usage:
+[⚛️] Usage:
 
 -   `configure(options)`.
 
