@@ -63,7 +63,7 @@ MobX works just as well server side, and is already combined with jQuery (see th
 
 ##### Can I record states and re-hydrate them?
 
-Yes, see [createTransformer](http://mobxjs.github.io/mobx/refguide/create-transformer.html) for some examples.
+Yes, see [createTransformer in mobx-utils](https://github.com/mobxjs/mobx-utils)for some examples.
 
 ##### Can you tell me how it works?
 

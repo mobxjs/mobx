@@ -116,10 +116,6 @@
         "title": "configure",
         "sidebar_label": "configure"
       },
-      "refguide/create-transformer": {
-        "title": "createTransformer",
-        "sidebar_label": "mobxUtils.createTransformer"
-      },
       "refguide/expr": {
         "title": "refguide/expr",
         "sidebar_label": "mobxUtils.expr"
