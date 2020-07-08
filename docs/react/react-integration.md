@@ -161,7 +161,7 @@ See [React class components](react-class-components.md) for more information.
 
 ## Tips
 
-### React DevTools support
+### React DevTools component name support
 
 [React DevTools](https://reactjs.org/blog/2019/08/15/new-react-devtools.html) uses the display name information of components to properly display the component hierarchy.
 
@@ -172,6 +172,8 @@ export const MyComponent = observer(props => <div>hi</div>)
 ```
 
 then no display name will be visible in the DevTools.
+
+![devtools-noname](../assets/devtools-noDisplayName.png)
 
 The following approaches can be used to fix this:
 
@@ -205,6 +207,15 @@ The following approaches can be used to fix this:
     ```
 
     This is broken in React at the time of writing; mobx-react `observer` uses a React.memo and runs into this bug: https://github.com/facebook/react/issues/18026
+
+Now you can see component names:
+
+![devtools-withname](../assets/devtools-withDisplayName.png)
+
+### MobX developer tools
+
+[MobX developer tools](https://github.com/mobxjs/mobx-devtools) is browser plugin that lets you introspect observables and track changes. This can
+be used in addition to the React devtools. Check it out!
 
 ### Use the `<Observer>` component in cases where you can't use observer
 

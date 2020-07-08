@@ -13,10 +13,6 @@
         "title": "Decorators in MobX",
         "sidebar_label": "Decorators in MobX"
       },
-      "best/devtools": {
-        "title": "MobX + React DevTools",
-        "sidebar_label": "MobX + React DevTools"
-      },
       "best/dispose-reactions": {
         "title": "Always dispose reactions",
         "sidebar_label": "Always dispose reactions"

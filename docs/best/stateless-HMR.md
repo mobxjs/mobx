@@ -18,36 +18,6 @@ This is usually because the modules which have changed (and their parents) do no
 
 This is especially apparent when you start working with MobX since observables make it really easy to create a lot of stateless components. Here are some tips for how to build your stateless components and still get all the advantages of HMR:
 
-## Use function declarations instead of arrow functions
-
-Function declarations still do the exact same thing as arrow functions, but they have the key advantage of actually having names inside of the React DevTools.
-
-For instance, here's a stateless component built with an arrow function:
-
-```javascript
-const ToDoItem = observer(props => <div>{props.item}</div>)
-
-export default ToDoItem
-```
-
-And here's how that will appear in the React DevTools:
-
-![devtools-noname](../assets/devtools-noDisplayName.png)
-
-On the other hand, using a function declaration will allow you to build the same stateless component AND see it in the DevTools:
-
-```javascript
-function ToDoItem(props) {
-    return <div>{props.item}</div>
-}
-
-export default observer(ToDoItem)
-```
-
-And now the component shows up correctly in the DevTools:
-
-![devtools-withname](../assets/devtools-withDisplayName.png)
-
 ## Make sure your top-level component is a stateful observer
 
 By "stateful observer", all I really mean is a component created with `React.Component` or `React.createClass` and which uses the `@observer` decorator, like so:

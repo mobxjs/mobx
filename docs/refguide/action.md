@@ -24,7 +24,7 @@ Especially the fact that [`transaction`](api.md#transaction) is applied automati
 actions will batch mutations and only notify computed values and reactions after the (outer most) action has finished.
 This ensures that intermediate or incomplete values produced during an action are not visible to the rest of the application until the action has finished.
 
-`action` also provides useful debugging information in combination with the devtools.
+`action` also provides useful debugging information in combination with the [MobX developer tools](https://github.com/mobxjs/mobx-devtools).
 
 By passing in `name` you can control the name of the action, otherwise it
 is derived from the function or method that is wrapped.

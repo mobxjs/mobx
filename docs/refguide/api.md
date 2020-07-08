@@ -305,13 +305,6 @@ Get value from collection with key.
 
 _The following api's might come in handy if you want to build cool tools on top of MobX or if you want to inspect the internal state of MobX_
 
-### `"mobx-react-devtools"` package
-
-The mobx-react-devtools is a powerful package that helps you to investigate the performance and dependencies of your react components.
-Also has a powerful logger utility based on `spy`.
-
-[&laquo;details&raquo;](../best/devtools.md)
-
 ### `trace`
 
 Log when value is invalidated, or set debugger breakpoint.
@@ -332,7 +325,7 @@ Returns the backing _Atom_ of a given observable object, property, reaction etc.
 ### `getDebugName`
 
 Usage: `getDebugName(thing, property?)`
-Returns a (generated) friendly debug name of an observable object, property, reaction etc. Used by for example the `mobx-react-devtools`.
+Returns a (generated) friendly debug name of an observable object, property, reaction etc. Used by for example the [MobX developer tools](https://github.com/mobxjs/mobx-devtools).
 
 ### `getDependencyTree`
 

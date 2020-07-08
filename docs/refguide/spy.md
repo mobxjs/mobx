@@ -6,17 +6,13 @@ hide_title: true
 
 # Spy
 
-<div id='codefund'></div><div class="re_2020"><a class="re_2020_link" href="https://www.react-europe.org/#slot-2149-workshop-typescript-for-react-and-graphql-devs-with-michel-weststrate" target="_blank" rel="sponsored noopener"><div><div class="re_2020_ad" >Ad</div></div><img src="/img/reacteurope.svg"><span>Join the author of MobX at <b>ReactEurope</b> to learn how to use <span class="link">TypeScript with React</span></span></a></div>
+Usage:
 
-Usage: `spy(listener)`.
+-   `spy(listener)`
+
 Registers a global spy listener that listens to all events that happen in MobX.
 It is similar to attaching an `observe` listener to _all_ observables at once, but also notifies about running (trans/re)actions and computations.
-Used for example by the `mobx-react-devtools`.
-
-Usage: `spy(listener)`.
-Registers a global spy listener that listens to all events that happen in MobX.
-It is similar to attaching an `observe` listener to _all_ observables at once, but also notifies about running (trans/re)actions and computations.
-Used for example by the `mobx-react-devtools`.
+Used for example by the [MobX developer tools](../react/react-integration/md#mobxdevtools).
 
 Example usage of spying all actions:
 
