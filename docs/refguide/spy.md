@@ -13,6 +13,11 @@ Registers a global spy listener that listens to all events that happen in MobX.
 It is similar to attaching an `observe` listener to _all_ observables at once, but also notifies about running (trans/re)actions and computations.
 Used for example by the `mobx-react-devtools`.
 
+Usage: `spy(listener)`.
+Registers a global spy listener that listens to all events that happen in MobX.
+It is similar to attaching an `observe` listener to _all_ observables at once, but also notifies about running (trans/re)actions and computations.
+Used for example by the `mobx-react-devtools`.
+
 Example usage of spying all actions:
 
 ```javascript

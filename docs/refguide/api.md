@@ -265,17 +265,41 @@ Use this to change how MobX behaves as a whole.
 
 [&laquo;details&raquo;](configure.md)
 
-## Direct Observable manipulation
+## Object API
 
-There is now an utility API that enables manipulating observable maps, objects and arrays with the same API. These api's are fully reactive, which means that even new property declarations can be detected by mobx if `set` is used to add them, and `values` or `keys` to iterate them.
+The Object API is an optional, generic API that enables manipulating observable maps, objects and arrays with the same API. This is specially useful
+in [environments without `Proxy` support](../best/limitations-without-proxies.md).
 
--   **`values(thing)`** returns all values in the collection as array
--   **`keys(thing)`** returns all keys in the collection as array
--   **`entries(thing)`** returns a [key, value] pair for all entries in the collection as array
--   **`set(thing, key, value)`** or **`set(thing, { key: value })`** Updates the given collection with the provided key / value pair(s).
--   **`remove(thing, key)`** removes the specified child from the collection. For arrays splicing is used.
--   **`has(thing, key)`** returns true if the collection has the specified _observable_ property.
--   **`get(thing, key)`** returns the child under the specified key.
+### `values`
+
+Return all values in collection as array.
+
+### `keys`
+
+Return all keys/indices in collection as array.
+
+### `entries`
+
+Return a `[key, value]` pair for all entries in the collection
+as an array.
+
+### `set`
+
+Update collection.
+
+### `remove`
+
+Remove item from collection.
+
+### `has`
+
+Check for membership in collection.
+
+### `get`
+
+Get value from collection with key.
+
+[&laquo;details&raquo;](object-api.md)
 
 # Development utilities
 
@@ -290,27 +314,15 @@ Also has a powerful logger utility based on `spy`.
 
 ### `trace`
 
-Usage:
-
--   `trace(enterDebugger?)`
--   `trace(Reaction object / ComputedValue object / disposer function, enterDebugger?)`
--   `trace(object, computedValuePropertyName, enterDebugger?)`
-
-`trace` is a small utility that you can use inside a computed value or reaction.
-If it is enabled, it will start logging when the value is being invalidated, and why.
-If `enterDebugger` is set to true, and developer tools are enabled, the javascript engine
-will break on the point where it is triggered.
+Log when value is invalidated, or set debugger breakpoint.
 
 [&laquo;trace&raquo;](../best/trace.md)
 
 ### `spy`
 
-Usage: `spy(listener)`.
 Registers a global spy listener that listens to all events that happen in MobX.
-It is similar to attaching an `observe` listener to _all_ observables at once, but also notifies about running (trans/re)actions and computations.
-Used for example by the `mobx-react-devtools`.
 
-[&laquo;details&raquo;](spy.md)
+[&laquo;trace&raquo;](spy.md)
 
 ### `getAtom`
 
