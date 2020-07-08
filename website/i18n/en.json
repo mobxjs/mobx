@@ -116,10 +116,6 @@
         "title": "configure",
         "sidebar_label": "configure"
       },
-      "refguide/expr": {
-        "title": "refguide/expr",
-        "sidebar_label": "mobxUtils.expr"
-      },
       "refguide/extend-observable": {
         "title": "refguide/extend-observable",
         "sidebar_label": "extendObservable"

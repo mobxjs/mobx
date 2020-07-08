@@ -4,7 +4,8 @@
       "README",
       "intro/installation",
       "intro/overview",
-      "intro/concepts"
+      "intro/concepts",
+      "faq/faq"
     ],
     "MobX and React": [
       "react/react-integration",
@@ -55,7 +56,6 @@
       "refguide/mobx-utils"
     ],
     "Tips & Tricks": [
-      "faq/faq",
       "best/pitfalls",
       "refguide/configure",
       "best/limitations-without-proxies",

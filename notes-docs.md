@@ -69,6 +69,7 @@ https://deploy-preview-2382--mobx-docs.netlify.app/
 -   [ ] The debugging information for `observer` components in the React devtools does not match the screenshot in the mobx-react readme anymore. It does seem to work as intended according to the issue though.
 -   [ ] Find a good place for `onReactionError`.
 -   [ ] Invent a "obscure/advanced/special interest" marker and use it on documents that aren't important to newcomers.
+-   [ ] Move API overview into UI.
 
 ## Structure thoughts
 
