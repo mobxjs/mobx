@@ -122,4 +122,4 @@ Returns `true` if the given function is marked as an `action`.
 ## Disabling mandatory actions
 
 By default, MobX 6 and later require that you use actions to make state changes.
-You can however configure MobX to disable this behavior, see [`enforceActions`](api.md#enforceactions).
+You can however configure MobX to disable this behavior, see [`enforceActions`](configure.md#enforceactions).

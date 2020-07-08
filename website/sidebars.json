@@ -49,6 +49,7 @@
     "Utilities": [
       "refguide/api",
       "refguide/tojson",
+      "refguide/configure",
       "refguide/spy",
       "refguide/inject",
       "refguide/object-api",

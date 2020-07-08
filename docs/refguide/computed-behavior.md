@@ -36,7 +36,7 @@ This can cause performance degradation if a computed value is read in a high fre
 
 You can forcefully keep a computed value awake if you need to, by using [`keepAlive`](computed-options.md#computed-keepalive) or by using [`observe`](observe.md), but note that this can potentially create memory leaks.
 
-MobX can be configured to report an error when computeds are accessed directly with the `computedRequiresReaction` option:
+MobX can be configured to report an error when computeds are accessed directly with the [`computedRequiresReaction`](configure#computedrequiresreaction) option:
 
 ```javascript
 configure({

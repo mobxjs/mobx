@@ -21,12 +21,12 @@ MobX works in any ES5 environment, which includes browsers and NodeJS:
 
 By default MobX uses proxies for optimal performance and compatibility. However, on older JavaScript engines `Proxy` is not available (see [Proxy support](https://kangax.github.io/compat-table/es6/#test-Proxy)). For example, when running Microsoft Internet Explorer or React Native (if < v0.59 or when using the Hermes engine) on Android. In such cases, MobX can fallback to an ES5 compatible implementation which works almost identically, though there are a few [limitations without Proxy support](../best/limitations-without-proxies.md).
 
-You have to explicitly enable the fallback implementation by calling `enableES5()`:
+You have to explicitly enable the fallback implementation by configuring [`useProxies`](../refguide/configure#useproxies):
 
 ```javascript
-import { enableES5 } from "mobx"
+import { configure } from "mobx"
 
-enableES5()
+configure({ useProxies: "never" }) # or "ifavailable"
 ```
 
 ## Modern JavaScript environments
