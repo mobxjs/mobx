@@ -18,3 +18,11 @@ Use `set` whenever you want to create a dynamic set where the addition / removal
 Note that your browser needs to support ES6 sets, or polyfill them, to make sets work.
 
 Sets use the [ES6 Set API](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set)
+
+## `isObservableSet`
+
+Usage:
+
+-   `isObservableSet(value)`
+
+Returns `true` if `value` is an observable set.

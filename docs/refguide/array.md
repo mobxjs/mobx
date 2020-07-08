@@ -66,9 +66,26 @@ can also use `observable.shallow` for this; see also [modifiers](modifiers.md).
 
 The `name` option can be used to give the array a friendly debug name, to be used in for example `spy` or the MobX dev tools.
 
+## `isObservableArray`
+
+Usage:
+
+-   `isObservableArray(value)`
+
+Returns `true` if `value` is an observable array.
+
+## `isArrayLike`
+
+[Without Proxy support]
+
+Usage:
+
+-   `isArrayLike(thing)`
+
+Returns `true` if the given thing is either a true JS-array or an observable (MobX-)array. This is intended as convenience/shorthand. Note that observable arrays can be `.slice()`d to turn them into true JS-arrays.
+
 ## Array limitations in environments without Proxy support
 
-If your environment does not support Proxies, then MobX cannot make its observable
-array be a real JS Array.
+If your environment does not support Proxies, then MobX cannot make its observable array be a real JS Array.
 
 [More information](../best/limitations-without-proxies.md).

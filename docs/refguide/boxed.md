@@ -1,14 +1,14 @@
 ---
-title: Boxed Values
-sidebar_label: boxed values
+title: Observable Boxes
+sidebar_label: boxes
 hide_title: true
 ---
 
-# Boxed values
+# Observable Boxes
 
 Usage:
 
--   `observable.boxed(value, options?)`
+-   `observable.box(value, options?)`
 
 All primitive values in JavaScript are immutable and hence per definition not observable.
 Usually that is fine, as MobX usually can just make the _property_ that contains the value observable.
@@ -56,3 +56,11 @@ cityName.set("Amsterdam")
 ## `observable.box(value, { name: "my array" })`
 
 The `name` option can be used to give the box a friendly debug name, to be used in for example `spy` or the MobX dev tools.
+
+## `isBoxedObservable`
+
+Usage:
+
+-   `isBoxedObservable(value)`
+
+Returns `true` if `value` is an observable box.

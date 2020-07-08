@@ -6,8 +6,6 @@ hide_title: true
 
 # toJS
 
-<div id='codefund'></div><div class="re_2020"><a class="re_2020_link" href="https://www.react-europe.org/#slot-2149-workshop-typescript-for-react-and-graphql-devs-with-michel-weststrate" target="_blank" rel="sponsored noopener"><div><div class="re_2020_ad" >Ad</div></div><img src="/img/reacteurope.svg"><span>Join the author of MobX at <b>ReactEurope</b> to learn how to use <span class="link">TypeScript with React</span></span></a></div>
-
 `toJS(value, options?)`
 
 Recursively converts an (observable) object to a javascript _structure_.
@@ -24,11 +22,11 @@ Cycles are detected and properly supported by default, but this can be disabled 
 For more complex (de)serialization scenario's, one can use [serializr](https://github.com/mobxjs/serializr)
 
 ```javascript
-var obj = mobx.observable({
+const obj = mobx.observable({
     x: 1
 })
 
-var clone = mobx.toJS(obj)
+const clone = mobx.toJS(obj)
 
 console.log(mobx.isObservableObject(obj)) // true
 console.log(mobx.isObservableObject(clone)) // false

@@ -111,6 +111,14 @@ const ticker = new Ticker()
 setInterval(ticker.increment, 1000)
 ```
 
+## `isAction`
+
+Usage:
+
+-   `isAction(func)`
+
+Returns `true` if the given function is marked as an `action`.
+
 ## Disabling mandatory actions
 
 By default, MobX 6 and later require that you use actions to make state changes.

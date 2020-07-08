@@ -19,9 +19,10 @@
       "refguide/map",
       "refguide/set",
       "refguide/object",
+      "refguide/boxed",
       "refguide/modifiers",
       "refguide/extend-observable",
-      "refguide/boxed"
+      "refguide/is-observable"
     ],
     "Updating observables with actions": [
         "refguide/action",
@@ -39,7 +40,8 @@
         "refguide/when",
         "refguide/observe",
         "best/dispose-reactions",
-        "best/what-does-mobx-react-to"
+        "best/what-does-mobx-react-to",
+        "refguide/on-become-observed"
     ],
     "Debugging MobX": [
       "best/trace"

@@ -7,7 +7,9 @@ hide_title: true
 # Intercept & Observe
 
 `observe` and `intercept` can be used to monitor the changes of a single observable (they **_don't_** track nested observables).
-`intercept` can be used to detect and modify mutations before they are applied to the observable.
+
+`intercept` can be used to detect and modify mutations before they are applied to the observable. This is useful for useful for validation, normalization or cancellation.
+
 `observe` allows you to intercept changes after they have been made.
 
 ## Intercept

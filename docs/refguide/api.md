@@ -100,7 +100,7 @@ One-time actions.
 
 [&laquo;details&raquo;](action.md#runinaction)
 
-### Flow
+### `flow`
 
 MobX friendly replacement for `async` / `await`.
 
@@ -115,6 +115,16 @@ A higher order component you can use to make a React component re-render when ob
 Is part of the `mobx-react` package.
 
 [&laquo;details&raquo;](../react/react-integration.md)
+
+### `Provider` (`mobx-react` package)
+
+[*Deprecated*] Can be used to pass stores to child components using React's context mechanism. Use the [React context mechanism](https://reactjs.org/docs/context.html) instead.
+
+See the [`mobx-react` docs](https://github.com/mobxjs/mobx-react#provider-experimental).
+
+### `inject` (`mobx-react` package)
+
+[*Deprecated*] Higher order component and counterpart of `Provider`. Use the [React context mechanism](https://reactjs.org/docs/context.html) instead.
 
 ## Reactions & Derivations
 
@@ -134,7 +144,7 @@ Rerun a side-effect when data it observes changes.
 
 Execute a side-effect once when a observable condition becomes true.
 
-[&laquo;details&raquo;](when.md).
+[&laquo;details&raquo;](when.md)
 
 ### `onReactionError`
 
@@ -150,107 +160,103 @@ This can be used for monitoring or test purposes.
 _Here are some utilities that might make working with observable objects or computed values more convenient.
 More, less trivial utilities can be found in the \* [mobx-utils](https://github.com/mobxjs/mobx-utils) package._
 
-### `Provider` (`mobx-react` package)
-
-Can be used to pass stores to child components using React's context mechanism. See the [`mobx-react` docs](https://github.com/mobxjs/mobx-react#provider-experimental).
-
-### `inject` (`mobx-react` package)
-
-Higher order component and counterpart of `Provider`. Can be used to pick stores from React's context and pass it as props to the target component. Usage:
-
--   `inject("store1", "store2")(observer(MyComponent))`
--   `@inject("store1", "store2") @observer MyComponent`
--   `@inject((stores, props, context) => props) @observer MyComponent`
--   `@observer(["store1", "store2"]) MyComponent` is a shorthand for the the `@inject() @observer` combo.
-
 ### `toJS`
 
-Usage: `toJS(observableDataStructure, options?)`. Converts observable data structures back to plain javascript objects, ignoring computed values.
+Converts observable data structures back to plain javascript objects, ignoring computed values.
 
-The `options` include:
+[&laquo;details&raquo;](tojson.md)
 
--   **`detectCycles: boolean`**: Checks for cyclical references in the observable data-structure. Defaults to `true`.
--   **`exportMapsAsObjects: boolean`**: Treats ES6 Maps as regular objects for export. Defaults to `true`
+## `isObservable`
 
-[&laquo;details&raquo;](tojson.md).
+Is a value observable?
 
-### `isObservable` and `isObservableProp`
+[&laquo;details&raquo;](observable.md#isobservable)
 
-Usage: `isObservable(thing)` or `isObservableProp(thing, property?)`. Returns true if the given thing, or the `property` of the given thing is observable.
-Works for all observables, computed values and disposer functions of reactions.
+## `isObservableProp`
 
-[&laquo;details&raquo;](is-observable)
+Is a property observable?
 
-### `isObservableObject|Array|Map` and `isBoxedObservable`
+[&laquo;details&raquo;](observable.md#isobservableprop)
 
-Usage: `isObservableObject(thing)`, `isObservableArray(thing)`, `isObservableMap(thing)`, `isBoxedObservable(thing)`. Returns `true` if.., well, do the math.
+## `isObservableArray`
 
-### `isArrayLike`
+Is value an observable array?
 
-Usage: `isArrayLike(thing)`. Returns `true` if the given thing is either a true JS-array or an observable (MobX-)array.
-This is intended as convenience/shorthand.
-Note that observable arrays can be `.slice()`d to turn them into true JS-arrays.
+[&laquo;details&raquo;](array.md#isobservablearray)
+
+## `isObservableMap`
+
+Is value an observable map?
+
+[&laquo;details&raquo;](map.md#isobservablemap)
+
+## `isObservableSet`
+
+Is value an observable set?
+
+[&laquo;details&raquo;](set.md#isobservableset)
+
+## `isObservableObject`
+
+Is value an observable object?
+
+[&laquo;details&raquo;](object.md#isobservableobject)
+
+## `isBoxedObservable`
+
+Is value an observable box?
+
+[&laquo;details&raquo;](boxed.md#isboxedobservable)
+
+## `isArrayLike`
+
+[Without Proxy support]
+
+Is this an array of some type, observable or not?
+
+[&laquo;details&raquo;](array.md#isarraylike)
 
 ### `isAction`
 
-Usage: `isAction(func)`. Returns true if the given function is wrapped / decorated with `action`.
+Is this an action?
 
-### `isComputed` and `isComputedProp`
+[&laquo;details&raquo;](action.md#isaction)
 
-Usage: `isComputed(thing)` or `isComputedProp(thing, property?)`. Returns true if the given thing is a boxed computed value, or if the designated property is a computed value.
+### `isComputed`
+
+Is this a boxed computed value?
+
+[&laquo;details&raquo;](computed.md#iscomputed)
+
+### `isComputedProp`
+
+Is this a computed property?
+
+[&laquo;details&raquo;](computed.md#iscomputedprop)
 
 ### `intercept`
 
-Usage: `intercept(object, property?, interceptor)`.
-Api that can be used to intercept changes before they are applied to an observable api. Useful for validation, normalization or cancellation.
+Intercept changes before they are applied to an observable api.
 
 [&laquo;details&raquo;](observe.md)
 
 ### `observe`
 
-Usage: `observe(object, property?, listener, fireImmediately = false)`
 Low-level api that can be used to observe a single observable value.
 
 [&laquo;details&raquo;](observe.md)
 
-### `onBecomeObserved` and `onBecomeUnobserved`
+### `onBecomeObserved`
 
-Usage: `onBecomeObserved(observable, property?, listener: () => void): (() => void)` and
-`onBecomeUnobserved(observable, property?, listener: () => void): (() => void)`
+Hook for when something becomes observed.
 
-These functions are hooks into the observability system of MobX and get notified when observables _start_ / _stop_ becoming observed. It can be used to execute some lazy operations or perform network fetches.
+[&laquo;details&raquo;](on-become-observed.md)
 
-The return value is a _diposer-function_ that will detach the _listener_.
+### `onBecomeUnobserved`
 
-```javascript
-export class City {
-    @observable location
-    @observable temperature
-    interval
+Hook for when something stops being observed.
 
-    constructor(location) {
-        this.location = location
-        // only start data fetching if temperature is actually used!
-        onBecomeObserved(this, "temperature", this.resume)
-        onBecomeUnobserved(this, "temperature", this.suspend)
-    }
-
-    resume = () => {
-        log(`Resuming ${this.location}`)
-        this.interval = setInterval(() => this.fetchTemperature(), 5000)
-    }
-
-    suspend = () => {
-        log(`Suspending ${this.location}`)
-        this.temperature = undefined
-        clearInterval(this.interval)
-    }
-
-    fetchTemperature = flow(function* () {
-        // data fetching logic
-    })
-}
-```
+[&laquo;details&raquo;](on-become-observed.md)
 
 ### `configure`
 

@@ -101,8 +101,8 @@
         "sidebar_label": "autorun"
       },
       "refguide/boxed": {
-        "title": "Boxed Values",
-        "sidebar_label": "boxed values"
+        "title": "Observable Boxes",
+        "sidebar_label": "boxes"
       },
       "refguide/computed-behavior": {
         "title": "How computed works",
@@ -171,6 +171,10 @@
       "refguide/observe": {
         "title": "Intercept & Observe",
         "sidebar_label": "intercept & observe"
+      },
+      "refguide/on-become-observed": {
+        "title": "onBecomeObserved",
+        "sidebar_label": "onBecomeObserved"
       },
       "refguide/reaction": {
         "title": "reaction",

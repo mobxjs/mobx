@@ -60,6 +60,14 @@ Some things to keep in mind when making objects observable:
 -   Pass `{ deep: false }` as 3rd argument to disable the auto conversion of property values.
 -   Pass `{ name: "my object" }` to assign a friendly debug name to this object.
 
-## Object limitations in environments without Proxy support
+## `isObservableObject`
+
+Usage:
+
+-   `isObservableObject(value)`
+
+Returns `true` if `value` is an observable object.
+
+## Limitations in environments without Proxy support
 
 When passing objects through `observable`, only the properties that exist at the time of making the object observable will be observable. Properties that are added to the object at a later time won't become observable, unless [`set`](object-api.md) or [`extendObservable`](extend-observable.md) is used. See also [limitations without proxies](../best/limitations-without-proxies.md)

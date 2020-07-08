@@ -52,3 +52,11 @@ can also use `observable.shallow` for this; see also [modifiers](modifiers.md).
 ### `observable.map(values, { name: "my map" })`
 
 The `name` option can be used to give the map a friendly debug name, to be used in for example `spy` or the MobX dev tools.
+
+## `isObservableMap`
+
+Usage:
+
+-   `isObservableMap(value)`
+
+Returns `true` if `value` is an observable map.

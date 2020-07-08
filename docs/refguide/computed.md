@@ -136,6 +136,22 @@ Note: don't use arrow functions as the `this` would be incorrect.
 
 For further details, check the mobx-utils [docs](https://github.com/mobxjs/mobx-utils#computedfn)
 
+## `isComputed`
+
+Usage:
+
+-   `isComputed(value)`
+
+Returns `true` if `value` is a boxed computed value.
+
+## `isComputedProp`
+
+Usage:
+
+-   `isComputedProp(obj, propertyName)`
+
+Returns `true` if the designated property is a computed value.
+
 ## More about computed
 
 You can pass [options into `computed`](computed-options.md). If you experience
