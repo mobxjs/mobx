@@ -18,7 +18,7 @@ _Simple, scalable state management_
 [![OpenCollective](https://opencollective.com/mobx/sponsors/badge.svg)](#sponsors)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 
-MobX is proudly sponsored by Mendix, Coinbase, Facebook Open Source, Canva, Algolia, Guilded, Auction Frontier, Mantro and TalentPlot for 100\$/month or more! And beyond that by many [individual backers](#backers) and through [one time contributions](https://github.com/mobxjs/mobx/blob/master/sponsors.md).
+MobX is proudly sponsored by Mendix, Coinbase, Facebook Open Source, Canva, Algolia, Guilded, Auction Frontier, Mantro and TalentPlot for 100\$/month or more! And beyond that by many [individual backers](http://mobxjs.github.io/mobx/backers-sponsors.html#backers) and through [one time contributions](https://github.com/mobxjs/mobx/blob/master/sponsors.md).
 
 **🥇Gold sponsors (\$3000+ total contribution):** <br/>
 <a href="https://mendix.com/"><img src="assets/mendix-logo.png" align="center" width="100" title="Mendix" alt="Mendix" /></a>
@@ -107,6 +107,8 @@ ReactDOM.render(<TimerView timer={myTimer} />, document.body)
 To get more detail about this example, see [the gist of MobX](http://mobxjs.github.io/mobx/intro/overview.html).
 
 To learn about the underlying concepts together with a larger example, please read [Concepts & Principles](http://mobxjs.github.io/mobx/intro/concepts.html)
+
+Then see what to [read next](http://mobxjs.github/mobx/intro/how-to-read.html).
 
 ### MobX and Decorators
 
