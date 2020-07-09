@@ -5,6 +5,9 @@
     "previous": "Previous",
     "tagline": "Simple, scalable state management",
     "docs": {
+      "backers-sponsors": {
+        "title": "MobX Backers and Sponsors"
+      },
       "best/actions": {
         "title": "Asynchronous actions",
         "sidebar_label": "Asynchronous actions"
@@ -196,6 +199,7 @@
     "links": {
       "API": "API",
       "中文": "中文",
+      "Sponsors": "Sponsors",
       "Github": "Github"
     },
     "categories": {
