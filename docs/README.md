@@ -50,10 +50,6 @@ Installation: `npm install mobx --save`. React bindings: `npm install mobx-react
 
 [More about installing MobX](http://mobxjs.github.io/mobx/intro/installation.html)
 
-## Translations
-
--   [中文](http://cn.mobx.js.org)
-
 ## Introduction
 
 MobX is a battle tested library that makes state management simple and scalable by transparently applying functional reactive programming (TFRP).

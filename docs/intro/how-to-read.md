@@ -32,6 +32,8 @@ Here are a few suggestions about the next things to read:
 
 -   To get some ideas on how to organize your application's data stores, read [Defining data stores](../best/store.md).
 
--   If the behavior of MobX confuses you, it's useful to read [What does MobX react to?](../best/what-does-mobx-react-do.md).
+-   If the behavior of MobX confuses you, it's useful to read [What does MobX react to?](../best/what-does-mobx-react-to.md).
+
+-   Get [quick overview of the API](../refguide/api.md), also linked in the top navigation bar.
 
 This should give you a good grounding in day-to-day use of MobX. There is plenty more available you can then read at your own leisure.

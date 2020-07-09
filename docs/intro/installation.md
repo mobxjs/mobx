@@ -23,7 +23,7 @@ The main entry point of the MobX 6 package ships with ES5 code for backward comp
 
 ## Older JavaScript environments
 
-By default MobX uses proxies for optimal performance and compatibility. However, on older JavaScript engines `Proxy` is not available (see [Proxy support](https://kangax.github.io/compat-table/es6/#test-Proxy)). For example, when running Microsoft Internet Explorer or React Native (if < v0.59 or when using the Hermes engine) on Android. In such cases, MobX can fallback to an ES5 compatible implementation which works almost identically, though there are a few [limitations without Proxy support](../best/limitations-without-proxies.md).
+By default MobX uses proxies for optimal performance and compatibility. However, on older JavaScript engines `Proxy` is not available (see [Proxy support](https://kangax.github.io/compat-table/es6/#test-Proxy)). Examples are Internet Explorer (before Edge), Node.js < 6, iOS < 10, Android before RN 0.59, or Hermes runtime. In such cases, MobX can fallback to an ES5 compatible implementation which works almost identically, though there are a few [limitations without Proxy support](../best/limitations-without-proxies.md).
 
 You have to explicitly enable the fallback implementation by configuring [`useProxies`](../refguide/configure#useproxies):
 

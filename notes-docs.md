@@ -23,43 +23,27 @@ https://deploy-preview-2382--mobx-docs.netlify.app/
 
 -   "The props object and the state object of an observer component are automatically made observable to make it easier to create @computed properties that derive from props inside such a component." Does the props bit still apply to function component. Though computed doesn't apply anyhow, unless `useLocalStore` is in use.
 
--   How to name "compatible property tracking" as opposed to proxy-based? How does one configure it, or it is an automatic fallback?
-
 -   What to do about translations? They will be out of date.
 
 -   Is there a way to regenerate assets? flow.png for instance uses decorators and needs to be updated.
 
--   When we introduce actions we need a link to an actions section that describes how to turn off strict state reinforcing.
+*   Should this `computedRequiresAction` be the default? Or not have it at all?
 
--   How do we document `extendObservable` in the face of the existence of `makeObservable`?
+*   Does 'makeAutoObservable' work with computedFn? Should we be able to declare this explicitly with `makeObservable`?
 
--   Should peek() be brought back on arrays for non-decorator support? I have assumed it is still gone in the docs.
-
--   The async action document instead of offering "one way to do it" offers many different ways to do it. This may be unavoidable, but perhaps there is a way to at least focus this document. runInAction in particular seems like a pattern that doesn't add that much compared to just extracting actions as methods, especially in combination with makeAutoObservable.
-
--   Should this `computedRequiresAction` be the default? Or not have it at all?
-
--   Can you configure `computed` with options when used with `makeObservable`? I assume yes.
-
--   I am unclear about the order of `makeObservable` / `makeAutoObservable` in the constructor. Does it matter? Is there a good convention? What happens if you don't set a prop and then already talk about it in `makeObservable`? What about `makeAutoObservable`?
-
--   Does 'makeAutoObservable' work with computedFn? Should we be able to declare this explicitly with `makeObservable`?
-
--   Should we use `mobx-react-lite` in examples primarily? What's up with the
+*   Should we use `mobx-react-lite` in examples primarily? What's up with the
     observer batching story though?
 
--   createTransformer from mobx-utils is documented in the main docs but NOT
-    in mobx-utils. Should move it to mobx-utils? `expr` is also documented but we can instead directly refer to mobx-utils.
+*   What to do with the stateless HMR document? Is it still relevant?
 
 ## Todo
 
--   [ ] Netlify preview for docs PR.
+-   [x] Netlify preview for docs PR.
 -   [ ] Any code sandbox links need to be updated. jsfiddle as well, move it to codesandbox.
--   [ ] Codemod might change to a new package to reduce size. Documentation needs to be updated.
+-   [x] Codemod might change to a new package to reduce size. Documentation needs to be updated.
 -   [ ] There are a lot of references to external documentation resources. They can probably use a pruning.
--   [ ] We can still write a separate document that introduces "observable" and explains you need to wrap things in `action` if you want to modify things. Is that the right way forward?
 -   [ ] Update the 'Getting started tutorial'? It's maintained separately from the documentation - should we attempt to integrate it? The problem with that it is has live code. Docusaurus can run React snippets but the HTML page has very fancy animations. Update it as is?
--   [ ] Remove reference to the https://github.com/mobxjs/mobx-react-boilerplate projects, modify github README there that it's out of date and retired.
+-   [x] Remove reference to the https://github.com/mobxjs/mobx-react-boilerplate projects, modify github README there that it's out of date and retired.
 -   [ ] makeAutoObservable is handy, but you probably shouldn't use it on a React component to make local state observable. We should say that somewhere.
 -   [ ] mweststrate: Only sponsors are needed. For backers / sponsors and sponsoring in general I think we should add an entry in the top menu bar
 -   [ ] What to do about the egghead lessons? They use the decorator syntax and may not enforce actions by default. -> consolidate into a single page and explain the decorator story and action on it.
@@ -70,6 +54,7 @@ https://deploy-preview-2382--mobx-docs.netlify.app/
 -   [ ] Find a good place for `onReactionError`.
 -   [ ] Invent a "obscure/advanced/special interest" marker and use it on documents that aren't important to newcomers.
 -   [ ] Move API overview into UI.
+-   [ ] Either flatten docs into a single directory or follow new structure.
 
 ## Structure thoughts
 

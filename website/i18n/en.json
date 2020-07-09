@@ -194,7 +194,8 @@
       }
     },
     "links": {
-      "Documentation": "Documentation",
+      "API": "API",
+      "中文": "中文",
       "Github": "Github"
     },
     "categories": {
