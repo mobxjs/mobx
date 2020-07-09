@@ -51,7 +51,6 @@
       "refguide/spy"
     ],
     "Utilities": [
-      "refguide/api",
       "refguide/tojson",
       "refguide/object-api",
       "refguide/mobx-utils"
