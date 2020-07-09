@@ -63,4 +63,4 @@ Works for all observables, computed values and disposer functions of reactions.
 
 ### Type-specific APIs
 
-MobX also exposes `isObservable*`, like `isObservableArray` and so on to expect for specific observables.
+MobX also exposes `isObservable*`, like `isObservableArray` and so on to check for specific observables.
