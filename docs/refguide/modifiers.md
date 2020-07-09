@@ -1,10 +1,10 @@
 ---
 title: Observable modifiers
-sidebar_label: Observable modifiers
+sidebar_label: Observable modifiers [⚛️]
 hide_title: true
 ---
 
-# Observable modifiers
+# Observable modifiers [⚛️]
 
 When you use `makeObservable`, `makeAutoObservable`, `extendObservable` and `observable.object` you can use annotations to specify how observable properties behave:
 

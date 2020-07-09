@@ -35,7 +35,7 @@ Returns a tree structure with all reactions / computations that are observing th
 
 ### `getAtom`
 
-Usage:
+[⚛️] Usage:
 
 -   `getAtom(thing, property?)`.
 

@@ -1,6 +1,5 @@
 ---
-title: What does MobX react to?
-sidebar_label: Understanding what MobX reacts to
+sidebar_label: Understanding MobX
 hide_title: true
 ---
 

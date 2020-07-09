@@ -2,10 +2,10 @@
   "docs": {
     "Basics": [
       "README",
+      "intro/how-to-read",
       "intro/installation",
       "intro/overview",
       "intro/concepts",
-      "intro/how-to-read",
       "faq/faq"
     ],
     "MobX and React": [
@@ -40,9 +40,9 @@
         "refguide/autorun",
         "refguide/reaction",
         "refguide/when",
-        "refguide/observe",
         "best/dispose-reactions",
         "best/what-does-mobx-react-to",
+        "refguide/observe",
         "refguide/on-become-observed"
     ],
     "Debugging MobX": [
@@ -58,9 +58,9 @@
     ],
     "Tips & Tricks": [
       "best/store",
-      "refguide/configure",
       "best/decorators",
-      "best/limitations-without-proxies"
+      "best/limitations-without-proxies",
+      "refguide/configure"
     ],
     "Extending MobX": [
         "refguide/extending",

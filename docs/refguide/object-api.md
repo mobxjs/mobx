@@ -1,10 +1,9 @@
 ---
-sidebar_label: Object API
-title: Object API
+sidebar_label: Object API [⚛️]
 hide_title: true
 ---
 
-## Object API
+## Object API [⚛️]
 
 The Object API is a utility API that enables manipulating observable maps, objects and arrays with the same generic API.
 

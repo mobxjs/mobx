@@ -4,7 +4,7 @@ sidebar_label: objects
 hide_title: true
 ---
 
-## Observable Objects
+# Observable Objects
 
 Usage:
 

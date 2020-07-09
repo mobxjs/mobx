@@ -1,10 +1,10 @@
 ---
 title: onBecomeObserved
-sidebar_label: onBecomeObserved
+sidebar_label: onBecomeObserved [⚛️]
 hide_title: true
 ---
 
-# `onBecomeObserved` and `onBecomeUnobserved`
+# `onBecomeObserved` and `onBecomeUnobserved` [⚛️]
 
 Usage:
 

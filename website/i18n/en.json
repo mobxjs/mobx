@@ -10,16 +10,16 @@
         "sidebar_label": "Asynchronous actions"
       },
       "best/decorators": {
-        "title": "Decorators in MobX",
-        "sidebar_label": "Decorators in MobX"
+        "title": "best/decorators",
+        "sidebar_label": "Decorators in MobX [⚛️]"
       },
       "best/dispose-reactions": {
         "title": "Always dispose reactions",
         "sidebar_label": "Always dispose reactions"
       },
       "best/limitations-without-proxies": {
-        "title": "Limitations without Proxy support",
-        "sidebar_label": "Limitations without Proxy support"
+        "title": "best/limitations-without-proxies",
+        "sidebar_label": "Limitations without Proxy [⚛️]"
       },
       "best/stateless-HMR": {
         "title": "Hot Module Reloading with Stateless Components",
@@ -34,8 +34,8 @@
         "sidebar_label": "Using trace for debugging"
       },
       "best/what-does-mobx-react-to": {
-        "title": "What does MobX react to?",
-        "sidebar_label": "Understanding what MobX reacts to"
+        "title": "best/what-does-mobx-react-to",
+        "sidebar_label": "Understanding MobX"
       },
       "faq/faq": {
         "title": "FAQ",
@@ -98,15 +98,15 @@
       },
       "refguide/boxed": {
         "title": "Observable Boxes",
-        "sidebar_label": "boxes"
+        "sidebar_label": "boxes [⚛️]"
       },
       "refguide/computed-behavior": {
         "title": "How computed works",
-        "sidebar_label": "How computed works"
+        "sidebar_label": "How computed works [⚛️]"
       },
       "refguide/computed-options": {
         "title": "Options for computed",
-        "sidebar_label": "Options for computed"
+        "sidebar_label": "Options for computed [⚛️]"
       },
       "refguide/computed": {
         "title": "computed",
@@ -114,15 +114,15 @@
       },
       "refguide/configure": {
         "title": "Configuring MobX",
-        "sidebar_label": "Configuring MobX"
+        "sidebar_label": "Configuring MobX [⚛️]"
       },
       "refguide/extend-observable": {
         "title": "refguide/extend-observable",
-        "sidebar_label": "extendObservable"
+        "sidebar_label": "extendObservable [⚛️]"
       },
       "refguide/extending": {
-        "title": "Creating new observable types",
-        "sidebar_label": "Creating new observable types"
+        "title": "refguide/extending",
+        "sidebar_label": "New observable types [⚛️]"
       },
       "refguide/flow": {
         "title": "flow",
@@ -130,7 +130,7 @@
       },
       "refguide/internals": {
         "title": "Internal functions",
-        "sidebar_label": "Internal functions"
+        "sidebar_label": "Internal functions [⚛️]"
       },
       "refguide/introspection-utils": {
         "title": "Introspection APIs",
@@ -146,15 +146,15 @@
       },
       "refguide/mobx-utils": {
         "title": "mobx-utils",
-        "sidebar_label": "mobx-utils"
+        "sidebar_label": "mobx-utils [⚛️]"
       },
       "refguide/modifiers": {
         "title": "Observable modifiers",
-        "sidebar_label": "Observable modifiers"
+        "sidebar_label": "Observable modifiers [⚛️]"
       },
       "refguide/object-api": {
-        "title": "Object API",
-        "sidebar_label": "Object API"
+        "title": "refguide/object-api",
+        "sidebar_label": "Object API [⚛️]"
       },
       "refguide/object": {
         "title": "Observable Objects",
@@ -165,12 +165,12 @@
         "sidebar_label": "observable"
       },
       "refguide/observe": {
-        "title": "Intercept & Observe",
-        "sidebar_label": "intercept & observe"
+        "title": "refguide/observe",
+        "sidebar_label": "intercept & observe [⚛️]"
       },
       "refguide/on-become-observed": {
         "title": "onBecomeObserved",
-        "sidebar_label": "onBecomeObserved"
+        "sidebar_label": "onBecomeObserved [⚛️]"
       },
       "refguide/reaction": {
         "title": "reaction",
@@ -182,7 +182,7 @@
       },
       "refguide/spy": {
         "title": "Spy",
-        "sidebar_label": "spy"
+        "sidebar_label": "spy [⚛️]"
       },
       "refguide/tojson": {
         "title": "toJS",

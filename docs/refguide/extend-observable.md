@@ -1,16 +1,15 @@
 ---
-sidebar_label: extendObservable
+sidebar_label: extendObservable [⚛️]
 hide_title: true
 ---
 
-# extendObservable
+# extendObservable [⚛️]
 
 Usage:
 
 -   `extendObservable(target, properties, annotions?, options?)`
 
-ExtendObservable can be used to add observable properties to an existing target object.
-All key / value pairs in the `properties` object result in new observable properties on the target initialized to the given value. Any getters in the properties map are turned into computed properties.
+`extendObservable` can be used to add observable properties to an existing target object. All key / value pairs in the `properties` object result in new observable properties on the target initialized to the given value. Any getters in the properties map are turned into computed properties.
 
 The `annotations` param can be used to override the declaration that is used for a specific property, like [`makeObservable` and `makeAutoObservable`](make-observable.md). The difference between `extendObservable` and `makeAutoObservable` is that `extendObservable` sets properties and declares information about them at the same time.
 

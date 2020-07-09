@@ -1,10 +1,9 @@
 ---
-title: Creating new observable types
-sidebar_label: Creating new observable types
+sidebar_label: New observable types [⚛️]
 hide_title: true
 ---
 
-# Creating new observable types
+# Creating new observable types [⚛️]
 
 ## Atoms
 
