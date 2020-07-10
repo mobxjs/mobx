@@ -51,21 +51,27 @@
     -   [x] verify perf / memory changes -> general perf is similar (< 10% slower, class instanation is twice as slow...!?). Not sure if that is a problem or the result of difference in babel config in the first place (e.g. define props)
     -   [x] investigate skipped tests
     -   [x] process TODO's
-    -   [ ] // TODO: support chrome formatter https://www.mattzeunert.com/2016/02/19/custom-chrome-devtools-object-formatters.html
     -   [x] ~weakmap for hasMaps in Map (and Set?)~ no: that would only works for objectish keys which is an exception and would require separate map collection
     -   [x] include #2343
-    -   [ ] default observable requires reaction?
     -   [x] kill globalstate options?
-    -   [ ] no binding by default? https://twitter.com/getify/status/1258137826241241088
     -   [x] kill / fix flow types
     -   [x] enable search on docs
-    -   [ ] update ad links
+    -   [ ] // TODO: support chrome formatter https://www.mattzeunert.com/2016/02/19/custom-chrome-devtools-object-formatters.html
+    -   [ ] default observable requires reaction?
+    -   [ ] no binding by default? https://twitter.com/getify/status/1258137826241241088
+    -   [ ] update ad links (https://www.google.com/adsense/new/u/0/pub-1705981461067724/home ?)
     -   [ ] fix https://github.com/mobxjs/mobx/issues/2394
+    -   [ ] use autObservable options for codemod (if no superclass)
+    -   [ ] merge https://github.com/mobxjs/mobx/pull/2389
+    -   [ ] set up discussions
 -   [ ] mobx-react
     -   [ ] displayname for observer components facebook/react#18026
-    -   [ ] update useLocalStore in mobx-react-lite to use autoMakeObservable
+    -   [ ] update useLocalStore in mobx-react-lite to use
+            autoMakeObservable
+    -   [ ] fix batching setup
 -   [ ] post 6.0
     -   [ ] add a solution for keepAlive computeds like https://github.com/mobxjs/mobx/issues/2309#issuecomment-598707584
+    -   [ ] set up continous delivery
 
 ## Docs / migration guide
 
