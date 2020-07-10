@@ -36,6 +36,8 @@ https://deploy-preview-2382--mobx-docs.netlify.app/
 
 *   What to do with the stateless HMR document? Is it still relevant?
 
+-   window.nameStore = nameStore in trace sandbox?
+
 ## Todo
 
 -   [x] Netlify preview for docs PR.
@@ -65,11 +67,11 @@ https://deploy-preview-2382--mobx-docs.netlify.app/
 
 ## Code sandbox todo
 
--   [ ] spy.md Simple codesandbox trace example: https://codesandbox.io/s/nr58ylyn4m
+-   [x] trace.md Simple codesandbox trace example: https://codesandbox.io/s/nr58ylyn4m
 
--   [ ] faq.md MobX works just as well server side, and is already combined with jQuery (see this [Fiddle](http://jsfiddle.net/mweststrate/vxn7qgdw)
+-   [ ] faq.md MobX works just as well server side, and is already combined with jQuery (see this [Fiddle](http://jsfiddle.net/mweststrate/vxn7qgdw). This is a very ancient example, what to do?
 
--   [ ] concepts.md (https://jsfiddle.net/mweststrate/wv3yopo0/)
+-   [x] concepts.md (https://jsfiddle.net/mweststrate/wv3yopo0/)
 
 -   [x] overview.md Feel free to try this example on [JSFiddle](http://jsfiddle.net/mweststrate/wgbe4guu/).
 

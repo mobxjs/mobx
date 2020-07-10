@@ -22,7 +22,7 @@ In debugger mode, the debug information will also reveal the full derivation tre
 
 ## Live examples
 
-Simple codesandbox trace example: https://codesandbox.io/s/nr58ylyn4m
+[Simple CodeSandbox `trace` example](https://codesandbox.io/s/trace-dnhbz?file=/src/index.js:309-338)
 
 Here's a deployed example for exploring the stack: https://csb-nr58ylyn4m-hontnuliaa.now.sh/
 Be sure to play with chrome debugger's blackbox feature!
@@ -44,7 +44,7 @@ const MyComponent = observer(() => {
 Enable trace by using the `reaction` argument of an reaction / autorun:
 
 ```javascript
-mobx.autorun("loggerzz", reaction => {
+mobx.autorun("logger", reaction => {
     reaction.trace()
     console.log(user.fullname)
 })
