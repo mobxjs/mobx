@@ -16,8 +16,10 @@
  *
  */
 import { dieHard } from "./errors"
+import { getGlobal } from "./utils/global"
 ;["Symbol", "Map", "Set", "Symbol"].forEach(m => {
-    if (typeof global[m] === "undefined") {
+    let g = getGlobal()
+    if (typeof g[m] === "undefined") {
         dieHard(`MobX requires global '${m}' to be available or polyfilled`)
     }
 })

@@ -56,23 +56,23 @@
     -   [x] kill globalstate options?
     -   [x] kill / fix flow types
     -   [x] enable search on docs
-    -   [ ] // TODO: support chrome formatter https://www.mattzeunert.com/2016/02/19/custom-chrome-devtools-object-formatters.html
-    -   [ ] default observable requires reaction?
     -   [x] no binding by default? https://twitter.com/getify/status/1258137826241241088
+    -   [ ] default observable requires reaction?
     -   [ ] update ad links (https://www.google.com/adsense/new/u/0/pub-1705981461067724/home ?)
     -   [ ] fix https://github.com/mobxjs/mobx/issues/2394
-    -   [ ] use autObservable options for codemod (if no superclass)
     -   [ ] merge https://github.com/mobxjs/mobx/pull/2389
-    -   [ ] set up discussions
-    -   [ ] fix UMD build depending on `global`
+    -   [x] fix UMD build depending on `global`
 -   [ ] mobx-react
     -   [ ] displayname for observer components facebook/react#18026
     -   [ ] update useLocalStore in mobx-react-lite to use
             autoMakeObservable
-    -   [ ] fix batching setup
+    -   [ ] fix React unstable batch setup
 -   [ ] post 6.0
+    -   [ ] set up discussions
+    -   [ ] use autObservable options for codemod (if no superclass)?
     -   [ ] add a solution for keepAlive computeds like https://github.com/mobxjs/mobx/issues/2309#issuecomment-598707584
     -   [ ] set up continous delivery
+    -   [ ] support chrome formatter https://www.mattzeunert.com/2016/02/19/custom-chrome-devtools-object-formatters.html also in Immer?
 
 ## Docs / migration guide
 

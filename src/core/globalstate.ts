@@ -1,4 +1,4 @@
-import { IDerivation, IObservable, Reaction, die } from "../internal"
+import { IDerivation, IObservable, Reaction, die, getGlobal } from "../internal"
 
 /**
  * These values will persist if global state is reset
@@ -140,9 +140,8 @@ export class MobXGlobals {
 let canMergeGlobalState = true
 let isolateCalled = false
 
-declare const global: any
-
 export let globalState: MobXGlobals = (function () {
+    let global = getGlobal()
     if (global.__mobxInstanceCount > 0 && !global.__mobxGlobals) canMergeGlobalState = false
     if (global.__mobxGlobals && global.__mobxGlobals.version !== new MobXGlobals().version)
         canMergeGlobalState = false
@@ -173,6 +172,7 @@ export function isolateGlobalState() {
         die(36)
     isolateCalled = true
     if (canMergeGlobalState) {
+        let global = getGlobal()
         if (--global.__mobxInstanceCount === 0) global.__mobxGlobals = undefined
         globalState = new MobXGlobals()
     }
