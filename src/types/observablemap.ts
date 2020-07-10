@@ -48,6 +48,7 @@ export type IMapDidChange<K = any, V = any> =
           object: ObservableMap<K, V>
           name: K // actual the key or index, but this is based on the ancient .observe proposal for consistency
           type: "update"
+          observableKind: "map"
           newValue: V
           oldValue: V
       }
@@ -55,12 +56,14 @@ export type IMapDidChange<K = any, V = any> =
           object: ObservableMap<K, V>
           name: K
           type: "add"
+          observableKind: "map"
           newValue: V
       }
     | {
           object: ObservableMap<K, V>
           name: K
           type: "delete"
+          observableKind: "map"
           oldValue: V
       }
 
@@ -166,13 +169,14 @@ export class ObservableMap<K = any, V = any>
                 notify || notifySpy
                     ? <IMapDidChange<K, V>>{
                           type: DELETE,
+                          observableKind: "map",
                           object: this,
                           oldValue: (<any>this.data_.get(key)).value_,
                           name: key
                       }
                     : null
 
-            if (__DEV__ && notifySpy) spyReportStart({ ...change, name: this.name_, key })
+            if (__DEV__ && notifySpy) spyReportStart({ ...change!, name: this.name_, key })
             transaction(() => {
                 this.keysAtom_.reportChanged()
                 this.updateHasMapEntry_(key, false)
@@ -204,13 +208,14 @@ export class ObservableMap<K = any, V = any>
                 notify || notifySpy
                     ? <IMapDidChange<K, V>>{
                           type: UPDATE,
+                          observableKind: "map" as const,
                           object: this,
                           oldValue: (observable as any).value_,
                           name: key,
                           newValue
                       }
                     : null
-            if (__DEV__ && notifySpy) spyReportStart({ ...change, name: this.name_, key })
+            if (__DEV__ && notifySpy) spyReportStart({ ...change!, name: this.name_, key })
             observable.setNewValue_(newValue as V)
             if (notify) notifyListeners(this, change)
             if (__DEV__ && notifySpy) spyReportEnd()
@@ -237,12 +242,13 @@ export class ObservableMap<K = any, V = any>
             notify || notifySpy
                 ? <IMapDidChange<K, V>>{
                       type: ADD,
+                      observableKind: "map",
                       object: this,
                       name: key,
                       newValue
                   }
                 : null
-        if (__DEV__ && notifySpy) spyReportStart({ ...change, name: this.name_, key })
+        if (__DEV__ && notifySpy) spyReportStart({ ...change!, name: this.name_, key })
         if (notify) notifyListeners(this, change)
         if (__DEV__ && notifySpy) spyReportEnd()
     }

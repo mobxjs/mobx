@@ -5,6 +5,7 @@
 -   Don't omit action name in production [#2263](https://github.com/mobxjs/mobx/issues/2263) by [@elektronik2k5](https://github.com/elektronik2k5)
 -   Update readme to reflect correct scripts by [@elektronik2k5](https://github.com/elektronik2k5)
 -   `prettier` related tweaks by [@elektronik2k5](https://github.com/elektronik2k5)
+-   Add full types for the spy() function by [@phiresky](https://github.com/phiresky)
 
 # 5.15.4 / 4.15.4
 
