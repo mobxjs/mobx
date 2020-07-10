@@ -39,14 +39,14 @@ Generally speaking any function can become a reactive view that observes its dat
 But here is an (ES6) example of a view in the form of a React component.
 
 ```javascript
-import React from "react"
-import ReactDOM from "react-dom"
-import { observer } from "mobx-react"
+import * as React from "react"
+import { render } from "react-dom"
+import { observer } from "mobx-react-lite"
 
 const TimerView = observer(({ timer }) => (
     <button onClick={() => timer.resetTimer()}>Seconds passed: {timer.secondsPassed}</button>
 ))
-ReactDOM.render(<TimerView timer={myTimer} />, document.body)
+render(<TimerView timer={myTimer} />, document.getElementById("root"))
 ```
 
 (For the implementation of `resetTimer` method see the next section)
@@ -90,7 +90,7 @@ These methods, `increaseTimer` and `resetTimer` are just like you would write th
 
 **_MobX helps you do things in a simple straightforward way_**.
 
-Feel free to try this example on [JSFiddle](http://jsfiddle.net/mweststrate/wgbe4guu/).
+Feel free to try this example on [CodeSandbox](https://codesandbox.io/s/the-gist-of-mobx-piqqp?file=/src/index.js).
 
 To learn more about the concepts and principles underlying MobX, together with a more worked out example, read [Concepts & Principles](concepts.md). To learn more
 about how to use MobX with React, read [React integration](../react/react-integration.md).
