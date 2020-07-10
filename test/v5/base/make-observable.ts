@@ -108,8 +108,8 @@ test("makeObservable has sane defaults", () => {
                 x: true,
                 y: false,
                 double: true,
-                unbound: action,
-                bound: true
+                unbound: true,
+                bound: action.bound
                 // @ts-expect-error
                 // TODO: enable with TS 3.9 z: true
             })
@@ -122,6 +122,38 @@ test("makeObservable has sane defaults", () => {
     expect(isObservableProp(t, "y")).toBe(false)
 
     expect(isComputedProp(t, "double")).toBe(true)
+    expect(isAction(t.unbound)).toBe(true)
+    expect(isAction(t.bound)).toBe(true)
+    expect(t.unbound.call(undefined)).toBe(undefined)
+    expect(t.bound.call(undefined)).toBe(t)
+})
+
+test("makeObservable supports autoBind", () => {
+    class Test {
+        unbound() {
+            return this
+        }
+
+        bound() {
+            return this
+        }
+
+        constructor() {
+            makeObservable(
+                this,
+                {
+                    unbound: action,
+                    bound: true
+                },
+                {
+                    autoBind: true
+                }
+            )
+        }
+    }
+
+    const t = new Test()
+    expect(isObservableObject(t)).toBe(true)
     expect(isAction(t.unbound)).toBe(true)
     expect(isAction(t.bound)).toBe(true)
     expect(t.unbound.call(undefined)).toBe(undefined)
@@ -158,7 +190,36 @@ test("makeAutoObservable has sane defaults", () => {
     expect(isComputedProp(t, "double")).toBe(true)
     expect(isAction(t.unbound)).toBe(true)
     expect(isAction(t.bound)).toBe(true)
-    expect(t.unbound.call(undefined)).toBe(t) // will be bound!
+    expect(t.unbound.call(undefined)).toBe(undefined)
+    expect(t.bound.call(undefined)).toBe(undefined)
+})
+
+test("makeAutoObservable supports autoBind", () => {
+    class Test {
+        unbound() {
+            return this
+        }
+
+        bound() {
+            return this
+        }
+
+        constructor() {
+            makeAutoObservable(
+                this,
+                {
+                    unbound: false
+                },
+                { autoBind: true }
+            )
+        }
+    }
+
+    const t = new Test()
+    expect(isObservableObject(t)).toBe(true)
+    expect(isAction(t.unbound)).toBe(false)
+    expect(isAction(t.bound)).toBe(true)
+    expect(t.unbound.call(undefined)).toBe(undefined)
     expect(t.bound.call(undefined)).toBe(t)
 })
 
@@ -181,7 +242,8 @@ test("makeAutoObservable allows overrides", () => {
 
         constructor() {
             makeAutoObservable(this, {
-                unbound: action,
+                unbound: true,
+                bound: action.bound,
                 y: false
                 // @ts-expect-error
                 // TODO: enable with TS 3.9 z: true

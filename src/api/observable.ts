@@ -43,6 +43,7 @@ export type CreateObservableOptions = {
     deep?: boolean
     defaultDecorator?: Annotation
     proxy?: boolean
+    autoBind?: boolean
 }
 
 // Predefined bags of create observable options, to avoid allocating temporarily option objects
@@ -196,7 +197,8 @@ const observableFactories: IObservableFactory = {
                 ? base
                 : createDynamicObservableObject(base),
             props,
-            decorators
+            decorators,
+            options
         )
     },
     ref: createDecorator(OBSERVABLE_REF),

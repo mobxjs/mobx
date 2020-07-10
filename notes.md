@@ -58,12 +58,13 @@
     -   [x] enable search on docs
     -   [ ] // TODO: support chrome formatter https://www.mattzeunert.com/2016/02/19/custom-chrome-devtools-object-formatters.html
     -   [ ] default observable requires reaction?
-    -   [ ] no binding by default? https://twitter.com/getify/status/1258137826241241088
+    -   [x] no binding by default? https://twitter.com/getify/status/1258137826241241088
     -   [ ] update ad links (https://www.google.com/adsense/new/u/0/pub-1705981461067724/home ?)
     -   [ ] fix https://github.com/mobxjs/mobx/issues/2394
     -   [ ] use autObservable options for codemod (if no superclass)
     -   [ ] merge https://github.com/mobxjs/mobx/pull/2389
     -   [ ] set up discussions
+    -   [ ] fix UMD build depending on `global`
 -   [ ] mobx-react
     -   [ ] displayname for observer components facebook/react#18026
     -   [ ] update useLocalStore in mobx-react-lite to use
@@ -138,6 +139,7 @@ Why declare fields
 *   Fixed #2379
 *   [ ] Breaking: strict mode defaults to observed now
 *   [ ] killed option `computedConfigurable` as it was the default already
+*   [ ] document: `autoBind` options for observable / extendObservable / makeObserver
 
 ## NOTES
 

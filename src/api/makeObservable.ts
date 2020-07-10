@@ -45,12 +45,14 @@ function makeAction(target, key, name, fn, asAutoAction) {
 
 function getInferredAnnotation(
     desc: PropertyDescriptor,
-    defaultAnnotation: Annotation | undefined
+    defaultAnnotation: Annotation | undefined,
+    autoBind: boolean
 ): Annotation | boolean {
     if (desc.get) return computed
     if (desc.set) return false // ignore pure setters
     // if already wrapped in action, don't do that another time, but assume it is already set up properly
-    if (isFunction(desc.value)) return isAction(desc.value) ? false : autoAction.bound
+    if (isFunction(desc.value))
+        return isAction(desc.value) ? false : autoBind ? autoAction.bound : autoAction
     // if (!desc.configurable || !desc.writable) return false
     return defaultAnnotation ?? observable.deep
 }
@@ -74,13 +76,14 @@ export function makeProperty(
     key: PropertyKey,
     descriptor: PropertyDescriptor,
     annotation: Annotation | boolean,
-    forceCopy: boolean // extend observable will copy even unannotated properties
+    forceCopy: boolean, // extend observable will copy even unannotated properties
+    autoBind: boolean
 ): void {
     const { target_: target } = adm
     const defaultAnnotation: Annotation | undefined = observable // ideally grap this from adm's defaultEnahncer instead!
     const origAnnotation = annotation
     if (annotation === true) {
-        annotation = getInferredAnnotation(descriptor, defaultAnnotation)
+        annotation = getInferredAnnotation(descriptor, defaultAnnotation, autoBind)
     }
     if (annotation === false) {
         if (forceCopy) {
@@ -164,6 +167,7 @@ export function makeObservable<T extends Object, AdditionalKeys extends Property
     annotations?: AnnotationsMap<T, AdditionalKeys>,
     options?: CreateObservableOptions
 ): T {
+    const autoBind = !!options?.autoBind
     const adm = asObservableObject(
         target,
         options?.name,
@@ -182,7 +186,7 @@ export function makeObservable<T extends Object, AdditionalKeys extends Property
         const make = key => {
             let annotation = annotations[key]
             const [desc, owner] = getDescriptorInChain(target, key)
-            makeProperty(adm, owner, key, desc, annotation, false)
+            makeProperty(adm, owner, key, desc, annotation, false, autoBind)
         }
         ownKeys(annotations).forEach(make)
     } finally {
@@ -212,7 +216,7 @@ export function makeAutoObservable<T extends Object, AdditionalKeys extends Prop
         annotations = { ...excludes }
         extractAnnotationsFromObject(target, annotations, options)
         if (!isPlain) {
-            extractAnnotationsFromProto(proto, annotations)
+            extractAnnotationsFromProto(proto, annotations, options)
             addHiddenProp(proto, CACHED_ANNOTATIONS, annotations)
         }
     }
@@ -225,22 +229,27 @@ function extractAnnotationsFromObject(
     collector: AnnotationsMap<any, any>,
     options: CreateObservableOptions | undefined
 ) {
+    const autoBind = !!options?.autoBind
     const defaultAnnotation: Annotation = options?.deep
         ? observable.deep
         : options?.defaultDecorator ?? observable.deep
     Object.entries(getOwnPropertyDescriptors(target)).forEach(([key, descriptor]) => {
         if (key in collector || key === "constructor") return
-        collector[key] = getInferredAnnotation(descriptor, defaultAnnotation)
+        collector[key] = getInferredAnnotation(descriptor, defaultAnnotation, autoBind)
     })
 }
 
-function extractAnnotationsFromProto(proto: any, collector: AnnotationsMap<any, any>) {
+function extractAnnotationsFromProto(
+    proto: any,
+    collector: AnnotationsMap<any, any>,
+    options?: CreateObservableOptions
+) {
     Object.entries(getOwnPropertyDescriptors(proto)).forEach(([key, prop]) => {
         if (key in collector || key === "constructor") return
         if (prop.get) {
             collector[key as any] = computed
         } else if (isFunction(prop.value)) {
-            collector[key as any] = autoAction.bound
+            collector[key as any] = options?.autoBind ? autoAction.bound : autoAction
         }
     })
 }

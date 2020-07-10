@@ -44,7 +44,8 @@ export function extendObservable<A extends Object, B extends Object>(
                 key,
                 descs[key as any],
                 !annotations ? true : key in annotations ? annotations[key] : true,
-                true
+                true,
+                !!options?.autoBind
             )
         })
     } finally {
