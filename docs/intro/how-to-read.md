@@ -10,7 +10,7 @@ The documentation follows the principle that the most commonly used concepts are
 introduced before specialized information. This applies to the headings in the table
 of concepts as well as the pages under those headings.
 
-We've marked sections and concepts that are more advanced and which you likely don't need to understand until you have a special use case with the [⚛️] marker. You can use MobX very effectively without knowing about them, so feel free to skip them and move on to the next section!
+We've marked sections and concepts that are more advanced and which you likely don't need to understand until you have a special use case with the [🚀] marker. You can use MobX very effectively without knowing about them, so feel free to skip them and move on to the next section!
 
 ## Guided tour
 
@@ -26,7 +26,9 @@ Here are a few suggestions about the next things to read:
 
 -   It's also useful to at scan through the sections on [observable arrays](../refguide/array.md) and [observable maps](../refguide/map.md) to see what extra methods are available beyond the built-in JS `Array` and `Map`
 
--   Learn about [action](../refguide/action.md). Read the discussion about [asynchronous actions](../best/actions.md).
+-   Learn about [action](../refguide/action.md). Also read the discussion about [asynchronous actions](../best/actions.md).
+
+-   The basics of [computed](../refguide/computed.md).
 
 -   Read about [`autorun`](../refguide/autorun.md), if only because it's used in examples.
 

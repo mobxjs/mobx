@@ -34,7 +34,7 @@ For examples of the declarative use of `observable` with `makeObservable`, see [
 
 ## Using `observable` programmatically
 
-[⚛️] You can also use `observable` programmatically. `observable(value)` is a convenience API that succeeds only if the value can be made into an observable data structure (_Array_, _Map_, _Set_, or _observable-object_). For all other values, no conversion will be performed.
+[🚀] You can also use `observable` programmatically. `observable(value)` is a convenience API that succeeds only if the value can be made into an observable data structure (_Array_, _Map_, _Set_, or _observable-object_). For all other values, no conversion will be performed.
 
 You can't use `observable` to make objects with a prototype observable; as that is the responsibility of its constructor function. Use `makeObservable` or `makeAutoObservable` in its constructor.
 

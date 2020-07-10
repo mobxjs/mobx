@@ -1,9 +1,9 @@
 ---
-sidebar_label: extendObservable [⚛️]
+sidebar_label: extendObservable [🚀]
 hide_title: true
 ---
 
-# extendObservable [⚛️]
+# extendObservable [🚀]
 
 Usage:
 

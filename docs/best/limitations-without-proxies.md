@@ -1,9 +1,9 @@
 ---
-sidebar_label: Limitations without Proxy [⚛️]
+sidebar_label: Limitations without Proxy [🚀]
 hide_title: true
 ---
 
-# Limitations without Proxy support [⚛️]
+# Limitations without Proxy support [🚀]
 
 MobX 6 works on any ES 5 environment, but if your environment or browser does not have [Proxy support](https://kangax.github.io/compat-table/es6/#test-Proxy), there are some limitations:
 

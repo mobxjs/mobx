@@ -1,10 +1,10 @@
 ---
 title: Observable Boxes
-sidebar_label: boxes [⚛️]
+sidebar_label: boxes [🚀]
 hide_title: true
 ---
 
-# Observable Boxes [⚛️]
+# Observable Boxes [🚀]
 
 Usage:
 

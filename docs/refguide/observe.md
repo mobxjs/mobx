@@ -1,9 +1,9 @@
 ---
-sidebar_label: intercept & observe [⚛️]
+sidebar_label: intercept & observe [🚀]
 hide_title: true
 ---
 
-# Intercept & Observe [⚛️]
+# Intercept & Observe [🚀]
 
 `observe` and `intercept` can be used to monitor the changes of a single observable (they **_don't_** track nested observables).
 

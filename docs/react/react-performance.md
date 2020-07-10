@@ -88,7 +88,7 @@ There is nothing wrong with the latter, but a change in the `name` property will
 
 ### Function props
 
-[⚛️] You may notice that to deference values late you have to create lots of small observer components where each is customized to render some different part of data, for example:
+[🚀] You may notice that to deference values late you have to create lots of small observer components where each is customized to render some different part of data, for example:
 
 ```javascript
 const PersonNameDisplayer = observer(({ person }) => <DisplayName name={person.name} />)

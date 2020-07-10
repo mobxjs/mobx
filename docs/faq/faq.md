@@ -74,25 +74,25 @@ You don't need to.
 
 MobX already optimizes rendering, and it works with most kinds of data, including cycles and classes. So other programming paradigms like classic MVC can now be easily applied in applications that combine ReactJS with MobX.
 
-[⚛️] Flux implementations that do not work with the requirement that the data in their stores is immutable should work well with MobX. Redux does have this immutability requirement. Note that both mobx-state-tree and mobx-keystone add additional constraints to support better integration with Redux.
+[🚀] Flux implementations that do not work with the requirement that the data in their stores is immutable should work well with MobX. Redux does have this immutability requirement. Note that both mobx-state-tree and mobx-keystone add additional constraints to support better integration with Redux.
 
 ##### How does MobX compare to other Reactive frameworks?
 
-[⚛️] See this [issue](https://github.com/mobxjs/mobx/issues/18) for some considerations.
+[🚀] See this [issue](https://github.com/mobxjs/mobx/issues/18) for some considerations.
 
 ##### Can I record states and re-hydrate them?
 
 The frameworks built on top of MobX [mobx-state-tree](https://mobx-state-tree.js.org/) and [mobx-keystone](https://mobx-keystone.js.org/) can both do this for you.
 
-[⚛️] To roll your own, [createTransformer in mobx-utils](https://github.com/mobxjs/mobx-utils) has some examples.
+[🚀] To roll your own, [createTransformer in mobx-utils](https://github.com/mobxjs/mobx-utils) has some examples.
 
 ##### Can MobX be combined with RxJS?
 
-[⚛️] Yes, you can use [toStream and fromStream from mobx-utils](https://github.com/mobxjs/mobx-utils#tostream) to use RXJS and other TC 39 compatible observables with mobx.
+[🚀] Yes, you can use [toStream and fromStream from mobx-utils](https://github.com/mobxjs/mobx-utils#tostream) to use RXJS and other TC 39 compatible observables with mobx.
 
 ##### When to use RxJS instead of MobX?
 
-[⚛️] For anything that involves explictly working with the concept of time,
+[🚀] For anything that involves explictly working with the concept of time,
 or when you need to reason about the historical values / events of an observable (and not just the latest), RxJs is recommended as it provides more low-level primitives.
 Whenever you want to react to _state_ instead of _events_, MobX offers an easier and more high-level approach.
 In practice, combining RxJS and MobX might result in really powerful constructions.
@@ -108,5 +108,5 @@ MobX works just as well server side, and is already combined with jQuery (see th
 
 ##### Can you tell me how it works?
 
-[⚛️] Sure, join the [gitter chat](https://gitter.im/mobxjs/mobx) or check out the code. Or, submit an issue to motivate me to make some nice drawings :).
+[🚀] Sure, join the [gitter chat](https://gitter.im/mobxjs/mobx) or check out the code. Or, submit an issue to motivate me to make some nice drawings :).
 And look at this [Medium article](https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254).

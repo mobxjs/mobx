@@ -1,10 +1,10 @@
 ---
 title: Options for computed
-sidebar_label: Options for computed [⚛️]
+sidebar_label: Options for computed [🚀]
 hide_title: true
 ---
 
-# Options for computed [⚛️]
+# Options for computed [🚀]
 
 Usually `computed` behaves the way you want it to out of the box, but it's possible to customize its behavior by passing in an `options` argument:
 

@@ -1,9 +1,9 @@
 ---
-sidebar_label: Decorators in MobX [⚛️]
+sidebar_label: Decorators in MobX [🚀]
 hide_title: true
 ---
 
-# Decorators in MobX [⚛️]
+# Decorators in MobX [🚀]
 
 MobX before version 6 encouraged the use of ES.next decorators to mark things as `observable`, `computed` and `action`. Decorators are not currently a ES standard however, and the process of standardization is taking a long time. It also looks like the standard will be different from the way decorators were implemented previously. In the interest of compatibility we have chosen to move away from them in MobX 6, and recommend the use of [`makeObservable` / `makeAutoObservable`](../refguide/make-observable) instead.
 

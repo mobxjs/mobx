@@ -112,7 +112,7 @@ _Note: always define the setter *after* the getter, some TypeScript versions are
 
 ## Computed with arguments
 
-[⚛️] Sometimes you might want to have a computed value that takes one or more arguments. In such cases mobx-util's [`computedFn`](https://github.com/mobxjs/mobx-utils#computedfn) can be used:
+[🚀] Sometimes you might want to have a computed value that takes one or more arguments. In such cases mobx-util's [`computedFn`](https://github.com/mobxjs/mobx-utils#computedfn) can be used:
 
 ```javascript
 import { observable } from "mobx"
@@ -153,5 +153,5 @@ Returns `true` if the designated property is a computed value.
 
 ## More about computed
 
-[⚛️] You can pass [options into `computed`](computed-options.md). If you experience
+[🚀] You can pass [options into `computed`](computed-options.md). If you experience
 unexpected behavior, you can also read more about the [detailed behavior of `computed`](computed-behavior.md).

@@ -14,7 +14,7 @@
       },
       "best/decorators": {
         "title": "best/decorators",
-        "sidebar_label": "Decorators in MobX [⚛️]"
+        "sidebar_label": "Decorators in MobX [🚀]"
       },
       "best/dispose-reactions": {
         "title": "Always dispose reactions",
@@ -22,7 +22,7 @@
       },
       "best/limitations-without-proxies": {
         "title": "best/limitations-without-proxies",
-        "sidebar_label": "Limitations without Proxy [⚛️]"
+        "sidebar_label": "Limitations without Proxy [🚀]"
       },
       "best/stateless-HMR": {
         "title": "Hot Module Reloading with Stateless Components",
@@ -101,15 +101,15 @@
       },
       "refguide/boxed": {
         "title": "Observable Boxes",
-        "sidebar_label": "boxes [⚛️]"
+        "sidebar_label": "boxes [🚀]"
       },
       "refguide/computed-behavior": {
         "title": "How computed works",
-        "sidebar_label": "How computed works [⚛️]"
+        "sidebar_label": "How computed works [🚀]"
       },
       "refguide/computed-options": {
         "title": "Options for computed",
-        "sidebar_label": "Options for computed [⚛️]"
+        "sidebar_label": "Options for computed [🚀]"
       },
       "refguide/computed": {
         "title": "computed",
@@ -117,15 +117,15 @@
       },
       "refguide/configure": {
         "title": "Configuring MobX",
-        "sidebar_label": "Configuring MobX [⚛️]"
+        "sidebar_label": "Configuring MobX [🚀]"
       },
       "refguide/extend-observable": {
         "title": "refguide/extend-observable",
-        "sidebar_label": "extendObservable [⚛️]"
+        "sidebar_label": "extendObservable [🚀]"
       },
       "refguide/extending": {
         "title": "refguide/extending",
-        "sidebar_label": "New observable types [⚛️]"
+        "sidebar_label": "New observable types [🚀]"
       },
       "refguide/flow": {
         "title": "flow",
@@ -133,7 +133,7 @@
       },
       "refguide/internals": {
         "title": "Internal functions",
-        "sidebar_label": "Internal functions [⚛️]"
+        "sidebar_label": "Internal functions [🚀]"
       },
       "refguide/introspection-utils": {
         "title": "Introspection APIs",
@@ -149,15 +149,15 @@
       },
       "refguide/mobx-utils": {
         "title": "mobx-utils",
-        "sidebar_label": "mobx-utils [⚛️]"
+        "sidebar_label": "mobx-utils [🚀]"
       },
       "refguide/modifiers": {
         "title": "Observable modifiers",
-        "sidebar_label": "Observable modifiers [⚛️]"
+        "sidebar_label": "Observable modifiers [🚀]"
       },
       "refguide/object-api": {
         "title": "refguide/object-api",
-        "sidebar_label": "Object API [⚛️]"
+        "sidebar_label": "Object API [🚀]"
       },
       "refguide/object": {
         "title": "Observable Objects",
@@ -169,11 +169,11 @@
       },
       "refguide/observe": {
         "title": "refguide/observe",
-        "sidebar_label": "intercept & observe [⚛️]"
+        "sidebar_label": "intercept & observe [🚀]"
       },
       "refguide/on-become-observed": {
         "title": "onBecomeObserved",
-        "sidebar_label": "onBecomeObserved [⚛️]"
+        "sidebar_label": "onBecomeObserved [🚀]"
       },
       "refguide/reaction": {
         "title": "reaction",
@@ -185,7 +185,7 @@
       },
       "refguide/spy": {
         "title": "Spy",
-        "sidebar_label": "spy [⚛️]"
+        "sidebar_label": "spy [🚀]"
       },
       "refguide/tojson": {
         "title": "toJS",

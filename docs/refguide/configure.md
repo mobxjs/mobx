@@ -1,10 +1,10 @@
 ---
 title: Configuring MobX
-sidebar_label: Configuring MobX [⚛️]
+sidebar_label: Configuring MobX [🚀]
 hide_title: true
 ---
 
-# Configuring MobX [⚛️]
+# Configuring MobX [🚀]
 
 Usage:
 

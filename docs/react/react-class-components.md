@@ -119,7 +119,7 @@ The previous example looks a bit cumbersome. We recommended switching class
 components to function components if you can, and to use `useState` for maintaining
 simple state.
 
-[⚛️] But decorators are still supported -- here is the same example with
+[🚀] But decorators are still supported -- here is the same example with
 decorators:
 
 ```javascript
@@ -157,7 +157,7 @@ including how to enable them.
 
 ### Don't mark (some) React lifecycle methods as `action.bound` on `observer` React components
 
-[⚛️] If you modify any observable data in method in your React component, that method
+[🚀] If you modify any observable data in method in your React component, that method
 should be marked as an `action`. For event handlers, `action.bound` is handy,
 as `this` then refers to the instance your component class.
 

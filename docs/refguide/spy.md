@@ -1,10 +1,10 @@
 ---
-sidebar_label: spy [⚛️]
+sidebar_label: spy [🚀]
 title: Spy
 hide_title: true
 ---
 
-# Spy [⚛️]
+# Spy [🚀]
 
 Usage:
 
