@@ -1,5 +1,4 @@
 ---
-title: Concepts & Principles
 sidebar_label: Concepts & Principles
 hide_title: true
 ---
@@ -31,16 +30,17 @@ class Todo {
     title = ""
     finished = false
 
-    constructor() {
+    constructor(title) {
         makeObservable(this, {
             title: observable,
             finished: observable,
             toggle: action
         })
+        this.title = title
     }
 
     toggle() {
-        this.finished = !finished
+        this.finished = !this.finished
     }
 }
 ```
@@ -115,9 +115,9 @@ In short, reactions bridge [reactive](https://en.wikipedia.org/wiki/Reactive_pro
 If you are using React, you can turn your (stateless function) components into reactive components by wrapping it with the [`observer`](http://mobxjs.github.io/mobx/react/react-integration.html) function from the `mobx-react` package.
 
 ```javascript
-import React from "react"
-import ReactDOM from "react-dom"
-import { observer } from "mobx-react"
+import * as React from "react"
+import { render } from "react-dom"
+import { observer } from "mobx-react-lite"
 
 const TodoListView = observer(({ todoList }) => (
     <div>
@@ -137,14 +137,22 @@ const TodoView = observer(({ todo }) => (
     </li>
 ))
 
-const store = new TodoList()
-ReactDOM.render(<TodoListView todoList={store} />, document.getElementById("mount"))
+const store = new TodoList([new Todo("Get Coffee"), new Todo("Write simpler code")])
+render(<TodoListView todoList={store} />, document.getElementById("root"))
 ```
 
 `observer` turns React (function) components into derivations of the data they render.
 When using MobX there are no smart or dumb components.
 All components render smartly but are defined in a dumb manner. MobX will simply make sure the components are always re-rendered whenever needed, but also no more than that. So the `onClick` handler in the above example will force the proper `TodoView` to render as it uses the `toggle` action, and it will cause the `TodoListView` to render if the number of unfinished tasks has changed.
-However, if you would remove the `Tasks left` line (or put it into a separate component), the `TodoListView` will no longer re-render when ticking a box. You can verify this yourself by changing the [JSFiddle](https://jsfiddle.net/mweststrate/wv3yopo0/).
+However, if you would remove the `Tasks left` line (or put it into a separate component), the `TodoListView` will no longer re-render when ticking a box.
+
+##### Try it out!
+
+You can try this out yourself on [CodeSandbox](https://codesandbox.io/s/concepts-principles-il8lt?file=/src/index.js:1161-1252).
+
+You can verify this yourself by changing the [JSFiddle](https://jsfiddle.net/mweststrate/wv3yopo0/).
+
+##### Learn more
 
 To learn more about how React works with MobX, read [React integration](../react/react-integration.md).
 

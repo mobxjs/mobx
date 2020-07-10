@@ -71,7 +71,7 @@ https://deploy-preview-2382--mobx-docs.netlify.app/
 
 -   [ ] concepts.md (https://jsfiddle.net/mweststrate/wv3yopo0/)
 
--   [ ] overview.md Feel free to try this example on [JSFiddle](http://jsfiddle.net/mweststrate/wgbe4guu/).
+-   [x] overview.md Feel free to try this example on [JSFiddle](http://jsfiddle.net/mweststrate/wgbe4guu/).
 
 -   LINKS.md Or fork this [JSFiddle](https://jsfiddle.net/mweststrate/wgbe4guu/). same one was overview.md
 
