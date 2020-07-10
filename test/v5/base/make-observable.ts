@@ -110,9 +110,13 @@ test("makeObservable has sane defaults", () => {
                 double: true,
                 unbound: true,
                 bound: action.bound
-                // @ts-expect-error
-                // TODO: enable with TS 3.9 z: true
             })
+            if (3 - 1 === 4) {
+                makeObservable(this, {
+                    // @ts-expect-error
+                    z: true
+                })
+            }
         }
     }
 
@@ -245,9 +249,13 @@ test("makeAutoObservable allows overrides", () => {
                 unbound: true,
                 bound: action.bound,
                 y: false
-                // @ts-expect-error
-                // TODO: enable with TS 3.9 z: true
             })
+            if (3 - 1 === 4) {
+                makeObservable(this, {
+                    // @ts-expect-error
+                    z: true
+                })
+            }
         }
     }
 
