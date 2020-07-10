@@ -59,8 +59,7 @@
     -   [x] no binding by default? https://twitter.com/getify/status/1258137826241241088
     -   [ ] default observable requires reaction?
     -   [ ] update ad links (https://www.google.com/adsense/new/u/0/pub-1705981461067724/home ?)
-    -   [ ] fix https://github.com/mobxjs/mobx/issues/2394
-    -   [ ] merge https://github.com/mobxjs/mobx/pull/2389
+    -   [x] fix https://github.com/mobxjs/mobx/issues/2394
     -   [x] fix UMD build depending on `global`
 -   [ ] mobx-react
     -   [ ] displayname for observer components facebook/react#18026
@@ -68,6 +67,7 @@
             autoMakeObservable
     -   [ ] fix React unstable batch setup
 -   [ ] post 6.0
+    -   [ ] merge https://github.com/mobxjs/mobx/pull/2389
     -   [ ] set up discussions
     -   [ ] use autObservable options for codemod (if no superclass)?
     -   [ ] add a solution for keepAlive computeds like https://github.com/mobxjs/mobx/issues/2309#issuecomment-598707584

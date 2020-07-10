@@ -31,7 +31,7 @@ const siteConfig = {
     // For github.io type URLs, you would set the url and baseUrl like:
     //   url: 'https://facebook.github.io',
     //   baseUrl: '/test-site/',
-    url: "https://mobx.js.org/", // Your website URL
+    url: "https://mobx.js.org", // Your website URL
     baseUrl: "/", // Base URL for your project */
     docsUrl: "", // trim 'docs/ prefix
     cname: "mobx.js.org", // needed for github pages to work under a domain
