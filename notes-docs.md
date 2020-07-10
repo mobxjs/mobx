@@ -54,10 +54,32 @@ https://deploy-preview-2382--mobx-docs.netlify.app/
 -   [ ] The broken displayName issue with React.memo and thus with observer. Now marked as broken in the docs, but should be updated once fixed.
 -   [ ] The debugging information for `observer` components in the React devtools does not match the screenshot in the mobx-react readme anymore. It does seem to work as intended according to the issue though.
 -   [ ] Find a good place for `onReactionError`.
--   [ ] Invent a "obscure/advanced/special interest" marker and use it on documents that aren't important to newcomers.
+-   [x] Invent a "obscure/advanced/special interest" marker and use it on documents that aren't important to newcomers.
 -   [ ] Move API overview into UI.
 -   [ ] Either flatten docs into a single directory or follow new structure.
--   [ ] How to keep the root README in sync with the docs readme?
+-   [ ] How to keep the root README in sync with the docs readme? Keep the sponsors but otherwise place a link to the docs website.
+-   [ ] How is LINKS.md related to the docs? Need to clean this up.
+-   [ ] Use mobx-react-lite where possible in examples and codesandbox.
+-   [ ] Remove batching import from mobx-react-lite from codesandbox when possible.
+-   [ ] Add a typescript document to docs with an example.
+
+## Code sandbox todo
+
+-   [ ] spy.md Simple codesandbox trace example: https://codesandbox.io/s/nr58ylyn4m
+
+-   [ ] faq.md MobX works just as well server side, and is already combined with jQuery (see this [Fiddle](http://jsfiddle.net/mweststrate/vxn7qgdw)
+
+-   [ ] concepts.md (https://jsfiddle.net/mweststrate/wv3yopo0/)
+
+-   [ ] overview.md Feel free to try this example on [JSFiddle](http://jsfiddle.net/mweststrate/wgbe4guu/).
+
+-   LINKS.md Or fork this [JSFiddle](https://jsfiddle.net/mweststrate/wgbe4guu/). same one was overview.md
+
+-   LINKS.md - A simple webshop using [React + mobx](https://jsfiddle.net/mweststrate/46vL0phw) or [JQuery + mobx](http://jsfiddle.net/mweststrate/vxn7qgdw).
+
+-   LINKS.md [Simple timer](https://jsfiddle.net/mweststrate/wgbe4guu/) application in JSFiddle.
+
+-   LINKS.md [Simple ES5 MobX examples](https://github.com/mattruby/mobx-examples) Bite sized MobX examples all setup to run in jsFiddle.
 
 ## Fragments
 
