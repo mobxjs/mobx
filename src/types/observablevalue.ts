@@ -64,12 +64,7 @@ export class ObservableValue<T> extends Atom
         this.value_ = enhancer(value, undefined, name_)
         if (__DEV__ && notifySpy && isSpyEnabled()) {
             // only notify spy if this is a stand-alone observable
-            spyReport({
-                type: CREATE,
-                observableKind: "box",
-                name: this.name_,
-                newValue: "" + this.value_
-            })
+            spyReport({ type: CREATE, name: this.name_, newValue: "" + this.value_ })
         }
     }
 
@@ -86,7 +81,6 @@ export class ObservableValue<T> extends Atom
             if (__DEV__ && notifySpy) {
                 spyReportStart({
                     type: UPDATE,
-                    observableKind: "box",
                     name: this.name_,
                     newValue,
                     oldValue

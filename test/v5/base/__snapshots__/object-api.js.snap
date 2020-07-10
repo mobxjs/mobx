@@ -31,7 +31,6 @@ Array [
         "title": "get tea",
       },
       "object": "skip",
-      "observableKind": "object",
       "type": "add",
     },
   },
@@ -39,7 +38,6 @@ Array [
     "observe": Object {
       "name": "a",
       "object": "skip",
-      "observableKind": "object",
       "oldValue": Object {
         "title": "get coffee",
       },

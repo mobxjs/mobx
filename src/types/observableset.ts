@@ -38,13 +38,11 @@ export type ISetDidChange<T = any> =
     | {
           object: ObservableSet<T>
           type: "add"
-          observableKind: "set"
           newValue: T
       }
     | {
           object: ObservableSet<T>
           type: "delete"
-          observableKind: "set"
           oldValue: T
       }
 
@@ -133,12 +131,11 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
                 notify || notifySpy
                     ? <ISetDidChange<T>>{
                           type: ADD,
-                          observableKind: "set",
                           object: this,
                           newValue: value
                       }
                     : null
-            if (notifySpy && __DEV__) spyReportStart({ ...change!, name: this.name_ })
+            if (notifySpy && __DEV__) spyReportStart(change)
             if (notify) notifyListeners(this, change)
             if (notifySpy && __DEV__) spyReportEnd()
         }
@@ -162,13 +159,12 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
                 notify || notifySpy
                     ? <ISetDidChange<T>>{
                           type: DELETE,
-                          observableKind: "set",
                           object: this,
                           oldValue: value
                       }
                     : null
 
-            if (notifySpy && __DEV__) spyReportStart({ ...change!, name: this.name_ })
+            if (notifySpy && __DEV__) spyReportStart({ ...change, name: this.name_ })
             transaction(() => {
                 this.atom_.reportChanged()
                 this.data_.delete(value)
