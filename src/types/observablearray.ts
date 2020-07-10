@@ -248,19 +248,18 @@ export class ObservableArrayAdministration
         const notify = hasListeners(this)
         const change =
             notify || notifySpy
-                ? ({
+                ? {
                       object: this.proxy_,
                       type: UPDATE,
-                      observableKind: "array",
                       index,
                       newValue,
                       oldValue
-                  } as const)
+                  }
                 : null
 
         // The reason why this is on right hand side here (and not above), is this way the uglifier will drop it, but it won't
         // cause any runtime overhead in development mode without NODE_ENV set, unless spying is enabled
-        if (__DEV__ && notifySpy) spyReportStart({ ...change!, name: this.atom_.name_ })
+        if (__DEV__ && notifySpy) spyReportStart({ ...change, name: this.atom_.name_ })
         this.atom_.reportChanged()
         if (notify) notifyListeners(this, change)
         if (__DEV__ && notifySpy) spyReportEnd()
@@ -271,19 +270,18 @@ export class ObservableArrayAdministration
         const notify = hasListeners(this)
         const change =
             notify || notifySpy
-                ? ({
+                ? {
                       object: this.proxy_,
                       type: SPLICE,
-                      observableKind: "array",
                       index,
                       removed,
                       added,
                       removedCount: removed.length,
                       addedCount: added.length
-                  } as const)
+                  }
                 : null
 
-        if (__DEV__ && notifySpy) spyReportStart({ ...change!, name: this.atom_.name_ })
+        if (__DEV__ && notifySpy) spyReportStart({ ...change, name: this.atom_.name_ })
         this.atom_.reportChanged()
         // conform: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
         if (notify) notifyListeners(this, change)

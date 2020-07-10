@@ -5,7 +5,6 @@ Array [
   Object {
     "name": "ObservableValue@9",
     "newValue": 4,
-    "observableKind": "box",
     "oldValue": 3,
     "spyReportStart": true,
     "type": "update",
@@ -24,7 +23,6 @@ Array [
   },
   Object {
     "spyReportEnd": true,
-    "type": "report-end-only",
   },
 ]
 `;
