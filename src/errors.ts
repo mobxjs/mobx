@@ -87,10 +87,3 @@ export function die(error: string | keyof typeof errors, ...args: any[]): never 
             : `[MobX] ${error}`
     )
 }
-
-/**
- * Like die, but errors will be preserved in prod builds
- */
-export function dieHard(error: string): never {
-    throw new Error(`[MobX] ${error}`)
-}

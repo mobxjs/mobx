@@ -20,7 +20,6 @@ import {
     interceptChange,
     isObject,
     isPlainObject,
-    isPropertyConfigurable,
     isSpyEnabled,
     notifyListeners,
     referenceEnhancer,
@@ -163,7 +162,7 @@ export class ObservableObjectAdministration
         enhancer: IEnhancer<any> = this.defaultEnhancer_
     ) {
         const { target_: target } = this
-        assertPropertyConfigurable(target, propName)
+        if (__DEV__) assertPropertyConfigurable(target, propName)
 
         if (hasInterceptors(this)) {
             const change = interceptChange<IObjectWillChange>(this, {
@@ -197,8 +196,9 @@ export class ObservableObjectAdministration
         options.name = options.name || `${this.name_}.${stringifyKey(propName)}`
         options.context = this.proxy_ || target
         this.values_.set(propName, new ComputedValue(options))
-        if (propertyOwner === target || isPropertyConfigurable(propertyOwner, propName))
-            defineProperty(propertyOwner, propName, generateComputedPropConfig(propName))
+        // Doesn't seem we need this condition:
+        // if (propertyOwner === target || isPropertyConfigurable(propertyOwner, propName))
+        defineProperty(propertyOwner, propName, generateComputedPropConfig(propName))
     }
 
     remove_(key: PropertyKey) {

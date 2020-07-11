@@ -81,9 +81,6 @@ const arrayTraps = {
         const adm: ObservableArrayAdministration = target[$mobx]
         if (name === $mobx) return adm
         if (name === "length") return adm.getArrayLength_()
-        if (typeof name === "number") {
-            adm.get_(name)
-        }
         if (typeof name === "string" && !isNaN(name as any)) {
             adm.get_(parseInt(name))
         }
@@ -96,9 +93,6 @@ const arrayTraps = {
         const adm: ObservableArrayAdministration = target[$mobx]
         if (name === "length") {
             adm.setArrayLength_(value)
-        }
-        if (typeof name === "number") {
-            adm.set_(name, value)
         }
         if (typeof name === "symbol" || isNaN(name)) {
             target[name] = value
@@ -475,7 +469,7 @@ addArrayExtension("reduce", reduceLikeFunc)
 addArrayExtension("reduceRight", reduceLikeFunc)
 
 function addArrayExtension(funcName, funcFactory) {
-    if (Array.prototype[funcName] === "function") {
+    if (typeof Array.prototype[funcName] === "function") {
         arrayExtensions[funcName] = funcFactory(funcName)
     }
 }

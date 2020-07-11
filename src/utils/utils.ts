@@ -103,18 +103,16 @@ export function addHiddenFinalProp(object: any, propName: PropertyKey, value: an
     })
 }
 
-export function isPropertyConfigurable(object: any, prop: PropertyKey): boolean {
-    const descriptor = getDescriptor(object, prop)
-    return !descriptor || (descriptor.configurable !== false && descriptor.writable !== false)
-}
-
 export function assertPropertyConfigurable(object: any, prop: PropertyKey) {
-    if (__DEV__ && !isPropertyConfigurable(object, prop))
-        die(
-            `Cannot make property '${stringifyKey(
-                prop
-            )}' observable, it is not configurable and writable in the target object`
-        )
+    if (__DEV__) {
+        const descriptor = getDescriptor(object, prop)
+        if (descriptor?.configurable === false || descriptor?.writable === false)
+            die(
+                `Cannot make property '${stringifyKey(
+                    prop
+                )}' observable, it is not configurable and writable in the target object`
+            )
+    }
 }
 
 export function createInstanceofPredicate<T>(

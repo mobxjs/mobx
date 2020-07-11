@@ -156,7 +156,7 @@ test("box", () => {
         get width() {
             return this.height * this.sizes.length * this.someFunc() * (this.uninitialized ? 2 : 1)
         }
-        @action
+        @action("test")
         addSize() {
             this.sizes.push(3)
             this.sizes.push(4)
@@ -1023,6 +1023,24 @@ test("@observable.shallow (TS)", () => {
     t.equal(mobx.isObservable(a.arr[0]), false)
     t.equal(mobx.isObservable(a.arr[1]), false)
     t.equal(a.arr[1] === todo2, true)
+})
+
+test("@observable.shallow - 2 (TS)", () => {
+    class A {
+        @observable.shallow arr: Record<string, any> = { x: { todo: 1 } }
+        constructor() {
+            makeObservable(this)
+        }
+    }
+
+    const a = new A()
+    const todo2 = { todo: 2 }
+    a.arr.y = todo2
+    t.equal(mobx.isObservable(a.arr), true)
+    t.equal(mobx.isObservableProp(a, "arr"), true)
+    t.equal(mobx.isObservable(a.arr.x), false)
+    t.equal(mobx.isObservable(a.arr.y), false)
+    t.equal(a.arr.y === todo2, true)
 })
 
 test("@observable.deep (TS)", () => {

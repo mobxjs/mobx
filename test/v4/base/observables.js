@@ -400,21 +400,6 @@ test("props4", function () {
     expect(x.sum).toBe(13)
 })
 
-test("extend observable multiple prop maps", function () {
-    const x = { a: 1 }
-    expect(() => {
-        mobx.extendObservable(
-            x,
-            {},
-            {},
-            {
-                c: 3,
-                d: 4
-            }
-        )
-    }).toThrow(/invalid option for \(extend\)observable: c/)
-})
-
 test("object enumerable props", function () {
     const x = mobx.observable({
         a: 3,

@@ -28,7 +28,6 @@ import {
     globalState,
     assign,
     die,
-    isString,
     isStringish
 } from "../internal"
 
@@ -56,19 +55,8 @@ export const defaultCreateObservableOptions: CreateObservableOptions = {
 }
 Object.freeze(defaultCreateObservableOptions)
 
-function assertValidOption(key: string) {
-    if (!/^(deep|name|equals|defaultDecorator|proxy)$/.test(key))
-        die(`invalid option for (extend)observable: ${key}`)
-}
-
 export function asCreateObservableOptions(thing: any): CreateObservableOptions {
-    if (thing == null) return defaultCreateObservableOptions
-    if (isString(thing)) return { name: "" + thing, deep: true, proxy: true }
-    if (__DEV__) {
-        if (typeof thing !== "object") return die("expected options object")
-        Object.keys(thing).forEach(assertValidOption)
-    }
-    return thing as CreateObservableOptions
+    return thing || defaultCreateObservableOptions
 }
 
 export function getEnhancerFromOption(options: CreateObservableOptions): IEnhancer<any> {

@@ -1,5 +1,4 @@
 import {
-    addHiddenProp,
     createAction,
     executeAction,
     Annotation,
@@ -71,8 +70,4 @@ export function runInAction<T>(fn: () => T): T {
 
 export function isAction(thing: any) {
     return isFunction(thing) && thing.isMobxAction === true
-}
-
-export function defineBoundAction(target: any, propertyName: string, fn: Function) {
-    addHiddenProp(target, propertyName, createAction(propertyName, fn.bind(target)))
 }

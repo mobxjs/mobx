@@ -59,9 +59,10 @@
     -   [x] no binding by default? https://twitter.com/getify/status/1258137826241241088
     -   [x] fix https://github.com/mobxjs/mobx/issues/2394
     -   [x] fix UMD build depending on `global`
+    -   [x] ~default observable requires reaction?~
     -   [ ] check coverage
-    -   [ ] default observable requires reaction?
     -   [ ] update ad links (https://www.google.com/adsense/new/u/0/pub-1705981461067724/home ?)
+    -   [ ] re-execute perf checks
 -   [ ] mobx-react
     -   [ ] displayname for observer components facebook/react#18026
     -   [ ] update useLocalStore in mobx-react-lite to use
@@ -99,7 +100,6 @@ Why declare fields
 *   [ ] Breaking: can no longer re-decorate fields already decorated by a superclass
 *   [ ] Breaking: methods will be actions by default in `extendObservable` / `observable`
 *   [ ] Breaking: `decorate` has been removed
-*   [ ] Breaking: `observableRequiresReaction` is now the default
 *   [ ] Breaking: `enforceActions` is now defaulted to `observed`, but now generates a warning rather than an error
 *   [ ] Breaking: `runInAction` now longer supports a name as first argument. Use an action or named function instead
 *   [ ] Breaking: `computed` does not accept setter function as second argument anymore, use `options.set` instead
@@ -141,6 +141,7 @@ Why declare fields
 *   [ ] Breaking: strict mode defaults to observed now
 *   [ ] killed option `computedConfigurable` as it was the default already
 *   [ ] document: `autoBind` options for observable / extendObservable / makeObserver
+*   [ ] document: linting options
 
 ## NOTES
 
