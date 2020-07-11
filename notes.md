@@ -57,10 +57,11 @@
     -   [x] kill / fix flow types
     -   [x] enable search on docs
     -   [x] no binding by default? https://twitter.com/getify/status/1258137826241241088
-    -   [ ] default observable requires reaction?
-    -   [ ] update ad links (https://www.google.com/adsense/new/u/0/pub-1705981461067724/home ?)
     -   [x] fix https://github.com/mobxjs/mobx/issues/2394
     -   [x] fix UMD build depending on `global`
+    -   [ ] check coverage
+    -   [ ] default observable requires reaction?
+    -   [ ] update ad links (https://www.google.com/adsense/new/u/0/pub-1705981461067724/home ?)
 -   [ ] mobx-react
     -   [ ] displayname for observer components facebook/react#18026
     -   [ ] update useLocalStore in mobx-react-lite to use

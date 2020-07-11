@@ -11,6 +11,7 @@ import {
     autorun,
     extendObservable
 } from "../../../src/mobx"
+import { mobxDecoratorsSymbol, configure } from "../../../src/internal"
 
 test("makeObservable picks up decorators", () => {
     class Test {
@@ -426,4 +427,18 @@ test("extendObservable can be used late and support non-enumerable getters #2386
     expect(isObservableProp(i, "x")).toBe(true)
     expect(isComputedProp(i, "double")).toBe(true)
     expect(isAction(i.inc)).toBe(true)
+})
+
+test("makeObservable doesn't trigger in always mode'", () => {
+    configure({
+        enforceActions: "always"
+    })
+    class C {
+        x = 3
+        constructor() {
+            makeAutoObservable(this)
+        }
+    }
+
+    expect(new C()).toBeTruthy()
 })
