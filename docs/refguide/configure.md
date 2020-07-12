@@ -1,10 +1,54 @@
 ---
 title: Configuring MobX
-sidebar_label: Configuring MobX [🚀]
+sidebar_label: Configuring MobX
 hide_title: true
 ---
 
-# Configuring MobX [🚀]
+# Configuring MobX
+
+MobX has several configuration depending on how you prefer to use MobX, which JavaScript engines you want to target, and whether you want MobX to hint at best practices.
+Most configuration options can be set by using the `configure` method as provided by MobX.
+
+## Proxy support
+
+By default MobX uses proxies to make arrays and plain objects observable. Proxies provide the best performance and most concistent behavior accross environments.
+However, if you are targetting an environment that doesn't support proxies, proxy support has to be disabled.
+Most notably this is the case when targetting Internet Explorer or React Native without using the Hermes engine.
+
+Proxy support can be disabled by using `configure`:
+
+```typescript
+import { configure } from "mobx"
+
+configure({
+    useProxies: "never"
+})
+```
+
+Accepted values for the `useProxies` configuration are:
+
+-   `"always"` (default): MobX is expected to only run in environments with [`Proxy` support](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy). MobX will error if these are not available.
+-   `"never"`: Proxies are never used. MobX falls back on non-proxy alternatives. This is compatible with all ES5 environments, but causes various [limitations](../best/limitations-without-proxies.md).
+-   `"ifavailable"`: (Experimental option) Proxies are used if they are available, and otherwise MobX falls back to non-proxy alternatives. The benefit of this mode is that MobX will try to warn if API's or language features that wouldn't work in ES5 enviroments are used, triggering errors when hitting an ES5 limitation when running on a modern environment.
+
+Note: before MobX 6 one had to pick either MobX 4 for older engines, or MobX 5 for new engines. However, MobX 6 supports both, although polyfills for certain api's like Map will be required when targetting older JavaScript engines.
+
+Note: Proxies cannot be polyfilled. Even though polyfills do exist, they don't support the full spec and are unsuitable for MobX. Don't use them.
+
+### Limitations without Proxy support
+
+1.  Observable arrays are not real arrays, so they won't pass the `Array.isArray()` check. The practical consequence is that you often need to `.slice()` the array first (to get a real array shallow copy) before passing to third party libraries. For example using observable arrays in concat arrays doesn't work as expected. So '.slice()' them first.
+2.  Adding or deleting properties to existing observable plain objects after creation is not automatically picked up. If you intend to use objects as index based lookup maps, in other words, as dymamic collection of things, use observable maps instead.
+
+## Decorator support
+
+For enabling experimental decorator support see [Decorators](../best/decorators).
+
+## Linting
+
+TODO
+
+## Further options
 
 Usage:
 
@@ -132,11 +176,3 @@ configure({
     }
 })
 ```
-
-### `useProxies`
-
-Accepted values:
-
--   `"always"` (default): MobX is expected to only run in environments with [`Proxy` support](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy). It is an error if these are not available.
--   `"never"`: Proxies are never used. MobX falls back on non-proxy alternatives. This is compatible with all ES5 environments, but causes various [limitations](../best/limitations-without-proxies.md).
--   `"ifavailable"`: Proxies are used if they are available, and otherwise MobX falls back to non-proxy alternatives. This causes various [limitations](../best/limitations-without-proxies.md). You still need to write code taking these limitations into account.

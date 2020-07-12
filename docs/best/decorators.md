@@ -45,37 +45,18 @@ MobX before version 6 did not require the `makeObservable(this)` call in the con
 
 We intend to continue to support decorators in this form.
 
-## Decorator differences
+Note: When migrating from MobX 4/5 to 6, we recommend to always run the code mode, as even in the case where you keep using decorators, the `makeObservable` calls need to be generated. See the [migration guide](../faq/migrate-to-6) for details.
 
--   You cannot pass (options)[../refguide/computed-options] into `@computed` when `computed` is used as a decorator. `computed.struct` is available to enable strucural comparison.
+## Using `observer` as decorator
 
-## Upgrading your code with the `mobx-undecorate` codemod
+The `observer` function from `mobx-react` is both a function and a decorator that can be used on class components:
 
-If you are an existing MobX user you have code that uses a lot of decorators, or the equivalent calls to `decorate`.
-
-The [`mobx-undecorate`](https://www.npmjs.com/package/mobx-undecorate) package provides a codemod that can automatically update your code to be conformant to MobX 6. There is no need to install it; instead you download and execute it using the [`npx`](https://www.npmjs.com/package/npx) tool which you do need to install if you haven't already.
-
-To get rid of all uses of MobX decorators and replace them with the equivalent `makeObservable` calls, go to the directory that contains your source code and run:
-
-```shell
-npx mobx-undecorate
+```javascript
+@observer
+class Timer extends React.Component {
+    /* ... */
+}
 ```
-
-MobX will continue to support decorators -- so if you want to retain them
-and only introduce `makeObservable(this)` where required, you can use the `--keepDecorators` option:
-
-```shell
-npx mobx-undecorate --keepDecorators
-```
-
-### limitations of `mobx-undecorate`
-
-The `mobx-undecorate` command has to introduce a constructor in classes that do not yet have one. If base class of the constructor expects arguments, the codemod cannot introduce these arguments for the subclass being upgraded, and the `super` call won't pass them either. You have to fix these manually.
-
-`mobx-undecorate` outputs warnings for these cases when it's run.
-
-We do have a special case for React class components to do the right thing and
-pass along `props` to the superclass.
 
 ## How to enable decorator support
 
@@ -83,45 +64,24 @@ We do not recommend new codebases that use MobX use decorators until the point w
 
 ### TypeScript
 
-Enable the compiler option `"experimentalDecorators": true` in your `tsconfig.json`.
+Enable the compiler option `"experimentalDecorators": true` and `"useDefineForClassFields": true` in your `tsconfig.json`.
 
 ### Babel 7
 
-Install support for decorators: `npm i --save-dev @babel/plugin-proposal-class-properties @babel/plugin-proposal-decorators`. And enable it in your `.babelrc` file:
+Install support for decorators: `npm i --save-dev @babel/plugin-proposal-class-properties @babel/plugin-proposal-decorators`. And enable it in your `.babelrc` file (note that the order is important):
 
 ```json
 {
     "plugins": [
         ["@babel/plugin-proposal-decorators", { "legacy": true }],
-        ["@babel/plugin-proposal-class-properties", { "loose": true }]
+        ["@babel/plugin-proposal-class-properties", { "loose": false }]
     ]
 }
 ```
 
-Note that the `legacy` mode is important (as is putting the decorators proposal first).
-
 ### Decorator syntax and Create React App (v2)
 
 Decorators are only supported out of the box when using TypeScript in `create-react-app@^2.1.1` and newer. In older versions or when using vanilla JavaScript use eject, or the [customize-cra](https://github.com/arackaf/customize-cra) package.
-
-### Using `observer` from `mobx-react`
-
-The `observer` function from `mobx-react` is both a decorator and a function, that means that all these syntax variants will work:
-
-```javascript
-const Timer = observer((props) => (
-	/* rendering */
-))
-
-const Timer = observer(class Timer extends React.Component {
-	/* ... */
-})
-
-@observer
-class Timer extends React.Component {
-	/* ... */
-}
-```
 
 ## Disclaimer: Limitations of decorator syntax:
 
@@ -136,7 +96,3 @@ The following patterns are not officially supported by the MobX community:
 -   Decorating static class members
 -   Combining decorators provided by MobX with other decorators
 -   Hot module reloading (HMR) / React-hot-loader might not work as expected
-
-Decorated properties might not be visible yet on class instances as _own_ property until the first read / write to that property occurred.
-
-(N.B.: not supported doesn't mean it doesn't work, it means that if it doesn't work, reported issues will not be processed until the official spec has been moved forward)

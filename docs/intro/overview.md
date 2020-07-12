@@ -87,6 +87,7 @@ setInterval(() => {
 ```
 
 These methods, `increaseTimer` and `resetTimer` are just like you would write them without MobX. You can use them anywhere -- from React event handlers or in `setInterval`, for instance.
+Notice that making updates asynchronously doesn't require any special wiring; since MobX is a \_re_active system, it doesn't matter how or even when state updates are triggered; the reactivity system will propagate changes in any case.
 
 **_MobX helps you do things in a simple straightforward way_**.
 

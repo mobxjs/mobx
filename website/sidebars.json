@@ -56,10 +56,10 @@
       "refguide/mobx-utils"
     ],
     "Tips & Tricks": [
-      "best/store",
+      "refguide/configure",
       "best/decorators",
-      "best/limitations-without-proxies",
-      "refguide/configure"
+      "best/store",
+      "faq/migrate-to-6"
     ],
     "Extending MobX": [
         "refguide/extending",

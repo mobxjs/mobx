@@ -117,7 +117,7 @@
       },
       "refguide/configure": {
         "title": "Configuring MobX",
-        "sidebar_label": "Configuring MobX [🚀]"
+        "sidebar_label": "Configuring MobX"
       },
       "refguide/extend-observable": {
         "title": "refguide/extend-observable",

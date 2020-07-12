@@ -5,7 +5,8 @@
         "lib": ["esnext"],
         "noUnusedLocals": false,
         "moduleResolution": "node",
-        "experimentalDecorators": true
+        "experimentalDecorators": true,
+        "useDefineForClassFields": true
     },
     "include": ["src/**/*.ts", "test/**/*.ts"]
 }
