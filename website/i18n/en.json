@@ -20,10 +20,6 @@
         "title": "Always dispose reactions",
         "sidebar_label": "Always dispose reactions"
       },
-      "best/limitations-without-proxies": {
-        "title": "best/limitations-without-proxies",
-        "sidebar_label": "Limitations without Proxy [🚀]"
-      },
       "best/stateless-HMR": {
         "title": "Hot Module Reloading with Stateless Components",
         "sidebar_label": "Hot Module Reloading with Stateless Components"
@@ -43,6 +39,10 @@
       "faq/faq": {
         "title": "FAQ",
         "sidebar_label": "Frequently Asked Questions"
+      },
+      "faq/migrate-to-6": {
+        "title": "faq/migrate-to-6",
+        "sidebar_label": "Migrating to MobX 6 [🚀]"
       },
       "intro/concepts": {
         "title": "intro/concepts",

@@ -146,6 +146,10 @@ When using MobX there are no smart or dumb components.
 All components render smartly but are defined in a dumb manner. MobX will simply make sure the components are always re-rendered whenever needed, but also no more than that. So the `onClick` handler in the above example will force the proper `TodoView` to render as it uses the `toggle` action, and it will cause the `TodoListView` to render if the number of unfinished tasks has changed.
 However, if you would remove the `Tasks left` line (or put it into a separate component), the `TodoListView` will no longer re-render when ticking a box.
 
+##### Linting
+
+If you find it hard to adopt the mental model of MobX, MobX can be configured to be very strict and warn at run-time whenever you deviate from these patterns. See [linting MobX](../refguide/configure.md#linting-options).
+
 ##### Try it out!
 
 You can try this out yourself on [CodeSandbox](https://codesandbox.io/s/concepts-principles-il8lt?file=/src/index.js:1161-1252).
