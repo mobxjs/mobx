@@ -64,6 +64,15 @@ https://deploy-preview-2382--mobx-docs.netlify.app/
 -   [ ] Use mobx-react-lite where possible in examples and codesandbox.
 -   [ ] Remove batching import from mobx-react-lite from codesandbox when possible.
 -   [ ] Add a typescript document to docs with an example.
+-   [ ] The mobx react devtools are no longer supported, but the mobx devtools are.
+
+        The MobX-react devtools (either as package or browser plugin) are no longer supported. Instead, the following tools can be analyzed to analyze your mobx-react application:
+
+        Visualizing re-rendering of components is now part of the standard React devtools
+        The dependency tree of a compent tree can be inspected by showing the state of the useObserver hook in the React devtools (at the time of this release it displays as just Object, but the next iteration of the React devtools will support those properly)
+        Spying on events can still be done with the MobX-react browser plugin, through the mobx-logger package or manually by using the spy or trace utility from the mobx package.
+
+-   [ ] Decorators like computed can take arguments, adjust docs if still needed
 
 ## Code sandbox todo
 
