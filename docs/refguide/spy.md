@@ -26,24 +26,28 @@ spy(event => {
 
 Spy listeners always receive one object, which usually has at least a `type` field. The following events are emitted by default by spy.
 
-| event                     | fields                                                              | nested |
-| ------------------------- | ------------------------------------------------------------------- | ------ |
-| action                    | name, object (scope), arguments                                     | yes    |
-| scheduled-reaction        | name                                                                | no     |
-| reaction                  | name                                                                | yes    |
-| compute                   | name                                                                | no     |
-| error                     | message                                                             | no     |
-| update (array)            | object (the array), index, newValue, oldValue                       | yes    |
-| update (map)              | object (observable map instance), name, newValue, oldValue          | yes    |
-| update (object)           | object (instance), name, newValue, oldValue                         | yes    |
-| splice (array)            | object (the array), index, added, removed, addedCount, removedCount | yes    |
-| add (map)                 | object, name, newValue                                              | yes    |
-| add (object)              | object, name, newValue                                              | yes    |
-| delete (map)              | object, name, oldValue                                              | yes    |
-| create (boxed observable) | object (ObservableValue instance), newValue                         | yes    |
+| type               | observableKind | other fields                                                              | nested |
+| ------------------ | -------------- | ------------------------------------------------------------------------- | ------ |
+| action             |                | name, object (scope), arguments[]                                         | yes    |
+| scheduled-reaction |                | name                                                                      | no     |
+| reaction           |                | name                                                                      | yes    |
+| compute            |                | name                                                                      | no     |
+| error              |                | name, message, error                                                      | no     |
+| add                | object         | name, object, key, newValue                                               | yes    |
+| update             | object         | name, object, key, newValue, oldValue                                     | yes    |
+| remove             | object         | name, object, key, oldValue                                               | yes    |
+| update             | array          | name, object (the array), index, newValue, oldValue                       | yes    |
+| splice             | array          | name, object (the array), index, added, removed, addedCount, removedCount | yes    |
+| add                | map            | name, object (observable map instance), key, newValue                     | yes    |
+| update             | map            | name, object (observable map instance), key, newValue, oldValue           | yes    |
+| delete             | map            | name, object (observable map instance), key, oldValue                     | yes    |
+| add                | set            | name, object (observable set instance), newValue                          | yes    |
+| delete             | set            | name, object (observable set instance), oldValue                          | yes    |
+| create             | box            | name, object (Observable box instance), newValue                          | yes    |
+| update             | box            | name, object (Observable box instance), newValue, oldValue                | yes    |
+| report-end         |                | spyReportEnd=true, time? (total execution time in ms)                     | no     |
 
-Note that there are events with the signature `{ spyReportEnd: true, time? }`.
-These events might not have a `type` field, but they are part of an earlier fired event that had `spyReportStart: true`.
+The `report-end` events are part of an earlier fired event that had `spyReportStart: true`.
 This event indicates the end of an event and this way groups of events with sub-events are created.
 This event might report the total execution time as well.
 

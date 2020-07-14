@@ -12,6 +12,7 @@ Array [
   },
   Object {
     "spyReportEnd": true,
+    "type": "report-end",
   },
   Object {
     "arguments": Array [
@@ -25,15 +26,18 @@ Array [
     "key": "a",
     "name": "ObservableObject@10",
     "newValue": 2,
+    "observableKind": "object",
     "oldValue": 1,
     "spyReportStart": true,
     "type": "update",
   },
   Object {
     "spyReportEnd": true,
+    "type": "report-end",
   },
   Object {
     "spyReportEnd": true,
+    "type": "report-end",
   },
   Object {
     "arguments": Array [
@@ -47,26 +51,31 @@ Array [
     "key": "a",
     "name": "ObservableObject@10",
     "newValue": 5,
+    "observableKind": "object",
     "oldValue": 2,
     "spyReportStart": true,
     "type": "update",
   },
   Object {
     "spyReportEnd": true,
+    "type": "report-end",
   },
   Object {
     "key": "a",
     "name": "ObservableObject@10",
     "newValue": 4,
+    "observableKind": "object",
     "oldValue": 5,
     "spyReportStart": true,
     "type": "update",
   },
   Object {
     "spyReportEnd": true,
+    "type": "report-end",
   },
   Object {
     "spyReportEnd": true,
+    "type": "report-end",
   },
   Object {
     "arguments": Array [
@@ -80,15 +89,18 @@ Array [
     "key": "a",
     "name": "ObservableObject@10",
     "newValue": 3,
+    "observableKind": "object",
     "oldValue": 4,
     "spyReportStart": true,
     "type": "update",
   },
   Object {
     "spyReportEnd": true,
+    "type": "report-end",
   },
   Object {
     "spyReportEnd": true,
+    "type": "report-end",
   },
 ]
 `;

@@ -121,16 +121,18 @@ export class ObservableObjectAdministration
             const notifySpy = __DEV__ && isSpyEnabled()
             const change =
                 notify || notifySpy
-                    ? {
+                    ? ({
                           type: UPDATE,
+
                           object: this.proxy_ || instance,
                           oldValue: (observable as any).value_,
                           name: key,
                           newValue
-                      }
+                      } as const)
                     : null
 
-            if (__DEV__ && notifySpy) spyReportStart({ ...change, name: this.name_, key })
+            if (__DEV__ && notifySpy)
+                spyReportStart({ ...change!, observableKind: "object", name: this.name_, key })
             ;(observable as ObservableValue<any>).setNewValue_(newValue)
             if (notify) notifyListeners(this, change)
             if (__DEV__ && notifySpy) spyReportEnd()
@@ -230,14 +232,16 @@ export class ObservableObjectAdministration
             delete this.target_[key]
             const change =
                 notify || notifySpy
-                    ? {
+                    ? ({
                           type: REMOVE,
+
                           object: this.proxy_ || target,
                           oldValue: oldValue,
                           name: key
-                      }
+                      } as const)
                     : null
-            if (__DEV__ && notifySpy) spyReportStart({ ...change, name: this.name_, key })
+            if (__DEV__ && notifySpy)
+                spyReportStart({ ...change!, observableKind: "object", name: this.name_, key })
             if (notify) notifyListeners(this, change)
             if (__DEV__ && notifySpy) spyReportEnd()
         } finally {
@@ -265,15 +269,17 @@ export class ObservableObjectAdministration
         const notifySpy = __DEV__ && isSpyEnabled()
         const change =
             notify || notifySpy
-                ? {
+                ? ({
                       type: ADD,
+
                       object: this.proxy_ || this.target_,
                       name: key,
                       newValue
-                  }
+                  } as const)
                 : null
 
-        if (__DEV__ && notifySpy) spyReportStart({ ...change, name: this.name_, key })
+        if (__DEV__ && notifySpy)
+            spyReportStart({ ...change!, observableKind: "object", name: this.name_, key })
         if (notify) notifyListeners(this, change)
         if (__DEV__ && notifySpy) spyReportEnd()
         if (this.pendingKeys_) {

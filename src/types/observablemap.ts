@@ -172,7 +172,8 @@ export class ObservableMap<K = any, V = any>
                       }
                     : null
 
-            if (__DEV__ && notifySpy) spyReportStart({ ...change, name: this.name_, key })
+            if (__DEV__ && notifySpy)
+                spyReportStart({ ...change!, observableKind: "map", name: this.name_, key })
             transaction(() => {
                 this.keysAtom_.reportChanged()
                 this.updateHasMapEntry_(key, false)
@@ -210,7 +211,8 @@ export class ObservableMap<K = any, V = any>
                           newValue
                       }
                     : null
-            if (__DEV__ && notifySpy) spyReportStart({ ...change, name: this.name_, key })
+            if (__DEV__ && notifySpy)
+                spyReportStart({ ...change!, observableKind: "map", name: this.name_, key })
             observable.setNewValue_(newValue as V)
             if (notify) notifyListeners(this, change)
             if (__DEV__ && notifySpy) spyReportEnd()
@@ -242,7 +244,8 @@ export class ObservableMap<K = any, V = any>
                       newValue
                   }
                 : null
-        if (__DEV__ && notifySpy) spyReportStart({ ...change, name: this.name_, key })
+        if (__DEV__ && notifySpy)
+            spyReportStart({ ...change!, observableKind: "map", name: this.name_, key })
         if (notify) notifyListeners(this, change)
         if (__DEV__ && notifySpy) spyReportEnd()
     }

@@ -135,7 +135,8 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
                           newValue: value
                       }
                     : null
-            if (notifySpy && __DEV__) spyReportStart(change)
+            if (notifySpy && __DEV__)
+                spyReportStart({ ...change!, observableKind: "set", name: this.name_ })
             if (notify) notifyListeners(this, change)
             if (notifySpy && __DEV__) spyReportEnd()
         }
@@ -164,7 +165,8 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
                       }
                     : null
 
-            if (notifySpy && __DEV__) spyReportStart({ ...change, name: this.name_ })
+            if (notifySpy && __DEV__)
+                spyReportStart({ ...change!, observableKind: "set", name: this.name_ })
             transaction(() => {
                 this.atom_.reportChanged()
                 this.data_.delete(value)
