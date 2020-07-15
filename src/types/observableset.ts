@@ -37,11 +37,15 @@ export type IObservableSetInitialValues<T> = Set<T> | readonly T[]
 export type ISetDidChange<T = any> =
     | {
           object: ObservableSet<T>
+          observableKind: "set"
+          objectName: string
           type: "add"
           newValue: T
       }
     | {
           object: ObservableSet<T>
+          observableKind: "set"
+          objectName: string
           type: "delete"
           oldValue: T
       }
@@ -130,13 +134,14 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
             const change =
                 notify || notifySpy
                     ? <ISetDidChange<T>>{
+                          observableKind: "set",
+                          objectName: this.name_,
                           type: ADD,
                           object: this,
                           newValue: value
                       }
                     : null
-            if (notifySpy && __DEV__)
-                spyReportStart({ ...change!, observableKind: "set", name: this.name_ })
+            if (notifySpy && __DEV__) spyReportStart(change!)
             if (notify) notifyListeners(this, change)
             if (notifySpy && __DEV__) spyReportEnd()
         }
@@ -159,14 +164,15 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
             const change =
                 notify || notifySpy
                     ? <ISetDidChange<T>>{
+                          observableKind: "set",
+                          objectName: this.name_,
                           type: DELETE,
                           object: this,
                           oldValue: value
                       }
                     : null
 
-            if (notifySpy && __DEV__)
-                spyReportStart({ ...change!, observableKind: "set", name: this.name_ })
+            if (notifySpy && __DEV__) spyReportStart(change!)
             transaction(() => {
                 this.atom_.reportChanged()
                 this.data_.delete(value)

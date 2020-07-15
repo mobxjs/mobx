@@ -6,6 +6,7 @@
 -   Update readme to reflect correct scripts by [@elektronik2k5](https://github.com/elektronik2k5)
 -   `prettier` related tweaks by [@elektronik2k5](https://github.com/elektronik2k5)
 -   Add full types for the spy() function by [@phiresky](https://github.com/phiresky)
+-   Unify the interfaces of spy() and observe() (BREAKING: the `.name` prop of the spy event is now the name of the property key (as in observe()), the name of the object is in `.objectName`)
 
 # 5.15.4 / 4.15.4
 

@@ -8,8 +8,7 @@ import {
     extendObservable,
     action,
     IObservableArray,
-    IArrayChange,
-    IArraySplice,
+    IArrayDidChange,
     IArrayWillChange,
     IArrayWillSplice,
     IObservableValue,
@@ -210,7 +209,7 @@ test("typing", () => {
         // console.log(c.type)
         return null
     })
-    mobx.observe(ar, (d: IArrayChange<number> | IArraySplice<number>) => {
+    mobx.observe(ar, (d: IArrayDidChange<number>) => {
         // console.log(d.type)
     })
 
@@ -219,7 +218,7 @@ test("typing", () => {
         // console.log(c.type)
         return null
     })
-    mobx.observe(ar2, (d: IArrayChange<number> | IArraySplice<number>) => {
+    mobx.observe(ar2, (d: IArrayDidChange<number>) => {
         // console.log(d.type)
     })
 

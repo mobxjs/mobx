@@ -1,81 +1,24 @@
+import { IComputedDidChange } from "./computedvalue"
+import { IValueDidChange } from "./../types/observablevalue"
+import { IObjectDidChange } from "./../types/observableobject"
+import { IArrayDidChange } from "./../types/observablearray"
 import { Lambda, globalState, once, ISetDidChange, IMapDidChange } from "../internal"
 
 export function isSpyEnabled() {
     return __DEV__ && !!globalState.spyListeners.length
 }
 
-export type ObjectSpyEvent = {
-    observableKind: "object"
-    object: unknown
-    name: string
-    key: string | number | symbol
-} & (
-    | {
-          type: "add"
-          newValue: unknown
-      }
-    | {
-          type: "update"
-          newValue: unknown
-          oldValue: unknown
-      }
-    | {
-          type: "remove"
-          oldValue: unknown
-      }
-)
-
-export type ArraySpyEvent = {
-    observableKind: "array"
-    name: string
-    index: number
-    object: unknown[]
-} & (
-    | {
-          type: "update"
-          index: number
-          newValue: unknown
-          oldValue: unknown
-      }
-    | {
-          type: "splice"
-          removed: unknown[]
-          added: unknown[]
-          removedCount: number
-          addedCount: number
-      }
-)
-
-export type BoxSpyEvent =
-    | {
-          type: "create"
-          observableKind: "box"
-          name: string
-          newValue: unknown
-      }
-    | {
-          type: "update"
-          observableKind: "box"
-          name: string
-          newValue: unknown
-          oldValue: unknown
-      }
-
 export type PureSpyEvent =
     | { type: "action"; name: string; object: unknown; arguments: unknown[] }
     | { type: "scheduled-reaction"; name: string }
     | { type: "reaction"; name: string }
-    | { type: "compute"; object: unknown; name: string }
     | { type: "error"; name: string; message: string; error: string }
-    | ObjectSpyEvent
-    | ArraySpyEvent
-    | (Omit<IMapDidChange<unknown, unknown>, "name"> & {
-          observableKind: "map"
-          name: string
-          key: unknown
-      })
-    | (Omit<ISetDidChange<unknown>, "name"> & { observableKind: "set"; name: string })
-    | BoxSpyEvent
+    | IComputedDidChange<unknown>
+    | IObjectDidChange<unknown>
+    | IArrayDidChange<unknown>
+    | IMapDidChange<unknown, unknown>
+    | ISetDidChange<unknown>
+    | IValueDidChange<unknown>
     | { type: "report-end"; spyReportEnd: true; time?: number }
 
 type SpyEvent = PureSpyEvent & { spyReportStart?: true }

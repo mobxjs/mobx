@@ -1,6 +1,5 @@
 import {
-    IArrayChange,
-    IArraySplice,
+    IArrayDidChange,
     IComputedValue,
     IMapDidChange,
     IObjectDidChange,
@@ -22,7 +21,7 @@ export function observe<T>(
 ): Lambda
 export function observe<T>(
     observableArray: IObservableArray<T>,
-    listener: (change: IArrayChange<T> | IArraySplice<T>) => void,
+    listener: (change: IArrayDidChange<T>) => void,
     fireImmediately?: boolean
 ): Lambda
 export function observe<V>(

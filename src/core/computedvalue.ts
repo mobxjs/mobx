@@ -4,7 +4,6 @@ import {
     IDerivationState_,
     IEqualsComparer,
     IObservable,
-    IValueDidChange,
     Lambda,
     TraceMode,
     autorun,
@@ -36,7 +35,7 @@ import {
 export interface IComputedValue<T> {
     get(): T
     set(value: T): void
-    observe_(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda
+    observe_(listener: (change: IComputedDidChange<T>) => void, fireImmediately?: boolean): Lambda
 }
 
 export interface IComputedValueOptions<T> {
@@ -49,7 +48,14 @@ export interface IComputedValueOptions<T> {
     keepAlive?: boolean
 }
 
-const COMPUTE = "compute"
+export type IComputedDidChange<T = any> = {
+    type: "update"
+    observableKind: "computed"
+    object: unknown
+    objectName: string
+    newValue: T
+    oldValue: T | undefined
+}
 
 /**
  * A node in the state dependency root that observes other nodes, and can be observed itself.
@@ -178,17 +184,21 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     }
 
     private trackAndCompute_(): boolean {
-        if (__DEV__ && isSpyEnabled()) {
-            spyReport({
-                object: this.scope_,
-                type: COMPUTE,
-                name: this.name_
-            })
-        }
         const oldValue = this.value_
         const wasSuspended =
             /* see #1208 */ this.dependenciesState_ === IDerivationState_.NOT_TRACKING_
         const newValue = this.computeValue_(true)
+
+        if (__DEV__ && isSpyEnabled()) {
+            spyReport({
+                observableKind: "computed",
+                objectName: this.name_,
+                object: this.scope_,
+                type: "update",
+                oldValue: this.value_,
+                newValue
+            } as IComputedDidChange)
+        }
 
         const changed =
             wasSuspended ||
@@ -233,14 +243,17 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         }
     }
 
-    observe_(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda {
+    observe_(listener: (change: IComputedDidChange<T>) => void, fireImmediately?: boolean): Lambda {
         let firstTime = true
         let prevValue: T | undefined = undefined
         return autorun(() => {
+            // TODO: why is this in a different place than the spyReport() function? in all other observables it's called in the same place
             let newValue = this.get()
             if (!firstTime || fireImmediately) {
                 const prevU = untrackedStart()
                 listener({
+                    observableKind: "computed",
+                    objectName: this.name_,
                     type: UPDATE,
                     object: this,
                     newValue,

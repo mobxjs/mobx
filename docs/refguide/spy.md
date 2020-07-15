@@ -43,8 +43,8 @@ Spy listeners always receive one object, which usually has at least a `type` fie
 | delete             | map            | name, object (observable map instance), key, oldValue                     | yes    |
 | add                | set            | name, object (observable set instance), newValue                          | yes    |
 | delete             | set            | name, object (observable set instance), oldValue                          | yes    |
-| create             | box            | name, object (Observable box instance), newValue                          | yes    |
-| update             | box            | name, object (Observable box instance), newValue, oldValue                | yes    |
+| create             | box            | object (Observable box instance), newValue                                | yes    |
+| update             | box            | object (Observable box instance), newValue, oldValue                      | yes    |
 | report-end         |                | spyReportEnd=true, time? (total execution time in ms)                     | no     |
 
 The `report-end` events are part of an earlier fired event that had `spyReportStart: true`.

@@ -43,18 +43,23 @@ export interface IObservableArray<T = any> extends Array<T> {
     toJSON(): T[]
 }
 
-export interface IArrayChange<T = any> {
-    type: "update"
+interface IArrayBaseChange<T> {
     object: IObservableArray<T>
+    observableKind: "array"
+    objectName: string
     index: number
+}
+
+export type IArrayDidChange<T = any> = IArrayUpdate<T> | IArraySplice<T>
+
+interface IArrayUpdate<T = any> extends IArrayBaseChange<T> {
+    type: "update"
     newValue: T
     oldValue: T
 }
 
-export interface IArraySplice<T = any> {
+interface IArraySplice<T = any> extends IArrayBaseChange<T> {
     type: "splice"
-    object: IObservableArray<T>
-    index: number
     added: T[]
     addedCount: number
     removed: T[]
@@ -62,16 +67,16 @@ export interface IArraySplice<T = any> {
 }
 
 export interface IArrayWillChange<T = any> {
-    type: "update"
     object: IObservableArray<T>
     index: number
+    type: "update"
     newValue: T
 }
 
 export interface IArrayWillSplice<T = any> {
-    type: "splice"
     object: IObservableArray<T>
     index: number
+    type: "splice"
     added: T[]
     removedCount: number
 }
@@ -115,7 +120,7 @@ export class ObservableArrayAdministration
     changeListeners_
     enhancer_: (newV: any, oldV: any | undefined) => any
     dehancer: any
-    proxy_: any[] = undefined as any
+    proxy_!: IObservableArray<any>
     lastKnownLength_ = 0
 
     constructor(
@@ -144,12 +149,14 @@ export class ObservableArrayAdministration
     }
 
     observe_(
-        listener: (changeData: IArrayChange<any> | IArraySplice<any>) => void,
+        listener: (changeData: IArrayDidChange<any>) => void,
         fireImmediately = false
     ): Lambda {
         if (fireImmediately) {
             listener(<IArraySplice<any>>{
+                observableKind: "array",
                 object: this.proxy_ as any,
+                objectName: this.atom_.name_,
                 type: "splice",
                 index: 0,
                 added: this.values_.slice(),
@@ -240,12 +247,13 @@ export class ObservableArrayAdministration
     notifyArrayChildUpdate_(index: number, newValue: any, oldValue: any) {
         const notifySpy = !this.owned_ && isSpyEnabled()
         const notify = hasListeners(this)
-        const change =
+        const change: IArrayDidChange | null =
             notify || notifySpy
                 ? ({
+                      observableKind: "array",
                       object: this.proxy_,
                       type: UPDATE,
-
+                      objectName: this.atom_.name_,
                       index,
                       newValue,
                       oldValue
@@ -254,8 +262,7 @@ export class ObservableArrayAdministration
 
         // The reason why this is on right hand side here (and not above), is this way the uglifier will drop it, but it won't
         // cause any runtime overhead in development mode without NODE_ENV set, unless spying is enabled
-        if (__DEV__ && notifySpy)
-            spyReportStart({ ...change!, observableKind: "array", name: this.atom_.name_ })
+        if (__DEV__ && notifySpy) spyReportStart(change!)
         this.atom_.reportChanged()
         if (notify) notifyListeners(this, change)
         if (__DEV__ && notifySpy) spyReportEnd()
@@ -264,10 +271,12 @@ export class ObservableArrayAdministration
     notifyArraySplice_(index: number, added: any[], removed: any[]) {
         const notifySpy = !this.owned_ && isSpyEnabled()
         const notify = hasListeners(this)
-        const change =
+        const change: IArraySplice | null =
             notify || notifySpy
                 ? ({
+                      observableKind: "array",
                       object: this.proxy_,
+                      objectName: this.atom_.name_,
                       type: SPLICE,
                       index,
                       removed,
@@ -277,8 +286,7 @@ export class ObservableArrayAdministration
                   } as const)
                 : null
 
-        if (__DEV__ && notifySpy)
-            spyReportStart({ ...change!, observableKind: "array", name: this.atom_.name_ })
+        if (__DEV__ && notifySpy) spyReportStart(change!)
         this.atom_.reportChanged()
         // conform: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
         if (notify) notifyListeners(this, change)

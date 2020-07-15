@@ -8,8 +8,6 @@ import {
     extendObservable,
     action,
     IObservableArray,
-    IArrayChange,
-    IArraySplice,
     IArrayWillChange,
     IArrayWillSplice,
     IObservableValue,

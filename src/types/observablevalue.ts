@@ -27,14 +27,27 @@ import {
 } from "../internal"
 
 export interface IValueWillChange<T> {
-    object: any
+    object: IObservableValue<T>
     type: "update"
     newValue: T
 }
 
-export interface IValueDidChange<T> extends IValueWillChange<T> {
-    oldValue: T | undefined
-}
+export type IValueDidChange<T = any> =
+    | {
+          type: "create"
+          observableKind: "box"
+          object: IObservableValue<T>
+          objectName: string
+          newValue: unknown
+      }
+    | {
+          type: "update"
+          observableKind: "box"
+          object: IObservableValue<T>
+          objectName: string
+          newValue: unknown
+          oldValue: unknown
+      }
 
 export interface IObservableValue<T> {
     get(): T
@@ -66,8 +79,9 @@ export class ObservableValue<T> extends Atom
             // only notify spy if this is a stand-alone observable
             spyReport({
                 type: CREATE,
+                object: this,
                 observableKind: "box",
-                name: this.name_,
+                objectName: this.name_,
                 newValue: "" + this.value_
             })
         }
@@ -86,8 +100,9 @@ export class ObservableValue<T> extends Atom
             if (__DEV__ && notifySpy) {
                 spyReportStart({
                     type: UPDATE,
+                    object: this,
                     observableKind: "box",
-                    name: this.name_,
+                    objectName: this.name_,
                     newValue,
                     oldValue
                 })
@@ -139,6 +154,8 @@ export class ObservableValue<T> extends Atom
     observe_(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda {
         if (fireImmediately)
             listener({
+                observableKind: "box",
+                objectName: this.name_,
                 object: this,
                 type: UPDATE,
                 newValue: this.value_,
