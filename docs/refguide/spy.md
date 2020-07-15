@@ -31,7 +31,6 @@ Spy listeners always receive one object, which usually has at least a `type` fie
 | action                          |                | name, object (scope), arguments[]                     | yes    |
 | scheduled-reaction              |                | name                                                  | no     |
 | reaction                        |                | name                                                  | yes    |
-| update                          | computed       | name                                                  | no     |
 | error                           |                | name, message, error                                  | no     |
 | add,update,remove,delete,splice | \*             | see [observe](observe.md)                             | yes    |
 | report-end                      |                | spyReportEnd=true, time? (total execution time in ms) | no     |
