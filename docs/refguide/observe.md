@@ -107,6 +107,8 @@ Related blog: [Object.observe is dead. Long live mobx.observe](https://medium.co
 The callbacks of `intercept` and `observe` will receive an event object which has at least the following properties:
 
 -   `object`: the observable triggering the event
+-   `objectName`: the name of the observable triggering the event (for debugging)
+-   `observableKind`: the type of the observable (object,array,map,set,box,computed)
 -   `type`: (string) the type of the current event
 
 These are the additional fields that are available per type:
