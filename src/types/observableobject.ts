@@ -41,7 +41,7 @@ export type IObjectDidChange<T = any> = {
     observableKind: "object"
     name: PropertyKey
     object: T
-    objectName: string
+    debugObjectName: string
 } & (
     | {
           type: "add"
@@ -124,7 +124,7 @@ export class ObservableObjectAdministration
                     ? {
                           type: UPDATE,
                           observableKind: "object",
-                          objectName: this.name_,
+                          debugObjectName: this.name_,
                           object: this.proxy_ || instance,
                           oldValue: (observable as any).value_,
                           name: key,
@@ -236,7 +236,7 @@ export class ObservableObjectAdministration
                           type: REMOVE,
                           observableKind: "object",
                           object: this.proxy_ || target,
-                          objectName: this.name_,
+                          debugObjectName: this.name_,
                           oldValue: oldValue,
                           name: key
                       } as const)
@@ -272,7 +272,7 @@ export class ObservableObjectAdministration
                 ? ({
                       type: ADD,
                       observableKind: "object",
-                      objectName: this.name_,
+                      debugObjectName: this.name_,
                       object: this.proxy_ || this.target_,
                       name: key,
                       newValue

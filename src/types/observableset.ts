@@ -38,14 +38,14 @@ export type ISetDidChange<T = any> =
     | {
           object: ObservableSet<T>
           observableKind: "set"
-          objectName: string
+          debugObjectName: string
           type: "add"
           newValue: T
       }
     | {
           object: ObservableSet<T>
           observableKind: "set"
-          objectName: string
+          debugObjectName: string
           type: "delete"
           oldValue: T
       }
@@ -135,7 +135,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
                 notify || notifySpy
                     ? <ISetDidChange<T>>{
                           observableKind: "set",
-                          objectName: this.name_,
+                          debugObjectName: this.name_,
                           type: ADD,
                           object: this,
                           newValue: value
@@ -165,7 +165,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
                 notify || notifySpy
                     ? <ISetDidChange<T>>{
                           observableKind: "set",
-                          objectName: this.name_,
+                          debugObjectName: this.name_,
                           type: DELETE,
                           object: this,
                           oldValue: value

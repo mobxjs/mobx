@@ -52,7 +52,7 @@ export type IComputedDidChange<T = any> = {
     type: "update"
     observableKind: "computed"
     object: unknown
-    objectName: string
+    debugObjectName: string
     newValue: T
     oldValue: T | undefined
 }
@@ -192,7 +192,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         if (__DEV__ && isSpyEnabled()) {
             spyReport({
                 observableKind: "computed",
-                objectName: this.name_,
+                debugObjectName: this.name_,
                 object: this.scope_,
                 type: "update",
                 oldValue: this.value_,
@@ -253,7 +253,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
                 const prevU = untrackedStart()
                 listener({
                     observableKind: "computed",
-                    objectName: this.name_,
+                    debugObjectName: this.name_,
                     type: UPDATE,
                     object: this,
                     newValue,

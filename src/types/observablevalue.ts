@@ -32,22 +32,23 @@ export interface IValueWillChange<T> {
     newValue: T
 }
 
-export type IValueDidChange<T = any> =
+export type IValueDidChange<T = any> = {
+    type: "update"
+    observableKind: "value"
+    object: IObservableValue<T>
+    debugObjectName: string
+    newValue: unknown
+    oldValue: unknown
+}
+export type IBoxDidChange<T = any> =
     | {
           type: "create"
-          observableKind: "box"
+          observableKind: "value"
           object: IObservableValue<T>
-          objectName: string
+          debugObjectName: string
           newValue: unknown
       }
-    | {
-          type: "update"
-          observableKind: "box"
-          object: IObservableValue<T>
-          objectName: string
-          newValue: unknown
-          oldValue: unknown
-      }
+    | IValueDidChange<T>
 
 export interface IObservableValue<T> {
     get(): T
@@ -80,8 +81,8 @@ export class ObservableValue<T> extends Atom
             spyReport({
                 type: CREATE,
                 object: this,
-                observableKind: "box",
-                objectName: this.name_,
+                observableKind: "value",
+                debugObjectName: this.name_,
                 newValue: "" + this.value_
             })
         }
@@ -101,8 +102,8 @@ export class ObservableValue<T> extends Atom
                 spyReportStart({
                     type: UPDATE,
                     object: this,
-                    observableKind: "box",
-                    objectName: this.name_,
+                    observableKind: "value",
+                    debugObjectName: this.name_,
                     newValue,
                     oldValue
                 })
@@ -154,8 +155,8 @@ export class ObservableValue<T> extends Atom
     observe_(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda {
         if (fireImmediately)
             listener({
-                observableKind: "box",
-                objectName: this.name_,
+                observableKind: "value",
+                debugObjectName: this.name_,
                 object: this,
                 type: UPDATE,
                 newValue: this.value_,

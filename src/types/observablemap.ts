@@ -43,7 +43,7 @@ export interface IKeyValueMap<V = any> {
 export type IMapEntry<K = any, V = any> = [K, V]
 export type IMapEntries<K = any, V = any> = IMapEntry<K, V>[]
 
-export type IMapDidChange<K = any, V = any> = { observableKind: "map"; objectName: string } & (
+export type IMapDidChange<K = any, V = any> = { observableKind: "map"; debugObjectName: string } & (
     | {
           object: ObservableMap<K, V>
           name: K // actual the key or index, but this is based on the ancient .observe proposal for consistency
@@ -167,7 +167,7 @@ export class ObservableMap<K = any, V = any>
                 notify || notifySpy
                     ? {
                           observableKind: "map",
-                          objectName: this.name_,
+                          debugObjectName: this.name_,
                           type: DELETE,
                           object: this,
                           oldValue: (<any>this.data_.get(key)).value_,
@@ -207,7 +207,7 @@ export class ObservableMap<K = any, V = any>
                 notify || notifySpy
                     ? {
                           observableKind: "map",
-                          objectName: this.name_,
+                          debugObjectName: this.name_,
                           type: UPDATE,
                           object: this,
                           oldValue: (observable as any).value_,
@@ -242,7 +242,7 @@ export class ObservableMap<K = any, V = any>
             notify || notifySpy
                 ? {
                       observableKind: "map",
-                      objectName: this.name_,
+                      debugObjectName: this.name_,
                       type: ADD,
                       object: this,
                       name: key,

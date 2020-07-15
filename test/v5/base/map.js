@@ -12,8 +12,11 @@ test("map crud", function () {
 
     const events = []
     const m = map({ "1": "a" })
-    mobx.observe(m, function (changes) {
-        events.push(changes)
+    mobx.observe(m, function (change) {
+        events.push(change)
+        expect(change.observableKind).toBe("map")
+        delete change.observableKind
+        delete change.debugObjectName
     })
 
     expect(m.has("1")).toBe(true)

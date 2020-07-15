@@ -3,9 +3,9 @@
 exports[`delay autorun until end of transaction 1`] = `
 Array [
   Object {
+    "debugObjectName": "ObservableObject@1",
     "name": "a",
     "newValue": 3,
-    "objectName": "ObservableObject@1",
     "observableKind": "object",
     "oldValue": 2,
     "spyReportStart": true,
@@ -16,9 +16,9 @@ Array [
     "type": "report-end",
   },
   Object {
+    "debugObjectName": "ObservableObject@1",
     "name": "a",
     "newValue": 4,
-    "objectName": "ObservableObject@1",
     "observableKind": "object",
     "oldValue": 3,
     "spyReportStart": true,
@@ -30,9 +30,9 @@ Array [
   },
   "end1",
   Object {
+    "debugObjectName": "ObservableObject@1",
     "name": "a",
     "newValue": 5,
-    "objectName": "ObservableObject@1",
     "observableKind": "object",
     "oldValue": 4,
     "spyReportStart": true,
@@ -51,8 +51,8 @@ Array [
   "auto",
   "calc y",
   Object {
+    "debugObjectName": "ObservableObject@1.b",
     "newValue": 5,
-    "objectName": "ObservableObject@1.b",
     "observableKind": "computed",
     "oldValue": CaughtException {
       "cause": null,
@@ -65,9 +65,9 @@ Array [
   },
   "post trans1",
   Object {
+    "debugObjectName": "ObservableObject@1",
     "name": "a",
     "newValue": 6,
-    "objectName": "ObservableObject@1",
     "observableKind": "object",
     "oldValue": 5,
     "spyReportStart": true,
@@ -75,8 +75,8 @@ Array [
   },
   "calc y",
   Object {
+    "debugObjectName": "ObservableObject@1.b",
     "newValue": 6,
-    "objectName": "ObservableObject@1.b",
     "observableKind": "computed",
     "oldValue": 5,
     "type": "update",
@@ -97,9 +97,9 @@ Array [
   },
   "post trans2",
   Object {
+    "debugObjectName": "ObservableObject@1",
     "name": "a",
     "newValue": 3,
-    "objectName": "ObservableObject@1",
     "observableKind": "object",
     "oldValue": 6,
     "spyReportStart": true,
@@ -119,9 +119,9 @@ Array [
   "calc c",
   "transstart",
   Object {
+    "debugObjectName": "ObservableObject@1",
     "name": "a",
     "newValue": false,
-    "objectName": "ObservableObject@1",
     "observableKind": "object",
     "oldValue": true,
     "spyReportStart": true,
@@ -132,9 +132,9 @@ Array [
     "type": "report-end",
   },
   Object {
+    "debugObjectName": "ObservableObject@1",
     "name": "b",
     "newValue": true,
-    "objectName": "ObservableObject@1",
     "observableKind": "object",
     "oldValue": false,
     "spyReportStart": true,
@@ -153,8 +153,8 @@ Array [
   "auto",
   "calc c",
   Object {
+    "debugObjectName": "ObservableObject@1.c",
     "newValue": true,
-    "objectName": "ObservableObject@1.c",
     "observableKind": "computed",
     "oldValue": false,
     "type": "update",
@@ -173,9 +173,9 @@ Array [
   "calc c",
   "transstart",
   Object {
+    "debugObjectName": "ObservableObject@1",
     "name": "b",
     "newValue": 2,
-    "objectName": "ObservableObject@1",
     "observableKind": "object",
     "oldValue": 1,
     "spyReportStart": true,
@@ -188,8 +188,8 @@ Array [
   "transpreend",
   "calc c",
   Object {
+    "debugObjectName": "ObservableObject@1.c",
     "newValue": 2,
-    "objectName": "ObservableObject@1.c",
     "observableKind": "computed",
     "oldValue": 1,
     "type": "update",

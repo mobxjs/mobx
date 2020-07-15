@@ -23,9 +23,9 @@ Array [
     "type": "action",
   },
   Object {
+    "debugObjectName": "ObservableObject@10",
     "name": "a",
     "newValue": 2,
-    "objectName": "ObservableObject@10",
     "observableKind": "object",
     "oldValue": 1,
     "spyReportStart": true,
@@ -48,9 +48,9 @@ Array [
     "type": "action",
   },
   Object {
+    "debugObjectName": "ObservableObject@10",
     "name": "a",
     "newValue": 5,
-    "objectName": "ObservableObject@10",
     "observableKind": "object",
     "oldValue": 2,
     "spyReportStart": true,
@@ -61,9 +61,9 @@ Array [
     "type": "report-end",
   },
   Object {
+    "debugObjectName": "ObservableObject@10",
     "name": "a",
     "newValue": 4,
-    "objectName": "ObservableObject@10",
     "observableKind": "object",
     "oldValue": 5,
     "spyReportStart": true,
@@ -86,9 +86,9 @@ Array [
     "type": "action",
   },
   Object {
+    "debugObjectName": "ObservableObject@10",
     "name": "a",
     "newValue": 3,
-    "objectName": "ObservableObject@10",
     "observableKind": "object",
     "oldValue": 4,
     "spyReportStart": true,

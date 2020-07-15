@@ -46,7 +46,7 @@ export interface IObservableArray<T = any> extends Array<T> {
 interface IArrayBaseChange<T> {
     object: IObservableArray<T>
     observableKind: "array"
-    objectName: string
+    debugObjectName: string
     index: number
 }
 
@@ -156,7 +156,7 @@ export class ObservableArrayAdministration
             listener(<IArraySplice<any>>{
                 observableKind: "array",
                 object: this.proxy_ as any,
-                objectName: this.atom_.name_,
+                debugObjectName: this.atom_.name_,
                 type: "splice",
                 index: 0,
                 added: this.values_.slice(),
@@ -253,7 +253,7 @@ export class ObservableArrayAdministration
                       observableKind: "array",
                       object: this.proxy_,
                       type: UPDATE,
-                      objectName: this.atom_.name_,
+                      debugObjectName: this.atom_.name_,
                       index,
                       newValue,
                       oldValue
@@ -276,7 +276,7 @@ export class ObservableArrayAdministration
                 ? ({
                       observableKind: "array",
                       object: this.proxy_,
-                      objectName: this.atom_.name_,
+                      debugObjectName: this.atom_.name_,
                       type: SPLICE,
                       index,
                       removed,

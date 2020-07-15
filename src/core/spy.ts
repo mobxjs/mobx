@@ -1,5 +1,5 @@
 import { IComputedDidChange } from "./computedvalue"
-import { IValueDidChange } from "./../types/observablevalue"
+import { IValueDidChange, IBoxDidChange } from "./../types/observablevalue"
 import { IObjectDidChange } from "./../types/observableobject"
 import { IArrayDidChange } from "./../types/observablearray"
 import { Lambda, globalState, once, ISetDidChange, IMapDidChange } from "../internal"
@@ -19,6 +19,7 @@ export type PureSpyEvent =
     | IMapDidChange<unknown, unknown>
     | ISetDidChange<unknown>
     | IValueDidChange<unknown>
+    | IBoxDidChange<unknown>
     | { type: "report-end"; spyReportEnd: true; time?: number }
 
 type SpyEvent = PureSpyEvent & { spyReportStart?: true }

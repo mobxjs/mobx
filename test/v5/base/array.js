@@ -207,6 +207,9 @@ test("observe", function () {
     buf.forEach(function (change) {
         expect(change.object).toBe(ar)
         delete change.object
+        expect(change.observableKind).toBe("array")
+        delete change.observableKind
+        delete change.debugObjectName
     })
 
     const result = [
