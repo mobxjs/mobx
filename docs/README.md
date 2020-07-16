@@ -31,7 +31,7 @@ MobX is proudly sponsored by Mendix, Coinbase, Facebook Open Source, Canva, Algo
 <a href="https://coinbase.com/"><img src="assets/coinbase.jpeg" align="center" width="100" title="Coinbase" alt="Coinbase" /></a>
 <a href="https://www.canva.com/"><img src="assets/canva.png" align="center" width="100" title="Canva" alt="Canva" /></a>
 
-**🥈Silver sponsors (\$100+ pm):**<br/>
+**🥈Silver sponsors (\$1000+ pm):**<br/>
 <a href="https://mantro.net/jobs/warlock"><img src="assets/mantro.png" align="center" width="100" title="mantro GmbH" alt="mantro GmbH"></a>
 <a href="https://www.codefirst.co.uk/"><img src="assets/codefirst.png" align="center" width="100" title="CodeFirst" alt="CodeFirst"/></a>
 <a href="https://www.bugsnag.com/platforms/react-error-reporting?utm_source=MobX&utm_medium=Website&utm_content=open-source&utm_campaign=2019-community&utm_term=20190913"><img src="assets/bugsnag.jpg" align="center" width="100" title="Bugsnag" alt="Bugsnag"/></a>
