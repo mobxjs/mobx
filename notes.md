@@ -60,9 +60,10 @@
     -   [x] fix https://github.com/mobxjs/mobx/issues/2394
     -   [x] fix UMD build depending on `global`
     -   [x] ~default observable requires reaction?~
-    -   [ ] check coverage
+    -   [x] check coverage
+    -   [x] re-execute perf checks
     -   [ ] update ad links (https://www.google.com/adsense/new/u/0/pub-1705981461067724/home ?)
-    -   [ ] re-execute perf checks
+    -   [ ] make cheatsheet
 -   [ ] mobx-react
     -   [ ] displayname for observer components facebook/react#18026
     -   [ ] update useLocalStore in mobx-react-lite to use
@@ -97,49 +98,12 @@ Why declare fields
 *   [ ] update tsconfig, no decorators, yes define
 *   [ ] update docs for non-default decorators
 *   [ ] instruct using TS / Babel decorators
-*   [ ] Breaking: can no longer re-decorate fields already decorated by a superclass
-*   [ ] Breaking: methods will be actions by default in `extendObservable` / `observable`
-*   [ ] Breaking: `decorate` has been removed
-*   [ ] Breaking: `enforceActions` is now defaulted to `observed`, but now generates a warning rather than an error
-*   [ ] Breaking: `runInAction` now longer supports a name as first argument. Use an action or named function instead
-*   [ ] Breaking: `computed` does not accept setter function as second argument anymore, use `options.set` instead
-*   [ ] Breaking: the `findIndex` / `find` offset argument (third) on observable arrays is no longer supported, to be consistent with ES arrays
-*   [ ] Breaking: option `computedConfigurable` was dropped and is the default now
-*   [ ] Breaking: a setter function as second argument to `computed` is no longer supported, use `computed(getter, { set: setter })` instead
-*   [ ] Breaking: toJS no longer supports the `recurseEverything` option
-*   [ ] optimization tip: hoist the mapping constant
-*   [ ] document: unconditional map
+
+*   [ ] optimization tip: hoist the mapping constant of makeObservable
+*   [ ] document: unconditional map / makeObservable calls
 *   [ ] document `true` and `false` as annotations
-*   [ ] how to enable ES5 support
-*   [ ] observable.array now supports proxy:false option
-*   [ ] migration: migrate mobx4 to mobx5 first, don't test on old browsers, then go to 6
-*   [ ] Breaking: no generic decorators or lists anymore for extendObservable?
-*   [ ] Breaking: dropped `intercept` and `observe` as array & map methods, use the mobx utilities instead
-*   [ ] Breaking: dropped array.toJS, use .slice() instead
-*   [ ] Breaking dropped Map.toPOJO / toJS / toJSON , use new Map(map) instead
-*   [ ] Breaking: Map.toJSON now returns the entries array
-*   [ ] Breaking dropped Set.toJS, use new Set(observableSet) instead
-*   [ ] Breaking Set.toJSON returns an array now
-*   [ ] Breaking: dropped Array.toJS, use .toJSON instead
-*   [ ] Breaking: dropped .observe and .intercept on types, use the {observe, intercept} from 'mobx' instead
-*   [ ] Running codemod: yarn jscodeshift -t codemod/undecorate.ts test/v5/base/typescript-tests.ts --ignoreImports=true
-*   [ ] killed: IGNORE_MOBX_MINIFY_WARNING
-*   [ ] Document: recommended settings for prod versus experimentation
-*   [ ] Migration: document switching from 4 to 5: configure( ) with proxies, requiresReqction, enforceActions
 *   [ ] makeObservable + private members in TypeScript (second call? computed name? tsignore?)
-*   [ ] print deprecation warnings for all old apis in mobx 4/5
-*   [ ] Breaking: it is no longer safe to call action from autorun. Use effect or reaction instead.
-*   [ ] \_allowStateChangesINComputation is no longer needed, us `runInAction` instead.
-*   [ ] Breaking: in computed, the when predicate, and reaction predicate it is never allowed to directly change state. State changes should be wrapped in action.
-*   [ ] Breaking: `toJS` no longer takes action, and no longer converts Maps and Sets to plain data structures. Serializing data structures is out of scope for the MobX project, and write custom serialization methods are much more sustainable. You might even leverage @computed to serialize state.
-*   [ ] Breaking: directly calling .get() / .set() on an observable array is no longer supported
-*   [ ] Breaking: killed IObservableObject interface.
-*   [ ] Breaking: sorting or reversing an array in an derivation will now throw rather than warn.
-*   [ ] Breaking: sorting or reversing an array in an actino will no sort or reverse the source array rather than shallow copy.
-*   Fixed #2326
-*   Fixed #2379
-*   [ ] Breaking: strict mode defaults to observed now
-*   [ ] killed option `computedConfigurable` as it was the default already
+
 *   [ ] document: `autoBind` options for observable / extendObservable / makeObserver
 *   [ ] document: linting options
 
