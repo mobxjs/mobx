@@ -30,7 +30,7 @@ configure({
 Accepted values for the `useProxies` configuration are:
 
 -   `"always"` (default): MobX is expected to only run in environments with [`Proxy` support](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy). MobX will error if these are not available.
--   `"never"`: Proxies are never used. MobX falls back on non-proxy alternatives. This is compatible with all ES5 environments, but causes various [limitations](../best/limitations-without-proxies.md).
+-   `"never"`: Proxies are never used. MobX falls back on non-proxy alternatives. This is compatible with all ES5 environments, but causes various [limitations](#limitations-without-proxies).
 -   `"ifavailable"`: (Experimental option) Proxies are used if they are available, and otherwise MobX falls back to non-proxy alternatives. The benefit of this mode is that MobX will try to warn if API's or language features that wouldn't work in ES5 enviroments are used, triggering errors when hitting an ES5 limitation when running on a modern environment.
 
 Note: before MobX 6 one had to pick either MobX 4 for older engines, or MobX 5 for new engines. However, MobX 6 supports both, although polyfills for certain api's like Map will be required when targetting older JavaScript engines.

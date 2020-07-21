@@ -63,6 +63,7 @@
     -   [x] check coverage
     -   [x] re-execute perf checks
     -   [x] update ad links (https://www.google.com/adsense/new/u/0/pub-1705981461067724/home ?)
+    -   [ ] add deprecation messages to latest mobx 5
 -   [ ] mobx-react
     -   [ ] displayname for observer components facebook/react#18026
     -   [ ] update useLocalStore in mobx-react-lite to use
