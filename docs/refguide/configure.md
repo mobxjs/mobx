@@ -4,6 +4,8 @@ sidebar_label: Configuring MobX
 hide_title: true
 ---
 
+<script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
+
 # Configuring MobX
 
 MobX has several configuration depending on how you prefer to use MobX, which JavaScript engines you want to target, and whether you want MobX to hint at best practices.

@@ -3,6 +3,8 @@ sidebar_label: intercept & observe [🚀]
 hide_title: true
 ---
 
+<script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
+
 # Intercept & Observe [🚀]
 
 `observe` and `intercept` can be used to monitor the changes of a single observable (they **_don't_** track nested observables).

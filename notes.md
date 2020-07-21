@@ -62,14 +62,14 @@
     -   [x] ~default observable requires reaction?~
     -   [x] check coverage
     -   [x] re-execute perf checks
-    -   [ ] update ad links (https://www.google.com/adsense/new/u/0/pub-1705981461067724/home ?)
-    -   [ ] make cheatsheet
+    -   [x] update ad links (https://www.google.com/adsense/new/u/0/pub-1705981461067724/home ?)
 -   [ ] mobx-react
     -   [ ] displayname for observer components facebook/react#18026
     -   [ ] update useLocalStore in mobx-react-lite to use
             autoMakeObservable
     -   [ ] fix React unstable batch setup
 -   [ ] post 6.0
+    -   [ ] make cheatsheet
     -   [ ] merge https://github.com/mobxjs/mobx/pull/2389
     -   [ ] set up discussions
     -   [ ] use autObservable options for codemod (if no superclass)?

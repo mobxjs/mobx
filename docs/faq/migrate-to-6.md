@@ -3,6 +3,8 @@ sidebar_label: Migrating to MobX 6 [🚀]
 hide_title: true
 ---
 
+<script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
+
 MobX 6 is quite different from MobX 5. This pages covers a migration guide from MobX 4 and 5 to 6, and an extensive list of all the changes.
 
 # Migrating to MobX 6
