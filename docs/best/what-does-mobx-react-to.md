@@ -294,7 +294,7 @@ runInAction(() => {
 })
 ```
 
-This will react. Even though `author.name` is not dereferenced by the the function passed to `autorun` itself, MobX will still track the dereferencing that happens in `upperCaseAuthorName`, because it happens _during_ the execution of the autorun.
+This will react. Even though `author.name` is not dereferenced by the function passed to `autorun` itself, MobX will still track the dereferencing that happens in `upperCaseAuthorName`, because it happens _during_ the execution of the autorun.
 
 ---
 

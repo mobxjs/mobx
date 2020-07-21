@@ -71,7 +71,7 @@ autoActions
 
 -   The `decorate` API has been removed, and need to be replaced by `makeObservable` in the constructor of the targeted class. It accepts the same arguments. The `mobx-undecorate` can transform this automatically.
 -   When using `extendObservable` / `observable`, fields that contained functions used to be turned into observables. This is no longer the case, they will be converted into autoActions.
--   [Strict mode](../refguide/configure.md#enforceActions) for actions is now enabled by default in `observabed` mode.
+-   [Strict mode](../refguide/configure.md#enforceActions) for actions is now enabled by default in `observed` mode.
 -   `toJS` no longer takes any options. It no longer converts Maps and Sets to plain data structures. Generic, flexible serialization of data structures is out of scope for the MobX project, and writing custom serialization methods are a much more scalable approach to serialization. (Tip: leverage `computed`s to define how class instances should be serialized).
 -   The methods `intercept` and `observe` are no longer exposed on observable arrays and maps and boxed observables. Import them as utility from mobx instead: `import { observe, intercept } from "mobx"`, and pass the collection as first argument: `observer(collection, callback)`. Note that we still recommend to avoid those API's.
 -   `observableMap.toPOJO()`, `observableMap.toJS()` have been dropped. use `new Map(observableMap)` instead if you want to convert an observable map to to a plain Map shallowly.
