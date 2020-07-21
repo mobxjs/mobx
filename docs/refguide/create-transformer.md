@@ -6,7 +6,7 @@ hide_title: true
 
 # createTransformer
 
-<div id='codefund'></div>
+<script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
 Provided by the `mobx-utils` package.
 
@@ -41,7 +41,7 @@ This example is taken from the [Reactive2015 conference demo](https://github.com
 const store = observable({
     boxes: [],
     arrows: [],
-    selection: null
+    selection: null,
 })
 
 /**
@@ -53,18 +53,18 @@ autorun(() => {
     states.push(serializeState(store))
 })
 
-const serializeState = createTransformer(store => ({
+const serializeState = createTransformer((store) => ({
     boxes: store.boxes.map(serializeBox),
     arrows: store.arrows.map(serializeArrow),
-    selection: store.selection ? store.selection.id : null
+    selection: store.selection ? store.selection.id : null,
 }))
 
-const serializeBox = createTransformer(box => ({ ...box }))
+const serializeBox = createTransformer((box) => ({ ...box }))
 
-const serializeArrow = createTransformer(arrow => ({
+const serializeArrow = createTransformer((arrow) => ({
     id: arrow.id,
     to: arrow.to.id,
-    from: arrow.from.id
+    from: arrow.from.id,
 }))
 ```
 

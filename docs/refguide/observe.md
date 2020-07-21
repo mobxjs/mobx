@@ -6,7 +6,7 @@ hide_title: true
 
 # Intercept & Observe
 
-<div id='codefund'></div>
+<script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
 `observe` and `intercept` can be used to monitor the changes of a single observable (they **_don't_** track nested observables).
 `intercept` can be used to detect and modify mutations before they are applied to the observable.
@@ -37,10 +37,10 @@ In that case the parent object interceptors are run before the property intercep
 
 ```javascript
 const theme = observable({
-    backgroundColor: "#ffffff"
+    backgroundColor: "#ffffff",
 })
 
-const disposer = intercept(theme, "backgroundColor", change => {
+const disposer = intercept(theme, "backgroundColor", (change) => {
     if (!change.newValue) {
         // ignore attempts to unset the background color
         return null
@@ -82,10 +82,10 @@ import { observable, observe } from "mobx"
 
 const person = observable({
     firstName: "Maarten",
-    lastName: "Luther"
+    lastName: "Luther",
 })
 
-const disposer = observe(person, change => {
+const disposer = observe(person, (change) => {
     console.log(change.type, change.name, "from", change.oldValue, "to", change.object[change.name])
 })
 
@@ -96,7 +96,7 @@ disposer()
 // Ignore any future updates
 
 // observe a single field
-const disposer2 = observe(person, "lastName", change => {
+const disposer2 = observe(person, "lastName", (change) => {
     console.log("LastName changed to ", change.newValue)
 })
 ```

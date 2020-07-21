@@ -6,7 +6,7 @@ hide_title: true
 
 # Writing asynchronous actions
 
-<div id='codefund'></div>
+<script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
 The `action` wrapper / decorator only affects the currently running function, not functions that are scheduled (but not invoked) by the current function!
 This means that if you have a `setTimeout`, promise`.then` or `async` construction, and in that callback some more state is changed, those callbacks should be wrapped in `action` as well! There are several ways to create asynchronous actions. No approach is strictly better than the other, but this section just list different approaches you can take to writing asynchronous code.
@@ -26,12 +26,12 @@ class Store {
         this.githubProjects = []
         this.state = "pending"
         fetchGithubProjectsSomehow().then(
-            projects => {
+            (projects) => {
                 const filteredProjects = somePreprocessing(projects)
                 this.githubProjects = filteredProjects
                 this.state = "done"
             },
-            error => {
+            (error) => {
                 this.state = "error"
             }
         )
@@ -86,13 +86,13 @@ class Store {
         this.state = "pending"
         fetchGithubProjectsSomehow().then(
             // inline created action
-            action("fetchSuccess", projects => {
+            action("fetchSuccess", (projects) => {
                 const filteredProjects = somePreprocessing(projects)
                 this.githubProjects = filteredProjects
                 this.state = "done"
             }),
             // inline created action
-            action("fetchError", error => {
+            action("fetchError", (error) => {
                 this.state = "error"
             })
         )
@@ -118,7 +118,7 @@ class Store {
         this.githubProjects = []
         this.state = "pending"
         fetchGithubProjectsSomehow().then(
-            projects => {
+            (projects) => {
                 const filteredProjects = somePreprocessing(projects)
                 // put the 'final' modification in an anonymous action
                 runInAction(() => {
@@ -126,7 +126,7 @@ class Store {
                     this.state = "done"
                 })
             },
-            error => {
+            (error) => {
                 // the alternative ending of this process:...
                 runInAction(() => {
                     this.state = "error"
@@ -191,7 +191,7 @@ class Store {
     @observable githubProjects = []
     @observable state = "pending"
 
-    fetchProjects = flow(function*() {
+    fetchProjects = flow(function* () {
         // <- note the star, this a generator function!
         this.githubProjects = []
         this.state = "pending"

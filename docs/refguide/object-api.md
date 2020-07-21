@@ -6,7 +6,7 @@ hide_title: true
 
 ## Direct Observable manipulation
 
-<div id='codefund'></div>
+<script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
 There is now an utility API that enables manipulating observable maps, objects and arrays with the same API. These api's are fully reactive, which means that even new property declarations can be detected by mobx if `set` is used to add them, and `values` or `keys` to iterate them.
 
@@ -25,7 +25,7 @@ The following methods are not really necessary when using MobX 5, but can be use
 import { get, set, observable, values } from "mobx"
 
 const twitterUrls = observable.object({
-    John: "twitter.com/johnny"
+    John: "twitter.com/johnny",
 })
 
 autorun(() => {

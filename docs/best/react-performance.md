@@ -6,7 +6,7 @@ hide_title: true
 
 # Optimizing rendering React components
 
-<div id='codefund'></div>
+<script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
 MobX is very fast, [often even faster than Redux](https://twitter.com/mweststrate/status/718444275239882753). But here are some tips to get most out of React and MobX. Note that most tips apply to React in general and are not specific for MobX.
 
@@ -32,7 +32,7 @@ class MyComponent extends Component {
             <div>
                 {user.name}
                 <ul>
-                    {todos.map(todo => (
+                    {todos.map((todo) => (
                         <TodoView todo={todo} key={todo.id} />
                     ))}
                 </ul>

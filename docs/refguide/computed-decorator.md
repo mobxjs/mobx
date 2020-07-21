@@ -6,7 +6,7 @@ hide_title: true
 
 # (@)computed
 
-<div id='codefund'></div>
+<script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
 <details>
     <summary style="color: white; background:green;padding:5px;margin:5px;border-radius:2px">egghead.io lesson 3: computed values</summary>
@@ -80,7 +80,7 @@ class OrderLine {
 decorate(OrderLine, {
     price: observable,
     amount: observable,
-    total: computed
+    total: computed,
 })
 ```
 
@@ -92,7 +92,7 @@ const orderLine = observable.object({
     amount: 1,
     get total() {
         return this.price * this.amount
-    }
+    },
 })
 ```
 
@@ -115,7 +115,7 @@ As long as a computed value is not used by a reaction, it is not memoized and so
 
 ```javascript
 configure({
-    computedRequiresReaction: true
+    computedRequiresReaction: true,
 })
 ```
 
@@ -192,7 +192,7 @@ const orderLine = observable.object({
     },
     set total(total) {
         this.price = total / this.amount // infer price from total
-    }
+    },
 })
 ```
 
@@ -228,7 +228,7 @@ var name = observable.box("John")
 
 var upperCaseName = computed(() => name.get().toUpperCase())
 
-var disposer = upperCaseName.observe(change => console.log(change.newValue))
+var disposer = upperCaseName.observe((change) => console.log(change.newValue))
 
 name.set("Dave")
 // prints: 'DAVE'
@@ -303,7 +303,7 @@ class Todos {
     @observable todos = []
 
     getAllTodosByUser = computedFn(function getAllTodosByUser(userId) {
-        return this.todos.filter(todo => todo.user === userId)
+        return this.todos.filter((todo) => todo.user === userId)
     })
 }
 ```

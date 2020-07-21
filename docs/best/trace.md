@@ -6,7 +6,7 @@ hide_title: true
 
 # Using `trace` for debugging
 
-<div id='codefund'></div>
+<script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
 Trace is a small utility that helps to find out why your computed values, reactions or components are re-evaluating.
 
@@ -49,7 +49,7 @@ class MyComponent extends React.Component {
 Enable trace by using the `reaction` argument of an reaction / autorun:
 
 ```javascript
-mobx.autorun("loggerzz", r => {
+mobx.autorun("loggerzz", (r) => {
     r.trace()
     console.log(user.fullname)
 })

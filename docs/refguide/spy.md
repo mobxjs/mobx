@@ -6,7 +6,7 @@ hide_title: true
 
 # Spy
 
-<div id='codefund'></div>
+<script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
 Usage: `spy(listener)`.
 Registers a global spy listener that listens to all events that happen in MobX.
@@ -16,7 +16,7 @@ Used for example by the `mobx-react-devtools`.
 Example usage of spying all actions:
 
 ```javascript
-spy(event => {
+spy((event) => {
     if (event.type === "action") {
         console.log(`${event.name} with args: ${event.arguments}`)
     }

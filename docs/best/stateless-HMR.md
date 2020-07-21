@@ -6,7 +6,7 @@ hide_title: true
 
 # Hot Module Reloading with Stateless Components
 
-<div id='codefund'></div>
+<script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
 One thing that can be a challenge when getting started with MobX (and React in general) is understanding why Hot Module Reloading (HMR) sometimes breaks. When you initially get it working, it seems like magic (and it kind of is), however there's at least one rough edge with regard to HMR and React: stateless components. Since stateless components don't explicitly identify themselves as React components, HMR doesn't quite know what to do with them, and so you'll often see warnings in your console like this:
 
@@ -25,7 +25,7 @@ Function declarations still do the exact same thing as arrow functions, but they
 For instance, here's a stateless component built with an arrow function:
 
 ```javascript
-const ToDoItem = observer(props => <div>{props.item}</div>)
+const ToDoItem = observer((props) => <div>{props.item}</div>)
 
 export default ToDoItem
 ```

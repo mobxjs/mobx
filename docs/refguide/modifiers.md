@@ -6,7 +6,7 @@ hide_title: true
 
 # Modifiers
 
-<div id='codefund'></div>
+<script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
 In MobX there is a set of decorators that defines how observable properties will behave.
 
@@ -41,10 +41,10 @@ var person = observable(
         // action:
         setAge(age) {
             this.age = age
-        }
+        },
     },
     {
-        setAge: action
+        setAge: action,
         // the other properties will default to observables  / computed
     }
 )
@@ -70,7 +70,7 @@ decorate(Person, {
     age: observable,
     showAge: observable,
     labelText: computed,
-    setAge: action
+    setAge: action,
 })
 ```
 
@@ -110,10 +110,10 @@ function Message() {
         this,
         {
             message: "Hello world",
-            author: null
+            author: null,
         },
         {
-            author: observable.ref
+            author: observable.ref,
         }
     )
 }

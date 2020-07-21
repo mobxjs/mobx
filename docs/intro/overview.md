@@ -6,7 +6,7 @@ hide_title: true
 
 # The gist of MobX
 
-<div id='codefund'></div>
+<script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
 <details>
     <summary style="color: white; background:green;padding:5px;margin:5px;border-radius:2px">egghead.io lesson 1: observable & observer</summary>
@@ -29,7 +29,7 @@ Just make sure that all properties that you want to change over time are marked 
 import { observable } from "mobx"
 
 var appState = observable({
-    timer: 0
+    timer: 0,
 })
 ```
 

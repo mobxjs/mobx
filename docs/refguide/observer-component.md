@@ -6,7 +6,7 @@ hide_title: true
 
 # @observer
 
-<div id='codefund'></div>
+<script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
 <details>
     <summary style="color: white; background:green;padding:5px;margin:5px;border-radius:2px">egghead.io lesson 1: observable & observer</summary>
@@ -33,7 +33,7 @@ Using `observer` is pretty straight forward:
 import { observer } from "mobx-react"
 
 var timerData = observable({
-    secondsPassed: 0
+    secondsPassed: 0,
 })
 
 setInterval(() => {
@@ -101,7 +101,7 @@ Similarly, we can store observables in local component state using `useState`. A
 const Timer = observer(() => {
     const [timerData] = useState(() =>
         observable({
-            secondsPassed: 0
+            secondsPassed: 0,
         })
     )
 

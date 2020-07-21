@@ -6,7 +6,7 @@ hide_title: true
 
 ## Observable Arrays
 
-<div id='codefund'></div>
+<script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
 Similar to objects, arrays can be made observable using `observable.array(values?)` or by passing an array to `observable`.
 This works recursively as well, so all (future) values of the array will also be observable.
@@ -16,15 +16,15 @@ import { observable, autorun } from "mobx"
 
 var todos = observable([
     { title: "Spoil tea", completed: true },
-    { title: "Make coffee", completed: false }
+    { title: "Make coffee", completed: false },
 ])
 
 autorun(() => {
     console.log(
         "Remaining:",
         todos
-            .filter(todo => !todo.completed)
-            .map(todo => todo.title)
+            .filter((todo) => !todo.completed)
+            .map((todo) => todo.title)
             .join(", ")
     )
 })

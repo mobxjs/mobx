@@ -6,7 +6,7 @@ hide_title: true
 
 # Reaction
 
-<div id='codefund'></div>
+<script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
 Usage: `reaction(() => data, (data, reaction) => { sideEffect }, options?)`.
 
@@ -47,28 +47,30 @@ See also [what will MobX React to?](../best/react).
 const todos = observable([
     {
         title: "Make coffee",
-        done: true
+        done: true,
     },
     {
         title: "Find biscuit",
-        done: false
-    }
+        done: false,
+    },
 ])
 
 // wrong use of reaction: reacts to length changes, but not to title changes!
 const reaction1 = reaction(
     () => todos.length,
-    length => console.log("reaction 1:", todos.map(todo => todo.title).join(", "))
+    (length) => console.log("reaction 1:", todos.map((todo) => todo.title).join(", "))
 )
 
 // correct use of reaction: reacts to length and title changes
 const reaction2 = reaction(
-    () => todos.map(todo => todo.title),
-    titles => console.log("reaction 2:", titles.join(", "))
+    () => todos.map((todo) => todo.title),
+    (titles) => console.log("reaction 2:", titles.join(", "))
 )
 
 // autorun reacts to just everything that is used in its function
-const autorun1 = autorun(() => console.log("autorun 1:", todos.map(todo => todo.title).join(", ")))
+const autorun1 = autorun(() =>
+    console.log("autorun 1:", todos.map((todo) => todo.title).join(", "))
+)
 
 todos.push({ title: "explain reactions", done: false })
 // prints:

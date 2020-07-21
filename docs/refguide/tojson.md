@@ -6,7 +6,7 @@ hide_title: true
 
 # toJS
 
-<div id='codefund'></div>
+<script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
 `toJS(value, options?)`
 
@@ -25,7 +25,7 @@ For more complex (de)serialization scenario's, one can use [serializr](https://g
 
 ```javascript
 var obj = mobx.observable({
-    x: 1
+    x: 1,
 })
 
 var clone = mobx.toJS(obj)

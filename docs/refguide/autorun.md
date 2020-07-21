@@ -6,7 +6,7 @@ hide_title: true
 
 # Autorun
 
-<div id='codefund'></div>
+<script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
 <details>
     <summary style="color: white; background:green;padding:5px;margin:5px;border-radius:2px">egghead.io lesson 9: custom reactions</summary>
@@ -29,14 +29,14 @@ If a string is passed as first argument to `autorun`, it will be used as debug n
 The return value from autorun is a disposer function, which can be used to dispose of the autorun when you no longer need it. The reaction itself will also be passed as the only argument to the function given to autorun, which allows you to manipulate it from within the autorun function. This means there are two ways you can dispose of the reaction when you no longer need it:
 
 ```javascript
-const disposer = autorun(reaction => {
+const disposer = autorun((reaction) => {
     /* do some stuff */
 })
 disposer()
 
 // or
 
-autorun(reaction => {
+autorun((reaction) => {
     /* do some stuff */
     reaction.dispose()
 })
@@ -102,7 +102,7 @@ const dispose = autorun(
     {
         onError(e) {
             window.alert("Please enter a valid age")
-        }
+        },
     }
 )
 ```

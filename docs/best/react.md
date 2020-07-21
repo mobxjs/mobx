@@ -6,7 +6,7 @@ hide_title: true
 
 # What does MobX react to?
 
-<div id='codefund'></div>
+<script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
 MobX usually reacts to exactly the things you expect it to.
 Which means that in 90% of your use cases mobx "just works".
@@ -32,9 +32,9 @@ To elaborate on the above rules with an example, suppose that you have the follo
 let message = observable({
     title: "Foo",
     author: {
-        name: "Michel"
+        name: "Michel",
     },
-    likes: ["John", "Sara"]
+    likes: ["John", "Sara"],
 })
 ```
 
@@ -265,7 +265,7 @@ autorun(() => {
     console.log(message.postDate)
 })
 extendObservable(message, {
-    postDate: new Date()
+    postDate: new Date(),
 })
 ```
 
@@ -276,7 +276,7 @@ If the two statements are swapped, or if any other observable causes the `autoru
 
 ```javascript
 const twitterUrls = observable.map({
-    John: "twitter.com/johnny"
+    John: "twitter.com/johnny",
 })
 
 autorun(() => {
@@ -298,7 +298,7 @@ Since MobX 4 it is also possible to use observable objects as dynamic collection
 import { get, set, observable } from "mobx"
 
 const twitterUrls = observable.object({
-    John: "twitter.com/johnny"
+    John: "twitter.com/johnny",
 })
 
 autorun(() => {
@@ -431,7 +431,7 @@ const Author = observer(({ author }) => <span>{author.name}</span>)
 
 const Likes = observer(({ likes }) => (
     <ul>
-        {likes.map(like => (
+        {likes.map((like) => (
             <li>{like}</li>
         ))}
     </ul>

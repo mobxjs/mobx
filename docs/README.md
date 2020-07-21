@@ -18,7 +18,7 @@ _Simple, scalable state management_
 [![OpenCollective](https://opencollective.com/mobx/sponsors/badge.svg)](#sponsors)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 
-<div id='codefund'></div>
+<script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
 MobX is proudly sponsored by Mendix, Coinbase, Facebook Open Source, Canva, Algolia, Guilded, Auction Frontier, Mantro and TalentPlot for 100\$/month or more! And beyond that by many [individual backers](#backers) and through [one time contributions](https://github.com/mobxjs/mobx/blob/master/sponsors.md).
 
@@ -132,7 +132,7 @@ class Todo {
 }
 decorate(Todo, {
     title: observable,
-    finished: observable
+    finished: observable,
 })
 ```
 
@@ -147,7 +147,7 @@ By using the [`@computed`](http://mobxjs.github.io/mobx/refguide/computed-decora
 class TodoList {
     @observable todos = []
     @computed get unfinishedTodoCount() {
-        return this.todos.filter(todo => !todo.finished).length
+        return this.todos.filter((todo) => !todo.finished).length
     }
 }
 ```
@@ -179,7 +179,7 @@ class TodoListView extends Component {
         return (
             <div>
                 <ul>
-                    {this.props.todoList.todos.map(todo => (
+                    {this.props.todoList.todos.map((todo) => (
                         <TodoView todo={todo} key={todo.id} />
                     ))}
                 </ul>

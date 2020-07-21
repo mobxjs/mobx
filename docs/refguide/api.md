@@ -6,7 +6,7 @@ hide_title: true
 
 # MobX Api Reference
 
-<div id='codefund'></div>
+<script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
 **Applies to MobX 4 and higher**
 
@@ -162,11 +162,11 @@ const taskStore = observable(
         tasks: [],
         addTask(task) {
             /* ... */
-        }
+        },
     },
     {
         tasks: observable.shallow,
-        addTask: action
+        addTask: action,
     }
 )
 ```
@@ -184,7 +184,7 @@ Use this if you cannot use the _@decorator_ syntax or need more control over set
 class TodoList {
     todos = {}
     get unfinishedTodoCount() {
-        return values(this.todos).filter(todo => !todo.finished).length
+        return values(this.todos).filter((todo) => !todo.finished).length
     }
     addTodo() {
         const t = new Todo()
@@ -196,7 +196,7 @@ class TodoList {
 decorate(TodoList, {
     todos: observable,
     unfinishedTodoCount: computed,
-    addTodo: action.bound
+    addTodo: action.bound,
 })
 ```
 
@@ -215,7 +215,7 @@ class Todo {
 
 decorate(Todo, {
     title: [serializable(primitive), persist("object"), observable],
-    finished: [serializable(primitive), observable]
+    finished: [serializable(primitive), observable],
 })
 ```
 
@@ -324,7 +324,7 @@ async function* someNumbers() {
     yield Promise.resolve(3)
 }
 
-const count = mobx.flow(async function*() {
+const count = mobx.flow(async function* () {
     // use for await to loop async iterators
     for await (const number of someNumbers()) {
         total += number
@@ -522,7 +522,7 @@ export class City {
         clearInterval(this.interval)
     }
 
-    fetchTemperature = flow(function*() {
+    fetchTemperature = flow(function* () {
         // data fetching logic
     })
 }
@@ -649,7 +649,7 @@ configure({
     reactionScheduler: (f): void => {
         console.log("Running an event after a delay:", f)
         setTimeout(f, 100)
-    }
+    },
 })
 ```
 
@@ -770,7 +770,7 @@ Example:
 ```javascript
 const person = observable({
     firstName: "Michel",
-    lastName: "Weststrate"
+    lastName: "Weststrate",
 })
 
 autorun(() => {

@@ -6,7 +6,7 @@ hide_title: true
 
 ## Observable Objects
 
-<div id='codefund'></div>
+<script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
 Usage `observable.object(props, decorators?, options?)`
 
@@ -31,10 +31,10 @@ var person = observable(
 
         setAge(age) {
             this.age = age
-        }
+        },
     },
     {
-        setAge: action
+        setAge: action,
     }
 )
 

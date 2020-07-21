@@ -5,7 +5,7 @@ hide_title: true
 
 # extendObservable
 
-<div id='codefund'></div>
+<script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
 `extendObservable(target, properties, decorators?, options?)`
 
@@ -18,7 +18,7 @@ The `decorators` param can be used to override the decorator that will be used f
 Use the `deep: false` option to make the new properties _shallow_. That is, prevent auto conversion of their _values_ to observables.
 
 ```javascript
-var Person = function(firstName, lastName) {
+var Person = function (firstName, lastName) {
     // initialize observable properties on a new instance
     extendObservable(
         this,
@@ -30,10 +30,10 @@ var Person = function(firstName, lastName) {
             },
             setFirstName(firstName) {
                 this.firstName = firstName
-            }
+            },
         },
         {
-            setFirstName: action
+            setFirstName: action,
         }
     )
 }
@@ -42,7 +42,7 @@ var matthew = new Person("Matthew", "Henry")
 
 // add an observable property to an already observable object
 extendObservable(matthew, {
-    age: 353
+    age: 353,
 })
 ```
 

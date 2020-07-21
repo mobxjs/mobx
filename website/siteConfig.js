@@ -16,8 +16,8 @@ const users = [
         // if it is not '/', like: '/test-site/img/image.jpg'.
         image: "/img/undraw_open_source.svg",
         infoLink: "https://www.facebook.com",
-        pinned: true
-    }
+        pinned: true,
+    },
 ]
 
 const siteConfig = {
@@ -48,7 +48,7 @@ const siteConfig = {
     // For no header links in the top nav bar -> headerLinks: [],
     headerLinks: [
         { doc: "intro/concepts", label: "Documentation" },
-        { href: "https://github.com/mobxjs/mobx", label: "Github" }
+        { href: "https://github.com/mobxjs/mobx", label: "Github" },
     ],
 
     // If you have users set above, you add it here:
@@ -62,7 +62,7 @@ const siteConfig = {
     /* Colors for website */
     colors: {
         primaryColor: "#035193",
-        secondaryColor: "#023866"
+        secondaryColor: "#023866",
     },
 
     /* Custom fonts for website */
@@ -84,17 +84,11 @@ myOtherFont: [
 
     highlight: {
         // Highlight.js theme to use for syntax highlighting in code blocks.
-        theme: "default"
+        theme: "default",
     },
 
     // Add custom scripts here that would be placed in <script> tags.
-    scripts: [
-        "https://buttons.github.io/buttons.js",
-        {
-            src: "https://codefund.app/properties/259/funder.js",
-            async: true
-        }
-    ],
+    scripts: ["https://buttons.github.io/buttons.js"],
 
     // On page navigation for the current documentation page.
     onPageNav: "separate",
@@ -115,7 +109,7 @@ myOtherFont: [
 
     // You may provide arbitrary config keys to be used as needed by your
     // template. For example, if you need your repo's URL...
-    repoUrl: "https://github.com/mobxjs/mobx"
+    repoUrl: "https://github.com/mobxjs/mobx",
 }
 
 module.exports = siteConfig

@@ -6,7 +6,7 @@ hide_title: true
 
 # Best Practices for building large scale maintainable projects
 
-<div id='codefund'></div>
+<script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
 This section contains some best practices we discovered at Mendix while working with MobX.
 This section is opinionated and you are in no way forced to apply these practices.
@@ -66,7 +66,7 @@ export class UiState {
     // dimensions object changed in a deepEqual manner
     @observable.struct windowDimensions = {
         width: jquery(window).width(),
-        height: jquery(window).height()
+        height: jquery(window).height(),
     }
 
     constructor() {
@@ -145,7 +145,7 @@ export class TodoStore {
     constructor(transportLayer, authorStore) {
         this.authorStore = authorStore // Store that can resolve authors for us
         this.transportLayer = transportLayer // Thing that can make server requests for us
-        this.transportLayer.onReceiveTodoUpdate(updatedTodo =>
+        this.transportLayer.onReceiveTodoUpdate((updatedTodo) =>
             this.updateTodoFromServer(updatedTodo)
         )
         this.loadTodos()
@@ -156,8 +156,8 @@ export class TodoStore {
      */
     loadTodos() {
         this.isLoading = true
-        this.transportLayer.fetchTodos().then(fetchedTodos => {
-            fetchedTodos.forEach(json => this.updateTodoFromServer(json))
+        this.transportLayer.fetchTodos().then((fetchedTodos) => {
+            fetchedTodos.forEach((json) => this.updateTodoFromServer(json))
             this.isLoading = false
         })
     }
@@ -168,7 +168,7 @@ export class TodoStore {
      * or remove a todo if it has been deleted on the server.
      */
     updateTodoFromServer(json) {
-        var todo = this.todos.find(todo => todo.id === json.id)
+        var todo = this.todos.find((todo) => todo.id === json.id)
         if (!todo) {
             todo = new Todo(this, json.id)
             this.todos.push(todo)
@@ -234,7 +234,7 @@ export class Todo {
             // observe everything that is used in the JSON:
             () => this.asJson,
             // if autoSave is on, send json to server
-            json => {
+            (json) => {
                 if (this.autoSave) {
                     this.store.transportLayer.saveTodo(json)
                 }
@@ -255,7 +255,7 @@ export class Todo {
             id: this.id,
             completed: this.completed,
             task: this.task,
-            authorId: this.author ? this.author.id : null
+            authorId: this.author ? this.author.id : null,
         }
     }
 
@@ -305,7 +305,7 @@ class UserStore {
 
     getTodos(user) {
         // access todoStore through the root store
-        return this.rootStore.todoStore.todos.filter(todo => todo.author === user)
+        return this.rootStore.todoStore.todos.filter((todo) => todo.author === user)
     }
 }
 

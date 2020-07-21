@@ -6,7 +6,7 @@ hide_title: true
 
 # Common pitfalls & best practices
 
-<div id='codefund'></div>
+<script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
 Stuck with MobX? This section contains a list of common issues people new to MobX might run into.
 
@@ -205,7 +205,7 @@ The following approaches can be used to fix this:
 
 ```javascript
 // 1 (set displayName explicitly)
-export const MyComponent = observer(props => <div>hi</div>)
+export const MyComponent = observer((props) => <div>hi</div>)
 myComponent.displayName = "MyComponent"
 
 // 2 (MobX infers component name from function name)
@@ -214,11 +214,11 @@ export const MyComponent = observer(function MyComponent(props) {
 })
 
 // 3 (transpiler will infer component name from variable name)
-const _MyComponent = props => <div>hi</div>
+const _MyComponent = (props) => <div>hi</div>
 export const MyComponent = observer(_MyComponent)
 
 // 4 (with default export)
-const MyComponent = props => <div>hi</div>
+const MyComponent = (props) => <div>hi</div>
 export default observer(MyComponent)
 ```
 
@@ -252,7 +252,7 @@ class List extends Component {
         return (
             <ListView
                 dataSource={listStore.dataSource}
-                renderRow={row => <Text>{row}</Text>}
+                renderRow={(row) => <Text>{row}</Text>}
                 enableEmptySections={true}
             />
         )

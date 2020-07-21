@@ -6,7 +6,7 @@ hide_title: true
 
 # Concepts & Principles
 
-<div id='codefund'></div>
+<script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
 ## Concepts
 
@@ -73,19 +73,19 @@ var todoStore = observable({
 
     /* a derived value */
     get completedCount() {
-        return this.todos.filter(todo => todo.completed).length
-    }
+        return this.todos.filter((todo) => todo.completed).length
+    },
 })
 
 /* a function that observes the state */
-autorun(function() {
+autorun(function () {
     console.log("Completed %d of %d items", todoStore.completedCount, todoStore.todos.length)
 })
 
 /* ..and some actions that modify the state */
 todoStore.todos[0] = {
     title: "Take a walk",
-    completed: false
+    completed: false,
 }
 // -> synchronously prints 'Completed 0 of 1 items'
 

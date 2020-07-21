@@ -6,7 +6,7 @@ hide_title: true
 
 ## Primitive values and references
 
-<div id='codefund'></div>
+<script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
 All primitive values in JavaScript are immutable and hence per definition not observable.
 Usually that is fine, as MobX usually can just make the _property_ that contains the value observable.
@@ -43,7 +43,7 @@ const cityName = observable.box("Vienna")
 console.log(cityName.get())
 // prints 'Vienna'
 
-cityName.observe(function(change) {
+cityName.observe(function (change) {
     console.log(change.oldValue, "->", change.newValue)
 })
 
