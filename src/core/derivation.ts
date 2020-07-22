@@ -223,12 +223,12 @@ function bindDependencies(derivation: IDerivation) {
             dep.diffValue_ = 1
             if (i0 !== i) observing[i0] = dep
             i0++
-        }
 
-        // Upcast is 'safe' here, because if dep is IObservable, `dependenciesState` will be undefined,
-        // not hitting the condition
-        if (((dep as any) as IDerivation).dependenciesState_ > lowestNewObservingDerivationState) {
-            lowestNewObservingDerivationState = ((dep as any) as IDerivation).dependenciesState_
+            // Upcast is 'safe' here, because if dep is IObservable, `dependenciesState` will be undefined,
+            // not hitting the condition
+            if (((dep as any) as IDerivation).dependenciesState_ > lowestNewObservingDerivationState) {
+                lowestNewObservingDerivationState = ((dep as any) as IDerivation).dependenciesState_
+            }
         }
     }
     observing.length = i0
