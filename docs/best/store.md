@@ -262,7 +262,6 @@ Example of a store (using ES6 syntax):
 
 ```javascript
 import { makeAutoObservable, observable, computed, asStructure } from "mobx"
-import jquery from "jquery"
 
 export class UiState {
     language = "en_US"
@@ -271,15 +270,15 @@ export class UiState {
     // .struct makes sure observer won't be signaled unless the
     // dimensions object changed in a deepEqual manner
     windowDimensions = {
-        width: jquery(window).width(),
-        height: jquery(window).height()
+        width: window.innerWidth,
+        height: window.innerHeight
     }
 
     constructor() {
         makeAutoObservable(this, { windowDimensions: observable.struct })
-        jquery.resize(() => {
+        window.onresize = () => {
             this.windowDimensions = getWindowDimensions()
-        })
+        }
     }
 
     get appIsInSync() {
