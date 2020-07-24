@@ -18,7 +18,9 @@ _Simple, scalable state management_
 [![OpenCollective](https://opencollective.com/mobx/sponsors/badge.svg)](#sponsors)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 
-MobX is proudly sponsored by Mendix, Coinbase, Facebook Open Source, Canva, Algolia, Guilded, Auction Frontier, Mantro and TalentPlot for 100\$/month or more! And beyond that by many [individual backers](http://mobxjs.github.io/mobx/backers-sponsors.html#backers) and through [one time contributions](https://github.com/mobxjs/mobx/blob/master/sponsors.md).
+---
+
+MobX is made possible by the generosity of the sponsors below, and many [individual backers](http://mobxjs.github.io/mobx/backers-sponsors.html#backers). Sponsoring directly impacts the longevity of this project.
 
 **🥇Gold sponsors (\$3000+ total contribution):** <br/>
 <a href="https://mendix.com/"><img src="assets/mendix-logo.png" align="center" width="100" title="Mendix" alt="Mendix" /></a>
@@ -42,13 +44,13 @@ MobX is proudly sponsored by Mendix, Coinbase, Facebook Open Source, Canva, Algo
 <a href="https://careers.dazn.com/"><img src="assets/dazn.png" align="center" width="100" title="DAZN" alt="DAZN"></a>
 <a href="https://blokt.com/"><img src="assets/blokt.jpg" align="center" width="100" title="Blokt" alt="Blokt"/></a>
 
-# Installation
+---
 
-MobX >=6 runs in any ES5 environment, which includes web browsers and NodeJS.
+## Installation
 
-Installation: `npm install mobx --save`. React bindings: `npm install mobx-react --save`.
+Installation: `npm install mobx --save`. For the React bindings: `npm install mobx-react --save`.
 
-[More about installing MobX](http://mobxjs.github.io/mobx/intro/installation.html)
+For more options see the [installation page](intro/installation.md).
 
 ## Introduction
 
@@ -63,7 +65,9 @@ which includes the UI, data serialization, server communication, etc.
 
 React and MobX together are a powerful combination. React renders the application state by providing mechanisms to translate it into a tree of renderable components. MobX provides the mechanism to store and update the application state that React then uses.
 
-Both React and MobX provide an optimal and unique solutions to common problems in application development. React provides mechanisms to optimally render UI by using a virtual DOM that reduces the number of costly DOM mutations. MobX provides mechanisms to optimally synchronize application state with your React components by using a reactive virtual dependency state graph that is only updated when strictly needed and is never stale.
+Both React and MobX provide an optimal and unique solutions to common problems in application development. React provides mechanisms to optimally render UI by using a virtual DOM that reduces the number of costly DOM mutations. MobX provides mechanisms to optimally synchronize application state with your React components by building a reactive dependency tree that is only updated when strictly needed and is never stale. MobX will optimize your React components for you, without needing to specify data dependencies, use `memo`, or refactoring states or contexts to make things optimal.
+
+In fact, with MobX state can be completely separated from your UI layer. This makes testing much simpler and enables code sharing between stacks and frameworks, and leads to a natural separation of concerns.
 
 ## Example
 
@@ -101,72 +105,12 @@ setInterval(() => {
 const TimerView = observer(({ timer }) => (
     <button onClick={() => timer.resetTimer()}>Seconds passed: {timer.secondsPassed}</button>
 ))
+
 ReactDOM.render(<TimerView timer={myTimer} />, document.body)
 ```
 
 To get more detail about this example, see [the gist of MobX](http://mobxjs.github.io/mobx/intro/overview.html).
-
-To learn about the underlying concepts together with a larger example, please read [Concepts & Principles](http://mobxjs.github.io/mobx/intro/concepts.html)
-
-Then see what to [read next](http://mobxjs.github/mobx/intro/how-to-read.html).
-
-### MobX and Decorators
-
-Wait! This example doesn't use decorators. Haven't you seen MobX code before that uses them? In MobX 6 we have chosen to move away from them for maximum compatibility with standard JavaScript.
-
-There is a codemod available to help you upgrade existing code to be compliant with MobX 6.
-
-The [decorators guide](http://mobxjs.github.io/mobx/best/decorators.html) has more information.
-
-## MobX: Simple and scalable
-
-MobX is one of the least obtrusive libraries you can use for state management. That makes the `MobX` approach not just simple, but very scalable as well:
-
-### Using classes and real references
-
-With MobX you don't need to normalize your data. This makes the library very suitable for very complex domain models (At Mendix for example ~500 different domain classes in a single application).
-
-### Referential integrity is guaranteed
-
-Since data doesn't need to be normalized, and MobX automatically tracks the relations between state and derivations, you get referential integrity for free. Rendering something that is accessed through three levels of indirection?
-
-No problem, MobX will track them and re-render whenever one of the references changes. As a result staleness bugs are a thing of the past. As a programmer you might forget that changing some data might influence a seemingly unrelated component in a corner case. MobX won't forget.
-
-### Simpler actions are easier to maintain
-
-As demonstrated above, modifying state when using MobX is very straightforward. You simply write down your intentions. MobX will take care of the rest.
-
-### Fine grained observability is efficient
-
-MobX builds a graph of all the derivations in your application to find the least number of re-computations that is needed to prevent staleness. "Derive everything" might sound expensive, MobX builds a virtual derivation graph to minimize the number of recomputations needed to keep derivations in sync with the state.
-
-In fact, when testing MobX at Mendix we found out that using this library to track the relations in our code is often a lot more efficient than pushing changes through our application by using handwritten events or "smart" selector based container components.
-
-The simple reason is that MobX will establish far more fine grained 'listeners' on your data than you would do as a programmer.
-
-Secondly MobX sees the causality between derivations so it can order them in such a way that no derivation has to run twice or introduces a glitch.
-
-How that works? See this [in-depth explanation of MobX](https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254).
-
-### Easy interoperability
-
-MobX works with plain javascript structures. Due to its unobtrusiveness it works with most javascript libraries out of the box, without needing MobX specific library flavors.
-
-So you can simply keep using your existing router, data fetching, and utility libraries like `react-router`, `director`, `superagent`, `lodash` etc.
-
-For the same reason you can use it out of the box both server and client side, in isomorphic applications and with react-native.
-
-The result of this is that you often need to learn less new concepts when using MobX in comparison to other state management solutions.
-
----
-
-## Credits
-
-MobX is inspired by reactive programming principles as found in spreadsheets. It is inspired by MVVM frameworks like in MeteorJS tracker, knockout and Vue.js. But MobX brings Transparent Functional Reactive Programming to the next level and provides a stand alone implementation. It implements TFRP in a glitch-free, synchronous, predictable and efficient manner.
-
-A ton of credits for [Mendix](https://github.com/mendix), for providing the flexibility and support to maintain MobX and the chance to proof the philosophy of MobX in a real, complex, performance critical applications.
-
-And finally kudos for all the people that believed in, tried, validated and even [sponsored](https://github.com/mobxjs/mobx/blob/master/sponsors.md) MobX.
+To learn about the underlying concepts together with a larger example, please read [Concepts & Principles](http://mobxjs.github.io/mobx/intro/concepts.html). Or read on to see some of the benefits of MobX.
 
 ## What others are saying...
 
@@ -182,36 +126,32 @@ And finally kudos for all the people that believed in, tried, validated and even
 
 > The #mobx is the way I always want things to be! It's really surprising simple and fast! Totally awesome! Don't miss it!
 
-## Contributing
+## The benefits of MobX
 
--   Feel free to send small pull requests. Please discuss new features or big changes in a GitHub issue first.
--   Use `npm test` to run the basic test suite, `npm run coverage` for the test suite with coverage and `npm run test:performance` for the performance tests.
+MobX is one of the least obtrusive libraries you can use for state management. That makes the `MobX` approach not just simple, but very scalable as well. It has caused many well known companies to adopt MobX, which is used at companies like Microsoft, Amazon, Netflix, EA Games and [many more](https://github.com/mobxjs/mobx/issues/681).
 
-## Donating
-
-Was MobX key in making your project a success?
-Join our [open collective](https://opencollective.com/mobx#)! Thank you to our existing [backers and sponsors](backers-sponsors.md).
+-   **Mutable Data < Immutable Data < Observable Data**. Immutability is too often seen as silver bullet in programming. While it is justified in many cases, for stateful data or CRUD operations it is often a mismatch. Re-creating an object just to modify one of its attributes is not only cognitive challenging, it is inefficient as well. It does make change detection easy. But only compared to 'classic' mutable data. Observable data will pick up changes without any diffing. At all. And you will always be looking at the latest version. From anywhere.
+-   **Simpler actions are easier to read and maintain**. As demonstrated above, modifying state when using MobX is very straightforward. You write down your intentions imperatively. And MobX will make sure no mutation will goes undetected.
+-   **Fine grained observability is efficient**. MobX is a reactive library that builds a graph of all the derivations in your application to find the least number of re-computations that is needed to prevent staleness. By performing runtime analysis it will optimize at a much finer granularity than any programmer would to by hand.
+-   **Access any observable anywhere**. If an observable is used in a reactive context, MobX will track it. Regardless how it got there; through a closure, module import, React component prop or context? It doesn't matter. That keeps things simple and guarantees architectural freedom.
+-   **Structure state using any common language construct**. With MobX you don't need to normalize your data. This makes the library very suitable for very complex domain models (At Mendix for example ~500 different domain classes in a single application). MobX has few opinions, so you are free to either use classes or plain old objects. To store direct references or just identifiers.
+-   **Easy interoperability**. MobX works with enriched but plain javascript structures. Due to its unobtrusiveness it works with most javascript libraries out of the box, without needing MobX specific flavors. So you can simply keep using promises, async/await, generators, your existing router, data fetching, and utility libraries like `react-router`, `director`, `superagent`, `lodash` etc.
 
 ## Further resources and documentation
 
--   <i><a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/courses/manage-complex-state-in-react-apps-with-mobx">egghead.io course</a></i>
 -   [Ten minute, interactive MobX + React tutorial](https://mobx.js.org/getting-started)
--   <img src="assets/book.jpg" height="80px"/> [The MobX book](https://books.google.nl/books?id=ALFmDwAAQBAJ&pg=PP1&lpg=PP1&dq=michel+weststrate+mobx+quick+start+guide:+supercharge+the+client+state+in+your+react+apps+with+mobx&source=bl&ots=D460fxti0F&sig=ivDGTxsPNwlOjLHrpKF1nweZFl8&hl=nl&sa=X&ved=2ahUKEwiwl8XO--ncAhWPmbQKHWOYBqIQ6AEwAnoECAkQAQ#v=onepage&q=michel%20weststrate%20mobx%20quick%20start%20guide%3A%20supercharge%20the%20client%20state%20in%20your%20react%20apps%20with%20mobx&f=false) by Pavan Podila and Michel Weststrate (which despite its name is in-depth!)
--   [Official MobX 4 documentation and API overview](https://mobxjs.github.io/mobx/refguide/api.html) ([MobX 3](https://github.com/mobxjs/mobx/blob/54557dc319b04e92e31cb87427bef194ec1c549c/docs/refguide/api.md), [MobX 2](https://github.com/mobxjs/mobx/blob/7c9e7c86e0c6ead141bb0539d33143d0e1f576dd/docs/refguide/api.md))
+-   <i><a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/courses/manage-complex-state-in-react-apps-with-mobx">egghead.io course</a></i> (Based on MobX 3)
+-   <img src="assets/book.jpg" height="80px"/> [The MobX book](https://books.google.nl/books?id=ALFmDwAAQBAJ&pg=PP1&lpg=PP1&dq=michel+weststrate+mobx+quick+start+guide:+supercharge+the+client+state+in+your+react+apps+with+mobx&source=bl&ots=D460fxti0F&sig=ivDGTxsPNwlOjLHrpKF1nweZFl8&hl=nl&sa=X&ved=2ahUKEwiwl8XO--ncAhWPmbQKHWOYBqIQ6AEwAnoECAkQAQ#v=onepage&q=michel%20weststrate%20mobx%20quick%20start%20guide%3A%20supercharge%20the%20client%20state%20in%20your%20react%20apps%20with%20mobx&f=false) by Pavan Podila and Michel Weststrate.
 -   Videos:
+    -   [Introduction to MobX & React in 2020](https://www.youtube.com/watch?v=pnhIJA64ByY) - 17m by Leigh Halliday.
     -   [ReactNext 2016: Real World MobX](https://www.youtube.com/watch?v=Aws40KOx90U) - 40m [slides](https://docs.google.com/presentation/d/1DrI6Hc2xIPTLBkfNH8YczOcPXQTOaCIcDESdyVfG_bE/edit?usp=sharing)
     -   [Practical React with MobX](https://www.youtube.com/watch?v=XGwuM_u7UeQ). In depth introduction and explanation to MobX and React by Matt Ruby on OpenSourceNorth (ES5 only) - 42m.
-    -   LearnCode.academy MobX tutorial [Part I: MobX + React is AWESOME (7m)](https://www.youtube.com/watch?v=_q50BXqkAfI) [Part II: Computed Values and Nested/Referenced Observables (12m.)](https://www.youtube.com/watch?v=nYvNqKrl69s)
-    -   [Screencast: intro to MobX](https://www.youtube.com/watch?v=K8dr8BMU7-8) - 8m
+    -   [MobX and the unique symbiosis of predictability and speed](https://www.youtube.com/watch?v=NBYbBbjZeX4&list=PL8sJahqnzh8JJD7xahG5zXkjfM5GOgcPA&index=21&t=0s) - HolyJS 2019 conf, 59 min
     -   [Talk: State Management Is Easy, React Amsterdam 2016 conf](https://www.youtube.com/watch?v=ApmSsu3qnf0&feature=youtu.be) ([slides](https://speakerdeck.com/mweststrate/state-management-is-easy-introduction-to-mobx))
--   Boilerplates [MobX awesome list](https://github.com/mobxjs/awesome-mobx#boilerplates)
--   Related projects [MobX awesome list](https://github.com/mobxjs/awesome-mobx#related-projects-and-utilities)
--   More tutorials, blogs, videos, and other helpful resources can be found on the [MobX awesome list](https://github.com/mobxjs/awesome-mobx#awesome-mobx)
--   <img src="assets/book.jpg" height="80px"/> [The MobX book](https://books.google.nl/books?id=ALFmDwAAQBAJ&pg=PP1&lpg=PP1&dq=michel+weststrate+mobx+quick+start+guide:+supercharge+the+client+state+in+your+react+apps+with+mobx&source=bl&ots=D460fxti0F&sig=ivDGTxsPNwlOjLHrpKF1nweZFl8&hl=nl&sa=X&ved=2ahUKEwiwl8XO--ncAhWPmbQKHWOYBqIQ6AEwAnoECAkQAQ#v=onepage&q=michel%20weststrate%20mobx%20quick%20start%20guide%3A%20supercharge%20the%20client%20state%20in%20your%20react%20apps%20with%20mobx&f=false) by Pavan Podila and Michel Weststrate (which despite its name is in-depth!)
--   [MobX homepage](http://mobxjs.github.io)
--   [API overview](http://mobxjs.github.io/mobx/refguide/api.html)
--   [Tutorials](https://github.com/mobxjs/awesome-mobx#tutorials)
--   [Blogs](https://github.com/mobxjs/awesome-mobx#blogs)
--   [Videos](https://github.com/mobxjs/awesome-mobx#videos)
--   [Boilerplates](https://github.com/mobxjs/awesome-mobx#boilerplates)
 -   [MobX awesome list](https://github.com/mobxjs/awesome-mobx#awesome-mobx)
+
+## Credits
+
+MobX is inspired by reactive programming principles as found in spreadsheets. It is inspired by MVVM frameworks like in MeteorJS tracker, knockout and Vue.js. But MobX brings Transparent Functional Reactive Programming to the next level and provides a stand alone implementation. It implements TFRP in a glitch-free, synchronous, predictable and efficient manner.
+
+A ton of credits for [Mendix](https://github.com/mendix), for providing the flexibility and support to maintain MobX and the chance to proof the philosophy of MobX in a real, complex, performance critical applications.

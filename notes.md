@@ -64,6 +64,9 @@
     -   [x] re-execute perf checks
     -   [x] update ad links (https://www.google.com/adsense/new/u/0/pub-1705981461067724/home ?)
     -   [ ] add deprecation messages to latest mobx 5
+    -   [ ] merge 2398
+    -   [ ] fix docs
+    -   [ ] fix interactive tut
 -   [ ] mobx-react
     -   [ ] displayname for observer components facebook/react#18026
     -   [ ] update useLocalStore in mobx-react-lite to use
@@ -109,6 +112,16 @@ Why declare fields
 *   [ ] document: linting options
 
 ## NOTES
+
+---
+
+### MobX and Decorators
+
+Wait! This example doesn't use decorators. Haven't you seen MobX code before that uses them? In MobX 6 we have chosen to move away from them for maximum compatibility with standard JavaScript.
+
+There is a codemod available to help you upgrade existing code to be compliant with MobX 6.
+
+## The [decorators guide](http://mobxjs.github.io/mobx/best/decorators.html) has more information.
 
 ## Blog
 

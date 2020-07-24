@@ -10,5 +10,6 @@
     "typescript.tsdk": "node_modules/typescript/lib",
     // "javascript.validate.enable": false // enable for flow
     "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
-    "fb.doctor.disabled-tests": ["CorporateNetworkDoctor"]
+    "fb.doctor.disabled-tests": ["CorporateNetworkDoctor"],
+    "cSpell.enabled": true
 }

@@ -139,9 +139,3 @@ article p img {
         font-size: 14px;
     }
 }
-
-/* temporarily */
-body {
-    background: #333;
-    filter: invert(100%);
-}
