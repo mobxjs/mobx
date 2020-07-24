@@ -56,7 +56,6 @@ Example of a store (using ES6 syntax):
 
 ```javascript
 import { observable, computed, asStructure } from "mobx"
-import jquery from "jquery"
 
 export class UiState {
     @observable language = "en_US"
@@ -65,14 +64,14 @@ export class UiState {
     // .struct makes sure observer won't be signaled unless the
     // dimensions object changed in a deepEqual manner
     @observable.struct windowDimensions = {
-        width: jquery(window).width(),
-        height: jquery(window).height(),
+        width: window.innerWidth,
+        height: window.innerHeight,
     }
 
     constructor() {
-        jquery.resize(() => {
+        window.onresize = () => {
             this.windowDimensions = getWindowDimensions()
-        })
+        }
     }
 
     @computed get appIsInSync() {
