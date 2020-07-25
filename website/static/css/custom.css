@@ -41,6 +41,11 @@ article p img {
   background: url("/img/github-brand.svg");
 }
 
+.detail {
+    font-size: 0.8em;
+    color: #979797;
+}
+
 /* BLM */
 .slidingNav::before {
 	content: "Black Lives Matter";

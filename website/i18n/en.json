@@ -56,10 +56,6 @@
         "title": "Installation",
         "sidebar_label": "Installation"
       },
-      "intro/overview": {
-        "title": "The gist of MobX",
-        "sidebar_label": "The gist of MobX"
-      },
       "LINKS": {
         "title": "LINKS"
       },
@@ -140,8 +136,8 @@
         "sidebar_label": "Introspection APIs"
       },
       "refguide/make-observable": {
-        "title": "makeObservable / makeAutoObservable",
-        "sidebar_label": "makeObservable / makeAutoObservable"
+        "title": "Making things observable",
+        "sidebar_label": "Making things observable"
       },
       "refguide/map": {
         "title": "Observable Maps",
@@ -203,9 +199,9 @@
       "Github": "Github"
     },
     "categories": {
+      "Introduction": "Introduction",
       "Basics": "Basics",
       "MobX and React": "MobX and React",
-      "Making things observable": "Making things observable",
       "Updating observables with actions": "Updating observables with actions",
       "Computed values": "Computed values",
       "Effects for observables": "Effects for observables",

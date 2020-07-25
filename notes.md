@@ -67,6 +67,7 @@
     -   [ ] merge 2398
     -   [ ] fix docs
     -   [ ] fix interactive tut
+    -   [ ] document and introduce flow annotation
 -   [ ] mobx-react
     -   [ ] displayname for observer components facebook/react#18026
     -   [ ] update useLocalStore in mobx-react-lite to use

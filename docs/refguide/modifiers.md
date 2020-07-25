@@ -10,11 +10,7 @@ hide_title: true
 
 When you use `makeObservable`, `makeAutoObservable`, `extendObservable` and `observable.object` you can use annotations to specify how observable properties behave:
 
--   `observable`: An alias for `observable.deep`. The default.
--   `observable.deep`: This is the default modifier, used by any observable. It clones and converts any (not yet observable) array, Map or plain object into its observable counterpart upon assignment to the given property
--   `observable.ref`: Disables automatic observable conversion, just creates an observable reference instead.
--   `observable.struct`: Like `ref`, but will ignore new values that are structurally equal to the current value.
--   `observable.shallow`: Can only used in combination with collections. Turns any assigned collection into an observable, but the values of that collection will be treated as-is and are not observable themselves.
+TODO: move to refguide
 
 ### Deep observability
 

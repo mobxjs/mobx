@@ -1,18 +1,12 @@
 {
   "docs": {
-    "Basics": [
+    "Introduction": [
       "README",
       "intro/how-to-read",
       "intro/installation",
       "intro/concepts"
     ],
-    "MobX and React": [
-      "react/react-integration",
-      "react/react-pitfalls",
-      "react/react-performance",
-      "react/react-class-components"
-    ],
-    "Making things observable": [
+    "Basics": [
       "refguide/make-observable",
       "refguide/observable",
       "refguide/array",
@@ -23,6 +17,12 @@
       "refguide/modifiers",
       "refguide/extend-observable",
       "refguide/is-observable"
+    ],
+    "MobX and React": [
+      "react/react-integration",
+      "react/react-pitfalls",
+      "react/react-performance",
+      "react/react-class-components"
     ],
     "Updating observables with actions": [
         "refguide/action",

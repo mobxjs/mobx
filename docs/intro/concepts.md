@@ -200,5 +200,3 @@ You can play with the above yourself on [CodeSandbox](https://codesandbox.io/s/c
 ## Linting
 
 If you find it hard to adopt the mental model of MobX, MobX can be configured to be very strict and warn at run-time whenever you deviate from these patterns. See [linting MobX](../refguide/configure.md#linting-options).
-
-## Learn more
