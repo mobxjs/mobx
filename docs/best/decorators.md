@@ -46,8 +46,8 @@ class TodoList {
 MobX before version 6 did not require the `makeObservable(this)` call in the constructor, but because it makes the implementation of decorator simpler and more compatible, it now does. This instructs MobX to make the instances observable following the information in the decorators -- the decorators take the place of the second argument to `makeObservable`.
 
 We intend to continue to support decorators in this form.
-
-Note: When migrating from MobX 4/5 to 6, we recommend to always run the code mode, as even in the case where you keep using decorators, the `makeObservable` calls need to be generated. See the [migration guide](../faq/migrate-to-6) for details.
+Any existing MobX 4/5 codebase can be migrated to use `makeObservable` calls by our [code-mod](https://www.npmjs.com/package/mobx-undecorate).
+When migrating from MobX 4/5 to 6, we recommend to always run the code-mod, to make sure the necessary `makeObservable` calls are generated. See the [migration guide](../faq/migrate-to-6) for details.
 
 ## Using `observer` as decorator
 
@@ -77,6 +77,7 @@ Install support for decorators: `npm i --save-dev @babel/plugin-proposal-class-p
     "plugins": [
         ["@babel/plugin-proposal-decorators", { "legacy": true }],
         ["@babel/plugin-proposal-class-properties", { "loose": false }]
+        // In contrast to MobX 4/5, "loose" must be false!    ^
     ]
 }
 ```

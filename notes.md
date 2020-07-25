@@ -115,14 +115,6 @@ Why declare fields
 
 ---
 
-### MobX and Decorators
-
-Wait! This example doesn't use decorators. Haven't you seen MobX code before that uses them? In MobX 6 we have chosen to move away from them for maximum compatibility with standard JavaScript.
-
-There is a codemod available to help you upgrade existing code to be compliant with MobX 6.
-
-## The [decorators guide](http://mobxjs.github.io/mobx/best/decorators.html) has more information.
-
 ## Blog
 
 -   mobx 6 is more backward compatible than its predecessor
