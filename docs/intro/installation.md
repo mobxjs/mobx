@@ -12,7 +12,7 @@ MobX works in any ES5 environment, which includes browsers and NodeJS:
 
 -   Yarn: `yarn add mobx`. React bindings: `yarn add mobx-react`
 
--   NPM: `npm install mobx --save`. React bindings: `npm install mobx-react --save`.
+-   NPM: `npm install mobx --save`. React bindings: `npm install mobx-react-lite --save`.
 
 -   CDN:
     -   cndjs: https://cdnjs.com/libraries/mobx

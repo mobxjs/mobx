@@ -12,9 +12,8 @@ So far it all might sound a bit fancy, but making an app reactive using MobX boi
 
 ## 1. Define your state and make it observable
 
-Store state in any data structure you like; objects, array, classes.
-Cyclic data structures, references, it doesn't matter.
-Just make sure that all properties that you want to change over time are marked by MobX to make them observable.
+Store state in any data structure you like; plain objects, array, classes, cyclic data structures, references, it doesn't matter for the workings of MobX.
+Just make sure that all properties that you want to change over time are marked 'observable' so that MobX can track them. Here is a simple example:
 
 ```javascript
 import { makeAutoObservable } from "mobx"
@@ -37,8 +36,8 @@ you can now create views that automatically update whenever relevant data in a `
 MobX will find the minimal way to update your views.
 This single fact saves you tons of boilerplate and is [wickedly efficient](https://mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/).
 
-Generally speaking any function can become a reactive view that observes its data, and MobX can be applied in any ES5 conformant JavaScript environment.
-But here is an (ES6) example of a view in the form of a React component.
+Generally speaking any function can become a reactive view that observes its data.
+But here is an example of a React component to create a view on the timer state:
 
 ```javascript
 import * as React from "react"
@@ -57,10 +56,7 @@ render(<TimerView timer={myTimer} />, document.getElementById("root"))
 
 The third thing to do is to modify the state.
 That is what your app is all about after all.
-
-Let's alter the timer every second, and see that the UI will update automatically when needed. Let's also implement that `resetTimer` method.
-
-Here's the new `Timer` model with a few methods added that modify state:
+Here's the new `Timer` model with a few methods added that modify the state:
 
 ```javascript
 import { makeAutoObservable } from "mobx"
@@ -88,8 +84,12 @@ setInterval(() => {
 }, 1000)
 ```
 
-These methods, `increaseTimer` and `resetTimer` are just like you would write them without MobX. You can use them anywhere -- from React event handlers or in `setInterval`, for instance.
-Notice that making updates asynchronously doesn't require any special wiring; since MobX is a \_re_active system, it doesn't matter how or even when state updates are triggered; the reactivity system will propagate changes in any case.
+These methods, `increaseTimer` and `resetTimer` are just like how you would write them without MobX. You can use them anywhere -- from React event handlers or in `setInterval`, for instance.
+
+Note that making updates asynchronously doesn't require any special wiring; since MobX is a \_re_active system, it doesn't matter how or even when state updates are triggered; the reactivity system will propagate changes in any case.
+
+Methods that modify state are called _actions_ in MobX terminology. In contrast to _views_ which compute new information based on the current state.
+Every method should serve at most one of those two goals.
 
 **_MobX helps you do things in a simple straightforward way_**.
 
