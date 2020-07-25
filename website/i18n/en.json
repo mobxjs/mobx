@@ -87,17 +87,9 @@
         "title": "MobX API Reference",
         "sidebar_label": "API overview"
       },
-      "refguide/array": {
-        "title": "Observable Arrays",
-        "sidebar_label": "arrays"
-      },
       "refguide/autorun": {
         "title": "autorun",
         "sidebar_label": "autorun"
-      },
-      "refguide/boxed": {
-        "title": "Observable Boxes",
-        "sidebar_label": "boxes [🚀]"
       },
       "refguide/computed-behavior": {
         "title": "How computed works",
@@ -115,10 +107,6 @@
         "title": "Configuring MobX",
         "sidebar_label": "Configuring MobX"
       },
-      "refguide/extend-observable": {
-        "title": "refguide/extend-observable",
-        "sidebar_label": "extendObservable [🚀]"
-      },
       "refguide/extending": {
         "title": "refguide/extending",
         "sidebar_label": "New observable types [🚀]"
@@ -134,14 +122,6 @@
       "refguide/introspection-utils": {
         "title": "Introspection APIs",
         "sidebar_label": "Introspection APIs"
-      },
-      "refguide/make-observable": {
-        "title": "Making things observable",
-        "sidebar_label": "Making things observable"
-      },
-      "refguide/map": {
-        "title": "Observable Maps",
-        "sidebar_label": "maps"
       },
       "refguide/mobx-utils": {
         "title": "mobx-utils",
@@ -160,8 +140,8 @@
         "sidebar_label": "objects"
       },
       "refguide/observable": {
-        "title": "observable",
-        "sidebar_label": "observable"
+        "title": "Creating observables",
+        "sidebar_label": "Creating observables"
       },
       "refguide/observe": {
         "title": "refguide/observe",
@@ -193,7 +173,7 @@
       }
     },
     "links": {
-      "API": "API",
+      "API Reference": "API Reference",
       "中文": "中文",
       "Sponsors": "Sponsors",
       "Github": "Github"

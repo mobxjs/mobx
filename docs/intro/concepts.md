@@ -50,7 +50,7 @@ class Todo {
 }
 ```
 
-(Tip: this example could be shortened by using [`makeAutoObservable`](../refguide/make-observable.md) instead, but by being explicit we can show the different concepts in detail)
+(Tip: this example could be shortened by using [`makeAutoObservable`](../refguide/observable.md) instead, but by being explicit we can show the different concepts in detail)
 
 Using `observable` is like turning a property of an object into a spreadsheet cell.
 But unlike spreadsheets, these values can be not only primitive values, but also references, objects and arrays.

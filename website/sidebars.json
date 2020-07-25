@@ -7,16 +7,7 @@
       "intro/concepts"
     ],
     "Basics": [
-      "refguide/make-observable",
-      "refguide/observable",
-      "refguide/array",
-      "refguide/map",
-      "refguide/set",
-      "refguide/object",
-      "refguide/boxed",
-      "refguide/modifiers",
-      "refguide/extend-observable",
-      "refguide/is-observable"
+      "refguide/observable"
     ],
     "MobX and React": [
       "react/react-integration",

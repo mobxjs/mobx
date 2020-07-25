@@ -65,9 +65,13 @@
     -   [x] update ad links (https://www.google.com/adsense/new/u/0/pub-1705981461067724/home ?)
     -   [ ] add deprecation messages to latest mobx 5
     -   [ ] merge 2398
-    -   [ ] fix docs
+-   [ ] docs
+    -   [ ] clean up docs
     -   [ ] fix interactive tut
     -   [ ] document and introduce flow annotation
+    -   [ ] fix link warnings
+    -   [ ] revisit how-to-read guide with all things in place
+    -   [ ] finish migration guide
 -   [ ] mobx-react
     -   [ ] displayname for observer components facebook/react#18026
     -   [ ] update useLocalStore in mobx-react-lite to use
@@ -99,18 +103,18 @@ Why declare fields
 -   detect misspellings in makeObservable early
 
 *   [ ] Host old docs somewhere? Figure out how docusaurus can support a second version
-*   [ ] Using the codemod
-*   [ ] update tsconfig, no decorators, yes define
+*   [x] Using the codemod
+*   [x] update tsconfig, no decorators, yes define
 *   [ ] update docs for non-default decorators
-*   [ ] instruct using TS / Babel decorators
+*   [x] instruct using TS / Babel decorators
 
 *   [ ] optimization tip: hoist the mapping constant of makeObservable
-*   [ ] document: unconditional map / makeObservable calls
-*   [ ] document `true` and `false` as annotations
-*   [ ] makeObservable + private members in TypeScript (second call? computed name? tsignore?)
+*   [x] document: unconditional map / makeObservable calls
+*   [x] document `true` and `false` as annotations
+*   [x] makeObservable + private members in TypeScript (second call? computed name? tsignore?)
 
-*   [ ] document: `autoBind` options for observable / extendObservable / makeObserver
-*   [ ] document: linting options
+*   [x] document: `autoBind` options for observable / extendObservable / makeObserver
+*   [x] document: linting options
 
 ## NOTES
 

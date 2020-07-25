@@ -22,7 +22,7 @@ Here are a few suggestions about the next things to read:
 
 -   [React integration](../react/react-integration.md).
 
--   [`makeObservable` / `makeAutoObservable`](../refguide/make-observable.md).
+-   [`makeObservable` / `makeAutoObservable`](../refguide/observable.md).
 
 -   It's also useful to at scan through the sections on [observable arrays](../refguide/array.md) and [observable maps](../refguide/map.md) to see what extra methods are available beyond the built-in JS `Array` and `Map`
 

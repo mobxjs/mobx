@@ -18,7 +18,7 @@ Usage:
 -   `makeObservable(this, {someProperty: action.bound})`
 
 Any application has actions. Actions is code that that modifies the state.
-MobX requires that you declare your actions, though [makeAutoObservable](make-observable.md) can automate much of this job. Actions help you to structure your code better and offer performance benefits.
+MobX requires that you declare your actions, though [makeAutoObservable](observable.md) can automate much of this job. Actions help you to structure your code better and offer performance benefits.
 
 Actions are wrapped with with [`transaction`](api.md#transaction), [`untracked`](api.md#untracked), and [`allowStateChanges`](api.md#untracked).
 
@@ -38,7 +38,7 @@ is derived from the function or method that is wrapped.
 Actions should only, and always, be used on functions that _modify_ state.
 Functions that just perform look-ups, filters etc should _not_ be marked as actions; to allow MobX to track their invocations.
 
-If you use `makeAutoObservable` you have to [exclude these methods explicitly from being marked as actions](make-observable.md#excluding-methods-that-are-not-actions).
+If you use `makeAutoObservable` you have to [exclude these methods explicitly from being marked as actions](observable.md#excluding-methods-that-are-not-actions).
 
 ## `runInAction`
 
