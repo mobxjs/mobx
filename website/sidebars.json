@@ -4,9 +4,7 @@
       "README",
       "intro/how-to-read",
       "intro/installation",
-      "intro/overview",
-      "intro/concepts",
-      "faq/faq"
+      "intro/concepts"
     ],
     "MobX and React": [
       "react/react-integration",
@@ -59,7 +57,8 @@
       "refguide/configure",
       "best/decorators",
       "best/store",
-      "faq/migrate-to-6"
+      "faq/migrate-to-6",
+      "faq/faq"
     ],
     "Extending MobX": [
         "refguide/extending",

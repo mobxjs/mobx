@@ -45,8 +45,8 @@
         "sidebar_label": "Migrating to MobX 6 [🚀]"
       },
       "intro/concepts": {
-        "title": "intro/concepts",
-        "sidebar_label": "Concepts & Principles"
+        "title": "The gist of MobX",
+        "sidebar_label": "The gist of MobX"
       },
       "intro/how-to-read": {
         "title": "How to read this documentation",

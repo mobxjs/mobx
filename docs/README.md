@@ -109,8 +109,8 @@ const TimerView = observer(({ timer }) => (
 ReactDOM.render(<TimerView timer={myTimer} />, document.body)
 ```
 
-To get more detail about this example, see [the gist of MobX](http://mobxjs.github.io/mobx/intro/overview.html).
-To learn about the underlying concepts together with a larger example, please read [Concepts & Principles](http://mobxjs.github.io/mobx/intro/concepts.html). Or read on to see some of the benefits of MobX.
+To learn about the core concepts of MobX with a larger example, please read [Concepts & Principles](http://mobxjs.github.io/mobx/intro/concepts.html) or take the [10 minute interactive introduction to MobX and React](https://mobx.js.org/getting-started).
+Read on to learn about some of the benefits of using MobX.
 
 ## What others are saying...
 
