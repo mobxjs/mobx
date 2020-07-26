@@ -119,7 +119,7 @@ configure({
 })
 ```
 
-Though this restriction is confusing and contradictory Computeds can be altered to work in a direct access manner with some of the following methods...
+Though this restriction is confusing and contradictory. Computeds can be altered to work in a direct access manner with some of the following methods...
 
 ### Computed memoization with reactions
 

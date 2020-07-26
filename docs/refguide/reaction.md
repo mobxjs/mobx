@@ -39,8 +39,8 @@ Reaction accepts a third argument as an options object with the following option
 ## Example
 
 In the following example both `reaction1`, `reaction2` and `autorun1` will react to the addition, removal or replacement of todo's in the `todos` array.
-But only `reaction2` and `autorun` will react to the change of a `title` in one of the todo items, because `title` is used in the data expression of reaction 2, while it isn't in the data expression of reaction 1.
-`autorun` tracks the complete side effect, hence it will always trigger correctly, but is also more suspectible to accidentally accessing unrelevant data.
+But only `reaction2` and `autorun1` will react to the change of a `title` in one of the todo items, because `title` is used in the data expression of `reaction2`, while it isn't in the data expression of `reaction1`.
+`autorun1` tracks the complete side effect, hence it will always trigger correctly, but is also more suspectible to accidentally accessing unrelevant data.
 See also [what will MobX React to?](../best/react).
 
 ```javascript

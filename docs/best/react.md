@@ -194,7 +194,7 @@ message.likes.push("Jennifer")
 ```
 
 This will react with the above sample data, array indexers count as property access. But **only** if the provided `index < length`.
-MobX will not track not-yet-existing indices or object properties (except when using maps).
+MobX will not track not-yet-existing indices.
 So always guard your array index based access with a `.length` check.
 
 #### Correct: access array functions in tracked function
@@ -217,7 +217,7 @@ autorun(() => {
 message.likes[2] = "Jennifer"
 ```
 
-This will react as expected. All array index assignments are detected, but only if `index <= length`.
+This will react as expected. All array index assignments are detected, but only if `index < length`.
 
 #### Incorrect: "use" an observable but without accessing any of its properties
 
