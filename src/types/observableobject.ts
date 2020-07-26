@@ -80,6 +80,8 @@ export class ObservableObjectAdministration
     interceptors_
     proxy_: any
     private pendingKeys_: undefined | Map<PropertyKey, ObservableValue<boolean>>
+    private keysValue_: PropertyKey[] = []
+    private isStaledKeysValue_ = true
 
     constructor(
         public target_: any,
@@ -220,7 +222,7 @@ export class ObservableObjectAdministration
             const oldValue = oldObservable && oldObservable.get()
             oldObservable && oldObservable.set(undefined)
             // notify key and keyset listeners
-            this.keysAtom_.reportChanged()
+            this.reportKeysChanged()
             this.values_.delete(key)
             if (this.pendingKeys_) {
                 const entry = this.pendingKeys_.get(key)
@@ -280,15 +282,24 @@ export class ObservableObjectAdministration
             const entry = this.pendingKeys_.get(key)
             if (entry) entry.set(true)
         }
-        this.keysAtom_.reportChanged()
+        this.reportKeysChanged()
     }
 
     getKeys_(): PropertyKey[] {
         this.keysAtom_.reportObserved()
+        if (!this.isStaledKeysValue_) {
+            return this.keysValue_
+        }
         // return Reflect.ownKeys(this.values) as any
         const res: PropertyKey[] = []
         for (const [key, value] of this.values_) if (value instanceof ObservableValue) res.push(key)
-        return res
+        this.isStaledKeysValue_ = false
+        return (this.keysValue_ = res)
+    }
+
+    private reportKeysChanged() {
+        this.isStaledKeysValue_ = true
+        this.keysAtom_.reportChanged()
     }
 }
 
