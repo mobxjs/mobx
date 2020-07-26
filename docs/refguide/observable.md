@@ -186,3 +186,11 @@ The above APIs take an optional `options` argument which is an object that suppo
 -   `autoBind: true`. Automatically binds all created actions to the instance.
 -   `deep: false`. Use `observable.ref` by default, rather than `observable` to create new observable members
 -   `name: <string>`. Gives the object a debug name that is printed in error messages and reflection APIs.
+
+## A short note on classes
+
+So far most examples above have been leaning towards class syntax.
+MobX is unopinionated about this, and there are probably just as many MobX users that use plain objects.
+A slight benefit of classes is that they have easily discoverable APIs icmw. TypeScript and are presented clearly in debug tools.
+But heavy inheritance patterns can become foot-guns easily.
+So if you use classes, keep them simple.

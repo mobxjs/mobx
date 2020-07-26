@@ -80,8 +80,8 @@
         "sidebar_label": "Introduction"
       },
       "refguide/action": {
-        "title": "action",
-        "sidebar_label": "action"
+        "title": "Update state using actions",
+        "sidebar_label": "Update state using actions"
       },
       "refguide/api": {
         "title": "MobX API Reference",

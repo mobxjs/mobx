@@ -72,6 +72,8 @@
     -   [ ] fix link warnings
     -   [ ] revisit how-to-read guide with all things in place
     -   [ ] finish migration guide
+    -   [ ] make details section collapsible
+    -   [ ] better sel page
 -   [ ] mobx-react
     -   [ ] displayname for observer components facebook/react#18026
     -   [ ] update useLocalStore in mobx-react-lite to use

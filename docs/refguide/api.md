@@ -63,7 +63,7 @@ It is possible to use `extendObservable` to add observable fields to an existing
 
 Usage:
 
--   `observable`: Mark a property as observable.
+-   `observable` (annotation): Mark a property as observable.
 -   `observable(source, overrides?, options?)`: Clones an object and makes it observable. Source can be a plain object, [array](#observable-array), [Map](#observable-map) or [Set](#observable-set).
 
 [&laquo;`details`&raquo;](observable.md#observable)
@@ -129,7 +129,7 @@ The `{ deep: false }` option can be used to make this set shallowly observable, 
 
 Usage:
 
--   `observable.ref`
+-   `observable.ref` (annotation)
 
 Like the `observable` annotation, but only reassignments will be tracked. The assigned values themselves won't be made observable automatically. Use this if you intend to store for example immutable data in an observable field.
 
@@ -139,7 +139,7 @@ Like the `observable` annotation, but only reassignments will be tracked. The as
 
 Usage:
 
--   `observable.shallow`
+-   `observable.shallow` (annotation)
 
 Like the `observable` annotation, except that any assigned value that is structurally equal to the current value will be ignored.
 
@@ -149,7 +149,7 @@ Like the `observable` annotation, except that any assigned value that is structu
 
 Usage:
 
--   `observable.struct`
+-   `observable.struct` (annotation)
 
 Like `observable.ref` but for collections; any collection assigned will be made observable, but the contents of the collection itself won't become observable.
 
@@ -159,7 +159,7 @@ Like `observable.ref` but for collections; any collection assigned will be made 
 
 Usage:
 
--   `observable.deep`
+-   `observable.deep` (annotation)
 
 Alias for the [`observable`](#observable) annotation.
 
@@ -202,21 +202,30 @@ _Actions are anything that modify the state._
 
 ### `action`
 
+Usage:
+
+-   `action` (annotation)
+-   `action(fn)`
+
 Marking things as action.
 
 [&laquo;details&raquo;](action.md)
 
 ### `runInAction`
 
-One-time actions.
+Usage:
+
+-   `runInAction(fn)`
+
+Create a one-time action that is immediately invoked.
 
 [&laquo;details&raquo;](action.md#runinaction)
 
 ### `flow`
 
-MobX friendly replacement for `async` / `await`.
+MobX friendly replacement for `async` / `await` that supports cancellation.
 
-[&laquo;details&raquo;](flow.md)
+[&laquo;details&raquo;](action.md#using-flow-instead-of-asyncawait)
 
 ## Computed
 
@@ -405,9 +414,11 @@ Is value an observable box?
 
 ### `isAction`
 
-Is this an action?
+Usage:
 
-[&laquo;details&raquo;](action.md#isaction)
+-   `isAction(func)`
+
+Returns `true` if the given function is marked as an `action`.
 
 ### `isComputed`
 

@@ -112,6 +112,8 @@ class Foo {
 
 _Note: always define the setter *after* the getter, some TypeScript versions are known to declare two properties with the same name otherwise._
 
+Setters are automatically marked as actions.
+
 ## Computed with arguments
 
 [🚀] Sometimes you might want to have a computed value that takes one or more arguments. In such cases mobx-util's [`computedFn`](https://github.com/mobxjs/mobx-utils#computedfn) can be used:
