@@ -8,10 +8,6 @@
       "backers-sponsors": {
         "title": "MobX Backers and Sponsors"
       },
-      "best/actions": {
-        "title": "Asynchronous actions",
-        "sidebar_label": "Asynchronous actions"
-      },
       "best/decorators": {
         "title": "best/decorators",
         "sidebar_label": "Decorators in MobX [🚀]"
@@ -111,10 +107,6 @@
         "title": "refguide/extending",
         "sidebar_label": "New observable types [🚀]"
       },
-      "refguide/flow": {
-        "title": "flow",
-        "sidebar_label": "flow"
-      },
       "refguide/internals": {
         "title": "Internal functions",
         "sidebar_label": "Internal functions [🚀]"
@@ -182,7 +174,6 @@
       "Introduction": "Introduction",
       "Basics": "Basics",
       "MobX and React": "MobX and React",
-      "Updating observables with actions": "Updating observables with actions",
       "Computed values": "Computed values",
       "Effects for observables": "Effects for observables",
       "Debugging MobX": "Debugging MobX",

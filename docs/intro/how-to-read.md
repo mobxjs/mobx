@@ -24,9 +24,9 @@ Here are a few suggestions about the next things to read:
 
 -   [`makeObservable` / `makeAutoObservable`](../refguide/observable.md).
 
--   It's also useful to at scan through the sections on [observable arrays](../refguide/array.md) and [observable maps](../refguide/map.md) to see what extra methods are available beyond the built-in JS `Array` and `Map`
+-   It's also useful to at scan through the sections on [observable arrays](../refguide/api.md#observablearray) and [observable maps](../refguide/api.md#observablemap) to see what extra methods are available beyond the built-in JS `Array` and `Map`
 
--   Learn about [action](../refguide/action.md). Also read the discussion about [asynchronous actions](../best/actions.md).
+-   Learn about [action](../refguide/action.md), which includes a discussion on asynchronous actions.
 
 -   The basics of [computed](../refguide/computed.md).
 
