@@ -150,7 +150,7 @@ However, if you would remove the `Tasks left` line (or put it into a separate co
 
 You can try this out yourself on [CodeSandbox](https://codesandbox.io/s/concepts-principles-il8lt?file=/src/index.js:1161-1252).
 
-You can verify this yourself by changing the [JSFiddle](https://jsfiddle.net/mweststrate/wv3yopo0/).
+For a more extensive introduction into this example, see the [10 minute introduction to MobX and React](https://mobx.js.org/getting-started).
 
 ##### Learn more
 
