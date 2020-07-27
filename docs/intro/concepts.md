@@ -118,6 +118,9 @@ Reactions are similar to computed values, but instead of producing information, 
 In short, reactions bridge the worlds of [reactive](https://en.wikipedia.org/wiki/Reactive_programming) and [imperative](https://en.wikipedia.org/wiki/Imperative_programming) programming.
 
 By far the most used form of reactions are UI components.
+Note that it is possible to trigger side effects from both actions and reactions.
+Side effects that have a clear, explicit origin from which they can be triggered, such
+as making a network request when submitting a form, should be triggered explicitly from the relevant event handler.
 
 #### 3.3. Reactive React components
 

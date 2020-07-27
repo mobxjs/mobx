@@ -159,3 +159,5 @@ Returns `true` if the designated property is a computed value.
 
 [🚀] You can pass [options into `computed`](computed-options.md). If you experience
 unexpected behavior, you can also read more about the [detailed behavior of `computed`](computed-behavior.md).
+
+-   don't create new observables in computed, dont cause side effects

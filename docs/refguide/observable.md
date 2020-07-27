@@ -1,12 +1,12 @@
 ---
-title: Creating observables
-sidebar_label: Creating observables
+title: Create observable state
+sidebar_label: Create observable state
 hide_title: true
 ---
 
 <script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
-# Creating observables
+# Create observable state
 
 Properties, entire objects, arrays, Maps and Sets can all be made observable.
 The basics of making objects observable is by specifying an annotation per property by using `makeObservable`.

@@ -8,10 +8,6 @@
       "backers-sponsors": {
         "title": "MobX Backers and Sponsors"
       },
-      "best/actions": {
-        "title": "Asynchronous actions",
-        "sidebar_label": "Asynchronous actions"
-      },
       "best/decorators": {
         "title": "best/decorators",
         "sidebar_label": "Decorators in MobX [🚀]"
@@ -88,8 +84,8 @@
         "sidebar_label": "API overview"
       },
       "refguide/autorun": {
-        "title": "autorun",
-        "sidebar_label": "autorun"
+        "title": "Introduction to reactions",
+        "sidebar_label": "Introduction to reactions"
       },
       "refguide/computed-behavior": {
         "title": "How computed works",
@@ -110,10 +106,6 @@
       "refguide/extending": {
         "title": "refguide/extending",
         "sidebar_label": "New observable types [🚀]"
-      },
-      "refguide/flow": {
-        "title": "flow",
-        "sidebar_label": "flow"
       },
       "refguide/internals": {
         "title": "Internal functions",
@@ -140,8 +132,8 @@
         "sidebar_label": "objects"
       },
       "refguide/observable": {
-        "title": "Creating observables",
-        "sidebar_label": "Creating observables"
+        "title": "Create observable state",
+        "sidebar_label": "Create observable state"
       },
       "refguide/observe": {
         "title": "refguide/observe",
@@ -182,7 +174,6 @@
       "Introduction": "Introduction",
       "Basics": "Basics",
       "MobX and React": "MobX and React",
-      "Updating observables with actions": "Updating observables with actions",
       "Computed values": "Computed values",
       "Effects for observables": "Effects for observables",
       "Debugging MobX": "Debugging MobX",

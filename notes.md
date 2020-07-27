@@ -65,6 +65,7 @@
     -   [x] update ad links (https://www.google.com/adsense/new/u/0/pub-1705981461067724/home ?)
     -   [ ] add deprecation messages to latest mobx 5
     -   [ ] merge 2398
+    -   [ ] make `onReactionError` an option for `configure`
 -   [ ] docs
     -   [ ] clean up docs
     -   [ ] fix interactive tut

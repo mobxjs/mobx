@@ -345,13 +345,12 @@ Usage:
 
 -   `flow(function* (args) { })`
 
-The `flow` wrapper is an alternative to `async` / `await` that makes it more easy to
+The `flow` wrapper is an optional alternative to `async` / `await` that makes it easier to
 work with MobX actions.
 `flow()` takes a [generator function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Generator) as its only input.
 Inside the generator you can chain promises by yielding them (so instead of `await somePromise` you write `yield somePromise`).
-The flow mechanism than will make sure the generator continues or throws when the promise resolves.
-However, the code that is executed when continuing will automatically be wrapped in action.
-So `flow` is an alternative to `async / await` that doesn't need any further action wrapping.
+The flow mechanism then will make sure the generator continues or throws when a yielded promise resolves.
+So `flow` is an alternative to `async / await` that doesn't need any further `action` wrapping.
 It can be applied as follows:
 
 1. Wrap `flow` around your asynchronous function.

@@ -8,7 +8,8 @@
     ],
     "Basics": [
       "refguide/observable",
-      "refguide/action"
+      "refguide/action",
+      "refguide/autorun"
     ],
     "MobX and React": [
       "react/react-integration",
@@ -22,10 +23,6 @@
         "refguide/computed-behavior"
     ],
     "Effects for observables": [
-        "refguide/autorun",
-        "refguide/reaction",
-        "refguide/when",
-        "best/dispose-reactions",
         "best/what-does-mobx-react-to",
         "refguide/observe",
         "refguide/on-become-observed"
