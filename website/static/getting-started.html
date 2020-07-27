@@ -509,7 +509,6 @@ rather than being something that's required by default for anything more than a 
                     </h3>
                     <div id="consoleout"></div>
                 </div>
-                <div id="devtools"></div>
             </td>
         </tr>
     </table>
@@ -519,16 +518,13 @@ rather than being something that's required by default for anything more than a 
     <link rel="stylesheet" href="assets/getting-started-assets/javascripts/codemirror/lib/codemirror.css">
     <link rel="stylesheet" href="assets/getting-started-assets/javascripts/codemirror/theme/xq-light.css">
     <script src="assets/getting-started-assets/javascripts/codemirror/javascript/javascript.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.7/react-with-addons.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.7/react-dom.js"></script>
+    
+    <script src="https://unpkg.com/react@16.13.1/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@16.13.1/umd/react-dom.development.js"></script>
     <script src="assets/getting-started-assets/babel.min.js"></script>
-    <script src="https://npmcdn.com/mobx@2.0.0/lib/mobx.umd.js"></script>
-    <script src="https://npmcdn.com/mobx-react@3.0.0/index.js"></script>
-    <script src="https://npmcdn.com/mobx-react-devtools@4.0.2/index.js"></script>
+    <script src="https://unpkg.com/mobx@6.0.0-rc.0/dist/mobx.umd.development.js"></script>
+    <script src="https://unpkg.com/mobx-react-lite@2.0.7/dist/mobxreactlite.umd.development.js"></script>
     <script src="assets/getting-started-assets/script.js"></script>
-    <script>
-        ReactDOM.render(React.createElement(window.mobxDevtools.default, {}), document.getElementById("devtools"));
-    </script>
     <script type="text/javascript">
         var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
         document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
