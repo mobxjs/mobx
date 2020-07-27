@@ -14,10 +14,11 @@ import {
     refDecorator,
     startBatch,
     stringifyKey,
-    initializeInstance
+    initializeInstance,
+    globalState,
 } from "../internal"
 import { IObservableDecorator } from "./observabledecorator"
-import { isPlainObject } from "../utils/utils"
+import { isPlainObject, ownKeys } from "../utils/utils"
 
 export function extendObservable<A extends Object, B extends Object>(
     target: A,
@@ -80,7 +81,10 @@ export function extendObservableObjectWithProperties(
     }
     startBatch()
     try {
-        const keys = getPlainObjectKeys(properties)
+        const keys = globalState.enableNonEnumerablePropertiesInExtendObservable
+            ? ownKeys(properties)
+            : getPlainObjectKeys(properties)
+
         for (const key of keys) {
             const descriptor = Object.getOwnPropertyDescriptor(properties, key)!
             if (process.env.NODE_ENV !== "production") {

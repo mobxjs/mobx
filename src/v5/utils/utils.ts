@@ -181,3 +181,10 @@ export function stringifyKey(key: any): string {
 export function toPrimitive(value) {
     return value === null ? null : typeof value === "object" ? "" + value : value
 }
+
+export const ownKeys: (target: any) => PropertyKey[] =
+    typeof Reflect !== "undefined" && Reflect.ownKeys
+        ? Reflect.ownKeys
+        : Object.getOwnPropertySymbols
+        ? (obj) => Object.getOwnPropertyNames(obj).concat(Object.getOwnPropertySymbols(obj) as any)
+        : /* istanbul ignore next */ Object.getOwnPropertyNames
