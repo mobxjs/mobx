@@ -92,7 +92,7 @@ Besides all language built-in Array functions, the following goodies are availab
 -   `replace(newItems)` Replaces all existing entries in the array with new ones.
 -   `remove(value)` Remove a single item by value from the array. Returns `true` if the item was found and removed.
 
-To recommend observable arrays back to plain arrays, it is recommend to use the `.slice()` method, or to convert recursively, see [toJS](#toJS)
+To convert observable arrays back to plain arrays, use the `.slice()` method, or to convert recursively, see [toJS](#toJS)
 
 The `{ deep: false }` option can be used to make this array shallowly observable, that is, values stored in it won't be converted to observables automatically.
 
