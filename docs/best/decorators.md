@@ -3,9 +3,11 @@ sidebar_label: Decorators in MobX [🚀]
 hide_title: true
 ---
 
+<script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
+
 # Decorators in MobX [🚀]
 
-MobX before version 6 encouraged the use of ES.next decorators to mark things as `observable`, `computed` and `action`. Decorators are not currently a ES standard however, and the process of standardization is taking a long time. It also looks like the standard will be different from the way decorators were implemented previously. In the interest of compatibility we have chosen to move away from them in MobX 6, and recommend the use of [`makeObservable` / `makeAutoObservable`](../refguide/make-observable) instead.
+MobX before version 6 encouraged the use of ES.next decorators to mark things as `observable`, `computed` and `action`. Decorators are not currently a ES standard however, and the process of standardization is taking a long time. It also looks like the standard will be different from the way decorators were implemented previously. In the interest of compatibility we have chosen to move away from them in MobX 6, and recommend the use of [`makeObservable` / `makeAutoObservable`](../refguide/observable) instead.
 
 But many existing code bases use decorators, and a lot of the documentation and tutorial material online uses them as well. The rule is that anything you can use as an annotation to `makeObservable`, such as `observable`, `action` and `computed`, you can also use as a decorator. So let's examine what that looks like:
 
@@ -44,8 +46,8 @@ class TodoList {
 MobX before version 6 did not require the `makeObservable(this)` call in the constructor, but because it makes the implementation of decorator simpler and more compatible, it now does. This instructs MobX to make the instances observable following the information in the decorators -- the decorators take the place of the second argument to `makeObservable`.
 
 We intend to continue to support decorators in this form.
-
-Note: When migrating from MobX 4/5 to 6, we recommend to always run the code mode, as even in the case where you keep using decorators, the `makeObservable` calls need to be generated. See the [migration guide](../faq/migrate-to-6) for details.
+Any existing MobX 4/5 codebase can be migrated to use `makeObservable` calls by our [code-mod](https://www.npmjs.com/package/mobx-undecorate).
+When migrating from MobX 4/5 to 6, we recommend to always run the code-mod, to make sure the necessary `makeObservable` calls are generated. See the [migration guide](../faq/migrate-to-6) for details.
 
 ## Using `observer` as decorator
 
@@ -75,6 +77,7 @@ Install support for decorators: `npm i --save-dev @babel/plugin-proposal-class-p
     "plugins": [
         ["@babel/plugin-proposal-decorators", { "legacy": true }],
         ["@babel/plugin-proposal-class-properties", { "loose": false }]
+        // In contrast to MobX 4/5, "loose" must be false!    ^
     ]
 }
 ```

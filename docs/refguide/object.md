@@ -4,6 +4,8 @@ sidebar_label: objects
 hide_title: true
 ---
 
+<script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
+
 # Observable Objects
 
 Usage:
@@ -14,7 +16,7 @@ If a plain JavaScript object is passed to `observable` all properties inside wil
 (A plain object is an object that wasn't created using a constructor function / but has `Object` as its prototype, or no prototype at all.)
 `observable` is by default applied recursively, so if one of the encountered values is an object or array, that value will be passed through `observable` as well.
 
-The `annotations` param can be used to override the declaration that is used for a specific property, like [`makeObservable` and `makeAutoObservable`](make-observable.md). See also [modifiers](modifiers.md).
+The `annotations` param can be used to override the declaration that is used for a specific property, like [`makeObservable` and `makeAutoObservable`](observable.md). See also [modifiers](modifiers.md).
 
 ```javascript
 import { observable, autorun, action } from "mobx"
@@ -53,7 +55,7 @@ person.setAge(21)
 
 Some things to keep in mind when making objects observable:
 
--   Only plain objects will be made observable. For non-plain objects it is considered the responsibility of the constructor to initialize the observable properties using [`makeObservable` or `makeAutoObservable`](make-observable.md).
+-   Only plain objects will be made observable. For non-plain objects it is considered the responsibility of the constructor to initialize the observable properties using [`makeObservable` or `makeAutoObservable`](observable.md).
 -   Property getters will be automatically turned into derived properties, just like declaring it [`computed`](computed) would do.
 -   `observable` is applied recursively to a whole object graph automatically. Both on instantiation and to any new values that will be assigned to observable properties in the future. Observable will not recurse into non-plain objects.
 -   These defaults are fine in 95% of the cases, but for more fine-grained on how and which properties should be made observable, see the [modifiers](modifiers.md) section.

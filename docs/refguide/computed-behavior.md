@@ -4,6 +4,8 @@ sidebar_label: How computed works [🚀]
 hide_title: true
 ---
 
+<script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
+
 # How `computed` works [🚀]
 
 Here we go into some more details concerning how computed behaves. Since `computed` tries to be tranparent in its behavior you normally do not need to be aware of them, but is useful to know if something unexpected happens.
@@ -124,3 +126,25 @@ var disposer = upperCaseName.observe(change => console.log(change.newValue))
 name.set("Dave")
 // prints: 'DAVE'
 ```
+
+### Computed KeepAlive
+
+A computed may be initalized with the `keepAlive` flag. `keepAlive` will cause the computed to act as though it is observed by a reaction. This is a convience method and `keepAlive` does the same as the autorun in example above, but it does it a lot more efficient (it can for example keep the computed alive, but defer computation until somebody actually reads the value, something the autorun can't do).
+
+```javascript
+class OrderLine {
+    @observable price = 0
+    @observable amount = 1
+    constructor(price) {
+        this.price = price
+    }
+    @computed({ keepAlive: true })
+    get total() {
+        return this.price * this.amount
+    }
+}
+```
+
+### Autorun vs keepAlive
+
+The only case where autorun would be more beneficial than a `keepAlive` computed, is during a manual management case in which you call the returned disposer to nicely clean up the computed value if it is no longer used typically you would do that in a destructor of a class for example.

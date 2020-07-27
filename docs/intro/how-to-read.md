@@ -4,6 +4,8 @@ sidebar_label: How to read this documentation
 hide_title: true
 ---
 
+<script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
+
 # How to read this documentation
 
 The documentation follows the principle that the most commonly used concepts are
@@ -20,9 +22,7 @@ Here are a few suggestions about the next things to read:
 
 -   [React integration](../react/react-integration.md).
 
--   [`makeObservable` / `makeAutoObservable`](../refguide/make-observable.md).
-
--   Scan through the rules of [`observable`](../refguide/observable.md).
+-   [`makeObservable` / `makeAutoObservable`](../refguide/observable.md).
 
 -   It's also useful to at scan through the sections on [observable arrays](../refguide/array.md) and [observable maps](../refguide/map.md) to see what extra methods are available beyond the built-in JS `Array` and `Map`
 

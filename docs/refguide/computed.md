@@ -4,6 +4,8 @@ sidebar_label: computed
 hide_title: true
 ---
 
+<script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
+
 # computed
 
 Computed values are values that can be derived from the existing state or other computed values.
@@ -109,6 +111,8 @@ class Foo {
 ```
 
 _Note: always define the setter *after* the getter, some TypeScript versions are known to declare two properties with the same name otherwise._
+
+Setters are automatically marked as actions.
 
 ## Computed with arguments
 

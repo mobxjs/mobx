@@ -20,10 +20,6 @@
         "title": "Always dispose reactions",
         "sidebar_label": "Always dispose reactions"
       },
-      "best/limitations-without-proxies": {
-        "title": "best/limitations-without-proxies",
-        "sidebar_label": "Limitations without Proxy [🚀]"
-      },
       "best/stateless-HMR": {
         "title": "Hot Module Reloading with Stateless Components",
         "sidebar_label": "Hot Module Reloading with Stateless Components"
@@ -44,9 +40,13 @@
         "title": "FAQ",
         "sidebar_label": "Frequently Asked Questions"
       },
+      "faq/migrate-to-6": {
+        "title": "faq/migrate-to-6",
+        "sidebar_label": "Migrating to MobX 6 [🚀]"
+      },
       "intro/concepts": {
-        "title": "intro/concepts",
-        "sidebar_label": "Concepts & Principles"
+        "title": "The gist of MobX",
+        "sidebar_label": "The gist of MobX"
       },
       "intro/how-to-read": {
         "title": "How to read this documentation",
@@ -55,10 +55,6 @@
       "intro/installation": {
         "title": "Installation",
         "sidebar_label": "Installation"
-      },
-      "intro/overview": {
-        "title": "The gist of MobX",
-        "sidebar_label": "The gist of MobX"
       },
       "LINKS": {
         "title": "LINKS"
@@ -84,24 +80,16 @@
         "sidebar_label": "Introduction"
       },
       "refguide/action": {
-        "title": "action",
-        "sidebar_label": "action"
+        "title": "Update state using actions",
+        "sidebar_label": "Update state using actions"
       },
       "refguide/api": {
         "title": "MobX API Reference",
         "sidebar_label": "API overview"
       },
-      "refguide/array": {
-        "title": "Observable Arrays",
-        "sidebar_label": "arrays"
-      },
       "refguide/autorun": {
         "title": "autorun",
         "sidebar_label": "autorun"
-      },
-      "refguide/boxed": {
-        "title": "Observable Boxes",
-        "sidebar_label": "boxes [🚀]"
       },
       "refguide/computed-behavior": {
         "title": "How computed works",
@@ -119,10 +107,6 @@
         "title": "Configuring MobX",
         "sidebar_label": "Configuring MobX"
       },
-      "refguide/extend-observable": {
-        "title": "refguide/extend-observable",
-        "sidebar_label": "extendObservable [🚀]"
-      },
       "refguide/extending": {
         "title": "refguide/extending",
         "sidebar_label": "New observable types [🚀]"
@@ -138,14 +122,6 @@
       "refguide/introspection-utils": {
         "title": "Introspection APIs",
         "sidebar_label": "Introspection APIs"
-      },
-      "refguide/make-observable": {
-        "title": "makeObservable / makeAutoObservable",
-        "sidebar_label": "makeObservable / makeAutoObservable"
-      },
-      "refguide/map": {
-        "title": "Observable Maps",
-        "sidebar_label": "maps"
       },
       "refguide/mobx-utils": {
         "title": "mobx-utils",
@@ -164,8 +140,8 @@
         "sidebar_label": "objects"
       },
       "refguide/observable": {
-        "title": "observable",
-        "sidebar_label": "observable"
+        "title": "Creating observables",
+        "sidebar_label": "Creating observables"
       },
       "refguide/observe": {
         "title": "refguide/observe",
@@ -197,15 +173,15 @@
       }
     },
     "links": {
-      "API": "API",
+      "API Reference": "API Reference",
       "中文": "中文",
       "Sponsors": "Sponsors",
       "Github": "Github"
     },
     "categories": {
+      "Introduction": "Introduction",
       "Basics": "Basics",
       "MobX and React": "MobX and React",
-      "Making things observable": "Making things observable",
       "Updating observables with actions": "Updating observables with actions",
       "Computed values": "Computed values",
       "Effects for observables": "Effects for observables",

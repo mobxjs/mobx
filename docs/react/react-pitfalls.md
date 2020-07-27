@@ -4,6 +4,8 @@ sidebar_label: MobX and React pitfalls
 hide_title: true
 ---
 
+<script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
+
 # MobX and React pitfalls
 
 ## MobX only tracks data accessed for `observer` components if they are directly accessed by `render`

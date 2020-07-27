@@ -41,44 +41,106 @@ article p img {
   background: url("/img/github-brand.svg");
 }
 
-.re_2020 {
-  font-size: 14px;
-  box-sizing: border-box;
-  width: 100%;
-  line-height: 1.5;
-  display: block;
-  padding: 12px 11px;
-  text-align: left;
-  margin: 12px 0;
-  background-color: #f8f8f8;  
-  font-family: Helvetica Neue,Helvetica,Arial,sans-serif;
+.detail {
+    font-size: 0.8em;
+    color: #979797;
 }
 
-.re_2020_link {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
+/* BLM */
+.slidingNav::before {
+	content: "Black Lives Matter";
+	position: fixed;
+	left: 0;
+	width: 100vw;
+	top: 13px;
+	text-align: center;
+	pointer-events: none;
+	text-transform: uppercase;
+	font-weight: bold;
 }
 
-.re_2020 img {
-  margin-left: 8px;
-  margin-right: 8px;
+/* Carbon */
+#carbonads {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu,
+        Cantarell, "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
-.re_2020 span {
-  color: rgba(0,0,0,.6);
+#carbonads {
+    display: block;
+    overflow: hidden;
+    max-width: 728px;
+    position: relative;
+    background-color: hsl(0, 0%, 99%);
+    border: solid 1px #eee;
+    font-size: 22px;
+    box-sizing: content-box;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 20px;
 }
 
-.re_2020_ad {
-  display: inline;
-  background-color: #4caf50;
-  color: #fff;
-  margin-right: 4px;
-  padding: 2px 6px;
-  border-radius: 3px;
+#carbonads > span {
+    display: block;
 }
 
-.re_2020_link .link {
-  color: #2c6ac7;
-  text-decoration: underline;
+#carbonads a {
+    color: inherit;
+    text-decoration: none;
+}
+
+#carbonads a:hover {
+    color: inherit;
+}
+
+.carbon-wrap {
+    display: flex;
+    align-items: center;
+}
+
+.carbon-img {
+    display: block;
+    margin: 0;
+    line-height: 1;
+}
+
+.carbon-img img {
+    display: block;
+    height: 90px;
+    width: auto;
+}
+
+.carbon-text {
+    display: block;
+    padding: 0 1em;
+    line-height: 1.35;
+    text-align: left;
+}
+
+.carbon-poweredby {
+    display: block;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    padding: 6px 10px;
+    background: repeating-linear-gradient(
+            -45deg,
+            transparent,
+            transparent 5px,
+            hsla(0, 0%, 0%, 0.025) 5px,
+            hsla(0, 0%, 0%, 0.025) 10px
+        )
+        hsla(203, 11%, 95%, 0.8);
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+    font-size: 8px;
+    border-top-left-radius: 4px;
+    line-height: 1;
+}
+
+@media only screen and (min-width: 320px) and (max-width: 759px) {
+    .carbon-text {
+        font-size: 14px;
+    }
 }

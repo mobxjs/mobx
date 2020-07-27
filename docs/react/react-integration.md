@@ -4,6 +4,8 @@ sidebar_label: React integration
 hide_title: true
 ---
 
+<script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
+
 # React integration
 
 While MobX works independently from React they are most commonly used together. In [the gist of Mobx](../intro/overview.md) as well as the [conceptual introduction](../intro/concepts.md) you have already seen the most important part of this integration: the `observer` [HoC](https://reactjs.org/docs/higher-order-components.html) that you can wrap around a React component.
