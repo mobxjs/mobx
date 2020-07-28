@@ -139,12 +139,6 @@ export class MobXGlobals {
      * they are not the cause, see: https://github.com/mobxjs/mobx/issues/1836
      */
     suppressReactionErrors = false
-
-    /**
-     * see: https://github.com/mobxjs/mobx/issues/2386
-     */
-    enableNonEnumerablePropertiesInExtendObservable = false
-
 }
 
 declare const window: any

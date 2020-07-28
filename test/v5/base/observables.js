@@ -2076,7 +2076,6 @@ test("extendObservable should not accept complex objects as second argument", ()
 })
 
 test("extendObservable can be used late and support non-enumerable getters #2386", () => {
-    mobx._getGlobalState().enableNonEnumerablePropertiesInExtendObservable = true
     function MyClass() {
         const args = {
             x: 1,
@@ -2096,5 +2095,4 @@ test("extendObservable can be used late and support non-enumerable getters #2386
 
     expect(i.x).toBe(1)
     expect(i.double).toBe(1)
-    m._resetGlobalState()
 })
