@@ -46,6 +46,22 @@ article p img {
     color: #979797;
 }
 
+details {
+    background-color: aliceblue;
+    font-size: 0.8em;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+details > summary {
+    color: navy;
+    cursor: pointer;
+}
+
+details[open] > summary {
+    margin-bottom: 8px;
+}
+
 /* BLM */
 .slidingNav::before {
 	content: "Black Lives Matter";

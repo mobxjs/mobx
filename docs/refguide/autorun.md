@@ -1,12 +1,12 @@
 ---
-title: Introduction to reactions
-sidebar_label: Introduction to reactions
+title: Run side-effects with reactions
+sidebar_label: Run side-effects with reactions
 hide_title: true
 ---
 
 <script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
-# Introduction to Reactions
+# Run side-effects with reactions
 
 Reactions are an important concept to understand as it is where everything in MobX comes together.
 The goal of reactions is to model side-effects that happen automatically.
@@ -133,20 +133,8 @@ in the _data_ function, and in that way control more precisely when the effect t
 
 Unlike `autorun` the side effect won't be run directly when created, but only after the data expression returns a new value for the first time.
 
-Reaction is roughly equivalent to:
-
-```javascript
-function reaction(dataFn, effectFn) {
-    return autorun(() => {
-        const data = dataFn()
-        runInAction(() => {
-            effectFn(data)
-        })
-    })
-}
-```
-
-### Example
+<details>
+  <summary>Example</summary>
 
 In the example below, the reaction is only triggered once, when `isHungry` changes.
 Changes to `giraffe.energyLevel`, which is used by the _effect_ function, do not cause the _effect_ function to be executed. If you wanted `reaction` to respond to this
@@ -202,6 +190,8 @@ Now I'm hungry!
 Energy level: 40
 ```
 
+</details>
+
 ## When
 
 Usage:
@@ -212,7 +202,10 @@ Usage:
 `when` observes and runs the given _predicate_ function until it returns `true`.
 Once that happens, the given _effect_ function is executed and the autorunner is disposed.
 
-### Example
+The `when` function returns a disposer to allow you to cancel it manually, unless you don't pass in a second `effect` function, in which case it returns a `Promise`.
+
+<details>
+  <summary>Example</summary>
 
 This function is really useful to dispose or cancel stuff in a reactive way.
 For example:
@@ -244,9 +237,9 @@ class MyResource {
 As soon as `isVisible` becomes `false`, the `dispose` method is called that
 then does some cleanup for `MyResource`.
 
-`when` returns a disposer to allow you to cancel it manually, unless you don't pass in a second `effect` function, in which case it returns a `Promise`.
+</details>
 
-### `await when(...)`
+### await when(...)
 
 If no `effect` function is provided, `when` returns a `Promise`. This combines nicely with `async / await` to let you wait for changes in observable state:
 
@@ -259,7 +252,76 @@ async function() {
 
 To cancel the `when` prematurely, it is possible to call `.cancel()` on the promise returned by `when`.
 
-## Reaction Options
+## Always dispose reactions
+
+The functions passed to `autorun`, `reaction`, `when` are only garbage collected if all objects they observe are garbage collected themselves; in principle they keep waiting forever for new changes to happen in the observables they use.
+To be able to stop them from waiting until forever has passed, they all return a disposer function that can be used to stop them and unsubscribe from any observables used.
+
+```javascript
+const counter = observable({ count: 0 })
+// sets up the autorun, prints 0
+const disposer = autorun(() => {
+    console.log(counter.count)
+})
+// prints 1
+counter.count++
+
+// stops the autorun
+disposer()
+// won't print
+counter.count++
+```
+
+We strongly recommend to always use the disposer function that is returned from these functions as soon as their side effect is no longer needed.
+Failing to do so can lead to memory leaks.
+
+The `reaction` argument that is passed as second argument to the effect functions of `reaction` and `autorun` can be used to prematurely clean up the reaction as well by calling `reaction.dispose()`.
+
+<details><summary>Memory leak example</summary>
+
+```javascript
+class Vat {
+    value = 1.2
+
+    constructor() {
+        makeAutoObservable(this)
+    }
+}
+
+const vat = new Vat()
+
+class OrderLine {
+    price = 10
+    amount = 1
+    constructor() {
+        makeAutoObservable(this)
+
+        // this autorun will be GC-ed together with the current orderline instance
+        // as it only uses observables from `this`. It's not strictly necessary
+        // to dispose of it once an OrderLine instance is deleted.
+        this.disposer1 = autorun(() => {
+            doSomethingWith(this.price * this.amount)
+        })
+        // this autorun won't be GC-ed together with the current orderline instance
+        // since vat keeps a reference to notify this autorun, which in turn keeps
+        // 'this' in scope
+        this.disposer2 = autorun(() => {
+            doSomethingWith(this.price * this.amount * vat.value)
+        })
+    }
+
+    dispose() {
+        // So, to avoid subtle memory issues, always call the
+        // disposers when the reaction is no longer needed
+        this.disposer1()
+        this.disposer2()
+    }
+}
+```
+
+</details>
+
+## Reaction options
 
 The `options` argument as shown above can be passed to further fine tune the behavior of `autorun` / `reaction` / `when`:
 
@@ -271,15 +333,7 @@ The `options` argument as shown above can be passed to further fine tune the beh
 -   `scheduler` (autorun, reaction): Set a custom scheduler to determine how re-running the autorun function should be scheduled. It takes a function that should be invoked at some point in the future, for example: `{ scheduler: run => { setTimeout(run, 1000) }}`
 -   `equals`: (reaction) `comparer.default` by default. If specified, this comparer function is used to compare the previous and next values produced by the _data_ function. The _effect_ function is only invoked if this function returns false.
 
-## Always dispose reactions
-
-The functions passed to `autorun`, `reaction`, `when` are only garbage collected if all objects they observe are garbage collected themselves; in principle they keep waiting forever for new changes to happen in the observables they use.
-To be able to stop them from waiting until forever has passed, they all return a disposer function that can be used to stop them and unsubscribe from any observables used.
-
-We strongly recommend to always use the disposer function that is returned from these functions as soon as their side effect is no longer needed.
-Failing to do so can lead to memory leaks.
-
-## Use reactions sparingly
+## Use reactions sparingly!
 
 As said, typically you won't create reactions very often.
 It might very well be that your application doesn't use any of those APIs directly, and the only way reactions are construction is indirectly through for example `observer` from the mobx-react bindings.
@@ -292,4 +346,4 @@ Before you set up a reaction, it is good to check if it complies to the followin
 3. **Reactions should be decoupled from their cause**: If a side effect should happen in response to a very limited set of events / actions, it will often be clearer to directly trigger the effect from those specific events. For example, if pressing a form submit button should lead to a network request to be posted, it is clearer to trigger this effect directly in response of the `onClick` event, rather than indirectly through a reaction. In contrast, if any change you make to the form state should automatically end up in local storage, then a reaction can be very useful, so that you don't have to trigger this effect from every individual `onChange` event.
 
 There are real-life scenarios that don't fit in above principles. That is why they are _principles_, not _laws_.
-But the exceptions are rare so only violate them as a last resort.
+But, the exceptions are rare so only violate them as a last resort.

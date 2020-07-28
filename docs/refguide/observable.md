@@ -26,20 +26,18 @@ Usage:
 
 MakeObservable can be used to trap _existing_ object properties and make them observable. Any JavaScript object (including class instances) can be passed into `target`.
 Typically `makeObservable` is used in the constructor of a class, and its first argument is `this`.
-The `annotations` argument then maps property names to [annotations](#available-annotations) to apply (see below for the list of available annotations).
+The `annotations` argument then maps [annotations](#available-annotations) to map to each member (n.b.: when using [decorators](../best/decorators), the `annotations` argument can be omitted).
 
 Methods that derive information and take arguments (for example `findUsersOlderThan(age: number): User[]`) don't need any annotation.
 Their read operations will still be tracked when they are called from a reaction, but their output won't be memoized to avoid memory leaks (see also [mobx-utils:computedFn](https://github.com/mobxjs/mobx-utils#computedfn)).
 
-<div class="detail">
+<details><summary>makeObservable limitations</summary>
 
 MakeObservable can only annotate properties declared by its own class definition. If a sub- or superclass introduces observable fields, it will have to call `makeObservable` for those properties itself.
 
-Decorators note: When using [decorators](../best/decorators), the `annotations` argument can be omitted.
-
 TypeScript note: When decorating private properties in TypeScript, you can pass the private property names as generic argument to `makeObservable` to suppress the compile error about the field not existing like this: `makeObservable<"myPrivateField" | "myOtherPrivateField>(this, { myPrivateField: observable })`
 
-</div>
+</details>
 
 <!--DOCUSAURUS_CODE_TABS-->
 <!--makeObservable-->
@@ -131,14 +129,8 @@ Inference rules:
 -   Any other _own_ field will be marked with `observable`.
 -   Members marked with `false` in the `overrides` argument will not be annotated. Use this for for example read only fields such as identifiers.
 
-<div class="detail">
-
-When you call `makeObservable` or `makeAutoObservable` all properties you want to be observable
-_must_ exist on the instance already. Either by [declaring](https://github.com/tc39/proposal-class-fields) them (recommended, as done above) or otherwise by assigning them _before_ calling `makeAutoObservable`
-
-Providing annotations must be done unconditionally, as this makes it possible to cache the inference results.
-
-</div>
+When you call `makeObservable` or `makeAutoObservable` all properties you want to annotate
+_must_ exist on the instance already. Either by [declaring](https://github.com/tc39/proposal-class-fields) them (recommended, as done above) or otherwise by assigning them _before_ calling `makeAutoObservable` (declaring and annotating in one go can be done using [extendObservable](api.md#extendobservable)). Beyond that, calling and providing annotations must be done unconditionally, as this makes it possible to cache the inference results.
 
 ## `observable`
 
@@ -155,13 +147,15 @@ The object returned by `observable` will be a Proxy, which means that properties
 
 The `observable` method can also be called with collections types like [arrays](../refguide/api.md#observablearray), [Maps](../refguide/api.md#observablemap) and [Sets](../refguide/api.md#observableset). Those will be cloned as well and converted into their observable counterpart.
 
-<div class="detail">
+<details><summary>Primitives and class instances are never converted to observables</summary>
 
-Primitive values cannot be made observable by MobX since they are immutable in JavaScript (but they can be [boxed](../refguide/api.md#observablebox)).
 Class instances will never be made observable automatically by passing them to `observable` or assigning them to an `observable` property.
 Making class members observable is considered the responsibility of the class constructor.
 
-</div>
+Primitive values cannot be made observable by MobX since they are immutable in JavaScript (but they can be [boxed](../refguide/api.md#observablebox)).
+Although there is typically no use for this mechanism outside libraries.
+
+</details>
 
 ## Available annotations
 
@@ -190,7 +184,8 @@ The above APIs take an optional `options` argument which is an object that suppo
 ## A short note on classes
 
 So far most examples above have been leaning towards class syntax.
-MobX is unopinionated about this, and there are probably just as many MobX users that use plain objects.
-A slight benefit of classes is that they have easily discoverable APIs icmw. TypeScript and are presented clearly in debug tools.
+MobX is in principle unopinionated about this, and there are probably just as many MobX users that use plain objects.
+However, a slight benefit of classes is that they have more easily discoverable APIs icmw. TypeScript.
+Also, `instanceof` checks are really powerful for type inference, and class instances aren't wrapped in `Proxy` objects giving them a better experience in debuggers.
 But heavy inheritance patterns can become foot-guns easily.
 So if you use classes, keep them simple.

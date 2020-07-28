@@ -26,6 +26,8 @@ Functions that just perform look-ups, filter data, in short any function that de
 1. Actions are run inside [transactions](api.md#transaction). No observers will be updated until the outer-most action has finished. This ensures that intermediate or incomplete values produced during an action are not visible to the rest of the application until the action has finished.
 2. Outside actions it is (by default) not allowed to modify state. This helps to clearly identify in your code base where the state updates happen.
 
+### Examples
+
 <!--DOCUSAURUS_CODE_TABS-->
 <!--makeObservable-->
 
@@ -165,7 +167,8 @@ Usage:
 
 The `action.bound` annotation can be used to automatically bind a method to the correct instance, so that `this` is always correctly bound inside the function.
 
-Tip: If you want to bind actions in combination with `makeAutoObservable`, it is usually simpler to use arrow functions instead:
+<details><summary>Tip: prefer arrow functions over `action.bound`</summary>
+If you want to bind actions in combination with `makeAutoObservable`, it is usually simpler to use arrow functions instead:
 
 ```javascript
 import { makeAutoObservable } from "mobx"
@@ -184,6 +187,8 @@ class Doubler {
 }
 ```
 
+</details>
+
 ### `runInAction`
 
 Usage:
@@ -191,7 +196,7 @@ Usage:
 -   `runInAction(fn)`
 
 Use this utility to create a temporarily action that is immediately invoked. Can be useful in asynchronous processes.
-See the above code block for an example.
+See the [above code block](#examples) for an example.
 
 ## Asynchronous actions
 
@@ -357,7 +362,7 @@ It can be applied as follows:
 2. Instead of `async` you use `function *`.
 3. Instead of `await` you use `yield`.
 
-The listing above shows what this looks in practice.
+The [listing above](#examples) shows what this looks in practice.
 
 ### Flow cancellation
 
