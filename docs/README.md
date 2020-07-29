@@ -140,6 +140,8 @@ The reason for MobX's popularity boil down to this: _With MobX you write typical
 -   **Easy interoperability**. MobX works with enriched but plain javascript structures. Due to its unobtrusiveness it works with most javascript libraries out of the box, without needing MobX specific flavors. So you can simply keep using promises, async/await, generators, your existing router, data fetching, and utility libraries like `react-router`, `director`, `superagent`, `lodash` etc.
 -   **Asynchronous processes aren't special**. They are merely multiple synchronous actions spread over time. Because observable data structures allow you to hold on to references, asynchronous processes aren't more complicated than they should be.
 
+The philosophy and benefits of the mental model provided by MobX are described in detail in the blogs [UI as an afterthought](https://michel.codes/blogs/ui-as-an-afterthought) and [How to decouple state and UI (a.k.a. you don’t need componentWillMount)](https://hackernoon.com/how-to-decouple-state-and-ui-a-k-a-you-dont-need-componentwillmount-cc90b787aa37).
+
 ## Further resources and documentation
 
 -   [Ten minute, interactive MobX + React tutorial](https://mobx.js.org/getting-started)

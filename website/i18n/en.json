@@ -73,7 +73,7 @@
       },
       "refguide/action": {
         "title": "Update state using actions",
-        "sidebar_label": "Update state using actions"
+        "sidebar_label": "Actions"
       },
       "refguide/api": {
         "title": "MobX API Reference",
@@ -81,7 +81,7 @@
       },
       "refguide/autorun": {
         "title": "Run side-effects with reactions",
-        "sidebar_label": "Run side-effects with reactions"
+        "sidebar_label": "Reactions"
       },
       "refguide/computed-behavior": {
         "title": "How computed works",
@@ -92,8 +92,8 @@
         "sidebar_label": "Options for computed [🚀]"
       },
       "refguide/computed": {
-        "title": "computed",
-        "sidebar_label": "computed"
+        "title": "Derive information with computed",
+        "sidebar_label": "Computed"
       },
       "refguide/configure": {
         "title": "Configuring MobX",
@@ -128,8 +128,8 @@
         "sidebar_label": "objects"
       },
       "refguide/observable": {
-        "title": "Create observable state",
-        "sidebar_label": "Create observable state"
+        "title": "Creating observable state",
+        "sidebar_label": "Observable state"
       },
       "refguide/observe": {
         "title": "refguide/observe",
@@ -160,7 +160,7 @@
     },
     "categories": {
       "Introduction": "Introduction",
-      "Basics": "Basics",
+      "MobX core": "MobX core",
       "MobX and React": "MobX and React",
       "Computed values": "Computed values",
       "Effects for observables": "Effects for observables",

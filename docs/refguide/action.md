@@ -1,6 +1,6 @@
 ---
 title: Update state using actions
-sidebar_label: Update state using actions
+sidebar_label: Actions
 hide_title: true
 ---
 
@@ -344,7 +344,7 @@ class Store {
 
 <!--END_DOCUSAURUS_CODE_TABS-->
 
-## Using flow instead of async/await
+## 🚀 Using flow instead of async/await
 
 Usage:
 
@@ -364,14 +364,14 @@ It can be applied as follows:
 
 The [listing above](#examples) shows what this looks in practice.
 
-### Flow cancellation
+### 🚀 Flow cancellation
 
 Another neat benefit of flows is that they are cancellable.
 The return value of `flow` is a promise that resolves with the value that is returned from the generator function in the end.
 The returned promise has an additional `cancel()` methods that will interrupt the running generator and cancel it.
 Any `try / finally` clauses will still be run.
 
-## Disabling mandatory actions
+## 🚀 Disabling mandatory actions
 
 By default, MobX 6 and later require that you use actions to make state changes.
 You can however configure MobX to disable this behavior, see [`enforceActions`](configure.md#enforceactions).

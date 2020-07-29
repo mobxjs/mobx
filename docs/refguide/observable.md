@@ -1,6 +1,6 @@
 ---
-title: Create observable state
-sidebar_label: Create observable state
+title: Creating observable state
+sidebar_label: Observable state
 hide_title: true
 ---
 
@@ -147,6 +147,48 @@ The object returned by `observable` will be a Proxy, which means that properties
 
 The `observable` method can also be called with collections types like [arrays](../refguide/api.md#observablearray), [Maps](../refguide/api.md#observablemap) and [Sets](../refguide/api.md#observableset). Those will be cloned as well and converted into their observable counterpart.
 
+<details><summary>Observable array example</summary>
+
+The following example creates an observable and observes it using [`autorun`](autorun.md).
+Working with Map and Set collections works similarly.
+
+```javascript
+import { observable, autorun } from "mobx"
+
+const todos = observable([
+    { title: "Spoil tea", completed: true },
+    { title: "Make coffee", completed: false }
+])
+
+autorun(() => {
+    console.log(
+        "Remaining:",
+        todos
+            .filter(todo => !todo.completed)
+            .map(todo => todo.title)
+            .join(", ")
+    )
+})
+// Prints: 'Remaining: Make coffee'
+
+todos[0].completed = false
+// Prints: 'Remaining: Spoil tea, Make coffee'
+
+todos[2] = { title: "Take a nap", completed: false }
+// Prints: 'Remaining: Spoil tea, Make coffee, Take a nap'
+
+todos.shift()
+// Prints: 'Remaining: Make coffee, Take a nap'
+```
+
+Observable arrays have some additional nifty utility functions:
+
+-   `clear()` Remove all current entries from the array.
+-   `replace(newItems)` Replaces all existing entries in the array with new ones.
+-   `remove(value)` Remove a single item by value from the array. Returns `true` if the item was found and removed.
+
+</details>
+
 <details><summary>Primitives and class instances are never converted to observables</summary>
 
 Class instances will never be made observable automatically by passing them to `observable` or assigning them to an `observable` property.
@@ -173,13 +215,29 @@ Although there is typically no use for this mechanism outside libraries.
 | `false`                            | Explicitly do not annotate this property.                                                                                                                                                                                  |
 | `autoAction`                       | Should not be used explicitly, but is used under the hood by `makeAutoObservable` to mark methods that can act as action or derivation, based on their calling context                                                     |
 
-## The `options` argument
+## 🚀 The `options` argument
 
 The above APIs take an optional `options` argument which is an object that supports the following options:
 
 -   `autoBind: true`. Automatically binds all created actions to the instance.
 -   `deep: false`. Use `observable.ref` by default, rather than `observable` to create new observable members
 -   `name: <string>`. Gives the object a debug name that is printed in error messages and reflection APIs.
+
+## Converting observables back to vanilla JavaScript collections
+
+Sometimes it is necessary to convert observable data structures back to their vanilla counterpart.
+For example when passing observable objects to a React component that can't track observables, or to obtain a clone that should not further be mutated.
+
+To convert a collection shallowly the usual JavaScript mechanisms work:
+
+```javascript
+const plainObject = { ...observableObject }
+const plainArray = observableArray.slice()
+const plainMap = new Map(observableMap)
+```
+
+To convert a data tree recursively to plain objects, the [`toJS`](api.md#tojs) utility can be used.
+For classes, it is recommend to implement a `toJSON()` method, as that one will be picked up by `JSON.stringify`.
 
 ## A short note on classes
 

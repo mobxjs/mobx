@@ -6,10 +6,11 @@
       "intro/installation",
       "intro/concepts"
     ],
-    "Basics": [
+    "MobX core": [
       "refguide/observable",
       "refguide/action",
-      "refguide/autorun"
+      "refguide/autorun",
+      "refguide/computed"
     ],
     "MobX and React": [
       "react/react-integration",
@@ -18,7 +19,6 @@
       "react/react-class-components"
     ],
     "Computed values": [
-        "refguide/computed",
         "refguide/computed-options",
         "refguide/computed-behavior"
     ],

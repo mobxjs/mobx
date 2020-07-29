@@ -196,6 +196,8 @@ If a view is no longer in use it will be garbage collected automatically.
 
 All _Computed values_ should be **pure**. They are not supposed to change _state_.
 
+For some more background context, read [the fundamental principles behind MobX](https://hackernoon.com/the-fundamental-principles-behind-mobx-7a725f71f3e8).
+
 ## Try it out!
 
 You can play with the above yourself on [CodeSandbox](https://codesandbox.io/s/concepts-principles-il8lt?file=/src/index.js:1161-1252).

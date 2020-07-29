@@ -66,6 +66,8 @@
     -   [ ] add deprecation messages to latest mobx 5
     -   [ ] merge 2398
     -   [ ] make `onReactionError` an option for `configure`
+    -   [ ] investigate the onbecomeunobserved issue
+    -   [ ] support `flow` and `computedFn` as annotation
 -   [ ] docs
     -   [ ] clean up docs
     -   [ ] fix interactive tut

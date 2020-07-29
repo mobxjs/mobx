@@ -1,6 +1,6 @@
 ---
 title: Run side-effects with reactions
-sidebar_label: Run side-effects with reactions
+sidebar_label: Reactions
 hide_title: true
 ---
 
@@ -41,7 +41,8 @@ There are a few rules that apply to any reactive context:
 2. Autorun tracks only the observables that are read during the synchronous execution of the provided function, but it won't track anything that happens asynchronously.
 3. Autorun won't track observables that are read by an action invoked by the autorun, as actions are always _untracked_.
 
-For a more detailed break down of what MobX reacts to, see [what does MobX react to](what-does-mobx-react-to.md).
+For a more examples on what precisely MobX will and won't react to, see [what does MobX react to](what-does-mobx-react-to.md).
+For a detailed technical breakdown on how tracking works, read [Becoming fully reactive: an in-depth explanation of MobX](https://hackernoon.com/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254)
 
 ### Example
 
@@ -321,7 +322,7 @@ class OrderLine {
 
 </details>
 
-## Reaction options
+## 🚀 Reaction options
 
 The `options` argument as shown above can be passed to further fine tune the behavior of `autorun` / `reaction` / `when`:
 
