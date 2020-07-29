@@ -616,7 +616,6 @@ test("using deep map - toJS", () => {
     expect(observed).toBe(1)
     expect(seen).toEqual([new Map(), new Map([["shoes", []]])])
 
-    debugger
     store.map_deep.get("shoes").push({ color: "black" })
     expect(seen).toEqual([
         new Map([]),
