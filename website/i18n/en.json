@@ -91,6 +91,9 @@
         "title": "Options for computed",
         "sidebar_label": "Options for computed [🚀]"
       },
+      "refguide/computed-with-args": {
+        "title": "refguide/computed-with-args"
+      },
       "refguide/computed": {
         "title": "Derive information with computed",
         "sidebar_label": "Computed"

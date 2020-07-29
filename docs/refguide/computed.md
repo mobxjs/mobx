@@ -14,25 +14,17 @@ Usage:
 -   `computed(options)` (annotation)
 -   `computed(fn, options?)`
 
-Computed values are values that can be expressed entirely in terms of already existing state.
-Conceptually, they are very similar to formulas in spreadsheets.
+Computed values can be used to derive information from other observables.
+They evaluate lazily.
+Computed values will cache their output and only update recompute if one of the underlying observables has changed.
+If they are not observed by anything, they suspend entirely.
+
+Conceptually, computed values are very similar to formulas in spreadsheets.
 Computed values can't be underestimated, they help in reducing the amount of state you have to store and are highly optimized. Use them wherever possible.
-
-Computed values are automatically derived from your state if any value that affects them changes.
-MobX can optimize the re-calculation of computed values away in many cases because
-this calculation is assumed to be pure.
-For example, a computed property won't re-run when read, if no observable data used in the previous computation changed.
-Nor will a computed property automatically re-run if is not being observed by some [reaction](autorun.md).
-In such cases the computation will be suspended.
-This means in practice if a computation isn't shown (for example) somewhere in the UI, no cycles will be spend on it.
-
-To create a `computed` property, you need to use a JavaScript [getters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get) and annotate it with `computed`.
-
-It is important to never confuse `computed` with [`autorun`](autorun.md).
-They are both expressions tracked by MobX, but always [prefer](autorun.md#use-reactions-sparingly) `computed` if you want to derive a value that is of further use of your program.
 
 ## Example
 
+Computed values can be created by annotating a JavaScript [getters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get) with `computed`.
 You can use `makeObservable` to declare a getter as computed (if you use `makeAutoObservable`, `observable` or `extendObservable`, all getters are automatically declared as `computed`):
 
 ```javascript
@@ -89,20 +81,49 @@ it won't trigger the `autorun`, as `total` will detect it output hasn't been aff
 In comparison, if total would not be annotated, the autorun would run it's effect 3 times,
 as it will directly depend on `total` and `amount`. [Try it](https://codesandbox.io/s/computed-3cjo9?file=/src/index.tsx).
 
-<details><summary>Note: computed values won't cache if they are _not_ observed</summary>
+This is the dependency graph that would be created for the above example:
 
-A thing that often confuses newcomers to MobX is that computed values don't
-cache or track changes if they are not actively in use.
+![computed graph](../assets/computed-example.png)
+
+## Rules
+
+When using computed values, there are a few best practices to observe:
+
+1. Computed values should not have side-effects or update other observables.
+2. Avoid creating and returning new observables.
+
+## Tips
+
+<details><summary>Note: computed values will be suspended if they are _not_ observed</summary>
+
+It sometimes confuses people new to MobX (perhaps used to a library like [Reselect](https://github.com/reduxjs/reselect)) that if you create a computed property but don't use it anywhere in a reaction, it is not memoized and appears to be recomputed more often than necessary.
 For example, if we'd extend the above example with calling `console.log(order.total)` twice, after we called `stop()`, the value would be recomputed twice.
 
-The reason is that it is by default beneficial to forget about computations that are not in use by a reaction, for example because they aren't shown anywhere in the UI at this moment.
-This default saves memory and computational resources, but can sometimes be confusing in small experiments.
-It can be overridden by setting annotating with the `keepAlive` flag ([try it](https://codesandbox.io/s/computed-3cjo9?file=/src/index.tsx)) or by creating a no-op `autorun(() => { someObject.someComputed })`.
+This allows MobX to automatically suspend computations that are not actively in use,
+to avoid unnecessary updates to computed values that are not being accessed. But if a computed property is _not_ in use by some reaction, computed expressions are evaluated each time their value is requested, so they just behave like a normal property.
+
+So if you fiddle around, computed properties might not seem efficient. But when applied in a project that uses `observer`, `autorun` etc, they become very efficient.
+
+The following code demonstrates the issue.
+
+```javascript
+// OrderLine has a computed property `total`
+const line = new OrderLine(2.0)
+
+// if you access line.total outside of a reaction it is recomputed every time
+setInterval(() => {
+    console.log(line.total)
+}, 60)
+```
+
+It can be overridden by setting annotating with the `keepAlive` flag ([try it](https://codesandbox.io/s/computed-3cjo9?file=/src/index.tsx)) or by creating a no-op `autorun(() => { someObject.someComputed })` (which can nicely be cleaned up later if needed).
 Note that both solutions have the risk of creating memory leaks; changing the default behavior here is an anti-pattern.
+
+MobX can be configured to report an error when computeds are accessed outside an reactive context with the [`computedRequiresReaction`](configure#computedrequiresreaction) option.
 
 </details>
 
-<details><summary>Tip: computed values can also have setters</summary>
+<details><summary>Tip: computed values can have setters</summary>
 
 It is possible to define a [setter](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/set) for computed values as well. Note that these setters cannot be used to alter the value of the computed property directly,
 but they can be used as 'inverse' of the derivation. Setters are automatically marked as actions. For example:
@@ -126,82 +147,76 @@ class Dimension {
 
 </details>
 
-## About derivations with arguments
+<details><summary>🚀 Tip: `computed.struct` for comparing output structurally </summary>
 
-The `computed` annotation can only be used on getters, which don't take arguments.
-What about computations that do take arguments?
-Take the below example of a React component that renders a specific todo,
-and the application supports multi-selection.
-How can we implement a derivation like `todoStore.isSelected(todoId)`?
-
-Base example (based on React):
+If the output of a computed value, that is structurally equivalent to the previous computation, doesn't need to notify observers, `computed.struct` can be used. It will make a structural comparison first (rather than a reference equality check) before notifying observers. Example:
 
 ```javascript
-import * as React from 'react'
-import {observer} from 'mobx-react-lite'
+class Box {
+    width = 0
+    height = 0
 
-const Todo = observer(({ todo, todoStore }) => (
-    <div className={todoStore.isSelected(todo.id) ? "selected" : ""}>
-        {todo.title}
-    </div>
-)
+    constructor() {
+        makeObsevable(this, {
+            x: observable,
+            y: observable,
+            topRight: computed.struct
+        })
+    }
+
+    get topRight() {
+        return {
+            x: this.width,
+            y: this.height
+        }
+    }
+}
 ```
 
-### 1. Derivations don't _need_ computed
+By default the output of a `computed` is compared by reference. Since the `topRight` in the above example will always produce a new result object, it is never going to be considered equal to a previous output. Unless `computed.struct` is used.
 
-A function doesn't need to be marked `computed` to enable to MobX to track it.
-The above example would already work completely fine out of the box.
-It is important to realise that computed values are only _caching points_.
-If they are pure (and they shouldn't), having a getter or function without `computed` doesn't change behavior; it is just slightly less inefficient.
-The above example works fine despite `isSelected` not being a `computed`;
-the `observer` component will detect and subscribe to any observables that were read by `isSelected`, because the function executes as part of the rendering that is tracked.
+However, in the above example _we actually don't need `computed.struct`_!
+Computed values normally only re-evaluate if the backing values change.
+So, `topRight` will only react to changes in `width` or `height`.
+Since if any of those change, we would get a different topRight coordinate anyway, `computed.struct` would never have a cache hit and be a waste of effort. So we don't need it.
 
-It is good to realize that all `Todo` components in this case will respond to future selection changes,
-as they all subscribe directly to the observables that capture the selection.
-This is a worst case example, in general it is completely fine to have unmarked functions that derive information, and this is a good default strategy, until numbers proof anything else should be done.
+In practice, `computed.struct` is less useful than it sounds; only use it if changes in the underlying observables can still lead to the same output. For example if we were rounding the coordinates first; the rounded coordinates might be equal to the previously rounded coordinates even though the underlying values aren't.
 
-### 2. Close over the arguments
+See also the `equals` [option](#option) for further customizations for determining whether the output has changed.
 
-Here is a more efficient implementation:
+</details>
 
-```javascript
-import * as React from 'react'
-import {observer, computed} from 'mobx-react-lite'
+<details><summary>🚀 Tip: computed values with arguments</summary>
 
-const Todo = observer(({ todo, todoStore }) => (
-    const isSelected = computed(() => todoStore.isSelected(todo.id))
-    <div className={isSelected ? "selected" : ""}>
-        {todo.title}
-    </div>
-)
-```
+Although getters don't take arguments, several strategies to work with derived values that need arguments are discusses [here](computed-with-args.md).
 
-Here we create a fresh computed value in the middle of a reaction.
-That works fine and does introduce that additional caching point, avoiding all components to directly
-to all selection changes.
-The advantage of this approach is that the component itself will only render if the
-`isSelected` state toggles (in which we case indeed have to render to swap the `className`).
-The fact that we create a new `computed` in a next render is fine, that one will now become the caching
-point and the previous one will be cleaned up nicely.
-This is a great, advanced optimization technique.
+</details>
 
-### 3. 🚀 Use computedFn
+<details><summary>🚀 Tip: created stand-alone computed values with `computed(expression)`</summary>
 
-Finally,
-[`computedFn`](https://github.com/mobxjs/mobx-utils#computedfn) from `mobx-utils` can be used in the definition of `todoStore.selected` to automatically memoize `isSelected`.
-It creates a function that memoize for each combination of input arguments.
-We recommend to not resort to that one too quickly, as, typical for memoization, before you can reason about the memory consumption you will need to think about how many different arguments the function is going to be called with.
-It does however automatically clean up entries if their results aren't observed by any reaction, so it won't leak memory in normal circumstances.
+`computed` can also be invoked directly as function.
+Just like [`observable.box`](api.md#observablebox) creates a stand-alone computed value.
+Use `.get()` on the returned object to get the current value of the computation.
+This form of `computed` is not used very often, but in some cases where you need to pass a "boxed" computed value around it might prove useful, one such case is discussed [here](computed-with-args.md).
 
-## More about computed
+</details>
 
-[🚀] You can pass [options into `computed`](computed-options.md). If you experience
-unexpected behavior, you can also read more about the [detailed behavior of `computed`](computed-behavior.md).
+## 🚀 Options
 
--   unobserved, computeds won't cache
+Usually `computed` behaves the way you want it to out of the box, but it's possible to customize its behavior by passing in an `options` argument:
 
--   don't create new observables in computed, dont cause side effects
+-   `name`: String, the debug name used in spy and the [MobX developer tools](https://github.com/mobxjs/mobx-devtools).
+-   `equals`: By default `comparer.default`. This acts as a comparison function for comparing the previous value with the next value. If this function considers the previous and next values to be equal, then observers will not be re-evaluated. This is useful when working with structural data, and types from other libraries. For example, a computed [moment](https://momentjs.com/) instance could use `(a, b) => a.isSame(b)`. `comparer.structural` and `comparer.shallow` come in handy if you want to use structural/shallow comparison to determine whether the new value is different from the previous value (and as a result notify observers). See also `computed.struct` as [discussed above](#tips).
+-   `requiresReaction`: It is recommended to set this one to `true` on very expensive computed values. If you try to read its value outside reactive context, in which case it might nob e cached, this will cause the computed to throw, instead of doing an expensive re-evalution.
+-   `keepAlive`: This avoids suspending computed values when they are not observed by anybody (see the above explanation). Can potentially create memory leaks, similar to the ones discussed for [reactions](autorun.md#always-dispose-reactions).
 
-Note that `computed` properties are not [enumerable](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Enumerability_and_ownership_of_properties). Nor can they be overwritten in an inheritance chain.
+### 🚀 Built-in comparers
 
-Derivation graph plaatje
+MobX provides four built-in `comparer`s which should cover most needs for the `equals` option of `computed` (they can be used for `reaction` as well):
+
+-   `comparer.identity`: Uses the identity (`===`) operator to determine if two values are the same.
+-   `comparer.default`: The same as `comparer.identity`, but also considers `NaN` to be equal to `NaN`.
+-   `comparer.structural`: Performs deep structural comparison to determine if two values are the same.
+-   `comparer.shallow`: Performs shallow structural comparison to determine if two values are the same.
+
+You can import `comparer` from `mobx` to access these.

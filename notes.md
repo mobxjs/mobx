@@ -77,6 +77,7 @@
     -   [ ] finish migration guide
     -   [ ] make details section collapsible
     -   [ ] better sel page
+    -   [ ] link flutter, lit, angular
 -   [ ] mobx-react
     -   [ ] displayname for observer components facebook/react#18026
     -   [ ] update useLocalStore in mobx-react-lite to use

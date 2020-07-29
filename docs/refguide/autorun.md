@@ -34,15 +34,9 @@ It also runs once when you create the `autorun`. It only responds to changes in 
 Autorun works by running `effect` in a _reactive context_; during the executing of the provided function MobX will keep track of all observable and computed values that are directly or indirectly _read_ by the effect.
 Once the function finishes, MobX will collect and subscribe to all observables that were read and wait until any of them changes again.
 Once any of these observables changes, the autorun will trigger again, repeating the entire process.
+In a picture, the code-example below works like this:
 
-There are a few rules that apply to any reactive context:
-
-1. Affected reactions run by default immediately (synchronously) if an observable is changed. However, they won't run before the end of the current outermost (trans)action.
-2. Autorun tracks only the observables that are read during the synchronous execution of the provided function, but it won't track anything that happens asynchronously.
-3. Autorun won't track observables that are read by an action invoked by the autorun, as actions are always _untracked_.
-
-For a more examples on what precisely MobX will and won't react to, see [what does MobX react to](what-does-mobx-react-to.md).
-For a detailed technical breakdown on how tracking works, read [Becoming fully reactive: an in-depth explanation of MobX](https://hackernoon.com/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254)
+![autorun](../assets/autorun.png)
 
 ### Example
 
@@ -253,6 +247,17 @@ async function() {
 
 To cancel the `when` prematurely, it is possible to call `.cancel()` on the promise returned by `when`.
 
+## Rules
+
+There are a few rules that apply to any reactive context:
+
+1. Affected reactions run by default immediately (synchronously) if an observable is changed. However, they won't run before the end of the current outermost (trans)action.
+2. Autorun tracks only the observables that are read during the synchronous execution of the provided function, but it won't track anything that happens asynchronously.
+3. Autorun won't track observables that are read by an action invoked by the autorun, as actions are always _untracked_.
+
+For a more examples on what precisely MobX will and won't react to, see [what does MobX react to](what-does-mobx-react-to.md).
+For a detailed technical breakdown on how tracking works, read [Becoming fully reactive: an in-depth explanation of MobX](https://hackernoon.com/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254)
+
 ## Always dispose reactions
 
 The functions passed to `autorun`, `reaction`, `when` are only garbage collected if all objects they observe are garbage collected themselves; in principle they keep waiting forever for new changes to happen in the observables they use.
@@ -332,7 +337,7 @@ The `options` argument as shown above can be passed to further fine tune the beh
 -   `timeout` (when): Set a limited amount of time that `when` will wait. If the deadline passes, `when` will reject / throw.
 -   `onError`: By default any exception thrown inside a reaction will be logged but not further thrown. This is to make sure that an exception in one reaction does not prevent the scheduled execution of other, possibly unrelated, reactions. This also allows reactions to recover from exceptions; throwing an exception does not break the tracking done by MobX, so as subsequent run of a reaction might complete normally again if the cause for the exception is removed. This option allows overriding that behavior. It is possible to set a global error handler or to disable catching errors completely using [configure](configure.md).
 -   `scheduler` (autorun, reaction): Set a custom scheduler to determine how re-running the autorun function should be scheduled. It takes a function that should be invoked at some point in the future, for example: `{ scheduler: run => { setTimeout(run, 1000) }}`
--   `equals`: (reaction) `comparer.default` by default. If specified, this comparer function is used to compare the previous and next values produced by the _data_ function. The _effect_ function is only invoked if this function returns false.
+-   `equals`: (reaction) `comparer.default` by default. If specified, this comparer function is used to compare the previous and next values produced by the _data_ function. The _effect_ function is only invoked if this function returns false. See [built-in-comparers](computed.html#built-in-comparers) for some default available options.
 
 ## Use reactions sparingly!
 

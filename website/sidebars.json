@@ -18,10 +18,6 @@
       "react/react-performance",
       "react/react-class-components"
     ],
-    "Computed values": [
-        "refguide/computed-options",
-        "refguide/computed-behavior"
-    ],
     "Effects for observables": [
         "best/what-does-mobx-react-to",
         "refguide/observe",
@@ -42,7 +38,8 @@
       "best/decorators",
       "best/store",
       "faq/migrate-to-6",
-      "faq/faq"
+      "faq/faq",
+      "refguide/computed-with-args"
     ],
     "Extending MobX": [
         "refguide/extending",
