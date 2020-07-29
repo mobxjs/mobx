@@ -291,10 +291,12 @@ export class ObservableObjectAdministration
             return this.keysValue_
         }
         // return Reflect.ownKeys(this.values) as any
-        const res: PropertyKey[] = []
-        for (const [key, value] of this.values_) if (value instanceof ObservableValue) res.push(key)
+        this.keysValue_ = []
+        for (const [key, value] of this.values_)
+            if (value instanceof ObservableValue) this.keysValue_.push(key)
+        if (__DEV__) Object.freeze(this.keysValue_)
         this.isStaledKeysValue_ = false
-        return (this.keysValue_ = res)
+        return this.keysValue_
     }
 
     private reportKeysChanged() {
