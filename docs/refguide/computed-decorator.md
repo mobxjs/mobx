@@ -111,7 +111,7 @@ setInterval(() => {
 }, 60);
 ```
 
-As long as a computed value is not used by a reaction, it is not memoized and so it executes everytime it is accessed just like a normal eager evaluating function. This can cause performance degradation if a computed value is read high in a frequency loop like `requestAnimationFrame`. MobX can be configured to report an error when computeds are being access directly by using the `computedRequiresReaction` option
+As long as a computed value is not used by a reaction, it is not memoized and so it executes everytime it is accessed just like a normal eager evaluating function. This can cause performance degradation if a computed value is read high in a frequency loop like `requestAnimationFrame`. MobX can be configured to report an error when computeds are being accessed directly by using the `computedRequiresReaction` option
 
 ```javascript
 configure({
@@ -119,11 +119,11 @@ configure({
 })
 ```
 
-Though this restriction is confusing and contradictory Computeds can be altered to work in a direct access manner with some of the following methods...
+Though this restriction is confusing and contradictory, computeds can be altered to work in a direct access manner with some of the following methods...
 
 ### Computed memoization with reactions
 
-A computed value should always be read by a reaction. Reading a computed value directly will cause it to recompute which can be expensive, depending on the how complex the derived result is. The following code uses the previous `OrderLine` class example and memoizes the `total` value so that it can be read directly.
+A computed value should always be read by a reaction. Reading a computed value directly will cause it to recompute which can be expensive, depending on how complex the derived result is. The following code uses the previous `OrderLine` class example and memoizes the `total` value so that it can be read directly.
 
 ```javascript
 class OrderLine {
@@ -156,7 +156,7 @@ setInterval(() => {
 
 ### Computed KeepAlive
 
-A computed may be initalized with the `keepAlive` flag. `keepAlive` will cause the computed to act as though it is observed by a reaction. This is a convience method and `keepAlive` does the same as the autorun in example above, but it does it a lot more efficient (it can for example keep the computed alive, but defer computation until somebody actually reads the value, something the autorun can't do).
+A computed may be initalized with the `keepAlive` flag. `keepAlive` will cause the computed to act as though it is observed by a reaction. This is a convenient method and `keepAlive` does the same as the autorun in example above, but what it does is a lot more efficient (it can for example keep the computed alive, but defer computation until somebody actually reads the value, something the autorun can't do).
 
 ```javascript
 class OrderLine {
@@ -176,7 +176,7 @@ class OrderLine {
 
 ### Autorun vs keepAlive
 
-The only case where autorun would be more beneficial than a `keepAlive` computed, is during a manual management case in which you call the returned disposer to nicely clean up the computed value if it is no longer used typically you would do that in a destructor of a class for example.
+The only case where autorun would be more beneficial than a `keepAlive` computed, is during a manual management case in which you call the returned disposer to nicely clean up the computed value if it is no longer used. Typically you would do that in a destructor of a class for example.
 
 ## Setters for computed values
 
