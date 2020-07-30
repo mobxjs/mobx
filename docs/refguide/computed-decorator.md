@@ -111,7 +111,7 @@ setInterval(() => {
 }, 60);
 ```
 
-As long as a computed value is not used by a reaction, it is not memoized and so it executes everytime it is accessed just like a normal eager evaluating function. This can cause performance degredation if a computed value is read high in a frequency loop like `requestAnimationFrame`. MobX can be configured to report an error when computeds are being access directly by using the `computedRequiresReaction` option
+As long as a computed value is not used by a reaction, it is not memoized and so it executes everytime it is accessed just like a normal eager evaluating function. This can cause performance degradation if a computed value is read high in a frequency loop like `requestAnimationFrame`. MobX can be configured to report an error when computeds are being access directly by using the `computedRequiresReaction` option
 
 ```javascript
 configure({
