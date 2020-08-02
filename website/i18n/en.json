@@ -83,16 +83,9 @@
         "title": "Run side-effects with reactions",
         "sidebar_label": "Reactions"
       },
-      "refguide/computed-behavior": {
-        "title": "How computed works",
-        "sidebar_label": "How computed works [🚀]"
-      },
-      "refguide/computed-options": {
-        "title": "Options for computed",
-        "sidebar_label": "Options for computed [🚀]"
-      },
       "refguide/computed-with-args": {
-        "title": "refguide/computed-with-args"
+        "title": "Computeds with arguments",
+        "sidebar_label": "Computeds with arguments [🚀]"
       },
       "refguide/computed": {
         "title": "Derive information with computed",
@@ -165,7 +158,6 @@
       "Introduction": "Introduction",
       "MobX core": "MobX core",
       "MobX and React": "MobX and React",
-      "Computed values": "Computed values",
       "Effects for observables": "Effects for observables",
       "Debugging MobX": "Debugging MobX",
       "Utilities": "Utilities",

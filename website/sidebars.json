@@ -13,15 +13,12 @@
       "refguide/computed"
     ],
     "MobX and React": [
-      "react/react-integration",
-      "react/react-pitfalls",
-      "react/react-performance",
-      "react/react-class-components"
+      "react/react-integration"
     ],
     "Effects for observables": [
-        "best/what-does-mobx-react-to",
-        "refguide/observe",
-        "refguide/on-become-observed"
+      "best/what-does-mobx-react-to",
+      "refguide/observe",
+      "refguide/on-become-observed"
     ],
     "Debugging MobX": [
       "best/trace",
@@ -34,6 +31,7 @@
       "refguide/mobx-utils"
     ],
     "Tips & Tricks": [
+      "react/react-performance",
       "refguide/configure",
       "best/decorators",
       "best/store",

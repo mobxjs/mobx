@@ -62,6 +62,18 @@ details[open] > summary {
     margin-bottom: 8px;
 }
 
+.tabs {
+    background: #efefef
+}
+
+.tab-content {
+    padding: 1.25rem 1.5rem;
+}
+
+.tab-content .hljs {
+    padding: 1.25rem 0px;
+}
+
 /* BLM */
 .slidingNav::before {
 	content: "Black Lives Matter";
