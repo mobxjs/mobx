@@ -63,6 +63,10 @@ which includes the UI, data serialization, server communication, etc.
 
 <img alt="MobX unidirectional flow" src="assets/flow.png" align="center" />
 
+TODO: clean this up
+
+Easy to read, easy to write. Optimized out of the box.
+
 React and MobX together are a powerful combination. React renders the application state by providing mechanisms to translate it into a tree of renderable components. MobX provides the mechanism to store and update the application state that React then uses.
 
 Both React and MobX provide an optimal and unique solutions to common problems in application development. React provides mechanisms to optimally render UI by using a virtual DOM that reduces the number of costly DOM mutations. MobX provides mechanisms to optimally synchronize application state with your React components by building a reactive dependency tree that is only updated when strictly needed and is never stale. MobX will optimize your React components for you, without needing to specify data dependencies, use `memo`, or refactoring states or contexts to make things optimal.
@@ -127,6 +131,8 @@ Read on to learn about some of the benefits of using MobX.
 > The #mobx is the way I always want things to be! It's really surprising simple and fast! Totally awesome! Don't miss it!
 
 ## The benefits of MobX
+
+TODO: clean this up, and move up, merge with intro section?
 
 MobX is one of the least obtrusive libraries you can use for state management. That makes the `MobX` approach not just simple, but very scalable as well. It has caused many well known companies to adopt MobX, which is used at companies like Microsoft, Amazon, Netflix, EA Games and [many more](https://github.com/mobxjs/mobx/issues/681).
 

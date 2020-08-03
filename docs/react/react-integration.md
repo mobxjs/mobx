@@ -17,20 +17,14 @@ const MyComponent = observer(props => ReactElement)
 ```
 
 While MobX works independently from React they are most commonly used together. In [the gist of Mobx](../intro/overview.md) as well as the [conceptual introduction](../intro/concepts.md) you have already seen the most important part of this integration: the `observer` [HoC](https://reactjs.org/docs/higher-order-components.html) that you can wrap around a React component.
-
-The `observer` HoC subscribes React components automatically to _any observables_ that are used _during render_.
-As a result, components will automatically re-render when relevant observables change.
-But it also makes sure that components don't re-render when there are _no relevant_ changes.
-As a result MobX applications are in practice much better optimized than Redux or vanilla React applications are out of the box when using large collections or state that is re-used in many places.
-
-`observer` is provided through the separate [`mobx-react-lite` package](https://github.com/mobxjs/mobx-react-lite).
-Using `observer` is pretty straight forward:
+`observer` is provided by the separate [`mobx-react-lite` package](https://github.com/mobxjs/mobx-react-lite).
+Using `observer` is pretty straight forward [[try it]](https://codesandbox.io/s/minimal-observer-p9ti4?file=/src/index.tsx):
 
 ```javascript
 import React from "react"
 import ReactDOM from "react-dom"
 import { makeAutoObservable } from "mobx"
-import { observer } from "mobx-react"
+import { observer } from "mobx-react-lite"
 
 class Timer {
     secondsPassed = 0
@@ -57,17 +51,21 @@ const TimerView = observer(({ timer }) => <span>Seconds passed: {timer.secondsPa
 ReactDOM.render(<TimerView timer={myTimer} />, document.body)
 ```
 
-## observer components listen to _any_ observables read during render
+The `observer` HoC subscribes React components automatically to _any observables_ that are used _during render_.
+As a result, components will automatically re-render when relevant observables change.
+It also makes sure that components don't re-render when there are _no relevant_ changes.
+So, observables that are accessible by the component, but not actually read, won't cause a re-render ever.
+As a result MobX applications are in practice very well optimized out of the box and typically don't need any additional code to prevent excessive rendering.
 
 For `observer` to work it doesn't matter _how_ the observables arrive in the component; only that they are read.
-This means that observation is deep; so complex expression like `todos[0].author.displayName` work out of the box.
-It also means that observables that are accessible by the component, but not actually read, won't cause a re-render ever.
-This makes the subscription mechanism is much more precise and efficient compared to any framework in which data dependencies have to be explicitly declared or preprocessed (with for example selectors).
+Reading observables deeply is fine, complex expression like `todos[0].author.displayName` work out of the box.
+This makes the subscription mechanism much more precise and efficient compared to other framework in which data dependencies have to be declared explicitly or be pre-computed (with for example selectors).
 
-Since it doesn't matter (technically that is) what we read, or where observables originated from,
+## Local and external state
+
+Since it doesn't matter (technically that is) which observables we read, or where observables originated from,
 there is great flexibility in how state is organized.
-Here are a few options,
-updates to the timer will be properly reflected in all examples:
+The examples below demonstrate different patterns on how external and local observable state can be used in `observer` components.
 
 ### Using external state in `observer` components
 
@@ -90,7 +88,7 @@ ReactDOM.render(<TimerView timer={myTimer} />, document.body)
 <!--using global variables-->
 
 Since it doesn't matter _how_ we got the reference to an observable, we can consume
-observables from closures directly. (Including from imports etc).
+observables from outer scopes directly. (Including from imports etc).
 
 ```javascript
 const myTimer = new Timer() // see Timer definition above
@@ -101,9 +99,9 @@ const TimerView = observer(() => <span>Seconds passed: {myTimer.secondsPassed}</
 ReactDOM.render(<TimerView />, document.body)
 ```
 
-Using observables directly works very well, but since it typically creates module state, it might complicate unit testing, and we recommend using React Context instead.
+Using observables directly works very well, but since this typically introduces module state, this pattern might complicate unit testing, and we recommend using React Context instead.
 
-<!--using context-->
+<!--using React context-->
 
 [React Context](https://reactjs.org/docs/context.html) is a great mechanism to share observables with an entire subtree.
 
@@ -129,20 +127,20 @@ ReactDOM.render(
 )
 ```
 
-Note that we don't recommend ever replacing the `value` of a `Provider`. With MobX there should be no need for that, since the observable that is shared can be updated itself.
+Note that we don't recommend ever replacing the `value` of a `Provider` with a different value. Using MobX, there should be no need for that, since the observable that is shared can be updated itself.
 
 <!--END_DOCUSAURUS_CODE_TABS-->
 
 ### Using local observable state in `observer` components
 
-Since observables used by `observer` can come from anywhere, they can local state as well.
+Since observables used by `observer` can come from anywhere, they can be local state as well.
 Again, different options are available for us:
 
 <!--DOCUSAURUS_CODE_TABS-->
 <!--`useState` with observable class-->
 
 The simplest way to use local observable state is to store a reference to an observable class with `useState`.
-Note that, since we typically don't want to replace the reference, we don't need the updater function returned by `useState`:
+Note that, since we typically don't want to replace the reference, we totally ignore the updater function returned by `useState`:
 
 ```javascript
 import { observer } from "mobx-react-lite"
@@ -157,7 +155,7 @@ ReactDOM.render(<TimerView />, document.body)
 ```
 
 If you want to automatically update the timer like we did in the original example,
-an `useEffect` could be used in typical React fashion:
+`useEffect` could be used in typical React fashion:
 
 ```javascript
 useEffect(() => {
@@ -169,15 +167,6 @@ useEffect(() => {
     }
 }, [myTimer])
 ```
-
-<details><summary>What about `useMemo`?</summary>
-A critical reader might notice that we might have used `useMemo`, 
-rather than `useState`. 
-That would in practice work the same.
-However, React doesn't _guarantee_ that memoized values are actually
-memoized in all cases, so it _could_ randomly throw away our Timer instance
-and create a fresh one. 
-</details>
 
 <!--`useState` with local observable object-->
 
@@ -228,26 +217,33 @@ ReactDOM.render(<TimerView />, document.body)
 
 <!--END_DOCUSAURUS_CODE_TABS-->
 
+<details><summary>What about `useMemo`?</summary>
+A critical reader might notice that we might have used `useMemo`, 
+rather than `useState`. 
+That would in practice work the same.
+However, React doesn't _guarantee_ that memoized values are actually
+memoized in all cases, so it _could_ randomly throw away our Timer instance
+and create a fresh one, resetting our timer progress in the process. 
+</details>
+
 ### You might not need locally observable state
 
-In general we recommend not to resort to using MobX observables for local component state too quickly; as this can theoretically lock you out of some features of React's Suspense mechanism.
+In general we recommend to not resort to MobX observables for local component state too quickly; as this can theoretically lock you out of some features of React's Suspense mechanism.
 As a rule of thumb use MobX observables when the state captures domain data that is shared among components (including children), such as todo items, users, bookings, etc.
 State that is only captures UI state, such as loading state, selections, etc, might be better served by the [`useState` hook](https://reactjs.org/docs/hooks-state.html), since this allows you to leverage React suspense features in the future.
 
-## When to apply `observer`?
+## Always read observables inside `observer` components.
 
-The simple rule of thumb is: _all components that render observable data_.
+You might be wondering, when to apply `observer`? The simple rule of thumb is: _apply `observer` to all components that read observable data_.
+`observer` only enhances the component you are decorating, not the components called by it. So usually all your components should be wrapped by `observer`. Don't worry, this is not inefficient, in contrast, more `observer` components make rendering more efficient as updates become more fine-grained.
 
-`observer` only enhances the component you are decorating, not the components used inside it. So usually all your components should be wrapped by `observer`. Don't worry, this is not inefficient, in contrast, more `observer` components make rendering more efficient.
+### Tip: Grab values from objects as late as possible
 
-### Tip: Dereference values _inside_ your components
-
-MobX can do a lot, but it cannot make primitive values observable.
-So MobX works the best if you pass object references around as long as possible, and only read their properties inside the `observer` based components that are going to render them into the DOM / low-level components.
-In other words, `observer` reacts to the fact that you dereference a value.
+`observer` works the best if you pass object references around as long as possible, and only read their properties inside the `observer` based components that are going to render them into the DOM / low-level components.
+In other words, `observer` reacts to the fact that you 'dereference' a value from an object.
 
 In the above example, the `TimerView` component would **not** react to future changes if it was defined
-as follows, because the `.secondsPassed` is not actually read inside the `observer` component, and hence not tracked:
+as follows, because the `.secondsPassed` is not read inside the `observer` component, but outside, and hence _not_ tracked:
 
 ```javascript
 const TimerView = observer(({ secondsPassed }) => <span>Seconds passed: {secondsPassed}</span>)
@@ -255,17 +251,18 @@ const TimerView = observer(({ secondsPassed }) => <span>Seconds passed: {seconds
 React.render(<TimerViewer secondPassed={myTimer.secondsPassed} />, document.body)
 ```
 
-If the problem is not entirely clear, make sure to study [what does MobX react to?](../best/what-does-mobx-react-to.md) first!
-
 Note that this is a different mindset from other libraries like React-redux, where it is a good practice to dereference early and pass primitives down, to better leverage memoization.
+If the problem is not entirely clear, make sure to study [what does MobX react to?](../best/what-does-mobx-react-to.md).
 
-### Common pitfall: Passing observables to components that aren't `observer`
+### Don't pass observables into components that aren't `observer`
 
-Components wrapped with `observer` _only_ subscribe to observables used during the _own_ render of the component. So if observable objects/ arrays / maps are passed to child components, those have to be marked as `observer` as well. This also holds for any callback based components.
+Components wrapped with `observer` _only_ subscribe to observables used during the _own_ render of the component. So if observable objects/ arrays / maps are passed to child components, those have to be marked as `observer` as well.
+This is also true for any callback based components.
 
-If you want to pass observables to a component that isn't `observer`, for example because it is a third-party component, or you want to keep that component MobX agnostic, you will have to [convert the observables to plain JavaScript structures](observable.md#converting-observables-back-to-vanilla-javascript-collections) before passing them on.
+If you want to pass observables to a component that isn't `observer`, either because it is a third-party component, or because you want to keep that component MobX agnostic, you will have to [convert the observables to plain JavaScript values or structures](observable.md#converting-observables-back-to-vanilla-javascript-collections) before passing them on.
 
-Given a an observable `todo` object, a `TodoView` component (observer) and an imaginary `GridRow` component that takes a column / value mapping, which isn't observer:
+To elaborate on the above,
+take the following example observable `todo` object, a `TodoView` component (observer) and an imaginary `GridRow` component that takes a column / value mapping, but which isn't an `observer`:
 
 ```javascript
 class Todo {
@@ -282,17 +279,18 @@ const TodoView = observer(({ todo }: { todo: Todo }) =>
    // since it isn't an observer
    return <GridRow data={todo} />
 
-   // CORRECT: let `Todo` picks up relevant changes, and pass plain data down
+   // CORRECT: let `TodoView` detect relevant changes in `todo`, and pass plain data down
    return <GridRow data={{
        title: todo.title,
        done: todo.done
    }} />
 
-   // NOTE: `data={toJS(todo)} would have worked as well
+   // CORRECT: Using `toJS` works as well. But being explicit is typically better
+   return <GridRow data={toJS(todo)} />
 )
 ```
 
-### Common pitfall: Using observables in a callback component that isn't `observer`
+### Callback components might require `<Observer>`
 
 Imagine the same example, where `GridRow` takes an `onRender` callback instead.
 Since `onRender` is part of the rendering cycle of `GridRow`, rather than `TodoView`'s render (even though that is where it syntactically appears), we have to make sure that the callback component uses an `observer` component.
@@ -326,6 +324,11 @@ It offers a few more features which are typically not needed anymore in greenfie
 Note that `mobx-react` fully repackages and re-exports `mobx-react-lite`, including function component support.
 If you use `mobx-react`, there is no need to add `mobx-react-lite` as dependency or import from it anywhere.
 
+</details>
+
+<details><summary>`observer` and `React.memo`?</summary>
+`observer` automatically applies `memo`, so `observer` components never need to be wrapped in `memo`. 
+`memo` can be applied safely to observer components because mutations (deeply) inside the props will be picked up by `observer` anyway if relevant.  
 </details>
 
 <details><summary>

@@ -51,10 +51,6 @@
       "LINKS": {
         "title": "LINKS"
       },
-      "react/react-class-components": {
-        "title": "React class components",
-        "sidebar_label": "React class components"
-      },
       "react/react-integration": {
         "title": "React integration",
         "sidebar_label": "React integration"
@@ -62,10 +58,6 @@
       "react/react-performance": {
         "title": "Optimizing rendering React components",
         "sidebar_label": "Optimizing React components"
-      },
-      "react/react-pitfalls": {
-        "title": "MobX and React pitfalls",
-        "sidebar_label": "MobX and React pitfalls"
       },
       "README": {
         "title": "Introduction",
