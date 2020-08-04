@@ -1,5 +1,5 @@
 ---
-sidebar_label: Decorators in MobX [🚀]
+sidebar_label: Enabling decorators 🚀
 hide_title: true
 ---
 

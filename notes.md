@@ -68,6 +68,7 @@
     -   [ ] make `onReactionError` an option for `configure`
     -   [ ] investigate the onbecomeunobserved issue
     -   [ ] support `flow` and `computedFn` as annotation
+    -   [ ] make second arg of reaction effect the old value
 -   [ ] docs
     -   [ ] clean up docs
     -   [ ] fix interactive tut
@@ -78,6 +79,7 @@
     -   [ ] make details section collapsible
     -   [ ] better sel page
     -   [ ] link flutter, lit, angular
+    -   [ ] update footer
 -   [ ] mobx-react
     -   [ ] displayname for observer components facebook/react#18026
     -   [ ] update useLocalStore in mobx-react-lite to use

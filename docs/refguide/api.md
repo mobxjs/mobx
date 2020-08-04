@@ -8,6 +8,8 @@ hide_title: true
 
 # MobX API Reference
 
+Functions marked with '🚀' should typically not be needed.
+
 # Core API
 
 _These are the most important MobX API's._
@@ -309,9 +311,29 @@ More, less trivial utilities can be found in the [mobx-utils](https://github.com
 
 ### `toJS`
 
-Converts observable data structures back to plain javascript objects, ignoring computed values.
+Usage:
 
-[&laquo;details&raquo;](tojson.md)
+`toJS(value)`
+
+Recursively converts an (observable) object to a javascript _structure_.
+Supports observable arrays, objects, maps and primitives.
+Computed values and other non-enumerable properties won't be part of the result.
+Cycles are detected and properly supported by default, but this can be disabled to improve performance.
+
+`toJS` accepts three options
+
+For more complex (de)serialization scenario's it is recommended to give classes a (computed) `toJSON` method, or use a serialization library like [serializr](https://github.com/mobxjs/serializr)
+
+```javascript
+const obj = mobx.observable({
+    x: 1
+})
+
+const clone = mobx.toJS(obj)
+
+console.log(mobx.isObservableObject(obj)) // true
+console.log(mobx.isObservableObject(clone)) // false
+```
 
 ### `isArrayLike`
 
@@ -480,12 +502,69 @@ Returns the backing atom.
 
 ### `transaction`
 
-Wrap code in a transaction.
+Usage 🚀:
 
-[&laquo;trace&raquo;](internals.md#transaction)
+-   `transaction(worker: () => any)`
+
+_Transaction is a low-level api, it is recommended to use [`action`](#action) / [`runInAction`](#runinaction) instead_
+
+`transaction` can be used to batch a bunch of updates without notifying any observers until the end of the transaction. Like `untracked`, it is automatically applied by `action`, so usually it makes more sense to use actions than to use `transaction` directly.
+
+`transaction` takes a single, parameterless `worker` function as argument and runs it.
+No observers are notified until this function has completed.
+`transaction` returns any value that was returned by the `worker` function.
+Note that `transaction` runs completely synchronously.
+Transactions can be nested. Only after completing the outermost `transaction` pending reactions will be run.
+
+```javascript
+import { observable, transaction, autorun } from "mobx"
+
+const numbers = observable([])
+
+autorun(() => console.log(numbers.length, "numbers!"))
+// Prints: '0 numbers!'
+
+transaction(() => {
+    transaction(() => {
+        numbers.push(1)
+        numbers.push(2)
+    })
+    numbers.push(3)
+})
+// Prints: '3 numbers!'
+```
 
 ### `untracked`
 
-Untracked allows you to run a piece of code without establishing observers.
+Usage 🚀:
 
-[&laquo;trace&raquo;](internals.md#untracked)
+-   `untracked(worker: () => any)`
+
+_Untracked is a low-level api, it is recommended to use `action`](#action) / [`runInAction`](#runinaction) instead_
+
+Untracked allows you to run a piece of code without establishing observers.
+Like `transaction`, `untracked` is automatically applied by `action`, so usually it makes more sense to use actions than to use `untracked` directly.
+Example:
+
+```javascript
+const person = observable({
+    firstName: "Michel",
+    lastName: "Weststrate"
+})
+
+autorun(() => {
+    console.log(
+        person.lastName,
+        ",",
+        // this untracked block will return the person's firstName without establishing a dependency
+        untracked(() => person.firstName)
+    )
+})
+// prints: Weststrate, Michel
+
+person.firstName = "G.K."
+// doesn't print!
+
+person.lastName = "Chesterton"
+// prints: Chesterton, G.K.
+```

@@ -1,5 +1,5 @@
 ---
-sidebar_label: Migrating to MobX 6 [🚀]
+sidebar_label: Migrating from MobX 4/5 🚀
 hide_title: true
 ---
 

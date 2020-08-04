@@ -1,11 +1,13 @@
 ---
-sidebar_label: intercept & observe [🚀]
+sidebar_label: Intercept & Observe 🚀
 hide_title: true
 ---
 
 <script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
-# Intercept & Observe [🚀]
+# Intercept & Observe 🚀
+
+_Warning: intercept and observe are low level utilities, and should not be needed in practice. Use some form of [reaction](autorun.md) instead. For example `observe` doesn't respect transactions, and doesn't support deep observing changes. Using those utilities is an anti-pattern. If you intend to use `observe` to get access to the old- and new value, use [`reaction`](api.md#reaction) instead._
 
 `observe` and `intercept` can be used to monitor the changes of a single observable (they **_don't_** track nested observables).
 
@@ -16,6 +18,8 @@ hide_title: true
 ## Intercept
 
 Usage: `intercept(target, propertyName?, interceptor)`
+
+_Please avoid this API, it basically provides a bit of aspect-oriented programming, creating flows that are really hard to debug. Rather, do things like data-validation *before* updating any state, rather than during._
 
 -   `target`: the observable to guard
 -   `propertyName`: optional parameter to specify a specific property to intercept. Note that `intercept(user.name, interceptor)` is fundamentally different from `intercept(user, "name", interceptor)`. The first tries to add an interceptor to the _current_ `value` inside `user.name` (which might not be an observable at all), the latter intercepts changes to the `name` _property_ of `user`.
@@ -63,6 +67,8 @@ const disposer = intercept(theme, "backgroundColor", change => {
 ## Observe
 
 Usage: `observe(target, propertyName?, listener, invokeImmediately?)`
+
+_See above notice, please avoid this API, and use `reaction` instead_
 
 -   `target`: the observable to observe
 -   `propertyName`: optional parameter to specify a specific property to observe. Note that `observe(user.name, listener)` is fundamentally different from `observe(user, "name", listener)`. The first observes the _current_ `value` inside `user.name` (which might not be an observable at all), the latter observes the `name` _property_ of `user`.

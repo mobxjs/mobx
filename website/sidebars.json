@@ -15,33 +15,22 @@
     "MobX and React": [
       "react/react-integration"
     ],
-    "Effects for observables": [
-      "best/what-does-mobx-react-to",
-      "refguide/observe",
-      "refguide/on-become-observed"
-    ],
-    "Debugging MobX": [
-      "best/trace",
-      "refguide/introspection-utils",
-      "refguide/spy"
-    ],
-    "Utilities": [
-      "refguide/tojson",
-      "refguide/object-api",
-      "refguide/mobx-utils"
-    ],
     "Tips & Tricks": [
+      "best/what-does-mobx-react-to",
+      "best/debugging-mobx",
+      "best/store",
       "react/react-performance",
+      "refguide/mobx-utils",
+      "refguide/object-api",
+      "refguide/computed-with-args",
+      "refguide/extending",
+      "refguide/on-become-observed",
+      "refguide/observe"
+    ],
+    "Configuring MobX": [
       "refguide/configure",
       "best/decorators",
-      "best/store",
-      "faq/migrate-to-6",
-      "faq/faq",
-      "refguide/computed-with-args"
-    ],
-    "Extending MobX": [
-        "refguide/extending",
-        "refguide/internals"
+      "faq/migrate-to-6"
     ]
   }
 }

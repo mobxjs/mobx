@@ -1,5 +1,5 @@
 ---
-sidebar_label: Understanding MobX
+sidebar_label: Understanding reactivity
 hide_title: true
 ---
 

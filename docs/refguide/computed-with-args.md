@@ -1,6 +1,6 @@
 ---
 title: Computeds with arguments
-sidebar_label: Computeds with arguments [🚀]
+sidebar_label: Computeds with arguments 🚀
 hide_title: true
 ---
 

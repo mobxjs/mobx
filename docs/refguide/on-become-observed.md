@@ -1,18 +1,19 @@
 ---
 title: onBecomeObserved
-sidebar_label: onBecomeObserved [🚀]
+sidebar_label: Lazy observables 🚀
 hide_title: true
 ---
 
 <script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
-# `onBecomeObserved` and `onBecomeUnobserved` [🚀]
+# Creating lazy observables [🚀]
 
 Usage:
 
 -   `onBecomeObserved(observable, property?, listener: () => void): (() => void)`
 -   `onBecomeUnobserved(observable, property?, listener: () => void): (() => void)`
 
+The functions `onBecomeObserved` and `onBecomeUnobserved` can be used to attach lazy behavior or side-effects to existing observables.
 These functions are hooks into the observability system of MobX and get notified when observables _start_ / _stop_ becoming observed. It can be used to execute some lazy operations or perform network fetches.
 
 The return value is a _diposer-function_ that will detach the _listener_.

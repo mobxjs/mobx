@@ -1,6 +1,6 @@
 ---
 title: Configuring MobX
-sidebar_label: Configuring MobX [🚀]
+sidebar_label: Configuring MobX 🚀
 hide_title: true
 ---
 
@@ -41,6 +41,10 @@ Note: Proxies cannot be polyfilled. Even though polyfills do exist, they don't s
 
 1.  Observable arrays are not real arrays, so they won't pass the `Array.isArray()` check. The practical consequence is that you often need to `.slice()` the array first (to get a real array shallow copy) before passing to third party libraries. For example using observable arrays in concat arrays doesn't work as expected. So '.slice()' them first.
 2.  Adding or deleting properties to existing observable plain objects after creation is not automatically picked up. If you intend to use objects as index based lookup maps, in other words, as dymamic collection of things, use observable maps instead.
+
+Note that it is possible to add properties dynamically to objects, and detect their addition, even when Proxies aren't enabled.
+This can be achieved by using the [collection utilities](object-api.md); make sure that (new) properties are set using the `set` utility, and that the objects are iterated using one of the `values` / `keys` or `entries` utilities, rather than the build-in JavaScript mechanisms.
+But, since this is really easy to forget, we do recommend to use observable maps instead if possible.
 
 ## Decorator support
 

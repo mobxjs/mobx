@@ -8,9 +8,13 @@
       "backers-sponsors": {
         "title": "MobX Backers and Sponsors"
       },
+      "best/debugging-mobx": {
+        "title": "best/debugging-mobx",
+        "sidebar_label": "Analyzing reactivity 🚀"
+      },
       "best/decorators": {
         "title": "best/decorators",
-        "sidebar_label": "Decorators in MobX [🚀]"
+        "sidebar_label": "Enabling decorators 🚀"
       },
       "best/stateless-HMR": {
         "title": "Hot Module Reloading with Stateless Components",
@@ -20,21 +24,13 @@
         "title": "Best Practices for building large scale maintainable projects",
         "sidebar_label": "Defining data stores"
       },
-      "best/trace": {
-        "title": "Using `trace` for debugging",
-        "sidebar_label": "Using trace for debugging"
-      },
       "best/what-does-mobx-react-to": {
         "title": "best/what-does-mobx-react-to",
-        "sidebar_label": "Understanding MobX"
-      },
-      "faq/faq": {
-        "title": "FAQ",
-        "sidebar_label": "Frequently Asked Questions"
+        "sidebar_label": "Understanding reactivity"
       },
       "faq/migrate-to-6": {
         "title": "faq/migrate-to-6",
-        "sidebar_label": "Migrating to MobX 6 [🚀]"
+        "sidebar_label": "Migrating from MobX 4/5 🚀"
       },
       "intro/concepts": {
         "title": "The gist of MobX",
@@ -56,8 +52,8 @@
         "sidebar_label": "React integration"
       },
       "react/react-performance": {
-        "title": "Optimizing rendering React components",
-        "sidebar_label": "Optimizing React components"
+        "title": "Optimizing React components",
+        "sidebar_label": "Optimizing React"
       },
       "README": {
         "title": "Introduction",
@@ -77,7 +73,7 @@
       },
       "refguide/computed-with-args": {
         "title": "Computeds with arguments",
-        "sidebar_label": "Computeds with arguments [🚀]"
+        "sidebar_label": "Computeds with arguments 🚀"
       },
       "refguide/computed": {
         "title": "Derive information with computed",
@@ -85,23 +81,15 @@
       },
       "refguide/configure": {
         "title": "Configuring MobX",
-        "sidebar_label": "Configuring MobX [🚀]"
+        "sidebar_label": "Configuring MobX 🚀"
       },
       "refguide/extending": {
         "title": "refguide/extending",
-        "sidebar_label": "New observable types [🚀]"
-      },
-      "refguide/internals": {
-        "title": "Internal functions",
-        "sidebar_label": "Internal functions [🚀]"
-      },
-      "refguide/introspection-utils": {
-        "title": "Introspection APIs",
-        "sidebar_label": "Introspection APIs"
+        "sidebar_label": "Custom observables 🚀"
       },
       "refguide/mobx-utils": {
         "title": "mobx-utils",
-        "sidebar_label": "mobx-utils [🚀]"
+        "sidebar_label": "mobx-utils 🚀"
       },
       "refguide/modifiers": {
         "title": "Observable modifiers",
@@ -109,7 +97,7 @@
       },
       "refguide/object-api": {
         "title": "refguide/object-api",
-        "sidebar_label": "Object API [🚀]"
+        "sidebar_label": "Collection utilities 🚀"
       },
       "refguide/object": {
         "title": "Observable Objects",
@@ -121,21 +109,17 @@
       },
       "refguide/observe": {
         "title": "refguide/observe",
-        "sidebar_label": "intercept & observe [🚀]"
+        "sidebar_label": "Intercept & Observe 🚀"
       },
       "refguide/on-become-observed": {
         "title": "onBecomeObserved",
-        "sidebar_label": "onBecomeObserved [🚀]"
+        "sidebar_label": "Lazy observables 🚀"
       },
       "refguide/set": {
         "title": "Observable Sets",
         "sidebar_label": "sets"
       },
-      "refguide/spy": {
-        "title": "Spy",
-        "sidebar_label": "spy [🚀]"
-      },
-      "refguide/tojson": {
+      "refguide/tojs": {
         "title": "toJS",
         "sidebar_label": "toJS"
       }
@@ -150,11 +134,8 @@
       "Introduction": "Introduction",
       "MobX core": "MobX core",
       "MobX and React": "MobX and React",
-      "Effects for observables": "Effects for observables",
-      "Debugging MobX": "Debugging MobX",
-      "Utilities": "Utilities",
       "Tips & Tricks": "Tips & Tricks",
-      "Extending MobX": "Extending MobX"
+      "Configuring MobX": "Configuring MobX"
     }
   },
   "pages-strings": {
