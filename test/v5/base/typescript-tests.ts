@@ -8,8 +8,7 @@ import {
     extendObservable,
     action,
     IObservableArray,
-    IArrayChange,
-    IArraySplice,
+    IArrayDidChange,
     IArrayWillChange,
     IArrayWillSplice,
     IObservableValue,
@@ -210,7 +209,7 @@ test("typing", () => {
         // console.log(c.type)
         return null
     })
-    mobx.observe(ar, (d: IArrayChange<number> | IArraySplice<number>) => {
+    mobx.observe(ar, (d: IArrayDidChange<number>) => {
         // console.log(d.type)
     })
 
@@ -219,7 +218,7 @@ test("typing", () => {
         // console.log(c.type)
         return null
     })
-    mobx.observe(ar2, (d: IArrayChange<number> | IArraySplice<number>) => {
+    mobx.observe(ar2, (d: IArrayDidChange<number>) => {
         // console.log(d.type)
     })
 
@@ -549,11 +548,11 @@ test("action decorator (typescript)", () => {
 
     t.deepEqual(normalizeSpyEvents(events), [
         { arguments: [3, 4], name: "add", spyReportStart: true, object: store1, type: "action" },
-        { spyReportEnd: true },
+        { type: "report-end", spyReportEnd: true },
         { arguments: [2, 2], name: "add", spyReportStart: true, object: store2, type: "action" },
-        { spyReportEnd: true },
+        { type: "report-end", spyReportEnd: true },
         { arguments: [1, 1], name: "add", spyReportStart: true, object: store1, type: "action" },
-        { spyReportEnd: true }
+        { type: "report-end", spyReportEnd: true }
     ])
 
     d()
@@ -588,7 +587,7 @@ test("custom action decorator (typescript)", () => {
             object: store1,
             type: "action"
         },
-        { spyReportEnd: true },
+        { type: "report-end", spyReportEnd: true },
         {
             arguments: [2, 2],
             name: "zoem zoem",
@@ -596,7 +595,7 @@ test("custom action decorator (typescript)", () => {
             object: store2,
             type: "action"
         },
-        { spyReportEnd: true },
+        { type: "report-end", spyReportEnd: true },
         {
             arguments: [1, 1],
             name: "zoem zoem",
@@ -604,7 +603,7 @@ test("custom action decorator (typescript)", () => {
             object: store1,
             type: "action"
         },
-        { spyReportEnd: true }
+        { type: "report-end", spyReportEnd: true }
     ])
 
     d()
@@ -635,11 +634,11 @@ test("action decorator on field (typescript)", () => {
 
     t.deepEqual(normalizeSpyEvents(events), [
         { arguments: [3, 4], name: "add", spyReportStart: true, object: store1, type: "action" },
-        { spyReportEnd: true },
+        { type: "report-end", spyReportEnd: true },
         { arguments: [4, 5], name: "add", spyReportStart: true, object: store2, type: "action" },
-        { spyReportEnd: true },
+        { type: "report-end", spyReportEnd: true },
         { arguments: [2, 2], name: "add", spyReportStart: true, object: store1, type: "action" },
-        { spyReportEnd: true }
+        { type: "report-end", spyReportEnd: true }
     ])
 
     d()
@@ -675,7 +674,7 @@ test("custom action decorator on field (typescript)", () => {
             object: store1,
             type: "action"
         },
-        { spyReportEnd: true },
+        { type: "report-end", spyReportEnd: true },
         {
             arguments: [4, 5],
             name: "zoem zoem",
@@ -683,7 +682,7 @@ test("custom action decorator on field (typescript)", () => {
             object: store2,
             type: "action"
         },
-        { spyReportEnd: true },
+        { type: "report-end", spyReportEnd: true },
         {
             arguments: [2, 2],
             name: "zoem zoem",
@@ -691,7 +690,7 @@ test("custom action decorator on field (typescript)", () => {
             object: store1,
             type: "action"
         },
-        { spyReportEnd: true }
+        { type: "report-end", spyReportEnd: true }
     ])
 
     d()

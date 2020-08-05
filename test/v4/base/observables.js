@@ -463,6 +463,9 @@ test("observe object", function () {
         }
     })
     const stop = m.observe(a, function (change) {
+        expect(change.observableKind).toEqual("object")
+        delete change.observableKind
+        delete change.debugObjectName
         events.push(change)
     })
 
@@ -515,6 +518,7 @@ test("mobx.observe", function () {
     const map = mobx.observable.map({})
 
     const push = function (event) {
+        delete event.debugObjectName
         events.push(event)
     }
 
@@ -537,20 +541,23 @@ test("mobx.observe", function () {
     expect(events).toEqual([
         {
             type: "update",
+            observableKind: "object",
             object: o,
             name: "b",
             newValue: 5,
             oldValue: 2
         },
         {
-            object: ar,
             type: "update",
+            observableKind: "array",
+            object: ar,
             index: 0,
             newValue: 6,
             oldValue: 3
         },
         {
             type: "add",
+            observableKind: "map",
             object: map,
             newValue: 7,
             name: "d"

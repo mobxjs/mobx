@@ -37,26 +37,26 @@ import {
     hasProp
 } from "../internal"
 
-export type IObjectDidChange<T = any> =
+export type IObjectDidChange<T = any> = {
+    observableKind: "object"
+    name: PropertyKey
+    object: T
+    debugObjectName: string
+} & (
     | {
-          name: PropertyKey
-          object: T
           type: "add"
           newValue: any
       }
     | {
-          name: PropertyKey
-          object: T
           type: "update"
           oldValue: any
           newValue: any
       }
     | {
-          name: PropertyKey
-          object: T
           type: "remove"
           oldValue: any
       }
+)
 
 export type IObjectWillChange<T = any> =
     | {
@@ -121,10 +121,12 @@ export class ObservableObjectAdministration
         if (newValue !== globalState.UNCHANGED) {
             const notify = hasListeners(this)
             const notifySpy = __DEV__ && isSpyEnabled()
-            const change =
+            const change: IObjectDidChange | null =
                 notify || notifySpy
                     ? {
                           type: UPDATE,
+                          observableKind: "object",
+                          debugObjectName: this.name_,
                           object: this.proxy_ || instance,
                           oldValue: (observable as any).value_,
                           name: key,
@@ -132,7 +134,7 @@ export class ObservableObjectAdministration
                       }
                     : null
 
-            if (__DEV__ && notifySpy) spyReportStart({ ...change, name: this.name_, key })
+            if (__DEV__ && notifySpy) spyReportStart(change!)
             ;(observable as ObservableValue<any>).setNewValue_(newValue)
             if (notify) notifyListeners(this, change)
             if (__DEV__ && notifySpy) spyReportEnd()
@@ -230,16 +232,18 @@ export class ObservableObjectAdministration
             }
             // delete the prop
             delete this.target_[key]
-            const change =
+            const change: IObjectDidChange | null =
                 notify || notifySpy
-                    ? {
+                    ? ({
                           type: REMOVE,
+                          observableKind: "object",
                           object: this.proxy_ || target,
+                          debugObjectName: this.name_,
                           oldValue: oldValue,
                           name: key
-                      }
+                      } as const)
                     : null
-            if (__DEV__ && notifySpy) spyReportStart({ ...change, name: this.name_, key })
+            if (__DEV__ && notifySpy) spyReportStart(change!)
             if (notify) notifyListeners(this, change)
             if (__DEV__ && notifySpy) spyReportEnd()
         } finally {
@@ -265,17 +269,19 @@ export class ObservableObjectAdministration
     notifyPropertyAddition_(key: PropertyKey, newValue) {
         const notify = hasListeners(this)
         const notifySpy = __DEV__ && isSpyEnabled()
-        const change =
+        const change: IObjectDidChange | null =
             notify || notifySpy
-                ? {
+                ? ({
                       type: ADD,
+                      observableKind: "object",
+                      debugObjectName: this.name_,
                       object: this.proxy_ || this.target_,
                       name: key,
                       newValue
-                  }
+                  } as const)
                 : null
 
-        if (__DEV__ && notifySpy) spyReportStart({ ...change, name: this.name_, key })
+        if (__DEV__ && notifySpy) spyReportStart(change!)
         if (notify) notifyListeners(this, change)
         if (__DEV__ && notifySpy) spyReportEnd()
         if (this.pendingKeys_) {
