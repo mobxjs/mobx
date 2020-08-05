@@ -9,8 +9,11 @@ test("set crud", function () {
     const events = []
     const s = set([1])
 
-    mobx.observe(s, changes => {
-        events.push(changes)
+    mobx.observe(s, change => {
+        expect(change.observableKind).toEqual("set")
+        delete change.observableKind
+        delete change.debugObjectName
+        events.push(change)
     })
 
     expect(s.has(1)).toBe(true)
@@ -254,12 +257,13 @@ test("getAtom", () => {
 test("observe", () => {
     const vals = []
     const x = set([1])
-    mobx.observe(x, v => {
-        vals.push(v)
+    mobx.observe(x, change => {
+        delete change.debugObjectName
+        vals.push(change)
     })
     x.add(2)
     x.add(1)
-    expect(vals).toEqual([{ newValue: 2, object: x, type: "add" }])
+    expect(vals).toEqual([{ newValue: 2, object: x, type: "add", observableKind: "set" }])
 })
 
 test("toJS", () => {

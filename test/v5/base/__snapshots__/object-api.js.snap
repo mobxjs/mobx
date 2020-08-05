@@ -26,18 +26,22 @@ exports[`observe & intercept 2`] = `
 Array [
   Object {
     "observe": Object {
+      "debugObjectName": "ObservableObject@52",
       "name": "b",
       "newValue": Object {
         "title": "get tea",
       },
       "object": "skip",
+      "observableKind": "object",
       "type": "add",
     },
   },
   Object {
     "observe": Object {
+      "debugObjectName": "ObservableObject@52",
       "name": "a",
       "object": "skip",
+      "observableKind": "object",
       "oldValue": Object {
         "title": "get coffee",
       },

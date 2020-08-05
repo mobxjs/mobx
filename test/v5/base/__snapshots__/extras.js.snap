@@ -3,15 +3,19 @@
 exports[`spy 1 1`] = `
 Array [
   Object {
-    "name": "ObservableValue@9",
+    "debugObjectName": "ObservableValue@9",
     "newValue": 4,
+    "observableKind": "value",
     "oldValue": 3,
     "spyReportStart": true,
     "type": "update",
   },
   Object {
-    "name": "ComputedValue@11",
-    "type": "compute",
+    "debugObjectName": "ComputedValue@11",
+    "newValue": 8,
+    "observableKind": "computed",
+    "oldValue": 6,
+    "type": "update",
   },
   Object {
     "name": "Autorun@12",
@@ -20,9 +24,11 @@ Array [
   },
   Object {
     "spyReportEnd": true,
+    "type": "report-end",
   },
   Object {
     "spyReportEnd": true,
+    "type": "report-end",
   },
 ]
 `;

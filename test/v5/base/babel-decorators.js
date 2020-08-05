@@ -272,11 +272,11 @@ test("action decorator (babel)", function () {
 
     expect(normalizeSpyEvents(events)).toEqual([
         { arguments: [3, 4], name: "add", spyReportStart: true, object: store1, type: "action" },
-        { spyReportEnd: true },
+        { type: "report-end", spyReportEnd: true },
         { arguments: [3, 4], name: "add", spyReportStart: true, object: store2, type: "action" },
-        { spyReportEnd: true },
+        { type: "report-end", spyReportEnd: true },
         { arguments: [1, 1], name: "add", spyReportStart: true, object: store1, type: "action" },
-        { spyReportEnd: true }
+        { type: "report-end", spyReportEnd: true }
     ])
 
     d()
@@ -311,7 +311,7 @@ test("custom action decorator (babel)", function () {
             object: store1,
             type: "action"
         },
-        { spyReportEnd: true },
+        { type: "report-end", spyReportEnd: true },
         {
             arguments: [3, 4],
             name: "zoem zoem",
@@ -319,7 +319,7 @@ test("custom action decorator (babel)", function () {
             object: store2,
             type: "action"
         },
-        { spyReportEnd: true },
+        { type: "report-end", spyReportEnd: true },
         {
             arguments: [1, 1],
             name: "zoem zoem",
@@ -327,7 +327,7 @@ test("custom action decorator (babel)", function () {
             object: store1,
             type: "action"
         },
-        { spyReportEnd: true }
+        { type: "report-end", spyReportEnd: true }
     ])
 
     d()
@@ -357,11 +357,11 @@ test("action decorator on field (babel)", function () {
 
     expect(normalizeSpyEvents(events)).toEqual([
         { arguments: [3, 4], name: "add", spyReportStart: true, object: store1, type: "action" },
-        { spyReportEnd: true },
+        { type: "report-end", spyReportEnd: true },
         { arguments: [5, 4], name: "add", spyReportStart: true, object: store2, type: "action" },
-        { spyReportEnd: true },
+        { type: "report-end", spyReportEnd: true },
         { arguments: [2, 2], name: "add", spyReportStart: true, object: store1, type: "action" },
-        { spyReportEnd: true }
+        { type: "report-end", spyReportEnd: true }
     ])
 
     d()
@@ -397,7 +397,7 @@ test("custom action decorator on field (babel)", function () {
             object: store1,
             type: "action"
         },
-        { spyReportEnd: true },
+        { type: "report-end", spyReportEnd: true },
         {
             arguments: [5, 4],
             name: "zoem zoem",
@@ -405,7 +405,7 @@ test("custom action decorator on field (babel)", function () {
             object: store2,
             type: "action"
         },
-        { spyReportEnd: true },
+        { type: "report-end", spyReportEnd: true },
         {
             arguments: [2, 2],
             name: "zoem zoem",
@@ -413,7 +413,7 @@ test("custom action decorator on field (babel)", function () {
             object: store1,
             type: "action"
         },
-        { spyReportEnd: true }
+        { type: "report-end", spyReportEnd: true }
     ])
 
     d()
