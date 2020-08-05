@@ -1344,7 +1344,11 @@ test("atom events #427", () => {
     let stop = 0
     let runs = 0
 
-    const a = mobx.createAtom("test", () => start++, () => stop++)
+    const a = mobx.createAtom(
+        "test",
+        () => start++,
+        () => stop++
+    )
     expect(a.reportObserved()).toEqual(false)
 
     expect(start).toBe(0)
@@ -1682,12 +1686,18 @@ test("computed equals function only invoked when necessary", () => {
 
         // Another value change will cause a comparison
         right.set("F")
-        expect(comparisons).toEqual([{ from: "ab", to: "cb" }, { from: "de", to: "df" }])
+        expect(comparisons).toEqual([
+            { from: "ab", to: "cb" },
+            { from: "de", to: "df" }
+        ])
 
         // Becoming unobserved, then observed won't cause a comparison
         disposeAutorun()
         disposeAutorun = mobx.autorun(() => values.push(combinedToLowerCase.get()))
-        expect(comparisons).toEqual([{ from: "ab", to: "cb" }, { from: "de", to: "df" }])
+        expect(comparisons).toEqual([
+            { from: "ab", to: "cb" },
+            { from: "de", to: "df" }
+        ])
 
         expect(values).toEqual(["ab", "cb", "de", "df", "df"])
 
@@ -1800,7 +1810,10 @@ test("computed comparer works with decorate (plain)", () => {
     time.minute = 0
     expect(changes).toEqual([{ hour: 9, minute: 0 }])
     time.hour = 10
-    expect(changes).toEqual([{ hour: 9, minute: 0 }, { hour: 10, minute: 0 }])
+    expect(changes).toEqual([
+        { hour: 9, minute: 0 },
+        { hour: 10, minute: 0 }
+    ])
     time.minute = 30
     expect(changes).toEqual([
         { hour: 9, minute: 0 },
@@ -1839,7 +1852,10 @@ test("computed comparer works with decorate (plain) - 2", () => {
     time.minute = 0
     expect(changes).toEqual([{ hour: 9, minute: 0 }])
     time.hour = 10
-    expect(changes).toEqual([{ hour: 9, minute: 0 }, { hour: 10, minute: 0 }])
+    expect(changes).toEqual([
+        { hour: 9, minute: 0 },
+        { hour: 10, minute: 0 }
+    ])
     time.minute = 30
     expect(changes).toEqual([
         { hour: 9, minute: 0 },
@@ -1874,7 +1890,10 @@ test("computed comparer works with decorate (plain) - 3", () => {
     time.minute = 0
     expect(changes).toEqual([{ hour: 9, minute: 0 }])
     time.hour = 10
-    expect(changes).toEqual([{ hour: 9, minute: 0 }, { hour: 10, minute: 0 }])
+    expect(changes).toEqual([
+        { hour: 9, minute: 0 },
+        { hour: 10, minute: 0 }
+    ])
     time.minute = 30
     expect(changes).toEqual([
         { hour: 9, minute: 0 },
@@ -2056,7 +2075,10 @@ test("tuples", () => {
     const myStuff = tuple(1, 3)
     const events = []
 
-    mobx.reaction(() => myStuff[0], val => events.push(val))
+    mobx.reaction(
+        () => myStuff[0],
+        val => events.push(val)
+    )
     myStuff[1] = 17 // should not react
     myStuff[0] = 2 // should react
     expect(events).toEqual([2])
@@ -2081,13 +2103,13 @@ test("extendObservable can be used late and support non-enumerable getters #2386
             x: 1,
             inc() {
                 this.x++
-            },
+            }
         }
         Object.defineProperty(args, "double", {
             get() {
                 return this.x
             },
-            enumerable: false,
+            enumerable: false
         })
         extendObservable(this, args)
     }
@@ -2095,4 +2117,23 @@ test("extendObservable can be used late and support non-enumerable getters #2386
 
     expect(i.x).toBe(1)
     expect(i.double).toBe(1)
+})
+
+test("observable supports non-enumerable getters #2386", () => {
+    const args = {
+        x: 1,
+        inc() {
+            this.x++
+        }
+    }
+    Object.defineProperty(args, "double", {
+        get() {
+            return this.x
+        },
+        enumerable: false
+    })
+
+    const o = observable(args)
+    expect(o.double).toBe(1)
+    expect(mobx.isObservableProp(o, "double")).toBe(true)
 })

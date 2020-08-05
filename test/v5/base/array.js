@@ -614,5 +614,5 @@ test("correct array should be passed to callbacks #2326", () => {
         "reduce",
         "reduceRight",
         "some"
-    ].forEach(method => array[method](callback))
+    ].forEach(method => array[method]?.(callback))
 })

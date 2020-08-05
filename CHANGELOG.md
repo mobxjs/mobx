@@ -1,8 +1,16 @@
 # UNPUBLISHED (keep this here and add unpublished changes)
 
+# 5.15.5 / 5.15.4
+
 -   Fixed ObservableSet.prototype.forEach not being reactive in 4.x [#2341](https://github.com/mobxjs/mobx/pull/2341) by [@melnikov-s](https://github.com/melnikov-s)
 -   Add error when computed value declared for unspecified getter [#1867](https://github.com/mobxjs/mobx/issues/1867) by [@berrunder](https://github.com/berrunder)
 -   Fixed [#2326](https://github.com/mobxjs/mobx/issues/2326) correct array is passed to callbacks by [@urugator](https://github.com/urugator)
+-   Fixed [#2278](https://github.com/mobxjs/mobx/issues/2278), `map.delete` should respect strict mode, by [@urugator](https://github.com/urugator)
+-   Fixed [#2253](https://github.com/mobxjs/mobx/issues/2253), [#1980](https://github.com/mobxjs/mobx/issues/1980), map key order not always preserved by [@urugator](https://github.com/urugator)
+-   Fixed [#2412](https://github.com/mobxjs/mobx/issues/2412), non-enumerable getters not being picked up by `extendObservable` by [@urugator](https://github.com/urugator)
+
+-   Several performance improvements
+-   Dropped `browser` fields from `package.json`
 
 # 5.15.4 / 4.15.4
 
