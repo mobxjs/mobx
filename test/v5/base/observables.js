@@ -2074,3 +2074,25 @@ test("extendObservable should not accept complex objects as second argument", ()
         `"[mobx] 'extendObservable' only accepts plain objects as second argument"`
     )
 })
+
+test("extendObservable can be used late and support non-enumerable getters #2386", () => {
+    function MyClass() {
+        const args = {
+            x: 1,
+            inc() {
+                this.x++
+            },
+        }
+        Object.defineProperty(args, "double", {
+            get() {
+                return this.x
+            },
+            enumerable: false,
+        })
+        extendObservable(this, args)
+    }
+    const i = new MyClass()
+
+    expect(i.x).toBe(1)
+    expect(i.double).toBe(1)
+})

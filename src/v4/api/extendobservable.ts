@@ -64,7 +64,9 @@ export function extendObservable<A extends Object, B extends Object>(
     asObservableObject(target, options.name, defaultDecorator.enhancer) // make sure object is observable, even without initial props
     startBatch()
     try {
-        for (let key in properties) {
+        const keys = Object.getOwnPropertyNames(properties)
+        for (let i = 0, l = keys.length; i < l; i++) {
+            const key = keys[i]
             const descriptor = Object.getOwnPropertyDescriptor(properties, key)!
             if (process.env.NODE_ENV !== "production") {
                 if (isComputed(descriptor.value))

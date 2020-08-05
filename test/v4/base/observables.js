@@ -2074,3 +2074,25 @@ test("tuples", () => {
 
     expect(myStuff.map(x => x * 2)).toEqual([4, 34])
 })
+
+test("extendObservable can be used late and support non-enumerable getters #2386", () => {
+    function MyClass() {
+        const args = {
+            x: 1,
+            inc() {
+                this.x++
+            },
+        }
+        Object.defineProperty(args, "double", {
+            get() {
+                return this.x
+            },
+            enumerable: false,
+        })
+        extendObservable(this, args)
+    }
+    const i = new MyClass()
+
+    expect(i.x).toBe(1)
+    expect(i.double).toBe(1)
+})
