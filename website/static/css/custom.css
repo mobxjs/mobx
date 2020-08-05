@@ -87,6 +87,13 @@ details[open] > summary {
 	font-weight: bold;
 }
 
+@media (max-width: 480px) {
+  .slidingNav::before {
+    text-align: left;
+    padding-left: 60px;
+  }
+}
+
 /* Carbon */
 #carbonads {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu,
