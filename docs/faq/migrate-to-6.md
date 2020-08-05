@@ -87,6 +87,8 @@ autoActions
 -   Fixed #2326
 -   Fixed #2379
 
+`reaction`'s effect function now receives the previous value seen by the reaction as second argument.
+
 ## Breaking changes
 
 ### Changes that might affect you
@@ -115,3 +117,4 @@ autoActions
 -   In `computed`, the when `predicate` (first arg), and `reaction` predicate (first arg) it is now forbidden to directly change state. State changes should be done in their effect functinos, or otherwise wrapped in `runInAction` at least (only the state change, not the observables you want to track!) (note that this is still an anti pattern).
 -   The `observableArray.get()` and `observableArray.set()` methods are no longer supported.
 -   The `IObservableObject` interface is no longer exported from MobX.
+-   The second argument to the `reaction` effect function, the disposer object, is now passed in as third argument. The second argument is now the previous value seen by the reaction.

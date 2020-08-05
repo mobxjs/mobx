@@ -11,8 +11,8 @@ test("basic", () => {
 
     const d = reaction(
         () => a.get(),
-        newValue => {
-            values.push(newValue)
+        (newValue, oldValue) => {
+            values.push([newValue, oldValue])
         }
     )
 
@@ -21,7 +21,10 @@ test("basic", () => {
     d()
     a.set(4)
 
-    expect(values).toEqual([2, 3])
+    expect(values).toEqual([
+        [2, 1],
+        [3, 2]
+    ])
 })
 
 test("effect fireImmediately is honored", () => {
@@ -187,7 +190,7 @@ test("passes Reaction as an argument to effect function", () => {
 
     reaction(
         () => a.get(),
-        (newValue, r) => {
+        (newValue, _oldValue, r) => {
             if (a.get() === "pleaseDispose") r.dispose()
             values.push(newValue)
         },
@@ -209,9 +212,9 @@ test("can dispose reaction on first run", () => {
     const valuesExpr1st = []
     reaction(
         () => a.get(),
-        (newValue, r) => {
+        (newValue, oldValue, r) => {
             r.dispose()
-            valuesExpr1st.push(newValue)
+            valuesExpr1st.push([newValue, oldValue])
         },
         { fireImmediately: true }
     )
@@ -222,8 +225,8 @@ test("can dispose reaction on first run", () => {
             r.dispose()
             return a.get()
         },
-        newValue => {
-            valuesEffect1st.push(newValue)
+        (newValue, oldValue) => {
+            valuesEffect1st.push([newValue, oldValue])
         },
         { fireImmediately: true }
     )
@@ -231,9 +234,9 @@ test("can dispose reaction on first run", () => {
     const valuesExpr = []
     reaction(
         () => a.get(),
-        (newValue, r) => {
+        (newValue, oldValue, r) => {
             r.dispose()
-            valuesExpr.push(newValue)
+            valuesExpr.push([newValue, oldValue])
         }
     )
 
@@ -243,17 +246,17 @@ test("can dispose reaction on first run", () => {
             r.dispose()
             return a.get()
         },
-        newValue => {
-            valuesEffect.push(newValue)
+        (newValue, oldValue) => {
+            valuesEffect.push([newValue, oldValue])
         }
     )
 
     a.set(2)
     a.set(3)
 
-    expect(valuesExpr1st).toEqual([1])
-    expect(valuesEffect1st).toEqual([1])
-    expect(valuesExpr).toEqual([2])
+    expect(valuesExpr1st).toEqual([[1, undefined]])
+    expect(valuesEffect1st).toEqual([[1, undefined]])
+    expect(valuesExpr).toEqual([[2, 1]])
     expect(valuesEffect).toEqual([])
 })
 

@@ -118,7 +118,7 @@ change to its observable state:
 
 Usage:
 
--   `reaction(() => data, (data, reaction) => { sideEffect }, options?)`.
+-   `reaction(() => value, (value, previousValue, reaction) => { sideEffect }, options?)`.
 
 `reaction` is like `autorun` but gives more fine grained control on which observables will be tracked.
 It takes two functions, the first one (the _data_ function) is tracked and returns data that is used as input for the second one, the _effect_ function.

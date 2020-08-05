@@ -62,13 +62,18 @@
     -   [x] ~default observable requires reaction?~
     -   [x] check coverage
     -   [x] re-execute perf checks
-    -   [x] update ad links (https://www.google.com/adsense/new/u/0/pub-1705981461067724/home ?)
-    -   [ ] add deprecation messages to latest mobx 5
-    -   [ ] merge 2398
+    -   [x] update ad links
+    -   [x] ~add deprecation messages to latest mobx 5~ tricky; a lot of the api's are valid in v5 without alternative, so wouldn't result in actionable hints if the user doesn't intent to upgrade to v6
+    -   [x] merge 2398
     -   [ ] make `onReactionError` an option for `configure`
     -   [ ] investigate the onbecomeunobserved issue
     -   [ ] support `flow` and `computedFn` as annotation
-    -   [ ] make second arg of reaction effect the old value
+    -   [x] make second arg of reaction effect the old value
+    -   [ ] fix #2415
+    -   [ ] fix #2404?
+    -   [ ] fix #2346?
+    -   [ ] fix #2309?
+    -   [ ]
 -   [ ] docs
     -   [ ] clean up docs
     -   [ ] fix interactive tut

@@ -102,7 +102,7 @@ function createSchedulerFromOptions(opts: IReactionOptions) {
 
 export function reaction<T>(
     expression: (r: IReactionPublic) => T,
-    effect: (arg: T, r: IReactionPublic) => void,
+    effect: (arg: T, prev: T, r: IReactionPublic) => void,
     opts: IReactionOptions = EMPTY_OBJECT
 ): IReactionDisposer {
     if (__DEV__) {
@@ -121,6 +121,7 @@ export function reaction<T>(
     let firstTime = true
     let isScheduled = false
     let value: T
+    let oldValue: T = undefined as any // only an issue with fireImmediately
 
     const equals = (opts as any).compareStructural
         ? comparer.structural
@@ -143,15 +144,16 @@ export function reaction<T>(
     function reactionRunner() {
         isScheduled = false
         if (r.isDisposed_) return
-        let changed = false
+        let changed: boolean = false
         r.track(() => {
             const nextValue = allowStateChanges(false, () => expression(r))
             changed = firstTime || !equals(value, nextValue)
+            oldValue = value
             value = nextValue
         })
-        if (firstTime && opts.fireImmediately!) effectAction(value, r)
-        if (!firstTime && (changed as boolean) === true) effectAction(value, r)
-        if (firstTime) firstTime = false
+        if (firstTime && opts.fireImmediately!) effectAction(value, oldValue, r)
+        else if (!firstTime && changed) effectAction(value, oldValue, r)
+        firstTime = false
     }
 
     r.schedule_()
