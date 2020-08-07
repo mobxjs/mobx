@@ -2137,3 +2137,14 @@ test("observable supports non-enumerable getters #2386", () => {
     expect(o.double).toBe(1)
     expect(mobx.isObservableProp(o, "double")).toBe(true)
 })
+
+test("observable can be created when enforceActions is `always` #2424", () => {
+    mobx.configure({ enforceActions: "always" });
+    observable.array([["item", "text"]]);
+    observable.set(["item"]);
+    observable.map([
+        ["item", "text"]
+    ]);
+    observable.object({ item: "text" });
+    mobx.configure({ enforceActions: "never" });
+})

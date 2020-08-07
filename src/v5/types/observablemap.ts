@@ -32,7 +32,9 @@ import {
     untracked,
     onBecomeUnobserved,
     globalState,
-    convertToMap
+    convertToMap,
+    allowStateChangesStart,
+    allowStateChangesEnd
 } from "../internal"
 
 export interface IKeyValueMap<V = any> {
@@ -307,15 +309,22 @@ export class ObservableMap<K = any, V = any>
             other = other.toJS()
         }
         transaction(() => {
-            if (isPlainObject(other))
-                getPlainObjectKeys(other).forEach(key => this.set((key as any) as K, other[key]))
-            else if (Array.isArray(other)) other.forEach(([key, value]) => this.set(key, value))
-            else if (isES6Map(other)) {
-                if (other.constructor !== Map)
-                    fail("Cannot initialize from classes that inherit from Map: " + other.constructor.name) // prettier-ignore
-                other.forEach((value, key) => this.set(key, value))
-            } else if (other !== null && other !== undefined)
-                fail("Cannot initialize map from " + other)
+            const prev = allowStateChangesStart(true)
+            try {
+                if (isPlainObject(other))
+                    getPlainObjectKeys(other).forEach((key) =>
+                        this.set((key as any) as K, other[key])
+                    )
+                else if (Array.isArray(other)) other.forEach(([key, value]) => this.set(key, value))
+                else if (isES6Map(other)) {
+                    if (other.constructor !== Map)
+                        fail("Cannot initialize from classes that inherit from Map: " + other.constructor.name) // prettier-ignore
+                    other.forEach((value, key) => this.set(key, value))
+                } else if (other !== null && other !== undefined)
+                    fail("Cannot initialize map from " + other)
+            } finally {
+                allowStateChangesEnd(prev)
+            }
         })
         return this
     }
