@@ -506,8 +506,8 @@ const arrayExtensions = {
     arrayExtensions[funcName] = function(callback, thisArg) {
         const adm: ObservableArrayAdministration = this[$mobx]
         adm.atom.reportObserved()
-        return adm.values[funcName]((element, index) => {
-            element = adm.dehanceValue(element)
+        const dehancedValues = adm.dehanceValues(adm.values)
+        return dehancedValues[funcName]((element, index) => {
             return callback.call(thisArg, element, index, this)
         }, thisArg)
     }

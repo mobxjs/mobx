@@ -649,3 +649,132 @@ test("correct array should be passed to callbacks #2326", () => {
         "some"
     ].forEach(method => array[method](callback))
 })
+
+describe("dehances", () => {
+    function supressConsoleWarn(fn) {
+        const { warn } = console
+        console.warn = () => {}
+        const result = fn()
+        console.warn = warn
+        return result
+    }
+
+    const dehancer = ({ value }) => value
+
+    let enhanced, dehanced, array
+
+    beforeEach(() => {
+        enhanced = [{ value: 1 }, { value: 2 }, { value: 3 }]
+        dehanced = enhanced.map(dehancer)
+        array = observable(enhanced)
+        mobx._getAdministration(array).dehancer = dehancer
+    })
+
+    test("slice", () => {
+        expect(array.slice()).toEqual(dehanced.slice())
+    })
+
+    test("filter", () => {
+        const predicate = value => value === 2
+        expect(array.filter(predicate)).toEqual(dehanced.filter(predicate))
+    })
+
+    test("concat", () => {
+        expect(array.concat(4)).toEqual(dehanced.concat(4))
+    })
+
+    test("entries", () => {
+        expect([...array.entries()]).toEqual([...dehanced.entries()])
+    })
+
+    test("every", () => {
+        array.every((value, index) => {
+            expect(value).toEqual(dehanced[index])
+            return true
+        })
+    })
+
+    test("find", () => {
+        const predicate = value => value === 2
+        expect(array.find(predicate)).toEqual(dehanced.find(predicate))
+    })
+
+    test("forEach", () => {
+        array.forEach((value, index) => {
+            expect(value).toEqual(dehanced[index])
+        })
+    })
+
+    test("includes", () => {
+        expect(array.includes(2)).toEqual(dehanced.includes(2))
+    })
+
+    test("indexOf", () => {
+        expect(array.indexOf(2)).toEqual(dehanced.indexOf(2))
+    })
+
+    test("join", () => {
+        expect(array.join()).toEqual(dehanced.join())
+    })
+
+    test("lastIndexOf", () => {
+        expect(array.lastIndexOf(2)).toEqual(dehanced.lastIndexOf(2))
+    })
+
+    test("map", () => {
+        array.map((value, index) => {
+            expect(value).toEqual(dehanced[index])
+            return value
+        })
+    })
+
+    test("pop", () => {
+        expect(array.pop()).toEqual(dehanced.pop())
+    })
+
+    test("reduce", () => {
+        array.reduce((_, value, index) => {
+            expect(value).toEqual(dehanced[index])
+        })
+    })
+
+    test("reduceRight", () => {
+        array.reduceRight((_, value, index) => {
+            expect(value).toEqual(dehanced[index])
+        })
+    })
+
+    test("reverse", () => {
+        const reversedArray = supressConsoleWarn(() => array.reverse())
+        expect(reversedArray).toEqual(dehanced.reverse())
+    })
+
+    test("shift", () => {
+        expect(array.shift()).toEqual(dehanced.shift())
+    })
+
+    test("some", () => {
+        array.some((value, index) => {
+            expect(value).toEqual(dehanced[index])
+            return false
+        })
+    })
+
+    test("splice", () => {
+        expect(array.splice(1, 2)).toEqual(dehanced.splice(1, 2))
+    })
+
+    test("sort", () => {
+        const comparator = (a, b) => {
+            expect(typeof a).toEqual("number")
+            expect(typeof b).toEqual("number")
+            return b > a
+        }
+        const sortedArray = supressConsoleWarn(() => array.sort(comparator))
+        expect(sortedArray).toEqual(dehanced.sort(comparator))
+    })
+
+    test("values", () => {
+        expect([...array.values()]).toEqual([...dehanced.values()])
+    })
+})
