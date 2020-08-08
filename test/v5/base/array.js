@@ -626,7 +626,21 @@ describe("dehances", () => {
         return result
     }
 
-    const dehancer = ({ value }) => value
+    const dehancer = thing => {
+        // Dehance only objects of a proper type
+        if (thing && typeof thing === "object" && thing.hasOwnProperty("value")) {
+            return thing.value
+        }
+        // Support nested arrays
+        if (Array.isArray(thing)) {
+            // If array has own dehancer it's still applied prior to ours.
+            // It doesn't matter how many dehancers we apply,
+            // if they ignore unknown types.
+            return thing.map(dehancer)
+        }
+        // Ignore unknown types
+        return thing
+    }
 
     let enhanced, dehanced, array
 
@@ -743,5 +757,21 @@ describe("dehances", () => {
 
     test("values", () => {
         expect([...array.values()]).toEqual([...dehanced.values()])
+    })
+
+    test("flat/flatMap", () => {
+        const nestedArray = [{ value: 1 }, [{ value: 2 }, [{ value: 3 }]]]
+        const dehancedNestedArray = nestedArray.map(dehancer)
+
+        // flat
+        array.replace(nestedArray)
+        expect(array.flat(Infinity)).toEqual(dehancedNestedArray.flat(Infinity))
+
+        // flatMap
+        const flattenedArray = array.flatMap((value, index) => {
+            expect(value).toEqual(dehancedNestedArray[index])
+            return value
+        })
+        expect(flattenedArray).toEqual(dehancedNestedArray.flat(1))
     })
 })
