@@ -207,31 +207,6 @@ test("should be possible to change observed state in an action called from compu
     d()
 })
 
-test("should be possible to change observed state in an action called from computed", () => {
-    const a = mobx.observable.box(2)
-    const d = mobx.autorun(() => {
-        a.get()
-    })
-
-    const testAction = mobx.action(() => {
-        a.set(3)
-    })
-
-    const c = mobx.computed(() => {
-        testAction()
-        return a.get()
-    })
-
-    expect(
-        utils.grabConsole(() => {
-            c.get()
-        })
-    ).toBe("")
-
-    mobx._resetGlobalState()
-    d()
-})
-
 test("action in autorun should be untracked", () => {
     const a = mobx.observable.box(2)
     const b = mobx.observable.box(3)
@@ -617,7 +592,7 @@ test("auto action should not update state from inside a derivation", async () =>
                 double()
             })
         ).toMatchInlineSnapshot(
-            `"<STDOUT> [MobX] Side effects like changing state are not allowed at this point. Are you trying to modify state from, for example, a computed value or the render function of a React component? You can wrap side effects in 'runInAction' (or decorate functions with 'action') if needed. Tried to modify: ObservableValue@79"`
+            `"<STDOUT> [MobX] Side effects like changing state are not allowed at this point. Are you trying to modify state from, for example, a computed value or the render function of a React component? You can wrap side effects in 'runInAction' (or decorate functions with 'action') if needed. Tried to modify: ObservableValue@74"`
         )
         return a.get() === 2
     })
@@ -647,4 +622,47 @@ test("auto action should not update state from inside a derivation", async () =>
         return a.get() === 2
     })
     d()
+})
+
+test("warn on calls action while computed value is computing", () => {
+    const matchWarnReg = /Don't call Action .* while ComputedValue .* is computing/
+    const square = mobx.extendObservable(
+        {},
+        {
+            width: 5,
+            get area() {
+                const retArea = this.width * this.width
+                this.changeWidth(this.width + 1)
+                return retArea
+            },
+            changeWidth(newWidth) {
+                this.width = newWidth
+            }
+        },
+        {
+            changeWidth: mobx.action
+        }
+    )
+    expect(utils.grabConsole(() => square.area)).toMatch(matchWarnReg)
+
+    class Square {
+        constructor() {
+            mobx.makeObservable(this)
+        }
+
+        @mobx.observable width = 5
+
+        @mobx.computed get area() {
+            const retArea = this.width * this.width
+            this.changeWidth(this.width + 1)
+            return retArea
+        }
+
+        @mobx.action
+        changeWidth(newWidth) {
+            this.width = newWidth
+        }
+    }
+    const squareInst = new Square()
+    expect(utils.grabConsole(() => squareInst.area)).toMatch(matchWarnReg)
 })

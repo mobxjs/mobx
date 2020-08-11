@@ -217,6 +217,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         this.isComputing_ = true
         // don't allow state changes during computation
         const prev = allowStateChangesStart(false)
+        const prevComputingValue = computingValueStart(this)
         let res: T | CaughtException
         if (track) {
             res = trackDerivedFunction(this, this.derivation_, this.scope_)
@@ -231,6 +232,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
                 }
             }
         }
+        computingValueEnd(prevComputingValue)
         allowStateChangesEnd(prev)
         this.isComputing_ = false
         return res
@@ -297,3 +299,13 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 }
 
 export const isComputedValue = createInstanceofPredicate("ComputedValue", ComputedValue)
+
+export function computingValueStart(computingValue: ComputedValue<any> | null) {
+    const prev = globalState.computingValue
+    globalState.computingValue = computingValue
+    return prev
+}
+
+export function computingValueEnd(prev: ComputedValue<any> | null) {
+    globalState.computingValue = prev
+}

@@ -1,4 +1,4 @@
-import { IDerivation, IObservable, Reaction, die, getGlobal } from "../internal"
+import { IDerivation, IObservable, ComputedValue, Reaction, die, getGlobal } from "../internal"
 
 /**
  * These values will persist if global state is reset
@@ -135,6 +135,11 @@ export class MobXGlobals {
      * print warnings about code that would fail if proxies weren't available
      */
     verifyProxies = false
+
+    /**
+     * Currently running ComputedValue
+     */
+    computingValue: ComputedValue<any> | null = null
 }
 
 let canMergeGlobalState = true

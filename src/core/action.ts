@@ -60,6 +60,11 @@ export function executeAction(
     scope?: any,
     args?: IArguments
 ) {
+    if (__DEV__ && globalState.computingValue) {
+        console.warn(
+            `[MobX] Don't call Action ${actionName} while ComputedValue ${globalState.computingValue.name_} is computing`
+        )
+    }
     const runInfo = _startAction(actionName, canRunAsDeriviation, scope, args)
     try {
         return fn.apply(scope, args)
