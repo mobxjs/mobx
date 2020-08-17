@@ -27,7 +27,9 @@ import {
     toStringTagSymbol,
     declareIterator,
     addHiddenFinalProp,
-    iteratorToArray
+    iteratorToArray,
+    allowStateChangesStart,
+    allowStateChangesEnd
 } from "../internal"
 
 const ObservableSetMarker = {}
@@ -239,14 +241,19 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
         }
 
         transaction(() => {
-            if (Array.isArray(other)) {
-                this.clear()
-                other.forEach(value => this.add(value))
-            } else if (isES6Set(other)) {
-                this.clear()
-                other.forEach(value => this.add(value))
-            } else if (other !== null && other !== undefined) {
-                fail("Cannot initialize set from " + other)
+            const prev = allowStateChangesStart(true)
+            try {
+                if (Array.isArray(other)) {
+                    this.clear()
+                    other.forEach(value => this.add(value))
+                } else if (isES6Set(other)) {
+                    this.clear()
+                    other.forEach(value => this.add(value))
+                } else if (other !== null && other !== undefined) {
+                    fail("Cannot initialize set from " + other)
+                }
+            } finally {
+                allowStateChangesEnd(prev) 
             }
         })
 
