@@ -87,7 +87,7 @@ const arrayTraps = {
         if (name === $mobx) return adm
         if (name === "length") return adm.getArrayLength_()
         if (typeof name === "string" && !isNaN(name as any)) {
-            adm.get_(parseInt(name))
+            return adm.get_(parseInt(name))
         }
         if (hasProp(arrayExtensions, name)) {
             return arrayExtensions[name]
@@ -500,8 +500,8 @@ function mapLikeFunc(funcName) {
     return function (callback, thisArg) {
         const adm: ObservableArrayAdministration = this[$mobx]
         adm.atom_.reportObserved()
-        return adm.values_[funcName]((element, index) => {
-            element = adm.dehanceValue_(element)
+        const dehancedValues = adm.dehanceValue_(adm.values_)
+        return dehancedValues[funcName]((element, index) => {
             return callback.call(thisArg, element, index, this)
         })
     }
@@ -512,8 +512,8 @@ function reduceLikeFunc(funcName) {
     return function (callback, initialValue) {
         const adm: ObservableArrayAdministration = this[$mobx]
         adm.atom_.reportObserved()
-        return adm.values_[funcName]((accumulator, currentValue, index) => {
-            currentValue = adm.dehanceValue_(currentValue)
+        const dehancedValues = adm.dehanceValue_(adm.values_)
+        return dehancedValues[funcName]((accumulator, currentValue, index) => {
             return callback(accumulator, currentValue, index, this)
         }, initialValue)
     }
