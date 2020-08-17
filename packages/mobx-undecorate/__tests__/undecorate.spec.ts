@@ -1125,4 +1125,54 @@ describe("@observer", () => {
                 }"
         `)
     })
+
+    test("makeObservable gets added to the non-type import #2415", () => {
+        expect(
+            convert(
+                `
+        import type { IReactionDisposer } from 'mobx';
+        import { reaction, observable } from 'mobx';
+        
+        export default class Store {
+            @observable counter = 0;
+        
+            removeReaction: IReactionDisposer;
+            
+            constructor() {
+                this.removeReaction = reaction(() => this.counter, () => {
+                    console.log('it changed');
+                });
+            }
+        
+            cleanup() {
+                this.removeReaction();
+            }
+        }
+        `
+            )
+        ).toMatchInlineSnapshot(`
+            "import type { IReactionDisposer } from 'mobx';
+            import { reaction, observable, makeObservable } from 'mobx';
+
+            export default class Store {
+                counter = 0;
+
+                removeReaction: IReactionDisposer;
+                
+                constructor() {
+                    makeObservable(this, {
+                        counter: observable
+                    });
+
+                    this.removeReaction = reaction(() => this.counter, () => {
+                        console.log('it changed');
+                    });
+                }
+
+                cleanup() {
+                    this.removeReaction();
+                }
+            }"
+        `)
+    })
 })

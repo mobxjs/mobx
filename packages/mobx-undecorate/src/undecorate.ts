@@ -203,7 +203,8 @@ export default function tranform(
         const mobxImport = source
             .find(j.ImportDeclaration)
             .filter(im => im.value.source.value === "mobx")
-            .nodes()[0]
+            .nodes()
+            .filter(node => node.importKind === "value")[0]
         if (!mobxImport) {
             console.warn(
                 "Failed to find mobx import, can't add makeObservable as dependency in " +
