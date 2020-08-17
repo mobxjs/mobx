@@ -500,7 +500,7 @@ function mapLikeFunc(funcName) {
     return function (callback, thisArg) {
         const adm: ObservableArrayAdministration = this[$mobx]
         adm.atom_.reportObserved()
-        const dehancedValues = adm.dehanceValue_(adm.values_)
+        const dehancedValues = adm.dehanceValues_(adm.values_)
         return dehancedValues[funcName]((element, index) => {
             return callback.call(thisArg, element, index, this)
         })
@@ -512,7 +512,7 @@ function reduceLikeFunc(funcName) {
     return function (callback, initialValue) {
         const adm: ObservableArrayAdministration = this[$mobx]
         adm.atom_.reportObserved()
-        const dehancedValues = adm.dehanceValue_(adm.values_)
+        const dehancedValues = adm.dehanceValues_(adm.values_)
         return dehancedValues[funcName]((accumulator, currentValue, index) => {
             return callback(accumulator, currentValue, index, this)
         }, initialValue)
