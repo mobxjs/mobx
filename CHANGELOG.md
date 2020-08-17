@@ -1,5 +1,6 @@
 # UNPUBLISHED (keep this here and add unpublished changes)
 
+-   Fixed [2423](https://github.com/mobxjs/mobx/issues/2423), array methods not dehancing by [@urugator](https://github.com/urugator)
 -   Fixed ObservableSet.prototype.forEach not being reactive in 4.x [#2341](https://github.com/mobxjs/mobx/pull/2341) by [@melnikov-s](https://github.com/melnikov-s)
 -   Add error when computed value declared for unspecified getter [#1867](https://github.com/mobxjs/mobx/issues/1867) by [@berrunder](https://github.com/berrunder)
 -   Don't omit action name in production [#2263](https://github.com/mobxjs/mobx/issues/2263) by [@elektronik2k5](https://github.com/elektronik2k5)

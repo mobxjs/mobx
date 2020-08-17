@@ -693,3 +693,162 @@ test("very long arrays can be safely passed to nativeArray.concat #2379", () => 
     expect(r2).toEqual(r1)
     expect(observableArray).toEqual(anotherArray)
 })
+
+describe("dehances", () => {
+    function supressConsoleWarn(fn) {
+        const { warn } = console
+        console.warn = () => {}
+        const result = fn()
+        console.warn = warn
+        return result
+    }
+
+    const dehancer = thing => {
+        // Dehance only objects of a proper type
+        if (thing && typeof thing === "object" && thing.hasOwnProperty("value")) {
+            return thing.value
+        }
+        // Support nested arrays
+        if (Array.isArray(thing)) {
+            // If array has own dehancer it's still applied prior to ours.
+            // It doesn't matter how many dehancers we apply,
+            // if they ignore unknown types.
+            return thing.map(dehancer)
+        }
+        // Ignore unknown types
+        return thing
+    }
+
+    let enhanced, dehanced, array
+
+    beforeEach(() => {
+        enhanced = [{ value: 1 }, { value: 2 }, { value: 3 }]
+        dehanced = enhanced.map(dehancer)
+        array = observable(enhanced)
+        mobx._getAdministration(array).dehancer = dehancer
+    })
+
+    test("slice", () => {
+        expect(array.slice()).toEqual(dehanced.slice())
+    })
+
+    test("filter", () => {
+        const predicate = value => value === 2
+        expect(array.filter(predicate)).toEqual(dehanced.filter(predicate))
+    })
+
+    test("concat", () => {
+        expect(array.concat(4)).toEqual(dehanced.concat(4))
+    })
+
+    test("entries", () => {
+        expect([...array.entries()]).toEqual([...dehanced.entries()])
+    })
+
+    test("every", () => {
+        array.every((value, index) => {
+            expect(value).toEqual(dehanced[index])
+            return true
+        })
+    })
+
+    test("find", () => {
+        const predicate = value => value === 2
+        expect(array.find(predicate)).toEqual(dehanced.find(predicate))
+    })
+
+    test("forEach", () => {
+        array.forEach((value, index) => {
+            expect(value).toEqual(dehanced[index])
+        })
+    })
+
+    test("includes", () => {
+        expect(array.includes(2)).toEqual(dehanced.includes(2))
+    })
+
+    test("indexOf", () => {
+        expect(array.indexOf(2)).toEqual(dehanced.indexOf(2))
+    })
+
+    test("join", () => {
+        expect(array.join()).toEqual(dehanced.join())
+    })
+
+    test("lastIndexOf", () => {
+        expect(array.lastIndexOf(2)).toEqual(dehanced.lastIndexOf(2))
+    })
+
+    test("map", () => {
+        array.map((value, index) => {
+            expect(value).toEqual(dehanced[index])
+            return value
+        })
+    })
+
+    test("pop", () => {
+        expect(array.pop()).toEqual(dehanced.pop())
+    })
+
+    test("reduce", () => {
+        array.reduce((_, value, index) => {
+            expect(value).toEqual(dehanced[index])
+        })
+    })
+
+    test("reduceRight", () => {
+        array.reduceRight((_, value, index) => {
+            expect(value).toEqual(dehanced[index])
+        })
+    })
+
+    test("reverse", () => {
+        const reversedArray = supressConsoleWarn(() => array.reverse())
+        expect(reversedArray).toEqual(dehanced.reverse())
+    })
+
+    test("shift", () => {
+        expect(array.shift()).toEqual(dehanced.shift())
+    })
+
+    test("some", () => {
+        array.some((value, index) => {
+            expect(value).toEqual(dehanced[index])
+            return false
+        })
+    })
+
+    test("splice", () => {
+        expect(array.splice(1, 2)).toEqual(dehanced.splice(1, 2))
+    })
+
+    test("sort", () => {
+        const comparator = (a, b) => {
+            expect(typeof a).toEqual("number")
+            expect(typeof b).toEqual("number")
+            return b > a
+        }
+        const sortedArray = supressConsoleWarn(() => array.sort(comparator))
+        expect(sortedArray).toEqual(dehanced.sort(comparator))
+    })
+
+    test("values", () => {
+        expect([...array.values()]).toEqual([...dehanced.values()])
+    })
+
+    test("flat/flatMap", () => {
+        const nestedArray = [{ value: 1 }, [{ value: 2 }, [{ value: 3 }]]]
+        const dehancedNestedArray = nestedArray.map(dehancer)
+
+        // flat
+        array.replace(nestedArray)
+        expect(array.flat(Infinity)).toEqual(dehancedNestedArray.flat(Infinity))
+
+        // flatMap
+        const flattenedArray = array.flatMap((value, index) => {
+            expect(value).toEqual(dehancedNestedArray[index])
+            return value
+        })
+        expect(flattenedArray).toEqual(dehancedNestedArray.flat(1))
+    })
+})
