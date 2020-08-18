@@ -1,5 +1,7 @@
 # UNPUBLISHED (keep this here and add unpublished changes)
 
+-   Fixed [2432](https://github.com/mobxjs/mobx/issues/2423), array.reduce without initial value by [@urugator](https://github.com/urugator)
+
 # 5.15.6 / 4.15.6
 
 -   Fixed [2423](https://github.com/mobxjs/mobx/issues/2423), array methods not dehancing by [@urugator](https://github.com/urugator)

@@ -668,13 +668,16 @@ addHiddenProp(ObservableArray.prototype, toStringTagSymbol(), "Array")
     })
 })
 ;["reduce", "reduceRight"].forEach(funcName => {
-    addHiddenProp(ObservableArray.prototype, funcName, function(callback, initialValue) {
+    addHiddenProp(ObservableArray.prototype, funcName, function() {
         const adm = this.$mobx
         adm.atom.reportObserved()
-        return adm.values[funcName]((accumulator, currentValue, index) => {
+        // #2432 - reduce behavior depends on arguments.length
+        const callback = arguments[0]
+        arguments[0] = (accumulator, currentValue, index) => {
             currentValue = adm.dehanceValue(currentValue)
             return callback(accumulator, currentValue, index, this)
-        }, initialValue)
+        }
+        return adm.values[funcName].apply(adm.values, arguments)
     })
 })
 

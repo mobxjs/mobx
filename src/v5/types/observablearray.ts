@@ -490,8 +490,8 @@ const arrayExtensions = {
     arrayExtensions[funcName] = function() {
         const adm: ObservableArrayAdministration = this[$mobx]
         adm.atom.reportObserved()
-        const res = adm.dehanceValues(adm.values)
-        return res[funcName].apply(res, arguments)
+        const dehancedValues = adm.dehanceValues(adm.values)
+        return dehancedValues[funcName].apply(dehancedValues, arguments)
     }
 })
 
@@ -513,13 +513,16 @@ const arrayExtensions = {
     }
 })
 ;["reduce", "reduceRight"].forEach(funcName => {
-    arrayExtensions[funcName] = function(callback, initialValue) {
+    arrayExtensions[funcName] = function() {
         const adm: ObservableArrayAdministration = this[$mobx]
         adm.atom.reportObserved()
-        return adm.values[funcName]((accumulator, currentValue, index) => {
+        // #2432 - reduce behavior depends on arguments.length
+        const callback = arguments[0]
+        arguments[0] = (accumulator, currentValue, index) => {
             currentValue = adm.dehanceValue(currentValue)
             return callback(accumulator, currentValue, index, this)
-        }, initialValue)
+        }
+        return adm.values[funcName].apply(adm.values, arguments)
     }
 })
 
