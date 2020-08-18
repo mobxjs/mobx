@@ -767,3 +767,25 @@ describe("dehances", () => {
         // not supported in V4
     })
 })
+
+test("reduce without initial value #2432", () => {
+    const array = [1, 2, 3]
+    const observableArray = observable(array)
+
+    const arrayReducerArgs = []
+    const observableArrayReducerArgs = []
+
+    const arraySum = array.reduce((...args) => {
+        arrayReducerArgs.push(args)
+        return args[0] + args[1]
+    })
+
+    const observableArraySum = observableArray.reduce((...args) => {
+        observableArrayReducerArgs.push(args)
+        return args[0] + args[1]
+    })
+
+    expect(arraySum).toEqual(1 + 2 + 3)
+    expect(observableArraySum).toEqual(arraySum)
+    expect(arrayReducerArgs).toEqual(observableArrayReducerArgs)
+})
