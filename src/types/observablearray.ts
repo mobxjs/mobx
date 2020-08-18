@@ -490,8 +490,8 @@ function simpleFunc(funcName) {
     return function () {
         const adm: ObservableArrayAdministration = this[$mobx]
         adm.atom_.reportObserved()
-        const res = adm.dehanceValues_(adm.values_)
-        return res[funcName].apply(res, arguments)
+        const dehancedValues = adm.dehanceValues_(adm.values_)
+        return dehancedValues[funcName].apply(dehancedValues, arguments)
     }
 }
 
@@ -509,13 +509,16 @@ function mapLikeFunc(funcName) {
 
 // Make sure callbacks recieve correct array arg #2326
 function reduceLikeFunc(funcName) {
-    return function (callback, initialValue) {
+    return function () {
         const adm: ObservableArrayAdministration = this[$mobx]
         adm.atom_.reportObserved()
         const dehancedValues = adm.dehanceValues_(adm.values_)
-        return dehancedValues[funcName]((accumulator, currentValue, index) => {
+        // #2432 - reduce behavior depends on arguments.length
+        const callback = arguments[0]
+        arguments[0] = (accumulator, currentValue, index) => {
             return callback(accumulator, currentValue, index, this)
-        }, initialValue)
+        }
+        return dehancedValues[funcName].apply(dehancedValues, arguments)
     }
 }
 
