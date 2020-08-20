@@ -65,10 +65,9 @@
     -   [x] update ad links
     -   [x] ~add deprecation messages to latest mobx 5~ tricky; a lot of the api's are valid in v5 without alternative, so wouldn't result in actionable hints if the user doesn't intent to upgrade to v6
     -   [x] merge 2398
-    -   [ ] make `onReactionError` an option for `configure`
+    -   [x] make `onReactionError` an option for `configure`
     -   [ ] investigate the onbecomeunobserved issue
-    -   [ ] support `flow` and `computedFn` as annotation
-    -   [x] make second arg of reaction effect the old value
+    -   [x] support `flow`
     -   [ ] fix #2415
     -   [ ] fix #2404?
     -   [ ] fix #2346?
@@ -92,6 +91,7 @@
     -   [ ] fix React unstable batch setup
 -   [ ] post 6.0
     -   [ ] make cheatsheet
+    -   [ ] support mobx-utils `computedFn` as annotation?
     -   [ ] merge https://github.com/mobxjs/mobx/pull/2389
     -   [ ] set up discussions
     -   [ ] use autObservable options for codemod (if no superclass)?

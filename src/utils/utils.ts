@@ -85,6 +85,15 @@ export function isPlainObject(value) {
     return proto === objectPrototype || proto === null
 }
 
+// https://stackoverflow.com/a/37865170
+export function isGenerator(obj: any): boolean {
+    const constructor = obj?.constructor
+    if (!constructor) return false
+    if ("GeneratorFunction" === constructor.name || "GeneratorFunction" === constructor.displayName)
+        return true
+    return false
+}
+
 export function addHiddenProp(object: any, propName: PropertyKey, value: any) {
     defineProperty(object, propName, {
         enumerable: false,

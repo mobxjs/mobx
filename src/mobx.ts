@@ -100,6 +100,7 @@ export {
     onBecomeObserved,
     onBecomeUnobserved,
     flow,
+    flowResult,
     FlowCancellationError,
     isFlowCancellationError,
     toJS,

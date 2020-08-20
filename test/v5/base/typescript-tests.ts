@@ -23,7 +23,9 @@ import {
     makeObservable,
     IAtom,
     createAtom,
-    runInAction
+    runInAction,
+    flow,
+    flowResult
 } from "../../../src/mobx"
 import * as mobx from "../../../src/mobx"
 // @ts-ignore
@@ -2098,3 +2100,165 @@ test("type inference of the action callback", () => {
     //     })
     // )
 })
+
+test("TS - it should support flow as function wrapper", done => {
+    const values: number[] = []
+
+    mobx.configure({ enforceActions: "observed" })
+
+    class X {
+        a = 1
+
+        constructor() {
+            makeObservable(this, {
+                a: true
+            })
+        }
+
+        f = flow(function* f(this: X, initial) {
+            this.a = initial // this runs in action
+            try {
+                this.a = yield delay(100, 5, true) // and this as well!
+                yield delay(100, 0)
+                this.a = 4
+            } catch (e) {
+                this.a = e
+            }
+            return this.a
+        })
+    }
+
+    const x = new X()
+    mobx.reaction(
+        () => x.a,
+        v => values.push(v),
+        { fireImmediately: true }
+    )
+
+    const x2 = new X()
+    expect(x2.f).not.toBe(x.f) // not shared!
+
+    setTimeout(() => {
+        x.f(2).then(v => {
+            let _x: number = v
+            // @ts-expect-error
+            let _y: string = v
+            expect(v).toBe(5)
+            expect(values).toEqual([1, 2, 5])
+            expect(x.a).toBe(5)
+            done()
+        })
+    }, 10)
+})
+
+test("TS - it should support flow as annotation", done => {
+    const values: number[] = []
+
+    mobx.configure({ enforceActions: "observed" })
+
+    class X {
+        a = 1
+
+        constructor() {
+            makeObservable(this, {
+                a: true,
+                f: flow
+            })
+        }
+
+        *f(initial) {
+            this.a = initial // this runs in action
+            try {
+                this.a = yield delay(100, 5, true) // and this as well!
+                yield delay(100, 0)
+                this.a = 4
+            } catch (e) {
+                this.a = e
+            }
+            return this.a
+        }
+    }
+
+    const x = new X()
+    mobx.reaction(
+        () => x.a,
+        v => values.push(v),
+        { fireImmediately: true }
+    )
+
+    const x2 = new X()
+    expect(x2.f).toBe(x.f) // shared!
+
+    setTimeout(() => {
+        // Too bad...
+        flowResult(x.f(2)).then(v => {
+            let _x: number = v
+            // @ts-expect-error
+            let _y: string = v
+            expect(v).toBe(5)
+            expect(values).toEqual([1, 2, 5])
+            expect(x.a).toBe(5)
+            done()
+        })
+    }, 10)
+})
+
+test("TS - it should support flow as decorator", done => {
+    const values: number[] = []
+
+    mobx.configure({ enforceActions: "observed" })
+
+    class X {
+        @observable
+        a = 1
+
+        constructor() {
+            makeObservable(this)
+        }
+
+        @flow
+        *f(initial) {
+            this.a = initial // this runs in action
+            try {
+                this.a = yield delay(100, 5, true) // and this as well!
+                yield delay(100, 0)
+                this.a = 4
+            } catch (e) {
+                this.a = e
+            }
+            return this.a
+        }
+    }
+
+    const x = new X()
+    mobx.reaction(
+        () => x.a,
+        v => values.push(v),
+        { fireImmediately: true }
+    )
+
+    const x2 = new X()
+    expect(x2.f).toBe(x.f) // shared!
+
+    setTimeout(() => {
+        // Too bad...
+        flowResult(x.f(2)).then(v => {
+            let _x: number = v
+            // @ts-expect-error
+            let _y: string = v
+            expect(v).toBe(5)
+            expect(values).toEqual([1, 2, 5])
+            expect(x.a).toBe(5)
+            done()
+        })
+    }, 10)
+})
+
+function delay(time, value, shouldThrow = false) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            if (shouldThrow) reject(value)
+            else resolve(value)
+        }, time)
+    })
+}

@@ -225,7 +225,23 @@ Create a one-time action that is immediately invoked.
 
 ### `flow`
 
+Usage:
+
+-   `flow`(annotation)
+-   `flow(fn)`
+
 MobX friendly replacement for `async` / `await` that supports cancellation.
+
+[&laquo;details&raquo;](action.md#using-flow-instead-of-asyncawait)
+
+### `flow`
+
+Usage:
+
+-   `flowResult(flowFunctionResult)`
+
+Utility for TypeScript users only, that casts the output of the generator to a promise.
+This is just to correct type-wise for the promise wrapping done by `flow`. At runtime it just directly returns the inputted value.
 
 [&laquo;details&raquo;](action.md#using-flow-instead-of-asyncawait)
 

@@ -124,6 +124,7 @@ However, `makeAutoObservable` cannot be used on classes that have super- or are 
 
 Inference rules:
 
+-   Any (inherited) member that is a generator function will be annotated with `flow`.
 -   Any (inherited) member that contains a `function` value will be annotated with `autoAction`.
 -   Any `get`ter will be annotated with `computed`.
 -   Any other _own_ field will be marked with `observable`.
@@ -213,6 +214,7 @@ Although there is typically no use for this mechanism outside libraries.
 | `computed.struct`                  | Like `computed`, except that if after recomputing the result is structurally equal to the previous result, no observers will be notified                                                                                   |
 | `true`                             | Infer the best annotation. See [makeAutoObservable](#makeautoobservable).                                                                                                                                                  |
 | `false`                            | Explicitly do not annotate this property.                                                                                                                                                                                  |
+| `flow`                             | Creates a `flow` to manage asynchronous processes. For more details see [flow](action.html#-using-flow-instead-of-asyncawait). Note that the inferred return type in typescript might be off.                              |
 | `autoAction`                       | Should not be used explicitly, but is used under the hood by `makeAutoObservable` to mark methods that can act as action or derivation, based on their calling context                                                     |
 
 ## 🚀 The `options` argument

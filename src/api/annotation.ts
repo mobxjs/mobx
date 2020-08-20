@@ -10,6 +10,7 @@ export type Annotation = {
         | "action.bound"
         | "autoAction"
         | "autoAction.bound"
+        | "flow"
     arg_?: any
 }
 

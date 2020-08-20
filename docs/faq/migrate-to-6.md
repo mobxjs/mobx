@@ -89,6 +89,8 @@ autoActions
 
 `reaction`'s effect function now receives the previous value seen by the reaction as second argument.
 
+flow can be used as annotation
+
 ## Breaking changes
 
 ### Changes that might affect you

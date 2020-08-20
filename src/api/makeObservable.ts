@@ -34,7 +34,11 @@ import {
     defineProperty,
     ownKeys,
     objectPrototype,
-    hasProp
+    hasProp,
+    FLOW,
+    flow,
+    isGenerator,
+    isFlow
 } from "../internal"
 
 const CACHED_ANNOTATIONS = Symbol("mobx-cached-annotations")
@@ -52,7 +56,13 @@ function getInferredAnnotation(
     if (desc.set) return false // ignore pure setters
     // if already wrapped in action, don't do that another time, but assume it is already set up properly
     if (isFunction(desc.value))
-        return isAction(desc.value) ? false : autoBind ? autoAction.bound : autoAction
+        return isGenerator(desc.value)
+            ? flow
+            : isAction(desc.value)
+            ? false
+            : autoBind
+            ? autoAction.bound
+            : autoAction
     // if (!desc.configurable || !desc.writable) return false
     return defaultAnnotation ?? observable.deep
 }
@@ -119,6 +129,14 @@ export function makeProperty(
                 fn.bind(adm.proxy_ || target),
                 type === AUTOACTION_BOUND
             )
+            break
+        }
+        case FLOW: {
+            if (owner !== target && !forceCopy) {
+                if (!isFlow(owner[key])) addHiddenProp(owner, key, flow(descriptor.value!))
+            } else {
+                addHiddenProp(target, key, flow(descriptor.value))
+            }
             break
         }
         case COMPUTED:
@@ -249,7 +267,11 @@ function extractAnnotationsFromProto(
         if (prop.get) {
             collector[key as any] = computed
         } else if (isFunction(prop.value)) {
-            collector[key as any] = options?.autoBind ? autoAction.bound : autoAction
+            collector[key as any] = isGenerator(prop.value)
+                ? flow
+                : options?.autoBind
+                ? autoAction.bound
+                : autoAction
         }
     })
 }

@@ -391,3 +391,96 @@ test("cancelled flow should not result in runaway reject", async () => {
         expect("" + e).toBe("Error: FLOW_CANCELLED")
     }
 })
+
+test("it should support flow as annotation", done => {
+    const values = []
+
+    mobx.configure({ enforceActions: "observed" })
+
+    class X {
+        a = 1
+
+        f = function* (initial) {
+            this.a = initial // this runs in action
+            try {
+                this.a = yield delay(100, 5, true) // and this as well!
+                yield delay(100, 0)
+                this.a = 4
+            } catch (e) {
+                this.a = e
+            }
+            return this.a
+        }
+        constructor() {
+            makeObservable(this, {
+                a: true,
+                f: flow
+            })
+        }
+    }
+
+    const x = new X()
+    mobx.reaction(
+        () => x.a,
+        v => values.push(v),
+        { fireImmediately: true }
+    )
+
+    const x2 = new X()
+    expect(x2.f).not.toBe(x.f) // local field!
+
+    setTimeout(() => {
+        x.f(2).then(v => {
+            expect(v).toBe(5)
+            expect(values).toEqual([1, 2, 5])
+            expect(x.a).toBe(5)
+            done()
+        })
+    }, 10)
+})
+
+test("it should support flow in makeAutoObservable", done => {
+    const values = []
+
+    mobx.configure({ enforceActions: "observed" })
+
+    class X {
+        a = 1;
+
+        *f(initial) {
+            this.a = initial // this runs in action
+            try {
+                this.a = yield delay(100, 5, true) // and this as well!
+                yield delay(100, 0)
+                this.a = 4
+            } catch (e) {
+                this.a = e
+            }
+            return this.a
+        }
+
+        constructor() {
+            debugger
+            mobx.makeAutoObservable(this)
+        }
+    }
+
+    const x = new X()
+    mobx.reaction(
+        () => x.a,
+        v => values.push(v),
+        { fireImmediately: true }
+    )
+
+    const x2 = new X()
+    expect(x2.f).toBe(x.f) // shared!
+
+    setTimeout(() => {
+        x.f(2).then(v => {
+            expect(v).toBe(5)
+            expect(values).toEqual([1, 2, 5])
+            expect(x.a).toBe(5)
+            done()
+        })
+    }, 10)
+})

@@ -316,18 +316,20 @@ class Store {
 Flow is explained below.
 
 ```javascript
-import { flow, makeAutoObservable } from "mobx"
+import { flow, makeAutoObservable, flowResult } from "mobx"
 
 class Store {
     githubProjects = []
     state = "pending"
 
     constructor() {
-        makeAutoObservable(this)
+        makeAutoObservable(this, {
+            fetchProjects: flow
+        })
     }
 
     // note the star, this a generator function!
-    fetchProjects = flow(function* fetchProjects() {
+    *fetchProjects() {
         this.githubProjects = []
         this.state = "pending"
         try {
@@ -338,8 +340,11 @@ class Store {
         } catch (error) {
             this.state = "error"
         }
-    })
+    }
 }
+
+const store = new Store()
+const projects = await flowResult(store.fetchProjects())
 ```
 
 <!--END_DOCUSAURUS_CODE_TABS-->
@@ -348,6 +353,7 @@ class Store {
 
 Usage:
 
+-   `flow` (annotation)
 -   `flow(function* (args) { })`
 
 The `flow` wrapper is an optional alternative to `async` / `await` that makes it easier to
@@ -363,6 +369,44 @@ It can be applied as follows:
 3. Instead of `await` you use `yield`.
 
 The [listing above](#examples) shows what this looks in practice.
+
+The `flowResult` function in the above listing is only needed when using TypeScript.
+Since decorating a method with `flow`, it will wrap the returned generator in a promise.
+However, TypeScript isn't aware of that transformation, so, `flowResult` will make sure that TypeScript is aware of that type change.
+
+`makeAutoObservable` and friends will automatically infer generators to be `flow`s.
+
+<details><summary>🚀 Using flow on object fields</summary>
+`flow`, like `action` can be used to wrap functions directly, so above example could also have been written as:
+
+```typescript
+import { flow, makeAutoObservable, flowResult } from "mobx"
+
+class Store {
+    githubProjects = []
+    state = "pending"
+
+    fetchProjects = flow(function* (this: Store) {
+        this.githubProjects = []
+        this.state = "pending"
+        try {
+            const projects = yield fetchGithubProjectsSomehow() // yield instead of await
+            const filteredProjects = somePreprocessing(projects)
+            this.state = "done"
+            this.githubProjects = filteredProjects
+        } catch (error) {
+            this.state = "error"
+        }
+    })
+}
+
+const store = new Store()
+const projects = await store.fetchProjects()
+```
+
+The upside is that we don't need `flowResult` anymore, the downside is that `this` needs to be typed to make sure its type is inferred correctly.
+
+</details>
 
 ### 🚀 Flow cancellation
 
