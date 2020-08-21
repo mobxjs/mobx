@@ -1,4 +1,5 @@
 import { IDerivation, IObservable, Reaction, die, getGlobal } from "../internal"
+import { ComputedValue } from "./computedvalue"
 
 /**
  * These values will persist if global state is reset
@@ -45,7 +46,7 @@ export class MobXGlobals {
      * (Tracking derivation is also set for temporal tracking of computed values inside actions,
      * but trackingReaction can only be set by a form of Reaction)
      */
-    trackingReaction: Reaction | null = null
+    trackingContext: Reaction | ComputedValue<any> | null = null
 
     /**
      * Each time a derivation is tracked, it is assigned a unique run-id

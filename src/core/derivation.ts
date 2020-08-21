@@ -169,6 +169,7 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T, con
     derivation.runId_ = ++globalState.runId
     const prevTracking = globalState.trackingDerivation
     globalState.trackingDerivation = derivation
+    globalState.inBatch++
     let result
     if (globalState.disableErrorBoundaries === true) {
         result = f.call(context)
@@ -179,6 +180,7 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T, con
             result = new CaughtException(e)
         }
     }
+    globalState.inBatch--
     globalState.trackingDerivation = prevTracking
     bindDependencies(derivation)
 

@@ -66,13 +66,12 @@
     -   [x] ~add deprecation messages to latest mobx 5~ tricky; a lot of the api's are valid in v5 without alternative, so wouldn't result in actionable hints if the user doesn't intent to upgrade to v6
     -   [x] merge 2398
     -   [x] make `onReactionError` an option for `configure`
-    -   [ ] investigate the onbecomeunobserved issue
+    -   [x] investigate the onbecomeunobserved issue
     -   [x] support `flow`
     -   [x] fix #2415
     -   [x] fix #2404?
     -   [x] fix #2346?
-    -   [ ] fix #2309?
-    -   [ ]
+    -   [x] fix #2309?
 -   [ ] docs
     -   [ ] clean up docs
     -   [ ] fix interactive tut

@@ -100,7 +100,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     scope_: Object | undefined
     private equals_: IEqualsComparer<any>
     private requiresReaction_: boolean
-    private keepAlive_: boolean
+    keepAlive_: boolean
 
     /**
      * Create a new computed value based on a function expression.
@@ -154,7 +154,12 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
      */
     public get(): T {
         if (this.isComputing_) die(32, this.name_, this.derivation_)
-        if (globalState.inBatch === 0 && this.observers_.size === 0 && !this.keepAlive_) {
+        if (
+            globalState.inBatch === 0 &&
+            // !globalState.trackingDerivatpion &&
+            this.observers_.size === 0 &&
+            !this.keepAlive_
+        ) {
             if (shouldCompute(this)) {
                 this.warnAboutUntrackedRead_()
                 startBatch() // See perf test 'computed memoization'
@@ -163,7 +168,12 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
             }
         } else {
             reportObserved(this)
-            if (shouldCompute(this)) if (this.trackAndCompute_()) propagateChangeConfirmed(this)
+            if (shouldCompute(this)) {
+                let prevTrackingContext = globalState.trackingContext
+                if (this.keepAlive_ && !prevTrackingContext) globalState.trackingContext = this
+                if (this.trackAndCompute_()) propagateChangeConfirmed(this)
+                globalState.trackingContext = prevTrackingContext
+            }
         }
         const result = this.value_!
 
