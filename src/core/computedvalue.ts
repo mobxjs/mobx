@@ -94,7 +94,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     triggeredBy_?: string
     isComputing_: boolean = false // to check for cycles
     isRunningSetter_: boolean = false
-    derivation_: () => T
+    derivation: () => T
     setter_?: (value: T) => void
     isTracing_: TraceMode = TraceMode.NONE
     scope_: Object | undefined
@@ -116,7 +116,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
      */
     constructor(options: IComputedValueOptions<T>) {
         if (!options.get) die(31)
-        this.derivation_ = options.get!
+        this.derivation = options.get!
         this.name_ = options.name || "ComputedValue@" + getNextId()
         if (options.set) this.setter_ = createAction(this.name_ + "-setter", options.set) as any
         this.equals_ =
@@ -153,7 +153,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
      * Will evaluate its computation first if needed.
      */
     public get(): T {
-        if (this.isComputing_) die(32, this.name_, this.derivation_)
+        if (this.isComputing_) die(32, this.name_, this.derivation)
         if (
             globalState.inBatch === 0 &&
             // !globalState.trackingDerivatpion &&
@@ -229,13 +229,13 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         const prev = allowStateChangesStart(false)
         let res: T | CaughtException
         if (track) {
-            res = trackDerivedFunction(this, this.derivation_, this.scope_)
+            res = trackDerivedFunction(this, this.derivation, this.scope_)
         } else {
             if (globalState.disableErrorBoundaries === true) {
-                res = this.derivation_.call(this.scope_)
+                res = this.derivation.call(this.scope_)
             } else {
                 try {
-                    res = this.derivation_.call(this.scope_)
+                    res = this.derivation.call(this.scope_)
                 } catch (e) {
                     res = new CaughtException(e)
                 }
@@ -294,7 +294,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     }
 
     toString() {
-        return `${this.name_}[${this.derivation_.toString()}]`
+        return `${this.name_}[${this.derivation.toString()}]`
     }
 
     valueOf(): T {

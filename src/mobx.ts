@@ -53,6 +53,8 @@ export {
     IObservableArray,
     IArrayWillChange,
     IArrayWillSplice,
+    IArraySplice,
+    IArrayUpdate,
     IArrayDidChange,
     isObservableArray,
     IKeyValueMap,

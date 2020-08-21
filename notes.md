@@ -91,10 +91,10 @@
 -   [ ] post 6.0
     -   [ ] make cheatsheet
     -   [ ] support mobx-utils `computedFn` as annotation?
-    -   [ ] merge https://github.com/mobxjs/mobx/pull/2389
-    -   [ ] set up discussions
+    -   [x] merge https://github.com/mobxjs/mobx/pull/2389
+    -   [x] set up discussions
     -   [ ] use autObservable options for codemod (if no superclass)?
-    -   [ ] add a solution for keepAlive computeds like https://github.com/mobxjs/mobx/issues/2309#issuecomment-598707584
+    -   [x] add a solution for keepAlive computeds like https://github.com/mobxjs/mobx/issues/2309#issuecomment-598707584
     -   [ ] set up continous delivery
     -   [ ] support chrome formatter https://www.mattzeunert.com/2016/02/19/custom-chrome-devtools-object-formatters.html also in Immer?
 

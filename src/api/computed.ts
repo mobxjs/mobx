@@ -8,7 +8,8 @@ import {
     isPlainObject,
     isFunction,
     assign,
-    die
+    die,
+    IComputedValue
 } from "../internal"
 
 export const COMPUTED = "computed"
@@ -18,7 +19,7 @@ export interface IComputedFactory extends Annotation, PropertyDecorator {
     // @computed(opts)
     <T>(options: IComputedValueOptions<T>): Annotation & PropertyDecorator
     // computed(fn, opts)
-    <T>(func: () => T, options?: IComputedValueOptions<T>): ComputedValue<T>
+    <T>(func: () => T, options?: IComputedValueOptions<T>): IComputedValue<T>
 
     struct: Annotation & PropertyDecorator
 }

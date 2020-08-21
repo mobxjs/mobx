@@ -52,13 +52,13 @@ interface IArrayBaseChange<T> {
 
 export type IArrayDidChange<T = any> = IArrayUpdate<T> | IArraySplice<T>
 
-interface IArrayUpdate<T = any> extends IArrayBaseChange<T> {
+export interface IArrayUpdate<T = any> extends IArrayBaseChange<T> {
     type: "update"
     newValue: T
     oldValue: T
 }
 
-interface IArraySplice<T = any> extends IArrayBaseChange<T> {
+export interface IArraySplice<T = any> extends IArrayBaseChange<T> {
     type: "splice"
     added: T[]
     addedCount: number

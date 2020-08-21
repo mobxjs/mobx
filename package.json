@@ -1,6 +1,6 @@
 {
   "name": "mobx",
-  "version": "6.0.0-rc.1",
+  "version": "6.0.0-rc.3",
   "description": "Simple, scalable state management.",
   "main": "dist/index.js",
   "module": "dist/mobx.esm.js",
