@@ -120,3 +120,4 @@ flow can be used as annotation
 -   The `observableArray.get()` and `observableArray.set()` methods are no longer supported.
 -   The `IObservableObject` interface is no longer exported from MobX.
 -   The second argument to the `reaction` effect function, the disposer object, is now passed in as third argument. The second argument is now the previous value seen by the reaction.
+-   `onBecomeObserved` / `onBecomeUnobserved` will no only trigger for observables that are actually used by a reaction (see [#2309](https://github.com/mobxjs/mobx/issues/2309) for background).

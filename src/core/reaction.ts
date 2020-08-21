@@ -130,7 +130,10 @@ export class Reaction implements IDerivation, IReactionPublic {
             })
         }
         this.isRunning_ = true
+        const prevReaction = globalState.trackingReaction // reactions could create reactions...
+        globalState.trackingReaction = this
         const result = trackDerivedFunction(this, fn, undefined)
+        globalState.trackingReaction = prevReaction
         this.isRunning_ = false
         this.isTrackPending_ = false
         if (this.isDisposed_) {

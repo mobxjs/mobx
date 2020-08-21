@@ -6,7 +6,8 @@ import {
     ObservableMap,
     getAtom,
     ObservableSet,
-    isFunction
+    isFunction,
+    IObservableValue
 } from "../internal"
 
 const ON_BECOME_OBSERVED = "onBO"
@@ -18,7 +19,8 @@ export function onBecomeObserved(
         | IComputedValue<any>
         | IObservableArray<any>
         | ObservableMap<any, any>
-        | ObservableSet<any>,
+        | ObservableSet<any>
+        | IObservableValue<any>,
     listener: Lambda
 ): Lambda
 export function onBecomeObserved<K, V = any>(
@@ -36,7 +38,8 @@ export function onBecomeUnobserved(
         | IComputedValue<any>
         | IObservableArray<any>
         | ObservableMap<any, any>
-        | ObservableSet<any>,
+        | ObservableSet<any>
+        | IObservableValue<any>,
     listener: Lambda
 ): Lambda
 export function onBecomeUnobserved<K, V = any>(

@@ -1296,14 +1296,13 @@ test("#2112 - iterators should be resilient to concurrent delete operation", () 
     testIterator("entries")
 })
 
-test.only("2346 - subscribe to not yet existing map keys", async () => {
+test("2346 - subscribe to not yet existing map keys", async () => {
     const events = observable([])
 
     class Compute {
         values = observable.map()
 
         @computed get get42() {
-            console.log("get42")
             return this.get(42)
         }
 

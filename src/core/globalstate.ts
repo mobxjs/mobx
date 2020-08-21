@@ -41,6 +41,13 @@ export class MobXGlobals {
     trackingDerivation: IDerivation | null = null
 
     /**
+     * Currently running reaction. This determines if we currently have a reactive context.
+     * (Tracking derivation is also set for temporal tracking of computed values inside actions,
+     * but trackingReaction can only be set by a form of Reaction)
+     */
+    trackingReaction: Reaction | null = null
+
+    /**
      * Each time a derivation is tracked, it is assigned a unique run-id
      */
     runId = 0

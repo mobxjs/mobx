@@ -145,7 +145,7 @@ export function reportObserved(observable: IObservable): boolean {
             observable.lastAccessedBy_ = derivation.runId_
             // Tried storing newObserving, or observing, or both as Set, but performance didn't come close...
             derivation.newObserving_![derivation.unboundDepsCount_++] = observable
-            if (!observable.isBeingObserved_) {
+            if (globalState.trackingReaction && !observable.isBeingObserved_) {
                 observable.isBeingObserved_ = true
                 observable.onBO()
             }

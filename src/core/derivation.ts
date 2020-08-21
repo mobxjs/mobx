@@ -183,9 +183,7 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T, con
     bindDependencies(derivation)
 
     warnAboutDerivationWithoutDependencies(derivation)
-
     allowStateReadsEnd(prevAllowStateReads)
-
     return result
 }
 
