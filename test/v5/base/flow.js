@@ -460,7 +460,6 @@ test("it should support flow in makeAutoObservable", done => {
         }
 
         constructor() {
-            debugger
             mobx.makeAutoObservable(this)
         }
     }

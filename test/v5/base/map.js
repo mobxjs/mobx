@@ -1,10 +1,18 @@
 "use strict"
 
-const mobx = require("../../../src/mobx.ts")
+import * as mobx from "../../../src/mobx.ts"
+import {
+    observable,
+    autorun,
+    makeObservable,
+    computed,
+    action,
+    when,
+    runInAction
+} from "../../../src/mobx.ts"
+
 const map = mobx.observable.map
-const autorun = mobx.autorun
 const iterall = require("iterall")
-const { makeObservable } = mobx
 import { grabConsole } from "../../v5/utils/test-utils"
 
 test("map crud", function () {
@@ -1286,4 +1294,45 @@ test("#2112 - iterators should be resilient to concurrent delete operation", () 
     testIterator("keys")
     testIterator("values")
     testIterator("entries")
+})
+
+test.only("2346 - subscribe to not yet existing map keys", async () => {
+    const events = observable([])
+
+    class Compute {
+        values = observable.map()
+
+        @computed get get42() {
+            console.log("get42")
+            return this.get(42)
+        }
+
+        constructor() {
+            makeObservable(this)
+        }
+
+        get(k) {
+            if (this.values.has(k)) return this.values.get(k)
+            this.fetchValue(k)
+            return this.values.get(k)
+        }
+
+        fetchValue = action(k => {
+            let v = k
+            this.values.set(k, k)
+            setImmediate(() =>
+                runInAction(() => {
+                    v *= 2
+                    this.values.set(k, v)
+                })
+            )
+        })
+    }
+
+    const c = new Compute()
+
+    autorun(() => events.push(c.get42))
+
+    await when(() => events.length > 1)
+    expect(events).toEqual([42, 84])
 })
