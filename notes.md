@@ -72,6 +72,8 @@
     -   [x] fix #2404?
     -   [x] fix #2346?
     -   [x] fix #2309?
+    -   [x] upgrade mobx-utils
+    -   [x] upgrade mobx-state-tree
 -   [ ] docs
     -   [ ] clean up docs
     -   [ ] fix interactive tut
@@ -83,11 +85,13 @@
     -   [ ] better sel page
     -   [ ] link flutter, lit, angular
     -   [ ] update footer
--   [ ] mobx-react
+-   [ ] mobx-react-lite
     -   [ ] displayname for observer components facebook/react#18026
     -   [ ] update useLocalStore in mobx-react-lite to use
             autoMakeObservable
     -   [ ] fix React unstable batch setup
+    -   [ ] mobx-react
+    -   [ ] deprecate useAsObservableSource direct usage?
 -   [ ] post 6.0
     -   [ ] make cheatsheet
     -   [ ] support mobx-utils `computedFn` as annotation?

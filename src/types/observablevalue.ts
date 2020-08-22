@@ -165,6 +165,11 @@ export class ObservableValue<T> extends Atom
         return registerListener(this, listener)
     }
 
+    raw() {
+        // used by MST ot get undehanced value
+        return this.value_
+    }
+
     toJSON() {
         return this.get()
     }

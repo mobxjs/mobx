@@ -132,7 +132,9 @@ export {
     allowStateReadsEnd as _allowStateReadsEnd,
     makeObservable,
     makeAutoObservable,
-    autoAction as _autoAction
+    autoAction as _autoAction,
+    AnnotationsMap,
+    AnnotationMapEntry
 } from "./internal"
 
 // Devtools support

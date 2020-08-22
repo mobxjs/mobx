@@ -94,7 +94,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     triggeredBy_?: string
     isComputing_: boolean = false // to check for cycles
     isRunningSetter_: boolean = false
-    derivation: () => T
+    derivation: () => T // N.B: unminified as it is used by MST
     setter_?: (value: T) => void
     isTracing_: TraceMode = TraceMode.NONE
     scope_: Object | undefined
@@ -171,7 +171,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
             if (shouldCompute(this)) {
                 let prevTrackingContext = globalState.trackingContext
                 if (this.keepAlive_ && !prevTrackingContext) globalState.trackingContext = this
-                if (this.trackAndCompute_()) propagateChangeConfirmed(this)
+                if (this.trackAndCompute()) propagateChangeConfirmed(this)
                 globalState.trackingContext = prevTrackingContext
             }
         }
@@ -193,7 +193,8 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         } else die(34, this.name_)
     }
 
-    private trackAndCompute_(): boolean {
+    trackAndCompute(): boolean {
+        // N.B: unminified as it is used by MST
         const oldValue = this.value_
         const wasSuspended =
             /* see #1208 */ this.dependenciesState_ === IDerivationState_.NOT_TRACKING_
