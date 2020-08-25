@@ -24,7 +24,7 @@ _Simple, scalable state management_
 
 ---
 
-MobX is proudly sponsored by Mendix, Coinbase, Facebook Open Source, Canva, Algolia, Guilded, Auction Frontier, Mantro and TalentPlot for 100\$/month or more! And beyond that by many [individual backers](#backers) and through [one time contributions](https://github.com/mobxjs/mobx/blob/master/sponsors.md).
+MobX is proudly sponsored by Mendix, Coinbase, Facebook Open Source, Canva, Algolia, Guilded, Auction Frontier, Mantro and TalentPlot for \$100/month or more! And beyond that by many [individual backers](#backers) and through [one time contributions](https://github.com/mobxjs/mobx/blob/master/sponsors.md).
 
 **🥇Gold sponsors (\$3000+ total contribution):** <br/>
 <a href="https://mendix.com/"><img src="docs/assets/mendix-logo.png" align="center" width="100" title="Mendix" alt="Mendix" /></a>
