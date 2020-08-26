@@ -24,7 +24,7 @@ import {
     referenceEnhancer,
     shallowEnhancer,
     getDefaultDecoratorFromObjectOptions,
-    extendObservableObjectWithProperties
+    extendObservableObjectWithProperties,
 } from "../internal"
 
 export type CreateObservableOptions = {
@@ -41,7 +41,7 @@ export const defaultCreateObservableOptions: CreateObservableOptions = {
     deep: true,
     name: undefined,
     defaultDecorator: undefined,
-    proxy: true
+    proxy: true,
 }
 Object.freeze(defaultCreateObservableOptions)
 
@@ -122,21 +122,21 @@ export interface IObservableFactory {
 }
 
 export interface IObservableFactories {
-    box<T = any>(value?: T, options?: CreateObservableOptions): IObservableValue<T>
-    array<T = any>(initialValues?: T[], options?: CreateObservableOptions): IObservableArray<T>
-    set<T = any>(
+    box: <T = any>(value?: T, options?: CreateObservableOptions) => IObservableValue<T>
+    array: <T = any>(initialValues?: T[], options?: CreateObservableOptions) => IObservableArray<T>
+    set: <T = any>(
         initialValues?: IObservableSetInitialValues<T>,
         options?: CreateObservableOptions
-    ): ObservableSet<T>
-    map<K = any, V = any>(
+    ) => ObservableSet<T>
+    map: <K = any, V = any>(
         initialValues?: IObservableMapInitialValues<K, V>,
         options?: CreateObservableOptions
-    ): ObservableMap<K, V>
-    object<T = any>(
+    ) => ObservableMap<K, V>
+    object: <T = any>(
         props: T,
         decorators?: { [K in keyof T]?: Function },
         options?: CreateObservableOptions
-    ): T & IObservableObject
+    ) => T & IObservableObject
 
     /**
      * Decorator that creates an observable that only observes the references, but doesn't try to turn the assigned value into an observable.ts.
@@ -197,7 +197,7 @@ const observableFactories: IObservableFactories = {
     ref: refDecorator,
     shallow: shallowDecorator,
     deep: deepDecorator,
-    struct: refStructDecorator
+    struct: refStructDecorator,
 } as any
 
 export const observable: IObservableFactory &
@@ -206,7 +206,7 @@ export const observable: IObservableFactory &
     } = createObservable as any
 
 // weird trick to keep our typings nicely with our funcs, and still extend the observable function
-Object.keys(observableFactories).forEach(name => (observable[name] = observableFactories[name]))
+Object.keys(observableFactories).forEach((name) => (observable[name] = observableFactories[name]))
 
 function incorrectlyUsedAsDecorator(methodName) {
     fail(

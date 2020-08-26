@@ -6,7 +6,7 @@ import {
     comparer,
     createPropDecorator,
     invariant,
-    stringifyKey
+    stringifyKey,
 } from "../internal"
 
 export interface IComputed {
@@ -14,7 +14,8 @@ export interface IComputed {
     <T>(func: () => T, setter: (v: T) => void): IComputedValue<T> // normal usage
     <T>(func: () => T, options?: IComputedValueOptions<T>): IComputedValue<T> // normal usage
     (target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): void // decorator
-    struct(target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): void // decorator
+    struct: (target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor) => void // decorator
+    shallow: (target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor) => void // decorator
 }
 
 export const computedDecorator = createPropDecorator(
@@ -43,12 +44,13 @@ export const computedDecorator = createPropDecorator(
             get,
             set,
             context: instance,
-            ...options
+            ...options,
         })
     }
 )
 
 const computedStructDecorator = computedDecorator({ equals: comparer.structural })
+const computedShallowDecorator = computedDecorator({ equals: comparer.shallow })
 
 /**
  * Decorator for class properties: @computed get value() { return expr; }.
@@ -81,3 +83,4 @@ export const computed: IComputed = function computed(arg1, arg2, arg3) {
 } as any
 
 computed.struct = computedStructDecorator
+computed.shallow = computedShallowDecorator
