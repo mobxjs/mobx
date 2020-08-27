@@ -24,7 +24,7 @@ import {
     referenceEnhancer,
     shallowEnhancer,
     getDefaultDecoratorFromObjectOptions,
-    extendObservableObjectWithProperties,
+    extendObservableObjectWithProperties
 } from "../internal"
 
 export type CreateObservableOptions = {
@@ -41,7 +41,7 @@ export const defaultCreateObservableOptions: CreateObservableOptions = {
     deep: true,
     name: undefined,
     defaultDecorator: undefined,
-    proxy: true,
+    proxy: true
 }
 Object.freeze(defaultCreateObservableOptions)
 
@@ -197,7 +197,7 @@ const observableFactories: IObservableFactories = {
     ref: refDecorator,
     shallow: shallowDecorator,
     deep: deepDecorator,
-    struct: refStructDecorator,
+    struct: refStructDecorator
 } as any
 
 export const observable: IObservableFactory &

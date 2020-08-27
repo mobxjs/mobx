@@ -22,7 +22,7 @@ import {
     IObservableMapInitialValues,
     ObservableValue,
     ObservableArray,
-    extendObservable,
+    extendObservable
 } from "../internal"
 
 export type CreateObservableOptions = {
@@ -37,12 +37,12 @@ export type CreateObservableOptions = {
 export const defaultCreateObservableOptions: CreateObservableOptions = {
     deep: true,
     name: undefined,
-    defaultDecorator: undefined,
+    defaultDecorator: undefined
 }
 export const shallowCreateObservableOptions = {
     deep: false,
     name: undefined,
-    defaultDecorator: undefined,
+    defaultDecorator: undefined
 }
 Object.freeze(defaultCreateObservableOptions)
 Object.freeze(shallowCreateObservableOptions)
@@ -228,7 +228,7 @@ const observableFactories: IObservableFactories = {
     ref: refDecorator,
     shallow: shallowDecorator,
     deep: deepDecorator,
-    struct: refStructDecorator,
+    struct: refStructDecorator
 } as any
 
 export const observable: IObservableFactory &

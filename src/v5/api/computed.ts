@@ -6,7 +6,7 @@ import {
     comparer,
     createPropDecorator,
     invariant,
-    stringifyKey,
+    stringifyKey
 } from "../internal"
 
 export interface IComputed {
@@ -43,7 +43,7 @@ export const computedDecorator = createPropDecorator(
             get,
             set,
             context: instance,
-            ...options,
+            ...options
         })
     }
 )

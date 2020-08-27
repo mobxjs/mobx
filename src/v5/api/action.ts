@@ -6,7 +6,7 @@ import {
     executeAction,
     fail,
     invariant,
-    namedActionDecorator,
+    namedActionDecorator
 } from "../internal"
 
 export interface IActionFactory {

@@ -5,7 +5,7 @@ import {
     createPropDecorator,
     defineComputedProperty,
     invariant,
-    ComputedValue,
+    ComputedValue
 } from "../internal"
 
 export interface IComputed {
