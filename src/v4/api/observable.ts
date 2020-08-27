@@ -237,7 +237,7 @@ export const observable: IObservableFactory &
     } = createObservable as any
 
 // weird trick to keep our typings nicely with our funcs, and still extend the observable function
-Object.keys(observableFactories).forEach((name) => (observable[name] = observableFactories[name]))
+Object.keys(observableFactories).forEach(name => (observable[name] = observableFactories[name]))
 
 function incorrectlyUsedAsDecorator(methodName) {
     fail(
