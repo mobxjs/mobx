@@ -1,8 +1,8 @@
 /* your custom css */
 
 
-/* 
-Docusaurus's default displays img tags as block. 
+/*
+Docusaurus's default displays img tags as block.
 Numerous images in the main README.md relied on default (inline-block) img tag styling
 when this project was migrated initially.
 
@@ -78,6 +78,23 @@ details[open] > summary {
 
 .tab-content .hljs {
     padding: 1.25rem 0px;
+}
+
+.benefits  {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+ .benefits > div {
+    width: 80%;
+    display: flex;
+    align-items: center;
+}
+
+.benefits .pic {
+    font-size: 40px;
+    margin-right: 40px;
 }
 
 /* BLM */

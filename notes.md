@@ -86,6 +86,10 @@
     -   [ ] link flutter, lit, angular
     -   [ ] update footer
     -   [ ] don't proxy objects tip, makeAutoObservable vs observable
+    -   [ ] drop interactive tutorial?
+    -   [ ] sync readme's
+    -   [ ] verify that MobX is by default in strict mode
+    -   [ ] make links for all tips
 -   [ ] mobx-react-lite
     -   [x] displayname for observer components facebook/react#18026. Fixed: https://github.com/facebook/react/issues/18026
     -   [x] update useLocalStore in mobx-react-lite to use

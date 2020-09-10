@@ -40,15 +40,15 @@ class Timer {
 
 const myTimer = new Timer()
 
-setInterval(() => {
-    myTimer.increaseTimer()
-}, 1000)
-
 // A function component wrapped with `observer` will reacts to any
 // future change in an observable it used before
 const TimerView = observer(({ timer }) => <span>Seconds passed: {timer.secondsPassed}</span>)
 
 ReactDOM.render(<TimerView timer={myTimer} />, document.body)
+
+setInterval(() => {
+    myTimer.increaseTimer()
+}, 1000)
 ```
 
 The `observer` HoC subscribes React components automatically to _any observables_ that are used _during render_.
@@ -193,17 +193,17 @@ const TimerView = observer(() => {
 ReactDOM.render(<TimerView />, document.body)
 ```
 
-<!--`useLocalStore` hook-->
+<!--`useLocalObservable` hook-->
 
 The combination `const [store] = useState(() => observable({ /* something */}))` is
-quite common. To make this pattern simpler the [`useLocalStore`](https://github.com/mobxjs/mobx-react#uselocalstore-hook) hook is exposed from `mobx-react-lite`, making it possible to simplify the earlier example to:
+quite common. To make this pattern simpler the [`useLocalObservable`](https://github.com/mobxjs/mobx-react#uselocalobservable-hook) hook is exposed from `mobx-react-lite`, making it possible to simplify the earlier example to:
 
 ```javascript
-import { observer, useLocalStore } from "mobx-react-lite"
+import { observer, useLocalObservable } from "mobx-react-lite"
 import { useState } from "react"
 
 const TimerView = observer(() => {
-    const timer = useLocalStore(() => ({
+    const timer = useLocalObservable(() => ({
         secondsPassed: 0,
         increaseTimer() {
             this.secondsPassed++
@@ -218,12 +218,12 @@ ReactDOM.render(<TimerView />, document.body)
 <!--END_DOCUSAURUS_CODE_TABS-->
 
 <details><summary>What about `useMemo`?</summary>
-A critical reader might notice that we might have used `useMemo`, 
-rather than `useState`. 
+A critical reader might notice that we might have used `useMemo`,
+rather than `useState`.
 That would in practice work the same.
 However, React doesn't _guarantee_ that memoized values are actually
 memoized in all cases, so it _could_ randomly throw away our Timer instance
-and create a fresh one, resetting our timer progress in the process. 
+and create a fresh one, resetting our timer progress in the process.
 </details>
 
 ### You might not need locally observable state
@@ -327,14 +327,14 @@ If you use `mobx-react`, there is no need to add `mobx-react-lite` as dependency
 </details>
 
 <details><summary>`observer` and `React.memo`?</summary>
-`observer` automatically applies `memo`, so `observer` components never need to be wrapped in `memo`. 
-`memo` can be applied safely to observer components because mutations (deeply) inside the props will be picked up by `observer` anyway if relevant.  
+`observer` automatically applies `memo`, so `observer` components never need to be wrapped in `memo`.
+`memo` can be applied safely to observer components because mutations (deeply) inside the props will be picked up by `observer` anyway if relevant.
 </details>
 
 <details><summary>
 Tip: `observer` for class based React components
 </summary>
-As stated above, class based components are only supported through `mobx-react`, and not `mobx-react-lite`. 
+As stated above, class based components are only supported through `mobx-react`, and not `mobx-react-lite`.
 Briefly, you can wrap class-based components in `observer` just like
 you can wrap function components:
 
@@ -356,7 +356,7 @@ See the [mobx-react docs](https://github.com/mobxjs/mobx-react#api-documentation
 </details>
 
 <details><summary>
-Tip: nice component names in React DevTools 
+Tip: nice component names in React DevTools
 </summary>
 [React DevTools](https://reactjs.org/blog/2019/08/15/new-react-devtools.html) uses the display name information of components to properly display the component hierarchy.
 
@@ -401,7 +401,7 @@ The following approaches can be used to fix this:
     MyComponent.displayName = "MyComponent"
     ```
 
-    This is broken in React at the time of writing; mobx-react `observer` uses a React.memo and runs into this bug: https://github.com/facebook/react/issues/18026
+    This is broken in React 16 at the time of writing; mobx-react `observer` uses a React.memo and runs into this bug: https://github.com/facebook/react/issues/18026, but it will be fixed in React 17.
 
 Now you can see component names:
 
@@ -419,19 +419,19 @@ otherwise it might do nothing at all.
 </details>
 
 <details><summary>🚀 Tip: Deriving computeds from props</summary>
-In some the computed values of your local observable might depend on some of the 
+In some the computed values of your local observable might depend on some of the
 props your component receives.
-However, the set of props that a React component receives is in itself not observable, so changes to the props won't be reflected in any computed values. 
+However, the set of props that a React component receives is in itself not observable, so changes to the props won't be reflected in any computed values.
 To make props observable, the [`useAsObservableSource`](https://github.com/mobxjs/mobx-react#useasobservablesource-hook) hook can be used, that will sync the props of a component into an local observable object.
 _Note that it is important to not deconstruct the result of this hook._
 
 ```javascript
-import { observer, useLocalStore, useAsObservableSource } from "mobx-react-lite"
+import { observer, useLocalObservable, useAsObservableSource } from "mobx-react-lite"
 import { useState } from "react"
 
 const TimerView = observer(({ offset }) => {
     const observableProps = useAsObservableSource({ offset })
-    const timer = useLocalStore(() => ({
+    const timer = useLocalObservable(() => ({
         secondsPassed: 0,
         increaseTimer() {
             this.secondsPassed++
@@ -449,6 +449,60 @@ ReactDOM.render(<TimerView />, document.body)
 In practice you will rarely need this pattern, since
 `return <span>Seconds passed: {timer.secondsPassed - offset}</span>`
 is a much simpler, albeit slightly less efficient solution.
+
+</details>
+
+<details><summary>🚀 Tip: useEffect and observables</summary>
+
+`useEffect` can be used to set up side effects that need to happen, and which are bound to the life-cycle of the React component.
+Using `useEffect` requires specifying dependencies.
+With MobX that isn't really needed, since MobX has already a way to automatically determine the dependencies of an effect, `autorun`.
+Combining `autorun` and coupling it to the life-cycle of the component using `useEffect` is luckily straight forward:
+
+```javascript
+import { observer, useLocalObservable, useAsObservableSource } from "mobx-react-lite"
+import { useState } from "react"
+
+const TimerView = observer(({ offset }) => {
+    const timer = useLocalObservable(() => ({
+        secondsPassed: 0,
+        increaseTimer() {
+            this.secondsPassed++
+        }
+    }))
+
+    // effect that triggers upon observable changes
+    useEffect(
+        () =>
+            autorun(() => {
+                if (timer.secondsPassed > 60) alert("Still there. It's a minute already?!!")
+            }),
+        []
+    )
+
+    // effect to set up a timer
+    // (this one is just here for demo purposes)
+    useEffect(() => {
+        const handle = setInterval(() => timer.increaseTimer, 1000)
+        return () => {
+            clearInterval(handle)
+        }
+    }, [])
+
+    return <span>Seconds passed: {timer.offsetTime}</span>
+})
+
+ReactDOM.render(<TimerView />, document.body)
+```
+
+Note that we return the disposer created by `autorun` from our effect function.
+This is important, since it makes sure the `autorun` gets cleaned up once the component unmounts!
+
+The dependency array can typically be left empty, unless a non-observable value should trigger a re-run of the autorun, in which case you will need to add it there.
+To make your linter happy, you can define `timer` (in the above example) as a dependency.
+That is safe and has no further effect, since the reference will never actually change.
+
+If you'd rather explicitly define which observables should trigger the effect, use `reaction` instead of `autorun`, beyond that the pattern remains identical.
 
 </details>
 
