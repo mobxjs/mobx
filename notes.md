@@ -85,13 +85,14 @@
     -   [ ] better sel page
     -   [ ] link flutter, lit, angular
     -   [ ] update footer
+    -   [ ] don't proxy objects tip, makeAutoObservable vs observable
 -   [ ] mobx-react-lite
-    -   [ ] displayname for observer components facebook/react#18026
-    -   [ ] update useLocalStore in mobx-react-lite to use
+    -   [x] displayname for observer components facebook/react#18026. Fixed: https://github.com/facebook/react/issues/18026
+    -   [x] update useLocalStore in mobx-react-lite to use
             autoMakeObservable
-    -   [ ] fix React unstable batch setup
-    -   [ ] mobx-react
-    -   [ ] deprecate useAsObservableSource direct usage?
+    -   [x] fix React unstable batch setup
+    -   [x] mobx-react
+    -   [x] deprecate useAsObservableSource direct usage?
 -   [ ] post 6.0
     -   [ ] make cheatsheet
     -   [ ] support mobx-utils `computedFn` as annotation?
@@ -156,6 +157,10 @@ Why declare fields
 -   reduce library size
 -   not two ways to learn everything
 -   ease to re-decorate once decorators are standardized, still working on that!
+
+useObserver deprecation:
+A very simple example: if you have a hook `useUser` which goes like `useObserver(() => state.user`, that looks fine, but actually, if you use that to render the user's name (e.g. `const user = useUser(); return <div>{user.name}</div>`, it won't pick up updates to `user.name`, but only updates on `store.user` reassignments. That is very confusing and very suboptimal. No you can fix that by changing your hook to create a shallow copy fo user, like `useObserver(() => ({...store.user})`, but that defeats the MobX purpose as well, as now you will be over subscribing and re-render the user.name when his `age` changes. So using `useObserver` in other hooks is likely to under or over-subscribe, or not really reusable anymore and just restating the render deps that MobX can already perfectly determine for you. E.g. `<Observer>{() => <div>{store.user.name}</div>}</Observer>` instead will subscribe to exactly the relevant things.
+For migration: wrapping observer around the callers of your hook should typically do the trick, observer tracks through hook invocations.
 
 ## Mobx Size
 
