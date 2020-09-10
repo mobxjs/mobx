@@ -440,7 +440,7 @@ test("288 atom not detected for object property", () => {
     expect(changed).toBe(true)
 })
 
-test.skip("observable performance", () => {
+test("observable performance", () => {
     const AMOUNT = 100000
 
     class A {
@@ -456,7 +456,15 @@ test.skip("observable performance", () => {
     const objs = []
     const start = Date.now()
 
-    for (let i = 0; i < AMOUNT; i++) objs.push(new A())
+    for (let i = 0; i < AMOUNT; i++) {
+        const a = new A()
+        objs.push(a)
+        // force initialization
+        a.a
+        a.b
+        a.c
+        a.d
+    }
 
     console.log("created in ", Date.now() - start)
 
@@ -936,7 +944,10 @@ test("@computed.equals (Babel)", () => {
     time.minute = 0
     expect(changes).toEqual([{ hour: 9, minute: 0 }])
     time.hour = 10
-    expect(changes).toEqual([{ hour: 9, minute: 0 }, { hour: 10, minute: 0 }])
+    expect(changes).toEqual([
+        { hour: 9, minute: 0 },
+        { hour: 10, minute: 0 }
+    ])
     time.minute = 30
     expect(changes).toEqual([
         { hour: 9, minute: 0 },
@@ -975,7 +986,10 @@ test("computed comparer works with decorate (babel)", () => {
     time.minute = 0
     expect(changes).toEqual([{ hour: 9, minute: 0 }])
     time.hour = 10
-    expect(changes).toEqual([{ hour: 9, minute: 0 }, { hour: 10, minute: 0 }])
+    expect(changes).toEqual([
+        { hour: 9, minute: 0 },
+        { hour: 10, minute: 0 }
+    ])
     time.minute = 30
     expect(changes).toEqual([
         { hour: 9, minute: 0 },
@@ -1016,7 +1030,10 @@ test("computed comparer works with decorate (babel) - 2", () => {
     time.minute = 0
     expect(changes).toEqual([{ hour: 9, minute: 0 }])
     time.hour = 10
-    expect(changes).toEqual([{ hour: 9, minute: 0 }, { hour: 10, minute: 0 }])
+    expect(changes).toEqual([
+        { hour: 9, minute: 0 },
+        { hour: 10, minute: 0 }
+    ])
     time.minute = 30
     expect(changes).toEqual([
         { hour: 9, minute: 0 },
@@ -1051,7 +1068,10 @@ test("computed comparer works with decorate (babel) - 3", () => {
     time.minute = 0
     expect(changes).toEqual([{ hour: 9, minute: 0 }])
     time.hour = 10
-    expect(changes).toEqual([{ hour: 9, minute: 0 }, { hour: 10, minute: 0 }])
+    expect(changes).toEqual([
+        { hour: 9, minute: 0 },
+        { hour: 10, minute: 0 }
+    ])
     time.minute = 30
     expect(changes).toEqual([
         { hour: 9, minute: 0 },
