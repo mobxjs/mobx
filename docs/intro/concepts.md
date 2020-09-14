@@ -164,8 +164,8 @@ To learn more about how React works with MobX, read [React integration](../react
 
 #### 3.4. Custom reactions
 
-You will need them rarely, but custom reactions can simply be created using the [`autorun`](../refguide/autorun.md),
-[`reaction`](../refguide/reaction.md) or [`when`](../refguide/when.md) functions to fit your specific situations.
+You will need them rarely, but custom reactions can simply be created using the [`autorun`](../refguide/autorun.md#autorun),
+[`reaction`](../refguide/autorun.md#reaction) or [`when`](../refguide/autorun.md#when) functions to fit your specific situations.
 For example the following `autorun` prints a log message each time the amount of `unfinishedTodoCount` changes:
 
 ```javascript

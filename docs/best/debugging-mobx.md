@@ -62,7 +62,7 @@ trace(user, "fullname")
 # Introspection APIs
 
 The following APIs might come in handy if you want to inspect the internal state of MobX while debugging, or want to build cool tools on top of MobX.
-Also relevant are [`toJS`](tojson.md) and the various [`isObservable*` APIs](api.md#isobservable).
+Also relevant are the various [`isObservable*` APIs](../refguide/object-api.md).
 
 ### `getDebugName`
 
@@ -96,7 +96,7 @@ Returns a tree structure with all reactions / computations that are observing th
 
 Returns the backing _Atom_ of a given observable object, property, reaction etc.
 
-# Spy [🚀]
+# Spy
 
 Usage:
 
@@ -124,13 +124,13 @@ Spy listeners always receive one object, which usually has at least a `type` fie
 | scheduled-reaction              |                | name                                                  | no     |
 | reaction                        |                | name                                                  | yes    |
 | error                           |                | name, message, error                                  | no     |
-| add,update,remove,delete,splice | \*             | see [observe](observe.md)                             | yes    |
+| add,update,remove,delete,splice | \*             | see [observe](../refguide/observe.md)                 | yes    |
 | report-end                      |                | spyReportEnd=true, time? (total execution time in ms) | no     |
 
 The `report-end` events are part of an earlier fired event that had `spyReportStart: true`.
 This event indicates the end of an event and this way groups of events with sub-events are created.
 This event might report the total execution time as well.
 
-The spy events for observable values are identical to the events passed to `observe`. See [intercept & observe](observe.md#event-overview) for an extensive overview.
+The spy events for observable values are identical to the events passed to `observe`. See [intercept & observe](../refguide/observe.md#event-overview) for an extensive overview.
 
 In production builds, the `spy` API is a no-op as it will be minimized away.

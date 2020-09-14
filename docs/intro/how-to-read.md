@@ -14,9 +14,14 @@ of concepts as well as the pages under those headings.
 
 We've marked sections and concepts that are more advanced and which you likely don't need to understand until you have a special use case with the [🚀] marker. You can use MobX very effectively without knowing about them, so feel free to skip them and move on to the next section!
 
+The documentation has been rewritten for MobX 6. For older versions of MobX, the documentation can be found [here](https://github.com/mobxjs/mobx/tree/master/docs).
+All the principles are the same, and the API is largely the same. The primarily difference is that before MobX 6 [decorators](https://github.com/mobxjs/mobx/blob/master/docs/best/decorators.md) are the recommended syntax to write MobX enhanced classes.
+
 ## Guided tour
 
-To get an overall idea of how to use MobX with React, read through this _Basics_ section, in particular [The gist of MobX](overview.md) and [Concepts & Principles](concepts.md). These introduce the most important principles and patterns. You should actually be ready to use MobX once you read this!
+To get an overall idea of how to use MobX with React, read through this _Basics_ section, in particular [The gist of MobX](concepts.md).
+These introduce the most important principles, api's and how they relate.
+You should actually be ready to use MobX once you read this!
 
 Here are a few suggestions about the next things to read:
 

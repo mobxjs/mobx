@@ -119,7 +119,6 @@ export {
     allowStateChanges as _allowStateChanges,
     runInAction as _allowStateChangesInsideComputed, // This has become the default behavior in Mobx 6
     Lambda,
-    isArrayLike,
     $mobx,
     isComputingDerivation as _isComputingDerivation,
     onReactionError,

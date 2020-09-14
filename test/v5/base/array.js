@@ -128,7 +128,6 @@ test("array should support iterall / iterable ", () => {
     const a = observable([1, 2, 3])
 
     expect(iterall.isIterable(a)).toBe(true)
-    expect(iterall.isArrayLike(a)).toBe(true)
 
     const values = []
     iterall.forEach(a, v => values.push(v))
@@ -396,19 +395,6 @@ test("array exposes correct keys", () => {
     for (const key in ar) keys.push(key)
 
     expect(keys).toEqual(["0", "1"])
-})
-
-test("isArrayLike", () => {
-    const arr = [0, 1, 2]
-    const observableArr = observable(arr)
-
-    const isArrayLike = mobx.isArrayLike
-    expect(typeof isArrayLike).toBe("function")
-
-    expect(isArrayLike(observableArr)).toBe(true)
-    expect(isArrayLike(arr)).toBe(true)
-    expect(isArrayLike(42)).toBe(false)
-    expect(isArrayLike({})).toBe(false)
 })
 
 test("accessing out of bound values throws", () => {

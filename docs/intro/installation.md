@@ -36,3 +36,10 @@ configure({ useProxies: "never" }) // or "ifavailable"
 If you have used MobX before, or if you followed online tutorials, you probably saw MobX with decorators like `@observable`.
 In MobX 6 we have chosen to move away by default from decorators for maximum compatibility with standard JavaScript.
 They can still be used though if you [enable decorators](../best/decorators.md).
+
+## MobX on other frameworks / platforms
+
+-   [MobX.dart](https://mobx.netlify.app/): MobX for Flutter / Dart
+-   [lit-mobx](https://github.com/adobe/lit-mobx): MobX for lit-element
+-   [mobx-angular](https://github.com/mobxjs/mobx-angular): MobX for angular
+-   [mobx-vue](https://github.com/mobxjs/mobx-vue): MobX for Vue

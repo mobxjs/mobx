@@ -104,7 +104,8 @@ flow can be used as annotation
 -   `observableMap.toJSON()` now returns an entries array rather than a new Map, to better support serialization.
 -   `observableSet.toJS()` has been dropped. use `new Set(observableSet)` instead if you want to convert an observable set to to a plain Set shallowly.
 -   `observableMap.toJSON()` now returns an array rather than a new Set, to better support serialization.
--   Breaking: sorting or reversing an observableArray in an derivation (without slicing first) will now throw rather than warn. In contrast, it is now allowed to sort or reverse observable arrays in-place, as long as it happens in an action.
+-   Sorting or reversing an observableArray in an derivation (without slicing first) will now throw rather than warn. In contrast, it is now allowed to sort or reverse observable arrays in-place, as long as it happens in an action.
+-   `isArrayLike` is no longer exposed as utility. Use `Array.isArray(x) || isObservableArray(x)` instead.
 
 ### Obscure things that don't work anymore, but that probably won't affect you
 

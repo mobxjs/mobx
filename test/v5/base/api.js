@@ -35,7 +35,6 @@ test("correct api should be exposed", function () {
             "intercept",
             "_interceptReads",
             "isAction",
-            "isArrayLike",
             "isBoxedObservable",
             "isComputed",
             "isComputedProp",

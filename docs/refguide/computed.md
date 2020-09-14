@@ -94,7 +94,7 @@ When using computed values, there are a few best practices to observe:
 
 ## Tips
 
-<details><summary>Note: computed values will be suspended if they are _not_ observed</summary>
+<details id="computed-suspend"><summary>Note: computed values will be suspended if they are _not_ observed<a href="#computed-suspend" class="tip-anchor"></a></summary>
 
 It sometimes confuses people new to MobX (perhaps used to a library like [Reselect](https://github.com/reduxjs/reselect)) that if you create a computed property but don't use it anywhere in a reaction, it is not memoized and appears to be recomputed more often than necessary.
 For example, if we'd extend the above example with calling `console.log(order.total)` twice, after we called `stop()`, the value would be recomputed twice.
@@ -123,7 +123,7 @@ MobX can be configured to report an error when computeds are accessed outside an
 
 </details>
 
-<details><summary>Tip: computed values can have setters</summary>
+<details id="computed-setter"><summary>Tip: computed values can have setters<a href="#computed-setter" class="tip-anchor"></a></summary>
 
 It is possible to define a [setter](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/set) for computed values as well. Note that these setters cannot be used to alter the value of the computed property directly,
 but they can be used as 'inverse' of the derivation. Setters are automatically marked as actions. For example:
@@ -147,7 +147,7 @@ class Dimension {
 
 </details>
 
-<details><summary>🚀 Tip: `computed.struct` for comparing output structurally </summary>
+<details id="computed-struct"><summary>🚀 Tip: `computed.struct` for comparing output structurally <a href="#computed-struct" class="tip-anchor"></a></summary>
 
 If the output of a computed value, that is structurally equivalent to the previous computation, doesn't need to notify observers, `computed.struct` can be used. It will make a structural comparison first (rather than a reference equality check) before notifying observers. Example:
 
@@ -186,13 +186,13 @@ See also the `equals` [option](#option) for further customizations for determini
 
 </details>
 
-<details><summary>🚀 Tip: computed values with arguments</summary>
+<details id="computed-with-args"><summary>🚀 Tip: computed values with arguments<a href="#computed-with-args" class="tip-anchor"></a></summary>
 
 Although getters don't take arguments, several strategies to work with derived values that need arguments are discusses [here](computed-with-args.md).
 
 </details>
 
-<details><summary>🚀 Tip: created stand-alone computed values with `computed(expression)`</summary>
+<details id="standalone"><summary>🚀 Tip: created stand-alone computed values with `computed(expression)`<a href="#standalone" class="tip-anchor"></a></summary>
 
 `computed` can also be invoked directly as function.
 Just like [`observable.box`](api.md#observablebox) creates a stand-alone computed value.

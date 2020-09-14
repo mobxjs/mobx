@@ -128,8 +128,8 @@ in the _data_ function, and in that way control more precisely when the effect t
 
 Unlike `autorun` the side effect won't be run directly when created, but only after the data expression returns a new value for the first time.
 
-<details>
-  <summary>Example</summary>
+<details id="reaction-example">
+  <summary>Example<a href="#reaction-example" class="tip-anchor"></a></summary>
 
 In the example below, the reaction is only triggered once, when `isHungry` changes.
 Changes to `giraffe.energyLevel`, which is used by the _effect_ function, do not cause the _effect_ function to be executed. If you wanted `reaction` to respond to this
@@ -199,8 +199,8 @@ Once that happens, the given _effect_ function is executed and the autorunner is
 
 The `when` function returns a disposer to allow you to cancel it manually, unless you don't pass in a second `effect` function, in which case it returns a `Promise`.
 
-<details>
-  <summary>Example</summary>
+<details id="when-example">
+  <summary>Example<a href="#when-example" class="tip-anchor"></a></summary>
 
 This function is really useful to dispose or cancel stuff in a reactive way.
 For example:
@@ -255,7 +255,7 @@ There are a few rules that apply to any reactive context:
 2. Autorun tracks only the observables that are read during the synchronous execution of the provided function, but it won't track anything that happens asynchronously.
 3. Autorun won't track observables that are read by an action invoked by the autorun, as actions are always _untracked_.
 
-For a more examples on what precisely MobX will and won't react to, see [what does MobX react to](what-does-mobx-react-to.md).
+For a more examples on what precisely MobX will and won't react to, see [what does MobX react to](../best/what-does-mobx-react-to.md).
 For a detailed technical breakdown on how tracking works, read [Becoming fully reactive: an in-depth explanation of MobX](https://hackernoon.com/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254)
 
 ## Always dispose reactions
@@ -283,7 +283,7 @@ Failing to do so can lead to memory leaks.
 
 The `reaction` argument that is passed as second argument to the effect functions of `reaction` and `autorun` can be used to prematurely clean up the reaction as well by calling `reaction.dispose()`.
 
-<details><summary>Memory leak example</summary>
+<details id="mem-leak-example"><summary>Memory leak example<a href="#mem-leak-example" class="tip-anchor"></a></summary>
 
 ```javascript
 class Vat {
@@ -331,7 +331,7 @@ class OrderLine {
 
 The `options` argument as shown above can be passed to further fine tune the behavior of `autorun` / `reaction` / `when`:
 
--   `name`: Debug name (string) that is used as name for this reaction in for example [`spy`](spy.md) events.
+-   `name`: Debug name (string) that is used as name for this reaction in for example [`spy`](../best/debugging-mobx.md#spy) events.
 -   `fireImmediately` (reaction): Boolean that indicates that the _effect_ function should immediately be triggered after the first run of the _data_ function. `false` by default.
 -   `delay` (reaction, autorun): Number in milliseconds that can be used to throttle the effect function. If zero (the default), no throttling happens.
 -   `timeout` (when): Set a limited amount of time that `when` will wait. If the deadline passes, `when` will reject / throw.

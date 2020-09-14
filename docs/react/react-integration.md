@@ -16,7 +16,7 @@ import {observer} from 'mobx-react-lite
 const MyComponent = observer(props => ReactElement)
 ```
 
-While MobX works independently from React they are most commonly used together. In [the gist of Mobx](../intro/overview.md) as well as the [conceptual introduction](../intro/concepts.md) you have already seen the most important part of this integration: the `observer` [HoC](https://reactjs.org/docs/higher-order-components.html) that you can wrap around a React component.
+While MobX works independently from React they are most commonly used together. In [the gist of Mobx](../intro/concepts.md) you have already seen the most important part of this integration: the `observer` [HoC](https://reactjs.org/docs/higher-order-components.html) that you can wrap around a React component.
 `observer` is provided by the separate [`mobx-react-lite` package](https://github.com/mobxjs/mobx-react-lite).
 Using `observer` is pretty straight forward [[try it]](https://codesandbox.io/s/minimal-observer-p9ti4?file=/src/index.tsx):
 
@@ -171,7 +171,7 @@ useEffect(() => {
 <!--`useState` with local observable object-->
 
 As stated before, instead of using classes, it is possible to directly create observable objects.
-We can leverage [observable](observable.md) for that.
+We can leverage [observable](../refguide/observable.md) for that.
 
 ```javascript
 import { observer } from "mobx-react-lite"
@@ -217,20 +217,13 @@ ReactDOM.render(<TimerView />, document.body)
 
 <!--END_DOCUSAURUS_CODE_TABS-->
 
-<details><summary>What about `useMemo`?</summary>
-A critical reader might notice that we might have used `useMemo`,
-rather than `useState`.
-That would in practice work the same.
-However, React doesn't _guarantee_ that memoized values are actually
-memoized in all cases, so it _could_ randomly throw away our Timer instance
-and create a fresh one, resetting our timer progress in the process.
-</details>
-
 ### You might not need locally observable state
 
 In general we recommend to not resort to MobX observables for local component state too quickly; as this can theoretically lock you out of some features of React's Suspense mechanism.
 As a rule of thumb use MobX observables when the state captures domain data that is shared among components (including children), such as todo items, users, bookings, etc.
 State that is only captures UI state, such as loading state, selections, etc, might be better served by the [`useState` hook](https://reactjs.org/docs/hooks-state.html), since this allows you to leverage React suspense features in the future.
+
+Using observables inside React components adds value as soon as they are either 1) deep, 2) have computed values or 3) are shared with other `observer` components.
 
 ## Always read observables inside `observer` components.
 
@@ -259,7 +252,7 @@ If the problem is not entirely clear, make sure to study [what does MobX react t
 Components wrapped with `observer` _only_ subscribe to observables used during the _own_ render of the component. So if observable objects/ arrays / maps are passed to child components, those have to be marked as `observer` as well.
 This is also true for any callback based components.
 
-If you want to pass observables to a component that isn't `observer`, either because it is a third-party component, or because you want to keep that component MobX agnostic, you will have to [convert the observables to plain JavaScript values or structures](observable.md#converting-observables-back-to-vanilla-javascript-collections) before passing them on.
+If you want to pass observables to a component that isn't `observer`, either because it is a third-party component, or because you want to keep that component MobX agnostic, you will have to [convert the observables to plain JavaScript values or structures](../refguide/observable.md#converting-observables-back-to-vanilla-javascript-collections) before passing them on.
 
 To elaborate on the above,
 take the following example observable `todo` object, a `TodoView` component (observer) and an imaginary `GridRow` component that takes a column / value mapping, but which isn't an `observer`:
@@ -311,8 +304,7 @@ const TodoView = observer(({ todo }: { todo: Todo }) =>
 
 ## Tips
 
-<details><summary>mobx-react vs. mobx-react-lite
-</summary>
+<details id="react-vs-lite"><summary>mobx-react vs. mobx-react-lite<a href="#react-vs-lite" class="tip-anchor"></a></summary>
 In this documentation we used `mobx-react-lite` as default.
 [`mobx-react`](https://github.com/mobxjs/mobx-react/) is it's big brother, which uses `mobx-react-lite` under the hood.
 It offers a few more features which are typically not needed anymore in greenfield projects. The additional things offered by mobx-react:
@@ -326,13 +318,13 @@ If you use `mobx-react`, there is no need to add `mobx-react-lite` as dependency
 
 </details>
 
-<details><summary>`observer` and `React.memo`?</summary>
+<details id="observer-vs-memo"><summary>`observer` and `React.memo`?<a href="#observer-vs-memo" class="tip-anchor"></a></summary>
 `observer` automatically applies `memo`, so `observer` components never need to be wrapped in `memo`.
 `memo` can be applied safely to observer components because mutations (deeply) inside the props will be picked up by `observer` anyway if relevant.
 </details>
 
-<details><summary>
-Tip: `observer` for class based React components
+<details id="class-comp"><summary>
+Tip: `observer` for class based React components<a href="#class-comp" class="tip-anchor"></a>
 </summary>
 As stated above, class based components are only supported through `mobx-react`, and not `mobx-react-lite`.
 Briefly, you can wrap class-based components in `observer` just like
@@ -355,8 +347,8 @@ See the [mobx-react docs](https://github.com/mobxjs/mobx-react#api-documentation
 
 </details>
 
-<details><summary>
-Tip: nice component names in React DevTools
+<details id="displayname"><summary>
+Tip: nice component names in React DevTools<a href="#displayname" class="tip-anchor"></a>
 </summary>
 [React DevTools](https://reactjs.org/blog/2019/08/15/new-react-devtools.html) uses the display name information of components to properly display the component hierarchy.
 
@@ -409,8 +401,8 @@ Now you can see component names:
 
 </details>
 
-<details><summary>
-🚀 When combining `observer` with other higher-order-components, apply `observer` first
+<details id="wrap-order"><summary>
+🚀 When combining `observer` with other higher-order-components, apply `observer` first<a href="#wrap-order" class="tip-anchor"></a>
 </summary>
 
 When `observer` needs to be combined with other decorators or higher-order-components, make sure that `observer` is the innermost (first applied) decorator;
@@ -418,7 +410,7 @@ otherwise it might do nothing at all.
 
 </details>
 
-<details><summary>🚀 Tip: Deriving computeds from props</summary>
+<details id="computed-props"><summary>🚀 Tip: Deriving computeds from props<a href="#computed-props" class="tip-anchor"></a></summary>
 In some the computed values of your local observable might depend on some of the
 props your component receives.
 However, the set of props that a React component receives is in itself not observable, so changes to the props won't be reflected in any computed values.
@@ -452,7 +444,7 @@ is a much simpler, albeit slightly less efficient solution.
 
 </details>
 
-<details><summary>🚀 Tip: useEffect and observables</summary>
+<details id="useeffect"><summary>🚀 Tip: useEffect and observables<a href="#useeffect" class="tip-anchor"></a></summary>
 
 `useEffect` can be used to set up side effects that need to happen, and which are bound to the life-cycle of the React component.
 Using `useEffect` requires specifying dependencies.
@@ -515,9 +507,9 @@ See the relevant [React performance section](react-performance.md).
 Help! My component isn't re-rendering...
 
 1. Make sure you didn't forget `observer` (yes, this is the most common mistake)
-1. Verify that the thing you intend to react to is indeed observable. Use utilities like [`isObservable`](api.md#isobservable), [`isObservableProp`](api.md#isobservableprop) if needed to verify this at runtime.
+1. Verify that the thing you intend to react to is indeed observable. Use utilities like [`isObservable`](../refguide/api.md#isobservable), [`isObservableProp`](../refguide/api.md#isobservableprop) if needed to verify this at runtime.
 1. Check the console logs in the browsers for any warnings or errors.
 1. Make sure you grok how tracking works in general: [what does MobX react to](../best/what-does-mobx-react-to.md)
 1. Read the common pitfalls as described above.
 1. [Configure](configure) MobX to warn you of unsound usage of MobX mechanisms and check the console logs.
-1. Use [trace](../best/trace.md) to verify that you are subscribing to the right things or check what MobX is doing in general using [spy](../refguide/spy.md) / the [mobx-logger](https://github.com/winterbe/mobx-logger) package.
+1. Use [trace](../best/debugging-mobx.md) to verify that you are subscribing to the right things or check what MobX is doing in general using [spy](../best/debugging-mobx#spy) / the [mobx-logger](https://github.com/winterbe/mobx-logger) package.

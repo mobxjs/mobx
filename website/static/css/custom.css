@@ -52,6 +52,25 @@ article p img {
     color: #979797;
 }
 
+/* no fixed header, it makes linking ugly as headers disappear */
+@media only screen and (min-width: 1024px)  {
+    .fixedHeaderContainer {
+        position: unset !important;
+    }
+
+    .navPusher {
+        padding-top: 0px !important;
+        margin-top: -40px !important;
+    }
+    .onPageNav {
+        top: 70px !important;
+    }
+    .docsNavContainer {
+        top: 30px !important;
+    }
+}
+
+
 details {
     background-color: aliceblue;
     font-size: 0.8em;
@@ -201,4 +220,12 @@ details[open] > summary {
     .carbon-text {
         font-size: 14px;
     }
+}
+
+.tip-anchor {
+    margin-left: 8px;
+
+}
+.tip-anchor::after {
+    content: "∞"
 }

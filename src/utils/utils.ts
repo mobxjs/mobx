@@ -135,13 +135,6 @@ export function createInstanceofPredicate<T>(
     } as any
 }
 
-/**
- * Returns whether the argument is an array, disregarding observability.
- */
-export function isArrayLike(x: any): x is Array<any> | IObservableArray<any> {
-    return Array.isArray(x) || isObservableArray(x)
-}
-
 export function isES6Map(thing): boolean {
     return thing instanceof Map
 }

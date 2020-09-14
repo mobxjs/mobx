@@ -75,21 +75,21 @@
     -   [x] upgrade mobx-utils
     -   [x] upgrade mobx-state-tree
 -   [ ] docs
-    -   [ ] clean up docs
-    -   [ ] fix interactive tut
-    -   [ ] document and introduce flow annotation
-    -   [ ] fix link warnings
+    -   [x] clean up docs
+    -   [x] finish api ref guide
+    -   [ ] fix / drop interactive tut
+    -   [x] document and introduce flow annotation
+    -   [x] fix link warnings
     -   [ ] revisit how-to-read guide with all things in place
     -   [ ] finish migration guide
-    -   [ ] make details section collapsible
-    -   [ ] better sel page
-    -   [ ] link flutter, lit, angular
-    -   [ ] update footer
-    -   [ ] don't proxy objects tip, makeAutoObservable vs observable
-    -   [ ] drop interactive tutorial?
+    -   [x] make details section collapsible
+    -   [x] better sel page
+    -   [x] link flutter, lit, angular
+    -   [x] update footer
+    -   [x] don't proxy objects tip, makeAutoObservable vs observable
     -   [ ] sync readme's
     -   [ ] verify that MobX is by default in strict mode
-    -   [ ] make links for all tips
+    -   [x] make links for all tips
 -   [ ] mobx-react-lite
     -   [x] displayname for observer components facebook/react#18026. Fixed: https://github.com/facebook/react/issues/18026
     -   [x] update useLocalStore in mobx-react-lite to use
