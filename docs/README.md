@@ -45,31 +45,31 @@ MobX is made possible by the generosity of the sponsors below, and many [individ
 
 ## Introduction
 
-MobX is a battle tested library that makes state management simple and scalable by transparently applying functional reactive programming (TFRP).
-The philosophy behind MobX is very simple:
-
 _Anything that can be derived from the application state, should be derived. Automatically._
 
-<div  class="benefits">
+MobX is a battle tested library that makes state management simple and scalable by transparently applying functional reactive programming (TFRP).
+The philosophy behind MobX is simple:
+
+<div class="benefits">
     <div>
         <div class="pic">😙</div>
         <div>
-            <h5>Straight forward code</h5>
-            <p>With MobX you write minimalistic, boilerplate free code that captures your intent:
-            Trying to update a record field? Use a good old JavaScript assignment.
-            Updating data in an asynchronous process? No special tools are needed.
-            The reactivity system will detect all your changes and propagate them where needed.
+            <h5>Straight forward</h5>
+            <p>With MobX, you write minimalistic, boilerplate free code that captures your intent:
+            Trying to update a record field? Use good old JavaScript assignment.
+            Updating data in an asynchronous process? No special tools are required.
+            The reactivity system will detect all your changes and propagate those changes out to where they are being used.
             </p>
         </div>
     </div>
     <div>
         <div class="pic">🚅</div>
         <div>
-            <h5>Optimal rendering without effort</h5>
+            <h5>Effortless optimization</h5>
             <p>
-                MobX tracks all updates and usages of your data and runtime, to build a dependency tree that captures all relations between state and output.
-                This makes sure that computations depending on your state, like React components, run never more than strictly needed.
-                With MobX there is no need to manually optimize components using error-prone and sub-optimal techniques like memoization and selectors.
+                MobX tracks all updates and usages of your data at runtime in order to build a dependency tree that captures all relations between state and output.
+                This makes sure that computations depending on your state, like React components, run only when strictly needed.
+                With MobX, there is no need to manually optimize components using error-prone and sub-optimal techniques like memoization and selectors.
             </p>
         </div>
     </div>
@@ -129,7 +129,7 @@ setInterval(() => {
 
 In the above example, the `observer` wrapper around the React component will automatically detect that the rendering
 of the component depends on `timer.secondsPassed`.
-Even though this relationship is defined nowhere explicitly, MobX's reactivity system will make sure the component gets re-rendered when _precisely that_ field is updated inthe future.
+Even though this relationship is not explicitly defined, MobX's reactivity system will make sure the component gets re-rendered when _precisely that_ field is updated in the future.
 
 ## Core concepts
 
