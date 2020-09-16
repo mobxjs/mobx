@@ -45,7 +45,7 @@ These are the responsibilities of a store:
 -   Provide backend integration. Store data when needed.
 -   Update existing instances if updates are received from the backend.
 -   Provide a stand-alone, universal, testable component of your application.
--   To make sure your store is testable and can be run server-side, you probably will move doing actual websocket / http requests to a separate object so that you can abstract over your communication layer.
+-   To make sure your store is testable and can be run server-side, you will probably move doing actual websocket / http requests to a separate object so that you can abstract over your communication layer.
 -   There should be only one instance of a store.
 
 ### Domain objects
@@ -65,10 +65,10 @@ It is possible to express your domain objects as plain objects, but classes have
     This makes your domain concepts easier to use stand-alone and reduces the amount of contextual awareness that is needed in your application.
     Just pass objects around.
     You don't have to pass stores around, or have to figure out which actions can be applied to an object if they are just available as instance methods.
-    Especially in large applications this is important.
+    This is especially important in large applications.
 -   They offer fine grained control over the visibility of attributes and methods.
 -   Objects created using a constructor function can freely mix observable properties and functions, and non-observable properties and methods.
--   They are easily recognizable and can strictly be type-checked.
+-   They are easily recognizable and can be strictly type-checked.
 
 ### Example domain store
 

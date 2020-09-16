@@ -9,7 +9,7 @@ hide_title: true
 
 # Using `trace` for debugging
 
-Trace is a small utility that helps to find out why your computed values, reactions or components are re-evaluating.
+Trace is a small utility that helps you find out why your computed values, reactions or components are re-evaluating.
 
 It can be used by simply importing `import { trace } from "mobx"`, and then put it inside a reaction or computed value.
 It will print why it is re-evaluating the current derivation.
@@ -27,7 +27,7 @@ In debugger mode, the debug information will also reveal the full derivation tre
 
 [Simple CodeSandbox `trace` example](https://codesandbox.io/s/trace-dnhbz?file=/src/index.js:309-338)
 
-Here's a deployed example for exploring the stack: https://csb-nr58ylyn4m-hontnuliaa.now.sh/
+Here's a deployed example for exploring the stack: https://csb-nr58ylyn4m-hontnuliaa.now.sh/.
 Be sure to play with chrome debugger's blackbox feature!
 
 ## Usage examples
@@ -70,7 +70,7 @@ Usage:
 
 -   `getDebugName(thing, property?)`
 
-Returns a (generated) friendly debug name of an observable object, property, reaction etc. Used by for example the [MobX developer tools](https://github.com/mobxjs/mobx-devtools).
+Returns a (generated) friendly debug name of an observable object, property, reaction etc. Used for example by the [MobX developer tools](https://github.com/mobxjs/mobx-devtools).
 
 ### `getDependencyTree`
 
