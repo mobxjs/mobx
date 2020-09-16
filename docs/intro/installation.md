@@ -14,7 +14,7 @@ There are two types of React bindings. `mobx-react` also supports class based co
 
 **Yarn:** `yarn add mobx`.
 
-**NPM:** `npm install mobx --save`.
+**NPM:** `npm install --save mobx`.
 
 **CDN:**
 -   cdnjs: https://cdnjs.com/libraries/mobx
@@ -24,7 +24,7 @@ There are two types of React bindings. `mobx-react` also supports class based co
 
 ## MobX on older JavaScript environments
 
-By default, MobX uses proxies for optimal performance and compatibility. However, on older JavaScript engines `Proxy` is not available (see [Proxy support](https://kangax.github.io/compat-table/es6/#test-Proxy)). Such examples are Internet Explorer (before Edge), Node.js < 6, iOS < 10, Android before RN 0.59, or Android on iOS. In such cases, MobX can fallback to an ES5 compatible implementation which works almost identically, though there are a few [limitations without Proxy support](../refguide/configure.md#limitations-without-proxy-support).
+By default, MobX uses proxies for optimal performance and compatibility. However, on older JavaScript engines `Proxy` is not available (see [Proxy support](https://kangax.github.io/compat-table/es6/#test-Proxy)). Such examples are Internet Explorer (before Edge), Node.js < 6, iOS < 10, Android before RN 0.59, or Android on iOS. In such cases, MobX can fallback to an ES5 compatible implementation which works almost identically, although there are a few [limitations without Proxy support](../refguide/configure.md#limitations-without-proxy-support).
 
 You will have to explicitly enable the fallback implementation by configuring [`useProxies`](../refguide/configure#useproxies):
 
