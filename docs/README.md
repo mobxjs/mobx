@@ -19,7 +19,7 @@ _Simple, scalable state management_
 
 MobX is made possible by the generosity of the sponsors below, and many [individual backers](http://mobxjs.github.io/mobx/backers-sponsors.html#backers). Sponsoring directly impacts the longevity of this project.
 
-**🥇Gold sponsors (\$3000+ total contribution):** <br/>
+**🥇 Gold sponsors (\$3000+ total contribution):** <br/>
 <a href="https://mendix.com/"><img src="assets/mendix-logo.png" align="center" width="100" title="Mendix" alt="Mendix" /></a>
 <a href="https://frontendmasters.com/"><img src="assets/frontendmasters.jpg" align="center" width="100" title="Frontend Masters" alt="Frontend Masters"></a>
 <a href="https://opensource.facebook.com/"><img src="assets/fbos.jpeg" align="center" width="100" title="Facebook Open Source" alt="Facebook Open Source" /></a>
@@ -28,14 +28,14 @@ MobX is made possible by the generosity of the sponsors below, and many [individ
 <a href="https://coinbase.com/"><img src="assets/coinbase.jpeg" align="center" width="100" title="Coinbase" alt="Coinbase" /></a>
 <a href="https://www.canva.com/"><img src="assets/canva.png" align="center" width="100" title="Canva" alt="Canva" /></a>
 
-**🥈Silver sponsors (\$100+ pm):**<br/>
+**🥈 Silver sponsors (\$100+ pm):**<br/>
 <a href="https://mantro.net/jobs/warlock"><img src="assets/mantro.png" align="center" width="100" title="mantro GmbH" alt="mantro GmbH"></a>
 <a href="https://www.codefirst.co.uk/"><img src="assets/codefirst.png" align="center" width="100" title="CodeFirst" alt="CodeFirst"/></a>
 <a href="https://www.dcslsoftware.com/"><img src="assets/dcsl.png" align="center" width="100" title="DCSL Software" alt="DCSL Software"/></a>
 <a href="https://www.bugsnag.com/platforms/react-error-reporting?utm_source=MobX&utm_medium=Website&utm_content=open-source&utm_campaign=2019-community&utm_term=20190913"><img src="assets/bugsnag.jpg" align="center" width="100" title="Bugsnag" alt="Bugsnag"/></a>
 <a href="https://curology.com/blog/tech"><img src="assets/curology.png" align="center" width="100" title="Curology" alt="Curology"/></a>
 
-**🥉Bronze sponsors (\$500+ total contributions):**<br/>
+**🥉 Bronze sponsors (\$500+ total contributions):**<br/>
 <a href="https://www.algolia.com/"><img src="assets/algolia.jpg" align="center" width="100" title="Algolia" alt="Algolia" /></a>
 <a href="https://talentplot.com/"><img src="assets/talentplot.png" align="center" width="100" title="talentplot" alt="talentplot"></a>
 <a href="https://careers.dazn.com/"><img src="assets/dazn.png" align="center" width="100" title="DAZN" alt="DAZN"></a>
@@ -45,31 +45,31 @@ MobX is made possible by the generosity of the sponsors below, and many [individ
 
 ## Introduction
 
-MobX is a battle tested library that makes state management simple and scalable by transparently applying functional reactive programming (TFRP).
-The philosophy behind MobX is very simple:
-
 _Anything that can be derived from the application state, should be derived. Automatically._
 
-<div  class="benefits">
+MobX is a battle tested library that makes state management simple and scalable by transparently applying functional reactive programming (TFRP).
+The philosophy behind MobX is simple:
+
+<div class="benefits">
     <div>
         <div class="pic">😙</div>
         <div>
-            <h5>Straight forward code</h5>
-            <p>With MobX you write minimalistic, boilerplate free code that captures your intent:
-            Trying to update a record field? Use a good old JavaScript assignment.
-            Updating data in an asynchronous process? No special tools are needed.
-            The reactivity system will detect all your changes and propagate them where needed.
+            <h5>Straight forward</h5>
+            <p>With MobX, you write minimalistic, boilerplate free code that captures your intent:
+            Trying to update a record field? Use good old JavaScript assignment.
+            Updating data in an asynchronous process? No special tools are required.
+            The reactivity system will detect all your changes and propagate those changes out to where they are being used.
             </p>
         </div>
     </div>
     <div>
         <div class="pic">🚅</div>
         <div>
-            <h5>Optimal rendering without effort</h5>
+            <h5>Effortless optimization</h5>
             <p>
-                MobX tracks all updates and usages of your data and runtime, to build a dependency tree that captures all relations between state and output.
-                This makes sure that computations depending on your state, like React components, run never more than strictly needed.
-                With MobX there is no need to manually optimize components using error-prone and sub-optimal techniques like memoization and selectors.
+                MobX tracks all updates and usages of your data at runtime in order to build a dependency tree that captures all relations between state and output.
+                This makes sure that computations depending on your state, like React components, run only when strictly needed.
+                With MobX, there is no need to manually optimize components using error-prone and sub-optimal techniques like memoization and selectors.
             </p>
         </div>
     </div>
@@ -129,7 +129,7 @@ setInterval(() => {
 
 In the above example, the `observer` wrapper around the React component will automatically detect that the rendering
 of the component depends on `timer.secondsPassed`.
-Even though this relationship is defined nowhere explicitly, MobX's reactivity system will make sure the component gets re-rendered when _precisely that_ field is updated inthe future.
+Even though this relationship is not explicitly defined, MobX's reactivity system will make sure the component gets re-rendered when _precisely that_ field is updated in the future.
 
 ## Core concepts
 
