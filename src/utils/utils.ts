@@ -1,4 +1,4 @@
-import { IObservableArray, globalState, isObservableArray, die } from "../internal"
+import { globalState, die } from "../internal"
 
 // We shorten anything used > 5 times
 export const assign = Object.assign
