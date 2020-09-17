@@ -26,7 +26,7 @@ export interface IActionFactory {
     (target: Object, propertyKey: string | symbol, descriptor?: PropertyDescriptor): void
 
     // @action.bound decorator
-    bound(target: Object, propertyKey: string | symbol, descriptor?: PropertyDescriptor): void
+    bound: (target: Object, propertyKey: string | symbol, descriptor?: PropertyDescriptor) => void
 }
 
 export const action: IActionFactory = function action(arg1, arg2?, arg3?, arg4?): any {

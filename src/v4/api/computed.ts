@@ -13,7 +13,7 @@ export interface IComputed {
     <T>(func: () => T, setter: (v: T) => void): IComputedValue<T> // normal usage
     <T>(func: () => T, options?: IComputedValueOptions<T>): IComputedValue<T> // normal usage
     (target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): void // decorator
-    struct(target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor): void // decorator
+    struct: (target: Object, key: string | symbol, baseDescriptor?: PropertyDescriptor) => void // decorator
 }
 
 export const computedDecorator = createPropDecorator(
