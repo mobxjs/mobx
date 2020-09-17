@@ -54,21 +54,21 @@ The philosophy behind MobX is simple:
     <div>
         <div class="pic">😙</div>
         <div>
-            <h5>Straight forward</h5>
+            <h5>Straightforward</h5>
             <p>With MobX, you write minimalistic, boilerplate free code that captures your intent:
             Trying to update a record field? Use good old JavaScript assignment.
             Updating data in an asynchronous process? No special tools are required.
-            The reactivity system will detect all your changes and propagate those changes out to where they are being used.
+            The reactivity system will detect all your changes and propagate them out to where they are being used.
             </p>
         </div>
     </div>
     <div>
         <div class="pic">🚅</div>
         <div>
-            <h5>Effortless optimization</h5>
+            <h5>Effortless optimal rendering</h5>
             <p>
-                MobX tracks all updates and usages of your data at runtime in order to build a dependency tree that captures all relations between state and output.
-                This makes sure that computations depending on your state, like React components, run only when strictly needed.
+                MobX tracks all updates and usages of your data at runtime, building a dependency tree that captures all relations between state and output.
+                This guarantees that computations depending on your state, like React components, run only when strictly needed.
                 With MobX, there is no need to manually optimize components using error-prone and sub-optimal techniques like memoization and selectors.
             </p>
         </div>
@@ -78,7 +78,7 @@ The philosophy behind MobX is simple:
         <div>
             <h5>Architectural freedom</h5>
             <p>
-                MobX is unopionated and allows you to manage your application state outside any UI framework.
+                MobX is unopinionated and allows you to manage your application state outside of any UI framework.
                 This makes your code decoupled, portable, and above all, easily testable.
             </p>
         </div>
@@ -127,17 +127,15 @@ setInterval(() => {
 }, 1000)
 ```
 
-In the above example, the `observer` wrapper around the React component will automatically detect that the rendering
-of the component depends on `timer.secondsPassed`.
-Even though this relationship is not explicitly defined, MobX's reactivity system will make sure the component gets re-rendered when _precisely that_ field is updated in the future.
+The `observer` wrapper around the `TimerView` React component will automatically detect that rendering
+of the component depends on `timer.secondsPassed`, even though this relationship is not explicitly defined. MobX's reactivity system will make sure the component gets re-rendered when _precisely that_ field is updated in the future.
 
-## Core concepts
+Every event (`onClick` and `setInterval`) invokes an _action_ (`increaseTimer` and `resetTimer` functions) that updates _observable state_ (`secondsPassed` class property).
+Changes in the observable state are propagated precisely to all _computations_ and _side-effects_ (`TimerView` component) that depend on the changes being made.
 
 <img alt="MobX unidirectional flow" src="assets/flow2.png" align="center" />
 
-The above diagram is the conceptual picture you can apply to the above example and any other application using MobX.
-Every event (the `onClick` and `setInterval`) invokes an _action_ (`increaseTimer` or `resetTimer`) that updates _observable state_ (`secondsPassed`).
-Changes in the observable state are propagated precisely to all _computations_ and _side-effects_ (the `TimerView` component) that depend on the changes made.
+You can apply this diagram as a conceptual picture to this simple example or any other application using MobX.
 
 To learn about the core concepts of MobX with a larger example, please read [Concepts & Principles](http://mobxjs.github.io/mobx/intro/concepts.html) or take the [10 minute interactive introduction to MobX and React](https://mobx.js.org/getting-started).
 The philosophy and benefits of the mental model provided by MobX are described in detail in the blogs [UI as an afterthought](https://michel.codes/blogs/ui-as-an-afterthought) and [How to decouple state and UI (a.k.a. you don’t need componentWillMount)](https://hackernoon.com/how-to-decouple-state-and-ui-a-k-a-you-dont-need-componentwillmount-cc90b787aa37).
