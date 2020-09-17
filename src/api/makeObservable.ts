@@ -180,9 +180,16 @@ export function makeProperty(
     }
 }
 
-export function makeObservable<T extends Object, AdditionalKeys extends PropertyKey = never>(
+// Hack based on https://github.com/Microsoft/TypeScript/issues/14829#issuecomment-322267089
+// We need this, because otherwise, AdditionalKeys is going to be inferred to be any
+// set of superfluos keys. But, we rather want to get a compile error unless AdditionalKeys is
+// _explicity_ passed as generic argument
+// Fixes: https://github.com/mobxjs/mobx/issues/2325#issuecomment-691070022
+type NoInfer<T> = [T][T extends any ? 0 : never]
+
+export function makeObservable<T, AdditionalKeys extends PropertyKey = never>(
     target: T,
-    annotations?: AnnotationsMap<T, AdditionalKeys>,
+    annotations?: AnnotationsMap<T, NoInfer<AdditionalKeys>>,
     options?: CreateObservableOptions
 ): T {
     const autoBind = !!options?.autoBind
@@ -215,7 +222,7 @@ export function makeObservable<T extends Object, AdditionalKeys extends Property
 
 export function makeAutoObservable<T extends Object, AdditionalKeys extends PropertyKey = never>(
     target: T,
-    excludes?: AnnotationsMap<T, AdditionalKeys>,
+    excludes?: AnnotationsMap<T, NoInfer<AdditionalKeys>>,
     options?: CreateObservableOptions
 ): T {
     const proto = Object.getPrototypeOf(target)
@@ -238,7 +245,7 @@ export function makeAutoObservable<T extends Object, AdditionalKeys extends Prop
             addHiddenProp(proto, CACHED_ANNOTATIONS, annotations)
         }
     }
-    makeObservable(target, annotations, options)
+    makeObservable(target, annotations as any, options)
     return target
 }
 
