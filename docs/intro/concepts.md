@@ -25,7 +25,7 @@ Usually, there is _domain specific state_ like a list of todo items, and there i
 State is like spreadsheet cells that hold a value.
 
 Store state in any data structure you like: plain objects, arrays, classes, cyclic data structures or references. It doesn't matter for the workings of MobX.
-Just make sure that all properties you want to change over time are marked `observable` so MobX can track them.
+Just make sure that all properties you want to change over time are marked as `observable` so MobX can track them.
 
 Here is a simple example:
 
@@ -116,7 +116,8 @@ These computations resemble formulas in spreadsheet programs like MS Excel. They
 
 For you as a user to be able to see a change in state or computed values on the screen a _reaction_ is needed that repaints a part of the GUI.
 
-Reactions are similar to computed values, but instead of producing information, reactions produce side effect like printing to the console, making network requests, incrementally updating the React component tree to patch the DOM, etc.
+Reactions are similar to computed values, but instead of producing information, reactions produce side effects like printing to the console, making network requests, incrementally updating React component tree to patch the DOM, etc.
+
 In short, reactions bridge the worlds of [reactive](https://en.wikipedia.org/wiki/Reactive_programming) and [imperative](https://en.wikipedia.org/wiki/Imperative_programming) programming.
 
 By far the most used form of reactions are UI components.
@@ -159,16 +160,16 @@ render(<TodoListView todoList={store} />, document.getElementById("root"))
 When using MobX there are no smart or dumb components.
 All components render smartly, but are defined in a dumb manner. MobX will simply make sure the components are always re-rendered whenever needed, and never more than that.
 
-So the `onClick` handler in the above example will force the proper `TodoView` to render as it uses the `toggle` action, but will only cause the `TodoListView` to render if the number of unfinished tasks has changed.
-And if you would remove the `Tasks left` line (or put that into a separate component), the `TodoListView` will no longer re-render when ticking a task.
+So the `onClick` handler in the above example will force the proper `TodoView` component to render as it uses the `toggle` action, but will only cause the `TodoListView` component to render if the number of unfinished tasks has changed.
+And if you would remove the `Tasks left` line (or put that into a separate component), the `TodoListView` component will no longer re-render when ticking a task.
 
-To learn more about how React works with MobX, read about it in [React integration](../react/react-integration.md).
+To learn more about how React works with MobX, check out [React integration](../react/react-integration.md).
 
 #### 3.4. Custom reactions
 
 You will need them rarely, but they can be created using the [`autorun`](../refguide/autorun.md#autorun),
 [`reaction`](../refguide/autorun.md#reaction) or [`when`](../refguide/autorun.md#when) functions to fit your specific situations.
-For example, the following `autorun` prints a log message each time the amount of `unfinishedTodoCount` changes:
+For example, the following `autorun` prints a log message every time the amount of `unfinishedTodoCount` changes:
 
 ```javascript
 /* a function that automatically observes the state */
@@ -181,7 +182,7 @@ Why does a new message get printed every time the `unfinishedTodoCount` is chang
 
 _MobX reacts to any existing observable property that is read during the execution of a tracked function._
 
-For an in-depth explanation about how MobX determines which observables need to be reacted to, check out [understanding what MobX reacts to](../best/what-does-mobx-react-to.md).
+To learn more about how MobX determines which observables need to be reacted to, check out [understanding what MobX reacts to](../best/what-does-mobx-react-to.md).
 
 ## Principles
 
