@@ -207,4 +207,4 @@ You can play with the above examples yourself on [CodeSandbox](https://codesandb
 
 ## Linting
 
-If you find it hard to adopt the mental model of MobX, configure it to be very strict and warn at run-time whenever you deviate from these patterns. Check out [linting MobX](../refguide/configure.md#linting-options).
+If you find it hard to adopt the mental model of MobX, configure it to be very strict and warn at runtime whenever you deviate from these patterns. Check out [linting MobX](../refguide/configure.md#linting-options).
