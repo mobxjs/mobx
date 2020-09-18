@@ -199,7 +199,7 @@ If a view is no longer in use it will be garbage collected automatically.
 
 All _computed values_ should be **pure**. They are not supposed to change _state_.
 
-For some more background context, read [the fundamental principles behind MobX](https://hackernoon.com/the-fundamental-principles-behind-mobx-7a725f71f3e8).
+To learn more about the background context, check out [the fundamental principles behind MobX](https://hackernoon.com/the-fundamental-principles-behind-mobx-7a725f71f3e8).
 
 ## Try it out!
 
@@ -207,4 +207,4 @@ You can play with the above examples yourself on [CodeSandbox](https://codesandb
 
 ## Linting
 
-If you find it hard to adopt the mental model of MobX, configure it to be very strict and warn at run-time whenever you deviate from these patterns. See [linting MobX](../refguide/configure.md#linting-options).
+If you find it hard to adopt the mental model of MobX, configure it to be very strict and warn at run-time whenever you deviate from these patterns. Check out [linting MobX](../refguide/configure.md#linting-options).
