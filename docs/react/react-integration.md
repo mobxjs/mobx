@@ -16,7 +16,7 @@ import {observer} from 'mobx-react-lite
 const MyComponent = observer(props => ReactElement)
 ```
 
-While MobX works independently from React, they are most commonly used together. In [the gist of Mobx](../intro/concepts.md) you have already seen the most important part of this integration: the `observer` [HoC](https://reactjs.org/docs/higher-order-components.html) that you can wrap around a React component.
+While MobX works independently from React, they are most commonly used together. In [the gist of MobX](../intro/concepts.md) you have already seen the most important part of this integration: the `observer` [HoC](https://reactjs.org/docs/higher-order-components.html) that you can wrap around a React component.
 
 `observer` is provided by a separate React bindings package you choose [during installation](../intro/installation.md#installation). In this example, we're going to use the more lightweight [`mobx-react-lite` package](https://github.com/mobxjs/mobx-react-lite).
 
@@ -52,12 +52,12 @@ setInterval(() => {
 ```
 **Hint:** you can play with the above example yourself on [CodeSandbox](https://codesandbox.io/s/minimal-observer-p9ti4?file=/src/index.tsx).
 
-The `observer` HoC subscribes React components automatically to _any observables_ that are used _during rendering_.
+The `observer` HoC automatically subscribes React components to _any observables_ that are used _during rendering_.
 As a result, components will automatically re-render when relevant observables change.
 It also makes sure that components don't re-render when there are _no relevant_ changes.
 So, observables that are accessible by the component, but not actually read, won't ever cause a re-render.
 
-In practice this makes MobX applications very well optimized out of the box and typically don't need any additional code to prevent excessive rendering.
+In practice this makes MobX applications very well optimized out of the box and they typically don't need any additional code to prevent excessive rendering.
 
 For `observer` to work, it doesn't matter _how_ the observables arrive in the component, only that they are read.
 Reading observables deeply is fine, complex expression like `todos[0].author.displayName` work out of the box.
@@ -73,7 +73,7 @@ The examples below demonstrate different patterns on how external and local obse
 <!--DOCUSAURUS_CODE_TABS-->
 <!--using props-->
 
-Observables can be passed as properties into components as props, as was done in the example above:
+Observables can be passed into components as props, as was done in the example above:
 
 ```javascript
 import { observer } from "mobx-react-lite"
@@ -128,7 +128,7 @@ ReactDOM.render(
 )
 ```
 
-Note that we don't recommend ever replacing the `value` of a `Provider` with a different value. Using MobX, there should be no need for that, since the observable that is shared can be updated itself.
+Note that we don't recommend ever replacing the `value` of a `Provider` with a different one. Using MobX, there should be no need for that, since the observable that is shared can be updated itself.
 
 <!--END_DOCUSAURUS_CODE_TABS-->
 
@@ -197,7 +197,7 @@ ReactDOM.render(<TimerView />, document.body)
 <!--`useLocalObservable` hook-->
 
 The combination `const [store] = useState(() => observable({ /* something */}))` is
-quite common. To make this pattern simpler the [`useLocalObservable`](https://github.com/mobxjs/mobx-react#uselocalobservable-hook) hook is exposed from `mobx-react-lite`, making it possible to simplify the earlier example to:
+quite common. To make this pattern simpler the [`useLocalObservable`](https://github.com/mobxjs/mobx-react#uselocalobservable-hook) hook is exposed from `mobx-react-lite` package, making it possible to simplify the earlier example to:
 
 ```javascript
 import { observer, useLocalObservable } from "mobx-react-lite"
@@ -220,7 +220,7 @@ ReactDOM.render(<TimerView />, document.body)
 
 ### You might not need locally observable state
 
-In general we recommend to not resort to MobX observables for local component state too quickly, as this can theoretically lock you out of some features of React's Suspense mechanism.
+In general, we recommend to not resort to MobX observables for local component state too quickly, as this can theoretically lock you out of some features of React's Suspense mechanism.
 As a rule of thumb, use MobX observables when the state captures domain data that is shared among components (including children). Such as todo items, users, bookings, etc.
 
 State that only captures UI state, like loading state, selections, etc, might be better served by the [`useState` hook](https://reactjs.org/docs/hooks-state.html), since this will allow you to leverage React suspense features in the future.
@@ -229,7 +229,7 @@ Using observables inside React components adds value as soon as they are either 
 
 ## Always read observables inside `observer` components
 
-You might be wondering, when do I apply `observer`? The simple rule of thumb is: _apply `observer` to all components that read observable data_.
+You might be wondering, when do I apply `observer`? The rule of thumb is: _apply `observer` to all components that read observable data_.
 
 `observer` only enhances the component you are decorating, not the components called by it. So usually all your components should be wrapped by `observer`. Don't worry, this is not inefficient. On the contrary, more `observer` components make rendering more efficient as updates become more fine-grained.
 
@@ -248,7 +248,7 @@ React.render(<TimerViewer secondPassed={myTimer.secondsPassed} />, document.body
 ```
 
 Note that this is a different mindset from other libraries like `react-redux`, where it is a good practice to dereference early and pass primitives down, to better leverage memoization.
-If the problem is not entirely clear, make sure to check out [what does MobX react to?](../best/what-does-mobx-react-to.md).
+If the problem is not entirely clear, make sure to check out [What does MobX react to?](../best/what-does-mobx-react-to.md).
 
 ### Don't pass observables into components that aren't `observer`
 
