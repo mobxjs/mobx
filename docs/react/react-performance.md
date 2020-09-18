@@ -9,7 +9,6 @@ hide_title: true
 # Optimizing rendering of React components
 
 MobX is very fast, [often even faster than Redux](https://twitter.com/mweststrate/status/718444275239882753). But here are some tips to get most out of React and MobX. Most apply to React in general and are not specific to MobX.
-
 Note that while it's good to be aware of these patterns, usually your application
 will be fast enough even if you don't worry about them at all. Prioritize performance only when it's an actual issue!
 
@@ -71,16 +70,16 @@ When using `mobx-react` it is recommended to dereference values as late as possi
 This is because MobX will re-render components that dereference observable values automatically.
 If this happens deeper in your component tree, less components have to re-render.
 
-Faster:
-
-```javascript
-<DisplayName person={person} />
-```
-
 Slower:
 
 ```javascript
 <DisplayName name={person.name} />
+```
+
+Faster:
+
+```javascript
+<DisplayName person={person} />
 ```
 
 There is nothing wrong with the latter, but a change in the `name` property will, in the first case, trigger only the `DisplayName` to re-render, while in the latter, the owner of the component has to re-render. If rendering the owning component is fast enough (usually it will be!), that approach will work well.
