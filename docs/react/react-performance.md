@@ -8,9 +8,11 @@ hide_title: true
 
 # Optimizing rendering of React components
 
-MobX is very fast, [often even faster than Redux](https://twitter.com/mweststrate/status/718444275239882753). But here are some tips to get most out of React and MobX. Most apply to React in general and are not specific to MobX.
+MobX is very fast, [often even faster than Redux](https://twitter.com/mweststrate/status/718444275239882753), but here are some tips to get most out of React and MobX. Most apply to React in general and are not specific to MobX.
 Note that while it's good to be aware of these patterns, usually your application
-will be fast enough even if you don't worry about them at all. Prioritize performance only when it's an actual issue!
+will be fast enough even if you don't worry about them at all.
+
+Prioritize performance only when it's an actual issue!
 
 ## Use many small components
 
@@ -21,7 +23,7 @@ So the smaller your components are, the smaller the change they have to re-rende
 
 The above is especially true when rendering big collections.
 React is notoriously bad at rendering large collections as the reconciler has to evaluate the components produced by a collection on each collection change.
-It is therefore recommended to have components that just map over a collection and render it, and render nothing else:
+It is therefore recommended to have components that just map over a collection and render it, and render nothing else.
 
 Bad:
 
