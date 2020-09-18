@@ -77,7 +77,7 @@
 -   [ ] docs
     -   [x] clean up docs
     -   [x] finish api ref guide
-    -   [ ] fix / drop interactive tut
+    -   [x] fix interactive tut
     -   [x] document and introduce flow annotation
     -   [x] fix link warnings
     -   [ ] revisit how-to-read guide with all things in place
