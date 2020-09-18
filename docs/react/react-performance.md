@@ -6,24 +6,21 @@ hide_title: true
 
 <script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
-# Optimizing rendering React components
+# Optimizing rendering of React components
 
-MobX is very fast, [often even faster than Redux](https://twitter.com/mweststrate/status/718444275239882753).
-
-But here are some tips to get most out of React and MobX. Most tips apply to React in general and are not specific for MobX.
+MobX is very fast, [often even faster than Redux](https://twitter.com/mweststrate/status/718444275239882753). But here are some tips to get most out of React and MobX. Most apply to React in general and are not specific to MobX.
 
 Note that while it's good to be aware of these patterns, usually your application
-will be fast enough if you don't worry about them at all. Prioritize performance only
-when it's an actual issue!
+will be fast enough even if you don't worry about them at all. Prioritize performance only when it's an actual issue!
 
 ## Use many small components
 
 `observer` components will track all values they use and re-render if any of them changes.
-So the smaller your components are, the smaller the change they have to re-render; it means that more parts of your user interface have the possibility to render independently of each other.
+So the smaller your components are, the smaller the change they have to re-render. It means that more parts of your user interface have the possibility to render independently of each other.
 
 ## Render lists in dedicated components
 
-This is especially true when rendering big collections.
+The above is especially true when rendering big collections.
 React is notoriously bad at rendering large collections as the reconciler has to evaluate the components produced by a collection on each collection change.
 It is therefore recommended to have components that just map over a collection and render it, and render nothing else:
 
@@ -66,7 +63,7 @@ const TodosView = observer(({ todos }) => (
 ## Don't use array indexes as keys
 
 Don't use array indexes or any value that might change in the future as key. Generate ids for your objects if needed.
-See also this [blog](https://medium.com/@robinpokorny/index-as-a-key-is-an-anti-pattern-e0349aece318).
+Check out this [blog](https://medium.com/@robinpokorny/index-as-a-key-is-an-anti-pattern-e0349aece318).
 
 ## Dereference values late
 
@@ -74,7 +71,7 @@ When using `mobx-react` it is recommended to dereference values as late as possi
 This is because MobX will re-render components that dereference observable values automatically.
 If this happens deeper in your component tree, less components have to re-render.
 
-Fast:
+Faster:
 
 ```javascript
 <DisplayName person={person} />
@@ -90,7 +87,7 @@ There is nothing wrong with the latter, but a change in the `name` property will
 
 ### Function props
 
-[🚀] You may notice that to deference values late you have to create lots of small observer components where each is customized to render some different part of data, for example:
+[🚀] You may notice that to dereference values late you have to create lots of small observer components where each is customized to render some different part of data, for example:
 
 ```javascript
 const PersonNameDisplayer = observer(({ person }) => <DisplayName name={person.name} />)
