@@ -49,7 +49,7 @@ https://deploy-preview-2382--mobx-docs.netlify.app/
 -   [ ] makeAutoObservable is handy, but you probably shouldn't use it on a React component to make local state observable. We should say that somewhere.
 -   [x] mweststrate: Only sponsors are needed. For backers / sponsors and sponsoring in general I think we should add an entry in the top menu bar.
 -   [ ] This is now incorrect unless we have a way to maintain it. "Become a sponsor and get your logo on our README on Github with a link to your site." Perhaps change to "gold & silver level sponsors" or something?
--   [ ] There is also this document https://github.com/mobxjs/mobx/blob/master/sponsors.md for one time contributions maintained separately.
+-   [ ] There is also this document https://github.com/mobxjs/mobx/blob/mobx6/sponsors.md for one time contributions maintained separately.
 -   [ ] What to do about the egghead lessons? They use the decorator syntax and may not enforce actions by default. -> consolidate into a single page and explain the decorator story and action on it.
 -   [ ] Consider breaking up computed.md into a basic and "advanced" document.
 -   [ ] API overview duplicates a lot of the material already discussed elsewhere. Break it into pieces. Introduce a separate API page which has a one line description and a link to the details?

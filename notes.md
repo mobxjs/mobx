@@ -90,6 +90,8 @@
     -   [x] sync readme's
     -   [ ] verify that MobX is by default in strict mode
     -   [x] make links for all tips
+    -   [ ] cleanup notes files
+    -   [ ] blog post
 -   [ ] mobx-react-lite
     -   [x] displayname for observer components facebook/react#18026. Fixed: https://github.com/facebook/react/issues/18026
     -   [x] update useLocalStore in mobx-react-lite to use
