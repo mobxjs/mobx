@@ -9,6 +9,8 @@ MobX 6 is quite different from MobX 5. This pages covers a migration guide from 
 
 # Migrating to MobX 6
 
+(for the changelog, scroll down)
+
 _⚠️ Disclaimer: Depending on factors like the size and complexity of your code base, your MobX usage patterns, and the quality of your automated tests, this migration guide might take you anywhere between an hour and a couple of days. Please refrain from upgrading if you don't trust your Continuous Integration or QA / test procedures enough to pick up any unexpected breakages. Unexpected behavioral changes might be caused by changes in MobX itself or the changes needed to your Babel / TypeScript build configuration. ⚠️_
 
 ## Getting started
@@ -39,7 +41,7 @@ Some specifics to note:
 1. Using `makeObservable` / `makeAutoObservable` needs to be done in every class definition that declares MobX based members. So if a sub-class and super-class both introduce observable members, they will both have to call `makeObservable`.
 2. `makeAutoObservable` will mark methods using a new decorator `autoAction`, that will apply `action` only if it is not in a derivation context. This makes it safe to call automatically decorated methods also from computed properties.
 
-Migrating a large code base with lots of classes might be daunting. But no worries, there is a code-mod available!
+Migrating a large code base with lots of classes might be daunting. But no worries, there is a code-mod available that will automate the above process!!
 
 ## Upgrading your code with the `mobx-undecorate` codemod
 
@@ -74,22 +76,12 @@ pass along `props` to the superclass.
 
 ## New features
 
-TODO:
-
-makeObservable
-
-makeAutoObservable
-
-autoActions
-
+-   [`makeObservable(target, annotations)`](../refguide/observable.md#makeobservable) is now the recommended way to make objects with a fixed shape observable, such as classes.
+-   [`makeAutoObservable(target)`](../refguide/observable.md#makeautoobservable) is will automatically determine the annotations used by `makeObservable`. Methods will be marked as 'autoAction', so that they can be used both from a computed value or as stand alone method.
+-   MobX 6 can be used in both modern environments, and environments that don't support Proxy. So both MobX 4 and 5 users can upgrade to 6. See [proxy support](../refguide/configure.md#proxy-support) for more details.
 -   `observable.array` now supports `{ proxy: false }` as option.
-
--   Fixed #2326
--   Fixed #2379
-
-`reaction`'s effect function now receives the previous value seen by the reaction as second argument.
-
-flow can be used as annotation
+-   `reaction`'s effect function now receives the previous value seen by the reaction as second argument.
+-   `flow` can now be used as annotation as well. You might need `flowResult` in case you use TypeScript to extract the correct result type. [details](../refguide/action.md#-using-flow-instead-of-asyncawait).
 
 ## Breaking changes
 
@@ -122,3 +114,10 @@ flow can be used as annotation
 -   The `IObservableObject` interface is no longer exported from MobX.
 -   The second argument to the `reaction` effect function, the disposer object, is now passed in as third argument. The second argument is now the previous value seen by the reaction.
 -   `onBecomeObserved` / `onBecomeUnobserved` will now only trigger for observables that are actually used by a reaction (see [#2309](https://github.com/mobxjs/mobx/issues/2309) for background).
+
+## Fixes
+
+-   [#2326](https://github.com/mobxjs/mobx/issues/2326): Incorrect `this` for array callbacks such as in `array.forEach`
+-   [#2379](https://github.com/mobxjs/mobx/issues/2379): Fixed issue with `array.concat`
+-   [#2309](https://github.com/mobxjs/mobx/issues/2309): Fixed several inconsistencies between keepAlive'd computed values and `on(un)BecomeObserved`
+-   Fixed several inconsistencies when `on(un)BecomeObserved` was triggered for observables changed in actions without having an observer

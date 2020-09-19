@@ -25,11 +25,11 @@ You should actually be ready to use MobX once you read this!
 
 Here are a few suggestions about the next things to read:
 
+-   Try the 10-minute [interactive tutorial](/getting-started.html)
+
 -   [React integration](../react/react-integration.md)
 
 -   [`makeObservable` / `makeAutoObservable`](../refguide/observable.md)
-
--   It's also useful to at scan through the sections on [observable arrays](../refguide/api.md#observablearray) and [observable maps](../refguide/api.md#observablemap) to see what extra methods are available beyond the built-in JS `Array` and `Map`
 
 -   Learn about [action](../refguide/action.md), which includes a discussion on asynchronous actions
 

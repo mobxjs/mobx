@@ -80,14 +80,14 @@
     -   [x] fix interactive tut
     -   [x] document and introduce flow annotation
     -   [x] fix link warnings
-    -   [ ] revisit how-to-read guide with all things in place
-    -   [ ] finish migration guide
+    -   [x] revisit how-to-read guide with all things in place
+    -   [x] finish migration guide
     -   [x] make details section collapsible
     -   [x] better sel page
     -   [x] link flutter, lit, angular
     -   [x] update footer
     -   [x] don't proxy objects tip, makeAutoObservable vs observable
-    -   [ ] sync readme's
+    -   [x] sync readme's
     -   [ ] verify that MobX is by default in strict mode
     -   [x] make links for all tips
 -   [ ] mobx-react-lite

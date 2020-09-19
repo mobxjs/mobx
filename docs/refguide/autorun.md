@@ -1,6 +1,6 @@
 ---
 title: Run side-effects with reactions
-sidebar_label: Reactions
+sidebar_label: Reactions 🚀
 hide_title: true
 ---
 
