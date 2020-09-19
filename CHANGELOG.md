@@ -1,5 +1,8 @@
 # UNPUBLISHED (keep this here and add unpublished changes)
 
+# 5.15.7 / 4.15.7
+
+-   Fixed [2438](https://github.com/mobxjs/mobx/issues/2438), factory types caused eslint warnings, by [@amareis](https://github.com/Amareis) through [2439](https://github.com/mobxjs/mobx/pull/2439)
 -   Fixed [2432](https://github.com/mobxjs/mobx/issues/2423), array.reduce without initial value by [@urugator](https://github.com/urugator)
 
 # 5.15.6 / 4.15.6
