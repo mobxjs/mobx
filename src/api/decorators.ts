@@ -9,7 +9,7 @@ import {
     objectPrototype
 } from "../internal"
 
-export const mobxDecoratorsSymbol = Symbol("mobx-decoratorators")
+export const mobxDecoratorsSymbol = Symbol("mobx-decorators")
 
 export function createDecorator<ArgType>(
     type: Annotation["annotationType_"]
