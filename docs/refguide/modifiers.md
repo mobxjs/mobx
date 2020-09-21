@@ -22,7 +22,7 @@ This is a very convenient default. Without any additional effort all values assi
 ### Reference observability
 
 In some cases however, objects don't need to be converted into observables.
-Typical cases are immutable objects, or objects that are not managed by you but by an external library. Examples are JSX elements, DOM elements, native objects like History, window or etc. You just want to store a reference to those kinds of objects without turning them into an observable.
+Typical cases are immutable objects, or objects that are not managed by you but by an external library. The examples are JSX elements, DOM elements, native objects like History, window or etc. You just want to store a reference to those kinds of objects without turning them into an observable.
 
 For these situations there is the `ref` modifier. It makes sure that an observable property is created which only tracks the reference but doesn't try to convert its value.
 

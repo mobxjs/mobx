@@ -7,8 +7,7 @@ hide_title: true
 
 # What does MobX react to?
 
-MobX usually reacts to exactly the things you expect it to.
-Which means that in 90% of your use cases MobX should "just work".
+MobX usually reacts to exactly the things you expect it to, which means that in 90% of your use cases MobX should "just work".
 However, at some point you will encounter a case where it does not do what you expected.
 At that point it is invaluable to understand how MobX determines what to react to.
 
@@ -47,7 +46,7 @@ class Message {
 let message = new Message("Foo", { name: "Michel" }, ["John", "Sara"])
 ```
 
-In memory that looks as follows. The green boxes indicate _observable_ properties. Note that the _values_ themselves are not observable!
+In memory this looks as follows. The green boxes indicate _observable_ properties. Note that the _values_ themselves are not observable!
 
 ![MobX reacts to changing references](../assets/observed-refs.png)
 
@@ -108,7 +107,7 @@ message = new Message("Bar", { name: "Martijn" }, ["Felicia", "Marcus"])
 
 This will **not** react. `message` was changed, but `message` is not an observable, just a variable which _refers to_ an observable, but the variable (reference) itself is not observable.
 
-#### Incorrect: dereference outside a tracked function
+#### Incorrect: dereference outside of a tracked function
 
 ```javascript
 let title = message.title

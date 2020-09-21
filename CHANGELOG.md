@@ -5,7 +5,7 @@
 ## New features
 
 -   [`makeObservable(target, annotations)`](../refguide/observable.md#makeobservable) is now the recommended way to make objects with a fixed shape observable, such as classes.
--   [`makeAutoObservable(target)`](../refguide/observable.md#makeautoobservable) is will automatically determine the annotations used by `makeObservable`. Methods will be marked as 'autoAction', so that they can be used both from a computed value or as stand alone method.
+-   [`makeAutoObservable(target)`](../refguide/observable.md#makeautoobservable) will automatically determine the annotations used by `makeObservable`. Methods will be marked as 'autoAction', so that they can be used both from a computed value or as standalone method.
 -   MobX 6 can be used in both modern environments, and environments that don't support Proxy. So both MobX 4 and 5 users can upgrade to 6. See [proxy support](../refguide/configure.md#proxy-support) for more details.
 -   `observable.array` now supports `{ proxy: false }` as option.
 -   `reaction`'s effect function now receives the previous value seen by the reaction as second argument.
@@ -19,8 +19,8 @@
 -   When using `extendObservable` / `observable`, fields that contained functions used to be turned into observables. This is no longer the case, they will be converted into `autoActions`.
 -   [Strict mode](../refguide/configure.md#enforceActions) for actions is now enabled by default in `observed` mode.
 -   `toJS` no longer takes any options. It no longer converts Maps and Sets to plain data structures. Generic, flexible serialization of data structures is out of scope for the MobX project, and writing custom serialization methods is a much more scalable approach to serialization (tip: leverage `computed`s to define how class instances should be serialized).
--   The methods `intercept` and `observe` are no longer exposed on observable arrays, maps and boxed observables. Import them as utility from mobx instead: `import { observe, intercept } from "mobx"`, and pass the collection as first argument: `observer(collection, callback)`. Note that we still recommend to avoid these API's.
--   `observableMap.toPOJO()`, `observableMap.toJS()` have been dropped. use `new Map(observableMap)` instead if you want to convert an observable map to a plain Map shallowly.
+-   The methods `intercept` and `observe` are no longer exposed on observable arrays, maps and boxed observables. Import them as utility from mobx instead: `import { observe, intercept } from "mobx"`, and pass the collection as first argument: `observer(collection, callback)`. Note that we still recommend to avoid these APIs.
+-   `observableMap.toPOJO()`, `observableMap.toJS()` have been dropped. Use `new Map(observableMap)` instead if you want to convert an observable map to a plain Map shallowly.
 -   `observableMap.toJSON()` now returns an entries array rather than a new Map, to better support serialization.
 -   `observableSet.toJS()` has been dropped. Use `new Set(observableSet)` instead if you want to convert an observable Set to a plain Set shallowly.
 -   `observableMap.toJSON()` now returns an array rather than a new Set, to better support serialization.
@@ -30,14 +30,14 @@
 ### Obscure things that don't work anymore, but that probably won't affect you
 
 -   It is no longer possible to re-decorate a field (through either `@observable` or `makeObservable`) that is already declared in a super class.
--   `runInAction` no longer supports passing a name as first argument. Name the original function or use `action(name, fn)()` if you cared about the debug name.
+-   `runInAction` no longer supports passing a name as first argument. Name the original function or use `action(name, fn)()` if you care about the debug name.
 -   `computed(getterFn, setterFn)` no longer accepts a setter function as a second argument. Use the `set` option instead: `computed(getterFn, { set: setterFn })`.
 -   In observable arrays, for `findIndex` / `find` method, the `offset` argument (the third one) is no longer supported, to be consistent with ES arrays.
 -   The option `computedConfigurable` of `configure` is no longer supported as it is now the default.
 -   `observableArray.toJS()` has been removed, use `observableArray.slice()` instead, which does the same.
 -   Killed support for the `IGNORE_MOBX_MINIFY_WARNING` environment flag.
 -   `_allowStateChangesInComputation(fn)` is no longer needed, use `runInAction(fn)` instead.
--   In `computed`, the when `predicate` (first arg), and `reaction` predicate (first arg) it is now forbidden to directly change state. State changes should be done in their effect functions, or otherwise at least wrapped in `runInAction` (only the state change, not the observables you want to track!). Note that this is still an anti pattern.
+-   In `computed`, the `when` predicate (first arg), and `reaction` predicate (first arg) it is now forbidden to directly change state. State changes should be done in their effect functions, or otherwise at least wrapped in `runInAction` (only the state change, not the observables you want to track!). Note that this is still an anti-pattern.
 -   The `observableArray.get()` and `observableArray.set()` methods are no longer supported.
 -   The `IObservableObject` interface is no longer exported from MobX.
 -   The second argument to the `reaction` effect function, the disposer object, is now passed in as third argument. The second argument is now the previous value seen by the reaction.

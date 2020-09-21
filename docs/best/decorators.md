@@ -9,7 +9,7 @@ hide_title: true
 
 MobX before version 6 encouraged the use of ES.next decorators to mark things as `observable`, `computed` and `action`. However, decorators are currently not an ES standard, and the process of standardization is taking a long time. It also looks like the standard will be different from the way decorators were implemented previously. In the interest of compatibility we have chosen to move away from them in MobX 6, and recommend the use of [`makeObservable` / `makeAutoObservable`](../refguide/observable) instead.
 
-But many existing code bases use decorators, and a lot of the documentation and tutorial material online uses them as well. The rule is that anything you can use as an annotation to `makeObservable`, such as `observable`, `action` and `computed`, you can also use as a decorator. So let's examine what that looks like:
+But many existing codebases use decorators, and a lot of the documentation and tutorial material online uses them as well. The rule is that anything you can use as an annotation to `makeObservable`, such as `observable`, `action` and `computed`, you can also use as a decorator. So let's examine what that looks like:
 
 ```javascript
 import { makeObservable, observable, computed, action } from "mobx"
@@ -62,7 +62,7 @@ class Timer extends React.Component {
 
 ## How to enable decorator support
 
-We do not recommend new codebases that use MobX use decorators until the point when they become an official part of the language, but you can still use them. It does require setup for transpilation: you have to use Babel or TypeScript.
+We do not recommend new codebases that use MobX use decorators until the point when they become an official part of the language, but you can still use them. It does require setup for transpilation so you have to use Babel or TypeScript.
 
 ### TypeScript
 
@@ -72,7 +72,7 @@ Enable the compiler option `"experimentalDecorators": true` and `"useDefineForCl
 
 Install support for decorators: `npm i --save-dev @babel/plugin-proposal-class-properties @babel/plugin-proposal-decorators`. And enable it in your `.babelrc` file (note that the order is important):
 
-```json
+```javascript
 {
     "plugins": [
         ["@babel/plugin-proposal-decorators", { "legacy": true }],

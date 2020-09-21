@@ -13,7 +13,7 @@ Most configuration options can be set by using the `configure` method.
 
 ## Proxy support
 
-By default MobX uses proxies to make arrays and plain objects observable. Proxies provide the best performance and most concistent behavior accross environments.
+By default MobX uses proxies to make arrays and plain objects observable. Proxies provide the best performance and most consistent behavior across environments.
 However, if you are targetting an environment that doesn't support proxies, proxy support has to be disabled.
 Most notably this is the case when targetting Internet Explorer or React Native without using the Hermes engine.
 
@@ -31,9 +31,9 @@ Accepted values for the `useProxies` configuration are:
 
 -   `"always"` (default): MobX is expected to only run in environments with [`Proxy` support](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy). MobX will error if these are not available.
 -   `"never"`: Proxies are never used. MobX falls back on non-proxy alternatives. This is compatible with all ES5 environments, but causes various [limitations](#limitations-without-proxies).
--   `"ifavailable"`: (Experimental option) Proxies are used if they are available, and otherwise MobX falls back to non-proxy alternatives. The benefit of this mode is that MobX will try to warn if API's or language features that wouldn't work in ES5 enviroments are used, triggering errors when hitting an ES5 limitation when running on a modern environment.
+-   `"ifavailable"`: (Experimental option) Proxies are used if they are available, and otherwise MobX falls back to non-proxy alternatives. The benefit of this mode is that MobX will try to warn if APIs or language features that wouldn't work in ES5 environments are used, triggering errors when hitting an ES5 limitation when running on a modern environment.
 
-Note: before MobX 6 one had to pick either MobX 4 for older engines, or MobX 5 for new engines. However, MobX 6 supports both, although polyfills for certain api's like Map will be required when targetting older JavaScript engines.
+Note: before MobX 6 one had to pick either MobX 4 for older engines, or MobX 5 for new engines. However, MobX 6 supports both, although polyfills for certain apis like Map will be required when targetting older JavaScript engines.
 
 Note: Proxies cannot be polyfilled. Even though polyfills do exist, they don't support the full spec and are unsuitable for MobX. Don't use them.
 
@@ -93,7 +93,7 @@ In the rare case where you create observables lazily, for example in a computed 
 
 Forbids the direct access of any unobserved computed value from outside an action or reaction.
 This makes sure you aren't using computed values in a way where MobX won't cache them.
-For example, in the following example, MobX won't cache the compute value in the first code block, but will cache the result in the second and third block:
+For example, in the following example, MobX won't cache the computed value in the first code block, but will cache the result in the second and third block:
 
 ```javascript
 class Clock {
@@ -190,7 +190,7 @@ This is useful when you have an encapsulated library that is using MobX, living 
 
 The reactivity inside the library will remain self-contained when you call `configure({isolateGlobalState: true})` inside the library.
 
-Without this options, if multiple MobX instances are active, the internal state will be shared. The benefit is that observables from both instances work together, the downside is that the MobX versions have to match.
+Without this option, if multiple MobX instances are active, the internal state will be shared. The benefit is that observables from both instances work together, the downside is that the MobX versions have to match.
 
 ```javascript
 configure({ isolateGlobalState: true })

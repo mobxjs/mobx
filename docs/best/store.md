@@ -12,7 +12,7 @@ This section contains some best practices we discovered at Mendix while working 
 This section is opinionated and you are in no way forced to apply these practices.
 There are many ways of working with MobX and React, and this is just one of them.
 
-This section focuses on an unobtrusive way of working with MobX, which works well in existing code bases, or with classic MVC patterns. Alternative, more opinionated ways of organizing stores are [mobx-state-tree](https://github.com/mobxjs/mobx-state-tree) and [mobx-keystone](https://mobx-keystone.js.org/). Both ship with cool features as structurally shared snapshots, action middlewares, JSON patch support etc out of the box.
+This section focuses on an unobtrusive way of working with MobX, which works well in existing codebases, or with classic MVC patterns. Alternative, more opinionated ways of organizing stores are [mobx-state-tree](https://github.com/mobxjs/mobx-state-tree) and [mobx-keystone](https://mobx-keystone.js.org/). Both ship with cool features such as structurally shared snapshots, action middlewares, JSON patch support etc. out of the box.
 
 ## Stores
 
@@ -251,8 +251,7 @@ Things you will typically find in UI stores:
     -   State of a wizard
     -   State of a global overlay
 
-It might very well be that these pieces of information start as internal state of a specific component (for example the visibility of a toolbar).
-But after a while you discover that you need this information somewhere else in your application.
+It might very well be that these pieces of information start as internal state of a specific component (for example the visibility of a toolbar), but after a while you discover that you need this information somewhere else in your application.
 Instead of pushing state in such a case upwards in the component tree, like you would do in plain React apps, you just move that state to the _ui-state-store_.
 
 For isomorphic applications you might also want to provide a stub implementation of this store with sane defaults so that all components render as expected.

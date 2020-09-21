@@ -13,7 +13,7 @@ These APIs are fully reactive, which means that even [without `Proxy` support](c
 
 Another benefit of `values`, `keys` and `entries` is that they return array rather than iterators, which makes it possible to, for example, immediately call `.map(fn)` on the result.
 
-That all being said, the typical project has little reason to use these APIs.
+That all being said, a typical project has little reason to use these APIs.
 
 Access:
 

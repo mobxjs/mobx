@@ -15,8 +15,7 @@ Usage:
 -   `computed(fn, options?)`
 
 Computed values can be used to derive information from other observables.
-They evaluate lazily.
-Computed values will cache their output and only update recompute if one of the underlying observables has changed.
+They evaluate lazily -- computed values will cache their output and only update recompute if one of the underlying observables has changed.
 If they are not observed by anything, they suspend entirely.
 
 Conceptually, computed values are very similar to formulas in spreadsheets.
@@ -24,7 +23,7 @@ Computed values can't be underestimated, they help in reducing the amount of sta
 
 ## Example
 
-Computed values can be created by annotating a JavaScript [getters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get) with `computed`.
+Computed values can be created by annotating JavaScript [getters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get) with `computed`.
 You can use `makeObservable` to declare a getter as computed (if you use `makeAutoObservable`, `observable` or `extendObservable`, all getters are automatically declared as `computed`):
 
 ```javascript
@@ -75,10 +74,10 @@ order.price = 3
 // (neither the computation or autorun will recomputed)
 ```
 
-The above example nicely demonstrates the benefit of a `computed`, it acts as caching point.
+The above example nicely demonstrates the benefit of a `computed`, it acts as a caching point.
 Even though we change the `amount`, and this will trigger the `total` to recompute,
 it won't trigger the `autorun`, as `total` will detect it output hasn't been affected, so there is no need to update the `autorun`.
-In comparison, if total would not be annotated, the autorun would run it's effect 3 times,
+In comparison, if total would not be annotated, the autorun would run its effect 3 times,
 as it will directly depend on `total` and `amount`. [Try it](https://codesandbox.io/s/computed-3cjo9?file=/src/index.tsx).
 
 This is the dependency graph that would be created for the above example:
@@ -99,7 +98,7 @@ When using computed values, there are a few best practices to observe:
 It sometimes confuses people new to MobX (perhaps used to a library like [Reselect](https://github.com/reduxjs/reselect)) that if you create a computed property but don't use it anywhere in a reaction, it is not memoized and appears to be recomputed more often than necessary.
 For example, if we'd extend the above example with calling `console.log(order.total)` twice, after we called `stop()`, the value would be recomputed twice.
 
-This allows MobX to automatically suspend computations that are not actively in use,
+This allows MobX to automatically suspend computations that are not actively in use
 to avoid unnecessary updates to computed values that are not being accessed. But if a computed property is _not_ in use by some reaction, computed expressions are evaluated each time their value is requested, so they just behave like a normal property.
 
 So if you fiddle around, computed properties might not seem efficient. But when applied in a project that uses `observer`, `autorun` etc, they become very efficient.
@@ -119,7 +118,7 @@ setInterval(() => {
 It can be overridden by setting annotating with the `keepAlive` flag ([try it](https://codesandbox.io/s/computed-3cjo9?file=/src/index.tsx)) or by creating a no-op `autorun(() => { someObject.someComputed })` (which can nicely be cleaned up later if needed).
 Note that both solutions have the risk of creating memory leaks; changing the default behavior here is an anti-pattern.
 
-MobX can be configured to report an error when computeds are accessed outside an reactive context with the [`computedRequiresReaction`](configure#computedrequiresreaction) option.
+MobX can be configured to report an error when computeds are accessed outside a reactive context with the [`computedRequiresReaction`](configure#computedrequiresreaction) option.
 
 </details>
 
@@ -149,7 +148,7 @@ class Dimension {
 
 <details id="computed-struct"><summary>🚀 Tip: `computed.struct` for comparing output structurally <a href="#computed-struct" class="tip-anchor"></a></summary>
 
-If the output of a computed value, that is structurally equivalent to the previous computation, doesn't need to notify observers, `computed.struct` can be used. It will make a structural comparison first (rather than a reference equality check) before notifying observers. Example:
+If the output of a computed value that is structurally equivalent to the previous computation doesn't need to notify observers, `computed.struct` can be used. It will make a structural comparison first (rather than a reference equality check) before notifying observers. Example:
 
 ```javascript
 class Box {
@@ -194,8 +193,7 @@ Although getters don't take arguments, several strategies to work with derived v
 
 <details id="standalone"><summary>🚀 Tip: created stand-alone computed values with `computed(expression)`<a href="#standalone" class="tip-anchor"></a></summary>
 
-`computed` can also be invoked directly as function.
-Just like [`observable.box`](api.md#observablebox) creates a stand-alone computed value.
+`computed` can also be invoked directly as function, just like [`observable.box`](api.md#observablebox) creates a stand-alone computed value.
 Use `.get()` on the returned object to get the current value of the computation.
 This form of `computed` is not used very often, but in some cases where you need to pass a "boxed" computed value around it might prove useful, one such case is discussed [here](computed-with-args.md).
 

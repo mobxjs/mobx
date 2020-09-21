@@ -11,11 +11,11 @@ hide_title: true
 
 Trace is a small utility that helps you find out why your computed values, reactions or components are re-evaluating.
 
-It can be used by simply importing `import { trace } from "mobx"`, and then put it inside a reaction or computed value.
+It can be used by simply importing `import { trace } from "mobx"`, and then putting it inside a reaction or computed value.
 It will print why it is re-evaluating the current derivation.
 
-Optionally it is possible to automatically enter the debugger by passing `true` as last argument.
-This way the exact mutation that causes the reaction to re-run is still in stack, usually ~8 stack frames up. See the image below.
+Optionally it is possible to automatically enter the debugger by passing `true` as the last argument.
+This way the exact mutation that causes the reaction to re-run will still be in stack, usually ~8 stack frames up. See the image below.
 
 In debugger mode, the debug information will also reveal the full derivation tree that is affecting the current computation / reaction.
 
@@ -28,7 +28,7 @@ In debugger mode, the debug information will also reveal the full derivation tre
 [Simple CodeSandbox `trace` example](https://codesandbox.io/s/trace-dnhbz?file=/src/index.js:309-338)
 
 Here's a deployed example for exploring the stack: https://csb-nr58ylyn4m-hontnuliaa.now.sh/.
-Be sure to play with chrome debugger's blackbox feature!
+Make sure to play with the chrome debugger's blackbox feature!
 
 ## Usage examples
 
@@ -44,7 +44,7 @@ const MyComponent = observer(() => {
 })
 ```
 
-Enable trace by using the `reaction` argument of an reaction / autorun:
+Enable trace by using the `reaction` argument of a reaction / autorun:
 
 ```javascript
 mobx.autorun("logger", reaction => {
