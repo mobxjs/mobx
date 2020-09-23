@@ -16,7 +16,7 @@ If a plain JavaScript object is passed to `observable` all properties inside wil
 A plain object is an object that wasn't created using a constructor function, but has `Object` as its prototype or no prototype at all.
 By default, `observable` is applied recursively. If one of the encountered values is an object or array, that value will be passed through `observable` as well.
 
-The `annotations` param can be used to override the declaration that is used for a specific property, like [`makeObservable` and `makeAutoObservable`](observable.md). Also check out [modifiers](modifiers.md).
+The `annotations` param can be used to override the declaration that is used for a specific property, like [`makeObservable` and `makeAutoObservable`](observable.md). Also check out the [modifiers](modifiers.md) section.
 
 ```javascript
 import { observable, autorun, action } from "mobx"
@@ -49,7 +49,7 @@ autorun(() => console.log(person.labelText))
 // Prints: 'Dave'.
 person.name = "Dave"
 
-// etc.
+// Prints: 'Dave (age: 21)'.
 person.setAge(21)
 ```
 
@@ -72,6 +72,6 @@ Returns `true` if `value` is an observable object.
 
 ## Limitations in environments without Proxy support
 
-When passing objects through `observable` only the properties that exist at the time of making the object observable will be observable. Properties that are added to the object at a later time won't become observable, unless [`set`](object-api.md) or [`extendObservable`](api.md#extendobservable) is used.
+When passing objects through `observable` only the properties that exist at the time of making the object observable will become observable. Properties that are added to the object at a later time won't become observable, unless [`set`](object-api.md) or [`extendObservable`](api.md#extendobservable) is used.
 
-Check out [limitations without proxies](configure.md#limitations-without-proxy-support).
+Check out the [limitations without proxies](configure.md#limitations-without-proxy-support) section.
