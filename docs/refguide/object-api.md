@@ -27,7 +27,7 @@ Mutation:
 -   `has(collection, key)` returns _true_ if the collection has the specified _observable_ property.
 -   `get(collection, key)` returns the child under the specified key.
 
-If you use the access API in an environment without `Proxy` support, then you should also use the mutation APIs so that they can detect changes.
+If you use the access APIs in an environment without `Proxy` support, then also use the mutation APIs so they can detect the changes.
 
 ```javascript
 import { get, set, observable, values } from "mobx"
