@@ -16,7 +16,7 @@ If a plain JavaScript object is passed to `observable` all properties inside wil
 A plain object is an object that wasn't created using a constructor function, but has `Object` as its prototype or no prototype at all.
 By default, `observable` is applied recursively. If one of the encountered values is an object or array, that value will be passed through `observable` as well.
 
-The `annotations` param can be used to override the declaration that is used for a specific property, like [`makeObservable` and `makeAutoObservable`](observable.md). Also check out the [modifiers](modifiers.md) section.
+The `annotations` param can be used to override the declaration that is used for a specific property, like [`makeObservable` and `makeAutoObservable`](observable.md). Check out the [modifiers](modifiers.md) section as well.
 
 ```javascript
 import { observable, autorun, action } from "mobx"
