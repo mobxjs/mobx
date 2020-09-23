@@ -102,8 +102,8 @@ const disposer = observe(person, change => {
 person.firstName = "Martin"
 // Prints: 'update firstName from Maarten to Martin'.
 
-disposer()
 // Ignore any future updates.
+disposer()
 
 // Observe a single field.
 const disposer2 = observe(person, "lastName", change => {
