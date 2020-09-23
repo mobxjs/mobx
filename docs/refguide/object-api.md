@@ -18,7 +18,7 @@ Access:
 
 -   `values(collection)` returns an array of all the values in the collection.
 -   `keys(collection)` returns an array of all the keys in the collection.
--   `entries(collection)` returns an array of all the `[key, value]` pairs of entries in the collection.
+-   `entries(collection)` returns an array of all the entries `[key, value]` pairs in the collection.
 
 Mutation:
 
