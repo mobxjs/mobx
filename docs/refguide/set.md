@@ -13,13 +13,11 @@ Usage:
 -   `observable.set(initialSet?, options?)`
 -   `observable(set)`
 
-Creates a new observable ES6 Set based on the provided value. Use the `{deep: false}` option if the values in the set should not be turned into observables.
+Creates a new observable [ES6 Set](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set) based on the provided value. If the values in the set should not be turned into observables, set the `{ deep: false }` option.
 
-Use `set` whenever you want to create a dynamic set where the addition / removal of values needs to be observed, and where values can appear only once in the collection.
+Use `set` whenever you want to create a dynamic set where the addition and removal of values needs to be observed, but where values can appear only once in the collection.
 
-Note that your browser needs to support ES6 sets, or polyfill them, to make sets work.
-
-Sets use the [ES6 Set API](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set)
+**Note:** your browser needs to support ES6 sets, or you have to use a polyfill to make them work.
 
 ## `isObservableSet`
 
