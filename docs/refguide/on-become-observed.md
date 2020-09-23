@@ -29,7 +29,7 @@ export class City {
             suspend: false
         })
         this.location = location
-        // only start data fetching if temperature is actually used!
+        // Only start data fetching if temperature is actually used!
         onBecomeObserved(this, "temperature", this.resume)
         onBecomeUnobserved(this, "temperature", this.suspend)
     }
@@ -46,7 +46,7 @@ export class City {
     }
 
     fetchTemperature = flow(function* () {
-        // data fetching logic
+        // Data fetching logic...
     })
 }
 ```
