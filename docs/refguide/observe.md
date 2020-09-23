@@ -94,11 +94,12 @@ const person = observable({
     lastName: "Luther"
 })
 
+// Observe all fields.
 const disposer = observe(person, change => {
     console.log(change.type, change.name, "from", change.oldValue, "to", change.object[change.name])
 })
 
-// Prints "update firstName from Maarten to Martin".
+// Prints: 'update firstName from Maarten to Martin'.
 person.firstName = "Martin"
 
 // Ignore any future updates.
