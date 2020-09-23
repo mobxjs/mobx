@@ -16,13 +16,13 @@ All that being said, a typical project has little reason to use these APIs.
 
 Access:
 
--   `values(collection)` returns all values in the collection as array.
--   `keys(collection)` returns all keys in the collection as array.
--   `entries(collection)` returns a `[key, value]` pair for all entries in the collection as array.
+-   `values(collection)` returns an array of all the values in the collection.
+-   `keys(collection)` returns an array of all the keys in the collection.
+-   `entries(collection)` returns an array of all the `[key, value]` pairs of entries in the collection.
 
 Mutation:
 
--   `set(collection, key, value)` or `set(collection, { key: value })` updates the given collection with the provided key / value pair(s).
+-   `set(collection, key, value)` or `set(collection, { key: value })` update the given collection with the provided key / value pair(s).
 -   `remove(collection, key)` removes the specified child from the collection. Splicing is used for arrays.
 -   `has(collection, key)` returns _true_ if the collection has the specified _observable_ property.
 -   `get(collection, key)` returns the child under the specified key.
