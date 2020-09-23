@@ -7,7 +7,7 @@ hide_title: true
 
 # Intercept & Observe [🚀]
 
-_⚠️ **Warning**: intercept and observe are low level utilities, and should not be needed in practice. Use some form of [reaction](autorun.md) instead. `observe` doesn't respect transactions and doesn't support deep observing of changes. Using these utilities is an anti-pattern. If you intend to get access to the old and new value using `observe`, use [`reaction`](api.md#reaction) instead. ⚠️_
+_⚠️ **Warning**: intercept and observe are low level utilities, and should not be needed in practice. Use some form of [reaction](autorun.md) instead, as `observe` doesn't respect transactions and doesn't support deep observing of changes. Using these utilities is an anti-pattern. If you intend to get access to the old and new value using `observe`, use [`reaction`](api.md#reaction) instead. ⚠️_
 
 `observe` and `intercept` can be used to monitor the changes of a single observable. They **_don't_** track nested observables.
 
