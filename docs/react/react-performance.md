@@ -84,7 +84,9 @@ Faster:
 <DisplayName person={person} />
 ```
 
-There is nothing wrong with the slower example, but a change in the `name` property will in the faster example trigger only the `DisplayName` to re-render, while in the slower example, the owner of the component has to re-render as well. If rendering the owning component is fast enough (usually it is!), then this approach will work well.
+In the faster example, a change in the `name` property triggers only `DisplayName` to re-render, while in the slower one the owner of the component has to re-render as well.
+
+There is nothing wrong with that, and if rendering of the owning component is fast enough (usually it is!), then this approach works well.
 
 ### Function props
 
