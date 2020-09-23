@@ -7,11 +7,12 @@ hide_title: true
 
 # Intercept & Observe 🚀
 
-_⚠️ Warning: intercept and observe are low level utilities, and should not be needed in practice. Use some form of [reaction](autorun.md) instead. `observe` doesn't respect transactions and doesn't support deep observing of changes. Using these utilities is an anti-pattern. If you intend to use `observe` to get access to the old and new value, use [`reaction`](api.md#reaction) instead. ⚠️_
+_⚠️ **Warning**: intercept and observe are low level utilities, and should not be needed in practice. Use some form of [reaction](autorun.md) instead. `observe` doesn't respect transactions and doesn't support deep observing of changes. Using these utilities is an anti-pattern. If you intend to use `observe` to get access to the old and new value, use [`reaction`](api.md#reaction) instead. ⚠️_
 
 `observe` and `intercept` can be used to monitor the changes of a single observable. They **_don't_** track nested observables.
 
-`intercept` can be used to detect and modify mutations before they are applied to the observable (useful for validation, normalization or cancellation), and `observe` allows you to intercept changes after they have been made.
+-    `intercept` can be used to detect and modify mutations before they are applied to the observable (useful for validation, normalization or cancellation).
+-    `observe` allows you to intercept changes after they have been made.
 
 ## Intercept
 
@@ -20,7 +21,7 @@ Usage: `intercept(target, propertyName?, interceptor)`
 _Please avoid this API. It basically provides a bit of aspect-oriented programming, creating flows that are really hard to debug. Instead, do things like data validation **before** updating any state, rather than during._
 
 -   `target`: the observable to guard.
--   `propertyName`: optional parameter to specify a specific property to intercept. Note that `intercept(user.name, interceptor)` is fundamentally different from `intercept(user, "name", interceptor)`. The first tries to add an interceptor to the _current_ `value` inside `user.name` (which might not be an observable at all), the latter intercepts changes to the `name` _property_ of `user`.
+-   `propertyName`: optional parameter to specify a specific property to intercept. Note that `intercept(user.name, interceptor)` is fundamentally different from `intercept(user, "name", interceptor)`. The first tries to add an interceptor to the _current_ `value` inside `user.name`, which might not be an observable at all. The latter intercepts changes to the `name` _property_ of `user`.
 -   `interceptor`: callback that is invoked for _each_ change that is made to the observable. Receives a single change object describing the mutation.
 
 The `intercept` should tell MobX what needs to happen with the current change.
@@ -69,19 +70,19 @@ const disposer = intercept(theme, "backgroundColor", change => {
 
 Usage: `observe(target, propertyName?, listener, invokeImmediately?)`
 
-_See above notice, please avoid this API and use `reaction` instead._
+_See above notice, please avoid this API and use [`reaction`](api.md#reaction) instead._
 
 -   `target`: the observable to observe.
--   `propertyName`: optional parameter to specify a specific property to observe. Note that `observe(user.name, listener)` is fundamentally different from `observe(user, "name", listener)`. The first observes the _current_ `value` inside `user.name` (which might not be an observable at all), the latter observes the `name` _property_ of `user`.
+-   `propertyName`: optional parameter to specify a specific property to observe. Note that `observe(user.name, listener)` is fundamentally different from `observe(user, "name", listener)`. The first observes the _current_ `value` inside `user.name`, which might not be an observable at all. The latter observes the `name` _property_ of `user`.
 -   `listener`: callback that will be invoked for _each_ change that is made to the observable. Receives a single change object describing the mutation, except for boxed observables, which will invoke the `listener` with two parameters: `newValue, oldValue`.
--   `invokeImmediately`: false by default. Set it to true if you want `observe` to invoke the `listener` directly with the state of the observable, instead of waiting for the first change. Not supported (yet) by all kinds of observables.
+-   `invokeImmediately`: _false_ by default. Set it to _true_ if you want `observe` to invoke the `listener` directly with the state of the observable, instead of waiting for the first change. Not supported (yet) by all kinds of observables.
 
 The function returns a `disposer` function that can be used to cancel the observer.
 Note that `transaction` does not affect the working of the `observe` method(s).
 This means that even inside a transaction `observe` will fire its listeners for each mutation.
 Hence [`autorun`](autorun.md) is usually a more powerful and declarative alternative to `observe`.
 
-_`observe` reacts to *mutations*, when they are being made, while reactions like `autorun` or `reaction` react to *new values* when they become available. In many cases the latter is sufficient._
+_`observe` reacts to **mutations** when they are being made, while reactions like `autorun` or `reaction` react to **new values** when they become available. In many cases the latter is sufficient._
 
 Example:
 
@@ -129,7 +130,7 @@ These are the additional fields that are available per type:
 |                              | update\*   | name         | Name of the property being updated.                                                               | √                          |                              |
 |                              |            | newValue     | The new value being assigned.                                                                     | √                          | √                            |
 |                              |            | oldValue     | The value that is replaced.                                                                       |                            |                              |
-| Array                        | splice     | index        | Starting index of the splice. Splices are also fired by `push`, `unshift`, `replace` etc.         | √                          |                              |
+| Array                        | splice     | index        | Starting index of the splice. Splices are also fired by `push`, `unshift`, `replace`, etc.        | √                          |                              |
 |                              |            | removedCount | Amount of items being removed.                                                                    | √                          | √                            |
 |                              |            | added        | Array with items being added.                                                                     | √                          | √                            |
 |                              |            | removed      | Array with items that were removed.                                                               |                            |                              |
@@ -139,13 +140,13 @@ These are the additional fields that are available per type:
 |                              |            | oldValue     | The old value that was replaced.                                                                  |                            |                              |
 | Map                          | add        | name         | The name of the entry that was added.                                                             | √                          |                              |
 |                              |            | newValue     | The new value that is being assigned.                                                             | √                          | √                            |
-|                              | update     | name         | The name of the entry that is being updated.                                                      | √                          |                              |
+|                              | update     | name         | The name of the entry being updated.                                                              | √                          |                              |
 |                              |            | newValue     | The new value that is being assigned.                                                             | √                          | √                            |
 |                              |            | oldValue     | The value that has been replaced.                                                                 |                            |                              |
-|                              | delete     | name         | The name of the entry that is being removed.                                                      | √                          |                              |
+|                              | delete     | name         | The name of the entry being removed.                                                              | √                          |                              |
 |                              |            | oldValue     | The value of the entry that was removed.                                                          |                            |                              |
 | Boxed & computed observables | create     | newValue     | The value that was assigned during creation. Only available as `spy` event for boxed observables. |                            |                              |
 |                              | update     | newValue     | The new value being assigned.                                                                     | √                          | √                            |
 |                              |            | oldValue     | The previous value of the observable.                                                             |                            |                              |
 
-**Note:** object `update` events won't fire for updated computed values (as those aren't mutations). But it is possible to observe them by explicitly subscribing to the specific property using `observe(object, 'computedPropertyName', listener)`._
+**Note:** object `update` events won't fire for updated computed values (as those aren't mutations). But it is possible to observe them by explicitly subscribing to the specific property using `observe(object, 'computedPropertyName', listener)`.
