@@ -5,13 +5,13 @@ hide_title: true
 
 <script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
-# Intercept & Observe 🚀
+# Intercept & Observe [🚀]
 
-_⚠️ **Warning**: intercept and observe are low level utilities, and should not be needed in practice. Use some form of [reaction](autorun.md) instead. `observe` doesn't respect transactions and doesn't support deep observing of changes. Using these utilities is an anti-pattern. If you intend to use `observe` to get access to the old and new value, use [`reaction`](api.md#reaction) instead. ⚠️_
+_⚠️ **Warning**: intercept and observe are low level utilities, and should not be needed in practice. Use some form of [reaction](autorun.md) instead. `observe` doesn't respect transactions and doesn't support deep observing of changes. Using these utilities is an anti-pattern. If you intend to get access to the old and new value using `observe`, use [`reaction`](api.md#reaction) instead. ⚠️_
 
 `observe` and `intercept` can be used to monitor the changes of a single observable. They **_don't_** track nested observables.
 
--    `intercept` can be used to detect and modify mutations before they are applied to the observable (useful for validation, normalization or cancellation).
+-    `intercept` can be used to detect and modify mutations before they are applied to the observable (validation, normalization or cancellation).
 -    `observe` allows you to intercept changes after they have been made.
 
 ## Intercept
