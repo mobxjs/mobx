@@ -46,11 +46,11 @@ var person = observable(
 // but don't worry, 'mobx.autorun' is even more powerful.
 autorun(() => console.log(person.labelText))
 
-// Prints: 'Dave'.
 person.name = "Dave"
+// Prints: 'Dave'.
 
-// Prints: 'Dave (age: 21)'.
 person.setAge(21)
+// Prints: 'Dave (age: 21)'.
 ```
 
 Some things to keep in mind when making objects observable:

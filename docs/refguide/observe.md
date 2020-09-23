@@ -99,11 +99,11 @@ const disposer = observe(person, change => {
     console.log(change.type, change.name, "from", change.oldValue, "to", change.object[change.name])
 })
 
-// Prints: 'update firstName from Maarten to Martin'.
 person.firstName = "Martin"
+// Prints: 'update firstName from Maarten to Martin'.
 
-// Ignore any future updates.
 disposer()
+// Ignore any future updates.
 
 // Observe a single field.
 const disposer2 = observe(person, "lastName", change => {
