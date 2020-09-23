@@ -57,7 +57,7 @@ Some things to keep in mind when making objects observable:
 
 -   Only plain objects will be made observable. For non-plain objects it is considered the responsibility of the constructor to initialize the observable properties using [`makeObservable` or `makeAutoObservable`](observable.md).
 -   Property getters will be automatically turned into derived properties, just like declaring it [`computed`](computed) would do.
--   `observable` is automatically recursively applied to a whole object graph, both on instantiation and to any new values that will be assigned to observable properties in the future. Observable will not recurse into non-plain objects.
+-   `observable` is automatically recursively applied to a whole object graph, both on instantiation and to any new values that will be assigned to observable properties in the future. It will not recurse into non-plain objects.
 -   These defaults are fine in 95% of the cases, but for more fine-grained control on how and which properties should be made observable, check out the [modifiers](modifiers.md) section.
 -   Pass `{ deep: false }` as 3rd argument to disable the automatic conversion of property values.
 -   Pass `{ name: "my object" }` to assign a friendly debug name to the object.
