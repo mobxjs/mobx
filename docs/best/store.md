@@ -92,7 +92,7 @@ export class TodoStore {
         this.loadTodos()
     }
 
-    // Fetches all todos from the server.
+    // Fetches all Todos from the server.
     loadTodos() {
         this.isLoading = true
         this.transportLayer.fetchTodos().then(fetchedTodos => {
@@ -103,9 +103,9 @@ export class TodoStore {
         })
     }
 
-    // Update a todo with information from the server. Guarantees a todo only
-    // exists once. Might either construct a new todo, update an existing one,
-    // or remove a todo if it has been deleted on the server.
+    // Update a Todo with information from the server. Guarantees a Todo only
+    // exists once. Might either construct a new Todo, update an existing one,
+    // or remove a Todo if it has been deleted on the server.
     updateTodoFromServer(json) {
         const todo = this.todos.find(todo => todo.id === json.id)
         if (!todo) {
@@ -119,14 +119,14 @@ export class TodoStore {
         }
     }
 
-    // Creates a fresh todo on the client and the server.
+    // Creates a fresh Todo on the client and the server.
     createTodo() {
         const todo = new Todo(this)
         this.todos.push(todo)
         return todo
     }
 
-    // A todo was somehow deleted, clean it from the client memory.
+    // A Todo was somehow deleted, clean it from the client memory.
     removeTodo(todo) {
         this.todos.splice(this.todos.indexOf(todo), 1)
         todo.dispose()
