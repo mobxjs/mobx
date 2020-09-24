@@ -92,7 +92,7 @@ Since it doesn't matter _how_ we got the reference to an observable, we can cons
 observables from outer scopes directly (including from imports, etc.).
 
 ```javascript
-const myTimer = new Timer() // see Timer definition above
+const myTimer = new Timer() // See the Timer definition above.
 
 // No props, `myTimer` is directly consumed from the closure.
 const TimerView = observer(() => <span>Seconds passed: {myTimer.secondsPassed}</span>)
