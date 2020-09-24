@@ -35,7 +35,9 @@ Their read operations will still be tracked when they are called from a reaction
 
 It can only annotate properties declared by its own class definition. If a sub or superclass introduces observable fields, it will have to call `makeObservable` for those properties itself.
 
-**TypeScript note:** when decorating private properties, you can pass the private property names as a generic argument to `makeObservable` to suppress the compile error about the field not existing, like this: `makeObservable<"myPrivateField" | "myOtherPrivateField>(this, { myPrivateField: observable })`.
+**TypeScript note:** when decorating private properties, you can pass the private property names as a generic argument to `makeObservable` to suppress the compile error about the field not existing, like this:
+
+`makeObservable<"myPrivateField" | "myOtherPrivateField>(this, { myPrivateField: observable })`.
 
 </details>
 
