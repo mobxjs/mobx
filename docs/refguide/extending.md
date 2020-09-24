@@ -37,24 +37,21 @@ class Clock {
             // - Atom's name, for debugging purposes.
             "Clock",
             // 2nd (optional) parameter:
-            // - Callback for when this atom transitions
-            //   from unobserved to observed.
+            // - Callback for when this atom transitions from unobserved to observed.
             () => this.startTicking(),
             // 3rd (optional) parameter:
-            // - Callback for when this atom transitions
-            //   from observed to unobserved.
+            // - Callback for when this atom transitions from observed to unobserved.
             () => this.stopTicking()
             // The same atom transitions between these two states multiple times.
         )
     }
 
     getTime() {
-        // Let MobX know this observable data source has been used. reportObserved
-        // will return true if the atom is currently being observed by some
-        // reaction.
+        // Let MobX know this observable data source has been used.
         //
-        // If needed, it will also trigger the startTicking onBecomeObserved
-        // event handler.
+        // reportObserved will return true if the atom is currently being observed
+        // by some reaction. If needed, it will also trigger the startTicking
+        // onBecomeObserved event handler.
         if (this.atom.reportObserved()) {
             return this.currentDateTime
         } else {
