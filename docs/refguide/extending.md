@@ -82,6 +82,7 @@ class Clock {
 }
 
 const clock = new Clock()
+
 const disposer = autorun(() => console.log(clock.getTime()))
 // Prints the time every second.
 
