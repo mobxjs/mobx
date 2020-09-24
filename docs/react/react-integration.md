@@ -405,9 +405,7 @@ Now you can see component names:
 
 </details>
 
-<details id="wrap-order"><summary>
-[🚀] Tip: When combining `observer` with other higher-order-components, apply `observer` first<a href="#wrap-order" class="tip-anchor"></a>
-</summary>
+<details id="wrap-order"><summary>[🚀] Tip: When combining `observer` with other higher-order-components, apply `observer` first<a href="#wrap-order" class="tip-anchor"></a></summary>
 
 When `observer` needs to be combined with other decorators or higher-order-components, make sure that `observer` is the innermost (first applied) decorator;
 otherwise it might do nothing at all.
