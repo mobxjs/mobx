@@ -47,10 +47,10 @@ var person = observable(
 autorun(() => console.log(person.labelText))
 
 person.name = "Dave"
-// Prints: 'Dave'.
+// Prints: 'Dave'
 
 person.setAge(21)
-// Prints: 'Dave (age: 21)'.
+// Prints: 'Dave (age: 21)'
 ```
 
 Some things to keep in mind when making objects observable:

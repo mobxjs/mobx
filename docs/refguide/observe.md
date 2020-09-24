@@ -100,7 +100,7 @@ const disposer = observe(person, change => {
 })
 
 person.firstName = "Martin"
-// Prints: 'update firstName from Maarten to Martin'.
+// Prints: 'update firstName from Maarten to Martin'
 
 // Ignore any future updates.
 disposer()
