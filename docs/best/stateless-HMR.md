@@ -12,7 +12,9 @@ One thing that can be a challenge when getting started with MobX (and React in g
 
 ```
 [HMR] The following modules couldn't be hot updated: (Full reload needed)
-This is usually because the modules which have changed (and their parents) do not know how to hot reload themselves. See http://webpack.github.io/docs/hot-module-replacement-with-webpack.html for more details.
+This is usually because the modules which have changed (and their parents)
+do not know how to hot reload themselves.
+See http://webpack.github.io/docs/hot-module-replacement-with-webpack.html for more details.
 [HMR]  - ./src/ToDoItem.jsx
 ```
 
