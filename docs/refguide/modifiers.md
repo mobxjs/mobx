@@ -13,16 +13,16 @@ You can use annotations to specify how observable properties behave when you use
 ### Deep observability
 
 When MobX creates an observable object, it introduces observable properties which by default use the `deep` modifier. The deep modifier basically recursively calls `observable(newValue)` for any newly assigned value, so
-all nested values become observable.
+all nested values become observable as well.
 
-This is a very convenient default. Without any additional effort all values assigned to an observable will themselves be made observable too (unless they already are), so no additional effort is required to make objects deeply observable.
+This is a very convenient default. All values assigned to an observable will themselves be made observable too (unless they already are), making objects deeply observable without any additional effort.
 
 ### Reference observability
 
 In some cases however, objects don't need to be converted into observables.
-Typical cases are immutable objects, or objects that are not managed by you but by an external library. The examples are JSX elements, DOM elements, native objects like History, window or etc. You just want to store a reference to those kinds of objects without turning them into an observable.
+Typical cases are immutable objects, or objects that are not managed by you but by an external library. Such examples are JSX and DOM elements, native objects like History, window, etc. You just want to store a reference to this kind of objects without turning them into an observable themselves.
 
-For these situations there is the `ref` modifier. It makes sure that an observable property is created which tracks only the reference but doesn't try to convert its value.
+For these situations there is the `ref` modifier. It makes sure that an observable property is created which tracks only the reference, but doesn't try to convert its value.
 
 For example:
 
@@ -59,7 +59,7 @@ class AuthorStore {
 
 In the example above, an assignment of a plain array with authors to the `authors` observable array, will update it with the original, non-observable authors.
 
-**Note:** `{ deep: false }` can be passed as option to `observable`, `observable.object`, `observable.array`, `observable.map` and `extendObservable` to create shallow collections.
+**Note:** `{ deep: false }` can be passed as an option to `observable`, `observable.object`, `observable.array`, `observable.map` and `extendObservable` to create shallow collections.
 
 ## Examples
 
