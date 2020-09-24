@@ -12,8 +12,8 @@ Properties, entire objects, arrays, Maps and Sets can all be made observable.
 The basics of making objects observable is specifying an annotation per property using `makeObservable`.
 The most important annotations are:
 
--   `observable` defines a trackable field that stores state.
--   `action` marks a method as action that will modify state.
+-   `observable` defines a trackable field that stores the state.
+-   `action` marks a method as action that will modify the state.
 -   `computed` marks a getter that will derive new facts from the state and cache its output.
 
 Collections such as arrays, Maps and Sets are made observable automatically.
@@ -33,7 +33,7 @@ Their read operations will still be tracked when they are called from a reaction
 
 <details id="limitations"><summary>makeObservable limitations<a href="#limitations" class="tip-anchor"></a></summary>
 
-It can only annotate properties declared by its own class definition. If a sub- or superclass introduces observable fields, it will have to call `makeObservable` for those properties itself.
+It can only annotate properties declared by its own class definition. If a sub or superclass introduces observable fields, it will have to call `makeObservable` for those properties itself.
 
 **TypeScript note:** when decorating private properties, you can pass the private property names as a generic argument to `makeObservable` to suppress the compile error about the field not existing, like this: `makeObservable<"myPrivateField" | "myOtherPrivateField>(this, { myPrivateField: observable })`.
 
@@ -118,9 +118,9 @@ Usage:
 
 `makeAutoObservable` is like `makeObservable` on steroids, as it infers all the properties by default. You can still use `overrides` to override the default behavior with specific annotations.
 In particular `false` can be used to exclude a property or method from being processed entirely.
-See the code tabs above for an example.
+Check out the code tabs above for an example.
 The `makeAutoObservable` function can be more compact and easier to maintain than using `makeObservable`, since new members don't have to be mentioned explicitly.
-However, `makeAutoObservable` cannot be used on classes that have super- or are subclassed.
+However, `makeAutoObservable` cannot be used on classes that have super or are subclassed.
 
 Inference rules:
 
@@ -142,11 +142,11 @@ Usage:
 The `observable` annotation can also be called as a function to make an entire object observable at once.
 The `source` object will be cloned and all members will be made observable, similar to how it would be done by `makeAutoObservable`.
 Likewise, an `overrides` map can be provided to specify the annotations of specific members.
-See the above code block for an example.
+Check out the above code block for an example.
 
 The object returned by `observable` will be a Proxy, which means that properties that are added later to the object will be picked up and made observable as well (except when [proxy usage](../refguide/configure.md#proxy-support) is disabled).
 
-The `observable` method can also be called with collections types like [arrays](../refguide/api.md#observablearray), [Maps](../refguide/api.md#observablemap) and [Sets](../refguide/api.md#observableset). Those will be cloned as well and converted into their observable counterpart.
+The `observable` method can also be called with collections types like [arrays](../refguide/api.md#observablearray), [Maps](../refguide/api.md#observablemap) and [Sets](../refguide/api.md#observableset). Those will be cloned as well and converted into their observable counterparts.
 
 <details id="observable-array"><summary>Observable array example<a href="#observable-array" class="tip-anchor"></a></summary>
 
@@ -205,9 +205,9 @@ Making class members observable is considered the responsibility of the class co
 The primary difference between `make(Auto)Observable` and `observable` is that the first one modifies the object you are passing in as first argument, while `observable` creates a _clone_ that is made observable.
 
 The second difference is that `observable` creates a `Proxy` object, to be able to trap future property additions in case you use the object as a dynamic lookup map.
-If the object you want to make observable has a regular structure where all members are known up-front, we recommend to use `makeObservable` as non proxied objects are a little faster, and they are easier to inspect in the debugger / `console.log`.
+If the object you want to make observable has a regular structure where all members are known up-front, we recommend to use `makeObservable` as non proxied objects are a little faster, and they are easier to inspect in the debugger and `console.log`.
 
-Because of that, `make(Auto)Observable` is the recommended API to use in for example factory functions.
+Because of that, `make(Auto)Observable` is the recommended API to use in factory functions.
 Note that it is possible to pass `{ proxy: false }` as an option to `observable` to get a non proxied clone.
 
 </details>
@@ -226,7 +226,7 @@ Note that it is possible to pass `{ proxy: false }` as an option to `observable`
 | `computed.struct`                  | Like `computed`, except that if after recomputing the result is structurally equal to the previous result, no observers will be notified.                                                                                   |
 | `true`                             | Infer the best annotation. Check out [makeAutoObservable](#makeautoobservable) for more details.                                                                                                                                                  |
 | `false`                            | Explicitly do not annotate this property.                                                                                                                                                                                  |
-| `flow`                             | Creates a `flow` to manage asynchronous processes. Check out[flow](action.html#-using-flow-instead-of-asyncawait) for more details. Note that the inferred return type in TypeScript might be off.                              |
+| `flow`                             | Creates a `flow` to manage asynchronous processes. Check out [flow](action.html#-using-flow-instead-of-asyncawait) for more details. Note that the inferred return type in TypeScript might be off.                              |
 | `autoAction`                       | Should not be used explicitly, but is used under the hood by `makeAutoObservable` to mark methods that can act as action or derivation, based on their calling context.                                                     |
 
 ## 🚀 The `options` argument
@@ -239,7 +239,7 @@ The above APIs take an optional `options` argument which is an object that suppo
 
 ## Converting observables back to vanilla JavaScript collections
 
-Sometimes it is necessary to convert observable data structures back to their vanilla counterpart.
+Sometimes it is necessary to convert observable data structures back to their vanilla counterparts.
 For example when passing observable objects to a React component that can't track observables, or to obtain a clone that should not be further mutated.
 
 To convert a collection shallowly, the usual JavaScript mechanisms work:
@@ -255,7 +255,7 @@ For classes, it is recommend to implement a `toJSON()` method, as it will be pic
 
 ## A short note on classes
 
-So far most examples above have been leaning towards class syntax.
+So far most examples above have been leaning towards the class syntax.
 MobX is in principle unopinionated about this, and there are probably just as many MobX users that use plain objects.
 However, a slight benefit of classes is that they have more easily discoverable APIs, e.g. TypeScript.
 Also, `instanceof` checks are really powerful for type inference, and class instances aren't wrapped in `Proxy` objects, giving them a better experience in debuggers.
