@@ -16,11 +16,9 @@ There are two types of React bindings. `mobx-react` also supports class based co
 
 **NPM:** `npm install --save mobx`.
 
-**CDN:**
--   cdnjs: https://cdnjs.com/libraries/mobx
--   unpkg: https://unpkg.com/mobx/lib/mobx.umd.js
+**CDN:** https://cdnjs.com/libraries/mobx / https://unpkg.com/mobx/lib/mobx.umd.js
 
-⚠️ When using a CDN, it is best to check the url in your browser and see what version it resolves to, so that your users aren't accidentally served a newer version in the future when updates are released. Use an url like: https://unpkg.com/mobx@5.15.4/lib/mobx.umd.production.min.js instead. For a development build, substitute `production.min` with `development` in the URL. ⚠️
+⚠️ **Warning:** When using a CDN, it is best to check the url in your browser and see what version it resolves to, so that your users aren't accidentally served a newer version in the future when updates are released. Use an url like: https://unpkg.com/mobx@5.15.4/lib/mobx.umd.production.min.js instead. For a development build, substitute `production.min` with `development` in the URL. ⚠️
 
 ## MobX on older JavaScript environments
 
