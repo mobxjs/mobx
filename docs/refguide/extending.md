@@ -16,7 +16,7 @@ Atoms can be used to signal MobX that some observable data source has been obser
 _**Tip**: in many cases you can avoid the need to create your own atoms just by creating a normal observable, and using
 the [`onBecomeObserved`](on-become-observed.md) utility to be notified when MobX starts tracking an observable._
 
-The following example demonstrates how you can create an observable `Clock` that returns the current date-time, which can be used in reactive functions.
+The following example demonstrates how you can create an observable `Clock` that returns the current date-time, which can then be used in reactive functions.
 This clock will only actually tick if it is being observed by someone.
 
 The complete API of the `Atom` class is demonstrated by this example.
@@ -82,7 +82,6 @@ class Clock {
 }
 
 const clock = new Clock()
-
 const disposer = autorun(() => console.log(clock.getTime()))
 
 // ... prints the time every second.
