@@ -113,7 +113,7 @@ import {createContext, useContext} from "react"
 const TimerContext = createContext<Timer>()
 
 const TimerView = observer(() => {
-    // Grab the timer from context.
+    // Grab the timer from the context.
     const timer = useContext(TimerContext) // See the Timer definition above.
     return (
         <span>Seconds passed: {timer.secondsPassed}</span>
@@ -271,12 +271,12 @@ class Todo {
 }
 
 const TodoView = observer(({ todo }: { todo: Todo }) =>
-   // WRONG: GridRow won't pick up changes in todo.title / todo.done since it
-   //        isn't an observer.
+   // WRONG: GridRow won't pick up changes in todo.title / todo.done
+   //        since it isn't an observer.
    return <GridRow data={todo} />
 
-   // CORRECT: let `TodoView` detect relevant changes in `todo`, and pass plain
-   //          data down.
+   // CORRECT: let `TodoView` detect relevant changes in `todo`,
+   //          and pass plain data down.
    return <GridRow data={{
        title: todo.title,
        done: todo.done
