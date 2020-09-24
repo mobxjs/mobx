@@ -172,7 +172,7 @@ You will need them rarely, but they can be created using the [`autorun`](../refg
 For example, the following `autorun` prints a log message every time the amount of `unfinishedTodoCount` changes:
 
 ```javascript
-/* a function that automatically observes the state */
+// A function that automatically observes the state.
 autorun(() => {
     console.log("Tasks left: " + todos.unfinishedTodoCount)
 })

@@ -84,17 +84,15 @@ export class TodoStore {
 
     constructor(transportLayer, authorStore) {
         makeAutoObservable(this)
-        this.authorStore = authorStore // Store that can resolve authors for us
-        this.transportLayer = transportLayer // Thing that can make server requests for us
+        this.authorStore = authorStore // Store that can resolve authors.
+        this.transportLayer = transportLayer // Thing that can make server requests.
         this.transportLayer.onReceiveTodoUpdate(updatedTodo =>
             this.updateTodoFromServer(updatedTodo)
         )
         this.loadTodos()
     }
 
-    /**
-     * Fetches all todos from the server
-     */
+    // Fetches all Todos from the server.
     loadTodos() {
         this.isLoading = true
         this.transportLayer.fetchTodos().then(fetchedTodos => {
@@ -105,11 +103,9 @@ export class TodoStore {
         })
     }
 
-    /**
-     * Update a todo with information from the server. Guarantees a todo
-     * only exists once. Might either construct a new todo, update an existing one,
-     * or remove a todo if it has been deleted on the server.
-     */
+    // Update a Todo with information from the server. Guarantees a Todo only
+    // exists once. Might either construct a new Todo, update an existing one,
+    // or remove a Todo if it has been deleted on the server.
     updateTodoFromServer(json) {
         const todo = this.todos.find(todo => todo.id === json.id)
         if (!todo) {
@@ -123,52 +119,29 @@ export class TodoStore {
         }
     }
 
-    /**
-     * Creates a fresh todo on the client and server
-     */
+    // Creates a fresh Todo on the client and the server.
     createTodo() {
         const todo = new Todo(this)
         this.todos.push(todo)
         return todo
     }
 
-    /**
-     * A todo was somehow deleted, clean it from the client memory
-     */
+    // A Todo was somehow deleted, clean it from the client memory.
     removeTodo(todo) {
         this.todos.splice(this.todos.indexOf(todo), 1)
         todo.dispose()
     }
 }
 
-// domain object Todo
+// Domain object Todo.
 export class Todo {
-    /**
-     * unique id of this todo, immutable.
-     */
-    id = null
-
+    id = null // Unique id of this Todo, immutable.
     completed = false
     task = ""
-
-    /**
-     * reference to an Author object (from the authorStore)
-     */
-    author = null
-
+    author = null // Reference to an Author object (from the authorStore).
     store = null
-
-    /**
-     * Indicates whether changes in this object
-     * should be submitted to the server
-     */
-    autoSave = true
-
-    /**
-     * Disposer for the side effect that automatically
-     * stores this Todo, see dispose.
-     */
-    saveHandler = null
+    autoSave = true // Indicator for submitting changes in this Todo to the server.
+    saveHandler = null // Disposer of the side effect auto-saving this Todo (dispose).
 
     constructor(store, id = uuid.v4()) {
         makeAutoObservable(this, {
@@ -182,10 +155,9 @@ export class Todo {
         this.id = id
 
         this.saveHandler = reaction(
-            // observe everything that is used in the JSON:
-            () => this.asJson,
-            // if autoSave is on, send json to server
+            () => this.asJson, // Observe everything that is used in the JSON.
             json => {
+                // If autoSave is true, send JSON to the server.
                 if (this.autoSave) {
                     this.store.transportLayer.saveTodo(json)
                 }
@@ -193,9 +165,7 @@ export class Todo {
         )
     }
 
-    /**
-     * Remove this todo from the client and server
-     */
+    // Remove this Todo from the client and the server.
     delete() {
         this.store.transportLayer.deleteTodo(this.id)
         this.store.removeTodo(this)
@@ -210,20 +180,17 @@ export class Todo {
         }
     }
 
-    /**
-     * Update this todo with information from the server
-     */
+    // Update this Todo with information from the server.
     updateFromJson(json) {
-        // make sure our changes aren't sent back to the server
-        this.autoSave = false
+        this.autoSave = false // Prevent sending of our changes back to the server.
         this.completed = json.completed
         this.task = json.task
         this.author = this.store.authorStore.resolveAuthor(json.authorId)
         this.autoSave = true
     }
 
+    // Clean up the observer.
     dispose() {
-        // clean up the observer
         this.saveHandler()
     }
 }
@@ -267,7 +234,7 @@ export class UiState {
     pendingRequestCount = 0
 
     // .struct makes sure observer won't be signaled unless the
-    // dimensions object changed in a deepEqual manner
+    // dimensions object changed in a deepEqual manner.
     windowDimensions = {
         width: window.innerWidth,
         height: window.innerHeight
@@ -312,7 +279,7 @@ class UserStore {
     }
 
     getTodos(user) {
-        // access todoStore through the root store
+        // Access todoStore through the root store.
         return this.rootStore.todoStore.todos.filter(todo => todo.author === user)
     }
 }

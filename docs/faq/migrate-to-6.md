@@ -7,11 +7,11 @@ hide_title: true
 
 MobX 6 is quite different from MobX 5. This pages covers a migration guide from MobX 4 and 5 to 6, and an extensive list of all the changes.
 
-# Migrating to MobX 6
+# Migrating from MobX 4/5 [🚀]
 
 [CHANGELOG](https://github.com/mobxjs/mobx/blob/mobx6/CHANGELOG.md#600)
 
-_⚠️ Disclaimer: Depending on factors like the size and complexity of your code base, your MobX usage patterns, and the quality of your automated tests, this migration guide might take you anywhere between an hour and a couple of days. Please refrain from upgrading if you don't trust your Continuous Integration or QA / test procedures enough to pick up any unexpected breakages. Unexpected behavioral changes might be caused by changes in MobX itself or the changes needed to your Babel / TypeScript build configuration. ⚠️_
+_⚠️ **Warning**: Depending on factors like the size and complexity of your code base, your MobX usage patterns, and the quality of your automated tests, this migration guide might take you anywhere between an hour and a couple of days. Please refrain from upgrading if you don't trust your Continuous Integration or QA / test procedures enough to pick up any unexpected breakages. Unexpected behavioral changes might be caused by changes in MobX itself or the changes needed to your Babel / TypeScript build configuration. ⚠️_
 
 ## Getting started
 

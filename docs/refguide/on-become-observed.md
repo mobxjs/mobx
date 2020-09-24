@@ -13,10 +13,9 @@ Usage:
 -   `onBecomeObserved(observable, property?, listener: () => void): (() => void)`
 -   `onBecomeUnobserved(observable, property?, listener: () => void): (() => void)`
 
-The functions `onBecomeObserved` and `onBecomeUnobserved` can be used to attach lazy behavior or side-effects to existing observables.
-These functions are hooks into the observability system of MobX and get notified when observables _start_ / _stop_ becoming observed. It can be used to execute some lazy operations or perform network fetches.
+Functions `onBecomeObserved` and `onBecomeUnobserved` can be used to attach lazy behavior or side-effects to existing observables. They are hooks into the observability system of MobX and get notified when the observables _start_ and _stop_ becoming observed. They both return a _disposer_ function that detaches the _listener_.
 
-The return value is a _diposer-function_ that will detach the _listener_.
+In the example below we use them to perform network fetches only when the observed value is actually in use.
 
 ```javascript
 export class City {
@@ -30,7 +29,7 @@ export class City {
             suspend: false
         })
         this.location = location
-        // only start data fetching if temperature is actually used!
+        // Only start data fetching if temperature is actually used!
         onBecomeObserved(this, "temperature", this.resume)
         onBecomeUnobserved(this, "temperature", this.suspend)
     }
@@ -47,7 +46,7 @@ export class City {
     }
 
     fetchTemperature = flow(function* () {
-        // data fetching logic
+        // Data fetching logic...
     })
 }
 ```

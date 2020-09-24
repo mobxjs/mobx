@@ -90,7 +90,7 @@ It is also possible to get the internal dependency (or observer) tree by using `
 ```javascript
 import { getDependencyTree } from "mobx"
 
-// prints the dependency tree of the reaction coupled to the disposer
+// Prints the dependency tree of the reaction coupled to the disposer.
 console.log(getDependencyTree(disposer))
 // Outputs:
 // { name: 'Autorun@2', dependencies: [ { name: 'Message@1.title' } ] }
@@ -165,7 +165,7 @@ autorun(() => {
     console.log(message)
 })
 
-// Won't trigger a re-run
+// Won't trigger a re-run.
 message.updateTitle("Hello world")
 ```
 
@@ -179,19 +179,19 @@ The way to make this work is to make sure to always pass immutable data or defen
 
 ```javascript
 autorun(() => {
-    console.log(message.title) // clearly, the `.title` observable is used
+    console.log(message.title) // Clearly, the `.title` observable is used.
 })
 
 autorun(() => {
-    console.log(mobx.toJS(message)) // toJS creates a deep clone, and thus will read the message
+    console.log(mobx.toJS(message)) // toJS creates a deep clone, and thus will read the message.
 })
 
 autorun(() => {
-    console.log({ ...message }) // creates a shallow clone, also using `.title` in the process
+    console.log({ ...message }) // Creates a shallow clone, also using `.title` in the process.
 })
 
 autorun(() => {
-    console.log(JSON.stringify(message)) // also reads the entire structure
+    console.log(JSON.stringify(message)) // Also reads the entire structure.
 })
 ```
 
@@ -371,7 +371,7 @@ const twitterUrls = observable.object({
 })
 
 autorun(() => {
-    console.log(get(twitterUrls, "Sara")) // get can track not yet existing properties
+    console.log(get(twitterUrls, "Sara")) // `get` can track not yet existing properties.
 })
 
 runInAction(() => {

@@ -12,15 +12,13 @@ MobX works in any ES5 environment, which includes browsers and NodeJS.
 
 There are two types of React bindings. `mobx-react` also supports class based components, whereas `mobx-react-lite` supports only functional components. Append the appropriate bindings for your use case to the below *Yarn* or *NPM* command.
 
-**Yarn:** `yarn add mobx`.
+**Yarn:** `yarn add mobx`
 
-**NPM:** `npm install --save mobx`.
+**NPM:** `npm install --save mobx`
 
-**CDN:**
--   cdnjs: https://cdnjs.com/libraries/mobx
--   unpkg: https://unpkg.com/mobx/lib/mobx.umd.js
+**CDN:** https://cdnjs.com/libraries/mobx / https://unpkg.com/mobx/lib/mobx.umd.js
 
-⚠️ When using a CDN, it is best to check the url in your browser and see what version it resolves to, so that your users aren't accidentally served a newer version in the future when updates are released. Use an url like: https://unpkg.com/mobx@5.15.4/lib/mobx.umd.production.min.js instead. For a development build, substitute `production.min` with `development` in the URL. ⚠️
+⚠️ **Warning:** When using a CDN, it is best to check the url in your browser and see what version it resolves to, so that your users aren't accidentally served a newer version in the future when updates are released. Use an url like: https://unpkg.com/mobx@5.15.4/lib/mobx.umd.production.min.js instead. For a development build, substitute `production.min` with `development` in the URL. ⚠️
 
 ## MobX on older JavaScript environments
 
@@ -31,7 +29,7 @@ You will have to explicitly enable the fallback implementation by configuring [`
 ```javascript
 import { configure } from "mobx"
 
-configure({ useProxies: "never" }) // or "ifavailable"
+configure({ useProxies: "never" }) // Or "ifavailable".
 ```
 
 ## MobX and Decorators
