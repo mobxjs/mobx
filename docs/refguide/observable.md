@@ -231,7 +231,7 @@ Note that it is possible to pass `{ proxy: false }` as an option to `observable`
 | `flow`                             | Creates a `flow` to manage asynchronous processes. Check out [flow](action.html#-using-flow-instead-of-asyncawait) for more details. Note that the inferred return type in TypeScript might be off.                              |
 | `autoAction`                       | Should not be used explicitly, but is used under the hood by `makeAutoObservable` to mark methods that can act as action or derivation, based on their calling context.                                                     |
 
-## 🚀 The `options` argument
+## The `options` argument [🚀]
 
 The above APIs take an optional `options` argument which is an object that supports the following options:
 
