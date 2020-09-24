@@ -31,7 +31,7 @@ You will have to explicitly enable the fallback implementation by configuring [`
 ```javascript
 import { configure } from "mobx"
 
-configure({ useProxies: "never" }) // or "ifavailable"
+configure({ useProxies: "never" }) // Or "ifavailable".
 ```
 
 ## MobX and Decorators
