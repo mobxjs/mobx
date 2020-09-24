@@ -1,6 +1,6 @@
 ---
-title: mobx-utils
-sidebar_label: mobx-utils 🚀
+title: MobX-utils
+sidebar_label: MobX-utils 🚀
 hide_title: true
 ---
 
