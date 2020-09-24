@@ -83,10 +83,8 @@ class Clock {
 
 const clock = new Clock()
 const disposer = autorun(() => console.log(clock.getTime()))
+// Prints the time every second.
 
-// ... prints the time every second.
-
+// Stop printing. If nobody else uses the same `clock`, it will stop ticking as well.
 disposer()
-
-// Printing stops. If nobody else uses the same `clock`, it will stop ticking as well.
 ```
