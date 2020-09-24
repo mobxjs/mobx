@@ -14,7 +14,7 @@ Achieving this is pretty simple by using the concept of atoms.
 Atoms can be used to signal MobX that some observable data source has been observed or changed, and MobX will signal the atom whenever it is used or no longer in use.
 
 _**Tip**: in many cases you can avoid the need to create your own atoms just by creating a normal observable, and using
-the [`onBecomeObserved`](on-become-observed.md) utility to be notified when MobX starts tracking an observable._
+the [`onBecomeObserved`](on-become-observed.md) utility to be notified when MobX starts tracking it._
 
 The following example demonstrates how you can create an observable `Clock` that returns the current date-time, which can then be used in reactive functions.
 This clock will only actually tick if it is being observed by someone.
