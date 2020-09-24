@@ -67,8 +67,7 @@ class Clock {
 
     tick() {
         this.currentDateTime = new Date()
-        // Let MobX know that this data source has changed.
-        this.atom.reportChanged()
+        this.atom.reportChanged() // Let MobX know that this data source has changed.
     }
 
     startTicking() {
