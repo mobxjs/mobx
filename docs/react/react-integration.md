@@ -78,11 +78,11 @@ Observables can be passed into components as props, as was done in the example a
 ```javascript
 import { observer } from "mobx-react-lite"
 
-const myTimer = new Timer() // see Timer definition above
+const myTimer = new Timer() // See the Timer definition above.
 
 const TimerView = observer(({ timer }) => <span>Seconds passed: {timer.secondsPassed}</span>)
 
-// pass myTimer as props
+// Pass myTimer as a prop.
 ReactDOM.render(<TimerView timer={myTimer} />, document.body)
 ```
 
@@ -94,7 +94,7 @@ observables from outer scopes directly (including from imports, etc.).
 ```javascript
 const myTimer = new Timer() // see Timer definition above
 
-// No props, the `myTimer` is directly consumed from the closure
+// No props, `myTimer` is directly consumed from the closure.
 const TimerView = observer(() => <span>Seconds passed: {myTimer.secondsPassed}</span>)
 
 ReactDOM.render(<TimerView />, document.body)
@@ -113,8 +113,8 @@ import {createContext, useContext} from "react"
 const TimerContext = createContext<Timer>()
 
 const TimerView = observer(() => {
-    // grab the timer from context
-    const timer = useContext(TimerContext) // see Timer definition above
+    // Grab the timer from context.
+    const timer = useContext(TimerContext) // See the Timer definition above.
     return (
         <span>Seconds passed: {timer.secondsPassed}</span>
     )
@@ -148,7 +148,7 @@ import { observer } from "mobx-react-lite"
 import { useState } from "react"
 
 const TimerView = observer(() => {
-    const [timer] = useState(() => new Timer()) // see Timer definition above
+    const [timer] = useState(() => new Timer()) // See the Timer definition above.
     return <span>Seconds passed: {timer.secondsPassed}</span>
 })
 
@@ -272,17 +272,17 @@ class Todo {
 
 const TodoView = observer(({ todo }: { todo: Todo }) =>
    // WRONG: GridRow won't pick up changes in todo.title / todo.done since it
-   //        isn't an observer
+   //        isn't an observer.
    return <GridRow data={todo} />
 
    // CORRECT: let `TodoView` detect relevant changes in `todo`, and pass plain
-   //          data down
+   //          data down.
    return <GridRow data={{
        title: todo.title,
        done: todo.done
    }} />
 
-   // CORRECT: using `toJS` works as well, but being explicit is typically better
+   // CORRECT: using `toJS` works as well, but being explicit is typically better.
    return <GridRow data={toJS(todo)} />
 )
 ```
@@ -296,10 +296,10 @@ Or, we can create an in-line anonymous observer using [`<Observer />`](https://g
 ```javascript
 const TodoView = observer(({ todo }: { todo: Todo }) =>
    // WRONG: GridRow.onRender won't pick up changes in todo.title / todo.done
-   // since it isn't an observer
+   //        since it isn't an observer.
    return <GridRow onRender={() => <td>{todo.title}</td>} />
 
-   // CORRECT: wrap the callback rendering in Observer to be able to detect changes
+   // CORRECT: wrap the callback rendering in Observer to be able to detect changes.
    return <GridRow onRender={() => <Observer>{() =>
      <td>{todo.title}</td>
    }} />
@@ -432,7 +432,7 @@ const TimerView = observer(({ offset }) => {
             this.secondsPassed++
         },
         get offsetTime() {
-            return this.secondsPassed - observableProps.offset // not 'offset'!
+            return this.secondsPassed - observableProps.offset // Not 'offset'!
         }
     }))
     return <span>Seconds passed: {timer.offsetTime}</span>
@@ -466,7 +466,7 @@ const TimerView = observer(({ offset }) => {
         }
     }))
 
-    // effect that triggers upon observable changes
+    // Effect that triggers upon observable changes.
     useEffect(
         () =>
             autorun(() => {
@@ -475,8 +475,7 @@ const TimerView = observer(({ offset }) => {
         []
     )
 
-    // effect to set up a timer
-    // (this one is just here for demo purposes)
+    // Effect to set up a timer, only for demo purposes.
     useEffect(() => {
         const handle = setInterval(() => timer.increaseTimer, 1000)
         return () => {
