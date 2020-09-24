@@ -86,9 +86,9 @@ Faster:
 
 In the faster example, a change in the `name` property triggers only `DisplayName` to re-render, while in the slower one the owner of the component has to re-render as well. There is nothing wrong with that, and if rendering of the owning component is fast enough (usually it is!), then this approach works well.
 
-### Function props
+### Function props [🚀]
 
-[🚀] You may notice that to dereference values late, you have to create lots of small observer components where each is customized to render a different part of data, for example:
+You may notice that to dereference values late, you have to create lots of small observer components where each is customized to render a different part of data, for example:
 
 ```javascript
 const PersonNameDisplayer = observer(({ person }) => <DisplayName name={person.name} />)
