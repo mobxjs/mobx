@@ -17,7 +17,7 @@ _**Tip**: in many cases you can avoid the need to create your own atoms just by 
 the [`onBecomeObserved`](on-become-observed.md) utility to be notified when MobX starts tracking an observable._
 
 The following example demonstrates how you can create an observable `Clock` that returns the current date-time, which can be used in reactive functions.
-This clock will only actually tick if it is observed by someone.
+This clock will only actually tick if it is being observed by someone.
 
 The complete API of the `Atom` class is demonstrated by this example.
 
@@ -54,7 +54,7 @@ class Clock {
         if (this.atom.reportObserved()) {
             return this.currentDateTime
         } else {
-            // getTime was called but not while a reaction was running, hence
+            // getTime was called, but not while a reaction was running, hence
             // nobody depends on this value, and the startTicking onBecomeObserved
             // handler won't be fired.
             //
