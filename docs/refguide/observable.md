@@ -42,7 +42,7 @@ It can only annotate properties declared by its own class definition. If a sub o
 </details>
 
 <!--DOCUSAURUS_CODE_TABS-->
-<!--makeObservable-->
+<!--class + makeObservable-->
 
 ```javascript
 import { makeObservable, observable, computed, action } from "mobx"
@@ -69,36 +69,13 @@ class Doubler {
 }
 ```
 
-<!--makeAutoObservable-->
-
-```javascript
-import { makeAutoObservable } from "mobx"
-
-class Doubler {
-    value
-
-    constructor(value) {
-        makeAutoObservable(this)
-        this.value = value
-    }
-
-    get double() {
-        return this.value * 2
-    }
-
-    increment() {
-        this.value++
-    }
-}
-```
-
-<!--observable-->
+<!--factory function + makeAutoObservable-->
 
 ```javascript
 import { observable } from "mobx"
 
 function createDoubler(value) {
-    return observable({
+    return makeAutoObservable({
         value,
         get double() {
             return this.value * 2
@@ -109,6 +86,33 @@ function createDoubler(value) {
     })
 }
 ```
+
+Note that classes can leverage `makeAutoObservable` as well.
+The difference in the examples just demonstrate how MobX can be applied to different programming styles.
+
+<!--observable-->
+
+```javascript
+import { observable } from "mobx"
+
+const todosById = observable({
+    "TODO-123": {
+        title: "find a decent task management system",
+        done: false
+    }
+})
+
+todosById["TODO-456"] = {
+    title: "close all tickets older than two weeks",
+    done: true
+}
+
+const tags = observable(["high prio", "medium prio", "low prio"])
+tags.push("prio: for fun")
+```
+
+In contrast to the first example with `makeObservable`, `observable` supports adding (and removing) _fields_ to an object.
+This makes `observable` great for collections like dynamically keyed objects, arrays, Maps and Sets.
 
 <!--END_DOCUSAURUS_CODE_TABS-->
 
