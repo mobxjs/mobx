@@ -119,7 +119,7 @@ export class TodoStore {
         }
     }
 
-    // Creates a fresh todo on the client and server.
+    // Creates a fresh todo on the client and the server.
     createTodo() {
         const todo = new Todo(this)
         this.todos.push(todo)
@@ -182,8 +182,7 @@ export class Todo {
 
     // Update this Todo with information from the server.
     updateFromJson(json) {
-        // Make sure our changes aren't sent back to the server.
-        this.autoSave = false
+        this.autoSave = false // Prevent sending of our changes back to the server.
         this.completed = json.completed
         this.task = json.task
         this.author = this.store.authorStore.resolveAuthor(json.authorId)
