@@ -95,7 +95,7 @@ import ReactDOM from "react-dom"
 import { makeAutoObservable } from "mobx"
 import { observer } from "mobx-react"
 
-// Model the application state
+// Model the application state.
 class Timer {
     secondsPassed = 0
 
@@ -114,14 +114,14 @@ class Timer {
 
 const myTimer = new Timer()
 
-// Build a user interface for this app, that merely uses the state...
+// Build a user interface for this app that merely uses the state.
 const TimerView = observer(({ timer }) => (
     <button onClick={() => timer.resetTimer()}>Seconds passed: {timer.secondsPassed}</button>
 ))
 
 ReactDOM.render(<TimerView timer={myTimer} />, document.body)
 
-// For demo's sake, let's force some updates...
+// Update the 'Seconds passed: X' text every second.
 setInterval(() => {
     myTimer.increaseTimer()
 }, 1000)
