@@ -10,14 +10,13 @@ hide_title: true
 ## Atoms
 
 At some point you might want to have more data structures or other things (like streams) that can be used in reactive computations.
-Achieving that is pretty simple by using the concept of atoms.
+Achieving this is pretty simple by using the concept of atoms.
 Atoms can be used to signal MobX that some observable data source has been observed or changed, and MobX will signal the atom whenever it is used or no longer in use.
 
-_**Tip**: in many cases you can avoid the need to create your own atoms, by just creating a normal observable, and use
+_**Tip**: in many cases you can avoid the need to create your own atoms just by creating a normal observable, and using
 the [`onBecomeObserved`](on-become-observed.md) utility to be notified when MobX starts tracking an observable._
 
-The following example demonstrates how you can create an observable `Clock`, which can be used in reactive functions,
-and returns the current date-time.
+The following example demonstrates how you can create an observable `Clock` that returns the current date-time, which can be used in reactive functions.
 This clock will only actually tick if it is observed by someone.
 
 The complete API of the `Atom` class is demonstrated by this example.
@@ -87,7 +86,7 @@ const clock = new Clock()
 
 const disposer = autorun(() => console.log(clock.getTime()))
 
-// ... prints the time each second.
+// ... prints the time every second.
 
 disposer()
 
