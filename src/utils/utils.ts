@@ -18,6 +18,7 @@ export interface Lambda {
 }
 
 const hasProxy = typeof Proxy !== "undefined"
+const plainObjectString = Object.toString()
 
 export function assertProxies() {
     if (!hasProxy) {
@@ -82,7 +83,8 @@ export function isObject(value: any): value is Object {
 export function isPlainObject(value) {
     if (!isObject(value)) return false
     const proto = Object.getPrototypeOf(value)
-    return proto === objectPrototype || proto === null
+    if (proto == null) return true
+    return proto.constructor?.toString() === plainObjectString
 }
 
 // https://stackoverflow.com/a/37865170
