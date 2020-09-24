@@ -90,7 +90,7 @@ Returns a tree structure with all reactions / computations that are observing th
 
 ### `getAtom`
 
-[🚀] Usage:
+Usage:
 
 -   `getAtom(thing, property?)`.
 
@@ -118,7 +118,7 @@ spy(event => {
 
 Spy listeners always receive one object, which usually has at least a `type` field. The following events are emitted by default by spy.
 
-| type                            | observableKind | other fields                                          | nested |
+| Type                            | observableKind | Other fields                                          | Nested |
 | ------------------------------- | -------------- | ----------------------------------------------------- | ------ |
 | action                          |                | name, object (scope), arguments[]                     | yes    |
 | scheduled-reaction              |                | name                                                  | no     |
