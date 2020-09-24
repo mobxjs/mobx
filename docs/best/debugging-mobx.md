@@ -39,7 +39,7 @@ import { observer } from "mobx-react"
 import { trace } from "mobx"
 
 const MyComponent = observer(() => {
-    trace(true) // enter the debugger whenever an observable value causes this component to re-run
+    trace(true) // Enter the debugger whenever an observable value causes this component to re-run.
     return <div>{this.props.user.name}</name>
 })
 ```
