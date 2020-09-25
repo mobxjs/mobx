@@ -1,6 +1,6 @@
 ---
-sidebar_label: Optimizing React
 title: Optimizing rendering of React components
+sidebar_label: Optimizing React
 hide_title: true
 ---
 
