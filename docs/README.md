@@ -8,7 +8,7 @@ hide_title: true
 
 # MobX
 
-_Simple, scalable state management_
+_Simple, scalable state management._
 
 [![Discuss on Github](https://img.shields.io/badge/discuss%20on-GitHub-orange)](https://github.com/mobxjs/mobx/discussions)
 [![npm version](https://badge.fury.io/js/mobx.svg)](https://badge.fury.io/js/mobx)
@@ -17,7 +17,7 @@ _Simple, scalable state management_
 
 ---
 
-MobX is made possible by the generosity of the sponsors below, and many [individual backers](http://mobxjs.github.io/mobx/backers-sponsors.html#backers). Sponsoring directly impacts the longevity of this project.
+MobX is made possible by the generosity of the sponsors below, and many other [individual backers](http://mobxjs.github.io/mobx/backers-sponsors.html#backers). Sponsoring directly impacts the longevity of this project.
 
 **🥇 Gold sponsors (\$3000+ total contribution):** <br/>
 <a href="https://mendix.com/"><img src="assets/mendix-logo.png" align="center" width="100" title="Mendix" alt="Mendix" /></a>
@@ -45,7 +45,7 @@ MobX is made possible by the generosity of the sponsors below, and many [individ
 
 ## Introduction
 
-_Anything that can be derived from the application state, should be derived. Automatically._
+_Anything that can be derived from the application state, should be. Automatically._
 
 MobX is a battle tested library that makes state management simple and scalable by transparently applying functional reactive programming (TFRP).
 The philosophy behind MobX is simple:
@@ -55,10 +55,9 @@ The philosophy behind MobX is simple:
         <div class="pic">😙</div>
         <div>
             <h5>Straightforward</h5>
-            <p>With MobX, you write minimalistic, boilerplate free code that captures your intent:
-            Trying to update a record field? Use good old JavaScript assignment.
-            Updating data in an asynchronous process? No special tools are required.
-            The reactivity system will detect all your changes and propagate them out to where they are being used.
+            <p>Write minimalistic, boilerplate free code that captures your intent.
+            Trying to update a record field? Use the good old JavaScript assignment.
+            Updating data in an asynchronous process? No special tools are required, the reactivity system will detect all your changes and propagate them out to where they are being used.
             </p>
         </div>
     </div>
@@ -67,9 +66,9 @@ The philosophy behind MobX is simple:
         <div>
             <h5>Effortless optimal rendering</h5>
             <p>
-                MobX tracks all updates and usages of your data at runtime, building a dependency tree that captures all relations between state and output.
+                All changes to and uses of your data are tracked at runtime, building a dependency tree that captures all relations between state and output.
                 This guarantees that computations depending on your state, like React components, run only when strictly needed.
-                With MobX, there is no need to manually optimize components using error-prone and sub-optimal techniques like memoization and selectors.
+                There is no need to manually optimize components with error-prone and sub-optimal techniques like memoization and selectors.
             </p>
         </div>
     </div>
@@ -103,42 +102,42 @@ class Timer {
         makeAutoObservable(this)
     }
 
-    increaseTimer() {
+    increase() {
         this.secondsPassed += 1
     }
 
-    resetTimer() {
+    reset() {
         this.secondsPassed = 0
     }
 }
 
 const myTimer = new Timer()
 
-// Build a user interface for this app that merely uses the state.
+// Build a "user interface" that uses the observable state.
 const TimerView = observer(({ timer }) => (
-    <button onClick={() => timer.resetTimer()}>Seconds passed: {timer.secondsPassed}</button>
+    <button onClick={() => timer.reset()}>Seconds passed: {timer.secondsPassed}</button>
 ))
 
 ReactDOM.render(<TimerView timer={myTimer} />, document.body)
 
 // Update the 'Seconds passed: X' text every second.
 setInterval(() => {
-    myTimer.increaseTimer()
+    myTimer.increase()
 }, 1000)
 ```
 
-The `observer` wrapper around the `TimerView` React component will automatically detect that rendering
-of the component depends on `timer.secondsPassed`, even though this relationship is not explicitly defined. MobX's reactivity system will make sure the component gets re-rendered when _precisely that_ field is updated in the future.
+The `observer` wrapper around the `TimerView` React component, will automatically detect that rendering
+depends on the `timer.secondsPassed` observable, even though this relationship is not explicitly defined. The reactivity system will take care of re-rendering the component when _precisely that_ field is updated in the future.
 
-Every event (`onClick` and `setInterval`) invokes an _action_ (`increaseTimer` and `resetTimer` functions) that updates _observable state_ (`secondsPassed` class property).
-Changes in the observable state are propagated precisely to all _computations_ and _side-effects_ (`TimerView` component) that depend on the changes being made.
+Every event (`onClick` / `setInterval`) invokes an _action_ (`myTimer.increase` / `myTimer.reset`) that updates _observable state_ (`myTimer.secondsPassed`).
+Changes in the observable state are propagated precisely to all _computations_ and _side-effects_ (`TimerView`) that depend on the changes being made.
 
 <img alt="MobX unidirectional flow" src="assets/flow2.png" align="center" />
 
-You can apply this diagram as a conceptual picture to this simple example or any other application using MobX.
+This conceptual picture can be applied to the above example, or any other application using MobX.
 
-To learn about the core concepts of MobX with a larger example, please read [Concepts & Principles](http://mobxjs.github.io/mobx/intro/concepts.html) or take the [10 minute interactive introduction to MobX and React](https://mobx.js.org/getting-started).
-The philosophy and benefits of the mental model provided by MobX are described in detail in the blogs [UI as an afterthought](https://michel.codes/blogs/ui-as-an-afterthought) and [How to decouple state and UI (a.k.a. you don’t need componentWillMount)](https://hackernoon.com/how-to-decouple-state-and-ui-a-k-a-you-dont-need-componentwillmount-cc90b787aa37).
+To learn about the core concepts of MobX using a larger example, check out [The gist of MobX](../intro/concepts) section, or take the [10 minute interactive introduction to MobX and React](https://mobx.js.org/getting-started).
+The philosophy and benefits of the mental model provided by MobX are also described in great detail in the blog posts [UI as an afterthought](https://michel.codes/blogs/ui-as-an-afterthought) and [How to decouple state and UI (a.k.a. you don’t need componentWillMount)](https://hackernoon.com/how-to-decouple-state-and-ui-a-k-a-you-dont-need-componentwillmount-cc90b787aa37).
 
 ## What others are saying...
 
@@ -154,7 +153,7 @@ The philosophy and benefits of the mental model provided by MobX are described i
 
 ## Further resources and documentation
 
--   [Ten minute, interactive MobX + React tutorial](https://mobx.js.org/getting-started)
+-   [10 minute interactive introduction to MobX and React](https://mobx.js.org/getting-started)
 -   <i><a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/courses/manage-complex-state-in-react-apps-with-mobx">egghead.io course</a></i> (Based on MobX 3)
 -   <img src="assets/book.jpg" height="80px"/> [The MobX book](https://books.google.nl/books?id=ALFmDwAAQBAJ&pg=PP1&lpg=PP1&dq=michel+weststrate+mobx+quick+start+guide:+supercharge+the+client+state+in+your+react+apps+with+mobx&source=bl&ots=D460fxti0F&sig=ivDGTxsPNwlOjLHrpKF1nweZFl8&hl=nl&sa=X&ved=2ahUKEwiwl8XO--ncAhWPmbQKHWOYBqIQ6AEwAnoECAkQAQ#v=onepage&q=michel%20weststrate%20mobx%20quick%20start%20guide%3A%20supercharge%20the%20client%20state%20in%20your%20react%20apps%20with%20mobx&f=false) by Pavan Podila and Michel Weststrate.
 -   Videos:
