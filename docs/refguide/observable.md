@@ -18,7 +18,7 @@ The most important annotations are:
 
 Collections such as arrays, Maps and Sets are made observable automatically.
 
-## makeObservable
+## `makeObservable`
 
 Usage:
 
@@ -260,5 +260,6 @@ For classes, it is recommend to implement a `toJSON()` method, as it will be pic
 So far most examples above have been leaning towards the class syntax.
 MobX is in principle unopinionated about this, and there are probably just as many MobX users that use plain objects.
 However, a slight benefit of classes is that they have more easily discoverable APIs, e.g. TypeScript.
+
 Also, `instanceof` checks are really powerful for type inference, and class instances aren't wrapped in `Proxy` objects, giving them a better experience in debuggers.
 But heavy inheritance patterns can easily become foot-guns, so if you use classes, keep them simple.
