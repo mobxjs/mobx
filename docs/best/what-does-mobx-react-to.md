@@ -1,4 +1,5 @@
 ---
+title: Understanding reactivity
 sidebar_label: Understanding reactivity
 hide_title: true
 ---
