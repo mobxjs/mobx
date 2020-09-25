@@ -1,4 +1,5 @@
 ---
+title: Enabling decorators
 sidebar_label: Enabling decorators 🚀
 hide_title: true
 ---
