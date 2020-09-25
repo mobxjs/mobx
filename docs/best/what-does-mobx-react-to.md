@@ -6,7 +6,7 @@ hide_title: true
 
 <script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
-# What does MobX react to?
+# Understanding reactivity
 
 MobX usually reacts to exactly the things you expect it to, which means that in 90% of your use cases MobX should "just work".
 However, at some point you will encounter a case where it does not do what you expected.
