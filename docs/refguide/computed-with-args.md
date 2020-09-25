@@ -28,7 +28,7 @@ const Item = observer(({ item, store }) => (
 
 There are four ways in which we can approach this. You can try the solutions below in [this sandbox](https://codesandbox.io/s/multi-selection-odup1?file=/src/index.tsx).
 
-### 1. Derivations don't _need_ to be `computed`
+## 1. Derivations don't _need_ to be `computed`
 
 A function doesn't need to be marked as `computed` in order for MobX to track it.
 The above example would already work completely fine out of the box.
@@ -41,7 +41,7 @@ It is good to realize that all `Item` components in this case will respond to fu
 as they all subscribe directly to the observables that capture the selection.
 This is a worst case example. In general it is completely fine to have unmarked functions that derive information, and this is a good default strategy, until numbers prove anything else should be done.
 
-### 2. Close over the arguments
+## 2. Close over the arguments
 
 This is a more efficient implementation compared to the original.
 
@@ -67,11 +67,11 @@ The fact that we create a new `computed` in a next render is fine, this one will
 point and the previous one will be cleaned up nicely.
 This is a great and advanced optimization technique.
 
-### 3. Move the state
+## 3. Move the state
 
 In this specific case the selection could also be stored as an `isSelected` observable on the `Item`. The selection in the store could then be expressed as a `computed` rather than an observable: `get selection() { return this.items.filter(item => item.isSelected) }`, and we don't need `isSelected` anymore.
 
-### 4. Use computedFn [🚀]
+## 4. Use computedFn [🚀]
 
 Finally,
 [`computedFn`](https://github.com/mobxjs/mobx-utils#computedfn) from `mobx-utils` can be used in the definition of `todoStore.selected` to automatically memoize `isSelected`.
