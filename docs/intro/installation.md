@@ -18,7 +18,7 @@ There are two types of React bindings. `mobx-react-lite` supports only functiona
 
 **CDN:** https://cdnjs.com/libraries/mobx / https://unpkg.com/mobx/lib/mobx.umd.js
 
-⚠️ **Warning:** When using a CDN, it is best to check the url in your browser and see what version it resolves to, so that your users aren't accidentally served a newer version in the future when updates are released. Use an url like: https://unpkg.com/mobx@5.15.4/lib/mobx.umd.production.min.js instead. For a development build, substitute `production.min` with `development` in the URL. ⚠️
+_⚠️ **Warning:** When using a CDN, it is best to check the url in your browser and see what version it resolves to, so that your users aren't accidentally served a newer version in the future when updates are released. Use an url like: https://unpkg.com/mobx@5.15.4/lib/mobx.umd.production.min.js instead. For a development build, substitute `production.min` with `development` in the URL. ⚠️_
 
 ## MobX on older JavaScript environments
 
