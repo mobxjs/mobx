@@ -1,4 +1,5 @@
 ---
+title: Creating custom observables
 sidebar_label: Custom observables 🚀
 hide_title: true
 ---
