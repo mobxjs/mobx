@@ -10,13 +10,13 @@ hide_title: true
 
 ## Concepts
 
-MobX distinguishes the following three concepts in your application:
+MobX distinguishes between the following three concepts in your application:
 
 1. State
 2. Actions
 3. Derivations
 
-Let's take a closer look at these concepts below, or alternatively, in the [10 minute introduction to MobX and React](https://mobx.js.org/getting-started) where you can interactively dive deeper into these concepts step by step and build a simple Todo list app using [React](https://facebook.github.io/react/) around it.
+Let's take a closer look at these concepts below, or alternatively, in the [10 minute introduction to MobX and React](https://mobx.js.org/getting-started), where you can interactively dive deeper into these concepts step by step and build a simple Todo list app.
 
 ### 1. Define state and make it observable
 
@@ -66,7 +66,7 @@ An action is like a user that enters a new value into a spreadsheet cell.
 
 In the `Todo` model above you can see that we have a `toggle` method that changes the value of `finished`. `finished` is marked as `observable`. It is recommended that you mark any piece of code that changes `observable`'s as an [`action`](../refguide/action.md). That way MobX can automatically apply transactions for effortless optimal performance.
 
-Using actions helps you structure your code and prevents you from inadvertently changing state when you don't want to.
+Using actions helps you structure your code and prevents you from inadvertently changing state when you don't intend to.
 Methods that modify state are called _actions_ in MobX terminology. In contrast to _views_, which compute new information based on the current state.
 Every method should serve at most one of those two goals.
 
@@ -89,7 +89,7 @@ The golden rule is, always use `computed` if you want to create a value based on
 
 #### 3.1. Model derived values using computed
 
-To create a *computed* value define a property using a JS getter function `get` and then mark it as `computed` with `makeObservable`.
+To create a *computed* value, define a property using a JS getter function `get` and mark it as `computed` with `makeObservable`.
 
 ```javascript
 import { makeObservable, observable, computed } from "mobx"
@@ -114,9 +114,9 @@ These computations resemble formulas in spreadsheet programs like MS Excel. They
 
 #### 3.2. Model side effects using reactions
 
-For you as a user to be able to see a change in state or computed values on the screen a _reaction_ is needed that repaints a part of the GUI.
+For you as a user to be able to see a change in state or computed values on the screen, a _reaction_ that repaints a part of the GUI is needed.
 
-Reactions are similar to computed values, but instead of producing information, reactions produce side effects like printing to the console, making network requests, incrementally updating React component tree to patch the DOM, etc.
+Reactions are similar to computed values, but instead of producing information, they produce side effects like printing to the console, making network requests, incrementally updating React component tree to patch the DOM, etc.
 
 In short, reactions bridge the worlds of [reactive](https://en.wikipedia.org/wiki/Reactive_programming) and [imperative](https://en.wikipedia.org/wiki/Imperative_programming) programming.
 
@@ -160,10 +160,10 @@ render(<TodoListView todoList={store} />, document.getElementById("root"))
 When using MobX there are no smart or dumb components.
 All components render smartly, but are defined in a dumb manner. MobX will simply make sure the components are always re-rendered whenever needed, and never more than that.
 
-So the `onClick` handler in the above example will force the proper `TodoView` component to render as it uses the `toggle` action, but will only cause the `TodoListView` component to render if the number of unfinished tasks has changed.
-And if you would remove the `Tasks left` line (or put that into a separate component), the `TodoListView` component will no longer re-render when ticking a task.
+So the `onClick` handler in the above example will force the proper `TodoView` component to re-render as it uses the `toggle` action, but will only cause the `TodoListView` component to re-render if the number of unfinished tasks has changed.
+And if you would remove the `Tasks left` line (or put it into a separate component), the `TodoListView` component would no longer re-render when ticking a task.
 
-To learn more about how React works with MobX, check out [React integration](../react/react-integration.md).
+To learn more about how React works with MobX, check out the [React integration](../react/react-integration.md) section.
 
 #### 3.4. Custom reactions
 
@@ -182,7 +182,7 @@ Why does a new message get printed every time the `unfinishedTodoCount` is chang
 
 _MobX reacts to any existing observable property that is read during the execution of a tracked function._
 
-To learn more about how MobX determines which observables need to be reacted to, check out [understanding what MobX reacts to](../best/what-does-mobx-react-to.md).
+To learn more about how MobX determines which observables need to be reacted to, check out the [understanding what MobX reacts to](../best/what-does-mobx-react-to.md) section.
 
 ## Principles
 
@@ -190,14 +190,14 @@ MobX supports a uni-directional data flow where _actions_ change the _state_, wh
 
 ![Action, State, View](../assets/action-state-view.png)
 
-All _derivations_ are updated **automatically** and **atomically** when the _state_ changes. As a result, it is never possible to observe intermediate values.
+1. All _derivations_ are updated **automatically** and **atomically** when the _state_ changes. As a result, it is never possible to observe intermediate values.
 
-All _derivations_ are updated **synchronously** by default. This means that, for example, _actions_ can safely inspect a computed value directly after altering the _state_.
+2. All _derivations_ are updated **synchronously** by default. This means that, for example, _actions_ can safely inspect a computed value directly after altering the _state_.
 
-_Computed values_ are updated **lazily**. Any computed value that is not actively in use will not be updated until it is needed for a side effect (I/O).
+3. _Computed values_ are updated **lazily**. Any computed value that is not actively in use will not be updated until it is needed for a side effect (I/O).
 If a view is no longer in use it will be garbage collected automatically.
 
-All _computed values_ should be **pure**. They are not supposed to change _state_.
+4. All _computed values_ should be **pure**. They are not supposed to change _state_.
 
 To learn more about the background context, check out [the fundamental principles behind MobX](https://hackernoon.com/the-fundamental-principles-behind-mobx-7a725f71f3e8).
 
@@ -207,4 +207,4 @@ You can play with the above examples yourself on [CodeSandbox](https://codesandb
 
 ## Linting
 
-If you find it hard to adopt the mental model of MobX, configure it to be very strict and warn at runtime whenever you deviate from these patterns. Check out [linting MobX](../refguide/configure.md#linting-options).
+If you find it hard to adopt the mental model of MobX, configure it to be very strict and warn you at runtime whenever you deviate from these patterns. Check out the [linting MobX](../refguide/configure.md#linting-options) section.
