@@ -186,7 +186,7 @@ To learn more about how MobX determines which observables need to be reacted to,
 
 ## Principles
 
-MobX supports a uni-directional data flow where _actions_ change the _state_, which in turn updates all affected _views_.
+MobX uses a uni-directional data flow where _actions_ change the _state_, which in turn updates all affected _views_.
 
 ![Action, State, View](../assets/action-state-view.png)
 
