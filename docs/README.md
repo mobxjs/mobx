@@ -1,6 +1,6 @@
 ---
-title: Introduction
-sidebar_label: Introduction
+title: About MobX
+sidebar_label: About MobX
 hide_title: true
 ---
 
