@@ -1,12 +1,12 @@
 ---
-title: Optimizing rendering of React components
+title: Optimizing React component rendering
 sidebar_label: Optimizing React
 hide_title: true
 ---
 
 <script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
-# Optimizing rendering of React components
+# Optimizing React component rendering
 
 MobX is very fast, [often even faster than Redux](https://twitter.com/mweststrate/status/718444275239882753), but here are some tips to get most out of React and MobX. Most apply to React in general and are not specific to MobX.
 Note that while it's good to be aware of these patterns, usually your application
