@@ -1,14 +1,14 @@
 ---
-title: Best Practices for building large scale maintainable projects
+title: Defining data stores
 sidebar_label: Defining data stores
 hide_title: true
 ---
 
 <script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
-# Best Practices for building large scale maintainable projects
+# Defining data stores
 
-This section contains some best practices we discovered at Mendix while working with MobX.
+This section contains some of the best practices for building large scale maintainable projects we discovered at Mendix while working with MobX.
 This section is opinionated and you are in no way forced to apply these practices.
 There are many ways of working with MobX and React, and this is just one of them.
 
