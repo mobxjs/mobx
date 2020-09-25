@@ -11,7 +11,7 @@ hide_title: true
 Usage:
 
 ```javascript
-import {observer} from "mobx-react-lite"
+import {observer} from "mobx-react-lite" // Or "mobx-react".
 
 const MyComponent = observer(props => ReactElement)
 ```
