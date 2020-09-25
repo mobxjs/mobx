@@ -172,6 +172,6 @@ And an all around [MobX awesome list](https://github.com/mobxjs/awesome-mobx#awe
 
 ## Credits
 
-MobX is inspired by reactive programming principles as found in spreadsheets. It is inspired by MVVM frameworks like in MeteorJS tracker, knockout and Vue.js. But MobX brings Transparent Functional Reactive Programming to the next level and provides a stand alone implementation. It implements TFRP in a glitch-free, synchronous, predictable and efficient manner.
+MobX is inspired by reactive programming principles as found in the spreadsheets. It is inspired by MVVM frameworks like MeteorJS tracker, knockout and Vue.js, but MobX brings _Transparent Functional Reactive Programming_ to the next level and provides a standalone implementation. It implements TFRP in a glitch-free, synchronous, predictable and efficient manner.
 
-A ton of credits for [Mendix](https://github.com/mendix), for providing the flexibility and support to maintain MobX and the chance to proof the philosophy of MobX in a real, complex, performance critical applications.
+A ton of credits goes to [Mendix](https://github.com/mendix), for providing the flexibility and support to maintain MobX and the chance to proof the philosophy of MobX in a real, complex, performance critical applications.
