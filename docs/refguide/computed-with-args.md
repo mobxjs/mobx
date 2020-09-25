@@ -10,7 +10,7 @@ hide_title: true
 
 The `computed` annotation can only be used on getters, which don't take arguments.
 What about computations that do take arguments?
-Take the below example of a React component that renders a specific Item,
+Take the below example of a React component that renders a specific `Item`,
 and the application supports multi-selection.
 
 How can we implement a derivation like `store.isSelected(item.id)`?
@@ -59,12 +59,11 @@ const Item = observer(({ item, store }) => {
 }
 ```
 
-We create a fresh computed value in the middle of a reaction. This works fine and does introduce that additional caching point, avoiding all components to directly respond
-to all selection changes.
+We create a fresh computed value in the middle of a reaction. This works fine and does introduce that additional caching point, avoiding all components having to directly respond to every selection change.
 The advantage of this approach is that the component itself will only re-render if the
 `isSelected` state toggles, in which case we indeed have to re-render to swap the `className`.
 
-The fact that we create a new `computed` in a next render is fine, that one will now become the caching
+The fact that we create a new `computed` in a next render is fine, this one will now become the caching
 point and the previous one will be cleaned up nicely.
 This is a great and advanced optimization technique.
 
