@@ -27,7 +27,7 @@
       "refguide/object-api",
       "refguide/observe"
     ],
-    "Configuring MobX": [
+    "Configuration": [
       "refguide/configure",
       "best/decorators",
       "faq/migrate-to-6"
