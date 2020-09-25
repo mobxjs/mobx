@@ -1,4 +1,5 @@
 ---
+title: Intercept & Observe
 sidebar_label: Intercept & Observe 🚀
 hide_title: true
 ---
