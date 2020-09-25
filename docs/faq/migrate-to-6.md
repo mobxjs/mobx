@@ -1,4 +1,5 @@
 ---
+title: Migrating from MobX 4/5
 sidebar_label: Migrating from MobX 4/5 🚀
 hide_title: true
 ---
