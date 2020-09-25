@@ -1,5 +1,5 @@
 ---
-title: onBecomeObserved
+title: Creating lazy observables
 sidebar_label: Lazy observables 🚀
 hide_title: true
 ---
