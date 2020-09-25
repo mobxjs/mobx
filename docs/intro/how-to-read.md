@@ -1,12 +1,12 @@
 ---
-title: How to read this documentation
-sidebar_label: How to read this documentation
+title: About this documentation
+sidebar_label: About this documentation
 hide_title: true
 ---
 
 <script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
-# How to read this documentation
+# About this documentation
 
 The documentation follows the principle that the most commonly used concepts are
 introduced before specialized information. This applies to the headings in the table
