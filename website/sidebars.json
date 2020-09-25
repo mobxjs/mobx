@@ -9,8 +9,8 @@
     "MobX core": [
       "refguide/observable",
       "refguide/action",
-      "refguide/autorun",
-      "refguide/computed"
+      "refguide/computed",
+      "refguide/autorun"
     ],
     "MobX and React": [
       "react/react-integration"
