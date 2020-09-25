@@ -1,4 +1,5 @@
 ---
+title: Collection utilities
 sidebar_label: Collection utilities 🚀
 hide_title: true
 ---
