@@ -1,4 +1,5 @@
 ---
+title: Analyzing reactivity
 sidebar_label: Analyzing reactivity 🚀
 hide_title: true
 ---
