@@ -1,6 +1,6 @@
 ---
 title: Optimizing React component rendering
-sidebar_label: Optimizing React
+sidebar_label: React optimizations
 hide_title: true
 ---
 

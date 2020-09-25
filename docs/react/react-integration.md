@@ -11,7 +11,7 @@ hide_title: true
 Usage:
 
 ```javascript
-import {observer} from "mobx-react-lite" // Or "mobx-react".
+import { observer } from "mobx-react-lite" // Or "mobx-react".
 
 const MyComponent = observer(props => ReactElement)
 ```
@@ -500,7 +500,7 @@ If you'd rather explicitly define which observables should trigger the effect, u
 
 ### How can I further optimize my React components?
 
-Check out the relevant [React performance section](react-performance.md).
+Check out the [React optimizations](react-performance.md) section.
 
 ## Troubleshooting
 

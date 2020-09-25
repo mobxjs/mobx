@@ -13,13 +13,13 @@
       "refguide/autorun"
     ],
     "MobX and React": [
-      "react/react-integration"
+      "react/react-integration",
+      "react/react-performance"
     ],
     "Tips & Tricks": [
+      "best/store",
       "best/what-does-mobx-react-to",
       "best/debugging-mobx",
-      "best/store",
-      "react/react-performance",
       "refguide/mobx-utils",
       "refguide/computed-with-args",
       "refguide/extending",
