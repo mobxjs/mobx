@@ -1,6 +1,6 @@
 ---
 title: Observable modifiers
-sidebar_label: Observable modifiers [🚀]
+sidebar_label: Observable modifiers 🚀
 hide_title: true
 ---
 
