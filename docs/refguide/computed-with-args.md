@@ -33,7 +33,7 @@ There are four ways in which we can approach this. You can try the solutions bel
 A function doesn't need to be marked as `computed` in order for MobX to track it.
 The above example would already work completely fine out of the box.
 It is important to realize that computed values are only _caching points_.
-If they are pure (and they shouldn't), having a getter or function without `computed` doesn't change behavior, it is just slightly less efficient.
+If the derivations are pure (and they shouldn't be), having a getter or function without `computed` doesn't change the behavior, it is just slightly less efficient.
 
 The above example works fine despite `isSelected` not being a `computed`. The `observer` component will detect and subscribe to any observables that were read by `isSelected` because the function executes as part of rendering that is tracked.
 
