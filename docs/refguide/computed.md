@@ -88,7 +88,7 @@ This is the dependency graph that would be created for the above example.
 
 When using computed values there are a couple of best practices to follow:
 
-1. They should not have side-effects or update other observables.
+1. They should not have side effects or update other observables.
 2. Avoid creating and returning new observables.
 
 ## Tips

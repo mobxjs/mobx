@@ -125,7 +125,7 @@ The `observer` wrapper around the `TimerView` React component will automatically
 of the component depends on `timer.secondsPassed`, even though this relationship is not explicitly defined. MobX's reactivity system will make sure the component gets re-rendered when _precisely that_ field is updated in the future.
 
 Every event (`onClick` and `setInterval`) invokes an _action_ (`increaseTimer` and `resetTimer` functions) that updates _observable state_ (`secondsPassed` class property).
-Changes in the observable state are propagated precisely to all _computations_ and _side-effects_ (`TimerView` component) that depend on the changes being made.
+Changes in the observable state are propagated precisely to all _computations_ and _side effects_ (`TimerView` component) that depend on the changes being made.
 
 <img alt="MobX unidirectional flow" src="docs/assets/flow2.png" align="center" />
 
