@@ -456,8 +456,6 @@ declare export function isObservableArray(thing: any): boolean
 
 declare export function isObservableObject<T>(thing: T): boolean
 
-declare export function isArrayLike(x: any): boolean
-
 declare export class Reaction {
     name: string;
     isDisposed: boolean;

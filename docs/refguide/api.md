@@ -43,7 +43,7 @@ Automatically convert object members into observables, computeds and actions.
 
 ### `extendObservable`
 
-Usage:
+Usage 🚀:
 
 -   `extendObservable(target, properties, overrides?, options?)
 
@@ -72,7 +72,7 @@ Usage:
 
 ### `observable.object`
 
-Usage:
+Usage 🚀:
 
 -   `observable.object(source, overrides?, options?)`
 
@@ -82,7 +82,7 @@ Alias for `observable(source, overrides?, options?)`. Creates a clone of the pro
 
 ### `observable.array`
 
-Usage
+Usage 🚀:
 
 -   `observable.array(initialValues?, options?)`
 
@@ -100,7 +100,7 @@ The `{ deep: false }` option can be used to make this array shallowly observable
 
 ### `observable.map`
 
-Usage:
+Usage 🚀:
 
 -   `observable.map(initialMap?, options?)`
 
@@ -118,7 +118,7 @@ The `{ deep: false }` option can be used to make this map shallowly observable, 
 
 ### `observable.set`
 
-Usage:
+Usage 🚀:
 
 -   `observable.set(initialSet?, options?)`
 
@@ -149,7 +149,7 @@ Like the `observable` annotation, except that any assigned value that is structu
 
 ### `observable.struct`
 
-Usage:
+Usage 🚀:
 
 -   `observable.struct` (annotation)
 
@@ -159,7 +159,7 @@ Like `observable.ref` but for collections; any collection assigned will be made 
 
 ### `observable.deep`
 
-Usage:
+Usage 🚀:
 
 -   `observable.deep` (annotation)
 
@@ -168,6 +168,8 @@ Alias for the [`observable`](#observable) annotation.
 [&laquo;`details`&raquo;](observable.md#available-annotations)
 
 ### `observable.box`
+
+Usage 🚀:
 
 -   `observable.box(value, options?)`
 
@@ -215,7 +217,7 @@ Marking things as action.
 
 ### `runInAction`
 
-Usage:
+Usage 🚀:
 
 -   `runInAction(fn)`
 
@@ -234,7 +236,7 @@ MobX friendly replacement for `async` / `await` that supports cancellation.
 
 [&laquo;details&raquo;](action.md#using-flow-instead-of-asyncawait)
 
-### `flow`
+### `flowResult`
 
 Usage:
 
@@ -251,21 +253,53 @@ _Computed values derived from observables and other computeds._
 
 ### `computed`
 
-Marking things as computed.
+Usage:
+
+-   `computed` (annotation)
+-   `computed(options)` (annotation)
+-   `computed(fn, options?)`
+
+Create an observable value that is derived from other observables, but won't re-computed unless one of the underlying observables changes.
 
 [&laquo;details&raquo;](computed.md)
 
 ## React integration
 
-From the `mobx-react` package.
+From the `mobx-react` / `mobx-react-lite` package.
 
 ### `observer`
 
-A higher order component you can use to make a React component re-render when observables change.
+Usage:
 
-Is part of the `mobx-react` package.
+-   `observer(functionComponent)`
+-   `observer(classComponent)`
+
+A higher order component you can use to make a React component re-render when observables change.
+Is part of the `mobx-react` / `mobx-react-lite` package.
 
 [&laquo;details&raquo;](../react/react-integration.md)
+
+### `Observer`
+
+Usage:
+
+-   `<Observer>{() => rendering}</Observer>`
+
+Renders the given render function, and automatically re-renders it once one of the observables used in the render function changes.
+Is part of the `mobx-react` / `mobx-react-lite` package.
+
+[&laquo;details&raquo;](../react/react-integration.md#callback-components-might-require-observer)
+
+### `useLocalObservable`
+
+Usage:
+
+-   `useLocalObservable(() => source, annotations?)`
+
+`useLocalObservable` creates a new observable object using `makeObservable`, and keeps it around in the in the component for the entire life-cycle of the component.
+Is part of the `mobx-react` / `mobx-react-lite` package.
+
+[&laquo;details&raquo;](../react/react-integration.md#using-local-observable-state-in-observer-components)
 
 ## Reactions
 
@@ -273,42 +307,78 @@ Side-effects for observables.
 
 ### `autorun`
 
+Usage:
+
+-   `autorun(() => effect, options?)`
+
 Rerun a function each time anything it observes changes.
 
-[&laquo;details&raquo;](autorun.md)
+[&laquo;details&raquo;](autorun.md#autorun)
 
 ### `reaction`
 
-Rerun a side-effect when data it observes changes.
+Usage:
 
-[&laquo;details&raquo;](reaction.md)
+-   `reaction(() => data, data => effect, options?)`
+
+Rerun a side-effect when any data selected before changes.
+
+[&laquo;details&raquo;](autorun.md#reaction)
 
 ### `when`
 
+Usage:
+
+-   `when(() => condition, () => effect, options?)`
+-   `await when(() => condition, options?)`
+
 Execute a side-effect once when a observable condition becomes true.
 
-[&laquo;details&raquo;](when.md)
+[&laquo;details&raquo;](autorun.md#when)
+
+## Utilities
+
+Here are some utilities that might make working with observable objects or computed values more convenient.
+More, less trivial utilities can be found in the [mobx-utils](https://github.com/mobxjs/mobx-utils) package.
 
 ### `onReactionError`
 
-Usage: `onReactionError(handler: (error: any, derivation) => void)`
+Usage 🚀:
+
+-   `onReactionError(handler: (error: any, derivation) => void)`
 
 This function attaches a global error listener, which is invoked for every error that is thrown from a _reaction_.
 This can be used for monitoring or test purposes.
 
 ### `intercept`
 
+Usage 🚀:
+
+-   `intercept(array | set | map, listener)`
+-   `intercept(object, propertyName, listener)`
+
 Intercept changes before they are applied to an observable api.
+Returns a disposer that stops the interception.
 
 [&laquo;details&raquo;](observe.md)
 
 ### `observe`
 
+Usage 🚀:
+
+-   `observe(array | set | map, listener)`
+-   `observe(object, propertyName, listener)`
+
 Low-level api that can be used to observe a single observable value.
+Returns a disposer that stops the interception.
 
 [&laquo;details&raquo;](observe.md)
 
 ### `onBecomeObserved`
+
+Usage 🚀:
+
+-   `onBecomeObserved(observable, property?, listener: () => void)`
 
 Hook for when something becomes observed.
 
@@ -316,27 +386,23 @@ Hook for when something becomes observed.
 
 ### `onBecomeUnobserved`
 
+Usage 🚀:
+
+-   `onBecomeUnobserved(observable, property?, listener: () => void)`
+
 Hook for when something stops being observed.
 
 [&laquo;details&raquo;](on-become-observed.md)
-
-## Utilities
-
-Here are some utilities that might make working with observable objects or computed values more convenient.
-More, less trivial utilities can be found in the [mobx-utils](https://github.com/mobxjs/mobx-utils) package.
 
 ### `toJS`
 
 Usage:
 
-`toJS(value)`
+-   `toJS(value)`
 
 Recursively converts an (observable) object to a javascript _structure_.
 Supports observable arrays, objects, maps and primitives.
 Computed values and other non-enumerable properties won't be part of the result.
-Cycles are detected and properly supported by default, but this can be disabled to improve performance.
-
-`toJS` accepts three options
 
 For more complex (de)serialization scenario's it is recommended to give classes a (computed) `toJSON` method, or use a serialization library like [serializr](https://github.com/mobxjs/serializr)
 
@@ -351,13 +417,7 @@ console.log(mobx.isObservableObject(obj)) // true
 console.log(mobx.isObservableObject(clone)) // false
 ```
 
-### `isArrayLike`
-
-[Without Proxy support]
-
-Is this an array of some type, observable or not?
-
-[&laquo;details&raquo;](array.md#isarraylike)
+[&laquo;details&raquo;](observable.md#converting-observables-back-to-vanilla-javascript-collections)
 
 ## Configuration
 
@@ -368,91 +428,145 @@ Use this to change how MobX behaves as a whole.
 
 [&laquo;details&raquo;](configure.md)
 
-## Object API
+## Object API 🚀
 
-The Object API is an optional, generic API that enables manipulating observable maps, objects and arrays with the same API. This is specially useful
-in [environments without `Proxy` support](../best/limitations-without-proxies.md).
+The Object API is an optional, generic API that enables manipulating observable maps, objects and arrays with the same API. This can be useful
+in [environments without `Proxy` support](configure.md#limitations-without-proxy-support), but are otherwise typically not needed.
 
 ### `values`
 
+Usage 🚀:
+
+-   `values(map|set|array|object)`
+
 Return all values in collection as array.
+
+[&laquo;details&raquo;](object-api.md)
 
 ### `keys`
 
+Usage 🚀:
+
+-   `keys(map|set|array|object)`
+
 Return all keys/indices in collection as array.
 
+[&laquo;details&raquo;](object-api.md)
+
 ### `entries`
+
+Usage 🚀:
+
+-   `entries(map|set|array|object)`
 
 Return a `[key, value]` pair for all entries in the collection
 as an array.
 
+[&laquo;details&raquo;](object-api.md)
+
 ### `set`
+
+Usage 🚀:
+
+-   `set(map|array|object, index, value)`
 
 Update collection.
 
+[&laquo;details&raquo;](object-api.md)
+
 ### `remove`
+
+Usage 🚀:
+
+-   `remove(map|array|object, index)`
 
 Remove item from collection.
 
+[&laquo;details&raquo;](object-api.md)
+
 ### `has`
+
+Usage 🚀:
+
+-   `has(map|array|object, index)`
 
 Check for membership in collection.
 
+[&laquo;details&raquo;](object-api.md)
+
 ### `get`
+
+Usage 🚀:
+
+-   `get(map|array|object, index)`
 
 Get value from collection with key.
 
 [&laquo;details&raquo;](object-api.md)
 
-## Introspection utilities
+## Introspection utilities 🚀
 
 The following APIs might come in handy if you want to inspect the internal state of MobX or want to build cool tools on top of MobX.
 
 ### `isObservable`
 
-Is a value observable?
+Usage 🚀:
 
-[&laquo;details&raquo;](observable.md#isobservable)
+-   `isObservable(map | array | set | object)`
+
+Is an object / collection made observable by MobX?
 
 ### `isObservableProp`
 
-Is a property observable?
+Usage 🚀:
 
-[&laquo;details&raquo;](observable.md#isobservableprop)
+-   `isObservableProp(object, propertyName)`
+
+Is a property observable?
 
 ### `isObservableArray`
 
-Is value an observable array?
+Usage 🚀:
 
-[&laquo;details&raquo;](array.md#isobservablearray)
+-   `isObservableArray(array)`
+
+Is value an observable array?
 
 ### `isObservableMap`
 
-Is value an observable map?
+Usage 🚀:
 
-[&laquo;details&raquo;](map.md#isobservablemap)
+-   `isObservableMap(map)`
+
+Is value an observable map?
 
 ### `isObservableSet`
 
-Is value an observable set?
+Usage 🚀:
 
-[&laquo;details&raquo;](set.md#isobservableset)
+-   `isObservableSet(set)`
+
+Is value an observable set?
 
 ### `isObservableObject`
 
-Is value an observable object?
+Usage 🚀:
 
-[&laquo;details&raquo;](object.md#isobservableobject)
+-   `isObservableObject(object)`
+
+Is value an observable object?
 
 ### `isBoxedObservable`
 
-Is value an observable box?
+Usage 🚀:
 
-[&laquo;details&raquo;](boxed.md#isboxedobservable)
+-   `isBoxedObservable(value)`
+
+Is value an observable box? That is, created using `observable.box`.
 
 ### `isAction`
 
-Usage:
+Usage 🚀:
 
 -   `isAction(func)`
 
@@ -460,45 +574,74 @@ Returns `true` if the given function is marked as an `action`.
 
 ### `isComputed`
 
-Is this a boxed computed value?
+Usage 🚀:
 
-[&laquo;details&raquo;](computed.md#iscomputed)
+-   `isComputed(boxedComputed)`
+
+Is this a boxed computed value? That is, created using `computed(() => expr)`?
 
 ### `isComputedProp`
 
-Is this a computed property?
+Usage 🚀:
 
-[&laquo;details&raquo;](computed.md#iscomputedprop)
+-   `isComputedProp(object, propertyName)`
+
+Is this a computed property?
 
 ### `trace`
 
-Log when value is invalidated, or set debugger breakpoint.
+Usage:
 
-[&laquo;trace&raquo;](../best/trace.md)
+-   `trace()` (inside a reaction / observer / computed value)
+-   `trace(true)` (enter the `debugger;` if this reaction is updated)
+-   `trace(object, propertyName, enterDebugger?)` (trace the specified computed property)
+
+Should be used inside a reaction / computed value. Log when value is invalidated, or set debugger breakpoint.
+
+[&laquo;trace&raquo;](../best/debugging-mobx.md)
 
 ### `spy`
 
+Usage 🚀:
+
+-   `spy(eventListener)`
+
 Registers a global spy listener that listens to all events that happen in MobX.
 
-[&laquo;trace&raquo;](spy.md)
+[&laquo;trace&raquo;](../best/debugging-mobx.md#spy)
 
 ### `getDebugName`
 
-Returns a (generated) friendly debug name
+Usage 🚀:
 
-[&laquo;trace&raquo;](introspection-utils.md#getdebugname)
+-   `getDebugName(reaction)`
+-   `getDebugName(array | set | map)`
+-   `getDebugName(object | map, propertyName)`
+
+Returns the (generated) friendly debug name for an observable or reaction.
+
+[&laquo;trace&raquo;](../best/debugging-mobx.md#getdebugname)
 
 ### `getDependencyTree`
 
+Usage 🚀:
+
+-   `getDependencyTree(object, computedPropertyName)`
+
 Returns a tree structure with all observables the given reaction / computation currently depends upon.
 
-[&laquo;trace&raquo;](introspection-utils.md#getdependencytree)
+[&laquo;trace&raquo;](../best/debugging-mobx.md#getdependencytree)
 
 ### `getObserverTree`
 
+Usage 🚀:
+
+-   `getObserverTree(array | set | map)`
+-   `getObserverTree(object | map, propertyName)`
+
 Returns a tree structure with all reactions / computations that are observing the given observable.
 
-[&laquo;trace&raquo;](introspection-utils.md#getobservertree)
+[&laquo;trace&raquo;](../best/debugging-mobx.md#getobservertree)
 
 ## Extending MobX
 
@@ -506,15 +649,27 @@ In the rare case you want to extend MobX itself.
 
 ### `createAtom`
 
+Usage 🚀:
+
+-   `createAtom(name, onBecomeObserved?, onBecomeUnobserved?)`
+
 Utility function that can be used to create your own observable data structures and hook them up to MobX. Used internally by all observable data types.
+Reports and atom that exposed to methods:
+
+-   `reportObserved()`, to notify that this atom is "used" at should be considered part of the dependency tree of the current derivation
+-   `reportChanged()`, to report to MobX that this atom has changed, and that all derivations depending on it should be invalidated
 
 [&laquo;details&raquo;](extending.md)
 
 ### `getAtom`
 
+Usage 🚀:
+
+-   `getAtom(thing, property?)`
+
 Returns the backing atom.
 
-[&laquo;trace&raquo;](introspection-utils.md#getatom)
+[&laquo;trace&raquo;](../best/debugging-mobx.md#getatom)
 
 ### `transaction`
 
@@ -556,7 +711,7 @@ Usage 🚀:
 
 -   `untracked(worker: () => any)`
 
-_Untracked is a low-level api, it is recommended to use `action`](#action) / [`runInAction`](#runinaction) instead_
+_Untracked is a low-level api, it is recommended to use `reaction`, `action` or `runInAction` instead_
 
 Untracked allows you to run a piece of code without establishing observers.
 Like `transaction`, `untracked` is automatically applied by `action`, so usually it makes more sense to use actions than to use `untracked` directly.

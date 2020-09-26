@@ -1,4 +1,4 @@
-import { IObservableArray, globalState, isObservableArray, die } from "../internal"
+import { globalState, die } from "../internal"
 
 // We shorten anything used > 5 times
 export const assign = Object.assign
@@ -133,13 +133,6 @@ export function createInstanceofPredicate<T>(
     return function (x) {
         return isObject(x) && x[propName] === true
     } as any
-}
-
-/**
- * Returns whether the argument is an array, disregarding observability.
- */
-export function isArrayLike(x: any): x is Array<any> | IObservableArray<any> {
-    return Array.isArray(x) || isObservableArray(x)
 }
 
 export function isES6Map(thing): boolean {

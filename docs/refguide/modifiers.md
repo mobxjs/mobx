@@ -41,7 +41,7 @@ class Message {
 }
 ```
 
-Note that an observable, boxed reference can be created by using `const box = observable.shallowBox(value)` ([more](boxed.md)).
+Note that an observable, boxed reference can be created by using `const box = observable.shallowBox(value)` ([more](api.md#observablebox)).
 
 ### Shallow observability
 

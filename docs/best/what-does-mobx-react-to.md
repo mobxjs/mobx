@@ -8,15 +8,15 @@ hide_title: true
 # What does MobX react to?
 
 MobX usually reacts to exactly the things you expect it to.
-Which means that in 90% of your use cases mobx "just works".
+Which means that in 90% of your use cases MobX should "just work".
 However, at some point you will encounter a case where it does not do what you expected.
 At that point it is invaluable to understand how MobX determines what to react to.
 
 > MobX reacts to any _existing_ **observable** _property_ that is read during the execution of a tracked function.
 
 -   _"reading"_ is dereferencing an object's property, which can be done through "dotting into" it (eg. `user.name`) or using the bracket notation (eg. `user['name']`, `todos[3]`).
--   _"tracked functions"_ are the expression of `computed`, the function of an observer React function component, the `render()` method of an observer React class component, and the functions that are passed as the first param to `autorun`, `reaction` and `when`.
--   _"during"_ means that only those observables that are read while the function is executing are tracked. It doesn't matter whether these values are used directly or indirectly by the tracked function.
+-   _"tracked functions"_ are the expression of `computed`, the _rendering_ of an `observer` React function component, the `render()` method of an `observer` based React class component, and the functions that are passed as the first param to `autorun`, `reaction` and `when`.
+-   _"during"_ means that only those observables that are read while the function is executing are tracked. It doesn't matter whether these values are used directly or indirectly by the tracked function. But things that have been 'spawned' from the function won't be tracked (e.g. `setTimeout`, `promise.then`, `await` etc).
 
 In other words, MobX will not react to:
 
@@ -66,7 +66,7 @@ autorun(() => {
 message.updateTitle("Bar")
 ```
 
-This will react as expected, the `.title` property was dereferenced by the autorun, and changed afterwards, so this change is detected.
+This will react as expected. The `.title` property was dereferenced by the autorun, and changed afterwards, so this change is detected.
 
 You can verify what MobX will track by calling [`trace()`](../refguide/trace) inside the tracked function. In the case of the above function it outputs the following:
 
@@ -118,7 +118,7 @@ autorun(() => {
 message.updateMessage("Bar")
 ```
 
-This will **not** react. `message.title` was dereferenced outside the `autorun`, and just contains the value of `message.title` at the moment of dereferencing (the string `"Foo"`). `title` is not an observable so `autorun` will never react.
+This will **not** react. `message.title` was dereferenced outside of `autorun`, and just contains the value of `message.title` at the moment of dereferencing (the string `"Foo"`). `title` is not an observable so `autorun` will never react.
 
 #### Correct: dereference inside the tracked function
 
@@ -157,7 +157,7 @@ runInAction(() => {
 ```
 
 The first change will be picked up, `message.author` and `author` are the same object, and the `.name` property is dereferenced in the autorun.
-However the second change is **not** picked up, because the `message.author` relation is not tracked by the `autorun`. Autorun is still using the "old" `author`.
+However, the second change is **not** picked up, because the `message.author` relation is not tracked by the `autorun`. Autorun is still using the "old" `author`.
 
 #### Common pitfall: console.log
 
@@ -176,7 +176,7 @@ The autorun only depends on `message`, which is not an observable, but a variabl
 If you use this in a web browser debugging tool, you may be able to find the
 updated value of `title` after all, but this is misleading -- autorun run after all has run once when it was first called. This happens because `console.log` is an asynchronous function and the object is only formatted later in time. This means that if you follow the title in the debugging toolbar, you can find the updated value. But the `autorun` does not track any updates.
 
-The way to make this work is to make sure to always pass immutable data or defensive copies to `console.log`. So the following solutions all react to chnages in `message.title`:
+The way to make this work is to make sure to always pass immutable data or defensive copies to `console.log`. So the following solutions all react to changes in `message.title`:
 
 ```javascript
 autorun(() => {
@@ -207,7 +207,7 @@ message.likes.push("Jennifer")
 
 This will react as expected. `.length` counts towards a property.
 Note that this will react to _any_ change in the array.
-Arrays are not tracked per index / property (like observable objects and maps) but as a whole.
+Arrays are not tracked per index / property (like observable objects and maps), but as a whole.
 
 #### Incorrect: access out-of-bounds indices in tracked function
 
@@ -218,7 +218,7 @@ autorun(() => {
 message.likes.push("Jennifer")
 ```
 
-This will react with the above sample data because array indexers count as property access. But **only** if the provided `index < length`.
+This will react with the above sample data because array indexes count as property access. But **only** if the provided `index < length`.
 MobX does not track not-yet-existing array indices.
 So always guard your array index based access with a `.length` check.
 
@@ -310,7 +310,7 @@ runInAction(() => {
 
 This will **not** react because during the execution of the `autorun` no observables were accessed, only during the `setTimeout`, which is an asynchronous function.
 
-Also see [Asynchronous actions](actions.md).
+Also see [Asynchronous actions](../refguide/action.md#asynchronous-actions).
 
 #### Using non-observable object properties
 

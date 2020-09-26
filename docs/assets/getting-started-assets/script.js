@@ -1,14 +1,12 @@
 /* For demo purposes only, component to track its own (and parents) amount of renderings */
-var RenderCounter = React.createClass({
-    _c: 0,
-    render: function() {
-        return React.createElement(
-            "div",
-            { className: "render-counter " + (++this._c % 2 ? "odd" : "even") },
-            this._c
-        )
-    }
-})
+var RenderCounter = function() {
+    var _c = React.useRef(0);
+    return React.createElement(
+        "div",
+        { className: "render-counter " + (++_c.current % 2 ? "odd" : "even") },
+        _c.current
+    )
+}
 
 // Save the original source before pretty printer is fired
 function getCodeFromTA(elem) {
@@ -26,15 +24,17 @@ function runCodeHelper(code) {
     window.observable = mobx.observable
     window.autorun = mobx.autorun
     window.computed = mobx.computed
-    window.observer = mobxReact.observer
+    window.action = mobx.action
+    window.observer = mobxReactLite.observer
+    window.makeObservable = mobx.makeObservable
+    window.makeAutoObservable = mobx.makeAutoObservable
 
     var globalEval = eval // global scope trick, See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval
 
+    try {
     code = Babel.transform(code, {
         presets: ["react", "es2015-no-commonjs", "stage-1"],
-        plugins: ["transform-decorators-legacy"]
     }).code.replace(/"use strict"/g, "")
-    try {
         globalEval(code)
     } catch (e) {
         console.error(e)
@@ -98,9 +98,9 @@ console.error = function(arg) {
     baseError.apply(console, arguments)
     $console.html(
         $console.html() +
-            "<div style='color:red'>" +
+            "<pre style='color:white;background:red;padding:10px;'>" +
             escapeHtml(arg).replace(/\n/, "<br/>") +
-            "</div>\n"
+            "</pre>\n"
     )
 }
 

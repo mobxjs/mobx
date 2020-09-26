@@ -1,30 +1,17 @@
-<img src="docs/assets/mobx.png" alt="logo" height="120" align="right" />
+<img src="assets/mobx.png" alt="logo" height="120" align="right" />
 
 # MobX
 
 _Simple, scalable state management_
 
-[![CircleCI](https://circleci.com/gh/mobxjs/mobx.svg?style=svg)](https://circleci.com/gh/mobxjs/mobx)
-[![Coverage Status](https://coveralls.io/repos/mobxjs/mobx/badge.svg?branch=master&service=github)](https://coveralls.io/github/mobxjs/mobx?branch=master)
-[![Join the chat at https://gitter.im/mobxjs/mobx](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mobxjs/mobx?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Join the community on Spectrum](https://withspectrum.github.io/badge/badge.svg)](https://spectrum.chat/mobx)
-[![Discuss MobX on Hashnode](https://hashnode.github.io/badges/mobx.svg)](https://hashnode.com/n/mobx)
+[![Discuss on Github](https://img.shields.io/badge/discuss%20on-GitHub-orange)](https://github.com/mobxjs/mobx/discussions)
+[![npm version](https://badge.fury.io/js/mobx.svg)](https://badge.fury.io/js/mobx)
 [![OpenCollective](https://opencollective.com/mobx/backers/badge.svg)](#backers)
 [![OpenCollective](https://opencollective.com/mobx/sponsors/badge.svg)](#sponsors)
-[![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
-[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/mobxjs/mobx)
 
 ---
 
-<center>
-
-## Official documentation can be found at https://mobx.js.org
-
-</center>
-
----
-
-MobX is proudly sponsored by Mendix, Coinbase, Facebook Open Source, Canva, Algolia, Guilded, Auction Frontier, Mantro and TalentPlot for \$100/month or more! And beyond that by many [individual backers](#backers) and through [one time contributions](https://github.com/mobxjs/mobx/blob/master/sponsors.md).
+MobX is made possible by the generosity of the sponsors below, and many [individual backers](http://mobxjs.github.io/mobx/backers-sponsors.html#backers). Sponsoring directly impacts the longevity of this project.
 
 **🥇Gold sponsors (\$3000+ total contribution):** <br/>
 <a href="https://mendix.com/"><img src="docs/assets/mendix-logo.png" align="center" width="100" title="Mendix" alt="Mendix" /></a>
@@ -48,137 +35,132 @@ MobX is proudly sponsored by Mendix, Coinbase, Facebook Open Source, Canva, Algo
 <a href="https://careers.dazn.com/"><img src="docs/assets/dazn.png" align="center" width="100" title="DAZN" alt="DAZN"></a>
 <a href="https://blokt.com/"><img src="docs/assets/blokt.jpg" align="center" width="100" title="Blokt" alt="Blokt"/></a>
 
-## Donating
+---
 
-Was MobX key in making your project a success?
-Join our [open collective](https://opencollective.com/mobx#)!
+## Introduction
 
-### Backers
+_Anything that can be derived from the application state, should be derived. Automatically._
 
-Support us with a monthly donation and help us continue our activities. [[Become a backer](https://opencollective.com/mobx#backer)]
+MobX is a battle tested library that makes state management simple and scalable by transparently applying functional reactive programming (TFRP).
+The philosophy behind MobX is simple:
 
-<a href="https://opencollective.com/mobx/backer/0/website" target="_blank"><img src="https://opencollective.com/mobx/backer/0/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/1/website" target="_blank"><img src="https://opencollective.com/mobx/backer/1/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/2/website" target="_blank"><img src="https://opencollective.com/mobx/backer/2/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/3/website" target="_blank"><img src="https://opencollective.com/mobx/backer/3/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/4/website" target="_blank"><img src="https://opencollective.com/mobx/backer/4/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/5/website" target="_blank"><img src="https://opencollective.com/mobx/backer/5/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/6/website" target="_blank"><img src="https://opencollective.com/mobx/backer/6/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/7/website" target="_blank"><img src="https://opencollective.com/mobx/backer/7/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/8/website" target="_blank"><img src="https://opencollective.com/mobx/backer/8/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/9/website" target="_blank"><img src="https://opencollective.com/mobx/backer/9/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/10/website" target="_blank"><img src="https://opencollective.com/mobx/backer/10/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/11/website" target="_blank"><img src="https://opencollective.com/mobx/backer/11/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/12/website" target="_blank"><img src="https://opencollective.com/mobx/backer/12/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/13/website" target="_blank"><img src="https://opencollective.com/mobx/backer/13/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/14/website" target="_blank"><img src="https://opencollective.com/mobx/backer/14/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/15/website" target="_blank"><img src="https://opencollective.com/mobx/backer/15/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/16/website" target="_blank"><img src="https://opencollective.com/mobx/backer/16/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/17/website" target="_blank"><img src="https://opencollective.com/mobx/backer/17/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/18/website" target="_blank"><img src="https://opencollective.com/mobx/backer/18/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/19/website" target="_blank"><img src="https://opencollective.com/mobx/backer/19/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/20/website" target="_blank"><img src="https://opencollective.com/mobx/backer/20/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/21/website" target="_blank"><img src="https://opencollective.com/mobx/backer/21/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/22/website" target="_blank"><img src="https://opencollective.com/mobx/backer/22/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/23/website" target="_blank"><img src="https://opencollective.com/mobx/backer/23/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/24/website" target="_blank"><img src="https://opencollective.com/mobx/backer/24/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/25/website" target="_blank"><img src="https://opencollective.com/mobx/backer/25/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/26/website" target="_blank"><img src="https://opencollective.com/mobx/backer/26/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/27/website" target="_blank"><img src="https://opencollective.com/mobx/backer/27/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/28/website" target="_blank"><img src="https://opencollective.com/mobx/backer/28/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/29/website" target="_blank"><img src="https://opencollective.com/mobx/backer/29/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/30/website" target="_blank"><img src="https://opencollective.com/mobx/backer/30/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/31/website" target="_blank"><img src="https://opencollective.com/mobx/backer/31/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/32/website" target="_blank"><img src="https://opencollective.com/mobx/backer/32/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/33/website" target="_blank"><img src="https://opencollective.com/mobx/backer/33/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/34/website" target="_blank"><img src="https://opencollective.com/mobx/backer/34/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/35/website" target="_blank"><img src="https://opencollective.com/mobx/backer/35/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/36/website" target="_blank"><img src="https://opencollective.com/mobx/backer/36/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/37/website" target="_blank"><img src="https://opencollective.com/mobx/backer/37/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/38/website" target="_blank"><img src="https://opencollective.com/mobx/backer/38/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/39/website" target="_blank"><img src="https://opencollective.com/mobx/backer/39/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/40/website" target="_blank"><img src="https://opencollective.com/mobx/backer/40/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/41/website" target="_blank"><img src="https://opencollective.com/mobx/backer/41/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/42/website" target="_blank"><img src="https://opencollective.com/mobx/backer/42/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/43/website" target="_blank"><img src="https://opencollective.com/mobx/backer/43/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/44/website" target="_blank"><img src="https://opencollective.com/mobx/backer/44/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/45/website" target="_blank"><img src="https://opencollective.com/mobx/backer/45/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/46/website" target="_blank"><img src="https://opencollective.com/mobx/backer/46/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/47/website" target="_blank"><img src="https://opencollective.com/mobx/backer/47/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/48/website" target="_blank"><img src="https://opencollective.com/mobx/backer/48/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/49/website" target="_blank"><img src="https://opencollective.com/mobx/backer/49/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/50/website" target="_blank"><img src="https://opencollective.com/mobx/backer/50/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/51/website" target="_blank"><img src="https://opencollective.com/mobx/backer/51/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/52/website" target="_blank"><img src="https://opencollective.com/mobx/backer/52/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/53/website" target="_blank"><img src="https://opencollective.com/mobx/backer/53/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/54/website" target="_blank"><img src="https://opencollective.com/mobx/backer/54/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/55/website" target="_blank"><img src="https://opencollective.com/mobx/backer/55/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/56/website" target="_blank"><img src="https://opencollective.com/mobx/backer/56/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/57/website" target="_blank"><img src="https://opencollective.com/mobx/backer/57/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/58/website" target="_blank"><img src="https://opencollective.com/mobx/backer/58/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/backer/59/website" target="_blank"><img src="https://opencollective.com/mobx/backer/59/avatar.svg"></a>
+<div class="benefits">
+    <div>
+        <div class="pic">😙</div>
+        <div>
+            <h5>Straightforward</h5>
+            <p>With MobX, you write minimalistic, boilerplate free code that captures your intent:
+            Trying to update a record field? Use good old JavaScript assignment.
+            Updating data in an asynchronous process? No special tools are required.
+            The reactivity system will detect all your changes and propagate them out to where they are being used.
+            </p>
+        </div>
+    </div>
+    <div>
+        <div class="pic">🚅</div>
+        <div>
+            <h5>Effortless optimal rendering</h5>
+            <p>
+                MobX tracks all updates and usages of your data at runtime, building a dependency tree that captures all relations between state and output.
+                This guarantees that computations depending on your state, like React components, run only when strictly needed.
+                With MobX, there is no need to manually optimize components using error-prone and sub-optimal techniques like memoization and selectors.
+            </p>
+        </div>
+    </div>
+    <div>
+        <div class="pic">🤹🏻‍♂️</div>
+        <div>
+            <h5>Architectural freedom</h5>
+            <p>
+                MobX is unopinionated and allows you to manage your application state outside of any UI framework.
+                This makes your code decoupled, portable, and above all, easily testable.
+            </p>
+        </div>
+    </div>
+</div>
 
-### Sponsors
+## A quick example
 
-Become a sponsor and get your logo on our README on Github with a link to your site. [[Become a sponsor](https://opencollective.com/mobx#sponsor)]
+So what does code that uses MobX look like?
 
-<a href="https://opencollective.com/mobx/sponsor/0/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/0/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/1/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/1/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/2/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/2/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/3/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/3/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/4/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/4/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/5/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/5/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/6/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/6/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/7/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/7/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/8/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/8/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/9/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/9/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/10/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/10/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/11/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/11/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/12/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/12/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/13/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/13/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/14/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/14/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/15/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/15/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/16/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/16/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/17/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/17/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/18/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/18/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/19/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/19/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/20/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/20/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/21/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/21/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/22/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/22/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/23/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/23/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/24/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/24/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/25/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/25/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/26/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/26/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/27/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/27/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/28/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/28/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/29/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/29/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/30/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/30/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/31/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/31/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/32/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/32/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/33/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/33/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/34/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/34/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/35/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/35/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/36/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/36/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/37/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/37/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/38/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/38/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/39/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/39/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/40/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/40/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/41/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/41/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/42/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/42/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/43/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/43/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/44/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/44/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/45/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/45/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/46/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/46/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/47/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/47/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/48/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/48/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/49/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/49/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/50/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/50/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/51/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/51/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/52/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/52/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/53/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/53/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/54/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/54/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/55/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/55/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/56/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/56/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/57/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/57/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/58/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/58/avatar.svg"></a>
-<a href="https://opencollective.com/mobx/sponsor/59/website" target="_blank"><img src="https://opencollective.com/mobx/sponsor/59/avatar.svg"></a>
+```javascript
+import React from "react"
+import ReactDOM from "react-dom"
+import { makeAutoObservable } from "mobx"
+import { observer } from "mobx-react"
+
+// Model the application state
+class Timer {
+    secondsPassed = 0
+
+    constructor() {
+        makeAutoObservable(this)
+    }
+
+    increaseTimer() {
+        this.secondsPassed += 1
+    }
+
+    resetTimer() {
+        this.secondsPassed = 0
+    }
+}
+
+const myTimer = new Timer()
+
+// Build a user interface for this app, that merely uses the state...
+const TimerView = observer(({ timer }) => (
+    <button onClick={() => timer.resetTimer()}>Seconds passed: {timer.secondsPassed}</button>
+))
+
+ReactDOM.render(<TimerView timer={myTimer} />, document.body)
+
+// For demo's sake, let's force some updates...
+setInterval(() => {
+    myTimer.increaseTimer()
+}, 1000)
+```
+
+The `observer` wrapper around the `TimerView` React component will automatically detect that rendering
+of the component depends on `timer.secondsPassed`, even though this relationship is not explicitly defined. MobX's reactivity system will make sure the component gets re-rendered when _precisely that_ field is updated in the future.
+
+Every event (`onClick` and `setInterval`) invokes an _action_ (`increaseTimer` and `resetTimer` functions) that updates _observable state_ (`secondsPassed` class property).
+Changes in the observable state are propagated precisely to all _computations_ and _side-effects_ (`TimerView` component) that depend on the changes being made.
+
+<img alt="MobX unidirectional flow" src="docs/assets/flow2.png" align="center" />
+
+You can apply this diagram as a conceptual picture to this simple example or any other application using MobX.
+
+To learn about the core concepts of MobX with a larger example, please read [Concepts & Principles](http://mobxjs.github.io/mobx/intro/concepts.html) or take the [10 minute interactive introduction to MobX and React](https://mobx.js.org/getting-started).
+The philosophy and benefits of the mental model provided by MobX are described in detail in the blogs [UI as an afterthought](https://michel.codes/blogs/ui-as-an-afterthought) and [How to decouple state and UI (a.k.a. you don’t need componentWillMount)](https://hackernoon.com/how-to-decouple-state-and-ui-a-k-a-you-dont-need-componentwillmount-cc90b787aa37).
+
+## What others are saying...
+
+> Guise, #mobx isn't pubsub, or your grandpa's observer pattern. Nay, it is a carefully orchestrated observable dimensional portal fueled by the power cosmic. It doesn't do change detection, it's actually a level 20 psionic with soul knife, slashing your viewmodel into submission.
+
+> After using #mobx for lone projects for a few weeks, it feels awesome to introduce it to the team. Time: 1/2, Fun: 2X
+
+> Working with #mobx is basically a continuous loop of me going “this is way too simple, it definitely won’t work” only to be proven wrong
+
+> I have built big apps with MobX already and comparing to the one before that which was using Redux, it is simpler to read and much easier to reason about.
+
+> The #mobx is the way I always want things to be! It's really surprising simple and fast! Totally awesome! Don't miss it!
+
+## Further resources and documentation
+
+-   [Ten minute, interactive MobX + React tutorial](https://mobx.js.org/getting-started)
+-   <i><a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/courses/manage-complex-state-in-react-apps-with-mobx">egghead.io course</a></i> (Based on MobX 3)
+-   <img src="docs/assets/book.jpg" height="80px"/> [The MobX book](https://books.google.nl/books?id=ALFmDwAAQBAJ&pg=PP1&lpg=PP1&dq=michel+weststrate+mobx+quick+start+guide:+supercharge+the+client+state+in+your+react+apps+with+mobx&source=bl&ots=D460fxti0F&sig=ivDGTxsPNwlOjLHrpKF1nweZFl8&hl=nl&sa=X&ved=2ahUKEwiwl8XO--ncAhWPmbQKHWOYBqIQ6AEwAnoECAkQAQ#v=onepage&q=michel%20weststrate%20mobx%20quick%20start%20guide%3A%20supercharge%20the%20client%20state%20in%20your%20react%20apps%20with%20mobx&f=false) by Pavan Podila and Michel Weststrate.
+-   Videos:
+    -   [Introduction to MobX & React in 2020](https://www.youtube.com/watch?v=pnhIJA64ByY) - 17m by Leigh Halliday.
+    -   [ReactNext 2016: Real World MobX](https://www.youtube.com/watch?v=Aws40KOx90U) - 40m [slides](https://docs.google.com/presentation/d/1DrI6Hc2xIPTLBkfNH8YczOcPXQTOaCIcDESdyVfG_bE/edit?usp=sharing)
+    -   [Practical React with MobX](https://www.youtube.com/watch?v=XGwuM_u7UeQ). In depth introduction and explanation to MobX and React by Matt Ruby on OpenSourceNorth (ES5 only) - 42m.
+    -   [MobX and the unique symbiosis of predictability and speed](https://www.youtube.com/watch?v=NBYbBbjZeX4&list=PL8sJahqnzh8JJD7xahG5zXkjfM5GOgcPA&index=21&t=0s) - HolyJS 2019 conf, 59 min
+    -   [Talk: State Management Is Easy, React Amsterdam 2016 conf](https://www.youtube.com/watch?v=ApmSsu3qnf0&feature=youtu.be) ([slides](https://speakerdeck.com/mweststrate/state-management-is-easy-introduction-to-mobx))
+-   [MobX awesome list](https://github.com/mobxjs/awesome-mobx#awesome-mobx)
+
+## Credits
+
+MobX is inspired by reactive programming principles as found in spreadsheets. It is inspired by MVVM frameworks like in MeteorJS tracker, knockout and Vue.js. But MobX brings Transparent Functional Reactive Programming to the next level and provides a stand alone implementation. It implements TFRP in a glitch-free, synchronous, predictable and efficient manner.
+
+A ton of credits for [Mendix](https://github.com/mendix), for providing the flexibility and support to maintain MobX and the chance to proof the philosophy of MobX in a real, complex, performance critical applications.

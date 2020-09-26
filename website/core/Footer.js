@@ -45,6 +45,7 @@ class Footer extends React.Component {
                         {/* <a href={this.pageUrl('users.html', this.props.language)}>
               User Showcase
             </a> */}
+                        <a href="https://github.com/mobxjs/mobx/discussions" target="_blank" rel="noreferrer noopener">GitHub discussions (NEW)</a>
                         <a
                             href="https://stackoverflow.com/questions/tagged/mobx"
                             target="_blank"
@@ -52,7 +53,6 @@ class Footer extends React.Component {
                         >
                             Stack Overflow
                         </a>
-                        <a href="https://gitter.im/mobxjs/mobx">Project Chat</a>
                     </div>
                     <div>
                         <h5>More</h5>

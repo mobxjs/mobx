@@ -57,8 +57,8 @@ const siteConfig = {
         { href: "https://github.com/mobxjs/mobx", label: "Github" }
     ],
 
-    // docsSideNavCollapsible: true, 
-    
+    // docsSideNavCollapsible: true,
+
     // If you have users set above, you add it here:
     users,
 
@@ -97,7 +97,8 @@ myOtherFont: [
 
     // Add custom scripts here that would be placed in <script> tags.
     scripts: [
-        "https://buttons.github.io/buttons.js"
+        "/js/scripts.js",
+        "https://buttons.github.io/buttons.js",
     ],
 
     // On page navigation for the current documentation page.

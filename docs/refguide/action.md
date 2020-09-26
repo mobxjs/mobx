@@ -167,7 +167,7 @@ Usage:
 
 The `action.bound` annotation can be used to automatically bind a method to the correct instance, so that `this` is always correctly bound inside the function.
 
-<details><summary>Tip: prefer arrow functions over `action.bound`</summary>
+<details id="avoid-bound"><summary>Tip: prefer arrow functions over `action.bound`<a href="#avoid-bound" class="tip-anchor"></a></summary>
 If you want to bind actions in combination with `makeAutoObservable`, it is usually simpler to use arrow functions instead:
 
 ```javascript
@@ -376,7 +376,7 @@ However, TypeScript isn't aware of that transformation, so, `flowResult` will ma
 
 `makeAutoObservable` and friends will automatically infer generators to be `flow`s.
 
-<details><summary>🚀 Using flow on object fields</summary>
+<details id="flow-wrap"><summary>🚀 Using flow on object fields<a href="#flow-wrap" class="tip-anchor"></a></summary>
 `flow`, like `action` can be used to wrap functions directly, so above example could also have been written as:
 
 ```typescript

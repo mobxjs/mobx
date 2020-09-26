@@ -1,6 +1,6 @@
 ---
 title: Run side-effects with reactions
-sidebar_label: Reactions
+sidebar_label: Reactions 🚀
 hide_title: true
 ---
 
@@ -128,8 +128,8 @@ in the _data_ function, and in that way control more precisely when the effect t
 
 Unlike `autorun` the side effect won't be run directly when created, but only after the data expression returns a new value for the first time.
 
-<details>
-  <summary>Example</summary>
+<details id="reaction-example">
+  <summary>Example<a href="#reaction-example" class="tip-anchor"></a></summary>
 
 In the example below, the reaction is only triggered once, when `isHungry` changes.
 Changes to `giraffe.energyLevel`, which is used by the _effect_ function, do not cause the _effect_ function to be executed. If you wanted `reaction` to respond to this
@@ -199,8 +199,8 @@ Once that happens, the given _effect_ function is executed and the autorunner is
 
 The `when` function returns a disposer to allow you to cancel it manually, unless you don't pass in a second `effect` function, in which case it returns a `Promise`.
 
-<details>
-  <summary>Example</summary>
+<details id="when-example">
+  <summary>Example<a href="#when-example" class="tip-anchor"></a></summary>
 
 This function is really useful to dispose or cancel stuff in a reactive way.
 For example:
@@ -255,7 +255,7 @@ There are a few rules that apply to any reactive context:
 2. Autorun tracks only the observables that are read during the synchronous execution of the provided function, but it won't track anything that happens asynchronously.
 3. Autorun won't track observables that are read by an action invoked by the autorun, as actions are always _untracked_.
 
-For a more examples on what precisely MobX will and won't react to, see [what does MobX react to](what-does-mobx-react-to.md).
+For a more examples on what precisely MobX will and won't react to, see [what does MobX react to](../best/what-does-mobx-react-to.md).
 For a detailed technical breakdown on how tracking works, read [Becoming fully reactive: an in-depth explanation of MobX](https://hackernoon.com/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254)
 
 ## Always dispose reactions
@@ -283,7 +283,7 @@ Failing to do so can lead to memory leaks.
 
 The `reaction` argument that is passed as second argument to the effect functions of `reaction` and `autorun` can be used to prematurely clean up the reaction as well by calling `reaction.dispose()`.
 
-<details><summary>Memory leak example</summary>
+<details id="mem-leak-example"><summary>Memory leak example<a href="#mem-leak-example" class="tip-anchor"></a></summary>
 
 ```javascript
 class Vat {
@@ -331,7 +331,7 @@ class OrderLine {
 
 The `options` argument as shown above can be passed to further fine tune the behavior of `autorun` / `reaction` / `when`:
 
--   `name`: Debug name (string) that is used as name for this reaction in for example [`spy`](spy.md) events.
+-   `name`: Debug name (string) that is used as name for this reaction in for example [`spy`](../best/debugging-mobx.md#spy) events.
 -   `fireImmediately` (reaction): Boolean that indicates that the _effect_ function should immediately be triggered after the first run of the _data_ function. `false` by default.
 -   `delay` (reaction, autorun): Number in milliseconds that can be used to throttle the effect function. If zero (the default), no throttling happens.
 -   `timeout` (when): Set a limited amount of time that `when` will wait. If the deadline passes, `when` will reject / throw.
@@ -346,10 +346,10 @@ It might very well be that your application doesn't use any of those APIs direct
 
 Before you set up a reaction, it is good to check if it complies to the following principles first:
 
-1. **Reactions shouldn't derive values**: Is the reaction going to modify some observables? If the answer is yes, typically the observable you want to update should be expressing using a [`computed`](computed.md) value instead. For example, if a collection of todos is altered, don't use a reaction to compute the amount of `remainingTodos`, but express `remainingTodos` as a computed value. That will lead to much clearer and easier to debug code. Reactions should not compute new data but only cause effects. Put differently, side effects are in principle not observable from your application code itself but only affect the 'outside world'.
-2. **Reactions should be independent**: Does your code rely on some other reaction to have run first? If that is the case, you probably
+1. **Only use Reactions if there is no direct relation between cause and effect**: If a side effect should happen in response to a very limited set of events / actions, it will often be clearer to directly trigger the effect from those specific actions. For example, if pressing a form submit button should lead to a network request to be posted, it is clearer to trigger this effect directly in response of the `onClick` event, rather than indirectly through a reaction. In contrast, if any change you make to the form state should automatically end up in local storage, then a reaction can be very useful, so that you don't have to trigger this effect from every individual `onChange` event.
+1. **Reactions shouldn't update other observables**: Is the reaction going to modify some observables? If the answer is yes, typically the observable you want to update should be expressing using a [`computed`](computed.md) value instead. For example, if a collection of todos is altered, don't use a reaction to compute the amount of `remainingTodos`, but express `remainingTodos` as a computed value. That will lead to much clearer and easier to debug code. Reactions should not compute new data but only cause effects. Put differently, side effects are in principle not observable from your application code itself but only affect the 'outside world'.
+1. **Reactions should be independent**: Does your code rely on some other reaction to have run first? If that is the case, you probably
    either violated the first rule, or the new reaction you are about to create should be merged into the one it is depending upon. MobX doesn't guarantee the order in which reactions will be run.
-3. **Reactions should be decoupled from their cause**: If a side effect should happen in response to a very limited set of events / actions, it will often be clearer to directly trigger the effect from those specific events. For example, if pressing a form submit button should lead to a network request to be posted, it is clearer to trigger this effect directly in response of the `onClick` event, rather than indirectly through a reaction. In contrast, if any change you make to the form state should automatically end up in local storage, then a reaction can be very useful, so that you don't have to trigger this effect from every individual `onChange` event.
 
 There are real-life scenarios that don't fit in above principles. That is why they are _principles_, not _laws_.
 But, the exceptions are rare so only violate them as a last resort.

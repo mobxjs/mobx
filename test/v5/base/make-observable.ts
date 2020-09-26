@@ -87,6 +87,56 @@ test("makeObservable picks up annotations", () => {
     expect(t.bound.call(undefined)).toBe(t)
 })
 
+test("makeObservable supports private fields", () => {
+    class Test {
+        private x = 3
+        private y = 2
+
+        private get double() {
+            return this.x * 2
+        }
+
+        private unbound() {
+            return this
+        }
+
+        private bound() {
+            return this
+        }
+
+        constructor() {
+            makeObservable<this, "x" | "double" | "unbound" | "bound">(this, {
+                x: observable,
+                double: computed,
+                unbound: action,
+                bound: action.bound
+            })
+            if (3 - 1 === 4) {
+                makeObservable<this, "x" | "double" | "unbound" | "bound">(this, {
+                    // @ts-expect-error
+                    z: false
+                })
+
+                makeObservable(this, {
+                    // @ts-expect-error
+                    z: false
+                })
+            }
+        }
+    }
+
+    const t: any = new Test()
+    expect(isObservableObject(t)).toBe(true)
+    expect(isObservableProp(t, "x")).toBe(true)
+    expect(isObservableProp(t, "y")).toBe(false)
+
+    expect(isComputedProp(t, "double")).toBe(true)
+    expect(isAction(t.unbound)).toBe(true)
+    expect(isAction(t.bound)).toBe(true)
+    expect(t.unbound.call(undefined)).toBe(undefined)
+    expect(t.bound.call(undefined)).toBe(t)
+})
+
 test("makeObservable has sane defaults", () => {
     class Test {
         x = 3
@@ -114,6 +164,7 @@ test("makeObservable has sane defaults", () => {
             })
             if (3 - 1 === 4) {
                 makeObservable(this, {
+                    x: false,
                     // @ts-expect-error
                     z: true
                 })

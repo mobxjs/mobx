@@ -31,7 +31,7 @@ The `annotations` argument then maps [annotations](#available-annotations) to ma
 Methods that derive information and take arguments (for example `findUsersOlderThan(age: number): User[]`) don't need any annotation.
 Their read operations will still be tracked when they are called from a reaction, but their output won't be memoized to avoid memory leaks (see also [mobx-utils:computedFn](https://github.com/mobxjs/mobx-utils#computedfn)).
 
-<details><summary>makeObservable limitations</summary>
+<details id="limitations"><summary>makeObservable limitations<a href="#limitations" class="tip-anchor"></a></summary>
 
 MakeObservable can only annotate properties declared by its own class definition. If a sub- or superclass introduces observable fields, it will have to call `makeObservable` for those properties itself.
 
@@ -148,7 +148,7 @@ The object returned by `observable` will be a Proxy, which means that properties
 
 The `observable` method can also be called with collections types like [arrays](../refguide/api.md#observablearray), [Maps](../refguide/api.md#observablemap) and [Sets](../refguide/api.md#observableset). Those will be cloned as well and converted into their observable counterpart.
 
-<details><summary>Observable array example</summary>
+<details id="observable-array"><summary>Observable array example<a href="#observable-array" class="tip-anchor"></a></summary>
 
 The following example creates an observable and observes it using [`autorun`](autorun.md).
 Working with Map and Set collections works similarly.
@@ -190,13 +190,24 @@ Observable arrays have some additional nifty utility functions:
 
 </details>
 
-<details><summary>Primitives and class instances are never converted to observables</summary>
+<details id="non-convertibles"><summary>Primitives and class instances are never converted to observables<a href="#non-convertibles" class="tip-anchor"></a></summary>
 
 Class instances will never be made observable automatically by passing them to `observable` or assigning them to an `observable` property.
 Making class members observable is considered the responsibility of the class constructor.
 
 Primitive values cannot be made observable by MobX since they are immutable in JavaScript (but they can be [boxed](../refguide/api.md#observablebox)).
 Although there is typically no use for this mechanism outside libraries.
+
+</details>
+
+<details id="avoid-proxies"><summary>🚀 Tip: observable (proxied) versus makeObservable (unproxied)<a href="#avoid-proxies" class="tip-anchor"></a></summary>
+
+The primary difference between `make(Auto)Observable` and `observable` is that the first one modifies the object you are passing in as first argument, while `observable` creates a _clone_ that is made observable.
+
+The second difference is that `observable` creates a `Proxy` object, to be able to trap future property additions in case you use the object as a dynamic lookup map.
+If the object you want to make observable has a regular structure where all members are known up-front, we recommend to use `makeObservable`: Non proxied objects are a little faster, and they are easier to inspect in the debugger / `console.log`.
+So `make(Auto)Observable` is the recommended API to use in for example factory functions.
+Note that it is possible to pass `{ proxy: false }` as option to `observable` to get an non-proxied clone.
 
 </details>
 

@@ -21,10 +21,10 @@
       "best/store",
       "react/react-performance",
       "refguide/mobx-utils",
-      "refguide/object-api",
       "refguide/computed-with-args",
       "refguide/extending",
       "refguide/on-become-observed",
+      "refguide/object-api",
       "refguide/observe"
     ],
     "Configuring MobX": [

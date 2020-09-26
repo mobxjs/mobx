@@ -1,16 +1,76 @@
 # UNPUBLISHED (keep this here and add unpublished changes)
 
+# 6.0.0
+
+## New features
+
+-   [`makeObservable(target, annotations)`](../refguide/observable.md#makeobservable) is now the recommended way to make objects with a fixed shape observable, such as classes.
+-   [`makeAutoObservable(target)`](../refguide/observable.md#makeautoobservable) is will automatically determine the annotations used by `makeObservable`. Methods will be marked as 'autoAction', so that they can be used both from a computed value or as stand alone method.
+-   MobX 6 can be used in both modern environments, and environments that don't support Proxy. So both MobX 4 and 5 users can upgrade to 6. See [proxy support](../refguide/configure.md#proxy-support) for more details.
+-   `observable.array` now supports `{ proxy: false }` as option.
+-   `reaction`'s effect function now receives the previous value seen by the reaction as second argument.
+-   `flow` can now be used as annotation as well. You might need `flowResult` in case you use TypeScript to extract the correct result type. [details](../refguide/action.md#-using-flow-instead-of-asyncawait).
+
+## Breaking changes
+
+### Changes that might affect you
+
+-   The `decorate` API has been removed, and needs to be replaced by `makeObservable` in the constructor of the targeted class. It accepts the same arguments. The `mobx-undecorate` can transform this automatically.
+-   When using `extendObservable` / `observable`, fields that contained functions used to be turned into observables. This is no longer the case, they will be converted into `autoActions`.
+-   [Strict mode](../refguide/configure.md#enforceActions) for actions is now enabled by default in `observed` mode.
+-   `toJS` no longer takes any options. It no longer converts Maps and Sets to plain data structures. Generic, flexible serialization of data structures is out of scope for the MobX project, and writing custom serialization methods is a much more scalable approach to serialization (tip: leverage `computed`s to define how class instances should be serialized).
+-   The methods `intercept` and `observe` are no longer exposed on observable arrays, maps and boxed observables. Import them as utility from mobx instead: `import { observe, intercept } from "mobx"`, and pass the collection as first argument: `observer(collection, callback)`. Note that we still recommend to avoid these API's.
+-   `observableMap.toPOJO()`, `observableMap.toJS()` have been dropped. use `new Map(observableMap)` instead if you want to convert an observable map to a plain Map shallowly.
+-   `observableMap.toJSON()` now returns an entries array rather than a new Map, to better support serialization.
+-   `observableSet.toJS()` has been dropped. Use `new Set(observableSet)` instead if you want to convert an observable Set to a plain Set shallowly.
+-   `observableMap.toJSON()` now returns an array rather than a new Set, to better support serialization.
+-   Sorting or reversing an observableArray in a derivation (without slicing first) will now throw rather than warn. In contrast, it is now allowed to sort or reverse observable arrays in-place, as long as it happens in an action.
+-   `isArrayLike` is no longer exposed as utility. Use `Array.isArray(x) || isObservableArray(x)` instead.
+
+### Obscure things that don't work anymore, but that probably won't affect you
+
+-   It is no longer possible to re-decorate a field (through either `@observable` or `makeObservable`) that is already declared in a super class.
+-   `runInAction` no longer supports passing a name as first argument. Name the original function or use `action(name, fn)()` if you cared about the debug name.
+-   `computed(getterFn, setterFn)` no longer accepts a setter function as a second argument. Use the `set` option instead: `computed(getterFn, { set: setterFn })`.
+-   In observable arrays, for `findIndex` / `find` method, the `offset` argument (the third one) is no longer supported, to be consistent with ES arrays.
+-   The option `computedConfigurable` of `configure` is no longer supported as it is now the default.
+-   `observableArray.toJS()` has been removed, use `observableArray.slice()` instead, which does the same.
+-   Killed support for the `IGNORE_MOBX_MINIFY_WARNING` environment flag.
+-   `_allowStateChangesInComputation(fn)` is no longer needed, use `runInAction(fn)` instead.
+-   In `computed`, the when `predicate` (first arg), and `reaction` predicate (first arg) it is now forbidden to directly change state. State changes should be done in their effect functions, or otherwise at least wrapped in `runInAction` (only the state change, not the observables you want to track!). Note that this is still an anti pattern.
+-   The `observableArray.get()` and `observableArray.set()` methods are no longer supported.
+-   The `IObservableObject` interface is no longer exported from MobX.
+-   The second argument to the `reaction` effect function, the disposer object, is now passed in as third argument. The second argument is now the previous value seen by the reaction.
+-   `onBecomeObserved` / `onBecomeUnobserved` will now only trigger for observables that are actually used by a reaction (see [#2309](https://github.com/mobxjs/mobx/issues/2309) for background).
+
+## Fixes
+
+-   [#2326](https://github.com/mobxjs/mobx/issues/2326): Incorrect `this` for array callbacks such as in `array.forEach`
+-   [#2379](https://github.com/mobxjs/mobx/issues/2379): Fixed issue with `array.concat`
+-   [#2309](https://github.com/mobxjs/mobx/issues/2309): Fixed several inconsistencies between keepAlive'd computed values and `on(un)BecomeObserved`
+-   Fixed several inconsistencies when `on(un)BecomeObserved` was triggered for observables changed in actions without having an observer
+
+# 5.15.7 / 4.15.7
+
+-   Fixed [2438](https://github.com/mobxjs/mobx/issues/2438), factory types caused eslint warnings, by [@amareis](https://github.com/Amareis) through [2439](https://github.com/mobxjs/mobx/pull/2439)
 -   Fixed [2432](https://github.com/mobxjs/mobx/issues/2423), array.reduce without initial value by [@urugator](https://github.com/urugator)
+
+# 5.15.6 / 4.15.6
+
 -   Fixed [2423](https://github.com/mobxjs/mobx/issues/2423), array methods not dehancing by [@urugator](https://github.com/urugator)
+-   Fixed [2424](https://github.com/mobxjs/mobx/issues/2424) Map / Set instantiation triggering a strict warning, through [#2425](https://github.com/mobxjs/mobx/pull/2425) by [@moonball](https://github.com/moonball)
+
+# 5.15.5 / 4.15.5
+
 -   Fixed ObservableSet.prototype.forEach not being reactive in 4.x [#2341](https://github.com/mobxjs/mobx/pull/2341) by [@melnikov-s](https://github.com/melnikov-s)
 -   Add error when computed value declared for unspecified getter [#1867](https://github.com/mobxjs/mobx/issues/1867) by [@berrunder](https://github.com/berrunder)
--   Don't omit action name in production [#2263](https://github.com/mobxjs/mobx/issues/2263) by [@elektronik2k5](https://github.com/elektronik2k5)
--   Update readme to reflect correct scripts by [@elektronik2k5](https://github.com/elektronik2k5)
--   `prettier` related tweaks by [@elektronik2k5](https://github.com/elektronik2k5)
--   Add full types for the spy() function by [@phiresky](https://github.com/phiresky)
--   Unify the interfaces of spy() and observe()
-    -   BREAKING: the `.name` prop of the spy event is now the name of the property key (as in observe()), the name of the object is in `.debugObjectName`)
-    -   BREAKING: the event type of computed events is now `type: "update"` with `observableKind: "computed"`, like in observe()
+-   Fixed [#2326](https://github.com/mobxjs/mobx/issues/2326) correct array is passed to callbacks by [@urugator](https://github.com/urugator)
+-   Fixed [#2278](https://github.com/mobxjs/mobx/issues/2278), `map.delete` should respect strict mode, by [@urugator](https://github.com/urugator)
+-   Fixed [#2253](https://github.com/mobxjs/mobx/issues/2253), [#1980](https://github.com/mobxjs/mobx/issues/1980), map key order not always preserved by [@urugator](https://github.com/urugator)
+-   Fixed [#2412](https://github.com/mobxjs/mobx/issues/2412), non-enumerable getters not being picked up by `extendObservable` by [@urugator](https://github.com/urugator)
+
+-   Several performance improvements
+-   Dropped `browser` fields from `package.json`
 
 # 5.15.4 / 4.15.4
 
@@ -907,7 +967,7 @@ A deprecation message will now be printed if creating computed properties while 
 
 ```javascript
 const x = observable({
-    computedProp: function () {
+    computedProp: function() {
         return someComputation
     }
 })
@@ -932,7 +992,7 @@ or alternatively:
 
 ```javascript
 observable({
-    computedProp: computed(function () {
+    computedProp: computed(function() {
         return someComputation
     })
 })
@@ -950,7 +1010,7 @@ N.B. If you want to introduce actions on an observable that modify its state, us
 ```javascript
 observable({
     counter: 0,
-    increment: action(function () {
+    increment: action(function() {
         this.counter++
     })
 })
@@ -1076,10 +1136,10 @@ function Square() {
     extendObservable(this, {
         length: 2,
         squared: computed(
-            function () {
+            function() {
                 return this.squared * this.squared
             },
-            function (surfaceSize) {
+            function(surfaceSize) {
                 this.length = Math.sqrt(surfaceSize)
             }
         )

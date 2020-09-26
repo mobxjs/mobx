@@ -9,9 +9,11 @@ hide_title: true
 
 The Object API is a utility API that enables manipulating observable maps, objects and arrays with the same generic API.
 
-These APIs are fully reactive, which means that even [without `Proxy` support](../best/limitations-without-proxies.md) new property declarations can be detected by mobx if `set` is used to add them, and `values` or `keys` to iterate them.
+These APIs are fully reactive, which means that even [without `Proxy` support](configure.md#limitations-without-proxy-support) new property declarations can be detected by mobx if `set` is used to add them, and `values` or `keys` to iterate them.
 
 Another benefit of `values`, `keys` and `entries` is that they return array rather than iterators, which makes it possible to, for example, immediately call `.map(fn)` on the result.
+
+That all being said, the typical project has little reason to use these APIs.
 
 Access:
 
