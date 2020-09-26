@@ -181,7 +181,7 @@ Since if any of those change, we would get a different `topRight` coordinate any
 
 In practice, `computed.struct` is less useful than it sounds. Only use it if changes in the underlying observables can still lead to the same output. For example, if we were rounding the coordinates first, the rounded coordinates might be equal to the previously rounded coordinates even though the underlying values aren't.
 
-Check out the [`equals`](#equals) option for further customizations to determining whether the output has changed.
+Check out the [`equals`](#equals) option for further customizations on determining whether the output has changed.
 
 </details>
 
