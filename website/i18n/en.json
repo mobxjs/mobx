@@ -53,7 +53,7 @@
       },
       "react/react-performance": {
         "title": "Optimizing React component rendering",
-        "sidebar_label": "React optimizations"
+        "sidebar_label": "React optimizations 🚀"
       },
       "README": {
         "title": "About MobX",
@@ -68,7 +68,7 @@
         "sidebar_label": "API overview"
       },
       "refguide/autorun": {
-        "title": "Running side-effects with reactions",
+        "title": "Running side effects with reactions",
         "sidebar_label": "Reactions 🚀"
       },
       "refguide/computed-with-args": {
