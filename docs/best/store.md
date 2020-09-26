@@ -44,7 +44,7 @@ These are the responsibilities of a store:
     This is fast, straightforward and convenient when debugging.
 -   Provide backend integration. Store data when needed.
 -   Update existing instances if updates are received from the backend.
--   Provide a stand-alone, universal, testable component of your application.
+-   Provide a standalone, universal, testable component of your application.
 -   To make sure your store is testable and can be run server-side, you will probably move doing actual websocket / http requests to a separate object so that you can abstract over your communication layer.
 -   There should be only one instance of a store.
 
@@ -62,7 +62,7 @@ Domain objects can delegate all their logic to the store they belong to if that 
 It is possible to express your domain objects as plain objects, but classes have some important advantages over plain objects:
 
 -   They can have methods.
-    This makes your domain concepts easier to use stand-alone and reduces the amount of contextual awareness that is needed in your application.
+    This makes your domain concepts easier to use standalone and reduces the amount of contextual awareness that is needed in your application.
     Just pass objects around.
     You don't have to pass stores around, or have to figure out which actions can be applied to an object if they are just available as instance methods.
     This is especially important in large applications.

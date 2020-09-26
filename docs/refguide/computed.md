@@ -70,7 +70,7 @@ order.price = 2
 stop()
 
 order.price = 3
-// Neither the computation nor autorun will be re-computed.
+// Neither the computation nor autorun will be recomputed.
 ```
 
 The above example nicely demonstrates the benefits of a `computed` value, it acts as a caching point.
@@ -93,39 +93,39 @@ When using computed values there are a couple of best practices to follow:
 
 ## Tips
 
-<details id="computed-suspend"><summary>**Note:** computed values will be suspended if they are _not_ observed<a href="#computed-suspend" class="tip-anchor"></a></summary>
+<details id="computed-suspend"><summary>**Tip:** computed values will be suspended if they are _not_ observed<a href="#computed-suspend" class="tip-anchor"></a></summary>
 
-It sometimes confuses people new to MobX (perhaps used to a library like [Reselect](https://github.com/reduxjs/reselect)) that if you create a computed property but don't use it anywhere in a reaction, it is not memoized and appears to be recomputed more often than necessary.
-For example, if we'd extend the above example with calling `console.log(order.total)` twice, after we called `stop()`, the value would be recomputed twice.
+It sometimes confuses people new to MobX, perhaps used to a library like [Reselect](https://github.com/reduxjs/reselect), that if you create a computed property but don't use it anywhere in a reaction, it is not memoized and appears to be recomputed more often than necessary.
+For example, if we extended the above example with calling `console.log(order.total)` twice, after we called `stop()`, the value would be recomputed twice.
 
 This allows MobX to automatically suspend computations that are not actively in use
-to avoid unnecessary updates to computed values that are not being accessed. But if a computed property is _not_ in use by some reaction, computed expressions are evaluated each time their value is requested, so they just behave like a normal property.
+to avoid unnecessary updates to computed values that are not being accessed. But if a computed property is _not_ in use by some reaction, then computed expressions are evaluated each time their value is requested, so they behave just like a normal property.
 
-So if you fiddle around, computed properties might not seem efficient. But when applied in a project that uses `observer`, `autorun` etc, they become very efficient.
+If you only fiddle around computed properties might not seem efficient, but when applied in a project that uses `observer`, `autorun`, etc., they become very efficient.
 
 The following code demonstrates the issue.
 
 ```javascript
-// OrderLine has a computed property `total`
+// OrderLine has a computed property `total`.
 const line = new OrderLine(2.0)
 
-// if you access line.total outside of a reaction it is recomputed every time
+// If you access `line.total` outside of a reaction, it is recomputed every time.
 setInterval(() => {
     console.log(line.total)
 }, 60)
 ```
 
-It can be overridden by setting annotating with the `keepAlive` flag ([try it](https://codesandbox.io/s/computed-3cjo9?file=/src/index.tsx)) or by creating a no-op `autorun(() => { someObject.someComputed })` (which can nicely be cleaned up later if needed).
-Note that both solutions have the risk of creating memory leaks; changing the default behavior here is an anti-pattern.
+It can be overridden by setting the annotation with the `keepAlive` option ([try it out yourself](https://codesandbox.io/s/computed-3cjo9?file=/src/index.tsx)) or by creating a no-op `autorun(() => { someObject.someComputed })`, which can be nicely cleaned up later if needed.
+Note that both solutions have the risk of creating memory leaks. Changing the default behavior here is an anti-pattern.
 
-MobX can be configured to report an error when computeds are accessed outside a reactive context with the [`computedRequiresReaction`](configure#computedrequiresreaction) option.
+MobX can also be configured with the [`computedRequiresReaction`](configure#computedrequiresreaction-boolean) option, to report an error when computeds are accessed outside of a reactive context.
 
 </details>
 
 <details id="computed-setter"><summary>**Tip:** computed values can have setters<a href="#computed-setter" class="tip-anchor"></a></summary>
 
 It is possible to define a [setter](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/set) for computed values as well. Note that these setters cannot be used to alter the value of the computed property directly,
-but they can be used as 'inverse' of the derivation. Setters are automatically marked as actions. For example:
+but they can be used as an "inverse" of the derivation. Setters are automatically marked as actions. For example:
 
 ```javascript
 class Dimension {
@@ -148,7 +148,7 @@ class Dimension {
 
 <details id="computed-struct"><summary>[🚀] **Tip:** `computed.struct` for comparing output structurally <a href="#computed-struct" class="tip-anchor"></a></summary>
 
-If the output of a computed value that is structurally equivalent to the previous computation doesn't need to notify observers, `computed.struct` can be used. It will make a structural comparison first (rather than a reference equality check) before notifying observers. Example:
+If the output of a computed value that is structurally equivalent to the previous computation doesn't need to notify observers, `computed.struct` can be used. It will make a structural comparison first, rather than a reference equality check, before notifying observers. For example:
 
 ```javascript
 class Box {
@@ -172,16 +172,16 @@ class Box {
 }
 ```
 
-By default the output of a `computed` is compared by reference. Since the `topRight` in the above example will always produce a new result object, it is never going to be considered equal to a previous output. Unless `computed.struct` is used.
+By default, the output of a `computed` is compared by reference. Since `topRight` in the above example will always produce a new result object, it is never going to be considered equal to a previous output. Unless `computed.struct` is used.
 
 However, in the above example _we actually don't need `computed.struct`_!
 Computed values normally only re-evaluate if the backing values change.
-So, `topRight` will only react to changes in `width` or `height`.
-Since if any of those change, we would get a different topRight coordinate anyway, `computed.struct` would never have a cache hit and be a waste of effort. So we don't need it.
+That's why `topRight` will only react to changes in `width` or `height`.
+Since if any of those change, we would get a different `topRight` coordinate anyway. `computed.struct` would never have a cache hit and be a waste of effort, so we don't need it.
 
-In practice, `computed.struct` is less useful than it sounds; only use it if changes in the underlying observables can still lead to the same output. For example if we were rounding the coordinates first; the rounded coordinates might be equal to the previously rounded coordinates even though the underlying values aren't.
+In practice, `computed.struct` is less useful than it sounds. Only use it if changes in the underlying observables can still lead to the same output. For example, if we were rounding the coordinates first, the rounded coordinates might be equal to the previously rounded coordinates even though the underlying values aren't.
 
-See also the `equals` [option](#option) for further customizations for determining whether the output has changed.
+Check out the [`equals`](#equals) option for further customizations to determining whether the output has changed.
 
 </details>
 
@@ -191,11 +191,11 @@ Although getters don't take arguments, several strategies to work with derived v
 
 </details>
 
-<details id="standalone"><summary>[🚀] **Tip:** create stand-alone computed values with `computed(expression)`<a href="#standalone" class="tip-anchor"></a></summary>
+<details id="standalone"><summary>[🚀] **Tip:** create standalone computed values with `computed(expression)`<a href="#standalone" class="tip-anchor"></a></summary>
 
-`computed` can also be invoked directly as function, just like [`observable.box`](api.md#observablebox) creates a stand-alone computed value.
+`computed` can also be invoked directly as a function, just like [`observable.box`](api.md#observablebox) creates a standalone computed value.
 Use `.get()` on the returned object to get the current value of the computation.
-This form of `computed` is not used very often, but in some cases where you need to pass a "boxed" computed value around it might prove useful, one such case is discussed [here](computed-with-args.md).
+This form of `computed` is not used very often, but in some cases where you need to pass a "boxed" computed value around it might prove itself useful, one such case is discussed [here](computed-with-args.md).
 
 </details>
 
