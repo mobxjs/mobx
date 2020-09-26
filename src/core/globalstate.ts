@@ -86,7 +86,7 @@ export class MobXGlobals {
      * In general, MobX doesn't allow that when running computations and React.render.
      * To ensure that those functions stay pure.
      */
-    allowStateChanges = true
+    allowStateChanges = false
 
     /**
      * Is it allowed to read observables at this point?
