@@ -308,7 +308,7 @@ const TodoView = observer(({ todo }: { todo: Todo }) =>
 
 ## Tips
 
-<details id="react-vs-lite"><summary>mobx-react vs. mobx-react-lite<a href="#react-vs-lite" class="tip-anchor"></a></summary>
+<details id="react-vs-lite"><summary>**Note:** mobx-react vs. mobx-react-lite<a href="#react-vs-lite" class="tip-anchor"></a></summary>
 In this documentation we used `mobx-react-lite` as default.
 [mobx-react](https://github.com/mobxjs/mobx-react/) is it's big brother, which uses `mobx-react-lite` under the hood.
 It offers a few more features which are typically not needed anymore in greenfield projects. The additional things offered by mobx-react:
@@ -322,13 +322,12 @@ If you use `mobx-react`, there is no need to add `mobx-react-lite` as a dependen
 
 </details>
 
-<details id="observer-vs-memo"><summary>`observer` and `React.memo`?<a href="#observer-vs-memo" class="tip-anchor"></a></summary>
+<details id="observer-vs-memo"><summary>**Note:** `observer` or `React.memo`?<a href="#observer-vs-memo" class="tip-anchor"></a></summary>
 `observer` automatically applies `memo`, so `observer` components never need to be wrapped in `memo`.
 `memo` can be applied safely to observer components because mutations (deeply) inside the props will be picked up by `observer` anyway if relevant.
 </details>
 
-<details id="class-comp"><summary>
-Tip: `observer` for class based React components<a href="#class-comp" class="tip-anchor"></a>
+<details id="class-comp"><summary>**Tip:** `observer` for class based React components<a href="#class-comp" class="tip-anchor"></a>
 </summary>
 As stated above, class based components are only supported through `mobx-react`, and not `mobx-react-lite`.
 Briefly, you can wrap class-based components in `observer` just like
@@ -351,8 +350,7 @@ Check out [mobx-react docs](https://github.com/mobxjs/mobx-react#api-documentati
 
 </details>
 
-<details id="displayname"><summary>
-Tip: nice component names in React DevTools<a href="#displayname" class="tip-anchor"></a>
+<details id="displayname"><summary>**Tip:** nice component names in React DevTools<a href="#displayname" class="tip-anchor"></a>
 </summary>
 [React DevTools](https://reactjs.org/blog/2019/08/15/new-react-devtools.html) uses the display name information of components to properly display the component hierarchy.
 
@@ -405,14 +403,14 @@ Now you can see component names:
 
 </details>
 
-<details id="wrap-order"><summary>[🚀] Tip: When combining `observer` with other higher-order-components, apply `observer` first<a href="#wrap-order" class="tip-anchor"></a></summary>
+<details id="wrap-order"><summary>[🚀] **Tip:** When combining `observer` with other higher-order-components, apply `observer` first<a href="#wrap-order" class="tip-anchor"></a></summary>
 
 When `observer` needs to be combined with other decorators or higher-order-components, make sure that `observer` is the innermost (first applied) decorator;
 otherwise it might do nothing at all.
 
 </details>
 
-<details id="computed-props"><summary>[🚀] Tip: Deriving computeds from props<a href="#computed-props" class="tip-anchor"></a></summary>
+<details id="computed-props"><summary>[🚀] **Tip:** Deriving computeds from props<a href="#computed-props" class="tip-anchor"></a></summary>
 In some cases the computed values of your local observables might depend on some of the props your component receives.
 However, the set of props that a React component receives is in itself not observable, so changes to the props won't be reflected in any computed values.
 To make props observable, the [useAsObservableSource](https://github.com/mobxjs/mobx-react#useasobservablesource-hook) hook can be used, that will sync the props of a component into an local observable object.
@@ -445,7 +443,7 @@ is a much simpler, albeit slightly less efficient solution.
 
 </details>
 
-<details id="useeffect"><summary>[🚀] Tip: useEffect and observables<a href="#useeffect" class="tip-anchor"></a></summary>
+<details id="useeffect"><summary>[🚀] **Tip:** useEffect and observables<a href="#useeffect" class="tip-anchor"></a></summary>
 
 `useEffect` can be used to set up side effects that need to happen, and which are bound to the life-cycle of the React component.
 Using `useEffect` requires specifying dependencies.

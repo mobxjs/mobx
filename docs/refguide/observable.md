@@ -150,7 +150,7 @@ The object returned by `observable` will be a Proxy, which means that properties
 
 The `observable` method can also be called with collections types like [arrays](../refguide/api.md#observablearray), [Maps](../refguide/api.md#observablemap) and [Sets](../refguide/api.md#observableset). Those will be cloned as well and converted into their observable counterparts.
 
-<details id="observable-array"><summary>Observable array example<a href="#observable-array" class="tip-anchor"></a></summary>
+<details id="observable-array"><summary>**Example:** Observable array<a href="#observable-array" class="tip-anchor"></a></summary>
 
 The following example creates an observable and observes it using [`autorun`](autorun.md).
 Working with Map and Set collections works similarly.
@@ -192,7 +192,7 @@ Observable arrays have some additional nifty utility functions:
 
 </details>
 
-<details id="non-convertibles"><summary>Primitives and class instances are never converted to observables<a href="#non-convertibles" class="tip-anchor"></a></summary>
+<details id="non-convertibles"><summary>**Note:** Primitives and class instances are never converted to observables<a href="#non-convertibles" class="tip-anchor"></a></summary>
 
 Primitive values cannot be made observable by MobX since they are immutable in JavaScript (but they can be [boxed](../refguide/api.md#observablebox)).
 Although there is typically no use for this mechanism outside libraries.
@@ -202,7 +202,7 @@ Making class members observable is considered the responsibility of the class co
 
 </details>
 
-<details id="avoid-proxies"><summary>[🚀] Tip: observable (proxied) versus makeObservable (unproxied)<a href="#avoid-proxies" class="tip-anchor"></a></summary>
+<details id="avoid-proxies"><summary>[🚀] **Tip:** observable (proxied) versus makeObservable (unproxied)<a href="#avoid-proxies" class="tip-anchor"></a></summary>
 
 The primary difference between `make(Auto)Observable` and `observable` is that the first one modifies the object you are passing in as first argument, while `observable` creates a _clone_ that is made observable.
 
