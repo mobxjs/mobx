@@ -7,7 +7,7 @@
         "rootDir": "src",
         "downlevelIteration": true,
         "alwaysStrict": true,
-        "sourceMap": false,
+        "sourceMap": true,
         "declaration": true,
         "removeComments": false,
         "strict": true,
