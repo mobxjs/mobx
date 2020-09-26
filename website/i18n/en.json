@@ -9,11 +9,11 @@
         "title": "MobX Backers and Sponsors"
       },
       "best/debugging-mobx": {
-        "title": "best/debugging-mobx",
+        "title": "Analyzing reactivity",
         "sidebar_label": "Analyzing reactivity 🚀"
       },
       "best/decorators": {
-        "title": "best/decorators",
+        "title": "Enabling decorators",
         "sidebar_label": "Enabling decorators 🚀"
       },
       "best/stateless-HMR": {
@@ -21,15 +21,15 @@
         "sidebar_label": "Hot Module Reloading with Stateless Components"
       },
       "best/store": {
-        "title": "Best Practices for building large scale maintainable projects",
+        "title": "Defining data stores",
         "sidebar_label": "Defining data stores"
       },
       "best/what-does-mobx-react-to": {
-        "title": "best/what-does-mobx-react-to",
+        "title": "Understanding reactivity",
         "sidebar_label": "Understanding reactivity"
       },
       "faq/migrate-to-6": {
-        "title": "faq/migrate-to-6",
+        "title": "Migrating from MobX 4/5",
         "sidebar_label": "Migrating from MobX 4/5 🚀"
       },
       "intro/concepts": {
@@ -37,8 +37,8 @@
         "sidebar_label": "The gist of MobX"
       },
       "intro/how-to-read": {
-        "title": "How to read this documentation",
-        "sidebar_label": "How to read this documentation"
+        "title": "About this documentation",
+        "sidebar_label": "About this documentation"
       },
       "intro/installation": {
         "title": "Installation",
@@ -52,15 +52,15 @@
         "sidebar_label": "React integration"
       },
       "react/react-performance": {
-        "title": "Optimizing React components",
-        "sidebar_label": "Optimizing React"
+        "title": "Optimizing React component rendering",
+        "sidebar_label": "React optimizations"
       },
       "README": {
-        "title": "Introduction",
-        "sidebar_label": "Introduction"
+        "title": "About MobX",
+        "sidebar_label": "About MobX"
       },
       "refguide/action": {
-        "title": "Update state using actions",
+        "title": "Updating state using actions",
         "sidebar_label": "Actions"
       },
       "refguide/api": {
@@ -68,7 +68,7 @@
         "sidebar_label": "API overview"
       },
       "refguide/autorun": {
-        "title": "Run side-effects with reactions",
+        "title": "Running side-effects with reactions",
         "sidebar_label": "Reactions 🚀"
       },
       "refguide/computed-with-args": {
@@ -76,27 +76,27 @@
         "sidebar_label": "Computeds with arguments 🚀"
       },
       "refguide/computed": {
-        "title": "Derive information with computed",
-        "sidebar_label": "Computed"
+        "title": "Deriving information with computeds",
+        "sidebar_label": "Computeds"
       },
       "refguide/configure": {
         "title": "Configuring MobX",
         "sidebar_label": "Configuring MobX 🚀"
       },
       "refguide/extending": {
-        "title": "refguide/extending",
+        "title": "Creating custom observables",
         "sidebar_label": "Custom observables 🚀"
       },
       "refguide/mobx-utils": {
-        "title": "mobx-utils",
-        "sidebar_label": "mobx-utils 🚀"
+        "title": "MobX-utils",
+        "sidebar_label": "MobX-utils 🚀"
       },
       "refguide/modifiers": {
         "title": "Observable modifiers",
-        "sidebar_label": "Observable modifiers [🚀]"
+        "sidebar_label": "Observable modifiers 🚀"
       },
       "refguide/object-api": {
-        "title": "refguide/object-api",
+        "title": "Collection utilities",
         "sidebar_label": "Collection utilities 🚀"
       },
       "refguide/object": {
@@ -108,20 +108,16 @@
         "sidebar_label": "Observable state"
       },
       "refguide/observe": {
-        "title": "refguide/observe",
+        "title": "Intercept & Observe",
         "sidebar_label": "Intercept & Observe 🚀"
       },
       "refguide/on-become-observed": {
-        "title": "onBecomeObserved",
+        "title": "Creating lazy observables",
         "sidebar_label": "Lazy observables 🚀"
       },
       "refguide/set": {
         "title": "Observable Sets",
         "sidebar_label": "sets"
-      },
-      "refguide/tojs": {
-        "title": "toJS",
-        "sidebar_label": "toJS"
       }
     },
     "links": {
@@ -135,7 +131,7 @@
       "MobX core": "MobX core",
       "MobX and React": "MobX and React",
       "Tips & Tricks": "Tips & Tricks",
-      "Configuring MobX": "Configuring MobX"
+      "Configuration": "Configuration"
     }
   },
   "pages-strings": {
