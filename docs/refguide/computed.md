@@ -25,6 +25,8 @@ Conceptually, they are very similar to formulas in spreadsheets, and can't be un
 Computed values can be created by annotating JavaScript [getters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get) with `computed`.
 Use `makeObservable` to declare a getter as computed. If you instead want all getters to be automatically declared as `computed`, you can use either `makeAutoObservable`, `observable` or `extendObservable`.
 
+The example below relies on [`autorun`](autorun.md#autorun) from the [Reactions 🚀](autorun.md) advanced section to help illustrate the point of computed values.
+
 ```javascript
 import { makeObservable, observable, computed } from "mobx"
 
@@ -77,7 +79,7 @@ The above example nicely demonstrates the benefits of a `computed` value, it act
 Even though we change the `amount`, and this will trigger the `total` to recompute,
 it won't trigger the `autorun`, as `total` will detect its output hasn't been affected, so there is no need to update the `autorun`.
 
-In comparison, if `total` would not be annotated, the autorun would run its effect 3 times,
+In comparison, if `total` would not be annotated, the `autorun` would run its effect 3 times,
 as it would directly depend on `total` and `amount`. [Try it out yourself](https://codesandbox.io/s/computed-3cjo9?file=/src/index.tsx).
 
 ![computed graph](../assets/computed-example.png)
