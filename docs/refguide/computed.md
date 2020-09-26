@@ -25,7 +25,7 @@ Conceptually, they are very similar to formulas in spreadsheets, and can't be un
 Computed values can be created by annotating JavaScript [getters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get) with `computed`.
 Use `makeObservable` to declare a getter as computed. If you instead want all getters to be automatically declared as `computed`, you can use either `makeAutoObservable`, `observable` or `extendObservable`.
 
-The example below relies on [`autorun`](autorun.md#autorun) from the [Reactions 🚀](autorun.md) advanced section to help illustrate the point of computed values.
+To help illustrate the point of computed values, the example below relies on [`autorun`](autorun.md#autorun) from the [Reactions 🚀](autorun.md) advanced section.
 
 ```javascript
 import { makeObservable, observable, computed } from "mobx"
