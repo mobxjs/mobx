@@ -24,7 +24,7 @@ import { observable, autorun, action } from "mobx"
 var person = observable(
     {
         // Observable properties:
-        name: "John",
+        name: "Michel",
         age: 42,
         showAge: false,
 

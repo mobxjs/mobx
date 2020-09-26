@@ -44,7 +44,7 @@ class Message {
     }
 }
 
-let message = new Message("Foo", { name: "Michel" }, ["John", "Sara"])
+let message = new Message("Foo", { name: "Michel" }, ["Joe", "Sara"])
 ```
 
 In memory this looks as follows. The green boxes indicate _observable_ properties. Note that the _values_ themselves are not observable!
@@ -131,7 +131,7 @@ runInAction(() => {
     message.author.name = "Sara"
 })
 runInAction(() => {
-    message.author = { name: "John" }
+    message.author = { name: "Joe" }
 })
 ```
 
@@ -152,7 +152,7 @@ runInAction(() => {
     message.author.name = "Sara"
 })
 runInAction(() => {
-    message.author = { name: "John" }
+    message.author = { name: "Joe" }
 })
 ```
 
@@ -260,7 +260,7 @@ So in contrast, `messages.likes = ["Jennifer"]` would be picked up; that stateme
 
 ```javascript
 const twitterUrls = observable.map({
-    John: "twitter.com/johnny"
+    Joe: "twitter.com/joey"
 })
 
 autorun(() => {
@@ -368,7 +368,7 @@ The following will react as well:
 import { get, set, observable } from "mobx"
 
 const twitterUrls = observable.object({
-    John: "twitter.com/johnny"
+    Joe: "twitter.com/joey"
 })
 
 autorun(() => {

@@ -68,7 +68,7 @@ import { observable, autorun, action } from "mobx"
 
 var person = observable(
     {
-        name: "John",
+        name: "Michel",
         age: 42,
         showAge: false,
 
@@ -90,7 +90,7 @@ var person = observable(
 
 ```javascript
 class Person {
-    name = "John"
+    name = "Michel"
     age = 42
     showAge = false
 

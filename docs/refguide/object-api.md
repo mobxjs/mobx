@@ -6,7 +6,7 @@ hide_title: true
 
 <script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
-#  Collection utilities [🚀]
+# Collection utilities [🚀]
 
 The Object API is a utility API that enables manipulating observable maps, objects and arrays with the same generic API.
 
@@ -34,7 +34,7 @@ If you use the access APIs in an environment without `Proxy` support, then also 
 import { get, set, observable, values } from "mobx"
 
 const twitterUrls = observable.object({
-    John: "twitter.com/johnny"
+    Joe: "twitter.com/joey"
 })
 
 autorun(() => {

@@ -10,21 +10,20 @@ hide_title: true
 
 Usage:
 
--   `computed` (annotation)
--   `computed(options)` (annotation)
+-   `computed` _(annotation)_
+-   `computed(options)` _(annotation)_
 -   `computed(fn, options?)`
 
 Computed values can be used to derive information from other observables.
-They evaluate lazily, caching their output and only re-compute if one of the underlying observables has changed.
+They evaluate lazily, caching their output and only re-computing if one of the underlying observables has changed.
 If they are not observed by anything, they suspend entirely.
 
-Conceptually, computed values are very similar to formulas in spreadsheets.
-Computed values can't be underestimated, they help in reducing the amount of state you have to store and are highly optimized. Use them wherever possible.
+Conceptually, they are very similar to formulas in spreadsheets, and can't be underestimated. They help in reducing the amount of state you have to store and are highly optimized. Use them wherever possible.
 
 ## Example
 
 Computed values can be created by annotating JavaScript [getters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get) with `computed`.
-You can use `makeObservable` to declare a getter as computed. If you use `makeAutoObservable`, `observable` or `extendObservable`, then all getters are automatically declared as `computed`.
+Use `makeObservable` to declare a getter as computed. If you instead want all getters to be automatically declared as `computed`, you can use either `makeAutoObservable`, `observable` or `extendObservable`.
 
 ```javascript
 import { makeObservable, observable, computed } from "mobx"
@@ -74,12 +73,12 @@ order.price = 3
 // Neither the computation nor autorun will be re-computed.
 ```
 
-The above example nicely demonstrates the benefit of a `computed` value, it acts as a caching point.
-Even though we change the `amount`, and this will trigger the `total` to recompute,
+The above example nicely demonstrates the benefits of a `computed` value, it acts as a caching point.
+Even though we change the `amount`, and this will trigger the `total` to re-compute,
 it won't trigger the `autorun`, as `total` will detect its output hasn't been affected, so there is no need to update the `autorun`.
 
 In comparison, if `total` would not be annotated, the autorun would run its effect 3 times,
-as it will directly depend on `total` and `amount`. [Try it yourself](https://codesandbox.io/s/computed-3cjo9?file=/src/index.tsx).
+as it would directly depend on `total` and `amount`. [Try it out yourself](https://codesandbox.io/s/computed-3cjo9?file=/src/index.tsx).
 
 ![computed graph](../assets/computed-example.png)
 
@@ -87,9 +86,9 @@ This is the dependency graph that would be created for the above example.
 
 ## Rules
 
-When using computed values, there are a couple of best practices to follow:
+When using computed values there are a couple of best practices to follow:
 
-1. Computed values should not have side-effects or update other observables.
+1. They should not have side-effects or update other observables.
 2. Avoid creating and returning new observables.
 
 ## Tips
@@ -147,7 +146,7 @@ class Dimension {
 
 </details>
 
-<details id="computed-struct"><summary>🚀 Tip: `computed.struct` for comparing output structurally <a href="#computed-struct" class="tip-anchor"></a></summary>
+<details id="computed-struct"><summary>[🚀] Tip: `computed.struct` for comparing output structurally <a href="#computed-struct" class="tip-anchor"></a></summary>
 
 If the output of a computed value that is structurally equivalent to the previous computation doesn't need to notify observers, `computed.struct` can be used. It will make a structural comparison first (rather than a reference equality check) before notifying observers. Example:
 
@@ -186,13 +185,13 @@ See also the `equals` [option](#option) for further customizations for determini
 
 </details>
 
-<details id="computed-with-args"><summary>🚀 Tip: computed values with arguments<a href="#computed-with-args" class="tip-anchor"></a></summary>
+<details id="computed-with-args"><summary>[🚀] Tip: computed values with arguments<a href="#computed-with-args" class="tip-anchor"></a></summary>
 
 Although getters don't take arguments, several strategies to work with derived values that need arguments are discusses [here](computed-with-args.md).
 
 </details>
 
-<details id="standalone"><summary>🚀 Tip: created stand-alone computed values with `computed(expression)`<a href="#standalone" class="tip-anchor"></a></summary>
+<details id="standalone"><summary>[🚀] Tip: created stand-alone computed values with `computed(expression)`<a href="#standalone" class="tip-anchor"></a></summary>
 
 `computed` can also be invoked directly as function, just like [`observable.box`](api.md#observablebox) creates a stand-alone computed value.
 Use `.get()` on the returned object to get the current value of the computation.
@@ -202,20 +201,35 @@ This form of `computed` is not used very often, but in some cases where you need
 
 ## Options [🚀]
 
-`computed` usually behaves the way you want it to out of the box, but it's possible to customize its behavior by passing in an `options` argument:
+`computed` usually behaves the way you want it to out of the box, but it's possible to customize its behavior by passing in an `options` argument.
 
--   `name`: String, the debug name used in spy and the [MobX developer tools](https://github.com/mobxjs/mobx-devtools).
--   `equals`: By default `comparer.default`. This acts as a comparison function for comparing the previous value with the next value. If this function considers the previous and next values to be equal, then observers will not be re-evaluated. This is useful when working with structural data, and types from other libraries. For example, a computed [moment](https://momentjs.com/) instance could use `(a, b) => a.isSame(b)`. `comparer.structural` and `comparer.shallow` come in handy if you want to use structural/shallow comparison to determine whether the new value is different from the previous value (and as a result notify observers). Check out the [`computed.struct`](#computed-struct) section above.
--   `requiresReaction`: It is recommended to set this one to `true` on very expensive computed values. If you try to read its value outside of the reactive context, in which case it might not be cached, it will cause the computed to throw instead of doing an expensive re-evalution.
--   `keepAlive`: This avoids suspending computed values when they are not observed by anything (see the above explanation). Can potentially create memory leaks, similar to the ones discussed for [reactions](autorun.md#always-dispose-reactions).
+### `name`
 
-### Built-in comparers [🚀]
+This string is used as a debug name in the [Spy event listeners](best/debugging-mobx.md#spy) and [MobX developer tools](https://github.com/mobxjs/mobx-devtools).
 
-MobX provides four built-in `comparer`s which should cover most needs for the `equals` option of `computed` (they can be used for `reaction` as well):
+### `equals`
+
+Set to `comparer.default` by default. It acts as a comparison function for comparing the previous value with the next value. If this function considers the values to be equal, then the observers will not be re-evaluated. 
+
+This is useful when working with structural data and types from other libraries. For example, a computed [moment](https://momentjs.com/) instance could use `(a, b) => a.isSame(b)`. `comparer.structural` and `comparer.shallow` come in handy if you want to use structural / shallow comparison to determine whether the new value is different from the previous value, and as a result notify its observers.
+
+Check out the [`computed.struct`](#computed-struct) section above.
+
+#### Built-in comparers [🚀]
+
+MobX provides four built-in `comparer` methods which should cover most needs of the `equals` option of `computed`. They can be used for `reaction` as well.
 
 -   `comparer.identity` uses the identity (`===`) operator to determine if two values are the same.
 -   `comparer.default` is the same as `comparer.identity`, but also considers `NaN` to be equal to `NaN`.
 -   `comparer.structural` performs deep structural comparison to determine if two values are the same.
 -   `comparer.shallow` performs shallow structural comparison to determine if two values are the same.
 
-You can import `comparer` from `mobx` to access these.
+You can import `comparer` from `mobx` to access these methods.
+
+### `requiresReaction`
+
+It is recommended to set this one to `true` on very expensive computed values. If you try to read its value outside of the reactive context, in which case it might not be cached, it will cause the computed to throw instead of doing an expensive re-evalution.
+
+### `keepAlive`
+
+This avoids suspending computed values when they are not being observed by anything (see the above explanation). Can potentially create memory leaks, similar to the ones discussed for [reactions](autorun.md#always-dispose-reactions).
