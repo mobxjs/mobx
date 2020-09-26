@@ -1,12 +1,12 @@
 ---
 title: Observable modifiers
-sidebar_label: Observable modifiers 🚀
+sidebar_label: Observable modifiers {🚀}
 hide_title: true
 ---
 
 <script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
-# Observable modifiers [🚀]
+# Observable modifiers {🚀}
 
 You can use annotations to specify how observable properties behave when you use `makeObservable`, `makeAutoObservable`, `extendObservable` and `observable.object`.
 

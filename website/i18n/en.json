@@ -10,11 +10,11 @@
       },
       "best/debugging-mobx": {
         "title": "Analyzing reactivity",
-        "sidebar_label": "Analyzing reactivity 🚀"
+        "sidebar_label": "Analyzing reactivity {🚀}"
       },
       "best/decorators": {
         "title": "Enabling decorators",
-        "sidebar_label": "Enabling decorators 🚀"
+        "sidebar_label": "Enabling decorators {🚀}"
       },
       "best/stateless-HMR": {
         "title": "Hot Module Reloading with Stateless Components",
@@ -30,7 +30,7 @@
       },
       "faq/migrate-to-6": {
         "title": "Migrating from MobX 4/5",
-        "sidebar_label": "Migrating from MobX 4/5 🚀"
+        "sidebar_label": "Migrating from MobX 4/5 {🚀}"
       },
       "intro/concepts": {
         "title": "The gist of MobX",
@@ -53,7 +53,7 @@
       },
       "react/react-performance": {
         "title": "Optimizing React component rendering",
-        "sidebar_label": "React optimizations 🚀"
+        "sidebar_label": "React optimizations {🚀}"
       },
       "README": {
         "title": "About MobX",
@@ -69,11 +69,11 @@
       },
       "refguide/autorun": {
         "title": "Running side effects with reactions",
-        "sidebar_label": "Reactions 🚀"
+        "sidebar_label": "Reactions {🚀}"
       },
       "refguide/computed-with-args": {
         "title": "Computeds with arguments",
-        "sidebar_label": "Computeds with arguments 🚀"
+        "sidebar_label": "Computeds with arguments {🚀}"
       },
       "refguide/computed": {
         "title": "Deriving information with computeds",
@@ -81,23 +81,23 @@
       },
       "refguide/configure": {
         "title": "Configuring MobX",
-        "sidebar_label": "Configuring MobX 🚀"
+        "sidebar_label": "Configuring MobX {🚀}"
       },
       "refguide/extending": {
         "title": "Creating custom observables",
-        "sidebar_label": "Custom observables 🚀"
+        "sidebar_label": "Custom observables {🚀}"
       },
       "refguide/mobx-utils": {
         "title": "MobX-utils",
-        "sidebar_label": "MobX-utils 🚀"
+        "sidebar_label": "MobX-utils {🚀}"
       },
       "refguide/modifiers": {
         "title": "Observable modifiers",
-        "sidebar_label": "Observable modifiers 🚀"
+        "sidebar_label": "Observable modifiers {🚀}"
       },
       "refguide/object-api": {
         "title": "Collection utilities",
-        "sidebar_label": "Collection utilities 🚀"
+        "sidebar_label": "Collection utilities {🚀}"
       },
       "refguide/object": {
         "title": "Observable Objects",
@@ -109,11 +109,11 @@
       },
       "refguide/observe": {
         "title": "Intercept & Observe",
-        "sidebar_label": "Intercept & Observe 🚀"
+        "sidebar_label": "Intercept & Observe {🚀}"
       },
       "refguide/on-become-observed": {
         "title": "Creating lazy observables",
-        "sidebar_label": "Lazy observables 🚀"
+        "sidebar_label": "Lazy observables {🚀}"
       },
       "refguide/set": {
         "title": "Observable Sets",

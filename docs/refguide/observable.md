@@ -202,7 +202,7 @@ Making class members observable is considered the responsibility of the class co
 
 </details>
 
-<details id="avoid-proxies"><summary>[🚀] **Tip:** observable (proxied) versus makeObservable (unproxied)<a href="#avoid-proxies" class="tip-anchor"></a></summary>
+<details id="avoid-proxies"><summary>{🚀} **Tip:** observable (proxied) versus makeObservable (unproxied)<a href="#avoid-proxies" class="tip-anchor"></a></summary>
 
 The primary difference between `make(Auto)Observable` and `observable` is that the first one modifies the object you are passing in as first argument, while `observable` creates a _clone_ that is made observable.
 
@@ -231,7 +231,7 @@ Note that it is possible to pass `{ proxy: false }` as an option to `observable`
 | `flow`                             | Creates a `flow` to manage asynchronous processes. Check out [flow](action.html#-using-flow-instead-of-asyncawait) for more details. Note that the inferred return type in TypeScript might be off.                              |
 | `autoAction`                       | Should not be used explicitly, but is used under the hood by `makeAutoObservable` to mark methods that can act as action or derivation, based on their calling context.                                                     |
 
-## The `options` argument [🚀]
+## The `options` argument {🚀}
 
 The above APIs take an optional `options` argument which is an object that supports the following options:
 

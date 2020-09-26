@@ -1,12 +1,12 @@
 ---
 title: Enabling decorators
-sidebar_label: Enabling decorators 🚀
+sidebar_label: Enabling decorators {🚀}
 hide_title: true
 ---
 
 <script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
-# Enabling decorators [🚀]
+# Enabling decorators {🚀}
 
 MobX before version 6 encouraged the use of ES.next decorators to mark things as `observable`, `computed` and `action`. However, decorators are currently not an ES standard, and the process of standardization is taking a long time. It also looks like the standard will be different from the way decorators were implemented previously. In the interest of compatibility we have chosen to move away from them in MobX 6, and recommend the use of [`makeObservable` / `makeAutoObservable`](../refguide/observable) instead.
 

@@ -1,6 +1,6 @@
 ---
 title: Migrating from MobX 4/5
-sidebar_label: Migrating from MobX 4/5 🚀
+sidebar_label: Migrating from MobX 4/5 {🚀}
 hide_title: true
 ---
 
@@ -8,7 +8,7 @@ hide_title: true
 
 MobX 6 is quite different from MobX 5. This pages covers a migration guide from MobX 4 and 5 to 6, and an extensive list of all the changes.
 
-# Migrating from MobX 4/5 [🚀]
+# Migrating from MobX 4/5 {🚀}
 
 [CHANGELOG](https://github.com/mobxjs/mobx/blob/mobx6/CHANGELOG.md#600)
 

@@ -1,12 +1,12 @@
 ---
 title: Creating custom observables
-sidebar_label: Custom observables 🚀
+sidebar_label: Custom observables {🚀}
 hide_title: true
 ---
 
 <script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
-# Creating custom observables [🚀]
+# Creating custom observables {🚀}
 
 ## Atoms
 
