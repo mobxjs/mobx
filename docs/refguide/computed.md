@@ -15,7 +15,7 @@ Usage:
 -   `computed(fn, options?)`
 
 Computed values can be used to derive information from other observables.
-They evaluate lazily, caching their output and only re-computing if one of the underlying observables has changed.
+They evaluate lazily, caching their output and only recomputing if one of the underlying observables has changed.
 If they are not observed by anything, they suspend entirely.
 
 Conceptually, they are very similar to formulas in spreadsheets, and can't be underestimated. They help in reducing the amount of state you have to store and are highly optimized. Use them wherever possible.
@@ -56,7 +56,7 @@ const stop = autorun(() => {
 // Total: 0
 
 console.log(order.total)
-// (No re-computing!)
+// (No recomputing!)
 // 0
 
 order.amount = 5
@@ -74,7 +74,7 @@ order.price = 3
 ```
 
 The above example nicely demonstrates the benefits of a `computed` value, it acts as a caching point.
-Even though we change the `amount`, and this will trigger the `total` to re-compute,
+Even though we change the `amount`, and this will trigger the `total` to recompute,
 it won't trigger the `autorun`, as `total` will detect its output hasn't been affected, so there is no need to update the `autorun`.
 
 In comparison, if `total` would not be annotated, the autorun would run its effect 3 times,
