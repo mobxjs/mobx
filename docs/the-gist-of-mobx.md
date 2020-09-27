@@ -16,7 +16,7 @@ MobX distinguishes between the following three concepts in your application:
 2. Actions
 3. Derivations
 
-Let's take a closer look at these concepts below, or alternatively, in the [10 minute introduction to MobX and React](https://mobx.js.org/getting-started), where you can interactively dive deeper into these concepts step by step and build a simple Todo list app.
+Let's take a closer look at these concepts below, or alternatively, in the [10 minute introduction to MobX and React](https://mobx.js.org/getting-started.html), where you can interactively dive deeper into these concepts step by step and build a simple Todo list app.
 
 ### 1. Define state and make it observable
 
@@ -52,7 +52,7 @@ class Todo {
 }
 ```
 
-**Hint**: this example can be shortened using [`makeAutoObservable`](../refguide/observable.md), but by being explicit we can showcase the different concepts in greater detail.
+**Hint**: this example can be shortened using [`makeAutoObservable`](observable-state.md), but by being explicit we can showcase the different concepts in greater detail.
 
 Using `observable` is like turning a property of an object into a spreadsheet cell.
 But unlike spreadsheets, these values can not only be primitive values, but also references, objects and arrays.
@@ -64,7 +64,7 @@ But what about `toggle`, which we marked as `action`?
 An _action_ is any piece of code that changes the _state_. User events, backend data pushes, scheduled events, etc.
 An action is like a user that enters a new value into a spreadsheet cell.
 
-In the `Todo` model above you can see that we have a `toggle` method that changes the value of `finished`. `finished` is marked as `observable`. It is recommended that you mark any piece of code that changes `observable`'s as an [`action`](../refguide/action.md). That way MobX can automatically apply transactions for effortless optimal performance.
+In the `Todo` model above you can see that we have a `toggle` method that changes the value of `finished`. `finished` is marked as `observable`. It is recommended that you mark any piece of code that changes `observable`'s as an [`action`](actions.md). That way MobX can automatically apply transactions for effortless optimal performance.
 
 Using actions helps you structure your code and prevents you from inadvertently changing state when you don't intend to.
 Methods that modify state are called _actions_ in MobX terminology. In contrast to _views_, which compute new information based on the current state.
@@ -127,7 +127,7 @@ as making a network request when submitting a form, should be triggered explicit
 
 #### 3.3. Reactive React components
 
-If you are using React, you can make your components reactive by wrapping them with the [`observer`](http://mobxjs.github.io/mobx/react/react-integration.html) function from the bindings package you've [chosen during installation](installation.md#installation). In this example, we're going to use the more lightweight `mobx-react-lite` package.
+If you are using React, you can make your components reactive by wrapping them with the [`observer`](react-integration.md) function from the bindings package you've [chosen during installation](installation.md#installation). In this example, we're going to use the more lightweight `mobx-react-lite` package.
 
 ```javascript
 import * as React from "react"
@@ -163,12 +163,12 @@ All components render smartly, but are defined in a dumb manner. MobX will simpl
 So the `onClick` handler in the above example will force the proper `TodoView` component to re-render as it uses the `toggle` action, but will only cause the `TodoListView` component to re-render if the number of unfinished tasks has changed.
 And if you would remove the `Tasks left` line (or put it into a separate component), the `TodoListView` component would no longer re-render when ticking a task.
 
-To learn more about how React works with MobX, check out the [React integration](../react/react-integration.md) section.
+To learn more about how React works with MobX, check out the [React integration](react-integration.md) section.
 
 #### 3.4. Custom reactions
 
-You will need them rarely, but they can be created using the [`autorun`](../refguide/autorun.md#autorun),
-[`reaction`](../refguide/autorun.md#reaction) or [`when`](../refguide/autorun.md#when) functions to fit your specific situations.
+You will need them rarely, but they can be created using the [`autorun`](reactions.md#autorun),
+[`reaction`](reactions.md#reaction) or [`when`](reactions.md#when) functions to fit your specific situations.
 For example, the following `autorun` prints a log message every time the amount of `unfinishedTodoCount` changes:
 
 ```javascript
@@ -182,13 +182,13 @@ Why does a new message get printed every time the `unfinishedTodoCount` is chang
 
 _MobX reacts to any existing observable property that is read during the execution of a tracked function._
 
-To learn more about how MobX determines which observables need to be reacted to, check out the [understanding what MobX reacts to](../best/what-does-mobx-react-to.md) section.
+To learn more about how MobX determines which observables need to be reacted to, check out the [Understanding reactivity](understanding-reactivity.md) section.
 
 ## Principles
 
 MobX uses a uni-directional data flow where _actions_ change the _state_, which in turn updates all affected _views_.
 
-![Action, State, View](../assets/action-state-view.png)
+![Action, State, View](assets/action-state-view.png)
 
 1. All _derivations_ are updated **automatically** and **atomically** when the _state_ changes. As a result, it is never possible to observe intermediate values.
 
@@ -207,4 +207,4 @@ You can play with the above examples yourself on [CodeSandbox](https://codesandb
 
 ## Linting
 
-If you find it hard to adopt the mental model of MobX, configure it to be very strict and warn you at runtime whenever you deviate from these patterns. Check out the [linting MobX](../refguide/configure.md#linting-options) section.
+If you find it hard to adopt the mental model of MobX, configure it to be very strict and warn you at runtime whenever you deviate from these patterns. Check out the [linting MobX](configuration.md#linting-options) section.

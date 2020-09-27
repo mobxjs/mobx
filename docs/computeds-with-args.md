@@ -26,7 +26,7 @@ const Item = observer(({ item, store }) => (
 )
 ```
 
-There are four ways in which we can approach this. You can try the solutions below in [this sandbox](https://codesandbox.io/s/multi-selection-odup1?file=/src/index.tsx).
+There are four ways in which we can approach this. You can try the solutions below in [this CodeSandbox](https://codesandbox.io/s/multi-selection-odup1?file=/src/index.tsx).
 
 ## 1. Derivations don't _need_ to be `computed`
 
@@ -80,4 +80,4 @@ It creates a function that memoizes the output for every combination of input ar
 We recommend to not resort to this one too quickly. It is typical for memoization, that you will need to think about how many different arguments the function is going to be called with, before you can reason about the memory consumption.
 It does however automatically clean up entries if their results aren't observed by any reaction, so it won't leak memory in normal circumstances.
 
-Again, check out the [linked sandbox](https://codesandbox.io/s/multi-selection-odup1?file=/src/index.tsx) to try this one out.
+Again, check out the [linked CodeSandbox](https://codesandbox.io/s/multi-selection-odup1?file=/src/index.tsx) to try this one out.

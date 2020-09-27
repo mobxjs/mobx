@@ -30,7 +30,7 @@ configure({
 Accepted values for the `useProxies` configuration are:
 
 -   `"always"` (default): MobX expects to run only in environments with [`Proxy` support](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) and it will error if such an environment is not available.
--   `"never"`: Proxies are not used and MobX falls back on non-proxy alternatives. This is compatible with all ES5 environments, but causes various [limitations](#limitations-without-proxies).
+-   `"never"`: Proxies are not used and MobX falls back on non-proxy alternatives. This is compatible with all ES5 environments, but causes various [limitations](#limitations-without-proxy-support).
 -   `"ifavailable"` (experimental): Proxies are used if they are available, and otherwise MobX falls back to non-proxy alternatives. The benefit of this mode is that MobX will try to warn if APIs or language features that wouldn't work in ES5 environments are used, triggering errors when hitting an ES5 limitation running on a modern environment.
 
 **Note:** before MobX 6, one had to pick either MobX 4 for older engines, or MobX 5 for new engines. However, MobX 6 supports both, although polyfills for certain APIs like Map will be required when targetting older JavaScript engines.
@@ -42,12 +42,12 @@ Proxies cannot be polyfilled. Even though polyfills do exist, they don't support
 2.  Adding or deleting properties of existing observable plain objects after creation is not automatically picked up. If you intend to use objects as index based lookup maps, in other words, as dynamic collections of things, use observable Maps instead.
 
 It is possible to dynamically add properties to objects, and detect their additions, even when Proxies aren't enabled.
-This can be achieved by using the [collection utilities](object-api.md). Make sure that (new) properties are set using the `set` utility, and that the objects are iterated using one of the `values` / `keys` or `entries` utilities, rather than the built-in JavaScript mechanisms.
+This can be achieved by using the [collection utilities](collection-utilities.md). Make sure that (new) properties are set using the `set` utility, and that the objects are iterated using one of the `values` / `keys` or `entries` utilities, rather than the built-in JavaScript mechanisms.
 But, since this is really easy to forget, we instead recommend using observable Maps if possible.
 
 ## Decorator support
 
-For enabling experimental decorator support check out the [Decorators](../best/decorators) section.
+For enabling experimental decorator support check out the [Enabling decorators](enabling-decorators.md) section.
 
 ## Linting options
 
@@ -74,7 +74,7 @@ Don't be fundamentalistic about them.
 
 #### `enforceActions`
 
-The goal of _enforceActions_ is that you don't forget to wrap event handlers in [`action`](action.md).
+The goal of _enforceActions_ is that you don't forget to wrap event handlers in [`action`](actions.md).
 
 Possible options:
 

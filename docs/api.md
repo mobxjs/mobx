@@ -29,7 +29,7 @@ Usage:
 
 Convert object members into observables, computeds and actions.
 
-[&laquo;`details`&raquo;](observable.md#makeObservable)
+[&laquo;`details`&raquo;](observable-state.md#makeObservable)
 
 ### `makeAutoObservable`
 
@@ -39,7 +39,7 @@ Usage:
 
 Automatically convert object members into observables, computeds and actions.
 
-[&laquo;`details`&raquo;](observable.md#makeAutoObservable)
+[&laquo;`details`&raquo;](observable-state.md#makeAutoObservable)
 
 ### `extendObservable`
 
@@ -68,7 +68,7 @@ Usage:
 -   `observable` (annotation): Mark a property as observable.
 -   `observable(source, overrides?, options?)`: Clones an object and makes it observable. Source can be a plain object, [array](#observable-array), [Map](#observable-map) or [Set](#observable-set).
 
-[&laquo;`details`&raquo;](observable.md#observable)
+[&laquo;`details`&raquo;](observable-state.md#observable)
 
 ### `observable.object`
 
@@ -78,7 +78,7 @@ Usage {🚀}:
 
 Alias for `observable(source, overrides?, options?)`. Creates a clone of the provided object and makes all its properties observable.
 
-[&laquo;`details`&raquo;](observable.md#observable)
+[&laquo;`details`&raquo;](observable-state.md#observable)
 
 ### `observable.array`
 
@@ -135,7 +135,7 @@ Usage:
 
 Like the `observable` annotation, but only reassignments will be tracked. The assigned values themselves won't be made observable automatically. Use this if you intend to store for example immutable data in an observable field.
 
-[&laquo;`details`&raquo;](observable.md#available-annotations)
+[&laquo;`details`&raquo;](observable-state.md#available-annotations)
 
 ### `observable.shallow`
 
@@ -145,7 +145,7 @@ Usage:
 
 Like the `observable` annotation, except that any assigned value that is structurally equal to the current value will be ignored.
 
-[&laquo;`details`&raquo;](observable.md#available-annotations)
+[&laquo;`details`&raquo;](observable-state.md#available-annotations)
 
 ### `observable.struct`
 
@@ -155,7 +155,7 @@ Usage {🚀}:
 
 Like `observable.ref` but for collections; any collection assigned will be made observable, but the contents of the collection itself won't become observable.
 
-[&laquo;`details`&raquo;](observable.md#available-annotations)
+[&laquo;`details`&raquo;](observable-state.md#available-annotations)
 
 ### `observable.deep`
 
@@ -165,7 +165,7 @@ Usage {🚀}:
 
 Alias for the [`observable`](#observable) annotation.
 
-[&laquo;`details`&raquo;](observable.md#available-annotations)
+[&laquo;`details`&raquo;](observable-state.md#available-annotations)
 
 ### `observable.box`
 
@@ -213,7 +213,7 @@ Usage:
 
 Marking things as action.
 
-[&laquo;details&raquo;](action.md)
+[&laquo;details&raquo;](actions.md)
 
 ### `runInAction`
 
@@ -223,7 +223,7 @@ Usage {🚀}:
 
 Create a one-time action that is immediately invoked.
 
-[&laquo;details&raquo;](action.md#runinaction)
+[&laquo;details&raquo;](actions.md#runinaction)
 
 ### `flow`
 
@@ -234,7 +234,7 @@ Usage:
 
 MobX friendly replacement for `async` / `await` that supports cancellation.
 
-[&laquo;details&raquo;](action.md#using-flow-instead-of-asyncawait)
+[&laquo;details&raquo;](actions.md#using-flow-instead-of-asyncawait)
 
 ### `flowResult`
 
@@ -245,7 +245,7 @@ Usage:
 Utility for TypeScript users only, that casts the output of the generator to a promise.
 This is just to correct type-wise for the promise wrapping done by `flow`. At runtime it just directly returns the inputted value.
 
-[&laquo;details&raquo;](action.md#using-flow-instead-of-asyncawait)
+[&laquo;details&raquo;](actions.md#using-flow-instead-of-asyncawait)
 
 ## Computed
 
@@ -261,7 +261,7 @@ Usage:
 
 Create an observable value that is derived from other observables, but won't recomputed unless one of the underlying observables changes.
 
-[&laquo;details&raquo;](computed.md)
+[&laquo;details&raquo;](computeds.md)
 
 ## React integration
 
@@ -277,7 +277,7 @@ Usage:
 A higher order component you can use to make a React component re-render when observables change.
 Is part of the `mobx-react` / `mobx-react-lite` package.
 
-[&laquo;details&raquo;](../react/react-integration.md)
+[&laquo;details&raquo;](react-integration.md)
 
 ### `Observer`
 
@@ -288,7 +288,7 @@ Usage:
 Renders the given render function, and automatically re-renders it once one of the observables used in the render function changes.
 Is part of the `mobx-react` / `mobx-react-lite` package.
 
-[&laquo;details&raquo;](../react/react-integration.md#callback-components-might-require-observer)
+[&laquo;details&raquo;](react-integration.md#callback-components-might-require-observer)
 
 ### `useLocalObservable`
 
@@ -299,7 +299,7 @@ Usage:
 `useLocalObservable` creates a new observable object using `makeObservable`, and keeps it around in the in the component for the entire life-cycle of the component.
 Is part of the `mobx-react` / `mobx-react-lite` package.
 
-[&laquo;details&raquo;](../react/react-integration.md#using-local-observable-state-in-observer-components)
+[&laquo;details&raquo;](react-integration.md#using-local-observable-state-in-observer-components)
 
 ## Reactions
 
@@ -313,7 +313,7 @@ Usage:
 
 Rerun a function each time anything it observes changes.
 
-[&laquo;details&raquo;](autorun.md#autorun)
+[&laquo;details&raquo;](reactions.md#autorun)
 
 ### `reaction`
 
@@ -323,7 +323,7 @@ Usage:
 
 Rerun a side effect when any data selected before changes.
 
-[&laquo;details&raquo;](autorun.md#reaction)
+[&laquo;details&raquo;](reactions.md#reaction)
 
 ### `when`
 
@@ -334,7 +334,7 @@ Usage:
 
 Execute a side effect once when a observable condition becomes true.
 
-[&laquo;details&raquo;](autorun.md#when)
+[&laquo;details&raquo;](reactions.md#when)
 
 ## Utilities
 
@@ -360,7 +360,7 @@ Usage {🚀}:
 Intercept changes before they are applied to an observable api.
 Returns a disposer that stops the interception.
 
-[&laquo;details&raquo;](observe.md)
+[&laquo;details&raquo;](intercept-and-observe.md)
 
 ### `observe`
 
@@ -372,7 +372,7 @@ Usage {🚀}:
 Low-level api that can be used to observe a single observable value.
 Returns a disposer that stops the interception.
 
-[&laquo;details&raquo;](observe.md)
+[&laquo;details&raquo;](intercept-and-observe.md)
 
 ### `onBecomeObserved`
 
@@ -382,7 +382,7 @@ Usage {🚀}:
 
 Hook for when something becomes observed.
 
-[&laquo;details&raquo;](on-become-observed.md)
+[&laquo;details&raquo;](lazy-observables.md)
 
 ### `onBecomeUnobserved`
 
@@ -392,7 +392,7 @@ Usage {🚀}:
 
 Hook for when something stops being observed.
 
-[&laquo;details&raquo;](on-become-observed.md)
+[&laquo;details&raquo;](lazy-observables.md)
 
 ### `toJS`
 
@@ -417,7 +417,7 @@ console.log(mobx.isObservableObject(obj)) // true
 console.log(mobx.isObservableObject(clone)) // false
 ```
 
-[&laquo;details&raquo;](observable.md#converting-observables-back-to-vanilla-javascript-collections)
+[&laquo;details&raquo;](observable-state.md#converting-observables-back-to-vanilla-javascript-collections)
 
 ## Configuration
 
@@ -426,12 +426,12 @@ console.log(mobx.isObservableObject(clone)) // false
 Sets global behavior settings on the active MobX instance.
 Use this to change how MobX behaves as a whole.
 
-[&laquo;details&raquo;](configure.md)
+[&laquo;details&raquo;](configuration.md)
 
 ## Object API{🚀}
 
 The Object API is an optional, generic API that enables manipulating observable maps, objects and arrays with the same API. This can be useful
-in [environments without `Proxy` support](configure.md#limitations-without-proxy-support), but are otherwise typically not needed.
+in [environments without `Proxy` support](configuration.md#limitations-without-proxy-support), but are otherwise typically not needed.
 
 ### `values`
 
@@ -441,7 +441,7 @@ Usage {🚀}:
 
 Return all values in collection as array.
 
-[&laquo;details&raquo;](object-api.md)
+[&laquo;details&raquo;](collection-utilities.md)
 
 ### `keys`
 
@@ -451,7 +451,7 @@ Usage {🚀}:
 
 Return all keys/indices in collection as array.
 
-[&laquo;details&raquo;](object-api.md)
+[&laquo;details&raquo;](collection-utilities.md)
 
 ### `entries`
 
@@ -462,7 +462,7 @@ Usage {🚀}:
 Return a `[key, value]` pair for all entries in the collection
 as an array.
 
-[&laquo;details&raquo;](object-api.md)
+[&laquo;details&raquo;](collection-utilities.md)
 
 ### `set`
 
@@ -472,7 +472,7 @@ Usage {🚀}:
 
 Update collection.
 
-[&laquo;details&raquo;](object-api.md)
+[&laquo;details&raquo;](collection-utilities.md)
 
 ### `remove`
 
@@ -482,7 +482,7 @@ Usage {🚀}:
 
 Remove item from collection.
 
-[&laquo;details&raquo;](object-api.md)
+[&laquo;details&raquo;](collection-utilities.md)
 
 ### `has`
 
@@ -492,7 +492,7 @@ Usage {🚀}:
 
 Check for membership in collection.
 
-[&laquo;details&raquo;](object-api.md)
+[&laquo;details&raquo;](collection-utilities.md)
 
 ### `get`
 
@@ -502,7 +502,7 @@ Usage {🚀}:
 
 Get value from collection with key.
 
-[&laquo;details&raquo;](object-api.md)
+[&laquo;details&raquo;](collection-utilities.md)
 
 ## Introspection utilities{🚀}
 
@@ -598,7 +598,7 @@ Usage:
 
 Should be used inside a reaction / computed value. Log when value is invalidated, or set debugger breakpoint.
 
-[&laquo;trace&raquo;](../best/debugging-mobx.md)
+[&laquo;trace&raquo;](analyzing-reactivity.md)
 
 ### `spy`
 
@@ -608,7 +608,7 @@ Usage {🚀}:
 
 Registers a global spy listener that listens to all events that happen in MobX.
 
-[&laquo;trace&raquo;](../best/debugging-mobx.md#spy)
+[&laquo;trace&raquo;](analyzing-reactivity.md#spy)
 
 ### `getDebugName`
 
@@ -620,7 +620,7 @@ Usage {🚀}:
 
 Returns the (generated) friendly debug name for an observable or reaction.
 
-[&laquo;trace&raquo;](../best/debugging-mobx.md#getdebugname)
+[&laquo;trace&raquo;](analyzing-reactivity.md#getdebugname)
 
 ### `getDependencyTree`
 
@@ -630,7 +630,7 @@ Usage {🚀}:
 
 Returns a tree structure with all observables the given reaction / computation currently depends upon.
 
-[&laquo;trace&raquo;](../best/debugging-mobx.md#getdependencytree)
+[&laquo;trace&raquo;](analyzing-reactivity.md#getdependencytree)
 
 ### `getObserverTree`
 
@@ -641,7 +641,7 @@ Usage {🚀}:
 
 Returns a tree structure with all reactions / computations that are observing the given observable.
 
-[&laquo;trace&raquo;](../best/debugging-mobx.md#getobservertree)
+[&laquo;trace&raquo;](analyzing-reactivity.md#getobservertree)
 
 ## Extending MobX
 
@@ -659,7 +659,7 @@ Reports and atom that exposed to methods:
 -   `reportObserved()`, to notify that this atom is "used" at should be considered part of the dependency tree of the current derivation
 -   `reportChanged()`, to report to MobX that this atom has changed, and that all derivations depending on it should be invalidated
 
-[&laquo;details&raquo;](extending.md)
+[&laquo;details&raquo;](custom-observables.md)
 
 ### `getAtom`
 
@@ -669,7 +669,7 @@ Usage {🚀}:
 
 Returns the backing atom.
 
-[&laquo;trace&raquo;](../best/debugging-mobx.md#getatom)
+[&laquo;trace&raquo;](analyzing-reactivity.md#getatom)
 
 ### `transaction`
 

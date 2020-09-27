@@ -16,9 +16,9 @@ import { observer } from "mobx-react-lite" // Or "mobx-react".
 const MyComponent = observer(props => ReactElement)
 ```
 
-While MobX works independently from React, they are most commonly used together. In [the gist of MobX](../intro/concepts.md) you have already seen the most important part of this integration: the `observer` [HoC](https://reactjs.org/docs/higher-order-components.html) that you can wrap around a React component.
+While MobX works independently from React, they are most commonly used together. In [The gist of MobX](the-gist-of-mobx.md) you have already seen the most important part of this integration: the `observer` [HoC](https://reactjs.org/docs/higher-order-components.html) that you can wrap around a React component.
 
-`observer` is provided by a separate React bindings package you choose [during installation](../intro/installation.md#installation). In this example, we're going to use the more lightweight [`mobx-react-lite` package](https://github.com/mobxjs/mobx-react-lite).
+`observer` is provided by a separate React bindings package you choose [during installation](installation.md#installation). In this example, we're going to use the more lightweight [`mobx-react-lite` package](https://github.com/mobxjs/mobx-react-lite).
 
 ```javascript
 import React from "react"
@@ -172,7 +172,7 @@ useEffect(() => {
 <!--`useState` with local observable object-->
 
 As stated before, instead of using classes, it is possible to directly create observable objects.
-We can leverage [observable](../refguide/observable.md) for that.
+We can leverage [observable](observable-state.md#observable) for that.
 
 ```javascript
 import { observer } from "mobx-react-lite"
@@ -248,14 +248,14 @@ React.render(<TimerViewer secondPassed={myTimer.secondsPassed} />, document.body
 ```
 
 Note that this is a different mindset from other libraries like `react-redux`, where it is a good practice to dereference early and pass primitives down, to better leverage memoization.
-If the problem is not entirely clear, make sure to check out the [Understanding reactivity](../best/what-does-mobx-react-to.md) section.
+If the problem is not entirely clear, make sure to check out the [Understanding reactivity](understanding-reactivity.md) section.
 
 ### Don't pass observables into components that aren't `observer`
 
 Components wrapped with `observer` _only_ subscribe to observables used during their _own_ rendering of the component. So if observable objects / arrays / maps are passed to child components, those have to be wrapped with `observer` as well.
 This is also true for any callback based components.
 
-If you want to pass observables to a component that isn't an `observer`, either because it is a third-party component, or because you want to keep that component MobX agnostic, you will have to [convert the observables to plain JavaScript values or structures](../refguide/observable.md#converting-observables-back-to-vanilla-javascript-collections) before passing them on.
+If you want to pass observables to a component that isn't an `observer`, either because it is a third-party component, or because you want to keep that component MobX agnostic, you will have to [convert the observables to plain JavaScript values or structures](observable-state.md#converting-observables-back-to-vanilla-javascript-collections) before passing them on.
 
 To elaborate on the above,
 take the following example observable `todo` object, a `TodoView` component (observer) and an imaginary `GridRow` component that takes a column / value mapping, but which isn't an `observer`:
@@ -362,7 +362,7 @@ export const MyComponent = observer(props => <div>hi</div>)
 
 then no display name will be visible in the DevTools.
 
-![devtools-noname](../assets/devtools-noDisplayName.png)
+![devtools-noname](assets/devtools-noDisplayName.png)
 
 The following approaches can be used to fix this:
 
@@ -399,7 +399,7 @@ The following approaches can be used to fix this:
 
 Now you can see component names:
 
-![devtools-withname](../assets/devtools-withDisplayName.png)
+![devtools-withname](assets/devtools-withDisplayName.png)
 
 </details>
 
@@ -498,16 +498,16 @@ If you'd rather explicitly define which observables should trigger the effect, u
 
 ### How can I further optimize my React components?
 
-Check out the [React optimizations](react-performance.md) section.
+Check out the [React optimizations](react-optimizations.md) section.
 
 ## Troubleshooting
 
 Help! My component isn't re-rendering...
 
 1. Make sure you didn't forget `observer` (yes, this is the most common mistake).
-1. Verify that the thing you intend to react to is indeed observable. Use utilities like [`isObservable`](../refguide/api.md#isobservable), [`isObservableProp`](../refguide/api.md#isobservableprop) if needed to verify this at runtime.
+1. Verify that the thing you intend to react to is indeed observable. Use utilities like [`isObservable`](api.md#isobservable), [`isObservableProp`](api.md#isobservableprop) if needed to verify this at runtime.
 1. Check the console logs in the browsers for any warnings or errors.
-1. Make sure you grok how tracking works in general. Check out the [Understanding reactivity](../best/what-does-mobx-react-to.md) section.
+1. Make sure you grok how tracking works in general. Check out the [Understanding reactivity](understanding-reactivity.md) section.
 1. Read the common pitfalls as described above.
-1. [Configure](configure) MobX to warn you of unsound usage of mechanisms and check the console logs.
-1. Use [trace](../best/debugging-mobx.md) to verify that you are subscribing to the right things or check what MobX is doing in general using [spy](../best/debugging-mobx#spy) / the [mobx-logger](https://github.com/winterbe/mobx-logger) package.
+1. [Configure](configuration.md#linting-options) MobX to warn you of unsound usage of mechanisms and check the console logs.
+1. Use [trace](analyzing-reactivity.md) to verify that you are subscribing to the right things or check what MobX is doing in general using [spy](analyzing-reactivity.md#spy) / the [mobx-logger](https://github.com/winterbe/mobx-logger) package.

@@ -8,7 +8,7 @@ hide_title: true
 
 # Intercept & Observe {🚀}
 
-_⚠️ **Warning**: intercept and observe are low level utilities, and should not be needed in practice. Use some form of [reaction](autorun.md) instead, as `observe` doesn't respect transactions and doesn't support deep observing of changes. Using these utilities is an anti-pattern. If you intend to get access to the old and new value using `observe`, use [`reaction`](api.md#reaction) instead. ⚠️_
+_⚠️ **Warning**: intercept and observe are low level utilities, and should not be needed in practice. Use some form of [reaction](reactions.md) instead, as `observe` doesn't respect transactions and doesn't support deep observing of changes. Using these utilities is an anti-pattern. If you intend to get access to the old and new value using `observe`, use [`reaction`](reactions.md#reaction) instead. ⚠️_
 
 `observe` and `intercept` can be used to monitor the changes of a single observable. They **_don't_** track nested observables.
 
@@ -71,7 +71,7 @@ const disposer = intercept(theme, "backgroundColor", change => {
 
 Usage: `observe(target, propertyName?, listener, invokeImmediately?)`
 
-_See above notice, please avoid this API and use [`reaction`](api.md#reaction) instead._
+_See above notice, please avoid this API and use [`reaction`](reactions.md#reaction) instead._
 
 -   `target`: the observable to observe.
 -   `propertyName`: optional parameter to specify a specific property to observe. Note that `observe(user.name, listener)` is fundamentally different from `observe(user, "name", listener)`. The first observes the _current_ `value` inside `user.name`, which might not be an observable at all. The latter observes the `name` _property_ of `user`.
@@ -81,7 +81,7 @@ _See above notice, please avoid this API and use [`reaction`](api.md#reaction) i
 The function returns a `disposer` function that can be used to cancel the observer.
 Note that `transaction` does not affect the working of the `observe` method(s).
 This means that even inside a transaction `observe` will fire its listeners for each mutation.
-Hence [`autorun`](autorun.md) is usually a more powerful and declarative alternative to `observe`.
+Hence [`autorun`](reactions.md#autorun) is usually a more powerful and declarative alternative to `observe`.
 
 _`observe` reacts to **mutations** when they are being made, while reactions like `autorun` or `reaction` react to **new values** when they become available. In many cases the latter is sufficient._
 

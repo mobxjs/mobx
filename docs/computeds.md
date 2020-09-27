@@ -25,7 +25,7 @@ Conceptually, they are very similar to formulas in spreadsheets, and can't be un
 Computed values can be created by annotating JavaScript [getters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get) with `computed`.
 Use `makeObservable` to declare a getter as computed. If you instead want all getters to be automatically declared as `computed`, you can use either `makeAutoObservable`, `observable` or `extendObservable`.
 
-To help illustrate the point of computed values, the example below relies on [`autorun`](autorun.md#autorun) from the [Reactions {🚀}](autorun.md) advanced section.
+To help illustrate the point of computed values, the example below relies on [`autorun`](reactions.md#autorun) from the [Reactions {🚀}](reactions.md) advanced section.
 
 ```javascript
 import { makeObservable, observable, computed } from "mobx"
@@ -82,7 +82,7 @@ it won't trigger the `autorun`, as `total` will detect its output hasn't been af
 In comparison, if `total` would not be annotated, the `autorun` would run its effect 3 times,
 as it would directly depend on `total` and `amount`. [Try it out yourself](https://codesandbox.io/s/computed-3cjo9?file=/src/index.tsx).
 
-![computed graph](../assets/computed-example.png)
+![computed graph](assets/computed-example.png)
 
 This is the dependency graph that would be created for the above example.
 
@@ -120,7 +120,7 @@ setInterval(() => {
 It can be overridden by setting the annotation with the `keepAlive` option ([try it out yourself](https://codesandbox.io/s/computed-3cjo9?file=/src/index.tsx)) or by creating a no-op `autorun(() => { someObject.someComputed })`, which can be nicely cleaned up later if needed.
 Note that both solutions have the risk of creating memory leaks. Changing the default behavior here is an anti-pattern.
 
-MobX can also be configured with the [`computedRequiresReaction`](configure#computedrequiresreaction-boolean) option, to report an error when computeds are accessed outside of a reactive context.
+MobX can also be configured with the [`computedRequiresReaction`](configuration.md#computedrequiresreaction-boolean) option, to report an error when computeds are accessed outside of a reactive context.
 
 </details>
 
@@ -189,7 +189,7 @@ Check out the [`equals`](#equals) option for further customizations on determini
 
 <details id="computed-with-args"><summary>{🚀} **Tip:** computed values with arguments<a href="#computed-with-args" class="tip-anchor"></a></summary>
 
-Although getters don't take arguments, several strategies to work with derived values that need arguments are discusses [here](computed-with-args.md).
+Although getters don't take arguments, several strategies to work with derived values that need arguments are discusses [here](computeds-with-args.md).
 
 </details>
 
@@ -197,7 +197,7 @@ Although getters don't take arguments, several strategies to work with derived v
 
 `computed` can also be invoked directly as a function, just like [`observable.box`](api.md#observablebox) creates a standalone computed value.
 Use `.get()` on the returned object to get the current value of the computation.
-This form of `computed` is not used very often, but in some cases where you need to pass a "boxed" computed value around it might prove itself useful, one such case is discussed [here](computed-with-args.md).
+This form of `computed` is not used very often, but in some cases where you need to pass a "boxed" computed value around it might prove itself useful, one such case is discussed [here](computeds-with-args.md).
 
 </details>
 
@@ -207,7 +207,7 @@ This form of `computed` is not used very often, but in some cases where you need
 
 ### `name`
 
-This string is used as a debug name in the [Spy event listeners](best/debugging-mobx.md#spy) and [MobX developer tools](https://github.com/mobxjs/mobx-devtools).
+This string is used as a debug name in the [Spy event listeners](analyzing-reactivity.md#spy) and [MobX developer tools](https://github.com/mobxjs/mobx-devtools).
 
 ### `equals`
 
@@ -234,4 +234,4 @@ It is recommended to set this one to `true` on very expensive computed values. I
 
 ### `keepAlive`
 
-This avoids suspending computed values when they are not being observed by anything (see the above explanation). Can potentially create memory leaks, similar to the ones discussed for [reactions](autorun.md#always-dispose-reactions).
+This avoids suspending computed values when they are not being observed by anything (see the above explanation). Can potentially create memory leaks, similar to the ones discussed for [reactions](reactions.md#always-dispose-of-reactions).

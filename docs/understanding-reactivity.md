@@ -49,7 +49,7 @@ let message = new Message("Foo", { name: "Michel" }, ["Joe", "Sara"])
 
 In memory this looks as follows. The green boxes indicate _observable_ properties. Note that the _values_ themselves are not observable!
 
-![MobX reacts to changing references](../assets/observed-refs.png)
+![MobX reacts to changing references](assets/observed-refs.png)
 
 What MobX basically does is recording which _arrows_ you use in your function. After that, it will re-run whenever one of these _arrows_ changes; when they start to refer to something else.
 
@@ -68,7 +68,7 @@ message.updateTitle("Bar")
 
 This will react as expected. The `.title` property was dereferenced by the autorun, and changed afterwards, so this change is detected.
 
-You can verify what MobX will track by calling [`trace()`](../refguide/trace) inside the tracked function. In the case of the above function it outputs the following:
+You can verify what MobX will track by calling [`trace()`](analyzing-reactivity.md) inside the tracked function. In the case of the above function it outputs the following:
 
 ```javascript
 import { trace } from "mobx"
@@ -310,7 +310,7 @@ runInAction(() => {
 
 This will **not** react because during the execution of the `autorun` no observables were accessed, only during the `setTimeout`, which is an asynchronous function.
 
-Also see [Asynchronous actions](../refguide/action.md#asynchronous-actions).
+Check out the [Asynchronous actions](actions.md#asynchronous-actions) section as well.
 
 #### Using non-observable object properties
 
@@ -380,7 +380,7 @@ runInAction(() => {
 })
 ```
 
-See the [object manipulation api](../refguide/api.md#direct-observable-manipulation) for more details
+See the [object manipulation api](api.md#object-api) for more details
 
 #### TL;DR
 

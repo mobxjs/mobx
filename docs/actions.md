@@ -18,7 +18,7 @@ Usage:
 
 Any application has actions. An action is any code block that modifies state.
 In principle actions always happen in response to an event. For example a button was clicked, some input did change, a websocket message arrived, etc.
-MobX requires that you declare your actions, though [makeAutoObservable](observable.md) can automate much of this job. Actions help you to structure your code better and offer performance benefits:
+MobX requires that you declare your actions, though [makeAutoObservable](observable-state.md#makeautoobservable) can automate much of this job. Actions help you to structure your code better and offer performance benefits:
 
 The `action` annotation should only be used on functions that intend to _modify_ state.
 Functions that just perform look-ups, filter data, in short any function that derives information, should _not_ be marked as actions; to allow MobX to track their invocations.
@@ -418,5 +418,5 @@ Any `try / finally` clauses will still be run.
 ## {🚀}Disabling mandatory actions
 
 By default, MobX 6 and later require that you use actions to make state changes.
-You can however configure MobX to disable this behavior, see [`enforceActions`](configure.md#enforceactions).
+You can however configure MobX to disable this behavior, see [`enforceActions`](configuration.md#enforceactions).
 This can be quite useful in for example unit test setup, where the warnings don't always have much value.

@@ -34,7 +34,7 @@ Autorun works by running `effect` in a _reactive context_. During the execution 
 Once the function finishes, MobX will collect and subscribe to all observables that were read and wait until any of them changes again.
 Once they do, the `autorun` will trigger again, repeating the entire process.
 
-![autorun](../assets/autorun.png)
+![autorun](assets/autorun.png)
 
 This is how the example below works like.
 
@@ -252,7 +252,7 @@ There are a few rules that apply to any reactive context:
 2. Autorun tracks only the observables that are read during the synchronous execution of the provided function, but it won't track anything that happens asynchronously.
 3. Autorun won't track observables that are read by an action invoked by the autorun, as actions are always _untracked_.
 
-For more examples on what precisely MobX will and will not react to, check out the [Understanding reactivity](../best/what-does-mobx-react-to.md) section.
+For more examples on what precisely MobX will and will not react to, check out the [Understanding reactivity](understanding-reactivity.md) section.
 For a more detailed technical breakdown on how tracking works, read the blog post [Becoming fully reactive: an in-depth explanation of MobX](https://hackernoon.com/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254).
 
 ## Always dispose of reactions
@@ -336,7 +336,7 @@ It might very well be that your application doesn't use any of these APIs direct
 Before you set up a reaction, it is good to first check if it conforms to the following principles:
 
 1. **Only use Reactions if there is no direct relation between cause and effect**: If a side effect should happen in response to a very limited set of events / actions, it will often be clearer to directly trigger the effect from those specific actions. For example, if pressing a form submit button should lead to a network request to be posted, it is clearer to trigger this effect directly in response of the `onClick` event, rather than indirectly through a reaction. In contrast, if any change you make to the form state should automatically end up in local storage, then a reaction can be very useful, so that you don't have to trigger this effect from every individual `onChange` event.
-1. **Reactions shouldn't update other observables**: Is the reaction going to modify other observables? If the answer is yes, typically the observable you want to update should be annotated as a [`computed`](computed.md) value instead. For example, if a collection of todos is altered, don't use a reaction to compute the amount of `remainingTodos`, but annotate `remainingTodos` as a computed value. That will lead to much clearer and easier to debug code. Reactions should not compute new data, but only cause effects.
+1. **Reactions shouldn't update other observables**: Is the reaction going to modify other observables? If the answer is yes, typically the observable you want to update should be annotated as a [`computed`](computeds.md) value instead. For example, if a collection of todos is altered, don't use a reaction to compute the amount of `remainingTodos`, but annotate `remainingTodos` as a computed value. That will lead to much clearer and easier to debug code. Reactions should not compute new data, but only cause effects.
 1. **Reactions should be independent**: Does your code rely on some other reaction having to run first? If that is the case, you probably
 either violated the first rule, or the new reaction you are about to create should be merged into the one it is depending upon. MobX does not guarantee the order in which reactions will be run.
 
@@ -349,7 +349,7 @@ The behavior of `autorun`, `reaction` and `when` can be further fine-tuned by pa
 
 ### `name`
 
-This string is used as a debug name for this reaction in the [Spy event listeners](best/debugging-mobx.md#spy) and [MobX developer tools](https://github.com/mobxjs/mobx-devtools).
+This string is used as a debug name for this reaction in the [Spy event listeners](analyzing-reactivity.md#spy) and [MobX developer tools](https://github.com/mobxjs/mobx-devtools).
 
 ### `fireImmediately` _(reaction)_
 
@@ -365,7 +365,7 @@ Set a limited amount of time that `when` will wait for. If the deadline passes, 
 
 ### `onError`
 
-By default, any exception thrown inside an reaction will be logged, but not further thrown. This is to make sure that an exception in one reaction does not prevent the scheduled execution of other, possibly unrelated reactions. This also allows reactions to recover from exceptions. Throwing an exception does not break the tracking done by MobX, so subsequent runs of the reaction might complete normally again if the cause for the exception is removed. This option allows overriding that behavior. It is possible to set a global error handler or to disable catching errors completely using [configure](configure.md).
+By default, any exception thrown inside an reaction will be logged, but not further thrown. This is to make sure that an exception in one reaction does not prevent the scheduled execution of other, possibly unrelated reactions. This also allows reactions to recover from exceptions. Throwing an exception does not break the tracking done by MobX, so subsequent runs of the reaction might complete normally again if the cause for the exception is removed. This option allows overriding that behavior. It is possible to set a global error handler or to disable catching errors completely using [configure](configuration.md).
 
 ### `scheduler` _(autorun, reaction)_
 
@@ -375,4 +375,4 @@ Set a custom scheduler to determine how re-running the autorun function should b
 
 Set to `comparer.default` by default. If specified, this comparer function is used to compare the previous and next values produced by the _data_ function. The _effect_ function is only invoked if this function returns false.
 
-Check out the [Built-in comparers](computed.md#built-in-comparers) section.
+Check out the [Built-in comparers](computeds.md#built-in-comparers) section.

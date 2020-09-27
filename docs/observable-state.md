@@ -26,7 +26,7 @@ Usage:
 
 It can be used to trap _existing_ object properties and make them observable. Any JavaScript object (including class instances) can be passed into `target`.
 Typically `makeObservable` is used in the constructor of a class, and its first argument is `this`.
-The `annotations` argument maps [annotations](#available-annotations) to each member. Note that when using [decorators](../best/decorators), the `annotations` argument can be omitted.
+The `annotations` argument maps [annotations](#available-annotations) to each member. Note that when using [decorators](enabling-decorators.md), the `annotations` argument can be omitted.
 
 Methods that derive information and take arguments (for example `findUsersOlderThan(age: number): User[]`) don't need any annotation.
 Their read operations will still be tracked when they are called from a reaction, but their output won't be memoized to avoid memory leaks. Check out [MobX-utils computedFn](https://github.com/mobxjs/mobx-utils#computedfn) as well.
@@ -150,13 +150,13 @@ The `source` object will be cloned and all members will be made observable, simi
 Likewise, an `overrides` map can be provided to specify the annotations of specific members.
 Check out the above code block for an example.
 
-The object returned by `observable` will be a Proxy, which means that properties that are added later to the object will be picked up and made observable as well (except when [proxy usage](../refguide/configure.md#proxy-support) is disabled).
+The object returned by `observable` will be a Proxy, which means that properties that are added later to the object will be picked up and made observable as well (except when [proxy usage](configuration.md#proxy-support) is disabled).
 
-The `observable` method can also be called with collections types like [arrays](../refguide/api.md#observablearray), [Maps](../refguide/api.md#observablemap) and [Sets](../refguide/api.md#observableset). Those will be cloned as well and converted into their observable counterparts.
+The `observable` method can also be called with collections types like [arrays](api.md#observablearray), [Maps](api.md#observablemap) and [Sets](api.md#observableset). Those will be cloned as well and converted into their observable counterparts.
 
 <details id="observable-array"><summary>**Example:** Observable array<a href="#observable-array" class="tip-anchor"></a></summary>
 
-The following example creates an observable and observes it using [`autorun`](autorun.md).
+The following example creates an observable and observes it using [`autorun`](reactions.md#autorun).
 Working with Map and Set collections works similarly.
 
 ```javascript
@@ -198,7 +198,7 @@ Observable arrays have some additional nifty utility functions:
 
 <details id="non-convertibles"><summary>**Note:** Primitives and class instances are never converted to observables<a href="#non-convertibles" class="tip-anchor"></a></summary>
 
-Primitive values cannot be made observable by MobX since they are immutable in JavaScript (but they can be [boxed](../refguide/api.md#observablebox)).
+Primitive values cannot be made observable by MobX since they are immutable in JavaScript (but they can be [boxed](api.md#observablebox)).
 Although there is typically no use for this mechanism outside libraries.
 
 Class instances will never be made observable automatically by passing them to `observable` or assigning them to an `observable` property.
@@ -226,13 +226,13 @@ Note that it is possible to pass `{ proxy: false }` as an option to `observable`
 | `observable.ref`                   | Like `observable`, but only reassignments will be tracked. The assigned values themselves won't be made observable automatically. For example, use this if you intend to store immutable data in an observable field.       |
 | `observable.shallow`               | Like `observable.ref` but for collections. Any collection assigned will be made observable, but the contents of the collection itself won't become observable.                                                             |
 | `observable.struct`                | Like `observable`, except that any assigned value that is structurally equal to the current value will be ignored.                                                                                                         |
-| `action`                           | Mark a method as an action that will modify the state. Check out [action](../refguide/action.md) for more details.                                                                                                                           |
+| `action`                           | Mark a method as an action that will modify the state. Check out [actions](actions.md) for more details.                                                                                                                           |
 | `action.bound`                     | Like action, but will also bind the action to the instance so that `this` will always be set.                                                                                                                              |
-| `computed`                         | Can be used on a [getter](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get) to declare it as a derived value that can be cached. Check out [computed](../refguide/computed.md) for more details.       |
+| `computed`                         | Can be used on a [getter](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get) to declare it as a derived value that can be cached. Check out [computeds](computeds.md) for more details.       |
 | `computed.struct`                  | Like `computed`, except that if after recomputing the result is structurally equal to the previous result, no observers will be notified.                                                                                   |
 | `true`                             | Infer the best annotation. Check out [makeAutoObservable](#makeautoobservable) for more details.                                                                                                                                                  |
 | `false`                            | Explicitly do not annotate this property.                                                                                                                                                                                  |
-| `flow`                             | Creates a `flow` to manage asynchronous processes. Check out [flow](action.html#-using-flow-instead-of-asyncawait) for more details. Note that the inferred return type in TypeScript might be off.                              |
+| `flow`                             | Creates a `flow` to manage asynchronous processes. Check out [flow](actions.md#using-flow-instead-of-asyncawait) for more details. Note that the inferred return type in TypeScript might be off.                              |
 | `autoAction`                       | Should not be used explicitly, but is used under the hood by `makeAutoObservable` to mark methods that can act as action or derivation, based on their calling context.                                                     |
 
 ## The `options` argument {🚀}
