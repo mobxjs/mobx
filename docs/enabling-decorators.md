@@ -48,7 +48,9 @@ MobX before version 6 did not require the `makeObservable(this)` call in the con
 
 We intend to continue to support decorators in this form.
 Any existing MobX 4/5 codebase can be migrated to use `makeObservable` calls by our [code-mod](https://www.npmjs.com/package/mobx-undecorate).
-When migrating from MobX 4/5 to 6, we recommend to always run the code-mod, to make sure the necessary `makeObservable` calls are generated. See the [migration guide](migrating-from-4-or-5.md) for details.
+When migrating from MobX 4/5 to 6, we recommend to always run the code-mod, to make sure the necessary `makeObservable` calls are generated.
+
+Check out the [Migrating from MobX 4/5 {🚀}](migrating-from-4-or-5.md) section.
 
 ## Using `observer` as decorator
 

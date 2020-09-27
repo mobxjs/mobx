@@ -498,7 +498,7 @@ If you'd rather explicitly define which observables should trigger the effect, u
 
 ### How can I further optimize my React components?
 
-Check out the [React optimizations](react-optimizations.md) section.
+Check out the [React optimizations {🚀}](react-optimizations.md) section.
 
 ## Troubleshooting
 

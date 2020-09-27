@@ -29,7 +29,7 @@ Typically `makeObservable` is used in the constructor of a class, and its first 
 The `annotations` argument maps [annotations](#available-annotations) to each member. Note that when using [decorators](enabling-decorators.md), the `annotations` argument can be omitted.
 
 Methods that derive information and take arguments (for example `findUsersOlderThan(age: number): User[]`) don't need any annotation.
-Their read operations will still be tracked when they are called from a reaction, but their output won't be memoized to avoid memory leaks. Check out [MobX-utils computedFn](https://github.com/mobxjs/mobx-utils#computedfn) as well.
+Their read operations will still be tracked when they are called from a reaction, but their output won't be memoized to avoid memory leaks. Check out [MobX-utils computedFn {🚀}](https://github.com/mobxjs/mobx-utils#computedfn) as well.
 
 <details id="limitations"><summary>makeObservable limitations<a href="#limitations" class="tip-anchor"></a></summary>
 
