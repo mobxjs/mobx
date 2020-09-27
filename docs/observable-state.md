@@ -154,7 +154,7 @@ The object returned by `observable` will be a Proxy, which means that properties
 
 The `observable` method can also be called with collections types like [arrays](api.md#observablearray), [Maps](api.md#observablemap) and [Sets](api.md#observableset). Those will be cloned as well and converted into their observable counterparts.
 
-<details id="observable-array"><summary>**Example:** Observable array<a href="#observable-array" class="tip-anchor"></a></summary>
+<details id="observable-array"><summary>**Example:** observable array<a href="#observable-array" class="tip-anchor"></a></summary>
 
 The following example creates an observable and observes it using [`autorun`](reactions.md#autorun).
 Working with Map and Set collections works similarly.
@@ -196,7 +196,7 @@ Observable arrays have some additional nifty utility functions:
 
 </details>
 
-<details id="non-convertibles"><summary>**Note:** Primitives and class instances are never converted to observables<a href="#non-convertibles" class="tip-anchor"></a></summary>
+<details id="non-convertibles"><summary>**Note:** primitives and class instances are never converted to observables<a href="#non-convertibles" class="tip-anchor"></a></summary>
 
 Primitive values cannot be made observable by MobX since they are immutable in JavaScript (but they can be [boxed](api.md#observablebox)).
 Although there is typically no use for this mechanism outside libraries.

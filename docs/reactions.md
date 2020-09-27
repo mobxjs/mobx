@@ -126,7 +126,7 @@ The typical pattern is that you produce the things you need in your side effect
 in the _data_ function, and in that way control more precisely when the effect triggers.
 Unlike `autorun`, the side effect won't run once when initialized, but only after the data expression returns a new value for the first time.
 
-<details id="reaction-example"><summary>**Example:** The data and effect functions<a href="#reaction-example" class="tip-anchor"></a></summary>
+<details id="reaction-example"><summary>**Example:** the data and effect functions<a href="#reaction-example" class="tip-anchor"></a></summary>
 
 In the example below, the reaction is only triggered once, when `isHungry` changes.
 Changes to `giraffe.energyLevel`, which is used by the _effect_ function, do not cause the _effect_ function to be executed. If you wanted `reaction` to respond to this
@@ -197,7 +197,7 @@ Once that happens, the given _effect_ function is executed and the autorunner is
 The `when` function returns a disposer, allowing you to cancel it manually, unless you don't pass in a second `effect` function, in which case it returns a `Promise`.
 
 <details id="when-example">
-  <summary>**Example:** Dispose of things in a reactive way<a href="#when-example" class="tip-anchor"></a></summary>
+  <summary>**Example:** dispose of things in a reactive way<a href="#when-example" class="tip-anchor"></a></summary>
 
 `when` is really useful for disposing or canceling of things in a reactive way.
 For example:
@@ -283,7 +283,7 @@ Failing to do so can lead to memory leaks.
 
 The `reaction` argument that is passed as second argument to the effect functions of `reaction` and `autorun`, can be used to prematurely clean up the reaction as well by calling `reaction.dispose()`.
 
-<details id="mem-leak-example"><summary>**Example:** Memory leak<a href="#mem-leak-example" class="tip-anchor"></a></summary>
+<details id="mem-leak-example"><summary>**Example:** memory leak<a href="#mem-leak-example" class="tip-anchor"></a></summary>
 
 ```javascript
 class Vat {

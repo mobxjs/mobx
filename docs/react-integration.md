@@ -403,14 +403,14 @@ Now you can see component names:
 
 </details>
 
-<details id="wrap-order"><summary>{🚀} **Tip:** When combining `observer` with other higher-order-components, apply `observer` first<a href="#wrap-order" class="tip-anchor"></a></summary>
+<details id="wrap-order"><summary>{🚀} **Tip:** when combining `observer` with other higher-order-components, apply `observer` first<a href="#wrap-order" class="tip-anchor"></a></summary>
 
 When `observer` needs to be combined with other decorators or higher-order-components, make sure that `observer` is the innermost (first applied) decorator;
 otherwise it might do nothing at all.
 
 </details>
 
-<details id="computed-props"><summary>{🚀} **Tip:** Deriving computeds from props<a href="#computed-props" class="tip-anchor"></a></summary>
+<details id="computed-props"><summary>{🚀} **Tip:** deriving computeds from props<a href="#computed-props" class="tip-anchor"></a></summary>
 In some cases the computed values of your local observables might depend on some of the props your component receives.
 However, the set of props that a React component receives is in itself not observable, so changes to the props won't be reflected in any computed values.
 To make props observable, the [useAsObservableSource](https://github.com/mobxjs/mobx-react#useasobservablesource-hook) hook can be used, that will sync the props of a component into an local observable object.
