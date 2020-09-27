@@ -72,7 +72,7 @@ class Doubler {
 <!--factory function + makeAutoObservable-->
 
 ```javascript
-import { observable } from "mobx"
+import { makeAutoObservable } from "mobx"
 
 function createDoubler(value) {
     return makeAutoObservable({
