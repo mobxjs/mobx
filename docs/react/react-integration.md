@@ -248,7 +248,7 @@ React.render(<TimerViewer secondPassed={myTimer.secondsPassed} />, document.body
 ```
 
 Note that this is a different mindset from other libraries like `react-redux`, where it is a good practice to dereference early and pass primitives down, to better leverage memoization.
-If the problem is not entirely clear, make sure to check out [What does MobX react to?](../best/what-does-mobx-react-to.md).
+If the problem is not entirely clear, make sure to check out the [Understanding reactivity](../best/what-does-mobx-react-to.md) section.
 
 ### Don't pass observables into components that aren't `observer`
 
@@ -507,7 +507,7 @@ Help! My component isn't re-rendering...
 1. Make sure you didn't forget `observer` (yes, this is the most common mistake).
 1. Verify that the thing you intend to react to is indeed observable. Use utilities like [`isObservable`](../refguide/api.md#isobservable), [`isObservableProp`](../refguide/api.md#isobservableprop) if needed to verify this at runtime.
 1. Check the console logs in the browsers for any warnings or errors.
-1. Make sure you grok how tracking works in general. Check out [What does MobX react to?](../best/what-does-mobx-react-to.md).
+1. Make sure you grok how tracking works in general. Check out the [Understanding reactivity](../best/what-does-mobx-react-to.md) section.
 1. Read the common pitfalls as described above.
 1. [Configure](configure) MobX to warn you of unsound usage of mechanisms and check the console logs.
 1. Use [trace](../best/debugging-mobx.md) to verify that you are subscribing to the right things or check what MobX is doing in general using [spy](../best/debugging-mobx#spy) / the [mobx-logger](https://github.com/winterbe/mobx-logger) package.

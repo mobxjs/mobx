@@ -39,7 +39,7 @@ Here are a few suggestions about the next things to check out:
 
 -   To get an idea on how to organize your application's data stores, check out [Defining data stores](../best/store.md)
 
--   If the behavior of MobX confuses you, it's useful to read [What does MobX react to?](../best/what-does-mobx-react-to.md)
+-   If the behavior of MobX confuses you, it's useful to check out [Understanding reactivity](../best/what-does-mobx-react-to.md)
 
 -   Get a [quick overview of the API](../refguide/api.md), also linked in the top navigation bar
 

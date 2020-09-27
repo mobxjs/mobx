@@ -1,24 +1,23 @@
 ---
-title: Run side-effects with reactions
-sidebar_label: Reactions 🚀
+title: Running side effects with reactions
+sidebar_label: Reactions {🚀}
 hide_title: true
 ---
 
 <script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
-# Run side-effects with reactions
+# Running side effects with reactions {🚀}
 
-Reactions are an important concept to understand as it is where everything in MobX comes together.
-The goal of reactions is to model side-effects that happen automatically.
-Applications without side effects are meaningless; if an application doesn't cause a physical change in the world somewhere, it even doesn't have to run after all.
-So the significance of reactions is to create consumers for your observable state and _automatically_ run side effects whenever something _relevant_ changes.
+Reactions are an important concept to understand, as it is where everything in MobX comes together.
+The goal of reactions is to model side effects that happen automatically.
+Their significance is in creating consumers for your observable state and _automatically_ running side effects whenever something _relevant_ changes.
 
 However, with that in mind, it is important to realize that the APIs discussed here should rarely be used.
-Typically they are abstracted away in other libraries (like mobx-react) or abstractions that are specific to your application.
+They are often abstracted away in other libraries (like mobx-react) or abstractions specific to your application.
 
 But, to grok MobX, let's take a look at how reactions can be created.
 The simplest way is to use the [`autorun`](#autorun) utility.
-Beyond that, there is also [`reaction`](#reaction) and [`when`](#when).
+Beyond that, there are also [`reaction`](#reaction) and [`when`](#when).
 
 ## Autorun
 
@@ -26,17 +25,18 @@ Usage:
 
 -   `autorun(effect: (reaction) => void)`
 
-The `autorun` function accepts one function that should run each time anything it observes changes.
-It also runs once when you create the `autorun`. It only responds to changes in observable state -- so things you marked `observable` or `computed`.
+The `autorun` function accepts one function that should run every time anything it observes changes.
+It also runs once when you create the `autorun` itself. It only responds to changes in observable state, things you have annotated `observable` or `computed`.
 
 ### How tracking works
 
-Autorun works by running `effect` in a _reactive context_; during the executing of the provided function MobX will keep track of all observable and computed values that are directly or indirectly _read_ by the effect.
+Autorun works by running `effect` in a _reactive context_. During the execution of the provided function, MobX keeps track of all observable and computed values that are directly or indirectly _read_ by the effect.
 Once the function finishes, MobX will collect and subscribe to all observables that were read and wait until any of them changes again.
-Once any of these observables changes, the autorun will trigger again, repeating the entire process.
-In a picture, the code-example below works like this:
+Once they do, the `autorun` will trigger again, repeating the entire process.
 
 ![autorun](../assets/autorun.png)
+
+This is how the example below works like.
 
 ### Example
 
@@ -82,7 +82,7 @@ for (let i = 0; i < 10; i++) {
 }
 ```
 
-When you run this code, you get the following output:
+Running this code, you will get the following output:
 
 ```
 Energy level: 100
@@ -101,18 +101,16 @@ Energy level: 10
 Energy level: 0
 ```
 
-As you can see in the example, both `autorun` functions run once when they are initialized --
-this is all you would see without the `for` loop. This accounts for the
-first two lines of the output.
+As you can see in the first two lines of the output above, both `autorun` functions run once when they are initialized. This is all you would see without the `for` loop.
 
 Once we run the `for` loop to change the `energyLevel` with the `reduceEnergy`
-action we see a new log entry each time an `autorun` function observes a
-change to its observable state:
+action, we see a new log entry every time an `autorun` function observes a
+change in its observable state.
 
--   For the "Energy level" function this is each time the observable property `energyLevel` changes, so 10 times.
+1.   For the _"Energy level"_ function, this is every time the `energyLevel` observable changes, 10 times in total.
 
--   For the "Now I'm hungry" function it's each time the `isHungry` computed
-    changes; so only once.
+2.   For the _"Now I'm hungry"_ function, this is every time the `isHungry` computed
+    changes, only one time.
 
 ## Reaction
 
@@ -120,16 +118,15 @@ Usage:
 
 -   `reaction(() => value, (value, previousValue, reaction) => { sideEffect }, options?)`.
 
-`reaction` is like `autorun` but gives more fine grained control on which observables will be tracked.
-It takes two functions, the first one (the _data_ function) is tracked and returns data that is used as input for the second one, the _effect_ function.
-It is important to notice that the side effect _only_ reacts to data that was _accessed_ in the data expression, which might be less than the data that is actually used in the effect.
+`reaction` is like `autorun`, but gives more fine grained control on which observables will be tracked.
+It takes two functions, the first, _data_ function, is tracked and returns the data that is used as input for the second, _effect_ function.
+It is important to note that the side effect _only_ reacts to data that was _accessed_ in the data function, which might be less than the data that is actually used in the effect function.
+
 The typical pattern is that you produce the things you need in your side effect
 in the _data_ function, and in that way control more precisely when the effect triggers.
+Unlike `autorun`, the side effect won't run once when initialized, but only after the data expression returns a new value for the first time.
 
-Unlike `autorun` the side effect won't be run directly when created, but only after the data expression returns a new value for the first time.
-
-<details id="reaction-example">
-  <summary>Example<a href="#reaction-example" class="tip-anchor"></a></summary>
+<details id="reaction-example"><summary>**Example:** The data and effect functions<a href="#reaction-example" class="tip-anchor"></a></summary>
 
 In the example below, the reaction is only triggered once, when `isHungry` changes.
 Changes to `giraffe.energyLevel`, which is used by the _effect_ function, do not cause the _effect_ function to be executed. If you wanted `reaction` to respond to this
@@ -177,7 +174,7 @@ for (let i = 0; i < 10; i++) {
 }
 ```
 
-The output of this example is:
+Output:
 
 ```
 Now let's change state!
@@ -197,12 +194,12 @@ Usage:
 `when` observes and runs the given _predicate_ function until it returns `true`.
 Once that happens, the given _effect_ function is executed and the autorunner is disposed.
 
-The `when` function returns a disposer to allow you to cancel it manually, unless you don't pass in a second `effect` function, in which case it returns a `Promise`.
+The `when` function returns a disposer, allowing you to cancel it manually, unless you don't pass in a second `effect` function, in which case it returns a `Promise`.
 
 <details id="when-example">
-  <summary>Example<a href="#when-example" class="tip-anchor"></a></summary>
+  <summary>**Example:** Dispose of things in a reactive way<a href="#when-example" class="tip-anchor"></a></summary>
 
-This function is really useful to dispose or cancel stuff in a reactive way.
+`when` is really useful for disposing or canceling of things in a reactive way.
 For example:
 
 ```javascript
@@ -212,19 +209,19 @@ class MyResource {
     constructor() {
         makeAutoObservable(this, { dispose: false })
         when(
-            // once...
+            // Once...
             () => !this.isVisible,
-            // ... then
+            // ... then.
             () => this.dispose()
         )
     }
 
     get isVisible() {
-        // indicate whether this item is visible
+        // Indicate whether this item is visible.
     }
 
     dispose() {
-        // clean up some resources
+        // Clean up some resources.
     }
 }
 ```
@@ -234,18 +231,18 @@ then does some cleanup for `MyResource`.
 
 </details>
 
-### await when(...)
+### `await when(...)`
 
-If no `effect` function is provided, `when` returns a `Promise`. This combines nicely with `async / await` to let you wait for changes in observable state:
+If no `effect` function is provided, `when` returns a `Promise`. This combines nicely with `async / await` to let you wait for changes in observable state.
 
 ```javascript
 async function() {
 	await when(() => that.isVisible)
-	// etc..
+	// etc...
 }
 ```
 
-To cancel the `when` prematurely, it is possible to call `.cancel()` on the promise returned by `when`.
+To cancel `when` prematurely, it is possible to call `.cancel()` on the promise returned by itself.
 
 ## Rules
 
@@ -255,35 +252,38 @@ There are a few rules that apply to any reactive context:
 2. Autorun tracks only the observables that are read during the synchronous execution of the provided function, but it won't track anything that happens asynchronously.
 3. Autorun won't track observables that are read by an action invoked by the autorun, as actions are always _untracked_.
 
-For a more examples on what precisely MobX will and won't react to, see [what does MobX react to](../best/what-does-mobx-react-to.md).
-For a detailed technical breakdown on how tracking works, read [Becoming fully reactive: an in-depth explanation of MobX](https://hackernoon.com/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254)
+For more examples on what precisely MobX will and will not react to, check out the [Understanding reactivity](../best/what-does-mobx-react-to.md) section.
+For a more detailed technical breakdown on how tracking works, read the blog post [Becoming fully reactive: an in-depth explanation of MobX](https://hackernoon.com/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254).
 
-## Always dispose reactions
+## Always dispose of reactions
 
-The functions passed to `autorun`, `reaction`, `when` are only garbage collected if all objects they observe are garbage collected themselves; in principle they keep waiting forever for new changes to happen in the observables they use.
-To be able to stop them from waiting until forever has passed, they all return a disposer function that can be used to stop them and unsubscribe from any observables used.
+The functions passed to `autorun`, `reaction` and `when` are only garbage collected if all objects they observe are garbage collected themselves. In principle, they keep waiting forever for new changes to happen in the observables they use.
+To be able to stop them from waiting until forever has passed, they all return a disposer function that can be used to stop them and unsubscribe from any observables they used.
 
 ```javascript
 const counter = observable({ count: 0 })
-// sets up the autorun, prints 0
+
+// Sets up the autorun and prints 0.
 const disposer = autorun(() => {
     console.log(counter.count)
 })
-// prints 1
+
+// Prints: 1
 counter.count++
 
-// stops the autorun
+// Stops the autorun.
 disposer()
-// won't print
+
+// Will not print.
 counter.count++
 ```
 
 We strongly recommend to always use the disposer function that is returned from these functions as soon as their side effect is no longer needed.
 Failing to do so can lead to memory leaks.
 
-The `reaction` argument that is passed as second argument to the effect functions of `reaction` and `autorun` can be used to prematurely clean up the reaction as well by calling `reaction.dispose()`.
+The `reaction` argument that is passed as second argument to the effect functions of `reaction` and `autorun`, can be used to prematurely clean up the reaction as well by calling `reaction.dispose()`.
 
-<details id="mem-leak-example"><summary>Memory leak example<a href="#mem-leak-example" class="tip-anchor"></a></summary>
+<details id="mem-leak-example"><summary>**Example:** Memory leak<a href="#mem-leak-example" class="tip-anchor"></a></summary>
 
 ```javascript
 class Vat {
@@ -302,15 +302,16 @@ class OrderLine {
     constructor() {
         makeAutoObservable(this)
 
-        // this autorun will be GC-ed together with the current orderline instance
-        // as it only uses observables from `this`. It's not strictly necessary
-        // to dispose of it once an OrderLine instance is deleted.
+        // This autorun will be GC-ed together with the current orderline
+        // instance as it only uses observables from `this`. It's not strictly
+        // necessary to dispose of it once an OrderLine instance is deleted.
         this.disposer1 = autorun(() => {
             doSomethingWith(this.price * this.amount)
         })
-        // this autorun won't be GC-ed together with the current orderline instance
-        // since vat keeps a reference to notify this autorun, which in turn keeps
-        // 'this' in scope
+
+        // This autorun won't be GC-ed together with the current orderline
+        // instance, since vat keeps a reference to notify this autorun, which
+        // in turn keeps 'this' in scope.
         this.disposer2 = autorun(() => {
             doSomethingWith(this.price * this.amount * vat.value)
         })
@@ -318,7 +319,7 @@ class OrderLine {
 
     dispose() {
         // So, to avoid subtle memory issues, always call the
-        // disposers when the reaction is no longer needed
+        // disposers when the reactions are no longer needed.
         this.disposer1()
         this.disposer2()
     }
@@ -327,29 +328,51 @@ class OrderLine {
 
 </details>
 
-## 🚀 Reaction options
-
-The `options` argument as shown above can be passed to further fine tune the behavior of `autorun` / `reaction` / `when`:
-
--   `name`: Debug name (string) that is used as name for this reaction in for example [`spy`](../best/debugging-mobx.md#spy) events.
--   `fireImmediately` (reaction): Boolean that indicates that the _effect_ function should immediately be triggered after the first run of the _data_ function. `false` by default.
--   `delay` (reaction, autorun): Number in milliseconds that can be used to throttle the effect function. If zero (the default), no throttling happens.
--   `timeout` (when): Set a limited amount of time that `when` will wait. If the deadline passes, `when` will reject / throw.
--   `onError`: By default any exception thrown inside a reaction will be logged but not further thrown. This is to make sure that an exception in one reaction does not prevent the scheduled execution of other, possibly unrelated, reactions. This also allows reactions to recover from exceptions; throwing an exception does not break the tracking done by MobX, so as subsequent run of a reaction might complete normally again if the cause for the exception is removed. This option allows overriding that behavior. It is possible to set a global error handler or to disable catching errors completely using [configure](configure.md).
--   `scheduler` (autorun, reaction): Set a custom scheduler to determine how re-running the autorun function should be scheduled. It takes a function that should be invoked at some point in the future, for example: `{ scheduler: run => { setTimeout(run, 1000) }}`
--   `equals`: (reaction) `comparer.default` by default. If specified, this comparer function is used to compare the previous and next values produced by the _data_ function. The _effect_ function is only invoked if this function returns false. See [built-in-comparers](computed.html#built-in-comparers) for some default available options.
-
 ## Use reactions sparingly!
 
-As said, typically you won't create reactions very often.
-It might very well be that your application doesn't use any of those APIs directly, and the only way reactions are construction is indirectly through for example `observer` from the mobx-react bindings.
+As it was already said, you won't create reactions very often.
+It might very well be that your application doesn't use any of these APIs directly, and the only way reactions are constructed is indirectly, through for example `observer` from the mobx-react bindings.
 
-Before you set up a reaction, it is good to check if it complies to the following principles first:
+Before you set up a reaction, it is good to first check if it conforms to the following principles:
 
 1. **Only use Reactions if there is no direct relation between cause and effect**: If a side effect should happen in response to a very limited set of events / actions, it will often be clearer to directly trigger the effect from those specific actions. For example, if pressing a form submit button should lead to a network request to be posted, it is clearer to trigger this effect directly in response of the `onClick` event, rather than indirectly through a reaction. In contrast, if any change you make to the form state should automatically end up in local storage, then a reaction can be very useful, so that you don't have to trigger this effect from every individual `onChange` event.
-1. **Reactions shouldn't update other observables**: Is the reaction going to modify some observables? If the answer is yes, typically the observable you want to update should be expressing using a [`computed`](computed.md) value instead. For example, if a collection of todos is altered, don't use a reaction to compute the amount of `remainingTodos`, but express `remainingTodos` as a computed value. That will lead to much clearer and easier to debug code. Reactions should not compute new data but only cause effects. Put differently, side effects are in principle not observable from your application code itself but only affect the 'outside world'.
-1. **Reactions should be independent**: Does your code rely on some other reaction to have run first? If that is the case, you probably
-   either violated the first rule, or the new reaction you are about to create should be merged into the one it is depending upon. MobX doesn't guarantee the order in which reactions will be run.
+1. **Reactions shouldn't update other observables**: Is the reaction going to modify other observables? If the answer is yes, typically the observable you want to update should be annotated as a [`computed`](computed.md) value instead. For example, if a collection of todos is altered, don't use a reaction to compute the amount of `remainingTodos`, but annotate `remainingTodos` as a computed value. That will lead to much clearer and easier to debug code. Reactions should not compute new data, but only cause effects.
+1. **Reactions should be independent**: Does your code rely on some other reaction having to run first? If that is the case, you probably
+either violated the first rule, or the new reaction you are about to create should be merged into the one it is depending upon. MobX does not guarantee the order in which reactions will be run.
 
-There are real-life scenarios that don't fit in above principles. That is why they are _principles_, not _laws_.
+There are real-life scenarios that do not fit in the above principles. That is why they are _principles_, not _laws_.
 But, the exceptions are rare so only violate them as a last resort.
+
+## Options {🚀}
+
+The behavior of `autorun`, `reaction` and `when` can be further fine-tuned by passing in an `options` argument as shown in the usages above.
+
+### `name`
+
+This string is used as a debug name for this reaction in the [Spy event listeners](best/debugging-mobx.md#spy) and [MobX developer tools](https://github.com/mobxjs/mobx-devtools).
+
+### `fireImmediately` _(reaction)_
+
+Boolean indicating that the _effect_ function should immediately be triggered after the first run of the _data_ function. `false` by default.
+
+### `delay` _(autorun, reaction)_
+
+Number of milliseconds that can be used to throttle the effect function. If zero (default), no throttling happens.
+
+### `timeout` _(when)_
+
+Set a limited amount of time that `when` will wait for. If the deadline passes, `when` will reject / throw.
+
+### `onError`
+
+By default, any exception thrown inside an reaction will be logged, but not further thrown. This is to make sure that an exception in one reaction does not prevent the scheduled execution of other, possibly unrelated reactions. This also allows reactions to recover from exceptions. Throwing an exception does not break the tracking done by MobX, so subsequent runs of the reaction might complete normally again if the cause for the exception is removed. This option allows overriding that behavior. It is possible to set a global error handler or to disable catching errors completely using [configure](configure.md).
+
+### `scheduler` _(autorun, reaction)_
+
+Set a custom scheduler to determine how re-running the autorun function should be scheduled. It takes a function that should be invoked at some point in the future, for example: `{ scheduler: run => { setTimeout(run, 1000) }}`
+
+### `equals`: (reaction)
+
+Set to `comparer.default` by default. If specified, this comparer function is used to compare the previous and next values produced by the _data_ function. The _effect_ function is only invoked if this function returns false.
+
+Check out the [Built-in comparers](computed.md#built-in-comparers) section.
