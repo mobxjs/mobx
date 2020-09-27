@@ -1,12 +1,12 @@
 ---
-title: Update state using actions
+title: Updating state using actions
 sidebar_label: Actions
 hide_title: true
 ---
 
 <script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
-# Update state using actions
+# Updating state using actions
 
 ## Action
 
@@ -167,7 +167,7 @@ Usage:
 
 The `action.bound` annotation can be used to automatically bind a method to the correct instance, so that `this` is always correctly bound inside the function.
 
-<details id="avoid-bound"><summary>Tip: prefer arrow functions over `action.bound`<a href="#avoid-bound" class="tip-anchor"></a></summary>
+<details id="avoid-bound"><summary>**Tip:** prefer arrow functions over `action.bound`<a href="#avoid-bound" class="tip-anchor"></a></summary>
 If you want to bind actions in combination with `makeAutoObservable`, it is usually simpler to use arrow functions instead:
 
 ```javascript
@@ -349,7 +349,7 @@ const projects = await flowResult(store.fetchProjects())
 
 <!--END_DOCUSAURUS_CODE_TABS-->
 
-## 🚀 Using flow instead of async/await
+## {🚀}Using flow instead of async/await
 
 Usage:
 
@@ -376,7 +376,7 @@ However, TypeScript isn't aware of that transformation, so, `flowResult` will ma
 
 `makeAutoObservable` and friends will automatically infer generators to be `flow`s.
 
-<details id="flow-wrap"><summary>🚀 Using flow on object fields<a href="#flow-wrap" class="tip-anchor"></a></summary>
+<details id="flow-wrap"><summary>{🚀} **Note:** Using flow on object fields<a href="#flow-wrap" class="tip-anchor"></a></summary>
 `flow`, like `action` can be used to wrap functions directly, so above example could also have been written as:
 
 ```typescript
@@ -408,14 +408,14 @@ The upside is that we don't need `flowResult` anymore, the downside is that `thi
 
 </details>
 
-### 🚀 Flow cancellation
+### {🚀}Flow cancellation
 
 Another neat benefit of flows is that they are cancellable.
 The return value of `flow` is a promise that resolves with the value that is returned from the generator function in the end.
 The returned promise has an additional `cancel()` methods that will interrupt the running generator and cancel it.
 Any `try / finally` clauses will still be run.
 
-## 🚀 Disabling mandatory actions
+## {🚀}Disabling mandatory actions
 
 By default, MobX 6 and later require that you use actions to make state changes.
 You can however configure MobX to disable this behavior, see [`enforceActions`](configure.md#enforceactions).

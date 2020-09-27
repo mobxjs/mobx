@@ -8,7 +8,7 @@ hide_title: true
 
 # MobX API Reference
 
-Functions marked with '🚀' should typically not be needed.
+Functions marked with {🚀} should typically not be needed.
 
 # Core API
 
@@ -43,7 +43,7 @@ Automatically convert object members into observables, computeds and actions.
 
 ### `extendObservable`
 
-Usage 🚀:
+Usage {🚀}:
 
 -   `extendObservable(target, properties, overrides?, options?)
 
@@ -72,7 +72,7 @@ Usage:
 
 ### `observable.object`
 
-Usage 🚀:
+Usage {🚀}:
 
 -   `observable.object(source, overrides?, options?)`
 
@@ -82,7 +82,7 @@ Alias for `observable(source, overrides?, options?)`. Creates a clone of the pro
 
 ### `observable.array`
 
-Usage 🚀:
+Usage {🚀}:
 
 -   `observable.array(initialValues?, options?)`
 
@@ -100,7 +100,7 @@ The `{ deep: false }` option can be used to make this array shallowly observable
 
 ### `observable.map`
 
-Usage 🚀:
+Usage {🚀}:
 
 -   `observable.map(initialMap?, options?)`
 
@@ -118,7 +118,7 @@ The `{ deep: false }` option can be used to make this map shallowly observable, 
 
 ### `observable.set`
 
-Usage 🚀:
+Usage {🚀}:
 
 -   `observable.set(initialSet?, options?)`
 
@@ -149,7 +149,7 @@ Like the `observable` annotation, except that any assigned value that is structu
 
 ### `observable.struct`
 
-Usage 🚀:
+Usage {🚀}:
 
 -   `observable.struct` (annotation)
 
@@ -159,7 +159,7 @@ Like `observable.ref` but for collections; any collection assigned will be made 
 
 ### `observable.deep`
 
-Usage 🚀:
+Usage {🚀}:
 
 -   `observable.deep` (annotation)
 
@@ -169,7 +169,7 @@ Alias for the [`observable`](#observable) annotation.
 
 ### `observable.box`
 
-Usage 🚀:
+Usage {🚀}:
 
 -   `observable.box(value, options?)`
 
@@ -217,7 +217,7 @@ Marking things as action.
 
 ### `runInAction`
 
-Usage 🚀:
+Usage {🚀}:
 
 -   `runInAction(fn)`
 
@@ -259,7 +259,7 @@ Usage:
 -   `computed(options)` (annotation)
 -   `computed(fn, options?)`
 
-Create an observable value that is derived from other observables, but won't re-computed unless one of the underlying observables changes.
+Create an observable value that is derived from other observables, but won't recomputed unless one of the underlying observables changes.
 
 [&laquo;details&raquo;](computed.md)
 
@@ -303,7 +303,7 @@ Is part of the `mobx-react` / `mobx-react-lite` package.
 
 ## Reactions
 
-Side-effects for observables.
+Side effects for observables.
 
 ### `autorun`
 
@@ -321,7 +321,7 @@ Usage:
 
 -   `reaction(() => data, data => effect, options?)`
 
-Rerun a side-effect when any data selected before changes.
+Rerun a side effect when any data selected before changes.
 
 [&laquo;details&raquo;](autorun.md#reaction)
 
@@ -332,7 +332,7 @@ Usage:
 -   `when(() => condition, () => effect, options?)`
 -   `await when(() => condition, options?)`
 
-Execute a side-effect once when a observable condition becomes true.
+Execute a side effect once when a observable condition becomes true.
 
 [&laquo;details&raquo;](autorun.md#when)
 
@@ -343,7 +343,7 @@ More, less trivial utilities can be found in the [mobx-utils](https://github.com
 
 ### `onReactionError`
 
-Usage 🚀:
+Usage {🚀}:
 
 -   `onReactionError(handler: (error: any, derivation) => void)`
 
@@ -352,7 +352,7 @@ This can be used for monitoring or test purposes.
 
 ### `intercept`
 
-Usage 🚀:
+Usage {🚀}:
 
 -   `intercept(array | set | map, listener)`
 -   `intercept(object, propertyName, listener)`
@@ -364,7 +364,7 @@ Returns a disposer that stops the interception.
 
 ### `observe`
 
-Usage 🚀:
+Usage {🚀}:
 
 -   `observe(array | set | map, listener)`
 -   `observe(object, propertyName, listener)`
@@ -376,7 +376,7 @@ Returns a disposer that stops the interception.
 
 ### `onBecomeObserved`
 
-Usage 🚀:
+Usage {🚀}:
 
 -   `onBecomeObserved(observable, property?, listener: () => void)`
 
@@ -386,7 +386,7 @@ Hook for when something becomes observed.
 
 ### `onBecomeUnobserved`
 
-Usage 🚀:
+Usage {🚀}:
 
 -   `onBecomeUnobserved(observable, property?, listener: () => void)`
 
@@ -428,14 +428,14 @@ Use this to change how MobX behaves as a whole.
 
 [&laquo;details&raquo;](configure.md)
 
-## Object API 🚀
+## Object API{🚀}
 
 The Object API is an optional, generic API that enables manipulating observable maps, objects and arrays with the same API. This can be useful
 in [environments without `Proxy` support](configure.md#limitations-without-proxy-support), but are otherwise typically not needed.
 
 ### `values`
 
-Usage 🚀:
+Usage {🚀}:
 
 -   `values(map|set|array|object)`
 
@@ -445,7 +445,7 @@ Return all values in collection as array.
 
 ### `keys`
 
-Usage 🚀:
+Usage {🚀}:
 
 -   `keys(map|set|array|object)`
 
@@ -455,7 +455,7 @@ Return all keys/indices in collection as array.
 
 ### `entries`
 
-Usage 🚀:
+Usage {🚀}:
 
 -   `entries(map|set|array|object)`
 
@@ -466,7 +466,7 @@ as an array.
 
 ### `set`
 
-Usage 🚀:
+Usage {🚀}:
 
 -   `set(map|array|object, index, value)`
 
@@ -476,7 +476,7 @@ Update collection.
 
 ### `remove`
 
-Usage 🚀:
+Usage {🚀}:
 
 -   `remove(map|array|object, index)`
 
@@ -486,7 +486,7 @@ Remove item from collection.
 
 ### `has`
 
-Usage 🚀:
+Usage {🚀}:
 
 -   `has(map|array|object, index)`
 
@@ -496,7 +496,7 @@ Check for membership in collection.
 
 ### `get`
 
-Usage 🚀:
+Usage {🚀}:
 
 -   `get(map|array|object, index)`
 
@@ -504,13 +504,13 @@ Get value from collection with key.
 
 [&laquo;details&raquo;](object-api.md)
 
-## Introspection utilities 🚀
+## Introspection utilities{🚀}
 
 The following APIs might come in handy if you want to inspect the internal state of MobX or want to build cool tools on top of MobX.
 
 ### `isObservable`
 
-Usage 🚀:
+Usage {🚀}:
 
 -   `isObservable(map | array | set | object)`
 
@@ -518,7 +518,7 @@ Is an object / collection made observable by MobX?
 
 ### `isObservableProp`
 
-Usage 🚀:
+Usage {🚀}:
 
 -   `isObservableProp(object, propertyName)`
 
@@ -526,7 +526,7 @@ Is a property observable?
 
 ### `isObservableArray`
 
-Usage 🚀:
+Usage {🚀}:
 
 -   `isObservableArray(array)`
 
@@ -534,7 +534,7 @@ Is value an observable array?
 
 ### `isObservableMap`
 
-Usage 🚀:
+Usage {🚀}:
 
 -   `isObservableMap(map)`
 
@@ -542,7 +542,7 @@ Is value an observable map?
 
 ### `isObservableSet`
 
-Usage 🚀:
+Usage {🚀}:
 
 -   `isObservableSet(set)`
 
@@ -550,7 +550,7 @@ Is value an observable set?
 
 ### `isObservableObject`
 
-Usage 🚀:
+Usage {🚀}:
 
 -   `isObservableObject(object)`
 
@@ -558,7 +558,7 @@ Is value an observable object?
 
 ### `isBoxedObservable`
 
-Usage 🚀:
+Usage {🚀}:
 
 -   `isBoxedObservable(value)`
 
@@ -566,7 +566,7 @@ Is value an observable box? That is, created using `observable.box`.
 
 ### `isAction`
 
-Usage 🚀:
+Usage {🚀}:
 
 -   `isAction(func)`
 
@@ -574,7 +574,7 @@ Returns `true` if the given function is marked as an `action`.
 
 ### `isComputed`
 
-Usage 🚀:
+Usage {🚀}:
 
 -   `isComputed(boxedComputed)`
 
@@ -582,7 +582,7 @@ Is this a boxed computed value? That is, created using `computed(() => expr)`?
 
 ### `isComputedProp`
 
-Usage 🚀:
+Usage {🚀}:
 
 -   `isComputedProp(object, propertyName)`
 
@@ -602,7 +602,7 @@ Should be used inside a reaction / computed value. Log when value is invalidated
 
 ### `spy`
 
-Usage 🚀:
+Usage {🚀}:
 
 -   `spy(eventListener)`
 
@@ -612,7 +612,7 @@ Registers a global spy listener that listens to all events that happen in MobX.
 
 ### `getDebugName`
 
-Usage 🚀:
+Usage {🚀}:
 
 -   `getDebugName(reaction)`
 -   `getDebugName(array | set | map)`
@@ -624,7 +624,7 @@ Returns the (generated) friendly debug name for an observable or reaction.
 
 ### `getDependencyTree`
 
-Usage 🚀:
+Usage {🚀}:
 
 -   `getDependencyTree(object, computedPropertyName)`
 
@@ -634,7 +634,7 @@ Returns a tree structure with all observables the given reaction / computation c
 
 ### `getObserverTree`
 
-Usage 🚀:
+Usage {🚀}:
 
 -   `getObserverTree(array | set | map)`
 -   `getObserverTree(object | map, propertyName)`
@@ -649,7 +649,7 @@ In the rare case you want to extend MobX itself.
 
 ### `createAtom`
 
-Usage 🚀:
+Usage {🚀}:
 
 -   `createAtom(name, onBecomeObserved?, onBecomeUnobserved?)`
 
@@ -663,7 +663,7 @@ Reports and atom that exposed to methods:
 
 ### `getAtom`
 
-Usage 🚀:
+Usage {🚀}:
 
 -   `getAtom(thing, property?)`
 
@@ -673,7 +673,7 @@ Returns the backing atom.
 
 ### `transaction`
 
-Usage 🚀:
+Usage {🚀}:
 
 -   `transaction(worker: () => any)`
 
@@ -707,7 +707,7 @@ transaction(() => {
 
 ### `untracked`
 
-Usage 🚀:
+Usage {🚀}:
 
 -   `untracked(worker: () => any)`
 
