@@ -8,25 +8,23 @@ hide_title: true
 
 # Updating state using actions
 
-## Action
-
 Usage:
 
--   `action` (annotation)
+-   `action` _(annotation)_
 -   `action(fn)`
 -   `action(name, fn)`
 
-Any application has actions. An action is any code block that modifies state.
-In principle actions always happen in response to an event. For example a button was clicked, some input did change, a websocket message arrived, etc.
-MobX requires that you declare your actions, though [makeAutoObservable](observable-state.md#makeautoobservable) can automate much of this job. Actions help you to structure your code better and offer performance benefits:
+All applications have actions. An action is any piece of code that modifies the state. In principle, actions always happen in response to an event. For example, a button was clicked, some input changed, a websocket message arrived, etc.
 
-The `action` annotation should only be used on functions that intend to _modify_ state.
-Functions that just perform look-ups, filter data, in short any function that derives information, should _not_ be marked as actions; to allow MobX to track their invocations.
+MobX requires that you declare your actions, although [`makeAutoObservable`](observable-state.md#makeautoobservable) can automate much of this job. Actions help you to structure your code better and offer the following performance benefits.
 
-1. Actions are run inside [transactions](api.md#transaction). No observers will be updated until the outer-most action has finished. This ensures that intermediate or incomplete values produced during an action are not visible to the rest of the application until the action has finished.
-2. Outside actions it is (by default) not allowed to modify state. This helps to clearly identify in your code base where the state updates happen.
+1. They are run inside [transactions](api.md#transaction). No observers will be updated until the outer-most action has finished, guaranteeing that intermediate or incomplete values produced during an action are not visible to the rest of the application until the action has completed.
 
-### Examples
+2. By default, it is not allowed to change the state outside of actions. This helps to clearly identify in your code base where the state updates happen.
+
+The `action` annotation should only be used on functions that intend to _modify_ the state. Functions that derive information (performing lookups or filtering data) should _not_ be marked as actions, to allow MobX to track their invocations.
+
+## Examples
 
 <!--DOCUSAURUS_CODE_TABS-->
 <!--makeObservable-->
@@ -45,7 +43,7 @@ class Doubler {
     }
 
     increment() {
-        // intermediate states won't become visible to observers
+        // Intermediate states will not become visible to observers.
         this.value++
         this.value++
     }
@@ -93,7 +91,9 @@ class Doubler {
 }
 
 const doubler = new Doubler()
-setInterval(doubler.increment, 1000) // calling increment this way is safe as it is bound already
+
+// Calling increment this way is safe as it is already bound.
+setInterval(doubler.increment, 1000)
 ```
 
 <!--action(fn)-->
@@ -126,13 +126,13 @@ runInAction(() => {
 
 <!--END_DOCUSAURUS_CODE_TABS-->
 
-### `action` can wrap functions
+## `action` can wrap functions
 
-To leverage the transactional nature of MobX as much as possible, actions should be passed as far outward as possible. It is good to mark a class method as action if it modifies state. It is even better to mark event handlers as action; as it is the outer-most transaction that counts. A single unmarked event handler that calls two actions subsequently would still generate two transactions.
+To leverage the transactional nature of MobX as much as possible, actions should be passed as far outward as possible. It is good to mark a class method as an action if it modifies the state. It is even better to mark event handlers as actions, as it is the outer-most transaction that counts. A single unmarked event handler that calls two actions subsequently would still generate two transactions.
 
-To help creating action based event handlers, `action` is not only an annotation, but also a higher order function; it can be called with a function as argument and in that case it will return an `action` wrapped function with the same signature.
+To help create action based event handlers, `action` is not only an annotation, but also a higher order function. It can be called with a function as an argument, and in that case it will return an `action` wrapped function with the same signature.
 
-For example in React an `onClick` handler can be wrapped like:
+For example in React, an `onClick` handler can be wrapped as below.
 
 ```javascript
 const ResetButton = ({ formState }) => (
@@ -148,27 +148,27 @@ const ResetButton = ({ formState }) => (
 )
 ```
 
-For debugging purposes we recommend either name the wrapped function, or pass a name as first argument to `action`.
+For debugging purposes, we recommend to either name the wrapped function, or pass a name as the first argument to `action`.
 
-<div class="detail">
+<details id="actions-are-untracked"><summary>**Note:** actions are untracked<a href="#actions-are-untracked" class="tip-anchor"></a></summary>
 
-Another feature of actions is that they are [untracked](api.md#untracked); when an action is called from inside a side effect or computed value (a thing that should really rarily be needed!), observables read by the action won't be counted towards the dependencies of the derivation
+Another feature of actions is that they are [untracked](api.md#untracked). When an action is called from inside a side effect or a computed value (very rare!), observables read by the action won't be counted towards the dependencies of the derivation
 
-`makeAutoObservable`, `extendObservable` and `observable` use a special flavour of `action`, `autoAction`
+`makeAutoObservable`, `extendObservable` and `observable` use a special flavour of `action` called `autoAction`,
 that will determine at runtime if the function is a derivation or action.
 
-</div>
+</details>
 
-### `action.bound`
+## `action.bound`
 
 Usage:
 
--   `action.bound` (annotation)
+-   `action.bound` _(annotation)_
 
 The `action.bound` annotation can be used to automatically bind a method to the correct instance, so that `this` is always correctly bound inside the function.
 
 <details id="avoid-bound"><summary>**Tip:** prefer arrow functions over `action.bound`<a href="#avoid-bound" class="tip-anchor"></a></summary>
-If you want to bind actions in combination with `makeAutoObservable`, it is usually simpler to use arrow functions instead:
+If you want to bind actions in combination with `makeAutoObservable`, it is usually simpler to use arrow functions instead.
 
 ```javascript
 import { makeAutoObservable } from "mobx"
@@ -189,19 +189,19 @@ class Doubler {
 
 </details>
 
-### `runInAction`
+## `runInAction`
 
 Usage:
 
 -   `runInAction(fn)`
 
 Use this utility to create a temporarily action that is immediately invoked. Can be useful in asynchronous processes.
-See the [above code block](#examples) for an example.
+Check out the [above code block](#examples) for an example.
 
 ## Asynchronous actions
 
-In essence asynchronous processes don't need any special treatment in MobX, as all reactions will update automatically regardless the moment in time they are caused.
-And since observable objects are mutable, it is generally safe to keep references to them during the duration of an action.
+In essence, asynchronous processes don't need any special treatment in MobX, as all reactions will update automatically regardless of the moment in time they are caused.
+And since observable objects are mutable, it is generally safe to keep references to them for the duration of an action.
 However, every step (tick) that updates observables in an asynchronous process should be marked as `action`.
 This can be achieved in multiple ways by leveraging the above APIs, as shown below.
 
@@ -210,14 +210,14 @@ For example, when handling promises, the handlers that update state should be wr
 <!--DOCUSAURUS_CODE_TABS-->
 <!--Wrap handlers in `action`-->
 
-Promise resolution handlers are handled in-line, but run after the original action finished, so need to be wrapped by `action`:
+Promise resolution handlers are handled in-line, but run after the original action finished, so they need to be wrapped by `action`.
 
 ```javascript
 import { action, makeAutoObservable } from "mobx"
 
 class Store {
     githubProjects = []
-    state = "pending" // "pending" / "done" / "error"
+    state = "pending" // "pending", "done" or "error"
 
     constructor() {
         makeAutoObservable(this)
@@ -242,14 +242,14 @@ class Store {
 
 <!--Handle updates in separate actions-->
 
-If the promise handlers are class fields, they will automatically be wrapped in `action` by `makeAutoObservable`:
+If the promise handlers are class fields, they will automatically be wrapped in `action` by `makeAutoObservable`.
 
 ```javascript
 import { makeAutoObservable } from "mobx"
 
 class Store {
     githubProjects = []
-    state = "pending" // "pending" / "done" / "error"
+    state = "pending" // "pending", "done" or "error"
 
     constructor() {
         makeAutoObservable(this)
@@ -278,15 +278,15 @@ class Store {
 
 <!--async/await + runInAction-->
 
-Any steps after `await` aren't in the same tick, so need action wrapping.
-We can leverage `runInAction` here:
+Any steps after `await` aren't in the same tick, so they require action wrapping.
+Here, we can leverage `runInAction`.
 
 ```javascript
 import { runInAction, makeAutoObservable } from "mobx"
 
 class Store {
     githubProjects = []
-    state = "pending" // "pending" / "done" / "error"
+    state = "pending" // "pending", "done" or "error"
 
     constructor() {
         makeAutoObservable(this)
@@ -328,12 +328,13 @@ class Store {
         })
     }
 
-    // note the star, this a generator function!
+    // Note the star, this a generator function!
     *fetchProjects() {
         this.githubProjects = []
         this.state = "pending"
         try {
-            const projects = yield fetchGithubProjectsSomehow() // yield instead of await
+            // Yield instead of await.
+            const projects = yield fetchGithubProjectsSomehow()
             const filteredProjects = somePreprocessing(projects)
             this.state = "done"
             this.githubProjects = filteredProjects
@@ -349,38 +350,38 @@ const projects = await flowResult(store.fetchProjects())
 
 <!--END_DOCUSAURUS_CODE_TABS-->
 
-## {🚀}Using flow instead of async/await
+## Using flow instead of async / await {🚀}
 
 Usage:
 
--   `flow` (annotation)
+-   `flow` _(annotation)_
 -   `flow(function* (args) { })`
 
 The `flow` wrapper is an optional alternative to `async` / `await` that makes it easier to
 work with MobX actions.
-`flow()` takes a [generator function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Generator) as its only input.
-Inside the generator you can chain promises by yielding them (so instead of `await somePromise` you write `yield somePromise`).
-The flow mechanism then will make sure the generator continues or throws when a yielded promise resolves.
-So `flow` is an alternative to `async / await` that doesn't need any further `action` wrapping.
-It can be applied as follows:
+`flow` takes a [generator function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Generator) as its only input.
+Inside the generator, you can chain promises by yielding them (instead of `await somePromise` you write `yield somePromise`).
+The flow mechanism will then make sure the generator either continues or throws when a yielded promise resolves.
+
+So `flow` is an alternative to `async` / `await` that doesn't need any further `action` wrapping. It can be applied as follows.
 
 1. Wrap `flow` around your asynchronous function.
-2. Instead of `async` you use `function *`.
-3. Instead of `await` you use `yield`.
+2. Instead of `async` use `function *`.
+3. Instead of `await` use `yield`.
 
-The [listing above](#examples) shows what this looks in practice.
+The [`flow` + generator function](#asynchronous-actions) example above shows what this looks like in practice.
 
-The `flowResult` function in the above listing is only needed when using TypeScript.
+Note that the `flowResult` function is only needed when using TypeScript.
 Since decorating a method with `flow`, it will wrap the returned generator in a promise.
-However, TypeScript isn't aware of that transformation, so, `flowResult` will make sure that TypeScript is aware of that type change.
+However, TypeScript isn't aware of that transformation, so `flowResult` will make sure that TypeScript is aware of that type change.
 
 `makeAutoObservable` and friends will automatically infer generators to be `flow`s.
 
-<details id="flow-wrap"><summary>{🚀} **Note:** Using flow on object fields<a href="#flow-wrap" class="tip-anchor"></a></summary>
-`flow`, like `action` can be used to wrap functions directly, so above example could also have been written as:
+<details id="flow-wrap"><summary>{🚀} **Note:** using flow on object fields<a href="#flow-wrap" class="tip-anchor"></a></summary>
+`flow`, like `action`, can be used to wrap functions directly. The above example could also have been written as follows.
 
 ```typescript
-import { flow, makeAutoObservable, flowResult } from "mobx"
+import { flow } from "mobx"
 
 class Store {
     githubProjects = []
@@ -390,7 +391,8 @@ class Store {
         this.githubProjects = []
         this.state = "pending"
         try {
-            const projects = yield fetchGithubProjectsSomehow() // yield instead of await
+            // yield instead of await.
+            const projects = yield fetchGithubProjectsSomehow()
             const filteredProjects = somePreprocessing(projects)
             this.state = "done"
             this.githubProjects = filteredProjects
@@ -408,15 +410,15 @@ The upside is that we don't need `flowResult` anymore, the downside is that `thi
 
 </details>
 
-### {🚀}Flow cancellation
+## Flow cancellation {🚀}
 
 Another neat benefit of flows is that they are cancellable.
 The return value of `flow` is a promise that resolves with the value that is returned from the generator function in the end.
-The returned promise has an additional `cancel()` methods that will interrupt the running generator and cancel it.
-Any `try / finally` clauses will still be run.
+The returned promise has an additional `cancel()` method that will interrupt the running generator and cancel it.
+Any `try` / `finally` clauses will still be run.
 
-## {🚀}Disabling mandatory actions
+## Disabling mandatory actions {🚀}
 
-By default, MobX 6 and later require that you use actions to make state changes.
-You can however configure MobX to disable this behavior, see [`enforceActions`](configuration.md#enforceactions).
-This can be quite useful in for example unit test setup, where the warnings don't always have much value.
+By default, MobX 6 and later require that you use actions to make changes in the state.
+However, you can configure MobX to disable this behavior. Check out the [`enforceActions`](configuration.md#enforceactions) section.
+For example, this can be quite useful in unit test setup, where the warnings don't always have much value.
