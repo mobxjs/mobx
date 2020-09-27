@@ -1,6 +1,6 @@
 ---
-title: MobX API overview
-sidebar_label: MobX API overview
+title: MobX API Reference
+sidebar_label: MobX API Reference
 hide_title: true
 ---
 
@@ -8,7 +8,7 @@ hide_title: true
 
 # MobX API Reference
 
-Functions marked with {🚀} should typically not be needed.
+Functions marked with {🚀} are considered advanced, and should typically not be needed.
 
 # Core API
 
@@ -428,7 +428,7 @@ Use this to change how MobX behaves as a whole.
 
 [&laquo;details&raquo;](configuration.md)
 
-## Object API{🚀}
+## Collection utilities {🚀}
 
 The Object API is an optional, generic API that enables manipulating observable maps, objects and arrays with the same API. This can be useful
 in [environments without `Proxy` support](configuration.md#limitations-without-proxy-support), but are otherwise typically not needed.
@@ -504,7 +504,7 @@ Get value from collection with key.
 
 [&laquo;details&raquo;](collection-utilities.md)
 
-## Introspection utilities{🚀}
+## Introspection utilities {🚀}
 
 The following APIs might come in handy if you want to inspect the internal state of MobX or want to build cool tools on top of MobX.
 

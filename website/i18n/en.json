@@ -18,8 +18,8 @@
         "sidebar_label": "Analyzing reactivity {🚀}"
       },
       "api": {
-        "title": "MobX API overview",
-        "sidebar_label": "MobX API overview"
+        "title": "MobX API Reference",
+        "sidebar_label": "MobX API Reference"
       },
       "backers-sponsors": {
         "title": "MobX Backers and Sponsors"
@@ -199,7 +199,7 @@
       }
     },
     "links": {
-      "API overview": "API overview",
+      "API Reference": "API Reference",
       "中文": "中文",
       "Sponsors": "Sponsors",
       "GitHub": "GitHub"
