@@ -493,3 +493,31 @@ test("makeObservable doesn't trigger in always mode'", () => {
 
     expect(new C()).toBeTruthy()
 })
+
+test("#2457", () => {
+    class BaseClass {
+        @observable
+        value1?: number
+
+        constructor() {
+            makeObservable(this)
+        }
+    }
+
+    class SubClass extends BaseClass {
+        constructor() {
+            super()
+            makeObservable(this)
+        }
+
+        @computed
+        get value1Computed() {
+            return this.value1
+        }
+    }
+
+    const t = new SubClass()
+    expect(isObservableObject(t)).toBe(true)
+    expect(isObservableProp(t, "value1")).toBe(true)
+    expect(isComputedProp(t, "value1Computed")).toBe(true)
+})

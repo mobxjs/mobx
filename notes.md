@@ -43,7 +43,7 @@
     -   [x] observable; support `false` as argument
     -   [x] ~makeObservable don't warn about missing fields?~ use extendObservable instead
     -   [x] test late initialization (after declaring props)
--   [ ] misc
+-   [x] misc
     -   [x] revisit safety model
     -   [x] at startup, test presence of Map, Symbol ownPropertySymboles and other globals!
     -   [x] verify: action called from computed throws?
@@ -92,6 +92,9 @@
     -   [x] make links for all tips
     -   [ ] cleanup notes files
     -   [ ] blog post
+    -   [ ] fix #2457
+    -   [ ] don't minimize default builds
+    -   [ ] drop mobx-react website
 -   [ ] mobx-react-lite
     -   [x] displayname for observer components facebook/react#18026. Fixed: https://github.com/facebook/react/issues/18026
     -   [x] update useLocalStore in mobx-react-lite to use

@@ -10,6 +10,7 @@ import {
 } from "../internal"
 
 export const mobxDecoratorsSymbol = Symbol("mobx-decorators")
+const mobxAppliedDecoratorsSymbol = Symbol("mobx-applied-decorators")
 
 export function createDecorator<ArgType>(
     type: Annotation["annotationType_"]
@@ -63,6 +64,7 @@ export function storeDecorator(
 }
 
 export function applyDecorators(target: Object): boolean {
+    if (target[mobxAppliedDecoratorsSymbol]) return true
     let current = target
     // optimization: this could be cached per prototype!
     // (then we can remove the weird short circuiting as well..)
@@ -87,5 +89,6 @@ export function applyDecorators(target: Object): boolean {
     annotations.forEach(a => {
         makeObservable(target, a)
     })
+    addHiddenProp(target, mobxAppliedDecoratorsSymbol, true)
     return annotations.length > 0
 }

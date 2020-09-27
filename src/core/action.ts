@@ -55,12 +55,12 @@ export function createAction(
 
 export function executeAction(
     actionName: string,
-    canRunAsDeriviation: boolean,
+    canRunAsDerivation: boolean,
     fn: Function,
     scope?: any,
     args?: IArguments
 ) {
-    const runInfo = _startAction(actionName, canRunAsDeriviation, scope, args)
+    const runInfo = _startAction(actionName, canRunAsDerivation, scope, args)
     try {
         return fn.apply(scope, args)
     } catch (err) {
