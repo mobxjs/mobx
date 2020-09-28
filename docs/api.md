@@ -234,7 +234,7 @@ Usage:
 
 MobX friendly replacement for `async` / `await` that supports cancellation.
 
-[&laquo;details&raquo;](actions.md#using-flow-instead-of-asyncawait)
+[&laquo;details&raquo;](actions.md#using-flow-instead-of-async--await-)
 
 ### `flowResult`
 
@@ -245,7 +245,7 @@ Usage:
 Utility for TypeScript users only, that casts the output of the generator to a promise.
 This is just to correct type-wise for the promise wrapping done by `flow`. At runtime it just directly returns the inputted value.
 
-[&laquo;details&raquo;](actions.md#using-flow-instead-of-asyncawait)
+[&laquo;details&raquo;](actions.md#using-flow-instead-of-async--await-)
 
 ## Computed
 

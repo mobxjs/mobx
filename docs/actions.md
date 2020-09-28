@@ -16,7 +16,7 @@ Usage:
 
 All applications have actions. An action is any piece of code that modifies the state. In principle, actions always happen in response to an event. For example, a button was clicked, some input changed, a websocket message arrived, etc.
 
-MobX requires that you declare your actions, although [`makeAutoObservable`](observable-state.md#makeautoobservable) can automate much of this job. Actions help you to structure your code better and offer the following performance benefits.
+MobX requires that you declare your actions, although [`makeAutoObservable`](observable-state.md#makeautoobservable) can automate much of this job. Actions help you structure your code better and offer the following performance benefits:
 
 1. They are run inside [transactions](api.md#transaction). No observers will be updated until the outer-most action has finished, guaranteeing that intermediate or incomplete values produced during an action are not visible to the rest of the application until the action has completed.
 
@@ -126,7 +126,7 @@ runInAction(() => {
 
 <!--END_DOCUSAURUS_CODE_TABS-->
 
-## `action` can wrap functions
+## Wrapping functions using `action`
 
 To leverage the transactional nature of MobX as much as possible, actions should be passed as far outward as possible. It is good to mark a class method as an action if it modifies the state. It is even better to mark event handlers as actions, as it is the outer-most transaction that counts. A single unmarked event handler that calls two actions subsequently would still generate two transactions.
 
@@ -363,7 +363,7 @@ work with MobX actions.
 Inside the generator, you can chain promises by yielding them (instead of `await somePromise` you write `yield somePromise`).
 The flow mechanism will then make sure the generator either continues or throws when a yielded promise resolves.
 
-So `flow` is an alternative to `async` / `await` that doesn't need any further `action` wrapping. It can be applied as follows.
+So `flow` is an alternative to `async` / `await` that doesn't need any further `action` wrapping. It can be applied as follows:
 
 1. Wrap `flow` around your asynchronous function.
 2. Instead of `async` use `function *`.
@@ -410,7 +410,7 @@ The upside is that we don't need `flowResult` anymore, the downside is that `thi
 
 </details>
 
-## Flow cancellation {🚀}
+## Cancelling flows {🚀}
 
 Another neat benefit of flows is that they are cancellable.
 The return value of `flow` is a promise that resolves with the value that is returned from the generator function in the end.
@@ -419,6 +419,6 @@ Any `try` / `finally` clauses will still be run.
 
 ## Disabling mandatory actions {🚀}
 
-By default, MobX 6 and later require that you use actions to make changes in the state.
+By default, MobX 6 and later require that you use actions to make changes to the state.
 However, you can configure MobX to disable this behavior. Check out the [`enforceActions`](configuration.md#enforceactions) section.
 For example, this can be quite useful in unit test setup, where the warnings don't always have much value.
