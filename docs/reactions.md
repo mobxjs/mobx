@@ -30,7 +30,7 @@ It also runs once when you create the `autorun` itself. It only responds to chan
 
 ### How tracking works
 
-Autorun works by running `effect` in a _reactive context_. During the execution of the provided function, MobX keeps track of all observable and computed values that are directly or indirectly _read_ by the effect.
+Autorun works by running the `effect` in a _reactive context_. During the execution of the provided function, MobX keeps track of all observable and computed values that are directly or indirectly _read_ by the effect.
 Once the function finishes, MobX will collect and subscribe to all observables that were read and wait until any of them changes again.
 Once they do, the `autorun` will trigger again, repeating the entire process.
 
@@ -119,7 +119,7 @@ Usage:
 -   `reaction(() => value, (value, previousValue, reaction) => { sideEffect }, options?)`.
 
 `reaction` is like `autorun`, but gives more fine grained control on which observables will be tracked.
-It takes two functions, the first, _data_ function, is tracked and returns the data that is used as input for the second, _effect_ function.
+It takes two functions: the first, _data_ function, is tracked and returns the data that is used as input for the second, _effect_ function.
 It is important to note that the side effect _only_ reacts to data that was _accessed_ in the data function, which might be less than the data that is actually used in the effect function.
 
 The typical pattern is that you produce the things you need in your side effect
@@ -278,7 +278,7 @@ disposer()
 counter.count++
 ```
 
-We strongly recommend to always use the disposer function that is returned from these functions as soon as their side effect is no longer needed.
+We strongly recommend to always use the disposer function that is returned from these methods as soon as their side effect is no longer needed.
 Failing to do so can lead to memory leaks.
 
 The `reaction` argument that is passed as second argument to the effect functions of `reaction` and `autorun`, can be used to prematurely clean up the reaction as well by calling `reaction.dispose()`.
@@ -365,7 +365,7 @@ Set a limited amount of time that `when` will wait for. If the deadline passes, 
 
 ### `onError`
 
-By default, any exception thrown inside an reaction will be logged, but not further thrown. This is to make sure that an exception in one reaction does not prevent the scheduled execution of other, possibly unrelated reactions. This also allows reactions to recover from exceptions. Throwing an exception does not break the tracking done by MobX, so subsequent runs of the reaction might complete normally again if the cause for the exception is removed. This option allows overriding that behavior. It is possible to set a global error handler or to disable catching errors completely using [configure](configuration.md).
+By default, any exception thrown inside an reaction will be logged, but not further thrown. This is to make sure that an exception in one reaction does not prevent the scheduled execution of other, possibly unrelated reactions. This also allows reactions to recover from exceptions. Throwing an exception does not break the tracking done by MobX, so subsequent runs of the reaction might complete normally again if the cause for the exception is removed. This option allows overriding that behavior. It is possible to set a global error handler or to disable catching errors completely using [configure](configuration.md#disableerrorboundaries-boolean).
 
 ### `scheduler` _(autorun, reaction)_
 
