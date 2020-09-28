@@ -2,35 +2,35 @@
   "docs": {
     "Introduction": [
       "README",
-      "intro/how-to-read",
-      "intro/installation",
-      "intro/concepts"
+      "about-this-documentation",
+      "installation",
+      "the-gist-of-mobx"
     ],
     "MobX core": [
-      "refguide/observable",
-      "refguide/action",
-      "refguide/autorun",
-      "refguide/computed"
+      "observable-state",
+      "actions",
+      "computeds",
+      "reactions"
     ],
     "MobX and React": [
-      "react/react-integration"
+      "react-integration",
+      "react-optimizations"
     ],
     "Tips & Tricks": [
-      "best/what-does-mobx-react-to",
-      "best/debugging-mobx",
-      "best/store",
-      "react/react-performance",
-      "refguide/mobx-utils",
-      "refguide/computed-with-args",
-      "refguide/extending",
-      "refguide/on-become-observed",
-      "refguide/object-api",
-      "refguide/observe"
+      "defining-data-stores",
+      "understanding-reactivity",
+      "analyzing-reactivity",
+      "computeds-with-args",
+      "mobx-utils",
+      "custom-observables",
+      "lazy-observables",
+      "collection-utilities",
+      "intercept-and-observe"
     ],
-    "Configuring MobX": [
-      "refguide/configure",
-      "best/decorators",
-      "faq/migrate-to-6"
+    "Fine-tuning": [
+      "configuration",
+      "enabling-decorators",
+      "migrating-from-4-or-5"
     ]
   }
 }

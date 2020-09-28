@@ -37,8 +37,8 @@ class Footer extends React.Component {
                     </a>
                     <div>
                         <h5>Docs</h5>
-                        <a href={this.docUrl("README#introduction")}>Why MobX</a>
-                        <a href={this.docUrl("intro/concepts")}>Concepts</a>
+                        <a href={this.docUrl("README.html#introduction")}>About MobX</a>
+                        <a href={this.docUrl("the-gist-of-mobx.html")}>The gist of MobX</a>
                     </div>
                     <div>
                         <h5>Community</h5>
@@ -70,9 +70,8 @@ class Footer extends React.Component {
                         {this.props.config.twitterUsername && (
                             <div className="social">
                                 <a
-                                    href={`https://twitter.com/${
-                                        this.props.config.twitterUsername
-                                    }`}
+                                    href={`https://twitter.com/${this.props.config.twitterUsername
+                                        }`}
                                     className="twitter-follow-button"
                                 >
                                     Follow @{this.props.config.twitterUsername}

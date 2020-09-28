@@ -51,10 +51,10 @@ const siteConfig = {
 
     // For no header links in the top nav bar -> headerLinks: [],
     headerLinks: [
-        { doc: "refguide/api", label: "API Reference"},
-        { href: "http://cn.mobx.js.org", label: "中文"},
-        { doc: "backers-sponsors", label: "Sponsors"},
-        { href: "https://github.com/mobxjs/mobx", label: "Github" }
+        { doc: "api", label: "API Reference" },
+        { href: "http://cn.mobx.js.org", label: "中文" },
+        { doc: "backers-sponsors", label: "Sponsors" },
+        { href: "https://github.com/mobxjs/mobx", label: "GitHub" }
     ],
 
     // docsSideNavCollapsible: true,

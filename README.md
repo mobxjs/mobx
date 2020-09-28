@@ -125,7 +125,7 @@ The `observer` wrapper around the `TimerView` React component will automatically
 of the component depends on `timer.secondsPassed`, even though this relationship is not explicitly defined. MobX's reactivity system will make sure the component gets re-rendered when _precisely that_ field is updated in the future.
 
 Every event (`onClick` and `setInterval`) invokes an _action_ (`increaseTimer` and `resetTimer` functions) that updates _observable state_ (`secondsPassed` class property).
-Changes in the observable state are propagated precisely to all _computations_ and _side-effects_ (`TimerView` component) that depend on the changes being made.
+Changes in the observable state are propagated precisely to all _computations_ and _side effects_ (`TimerView` component) that depend on the changes being made.
 
 <img alt="MobX unidirectional flow" src="docs/assets/flow2.png" align="center" />
 
@@ -161,6 +161,6 @@ The philosophy and benefits of the mental model provided by MobX are described i
 
 ## Credits
 
-MobX is inspired by reactive programming principles as found in spreadsheets. It is inspired by MVVM frameworks like in MeteorJS tracker, knockout and Vue.js. But MobX brings Transparent Functional Reactive Programming to the next level and provides a stand alone implementation. It implements TFRP in a glitch-free, synchronous, predictable and efficient manner.
+MobX is inspired by reactive programming principles as found in spreadsheets. It is inspired by MVVM frameworks like in MeteorJS tracker, knockout and Vue.js. But MobX brings Transparent Functional Reactive Programming to the next level and provides a standalone implementation. It implements TFRP in a glitch-free, synchronous, predictable and efficient manner.
 
 A ton of credits for [Mendix](https://github.com/mendix), for providing the flexibility and support to maintain MobX and the chance to proof the philosophy of MobX in a real, complex, performance critical applications.
