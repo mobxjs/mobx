@@ -117,7 +117,7 @@ spy(event => {
 })
 ```
 
-Spy listeners always receive one object, which usually has at least a `type` field. The following events are emitted by default by spy.
+Spy listeners always receive one object, which usually has at least a `type` field. The following events are emitted by default by spy:
 
 | Type                            | observableKind | Other fields                                                   | Nested |
 | ------------------------------- | -------------- | -------------------------------------------------------------- | ------ |

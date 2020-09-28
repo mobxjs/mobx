@@ -105,7 +105,7 @@ As you can see in the first two lines of the output above, both `autorun` functi
 
 Once we run the `for` loop to change the `energyLevel` with the `reduceEnergy`
 action, we see a new log entry every time an `autorun` function observes a
-change in its observable state.
+change in its observable state:
 
 1.   For the _"Energy level"_ function, this is every time the `energyLevel` observable changes, 10 times in total.
 

@@ -73,7 +73,7 @@ The examples below demonstrate different patterns on how external and local obse
 <!--DOCUSAURUS_CODE_TABS-->
 <!--using props-->
 
-Observables can be passed into components as props, as was done in the example above:
+Observables can be passed into components as props (as in the example above):
 
 ```javascript
 import { observer } from "mobx-react-lite"
@@ -89,7 +89,7 @@ ReactDOM.render(<TimerView timer={myTimer} />, document.body)
 <!--using global variables-->
 
 Since it doesn't matter _how_ we got the reference to an observable, we can consume
-observables from outer scopes directly (including from imports, etc.).
+observables from outer scopes directly (including from imports, etc.):
 
 ```javascript
 const myTimer = new Timer() // See the Timer definition above.
@@ -104,7 +104,7 @@ Using observables directly works very well, but since this typically introduces 
 
 <!--using React context-->
 
-[React Context](https://reactjs.org/docs/context.html) is a great mechanism to share observables with an entire subtree.
+[React Context](https://reactjs.org/docs/context.html) is a great mechanism to share observables with an entire subtree:
 
 ```javascript
 import {observer} from 'mobx-react-lite'
@@ -172,7 +172,7 @@ useEffect(() => {
 <!--`useState` with local observable object-->
 
 As stated before, instead of using classes, it is possible to directly create observable objects.
-We can leverage [observable](observable-state.md#observable) for that.
+We can leverage [observable](observable-state.md#observable) for that:
 
 ```javascript
 import { observer } from "mobx-react-lite"

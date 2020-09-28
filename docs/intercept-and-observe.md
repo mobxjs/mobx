@@ -10,7 +10,7 @@ hide_title: true
 
 _⚠️ **Warning**: intercept and observe are low level utilities, and should not be needed in practice. Use some form of [reaction](reactions.md) instead, as `observe` doesn't respect transactions and doesn't support deep observing of changes. Using these utilities is an anti-pattern. If you intend to get access to the old and new value using `observe`, use [`reaction`](reactions.md#reaction) instead. ⚠️_
 
-`observe` and `intercept` can be used to monitor the changes of a single observable. They **_don't_** track nested observables.
+`observe` and `intercept` can be used to monitor the changes of a single observable, but they **_don't_** track nested observables.
 
 -    `intercept` can be used to detect and modify mutations before they are applied to the observable (validating, normalizing or cancelling).
 -    `observe` allows you to intercept changes after they have been made.

@@ -105,7 +105,7 @@ to avoid unnecessary updates to computed values that are not being accessed. But
 
 If you only fiddle around computed properties might not seem efficient, but when applied in a project that uses `observer`, `autorun`, etc., they become very efficient.
 
-The following code demonstrates the issue.
+The following code demonstrates the issue:
 
 ```javascript
 // OrderLine has a computed property `total`.
@@ -219,14 +219,14 @@ Check out the [`computed.struct`](#computed-struct) section above.
 
 #### Built-in comparers
 
-MobX provides four built-in `comparer` methods which should cover most needs of the `equals` option of `computed`. They can be used for `reaction` as well.
+MobX provides four built-in `comparer` methods which should cover most needs of the `equals` option of `computed`:
 
 -   `comparer.identity` uses the identity (`===`) operator to determine if two values are the same.
 -   `comparer.default` is the same as `comparer.identity`, but also considers `NaN` to be equal to `NaN`.
 -   `comparer.structural` performs deep structural comparison to determine if two values are the same.
 -   `comparer.shallow` performs shallow structural comparison to determine if two values are the same.
 
-You can import `comparer` from `mobx` to access these methods.
+You can import `comparer` from `mobx` to access these methods. They can be used for `reaction` as well.
 
 ### `requiresReaction`
 

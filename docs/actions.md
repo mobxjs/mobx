@@ -210,7 +210,7 @@ For example, when handling promises, the handlers that update state should be wr
 <!--DOCUSAURUS_CODE_TABS-->
 <!--Wrap handlers in `action`-->
 
-Promise resolution handlers are handled in-line, but run after the original action finished, so they need to be wrapped by `action`.
+Promise resolution handlers are handled in-line, but run after the original action finished, so they need to be wrapped by `action`:
 
 ```javascript
 import { action, makeAutoObservable } from "mobx"
@@ -242,7 +242,7 @@ class Store {
 
 <!--Handle updates in separate actions-->
 
-If the promise handlers are class fields, they will automatically be wrapped in `action` by `makeAutoObservable`.
+If the promise handlers are class fields, they will automatically be wrapped in `action` by `makeAutoObservable`:
 
 ```javascript
 import { makeAutoObservable } from "mobx"
@@ -279,7 +279,7 @@ class Store {
 <!--async/await + runInAction-->
 
 Any steps after `await` aren't in the same tick, so they require action wrapping.
-Here, we can leverage `runInAction`.
+Here, we can leverage `runInAction`:
 
 ```javascript
 import { runInAction, makeAutoObservable } from "mobx"
@@ -312,8 +312,6 @@ class Store {
 ```
 
 <!--`flow` + generator function -->
-
-Flow is explained below.
 
 ```javascript
 import { flow, makeAutoObservable, flowResult } from "mobx"
@@ -378,7 +376,7 @@ However, TypeScript isn't aware of that transformation, so `flowResult` will mak
 `makeAutoObservable` and friends will automatically infer generators to be `flow`s.
 
 <details id="flow-wrap"><summary>{🚀} **Note:** using flow on object fields<a href="#flow-wrap" class="tip-anchor"></a></summary>
-`flow`, like `action`, can be used to wrap functions directly. The above example could also have been written as follows.
+`flow`, like `action`, can be used to wrap functions directly. The above example could also have been written as follows:
 
 ```typescript
 import { flow } from "mobx"
