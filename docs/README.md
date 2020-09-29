@@ -12,8 +12,8 @@ _Simple, scalable state management._
 
 [![Discuss on Github](https://img.shields.io/badge/discuss%20on-GitHub-orange)](https://github.com/mobxjs/mobx/discussions)
 [![npm version](https://badge.fury.io/js/mobx.svg)](https://badge.fury.io/js/mobx)
-[![OpenCollective](https://opencollective.com/mobx/backers/badge.svg)](#backers)
-[![OpenCollective](https://opencollective.com/mobx/sponsors/badge.svg)](#sponsors)
+[![OpenCollective](https://opencollective.com/mobx/backers/badge.svg)](backers-sponsors.md#backers)
+[![OpenCollective](https://opencollective.com/mobx/sponsors/badge.svg)](backers-sponsors.md#sponsors)
 
 ---
 
