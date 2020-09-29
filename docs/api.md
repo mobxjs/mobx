@@ -14,7 +14,7 @@ Functions marked with {🚀} are considered advanced, and should typically not b
 
 _These are the most important MobX APIs._
 
-> Understanding `observable`, `computed`, `reaction` and `action` is enough
+> Understanding [`observable`](#observable), [`computed`](#computed), [`reaction`](#reaction) and [`action`](#action) is enough
 > to master MobX and use it in your applications!
 
 ## Creating observables
@@ -247,7 +247,7 @@ This is just to correct type-wise for the promise wrapping done by `flow`. At ru
 
 [&laquo;details&raquo;](actions.md#using-flow-instead-of-async--await-)
 
-## Computed
+## Computeds
 
 _Computed values derived from observables and other computeds._
 
