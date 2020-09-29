@@ -2,7 +2,7 @@
 
 # Resources
 
--   [Ten minute interactive introduction to MobX and React](https://mobx.js.org/getting-started#demo)
+-   [Ten minute interactive introduction to MobX and React](https://mobx.js.org/getting-started.html)
 -   How MobX works: [In depth explanation of MobX](https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.wnlo6bw8y)
 -   Clone the boilerplate repository containing the above example from: https://github.com/mweststrate/react-mobservable-boilerplate.
 -   Or fork this [JSFiddle](https://jsfiddle.net/mweststrate/wgbe4guu/).

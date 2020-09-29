@@ -147,7 +147,7 @@ The philosophy and benefits of the mental model provided by MobX are also descri
 
 ## Further resources and documentation
 
--   [10 minute interactive introduction to MobX and React](https://mobx.js.org/getting-started)
+-   [10 minute interactive introduction to MobX and React](https://mobx.js.org/getting-started.html)
 -   [Egghead.io course, based on MobX 3](https://egghead.io/courses/manage-complex-state-in-react-apps-with-mobx)
 
 ### The MobX book
