@@ -223,17 +223,17 @@ Note that it is possible to pass `{ proxy: false }` as an option to `observable`
 | Annotation                         | Description                                                                                                                                                                                                                |
 | ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `observable`<br/>`observable.deep` | Defines a trackable field that stores state. Any value assigned to an `observable` field will be made recursively observable as well, if possible. That is, if and only if the value is a plain object, array, Map or Set. |
-| `observable.ref`                   | Like `observable`, but only reassignments will be tracked. The assigned values themselves won't be made observable automatically. For example, use this if you intend to store immutable data in an observable field.       |
+| `observable.ref`                   | Like `observable`, but only reassignments will be tracked. The assigned values themselves won't be made observable automatically. For example, use this if you intend to store immutable data in an observable field.      |
 | `observable.shallow`               | Like `observable.ref` but for collections. Any collection assigned will be made observable, but the contents of the collection itself won't become observable.                                                             |
 | `observable.struct`                | Like `observable`, except that any assigned value that is structurally equal to the current value will be ignored.                                                                                                         |
-| `action`                           | Mark a method as an action that will modify the state. Check out [actions](actions.md) for more details.                                                                                                                           |
+| `action`                           | Mark a method as an action that will modify the state. Check out [actions](actions.md) for more details.                                                                                                                   |
 | `action.bound`                     | Like action, but will also bind the action to the instance so that `this` will always be set.                                                                                                                              |
-| `computed`                         | Can be used on a [getter](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get) to declare it as a derived value that can be cached. Check out [computeds](computeds.md) for more details.       |
-| `computed.struct`                  | Like `computed`, except that if after recomputing the result is structurally equal to the previous result, no observers will be notified.                                                                                   |
-| `true`                             | Infer the best annotation. Check out [makeAutoObservable](#makeautoobservable) for more details.                                                                                                                                                  |
+| `computed`                         | Can be used on a [getter](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get) to declare it as a derived value that can be cached. Check out [computeds](computeds.md) for more details.      |
+| `computed.struct`                  | Like `computed`, except that if after recomputing the result is structurally equal to the previous result, no observers will be notified.                                                                                  |
+| `true`                             | Infer the best annotation. Check out [makeAutoObservable](#makeautoobservable) for more details.                                                                                                                           |
 | `false`                            | Explicitly do not annotate this property.                                                                                                                                                                                  |
-| `flow`                             | Creates a `flow` to manage asynchronous processes. Check out [flow](actions.md#using-flow-instead-of-async--await-) for more details. Note that the inferred return type in TypeScript might be off.                              |
-| `autoAction`                       | Should not be used explicitly, but is used under the hood by `makeAutoObservable` to mark methods that can act as action or derivation, based on their calling context.                                                     |
+| `flow`                             | Creates a `flow` to manage asynchronous processes. Check out [flow](actions.md#using-flow-instead-of-async--await-) for more details. Note that the inferred return type in TypeScript might be off.                       |
+| `autoAction`                       | Should not be used explicitly, but is used under the hood by `makeAutoObservable` to mark methods that can act as action or derivation, based on their calling context.                                                    |
 
 ## Options {🚀}
 
@@ -264,6 +264,7 @@ For classes, it is recommend to implement a `toJSON()` method, as it will be pic
 So far most examples above have been leaning towards the class syntax.
 MobX is in principle unopinionated about this, and there are probably just as many MobX users that use plain objects.
 However, a slight benefit of classes is that they have more easily discoverable APIs, e.g. TypeScript.
-
 Also, `instanceof` checks are really powerful for type inference, and class instances aren't wrapped in `Proxy` objects, giving them a better experience in debuggers.
+Finally, classes benefit from a lot of engine optimizations, since their shape is predictable, and methods are shared on the prototype.
 But heavy inheritance patterns can easily become foot-guns, so if you use classes, keep them simple.
+So, even though there is a slight preference to use classes, we definitely want to encourage you to deviate from this style if that suits you better.
