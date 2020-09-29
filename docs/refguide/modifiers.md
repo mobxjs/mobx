@@ -7,4 +7,4 @@ hide_title: true
 
 # This document has been updated and moved
 
-[Please click on this link to open the updated version.](../observable-modifiers.md)
+[Please click on this link to open the updated version.](../observable-state.md#available-annotations)

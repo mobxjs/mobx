@@ -127,7 +127,7 @@ The `{ deep: false }` option can be used to make this map shallowly observable, 
 
 Creates a new observable [ES6 Set](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set) based on the provided value. Use it whenever you want to create a dynamic set where the addition and removal of values needs to be observed, but where values can appear only once in the entire collection.
 
-If the values in the Set should not be turned into observables, then use the `{ deep: false }` option to make a shallowly observable Set.
+If the values in the Set should not be turned into observables automatically, use the `{ deep: false }` option to make the Set shallowly observable.
 
 ### `observable.ref`
 

@@ -102,10 +102,6 @@
         "title": "MobX-utils",
         "sidebar_label": "MobX-utils {🚀}"
       },
-      "observable-modifiers": {
-        "title": "Observable modifiers",
-        "sidebar_label": "Observable modifiers {🚀}"
-      },
       "observable-state": {
         "title": "Creating observable state",
         "sidebar_label": "Observable state"
