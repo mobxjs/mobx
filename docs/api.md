@@ -10,9 +10,9 @@ hide_title: true
 
 Functions marked with {🚀} are considered advanced, and should typically not be needed.
 
-# Core API
+## Core APIs
 
-_These are the most important MobX API's._
+_These are the most important MobX APIs._
 
 > Understanding `observable`, `computed`, `reaction` and `action` is enough
 > to master MobX and use it in your applications!
