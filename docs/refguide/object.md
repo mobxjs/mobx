@@ -7,4 +7,4 @@ hide_title: true
 
 # This document has been updated and moved
 
-[Please click on this link to open the updated version.](../observable-objects.md)
+[Please click on this link to open the updated version.](../api.md#observableobject)

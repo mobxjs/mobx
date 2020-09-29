@@ -68,6 +68,8 @@ Usage:
 -   `observable` (annotation): Mark a property as observable.
 -   `observable(source, overrides?, options?)`: Clones an object and makes it observable. Source can be a plain object, [array](#observable-array), [Map](#observable-map) or [Set](#observable-set).
 
+By default, `observable` is applied recursively. If one of the encountered values is an object or array, that value will be passed through `observable` as well.
+
 [&laquo;`details`&raquo;](observable-state.md#observable)
 
 ### `observable.object`
@@ -76,7 +78,7 @@ Usage:
 
 -   `observable.object(source, overrides?, options?)`
 
-Alias for `observable(source, overrides?, options?)`. Creates a clone of the provided object and makes all its properties observable.
+Alias for `observable(source, overrides?, options?)`. Creates a clone of the provided object and makes all of its properties observable.
 
 [&laquo;`details`&raquo;](observable-state.md#observable)
 

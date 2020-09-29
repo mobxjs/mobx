@@ -106,10 +106,6 @@
         "title": "Observable modifiers",
         "sidebar_label": "Observable modifiers {🚀}"
       },
-      "observable-objects": {
-        "title": "Observable Objects",
-        "sidebar_label": "objects"
-      },
       "observable-state": {
         "title": "Creating observable state",
         "sidebar_label": "Observable state"
