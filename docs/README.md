@@ -17,7 +17,7 @@ _Simple, scalable state management._
 
 ---
 
-MobX is made possible by the generosity of the sponsors below, and many other [individual backers](http://mobxjs.github.io/mobx/backers-sponsors.html#backers). Sponsoring directly impacts the longevity of this project.
+MobX is made possible by the generosity of the sponsors below, and many other [individual backers](backers-sponsors.md#backers). Sponsoring directly impacts the longevity of this project.
 
 **🥇 Gold sponsors (\$3000+ total contribution):** <br/>
 <a href="https://mendix.com/"><img src="assets/mendix-logo.png" align="center" width="100" title="Mendix" alt="Mendix" /></a>
