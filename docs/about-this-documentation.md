@@ -17,6 +17,10 @@ We've marked the sections and concepts that are more advanced with the {🚀} ma
 The documentation has been rewritten for MobX 6. For older versions of MobX, it can be found [here](https://github.com/mobxjs/mobx/tree/mobx4and5/docs).
 All the principles are the same, and the API is largely the same. The main difference is that before MobX 6, [decorators](https://github.com/mobxjs/mobx/blob/mobx4and5/docs/best/decorators.md) were the recommended syntax to write MobX enhanced classes.
 
+A summary of the documentation can be downloaded as cheat sheet:
+
+<div class="cheat"><a href="https://gum.co/fSocU"><button title="Download the MobX 6 cheat sheet and sponsor the project">Download the MobX 6 cheat sheet</button></a></div>
+
 ## Guided tour
 
 To get an overall idea of how to use MobX with React, read through the current _Introduction_ heading, in particular [The gist of MobX](the-gist-of-mobx.md) section.

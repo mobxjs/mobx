@@ -9,6 +9,9 @@ hide_title: true
 # MobX API Reference
 
 Functions marked with {🚀} are considered advanced, and should typically not be needed.
+Consider downloading our handy cheat sheet that explains all important APIs as a one pager:
+
+<div class="cheat"><a href="https://gum.co/fSocU"><button title="Download the MobX 6 cheat sheet and sponsor the project">Download the MobX 6 cheat sheet</button></a></div>
 
 ## Core APIs
 

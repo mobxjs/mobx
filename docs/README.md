@@ -139,6 +139,8 @@ This conceptual picture can be applied to the above example, or any other applic
 To learn about the core concepts of MobX using a larger example, check out [The gist of MobX](the-gist-of-mobx.md) section, or take the [10 minute interactive introduction to MobX and React](https://mobx.js.org/getting-started).
 The philosophy and benefits of the mental model provided by MobX are also described in great detail in the blog posts [UI as an afterthought](https://michel.codes/blogs/ui-as-an-afterthought) and [How to decouple state and UI (a.k.a. you don’t need componentWillMount)](https://hackernoon.com/how-to-decouple-state-and-ui-a-k-a-you-dont-need-componentwillmount-cc90b787aa37).
 
+<div class="cheat"><a href="https://gum.co/fSocU"><button title="Download the MobX 6 cheat sheet and sponsor the project">Download the MobX 6 cheat sheet</button></a></div>
+
 ## What others are saying...
 
 > Guise, #mobx isn't pubsub, or your grandpa's observer pattern. Nay, it is a carefully orchestrated observable dimensional portal fueled by the power cosmic. It doesn't do change detection, it's actually a level 20 psionic with soul knife, slashing your viewmodel into submission.
@@ -153,17 +155,21 @@ The philosophy and benefits of the mental model provided by MobX are also descri
 
 ## Further resources and documentation
 
+-   [MobX cheat sheet (also sponsors the project)](https://gum.co/fSocU)
 -   [10 minute interactive introduction to MobX and React](https://mobx.js.org/getting-started)
 -   [Egghead.io course, based on MobX 3](https://egghead.io/courses/manage-complex-state-in-react-apps-with-mobx)
 
 ### The MobX book
+
 [<img src="assets/book.jpg" height="80px"/> ](https://books.google.nl/books?id=ALFmDwAAQBAJ&pg=PP1&lpg=PP1&dq=michel+weststrate+mobx+quick+start+guide:+supercharge+the+client+state+in+your+react+apps+with+mobx&source=bl&ots=D460fxti0F&sig=ivDGTxsPNwlOjLHrpKF1nweZFl8&hl=nl&sa=X&ved=2ahUKEwiwl8XO--ncAhWPmbQKHWOYBqIQ6AEwAnoECAkQAQ#v=onepage&q=michel%20weststrate%20mobx%20quick%20start%20guide%3A%20supercharge%20the%20client%20state%20in%20your%20react%20apps%20with%20mobx&f=false)
 
 Created by [Pavan Podila](https://twitter.com/pavanpodila) and [Michel Weststrate](https://twitter.com/mweststrate).
 
 ### Videos
+
 -   [Introduction to MobX & React in 2020](https://www.youtube.com/watch?v=pnhIJA64ByY) by Leigh Halliday, _17min_.
 -   [ReactNext 2016: Real World MobX](https://www.youtube.com/watch?v=Aws40KOx90U) by Michel Weststrate, _40min_, [slides](https://docs.google.com/presentation/d/1DrI6Hc2xIPTLBkfNH8YczOcPXQTOaCIcDESdyVfG_bE/edit?usp=sharing).
+-   [CityJS 2020: MobX, from mutable to immutable, to observable data](https://youtu.be/sP7dtZm_Wx0?t=27050) by Michel Weststrate, _30min_
 -   [OpenSourceNorth: Practical React with MobX (ES5)](https://www.youtube.com/watch?v=XGwuM_u7UeQ) by Matt Ruby, _42min_.
 -   [HolyJS 2019: MobX and the unique symbiosis of predictability and speed](https://www.youtube.com/watch?v=NBYbBbjZeX4&list=PL8sJahqnzh8JJD7xahG5zXkjfM5GOgcPA&index=21&t=0s) by Michel Weststrate, _59min_.
 -   [React Amsterdam 2016: State Management Is Easy](https://www.youtube.com/watch?v=ApmSsu3qnf0&feature=youtu.be) by Michel Weststrate, _20min_, [slides](https://speakerdeck.com/mweststrate/state-management-is-easy-introduction-to-mobx).
