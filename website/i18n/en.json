@@ -110,10 +110,6 @@
         "title": "Observable Objects",
         "sidebar_label": "objects"
       },
-      "observable-sets": {
-        "title": "Observable Sets",
-        "sidebar_label": "sets"
-      },
       "observable-state": {
         "title": "Creating observable state",
         "sidebar_label": "Observable state"
