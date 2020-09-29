@@ -1,4 +1,4 @@
-<img src="assets/mobx.png" alt="logo" height="120" align="right" />
+<img src="docs/assets/mobx.png" alt="logo" height="120" align="right" />
 
 # MobX
 
