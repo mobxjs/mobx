@@ -25,7 +25,7 @@ You should be ready to use MobX once you read this!
 
 Here are a few suggestions about the next things to check out:
 
--   Try the [10 minute interactive introduction to MobX and React](https://mobx.js.org/getting-started.html)
+-   Try the [10 minute interactive introduction to MobX and React](https://mobx.js.org/getting-started)
 
 -   [React integration](react-integration.md)
 

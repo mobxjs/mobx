@@ -16,7 +16,7 @@ MobX distinguishes between the following three concepts in your application:
 2. Actions
 3. Derivations
 
-Let's take a closer look at these concepts below, or alternatively, in the [10 minute introduction to MobX and React](https://mobx.js.org/getting-started.html), where you can interactively dive deeper into these concepts step by step and build a simple Todo list app.
+Let's take a closer look at these concepts below, or alternatively, in the [10 minute introduction to MobX and React](https://mobx.js.org/getting-started), where you can interactively dive deeper into these concepts step by step and build a simple Todo list app.
 
 ### 1. Define state and make it observable
 
