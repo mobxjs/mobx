@@ -12,12 +12,12 @@ _Simple, scalable state management._
 
 [![Discuss on Github](https://img.shields.io/badge/discuss%20on-GitHub-orange)](https://github.com/mobxjs/mobx/discussions)
 [![npm version](https://badge.fury.io/js/mobx.svg)](https://badge.fury.io/js/mobx)
-[![OpenCollective](https://opencollective.com/mobx/backers/badge.svg)](#backers)
-[![OpenCollective](https://opencollective.com/mobx/sponsors/badge.svg)](#sponsors)
+[![OpenCollective](https://opencollective.com/mobx/backers/badge.svg)](backers-sponsors.md#backers)
+[![OpenCollective](https://opencollective.com/mobx/sponsors/badge.svg)](backers-sponsors.md#sponsors)
 
 ---
 
-MobX is made possible by the generosity of the sponsors below, and many other [individual backers](http://mobxjs.github.io/mobx/backers-sponsors.html#backers). Sponsoring directly impacts the longevity of this project.
+MobX is made possible by the generosity of the sponsors below, and many other [individual backers](backers-sponsors.md#backers). Sponsoring directly impacts the longevity of this project.
 
 **🥇 Gold sponsors (\$3000+ total contribution):** <br/>
 <a href="https://mendix.com/"><img src="assets/mendix-logo.png" align="center" width="100" title="Mendix" alt="Mendix" /></a>
@@ -136,7 +136,7 @@ Changes in the observable state are propagated precisely to all _computations_ a
 
 This conceptual picture can be applied to the above example, or any other application using MobX.
 
-To learn about the core concepts of MobX using a larger example, check out [The gist of MobX](the-gist-of-mobx.md) section, or take the [10 minute interactive introduction to MobX and React](https://mobx.js.org/getting-started.html).
+To learn about the core concepts of MobX using a larger example, check out [The gist of MobX](the-gist-of-mobx.md) section, or take the [10 minute interactive introduction to MobX and React](https://mobx.js.org/getting-started).
 The philosophy and benefits of the mental model provided by MobX are also described in great detail in the blog posts [UI as an afterthought](https://michel.codes/blogs/ui-as-an-afterthought) and [How to decouple state and UI (a.k.a. you don’t need componentWillMount)](https://hackernoon.com/how-to-decouple-state-and-ui-a-k-a-you-dont-need-componentwillmount-cc90b787aa37).
 
 ## What others are saying...

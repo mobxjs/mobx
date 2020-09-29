@@ -20,12 +20,12 @@ All the principles are the same, and the API is largely the same. The main diffe
 ## Guided tour
 
 To get an overall idea of how to use MobX with React, read through the current _Introduction_ heading, in particular [The gist of MobX](the-gist-of-mobx.md) section.
-It will introduce you to the most important principles, API's and how they relate.
+It will introduce you to the most important principles, APIs and how they relate.
 You should be ready to use MobX once you read this!
 
 Here are a few suggestions about the next things to check out:
 
--   Try the [10 minute interactive introduction to MobX and React](getting-started.html)
+-   Try the [10 minute interactive introduction to MobX and React](https://mobx.js.org/getting-started)
 
 -   [React integration](react-integration.md)
 
