@@ -125,12 +125,11 @@ async function main() {
 
         console.log(`Starting publish of ${nextVersion}...`)
 
-        const distPath = path.resolve(__dirname, "..", "dist")
-        const verPkgFile = path.join(distPath, "package.json")
+        const verPkgFile = path.join(__dirname, "..", "package.json")
         const verPkg = require(verPkgFile)
         await writeJSON(verPkgFile, { ...verPkg, version: nextVersion })
 
-        run(`npm publish ${distPath} --tag ${distTag}`)
+        run(`npm publish --tag ${distTag}`)
         console.log(`Published ${nextVersion} to NPM with distTag ${distTag}`)
 
         return nextVersion
