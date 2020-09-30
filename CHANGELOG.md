@@ -23,7 +23,7 @@
 -   `observableMap.toPOJO()`, `observableMap.toJS()` have been dropped. Use `new Map(observableMap)` instead if you want to convert an observable map to a plain Map shallowly.
 -   `observableMap.toJSON()` now returns an entries array rather than a new Map, to better support serialization.
 -   `observableSet.toJS()` has been dropped. Use `new Set(observableSet)` instead if you want to convert an observable Set to a plain Set shallowly.
--   `observableMap.toJSON()` now returns an array rather than a new Set, to better support serialization.
+-   `observableSet.toJSON()` now returns an array rather than a new Set, to better support serialization.
 -   Sorting or reversing an observableArray in a derivation (without slicing first) will now throw rather than warn. In contrast, it is now allowed to sort or reverse observable arrays in-place, as long as it happens in an action.
 -   `isArrayLike` is no longer exposed as utility. Use `Array.isArray(x) || isObservableArray(x)` instead.
 
