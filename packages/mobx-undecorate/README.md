@@ -13,7 +13,7 @@ This package converts the following MobX 4/5 API's to their MobX 6 equivalent
 -   `@observable`
 -   `@observer`
 -   `@inject`
--   `decorate
+-   `decorate`
 
 ### Options
 
