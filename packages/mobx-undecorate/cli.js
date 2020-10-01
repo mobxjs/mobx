@@ -3,7 +3,7 @@ const { spawn } = require("child_process")
 
 // this is pretty lame, probably better make a .cmd and .sh file...
 spawn(
-    "node_modules/.bin/jscodeshift",
+    "node_modules\\.bin\\jscodeshift",
     [
         "--extensions=js,jsx,ts,tsx",
         ...process.argv.filter(arg => arg.startsWith("--")),
@@ -13,6 +13,7 @@ spawn(
     ],
     {
         cwd: __dirname,
-        stdio: "inherit"
+        stdio: "inherit",
+        shell: true
     }
 )
