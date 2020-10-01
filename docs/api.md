@@ -306,10 +306,10 @@ console.log(mobx.isObservableObject(clone)) // false
 
 ### `configure`
 
-Sets global behavior settings on the active MobX instance.
-Use this to change how MobX behaves as a whole.
+[**Usage**](configuration.md): sets global behavior settings on the active MobX instance.
+Use it to change how MobX behaves as a whole.
 
-[&laquo;details&raquo;](configuration.md)
+---
 
 ## Collection utilities {🚀}
 
