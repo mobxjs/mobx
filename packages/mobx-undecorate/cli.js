@@ -4,7 +4,7 @@ const path = require("path")
 
 // this is pretty lame, probably better make a .cmd and .sh file...
 spawn(
-    `node_modules${path.sep}.bin${path.sep}jscodeshift`,
+    path.join("node_modules", ".bin", "jscodeshift"),
     [
         "--extensions=js,jsx,ts,tsx",
         ...process.argv.filter(arg => arg.startsWith("--")),
