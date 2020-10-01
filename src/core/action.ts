@@ -85,7 +85,7 @@ export interface IActionRunInfo {
 
 export function _startAction(
     actionName: string,
-    canRunAsDeriviation: boolean, // true for autoAction
+    canRunAsDerivation: boolean, // true for autoAction
     scope: any,
     args?: IArguments
 ): IActionRunInfo {
@@ -93,16 +93,16 @@ export function _startAction(
     let startTime_: number = 0
     if (__DEV__ && notifySpy_) {
         startTime_ = Date.now()
-        const flattendArgs = args ? Array.from(args) : EMPTY_ARRAY
+        const flattenedArgs = args ? Array.from(args) : EMPTY_ARRAY
         spyReportStart({
             type: ACTION,
             name: actionName,
             object: scope,
-            arguments: flattendArgs
+            arguments: flattenedArgs
         })
     }
     const prevDerivation_ = globalState.trackingDerivation
-    const runAsAction = !canRunAsDeriviation || !prevDerivation_
+    const runAsAction = !canRunAsDerivation || !prevDerivation_
     startBatch()
     let prevAllowStateChanges_ = globalState.allowStateChanges // by default preserve previous allow
     if (runAsAction) {
