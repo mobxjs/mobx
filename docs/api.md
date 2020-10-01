@@ -119,7 +119,7 @@ Like the `observable` annotation, except that any assigned value that is structu
 
 {🚀} [**Usage**](observable-state.md#available-annotations): `observable.struct` _(annotation)_
 
-Like `observable.ref` but for collections. Any collection assigned will be made observable, but the contents of the collection itself won't become observable.
+Like the `observable.ref` annotation, but for collections. Any collection assigned will be made observable, but the contents of the collection itself won't become observable.
 
 ### `observable.deep`
 
@@ -158,50 +158,32 @@ If the values in the box should not be turned into observables automatically, us
 
 ## Actions
 
-_Actions are anything that modify the state._
+_An action is any piece of code that modifies the state._
 
 ### `action`
 
-Usage:
+[**Usage**](actions.md): `action(fn)` or `action` _(annotation)_
 
--   `action` (annotation)
--   `action(fn)`
-
-Marking things as action.
-
-[&laquo;details&raquo;](actions.md)
+Use on functions that intend to modify the state.
 
 ### `runInAction`
 
-{🚀} Usage:
-
--   `runInAction(fn)`
+{🚀} [**Usage**](actions.md#runinaction): `runInAction(fn)`
 
 Create a one-time action that is immediately invoked.
 
-[&laquo;details&raquo;](actions.md#runinaction)
-
 ### `flow`
 
-Usage:
-
--   `flow`(annotation)
--   `flow(fn)`
+[**Usage**](actions.md#using-flow-instead-of-async--await-): `flow(fn)` or `flow` _(annotation)_
 
 MobX friendly replacement for `async` / `await` that supports cancellation.
 
-[&laquo;details&raquo;](actions.md#using-flow-instead-of-async--await-)
-
 ### `flowResult`
 
-Usage:
+[**Usage**](actions.md#using-flow-instead-of-async--await-): `flowResult(flowFunctionResult)`
 
--   `flowResult(flowFunctionResult)`
-
-Utility for TypeScript users only, that casts the output of the generator to a promise.
-This is just to correct type-wise for the promise wrapping done by `flow`. At runtime it just directly returns the inputted value.
-
-[&laquo;details&raquo;](actions.md#using-flow-instead-of-async--await-)
+For TypeScript users only. Utility that casts the output of the generator to a promise.
+This is just a type-wise correction for the promise wrapping done by `flow`. At runtime it directly returns the inputted value.
 
 ## Computeds
 
