@@ -225,38 +225,27 @@ Creates a new observable object using `makeObservable`, and keeps it around in t
 
 ## Reactions
 
-Side effects for observables.
+_The goal of reactions is to model side effects that happen automatically._
 
 ### `autorun`
 
-Usage:
+[**Usage**](reactions.md#autorun): `autorun(() => effect, options?)`
 
--   `autorun(() => effect, options?)`
-
-Rerun a function each time anything it observes changes.
-
-[&laquo;details&raquo;](reactions.md#autorun)
+Reruns a function every time anything it observes changes.
 
 ### `reaction`
 
-Usage:
+[**Usage**](reactions.md#reaction): `reaction(() => data, data => effect, options?)`
 
--   `reaction(() => data, data => effect, options?)`
-
-Rerun a side effect when any data selected before changes.
-
-[&laquo;details&raquo;](reactions.md#reaction)
+Reruns a side effect when any selected data changes.
 
 ### `when`
 
-Usage:
+[**Usage**](reactions.md#when): `when(() => condition, () => effect, options?)` or `await when(() => condition, options?)`
 
--   `when(() => condition, () => effect, options?)`
--   `await when(() => condition, options?)`
+Executes a side effect once when a observable condition becomes true.
 
-Execute a side effect once when a observable condition becomes true.
-
-[&laquo;details&raquo;](reactions.md#when)
+---
 
 ## Utilities
 
