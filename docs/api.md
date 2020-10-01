@@ -187,19 +187,13 @@ This is just a type-wise correction for the promise wrapping done by `flow`. At 
 
 ## Computeds
 
-_Computed values derived from observables and other computeds._
+_Computed values can be used to derive information from other observables._
 
 ### `computed`
 
-Usage:
+[**Usage**](computeds.md): `computed(fn, options?)` or  `computed(options?)` _(annotation)_
 
--   `computed` (annotation)
--   `computed(options)` (annotation)
--   `computed(fn, options?)`
-
-Create an observable value that is derived from other observables, but won't recomputed unless one of the underlying observables changes.
-
-[&laquo;details&raquo;](computeds.md)
+Creates an observable value that is derived from other observables, but won't be recomputed unless one of the underlying observables changes.
 
 ## React integration
 
