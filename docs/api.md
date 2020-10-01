@@ -9,7 +9,7 @@ hide_title: true
 # MobX API Reference
 
 Functions marked with {🚀} are considered advanced, and should typically not be needed.
-Consider downloading our handy cheat sheet that explains all important APIs as a one pager:
+Consider downloading our handy cheat sheet that explains all important APIs on a single page:
 
 <div class="cheat"><a href="https://gum.co/fSocU"><button title="Download the MobX 6 cheat sheet and sponsor the project">Download the MobX 6 cheat sheet</button></a></div>
 
@@ -17,42 +17,31 @@ Consider downloading our handy cheat sheet that explains all important APIs as a
 
 _These are the most important MobX APIs._
 
-> Understanding [`observable`](#observable), [`computed`](#computed), [`reaction`](#reaction) and [`action`](#action) is enough
-> to master and use MobX in your applications!
+> Understanding [`observable`](#observable), [`computed`](#computed), [`reaction`](#reaction) and [`action`](#action) is enough to master and use MobX in your applications!
 
 ## Creating observables
 
-_Making things observable_
+_Making things observable._
 
 ### `makeObservable`
 
-Usage:
+[**Usage**](observable-state.md#makeobservable): `makeObservable(target, annotations?, options?)`
 
--   `makeObservable(target, annotations?, options?)`
-
-Convert object members into observables, computeds and actions.
-
-[&laquo;`details`&raquo;](observable-state.md#makeObservable)
+Properties, entire objects, arrays, Maps and Sets can all be made observable.
 
 ### `makeAutoObservable`
 
-Usage:
+[**Usage**](observable-state.md#makeautoobservable): `makeAutoObservable(target, overrides?, options?)`
 
--   `makeAutoObservable(target, overrides?, options?)`
-
-Automatically convert object members into observables, computeds and actions.
-
-[&laquo;`details`&raquo;](observable-state.md#makeAutoObservable)
+Automatically make properties, objects, arrays, Maps and Sets observable.
 
 ### `extendObservable`
 
-{🚀} Usage:
+{🚀} Usage: `extendObservable(target, properties, overrides?, options?)`
 
--   `extendObservable(target, properties, overrides?, options?)
+Can be used to introduce new properties on the `target` object and make them observable immediately. Basically a shorthand for `Object.assign(target, properties); makeAutoObservable(target, overrides, options);`. However, existing properties on `target` won't be touched.
 
-Can be used to introduced new properties on the `target` object and make them observable immediately. Basically a shorthand for `Object.assign(target, properties); makeAutoObservable(target, overrides, options);`. However existing properties on `target` won't be touched.
-
-Old-fashioned constructor functions can leverage `extendObservable` nicely:
+Old-fashioned constructor functions can nicely leverage `extendObservable`:
 
 ```javascript
 function Person(firstName, lastName) {
@@ -66,128 +55,88 @@ It is possible to use `extendObservable` to add observable fields to an existing
 
 ### `observable`
 
-Usage:
+[**Usage**](observable-state.md#observable): `observable(source, overrides?, options?)` or `observable` _(annotation)_
 
--   `observable` (annotation): Mark a property as observable.
--   `observable(source, overrides?, options?)`: Clones an object and makes it observable. Source can be a plain object, [array](#observable-array), [Map](#observable-map) or [Set](#observable-set).
-
-By default, `observable` is applied recursively. If one of the encountered values is an object or array, that value will be passed through `observable` as well.
-
-[&laquo;`details`&raquo;](observable-state.md#observable)
+Clones an object and makes it observable. Source can be a plain object, array, Map or Set. By default, `observable` is applied recursively. If one of the encountered values is an object or array, that value will be passed through `observable` as well.
 
 ### `observable.object`
 
-{🚀} Usage:
-
--   `observable.object(source, overrides?, options?)`
+{🚀} [**Usage**](observable-state.md#observable): `observable.object(source, overrides?, options?)`
 
 Alias for `observable(source, overrides?, options?)`. Creates a clone of the provided object and makes all of its properties observable.
 
-[&laquo;`details`&raquo;](observable-state.md#observable)
-
 ### `observable.array`
 
-{🚀} Usage:
+{🚀} Usage: `observable.array(initialValues?, options?)`
 
--   `observable.array(initialValues?, options?)`
+Creates a new observable array based on the provided `initialValues`.
+To convert observable arrays back to plain arrays, use the `.slice()` method, or check out [toJS](#tojs) to convert them recursively.
+Besides all the language built-in array functions, the following goodies are available on observable arrays as well:
 
-Creates a new observable array based on the provided initial values.
+-   `clear()` removes all current entries from the array.
+-   `replace(newItems)` replaces all existing entries in the array with new ones.
+-   `remove(value)` removes a single item by value from the array and returns `true` if the item was found and removed.
 
-Besides all language built-in Array functions, the following goodies are available as well on observable arrays:
-
--   `clear()` Remove all current entries from the array.
--   `replace(newItems)` Replaces all existing entries in the array with new ones.
--   `remove(value)` Remove a single item by value from the array. Returns `true` if the item was found and removed.
-
-To convert observable arrays back to plain arrays, use the `.slice()` method, or to convert recursively, see [toJS](#toJS)
-
-The `{ deep: false }` option can be used to make this array shallowly observable, that is, values stored in it won't be converted to observables automatically.
+If the values in the array should not be turned into observables automatically, use the `{ deep: false }` option to make the array shallowly observable.
 
 ### `observable.map`
 
-{🚀} Usage:
+{🚀} Usage: `observable.map(initialMap?, options?)`
 
--   `observable.map(initialMap?, options?)`
+Creates a new observable [ES6 Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map) based on the provided `initialMap`.
+They are very useful if you don't want to react just to the change of a specific entry, but also to their addition and removal.
+Creating observable Maps is the recommended approach for creating dynamically keyed collections if you don't have [enabled Proxies](configuration.md#proxy-support).
 
-Creates a new observable Map based on the provided initialMap.
-Observable maps are very useful if you don't want to react just to the change of a specific entry, but also to the addition or removal of entries.
-If you don't have Proxies enabled, creating observable maps is the recommended approach to create dynamically keyed collection.
+Besides all the language built-in Map functions, the following goodies are available on observable Maps as well:
 
-The following functions are not in the Map spec but are available on observable Maps as well:
+-   `toJSON()` returns a shallow plain object representation of this Map (use [toJS](#tojs) for a deep copy).
+-   `merge(values)` copies all entries from the provided `values` (plain object, array of entries or a string-keyed ES6 Map) into this Map.
+-   `replace(values)` replaces the entire contents of this Map with the provided `values`.
 
--   `toJSON()`. Returns a shallow plain object representation of this map. (For a deep copy use [toJS](#toJS)).
--   `merge(values)`. Copies all entries from the provided object into this map. `values` can be a plain object, array of entries or string-keyed ES6 Map.
--   `replace(values)`. Replaces the entire contents of this map with the provided values.
-
-The `{ deep: false }` option can be used to make this map shallowly observable, that is, values stored in it won't be converted to observables automatically.
+If the values in the Map should not be turned into observables automatically, use the `{ deep: false }` option to make the Map shallowly observable.
 
 ### `observable.set`
 
-{🚀} Usage:
+{🚀} Usage: `observable.set(initialSet?, options?)`
 
--   `observable.set(initialSet?, options?)`
--   `observable(set)`
-
-Creates a new observable [ES6 Set](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set) based on the provided value. Use it whenever you want to create a dynamic set where the addition and removal of values needs to be observed, but where values can appear only once in the entire collection.
+Creates a new observable [ES6 Set](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set) based on the provided `initialSet`. Use it whenever you want to create a dynamic set where the addition and removal of values needs to be observed, but where values can appear only once in the entire collection.
 
 If the values in the Set should not be turned into observables automatically, use the `{ deep: false }` option to make the Set shallowly observable.
 
 ### `observable.ref`
 
-Usage:
+[**Usage**](observable-state.md#available-annotations): `observable.ref` _(annotation)_
 
--   `observable.ref` (annotation)
-
-Like the `observable` annotation, but only reassignments will be tracked. The assigned values themselves won't be made observable automatically. Use this if you intend to store for example immutable data in an observable field.
-
-[&laquo;`details`&raquo;](observable-state.md#available-annotations)
+Like the `observable` annotation, but only reassignments will be tracked. The assigned values themselves won't be made observable automatically. For example, use this if you intend to store immutable data in an observable field.
 
 ### `observable.shallow`
 
-Usage:
-
--   `observable.shallow` (annotation)
+[**Usage**](observable-state.md#available-annotations): `observable.shallow` _(annotation)_
 
 Like the `observable` annotation, except that any assigned value that is structurally equal to the current value will be ignored.
 
-[&laquo;`details`&raquo;](observable-state.md#available-annotations)
-
 ### `observable.struct`
 
-{🚀} Usage:
+{🚀} [**Usage**](observable-state.md#available-annotations): `observable.struct` _(annotation)_
 
--   `observable.struct` (annotation)
-
-Like `observable.ref` but for collections; any collection assigned will be made observable, but the contents of the collection itself won't become observable.
-
-[&laquo;`details`&raquo;](observable-state.md#available-annotations)
+Like `observable.ref` but for collections. Any collection assigned will be made observable, but the contents of the collection itself won't become observable.
 
 ### `observable.deep`
 
-{🚀} Usage:
-
--   `observable.deep` (annotation)
+{🚀} [**Usage**](observable-state.md#available-annotations): `observable.deep` _(annotation)_
 
 Alias for the [`observable`](#observable) annotation.
 
-[&laquo;`details`&raquo;](observable-state.md#available-annotations)
-
 ### `observable.box`
 
-{🚀} Usage:
-
--   `observable.box(value, options?)`
+{🚀} Usage: `observable.box(value, options?)`
 
 All primitive values in JavaScript are immutable and hence per definition not observable.
-Usually that is fine, as MobX usually can just make the _property_ that contains the value observable.
+Usually that is fine, as MobX can just make the _property_ that contains the value observable.
+In rare cases, it can be convenient to have an observable _primitive_ that is not owned by an object.
+For such cases, it is possible to create an observable _box_ that manages such a _primitive_.
 
-In rare cases it can be convenient to have an observable "primitive" that is not owned by an object.
-For these cases it is possible to create an observable _box_ that manages such a primitive.
-
-So `observable.box(value)` accepts any value and stores it inside a box.
-The current value can be accessed through `.get()` and updated using `.set(newValue)`.
-
-By default stored values will be turned into observables themselves if possible. This can be disabled by using the `deep: false` option.
+`observable.box(value)` accepts any value and stores it inside a box. The current value can be accessed through `.get()` and updated using `.set(newValue)`.
 
 ```javascript
 import { observable, autorun } from "mobx"
@@ -197,11 +146,13 @@ const cityName = observable.box("Vienna")
 autorun(() => {
     console.log(cityName.get())
 })
-// prints 'Vienna'
+// Prints: 'Vienna'
 
 cityName.set("Amsterdam")
-// prints 'Amsterdam'
+// Prints: 'Amsterdam'
 ```
+
+If the values in the box should not be turned into observables automatically, use the `{ deep: false }` option to make the box shallowly observable.
 
 ---
 
@@ -648,7 +599,7 @@ Returns a tree structure with all reactions / computations that are observing th
 
 [&laquo;trace&raquo;](analyzing-reactivity.md#getobservertree)
 
-## Extending MobX
+## Extending MobX {🚀}
 
 In the rare case you want to extend MobX itself.
 
