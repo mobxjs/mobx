@@ -249,73 +249,45 @@ Executes a side effect once when a observable condition becomes true.
 
 ## Utilities
 
-Here are some utilities that might make working with observable objects or computed values more convenient.
-More, less trivial utilities can be found in the [mobx-utils](https://github.com/mobxjs/mobx-utils) package.
+_Utilities that might make working with observable objects or computed values more convenient. Less trivial utilities can also be found in the [mobx-utils](https://github.com/mobxjs/mobx-utils) package._
 
 ### `onReactionError`
 
-{🚀} Usage:
+{🚀} Usage: `onReactionError(handler: (error: any, derivation) => void)`
 
--   `onReactionError(handler: (error: any, derivation) => void)`
-
-This function attaches a global error listener, which is invoked for every error that is thrown from a _reaction_.
-This can be used for monitoring or test purposes.
+Attaches a global error listener, which is invoked for every error that is thrown from a _reaction_. This can be used for monitoring or test purposes.
 
 ### `intercept`
 
-{🚀} Usage:
+{🚀} [**Usage**](intercept-and-observe.md#intercept): `intercept(propertyName | array | object | Set | Map, listener)`
 
--   `intercept(array | set | map, listener)`
--   `intercept(object, propertyName, listener)`
-
-Intercept changes before they are applied to an observable api.
-Returns a disposer that stops the interception.
-
-[&laquo;details&raquo;](intercept-and-observe.md)
+Intercepts changes before they are applied to an observable API. Returns a disposer function that stops the interception.
 
 ### `observe`
 
-{🚀} Usage:
+{🚀} [**Usage**](intercept-and-observe.md#observe): `observe(propertyName | array | object | Set | Map, listener)`
 
--   `observe(array | set | map, listener)`
--   `observe(object, propertyName, listener)`
-
-Low-level api that can be used to observe a single observable value.
-Returns a disposer that stops the interception.
-
-[&laquo;details&raquo;](intercept-and-observe.md)
+Low-level API that can be used to observe a single observable value. Returns a disposer function that stops the interception.
 
 ### `onBecomeObserved`
 
-{🚀} Usage:
-
--   `onBecomeObserved(observable, property?, listener: () => void)`
+{🚀} [**Usage**](lazy-observables.md): `onBecomeObserved(observable, property?, listener: () => void)`
 
 Hook for when something becomes observed.
 
-[&laquo;details&raquo;](lazy-observables.md)
-
 ### `onBecomeUnobserved`
 
-{🚀} Usage:
-
--   `onBecomeUnobserved(observable, property?, listener: () => void)`
+{🚀} [**Usage**](lazy-observables.md): `onBecomeUnobserved(observable, property?, listener: () => void)`
 
 Hook for when something stops being observed.
 
-[&laquo;details&raquo;](lazy-observables.md)
-
 ### `toJS`
 
-Usage:
+[**Usage**](observable-state.md#converting-observables-back-to-vanilla-javascript-collections): `toJS(value)`
 
--   `toJS(value)`
-
-Recursively converts an (observable) object to a javascript _structure_.
-Supports observable arrays, objects, maps and primitives.
+Recursively converts an observable object to a JavaScript _structure_. Supports observable arrays, objects, Maps and primitives.
 Computed values and other non-enumerable properties won't be part of the result.
-
-For more complex (de)serialization scenario's it is recommended to give classes a (computed) `toJSON` method, or use a serialization library like [serializr](https://github.com/mobxjs/serializr)
+For more complex (de)serialization scenarios, it is recommended to give classes a (computed) `toJSON` method, or use a serialization library like [serializr](https://github.com/mobxjs/serializr).
 
 ```javascript
 const obj = mobx.observable({
@@ -328,7 +300,7 @@ console.log(mobx.isObservableObject(obj)) // true
 console.log(mobx.isObservableObject(clone)) // false
 ```
 
-[&laquo;details&raquo;](observable-state.md#converting-observables-back-to-vanilla-javascript-collections)
+---
 
 ## Configuration
 
