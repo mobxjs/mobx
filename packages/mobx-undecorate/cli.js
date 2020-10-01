@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 const { spawn } = require("child_process")
+const path = require("path")
 
 // this is pretty lame, probably better make a .cmd and .sh file...
 spawn(
-    "node_modules\\.bin\\jscodeshift",
+    `node_modules${path.sep}.bin${path.sep}jscodeshift`,
     [
         "--extensions=js,jsx,ts,tsx",
         ...process.argv.filter(arg => arg.startsWith("--")),
