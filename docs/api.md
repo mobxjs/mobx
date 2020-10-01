@@ -185,6 +185,8 @@ MobX friendly replacement for `async` / `await` that supports cancellation.
 For TypeScript users only. Utility that casts the output of the generator to a promise.
 This is just a type-wise correction for the promise wrapping done by `flow`. At runtime it directly returns the inputted value.
 
+---
+
 ## Computeds
 
 _Computed values can be used to derive information from other observables._
@@ -195,43 +197,31 @@ _Computed values can be used to derive information from other observables._
 
 Creates an observable value that is derived from other observables, but won't be recomputed unless one of the underlying observables changes.
 
+---
+
 ## React integration
 
-From the `mobx-react` / `mobx-react-lite` package.
+_From the `mobx-react` / `mobx-react-lite` packages._
 
 ### `observer`
 
-Usage:
+[**Usage**](react-integration.md): `observer(component)`
 
--   `observer(functionComponent)`
--   `observer(classComponent)`
-
-A higher order component you can use to make a React component re-render when observables change.
-Is part of the `mobx-react` / `mobx-react-lite` package.
-
-[&laquo;details&raquo;](react-integration.md)
+A higher order component you can use to make a functional or class based React component re-render when observables change.
 
 ### `Observer`
 
-Usage:
-
--   `<Observer>{() => rendering}</Observer>`
+[**Usage**](react-integration.md#callback-components-might-require-observer): `<Observer>{() => rendering}</Observer>`
 
 Renders the given render function, and automatically re-renders it once one of the observables used in the render function changes.
-Is part of the `mobx-react` / `mobx-react-lite` package.
-
-[&laquo;details&raquo;](react-integration.md#callback-components-might-require-observer)
 
 ### `useLocalObservable`
 
-Usage:
+[**Usage**](react-integration.md#using-local-observable-state-in-observer-components): `useLocalObservable(() => source, annotations?)`
 
--   `useLocalObservable(() => source, annotations?)`
+Creates a new observable object using `makeObservable`, and keeps it around in the component for the entire life-cycle of the component.
 
-`useLocalObservable` creates a new observable object using `makeObservable`, and keeps it around in the in the component for the entire life-cycle of the component.
-Is part of the `mobx-react` / `mobx-react-lite` package.
-
-[&laquo;details&raquo;](react-integration.md#using-local-observable-state-in-observer-components)
+---
 
 ## Reactions
 
