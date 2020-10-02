@@ -380,7 +380,7 @@ runInAction(() => {
 })
 ```
 
-Check out the [Collection utilities](api.md#collection-utilities-) section for more details.
+Check out the [Collection utilities API](api.md#collection-utilities-) for more details.
 
 #### TL;DR
 

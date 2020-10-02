@@ -460,47 +460,33 @@ Returns a tree structure with all reactions / computations that are observing th
 
 ## Extending MobX {🚀}
 
-In the rare case you want to extend MobX itself.
+_In the rare case you want to extend MobX itself._
 
 ### `createAtom`
 
-{🚀} Usage:
+{🚀} [**Usage**](custom-observables.md): `createAtom(name, onBecomeObserved?, onBecomeUnobserved?)`
 
--   `createAtom(name, onBecomeObserved?, onBecomeUnobserved?)`
+Creates your own observable data structure and hooks it up to MobX. Used internally by all observable data types. Atom exposes two _report_ methods to notify MobX with when:
 
-Utility function that can be used to create your own observable data structures and hook them up to MobX. Used internally by all observable data types.
-Reports and atom that exposed to methods:
-
--   `reportObserved()`, to notify that this atom is "used" at should be considered part of the dependency tree of the current derivation
--   `reportChanged()`, to report to MobX that this atom has changed, and that all derivations depending on it should be invalidated
-
-[&laquo;details&raquo;](custom-observables.md)
+-   `reportObserved()`: the atom has become observed, and should be considered part of the dependency tree of the current derivation.
+-   `reportChanged()`: the atom has changed, and all derivations depending on it should be invalidated.
 
 ### `getAtom`
 
-{🚀} Usage:
-
--   `getAtom(thing, property?)`
+{🚀} [**Usage**](analyzing-reactivity.md#getatom): `getAtom(thing, property?)`
 
 Returns the backing atom.
 
-[&laquo;trace&raquo;](analyzing-reactivity.md#getatom)
-
 ### `transaction`
 
-{🚀} Usage:
+{🚀} Usage: `transaction(worker: () => any)`
 
--   `transaction(worker: () => any)`
+_Transaction is a low-level API. It is recommended to use [`action`](#action) or [`runInAction`](#runinaction) instead._
 
-_Transaction is a low-level api, it is recommended to use [`action`](#action) / [`runInAction`](#runinaction) instead_
+Used to batch a bunch of updates without notifying any observers until the end of the transaction. Like [`untracked`](#untracked), it is automatically applied by `action`, so usually it makes more sense to use actions than to use `transaction` directly.
 
-`transaction` can be used to batch a bunch of updates without notifying any observers until the end of the transaction. Like `untracked`, it is automatically applied by `action`, so usually it makes more sense to use actions than to use `transaction` directly.
-
-`transaction` takes a single, parameterless `worker` function as argument and runs it.
-No observers are notified until this function has completed.
-`transaction` returns any value that was returned by the `worker` function.
-Note that `transaction` runs completely synchronously.
-Transactions can be nested. Only after completing the outermost `transaction` pending reactions will be run.
+It takes a single, parameterless `worker` function as an argument, and returns any value that was returned by it.
+Note that `transaction` runs completely synchronously and can be nested. Only after completing the outermost `transaction`, the pending reactions will be run.
 
 ```javascript
 import { observable, transaction, autorun } from "mobx"
@@ -522,15 +508,11 @@ transaction(() => {
 
 ### `untracked`
 
-{🚀} Usage:
+{🚀} Usage: `untracked(worker: () => any)`
 
--   `untracked(worker: () => any)`
+_Untracked is a low-level API. It is recommended to use [`reaction`](#reaction), [`action`](#action) or [`runInAction`](#runinaction) instead._
 
-_Untracked is a low-level api, it is recommended to use `reaction`, `action` or `runInAction` instead_
-
-Untracked allows you to run a piece of code without establishing observers.
-Like `transaction`, `untracked` is automatically applied by `action`, so usually it makes more sense to use actions than to use `untracked` directly.
-Example:
+Runs a piece of code without establishing observers. Like `transaction`, `untracked` is automatically applied by `action`, so usually it makes more sense to use actions than to use `untracked` directly.
 
 ```javascript
 const person = observable({
@@ -542,15 +524,16 @@ autorun(() => {
     console.log(
         person.lastName,
         ",",
-        // this untracked block will return the person's firstName without establishing a dependency
+        // This untracked block will return the person's
+        // firstName without establishing a dependency.
         untracked(() => person.firstName)
     )
 })
-// prints: Weststrate, Michel
+// Prints: 'Weststrate, Michel'
 
 person.firstName = "G.K."
-// doesn't print!
+// Doesn't print!
 
 person.lastName = "Chesterton"
-// prints: Chesterton, G.K.
+// Prints: 'Chesterton, G.K.'
 ```
