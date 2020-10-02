@@ -304,6 +304,8 @@ console.log(mobx.isObservableObject(clone)) // false
 
 ## Configuration
 
+_Fine-tuning your MobX instance._
+
 ### `configure`
 
 [**Usage**](configuration.md): sets global behavior settings on the active MobX instance.
@@ -313,79 +315,51 @@ Use it to change how MobX behaves as a whole.
 
 ## Collection utilities {🚀}
 
-The Object API is an optional, generic API that enables manipulating observable maps, objects and arrays with the same API. This can be useful
-in [environments without `Proxy` support](configuration.md#limitations-without-proxy-support), but are otherwise typically not needed.
+_The Object API is a utility API that enables manipulating observable arrays, objects and Maps with the same generic API. This can be useful in [environments without `Proxy` support](configuration.md#limitations-without-proxy-support), but is otherwise typically not needed._
 
 ### `values`
 
-{🚀} Usage:
+{🚀} [**Usage**](collection-utilities.md): `values(array|object|Set|Map)`
 
--   `values(map|set|array|object)`
-
-Return all values in collection as array.
-
-[&laquo;details&raquo;](collection-utilities.md)
+Returns all values in the collection as an array.
 
 ### `keys`
 
-{🚀} Usage:
+{🚀} [**Usage**](collection-utilities.md): `keys(array|object|Set|Map)`
 
--   `keys(map|set|array|object)`
-
-Return all keys/indices in collection as array.
-
-[&laquo;details&raquo;](collection-utilities.md)
+Returns all keys / indices in the collection as an array.
 
 ### `entries`
 
-{🚀} Usage:
+{🚀} [**Usage**](collection-utilities.md): `entries(array|object|Set|Map)`
 
--   `entries(map|set|array|object)`
-
-Return a `[key, value]` pair for all entries in the collection
-as an array.
-
-[&laquo;details&raquo;](collection-utilities.md)
+Returns a `[key, value]` pair of every entry in the collection as an array.
 
 ### `set`
 
-{🚀} Usage:
+{🚀} [**Usage**](collection-utilities.md): `set(array|object|Map, key, value)`
 
--   `set(map|array|object, index, value)`
-
-Update collection.
-
-[&laquo;details&raquo;](collection-utilities.md)
+Updates the collection.
 
 ### `remove`
 
-{🚀} Usage:
+{🚀} [**Usage**](collection-utilities.md): `remove(array|object|Map, key)`
 
--   `remove(map|array|object, index)`
-
-Remove item from collection.
-
-[&laquo;details&raquo;](collection-utilities.md)
+Removes item from the collection.
 
 ### `has`
 
-{🚀} Usage:
+{🚀} [**Usage**](collection-utilities.md): `has(array|object|Map, key)`
 
--   `has(map|array|object, index)`
-
-Check for membership in collection.
-
-[&laquo;details&raquo;](collection-utilities.md)
+Checks for membership in the collection.
 
 ### `get`
 
-{🚀} Usage:
+{🚀} [**Usage**](collection-utilities.md): `get(array|object|Map, key)`
 
--   `get(map|array|object, index)`
+Gets value from the collection with key.
 
-Get value from collection with key.
-
-[&laquo;details&raquo;](collection-utilities.md)
+---
 
 ## Introspection utilities {🚀}
 
