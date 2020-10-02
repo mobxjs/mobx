@@ -380,7 +380,7 @@ runInAction(() => {
 })
 ```
 
-See the [object manipulation api](api.md#object-api) for more details
+Check out the [Collection utilities](api.md#collection-utilities-) section for more details.
 
 #### TL;DR
 

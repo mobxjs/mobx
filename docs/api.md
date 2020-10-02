@@ -259,13 +259,13 @@ Attaches a global error listener, which is invoked for every error that is throw
 
 ### `intercept`
 
-{🚀} [**Usage**](intercept-and-observe.md#intercept): `intercept(propertyName | array | object | Set | Map, listener)`
+{🚀} [**Usage**](intercept-and-observe.md#intercept): `intercept(propertyName|array|object|Set|Map, listener)`
 
 Intercepts changes before they are applied to an observable API. Returns a disposer function that stops the interception.
 
 ### `observe`
 
-{🚀} [**Usage**](intercept-and-observe.md#observe): `observe(propertyName | array | object | Set | Map, listener)`
+{🚀} [**Usage**](intercept-and-observe.md#observe): `observe(propertyName|array|object|Set|Map, listener)`
 
 Low-level API that can be used to observe a single observable value. Returns a disposer function that stops the interception.
 
@@ -315,7 +315,7 @@ Use it to change how MobX behaves as a whole.
 
 ## Collection utilities {🚀}
 
-_The Object API is a utility API that enables manipulating observable arrays, objects and Maps with the same generic API. This can be useful in [environments without `Proxy` support](configuration.md#limitations-without-proxy-support), but is otherwise typically not needed._
+_They enable manipulating observable arrays, objects and Maps with the same generic API. This can be useful in [environments without `Proxy` support](configuration.md#limitations-without-proxy-support), but is otherwise typically not needed._
 
 ### `values`
 
@@ -363,142 +363,100 @@ Gets value from the collection with key.
 
 ## Introspection utilities {🚀}
 
-The following APIs might come in handy if you want to inspect the internal state of MobX or want to build cool tools on top of MobX.
+_Utilities that might come in handy if you want to inspect the internal state of MobX, or want to build cool tools on top of MobX._
 
 ### `isObservable`
 
-{🚀} Usage:
+{🚀} Usage: `isObservable(array|object|Set|Map)`
 
--   `isObservable(map | array | set | object)`
-
-Is an object / collection made observable by MobX?
+Is the object / collection made observable by MobX?
 
 ### `isObservableProp`
 
-{🚀} Usage:
+{🚀} Usage: `isObservableProp(object, propertyName)`
 
--   `isObservableProp(object, propertyName)`
-
-Is a property observable?
+Is the property observable?
 
 ### `isObservableArray`
 
-{🚀} Usage:
+{🚀} Usage: `isObservableArray(array)`
 
--   `isObservableArray(array)`
-
-Is value an observable array?
-
-### `isObservableMap`
-
-{🚀} Usage:
-
--   `isObservableMap(map)`
-
-Is value an observable map?
-
-### `isObservableSet`
-
-{🚀} Usage:
-
--   `isObservableSet(set)`
-
-Is value an observable set?
+Is the value an observable array?
 
 ### `isObservableObject`
 
-{🚀} Usage:
+{🚀} Usage: `isObservableObject(object)`
 
--   `isObservableObject(object)`
+Is the value an observable object?
 
-Is value an observable object?
+### `isObservableSet`
+
+{🚀} Usage: `isObservableSet(set)`
+
+Is the value an observable Set?
+
+
+### `isObservableMap`
+
+{🚀} Usage: `isObservableMap(map)`
+
+Is the value an observable Map?
 
 ### `isBoxedObservable`
 
-{🚀} Usage:
+{🚀} Usage: `isBoxedObservable(value)`
 
--   `isBoxedObservable(value)`
-
-Is value an observable box? That is, created using `observable.box`.
+Is the value an observable box, created using `observable.box`?
 
 ### `isAction`
 
-{🚀} Usage:
+{🚀} Usage: `isAction(func)`
 
--   `isAction(func)`
-
-Returns `true` if the given function is marked as an `action`.
+Is the function marked as an `action`?
 
 ### `isComputed`
 
-{🚀} Usage:
+{🚀} Usage: `isComputed(boxedComputed)`
 
--   `isComputed(boxedComputed)`
-
-Is this a boxed computed value? That is, created using `computed(() => expr)`?
+Is this a boxed computed value, created using `computed(() => expr)`?
 
 ### `isComputedProp`
 
-{🚀} Usage:
-
--   `isComputedProp(object, propertyName)`
+{🚀} Usage: `isComputedProp(object, propertyName)`
 
 Is this a computed property?
 
 ### `trace`
 
-Usage:
+{🚀} [**Usage**](analyzing-reactivity.md): `trace()`, `trace(true)` _(enter debugger)_ or `trace(object, propertyName, enterDebugger?)`
 
--   `trace()` (inside a reaction / observer / computed value)
--   `trace(true)` (enter the `debugger;` if this reaction is updated)
--   `trace(object, propertyName, enterDebugger?)` (trace the specified computed property)
-
-Should be used inside a reaction / computed value. Log when value is invalidated, or set debugger breakpoint.
-
-[&laquo;trace&raquo;](analyzing-reactivity.md)
+Should be used inside an observer, reaction or computed value. Logs when the value is invalidated, or sets the debugger breakpoint if called with _true_.
 
 ### `spy`
 
-{🚀} Usage:
-
--   `spy(eventListener)`
+{🚀} [**Usage**](analyzing-reactivity.md#spy): `spy(eventListener)`
 
 Registers a global spy listener that listens to all events that happen in MobX.
 
-[&laquo;trace&raquo;](analyzing-reactivity.md#spy)
-
 ### `getDebugName`
 
-{🚀} Usage:
-
--   `getDebugName(reaction)`
--   `getDebugName(array | set | map)`
--   `getDebugName(object | map, propertyName)`
+{🚀} [**Usage**](analyzing-reactivity.md#getdebugname): `getDebugName(reaction|array|Set|Map)` or `getDebugName(object|Map, propertyName)`
 
 Returns the (generated) friendly debug name for an observable or reaction.
 
-[&laquo;trace&raquo;](analyzing-reactivity.md#getdebugname)
-
 ### `getDependencyTree`
 
-{🚀} Usage:
-
--   `getDependencyTree(object, computedPropertyName)`
+{🚀} [**Usage**](analyzing-reactivity.md#getdependencytree): `getDependencyTree(object, computedPropertyName)`
 
 Returns a tree structure with all observables the given reaction / computation currently depends upon.
 
-[&laquo;trace&raquo;](analyzing-reactivity.md#getdependencytree)
-
 ### `getObserverTree`
 
-{🚀} Usage:
-
--   `getObserverTree(array | set | map)`
--   `getObserverTree(object | map, propertyName)`
+{🚀} [**Usage**](analyzing-reactivity.md#getobservertree): `getObserverTree(array|Set|Map)` or `getObserverTree(object|Map, propertyName)`
 
 Returns a tree structure with all reactions / computations that are observing the given observable.
 
-[&laquo;trace&raquo;](analyzing-reactivity.md#getobservertree)
+---
 
 ## Extending MobX {🚀}
 
