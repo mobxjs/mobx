@@ -173,10 +173,6 @@
       "refguide/set": {
         "title": "Observable Sets"
       },
-      "stateless-HMR": {
-        "title": "Hot Module Reloading with Stateless Components",
-        "sidebar_label": "Hot Module Reloading with Stateless Components"
-      },
       "the-gist-of-mobx": {
         "title": "The gist of MobX",
         "sidebar_label": "The gist of MobX"

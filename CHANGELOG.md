@@ -9,7 +9,7 @@
 -   MobX 6 can be used in both modern environments, and environments that don't support Proxy. So both MobX 4 and 5 users can upgrade to 6. See [proxy support](./docs/configuration.md#proxy-support) for more details.
 -   `observable.array` now supports `{ proxy: false }` as option.
 -   `reaction`'s effect function now receives the previous value seen by the reaction as second argument.
--   `flow` can now be used as annotation as well. You might need `flowResult` in case you use TypeScript to extract the correct result type. [details](.docs/actions.md#-using-flow-instead-of-asyncawait).
+-   `flow` can now be used as annotation as well. You might need `flowResult` in case you use TypeScript to extract the correct result type. [details](./docs/actions.md#using-flow-instead-of-async--await-).
 
 ## Breaking changes
 
