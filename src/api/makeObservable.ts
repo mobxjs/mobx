@@ -222,7 +222,7 @@ export function makeObservable<T, AdditionalKeys extends PropertyKey = never>(
 
 export function makeAutoObservable<T extends Object, AdditionalKeys extends PropertyKey = never>(
     target: T,
-    excludes?: AnnotationsMap<T, NoInfer<AdditionalKeys>>,
+    overrides?: AnnotationsMap<T, NoInfer<AdditionalKeys>>,
     options?: CreateObservableOptions
 ): T {
     const proto = Object.getPrototypeOf(target)
@@ -238,7 +238,7 @@ export function makeAutoObservable<T extends Object, AdditionalKeys extends Prop
         // shortcut, reuse inferred annotations for this type from the previous time
         annotations = proto[CACHED_ANNOTATIONS] as any
     } else {
-        annotations = { ...excludes }
+        annotations = { ...overrides }
         extractAnnotationsFromObject(target, annotations, options)
         if (!isPlain) {
             extractAnnotationsFromProto(proto, annotations, options)
