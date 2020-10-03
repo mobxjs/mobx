@@ -90,7 +90,7 @@ async function main() {
     })
 
     if (npmInfoRet.code === 0) {
-        const versions = await execute("latest")
+        const version = await execute("latest")
 
         await writeJSON(rootPkgFile, { ...rootPkg, version: resp.action })
 
@@ -98,9 +98,7 @@ async function main() {
         run(`git commit --no-verify -m "Published version ${resp.action}"`)
         run("git push")
 
-        versions.forEach(ver => {
-            run(`git tag ${ver}`)
-        })
+        run(`git tag ${version}`)
         run("git push --tags")
 
         console.log("Pushed updated version & tags to git")
