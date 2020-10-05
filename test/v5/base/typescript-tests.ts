@@ -2262,3 +2262,59 @@ function delay(time, value, shouldThrow = false) {
         }, time)
     })
 }
+
+test("#2485", () => {
+    class Color {
+        public constructor(r: number, g: number, b: number, a?: number) {
+            makeObservable<Color, "_r" | "_g" | "_b" | "_a">(this, {
+                _r: observable,
+                r: computed,
+                _g: observable,
+                g: computed,
+                _b: observable,
+                b: computed,
+                _a: observable,
+                a: computed
+            })
+
+            this._r = r
+            this._g = g
+            this._b = b
+            this._a = a ?? 1
+        }
+
+        private _r: number
+        public get r(): number {
+            return this._r
+        }
+
+        private _g: number
+        public get g(): number {
+            return this._g
+        }
+
+        private _b: number
+        public get b(): number {
+            return this._b
+        }
+
+        private _a: number
+        public get a(): number {
+            return this._a
+        }
+
+        public stuff(): boolean {
+            return true
+        }
+
+        public toString(): string {
+            return `rgba(${this.r}, ${this.g}, ${this.b}, ${this.a})`
+        }
+
+        public toJSON(): number {
+            return 3
+        }
+    }
+
+    expect(new Color(1, 2, 3, 4).toString()).toMatchInlineSnapshot(`"rgba(1, 2, 3, 4)"`)
+})
