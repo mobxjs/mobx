@@ -91,7 +91,7 @@ export function makeProperty(
 ): void {
     const { target_: target } = adm
     const defaultAnnotation: Annotation | undefined = observable // ideally grap this from adm's defaultEnahncer instead!
-    const origAnnotation = annotation
+    const originAnnotation = annotation
     if (annotation === true) {
         annotation = getInferredAnnotation(descriptor, defaultAnnotation, autoBind)
     }
@@ -162,9 +162,9 @@ export function makeProperty(
                 die(
                     `Cannot decorate '${key.toString()}': observable cannot be used on setter / getter properties.`
                 )
-            // if the origAnnotation was true, preferred the adm's default enhancer over the inferred one
+            // if the originAnnotation was true, preferred the adm's default enhancer over the inferred one
             const enhancer =
-                origAnnotation === true
+                originAnnotation === true
                     ? adm.defaultEnhancer_
                     : getEnhancerFromAnnotation(annotation)
             adm.addObservableProp_(key, descriptor.value, enhancer)
@@ -182,7 +182,7 @@ export function makeProperty(
 
 // Hack based on https://github.com/Microsoft/TypeScript/issues/14829#issuecomment-322267089
 // We need this, because otherwise, AdditionalKeys is going to be inferred to be any
-// set of superfluos keys. But, we rather want to get a compile error unless AdditionalKeys is
+// set of superfluous keys. But, we rather want to get a compile error unless AdditionalKeys is
 // _explicity_ passed as generic argument
 // Fixes: https://github.com/mobxjs/mobx/issues/2325#issuecomment-691070022
 type NoInfer<T> = [T][T extends any ? 0 : never]
