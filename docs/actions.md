@@ -292,7 +292,7 @@ class Store {
         makeAutoObservable(this)
     }
 
-    fetchProjects() {
+    async fetchProjects() {
         this.githubProjects = []
         this.state = "pending"
         try {
