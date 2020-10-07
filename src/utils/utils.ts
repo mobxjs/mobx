@@ -126,10 +126,10 @@ export function assertPropertyConfigurable(object: any, prop: PropertyKey) {
 
 export function createInstanceofPredicate<T>(
     name: string,
-    clazz: new (...args: any[]) => T
+    theClass: new (...args: any[]) => T
 ): (x: any) => x is T {
     const propName = "isMobX" + name
-    clazz.prototype[propName] = true
+    theClass.prototype[propName] = true
     return function (x) {
         return isObject(x) && x[propName] === true
     } as any
