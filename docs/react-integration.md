@@ -50,6 +50,7 @@ setInterval(() => {
     myTimer.increaseTimer()
 }, 1000)
 ```
+
 **Hint:** you can play with the above example yourself on [CodeSandbox](https://codesandbox.io/s/minimal-observer-p9ti4?file=/src/index.tsx).
 
 The `observer` HoC automatically subscribes React components to _any observables_ that are used _during rendering_.
@@ -412,25 +413,37 @@ otherwise it might do nothing at all.
 
 <details id="computed-props"><summary>{🚀} **Tip:** deriving computeds from props<a href="#computed-props" class="tip-anchor"></a></summary>
 In some cases the computed values of your local observables might depend on some of the props your component receives.
-However, the set of props that a React component receives is in itself not observable, so changes to the props won't be reflected in any computed values.
-To make props observable, the [useAsObservableSource](https://github.com/mobxjs/mobx-react#useasobservablesource-hook) hook can be used, that will sync the props of a component into an local observable object.
-_Note that it is important to not deconstruct the result of this hook._
+However, the set of props that a React component receives is in itself not observable, so changes to the props won't be reflected in any computed values. You have to manually update local observable state in order to properly derive computed values from latest data.
 
 ```javascript
-import { observer, useLocalObservable, useAsObservableSource } from "mobx-react-lite"
-import { useState } from "react"
+import { observer, useLocalObservable } from "mobx-react-lite"
+import { useEffect } from "react"
 
 const TimerView = observer(({ offset }) => {
-    const observableProps = useAsObservableSource({ offset })
     const timer = useLocalObservable(() => ({
+        offset, // The initial offset value
         secondsPassed: 0,
         increaseTimer() {
             this.secondsPassed++
         },
         get offsetTime() {
-            return this.secondsPassed - observableProps.offset // Not 'offset'!
+            return this.secondsPassed - this.offset // Not 'offset' from 'props'!
         }
     }))
+
+    useEffect(() => {
+        // Sync the offset from 'props' into the observable 'timer'
+        timer.offset = offset
+    }, [offset])
+
+    // Effect to set up a timer, only for demo purposes.
+    useEffect(() => {
+        const handle = setInterval(timer.increaseTimer, 1000)
+        return () => {
+            clearInterval(handle)
+        }
+    }, [])
+
     return <span>Seconds passed: {timer.offsetTime}</span>
 })
 
@@ -473,7 +486,7 @@ const TimerView = observer(({ offset }) => {
 
     // Effect to set up a timer, only for demo purposes.
     useEffect(() => {
-        const handle = setInterval(() => timer.increaseTimer, 1000)
+        const handle = setInterval(timer.increaseTimer, 1000)
         return () => {
             clearInterval(handle)
         }
