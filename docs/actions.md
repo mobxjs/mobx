@@ -348,7 +348,7 @@ const projects = await flowResult(store.fetchProjects())
 
 <!--END_DOCUSAURUS_CODE_TABS-->
 
-## Using flow instead of async / await {🚀}
+## Using flow instead of async / await {<span title="Advanced feature">🚀</span>}
 
 Usage:
 
@@ -375,7 +375,7 @@ However, TypeScript isn't aware of that transformation, so `flowResult` will mak
 
 `makeAutoObservable` and friends will automatically infer generators to be `flow`s.
 
-<details id="flow-wrap"><summary>{🚀} **Note:** using flow on object fields<a href="#flow-wrap" class="tip-anchor"></a></summary>
+<details id="flow-wrap"><summary>{<span title="Advanced feature">🚀</span>} **Note:** using flow on object fields<a href="#flow-wrap" class="tip-anchor"></a></summary>
 `flow`, like `action`, can be used to wrap functions directly. The above example could also have been written as follows:
 
 ```typescript
@@ -408,14 +408,14 @@ The upside is that we don't need `flowResult` anymore, the downside is that `thi
 
 </details>
 
-## Cancelling flows {🚀}
+## Cancelling flows {<span title="Advanced feature">🚀</span>}
 
 Another neat benefit of flows is that they are cancellable.
 The return value of `flow` is a promise that resolves with the value that is returned from the generator function in the end.
 The returned promise has an additional `cancel()` method that will interrupt the running generator and cancel it.
 Any `try` / `finally` clauses will still be run.
 
-## Disabling mandatory actions {🚀}
+## Disabling mandatory actions {<span title="Advanced feature">🚀</span>}
 
 By default, MobX 6 and later require that you use actions to make changes to the state.
 However, you can configure MobX to disable this behavior. Check out the [`enforceActions`](configuration.md#enforceactions) section.

@@ -6,7 +6,7 @@ hide_title: true
 
 <script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
-# Computeds with arguments {🚀}
+# Computeds with arguments {<span title="Advanced feature">🚀</span>}
 
 The `computed` annotation can only be used on getters, which don't take arguments.
 What about computations that do take arguments?
@@ -71,7 +71,7 @@ This is a great and advanced optimization technique.
 
 In this specific case the selection could also be stored as an `isSelected` observable on the `Item`. The selection in the store could then be expressed as a `computed` rather than an observable: `get selection() { return this.items.filter(item => item.isSelected) }`, and we don't need `isSelected` anymore.
 
-## 4. Use computedFn {🚀}
+## 4. Use computedFn {<span title="Advanced feature">🚀</span>}
 
 Finally,
 [`computedFn`](https://github.com/mobxjs/mobx-utils#computedfn) from `mobx-utils` can be used in the definition of `todoStore.selected` to automatically memoize `isSelected`.

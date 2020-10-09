@@ -6,7 +6,7 @@ hide_title: true
 
 <script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
-# Collection utilities {🚀}
+# Collection utilities {<span title="Advanced feature">🚀</span>}
 
 They enable manipulating observable arrays, objects and Maps with the same generic API.
 These APIs are fully reactive, which means that even [without `Proxy` support](configuration.md#limitations-without-proxy-support) new property declarations can be detected by MobX if `set` is used to add them, and `values` or `keys` are used to iterate over them.

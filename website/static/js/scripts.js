@@ -8,8 +8,15 @@ function openTarget() {
             details.scrollIntoView();
         }, 150)
     }
-  }
-  window.addEventListener('hashchange', openTarget);
-  window.addEventListener('DOMContentLoaded', function() {
+}
+function addTooltipToSideBar() {
+    var items = document.getElementsByClassName('navItem');
+    for (var item of items) {
+        item.innerHTML = item.innerHTML.replace('🚀', '<span title="Advanced feature">🚀</span>');
+    }
+}
+window.addEventListener('hashchange', openTarget);
+window.addEventListener('DOMContentLoaded', function() {
     openTarget();
-  });
+    addTooltipToSideBar();
+});
