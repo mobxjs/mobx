@@ -9,14 +9,19 @@ function openTarget() {
         }, 150)
     }
 }
-function addTooltipToSideBar() {
-    var items = document.getElementsByClassName('navItem');
-    for (var item of items) {
-        item.innerHTML = item.innerHTML.replace('🚀', '<span title="Advanced feature">🚀</span>');
+function addTooltipToRockets() {
+    var classNames = ['navGroups', 'onPageNav', 'post'];
+    var rocketRegex = /🚀/g;
+
+    for (var className of classNames) {
+        var els = document.getElementsByClassName(className);
+        for (var el of els) {
+            el.innerHTML = el.innerHTML.replace(rocketRegex, '<span title="Advanced feature">🚀</span>');
+        }
     }
 }
 window.addEventListener('hashchange', openTarget);
 window.addEventListener('DOMContentLoaded', function() {
     openTarget();
-    addTooltipToSideBar();
+    addTooltipToRockets();
 });

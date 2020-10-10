@@ -25,7 +25,7 @@ Conceptually, they are very similar to formulas in spreadsheets, and can't be un
 Computed values can be created by annotating JavaScript [getters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get) with `computed`.
 Use `makeObservable` to declare a getter as computed. If you instead want all getters to be automatically declared as `computed`, you can use either `makeAutoObservable`, `observable` or `extendObservable`.
 
-To help illustrate the point of computed values, the example below relies on [`autorun`](reactions.md#autorun) from the [Reactions {<span title="Advanced feature">🚀</span>}](reactions.md) advanced section.
+To help illustrate the point of computed values, the example below relies on [`autorun`](reactions.md#autorun) from the [Reactions {🚀}](reactions.md) advanced section.
 
 ```javascript
 import { makeObservable, observable, computed } from "mobx"
@@ -148,7 +148,7 @@ class Dimension {
 
 </details>
 
-<details id="computed-struct"><summary>{<span title="Advanced feature">🚀</span>} **Tip:** `computed.struct` for comparing output structurally <a href="#computed-struct" class="tip-anchor"></a></summary>
+<details id="computed-struct"><summary>{🚀} **Tip:** `computed.struct` for comparing output structurally <a href="#computed-struct" class="tip-anchor"></a></summary>
 
 If the output of a computed value that is structurally equivalent to the previous computation doesn't need to notify observers, `computed.struct` can be used. It will make a structural comparison first, rather than a reference equality check, before notifying observers. For example:
 
@@ -187,13 +187,13 @@ Check out the [`equals`](#equals) option for further customizations on determini
 
 </details>
 
-<details id="computed-with-args"><summary>{<span title="Advanced feature">🚀</span>} **Tip:** computed values with arguments<a href="#computed-with-args" class="tip-anchor"></a></summary>
+<details id="computed-with-args"><summary>{🚀} **Tip:** computed values with arguments<a href="#computed-with-args" class="tip-anchor"></a></summary>
 
 Although getters don't take arguments, several strategies to work with derived values that need arguments are discusses [here](computeds-with-args.md).
 
 </details>
 
-<details id="standalone"><summary>{<span title="Advanced feature">🚀</span>} **Tip:** create standalone computed values with `computed(expression)`<a href="#standalone" class="tip-anchor"></a></summary>
+<details id="standalone"><summary>{🚀} **Tip:** create standalone computed values with `computed(expression)`<a href="#standalone" class="tip-anchor"></a></summary>
 
 `computed` can also be invoked directly as a function, just like [`observable.box`](api.md#observablebox) creates a standalone computed value.
 Use `.get()` on the returned object to get the current value of the computation.
@@ -201,7 +201,7 @@ This form of `computed` is not used very often, but in some cases where you need
 
 </details>
 
-## Options {<span title="Advanced feature">🚀</span>}
+## Options {🚀}
 
 `computed` usually behaves the way you want it to out of the box, but it's possible to customize its behavior by passing in an `options` argument.
 

@@ -8,7 +8,7 @@ hide_title: true
 
 # MobX API Reference
 
-Functions marked with {<span title="Advanced feature">🚀</span>} are considered advanced, and should typically not be needed.
+Functions marked with {🚀} are considered advanced, and should typically not be needed.
 Consider downloading our handy cheat sheet that explains all important APIs on a single page:
 
 <div class="cheat"><a href="https://gum.co/fSocU"><button title="Download the MobX 6 cheat sheet and sponsor the project">Download the MobX 6 cheat sheet</button></a></div>
@@ -37,7 +37,7 @@ Automatically make properties, objects, arrays, Maps and Sets observable.
 
 ### `extendObservable`
 
-{<span title="Advanced feature"><span title="Advanced feature">🚀</span><span>} Usage: `extendObservable(target, properties, overrides?, options?)`
+{🚀} Usage: `extendObservable(target, properties, overrides?, options?)`
 
 Can be used to introduce new properties on the `target` object and make them observable immediately. Basically a shorthand for `Object.assign(target, properties); makeAutoObservable(target, overrides, options);`. However, existing properties on `target` won't be touched.
 
@@ -61,13 +61,13 @@ Clones an object and makes it observable. Source can be a plain object, array, M
 
 ### `observable.object`
 
-{<span title="Advanced feature">🚀</span>} [**Usage**](observable-state.md#observable): `observable.object(source, overrides?, options?)`
+{🚀} [**Usage**](observable-state.md#observable): `observable.object(source, overrides?, options?)`
 
 Alias for `observable(source, overrides?, options?)`. Creates a clone of the provided object and makes all of its properties observable.
 
 ### `observable.array`
 
-{<span title="Advanced feature">🚀</span>} Usage: `observable.array(initialValues?, options?)`
+{🚀} Usage: `observable.array(initialValues?, options?)`
 
 Creates a new observable array based on the provided `initialValues`.
 To convert observable arrays back to plain arrays, use the `.slice()` method, or check out [toJS](#tojs) to convert them recursively.
@@ -81,7 +81,7 @@ If the values in the array should not be turned into observables automatically, 
 
 ### `observable.map`
 
-{<span title="Advanced feature">🚀</span>} Usage: `observable.map(initialMap?, options?)`
+{🚀} Usage: `observable.map(initialMap?, options?)`
 
 Creates a new observable [ES6 Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map) based on the provided `initialMap`.
 They are very useful if you don't want to react just to the change of a specific entry, but also to their addition and removal.
@@ -97,7 +97,7 @@ If the values in the Map should not be turned into observables automatically, us
 
 ### `observable.set`
 
-{<span title="Advanced feature">🚀</span>} Usage: `observable.set(initialSet?, options?)`
+{🚀} Usage: `observable.set(initialSet?, options?)`
 
 Creates a new observable [ES6 Set](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set) based on the provided `initialSet`. Use it whenever you want to create a dynamic set where the addition and removal of values needs to be observed, but where values can appear only once in the entire collection.
 
@@ -117,19 +117,19 @@ Like the `observable` annotation, except that any assigned value that is structu
 
 ### `observable.struct`
 
-{<span title="Advanced feature">🚀</span>} [**Usage**](observable-state.md#available-annotations): `observable.struct` _(annotation)_
+{🚀} [**Usage**](observable-state.md#available-annotations): `observable.struct` _(annotation)_
 
 Like the `observable.ref` annotation, but for collections. Any collection assigned will be made observable, but the contents of the collection itself won't become observable.
 
 ### `observable.deep`
 
-{<span title="Advanced feature">🚀</span>} [**Usage**](observable-state.md#available-annotations): `observable.deep` _(annotation)_
+{🚀} [**Usage**](observable-state.md#available-annotations): `observable.deep` _(annotation)_
 
 Alias for the [`observable`](#observable) annotation.
 
 ### `observable.box`
 
-{<span title="Advanced feature">🚀</span>} Usage: `observable.box(value, options?)`
+{🚀} Usage: `observable.box(value, options?)`
 
 All primitive values in JavaScript are immutable and hence per definition not observable.
 Usually that is fine, as MobX can just make the _property_ that contains the value observable.
@@ -168,7 +168,7 @@ Use on functions that intend to modify the state.
 
 ### `runInAction`
 
-{<span title="Advanced feature">🚀</span>} [**Usage**](actions.md#runinaction): `runInAction(fn)`
+{🚀} [**Usage**](actions.md#runinaction): `runInAction(fn)`
 
 Create a one-time action that is immediately invoked.
 
@@ -253,31 +253,31 @@ _Utilities that might make working with observable objects or computed values mo
 
 ### `onReactionError`
 
-{<span title="Advanced feature">🚀</span>} Usage: `onReactionError(handler: (error: any, derivation) => void)`
+{🚀} Usage: `onReactionError(handler: (error: any, derivation) => void)`
 
 Attaches a global error listener, which is invoked for every error that is thrown from a _reaction_. This can be used for monitoring or test purposes.
 
 ### `intercept`
 
-{<span title="Advanced feature">🚀</span>} [**Usage**](intercept-and-observe.md#intercept): `intercept(propertyName|array|object|Set|Map, listener)`
+{🚀} [**Usage**](intercept-and-observe.md#intercept): `intercept(propertyName|array|object|Set|Map, listener)`
 
 Intercepts changes before they are applied to an observable API. Returns a disposer function that stops the interception.
 
 ### `observe`
 
-{<span title="Advanced feature">🚀</span>} [**Usage**](intercept-and-observe.md#observe): `observe(propertyName|array|object|Set|Map, listener)`
+{🚀} [**Usage**](intercept-and-observe.md#observe): `observe(propertyName|array|object|Set|Map, listener)`
 
 Low-level API that can be used to observe a single observable value. Returns a disposer function that stops the interception.
 
 ### `onBecomeObserved`
 
-{<span title="Advanced feature">🚀</span>} [**Usage**](lazy-observables.md): `onBecomeObserved(observable, property?, listener: () => void)`
+{🚀} [**Usage**](lazy-observables.md): `onBecomeObserved(observable, property?, listener: () => void)`
 
 Hook for when something becomes observed.
 
 ### `onBecomeUnobserved`
 
-{<span title="Advanced feature">🚀</span>} [**Usage**](lazy-observables.md): `onBecomeUnobserved(observable, property?, listener: () => void)`
+{🚀} [**Usage**](lazy-observables.md): `onBecomeUnobserved(observable, property?, listener: () => void)`
 
 Hook for when something stops being observed.
 
@@ -313,158 +313,158 @@ Use it to change how MobX behaves as a whole.
 
 ---
 
-## Collection utilities {<span title="Advanced feature">🚀</span>}
+## Collection utilities {🚀}
 
 _They enable manipulating observable arrays, objects and Maps with the same generic API. This can be useful in [environments without `Proxy` support](configuration.md#limitations-without-proxy-support), but is otherwise typically not needed._
 
 ### `values`
 
-{<span title="Advanced feature">🚀</span>} [**Usage**](collection-utilities.md): `values(array|object|Set|Map)`
+{🚀} [**Usage**](collection-utilities.md): `values(array|object|Set|Map)`
 
 Returns all values in the collection as an array.
 
 ### `keys`
 
-{<span title="Advanced feature">🚀</span>} [**Usage**](collection-utilities.md): `keys(array|object|Set|Map)`
+{🚀} [**Usage**](collection-utilities.md): `keys(array|object|Set|Map)`
 
 Returns all keys / indices in the collection as an array.
 
 ### `entries`
 
-{<span title="Advanced feature">🚀</span>} [**Usage**](collection-utilities.md): `entries(array|object|Set|Map)`
+{🚀} [**Usage**](collection-utilities.md): `entries(array|object|Set|Map)`
 
 Returns a `[key, value]` pair of every entry in the collection as an array.
 
 ### `set`
 
-{<span title="Advanced feature">🚀</span>} [**Usage**](collection-utilities.md): `set(array|object|Map, key, value)`
+{🚀} [**Usage**](collection-utilities.md): `set(array|object|Map, key, value)`
 
 Updates the collection.
 
 ### `remove`
 
-{<span title="Advanced feature">🚀</span>} [**Usage**](collection-utilities.md): `remove(array|object|Map, key)`
+{🚀} [**Usage**](collection-utilities.md): `remove(array|object|Map, key)`
 
 Removes item from the collection.
 
 ### `has`
 
-{<span title="Advanced feature">🚀</span>} [**Usage**](collection-utilities.md): `has(array|object|Map, key)`
+{🚀} [**Usage**](collection-utilities.md): `has(array|object|Map, key)`
 
 Checks for membership in the collection.
 
 ### `get`
 
-{<span title="Advanced feature">🚀</span>} [**Usage**](collection-utilities.md): `get(array|object|Map, key)`
+{🚀} [**Usage**](collection-utilities.md): `get(array|object|Map, key)`
 
 Gets value from the collection with key.
 
 ---
 
-## Introspection utilities {<span title="Advanced feature">🚀</span>}
+## Introspection utilities {🚀}
 
 _Utilities that might come in handy if you want to inspect the internal state of MobX, or want to build cool tools on top of MobX._
 
 ### `isObservable`
 
-{<span title="Advanced feature">🚀</span>} Usage: `isObservable(array|object|Set|Map)`
+{🚀} Usage: `isObservable(array|object|Set|Map)`
 
 Is the object / collection made observable by MobX?
 
 ### `isObservableProp`
 
-{<span title="Advanced feature">🚀</span>} Usage: `isObservableProp(object, propertyName)`
+{🚀} Usage: `isObservableProp(object, propertyName)`
 
 Is the property observable?
 
 ### `isObservableArray`
 
-{<span title="Advanced feature">🚀</span>} Usage: `isObservableArray(array)`
+{🚀} Usage: `isObservableArray(array)`
 
 Is the value an observable array?
 
 ### `isObservableObject`
 
-{<span title="Advanced feature">🚀</span>} Usage: `isObservableObject(object)`
+{🚀} Usage: `isObservableObject(object)`
 
 Is the value an observable object?
 
 ### `isObservableSet`
 
-{<span title="Advanced feature">🚀</span>} Usage: `isObservableSet(set)`
+{🚀} Usage: `isObservableSet(set)`
 
 Is the value an observable Set?
 
 
 ### `isObservableMap`
 
-{<span title="Advanced feature">🚀</span>} Usage: `isObservableMap(map)`
+{🚀} Usage: `isObservableMap(map)`
 
 Is the value an observable Map?
 
 ### `isBoxedObservable`
 
-{<span title="Advanced feature">🚀</span>} Usage: `isBoxedObservable(value)`
+{🚀} Usage: `isBoxedObservable(value)`
 
 Is the value an observable box, created using `observable.box`?
 
 ### `isAction`
 
-{<span title="Advanced feature">🚀</span>} Usage: `isAction(func)`
+{🚀} Usage: `isAction(func)`
 
 Is the function marked as an `action`?
 
 ### `isComputed`
 
-{<span title="Advanced feature">🚀</span>} Usage: `isComputed(boxedComputed)`
+{🚀} Usage: `isComputed(boxedComputed)`
 
 Is this a boxed computed value, created using `computed(() => expr)`?
 
 ### `isComputedProp`
 
-{<span title="Advanced feature">🚀</span>} Usage: `isComputedProp(object, propertyName)`
+{🚀} Usage: `isComputedProp(object, propertyName)`
 
 Is this a computed property?
 
 ### `trace`
 
-{<span title="Advanced feature">🚀</span>} [**Usage**](analyzing-reactivity.md): `trace()`, `trace(true)` _(enter debugger)_ or `trace(object, propertyName, enterDebugger?)`
+{🚀} [**Usage**](analyzing-reactivity.md): `trace()`, `trace(true)` _(enter debugger)_ or `trace(object, propertyName, enterDebugger?)`
 
 Should be used inside an observer, reaction or computed value. Logs when the value is invalidated, or sets the debugger breakpoint if called with _true_.
 
 ### `spy`
 
-{<span title="Advanced feature">🚀</span>} [**Usage**](analyzing-reactivity.md#spy): `spy(eventListener)`
+{🚀} [**Usage**](analyzing-reactivity.md#spy): `spy(eventListener)`
 
 Registers a global spy listener that listens to all events that happen in MobX.
 
 ### `getDebugName`
 
-{<span title="Advanced feature">🚀</span>} [**Usage**](analyzing-reactivity.md#getdebugname): `getDebugName(reaction|array|Set|Map)` or `getDebugName(object|Map, propertyName)`
+{🚀} [**Usage**](analyzing-reactivity.md#getdebugname): `getDebugName(reaction|array|Set|Map)` or `getDebugName(object|Map, propertyName)`
 
 Returns the (generated) friendly debug name for an observable or reaction.
 
 ### `getDependencyTree`
 
-{<span title="Advanced feature">🚀</span>} [**Usage**](analyzing-reactivity.md#getdependencytree): `getDependencyTree(object, computedPropertyName)`
+{🚀} [**Usage**](analyzing-reactivity.md#getdependencytree): `getDependencyTree(object, computedPropertyName)`
 
 Returns a tree structure with all observables the given reaction / computation currently depends upon.
 
 ### `getObserverTree`
 
-{<span title="Advanced feature">🚀</span>} [**Usage**](analyzing-reactivity.md#getobservertree): `getObserverTree(array|Set|Map)` or `getObserverTree(object|Map, propertyName)`
+{🚀} [**Usage**](analyzing-reactivity.md#getobservertree): `getObserverTree(array|Set|Map)` or `getObserverTree(object|Map, propertyName)`
 
 Returns a tree structure with all reactions / computations that are observing the given observable.
 
 ---
 
-## Extending MobX {<span title="Advanced feature">🚀</span>}
+## Extending MobX {🚀}
 
 _In the rare case you want to extend MobX itself._
 
 ### `createAtom`
 
-{<span title="Advanced feature">🚀</span>} [**Usage**](custom-observables.md): `createAtom(name, onBecomeObserved?, onBecomeUnobserved?)`
+{🚀} [**Usage**](custom-observables.md): `createAtom(name, onBecomeObserved?, onBecomeUnobserved?)`
 
 Creates your own observable data structure and hooks it up to MobX. Used internally by all observable data types. Atom exposes two _report_ methods to notify MobX with when:
 
@@ -473,13 +473,13 @@ Creates your own observable data structure and hooks it up to MobX. Used interna
 
 ### `getAtom`
 
-{<span title="Advanced feature">🚀</span>} [**Usage**](analyzing-reactivity.md#getatom): `getAtom(thing, property?)`
+{🚀} [**Usage**](analyzing-reactivity.md#getatom): `getAtom(thing, property?)`
 
 Returns the backing atom.
 
 ### `transaction`
 
-{<span title="Advanced feature">🚀</span>} Usage: `transaction(worker: () => any)`
+{🚀} Usage: `transaction(worker: () => any)`
 
 _Transaction is a low-level API. It is recommended to use [`action`](#action) or [`runInAction`](#runinaction) instead._
 
@@ -508,7 +508,7 @@ transaction(() => {
 
 ### `untracked`
 
-{<span title="Advanced feature">🚀</span>} Usage: `untracked(worker: () => any)`
+{🚀} Usage: `untracked(worker: () => any)`
 
 _Untracked is a low-level API. It is recommended to use [`reaction`](#reaction), [`action`](#action) or [`runInAction`](#runinaction) instead._
 

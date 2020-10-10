@@ -29,7 +29,7 @@ Typically `makeObservable` is used in the constructor of a class, and its first 
 The `annotations` argument maps [annotations](#available-annotations) to each member. Note that when using [decorators](enabling-decorators.md), the `annotations` argument can be omitted.
 
 Methods that derive information and take arguments (for example `findUsersOlderThan(age: number): User[]`) don't need any annotation.
-Their read operations will still be tracked when they are called from a reaction, but their output won't be memoized to avoid memory leaks. Check out [MobX-utils computedFn {<span title="Advanced feature">🚀</span>}](https://github.com/mobxjs/mobx-utils#computedfn) as well.
+Their read operations will still be tracked when they are called from a reaction, but their output won't be memoized to avoid memory leaks. Check out [MobX-utils computedFn {🚀}](https://github.com/mobxjs/mobx-utils#computedfn) as well.
 
 <details id="limitations"><summary>makeObservable limitations<a href="#limitations" class="tip-anchor"></a></summary>
 
@@ -206,7 +206,7 @@ Making class members observable is considered the responsibility of the class co
 
 </details>
 
-<details id="avoid-proxies"><summary>{<span title="Advanced feature">🚀</span>} **Tip:** observable (proxied) versus makeObservable (unproxied)<a href="#avoid-proxies" class="tip-anchor"></a></summary>
+<details id="avoid-proxies"><summary>{🚀} **Tip:** observable (proxied) versus makeObservable (unproxied)<a href="#avoid-proxies" class="tip-anchor"></a></summary>
 
 The primary difference between `make(Auto)Observable` and `observable` is that the first one modifies the object you are passing in as first argument, while `observable` creates a _clone_ that is made observable.
 
@@ -235,7 +235,7 @@ Note that it is possible to pass `{ proxy: false }` as an option to `observable`
 | `flow`                             | Creates a `flow` to manage asynchronous processes. Check out [flow](actions.md#using-flow-instead-of-async--await-) for more details. Note that the inferred return type in TypeScript might be off.                       |
 | `autoAction`                       | Should not be used explicitly, but is used under the hood by `makeAutoObservable` to mark methods that can act as action or derivation, based on their calling context.                                                    |
 
-## Options {<span title="Advanced feature">🚀</span>}
+## Options {🚀}
 
 The above APIs take an optional `options` argument which is an object that supports the following options:
 

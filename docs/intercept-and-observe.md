@@ -6,7 +6,7 @@ hide_title: true
 
 <script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
-# Intercept & Observe {<span title="Advanced feature">🚀</span>}
+# Intercept & Observe {🚀}
 
 _⚠️ **Warning**: intercept and observe are low level utilities, and should not be needed in practice. Use some form of [reaction](reactions.md) instead, as `observe` doesn't respect transactions and doesn't support deep observing of changes. Using these utilities is an anti-pattern. If you intend to get access to the old and new value using `observe`, use [`reaction`](reactions.md#reaction) instead. ⚠️_
 

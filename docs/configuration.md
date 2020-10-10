@@ -6,7 +6,7 @@ hide_title: true
 
 <script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
-# Configuration {<span title="Advanced feature">🚀</span>}
+# Configuration {🚀}
 
 MobX has several configurations depending on how you prefer to use it, which JavaScript engines you want to target, and whether you want MobX to hint at best practices.
 Most configuration options can be set by using the `configure` method.
@@ -42,12 +42,12 @@ Proxies cannot be polyfilled. Even though polyfills do exist, they don't support
 2.  Adding or deleting properties of existing observable plain objects after creation is not automatically picked up. If you intend to use objects as index based lookup maps, in other words, as dynamic collections of things, use observable Maps instead.
 
 It is possible to dynamically add properties to objects, and detect their additions, even when Proxies aren't enabled.
-This can be achieved by using the [Collection utilities {<span title="Advanced feature">🚀</span>}](collection-utilities.md). Make sure that (new) properties are set using the `set` utility, and that the objects are iterated using one of the `values` / `keys` or `entries` utilities, rather than the built-in JavaScript mechanisms.
+This can be achieved by using the [Collection utilities {🚀}](collection-utilities.md). Make sure that (new) properties are set using the `set` utility, and that the objects are iterated using one of the `values` / `keys` or `entries` utilities, rather than the built-in JavaScript mechanisms.
 But, since this is really easy to forget, we instead recommend using observable Maps if possible.
 
 ## Decorator support
 
-For enabling experimental decorator support check out the [Enabling decorators {<span title="Advanced feature">🚀</span>}](enabling-decorators.md) section.
+For enabling experimental decorator support check out the [Enabling decorators {🚀}](enabling-decorators.md) section.
 
 ## Linting options
 

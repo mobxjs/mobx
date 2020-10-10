@@ -12,7 +12,7 @@ It follows the principle that the most commonly used concepts are
 introduced before specialized information. This applies to the headings in the table
 of concepts as well as the pages under those headings.
 
-We've marked the sections and concepts that are more advanced with the {<span title="Advanced feature">🚀</span>} marker. You likely won't have to understand them until you will have a special use case, and can use MobX very effectively without knowing about them. Feel free to skip them and move on to the next section!
+We've marked the sections and concepts that are more advanced with the {🚀} marker. You likely won't have to understand them until you will have a special use case, and can use MobX very effectively without knowing about them. Feel free to skip them and move on to the next section!
 
 The documentation has been rewritten for MobX 6. For older versions of MobX, it can be found [here](https://github.com/mobxjs/mobx/tree/mobx4and5/docs).
 All the principles are the same, and the API is largely the same. The main difference is that before MobX 6, [decorators](https://github.com/mobxjs/mobx/blob/mobx4and5/docs/best/decorators.md) were the recommended syntax to write MobX enhanced classes.

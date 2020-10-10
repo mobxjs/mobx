@@ -6,7 +6,7 @@ hide_title: true
 
 <script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
-# Optimizing React component rendering {<span title="Advanced feature">🚀</span>}
+# Optimizing React component rendering {🚀}
 
 MobX is very fast, [often even faster than Redux](https://twitter.com/mweststrate/status/718444275239882753), but here are some tips to get most out of React and MobX. Most apply to React in general and are not specific to MobX.
 Note that while it's good to be aware of these patterns, usually your application
@@ -86,7 +86,7 @@ Faster:
 
 In the faster example, a change in the `name` property triggers only `DisplayName` to re-render, while in the slower one the owner of the component has to re-render as well. There is nothing wrong with that, and if rendering of the owning component is fast enough (usually it is!), then this approach works well.
 
-### Function props {<span title="Advanced feature">🚀</span>}
+### Function props {🚀}
 
 You may notice that to dereference values late, you have to create lots of small observer components where each is customized to render a different part of data, for example:
 

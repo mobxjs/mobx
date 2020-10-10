@@ -6,7 +6,7 @@ hide_title: true
 
 <script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
-# Running side effects with reactions {<span title="Advanced feature">🚀</span>}
+# Running side effects with reactions {🚀}
 
 Reactions are an important concept to understand, as it is where everything in MobX comes together.
 The goal of reactions is to model side effects that happen automatically.
@@ -343,7 +343,7 @@ either violated the first rule, or the new reaction you are about to create shou
 There are real-life scenarios that do not fit in the above principles. That is why they are _principles_, not _laws_.
 But, the exceptions are rare so only violate them as a last resort.
 
-## Options {<span title="Advanced feature">🚀</span>}
+## Options {🚀}
 
 The behavior of `autorun`, `reaction` and `when` can be further fine-tuned by passing in an `options` argument as shown in the usages above.
 
