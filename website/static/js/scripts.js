@@ -10,7 +10,7 @@ function openTarget() {
     }
 }
 function addTooltipToRockets() {
-    var classNames = ['navGroups', 'onPageNav', 'post'];
+    var classNames = ['navGroups', 'onPageNav', 'post', 'docs-prevnext'];
     var rocketRegex = /🚀/g;
 
     for (var className of classNames) {
@@ -22,6 +22,6 @@ function addTooltipToRockets() {
 }
 window.addEventListener('hashchange', openTarget);
 window.addEventListener('DOMContentLoaded', function() {
-    openTarget();
     addTooltipToRockets();
+    openTarget();
 });
