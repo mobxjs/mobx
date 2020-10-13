@@ -19,7 +19,6 @@
 ### Code change checklist
 
 -   [ ] Added/updated unit tests
--   [ ] Updated changelog
 -   [ ] Updated `/docs`. For new functionality, at least `API.md` should be updated
 -   [ ] Verified that there is no significant performance drop (`npm run perf`)
 
