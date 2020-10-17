@@ -30,9 +30,6 @@
       "best/decorators": {
         "title": "Enabling decorators"
       },
-      "best/stateless-HMR": {
-        "title": "Hot Module Reloading with Stateless Components"
-      },
       "best/store": {
         "title": "Defining data stores"
       },

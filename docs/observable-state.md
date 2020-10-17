@@ -35,7 +35,7 @@ Their read operations will still be tracked when they are called from a reaction
 
 It can only annotate properties declared by its own class definition. If a sub or superclass introduces observable fields, it will have to call `makeObservable` for those properties itself.
 
-</summary>
+</details>
 
 <details id="ts-privates"><summary>annotating private fields<a href="#ts-privates" class="tip-anchor"></a></summary>
 
@@ -135,10 +135,10 @@ However, `makeAutoObservable` cannot be used on classes that have super or are s
 
 Inference rules:
 
--   Any (inherited) member that is a generator function will be annotated with `flow`. Note that generators functions are not detectable in some transpiler configurations, if flow doesn't work as expected, make sure to specify `flow` explicitly.
 -   Any (inherited) member that contains a `function` value will be annotated with `autoAction`.
 -   Any `get`ter will be annotated with `computed`.
 -   Any other _own_ field will be marked with `observable`.
+-   Any (inherited) member that is a generator function will be annotated with `flow`. (Note that generators functions are not detectable in some transpiler configurations, if flow doesn't work as expected, make sure to specify `flow` explicitly.)
 -   Members marked with `false` in the `overrides` argument will not be annotated. For example, using it for read only fields such as identifiers.
 
 When you call `makeObservable` or `makeAutoObservable`, all the properties you want to annotate
