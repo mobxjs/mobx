@@ -31,21 +31,6 @@ The `annotations` argument maps [annotations](#available-annotations) to each me
 Methods that derive information and take arguments (for example `findUsersOlderThan(age: number): User[]`) don't need any annotation.
 Their read operations will still be tracked when they are called from a reaction, but their output won't be memoized to avoid memory leaks. Check out [MobX-utils computedFn {🚀}](https://github.com/mobxjs/mobx-utils#computedfn) as well.
 
-<details id="limitations"><summary>makeObservable limitations<a href="#limitations" class="tip-anchor"></a></summary>
-
-It can only annotate properties declared by its own class definition. If a sub or superclass introduces observable fields, it will have to call `makeObservable` for those properties itself.
-
-</details>
-
-<details id="ts-privates"><summary>annotating private fields<a href="#ts-privates" class="tip-anchor"></a></summary>
-
-By default TypeScript will not allow you to annotate private fields.
-This can be overcome by explicitly passing the relevant private fields as generic argument, like this:
-
-`makeObservable<MyStore, "myPrivateField" | "myPrivateField2">(this, { myPrivateField: observable, myPrivateField2: observable })`.
-
-</details>
-
 <!--DOCUSAURUS_CODE_TABS-->
 <!--class + makeObservable-->
 
@@ -140,11 +125,6 @@ Inference rules:
 -   Any other _own_ field will be marked with `observable`.
 -   Any (inherited) member that is a generator function will be annotated with `flow`. (Note that generators functions are not detectable in some transpiler configurations, if flow doesn't work as expected, make sure to specify `flow` explicitly.)
 -   Members marked with `false` in the `overrides` argument will not be annotated. For example, using it for read only fields such as identifiers.
-
-When you call `makeObservable` or `makeAutoObservable`, all the properties you want to annotate
-_must_ exist on the instance already. Either by [declaring](https://github.com/tc39/proposal-class-fields) them (recommended, as done above) or otherwise by assigning them _before_ calling `makeAutoObservable` (declaring and annotating in one go can be done using [extendObservable](api.md#extendobservable)). Beyond that, calling and providing annotations must be done unconditionally, as this makes it possible to cache the inference results.
-
-JavaScript private fields are not supported (`#field` syntax). When using TypeScript, it is recommended to use the `private` modifier instead.
 
 ## `observable`
 
@@ -241,6 +221,14 @@ Note that it is possible to pass `{ proxy: false }` as an option to `observable`
 | `false`                            | Explicitly do not annotate this property.                                                                                                                                                                                  |
 | `flow`                             | Creates a `flow` to manage asynchronous processes. Check out [flow](actions.md#using-flow-instead-of-async--await-) for more details. Note that the inferred return type in TypeScript might be off.                       |
 | `autoAction`                       | Should not be used explicitly, but is used under the hood by `makeAutoObservable` to mark methods that can act as action or derivation, based on their calling context.                                                    |
+
+## Limitations
+
+1. `make(Auto)Observable` only supports properties that are already defined. Make sure your compiler configuration is [correct](installation.md#use-spec-compliant-transpilation-for-class-properties), or as work-around, that a value is assigned to all properties before using `make(Auto)Observable`. Without correct configuration, fields that are declared but not initialized (like in `class X { y; }`) will not be picked up correctly.
+1. `makeObservable` can only annotate properties declared by its own class definition. If a sub- or superclass introduces observable fields, it will have to call `makeObservable` for those properties itself.
+1. By default TypeScript will not allow you to annotate private fields. This can be overcome by explicitly passing the relevant private fields as generic argument, like this: `makeObservable<MyStore, "myPrivateField" | "myPrivateField2">(this, { myPrivateField: observable, myPrivateField2: observable })`.
+1. Calling `make(Auto)Observable` and providing annotations must be done unconditionally, as this makes it possible to cache the inference results.
+1. JavaScript private fields are not supported (the `#field` syntax). When using TypeScript, it is recommended to use the `private` modifier instead.
 
 ## Options {🚀}
 

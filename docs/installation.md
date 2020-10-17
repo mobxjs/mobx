@@ -10,7 +10,7 @@ hide_title: true
 
 MobX works in any ES5 environment, which includes browsers and NodeJS.
 
-There are two types of React bindings, `mobx-react-lite` supports only functional components, whereas `mobx-react` also supports class based components. Append the appropriate bindings for your use case to the *Yarn* or *NPM* command below:
+There are two types of React bindings, `mobx-react-lite` supports only functional components, whereas `mobx-react` also supports class based components. Append the appropriate bindings for your use case to the _Yarn_ or _NPM_ command below:
 
 **Yarn:** `yarn add mobx`
 
@@ -18,7 +18,12 @@ There are two types of React bindings, `mobx-react-lite` supports only functiona
 
 **CDN:** https://cdnjs.com/libraries/mobx / https://unpkg.com/mobx/lib/mobx.umd.js
 
-_⚠️ **Warning:** When using a CDN, it is best to check the url in your browser and see what version it resolves to, so that your users aren't accidentally served a newer version in the future when updates are released. Use an url like: https://unpkg.com/mobx@5.15.4/lib/mobx.umd.production.min.js instead. For a development build, substitute `production.min` with `development` in the URL. ⚠️_
+## Use spec compliant transpilation for class properties
+
+⚠️ **Warning:** When using MobX with TypeScript and Babel, and you plan to use classes; make sure to update your configuration to use a TC-39 spec compliant transpilation for class fields, since this is not the default. Without this, class fields cannot be made observable before they are initialized.
+
+-   For Babel: use the plugin `["@babel/plugin-proposal-class-properties", { "loose": false }]`
+-   For TypeScript, set the compiler option `"useDefineForClassFields": true`
 
 ## MobX on older JavaScript environments
 
