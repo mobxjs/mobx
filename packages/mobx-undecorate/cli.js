@@ -2,7 +2,6 @@
 const { spawn } = require("child_process")
 const path = require("path")
 
-// this is pretty lame, probably better make a .cmd and .sh file...
 spawn(
     path.join("node_modules", ".bin", "jscodeshift"),
     [
