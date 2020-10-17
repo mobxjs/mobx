@@ -309,6 +309,10 @@ const TodoView = observer(({ todo }: { todo: Todo }) =>
 
 ## Tips
 
+<details id="static-rendering"><summary>Server Side Rendering<a href="#static-rendering" class="tip-anchor"></a></summary>
+If `observer` is used in server side rendering context; make sure to call `enableStaticRendering(true)`, so that `observer` won't subscribe to any observables used, and no GC problems are introduced.
+</details>
+
 <details id="react-vs-lite"><summary>**Note:** mobx-react vs. mobx-react-lite<a href="#react-vs-lite" class="tip-anchor"></a></summary>
 In this documentation we used `mobx-react-lite` as default.
 [mobx-react](https://github.com/mobxjs/mobx-react/) is it's big brother, which uses `mobx-react-lite` under the hood.
