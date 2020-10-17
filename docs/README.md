@@ -29,13 +29,14 @@ MobX is made possible by the generosity of the sponsors below, and many other [i
 <a href="https://www.canva.com/"><img src="assets/canva.png" align="center" width="100" title="Canva" alt="Canva" /></a>
 
 **🥈 Silver sponsors (\$100+ pm):**<br/>
-<a href="https://mantro.net/jobs/warlock"><img src="assets/mantro.png" align="center" width="100" title="mantro GmbH" alt="mantro GmbH"></a>
 <a href="https://www.codefirst.co.uk/"><img src="assets/codefirst.png" align="center" width="100" title="CodeFirst" alt="CodeFirst"/></a>
 <a href="https://www.dcslsoftware.com/"><img src="assets/dcsl.png" align="center" width="100" title="DCSL Software" alt="DCSL Software"/></a>
 <a href="https://www.bugsnag.com/platforms/react-error-reporting?utm_source=MobX&utm_medium=Website&utm_content=open-source&utm_campaign=2019-community&utm_term=20190913"><img src="assets/bugsnag.jpg" align="center" width="100" title="Bugsnag" alt="Bugsnag"/></a>
 <a href="https://curology.com/blog/tech"><img src="assets/curology.png" align="center" width="100" title="Curology" alt="Curology"/></a>
+<a href="https://modulz.app/"><img src="assets/modulz.png" align="center" width="100" title="Modulz" alt="Modulz"/></a>
 
 **🥉 Bronze sponsors (\$500+ total contributions):**<br/>
+<a href="https://mantro.net/jobs/warlock"><img src="assets/mantro.png" align="center" width="100" title="mantro GmbH" alt="mantro GmbH"></a>
 <a href="https://www.algolia.com/"><img src="assets/algolia.jpg" align="center" width="100" title="Algolia" alt="Algolia" /></a>
 <a href="https://talentplot.com/"><img src="assets/talentplot.png" align="center" width="100" title="talentplot" alt="talentplot"></a>
 <a href="https://careers.dazn.com/"><img src="assets/dazn.png" align="center" width="100" title="DAZN" alt="DAZN"></a>

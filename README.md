@@ -25,13 +25,14 @@ MobX is made possible by the generosity of the sponsors below, and many other [i
 <a href="https://www.canva.com/"><img src="docs/assets/canva.png" align="center" width="100" title="Canva" alt="Canva" /></a>
 
 **🥈Silver sponsors (\$100+ pm):**<br/>
-<a href="https://mantro.net/jobs/warlock"><img src="docs/assets/mantro.png" align="center" width="100" title="mantro GmbH" alt="mantro GmbH"></a>
 <a href="https://www.codefirst.co.uk/"><img src="docs/assets/codefirst.png" align="center" width="100" title="CodeFirst" alt="CodeFirst"/></a>
 <a href="https://www.dcslsoftware.com/"><img src="docs/assets/dcsl.png" align="center" width="100" title="DCSL Software" alt="DCSL Software"/></a>
 <a href="https://www.bugsnag.com/platforms/react-error-reporting?utm_source=MobX&utm_medium=Website&utm_content=open-source&utm_campaign=2019-community&utm_term=20190913"><img src="docs/assets/bugsnag.jpg" align="center" width="100" title="Bugsnag" alt="Bugsnag"/></a>
 <a href="https://curology.com/blog/tech"><img src="docs/assets/curology.png" align="center" width="100" title="Curology" alt="Curology"/></a>
+<a href="https://modulz.app/"><img src="docs/assets/modulz.png" align="center" width="100" title="Modulz" alt="Modulz"/></a>
 
 **🥉Bronze sponsors (\$500+ total contributions):**<br/>
+<a href="https://mantro.net/jobs/warlock"><img src="docs/assets/mantro.png" align="center" width="100" title="mantro GmbH" alt="mantro GmbH"></a>
 <a href="https://www.algolia.com/"><img src="docs/assets/algolia.jpg" align="center" width="100" title="Algolia" alt="Algolia" /></a>
 <a href="https://talentplot.com/"><img src="docs/assets/talentplot.png" align="center" width="100" title="talentplot" alt="talentplot"></a>
 <a href="https://careers.dazn.com/"><img src="docs/assets/dazn.png" align="center" width="100" title="DAZN" alt="DAZN"></a>
@@ -165,7 +166,7 @@ Created by [Pavan Podila](https://twitter.com/pavanpodila) and [Michel Weststrat
 
 -   [Introduction to MobX & React in 2020](https://www.youtube.com/watch?v=pnhIJA64ByY) by Leigh Halliday, _17min_.
 -   [ReactNext 2016: Real World MobX](https://www.youtube.com/watch?v=Aws40KOx90U) by Michel Weststrate, _40min_, [slides](https://docs.google.com/presentation/d/1DrI6Hc2xIPTLBkfNH8YczOcPXQTOaCIcDESdyVfG_bE/edit?usp=sharing).
--   [CityJS 2020: MobX, from mutable to immutable, to observable data](https://youtu.be/sP7dtZm_Wx0?t=27050) by Michel Weststrate, _30min_.
+-   [CityJS 2020: MobX, from mutable to immutable, to observable data](https://www.youtube.com/watch?v=ZHxFrbK3VB0&feature=emb_logo) by Michel Weststrate, _30min_.
 -   [OpenSourceNorth: Practical React with MobX (ES5)](https://www.youtube.com/watch?v=XGwuM_u7UeQ) by Matt Ruby, _42min_.
 -   [HolyJS 2019: MobX and the unique symbiosis of predictability and speed](https://www.youtube.com/watch?v=NBYbBbjZeX4&list=PL8sJahqnzh8JJD7xahG5zXkjfM5GOgcPA&index=21&t=0s) by Michel Weststrate, _59min_.
 -   [React Amsterdam 2016: State Management Is Easy](https://www.youtube.com/watch?v=ApmSsu3qnf0&feature=youtu.be) by Michel Weststrate, _20min_, [slides](https://speakerdeck.com/mweststrate/state-management-is-easy-introduction-to-mobx).
