@@ -144,6 +144,8 @@ Inference rules:
 When you call `makeObservable` or `makeAutoObservable`, all the properties you want to annotate
 _must_ exist on the instance already. Either by [declaring](https://github.com/tc39/proposal-class-fields) them (recommended, as done above) or otherwise by assigning them _before_ calling `makeAutoObservable` (declaring and annotating in one go can be done using [extendObservable](api.md#extendobservable)). Beyond that, calling and providing annotations must be done unconditionally, as this makes it possible to cache the inference results.
 
+JavaScript private fields are not supported (`#field` syntax). When using TypeScript, it is recommended to use the `private` modifier instead.
+
 ## `observable`
 
 Usage:
