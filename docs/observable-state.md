@@ -35,11 +35,12 @@ Their read operations will still be tracked when they are called from a reaction
 
 It can only annotate properties declared by its own class definition. If a sub or superclass introduces observable fields, it will have to call `makeObservable` for those properties itself.
 
-**TypeScript note:** you should pass class constructor name as a generic argument to `makeObservable`, like this:
+</summary>
 
-`makeObservable<MyStore>(this, { myField: observable })`.
+<details id="ts-privates"><summary>annotating private fields<a href="#ts-privates" class="tip-anchor"></a></summary>
 
-And when decorating private properties, you can pass the private property names as a generic argument to `makeObservable` to suppress the compile error about the field not existing, like this:
+By default TypeScript will not allow you to annotate private fields.
+This can be overcome by explicitly passing the relevant private fields as generic argument, like this:
 
 `makeObservable<MyStore, "myPrivateField" | "myPrivateField2">(this, { myPrivateField: observable, myPrivateField2: observable })`.
 
@@ -134,7 +135,7 @@ However, `makeAutoObservable` cannot be used on classes that have super or are s
 
 Inference rules:
 
--   Any (inherited) member that is a generator function will be annotated with `flow`.
+-   Any (inherited) member that is a generator function will be annotated with `flow`. Note that generators functions are not detectable in some transpiler configurations, if flow doesn't work as expected, make sure to specify `flow` explicitly.
 -   Any (inherited) member that contains a `function` value will be annotated with `autoAction`.
 -   Any `get`ter will be annotated with `computed`.
 -   Any other _own_ field will be marked with `observable`.
