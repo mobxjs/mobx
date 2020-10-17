@@ -309,7 +309,7 @@ const TodoView = observer(({ todo }: { todo: Todo }) =>
 
 ## Tips
 
-<details id="static-rendering"><summary>Server Side Rendering<a href="#static-rendering" class="tip-anchor"></a></summary>
+<details id="static-rendering"><summary>Server Side Rendering (SSR)<a href="#static-rendering" class="tip-anchor"></a></summary>
 If `observer` is used in server side rendering context; make sure to call `enableStaticRendering(true)`, so that `observer` won't subscribe to any observables used, and no GC problems are introduced.
 </details>
 
