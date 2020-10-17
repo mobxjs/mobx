@@ -1,6 +1,6 @@
 {
   "name": "mobx-undecorate",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Migrate MobX 4/5 to MobX 6",
   "bin": "cli.js",
   "scripts": {
