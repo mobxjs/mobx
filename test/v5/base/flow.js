@@ -483,3 +483,34 @@ test("it should support flow in makeAutoObservable", done => {
         })
     }, 10)
 })
+
+test("verify #2519", done => {
+    mobx.configure({ enforceActions: "observed" })
+    const values = []
+    const x = mobx.observable({ a: 1 })
+    mobx.reaction(
+        () => x.a,
+        v => values.push(v),
+        { fireImmediately: true }
+    )
+
+    const f = mobx.flow(function* (initial) {
+        x.a = initial // this runs in action
+        try {
+            x.a = yield delay(100, 5, false) // and this as well!
+            yield delay(100, 0)
+            x.a = 4
+        } catch (e) {
+            x.a = e
+        }
+        return x.a
+    })
+
+    setTimeout(() => {
+        f(2).then(v => {
+            expect(v).toBe(4)
+            expect(values).toEqual(values, [1, 2, 5, 4])
+            done()
+        })
+    }, 10)
+})
