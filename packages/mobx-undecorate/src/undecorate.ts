@@ -45,7 +45,8 @@ const defaultOptions = {
         "optionalChaining",
         ["pipelineOperator", { proposal: "minimal" }],
         "throwExpressions",
-        "typescript"
+        "typescript",
+        "jsx"
     ]
 }
 
