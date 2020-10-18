@@ -4,19 +4,18 @@ daysUntilStale: 14
 daysUntilClose: 4
 # Issues with these labels will never be considered stale
 exemptLabels:
-    - has PR
-    - discuss
-    - enhancement
-    - documentation
-    - candidate-for-next-version
-    - ready-to-be-implemented-by-volunteer
-    - needs investigation
-    - breaking-change
-    - help wanted
-    - pinned
-    - waiting-for-standardized-decorators
+    - 📌 pinned
+    - 💬 discuss
+    - 🍗 enhancement
+    - 📖 documentation
+    - 🔨 breaking-change
+    - 🚧 experimental
+    - 🙏 help wanted
+    - 👓 needs investigation
+    - ✋ on hold
+
 # Label to use when marking an issue as stale
-staleLabel: stale
+staleLabel: 🚶 stale
 # Comment to post when marking an issue as stale. Set to `false` to disable
 markComment: >
     This issue has been automatically marked as stale because it has not had
