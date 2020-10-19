@@ -36,4 +36,6 @@ Instructions for how the issue can be reproduced by a maintainer or contributor.
 
 <!--
 If you are unable to use CodeSandbox for whatever reasons, please list here all relevant dependencies
+
+If you encounter the issue after upgrading from MobX 4/5 to MobX 6, make sure you've applied the migration guide: https://mobx.js.org/migrating-from-4-or-5.html
 -->
