@@ -109,13 +109,13 @@ const GenericNameDisplayer = observer(({ getName }) => <DisplayName name={getNam
 Then, you can use the component like this:
 
 ```javascript
-const MyComponent = observer(({ person, car }) => (
+const MyComponent = ({ person, car }) => (
     <>
         <GenericNameDisplayer getName={() => person.name} />
         <GenericNameDisplayer getName={() => car.model} />
         <GenericNameDisplayer getName={() => car.manufacturer.name} />
     </>
-))
+)
 ```
 
 This approach will allow `GenericNameDisplayer` to be reused throughout your application to render any name, and you still keep component re-rendering
