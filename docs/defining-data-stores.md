@@ -96,8 +96,8 @@ export class TodoStore {
     loadTodos() {
         this.isLoading = true
         this.transportLayer.fetchTodos().then(fetchedTodos => {
-            fetchedTodos.forEach(json => this.updateTodoFromServer(json))
             runInAction(() => {
+                fetchedTodos.forEach(json => this.updateTodoFromServer(json))
                 this.isLoading = false
             })
         })
