@@ -1,12 +1,6 @@
 <!--
     Thanks for taking the effort to create a PR! 🙌
 
-    🚨🚨🚨 IMPORTANT NOTICE 🚨🚨🚨
-
-    Next major of MobX V6 is under development. Try to direct all changes toward `mobx6` branch instead of `master`.
-
-    🚨🚨🚨 IMPORTANT NOTICE 🚨🚨🚨
-
     👋 Are you making a change to documentation only? Delete the rest of the template and go ahead.
 
     👋 If you are creating an extensive PR, you might want to open an issue with your idea first in case there is a chance for rejecting it.
