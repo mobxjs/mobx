@@ -1232,3 +1232,42 @@ test("weird syntaxes", () => {
         }"
     `)
 })
+
+test("makeObservable not added to imports #2540", () => {
+    expect(
+        convert(`
+        import { decorate, observable, action } from 'mobx';
+
+        class TestStore
+        {
+            testValue = 1;
+
+            testFunc = () =>
+            {
+                this.testValue++;
+            }
+        }
+
+        decorate(TestStore, {
+            testValue: observable,
+            testFunc: action
+        });
+        `)
+    ).toMatchInlineSnapshot(`
+        "import { observable, action, makeObservable } from 'mobx';
+
+        class TestStore
+        {
+            testValue = 1;
+
+            testFunc = () =>
+            {
+                this.testValue++;
+            }
+
+            constructor() {
+                makeObservable(this);
+            }
+        }"
+    `)
+})
