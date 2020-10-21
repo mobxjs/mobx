@@ -107,7 +107,7 @@ export class TodoStore {
     // exists once. Might either construct a new Todo, update an existing one,
     // or remove a Todo if it has been deleted on the server.
     updateTodoFromServer(json) {
-        const todo = this.todos.find(todo => todo.id === json.id)
+        let todo = this.todos.find(todo => todo.id === json.id)
         if (!todo) {
             todo = new Todo(this, json.id)
             this.todos.push(todo)
