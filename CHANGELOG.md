@@ -1,9 +1,5 @@
 # mobx
 
-## Unreleased
-
--   Fixed [2542](https://github.com/mobxjs/mobx/issues/2542), makeAutoObservable not respecting deep option [@urugator](https://github.com/urugator)
-
 ## 6.0.1
 
 -   Fixed issue in TS typings of `makeObservable` in combination with a member named `toString()`
