@@ -99,11 +99,12 @@ class TodoList {
     get unfinishedTodoCount() {
         return this.todos.filter(todo => !todo.finished).length
     }
-    constructor() {
+    constructor(todos) {
         makeObservable(this, {
             todos: observable,
             unfinishedTodoCount: computed
         })
+        this.todos = todos;
     }
 }
 ```
