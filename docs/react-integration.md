@@ -295,7 +295,7 @@ Since `onRender` is part of the rendering cycle of `GridRow`, rather than `TodoV
 Or, we can create an in-line anonymous observer using [`<Observer />`](https://github.com/mobxjs/mobx-react#observer):
 
 ```javascript
-const TodoView = observer(({ todo }: { todo: Todo }) =>
+const TodoView = observer(({ todo }: { todo: Todo }) => {
    // WRONG: GridRow.onRender won't pick up changes in todo.title / todo.done
    //        since it isn't an observer.
    return <GridRow onRender={() => <td>{todo.title}</td>} />
@@ -303,8 +303,8 @@ const TodoView = observer(({ todo }: { todo: Todo }) =>
    // CORRECT: wrap the callback rendering in Observer to be able to detect changes.
    return <GridRow onRender={() => <Observer>{() =>
      <td>{todo.title}</td>
-   }} />
-}
+   }</Observer>} />
+})
 ```
 
 ## Tips
