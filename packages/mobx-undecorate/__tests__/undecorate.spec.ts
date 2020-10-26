@@ -1008,6 +1008,48 @@ describe("@observer", () => {
         `)
     })
 
+    test("class comp with observer and decorator from another package", () => {
+        expect(
+            convert(`
+        import {observer} from 'mobx-react'
+        import {withRouter} from 'react-router-dom'
+
+
+        /* 1 */
+        @withRouter @observer /* 2 */ export /* 3 */ class X extends React.Component {}
+
+        `)
+        ).toMatchInlineSnapshot(`
+            "import {observer} from 'mobx-react'
+            import {withRouter} from 'react-router-dom'
+
+
+            /* 1 */
+            @withRouter @observer /* 2 */ export /* 3 */ class X extends React.Component {}"
+        `)
+    })
+
+    test("class comp with observer, inject and decorator from another package", () => {
+        expect(
+            convert(`
+        import {observer, inject} from 'mobx-react'
+        import {withRouter} from 'react-router-dom'
+
+
+        /* 1 */
+        @withRouter @inject("test") @observer /* 2 */ export /* 3 */ class X extends React.Component {}
+
+        `)
+        ).toMatchInlineSnapshot(`
+            "import {observer, inject} from 'mobx-react'
+            import {withRouter} from 'react-router-dom'
+
+
+            /* 1 */
+            @withRouter @inject("test") @observer /* 2 */ export /* 3 */ class X extends React.Component {}"
+        `)
+    })
+
     test("class comp with inject and observer", () => {
         expect(
             convert(`
