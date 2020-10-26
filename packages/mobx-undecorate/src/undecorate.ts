@@ -227,34 +227,31 @@ export default function tranform(
 
     function handleObserverAndInject(clazzPath: ASTPath<ClassDeclaration>) {
         const clazz = clazzPath.value
-        // find @observer
-        const observerDecorator = (clazz as any).decorators?.find(
-            dec =>
-                j.Decorator.check(dec) &&
-                j.Identifier.check(dec.expression) &&
-                dec.expression.name === "observer"
-        )
-        // find @inject
-        const injectDecorator = (clazz as any).decorators?.find(
-            dec =>
-                j.Decorator.check(dec) &&
-                j.CallExpression.check(dec.expression) &&
-                j.Identifier.check(dec.expression.callee) &&
-                dec.expression.callee.name === "inject"
-        )
-        if (!observerDecorator && !injectDecorator) return
+        const decorators = (clazz as any).decorators ?? []
+
+        const isObserver = dec =>
+            j.Decorator.check(dec) &&
+            j.Identifier.check(dec.expression) &&
+            dec.expression.name === "observer"
+
+        const isInject = dec =>
+            j.Decorator.check(dec) &&
+            j.CallExpression.check(dec.expression) &&
+            j.Identifier.check(dec.expression.callee) &&
+            dec.expression.callee.name === "inject"
+
+        const hasObserverOrInject = decorators.some(dec => isObserver(dec) || isInject(dec))
+        if (!hasObserverOrInject) return
 
         // re-create the class
         let newClassDefExpr: any = j.classExpression(clazz.id, clazz.body, clazz.superClass)
         newClassDefExpr.superTypeParameters = clazz.superTypeParameters
         newClassDefExpr.typeParameters = clazz.typeParameters
         newClassDefExpr.implements = clazz.implements
-        // wrap with observer
-        if (observerDecorator)
-            newClassDefExpr = j.callExpression(j.identifier("observer"), [newClassDefExpr])
-        // wrap with inject
-        if (injectDecorator)
-            newClassDefExpr = j.callExpression(injectDecorator.expression, [newClassDefExpr])
+        // wrap with decorators
+        newClassDefExpr = decorators.reduceRight((newClassDefExpr, dec) => {
+            return j.callExpression(dec.expression, [newClassDefExpr])
+        }, newClassDefExpr)
 
         changed = true
         const decl = j.variableDeclaration("const", [

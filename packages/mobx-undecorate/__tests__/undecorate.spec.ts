@@ -1232,3 +1232,37 @@ test("weird syntaxes", () => {
         }"
     `)
 })
+
+test("class comp with observer and decorator from another package", () => {
+    expect(
+        convert(`
+    import {observer} from 'mobx-react'
+    import {withRouter} from 'react-router-dom'
+    /* 1 */
+    @withRouter @observer /* 2 */ export /* 3 */ class X extends React.Component {}
+    `)
+    ).toMatchInlineSnapshot(`
+        "import {observer} from 'mobx-react'
+        import {withRouter} from 'react-router-dom'
+        /* 1 */
+        export const X = withRouter(observer(class /* 2 */ /* 3 */ X extends React.Component {}));"
+    `)
+})
+
+test("class comp with observer, inject and decorator from another package", () => {
+    expect(
+        convert(`
+    import {observer, inject} from 'mobx-react'
+    import {withRouter} from 'react-router-dom'
+    /* 1 */
+    @withRouter @inject("test") @observer /* 2 */ export /* 3 */ class X extends React.Component {}
+    `)
+    ).toMatchInlineSnapshot(`
+        "import {observer, inject} from 'mobx-react'
+        import {withRouter} from 'react-router-dom'
+        /* 1 */
+        export const X = withRouter(
+          inject(\\"test\\")(observer(class /* 2 */ /* 3 */ X extends React.Component {}))
+        );"
+    `)
+})
