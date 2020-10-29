@@ -77,5 +77,5 @@ test("correct api should be exposed", function () {
 
 test("mobx has no dependencies", () => {
     const pkg = require("../../../package.json")
-    expect(pkg.dependencies).toEqual({})
+    expect(pkg.dependencies).toEqual(undefined)
 })
