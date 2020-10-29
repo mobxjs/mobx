@@ -15,3 +15,6 @@ dist/
 *.iws
 yarn-error.log
 build/
+.yarn/*
+!.yarn/releases
+!.yarn/plugins

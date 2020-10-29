@@ -33,8 +33,7 @@
     "docs:build": "yarn --cwd website build",
     "docs:start": "yarn --cwd website start",
     "docs:publish": "yarn --cwd website publish-gh-pages",
-    "prepare": "yarn dedup && yarn --cwd website install",
-    "dedup": "npx yarn-deduplicate --strategy fewer yarn.lock"
+    "prepare": "yarn --cwd website install"
   },
   "repository": {
     "type": "git",
@@ -56,7 +55,6 @@
     "README.md"
   ],
   "homepage": "https://mobx.js.org/",
-  "dependencies": {},
   "devDependencies": {
     "@babel/core": "^7.9.0",
     "@babel/plugin-proposal-class-properties": "^7.8.3",

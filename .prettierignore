@@ -3,3 +3,4 @@ website/**/*
 dist/
 docs/assets/
 *.yml
+.yarn
