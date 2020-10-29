@@ -16,8 +16,8 @@ jobs:
         steps:
             - checkout
 
-            - node/install-packages:
-                pkg-manager: yarn
+            - run:
+                command: yarn --immutable
 
             - run: yarn build
 
