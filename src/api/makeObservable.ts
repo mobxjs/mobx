@@ -190,7 +190,7 @@ type NoInfer<T> = [T][T extends any ? 0 : never]
 export function makeObservable<T, AdditionalKeys extends PropertyKey = never>(
     target: T,
     annotations?: AnnotationsMap<T, NoInfer<AdditionalKeys>>,
-    options?: CreateObservableOptions
+    options?: CreateObservableOptions & { throwIfNoDecoratorFound?: boolean }
 ): T {
     const autoBind = !!options?.autoBind
     const adm = asObservableObject(
@@ -202,10 +202,17 @@ export function makeObservable<T, AdditionalKeys extends PropertyKey = never>(
     try {
         if (!annotations) {
             const didDecorate = applyDecorators(target)
-            if (__DEV__ && !didDecorate)
-                die(
-                    `No annotations were passed to makeObservable, but no decorator members have been found either`
-                )
+            if (__DEV__ && !didDecorate) {
+                const { throwIfNoDecoratorFound } = {
+                    throwIfNoDecoratorFound: true,
+                    ...options
+                }
+                if (throwIfNoDecoratorFound) {
+                    die(
+                        `No annotations were passed to makeObservable, but no decorator members have been found either`
+                    )
+                }
+            }
             return target
         }
         const make = key => {
