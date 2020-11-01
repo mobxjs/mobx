@@ -26,6 +26,10 @@ The following flags are accepted:
 
 ### Changelog
 
-1.0.2
+#### Unreleased
+
+-   Fix [#2558](https://github.com/mobxjs/mobx/issues/2558) Undecorate removes non-mobx decorator
+
+#### 1.0.2
 
 -   Fixed support for JSX
