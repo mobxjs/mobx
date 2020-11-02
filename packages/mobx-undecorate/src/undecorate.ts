@@ -60,7 +60,7 @@ export const parser = {
 
 let decoratorsBeforeExport = true // hack to get the options into the parser
 
-export default function tranform(
+export default function transform(
     fileInfo: FileInfo,
     api: API,
     options?: { ignoreImports?: boolean; keepDecorators?: boolean; decoratorsAfterExport?: boolean }
