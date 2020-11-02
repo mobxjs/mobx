@@ -3,6 +3,7 @@ import {
     action,
     computed,
     observable,
+    isObservable,
     isObservableObject,
     isObservableProp,
     isComputedProp,
@@ -520,4 +521,16 @@ test("#2457", () => {
     expect(isObservableObject(t)).toBe(true)
     expect(isObservableProp(t, "value1")).toBe(true)
     expect(isComputedProp(t, "value1Computed")).toBe(true)
+})
+
+test("makeAutoObservable respects options.deep #2542'", () => {
+    const o = makeAutoObservable({ nested: {} }, {}, { deep: false })
+    expect(isObservable(o)).toBe(true)
+    expect(isObservableProp(o, "nested")).toBe(true)
+    expect(isObservable(o.nested)).toBe(false)
+
+    const deepO = makeAutoObservable({ nested: {} }, {}, { deep: true })
+    expect(isObservable(deepO)).toBe(true)
+    expect(isObservableProp(deepO, "nested")).toBe(true)
+    expect(isObservable(deepO.nested)).toBe(true)
 })

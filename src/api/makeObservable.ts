@@ -255,9 +255,12 @@ function extractAnnotationsFromObject(
     options: CreateObservableOptions | undefined
 ) {
     const autoBind = !!options?.autoBind
-    const defaultAnnotation: Annotation = options?.deep
-        ? observable.deep
-        : options?.defaultDecorator ?? observable.deep
+    const defaultAnnotation: Annotation =
+        options?.deep === undefined
+            ? options?.defaultDecorator ?? observable.deep
+            : options?.deep
+            ? observable.deep
+            : observable.ref
     Object.entries(getOwnPropertyDescriptors(target)).forEach(([key, descriptor]) => {
         if (key in collector || key === "constructor") return
         collector[key] = getInferredAnnotation(descriptor, defaultAnnotation, autoBind)
