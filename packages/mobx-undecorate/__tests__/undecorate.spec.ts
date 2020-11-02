@@ -714,7 +714,7 @@ describe("decorate", () => {
             })
         `)
         ).toMatchInlineSnapshot(`
-            "import { observable, computed, action } from \\"mobx\\";
+            "import { observable, computed, action, makeObservable } from \\"mobx\\"
 
             class Box {
                 width = 3
@@ -768,7 +768,7 @@ describe("decorate", () => {
             })
         `)
         ).toMatchInlineSnapshot(`
-            "import { observable, computed, action } from \\"mobx\\";
+            "import { observable, computed, action, makeObservable } from \\"mobx\\"
 
             test(\\"a\\", () => {
                 class Box {
@@ -812,7 +812,7 @@ describe("decorate", () => {
             })
         `)
         ).toMatchInlineSnapshot(`
-            "import { observable, computed, action } from \\"mobx\\";
+            "import { observable, computed, action, makeObservable } from \\"mobx\\"
 
             class Box {
                 constructor() {
@@ -841,7 +841,7 @@ describe("decorate", () => {
             })
         `)
         ).toMatchInlineSnapshot(`
-            "import { observable, computed, action } from \\"mobx\\";
+            "import { observable, computed, action, makeObservable } from \\"mobx\\"
 
             const box = {
 
@@ -865,7 +865,7 @@ describe("decorate", () => {
             })
         `)
         ).toMatchInlineSnapshot(`
-                        "import { observable, computed, action } from \\"mobx\\";
+                        "import { observable, computed, action, makeObservable } from \\"mobx\\"
 
                         makeObservable({}, {
                             width: observable,
@@ -1264,5 +1264,42 @@ test("class comp with observer, inject and decorator from another package", () =
         export const X = withRouter(
           inject(\\"test\\")(observer(class /* 2 */ /* 3 */ X extends React.Component {}))
         );"
+    `)
+})
+
+test("makeObservable not added to imports #2540", () => {
+    expect(
+        convert(`
+        import { decorate, observable, action } from 'mobx';
+        class TestStore
+        {
+            testValue = 1;
+            testFunc = () =>
+            {
+                this.testValue++;
+            }
+        }
+        decorate(TestStore, {
+            testValue: observable,
+            testFunc: action
+        });
+        `)
+    ).toMatchInlineSnapshot(`
+        "import { observable, action, makeObservable } from 'mobx';
+        class TestStore
+        {
+            testValue = 1;
+            testFunc = () =>
+            {
+                this.testValue++;
+            }
+
+            constructor() {
+                makeObservable(this, {
+                    testValue: observable,
+                    testFunc: action
+                });
+            }
+        }"
     `)
 })
