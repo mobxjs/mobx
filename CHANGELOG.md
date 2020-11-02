@@ -1,5 +1,13 @@
 # mobx
 
+## 6.0.2
+
+### Patch Changes
+
+-   [`b5d64d19`](https://github.com/mobxjs/mobx/commit/b5d64d1965ecd9a593886279ddaf96eda61c4a77) [#2548](https://github.com/mobxjs/mobx/pull/2548) Thanks [@urugator](https://github.com/urugator)! - Fixed [2542](https://github.com/mobxjs/mobx/issues/2542), makeAutoObservable not respecting deep option [@urugator](https://github.com/urugator)
+
+*   [`f4c22925`](https://github.com/mobxjs/mobx/commit/f4c229259a72f0497d3f9b6a05af9d9c4280d8b1) [#2582](https://github.com/mobxjs/mobx/pull/2582) Thanks [@tomenden](https://github.com/tomenden)! - Support running in a web-worker
+
 ## 6.0.1
 
 -   Fixed issue in TS typings of `makeObservable` in combination with a member named `toString()`
@@ -971,7 +979,7 @@ A deprecation message will now be printed if creating computed properties while 
 
 ```javascript
 const x = observable({
-    computedProp: function () {
+    computedProp: function() {
         return someComputation
     }
 })
@@ -996,7 +1004,7 @@ or alternatively:
 
 ```javascript
 observable({
-    computedProp: computed(function () {
+    computedProp: computed(function() {
         return someComputation
     })
 })
@@ -1014,7 +1022,7 @@ N.B. If you want to introduce actions on an observable that modify its state, us
 ```javascript
 observable({
     counter: 0,
-    increment: action(function () {
+    increment: action(function() {
         this.counter++
     })
 })
@@ -1140,10 +1148,10 @@ function Square() {
     extendObservable(this, {
         length: 2,
         squared: computed(
-            function () {
+            function() {
                 return this.squared * this.squared
             },
-            function (surfaceSize) {
+            function(surfaceSize) {
                 this.length = Math.sqrt(surfaceSize)
             }
         )
