@@ -131,6 +131,7 @@ export default function transform(
                     changed = true
                     // @ts-ignore // TODO: or "observable" ?
                     callPath.value.callee.name = "makeObservable"
+                    needsInitializeImport = true
                     return
                 }
                 const declarations = callPath.scope.getBindings()[target.name]
@@ -147,11 +148,13 @@ export default function transform(
                     changed = true
                     // @ts-ignore // TODO: or "observable" ?
                     callPath.value.callee.name = "makeObservable"
+                    needsInitializeImport = true
                     return
                 }
                 const clazz: ClassDeclaration = targetDeclaration
                 // @ts-ignore
                 createConstructor(clazz, decorators, [])
+                needsInitializeImport = true
 
                 // Remove the callPath (and wrapping expressionStatement)
                 if (canRemoveDecorateCall) {
