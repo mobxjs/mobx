@@ -1,4 +1,5 @@
 const start = Date.now()
+const mkdirp = require("mkdirp")
 
 const ver = process.argv[2]
 if (!ver || !ver.match(/legacy|proxy/)) {
@@ -7,7 +8,9 @@ if (!ver || !ver.match(/legacy|proxy/)) {
 
 if (process.env.PERSIST) {
     const fs = require("fs")
-    const logFile = `${__dirname}/perf_${ver}.txt`
+    const path = require("path")
+    const logFile = path.resolve(`${__dirname}/../../perf_report/${ver}.txt`)
+    mkdirp.sync(path.dirname(logFile))
     // clear previous results
     if (fs.existsSync(logFile)) fs.unlinkSync(logFile)
 

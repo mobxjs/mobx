@@ -40,6 +40,9 @@ jobs:
                   command: yarn mobx test:performance
                   environment:
                       PERSIST: true
+            - store_artifacts:
+                  path: packages/mobx/perf_report
+                  destination: mobx-perf
 
     mobx-coverage:
         executor: node-executor
@@ -47,10 +50,13 @@ jobs:
             - attach_workspace:
                   at: .
             - run: yarn mobx test:coverage
+            - store_artifacts:
+                  path: packages/mobx/coverage
+                  destination: mobx-coverage
             - persist_to_workspace:
                   root: .
                   paths:
-                      - ./packages/mobx/coverage
+                      - ./*
 
     mobx-size:
         executor: node-executor
