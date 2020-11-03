@@ -49,7 +49,7 @@ jobs:
         steps:
             - attach_workspace:
                   at: .
-            - run: yarn mobx test
+            - run: yarn mobx test -i
 
     mobx-size:
         executor: node-executor
