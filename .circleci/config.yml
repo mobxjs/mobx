@@ -44,19 +44,12 @@ jobs:
                   path: packages/mobx/perf_report
                   destination: mobx-perf
 
-    mobx-coverage:
+    mobx-test:
         executor: node-executor
         steps:
             - attach_workspace:
                   at: .
-            - run: yarn mobx test:coverage
-            - store_artifacts:
-                  path: packages/mobx/coverage
-                  destination: mobx-coverage
-            - persist_to_workspace:
-                  root: .
-                  paths:
-                      - ./*
+            - run: yarn mobx test
 
     mobx-size:
         executor: node-executor
@@ -65,25 +58,6 @@ jobs:
                   at: .
 
             - run: yarn mobx test:size
-
-    # upload coverage
-    mobx-coveralls:
-        executor: node-executor
-        steps:
-            - attach_workspace:
-                  at: .
-
-            # only run coveralls if the token is present (it is not present for fork PRs for security reasons)
-            - run:
-                  name: upload coveralls
-                  command: |
-                      if [[ -v COVERALLS_REPO_TOKEN ]]
-                      then
-                          cat ./packages/mobx/coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
-                          echo "Coveralls info uploaded"
-                      else
-                          echo "Warning - Coveralls info could NOT be uploaded since the COVERALLS_REPO_TOKEN was not available"
-                      fi
 
     mobx-undecorate-test:
         executor: node-executor
@@ -104,15 +78,13 @@ workflows:
             - mobx-performance:
                   requires:
                       - mobx-build
-            - mobx-coverage:
+            - mobx-test:
                   requires:
                       - mobx-build
             - mobx-size:
                   requires:
                       - mobx-build
-            - mobx-coveralls:
-                  requires:
-                      - mobx-coverage
+
     mobx-undecorate:
         jobs:
             - mobx-undecorate-test
