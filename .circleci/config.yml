@@ -36,7 +36,10 @@ jobs:
         steps:
             - attach_workspace:
                   at: .
-            - run: yarn mobx test:performance
+            - run:
+                  command: yarn mobx test:performance
+                  environment:
+                      PERSIST: true
 
     mobx-coverage:
         executor: node-executor
@@ -88,24 +91,24 @@ workflows:
     mobx:
         jobs:
             - mobx-build
-            # - mobx-check:
-            #       requires:
-            #           - mobx-build
+            - mobx-check:
+                  requires:
+                      - mobx-build
             - mobx-performance:
                   requires:
                       - mobx-build
-            # - mobx-coverage:
-            #       requires:
-            #           - mobx-build
-            # - mobx-size:
-            #       requires:
-            #           - mobx-build
-            # - mobx-coveralls:
-            #       requires:
-            #           - mobx-coverage
-    # mobx-undecorate:
-    #     jobs:
-    #         - install
-    #         - mobx-undecorate-test:
-    #               requires:
-    #                   - install
+            - mobx-coverage:
+                  requires:
+                      - mobx-build
+            - mobx-size:
+                  requires:
+                      - mobx-build
+            - mobx-coveralls:
+                  requires:
+                      - mobx-coverage
+    mobx-undecorate:
+        jobs:
+            - install
+            - mobx-undecorate-test:
+                  requires:
+                      - install
