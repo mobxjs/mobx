@@ -1,5 +1,13 @@
 # mobx-undecorate
 
+## 1.0.4
+
+### Patch Changes
+
+-   [`88d3e886`](https://github.com/mobxjs/mobx/commit/88d3e88656ad0add08039ede42041102b895a95e) Thanks [@urugator](https://github.com/urugator)! - Fix [#2540](https://github.com/mobxjs/mobx/issues/2540) makeObservable not added to imports
+
+*   [`88d3e886`](https://github.com/mobxjs/mobx/commit/88d3e88656ad0add08039ede42041102b895a95e) Thanks [@urugator](https://github.com/urugator)! - Fix [#2558](https://github.com/mobxjs/mobx/issues/2558) Undecorate removes non-mobx decorator
+
 ## 1.0.2
 
 -   Fixed support for JSX
