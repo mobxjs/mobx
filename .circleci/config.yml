@@ -1,9 +1,9 @@
 version: 2.1
 
 executors:
-    my-executor:
+    node-executor:
         docker:
-            - image: circleci/node:14
+            - image: circleci/node:12
               environment:
                   CI: true
 
@@ -11,120 +11,80 @@ orbs:
     node: circleci/node@4.0.1
 
 jobs:
-    build:
-        executor: my-executor
+    mobx-build:
+        executor: node-executor
         steps:
             - checkout
-
             - node/install-packages:
                 pkg-manager: yarn
 
-            - run: yarn build
-
+            - run: yarn mobx build
             - persist_to_workspace:
                   root: .
                   paths:
                       - ./*
 
-    test-check:
-        executor: my-executor
+    mobx-check:
+        executor: node-executor
         steps:
             - attach_workspace:
                   at: .
+            - run: yarn mobx test:check
 
-            - run: yarn test:check
-
-    test-performance:
-        executor: my-executor
+    mobx-performance:
+        executor: node-executor
         steps:
             - attach_workspace:
                   at: .
-
             - run:
-                  command: time node --expose-gc test/perf/index.js legacy
+                  command: yarn mobx test:performance
                   environment:
                       PERSIST: true
+            - store_artifacts:
+                  path: packages/mobx/perf_report
+                  destination: mobx-perf
 
-            - run:
-                  command: time node --expose-gc test/perf/index.js proxy
-                  environment:
-                      PERSIST: true
+    mobx-test:
+        executor: node-executor
+        steps:
+            - attach_workspace:
+                  at: .
+            - run: yarn mobx test -i
 
-    test-coverage:
-        executor: my-executor
+    mobx-size:
+        executor: node-executor
         steps:
             - attach_workspace:
                   at: .
 
-            - run: yarn test:coverage
-            - persist_to_workspace:
-                  root: .
-                  paths:
-                      - ./coverage
+            - run: yarn mobx test:size
 
-    test-codemod:
-        executor: my-executor
+    mobx-undecorate-test:
+        executor: node-executor
         steps:
-            - attach_workspace:
-                  at: .
-            - run:
-                  name: run codemod
-                  command: |
-                      cd packages/mobx-undecorate
-                      yarn
-                      yarn test
-
-    test-size:
-        executor: my-executor
-        steps:
-            - attach_workspace:
-                  at: .
-
-            - run: yarn test:size
-
-    # upload coverage
-    upload-coveralls:
-        executor: my-executor
-        steps:
-            - attach_workspace:
-                  at: .
-
-            # only run coveralls if the token is present (it is not present for fork PRs for security reasons)
-            - run:
-                  name: upload coveralls
-                  command: |
-                      if [[ -v COVERALLS_REPO_TOKEN ]]
-                      then
-                          cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
-                          echo "Coveralls info uploaded"
-                      else
-                          echo "Warning - Coveralls info could NOT be uploaded since the COVERALLS_REPO_TOKEN was not available"
-                      fi
+            - checkout
+            - node/install-packages:
+                pkg-manager: yarn
+            - run: yarn mobx-undecorate test
 
 workflows:
     version: 2
-    build-and-test:
+    mobx:
         jobs:
-            - build:
-                  filters:
-                      branches:
-                          ignore:
-                              - gh-pages
-            - test-check:
+            - mobx-build
+            - mobx-check:
                   requires:
-                      - build
-            - test-performance:
+                      - mobx-build
+            - mobx-performance:
                   requires:
-                      - build
-            - test-coverage:
+                      - mobx-build
+            - mobx-test:
                   requires:
-                      - build
-            - test-size:
+                      - mobx-build
+            - mobx-size:
                   requires:
-                      - build
-            - test-codemod:
-                  requires:
-                      - build
-            - upload-coveralls:
-                  requires:
-                      - test-coverage
+                      - mobx-build
+
+    mobx-undecorate:
+        jobs:
+            - mobx-undecorate-test

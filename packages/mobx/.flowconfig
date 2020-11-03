@@ -1,0 +1,11 @@
+[ignore]
+.*/node_modules
+
+[include]
+__tests__/v5/flow
+
+[libs]
+flow-typed/
+
+[options]
+suppress_comment= \\(.\\|\n\\)*\\$ExpectError

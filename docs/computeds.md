@@ -211,7 +211,7 @@ This string is used as a debug name in the [Spy event listeners](analyzing-react
 
 ### `equals`
 
-Set to `comparer.default` by default. It acts as a comparison function for comparing the previous value with the next value. If this function considers the values to be equal, then the observers will not be re-evaluated. 
+Set to `comparer.default` by default. It acts as a comparison function for comparing the previous value with the next value. If this function considers the values to be equal, then the observers will not be re-evaluated.
 
 This is useful when working with structural data and types from other libraries. For example, a computed [moment](https://momentjs.com/) instance could use `(a, b) => a.isSame(b)`. `comparer.structural` and `comparer.shallow` come in handy if you want to use structural / shallow comparison to determine whether the new value is different from the previous value, and as a result notify its observers.
 

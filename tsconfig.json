@@ -4,7 +4,6 @@
         "module": "esnext",
         "moduleResolution": "node",
         "lib": ["es6"],
-        "rootDir": "src",
         "downlevelIteration": true,
         "alwaysStrict": true,
         "sourceMap": true,
@@ -18,6 +17,5 @@
         "noEmit": true,
         "experimentalDecorators": false,
         "useDefineForClassFields": true
-    },
-    "include": ["src/**/*.ts"]
+    }
 }

@@ -193,7 +193,7 @@ _Computed values can be used to derive information from other observables._
 
 ### `computed`
 
-[**Usage**](computeds.md): `computed(fn, options?)` or  `computed(options?)` _(annotation)_
+[**Usage**](computeds.md): `computed(fn, options?)` or `computed(options?)` _(annotation)_
 
 Creates an observable value that is derived from other observables, but won't be recomputed unless one of the underlying observables changes.
 
@@ -394,7 +394,6 @@ Is the value an observable object?
 {🚀} Usage: `isObservableSet(set)`
 
 Is the value an observable Set?
-
 
 ### `isObservableMap`
 

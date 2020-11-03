@@ -11,12 +11,6 @@ Here are some ways to contribute to the project, from easiest to most difficult:
 
 ## Issues
 
-## Online one-click setup for contributing
-
-You can use Gitpod (a free online VS Code-like IDE) for working on issues and making PRs. With a single click it will launch a ready to code workspace with everything setup so that you can start straight away.
-
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/from-referrer/)
-
 ### Reporting bugs
 
 If you encounter a bug, please file an issue on GitHub via the repository of the sub-project you think contains the bug. If an issue you have is already reported, please add additional information or add a 👍 reaction to indicate your agreement.

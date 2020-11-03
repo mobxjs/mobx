@@ -125,14 +125,14 @@ Spy listeners always receive one object, which usually has at least a `type` fie
 | scheduled-reaction              |                | name                                                           | no     |
 | reaction                        |                | name                                                           | yes    |
 | error                           |                | name, message, error                                           | no     |
-| add,update,remove,delete,splice |                | Check out [Intercept & observe {🚀}](intercept-and-observe.md)  | yes    |
+| add,update,remove,delete,splice |                | Check out [Intercept & observe {🚀}](intercept-and-observe.md) | yes    |
 | report-end                      |                | spyReportEnd=true, time? (total execution time in ms)          | no     |
 
 The `report-end` events are part of an earlier fired event that had `spyReportStart: true`.
 This event indicates the end of an event and this way groups of events with sub-events are created.
 This event might report the total execution time as well.
 
-The spy events for observable values are identical to the events passed to `observe`. 
+The spy events for observable values are identical to the events passed to `observe`.
 In production builds, the `spy` API is a no-op as it will be minimized away.
 
 Check out the [Intercept & observe {🚀}](intercept-and-observe.md#event-overview) section for an extensive overview.

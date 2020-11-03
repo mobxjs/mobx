@@ -4,7 +4,7 @@
   "description": "Migrate MobX 4/5 to MobX 6",
   "bin": "cli.js",
   "scripts": {
-    "test": "../../node_modules/.bin/jest"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -34,34 +34,13 @@
     "@babel/preset-env": "^7.9.5",
     "@babel/preset-typescript": "^7.9.0",
     "@babel/runtime": "^7.9.2",
-    "@types/jest": "^25.2.1",
-    "@types/jscodeshift": "^0.7.0",
-    "@types/node": "^11.15.12",
     "dedent-js": "^1.0.1",
     "jscodeshift": "^0.11.0"
   },
+  "devDependencies": {
+    "@types/jscodeshift": "^0.7.0"
+  },
   "keywords": [
     "mobx"
-  ],
-  "jest": {
-    "transform": {
-      "^.+\\.tsx?$": "ts-jest",
-      "^.+\\.jsx?$": "babel-jest"
-    },
-    "testRegex": "__tests__/.*\\.spec\\.(t|j)sx?$",
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js",
-      "jsx",
-      "json"
-    ],
-    "testPathIgnorePatterns": [
-      "/node_modules/",
-      "/\\./"
-    ],
-    "watchPathIgnorePatterns": [
-      "<rootDir>/node_modules/"
-    ]
-  }
+  ]
 }

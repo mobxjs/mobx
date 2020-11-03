@@ -1,0 +1,32 @@
+name: Coveralls
+
+on: ["push", "pull_request"]
+
+jobs:
+  mobx:
+    name: MobX Coverage
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@master
+        with:
+          # This makes Actions fetch all Git history so that Changesets can generate changelogs with the correct commits
+          fetch-depth: 0
+
+      - name: Setup Node.js 12.x
+        uses: actions/setup-node@master
+        with:
+          node-version: 12.x
+
+      - name: Install Dependencies
+        run: yarn --frozen-lockfile --ignore-scripts
+
+      - name: Run Coverage
+        run: yarn mobx test:coverage
+
+      - name: Upload to coveralls
+        uses: coverallsapp/github-action@v1.1.2 
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: ./packages/mobx/coverage/lcov.info
+          base-path: packages/mobx

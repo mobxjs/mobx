@@ -1,145 +1,50 @@
 {
-    "name": "mobx",
-    "version": "6.0.2",
-    "description": "Simple, scalable state management.",
-    "main": "dist/index.js",
-    "module": "dist/mobx.esm.js",
-    "umd:main": "dist/mobx.umd.production.min.js",
-    "unpkg": "dist/mobx.umd.production.min.js",
-    "jsnext:main": "dist/mobx.esm.js",
-    "react-native": "dist/mobx.esm.js",
-    "source": "src/mobx.ts",
-    "typings": "dist/mobx.d.ts",
-    "sideEffects": false,
+    "name": "mobx-root",
+    "private": true,
+    "workspaces": [
+        "packages/*"
+    ],
     "scripts": {
-        "test": "jest",
-        "lint": "eslint src/**/*.ts",
-        "watch": "jest --watch",
-        "perf": "yarn build && yarn test:performance proxy && yarn test:performance legacy",
-        "test:mixed-versions": "jest --testRegex mixed-versions",
-        "test:check": "yarn test:types && yarn lint",
-        "test:types": "tsc --noEmit && yarn test:flow",
-        "test:flow": "yarn build && flow check",
-        "test:coverage": "yarn test -i --coverage",
-        "test:performance": "PERSIST=true time node --expose-gc test/perf/index.js",
-        "test:size": "yarn build && yarn import-size --report . observable computed autorun action",
-        "test:codemod": "cd packages/mobx-undecorate && yarn test",
         "prettier": "prettier --write **/*.{js,ts,md}",
-        "prebuild": "rimraf lib",
-        "build": "tsdx build --name mobx --format esm,cjs,umd",
-        "postbuild": "cp flow-typed/mobx.js dist/index.js.flow",
-        "release": "yarn build && yarn changeset publish",
-        "publish-script": "yarn release",
+        "release": "yarn changeset publish",
+        "mobx": "yarn workspace mobx",
+        "mobx-undecorate": "yarn workspace mobx-undecorate",
         "docs:build": "yarn --cwd website build",
         "docs:start": "yarn --cwd website start",
         "docs:publish": "yarn --cwd website publish-gh-pages",
         "prepare": "yarn dedup && yarn --cwd website install",
         "dedup": "npx yarn-deduplicate --strategy fewer yarn.lock"
     },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/mobxjs/mobx.git"
-    },
-    "author": "Michel Weststrate",
-    "license": "MIT",
-    "funding": {
-        "type": "opencollective",
-        "url": "https://opencollective.com/mobx"
-    },
-    "bugs": {
-        "url": "https://github.com/mobxjs/mobx/issues"
-    },
-    "files": [
-        "src",
-        "dist",
-        "LICENSE",
-        "README.md"
-    ],
-    "homepage": "https://mobx.js.org/",
     "dependencies": {},
     "devDependencies": {
-        "@babel/core": "^7.9.0",
-        "@babel/plugin-proposal-class-properties": "^7.8.3",
-        "@babel/plugin-proposal-decorators": "^7.8.3",
-        "@babel/plugin-transform-runtime": "^7.9.0",
-        "@babel/preset-env": "^7.9.5",
-        "@babel/preset-typescript": "^7.9.0",
-        "@babel/runtime": "^7.9.2",
         "@changesets/changelog-github": "^0.2.7",
         "@changesets/cli": "^2.11.0",
-        "@types/jest": "^25.2.1",
-        "@types/node": "^11.15.12",
-        "@typescript-eslint/eslint-plugin": "^2.29.0",
+        "@types/jest": "^26.0.15",
+        "@types/node": "12",
+        "@typescript-eslint/eslint-plugin": "^4.6.1",
         "@typescript-eslint/parser": "^4.1.1",
-        "babel-jest": "^25.4.0",
-        "conditional-type-checks": "^1.0.5",
+        "babel-jest": "^26.6.2",
         "coveralls": "^3.1.0",
         "eslint": "^6.8.0",
-        "flow-bin": "^0.123.0",
+        "execa": "^4.1.0",
+        "fs-extra": "9.0.1",
         "husky": "^4.2.5",
         "import-size": "^1.0.2",
         "iterall": "^1.3.0",
-        "jest": "^25.4.0",
-        "jscodeshift": "^0.7.0",
+        "jest": "^26.6.2",
         "lint-staged": "^10.1.7",
+        "mkdirp": "1.0.4",
         "prettier": "^2.0.5",
-        "pretty-quick": "2.0.1",
-        "prompts": "^2.3.2",
-        "semver": "^7.3.2",
+        "pretty-quick": "3.1.0",
         "serializr": "^2.0.3",
-        "shelljs": "^0.8.4",
-        "tape": "^5.0.0",
-        "ts-jest": "^25.4.0",
-        "tsdx": "^0.13.2",
+        "tape": "^5.0.1",
+        "ts-jest": "^26.4.3",
+        "tsdx": "^0.14.1",
         "typescript": "^4.0.2"
-    },
-    "keywords": [
-        "mobx",
-        "mobservable",
-        "observable",
-        "react-component",
-        "react",
-        "reactjs",
-        "reactive",
-        "model",
-        "frp",
-        "functional-reactive-programming",
-        "state management",
-        "data flow"
-    ],
-    "jest": {
-        "globals": {
-            "__DEV__": true,
-            "ts-jest": {
-                "tsConfig": "tsconfig.test.json"
-            }
-        },
-        "setupFilesAfterEnv": [
-            "<rootDir>/test/setup.js"
-        ],
-        "transform": {
-            "^.+\\.tsx?$": "ts-jest",
-            "^.+\\.jsx?$": "babel-jest"
-        },
-        "testRegex": "test/v[4|5]/base/.*\\.(t|j)sx?$",
-        "moduleFileExtensions": [
-            "ts",
-            "tsx",
-            "js",
-            "jsx",
-            "json"
-        ],
-        "testPathIgnorePatterns": [
-            "/node_modules/",
-            "/\\./"
-        ],
-        "watchPathIgnorePatterns": [
-            "<rootDir>/node_modules/"
-        ]
     },
     "husky": {
         "hooks": {
             "pre-commit": "pretty-quick --staged"
         }
-    }
+    }        
 }

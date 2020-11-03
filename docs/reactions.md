@@ -107,9 +107,9 @@ Once we run the `for` loop to change the `energyLevel` with the `reduceEnergy`
 action, we see a new log entry every time an `autorun` function observes a
 change in its observable state:
 
-1.   For the _"Energy level"_ function, this is every time the `energyLevel` observable changes, 10 times in total.
+1.  For the _"Energy level"_ function, this is every time the `energyLevel` observable changes, 10 times in total.
 
-2.   For the _"Now I'm hungry"_ function, this is every time the `isHungry` computed
+2.  For the _"Now I'm hungry"_ function, this is every time the `isHungry` computed
     changes, only one time.
 
 ## Reaction
@@ -338,7 +338,7 @@ Before you set up a reaction, it is good to first check if it conforms to the fo
 1. **Only use Reactions if there is no direct relation between cause and effect**: If a side effect should happen in response to a very limited set of events / actions, it will often be clearer to directly trigger the effect from those specific actions. For example, if pressing a form submit button should lead to a network request to be posted, it is clearer to trigger this effect directly in response of the `onClick` event, rather than indirectly through a reaction. In contrast, if any change you make to the form state should automatically end up in local storage, then a reaction can be very useful, so that you don't have to trigger this effect from every individual `onChange` event.
 1. **Reactions shouldn't update other observables**: Is the reaction going to modify other observables? If the answer is yes, typically the observable you want to update should be annotated as a [`computed`](computeds.md) value instead. For example, if a collection of todos is altered, don't use a reaction to compute the amount of `remainingTodos`, but annotate `remainingTodos` as a computed value. That will lead to much clearer and easier to debug code. Reactions should not compute new data, but only cause effects.
 1. **Reactions should be independent**: Does your code rely on some other reaction having to run first? If that is the case, you probably
-either violated the first rule, or the new reaction you are about to create should be merged into the one it is depending upon. MobX does not guarantee the order in which reactions will be run.
+   either violated the first rule, or the new reaction you are about to create should be merged into the one it is depending upon. MobX does not guarantee the order in which reactions will be run.
 
 There are real-life scenarios that do not fit in the above principles. That is why they are _principles_, not _laws_.
 But, the exceptions are rare so only violate them as a last resort.
