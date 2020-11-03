@@ -10,6 +10,7 @@
         "lint": "eslint src/**/*.ts",
         "perf": "yarn workspace mobx perf",
         "test:mobx": "yarn workspace mobx test",
+        "test:mobx-undecorate": "yarn workspace mobx-undecorate test",
         "test:mixed-versions": "jest --testRegex mixed-versions",
         "test:check": "yarn test:types && yarn lint",
         "test:types": "tsc --noEmit && yarn test:flow",

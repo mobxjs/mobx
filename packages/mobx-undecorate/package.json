@@ -4,7 +4,7 @@
   "description": "Migrate MobX 4/5 to MobX 6",
   "bin": "cli.js",
   "scripts": {
-    "test": "../../node_modules/.bin/jest"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -42,26 +42,5 @@
   },
   "keywords": [
     "mobx"
-  ],
-  "jest": {
-    "transform": {
-      "^.+\\.tsx?$": "ts-jest",
-      "^.+\\.jsx?$": "babel-jest"
-    },
-    "testRegex": "__tests__/.*\\.spec\\.(t|j)sx?$",
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js",
-      "jsx",
-      "json"
-    ],
-    "testPathIgnorePatterns": [
-      "/node_modules/",
-      "/\\./"
-    ],
-    "watchPathIgnorePatterns": [
-      "<rootDir>/node_modules/"
-    ]
-  }
+  ]
 }
