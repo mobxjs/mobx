@@ -41,7 +41,8 @@
         "@babel/preset-env": "^7.9.5",
         "@babel/preset-typescript": "^7.9.0",
         "@babel/runtime": "^7.9.2",
-        "conditional-type-checks": "^1.0.5"
+        "conditional-type-checks": "^1.0.5",
+        "flow-bin": "^0.123.0"
     },
     "keywords": [
         "mobx",
@@ -59,9 +60,16 @@
     ],
     "scripts": {
         "test": "jest",
+        "lint": "eslint src/**/*",
         "build": "node scripts/build.js",
-        "prepublish": "yarn build",
-        "perf": "yarn test:performance proxy && yarn test:performance legacy",
-        "test:performance": "PERSIST=true time node --expose-gc __tests__/perf/index.js"
+        "perf": "scripts/perf.sh",
+        "test:performance": "yarn perf proxy && yarn perf legacy",
+        "test:mixed-versions": "yarn test --testRegex mixed-versions",
+        "test:check": "yarn test:types && yarn lint",
+        "test:types": "tsc --noEmit && yarn test:flow",
+        "test:flow": "flow check",
+        "test:coverage": "yarn test -i --coverage",
+        "test:size": "yarn import-size --report . observable computed autorun action",
+        "prepublish": "yarn build publish"
     }
 }

@@ -8,5 +8,6 @@ module.exports = {
         }
     },
     setupFilesAfterEnv: ["<rootDir>/__tests__/setup.ts"],
-    testRegex: "__tests__/v[4|5]/base/.*\\.(t|j)sx?$"
+    testRegex: "__tests__/v[4|5]/base/.*\\.(t|j)sx?$",
+    collectCoverageFrom: ["<rootDir>/src/**/*.ts"]
 }

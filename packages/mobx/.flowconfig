@@ -2,7 +2,7 @@
 .*/node_modules
 
 [include]
-test/v5/flow
+__tests__/v5/flow
 
 [libs]
 flow-typed/
