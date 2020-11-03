@@ -19,7 +19,7 @@ jobs:
           node-version: 12.x
 
       - name: Install Dependencies
-        run: yarn
+        run: yarn --frozen-lockfile --ignore-scripts
 
       - name: Run Coverage
         run: yarn mobx test:coverage
