@@ -296,14 +296,12 @@ Or, we can create an in-line anonymous observer using [`<Observer />`](https://g
 
 ```javascript
 const TodoView = observer(({ todo }: { todo: Todo }) => {
-   // WRONG: GridRow.onRender won't pick up changes in todo.title / todo.done
-   //        since it isn't an observer.
-   return <GridRow onRender={() => <td>{todo.title}</td>} />
+    // WRONG: GridRow.onRender won't pick up changes in todo.title / todo.done
+    //        since it isn't an observer.
+    return <GridRow onRender={() => <td>{todo.title}</td>} />
 
-   // CORRECT: wrap the callback rendering in Observer to be able to detect changes.
-   return <GridRow onRender={() => <Observer>{() =>
-     <td>{todo.title}</td>
-   }</Observer>} />
+    // CORRECT: wrap the callback rendering in Observer to be able to detect changes.
+    return <GridRow onRender={() => <Observer>{() => <td>{todo.title}</td>}</Observer>} />
 })
 ```
 

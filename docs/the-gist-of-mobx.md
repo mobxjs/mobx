@@ -89,7 +89,7 @@ The golden rule is, always use `computed` if you want to create a value based on
 
 #### 3.1. Model derived values using computed
 
-To create a *computed* value, define a property using a JS getter function `get` and mark it as `computed` with `makeObservable`.
+To create a _computed_ value, define a property using a JS getter function `get` and mark it as `computed` with `makeObservable`.
 
 ```javascript
 import { makeObservable, observable, computed } from "mobx"
@@ -104,7 +104,7 @@ class TodoList {
             todos: observable,
             unfinishedTodoCount: computed
         })
-        this.todos = todos;
+        this.todos = todos
     }
 }
 ```
@@ -196,7 +196,7 @@ MobX uses a uni-directional data flow where _actions_ change the _state_, which 
 2. All _derivations_ are updated **synchronously** by default. This means that, for example, _actions_ can safely inspect a computed value directly after altering the _state_.
 
 3. _Computed values_ are updated **lazily**. Any computed value that is not actively in use will not be updated until it is needed for a side effect (I/O).
-If a view is no longer in use it will be garbage collected automatically.
+   If a view is no longer in use it will be garbage collected automatically.
 
 4. All _computed values_ should be **pure**. They are not supposed to change _state_.
 
