@@ -82,8 +82,9 @@ jobs:
     mobx-undecorate-test:
         executor: node-executor
         steps:
-            - attach_workspace:
-                  at: .
+            - checkout
+            - node/install-packages:
+                pkg-manager: yarn
             - run: yarn mobx-undecorate test
 
 workflows:
@@ -108,7 +109,4 @@ workflows:
                       - mobx-coverage
     mobx-undecorate:
         jobs:
-            - install
-            - mobx-undecorate-test:
-                  requires:
-                      - install
+            - mobx-undecorate-test
