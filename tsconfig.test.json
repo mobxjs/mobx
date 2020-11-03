@@ -6,7 +6,7 @@
         "noUnusedLocals": false,
         "moduleResolution": "node",
         "experimentalDecorators": true,
-        "useDefineForClassFields": true
-    },
-    "include": ["src/**/*.ts", "test/**/*.ts"]
+        "useDefineForClassFields": true,
+        "allowSyntheticDefaultImports": true
+    }
 }

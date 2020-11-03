@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`error logging, #1836 - 1 1`] = `
+Array [
+  "<STDOUT> [mobx] (error in reaction 'Autorun@68' suppressed, fix error of causing action below)",
+  "<STDERR> Error: Action error",
+]
+`;
+
+exports[`error logging, #1836 - 2 1`] = `
+Array [
+  "<STDERR> [mobx] Encountered an uncaught exception that was thrown by a reaction or observer component, in: 'Reaction[Autorun@71]'",
+]
+`;

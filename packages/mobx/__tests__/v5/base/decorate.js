@@ -269,14 +269,15 @@ test("decorate should work with constructor function", function () {
             return 2
         }
         this.addSize = function () {
-            this.sizes.push([3])
-            this.sizes.push([4])
+            this.sizes.push(3)
+            this.sizes.push(4)
         }
         makeObservable(this, {
             uninitialized: observable,
             height: observable,
             sizes: observable,
             someFunc: observable,
+            // @ts-ignore TS is unable to see property through defineProperty
             width: computed,
             addSize: action
         })
@@ -423,6 +424,7 @@ test("expect warning for missing decorated getter", () => {
         makeObservable(obj, {
             x: observable,
             y: computed,
+            // @ts-expect-error
             z: computed
         })
     }).toThrowErrorMatchingInlineSnapshot(`"[MobX] Cannot decorate undefined property: 'z'"`)

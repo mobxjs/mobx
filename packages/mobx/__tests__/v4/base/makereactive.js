@@ -450,6 +450,9 @@ test("as structure view", function () {
 })
 
 test("ES5 non reactive props", function () {
+    expect(function () {
+        m.extendObservable(false, { notConfigurable: 1 })
+    }).toThrow(/'extendObservable' expects an object as first argument/)
     let te = m.observable({})
     Object.defineProperty(te, "nonConfigurable", {
         enumerable: true,
@@ -457,10 +460,6 @@ test("ES5 non reactive props", function () {
         writable: true,
         value: "static"
     })
-    // should throw if trying to reconfigure an existing non-configurable prop
-    expect(function () {
-        m.extendObservable(te2, { notConfigurable: 1 })
-    }).toThrow(/'extendObservable' expects an object as first argument/)
     // should skip non-configurable / writable props when using `observable`
     expect(() => {
         te = m.set(te, te)

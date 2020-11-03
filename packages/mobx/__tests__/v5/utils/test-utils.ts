@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { $mobx } from "../../../src/mobx"
 
 export function consoleError(block, regex) {

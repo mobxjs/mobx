@@ -1,7 +1,5 @@
-"use strict"
-
-const mobx = require("../../../src/mobx.ts")
-const utils = require("../../v5/utils/test-utils")
+import * as mobx from "../../../src/mobx"
+import * as utils from "../utils/test-utils"
 
 test("action should wrap in transaction", () => {
     const values = []

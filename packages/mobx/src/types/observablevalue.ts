@@ -59,7 +59,8 @@ export interface IObservableValue<T> {
 
 const CREATE = "create"
 
-export class ObservableValue<T> extends Atom
+export class ObservableValue<T>
+    extends Atom
     implements IObservableValue<T>, IInterceptable<IValueWillChange<T>>, IListenable {
     hasUnreportedChange_ = false
     interceptors_

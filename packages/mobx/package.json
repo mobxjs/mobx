@@ -1,0 +1,67 @@
+{
+    "name": "mobx",
+    "version": "6.0.2",
+    "description": "Simple, scalable state management.",
+    "main": "dist/index.js",
+    "module": "dist/mobx.esm.js",
+    "umd:main": "dist/mobx.umd.production.min.js",
+    "unpkg": "dist/mobx.umd.production.min.js",
+    "jsnext:main": "dist/mobx.esm.js",
+    "react-native": "dist/mobx.esm.js",
+    "source": "src/mobx.ts",
+    "typings": "dist/mobx.d.ts",
+    "sideEffects": false,
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/mobxjs/mobx.git"
+    },
+    "author": "Michel Weststrate",
+    "license": "MIT",
+    "funding": {
+        "type": "opencollective",
+        "url": "https://opencollective.com/mobx"
+    },
+    "bugs": {
+        "url": "https://github.com/mobxjs/mobx/issues"
+    },
+    "files": [
+        "src",
+        "dist",
+        "LICENSE",
+        "CHANGELOG.md",
+        "README.md"
+    ],
+    "homepage": "https://mobx.js.org/",
+    "dependencies": {},
+    "devDependencies": {
+        "@babel/core": "^7.9.0",
+        "@babel/plugin-proposal-class-properties": "^7.8.3",
+        "@babel/plugin-proposal-decorators": "^7.8.3",
+        "@babel/plugin-transform-runtime": "^7.9.0",
+        "@babel/preset-env": "^7.9.5",
+        "@babel/preset-typescript": "^7.9.0",
+        "@babel/runtime": "^7.9.2",
+        "conditional-type-checks": "^1.0.5"
+    },
+    "keywords": [
+        "mobx",
+        "mobservable",
+        "observable",
+        "react-component",
+        "react",
+        "reactjs",
+        "reactive",
+        "model",
+        "frp",
+        "functional-reactive-programming",
+        "state management",
+        "data flow"
+    ],
+    "scripts": {
+        "test": "jest",
+        "build": "node scripts/build.js",
+        "prepublish": "yarn build",
+        "perf": "yarn test:performance proxy && yarn test:performance legacy",
+        "test:performance": "PERSIST=true time node --expose-gc __tests__/perf/index.js"
+    }
+}

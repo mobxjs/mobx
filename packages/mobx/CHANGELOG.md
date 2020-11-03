@@ -979,7 +979,7 @@ A deprecation message will now be printed if creating computed properties while 
 
 ```javascript
 const x = observable({
-    computedProp: function() {
+    computedProp: function () {
         return someComputation
     }
 })
@@ -1004,7 +1004,7 @@ or alternatively:
 
 ```javascript
 observable({
-    computedProp: computed(function() {
+    computedProp: computed(function () {
         return someComputation
     })
 })
@@ -1022,7 +1022,7 @@ N.B. If you want to introduce actions on an observable that modify its state, us
 ```javascript
 observable({
     counter: 0,
-    increment: action(function() {
+    increment: action(function () {
         this.counter++
     })
 })
@@ -1148,10 +1148,10 @@ function Square() {
     extendObservable(this, {
         length: 2,
         squared: computed(
-            function() {
+            function () {
                 return this.squared * this.squared
             },
-            function(surfaceSize) {
+            function (surfaceSize) {
                 this.length = Math.sqrt(surfaceSize)
             }
         )

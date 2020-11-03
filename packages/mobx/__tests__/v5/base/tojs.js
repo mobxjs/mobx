@@ -1,9 +1,8 @@
 "use strict"
 
-const mobx = require("../mobx4")
+const mobx = require("../../../src/mobx.ts")
 const m = mobx
 const observable = mobx.observable
-const { makeObservable } = mobx
 
 test("json1", function () {
     mobx._resetGlobalState()
@@ -224,12 +223,29 @@ test("toJS handles dates", () => {
     expect(a.d === b.d).toBe(true)
 })
 
+test("toJS handles symbol keys in objects and maps", () => {
+    const key = Symbol("key")
+    const a = observable({
+        [key]: 42
+    })
+
+    expect(a[key]).toBe(42)
+    const b = mobx.toJS(a)
+    expect(b[key]).toBe(42)
+
+    const x = observable.map({
+        [key]: 43
+    })
+
+    const y = mobx.toJS(x)
+    expect(y.get(key)).toBe(43)
+})
+
 test("json cycles", function () {
     const a = observable({
         b: 1,
         c: [2],
-        d: mobx.observable.map(),
-        e: a
+        d: mobx.observable.map()
     })
 
     a.e = a
@@ -320,8 +336,7 @@ test("json cycles when exporting maps as maps", function () {
     const a = observable({
         b: 1,
         c: [2],
-        d: mobx.observable.map(),
-        e: a
+        d: mobx.observable.map()
     })
 
     a.e = a
@@ -345,16 +360,10 @@ test("json cycles when exporting maps as maps", function () {
     expect(cloneA.e).toBe(cloneA)
 })
 
-test("map to JS", () => {
-    class MyClass {
-        @observable meta = new Map()
-
-        constructor() {
-            makeObservable(this)
-            this.meta.set("test", { abc: "def", ghi: "jkl" })
-
-            expect(mobx.toJS(this.meta).constructor.name).toBe("Map")
-        }
-    }
-    new MyClass()
+describe("recurseEverything set to true", function () {
+    test("recurseEverything is no longer supported", () => {
+        expect(() => mobx.toJS({}, { recurseEverything: true })).toThrowErrorMatchingInlineSnapshot(
+            `"[MobX] toJS no longer supports options"`
+        )
+    })
 })

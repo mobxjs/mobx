@@ -8,7 +8,7 @@ import {
     isComputedProp,
     isAction,
     extendObservable
-} from "../mobx4"
+} from "../../../src/mobx"
 
 test("extendObservable should work", function () {
     class Box {
@@ -146,7 +146,6 @@ test("extendObservable should apply specified decorators", function () {
     }
 
     box.undeclared = 1
-
     extendObservable(
         box,
         {
@@ -154,6 +153,7 @@ test("extendObservable should apply specified decorators", function () {
                 return 2
             }
         },
+        // @ts-ignore
         { someFunc: action }
     )
 
