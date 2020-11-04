@@ -2086,3 +2086,9 @@ test("extendObservable should not accept complex objects as second argument", ()
         `"[MobX] 'extendObservabe' only accepts plain objects as second argument"`
     )
 })
+
+test("observable ignores class instances #2579", () => {
+    class C {}
+    const c = new C()
+    expect(observable(c)).toBe(c)
+})
