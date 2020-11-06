@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+contact_links:
+  - name: ✨ Feature Request / idea
+    url: https://github.com/mobxjs/mobx/discussions/new
+    about: Missing something in MobX? Let us know.
+  - name: 💬 Question / Discussion
+    about: Feel free to ask anything
+    url: https://github.com/mobxjs/mobx/discussions/new
+  - name: 📖 View documentation
+    url: https://mobx.js.org
+    about: Official Mobx documentation    
+  - name: ❓ StackOverflow
+    url: https://stackoverflow.com/questions/tagged/mobx
+    about: Ask question or find answers on Stack overflow
