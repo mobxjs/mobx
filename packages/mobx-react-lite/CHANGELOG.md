@@ -1,5 +1,11 @@
 # mobx-react-lite
 
+## 3.1.1
+
+### Patch Changes
+
+-   [`81a2f865`](https://github.com/mobxjs/mobx/commit/81a2f8654d9656e2e831176e45cbf926fbc364e0) Thanks [@FredyC](https://github.com/FredyC)! - ESM bundles without NODE_ENV present are available in dist folder. This useful for consumption in browser environment that supports ESM Choose either `esm.production.min.js` or `esm.development.js` from `dist` folder.
+
 ## 3.1.0
 
 ### Minor Changes

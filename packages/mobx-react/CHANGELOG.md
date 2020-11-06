@@ -1,5 +1,14 @@
 # mobx-react
 
+## 7.0.1
+
+### Patch Changes
+
+-   [`81a2f865`](https://github.com/mobxjs/mobx/commit/81a2f8654d9656e2e831176e45cbf926fbc364e0) Thanks [@FredyC](https://github.com/FredyC)! - ESM bundles without NODE_ENV present are available in dist folder. This useful for consumption in browser environment that supports ESM Choose either `esm.production.min.js` or `esm.development.js` from `dist` folder.
+
+-   Updated dependencies [[`81a2f865`](https://github.com/mobxjs/mobx/commit/81a2f8654d9656e2e831176e45cbf926fbc364e0)]:
+    -   mobx-react-lite@3.1.1
+
 ## 7.0.0
 
 Release for compatibility with MobX v6
