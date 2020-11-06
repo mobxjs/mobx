@@ -1,15 +1,22 @@
 const fs = require("fs-extra")
 const path = require("path")
 const execa = require("execa")
+const minimist = require("minimist")
 
 const stdio = ["ignore", "inherit", "ignore"]
 const opts = { stdio }
 
-const packageName = process.argv[2]
+const {
+    _: [packageName],
+    target
+} = minimist(process.argv.slice(2))
 
 // build to publish needs to do more things so it's slower
 // for the CI run and local testing this is not necessary
-const isPublish = process.argv[3] === "publish"
+const isPublish = target === "publish"
+
+// for running tests in CI we need CJS only
+const isTest = target === "test"
 
 const tempMove = name => fs.move(`dist/${name}`, `temp/${name}`)
 const moveTemp = name => fs.move(`temp/${name}`, `dist/${name}`)
@@ -28,7 +35,11 @@ const run = async () => {
         await tempMove(`${packageName}.esm.production.min.js.map`)
     }
 
-    await execa("tsdx", ["build", "--name", packageName, "--format", "esm,cjs,umd"], opts)
+    await execa(
+        "tsdx",
+        ["build", "--name", packageName, "--format", isTest ? "cjs" : "esm,cjs,umd"],
+        opts
+    )
 
     if (isPublish) {
         // move ESM bundles back to dist folder and remove temp

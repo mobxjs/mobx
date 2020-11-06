@@ -26,10 +26,9 @@ jobs:
         steps:
             - attach_workspace:
                   at: .
+            - run: yarn mobx build test
             - run: yarn lint
             - run: yarn test -i
-            - run: yarn mobx test:types
-            - run: yarn mobx-react test:types
 
     mobx:
         executor: node-executor
@@ -46,13 +45,22 @@ jobs:
             - store_artifacts:
                   path: packages/mobx/perf_report
                   destination: mobx-perf
+    mobx-react:
+        executor: node-executor
+        steps:
+            - attach_workspace:
+                  at: .
+            - run: yarn mobx build test
+            - run: yarn mobx test:size
 
 workflows:
     version: 2
-    test-all:
+    main:
         jobs:
             - install
             - test:
                   requires: [install]
             - mobx:
+                  requires: [install]
+            - mobx-react:
                   requires: [install]

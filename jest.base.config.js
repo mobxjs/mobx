@@ -18,7 +18,8 @@ module.exports = function buildConfig(packageDirectory, pkgConfig) {
         },
         testRegex: "__tests__/.*\\.(j|t)sx?$",
         coverageDirectory: "<rootDir>/coverage/",
-        collectCoverageFrom: ["<rootDir>/packages/*/src/**/*.{ts,tsx}"],
+        coverageReporters: ["lcov", "text"],
+        collectCoverageFrom: ["<rootDir>/src/**/*.{ts,tsx}", "!**/node_modules/**"],
         displayName: packageName,
         ...pkgConfig
     }

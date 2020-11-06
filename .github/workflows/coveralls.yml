@@ -4,7 +4,7 @@ on: ["push", "pull_request"]
 
 jobs:
   mobx:
-    name: MobX Coverage
+    name: Packages coverage
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
@@ -21,12 +21,13 @@ jobs:
       - name: Install Dependencies
         run: yarn --frozen-lockfile --ignore-scripts
 
+      - name: Build mobx
+        run: yarn mobx build --target test
+
       - name: Run Coverage
-        run: yarn mobx test:coverage
+        run: yarn coverage
 
       - name: Upload to coveralls
         uses: coverallsapp/github-action@v1.1.2 
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          path-to-lcov: ./packages/mobx/coverage/lcov.info
-          base-path: packages/mobx

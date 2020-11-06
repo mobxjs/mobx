@@ -69,6 +69,6 @@
         "test:flow": "flow check",
         "test:coverage": "yarn test -i --coverage",
         "test:size": "yarn import-size --report . observable computed autorun action",
-        "prepublish": "yarn build publish"
+        "prepublish": "yarn build --target publish"
     }
 }

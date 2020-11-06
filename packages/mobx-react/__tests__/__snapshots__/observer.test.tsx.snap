@@ -1,0 +1,39 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`issue 12 1`] = `
+<div>
+  <div>
+    <span>
+      coffee
+      !
+    </span>
+    <span>
+      tea
+      
+    </span>
+  </div>
+</div>
+`;
+
+exports[`issue 12 2`] = `
+<div>
+  <div>
+    <span>
+      soup
+      
+    </span>
+  </div>
+</div>
+`;
+
+exports[`should stop updating if error was thrown in render (#134) 1`] = `
+Array [
+  "Error: Hello",
+  Object {
+    "componentStack": "
+    in X
+    in div (created by Outer)
+    in Outer",
+  },
+]
+`;
