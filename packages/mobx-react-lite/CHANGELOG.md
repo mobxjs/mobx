@@ -1,5 +1,11 @@
 # mobx-react-lite
 
+## 3.1.2
+
+### Patch Changes
+
+-   [`5239db80`](https://github.com/mobxjs/mobx/commit/5239db80cf000026906c28a035725933d4dd6823) Thanks [@FredyC](https://github.com/FredyC)! - Fixed release with missing dist files
+
 ## 3.1.1
 
 ### Patch Changes
