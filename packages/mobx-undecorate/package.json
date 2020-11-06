@@ -3,9 +3,6 @@
     "version": "1.0.4",
     "description": "Migrate MobX 4/5 to MobX 6",
     "bin": "cli.js",
-    "scripts": {
-        "test": "jest"
-    },
     "repository": {
         "type": "git",
         "url": "https://github.com/mobxjs/mobx.git"
@@ -42,5 +39,8 @@
     },
     "keywords": [
         "mobx"
-    ]
+    ],
+    "scripts": {
+        "test": "jest"
+    }
 }

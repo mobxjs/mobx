@@ -399,6 +399,9 @@ export default function transform(
     }
 
     function warn(msg: string, node: Node) {
+        if (process.env.NODE_ENV === "test") {
+            return
+        }
         const line = lines[node.loc!.start.line - 1]
         const shortline = line.replace(/^\s*/, "")
         console.warn(

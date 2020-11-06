@@ -1,13 +1,6 @@
-module.exports = {
-    preset: "ts-jest/presets/js-with-ts",
+const buildConfig = require("../../jest.base.config")
 
-    globals: {
-        __DEV__: true,
-        "ts-jest": {
-            tsconfig: "tsconfig.test.json"
-        }
-    },
-    setupFilesAfterEnv: ["<rootDir>/__tests__/setup.ts"],
+module.exports = buildConfig(__dirname, {
     testRegex: "__tests__/v[4|5]/base/.*\\.(t|j)sx?$",
-    collectCoverageFrom: ["<rootDir>/src/**/*.ts"]
-}
+    setupFilesAfterEnv: [`<rootDir>/jest.setup.ts`]
+})

@@ -1,10 +1,5 @@
-module.exports = {
-    preset: "ts-jest/presets/js-with-ts",
+const buildConfig = require("../../jest.base.config")
 
-    globals: {
-        "ts-jest": {
-            tsconfig: "tsconfig.test.json"
-        }
-    },
+module.exports = buildConfig(__dirname, {
     testRegex: "__tests__/.*\\.spec\\.(t|j)sx?$"
-}
+})

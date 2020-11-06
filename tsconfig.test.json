@@ -1,12 +1,7 @@
 {
     "extends": "./tsconfig.json",
     "compilerOptions": {
-        "module": "commonjs",
-        "lib": ["esnext"],
-        "noUnusedLocals": false,
-        "moduleResolution": "node",
-        "experimentalDecorators": true,
-        "useDefineForClassFields": true,
-        "allowSyntheticDefaultImports": true
+        "allowJs": true,
+        "noUnusedLocals": false
     }
 }

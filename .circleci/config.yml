@@ -11,31 +11,34 @@ orbs:
     node: circleci/node@4.0.1
 
 jobs:
-    mobx-build:
+    install:
         executor: node-executor
         steps:
             - checkout
             - node/install-packages:
                 pkg-manager: yarn
-
-            - run: yarn mobx build
             - persist_to_workspace:
                   root: .
-                  paths:
-                      - ./*
+                  paths: [./*]
 
-    mobx-check:
+    test:
         executor: node-executor
         steps:
             - attach_workspace:
                   at: .
-            - run: yarn mobx test:check
+            - run: yarn lint
+            - run: yarn test -i
+            - run: yarn mobx test:types
+            - run: yarn mobx-react test:types
 
-    mobx-performance:
+    mobx:
         executor: node-executor
         steps:
             - attach_workspace:
                   at: .
+            - run: yarn mobx build
+            - run: yarn mobx test:flow
+            - run: yarn mobx test:size
             - run:
                   command: yarn mobx test:performance
                   environment:
@@ -44,47 +47,12 @@ jobs:
                   path: packages/mobx/perf_report
                   destination: mobx-perf
 
-    mobx-test:
-        executor: node-executor
-        steps:
-            - attach_workspace:
-                  at: .
-            - run: yarn mobx test -i
-
-    mobx-size:
-        executor: node-executor
-        steps:
-            - attach_workspace:
-                  at: .
-
-            - run: yarn mobx test:size
-
-    mobx-undecorate-test:
-        executor: node-executor
-        steps:
-            - checkout
-            - node/install-packages:
-                pkg-manager: yarn
-            - run: yarn mobx-undecorate test
-
 workflows:
     version: 2
-    mobx:
+    test-all:
         jobs:
-            - mobx-build
-            - mobx-check:
-                  requires:
-                      - mobx-build
-            - mobx-performance:
-                  requires:
-                      - mobx-build
-            - mobx-test:
-                  requires:
-                      - mobx-build
-            - mobx-size:
-                  requires:
-                      - mobx-build
-
-    mobx-undecorate:
-        jobs:
-            - mobx-undecorate-test
+            - install
+            - test:
+                  requires: [install]
+            - mobx:
+                  requires: [install]

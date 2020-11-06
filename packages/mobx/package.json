@@ -10,6 +10,13 @@
     "react-native": "dist/mobx.esm.js",
     "source": "src/mobx.ts",
     "typings": "dist/mobx.d.ts",
+    "files": [
+        "src",
+        "dist",
+        "LICENSE",
+        "CHANGELOG.md",
+        "README.md"
+    ],
     "sideEffects": false,
     "repository": {
         "type": "git",
@@ -24,13 +31,6 @@
     "bugs": {
         "url": "https://github.com/mobxjs/mobx/issues"
     },
-    "files": [
-        "src",
-        "dist",
-        "LICENSE",
-        "CHANGELOG.md",
-        "README.md"
-    ],
     "homepage": "https://mobx.js.org/",
     "dependencies": {},
     "devDependencies": {
@@ -65,8 +65,7 @@
         "perf": "scripts/perf.sh",
         "test:performance": "yarn perf proxy && yarn perf legacy",
         "test:mixed-versions": "yarn test --testRegex mixed-versions",
-        "test:check": "yarn test:types && yarn lint",
-        "test:types": "tsc --noEmit && yarn test:flow",
+        "test:types": "tsc --noEmit",
         "test:flow": "flow check",
         "test:coverage": "yarn test -i --coverage",
         "test:size": "yarn import-size --report . observable computed autorun action",

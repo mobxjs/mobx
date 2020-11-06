@@ -5,6 +5,8 @@
         "packages/*"
     ],
     "scripts": {
+        "test": "jest",
+        "lint": "eslint packages/*/src/**/*",
         "prettier": "prettier --write **/*.{js,ts,md}",
         "release": "yarn changeset publish",
         "mobx": "yarn workspace mobx",
@@ -23,7 +25,6 @@
         "@types/node": "12",
         "@typescript-eslint/eslint-plugin": "^4.6.1",
         "@typescript-eslint/parser": "^4.1.1",
-        "babel-jest": "^26.6.2",
         "coveralls": "^3.1.0",
         "eslint": "^6.8.0",
         "execa": "^4.1.0",
@@ -38,7 +39,7 @@
         "pretty-quick": "3.1.0",
         "serializr": "^2.0.3",
         "tape": "^5.0.1",
-        "ts-jest": "^26.4.3",
+        "ts-jest": "26.4.1",
         "tsdx": "^0.14.1",
         "typescript": "^4.0.2"
     },

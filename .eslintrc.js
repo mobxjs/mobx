@@ -3,7 +3,9 @@ module.exports = {
     plugins: ["@typescript-eslint"],
     extends: "eslint:recommended",
     env: {
-        es6: true
+        browser: true,
+        es6: true,
+        node: true
     },
     parserOptions: {
         ecmaVersion: 6,
@@ -18,7 +20,8 @@ module.exports = {
         "no-undef": "off",
         "no-extra-semi": "off", // doesn't get along well with prettier
         "no-unused-vars": "off", // got typescript for that,
-        "no-redeclare": "off" // No idea what it does, but it dies
+        "no-redeclare": "off", // No idea what it does, but it dies
+        "require-yield": "off" // Doesn't work with TS
     },
     globals: {
         process: "readable",
@@ -27,16 +30,5 @@ module.exports = {
         setTimeout: "readable",
         clearTimeout: "readable",
         module: "writable"
-    },
-    overrides: [
-        {
-            files: ["**/*.ts"],
-            rules: {
-                // Things that don't play nicely with TS:
-                "require-yield": "off",
-                "no-unused-vars": "off",
-                "no-extra-semi": "off"
-            }
-        }
-    ]
+    }
 }
