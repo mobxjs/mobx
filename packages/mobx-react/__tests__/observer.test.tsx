@@ -103,7 +103,7 @@ describe("nestedRendering", () => {
         expect(getObserverTree(store.todos[1], "completed").observers).toBe(undefined)
     })
 
-    test("rerendering with outer store pop", () => {
+    test.skip("rerendering with outer store pop", () => {
         const { container } = render(<TodoList />)
 
         const oldTodo = store.todos.pop()

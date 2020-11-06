@@ -31,9 +31,9 @@ Array [
   "Error: Hello",
   Object {
     "componentStack": "
-    in X
-    in div (created by Outer)
-    in Outer",
+    at X (/home/fredyc/workspace/github/mobxjs/mobx/packages/mobx-react/__tests__/observer.test.tsx:333:13)
+    at div
+    at Outer (/home/fredyc/workspace/github/mobxjs/mobx/packages/mobx-react/__tests__/observer.test.tsx:313:13)",
   },
 ]
 `;

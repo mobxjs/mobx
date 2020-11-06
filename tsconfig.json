@@ -19,5 +19,6 @@
         "useDefineForClassFields": true,
         "jsx": "react",
         "esModuleInterop": true
-    }
+    },
+    "exclude": ["__tests__"]
 }

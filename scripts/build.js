@@ -3,7 +3,7 @@ const path = require("path")
 const execa = require("execa")
 const minimist = require("minimist")
 
-const stdio = ["ignore", "inherit", "ignore"]
+const stdio = ["ignore", "inherit", "pipe"]
 const opts = { stdio }
 
 const {
@@ -39,7 +39,10 @@ const run = async () => {
         "tsdx",
         ["build", "--name", packageName, "--format", isTest ? "cjs" : "esm,cjs,umd"],
         opts
-    )
+    ).catch(err => {
+        console.error(err.stderr)
+        throw new Error("build failed")
+    })
 
     if (isPublish) {
         // move ESM bundles back to dist folder and remove temp
