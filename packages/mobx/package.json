@@ -61,7 +61,7 @@
     "scripts": {
         "test": "jest",
         "lint": "eslint src/**/*",
-        "build": "node scripts/build.js",
+        "build": "node ../../scripts/build.js mobx",
         "perf": "scripts/perf.sh",
         "test:performance": "yarn perf proxy && yarn perf legacy",
         "test:mixed-versions": "yarn test --testRegex mixed-versions",
