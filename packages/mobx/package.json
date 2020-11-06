@@ -64,6 +64,7 @@
         "test": "jest",
         "lint": "eslint src/**/*",
         "build": "node ../../scripts/build.js mobx",
+        "build:test": "yarn build --target test",
         "perf": "scripts/perf.sh",
         "test:performance": "yarn perf proxy && yarn perf legacy",
         "test:mixed-versions": "yarn test --testRegex mixed-versions",

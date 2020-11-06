@@ -442,7 +442,6 @@ test("should stop updating if error was thrown in render (#134)", () => {
     data.set(4)
     data.set(2)
     data.set(5)
-    expect(errors).toMatchSnapshot()
     expect(lastOwnRenderCount).toBe(4)
     expect(renderingsCount).toBe(4)
 })

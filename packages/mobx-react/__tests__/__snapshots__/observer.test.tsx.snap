@@ -25,15 +25,3 @@ exports[`issue 12 2`] = `
   </div>
 </div>
 `;
-
-exports[`should stop updating if error was thrown in render (#134) 1`] = `
-Array [
-  "Error: Hello",
-  Object {
-    "componentStack": "
-    at X (/home/fredyc/workspace/github/mobxjs/mobx/packages/mobx-react/__tests__/observer.test.tsx:333:13)
-    at div
-    at Outer (/home/fredyc/workspace/github/mobxjs/mobx/packages/mobx-react/__tests__/observer.test.tsx:313:13)",
-  },
-]
-`;
