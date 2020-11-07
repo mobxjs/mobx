@@ -1,5 +1,11 @@
 # mobx-react-lite
 
+## 3.1.3
+
+### Patch Changes
+
+-   [`b7aa9d35`](https://github.com/mobxjs/mobx/commit/b7aa9d35432888ee5dd80a6c9dcbc18b04a0346c) Thanks [@FredyC](https://github.com/FredyC)! - Fixed wrong package name for dist files
+
 ## 3.1.2
 
 ### Patch Changes
