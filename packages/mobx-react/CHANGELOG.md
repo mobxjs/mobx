@@ -1,5 +1,14 @@
 # mobx-react
 
+## 7.0.4
+
+### Patch Changes
+
+-   [`8bbbc7c0`](https://github.com/mobxjs/mobx/commit/8bbbc7c0df77cd79530add5db2d6a04cfe6d84b1) Thanks [@FredyC](https://github.com/FredyC)! - Fix names of dist files (for real now). Third time is the charm 😅
+
+-   Updated dependencies [[`8bbbc7c0`](https://github.com/mobxjs/mobx/commit/8bbbc7c0df77cd79530add5db2d6a04cfe6d84b1)]:
+    -   mobx-react-lite@3.1.4
+
 ## 7.0.3
 
 ### Patch Changes
