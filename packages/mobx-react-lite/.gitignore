@@ -1,5 +1,7 @@
 /node_modules/
 
+es/
+lib/
 dist/
 coverage/
 
