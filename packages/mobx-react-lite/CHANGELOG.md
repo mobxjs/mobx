@@ -1,5 +1,13 @@
 # mobx-react-lite
 
+## 3.1.5
+
+### Patch Changes
+
+-   [`01a050f7`](https://github.com/mobxjs/mobx/commit/01a050f7603183e6833b7fd948adb4fbe1437f5a) Thanks [@FredyC](https://github.com/FredyC)! - Fix use of react-dom vs react-native
+
+    The `es` folder content is compiled only without transpilation to keep `utils/reactBatchedUpdates` which exists in DOM and RN versions. The bundled `esm` is still kept around too, especially the prod/dev ones that should be utilized in modern browser environments.
+
 ## 3.1.4
 
 ### Patch Changes
