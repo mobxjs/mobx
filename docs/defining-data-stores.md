@@ -67,7 +67,7 @@ It is possible to express your domain objects as plain objects, but classes have
     You don't have to pass stores around, or have to figure out which actions can be applied to an object if they are just available as instance methods.
     This is especially important in large applications.
 -   They offer fine grained control over the visibility of attributes and methods.
--   Objects created using a constructor function can freely mix observable properties and functions, and non-observable properties and methods.
+-   Objects created using a constructor function can freely mix observable properties and methods, and non-observable properties and methods.
 -   They are easily recognizable and can be strictly type-checked.
 
 ### Example domain store
