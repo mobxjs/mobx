@@ -11,8 +11,7 @@
 
 Package with React component wrapper for combining React with MobX.
 Exports the `observer` decorator and other utilities.
-For documentation, see the [MobX](https://mobxjs.github.io/mobx) project.
-There is also work-in-progress [user guide](https://mobx-react.js.org) for additional information.
+For documentation, see the [MobX](https://mobx.js.org) project.
 This package supports both React and React Native.
 
 ## Choosing your version
@@ -25,7 +24,7 @@ There are currently two actively maintained versions of mobx-react:
 | v6          | 4._ / 5._            | 16.8+                    | Yes                                                                              |
 | v5          | 4._ / 5._            | 0.13+                    | No, but it is possible to use `<Observer>` sections inside hook based components |
 
-mobx-react 6 / 7 is a repackage of the smaller [mobx-react-lite](https://github.com/mobxjs/mobx-react-lite) package + following features from the `mobx-react@5` package added:
+mobx-react 6 / 7 is a repackage of the smaller [mobx-react-lite](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react-lite) package + following features from the `mobx-react@5` package added:
 
 -   Support for class based components for `observer` and `@observer`
 -   `Provider / inject` to pass stores around (but consider to use `React.createContext` instead)
@@ -45,7 +44,7 @@ import { observer } from "mobx-react"
 This package provides the bindings for MobX and React.
 See the [official documentation](https://mobx.js.org/react-integration.html) for how to get started.
 
-For greenfield projects you might want to consider to use [mobx-react-lite](https://github.com/mobxjs/mobx-react-lite), if you intend to only use function based components. `React.createContext` can be used to pass stores around.
+For greenfield projects you might want to consider to use [mobx-react-lite](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react-lite), if you intend to only use function based components. `React.createContext` can be used to pass stores around.
 
 ## API documentation
 
@@ -65,7 +64,7 @@ When using component classes, `this.props` and `this.state` will be made observa
 
 `shouldComponentUpdate` is not supported. As such, it is recommended that class components extend `React.PureComponent`. The `observer` will automatically patch non-pure class components with an internal implementation of `React.PureComponent` if necessary.
 
-See the [MobX](https://mobxjs.github.io/mobx/refguide/observer-component.html) documentation for more details.
+See the [MobX](https://mobx.js.org/react-integration.html#react-integration) documentation for more details.
 
 ```javascript
 import { observer } from "mobx-react"
@@ -199,7 +198,7 @@ If you don't want to mark a component as observer, for example to reduce the dep
 
 ### Enabling decorators (optional)
 
-Decorators are currently a stage-2 ESNext feature. How to enable them is documented [here](https://github.com/mobxjs/mobx#enabling-decorators-optional).
+Decorators are currently a stage-2 ESNext feature. How to enable them is documented [here](https://mobx.js.org/enabling-decorators.html#enabling-decorators-).
 
 ### Should I still use smart and dumb components?
 
