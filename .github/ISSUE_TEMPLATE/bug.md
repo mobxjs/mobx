@@ -1,7 +1,7 @@
 ---
 name: 🐛 Reporting a Bug
-about: Open a new issue here if something isn't working as expected.
-labels: bug
+about: Open a new issue if something isn't working as expected.
+labels: 🐛 bug
 ---
 
 <!--

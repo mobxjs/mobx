@@ -2,14 +2,23 @@
     "name": "mobx",
     "version": "6.0.3",
     "description": "Simple, scalable state management.",
+    "source": "src/mobx.ts",
     "main": "dist/index.js",
-    "module": "dist/mobx.esm.js",
     "umd:main": "dist/mobx.umd.production.min.js",
     "unpkg": "dist/mobx.umd.production.min.js",
-    "jsnext:main": "dist/mobx.esm.js",
+    "jsdelivr": "dist/mobx.umd.production.min.js",
+    "jsnext:main": "dist/mobx.esm.production.min.js",
+    "module": "dist/mobx.esm.js",
     "react-native": "dist/mobx.esm.js",
-    "source": "src/mobx.ts",
+    "types": "dist/mobx.d.ts",
     "typings": "dist/mobx.d.ts",
+    "files": [
+        "src",
+        "dist",
+        "LICENSE",
+        "CHANGELOG.md",
+        "README.md"
+    ],
     "sideEffects": false,
     "repository": {
         "type": "git",
@@ -24,13 +33,6 @@
     "bugs": {
         "url": "https://github.com/mobxjs/mobx/issues"
     },
-    "files": [
-        "src",
-        "dist",
-        "LICENSE",
-        "CHANGELOG.md",
-        "README.md"
-    ],
     "homepage": "https://mobx.js.org/",
     "dependencies": {},
     "devDependencies": {
@@ -61,15 +63,15 @@
     "scripts": {
         "test": "jest",
         "lint": "eslint src/**/*",
-        "build": "node scripts/build.js",
+        "build": "node ../../scripts/build.js mobx",
+        "build:test": "yarn build --target test",
         "perf": "scripts/perf.sh",
         "test:performance": "yarn perf proxy && yarn perf legacy",
         "test:mixed-versions": "yarn test --testRegex mixed-versions",
-        "test:check": "yarn test:types && yarn lint",
-        "test:types": "tsc --noEmit && yarn test:flow",
+        "test:types": "tsc --noEmit",
         "test:flow": "flow check",
         "test:coverage": "yarn test -i --coverage",
         "test:size": "yarn import-size --report . observable computed autorun action",
-        "prepublish": "yarn build publish"
+        "prepublish": "node ./scripts/prepublish.js && yarn build --target publish"
     }
 }

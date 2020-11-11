@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`stateless component with forwardRef is reactive 1`] = `
+<div>
+  <div>
+    result: 
+    hello world
+    , 
+    got ref
+    , a.x: 
+    2
+  </div>
+</div>
+`;
+
+exports[`stateless component with forwardRef render test correct 1`] = `
+<div>
+  <div>
+    result: 
+    hello world
+    , 
+    got ref
+    , a.x: 
+    1
+  </div>
+</div>
+`;

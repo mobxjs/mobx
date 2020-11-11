@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`issue 12 1`] = `
+<div>
+  <div>
+    <span>
+      coffee
+      !
+    </span>
+    <span>
+      tea
+      
+    </span>
+  </div>
+</div>
+`;
+
+exports[`issue 12 2`] = `
+<div>
+  <div>
+    <span>
+      soup
+      
+    </span>
+  </div>
+</div>
+`;

@@ -1,6 +1,6 @@
 import { execSync } from "child_process"
-import { join } from "path"
-import { readFileSync, writeFileSync } from "fs"
+import { join, dirname } from "path"
+import { readFileSync, writeFileSync, mkdirSync } from "fs"
 const dedent = require("dedent-js")
 
 test("run cli #2506", () => {
@@ -11,6 +11,7 @@ test("run cli #2506", () => {
     }
     `)
 
+    mkdirSync(dirname(testFile))
     writeFileSync(testFile, baseContent)
     execSync("node ../../cli.js", {
         cwd: join(__dirname, "fixtures")
