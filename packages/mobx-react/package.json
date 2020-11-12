@@ -1,6 +1,6 @@
 {
     "name": "mobx-react",
-    "version": "7.0.4",
+    "version": "7.0.5",
     "description": "React bindings for MobX. Create fully reactive components.",
     "source": "src/index.ts",
     "main": "dist/index.js",
@@ -36,10 +36,10 @@
     },
     "homepage": "http://mobx.js.org/",
     "dependencies": {
-        "mobx-react-lite": "^3.1.4"
+        "mobx-react-lite": "^3.1.6"
     },
     "peerDependencies": {
-        "mobx": "^6.0.0",
+        "mobx": "^6.0.4",
         "react": "^16.8.0 || ^17"
     },
     "peerDependenciesMeta": {
@@ -51,8 +51,8 @@
         }
     },
     "devDependencies": {
-        "mobx": "^6.0.0",
-        "mobx-react-lite": "^3.1.4"
+        "mobx": "^6.0.4",
+        "mobx-react-lite": "^3.1.6"
     },
     "keywords": [
         "mobx",
