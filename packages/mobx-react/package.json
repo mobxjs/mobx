@@ -64,7 +64,7 @@
     ],
     "scripts": {
         "lint": "eslint src/**/* --ext .js,.ts,.tsx",
-        "build": "node ../../scripts/build.js mobxreact",
+        "build": "node ../../scripts/build.js mobxReact",
         "build:test": "yarn build --target test",
         "test": "jest",
         "test:size": "yarn import-size --report . observer",

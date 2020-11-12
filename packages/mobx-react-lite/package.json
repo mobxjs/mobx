@@ -67,7 +67,7 @@
     ],
     "scripts": {
         "lint": "eslint src/**/* --ext .js,.ts,.tsx",
-        "build": "node ../../scripts/build.js mobxreactlite",
+        "build": "node ../../scripts/build.js mobxReactLite",
         "build:test": "yarn build --target test",
         "build:cjs": "tsc --project tsconfig.build.cjs.json",
         "build:es": "tsc --project tsconfig.build.es.json",
