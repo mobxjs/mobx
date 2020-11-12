@@ -10,7 +10,8 @@ import {
     isAction,
     makeAutoObservable,
     autorun,
-    extendObservable
+    extendObservable,
+    getDebugName
 } from "../../../src/mobx"
 import { mobxDecoratorsSymbol, configure } from "../../../src/internal"
 
@@ -533,4 +534,21 @@ test("makeAutoObservable respects options.deep #2542'", () => {
     expect(isObservable(deepO)).toBe(true)
     expect(isObservableProp(deepO, "nested")).toBe(true)
     expect(isObservable(deepO.nested)).toBe(true)
+})
+
+test("makeObservable respects options.name #2614'", () => {
+    const name = "DebugName"
+
+    class Clazz {
+        timer = 0
+        constructor() {
+            makeObservable(this, { timer: observable }, { name })
+        }
+    }
+
+    const instance = new Clazz()
+    const plain = makeObservable({ timer: 0 }, { timer: observable }, { name })
+
+    expect(getDebugName(instance)).toBe(name)
+    expect(getDebugName(plain)).toBe(name)
 })
