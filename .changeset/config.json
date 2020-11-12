@@ -2,5 +2,5 @@
     "changelog": ["@changesets/changelog-github", { "repo": "mobxjs/mobx" }],
     "commit": false,
     "access": "public",
-    "baseBranch": "mobx6"
+    "baseBranch": "main"
 }
