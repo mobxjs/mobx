@@ -1,5 +1,7 @@
 # mobx
 
+> 🚨🚨🚨 If you are upgrading from V4/V5, please follow [the migration guide](https://mobx.js.org/migrating-from-4-or-5.html).
+
 ## 6.0.4
 
 ### Patch Changes
