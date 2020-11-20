@@ -99,7 +99,7 @@ class Clock {
 
     get milliseconds() {
         console.log("computing")
-        return this.secons * 1000
+        return this.seconds * 1000
     }
 
     constructor() {
