@@ -324,9 +324,14 @@ export function asObservableObject(
 
     if (__DEV__ && !Object.isExtensible(target))
         die("Cannot make the designated object observable; it is not extensible")
-    if (!isPlainObject(target))
-        name = (target.constructor.name || "ObservableObject") + "@" + getNextId()
-    if (!name) name = "ObservableObject@" + getNextId()
+
+    if (!name) {
+        if (isPlainObject(target)) {
+            name = "ObservableObject@" + getNextId()
+        } else {
+            name = (target.constructor.name || "ObservableObject") + "@" + getNextId()
+        }
+    }
 
     const adm = new ObservableObjectAdministration(
         target,

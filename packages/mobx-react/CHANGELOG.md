@@ -1,5 +1,15 @@
 # mobx-react
 
+## 7.0.5
+
+### Patch Changes
+
+-   [`2f3dcb27`](https://github.com/mobxjs/mobx/commit/2f3dcb274f795ffca4ae724b6b4795958620838d) Thanks [@FredyC](https://github.com/FredyC)! - Fix names of UMD exports [#2517](https://github.com/mobxjs/mobx/issues/2617)
+
+-   Updated dependencies [[`2f3dcb27`](https://github.com/mobxjs/mobx/commit/2f3dcb274f795ffca4ae724b6b4795958620838d), [`79a09f49`](https://github.com/mobxjs/mobx/commit/79a09f49a9f2baddbab8d89e9a7ac07cffadf624)]:
+    -   mobx-react-lite@3.1.6
+    -   mobx@6.0.4
+
 ## 7.0.4
 
 ### Patch Changes
