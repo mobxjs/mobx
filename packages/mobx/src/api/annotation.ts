@@ -11,6 +11,7 @@ export type Annotation = {
         | "autoAction"
         | "autoAction.bound"
         | "flow"
+        | "override"
     arg_?: any
 }
 

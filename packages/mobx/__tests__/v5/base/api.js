@@ -70,7 +70,8 @@ test("correct api should be exposed", function () {
             "entries",
             "when",
             "_startAction",
-            "_endAction"
+            "_endAction",
+            "override"
         ].sort()
     )
 })

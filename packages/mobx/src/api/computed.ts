@@ -2,8 +2,8 @@ import {
     ComputedValue,
     IComputedValueOptions,
     Annotation,
-    storeDecorator,
-    createDecoratorAndAnnotation,
+    storeAnnotation,
+    createDecoratorAnnotation,
     isStringish,
     isPlainObject,
     isFunction,
@@ -28,14 +28,14 @@ export interface IComputedFactory extends Annotation, PropertyDecorator {
  * Decorator for class properties: @computed get value() { return expr; }.
  * For legacy purposes also invokable as ES5 observable created: `computed(() => expr)`;
  */
-export const computed: IComputedFactory = function computed(arg1, arg2, arg3) {
+export const computed: IComputedFactory = function computed(arg1, arg2) {
     if (isStringish(arg2)) {
         // @computed
-        return storeDecorator(arg1, arg2, COMPUTED)
+        return storeAnnotation(arg1, arg2, COMPUTED)
     }
     if (isPlainObject(arg1)) {
         // @computed({ options })
-        return createDecoratorAndAnnotation(COMPUTED, arg1)
+        return createDecoratorAnnotation(COMPUTED, arg1)
     }
 
     // computed(expr, options?)
@@ -54,11 +54,4 @@ export const computed: IComputedFactory = function computed(arg1, arg2, arg3) {
 } as any
 computed.annotationType_ = COMPUTED
 
-computed.struct = assign(
-    function (target, property) {
-        storeDecorator(target, property, COMPUTED_STRUCT)
-    },
-    {
-        annotationType_: COMPUTED_STRUCT
-    } as const
-)
+computed.struct = createDecoratorAnnotation(COMPUTED_STRUCT)

@@ -709,7 +709,8 @@ test("inheritance - 2", () => {
     expect(values).toEqual([10, 11, 12, 14, 18])
 })
 
-test("inheritance overrides observable", () => {
+// Re-annotating and re-defining is no longer possible and is covered by other tests
+test.skip("inheritance overrides observable", () => {
     class A {
         a = 2
 
@@ -795,7 +796,7 @@ test("enumerability", () => {
             return this.a
         } // non-enumerable, (and, ideally, on proto)
         m() {} // non-enumerable, on proto
-        m2 = () => {} // non-enumerable, on self
+        m2 = () => {} // enumerable, on self
     }
 
     const a = new A()
@@ -805,9 +806,9 @@ test("enumerability", () => {
     let props = []
     for (const key in a) props.push(key)
 
-    expect(ownProps).toEqual(["a", "a2"])
+    expect(ownProps).toEqual(["a", "a2", "m2"])
 
-    expect(props).toEqual(["a", "a2"])
+    expect(props).toEqual(["a", "a2", "m2"])
 
     expect("a" in a).toBe(true)
     expect(a.hasOwnProperty("a")).toBe(true)
@@ -830,10 +831,11 @@ test("enumerability", () => {
 
     expect(ownProps).toEqual([
         "a",
-        "a2" // a2 is now initialized as well, altough never accessed!
+        "a2", // a2 is now initialized as well, altough never accessed!
+        "m2"
     ])
 
-    expect(props).toEqual(["a", "a2"])
+    expect(props).toEqual(["a", "a2", "m2"])
 
     expect("a" in a).toBe(true)
     expect(a.hasOwnProperty("a")).toBe(true)
@@ -851,7 +853,7 @@ test("enumerability - workaround", () => {
             return this.a
         } // non-enumerable, (and, ideally, on proto)
         m() {} // non-enumerable, on proto
-        m2 = () => {} // non-enumerable, on self
+        m2 = () => {} // enumerable, on self
 
         constructor() {
             makeObservable(this, {
@@ -875,10 +877,11 @@ test("enumerability - workaround", () => {
 
     expect(ownProps).toEqual([
         "a",
-        "a2" // a2 is now initialized as well, altough never accessed!
+        "a2", // a2 is now initialized as well, altough never accessed!
+        "m2"
     ])
 
-    expect(props).toEqual(["a", "a2"])
+    expect(props).toEqual(["a", "a2", "m2"])
 
     expect("a" in a).toBe(true)
     expect(a.hasOwnProperty("a")).toBe(true)
@@ -953,28 +956,12 @@ test("379, inheritable actions (babel)", () => {
     }
 
     class B extends A {
-        constructor() {
-            super()
-
-            makeObservable(this, {
-                method: action
-            })
-        }
-
         method() {
             return super.method() * 2
         }
     }
 
     class C extends B {
-        constructor() {
-            super()
-
-            makeObservable(this, {
-                method: action
-            })
-        }
-
         method() {
             return super.method() + 3
         }
@@ -993,7 +980,8 @@ test("379, inheritable actions (babel)", () => {
     expect(isAction(c.method)).toBe(true)
 })
 
-test("379, inheritable actions - 2 (babel)", () => {
+// Changing annotation or it's configuration is not supported
+test.skip("379, inheritable actions - 2 (babel)", () => {
     class A {
         constructor() {
             makeObservable(this, {
@@ -1399,6 +1387,8 @@ test("computed comparer works with decorate (babel) - 3", () => {
 })
 
 test("actions are reassignable", () => {
+    const __DEV__PREV = __DEV__
+    __DEV__ = false
     // See #1398, make actions reassignable to support stubbing
     class A {
         constructor() {
@@ -1429,6 +1419,7 @@ test("actions are reassignable", () => {
     expect(isAction(a.m3)).toBe(false)
     a.m4 = () => {}
     expect(isAction(a.m4)).toBe(false)
+    __DEV__ = __DEV__PREV
 })
 
 test("it should support asyncAction (babel)", async () => {

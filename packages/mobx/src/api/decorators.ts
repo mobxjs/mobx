@@ -1,94 +1,96 @@
-import {
-    Annotation,
-    addHiddenProp,
-    AnnotationsMap,
-    makeObservable,
-    assign,
-    getDescriptor,
-    hasProp,
-    objectPrototype
-} from "../internal"
+import { Annotation, addHiddenProp, AnnotationsMap, hasProp, die } from "../internal"
 
-export const mobxDecoratorsSymbol = Symbol("mobx-decorators")
-const mobxAppliedDecoratorsSymbol = Symbol("mobx-applied-decorators")
+export const storedAnnotationsSymbol = Symbol("mobx-stored-annotations")
+export const appliedAnnotationsSymbol = Symbol("mobx-applied-annotations")
 
-export function createDecorator<ArgType>(
+export const override: PropertyDecorator & Annotation = createDecoratorAnnotation("override")
+export const OVERRIDE = "override"
+
+/**
+ * Creates a function that acts as
+ * - decorator
+ * - decorator factory when called with single parameter
+ * - annotation object
+ * TODO:
+ * Possibly get rid of this. It's only used for action.bound("name"), which is no longer supported?
+ */
+export function createCallableDecoratorAnnotation<ArgType>(
     type: Annotation["annotationType_"]
 ): Annotation & PropertyDecorator & ((arg: ArgType) => PropertyDecorator & Annotation) {
-    return assign(
-        function (target: any, property?: PropertyKey): any {
-            if (property === undefined) {
-                // @decorator(arg) member
-                createDecoratorAndAnnotation(type, target)
-            } else {
-                // @decorator member
-                storeDecorator(target, property!, type)
-            }
-        },
-        {
-            annotationType_: type
+    function decoratorOrFactory(targetOrArg: any, property?: PropertyKey): any {
+        if (property === undefined) {
+            // @decorator(arg) member
+            return createDecoratorAnnotation(type, targetOrArg)
+        } else {
+            // @decorator member
+            storeAnnotation(targetOrArg, property!, type)
         }
-    ) as any
+    }
+    decoratorOrFactory.annotationType_ = type
+    return decoratorOrFactory as any
 }
 
-export function createDecoratorAndAnnotation(
-    type: Annotation["annotationType_"],
+/**
+ * Creates a function that acts as
+ * - decorator
+ * - annotation object
+ */
+export function createDecoratorAnnotation(
+    annotationType_: Annotation["annotationType_"],
     arg_?: any
 ): PropertyDecorator & Annotation {
-    return assign(
-        function (target, property) {
-            storeDecorator(target, property, type, arg_)
-        },
-        {
-            annotationType_: type,
-            arg_
-        }
-    )
+    function decorator(target, property) {
+        storeAnnotation(target, property, annotationType_, arg_)
+    }
+    decorator.annotationType_ = annotationType_
+    decorator.arg_ = arg_
+    return decorator
 }
 
-export function storeDecorator(
+/**
+ * Stores annotation to target (prototype),
+ * so it can be inspected later by `makeObservable` called from constructor
+ */
+export function storeAnnotation(
     target: any,
-    property: PropertyKey,
-    type: Annotation["annotationType_"],
+    key: PropertyKey,
+    annotationType_: Annotation["annotationType_"],
     arg_?: any
 ) {
-    const desc = getDescriptor(target, mobxDecoratorsSymbol)
-    let map: any
-    if (desc) {
-        map = desc.value
-    } else {
-        map = {}
-        addHiddenProp(target, mobxDecoratorsSymbol, map)
+    if (!hasProp(target, storedAnnotationsSymbol)) {
+        addHiddenProp(target, storedAnnotationsSymbol, {
+            // Inherit annotations
+            ...target[storedAnnotationsSymbol]
+        })
     }
-    map[property] = { annotationType_: type, arg_ } as Annotation
+    // @override must override something
+    if (__DEV__ && annotationType_ === "override" && !target[storedAnnotationsSymbol][key]) {
+        die(
+            `Property '${key.toString()}' is decorated with '@override', but no such decorated member was found on prototype.`
+        )
+    }
+    // Cannot re-decorate
+    if (__DEV__ && annotationType_ !== "override" && target[storedAnnotationsSymbol][key]) {
+        die(38, key, target[storedAnnotationsSymbol][key].annotationType_, annotationType_)
+    }
+    // Ignore override
+    if (annotationType_ !== "override") {
+        target[storedAnnotationsSymbol][key] = { annotationType_, arg_, isDecorator_: true }
+    }
 }
 
-export function applyDecorators(target: Object): boolean {
-    if (target[mobxAppliedDecoratorsSymbol]) return true
-    let current = target
-    // optimization: this could be cached per prototype!
-    // (then we can remove the weird short circuiting as well..)
-    let annotations: AnnotationsMap<any, any>[] = []
-    while (current && current !== objectPrototype) {
-        const desc = getDescriptor(current, mobxDecoratorsSymbol)
-        if (desc) {
-            if (!annotations.length) {
-                for (let key in desc.value) {
-                    // second conditions is to recognize actions
-                    if (!hasProp(target, key) && !hasProp(current, key)) {
-                        // not all fields are defined yet, so we are in the makeObservable call of some super class,
-                        // short circuit, here, we will do this again in a later makeObservable call
-                        return true
-                    }
-                }
-            }
-            annotations.unshift(desc.value)
+/**
+ * Collects annotations from prototypes and stores them on target (instance)
+ */
+export function collectStoredAnnotations(target): AnnotationsMap<any, any> {
+    if (!hasProp(target, storedAnnotationsSymbol)) {
+        if (__DEV__ && !target[storedAnnotationsSymbol]) {
+            die(
+                `No annotations were passed to makeObservable, but no decorated members have been found either`
+            )
         }
-        current = Object.getPrototypeOf(current)
+        // We need a copy as we will remove annotation from the list once it's applied.
+        addHiddenProp(target, storedAnnotationsSymbol, { ...target[storedAnnotationsSymbol] })
     }
-    annotations.forEach(a => {
-        makeObservable(target, a)
-    })
-    addHiddenProp(target, mobxAppliedDecoratorsSymbol, true)
-    return annotations.length > 0
+    return target[storedAnnotationsSymbol]
 }

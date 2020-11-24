@@ -30,6 +30,7 @@ import {
     startBatch,
     stringifyKey,
     globalState,
+    isComputed,
     ADD,
     UPDATE,
     die,
@@ -162,9 +163,10 @@ export class ObservableObjectAdministration
 
     addObservableProp_(
         propName: PropertyKey,
-        newValue,
+        descriptor: PropertyDescriptor,
         enhancer: IEnhancer<any> = this.defaultEnhancer_
     ) {
+        let { value: newValue } = descriptor
         const { target_: target } = this
         if (__DEV__) assertPropertyConfigurable(target, propName)
 
@@ -187,7 +189,7 @@ export class ObservableObjectAdministration
         this.values_.set(propName, observable)
         newValue = (observable as any).value_ // observableValue might have changed it
 
-        defineProperty(target, propName, generateObservablePropConfig(propName))
+        defineProperty(target, propName, generateObservablePropConfig(propName, descriptor))
         this.notifyPropertyAddition_(propName, newValue)
     }
 
@@ -222,7 +224,11 @@ export class ObservableObjectAdministration
             const notifySpy = __DEV__ && isSpyEnabled()
             const oldObservable = this.values_.get(key)
             const oldValue = oldObservable && oldObservable.get()
-            oldObservable && oldObservable.set(undefined)
+            // clear the observable value
+            // computed without setter throws
+            if (oldObservable && !isComputed(oldObservable)) {
+                oldObservable.set(undefined)
+            }
             // notify key and keyset listeners
             this.reportKeysChanged()
             this.values_.delete(key)
@@ -346,7 +352,21 @@ export function asObservableObject(
 const observablePropertyConfigs = Object.create(null)
 const computedPropertyConfigs = Object.create(null)
 
-export function generateObservablePropConfig(propName) {
+// TODO use for computed as well
+export function generateObservablePropConfig(propName, { configurable = true, enumerable = true }) {
+    // writability is ignored - observable non-writable field is useless
+    return {
+        configurable,
+        enumerable,
+        get() {
+            return this[$mobx].read_(propName)
+        },
+        set(value) {
+            return this[$mobx].write_(propName, value)
+        }
+    }
+    // TODO
+    /*
     return (
         observablePropertyConfigs[propName] ||
         (observablePropertyConfigs[propName] = {
@@ -360,6 +380,7 @@ export function generateObservablePropConfig(propName) {
             }
         })
     )
+    */
 }
 
 export function generateComputedPropConfig(propName) {

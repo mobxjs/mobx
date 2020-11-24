@@ -2,12 +2,12 @@ import {
     createAction,
     executeAction,
     Annotation,
-    createDecorator,
-    createDecoratorAndAnnotation,
-    storeDecorator,
+    storeAnnotation,
     die,
     isFunction,
-    isStringish
+    isStringish,
+    createDecoratorAnnotation,
+    createCallableDecoratorAnnotation
 } from "../internal"
 
 export const ACTION = "action"
@@ -45,11 +45,11 @@ function createActionFactory(
         if (isFunction(arg2)) return createAction(arg1, arg2, autoAction)
         // @action
         if (isStringish(arg2)) {
-            return storeDecorator(arg1, arg2, annotation)
+            return storeAnnotation(arg1, arg2, annotation)
         }
-        // Annation: action("name") & @action("name")
+        // action("name") & @action("name")
         if (isStringish(arg1)) {
-            return createDecoratorAndAnnotation(annotation, arg1)
+            return createDecoratorAnnotation(annotation, arg1)
         }
 
         if (__DEV__) die("Invalid arguments for `action`")
@@ -61,8 +61,8 @@ function createActionFactory(
 export const action: IActionFactory = createActionFactory(false, ACTION)
 export const autoAction: IActionFactory = createActionFactory(true, AUTOACTION)
 
-action.bound = createDecorator<string>(ACTION_BOUND)
-autoAction.bound = createDecorator<string>(AUTOACTION_BOUND)
+action.bound = createCallableDecoratorAnnotation<string>(ACTION_BOUND)
+autoAction.bound = createCallableDecoratorAnnotation<string>(AUTOACTION_BOUND)
 
 export function runInAction<T>(fn: () => T): T {
     return executeAction(fn.name || ACTION_UNNAMED, false, fn, this, undefined)

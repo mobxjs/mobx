@@ -13,7 +13,7 @@ import {
     startBatch,
     CreateObservableOptions,
     ObservableObjectAdministration,
-    applyDecorators,
+    collectStoredAnnotations,
     isObservableProp,
     getDescriptor,
     isPlainObject,
@@ -38,22 +38,133 @@ import {
     FLOW,
     flow,
     isGenerator,
-    isFlow
+    isFlow,
+    appliedAnnotationsSymbol,
+    storedAnnotationsSymbol
 } from "../internal"
 
-const CACHED_ANNOTATIONS = Symbol("mobx-cached-annotations")
+const cachedAnnotationsSymbol = Symbol("mobx-cached-annotations")
 
-function makeAction(target, key, name, fn, asAutoAction) {
-    addHiddenProp(target, key, asAutoAction ? autoAction(name || key, fn) : action(name || key, fn))
+/*
+// Alterantive version allowing writable actions, without the need for re-annotating, but consumes more memory
+function addAction(
+    target: Object,
+    key: PropertyKey,
+    { value, writable, configurable, enumerable }: PropertyDescriptor,
+    name,
+    asAutoAction: boolean,
+    bindTo?: Object
+) {
+    name ||= key
+    let storedValue
+    defineProperty(target, key, {
+        configurable,
+        enumerable,
+        get() {
+            return storedValue
+        },
+        set: writable
+            ? function (v) {
+                  if (typeof v === "function" && !isAction(v)) {
+                      v = bindTo ? v.bind(bindTo) : v
+                      v = asAutoAction ? autoAction(name, v) : action(name, v)
+                  }
+                  storedValue = v
+              }
+            : undefined
+    })
+    target[key] = value
+}
+*/
+
+function addAction(
+    target: Object,
+    key: PropertyKey,
+    { value, writable, configurable, enumerable }: PropertyDescriptor,
+    name,
+    asAutoAction: boolean,
+    bindTo?: Object
+) {
+    name ||= key
+    value = bindTo ? value.bind(bindTo) : value
+    value = asAutoAction ? autoAction(name, value) : action(name, value)
+    // If non-writable make it sound on devel
+    if (__DEV__ && !writable) {
+        defineProperty(target, key, {
+            configurable,
+            enumerable,
+            get() {
+                return value
+            },
+            set(_) {
+                die(
+                    `Property ${key.toString()} is not writable.` +
+                        `\nAction fields created by 'makeObservable' are not writable.` +
+                        `\nOnly actions defined on prototype can be overriden by subclass.` +
+                        `\nYou can remove the annotation and wrap the function manually:` +
+                        `\nthis.${key.toString()} = action(() => {})`
+                )
+            }
+        })
+    } else {
+        defineProperty(target, key, {
+            value,
+            configurable,
+            enumerable,
+            writable
+        })
+    }
 }
 
-function getInferredAnnotation(
+function addFlow(
+    target: Object,
+    key: PropertyKey,
+    { value, writable, configurable, enumerable }: PropertyDescriptor
+) {
+    value = flow(value)
+    // If non-writable make it sound on devel
+    if (__DEV__ && !writable) {
+        defineProperty(target, key, {
+            configurable,
+            enumerable,
+            get() {
+                return value
+            },
+            set(_) {
+                die(
+                    `Property ${key.toString()} is not writable.` +
+                        `\nFlow fields created by 'makeObservable' are not writable.` +
+                        `\nOnly flows defined on prototype can be overriden by subclass.` +
+                        `\nYou can remove the annotation and wrap the function manually:` +
+                        `\nthis.${key.toString()} = flow(function*() {})`
+                )
+            }
+        })
+    } else {
+        defineProperty(target, key, {
+            value,
+            configurable,
+            enumerable,
+            writable
+        })
+    }
+}
+
+/**
+ * Infers the best fitting annotation from property descriptor
+ * - getter(+setter) -> computed
+ * - setter w/o getter -> false
+ * - generator -> flow
+ * - function -> action
+ * - other -> computed
+ */
+function inferAnnotation(
     desc: PropertyDescriptor,
     defaultAnnotation: Annotation | undefined,
     autoBind: boolean
 ): Annotation | boolean {
     if (desc.get) return computed
-    if (desc.set) return false // ignore pure setters
+    if (desc.set) return false // ignore setter w/o getter
     // if already wrapped in action, don't do that another time, but assume it is already set up properly
     if (isFunction(desc.value))
         return isGenerator(desc.value)
@@ -65,19 +176,6 @@ function getInferredAnnotation(
             : autoAction
     // if (!desc.configurable || !desc.writable) return false
     return defaultAnnotation ?? observable.deep
-}
-
-function getDescriptorInChain(target: Object, prop: PropertyKey): [PropertyDescriptor, Object] {
-    let current = target
-    while (current && current !== objectPrototype) {
-        // Optimization: cache meta data, especially for members from prototypes?
-        const desc = getDescriptor(current, prop)
-        if (desc) {
-            return [desc, current]
-        }
-        current = Object.getPrototypeOf(current)
-    }
-    die(1, prop)
 }
 
 export function makeProperty(
@@ -93,7 +191,7 @@ export function makeProperty(
     const defaultAnnotation: Annotation | undefined = observable // ideally grap this from adm's defaultEnahncer instead!
     const originAnnotation = annotation
     if (annotation === true) {
-        annotation = getInferredAnnotation(descriptor, defaultAnnotation, autoBind)
+        annotation = inferAnnotation(descriptor, defaultAnnotation, autoBind)
     }
     if (annotation === false) {
         if (forceCopy) {
@@ -104,38 +202,43 @@ export function makeProperty(
     if (!annotation || annotation === true || !annotation.annotationType_) {
         return die(2, key)
     }
+
     const type = annotation.annotationType_
+
     switch (type) {
         case AUTOACTION:
         case ACTION: {
-            const fn = descriptor.value
-            if (!isFunction(fn)) die(3, key)
+            const fn = owner[key]
+            if (!isFunction(fn)) die(3, key, type)
             if (owner !== target && !forceCopy) {
                 if (!isAction(owner[key]))
-                    makeAction(owner, key, annotation.arg_, fn, type === AUTOACTION)
+                    addAction(owner, key, descriptor, annotation.arg_, type === AUTOACTION)
             } else {
-                makeAction(target, key, annotation.arg_, fn, type === AUTOACTION)
+                addAction(target, key, descriptor, annotation.arg_, type === AUTOACTION)
             }
             break
         }
         case AUTOACTION_BOUND:
         case ACTION_BOUND: {
-            const fn = descriptor.value
-            if (!isFunction(fn)) die(3, key)
-            makeAction(
+            const fn = owner[key]
+            if (!isFunction(fn)) die(3, key, type)
+            addAction(
                 target,
                 key,
+                descriptor,
                 annotation.arg_,
-                fn.bind(adm.proxy_ || target),
-                type === AUTOACTION_BOUND
+                type === AUTOACTION_BOUND,
+                adm.proxy_ || target
             )
             break
         }
         case FLOW: {
+            const fn = owner[key]
+            if (!isFunction(fn)) die(3, key, type)
             if (owner !== target && !forceCopy) {
-                if (!isFlow(owner[key])) addHiddenProp(owner, key, flow(descriptor.value!))
+                if (!isFlow(owner[key])) addFlow(owner, key, descriptor)
             } else {
-                addHiddenProp(target, key, flow(descriptor.value))
+                addFlow(owner, key, descriptor)
             }
             break
         }
@@ -162,12 +265,13 @@ export function makeProperty(
                 die(
                     `Cannot decorate '${key.toString()}': observable cannot be used on setter / getter properties.`
                 )
-            // if the originAnnotation was true, preferred the adm's default enhancer over the inferred one
+            // if the originAnnotation was true, prefer the adm's default enhancer over the inferred one
             const enhancer =
                 originAnnotation === true
                     ? adm.defaultEnhancer_
                     : getEnhancerFromAnnotation(annotation)
-            adm.addObservableProp_(key, descriptor.value, enhancer)
+
+            adm.addObservableProp_(key, descriptor, enhancer)
             break
         }
         default:
@@ -200,24 +304,126 @@ export function makeObservable<T, AdditionalKeys extends PropertyKey = never>(
     )
     startBatch()
     try {
-        if (!annotations) {
-            const didDecorate = applyDecorators(target)
-            if (__DEV__ && !didDecorate)
-                die(
-                    `No annotations were passed to makeObservable, but no decorator members have been found either`
-                )
-            return target
+        // Prepare structure for tracking which fields were already annotated
+        if (__DEV__ && !target[appliedAnnotationsSymbol]) {
+            addHiddenProp(target, appliedAnnotationsSymbol, {})
         }
-        const make = key => {
-            let annotation = annotations[key]
-            const [desc, owner] = getDescriptorInChain(target, key)
-            makeProperty(adm, owner, key, desc, annotation, false, autoBind)
-        }
-        ownKeys(annotations).forEach(make)
+
+        // Default to decorators
+        annotations ??= collectStoredAnnotations(target)
+
+        // Annotate
+        ownKeys(annotations).forEach(key => annotate(adm, key, annotations![key], autoBind))
     } finally {
         endBatch()
     }
     return target
+}
+
+function annotate(adm, key, annotation, autoBind) {
+    const { target_: target } = adm
+    let annotationApplied = false
+    // Cannot re-annotate
+    if (
+        __DEV__ &&
+        annotation.annotationType_ !== "override" &&
+        hasProp(target[appliedAnnotationsSymbol], key)
+    ) {
+        die(
+            38,
+            key,
+            target[appliedAnnotationsSymbol][key].annotationType_,
+            annotation.annotationType_
+        )
+    }
+
+    // override must override something
+    if (
+        __DEV__ &&
+        annotation.annotationType_ === "override" &&
+        !hasProp(target[appliedAnnotationsSymbol], key)
+    ) {
+        die(
+            `Property '${key.toString()}' is annotated with 'override', but no such annotated member was found on prototype.`
+        )
+    }
+
+    // Ignore override
+    if (annotation.annotationType_ === "override") {
+        return
+    }
+
+    // Traverse proto chain and apply annotation to anything that has a descriptor for this key
+    let owner = target
+    while (owner && owner !== objectPrototype) {
+        const desc = getDescriptor(owner, key)
+        if (desc) {
+            // Cannot override computed
+            if (
+                __DEV__ &&
+                annotationApplied &&
+                (annotation.annotationType_ === COMPUTED ||
+                    annotation.annotationType_ === COMPUTED_STRUCT)
+            ) {
+                die(
+                    `Cannot override computed '${key.toString()}' - overriding computed is not supported.` +
+                        `\nPlease create a second private non-computed overridable getter and expose it via original computed.` +
+                        `\nSee an example in the documentation: TODO link`
+                )
+            }
+
+            // If bound action, use closest definition in proto chain and stop
+            if (
+                annotationApplied &&
+                (annotation.annotationType_ === ACTION_BOUND ||
+                    annotation.annotationType_ === AUTOACTION_BOUND)
+            ) {
+                break
+            }
+
+            if (__DEV__) {
+                // Make everything annotated non-configurable,
+                // so that user can't redefine fields in subclass:
+                // observable = 5;
+                // action = () => {};
+                desc.configurable = false
+                // Make action/flow non-writable,
+                // so that user can't rewrite action/flow in subclass constructor:
+                // this.action = function noLongerAction() {};
+                if (
+                    annotation.annotationType_ === ACTION ||
+                    annotation.annotationType_ === ACTION_BOUND ||
+                    annotation.annotationType_ === AUTOACTION ||
+                    annotation.annotationType_ === AUTOACTION_BOUND ||
+                    annotation.annotationType_ === FLOW
+                ) {
+                    desc.writable = false
+                }
+            }
+
+            makeProperty(adm, owner, key, desc, annotation, false, autoBind)
+            annotationApplied = true
+        }
+        owner = Object.getPrototypeOf(owner)
+    }
+    // Remove applied annotation so we don't try to apply it again in subclass constructor
+    if (annotation.isDecorator_ && annotationApplied) {
+        delete target[storedAnnotationsSymbol][key]
+    }
+
+    // Throw on missing key, except for decorators:
+    // Decorator annotations are collected from whole prototype chain.
+    // When called from super() some props may not exist yet.
+    // However we don't have to worry about missing prop,
+    // because the decorator must have been applied to something.
+    if (!annotation.isDecorator_ && !annotationApplied) {
+        die(1, key)
+    }
+
+    // Record annotation applied
+    if (__DEV__ && annotationApplied) {
+        target[appliedAnnotationsSymbol][key] = annotation
+    }
 }
 
 export function makeAutoObservable<T extends Object, AdditionalKeys extends PropertyKey = never>(
@@ -234,22 +440,22 @@ export function makeAutoObservable<T extends Object, AdditionalKeys extends Prop
             die(`makeAutoObservable can only be used on objects not already made observable`)
     }
     let annotations: AnnotationsMap<any, any>
-    if (!isPlain && hasProp(proto, CACHED_ANNOTATIONS)) {
+    if (!isPlain && hasProp(proto, cachedAnnotationsSymbol)) {
         // shortcut, reuse inferred annotations for this type from the previous time
-        annotations = proto[CACHED_ANNOTATIONS] as any
+        annotations = proto[cachedAnnotationsSymbol] as any
     } else {
         annotations = { ...overrides }
-        extractAnnotationsFromObject(target, annotations, options)
+        inferAnnotationsFromObject(target, annotations, options)
         if (!isPlain) {
-            extractAnnotationsFromProto(proto, annotations, options)
-            addHiddenProp(proto, CACHED_ANNOTATIONS, annotations)
+            inferAnnotationsFromProto(proto, annotations, options)
+            addHiddenProp(proto, cachedAnnotationsSymbol, annotations)
         }
     }
     makeObservable(target, annotations as any, options)
     return target
 }
 
-function extractAnnotationsFromObject(
+function inferAnnotationsFromObject(
     target,
     collector: AnnotationsMap<any, any>,
     options: CreateObservableOptions | undefined
@@ -263,11 +469,11 @@ function extractAnnotationsFromObject(
             : observable.ref
     Object.entries(getOwnPropertyDescriptors(target)).forEach(([key, descriptor]) => {
         if (key in collector || key === "constructor") return
-        collector[key] = getInferredAnnotation(descriptor, defaultAnnotation, autoBind)
+        collector[key] = inferAnnotation(descriptor, defaultAnnotation, autoBind)
     })
 }
 
-function extractAnnotationsFromProto(
+function inferAnnotationsFromProto(
     proto: any,
     collector: AnnotationsMap<any, any>,
     options?: CreateObservableOptions

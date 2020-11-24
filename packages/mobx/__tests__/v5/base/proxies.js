@@ -257,7 +257,7 @@ test("non-proxied object", () => {
     expect(isComputedProp(a, "y")).toBe(true)
     expect(isAction(a.double)).toBe(true)
     expect(stripAdminFromDescriptors(Object.getOwnPropertyDescriptors(a))).toMatchSnapshot()
-    expect(Object.keys(a)).toEqual(["x", "b"])
+    expect(Object.keys(a)).toEqual(["x", "b", "double"])
 })
 
 test("extend proxies", () => {
@@ -284,7 +284,7 @@ test("extend proxies", () => {
     expect(isComputedProp(a, "y")).toBe(true)
     expect(isAction(a.double)).toBe(true)
     expect(stripAdminFromDescriptors(Object.getOwnPropertyDescriptors(a))).toMatchSnapshot()
-    expect(Object.keys(a)).toEqual(["x", "b"])
+    expect(Object.keys(a)).toEqual(["x", "b", "double"])
 })
 
 test("decorate proxies", () => {
@@ -311,7 +311,7 @@ test("decorate proxies", () => {
     expect(isComputedProp(a, "y")).toBe(true)
     expect(isAction(a.double)).toBe(true)
     expect(stripAdminFromDescriptors(Object.getOwnPropertyDescriptors(a))).toMatchSnapshot()
-    expect(Object.keys(a)).toEqual(["x", "b"])
+    expect(Object.keys(a)).toEqual(["x", "b", "double"])
 })
 
 test("predictable 'this' - 1", () => {

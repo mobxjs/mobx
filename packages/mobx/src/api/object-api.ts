@@ -99,7 +99,7 @@ export function set(obj: any, key: any, value?: any): void {
         if (existingObservable) {
             adm.write_(key, value)
         } else {
-            adm.addObservableProp_(key, value, adm.defaultEnhancer_)
+            adm.addObservableProp_(key, { value }, adm.defaultEnhancer_)
         }
     } else if (isObservableMap(obj)) {
         obj.set(key, value)

@@ -979,7 +979,7 @@ test("enumerability", () => {
             return this.a
         } // non-enumerable, (and, ideally, on proto)
         m() {} // non-enumerable, on proto
-        m2 = () => {} // non-enumerable, on self
+        m2 = () => {} // enumerable, on self
     }
 
     const a = new A()
@@ -990,12 +990,14 @@ test("enumerability", () => {
     for (const key in a) props.push(key)
 
     t.deepEqual(ownProps, [
-        "a" // yeej!
+        "a", // yeej!
+        "m2"
     ])
 
     t.deepEqual(props, [
         // also 'a' would be ok
-        "a"
+        "a",
+        "m2"
     ])
 
     t.equal("a" in a, true)
@@ -1021,9 +1023,9 @@ test("enumerability", () => {
     props = []
     for (const key in a) props.push(key)
 
-    t.deepEqual(ownProps, ["a"])
+    t.deepEqual(ownProps, ["a", "m2"])
 
-    t.deepEqual(props, ["a"])
+    t.deepEqual(props, ["a", "m2"])
 
     t.equal("a" in a, true)
     // eslint-disable-next-line
@@ -1100,28 +1102,12 @@ test("379, inheritable actions (typescript)", () => {
     }
 
     class B extends A {
-        constructor() {
-            super()
-
-            makeObservable(this, {
-                method: action
-            })
-        }
-
         method() {
             return super.method() * 2
         }
     }
 
     class C extends B {
-        constructor() {
-            super()
-
-            makeObservable(this, {
-                method: action
-            })
-        }
-
         method() {
             return super.method() + 3
         }
@@ -1140,7 +1126,8 @@ test("379, inheritable actions (typescript)", () => {
     t.equal(isAction(c.method), true)
 })
 
-test("379, inheritable actions - 2 (typescript)", () => {
+// Changing annotation or it's configuration is not supported
+test.skip("379, inheritable actions - 2 (typescript)", () => {
     class A {
         constructor() {
             makeObservable(this, {
@@ -1803,7 +1790,8 @@ test("multiple inheritance should work", () => {
     expect(mobx.keys(new B())).toEqual(["x", "y"])
 })
 
-test("actions are reassignable", () => {
+// Only possible with __DEV__ === false
+test.skip("actions are reassignable", () => {
     // See #1398 and #1545, make actions reassignable to support stubbing
     class A {
         constructor() {

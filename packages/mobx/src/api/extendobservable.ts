@@ -40,7 +40,7 @@ export function extendObservable<A extends Object, B extends Object>(
         getPlainObjectKeys(descs).forEach(key => {
             makeProperty(
                 adm,
-                target,
+                properties,
                 key,
                 descs[key as any],
                 !annotations ? true : key in annotations ? annotations[key] : true,

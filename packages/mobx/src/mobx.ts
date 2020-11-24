@@ -133,7 +133,8 @@ export {
     makeAutoObservable,
     autoAction as _autoAction,
     AnnotationsMap,
-    AnnotationMapEntry
+    AnnotationMapEntry,
+    override
 } from "./internal"
 
 // Devtools support

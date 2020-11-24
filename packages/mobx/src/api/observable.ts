@@ -22,8 +22,8 @@ import {
     refStructEnhancer,
     AnnotationsMap,
     asObservableObject,
-    storeDecorator,
-    createDecorator,
+    storeAnnotation,
+    createDecoratorAnnotation,
     createLegacyArray,
     globalState,
     assign,
@@ -85,7 +85,7 @@ export function getEnhancerFromAnnotation(annotation?: Annotation): IEnhancer<an
 function createObservable(v: any, arg2?: any, arg3?: any) {
     // @observable someProp;
     if (isStringish(arg2)) {
-        storeDecorator(v, arg2, OBSERVABLE)
+        storeAnnotation(v, arg2, OBSERVABLE)
         return
     }
 
@@ -189,10 +189,10 @@ const observableFactories: IObservableFactory = {
             options
         )
     },
-    ref: createDecorator(OBSERVABLE_REF),
-    shallow: createDecorator(OBSERVABLE_SHALLOW),
-    deep: createDecorator(OBSERVABLE),
-    struct: createDecorator(OBSERVABLE_STRUCT)
+    ref: createDecoratorAnnotation(OBSERVABLE_REF),
+    shallow: createDecoratorAnnotation(OBSERVABLE_SHALLOW),
+    deep: createDecoratorAnnotation(OBSERVABLE),
+    struct: createDecoratorAnnotation(OBSERVABLE_STRUCT)
 } as any
 
 // eslint-disable-next-line

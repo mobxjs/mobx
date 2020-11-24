@@ -1,4 +1,12 @@
-import { action, noop, die, isFunction, Annotation, isStringish, storeDecorator } from "../internal"
+import {
+    action,
+    noop,
+    die,
+    isFunction,
+    Annotation,
+    isStringish,
+    storeAnnotation
+} from "../internal"
 
 export const FLOW = "flow"
 
@@ -25,7 +33,7 @@ export const flow: Flow = Object.assign(
     function flow(arg1, arg2?) {
         // @flow
         if (isStringish(arg2)) {
-            return storeDecorator(arg1, arg2, "flow")
+            return storeAnnotation(arg1, arg2, FLOW)
         }
         // flow(fn)
         if (__DEV__ && arguments.length !== 1)
