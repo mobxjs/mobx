@@ -48,7 +48,7 @@ MobX is proudly sponsored by Mendix, Coinbase, Facebook Open Source, Canva, Algo
 -   Installation: `npm install mobx --save`. React bindings: `npm install mobx-react --save`. To enable ESNext decorators (optional), see below.
 -   CDN:
 
-*   https://unpkg.com/mobx/lib/mobx.umd.js
+*   https://unpkg.com/mobx@5/lib/mobx.umd.js
 *   https://cdnjs.com/libraries/mobx
 
 # Browser support
@@ -67,7 +67,7 @@ _Tip: the main entry point of the MobX 5 package ships with ES5 code for backwar
 -   <i><a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/courses/manage-complex-state-in-react-apps-with-mobx">egghead.io course</a></i>
 -   [Ten minute, interactive MobX + React tutorial](https://mobx.js.org/getting-started)
 -   <img src="assets/book.jpg" height="80px"/> [The MobX book](https://books.google.nl/books?id=ALFmDwAAQBAJ&pg=PP1&lpg=PP1&dq=michel+weststrate+mobx+quick+start+guide:+supercharge+the+client+state+in+your+react+apps+with+mobx&source=bl&ots=D460fxti0F&sig=ivDGTxsPNwlOjLHrpKF1nweZFl8&hl=nl&sa=X&ved=2ahUKEwiwl8XO--ncAhWPmbQKHWOYBqIQ6AEwAnoECAkQAQ#v=onepage&q=michel%20weststrate%20mobx%20quick%20start%20guide%3A%20supercharge%20the%20client%20state%20in%20your%20react%20apps%20with%20mobx&f=false) by Pavan Podila and Michel Weststrate (which despite its name is in-depth!)
--   [Official MobX 4 documentation and API overview](https://mobxjs.github.io/mobx/refguide/api.html) ([MobX 3](https://github.com/mobxjs/mobx/blob/54557dc319b04e92e31cb87427bef194ec1c549c/docs/refguide/api.md), [MobX 2](https://github.com/mobxjs/mobx/blob/7c9e7c86e0c6ead141bb0539d33143d0e1f576dd/docs/refguide/api.md))
+-   [Official MobX 4 documentation and API overview](https://github.com/mobxjs/mobx/blob/4.15.7/docs/refguide/api.md) ([MobX 3](https://github.com/mobxjs/mobx/blob/54557dc319b04e92e31cb87427bef194ec1c549c/docs/refguide/api.md), [MobX 2](https://github.com/mobxjs/mobx/blob/7c9e7c86e0c6ead141bb0539d33143d0e1f576dd/docs/refguide/api.md))
 -   Videos:
     -   [ReactNext 2016: Real World MobX](https://www.youtube.com/watch?v=Aws40KOx90U) - 40m [slides](https://docs.google.com/presentation/d/1DrI6Hc2xIPTLBkfNH8YczOcPXQTOaCIcDESdyVfG_bE/edit?usp=sharing)
     -   [Practical React with MobX](https://www.youtube.com/watch?v=XGwuM_u7UeQ). In depth introduction and explanation to MobX and React by Matt Ruby on OpenSourceNorth (ES5 only) - 42m.
@@ -102,7 +102,7 @@ MobX has only a few core concepts. The following snippets can be tried online us
 <i><a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/javascript-sync-the-ui-with-the-app-state-using-mobx-observable-and-observer-in-react">Egghead.io lesson 1: observable & observer</a></i>
 
 MobX adds observable capabilities to existing data structures like objects, arrays and class instances.
-This can simply be done by annotating your class properties with the [@observable](http://mobxjs.github.io/mobx/refguide/observable-decorator.html) decorator (ES.Next).
+This can simply be done by annotating your class properties with the [@observable](https://github.com/mobxjs/mobx/blob/5.15.7/docs/refguide/observable-decorator.md) decorator (ES.Next).
 
 ```javascript
 import { observable } from "mobx"
@@ -118,7 +118,7 @@ Using `observable` is like turning a property of an object into a spreadsheet ce
 Unlike spreadsheet cells, `observable` values can be not only primitive values, but also references, objects and arrays.
 
 If your environment doesn't support decorator syntax, don't worry.
-You can read [here](http://mobxjs.github.io/mobx/best/decorators.html) about how to set them up.
+You can read [here](https://github.com/mobxjs/mobx/blob/5.15.7/docs/best/decorators.md) about how to set them up.
 Or you can skip them altogether, as MobX can be used fine without decorator _syntax_, by leveraging the _decorate_ utility.
 Many MobX users do prefer the decorator syntax though, as it is slightly more concise.
 
@@ -141,7 +141,7 @@ decorate(Todo, {
 <i><a style="color: white; background:green;padding:5px;margin:5px;border-radius:2px" href="https://egghead.io/lessons/javascript-derive-computed-values-and-manage-side-effects-with-mobx-reactions">Egghead.io lesson 3: computed values</a></i>
 
 With MobX you can define values that will be derived automatically when relevant data is modified.
-By using the [`@computed`](http://mobxjs.github.io/mobx/refguide/computed-decorator.html) decorator or by using getter / setter functions when using `(extend)Observable` (Of course, you can use `decorate` here again as alternative to the `@` syntax).
+By using the [`@computed`](https://github.com/mobxjs/mobx/blob/5.15.7/docs/refguide/computed-decorator.md) decorator or by using getter / setter functions when using `(extend)Observable` (Of course, you can use `decorate` here again as alternative to the `@` syntax).
 
 ```javascript
 class TodoList {
@@ -211,8 +211,8 @@ However, if you would remove the `Tasks left` line (or put it into a separate co
 
 #### Custom reactions
 
-Custom reactions can simply be created using the [`autorun`](http://mobxjs.github.io/mobx/refguide/autorun.html),
-[`reaction`](http://mobxjs.github.io/mobx/refguide/reaction.html) or [`when`](http://mobxjs.github.io/mobx/refguide/when.html) functions to fit your specific situations.
+Custom reactions can simply be created using the [`autorun`](https://github.com/mobxjs/mobx/blob/5.15.7/docs/refguide/autorun.md),
+[`reaction`](https://github.com/mobxjs/mobx/blob/5.15.7/docs/refguide/reaction.md) or [`when`](https://github.com/mobxjs/mobx/blob/5.15.7/docs/refguide/when.md) functions to fit your specific situations.
 
 For example the following `autorun` prints a log message each time the amount of `unfinishedTodoCount` changes:
 
@@ -228,7 +228,7 @@ Why does a new message get printed each time the `unfinishedTodoCount` is change
 
 _MobX reacts to any existing observable property that is read during the execution of a tracked function._
 
-For an in-depth explanation about how MobX determines to which observables needs to be reacted, check [understanding what MobX reacts to](https://mobx.js.org/best/react.html).
+For an in-depth explanation about how MobX determines to which observables needs to be reacted, check [understanding what MobX reacts to](https://github.com/mobxjs/mobx/blob/5.15.7/docs/best/react.md).
 
 ### Actions
 
@@ -251,7 +251,7 @@ store.todos.push(new Todo("Get Coffee"), new Todo("Write simpler code"))
 store.todos[0].finished = true
 ```
 
-Nonetheless, MobX has an optional built-in concept of [`actions`](https://mobxjs.github.io/mobx/refguide/action.html).
+Nonetheless, MobX has an optional built-in concept of [`actions`](https://github.com/mobxjs/mobx/blob/5.15.7/docs/refguide/action.md).
 Read this section as well if you want to know more about writing asynchronous actions. It's easy!
 Use them to your advantage; they will help you to structure your code better and make wise decisions about when and where state should be modified.
 
@@ -308,8 +308,8 @@ And finally kudos for all the people that believed in, tried, validated and even
 ## Further resources and documentation
 
 -   <img src="assets/book.jpg" height="80px"/> [The MobX book](https://books.google.nl/books?id=ALFmDwAAQBAJ&pg=PP1&lpg=PP1&dq=michel+weststrate+mobx+quick+start+guide:+supercharge+the+client+state+in+your+react+apps+with+mobx&source=bl&ots=D460fxti0F&sig=ivDGTxsPNwlOjLHrpKF1nweZFl8&hl=nl&sa=X&ved=2ahUKEwiwl8XO--ncAhWPmbQKHWOYBqIQ6AEwAnoECAkQAQ#v=onepage&q=michel%20weststrate%20mobx%20quick%20start%20guide%3A%20supercharge%20the%20client%20state%20in%20your%20react%20apps%20with%20mobx&f=false) by Pavan Podila and Michel Weststrate (which despite its name is in-depth!)
--   [MobX homepage](http://mobxjs.github.io)
--   [API overview](http://mobxjs.github.io/mobx/refguide/api.html)
+-   [MobX homepage](https://mobx.js.org/)
+-   [API overview](https://github.com/mobxjs/mobx/blob/5.15.7/docs/refguide/api.md)
 -   [Tutorials](https://github.com/mobxjs/awesome-mobx#tutorials)
 -   [Blogs](https://github.com/mobxjs/awesome-mobx#blogs)
 -   [Videos](https://github.com/mobxjs/awesome-mobx#videos)
@@ -343,15 +343,15 @@ The difference between MobX 4 and MobX 5 is that the latter uses Proxies to do p
 The most noteable limitations of MobX 4:
 
 -   Observable arrays are not real arrays, so they won't pass the `Array.isArray()` check. The practical consequence is that you often need to `.slice()` the array first (to get a real array shallow copy) before passing to third party libraries.
--   Adding properties to existing observable objects after creation is not automatically picked up. Either use observable maps instead, or use the the build in [utility functions](https://mobx.js.org/refguide/object-api.html) to read / write / iterate objects that you want to dynamically add properties to.
+-   Adding properties to existing observable objects after creation is not automatically picked up. Either use observable maps instead, or use the the build in [utility functions](https://github.com/mobxjs/mobx/blob/5.15.7/docs/refguide/object-api.md) to read / write / iterate objects that you want to dynamically add properties to.
 
-For more details see the [caveats page](https://mobx.js.org/best/pitfalls.html).
+For more details see the [caveats page](https://github.com/mobxjs/mobx/blob/5.15.7/docs/best/pitfalls.md).
 
 ## Flow support
 
-MobX ships with [flow typings](https://github.com/mobxjs/mobx/blob/master/flow-typed/mobx.js). Flow will automatically include them when you import mobx modules. Although you **do not** need to import the types explicitly, you can still do it like this: `import type { ... } from 'mobx'`.
+MobX ships with [flow typings](https://github.com/mobxjs/mobx/blob/5.15.7/flow-typed/mobx.js). Flow will automatically include them when you import mobx modules. Although you **do not** need to import the types explicitly, you can still do it like this: `import type { ... } from 'mobx'`.
 
-To use the [flow typings](https://github.com/mobxjs/mobx/blob/master/flow-typed/mobx.js) shipped with MobX:
+To use the [flow typings](https://github.com/mobxjs/mobx/blob/5.15.7/flow-typed/mobx.js) shipped with MobX:
 
 -   In `.flowconfig`, you **cannot** ignore `node_modules`.
 -   In `.flowconfig`, you **cannot** import it explicitly in the `[libs]` section.
