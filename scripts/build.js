@@ -50,8 +50,7 @@ const run = async () => {
     }
 
     await build(isTest ? "cjs" : "esm,cjs,umd").catch(err => {
-        console.error(err.stderr)
-        throw new Error("build failed")
+        throw new Error(`build failed: ${err.stderr}`)
     })
 
     if (isPublish) {
@@ -64,4 +63,7 @@ const run = async () => {
     }
 }
 
-run().catch(console.error)
+run().catch(err => {
+    console.error(err)
+    process.exit(1)
+})

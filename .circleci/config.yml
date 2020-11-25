@@ -19,6 +19,7 @@ jobs:
                 pkg-manager: yarn
 
             - run: yarn lint
+            - run: yarn lerna run build:check
             - run: yarn lerna run build:test
 
             - persist_to_workspace:

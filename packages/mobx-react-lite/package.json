@@ -73,6 +73,8 @@
         "build:es": "tsc --project tsconfig.build.es.json",
         "test": "jest",
         "test:size": "yarn import-size --report . observer useLocalObservable",
+        "test:types": "tsc --noEmit",
+        "test:check": "yarn test:types",
         "prepublish": "yarn build --target publish && yarn build:cjs && yarn build:es"
     }
 }

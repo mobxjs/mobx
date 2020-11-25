@@ -68,6 +68,8 @@
         "build:test": "yarn build --target test",
         "test": "jest",
         "test:size": "yarn import-size --report . observer",
+        "test:types": "tsc --noEmit",
+        "test:check": "yarn test:types",
         "prepublish": "yarn build --target publish"
     }
 }
