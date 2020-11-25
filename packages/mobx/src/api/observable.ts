@@ -89,22 +89,25 @@ function createObservable(v: any, arg2?: any, arg3?: any) {
         return
     }
 
-    // it is an observable already, done
+    // already observable - ignore
     if (isObservable(v)) return v
 
-    // something that can be converted and mutated?
-    const res = isPlainObject(v)
-        ? observable.object(v, arg2, arg3)
-        : Array.isArray(v)
-        ? observable.array(v, arg2)
-        : isES6Map(v)
-        ? observable.map(v, arg2)
-        : isES6Set(v)
-        ? observable.set(v, arg2)
-        : v
+    // plain object
+    if (isPlainObject(v)) return observable.object(v, arg2, arg3)
 
-    // this value could be converted to a new observable data structure, return it
-    if (res !== v) return res
+    // Array
+    if (Array.isArray(v)) return observable.array(v, arg2)
+
+    // Map
+    if (isES6Map(v)) return observable.map(v, arg2)
+
+    // Set
+    if (isES6Set(v)) return observable.set(v, arg2)
+
+    // other object - ignore
+    if (typeof v === "object" && v !== null) return v
+
+    // anything else
     return observable.box(v)
 }
 createObservable.annotationType_ = OBSERVABLE

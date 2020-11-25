@@ -1,5 +1,13 @@
 # mobx
 
+> 🚨🚨🚨 If you are upgrading from V4/V5, please follow [the migration guide](https://mobx.js.org/migrating-from-4-or-5.html).
+
+## 6.0.4
+
+### Patch Changes
+
+-   [`79a09f49`](https://github.com/mobxjs/mobx/commit/79a09f49a9f2baddbab8d89e9a7ac07cffadf624) [#2615](https://github.com/mobxjs/mobx/pull/2615) Thanks [@urugator](https://github.com/urugator)! - Fix [#2614](https://github.com/mobxjs/mobx/issues/2614) - `makeObservable` does not respect `options.name`
+
 ## 6.0.3
 
 ### Patch Changes
@@ -985,7 +993,7 @@ A deprecation message will now be printed if creating computed properties while 
 
 ```javascript
 const x = observable({
-    computedProp: function () {
+    computedProp: function() {
         return someComputation
     }
 })
@@ -1010,7 +1018,7 @@ or alternatively:
 
 ```javascript
 observable({
-    computedProp: computed(function () {
+    computedProp: computed(function() {
         return someComputation
     })
 })
@@ -1028,7 +1036,7 @@ N.B. If you want to introduce actions on an observable that modify its state, us
 ```javascript
 observable({
     counter: 0,
-    increment: action(function () {
+    increment: action(function() {
         this.counter++
     })
 })
@@ -1154,10 +1162,10 @@ function Square() {
     extendObservable(this, {
         length: 2,
         squared: computed(
-            function () {
+            function() {
                 return this.squared * this.squared
             },
-            function (surfaceSize) {
+            function(surfaceSize) {
                 this.length = Math.sqrt(surfaceSize)
             }
         )
