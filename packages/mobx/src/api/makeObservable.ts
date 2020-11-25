@@ -156,7 +156,7 @@ function addFlow(
  * - setter w/o getter -> false
  * - generator -> flow
  * - function -> action
- * - other -> computed
+ * - other -> observable.deep
  */
 function inferAnnotation(
     desc: PropertyDescriptor,
