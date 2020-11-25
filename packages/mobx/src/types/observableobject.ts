@@ -349,7 +349,7 @@ export function asObservableObject(
     return adm
 }
 
-const observablePropertyConfigs = Object.create(null)
+//const observablePropertyConfigs = Object.create(null)
 const computedPropertyConfigs = Object.create(null)
 
 // TODO use for computed as well

@@ -7,7 +7,6 @@ import {
     isStringish,
     isPlainObject,
     isFunction,
-    assign,
     die,
     IComputedValue
 } from "../internal"
