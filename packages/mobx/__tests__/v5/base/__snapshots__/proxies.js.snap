@@ -10,7 +10,7 @@ Object {
   },
   "double": Object {
     "configurable": true,
-    "enumerable": true,
+    "enumerable": false,
     "value": [Function],
     "writable": true,
   },
@@ -45,7 +45,7 @@ Object {
   },
   "double": Object {
     "configurable": true,
-    "enumerable": true,
+    "enumerable": false,
     "value": [Function],
     "writable": true,
   },
@@ -80,7 +80,7 @@ Object {
   },
   "double": Object {
     "configurable": true,
-    "enumerable": true,
+    "enumerable": false,
     "value": [Function],
     "writable": true,
   },

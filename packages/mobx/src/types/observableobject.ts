@@ -353,11 +353,11 @@ export function asObservableObject(
 const computedPropertyConfigs = Object.create(null)
 
 // TODO use for computed as well
-export function generateObservablePropConfig(propName, { configurable = true, enumerable = true }) {
+export function generateObservablePropConfig(propName, { configurable = true }) {
     // writability is ignored - observable non-writable field is useless
     return {
         configurable,
-        enumerable,
+        enumerable: true,
         get() {
             return this[$mobx].read_(propName)
         },

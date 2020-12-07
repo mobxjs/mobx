@@ -80,7 +80,7 @@ function addAction(
 function addAction(
     target: Object,
     key: PropertyKey,
-    { value, writable, configurable, enumerable }: PropertyDescriptor,
+    { value, writable, configurable }: PropertyDescriptor,
     name,
     asAutoAction: boolean,
     bindTo?: Object
@@ -92,7 +92,8 @@ function addAction(
     if (__DEV__ && !writable) {
         defineProperty(target, key, {
             configurable,
-            enumerable,
+            // https://github.com/mobxjs/mobx/pull/2641#issuecomment-737292058
+            enumerable: false,
             get() {
                 return value
             },
@@ -110,7 +111,7 @@ function addAction(
         defineProperty(target, key, {
             value,
             configurable,
-            enumerable,
+            enumerable: false,
             writable
         })
     }

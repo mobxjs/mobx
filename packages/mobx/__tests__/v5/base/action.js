@@ -477,7 +477,7 @@ test("bound actions bind", () => {
     expect(called).toBe(2)
 
     expect(events.filter(e => e.type === "action").map(e => e.name)).toEqual(["z"])
-    expect(Object.keys(x)).toEqual(["y", "z"])
+    expect(Object.keys(x)).toEqual(["y"])
 
     d()
     d2()

@@ -806,9 +806,9 @@ test("enumerability", () => {
     let props = []
     for (const key in a) props.push(key)
 
-    expect(ownProps).toEqual(["a", "a2", "m2"])
+    expect(ownProps).toEqual(["a", "a2"])
 
-    expect(props).toEqual(["a", "a2", "m2"])
+    expect(props).toEqual(["a", "a2"])
 
     expect("a" in a).toBe(true)
     expect(a.hasOwnProperty("a")).toBe(true)
@@ -831,11 +831,10 @@ test("enumerability", () => {
 
     expect(ownProps).toEqual([
         "a",
-        "a2", // a2 is now initialized as well, altough never accessed!
-        "m2"
+        "a2" // a2 is now initialized as well, altough never accessed!
     ])
 
-    expect(props).toEqual(["a", "a2", "m2"])
+    expect(props).toEqual(["a", "a2"])
 
     expect("a" in a).toBe(true)
     expect(a.hasOwnProperty("a")).toBe(true)
@@ -877,11 +876,10 @@ test("enumerability - workaround", () => {
 
     expect(ownProps).toEqual([
         "a",
-        "a2", // a2 is now initialized as well, altough never accessed!
-        "m2"
+        "a2" // a2 is now initialized as well, altough never accessed!
     ])
 
-    expect(props).toEqual(["a", "a2", "m2"])
+    expect(props).toEqual(["a", "a2"])
 
     expect("a" in a).toBe(true)
     expect(a.hasOwnProperty("a")).toBe(true)

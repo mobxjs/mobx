@@ -703,7 +703,7 @@ test("enumerability", () => {
         } // non-enumerable, (and, ideally, on proto)
         @action
         m() {} // non-enumerable, on proto
-        @action m2 = () => {} // enumerable, on self
+        @action m2 = () => {} // non-enumerable, on self
         constructor() {
             makeObservable(this)
         }
@@ -717,14 +717,12 @@ test("enumerability", () => {
     for (const key in a) props.push(key)
 
     t.deepEqual(ownProps, [
-        "a", // yeej!
-        "m2"
+        "a" // yeej!
     ])
 
     t.deepEqual(props, [
         // also 'a' would be ok
-        "a",
-        "m2"
+        "a"
     ])
 
     t.equal("a" in a, true)
@@ -750,9 +748,9 @@ test("enumerability", () => {
     props = []
     for (const key in a) props.push(key)
 
-    t.deepEqual(ownProps, ["a", "m2"])
+    t.deepEqual(ownProps, ["a"])
 
-    t.deepEqual(props, ["a", "m2"])
+    t.deepEqual(props, ["a"])
 
     t.equal("a" in a, true)
     // eslint-disable-next-line
