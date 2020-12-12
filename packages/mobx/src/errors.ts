@@ -1,3 +1,4 @@
+// TODO remove unused
 const niceErrors = {
     0: `Invalid value for configuration 'enforceActions', expected 'never', 'always' or 'observed'`,
     1(prop) {

@@ -27,8 +27,8 @@ import {
     createLegacyArray,
     globalState,
     assign,
-    die,
-    isStringish
+    isStringish,
+    createObservableAnnotation
 } from "../internal"
 
 export const OBSERVABLE = "observable"
@@ -59,6 +59,19 @@ export function asCreateObservableOptions(thing: any): CreateObservableOptions {
     return thing || defaultCreateObservableOptions
 }
 
+const observableAnnotation = createObservableAnnotation("observable.observable")
+const observableRefAnnotation = createObservableAnnotation("observable.ref", {
+    enhancer: referenceEnhancer
+})
+const observableShallowAnnotation = createObservableAnnotation("observable.shallow", {
+    enhancer: shallowEnhancer
+})
+const observableStructAnnotation = createObservableAnnotation("observable.struct", {
+    enhancer: refStructEnhancer
+})
+const observableDecoratorAnnotation = createDecoratorAnnotation(observableAnnotation)
+
+// TODO trailing "s"
 export function getEnhancerFromOption(options: CreateObservableOptions): IEnhancer<any> {
     return options.deep === true
         ? deepEnhancer
@@ -67,15 +80,29 @@ export function getEnhancerFromOption(options: CreateObservableOptions): IEnhanc
         : getEnhancerFromAnnotation(options.defaultDecorator)
 }
 
+export function getAnnotationFromOptions(
+    options?: CreateObservableOptions
+): Annotation | undefined {
+    return options
+        ? options.deep === true
+            ? observableAnnotation
+            : options.deep === false
+            ? observableRefAnnotation
+            : options.defaultDecorator
+        : undefined
+}
+
+/*
 const annotationToEnhancer = {
     [OBSERVABLE]: deepEnhancer,
     [OBSERVABLE_REF]: referenceEnhancer,
     [OBSERVABLE_SHALLOW]: shallowEnhancer,
     [OBSERVABLE_STRUCT]: refStructEnhancer
 }
+*/
 
 export function getEnhancerFromAnnotation(annotation?: Annotation): IEnhancer<any> {
-    return !annotation ? deepEnhancer : annotationToEnhancer[annotation.annotationType_] ?? die(12)
+    return !annotation ? deepEnhancer : annotation.options_?.enhancer ?? deepEnhancer
 }
 
 /**
@@ -85,7 +112,7 @@ export function getEnhancerFromAnnotation(annotation?: Annotation): IEnhancer<an
 function createObservable(v: any, arg2?: any, arg3?: any) {
     // @observable someProp;
     if (isStringish(arg2)) {
-        storeAnnotation(v, arg2, OBSERVABLE)
+        storeAnnotation(v, arg2, observableAnnotation)
         return
     }
 
@@ -110,7 +137,7 @@ function createObservable(v: any, arg2?: any, arg3?: any) {
     // anything else
     return observable.box(v)
 }
-createObservable.annotationType_ = OBSERVABLE
+Object.assign(createObservable, observableDecoratorAnnotation)
 
 export interface IObservableFactory extends Annotation, PropertyDecorator {
     <T = any>(value: T[], options?: CreateObservableOptions): IObservableArray<T>
@@ -182,7 +209,7 @@ const observableFactories: IObservableFactory = {
     ): T {
         const o = asCreateObservableOptions(options)
         const base = {}
-        asObservableObject(base, options?.name, getEnhancerFromOption(o))
+        asObservableObject(base, options?.name, getAnnotationFromOptions(o))
         return extendObservable(
             globalState.useProxies === false || o.proxy === false
                 ? base
@@ -192,10 +219,10 @@ const observableFactories: IObservableFactory = {
             options
         )
     },
-    ref: createDecoratorAnnotation(OBSERVABLE_REF),
-    shallow: createDecoratorAnnotation(OBSERVABLE_SHALLOW),
-    deep: createDecoratorAnnotation(OBSERVABLE),
-    struct: createDecoratorAnnotation(OBSERVABLE_STRUCT)
+    ref: createDecoratorAnnotation(observableRefAnnotation),
+    shallow: createDecoratorAnnotation(observableShallowAnnotation),
+    deep: observableDecoratorAnnotation,
+    struct: createDecoratorAnnotation(observableStructAnnotation)
 } as any
 
 // eslint-disable-next-line

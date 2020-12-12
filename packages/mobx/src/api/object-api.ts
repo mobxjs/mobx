@@ -23,7 +23,7 @@ export function keys(obj: any): any {
     if (isObservableObject(obj)) {
         return (((obj as any) as IIsObservableObject)[
             $mobx
-        ] as ObservableObjectAdministration).getKeys_()
+        ] as ObservableObjectAdministration).keys_()
     }
     if (isObservableMap(obj) || isObservableSet(obj)) {
         return Array.from(obj.keys())
@@ -94,13 +94,7 @@ export function set(obj: any, key: any, value?: any): void {
         return
     }
     if (isObservableObject(obj)) {
-        const adm: ObservableObjectAdministration = ((obj as any) as IIsObservableObject)[$mobx]
-        const existingObservable = adm.values_.get(key)
-        if (existingObservable) {
-            adm.write_(key, value)
-        } else {
-            adm.addObservableProp_(key, { value }, adm.defaultEnhancer_)
-        }
+        ;((obj as any) as IIsObservableObject)[$mobx].set_(key, value)
     } else if (isObservableMap(obj)) {
         obj.set(key, value)
     } else if (isObservableSet(obj)) {
@@ -121,7 +115,7 @@ export function remove<T>(obj: IObservableArray<T>, index: number)
 export function remove<T extends Object>(obj: T, key: string)
 export function remove(obj: any, key: any): void {
     if (isObservableObject(obj)) {
-        ;((obj as any) as IIsObservableObject)[$mobx].remove_(key)
+        ;((obj as any) as IIsObservableObject)[$mobx].delete_(key)
     } else if (isObservableMap(obj)) {
         obj.delete(key)
     } else if (isObservableSet(obj)) {
@@ -140,7 +134,6 @@ export function has<T>(obj: IObservableArray<T>, index: number): boolean
 export function has<T extends Object>(obj: T, key: string): boolean
 export function has(obj: any, key: any): boolean {
     if (isObservableObject(obj)) {
-        // return keys(obj).indexOf(key) >= 0
         return (getAdministration(obj) as ObservableObjectAdministration).has_(key)
     } else if (isObservableMap(obj)) {
         return obj.has(key)

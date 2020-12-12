@@ -1,3 +1,18 @@
+import { ObservableObjectAdministration } from "../internal"
+
+export type Annotation = {
+    annotationType_: string
+    options_: any
+    make_(adm: ObservableObjectAdministration, key: PropertyKey): boolean
+    extend_(
+        adm: ObservableObjectAdministration,
+        key: PropertyKey,
+        descriptor: PropertyDescriptor
+    ): boolean
+    isDecorator_?: boolean
+}
+// TODO delete
+/*
 export type Annotation = {
     annotationType_:
         | "observable"
@@ -12,8 +27,15 @@ export type Annotation = {
         | "autoAction.bound"
         | "flow"
         | "override"
-    arg_?: any
-}
+    makeObservable_(adm: ObservableObjectAdministration, key: PropertyKey): void
+    extendObservable_(
+        adm: ObservableObjectAdministration,
+        key: PropertyKey,
+        descriptor: PropertyDescriptor
+    ): void
+    isDecorator_?: boolean
+    //[key: string]: unknown // TODO
+}*/
 
 export type AnnotationMapEntry =
     | Annotation

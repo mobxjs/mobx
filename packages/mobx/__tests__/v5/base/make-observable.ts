@@ -1,5 +1,5 @@
 import { isFlow } from "../../../src/api/flow"
-import { ACTION_BOUND } from "../../../src/internal"
+import { ACTION_BOUND, getAdministration } from "../../../src/internal"
 import {
     makeObservable,
     action,
@@ -1328,4 +1328,27 @@ test("override must override", () => {
     }
 
     expect(() => new Child()).toThrow(/^\[MobX\] Property 'action' is annotated with 'override'/)
+})
+
+test.only("cannot reannotate prop of dynamic object", () => {
+    // create dynamic object with observable prop
+    const o = observable({ foo: 1 as any })
+    // change it to function so it won't throw that action must be function
+    o.foo = () => {}
+
+    //console.log(getAdministration(o).values_)
+    makeObservable(o, {
+        foo: action
+    })
+    console.log(o.foo)
+    console.log(isAction(o.foo))
+    console.log(isObservableProp(o, "foo"))
+    //console.log(getAdministration(o).values_)
+    /*
+    expect(() => {
+        makeObservable(o, {
+            foo: action
+        })
+    }).toThrow(/^\[MobX\] Cannot decorate/)
+    */
 })

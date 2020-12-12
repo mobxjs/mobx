@@ -5,7 +5,9 @@ import {
     isFunction,
     Annotation,
     isStringish,
-    storeAnnotation
+    storeAnnotation,
+    createFlowAnnotation,
+    isGenerator
 } from "../internal"
 
 export const FLOW = "flow"
@@ -29,15 +31,17 @@ interface Flow extends Annotation, PropertyDecorator {
     ): (...args: Args) => CancellablePromise<R>
 }
 
+const flowAnnotation = createFlowAnnotation("flow")
+
 export const flow: Flow = Object.assign(
     function flow(arg1, arg2?) {
         // @flow
         if (isStringish(arg2)) {
-            return storeAnnotation(arg1, arg2, FLOW)
+            return storeAnnotation(arg1, arg2, flowAnnotation)
         }
         // flow(fn)
-        if (__DEV__ && arguments.length !== 1)
-            die(`Flow expects 1 argument and cannot be used as decorator`)
+        if (__DEV__ && (arguments.length !== 1 || !isGenerator(arg1)))
+            die(`Flow expects single argument with generator function`)
         const generator = arg1
         const name = generator.name || "<unnamed flow>"
 
@@ -117,9 +121,7 @@ export const flow: Flow = Object.assign(
         res.isMobXFlow = true
         return res
     } as any,
-    {
-        annotationType_: "flow" as const
-    }
+    flowAnnotation
 )
 
 function cancelPromise(promise) {

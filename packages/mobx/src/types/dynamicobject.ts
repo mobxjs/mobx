@@ -50,15 +50,14 @@ const objectProxyTraps: ProxyHandler<any> = {
         if (isStringish(name)) adm.has_(name)
         return target[name]
     },
-    set(target: IIsObservableObject, name: PropertyKey, value: any) {
+    set(target: IIsObservableObject, name: PropertyKey, value: any): boolean {
         if (!isStringish(name)) return false
         if (__DEV__ && !getAdm(target).values_.has(name)) {
             warnAboutProxyRequirement(
                 "add a new observable property through direct assignment. Use 'set' from 'mobx' instead."
             )
         }
-        set(target, name, value)
-        return true
+        return getAdm(target).set_(name, value)
     },
     deleteProperty(target: IIsObservableObject, name: PropertyKey) {
         if (__DEV__)
@@ -66,18 +65,14 @@ const objectProxyTraps: ProxyHandler<any> = {
                 "delete properties from an observable object. Use 'remove' from 'mobx' instead."
             )
         if (!isStringish(name)) return false
-        const adm = getAdm(target)
-        adm.remove_(name)
-        return true
+        return getAdm(target).delete_(name)
     },
     ownKeys(target: IIsObservableObject) {
         if (__DEV__ && globalState.trackingDerivation)
             warnAboutProxyRequirement(
                 "iterate keys to detect added / removed properties. Use `keys` from 'mobx' instead."
             )
-        const adm = getAdm(target)
-        adm.keysAtom_.reportObserved()
-        return Reflect.ownKeys(target)
+        return getAdm(target).ownKeys_()
     },
     preventExtensions(target) {
         die(13)

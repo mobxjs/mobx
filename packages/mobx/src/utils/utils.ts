@@ -114,6 +114,8 @@ export function addHiddenFinalProp(object: any, propName: PropertyKey, value: an
     })
 }
 
+// TODO remove unused
+/*
 export function assertPropertyConfigurable(object: any, prop: PropertyKey) {
     if (__DEV__) {
         const descriptor = getDescriptor(object, prop)
@@ -125,6 +127,7 @@ export function assertPropertyConfigurable(object: any, prop: PropertyKey) {
             )
     }
 }
+*/
 
 export function createInstanceofPredicate<T>(
     name: string,
@@ -148,7 +151,7 @@ export function isES6Set(thing): thing is Set<any> {
 const hasGetOwnPropertySymbols = typeof Object.getOwnPropertySymbols !== "undefined"
 
 /**
- * Returns the following: own keys, prototype keys & own symbol keys, if they are enumerable.
+ * Returns the following: own enumerable keys and own symbols.
  */
 export function getPlainObjectKeys(object) {
     const keys = Object.keys(object)
@@ -167,6 +170,32 @@ export const ownKeys: (target: any) => PropertyKey[] =
         : hasGetOwnPropertySymbols
         ? obj => Object.getOwnPropertyNames(obj).concat(Object.getOwnPropertySymbols(obj) as any)
         : /* istanbul ignore next */ Object.getOwnPropertyNames
+
+export const reflectDefineProperty: (
+    target: any,
+    key: PropertyKey,
+    descriptor: PropertyDescriptor
+) => boolean =
+    Reflect?.defineProperty ??
+    ((target, key, descriptor) => {
+        try {
+            defineProperty(target, key, descriptor)
+        } catch {
+            return false
+        }
+        return true
+    })
+
+export const reflectDeleteProperty: (target: any, key: PropertyKey) => boolean =
+    Reflect?.deleteProperty ??
+    ((target, key) => {
+        try {
+            delete target[key]
+        } catch {
+            return false
+        }
+        return true
+    })
 
 export function stringifyKey(key: any): string {
     if (typeof key === "string") return key

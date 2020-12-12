@@ -42,6 +42,7 @@ import {
     appliedAnnotationsSymbol,
     storedAnnotationsSymbol
 } from "../internal"
+import { getAnnotationFromOptions } from "./observable"
 
 const cachedAnnotationsSymbol = Symbol("mobx-cached-annotations")
 
@@ -178,7 +179,7 @@ function inferAnnotation(
     // if (!desc.configurable || !desc.writable) return false
     return defaultAnnotation ?? observable.deep
 }
-
+/*
 export function makeProperty(
     adm: ObservableObjectAdministration,
     owner: Object,
@@ -189,7 +190,7 @@ export function makeProperty(
     autoBind: boolean
 ): void {
     const { target_: target } = adm
-    const defaultAnnotation: Annotation | undefined = observable // ideally grap this from adm's defaultEnahncer instead!
+    const defaultAnnotation: Annotation | undefined = observable // ideally grab this from adm's defaultEnahncer instead!
     const originAnnotation = annotation
     if (annotation === true) {
         annotation = inferAnnotation(descriptor, defaultAnnotation, autoBind)
@@ -284,7 +285,7 @@ export function makeProperty(
                 )
     }
 }
-
+*/
 // Hack based on https://github.com/Microsoft/TypeScript/issues/14829#issuecomment-322267089
 // We need this, because otherwise, AdditionalKeys is going to be inferred to be any
 // set of superfluous keys. But, we rather want to get a compile error unless AdditionalKeys is
@@ -292,6 +293,28 @@ export function makeProperty(
 // Fixes: https://github.com/mobxjs/mobx/issues/2325#issuecomment-691070022
 type NoInfer<T> = [T][T extends any ? 0 : never]
 
+export function makeObservable<T, AdditionalKeys extends PropertyKey = never>(
+    target: T,
+    annotations?: AnnotationsMap<T, NoInfer<AdditionalKeys>>,
+    options?: CreateObservableOptions
+): T {
+    const autoBind = !!options?.autoBind
+    const defaultAnnotation = options && getAnnotationFromOptions(options)
+    const adm = asObservableObject(target, options?.name, defaultAnnotation)
+    startBatch()
+    try {
+        // Default to decorators
+        annotations ??= collectStoredAnnotations(target)
+
+        // TODO infer annotation
+        // Annotate
+        ownKeys(annotations).forEach(key => annotate(adm, key, annotations![key], autoBind))
+    } finally {
+        endBatch()
+    }
+    return target
+}
+/*
 export function makeObservable<T, AdditionalKeys extends PropertyKey = never>(
     target: T,
     annotations?: AnnotationsMap<T, NoInfer<AdditionalKeys>>,
@@ -320,112 +343,7 @@ export function makeObservable<T, AdditionalKeys extends PropertyKey = never>(
     }
     return target
 }
-
-function annotate(adm, key, annotation, autoBind) {
-    const { target_: target } = adm
-    let annotationApplied = false
-    // Cannot re-annotate
-    if (
-        __DEV__ &&
-        annotation.annotationType_ !== "override" &&
-        hasProp(target[appliedAnnotationsSymbol], key)
-    ) {
-        die(
-            38,
-            key,
-            target[appliedAnnotationsSymbol][key].annotationType_,
-            annotation.annotationType_
-        )
-    }
-
-    // override must override something
-    if (
-        __DEV__ &&
-        annotation.annotationType_ === "override" &&
-        !hasProp(target[appliedAnnotationsSymbol], key)
-    ) {
-        die(
-            `Property '${key.toString()}' is annotated with 'override', but no such annotated member was found on prototype.`
-        )
-    }
-
-    // Ignore override
-    if (annotation.annotationType_ === "override") {
-        return
-    }
-
-    // Traverse proto chain and apply annotation to anything that has a descriptor for this key
-    let owner = target
-    while (owner && owner !== objectPrototype) {
-        const desc = getDescriptor(owner, key)
-        if (desc) {
-            // Cannot override computed
-            if (
-                __DEV__ &&
-                annotationApplied &&
-                (annotation.annotationType_ === COMPUTED ||
-                    annotation.annotationType_ === COMPUTED_STRUCT)
-            ) {
-                die(
-                    `Cannot override computed '${key.toString()}' - overriding computed is not supported.` +
-                        `\nPlease create a second private non-computed overridable getter and expose it via original computed.` +
-                        `\nSee an example in the documentation: TODO link`
-                )
-            }
-
-            // If bound action, use closest definition in proto chain and stop
-            if (
-                annotationApplied &&
-                (annotation.annotationType_ === ACTION_BOUND ||
-                    annotation.annotationType_ === AUTOACTION_BOUND)
-            ) {
-                break
-            }
-
-            if (__DEV__) {
-                // Make everything annotated non-configurable,
-                // so that user can't redefine fields in subclass:
-                // observable = 5;
-                // action = () => {};
-                desc.configurable = false
-                // Make action/flow non-writable,
-                // so that user can't rewrite action/flow in subclass constructor:
-                // this.action = function noLongerAction() {};
-                if (
-                    annotation.annotationType_ === ACTION ||
-                    annotation.annotationType_ === ACTION_BOUND ||
-                    annotation.annotationType_ === AUTOACTION ||
-                    annotation.annotationType_ === AUTOACTION_BOUND ||
-                    annotation.annotationType_ === FLOW
-                ) {
-                    desc.writable = false
-                }
-            }
-
-            makeProperty(adm, owner, key, desc, annotation, false, autoBind)
-            annotationApplied = true
-        }
-        owner = Object.getPrototypeOf(owner)
-    }
-    // Remove applied annotation so we don't try to apply it again in subclass constructor
-    if (annotation.isDecorator_ && annotationApplied) {
-        delete target[storedAnnotationsSymbol][key]
-    }
-
-    // Throw on missing key, except for decorators:
-    // Decorator annotations are collected from whole prototype chain.
-    // When called from super() some props may not exist yet.
-    // However we don't have to worry about missing prop,
-    // because the decorator must have been applied to something.
-    if (!annotation.isDecorator_ && !annotationApplied) {
-        die(1, key)
-    }
-
-    // Record annotation applied
-    if (__DEV__ && annotationApplied) {
-        target[appliedAnnotationsSymbol][key] = annotation
-    }
-}
+*/
 
 export function makeAutoObservable<T extends Object, AdditionalKeys extends PropertyKey = never>(
     target: T,

@@ -1,10 +1,11 @@
-import { Annotation, addHiddenProp, AnnotationsMap, hasProp, die } from "../internal"
+import { Annotation, addHiddenProp, AnnotationsMap, hasProp, die, isOverride } from "../internal"
 
 export const storedAnnotationsSymbol = Symbol("mobx-stored-annotations")
-export const appliedAnnotationsSymbol = Symbol("mobx-applied-annotations")
+// TODO move to observableobject.js
 
-export const override: PropertyDecorator & Annotation = createDecoratorAnnotation("override")
-export const OVERRIDE = "override"
+// TODO delete
+//export const override: PropertyDecorator & Annotation = createDecoratorAnnotation("override")
+//export const OVERRIDE = "override"
 
 /**
  * Creates a function that acts as
@@ -14,6 +15,7 @@ export const OVERRIDE = "override"
  * TODO:
  * Possibly get rid of this. It's only used for action.bound("name"), which is no longer supported?
  */
+/*
 export function createCallableDecoratorAnnotation<ArgType>(
     type: Annotation["annotationType_"]
 ): Annotation & PropertyDecorator & ((arg: ArgType) => PropertyDecorator & Annotation) {
@@ -29,53 +31,61 @@ export function createCallableDecoratorAnnotation<ArgType>(
     decoratorOrFactory.annotationType_ = type
     return decoratorOrFactory as any
 }
+*/
 
 /**
  * Creates a function that acts as
  * - decorator
  * - annotation object
  */
-export function createDecoratorAnnotation(
-    annotationType_: Annotation["annotationType_"],
-    arg_?: any
-): PropertyDecorator & Annotation {
+export function createDecoratorAnnotation(annotation: Annotation): PropertyDecorator & Annotation {
     function decorator(target, property) {
-        storeAnnotation(target, property, annotationType_, arg_)
+        storeAnnotation(target, property, annotation)
     }
-    decorator.annotationType_ = annotationType_
-    decorator.arg_ = arg_
-    return decorator
+    return Object.assign(decorator, annotation)
 }
 
 /**
- * Stores annotation to target (prototype),
+ * Stores annotation to prototype,
  * so it can be inspected later by `makeObservable` called from constructor
  */
-export function storeAnnotation(
-    target: any,
-    key: PropertyKey,
-    annotationType_: Annotation["annotationType_"],
-    arg_?: any
-) {
-    if (!hasProp(target, storedAnnotationsSymbol)) {
-        addHiddenProp(target, storedAnnotationsSymbol, {
+export function storeAnnotation(prototype: any, key: PropertyKey, annotation: Annotation) {
+    if (!hasProp(prototype, storedAnnotationsSymbol)) {
+        addHiddenProp(prototype, storedAnnotationsSymbol, {
             // Inherit annotations
-            ...target[storedAnnotationsSymbol]
+            ...prototype[storedAnnotationsSymbol]
         })
     }
     // @override must override something
-    if (__DEV__ && annotationType_ === "override" && !target[storedAnnotationsSymbol][key]) {
+    if (__DEV__ && isOverride(annotation) && !hasProp(prototype[storedAnnotationsSymbol], key)) {
         die(
-            `Property '${key.toString()}' is decorated with '@override', but no such decorated member was found on prototype.`
+            `${prototype.constructor.name}.${key.toString()} is decorated with 'override', ` +
+                `but no such decorated member was found on prototype.`
         )
     }
     // Cannot re-decorate
-    if (__DEV__ && annotationType_ !== "override" && target[storedAnnotationsSymbol][key]) {
-        die(38, key, target[storedAnnotationsSymbol][key].annotationType_, annotationType_)
-    }
+    assertNotDecorated(prototype, annotation, key)
+
     // Ignore override
-    if (annotationType_ !== "override") {
-        target[storedAnnotationsSymbol][key] = { annotationType_, arg_, isDecorator_: true }
+    if (!isOverride(annotation)) {
+        prototype[storedAnnotationsSymbol][key] = {
+            ...annotation,
+            isDecorator_: true
+        }
+    }
+}
+
+function assertNotDecorated(prototype: object, annotation /* TODO type */, key: PropertyKey) {
+    if (__DEV__ && !isOverride(annotation) && hasProp(prototype[storedAnnotationsSymbol], key)) {
+        const fieldName = `${prototype.constructor.name}.${key.toString()}`
+        die(
+            `Cannot re-decorate` +
+                `\n@${prototype[storedAnnotationsSymbol][key].annotationType_} ${fieldName}` +
+                `\nto` +
+                `\n@${annotation.annotationType_} ${fieldName}` +
+                `\nChanging decorator or it's configuration is not allowed` +
+                `\nUse 'override' annotation for methods overriden by subclass`
+        )
     }
 }
 

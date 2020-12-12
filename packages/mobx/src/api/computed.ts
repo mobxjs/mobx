@@ -8,11 +8,14 @@ import {
     isPlainObject,
     isFunction,
     die,
-    IComputedValue
+    IComputedValue,
+    createComputedAnnotation,
+    deepEnhancer
 } from "../internal"
 
-export const COMPUTED = "computed"
-export const COMPUTED_STRUCT = "computed.struct"
+// TODO
+//export const COMPUTED = "computed"
+//export const COMPUTED_STRUCT = "computed.struct"
 
 export interface IComputedFactory extends Annotation, PropertyDecorator {
     // @computed(opts)
@@ -23,6 +26,11 @@ export interface IComputedFactory extends Annotation, PropertyDecorator {
     struct: Annotation & PropertyDecorator
 }
 
+const computedAnnotation = createComputedAnnotation("computed")
+const computedStructAnnotation = createComputedAnnotation("computed.struct", {
+    equals: deepEnhancer
+})
+
 /**
  * Decorator for class properties: @computed get value() { return expr; }.
  * For legacy purposes also invokable as ES5 observable created: `computed(() => expr)`;
@@ -30,11 +38,11 @@ export interface IComputedFactory extends Annotation, PropertyDecorator {
 export const computed: IComputedFactory = function computed(arg1, arg2) {
     if (isStringish(arg2)) {
         // @computed
-        return storeAnnotation(arg1, arg2, COMPUTED)
+        return storeAnnotation(arg1, arg2, computedAnnotation)
     }
     if (isPlainObject(arg1)) {
         // @computed({ options })
-        return createDecoratorAnnotation(COMPUTED, arg1)
+        return createDecoratorAnnotation(createComputedAnnotation("computed", arg1))
     }
 
     // computed(expr, options?)
@@ -42,7 +50,7 @@ export const computed: IComputedFactory = function computed(arg1, arg2) {
         if (!isFunction(arg1)) die("First argument to `computed` should be an expression.")
         if (isFunction(arg2))
             die(
-                "A setter as second argument is no longer supported, use `{set: fn }` option instead"
+                "A setter as second argument is no longer supported, use `{ set: fn }` option instead"
             )
     }
     const opts: IComputedValueOptions<any> = isPlainObject(arg2) ? arg2 : {}
@@ -51,6 +59,7 @@ export const computed: IComputedFactory = function computed(arg1, arg2) {
 
     return new ComputedValue(opts)
 } as any
-computed.annotationType_ = COMPUTED
 
-computed.struct = createDecoratorAnnotation(COMPUTED_STRUCT)
+Object.assign(computed, computedAnnotation)
+
+computed.struct = createDecoratorAnnotation(computedStructAnnotation)
