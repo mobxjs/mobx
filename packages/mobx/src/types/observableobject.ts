@@ -38,8 +38,8 @@ import {
     isFunction,
     storedAnnotationsSymbol,
     ownKeys,
-    reflectDefineProperty,
-    isOverride
+    isOverride,
+    defineProperty
 } from "../internal"
 
 export const appliedAnnotationsSymbol = Symbol("mobx-applied-annotations")
@@ -81,6 +81,7 @@ export type IObjectWillChange<T = any> =
 const REMOVE = "remove"
 
 /**
+ * TODO reformulate
  * Most of the methods return false when property is not configurable to remain compatible with Reflect API,
  * Consumers can use assertPropertyConfigurable(adm, key) before calling the method
  */
@@ -112,23 +113,22 @@ export class ObservableObjectAdministration
         return this.values_.get(key)!.get()
     }
 
-    setObservablePropValue_(key: PropertyKey, newValue) {
-        const instance = this.target_
+    setObservablePropValue_(key: PropertyKey, newValue): boolean {
         const observable = this.values_.get(key)
         if (observable instanceof ComputedValue) {
             observable.set(newValue)
-            return
+            return true
         }
 
         // intercept
         if (hasInterceptors(this)) {
             const change = interceptChange<IObjectWillChange>(this, {
                 type: UPDATE,
-                object: this.proxy_ || instance,
+                object: this.proxy_ || this.target_,
                 name: key,
                 newValue
             })
-            if (!change) return
+            if (!change) return false
             newValue = (change as any).newValue
         }
         newValue = (observable as any).prepareNewValue_(newValue)
@@ -143,8 +143,8 @@ export class ObservableObjectAdministration
                           type: UPDATE,
                           observableKind: "object",
                           debugObjectName: this.name_,
-                          object: this.proxy_ || instance,
-                          oldValue: (observable as any).value_,
+                          object: this.proxy_ || this.target_,
+                          oldValue: (observable as any).get(),
                           name: key,
                           newValue
                       }
@@ -155,20 +155,29 @@ export class ObservableObjectAdministration
             if (notify) notifyListeners(this, change)
             if (__DEV__ && notifySpy) spyReportEnd()
         }
+        return true
     }
 
-    set_(key: PropertyKey, value: any): boolean {
+    set_(key: PropertyKey, value: any, proxyTrap: boolean = false): boolean {
         // faster than this.has_ - no need to subscribe for key here
         if (hasProp(this.target_, key)) {
-            this.target_[key] = value
+            if (this.values_.has(key)) {
+                // Can be intercepted
+                return this.setObservablePropValue_(key, value)
+            } else if (proxyTrap) {
+                return Reflect.set(this.target_, key, value)
+            } else {
+                this.target_[key] = value
+                return true
+            }
         } else {
             return this.extend_(
                 key,
                 { value, enumerable: true, writable: true, configurable: true },
-                this.defaultAnnotation_
+                this.defaultAnnotation_,
+                proxyTrap
             )
         }
-        return true
     }
 
     has_(key: PropertyKey): boolean {
@@ -187,7 +196,7 @@ export class ObservableObjectAdministration
         return entry.get()
     }
 
-    make_(key: PropertyKey, annotation /* TODO type */): boolean {
+    make_(key: PropertyKey, annotation: Annotation | boolean): boolean {
         if (annotation === false) {
             return true
         }
@@ -213,9 +222,14 @@ export class ObservableObjectAdministration
         return annotated
     }
 
-    extend_(key: PropertyKey, descriptor: PropertyDescriptor, annotation /* TODO type */): boolean {
+    extend_(
+        key: PropertyKey,
+        descriptor: PropertyDescriptor,
+        annotation: Annotation | boolean,
+        proxyTrap: boolean = false
+    ): boolean {
         if (annotation === false) {
-            return this.defineProperty_(key, descriptor)
+            return this.defineProperty_(key, descriptor, proxyTrap)
         }
         if (annotation === true) {
             annotation = this.defaultAnnotation_
@@ -224,26 +238,18 @@ export class ObservableObjectAdministration
             die(`Unable to extend observable: Invalid annotation`)
         }
         assertNotAnnotated(this, annotation, key)
-        const annotated = annotation.extend_(this, key, descriptor)
+        const annotated = annotation.extend_(this, key, descriptor, proxyTrap)
         if (annotated) {
             recordAnnotationApplied(this, annotation, key)
         }
         return annotated
     }
 
-    defineProperty_(key: PropertyKey, descriptor: PropertyDescriptor): boolean {
-        // Assert configurable
-        // TODO move - first try to define property, then if fails check configurability on devel
-        if (__DEV__ && getDescriptor(this, key)?.configurable === false) {
-            let error = `Property ${key.toString()} is not configurable.`
-            // Mention only if caused by us to avoid confusion
-            if (hasProp(this[appliedAnnotationsSymbol], key)) {
-                error += `\nTo prevent accidental re-definition of a field in a subclass, `
-                error += `all annotated fields of non-plain objects (classes) are not configurable.`
-            }
-            die(error)
-        }
-
+    defineProperty_(
+        key: PropertyKey,
+        descriptor: PropertyDescriptor,
+        proxyTrap: boolean = false
+    ): boolean {
         try {
             startBatch()
 
@@ -272,8 +278,12 @@ export class ObservableObjectAdministration
             }
 
             // Define
-            if (!reflectDefineProperty(this, key, descriptor)) {
-                return false
+            if (proxyTrap) {
+                if (!Reflect.defineProperty(this.target_, key, descriptor)) {
+                    return false
+                }
+            } else {
+                defineProperty(this.target_, key, descriptor)
             }
 
             // Notify
@@ -285,17 +295,26 @@ export class ObservableObjectAdministration
     }
 
     // If original descriptor becomes relevant, move this to annotation directly
-    defineObservableProperty_(key: PropertyKey, value: any, enhancer: IEnhancer<any>): boolean {
-        const defined = this.defineProperty_(key, {
-            configurable: this.isPlainObject_,
-            enumerable: true,
-            get() {
-                return this[$mobx].getObservablePropValue_(key)
+    defineObservableProperty_(
+        key: PropertyKey,
+        value: any,
+        enhancer: IEnhancer<any>,
+        proxyTrap: boolean = false
+    ): boolean {
+        const defined = this.defineProperty_(
+            key,
+            {
+                configurable: this.isPlainObject_,
+                enumerable: true,
+                get() {
+                    return this[$mobx].getObservablePropValue_(key)
+                },
+                set(value) {
+                    return this[$mobx].getObservablePropValue_(key, value)
+                }
             },
-            set(value) {
-                return this[$mobx].getObservablePropValue_(key, value)
-            }
-        })
+            proxyTrap
+        )
         if (defined) {
             const observable = new ObservableValue(
                 value,
@@ -309,42 +328,39 @@ export class ObservableObjectAdministration
     }
 
     // If original descriptor becomes relevant, move this to annotation directly
-    defineComputedProperty_(key: PropertyKey, options: IComputedValueOptions<any>): boolean {
+    defineComputedProperty_(
+        key: PropertyKey,
+        options: IComputedValueOptions<any>,
+        proxyTrap: boolean = false
+    ): boolean {
         options.name ||= `${this.name_}.${stringifyKey(key)}`
         options.context = this.proxy_ || this.target_
-        const defined = this.defineProperty_(key, {
-            configurable: this.isPlainObject_,
-            enumerable: false,
-            get() {
-                return this[$mobx].getObservablePropValue_(key)
+        const defined = this.defineProperty_(
+            key,
+            {
+                configurable: this.isPlainObject_,
+                enumerable: false,
+                get() {
+                    return this[$mobx].getObservablePropValue_(key)
+                },
+                set(value) {
+                    this[$mobx].setObservablePropValue_(key, value)
+                }
             },
-            set(value) {
-                this[$mobx].setObservablePropValue_(key, value)
-            }
-        })
+            proxyTrap
+        )
         if (defined) {
             this.values_.set(key, new ComputedValue(options))
         }
         return defined
     }
 
-    /**
-     * Returns false on failure:
-     * - non-configurable field (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/delete)
-     * - cancelled by interceptor
-     * @param key number|string|Symbol
-     * @returns boolean false on failure, true on success
-     */
-    delete_(key: PropertyKey): boolean {
-        const descriptor = getDescriptor(this.target_, key)
-        if (!descriptor) {
-            // No such field
+    delete_(key: PropertyKey, proxyTrap: boolean = false): boolean {
+        // No such prop
+        if (!hasProp(this.target_, key)) {
             return true
         }
-        if (!descriptor.configurable) {
-            // Not configurable
-            return false
-        }
+
         // Intercept
         if (hasInterceptors(this)) {
             const change = interceptChange<IObjectWillChange>(this, {
@@ -355,21 +371,32 @@ export class ObservableObjectAdministration
             // Cancelled
             if (!change) return false
         }
-        // Allow re-annotating this field
-        if (__DEV__) {
-            delete this[appliedAnnotationsSymbol][key]
-        }
+
         // Remove
         try {
             startBatch()
             const notify = hasListeners(this)
             const notifySpy = __DEV__ && isSpyEnabled()
             const observable = this.values_.get(key)
-            // delete prop
-            // shouldn't throw, we checked configurable
-            delete this.target_[key]
-            // value is undefined for getter/setter props
-            let { value } = descriptor
+            // Value needed for spy/listeners
+            let value = undefined
+            // Optimization: don't pull the value unless we will need it
+            if (!observable && (notify || notifySpy)) {
+                value = getDescriptor(this.target_, key)?.value
+            }
+            // delete prop (do first, may fail)
+            if (proxyTrap) {
+                if (!Reflect.deleteProperty(this.target_, key)) {
+                    return false
+                }
+            } else {
+                delete this.target_[key]
+            }
+            // Allow re-annotating this field
+            if (__DEV__) {
+                delete this[appliedAnnotationsSymbol][key]
+            }
+            // Clear observable
             if (observable) {
                 this.values_.delete(key)
                 // could be computed
@@ -378,31 +405,26 @@ export class ObservableObjectAdministration
                     observable.set(undefined)
                 }
             }
-            // notify keyset listeners
+            // handle keys
             this.reportKeysChanged()
-            // notify key listeners
             if (this.pendingKeys_) {
                 const entry = this.pendingKeys_.get(key)
                 if (entry) entry.set(false)
             }
-            // delete the prop
-            // TODO Reflect.delete -> move up
-
             // spy/listeners
-            const change: IObjectDidChange | null =
-                notify || notifySpy
-                    ? ({
-                          type: REMOVE,
-                          observableKind: "object",
-                          object: this.proxy_ || this.target_,
-                          debugObjectName: this.name_,
-                          oldValue: value,
-                          name: key
-                      } as const)
-                    : null
-            if (__DEV__ && notifySpy) spyReportStart(change!)
-            if (notify) notifyListeners(this, change)
-            if (__DEV__ && notifySpy) spyReportEnd()
+            if (notify || notifySpy) {
+                const change: IObjectDidChange = {
+                    type: REMOVE,
+                    observableKind: "object",
+                    object: this.proxy_ || this.target_,
+                    debugObjectName: this.name_,
+                    oldValue: value,
+                    name: key
+                }
+                if (__DEV__ && notifySpy) spyReportStart(change!)
+                if (notify) notifyListeners(this, change)
+                if (__DEV__ && notifySpy) spyReportEnd()
+            }
         } finally {
             endBatch()
         }
@@ -431,9 +453,9 @@ export class ObservableObjectAdministration
             const observable = this.values_.get(key)
             const newValue = observable
                 ? observable instanceof ObservableValue
-                    ? observable.value_ // observable
+                    ? observable.get() // observable
                     : undefined // computed
-                : getDescriptor(this, key)?.value // other
+                : getDescriptor(this.target_, key)?.value // other
 
             const change: IObjectDidChange | null =
                 notify || notifySpy
@@ -521,7 +543,7 @@ export function isObservableObject(thing: any): boolean {
 
 export function assertNotAnnotated(
     adm: ObservableObjectAdministration,
-    annotation /* TODO type */,
+    annotation: Annotation,
     key: PropertyKey
 ) {
     if (__DEV__ && !isOverride(annotation) && hasProp(adm[appliedAnnotationsSymbol], key)) {
@@ -539,7 +561,7 @@ export function assertNotAnnotated(
 
 export function recordAnnotationApplied(
     adm: ObservableObjectAdministration,
-    annotation /* TODO type */,
+    annotation: Annotation,
     key: PropertyKey
 ) {
     if (__DEV__) {
@@ -554,7 +576,7 @@ export function recordAnnotationApplied(
 // TODO delete
 export function assertAnnotationApplied(
     adm: ObservableObjectAdministration,
-    annotation /* TODO type */,
+    annotation: Annotation,
     key: PropertyKey
 ) {
     // Throw on missing key, except for decorators:
@@ -580,6 +602,30 @@ export function assertPropertyConfigurable(adm: ObservableObjectAdministration, 
         }
         die(error)
     }
+}
+
+// with proxy check - if false investigate object/descriptor and
+// strict_(method, args)
+
+export function assertPropertySettable(adm: ObservableObjectAdministration, key: PropertyKey) {
+    assertPropertyConfigurable(adm, key)
+    // if defined must be writable otherwise the object must not be sealed or freezed
+    if (__DEV__ && getDescriptor(adm.target_, key)?.configurable) {
+        //if ()
+    }
+}
+
+// assertPropertyManipulable()
+// assertProxyInvariants()
+// _proxyInvariants()
+// chekc
+//  fail
+export function checkProxyInvariants_(handlerOutcome: boolean): boolean {
+    if (handlerOutcome) return true
+    // if false either intrecepted or somethign with object
+    // set -> returns false when intercepted ... doesnt mean it must be configurable or writable zjisitme ze neni configurable a vyhodime coz je spatne
+    // defineProperty -> false when intercepted but would fail anyway
+    // check what could go wrong
 }
 
 export function asLoudAnnotatedDescriptor(

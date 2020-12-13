@@ -3,7 +3,6 @@ import {
     Atom,
     IIsObservableObject,
     ObservableObjectAdministration,
-    set,
     warnAboutProxyRequirement,
     assertProxies,
     die,

@@ -171,6 +171,7 @@ export const ownKeys: (target: any) => PropertyKey[] =
         ? obj => Object.getOwnPropertyNames(obj).concat(Object.getOwnPropertySymbols(obj) as any)
         : /* istanbul ignore next */ Object.getOwnPropertyNames
 
+//  TODO delete
 export const reflectDefineProperty: (
     target: any,
     key: PropertyKey,
@@ -186,6 +187,7 @@ export const reflectDefineProperty: (
         return true
     })
 
+// TODO delete
 export const reflectDeleteProperty: (target: any, key: PropertyKey) => boolean =
     Reflect?.deleteProperty ??
     ((target, key) => {
