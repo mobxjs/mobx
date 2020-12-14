@@ -34,13 +34,15 @@ function make_(adm: ObservableObjectAdministration, key: PropertyKey): boolean {
 function extend_(
     adm: ObservableObjectAdministration,
     key: PropertyKey,
-    descriptor: PropertyDescriptor
+    descriptor: PropertyDescriptor,
+    proxyTrap: boolean
 ): boolean {
     assertObservableDescriptor(adm, this, key, descriptor)
     return adm.defineObservableProperty_(
         key,
         descriptor.value,
-        this.options_?.enhancer ?? deepEnhancer
+        this.options_?.enhancer ?? deepEnhancer,
+        proxyTrap
     )
 }
 

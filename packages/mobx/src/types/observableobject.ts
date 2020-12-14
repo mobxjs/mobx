@@ -144,7 +144,7 @@ export class ObservableObjectAdministration
                           observableKind: "object",
                           debugObjectName: this.name_,
                           object: this.proxy_ || this.target_,
-                          oldValue: (observable as any).get(),
+                          oldValue: (observable as any).value_,
                           name: key,
                           newValue
                       }
@@ -156,6 +156,10 @@ export class ObservableObjectAdministration
             if (__DEV__ && notifySpy) spyReportEnd()
         }
         return true
+    }
+
+    get_(key: PropertyKey): any {
+        return this.target_[key]
     }
 
     set_(key: PropertyKey, value: any, proxyTrap: boolean = false): boolean {
@@ -181,12 +185,15 @@ export class ObservableObjectAdministration
     }
 
     has_(key: PropertyKey): boolean {
-        // TODO: do this only in derivation, otherwise return hasProp(this.target_, key)
+        // TODO: do this only in derivation, otherwise immediately return "key in this.target_"?
         this.pendingKeys_ ||= new Map()
         let entry = this.pendingKeys_.get(key)
         if (!entry) {
             entry = new ObservableValue(
-                hasProp(this.target_, key),
+                // It's handler for "in" operation,
+                // we care about all enumerable props,
+                // but we assume that prototype keys are stable
+                key in this.target_,
                 referenceEnhancer,
                 `${this.name_}.${stringifyKey(key)}?`,
                 false
@@ -217,6 +224,7 @@ export class ObservableObjectAdministration
             // However we don't have to worry about missing prop,
             // because the decorator must have been applied to something.
             // TODO improve error
+            // TODO perhpas move this check to makeObservable
             die(1, key)
         }
         return annotated
@@ -253,7 +261,7 @@ export class ObservableObjectAdministration
         try {
             startBatch()
 
-            // Remove
+            // Delete
             if (!this.delete_(key)) {
                 // Non-configurable or prevented by interceptor
                 return false
@@ -372,7 +380,7 @@ export class ObservableObjectAdministration
             if (!change) return false
         }
 
-        // Remove
+        // Delete
         try {
             startBatch()
             const notify = hasListeners(this)
@@ -401,15 +409,15 @@ export class ObservableObjectAdministration
                 this.values_.delete(key)
                 // could be computed
                 if (observable instanceof ObservableValue) {
-                    value = observable.get()
+                    value = observable.value_
                     observable.set(undefined)
                 }
             }
             // handle keys
-            this.reportKeysChanged()
+            this.keysAtom_.reportChanged()
             if (this.pendingKeys_) {
                 const entry = this.pendingKeys_.get(key)
-                if (entry) entry.set(false)
+                if (entry) entry.set(key in this.target_) // may still exist in proto
             }
             // spy/listeners
             if (notify || notifySpy) {
@@ -453,7 +461,7 @@ export class ObservableObjectAdministration
             const observable = this.values_.get(key)
             const newValue = observable
                 ? observable instanceof ObservableValue
-                    ? observable.get() // observable
+                    ? observable.value_ // observable
                     : undefined // computed
                 : getDescriptor(this.target_, key)?.value // other
 
@@ -478,7 +486,7 @@ export class ObservableObjectAdministration
             const entry = this.pendingKeys_.get(key)
             if (entry) entry.set(true)
         }
-        this.reportKeysChanged()
+        this.keysAtom_.reportChanged()
     }
 
     ownKeys_(): PropertyKey[] {
@@ -489,11 +497,6 @@ export class ObservableObjectAdministration
     keys_(): PropertyKey[] {
         this.keysAtom_.reportObserved()
         return Object.keys(this.target_)
-    }
-
-    // TODO remove method (replace with one-liner)
-    private reportKeysChanged() {
-        this.keysAtom_.reportChanged()
     }
 }
 
@@ -573,25 +576,6 @@ export function recordAnnotationApplied(
     }
 }
 
-// TODO delete
-export function assertAnnotationApplied(
-    adm: ObservableObjectAdministration,
-    annotation: Annotation,
-    key: PropertyKey
-) {
-    // Throw on missing key, except for decorators:
-    // Decorator annotations are collected from whole prototype chain.
-    // When called from super() some props may not exist yet.
-    // However we don't have to worry about missing prop,
-    // because the decorator must have been applied to something.
-    // NOTE: adm[appliedAnnotationSymbols] is available on __DEV__ only:
-    // to do this check on production we would have to move this to annotation.makeObservable_
-    if (__DEV__ && !annotation.isDecorator_ && !hasProp(adm[appliedAnnotationsSymbol], key)) {
-        // TODO improve error
-        die(1, key)
-    }
-}
-
 export function assertPropertyConfigurable(adm: ObservableObjectAdministration, key: PropertyKey) {
     if (__DEV__ && getDescriptor(adm.target_, key)?.configurable) {
         let error = `Property ${key.toString()} is not configurable.`
@@ -604,9 +588,7 @@ export function assertPropertyConfigurable(adm: ObservableObjectAdministration, 
     }
 }
 
-// with proxy check - if false investigate object/descriptor and
-// strict_(method, args)
-
+// TODO
 export function assertPropertySettable(adm: ObservableObjectAdministration, key: PropertyKey) {
     assertPropertyConfigurable(adm, key)
     // if defined must be writable otherwise the object must not be sealed or freezed
@@ -615,19 +597,7 @@ export function assertPropertySettable(adm: ObservableObjectAdministration, key:
     }
 }
 
-// assertPropertyManipulable()
-// assertProxyInvariants()
-// _proxyInvariants()
-// chekc
-//  fail
-export function checkProxyInvariants_(handlerOutcome: boolean): boolean {
-    if (handlerOutcome) return true
-    // if false either intrecepted or somethign with object
-    // set -> returns false when intercepted ... doesnt mean it must be configurable or writable zjisitme ze neni configurable a vyhodime coz je spatne
-    // defineProperty -> false when intercepted but would fail anyway
-    // check what could go wrong
-}
-
+// TODO delete
 export function asLoudAnnotatedDescriptor(
     adm,
     annotation /* TODO type*/,

@@ -57,15 +57,16 @@ function make_(adm: ObservableObjectAdministration, key: PropertyKey): boolean {
 function extend_(
     adm: ObservableObjectAdministration,
     key: PropertyKey,
-    descriptor: PropertyDescriptor
+    descriptor: PropertyDescriptor,
+    proxyTrap: boolean
 ): boolean {
     const actionDescriptor = createActionDescriptor(adm, this, key, descriptor, this.options_.bound)
-    return adm.defineProperty_(key, actionDescriptor)
+    return adm.defineProperty_(key, actionDescriptor, proxyTrap)
 }
 
 function assertActionDescriptor(
     adm: ObservableObjectAdministration,
-    { annotationType_ }, // TODO type
+    { annotationType_ }: Annotation, // TODO type
     key: PropertyKey,
     { value }: PropertyDescriptor
 ) {
@@ -77,7 +78,6 @@ function assertActionDescriptor(
     }
 }
 
-// TODO loud on devel
 function createActionDescriptor(
     adm: ObservableObjectAdministration,
     annotation, // TODO type

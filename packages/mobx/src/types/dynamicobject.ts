@@ -17,19 +17,15 @@ function getAdm(target): ObservableObjectAdministration {
 // Optimization: we don't need the intermediate objects and could have a completely custom administration for DynamicObjects,
 // and skip either the internal values map, or the base object with its property descriptors!
 const objectProxyTraps: ProxyHandler<any> = {
-    has(target: IIsObservableObject, name: PropertyKey) {
+    has(target: IIsObservableObject, name: PropertyKey): boolean {
         if (name === $mobx || name === "constructor") return true
         if (__DEV__ && globalState.trackingDerivation)
             warnAboutProxyRequirement(
                 "detect new properties using the 'in' operator. Use 'has' from 'mobx' instead."
             )
-        const adm = getAdm(target)
-        // MWE: should `in` operator be reactive? If not, below code path will be faster / more memory efficient
-        // check performance stats!
-        // if (adm.values.get(name as string)) return true
-        if (isStringish(name)) return adm.has_(name)
-        return (name as any) in target
+        return getAdm(target).has_(name)
     },
+    // TODO (support non-observables)
     get(target: IIsObservableObject, name: PropertyKey) {
         if (name === $mobx || name === "constructor") return target[name]
         const adm = getAdm(target)
@@ -58,7 +54,7 @@ const objectProxyTraps: ProxyHandler<any> = {
         }
         return getAdm(target).set_(name, value)
     },
-    deleteProperty(target: IIsObservableObject, name: PropertyKey) {
+    deleteProperty(target: IIsObservableObject, name: PropertyKey): boolean {
         if (__DEV__)
             warnAboutProxyRequirement(
                 "delete properties from an observable object. Use 'remove' from 'mobx' instead."
@@ -66,7 +62,7 @@ const objectProxyTraps: ProxyHandler<any> = {
         if (!isStringish(name)) return false
         return getAdm(target).delete_(name)
     },
-    ownKeys(target: IIsObservableObject) {
+    ownKeys(target: IIsObservableObject): PropertyKey[] {
         if (__DEV__ && globalState.trackingDerivation)
             warnAboutProxyRequirement(
                 "iterate keys to detect added / removed properties. Use `keys` from 'mobx' instead."

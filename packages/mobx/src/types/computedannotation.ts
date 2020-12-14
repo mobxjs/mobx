@@ -39,14 +39,19 @@ function make_(adm: ObservableObjectAdministration, key: PropertyKey): boolean {
 function extend_(
     adm: ObservableObjectAdministration,
     key: PropertyKey,
-    descriptor: PropertyDescriptor
+    descriptor: PropertyDescriptor,
+    proxyTrap: boolean
 ): boolean {
     assertComputedDescriptor(adm, this, key, descriptor)
-    return adm.defineComputedProperty_(key, {
-        ...this.options_,
-        get: descriptor.get,
-        set: descriptor.set
-    })
+    return adm.defineComputedProperty_(
+        key,
+        {
+            ...this.options_,
+            get: descriptor.get,
+            set: descriptor.set
+        },
+        proxyTrap
+    )
 }
 
 function assertComputedDescriptor(

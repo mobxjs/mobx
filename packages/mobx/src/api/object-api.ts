@@ -6,7 +6,6 @@ import {
     ObservableSet,
     ObservableObjectAdministration,
     endBatch,
-    getAdministration,
     isObservableArray,
     isObservableMap,
     isObservableSet,
@@ -134,7 +133,7 @@ export function has<T>(obj: IObservableArray<T>, index: number): boolean
 export function has<T extends Object>(obj: T, key: string): boolean
 export function has(obj: any, key: any): boolean {
     if (isObservableObject(obj)) {
-        return (getAdministration(obj) as ObservableObjectAdministration).has_(key)
+        return ((obj as any) as IIsObservableObject)[$mobx].has_(key)
     } else if (isObservableMap(obj)) {
         return obj.has(key)
     } else if (isObservableSet(obj)) {
@@ -151,7 +150,7 @@ export function get<T extends Object>(obj: T, key: string): any
 export function get(obj: any, key: any): any {
     if (!has(obj, key)) return undefined
     if (isObservableObject(obj)) {
-        return obj[key]
+        return obj.get_(key)
     } else if (isObservableMap(obj)) {
         return obj.get(key)
     } else if (isObservableArray(obj)) {

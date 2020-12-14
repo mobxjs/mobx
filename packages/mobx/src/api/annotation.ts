@@ -2,13 +2,14 @@ import { ObservableObjectAdministration } from "../internal"
 
 export type Annotation = {
     annotationType_: string
-    options_: any
     make_(adm: ObservableObjectAdministration, key: PropertyKey): boolean
     extend_(
         adm: ObservableObjectAdministration,
         key: PropertyKey,
-        descriptor: PropertyDescriptor
+        descriptor: PropertyDescriptor,
+        proxyTrap: boolean
     ): boolean
+    options_?: any
     isDecorator_?: boolean
 }
 // TODO delete
