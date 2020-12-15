@@ -39,10 +39,15 @@ import {
     storedAnnotationsSymbol,
     ownKeys,
     isOverride,
-    defineProperty
+    defineProperty,
+    inferAnnotationFromDescriptor
 } from "../internal"
+import { objectPrototype } from "../utils/utils"
 
+// TODO is export needed?
 export const appliedAnnotationsSymbol = Symbol("mobx-applied-annotations")
+// TODO rename to inferredAnnotationsSymbol
+const cachedAnnotationsSymbol = Symbol("mobx-cached-annotations")
 
 export type IObjectDidChange<T = any> = {
     observableKind: "object"
@@ -98,7 +103,8 @@ export class ObservableObjectAdministration
         public target_: any,
         public values_ = new Map<PropertyKey, ObservableValue<any> | ComputedValue<any>>(),
         public name_: string,
-        public defaultAnnotation_: Annotation = observable
+        public defaultAnnotation_: Annotation = observable,
+        public autoBind_: boolean = false
     ) {
         this.keysAtom_ = new Atom(name_ + ".keys")
         this.isPlainObject_ = isPlainObject(this.target_)
@@ -106,6 +112,7 @@ export class ObservableObjectAdministration
             // Prepare structure for tracking which fields were already annotated
             addHiddenProp(this, appliedAnnotationsSymbol, {})
             // TODO validate annotation
+            // TODO validate autoBind
         }
     }
 
@@ -184,6 +191,7 @@ export class ObservableObjectAdministration
         }
     }
 
+    // Returns false for non-enumerable by design!
     has_(key: PropertyKey): boolean {
         // TODO: do this only in derivation, otherwise immediately return "key in this.target_"?
         this.pendingKeys_ ||= new Map()
@@ -204,11 +212,11 @@ export class ObservableObjectAdministration
     }
 
     make_(key: PropertyKey, annotation: Annotation | boolean): boolean {
+        if (annotation === true) {
+            annotation = this.inferAnnotation_(key)
+        }
         if (annotation === false) {
             return true
-        }
-        if (annotation === true) {
-            annotation = this.defaultAnnotation_
         }
         if (__DEV__ && !isFunction(annotation.make_)) {
             die(`Unable to make observable: Invalid annotation`)
@@ -236,12 +244,17 @@ export class ObservableObjectAdministration
         annotation: Annotation | boolean,
         proxyTrap: boolean = false
     ): boolean {
+        if (annotation === true) {
+            annotation = inferAnnotationFromDescriptor(
+                descriptor,
+                this.defaultAnnotation_,
+                this.autoBind_
+            )
+        }
         if (annotation === false) {
             return this.defineProperty_(key, descriptor, proxyTrap)
         }
-        if (annotation === true) {
-            annotation = this.defaultAnnotation_
-        }
+
         if (__DEV__ && !isFunction(annotation.extend_)) {
             die(`Unable to extend observable: Invalid annotation`)
         }
@@ -251,6 +264,39 @@ export class ObservableObjectAdministration
             recordAnnotationApplied(this, annotation, key)
         }
         return annotated
+    }
+
+    inferAnnotation_(key): Annotation | false {
+        // Inherited is fine - annotation cannot differ in subclass
+        let annotation = this[cachedAnnotationsSymbol]?.[key]
+        if (annotation) return annotation
+
+        let current = this.target_
+        while (current && current !== objectPrototype) {
+            const descriptor = getDescriptor(current, key)
+            if (descriptor) {
+                annotation = inferAnnotationFromDescriptor(
+                    descriptor,
+                    this.defaultAnnotation_,
+                    this.autoBind_
+                )
+                break
+            }
+            current = Object.getPrototypeOf(current)
+        }
+
+        // Cache the annotation.
+        // Note we can do this only because annotation and field can't change.
+        if (!this.isPlainObject_ && annotation) {
+            // We could also place it on furthest proto, shoudn't matter
+            const closestProto = Object.getPrototypeOf(this.target_)
+            if (!hasProp(closestProto, cachedAnnotationsSymbol)) {
+                addHiddenProp(closestProto, cachedAnnotationsSymbol, {})
+            }
+            closestProto[cachedAnnotationsSymbol][key] = annotation
+        }
+
+        return annotation
     }
 
     defineProperty_(
@@ -504,10 +550,12 @@ export interface IIsObservableObject {
     $mobx: ObservableObjectAdministration
 }
 
+// TODO throw on options if already observable
 export function asObservableObject(
     target: any,
     name: PropertyKey = "",
-    defaultAnnotation: Annotation = observable
+    defaultAnnotation: Annotation = observable,
+    autoBind: boolean = false
 ): ObservableObjectAdministration {
     if (hasProp(target, $mobx)) return target[$mobx]
 
@@ -526,7 +574,8 @@ export function asObservableObject(
         target,
         new Map(),
         stringifyKey(name),
-        defaultAnnotation
+        defaultAnnotation,
+        autoBind
     )
     addHiddenProp(target, $mobx, adm)
     return adm
@@ -556,6 +605,31 @@ export function assertNotAnnotated(
                 `\n${fieldName}: ${adm[appliedAnnotationsSymbol][key].annotationType_}` +
                 `\nto` +
                 `\n${fieldName}: ${annotation.annotationType_}` +
+                `\nChanging annotation or it's configuration is not allowed` +
+                `\nUse 'override' annotation for methods overriden by subclass`
+        )
+    }
+}
+
+// TODO
+export function assertNotAnnotated2(
+    adm: ObservableObjectAdministration,
+    annotation: Annotation | boolean,
+    key: PropertyKey
+) {
+    if (
+        __DEV__ &&
+        (typeof annotation === "boolean" || !isOverride(annotation)) &&
+        hasProp(adm[appliedAnnotationsSymbol], key)
+    ) {
+        const fieldName = `${adm.name_}.${key.toString()}`
+        die(
+            `Cannot re-annotate` +
+                `\n${fieldName}: ${adm[appliedAnnotationsSymbol][key].annotationType_}` +
+                `\nto` +
+                `\n${fieldName}: ${
+                    typeof annotation === "boolean" ? annotation : annotation.annotationType_
+                }` +
                 `\nChanging annotation or it's configuration is not allowed` +
                 `\nUse 'override' annotation for methods overriden by subclass`
         )

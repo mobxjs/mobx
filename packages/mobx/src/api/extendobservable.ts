@@ -14,6 +14,7 @@ import {
     die,
     getOwnPropertyDescriptors
 } from "../internal"
+import { getAnnotationFromOptions } from "./observable"
 
 export function extendObservable<A extends Object, B extends Object>(
     target: A,
@@ -33,7 +34,7 @@ export function extendObservable<A extends Object, B extends Object>(
             die(`Extending an object with another observable (object) is not supported`)
     }
     const o = asCreateObservableOptions(options)
-    const adm = asObservableObject(target, o.name, getEnhancerFromOption(o))
+    const adm = asObservableObject(target, o.name, getAnnotationFromOptions(o), options?.autoBind)
     startBatch()
     try {
         const descs = getOwnPropertyDescriptors(properties)

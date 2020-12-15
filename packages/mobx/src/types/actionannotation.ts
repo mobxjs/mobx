@@ -66,7 +66,7 @@ function extend_(
 
 function assertActionDescriptor(
     adm: ObservableObjectAdministration,
-    { annotationType_ }: Annotation, // TODO type
+    { annotationType_ }: Annotation,
     key: PropertyKey,
     { value }: PropertyDescriptor
 ) {
@@ -80,7 +80,7 @@ function assertActionDescriptor(
 
 function createActionDescriptor(
     adm: ObservableObjectAdministration,
-    annotation, // TODO type
+    annotation: Annotation,
     key: PropertyKey,
     descriptor: PropertyDescriptor,
     // Intentionall - 'action.bound' applies 'action' to prototypes

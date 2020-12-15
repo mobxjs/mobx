@@ -1,3 +1,4 @@
+import { $mobx } from "../core/atom"
 import {
     asObservableObject,
     addHiddenProp,
@@ -44,7 +45,12 @@ import {
 } from "../internal"
 import { getAnnotationFromOptions } from "./observable"
 
+// TODO rename to inferredAnnotationsSymbol
 const cachedAnnotationsSymbol = Symbol("mobx-cached-annotations")
+
+// TODO? cache prototype descriptors?
+
+// vratim undefined... pouziju default na adm
 
 /**
  * Infers the best fitting annotation from property descriptor
@@ -54,28 +60,12 @@ const cachedAnnotationsSymbol = Symbol("mobx-cached-annotations")
  * - function -> action
  * - other -> observable.deep
  */
+// TODO delete
 function inferAnnotation(
     desc: PropertyDescriptor,
     defaultAnnotation: Annotation | undefined,
     autoBind: boolean
 ): Annotation | boolean {
-    if (desc.get) return computed
-    if (desc.set) return false // ignore setter w/o getter
-    // if already wrapped in action, don't do that another time, but assume it is already set up properly
-    if (isFunction(desc.value))
-        return isGenerator(desc.value)
-            ? flow
-            : isAction(desc.value)
-            ? false
-            : autoBind
-            ? autoAction.bound
-            : autoAction
-    // if (!desc.configurable || !desc.writable) return false
-    return defaultAnnotation ?? observable.deep
-}
-
-function inferAnnotation(desc: PropertyDescriptor, autoBind: boolean): Annotation | boolean {
-    //if ()
     if (desc.get) return computed
     if (desc.set) return false // ignore setter w/o getter
     // if already wrapped in action, don't do that another time, but assume it is already set up properly
@@ -103,26 +93,76 @@ export function makeObservable<T, AdditionalKeys extends PropertyKey = never>(
     annotations?: AnnotationsMap<T, NoInfer<AdditionalKeys>>,
     options?: CreateObservableOptions
 ): T {
-    const autoBind = !!options?.autoBind
-    const defaultAnnotation = getAnnotationFromOptions(options)
-    const adm = asObservableObject(target, options?.name, defaultAnnotation)
+    const adm = asObservableObject(
+        target,
+        options?.name,
+        getAnnotationFromOptions(options),
+        options?.autoBind
+    )
     startBatch()
     try {
         // Default to decorators
         annotations ??= collectStoredAnnotations(target)
 
-        // TODO infer annotation
         // Annotate
-        ownKeys(annotations).forEach(key => {
-            let annotation = annotations![key]
-            // infer only for true
-            //if (annotation === false)
-            //annotate(adm, key, , autoBind)
+        ownKeys(annotations).forEach(key => adm.make_(key, annotations![key]))
+    } finally {
+        endBatch()
+    }
+    return target
+}
+
+export function makeAutoObservable<T extends Object, AdditionalKeys extends PropertyKey = never>(
+    target: T,
+    overrides?: AnnotationsMap<T, NoInfer<AdditionalKeys>>,
+    options?: CreateObservableOptions
+): T {
+    const adm = asObservableObject(
+        target,
+        options?.name,
+        getAnnotationFromOptions(options),
+        options?.autoBind
+    )
+
+    if (__DEV__) {
+        if (!adm.isPlainObject_ && !isPlainObject(Object.getPrototypeOf(target)))
+            die(`'makeAutoObservable' can only be used for classes that don't have a superclass`)
+        if (isObservableObject(target))
+            die(`makeAutoObservable can only be used on objects not already made observable`)
+    }
+
+    // TODO cache keys on closest proto (or get inferred annotations directly??)
+    const keys = new Set(collectAllKeys(target))
+
+    startBatch()
+    try {
+        keys.forEach(key => {
+            if (key === "constructor" || key === $mobx) return
+            adm.make_(key, overrides?.[key] ?? true)
         })
     } finally {
         endBatch()
     }
     return target
+}
+/*
+function collectAllKeys(object) {
+    const keys = {}
+    let current = object
+    const collect = key => (keys[key] = true)
+    while (current && current !== objectPrototype) {
+        Object.getOwnPropertyNames(current).forEach(collect)
+        Object.getOwnPropertySymbols(current).forEach(collect)
+        current = Object.getPrototypeOf(current)
+    }
+    return keys
+}
+*/
+
+function collectAllKeys(object): PropertyKey[] {
+    const keys = ownKeys(object)
+    const proto = Object.getPrototypeOf(object)
+    return proto === objectPrototype ? keys : keys.concat(collectAllKeys(proto))
 }
 
 /*
@@ -155,7 +195,7 @@ export function makeObservable<T, AdditionalKeys extends PropertyKey = never>(
     return target
 }
 */
-
+/*
 export function makeAutoObservable<T extends Object, AdditionalKeys extends PropertyKey = never>(
     target: T,
     overrides?: AnnotationsMap<T, NoInfer<AdditionalKeys>>,
@@ -184,7 +224,19 @@ export function makeAutoObservable<T extends Object, AdditionalKeys extends Prop
     makeObservable(target, annotations as any, options)
     return target
 }
+*/
 
+// extend ... from descriptor
+// make from descriptor
+function getClosestDescriptor(object, key): PropertyDescriptor | undefined {
+    let current = object
+    while (current && current !== objectPrototype) {
+        const descriptor = getDescriptor(object, key)
+        if (descriptor) return descriptor
+    }
+    return undefined
+}
+// TODO delete
 function inferAnnotationsFromObject(
     target,
     collector: AnnotationsMap<any, any>,
@@ -202,7 +254,7 @@ function inferAnnotationsFromObject(
         collector[key] = inferAnnotation(descriptor, defaultAnnotation, autoBind)
     })
 }
-
+// TODO delete
 function inferAnnotationsFromProto(
     proto: any,
     collector: AnnotationsMap<any, any>,

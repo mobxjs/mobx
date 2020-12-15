@@ -1,4 +1,13 @@
-import { ObservableObjectAdministration } from "../internal"
+import {
+    ObservableObjectAdministration,
+    isGenerator,
+    isFunction,
+    autoAction,
+    isAction,
+    flow,
+    computed,
+    isFlow
+} from "../internal"
 
 export type Annotation = {
     annotationType_: string
@@ -28,14 +37,7 @@ export type Annotation = {
         | "autoAction.bound"
         | "flow"
         | "override"
-    makeObservable_(adm: ObservableObjectAdministration, key: PropertyKey): void
-    extendObservable_(
-        adm: ObservableObjectAdministration,
-        key: PropertyKey,
-        descriptor: PropertyDescriptor
-    ): void
     isDecorator_?: boolean
-    //[key: string]: unknown // TODO
 }*/
 
 export type AnnotationMapEntry =
@@ -49,3 +51,24 @@ export type AnnotationsMap<T, AdditionalFields extends PropertyKey> = {
     [P in Exclude<keyof T, "toString">]?: AnnotationMapEntry
 } &
     Record<AdditionalFields, AnnotationMapEntry>
+
+export function inferAnnotationFromDescriptor(
+    desc: PropertyDescriptor,
+    defaultAnnotation: Annotation,
+    autoBind: boolean
+): Annotation | false {
+    if (desc.get) return computed
+    if (desc.set) return false // ignore setter w/o getter
+    // if already wrapped in action/flow, don't do that another time, but assume it is already set up properly
+    return isFunction(desc.value)
+        ? isGenerator(desc.value)
+            ? isFlow(desc.value)
+                ? false
+                : flow
+            : isAction(desc.value)
+            ? false
+            : autoBind
+            ? autoAction.bound
+            : autoAction
+        : defaultAnnotation
+}
