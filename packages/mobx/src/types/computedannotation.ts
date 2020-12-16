@@ -22,7 +22,6 @@ function make_(adm: ObservableObjectAdministration, key: PropertyKey): boolean {
         const descriptor = getDescriptor(source, key)
         if (descriptor) {
             assertComputedDescriptor(adm, this, key, descriptor)
-            assertPropertyConfigurable(adm, key)
             adm.defineComputedProperty_(key, {
                 ...this.options_,
                 get: descriptor.get,

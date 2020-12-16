@@ -1,3 +1,5 @@
+import { isAnnotation } from "../api/annotation"
+import { getAnnotationFromOptions } from "../api/observable"
 import {
     CreateObservableOptions,
     $mobx,
@@ -88,6 +90,7 @@ const REMOVE = "remove"
 
 /**
  * TODO better non-configurable non-writable errors on devel
+ * TODO validate annotation in make_, extend_
  * TODO comment proxyTrap option
  */
 export class ObservableObjectAdministration
@@ -108,16 +111,13 @@ export class ObservableObjectAdministration
     ) {
         this.keysAtom_ = new Atom(name_ + ".keys")
         this.isPlainObject_ = isPlainObject(this.target_)
+        if (__DEV__ && !isAnnotation(this.defaultAnnotation_)) {
+            die(`defaultAnnotation must be valid annotation`)
+        }
+        if (__DEV__ && typeof this.autoBind_ !== "boolean") {
+            die(`autoBind must be boolean`)
+        }
         if (__DEV__) {
-            if (
-                !isFunction(this.defaultAnnotation_.extend_) ||
-                !isFunction(this.defaultAnnotation_.make_)
-            ) {
-                die("Invalid annotation")
-            }
-            if (typeof autoBind_ !== "boolean") {
-                die("autoBind must be boolean")
-            }
             // Prepare structure for tracking which fields were already annotated
             addHiddenProp(this, appliedAnnotationsSymbol, {})
         }
@@ -273,7 +273,7 @@ export class ObservableObjectAdministration
         return annotated
     }
 
-    inferAnnotation_(key): Annotation | false {
+    inferAnnotation_(key: PropertyKey): Annotation | false {
         // Inherited is fine - annotation cannot differ in subclass
         let annotation = this[inferredAnnotationsSymbol]?.[key]
         if (annotation) return annotation
@@ -578,7 +578,7 @@ export function asObservableObject(
         target,
         new Map(),
         stringifyKey(name),
-        options?.defaultDecorator,
+        getAnnotationFromOptions(options),
         options?.autoBind
     )
 
@@ -586,37 +586,6 @@ export function asObservableObject(
 
     return target
 }
-// TODO delete
-/*
-export function asObservableObject(
-    target: any,
-    name: PropertyKey = "",
-    defaultAnnotation: Annotation = observable,
-    autoBind: boolean = false
-): ObservableObjectAdministration {
-    if (hasProp(target, $mobx)) return target[$mobx]
-
-    if (__DEV__ && !Object.isExtensible(target))
-        die("Cannot make the designated object observable; it is not extensible")
-
-    if (!name) {
-        if (isPlainObject(target)) {
-            name = "ObservableObject@" + getNextId()
-        } else {
-            name = (target.constructor.name || "ObservableObject") + "@" + getNextId()
-        }
-    }
-
-    const adm = new ObservableObjectAdministration(
-        target,
-        new Map(),
-        stringifyKey(name),
-        defaultAnnotation,
-        autoBind
-    )
-    addHiddenProp(target, $mobx, adm)
-    return adm
-}*/
 
 const isObservableObjectAdministration = createInstanceofPredicate(
     "ObservableObjectAdministration",
@@ -700,6 +669,7 @@ export function assertPropertyConfigurable(adm: ObservableObjectAdministration, 
 }
 
 // TODO
+// assertPropertyAnnotable
 export function assertPropertySettable(adm: ObservableObjectAdministration, key: PropertyKey) {
     assertPropertyConfigurable(adm, key)
     // if defined must be writable otherwise the object must not be sealed or freezed

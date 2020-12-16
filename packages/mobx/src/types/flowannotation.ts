@@ -37,7 +37,6 @@ function make_(adm: ObservableObjectAdministration, key: PropertyKey): boolean {
                 defineProperty(source, key, flowDescriptor)
             } else {
                 const flowDescriptor = createFlowDescriptor(adm, this, key, descriptor)
-                assertPropertyConfigurable(adm, key)
                 adm.defineProperty_(key, flowDescriptor)
             }
             annotated = true

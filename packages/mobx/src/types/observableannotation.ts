@@ -3,7 +3,6 @@ import {
     getDescriptor,
     deepEnhancer,
     die,
-    assertPropertyConfigurable,
     Annotation
 } from "../internal"
 
@@ -20,7 +19,6 @@ function make_(adm: ObservableObjectAdministration, key: PropertyKey): boolean {
     const descriptor = getDescriptor(adm.target_, key)
     if (descriptor) {
         assertObservableDescriptor(adm, this, key, descriptor)
-        assertPropertyConfigurable(adm, key)
         adm.defineObservableProperty_(
             key,
             descriptor.value,

@@ -1,5 +1,5 @@
-import { $mobx } from "../core/atom"
 import {
+    $mobx,
     asObservableObject,
     addHiddenProp,
     action,

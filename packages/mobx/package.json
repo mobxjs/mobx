@@ -60,6 +60,9 @@
         "state management",
         "data flow"
     ],
+    "resolutions": {
+        "typescript": "^4.0.2"
+    },
     "scripts": {
         "test": "jest",
         "lint": "eslint src/**/*",
