@@ -75,8 +75,8 @@ export function inferAnnotationFromDescriptor(
 
 export function isAnnotation(thing: any) {
     return (
-        thing &&
-        typeof thing === "object" &&
+        // Can be function
+        thing instanceof Object &&
         typeof thing.annotationType_ === "string" &&
         isFunction(thing.make_) &&
         isFunction(thing.extend_)

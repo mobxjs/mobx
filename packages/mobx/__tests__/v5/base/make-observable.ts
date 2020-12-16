@@ -1,5 +1,4 @@
 import { isFlow } from "../../../src/api/flow"
-import { ACTION_BOUND, getAdministration } from "../../../src/internal"
 import {
     makeObservable,
     action,
@@ -1331,6 +1330,14 @@ test("override must override", () => {
 })
 
 test.only("cannot reannotate prop of dynamic object", () => {
+    const o = observable(
+        { observable: "observable", action: () => {} },
+        { action: action },
+        { name: "name" }
+    )
+    console.log(isObservable(o))
+    console.log(isObservableProp(o, "observable"))
+    console.log(isAction(o.action))
     /*
     // create dynamic object with observable prop
     const o = observable({ foo: 1 as any })

@@ -7,8 +7,7 @@ import {
     objectPrototype,
     die,
     isFunction,
-    Annotation,
-    assertPropertyConfigurable
+    Annotation
 } from "../internal"
 
 export function createActionAnnotation(name: string, options?: object): Annotation {
@@ -59,7 +58,13 @@ function extend_(
     descriptor: PropertyDescriptor,
     proxyTrap: boolean
 ): boolean {
-    const actionDescriptor = createActionDescriptor(adm, this, key, descriptor, this.options_.bound)
+    const actionDescriptor = createActionDescriptor(
+        adm,
+        this,
+        key,
+        descriptor,
+        this.options_?.bound ?? false
+    )
     return adm.defineProperty_(key, actionDescriptor, proxyTrap)
 }
 

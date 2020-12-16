@@ -565,7 +565,7 @@ export function asObservableObject(
         die(`Options can't be provided for already observable objects.`)
     }
 
-    if (hasProp(target, $mobx)) return target[$mobx]
+    if (hasProp(target, $mobx)) return target
 
     if (__DEV__ && !Object.isExtensible(target))
         die("Cannot make the designated object observable; it is not extensible")

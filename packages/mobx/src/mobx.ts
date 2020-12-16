@@ -134,7 +134,7 @@ export {
     autoAction as _autoAction,
     AnnotationsMap,
     AnnotationMapEntry,
-    overrideAnnotation as override
+    override
 } from "./internal"
 
 // Devtools support

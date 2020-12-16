@@ -59,7 +59,7 @@ export function asCreateObservableOptions(thing: any): CreateObservableOptions {
     return thing || defaultCreateObservableOptions
 }
 
-const observableAnnotation = createObservableAnnotation("observable.observable")
+const observableAnnotation = createObservableAnnotation("observable")
 const observableRefAnnotation = createObservableAnnotation("observable.ref", {
     enhancer: referenceEnhancer
 })

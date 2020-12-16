@@ -1,12 +1,13 @@
+import { createDecoratorAnnotation } from "../api/decorators"
 import { die, Annotation, hasProp, appliedAnnotationsSymbol } from "../internal"
 
 const OVERRIDE = "override"
 
-export const overrideAnnotation: Annotation = {
+export const override: Annotation & PropertyDecorator = createDecoratorAnnotation({
     annotationType_: OVERRIDE,
     make_,
     extend_
-}
+})
 
 export function isOverride(annotation: Annotation): boolean {
     return annotation.annotationType_ === OVERRIDE
