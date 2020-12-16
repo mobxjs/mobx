@@ -151,7 +151,7 @@ export function isES6Set(thing): thing is Set<any> {
 const hasGetOwnPropertySymbols = typeof Object.getOwnPropertySymbols !== "undefined"
 
 /**
- * Returns the following: own enumerable keys and own symbols.
+ * Returns the following: own enumerable keys and symbols.
  */
 export function getPlainObjectKeys(object) {
     const keys = Object.keys(object)

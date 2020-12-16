@@ -8,7 +8,7 @@ import {
     ObservableMap,
     ObservableSet,
     ObservableValue,
-    createDynamicObservableObject,
+    asDynamicObservableObject,
     createObservableArray,
     deepEnhancer,
     extendObservable,
@@ -207,16 +207,12 @@ const observableFactories: IObservableFactory = {
         decorators?: AnnotationsMap<T, never>,
         options?: CreateObservableOptions
     ): T {
-        const o = asCreateObservableOptions(options)
-        const base = {}
-        asObservableObject(base, options?.name, getAnnotationFromOptions(o))
         return extendObservable(
-            globalState.useProxies === false || o.proxy === false
-                ? base
-                : createDynamicObservableObject(base),
+            globalState.useProxies === false || options?.proxy === false
+                ? asObservableObject({}, options)
+                : asDynamicObservableObject({}, options),
             props,
-            decorators,
-            options
+            decorators
         )
     },
     ref: createDecoratorAnnotation(observableRefAnnotation),

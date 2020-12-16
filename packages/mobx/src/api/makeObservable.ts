@@ -21,7 +21,7 @@ import {
     isObservableObject,
     isFunction,
     die,
-    ACTION,
+    /*ACTION,
     ACTION_BOUND,
     AUTOACTION,
     AUTOACTION_BOUND,
@@ -30,7 +30,7 @@ import {
     OBSERVABLE,
     OBSERVABLE_REF,
     OBSERVABLE_SHALLOW,
-    OBSERVABLE_STRUCT,
+    OBSERVABLE_STRUCT,*/
     getOwnPropertyDescriptors,
     defineProperty,
     ownKeys,
@@ -41,12 +41,9 @@ import {
     isGenerator,
     isFlow,
     appliedAnnotationsSymbol,
-    storedAnnotationsSymbol
+    storedAnnotationsSymbol,
+    inferredAnnotationsSymbol
 } from "../internal"
-import { getAnnotationFromOptions } from "./observable"
-
-// TODO rename to inferredAnnotationsSymbol
-const cachedAnnotationsSymbol = Symbol("mobx-cached-annotations")
 
 // TODO? cache prototype descriptors?
 
@@ -93,12 +90,7 @@ export function makeObservable<T, AdditionalKeys extends PropertyKey = never>(
     annotations?: AnnotationsMap<T, NoInfer<AdditionalKeys>>,
     options?: CreateObservableOptions
 ): T {
-    const adm = asObservableObject(
-        target,
-        options?.name,
-        getAnnotationFromOptions(options),
-        options?.autoBind
-    )
+    const adm = asObservableObject(target, options)[$mobx]
     startBatch()
     try {
         // Default to decorators
@@ -117,12 +109,7 @@ export function makeAutoObservable<T extends Object, AdditionalKeys extends Prop
     overrides?: AnnotationsMap<T, NoInfer<AdditionalKeys>>,
     options?: CreateObservableOptions
 ): T {
-    const adm = asObservableObject(
-        target,
-        options?.name,
-        getAnnotationFromOptions(options),
-        options?.autoBind
-    )
+    const adm = asObservableObject(target, options)[$mobx]
 
     if (__DEV__) {
         if (!adm.isPlainObject_ && !isPlainObject(Object.getPrototypeOf(target)))
@@ -131,15 +118,19 @@ export function makeAutoObservable<T extends Object, AdditionalKeys extends Prop
             die(`makeAutoObservable can only be used on objects not already made observable`)
     }
 
-    // TODO cache keys on closest proto (or get inferred annotations directly??)
-    const keys = new Set(collectAllKeys(target))
-
     startBatch()
     try {
-        keys.forEach(key => {
-            if (key === "constructor" || key === $mobx) return
-            adm.make_(key, overrides?.[key] ?? true)
-        })
+        if (target[inferredAnnotationsSymbol]) {
+            for (let key in target[inferredAnnotationsSymbol]) {
+                adm.make_(key, target[inferredAnnotationsSymbol][key])
+            }
+        } else {
+            const keys = new Set(collectAllKeys(target))
+            keys.forEach(key => {
+                if (key === "constructor" || key === $mobx) return
+                adm.make_(key, overrides?.[key] ?? true)
+            })
+        }
     } finally {
         endBatch()
     }
@@ -210,15 +201,15 @@ export function makeAutoObservable<T extends Object, AdditionalKeys extends Prop
             die(`makeAutoObservable can only be used on objects not already made observable`)
     }
     let annotations: AnnotationsMap<any, any>
-    if (!isPlain && hasProp(proto, cachedAnnotationsSymbol)) {
+    if (!isPlain && hasProp(proto, inferredAnnotationsSymbol)) {
         // shortcut, reuse inferred annotations for this type from the previous time
-        annotations = proto[cachedAnnotationsSymbol] as any
+        annotations = proto[inferredAnnotationsSymbol] as any
     } else {
         annotations = { ...overrides }
         inferAnnotationsFromObject(target, annotations, options)
         if (!isPlain) {
             inferAnnotationsFromProto(proto, annotations, options)
-            addHiddenProp(proto, cachedAnnotationsSymbol, annotations)
+            addHiddenProp(proto, inferredAnnotationsSymbol, annotations)
         }
     }
     makeObservable(target, annotations as any, options)

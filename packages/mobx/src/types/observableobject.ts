@@ -1,4 +1,5 @@
 import {
+    CreateObservableOptions,
     $mobx,
     Atom,
     Annotation,
@@ -40,14 +41,14 @@ import {
     ownKeys,
     isOverride,
     defineProperty,
-    inferAnnotationFromDescriptor
+    inferAnnotationFromDescriptor,
+    objectPrototype
 } from "../internal"
-import { objectPrototype } from "../utils/utils"
 
 // TODO is export needed?
 export const appliedAnnotationsSymbol = Symbol("mobx-applied-annotations")
-// TODO rename to inferredAnnotationsSymbol
-const cachedAnnotationsSymbol = Symbol("mobx-cached-annotations")
+
+export const inferredAnnotationsSymbol = Symbol("mobx-inferred-annotations")
 
 export type IObjectDidChange<T = any> = {
     observableKind: "object"
@@ -86,9 +87,8 @@ export type IObjectWillChange<T = any> =
 const REMOVE = "remove"
 
 /**
- * TODO reformulate
- * Most of the methods return false when property is not configurable to remain compatible with Reflect API,
- * Consumers can use assertPropertyConfigurable(adm, key) before calling the method
+ * TODO better non-configurable non-writable errors on devel
+ * TODO comment proxyTrap option
  */
 export class ObservableObjectAdministration
     implements IInterceptable<IObjectWillChange>, IListenable {
@@ -109,10 +109,17 @@ export class ObservableObjectAdministration
         this.keysAtom_ = new Atom(name_ + ".keys")
         this.isPlainObject_ = isPlainObject(this.target_)
         if (__DEV__) {
+            if (
+                !isFunction(this.defaultAnnotation_.extend_) ||
+                !isFunction(this.defaultAnnotation_.make_)
+            ) {
+                die("Invalid annotation")
+            }
+            if (typeof autoBind_ !== "boolean") {
+                die("autoBind must be boolean")
+            }
             // Prepare structure for tracking which fields were already annotated
             addHiddenProp(this, appliedAnnotationsSymbol, {})
-            // TODO validate annotation
-            // TODO validate autoBind
         }
     }
 
@@ -232,7 +239,7 @@ export class ObservableObjectAdministration
             // However we don't have to worry about missing prop,
             // because the decorator must have been applied to something.
             // TODO improve error
-            // TODO perhpas move this check to makeObservable
+            // TODO perhaps move this check to makeObservable
             die(1, key)
         }
         return annotated
@@ -268,7 +275,7 @@ export class ObservableObjectAdministration
 
     inferAnnotation_(key): Annotation | false {
         // Inherited is fine - annotation cannot differ in subclass
-        let annotation = this[cachedAnnotationsSymbol]?.[key]
+        let annotation = this[inferredAnnotationsSymbol]?.[key]
         if (annotation) return annotation
 
         let current = this.target_
@@ -290,10 +297,10 @@ export class ObservableObjectAdministration
         if (!this.isPlainObject_ && annotation) {
             // We could also place it on furthest proto, shoudn't matter
             const closestProto = Object.getPrototypeOf(this.target_)
-            if (!hasProp(closestProto, cachedAnnotationsSymbol)) {
-                addHiddenProp(closestProto, cachedAnnotationsSymbol, {})
+            if (!hasProp(closestProto, inferredAnnotationsSymbol)) {
+                addHiddenProp(closestProto, inferredAnnotationsSymbol, {})
             }
-            closestProto[cachedAnnotationsSymbol][key] = annotation
+            closestProto[inferredAnnotationsSymbol][key] = annotation
         }
 
         return annotation
@@ -550,7 +557,37 @@ export interface IIsObservableObject {
     $mobx: ObservableObjectAdministration
 }
 
-// TODO throw on options if already observable
+export function asObservableObject(
+    target: any,
+    options?: CreateObservableOptions
+): IIsObservableObject {
+    if (__DEV__ && options && isObservableObject(target)) {
+        die(`Options can't be provided for already observable objects.`)
+    }
+
+    if (hasProp(target, $mobx)) return target[$mobx]
+
+    if (__DEV__ && !Object.isExtensible(target))
+        die("Cannot make the designated object observable; it is not extensible")
+
+    const name =
+        options?.name ??
+        `${isPlainObject(target) ? target.constructor.name : "ObservableObject"}@${getNextId()}`
+
+    const adm = new ObservableObjectAdministration(
+        target,
+        new Map(),
+        stringifyKey(name),
+        options?.defaultDecorator,
+        options?.autoBind
+    )
+
+    addHiddenProp(target, $mobx, adm)
+
+    return target
+}
+// TODO delete
+/*
 export function asObservableObject(
     target: any,
     name: PropertyKey = "",
@@ -579,7 +616,7 @@ export function asObservableObject(
     )
     addHiddenProp(target, $mobx, adm)
     return adm
-}
+}*/
 
 const isObservableObjectAdministration = createInstanceofPredicate(
     "ObservableObjectAdministration",

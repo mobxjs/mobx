@@ -2,19 +2,17 @@ import {
     CreateObservableOptions,
     isObservableMap,
     AnnotationsMap,
-    makeProperty,
     startBatch,
     endBatch,
     asObservableObject,
     isPlainObject,
-    asCreateObservableOptions,
-    getEnhancerFromOption,
+    ObservableObjectAdministration,
     isObservable,
     getPlainObjectKeys,
     die,
-    getOwnPropertyDescriptors
+    getOwnPropertyDescriptors,
+    $mobx
 } from "../internal"
-import { getAnnotationFromOptions } from "./observable"
 
 export function extendObservable<A extends Object, B extends Object>(
     target: A,
@@ -33,22 +31,13 @@ export function extendObservable<A extends Object, B extends Object>(
         if (isObservable(properties) || isObservable(annotations))
             die(`Extending an object with another observable (object) is not supported`)
     }
-    const o = asCreateObservableOptions(options)
-    const adm = asObservableObject(target, o.name, getAnnotationFromOptions(o), options?.autoBind)
+    const adm: ObservableObjectAdministration = asObservableObject(target, options)[$mobx]
     startBatch()
     try {
-        const descs = getOwnPropertyDescriptors(properties)
-        getPlainObjectKeys(descs).forEach(key => {
-            makeProperty(
-                adm,
-                properties,
-                key,
-                descs[key as any],
-                !annotations ? true : key in annotations ? annotations[key] : true,
-                true,
-                !!options?.autoBind
-            )
-        })
+        const descriptors = getOwnPropertyDescriptors(properties)
+        getPlainObjectKeys(descriptors).forEach(key =>
+            adm.extend_(key, descriptors[key as any], annotations?.[key] ?? true)
+        )
     } finally {
         endBatch()
     }

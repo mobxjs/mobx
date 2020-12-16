@@ -9,6 +9,8 @@ import {
     isStringish
 } from "../internal"
 import { globalState } from "../core/globalstate"
+import { CreateObservableOptions } from "../api/observable"
+import { asObservableObject } from "./observableobject"
 
 function getAdm(target): ObservableObjectAdministration {
     return target[$mobx]
@@ -74,9 +76,11 @@ const objectProxyTraps: ProxyHandler<any> = {
     }
 }
 
-export function createDynamicObservableObject(base) {
+export function asDynamicObservableObject(
+    target: any,
+    options?: CreateObservableOptions
+): IIsObservableObject {
     assertProxies()
-    const proxy = new Proxy(base, objectProxyTraps)
-    base[$mobx].proxy_ = proxy
-    return proxy
+    target = asObservableObject(target, options)
+    return (target[$mobx].proxy_ ??= new Proxy(target, objectProxyTraps))
 }

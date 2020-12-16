@@ -42,7 +42,7 @@ function make_(adm: ObservableObjectAdministration, key: PropertyKey): boolean {
             if (source === adm.target_ || bound) {
                 // Instance or bound
                 const actionDescriptor = createActionDescriptor(adm, this, key, descriptor, bound)
-                assertPropertyConfigurable(adm, key)
+                assertPropertyConfigurable(adm, key) // TODO move to make_?
                 adm.defineProperty_(key, actionDescriptor)
                 // We want to bind only the closest one
                 bound = false

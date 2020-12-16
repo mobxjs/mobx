@@ -1,7 +1,6 @@
 import { Annotation, addHiddenProp, AnnotationsMap, hasProp, die, isOverride } from "../internal"
 
 export const storedAnnotationsSymbol = Symbol("mobx-stored-annotations")
-// TODO move to observableobject.js
 
 // TODO delete
 //export const override: PropertyDecorator & Annotation = createDecoratorAnnotation("override")

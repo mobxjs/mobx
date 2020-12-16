@@ -72,3 +72,17 @@ export function inferAnnotationFromDescriptor(
             : autoAction
         : defaultAnnotation
 }
+
+export function isAnnotation(thing: any) {
+    return (
+        thing &&
+        typeof thing === "object" &&
+        typeof thing.annotationType_ === "string" &&
+        isFunction(thing.make_) &&
+        isFunction(thing.extend_)
+    )
+}
+
+export function isAnnotationMapEntry(thing: any) {
+    return typeof thing === "boolean" || isAnnotation(thing)
+}
