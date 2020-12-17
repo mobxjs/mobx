@@ -1331,12 +1331,26 @@ test("override must override", () => {
 
 test.only("cannot reannotate prop of dynamic object", () => {
     const o = observable(
-        { observable: "observable", action: () => {} },
-        { action: action },
+        {
+            observable: "observable",
+            action() {},
+            get computed() {
+                return this.observable
+            },
+            *flow() {
+                return true
+            }
+        },
+        {
+            observable: observable,
+            action: action
+        },
         { name: "name" }
     )
     console.log(isObservable(o))
     console.log(isObservableProp(o, "observable"))
+    console.log(isComputedProp(o, "computed"))
+    console.log(isFlow(o.flow))
     console.log(isAction(o.action))
     /*
     // create dynamic object with observable prop
