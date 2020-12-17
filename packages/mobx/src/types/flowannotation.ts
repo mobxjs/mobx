@@ -7,8 +7,7 @@ import {
     die,
     flow,
     isFlow,
-    isGenerator,
-    assertPropertyConfigurable
+    isGenerator
 } from "../internal"
 
 export function createFlowAnnotation(name: string, options?: object): Annotation {
@@ -63,13 +62,12 @@ function assertFlowDescriptor(
 ) {
     if (__DEV__ && !isGenerator(value)) {
         die(
-            `Cannot apply '${annotationType_}' to '${adm.name_}.${key.toString()}': ` +
-                `${annotationType_} can only be used on properties with a generator function value.`
+            `Cannot apply '${annotationType_}' to '${adm.name_}.${key.toString()}':` +
+                `\n'${annotationType_}' can only be used on properties with a generator function value.`
         )
     }
 }
 
-// TODO loud on devel loudAnnotationDescriptor
 function createFlowDescriptor(
     adm: ObservableObjectAdministration,
     annotation: Annotation,

@@ -85,12 +85,12 @@ function inferAnnotation(
 // Fixes: https://github.com/mobxjs/mobx/issues/2325#issuecomment-691070022
 type NoInfer<T> = [T][T extends any ? 0 : never]
 
-export function makeObservable<T, AdditionalKeys extends PropertyKey = never>(
+export function makeObservable<T extends object, AdditionalKeys extends PropertyKey = never>(
     target: T,
     annotations?: AnnotationsMap<T, NoInfer<AdditionalKeys>>,
     options?: CreateObservableOptions
 ): T {
-    const adm = asObservableObject(target, options)[$mobx]
+    const adm: ObservableObjectAdministration = asObservableObject(target, options)[$mobx]
     startBatch()
     try {
         // Default to decorators
@@ -104,19 +104,19 @@ export function makeObservable<T, AdditionalKeys extends PropertyKey = never>(
     return target
 }
 
-export function makeAutoObservable<T extends Object, AdditionalKeys extends PropertyKey = never>(
+export function makeAutoObservable<T extends object, AdditionalKeys extends PropertyKey = never>(
     target: T,
     overrides?: AnnotationsMap<T, NoInfer<AdditionalKeys>>,
     options?: CreateObservableOptions
 ): T {
-    const adm = asObservableObject(target, options)[$mobx]
-
     if (__DEV__) {
-        if (!adm.isPlainObject_ && !isPlainObject(Object.getPrototypeOf(target)))
+        if (!isPlainObject(target) && !isPlainObject(Object.getPrototypeOf(target)))
             die(`'makeAutoObservable' can only be used for classes that don't have a superclass`)
         if (isObservableObject(target))
             die(`makeAutoObservable can only be used on objects not already made observable`)
     }
+
+    const adm: ObservableObjectAdministration = asObservableObject(target, options)[$mobx]
 
     startBatch()
     try {

@@ -15,7 +15,7 @@ export function isOverride(annotation: Annotation): boolean {
 
 function make_(adm, key): boolean {
     // Must override something
-    if (__DEV__ && !hasProp(this[appliedAnnotationsSymbol], key)) {
+    if (__DEV__ && !hasProp(adm[appliedAnnotationsSymbol], key)) {
         die(
             `'${adm.name_}.${key.toString()}' is annotated with 'override', ` +
                 `but no such annotated member was found on prototype.`

@@ -3,8 +3,7 @@ import {
     getDescriptor,
     objectPrototype,
     die,
-    Annotation,
-    assertPropertyConfigurable
+    Annotation
 } from "../internal"
 
 export function createComputedAnnotation(name: string, options?: object): Annotation {
@@ -61,8 +60,8 @@ function assertComputedDescriptor(
 ) {
     if (__DEV__ && !get) {
         die(
-            `Cannot apply '${annotationType_}' to '${adm.name_}.${key.toString()}': ` +
-                `${annotationType_} can only be used on getter properties.`
+            `Cannot apply '${annotationType_}' to '${adm.name_}.${key.toString()}':` +
+                `\n'${annotationType_}' can only be used on getter properties.`
         )
     }
 }

@@ -21,24 +21,6 @@ export type Annotation = {
     options_?: any
     isDecorator_?: boolean
 }
-// TODO delete
-/*
-export type Annotation = {
-    annotationType_:
-        | "observable"
-        | "observable.ref"
-        | "observable.shallow"
-        | "observable.struct"
-        | "computed"
-        | "computed.struct"
-        | "action"
-        | "action.bound"
-        | "autoAction"
-        | "autoAction.bound"
-        | "flow"
-        | "override"
-    isDecorator_?: boolean
-}*/
 
 export type AnnotationMapEntry =
     | Annotation

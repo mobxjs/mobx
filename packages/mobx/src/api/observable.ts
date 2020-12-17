@@ -143,7 +143,7 @@ export interface IObservableFactory extends Annotation, PropertyDecorator {
     <T = any>(value: T[], options?: CreateObservableOptions): IObservableArray<T>
     <T = any>(value: Set<T>, options?: CreateObservableOptions): ObservableSet<T>
     <K = any, V = any>(value: Map<K, V>, options?: CreateObservableOptions): ObservableMap<K, V>
-    <T extends Object>(
+    <T extends object>(
         value: T,
         decorators?: AnnotationsMap<T, never>,
         options?: CreateObservableOptions

@@ -114,21 +114,6 @@ export function addHiddenFinalProp(object: any, propName: PropertyKey, value: an
     })
 }
 
-// TODO remove unused
-/*
-export function assertPropertyConfigurable(object: any, prop: PropertyKey) {
-    if (__DEV__) {
-        const descriptor = getDescriptor(object, prop)
-        if (descriptor?.configurable === false || descriptor?.writable === false)
-            die(
-                `Cannot make property '${stringifyKey(
-                    prop
-                )}' observable, it is not configurable and writable in the target object`
-            )
-    }
-}
-*/
-
 export function createInstanceofPredicate<T>(
     name: string,
     theClass: new (...args: any[]) => T
@@ -170,34 +155,6 @@ export const ownKeys: (target: any) => PropertyKey[] =
         : hasGetOwnPropertySymbols
         ? obj => Object.getOwnPropertyNames(obj).concat(Object.getOwnPropertySymbols(obj) as any)
         : /* istanbul ignore next */ Object.getOwnPropertyNames
-
-//  TODO delete
-export const reflectDefineProperty: (
-    target: any,
-    key: PropertyKey,
-    descriptor: PropertyDescriptor
-) => boolean =
-    Reflect?.defineProperty ??
-    ((target, key, descriptor) => {
-        try {
-            defineProperty(target, key, descriptor)
-        } catch {
-            return false
-        }
-        return true
-    })
-
-// TODO delete
-export const reflectDeleteProperty: (target: any, key: PropertyKey) => boolean =
-    Reflect?.deleteProperty ??
-    ((target, key) => {
-        try {
-            delete target[key]
-        } catch {
-            return false
-        }
-        return true
-    })
 
 export function stringifyKey(key: any): string {
     if (typeof key === "string") return key

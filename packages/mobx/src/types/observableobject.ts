@@ -123,7 +123,7 @@ export class ObservableObjectAdministration
         }
     }
 
-    getObservablePropValue_(key: PropertyKey) {
+    getObservablePropValue_(key: PropertyKey): any {
         return this.values_.get(key)!.get()
     }
 
@@ -228,7 +228,7 @@ export class ObservableObjectAdministration
         if (__DEV__ && !isFunction(annotation.make_)) {
             die(`Unable to make observable: Invalid annotation`)
         }
-        assertNotAnnotated(this, annotation, key)
+        assertAnnotable(this, annotation, key)
         const annotated = annotation.make_(this, key)
         if (annotated) {
             recordAnnotationApplied(this, annotation, key)
@@ -265,7 +265,7 @@ export class ObservableObjectAdministration
         if (__DEV__ && !isFunction(annotation.extend_)) {
             die(`Unable to extend observable: Invalid annotation`)
         }
-        assertNotAnnotated(this, annotation, key)
+        assertAnnotable(this, annotation, key)
         const annotated = annotation.extend_(this, key, descriptor, proxyTrap)
         if (annotated) {
             recordAnnotationApplied(this, annotation, key)
@@ -371,7 +371,7 @@ export class ObservableObjectAdministration
                     return this[$mobx].getObservablePropValue_(key)
                 },
                 set(value) {
-                    return this[$mobx].getObservablePropValue_(key, value)
+                    return this[$mobx].setObservablePropValue_(key, value)
                 }
             },
             proxyTrap
@@ -599,50 +599,7 @@ export function isObservableObject(thing: any): boolean {
     return false
 }
 
-export function assertNotAnnotated(
-    adm: ObservableObjectAdministration,
-    annotation: Annotation,
-    key: PropertyKey
-) {
-    if (__DEV__ && !isOverride(annotation) && hasProp(adm[appliedAnnotationsSymbol], key)) {
-        const fieldName = `${adm.name_}.${key.toString()}`
-        die(
-            `Cannot re-annotate` +
-                `\n${fieldName}: ${adm[appliedAnnotationsSymbol][key].annotationType_}` +
-                `\nto` +
-                `\n${fieldName}: ${annotation.annotationType_}` +
-                `\nChanging annotation or it's configuration is not allowed` +
-                `\nUse 'override' annotation for methods overriden by subclass`
-        )
-    }
-}
-
-// TODO
-export function assertNotAnnotated2(
-    adm: ObservableObjectAdministration,
-    annotation: Annotation | boolean,
-    key: PropertyKey
-) {
-    if (
-        __DEV__ &&
-        (typeof annotation === "boolean" || !isOverride(annotation)) &&
-        hasProp(adm[appliedAnnotationsSymbol], key)
-    ) {
-        const fieldName = `${adm.name_}.${key.toString()}`
-        die(
-            `Cannot re-annotate` +
-                `\n${fieldName}: ${adm[appliedAnnotationsSymbol][key].annotationType_}` +
-                `\nto` +
-                `\n${fieldName}: ${
-                    typeof annotation === "boolean" ? annotation : annotation.annotationType_
-                }` +
-                `\nChanging annotation or it's configuration is not allowed` +
-                `\nUse 'override' annotation for methods overriden by subclass`
-        )
-    }
-}
-
-export function recordAnnotationApplied(
+function recordAnnotationApplied(
     adm: ObservableObjectAdministration,
     annotation: Annotation,
     key: PropertyKey
@@ -656,54 +613,51 @@ export function recordAnnotationApplied(
     }
 }
 
-export function assertPropertyConfigurable(adm: ObservableObjectAdministration, key: PropertyKey) {
-    if (__DEV__ && getDescriptor(adm.target_, key)?.configurable) {
-        let error = `Property ${key.toString()} is not configurable.`
-        // Mention only if caused by us to avoid confusion
-        if (hasProp(adm[appliedAnnotationsSymbol], key)) {
-            error += `\nTo prevent accidental re-definition of a field in a subclass, `
-            error += `all annotated fields of non-plain objects (classes) are not configurable.`
-        }
-        die(error)
-    }
-}
-
-// TODO
-// assertPropertyAnnotable
-export function assertPropertySettable(adm: ObservableObjectAdministration, key: PropertyKey) {
-    assertPropertyConfigurable(adm, key)
-    // if defined must be writable otherwise the object must not be sealed or freezed
-    if (__DEV__ && getDescriptor(adm.target_, key)?.configurable) {
-        //if ()
-    }
-}
-
-// TODO delete
-export function asLoudAnnotatedDescriptor(
-    adm,
-    annotation /* TODO type*/,
-    key: PropertyKey,
-    descriptor: PropertyDescriptor
+function assertAnnotable(
+    adm: ObservableObjectAdministration,
+    annotation: Annotation,
+    key: PropertyKey
 ) {
-    if (__DEV__ && descriptor.writable === false) {
-        const { configurable, enumerable, value } = descriptor
-        return {
-            enumerable,
-            configurable,
-            get() {
-                return value
-            },
-            set(_) {
-                const fieldName = `@${annotation.annotationType_} ${adm.name_}.${key.toString()}`
-                die(
-                    `Property ${key.toString()} is not writable.` +
-                        `\n${fieldName} is not observable and therefore not writable.` +
-                        `\nTo keep the field writable make the field observable (or unannotated) and wrap the value manually, eg:` +
-                        `\nthis.${key.toString()} = action(() => {})` +
-                        `\nSubclass can override only methods defined on prototype.`
-                )
+    /*
+    // Configurable, not sealed not frozen
+    if (__DEV__) {
+        const configurable = getDescriptor(adm.target_, key)?.configurable
+        const frozen = Object.isFrozen(adm.target_)
+        const sealed = Object.isSealed(adm.target_)
+        if (!configurable || frozen || sealed) {
+            const fieldName = `${adm.name_}.${key.toString()}`
+            const requestedAnnotationType = annotation.annotationType_
+            let error = `Cannot apply '${requestedAnnotationType}' to '${fieldName}':`
+            if (frozen) {
+                error += `\nObject is frozen.`
             }
+            if (sealed) {
+                error += `\nObject is sealed.`
+            }
+            if (!configurable) {
+                error += `\nproperty is not configurable.`
+                // Mention only if caused by us to avoid confusion
+                if (hasProp(adm[appliedAnnotationsSymbol], key)) {
+                    error += `\nTo prevent accidental re-definition of a field by a subclass, `
+                    error += `all annotated fields of non-plain objects (classes) are not configurable.`
+                }
+            }
+
+            die(error)
         }
     }
-    return descriptor
+    */
+
+    // Not annotated
+    if (__DEV__ && !isOverride(annotation) && hasProp(adm[appliedAnnotationsSymbol], key)) {
+        const fieldName = `${adm.name_}.${key.toString()}`
+        const currentAnnotationType = adm[appliedAnnotationsSymbol][key].annotationType_
+        const requestedAnnotationType = annotation.annotationType_
+        die(
+            `Cannot apply '${requestedAnnotationType}' to '${fieldName}':` +
+                `\nthe field is already annotated with '${currentAnnotationType}'.` +
+                `\nRe-annotating fields is not allowed.` +
+                `\nUse 'override' annotation for methods overriden by subclass.`
+        )
+    }
 }

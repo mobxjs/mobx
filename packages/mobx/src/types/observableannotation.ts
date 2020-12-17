@@ -52,8 +52,8 @@ function assertObservableDescriptor(
 ) {
     if (__DEV__ && !("value" in descriptor)) {
         die(
-            `Cannot apply '${annotationType_}' to '${adm.name_}.${key.toString()}': ` +
-                `${annotationType_} can't be used on getter/setter properties`
+            `Cannot apply '${annotationType_}' to '${adm.name_}.${key.toString()}':` +
+                `\n'${annotationType_}' can't be used on getter/setter properties`
         )
     }
 }

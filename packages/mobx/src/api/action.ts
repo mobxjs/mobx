@@ -11,22 +11,20 @@ import {
 } from "../internal"
 
 export const ACTION = "action"
-/*
-TODO delete
 export const ACTION_BOUND = "action.bound"
 export const AUTOACTION = "autoAction"
 export const AUTOACTION_BOUND = "autoAction.bound"
-*/
+
 const DEFAULT_ACTION_NAME = "<unnamed action>"
 
-const actionAnnotation = createActionAnnotation("action")
-const actionBoundAnnotation = createActionAnnotation("action.bound", {
+const actionAnnotation = createActionAnnotation(ACTION)
+const actionBoundAnnotation = createActionAnnotation(ACTION_BOUND, {
     bound: true
 })
-const autoActionAnnotation = createActionAnnotation("autoAction", {
+const autoActionAnnotation = createActionAnnotation(AUTOACTION, {
     autoAction: true
 })
-const autoActionBoundAnnotation = createActionAnnotation("autoAction.bound", {
+const autoActionBoundAnnotation = createActionAnnotation(AUTOACTION_BOUND, {
     autoAction: true,
     bound: true
 })
@@ -53,13 +51,15 @@ function createActionFactory(autoAction: boolean): IActionFactory {
         if (isFunction(arg2)) return createAction(arg1, arg2, autoAction)
         // @action
         if (isStringish(arg2)) {
-            return storeAnnotation(arg1, arg2, actionAnnotation)
+            return storeAnnotation(arg1, arg2, autoAction ? autoActionAnnotation : actionAnnotation)
         }
         // action("name") & @action("name")
         if (isStringish(arg1)) {
-            // TODO types
             return createDecoratorAnnotation(
-                (createActionAnnotation("action", { name: arg1 }) as unknown) as Annotation
+                createActionAnnotation(autoAction ? AUTOACTION : ACTION, {
+                    name: arg1,
+                    autoAction
+                })
             )
         }
 

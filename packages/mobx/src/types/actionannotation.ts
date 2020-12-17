@@ -76,8 +76,8 @@ function assertActionDescriptor(
 ) {
     if (__DEV__ && !isFunction(value)) {
         die(
-            `Cannot apply '${annotationType_}' to '${adm.name_}.${key.toString()}': ` +
-                `${annotationType_} can only be used on properties with a function value.`
+            `Cannot apply '${annotationType_}' to '${adm.name_}.${key.toString()}':` +
+                `\n'${annotationType_}' can only be used on properties with a function value.`
         )
     }
 }

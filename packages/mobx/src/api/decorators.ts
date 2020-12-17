@@ -58,7 +58,7 @@ export function storeAnnotation(prototype: any, key: PropertyKey, annotation: An
     // @override must override something
     if (__DEV__ && isOverride(annotation) && !hasProp(prototype[storedAnnotationsSymbol], key)) {
         die(
-            `${prototype.constructor.name}.${key.toString()} is decorated with 'override', ` +
+            `'${prototype.constructor.name}.${key.toString()}' is decorated with 'override', ` +
                 `but no such decorated member was found on prototype.`
         )
     }
@@ -74,16 +74,16 @@ export function storeAnnotation(prototype: any, key: PropertyKey, annotation: An
     }
 }
 
-function assertNotDecorated(prototype: object, annotation /* TODO type */, key: PropertyKey) {
+function assertNotDecorated(prototype: object, annotation: Annotation, key: PropertyKey) {
     if (__DEV__ && !isOverride(annotation) && hasProp(prototype[storedAnnotationsSymbol], key)) {
-        const fieldName = `${prototype.constructor.name}.${key.toString()}`
+        const fieldName = `${prototype.constructor.name}.prototype.${key.toString()}`
+        const currentAnnotationType = prototype[storedAnnotationsSymbol][key].annotationType_
+        const requestedAnnotationType = annotation.annotationType_
         die(
-            `Cannot re-decorate` +
-                `\n@${prototype[storedAnnotationsSymbol][key].annotationType_} ${fieldName}` +
-                `\nto` +
-                `\n@${annotation.annotationType_} ${fieldName}` +
-                `\nChanging decorator or it's configuration is not allowed` +
-                `\nUse 'override' annotation for methods overriden by subclass`
+            `Cannot apply '@${requestedAnnotationType}' to '${fieldName}':` +
+                `\nthe field is already decorated with '@${currentAnnotationType}'.` +
+                `\nRe-decorating fields is not allowed.` +
+                `\nUse '@override' decorator for methods overriden by subclass.`
         )
     }
 }
