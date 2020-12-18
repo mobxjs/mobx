@@ -123,7 +123,7 @@ test("intercept object", () => {
     expect(a.b).toBe(22)
 })
 
-test("intercept property additions", () => {
+test.only("intercept property additions", () => {
     const a = m.observable({})
     const d4 = intercept(a, change => {
         expect(change.object).toBe(a)

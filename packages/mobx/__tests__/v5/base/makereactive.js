@@ -450,12 +450,16 @@ test("as structure view", function () {
     expect(cc).toBe(2)
 })
 
+// xx.xx.xxxx @mweststrate:
 // This test doesn't make much sense anymore with proxies;
 // creating non configurable props on dynamic observable object
 // will break the invariants of proxies (when trying to determine keys)
 // which is not unfixiable in itself,
 // but definitely a pattern we don't want to encourage
-test("ES5 non reactive props", function () {
+// 18.12.2020 @urugator:
+// Manipulating non-observable fields is supported and behavior is unified across different APIs
+// https://github.com/mobxjs/mobx/pull/2641#issuecomment-740949745
+test.skip("ES5 non reactive props", function () {
     expect(function () {
         m.extendObservable(false, { notConfigurable: 1 })
     }).toThrow(/'extendObservable' expects an object as first argument/)
@@ -493,7 +497,8 @@ test("ES5 non reactive props", function () {
     expect(m.extendObservable(te, { bla: 3 }).bla).toBe(3)
 })
 
-test("ES5 non reactive props - 2", function () {
+// same as previous
+test.skip("ES5 non reactive props - 2", function () {
     const te = {}
     Object.defineProperty(te, "nonConfigurable", {
         enumerable: true,

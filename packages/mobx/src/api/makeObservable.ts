@@ -44,6 +44,7 @@ import {
     storedAnnotationsSymbol,
     inferredAnnotationsSymbol
 } from "../internal"
+import { override } from "../types/overrideannotation"
 
 // TODO? cache prototype descriptors?
 
@@ -53,8 +54,8 @@ import {
  * Infers the best fitting annotation from property descriptor
  * - getter(+setter) -> computed
  * - setter w/o getter -> false
- * - generator -> flow
- * - function -> action
+ * - generator -> flow (if not already)
+ * - function -> action (if not already)
  * - other -> observable.deep
  */
 // TODO delete
@@ -128,7 +129,11 @@ export function makeAutoObservable<T extends object, AdditionalKeys extends Prop
             const keys = new Set(collectAllKeys(target))
             keys.forEach(key => {
                 if (key === "constructor" || key === $mobx) return
-                adm.make_(key, overrides?.[key] ?? true)
+                adm.make_(
+                    key,
+                    // must pass "undefined" for { key: undefined }
+                    !overrides ? true : key in overrides ? overrides[key] : true
+                )
             })
         }
     } finally {

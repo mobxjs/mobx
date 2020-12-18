@@ -7,8 +7,9 @@ import {
     die,
     flow,
     isFlow,
-    isGenerator
+    recordAnnotationApplied
 } from "../internal"
+import { isFunction } from "../utils/utils"
 
 export function createFlowAnnotation(name: string, options?: object): Annotation {
     return {
@@ -19,7 +20,7 @@ export function createFlowAnnotation(name: string, options?: object): Annotation
     }
 }
 
-function make_(adm: ObservableObjectAdministration, key: PropertyKey): boolean {
+function make_(adm: ObservableObjectAdministration, key: PropertyKey): void {
     let annotated = false
     let source = adm.target_
     while (source && source !== objectPrototype) {
@@ -30,28 +31,43 @@ function make_(adm: ObservableObjectAdministration, key: PropertyKey): boolean {
                 if (isFlow(descriptor.value)) {
                     // A prototype could have been annotated already by other constructor,
                     // rest of the proto chain must be annotated already
-                    return true
+                    annotated = true
+                    break
                 }
                 const flowDescriptor = createFlowDescriptor(adm, this, key, descriptor)
                 defineProperty(source, key, flowDescriptor)
             } else {
                 const flowDescriptor = createFlowDescriptor(adm, this, key, descriptor)
-                adm.defineProperty_(key, flowDescriptor)
+                const definePropertyOutcome = adm.defineProperty_(key, flowDescriptor)
+                if (!definePropertyOutcome) {
+                    // Intercepted
+                    return
+                }
             }
             annotated = true
         }
         source = Object.getPrototypeOf(source)
     }
-    return annotated
+    if (annotated) {
+        recordAnnotationApplied(adm, this, key)
+    } else if (!this.isDecorator_) {
+        // Throw on missing key, except for decorators:
+        // Decorator annotations are collected from whole prototype chain.
+        // When called from super() some props may not exist yet.
+        // However we don't have to worry about missing prop,
+        // because the decorator must have been applied to something.
+        die(1, this.annotationType_, `${adm.name_}.${key.toString()}`)
+    }
 }
 
 function extend_(
     adm: ObservableObjectAdministration,
     key: PropertyKey,
-    descriptor: PropertyDescriptor
-): boolean {
+    descriptor: PropertyDescriptor,
+    proxyTrap: boolean
+): boolean | null {
     const flowDescriptor = createFlowDescriptor(adm, this, key, descriptor)
-    return adm.defineProperty_(key, flowDescriptor)
+    return adm.defineProperty_(key, flowDescriptor, proxyTrap)
 }
 
 function assertFlowDescriptor(
@@ -60,7 +76,7 @@ function assertFlowDescriptor(
     key: PropertyKey,
     { value }: PropertyDescriptor
 ) {
-    if (__DEV__ && !isGenerator(value)) {
+    if (__DEV__ && !isFunction(value)) {
         die(
             `Cannot apply '${annotationType_}' to '${adm.name_}.${key.toString()}':` +
                 `\n'${annotationType_}' can only be used on properties with a generator function value.`

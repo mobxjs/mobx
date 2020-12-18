@@ -1,18 +1,18 @@
 // TODO remove unused
 const niceErrors = {
     0: `Invalid value for configuration 'enforceActions', expected 'never', 'always' or 'observed'`,
-    1(prop) {
-        return `Cannot decorate undefined property: '${prop.toString()}'`
+    1(annotationType, fieldName) {
+        return `Cannot apply '${annotationType}' to: '${fieldName}': Field not found`
     },
     2(prop) {
         return `invalid decorator for '${prop.toString()}'`
     },
-    3(prop, annotationType: string) {
+    /*3(prop, annotationType: string) {
         return `Cannot decorate '${prop.toString()}': ${annotationType} can only be used on properties with a function value.`
-    },
-    4(prop) {
+    },*/
+    /*4(prop) {
         return `Cannot decorate '${prop.toString()}': computed can only be used on getter properties.`
-    },
+    },*/
     5: "'keys()' can only be used on observable objects, arrays, sets and maps",
     6: "'values()' can only be used on observable objects, arrays, sets and maps",
     7: "'entries()' can only be used on observable objects, arrays and maps",

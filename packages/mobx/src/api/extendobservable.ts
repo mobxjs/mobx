@@ -36,7 +36,12 @@ export function extendObservable<A extends Object, B extends Object>(
     try {
         const descriptors = getOwnPropertyDescriptors(properties)
         getPlainObjectKeys(descriptors).forEach(key =>
-            adm.extend_(key, descriptors[key as any], annotations?.[key] ?? true)
+            adm.extend_(
+                key,
+                descriptors[key as any],
+                // must pass "undefined" for { key: undefined }
+                !annotations ? true : key in annotations ? annotations[key] : true
+            )
         )
     } finally {
         endBatch()

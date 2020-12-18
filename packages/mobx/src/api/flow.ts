@@ -40,7 +40,7 @@ export const flow: Flow = Object.assign(
             return storeAnnotation(arg1, arg2, flowAnnotation)
         }
         // flow(fn)
-        if (__DEV__ && (arguments.length !== 1 || !isGenerator(arg1)))
+        if (__DEV__ && arguments.length !== 1)
             die(`Flow expects single argument with generator function`)
         const generator = arg1
         const name = generator.name || "<unnamed flow>"

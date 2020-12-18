@@ -57,8 +57,9 @@ export function storeAnnotation(prototype: any, key: PropertyKey, annotation: An
     }
     // @override must override something
     if (__DEV__ && isOverride(annotation) && !hasProp(prototype[storedAnnotationsSymbol], key)) {
+        const fieldName = `${prototype.constructor.name}.prototype.${key.toString()}`
         die(
-            `'${prototype.constructor.name}.${key.toString()}' is decorated with 'override', ` +
+            `'${fieldName}' is decorated with 'override', ` +
                 `but no such decorated member was found on prototype.`
         )
     }

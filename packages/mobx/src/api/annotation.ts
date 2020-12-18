@@ -11,13 +11,13 @@ import {
 
 export type Annotation = {
     annotationType_: string
-    make_(adm: ObservableObjectAdministration, key: PropertyKey): boolean
+    make_(adm: ObservableObjectAdministration, key: PropertyKey): void
     extend_(
         adm: ObservableObjectAdministration,
         key: PropertyKey,
         descriptor: PropertyDescriptor,
         proxyTrap: boolean
-    ): boolean
+    ): boolean | null
     options_?: any
     isDecorator_?: boolean
 }
@@ -34,6 +34,16 @@ export type AnnotationsMap<T, AdditionalFields extends PropertyKey> = {
 } &
     Record<AdditionalFields, AnnotationMapEntry>
 
+/**
+ * Infers the best fitting annotation from property descriptor or false if the field shoudn't be annotated
+ * - getter(+setter) -> computed
+ * - setter w/o getter -> false
+ * - flow -> false
+ * - generator -> flow
+ * - action -> false
+ * - function -> action (optionally bound)
+ * - other -> defaultAnnotation
+ */
 export function inferAnnotationFromDescriptor(
     desc: PropertyDescriptor,
     defaultAnnotation: Annotation,

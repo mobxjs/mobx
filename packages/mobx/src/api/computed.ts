@@ -10,7 +10,7 @@ import {
     die,
     IComputedValue,
     createComputedAnnotation,
-    deepEnhancer
+    comparer
 } from "../internal"
 
 // TODO
@@ -28,7 +28,7 @@ export interface IComputedFactory extends Annotation, PropertyDecorator {
 
 const computedAnnotation = createComputedAnnotation("computed")
 const computedStructAnnotation = createComputedAnnotation("computed.struct", {
-    equals: deepEnhancer
+    equals: comparer.structural
 })
 
 /**

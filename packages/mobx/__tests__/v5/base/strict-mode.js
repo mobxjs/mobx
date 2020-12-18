@@ -441,6 +441,8 @@ test("#1869", function () {
     mobx._resetGlobalState() // should preserve strict mode
 })
 
+// 18.12.2020 @urugator:
+// No longer supported
 test("allow overwriting computed if configured", function () {
     try {
         mobx.configure({ computedConfigurable: true })

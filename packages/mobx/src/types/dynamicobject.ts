@@ -54,7 +54,7 @@ const objectProxyTraps: ProxyHandler<any> = {
                 "add a new observable property through direct assignment. Use 'set' from 'mobx' instead."
             )
         }
-        return getAdm(target).set_(name, value, true)
+        return getAdm(target).set_(name, value, true) ?? true
     },
     deleteProperty(target: IIsObservableObject, name: PropertyKey): boolean {
         if (__DEV__)
@@ -62,7 +62,7 @@ const objectProxyTraps: ProxyHandler<any> = {
                 "delete properties from an observable object. Use 'remove' from 'mobx' instead."
             )
         if (!isStringish(name)) return false
-        return getAdm(target).delete_(name, true)
+        return getAdm(target).delete_(name, true) ?? true
     },
     // TODO define property
     ownKeys(target: IIsObservableObject): PropertyKey[] {

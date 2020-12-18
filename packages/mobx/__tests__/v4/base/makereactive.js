@@ -449,7 +449,8 @@ test("as structure view", function () {
     expect(cc).toBe(2)
 })
 
-test("ES5 non reactive props", function () {
+// See V5
+test.skip("ES5 non reactive props", function () {
     expect(function () {
         m.extendObservable(false, { notConfigurable: 1 })
     }).toThrow(/'extendObservable' expects an object as first argument/)

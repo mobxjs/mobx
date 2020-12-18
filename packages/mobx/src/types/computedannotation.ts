@@ -3,7 +3,8 @@ import {
     getDescriptor,
     objectPrototype,
     die,
-    Annotation
+    Annotation,
+    recordAnnotationApplied
 } from "../internal"
 
 export function createComputedAnnotation(name: string, options?: object): Annotation {
@@ -15,23 +16,35 @@ export function createComputedAnnotation(name: string, options?: object): Annota
     }
 }
 
-function make_(adm: ObservableObjectAdministration, key: PropertyKey): boolean {
+function make_(adm: ObservableObjectAdministration, key: PropertyKey): void {
     let source = adm.target_
     while (source && source !== objectPrototype) {
         const descriptor = getDescriptor(source, key)
         if (descriptor) {
             assertComputedDescriptor(adm, this, key, descriptor)
-            adm.defineComputedProperty_(key, {
+            const definePropertyOutcome = adm.defineComputedProperty_(key, {
                 ...this.options_,
                 get: descriptor.get,
                 set: descriptor.set
             })
+            if (!definePropertyOutcome) {
+                // Intercepted
+                return
+            }
             // Use the closest descriptor
-            return true
+            recordAnnotationApplied(adm, this, key)
+            return
         }
         source = Object.getPrototypeOf(source)
     }
-    return false
+    if (!this.isDecorator_) {
+        // Throw on missing key, except for decorators:
+        // Decorator annotations are collected from whole prototype chain.
+        // When called from super() some props may not exist yet.
+        // However we don't have to worry about missing prop,
+        // because the decorator must have been applied to something.
+        die(1, this.annotationType_, `${adm.name_}.${key.toString()}`)
+    }
 }
 
 function extend_(
@@ -39,7 +52,7 @@ function extend_(
     key: PropertyKey,
     descriptor: PropertyDescriptor,
     proxyTrap: boolean
-): boolean {
+): boolean | null {
     assertComputedDescriptor(adm, this, key, descriptor)
     return adm.defineComputedProperty_(
         key,

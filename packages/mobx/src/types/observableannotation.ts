@@ -3,7 +3,8 @@ import {
     getDescriptor,
     deepEnhancer,
     die,
-    Annotation
+    Annotation,
+    recordAnnotationApplied
 } from "../internal"
 
 export function createObservableAnnotation(name: string, options?: object): Annotation {
@@ -15,18 +16,28 @@ export function createObservableAnnotation(name: string, options?: object): Anno
     }
 }
 
-function make_(adm: ObservableObjectAdministration, key: PropertyKey): boolean {
+function make_(adm: ObservableObjectAdministration, key: PropertyKey): void {
     const descriptor = getDescriptor(adm.target_, key)
     if (descriptor) {
         assertObservableDescriptor(adm, this, key, descriptor)
-        adm.defineObservableProperty_(
+        const definePropertyOutcome = adm.defineObservableProperty_(
             key,
             descriptor.value,
             this.options_?.enhancer ?? deepEnhancer
         )
-        return true
+        if (!definePropertyOutcome) {
+            // Intercepted
+            return
+        }
+        recordAnnotationApplied(adm, this, key)
+    } else if (!this.isDecorator_) {
+        // Throw on missing key, except for decorators:
+        // Decorator annotations are collected from whole prototype chain.
+        // When called from super() some props may not exist yet.
+        // However we don't have to worry about missing prop,
+        // because the decorator must have been applied to something.
+        die(1, this.annotationType_, `${adm.name_}.${key.toString()}`)
     }
-    return false
 }
 
 function extend_(
@@ -34,7 +45,7 @@ function extend_(
     key: PropertyKey,
     descriptor: PropertyDescriptor,
     proxyTrap: boolean
-): boolean {
+): boolean | null {
     assertObservableDescriptor(adm, this, key, descriptor)
     return adm.defineObservableProperty_(
         key,
@@ -53,7 +64,7 @@ function assertObservableDescriptor(
     if (__DEV__ && !("value" in descriptor)) {
         die(
             `Cannot apply '${annotationType_}' to '${adm.name_}.${key.toString()}':` +
-                `\n'${annotationType_}' can't be used on getter/setter properties`
+                `\n'${annotationType_}' cannot be used on getter/setter properties`
         )
     }
 }

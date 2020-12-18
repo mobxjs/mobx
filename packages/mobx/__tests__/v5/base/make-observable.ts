@@ -717,19 +717,12 @@ test("subclass - annotation", () => {
 
         constructor() {
             makeObservable(this, {
-                // @ts-ignore
                 observable: observable,
-                // @ts-ignore
                 "observable.ref": observable.ref,
-                // @ts-ignore
                 "observable.shallow": observable.shallow,
-                // @ts-ignore
                 computed: computed,
-                // @ts-ignore
                 action: action,
-                // @ts-ignore
                 "action.bound": action.bound,
-                // @ts-ignore
                 flow: flow
             })
         }
@@ -859,19 +852,12 @@ test("subclass - decorator", () => {
 
         constructor() {
             makeObservable(this, {
-                // @ts-ignore
                 observable: observable,
-                // @ts-ignore
                 "observable.ref": observable.ref,
-                // @ts-ignore
                 "observable.shallow": observable.shallow,
-                // @ts-ignore
                 computed: computed,
-                // @ts-ignore
                 action: action,
-                // @ts-ignore
                 "action.bound": action.bound,
-                // @ts-ignore
                 flow: flow
             })
         }
@@ -1019,8 +1005,7 @@ test("subclass - annotation - override", async () => {
         get computed() {
             return "child"
         }
-        // @ts-ignore
-        *flow() {
+        *flow(): any {
             const parent = yield super.flow()
             return "child of " + parent
         }
@@ -1037,6 +1022,7 @@ test("subclass - annotation - override", async () => {
     expect(Parent.prototype.action()).toBe("parent")
     expect(Child.prototype.action()).toBe("child of parent")
     expect(child.action()).toBe("child of parent")
+
     // Action bound
     expect(isAction(Parent.prototype["action.bound"])).toBe(true)
     expect(isAction(Child.prototype["action.bound"])).toBe(true)
@@ -1047,9 +1033,11 @@ test("subclass - annotation - override", async () => {
     expect(Parent.prototype["action.bound"]()).toBe("parent")
     expect(Child.prototype["action.bound"]()).toBe("child of parent")
     expect(child["action.bound"]()).toBe("child of parent")
+
     // Computed
     expect(isComputedProp(child, "computed")).toBe(true)
     expect(child.computed).toBe("child")
+
     // Flow
     expect(isFlow(Parent.prototype.flow)).toBe(true)
     expect(isFlow(Child.prototype.flow)).toBe(true)
@@ -1095,8 +1083,7 @@ test("subclass - decorator - override", async () => {
         get computed() {
             return "child"
         }
-        // @ts-ignore
-        *flow() {
+        *flow(): any {
             const parent = yield super.flow()
             return "child of " + parent
         }
@@ -1113,6 +1100,7 @@ test("subclass - decorator - override", async () => {
     expect(Parent.prototype.action()).toBe("parent")
     expect(Child.prototype.action()).toBe("child of parent")
     expect(child.action()).toBe("child of parent")
+
     // Action bound
     expect(isAction(Parent.prototype["action.bound"])).toBe(true)
     expect(isAction(Child.prototype["action.bound"])).toBe(true)
@@ -1123,9 +1111,11 @@ test("subclass - decorator - override", async () => {
     expect(Parent.prototype["action.bound"]()).toBe("parent")
     expect(Child.prototype["action.bound"]()).toBe("child of parent")
     expect(child["action.bound"]()).toBe("child of parent")
+
     // Computed
     expect(isComputedProp(child, "computed")).toBe(true)
     expect(child.computed).toBe("child")
+
     // Flow
     expect(isFlow(Parent.prototype.flow)).toBe(true)
     expect(isFlow(Child.prototype.flow)).toBe(true)
@@ -1146,11 +1136,13 @@ test("subclass - cannot re-annotate", () => {
                 action: action,
                 observable: observable,
                 actionBound: action.bound,
+                flow: flow,
                 computed: computed
             })
         }
         action() {}
         actionBound() {}
+        *flow() {}
         get computed() {
             return this
         }
@@ -1174,6 +1166,16 @@ test("subclass - cannot re-annotate", () => {
             })
         }
         actionBound() {}
+    }
+
+    class ChildFlow extends Parent {
+        constructor() {
+            super()
+            makeObservable(this, {
+                flow: flow
+            })
+        }
+        *flow() {}
     }
 
     class ChildObservable extends Parent {
@@ -1200,6 +1202,7 @@ test("subclass - cannot re-annotate", () => {
 
     expect(() => new ChildAction()).toThrow(/^\[MobX\] Cannot apply/)
     expect(() => new ChildActionBound()).toThrow(/^\[MobX\] Cannot apply/)
+    expect(() => new ChildFlow()).toThrow(/^\[MobX\] Cannot apply/)
     expect(() => new ChildObservable()).toThrow(/^\[MobX\] Cannot apply/)
     expect(() => new ChildComputed()).toThrow(/^\[MobX\] Cannot apply/)
 })
@@ -1215,6 +1218,8 @@ test("subclass - cannot re-decorate", () => {
         action() {}
         @action.bound
         actionBound() {}
+        @flow
+        *flow() {}
         @computed
         get computed() {
             return this
@@ -1240,6 +1245,17 @@ test("subclass - cannot re-decorate", () => {
             }
             @action.bound
             actionBound() {}
+        }
+    }).toThrow(/^\[MobX\] Cannot apply/)
+
+    expect(() => {
+        class ChildFlow extends Parent {
+            constructor() {
+                super()
+                makeObservable(this)
+            }
+            @flow
+            *flow() {}
         }
     }).toThrow(/^\[MobX\] Cannot apply/)
 
@@ -1330,29 +1346,6 @@ test("@override", () => {
     expect(child.action()).toBe("child of parent")
 })
 
-test("@override must override", () => {
-    expect(() => {
-        class Parent {
-            constructor() {
-                makeObservable(this)
-            }
-
-            action() {
-                return "parent"
-            }
-        }
-
-        class Child extends Parent {
-            @override
-            action() {
-                return `child of ${super.action()}`
-            }
-        }
-    }).toThrow(
-        /^\[MobX\] 'Child.action' is decorated with 'override', but no such decorated member was found on prototype\./
-    )
-})
-
 test("override", () => {
     class Parent {
         constructor() {
@@ -1388,10 +1381,6 @@ test("override", () => {
 
 test("override must override", () => {
     class Parent {
-        constructor() {
-            // makeObservable(this)
-        }
-
         action() {
             return "parent"
         }
@@ -1410,7 +1399,30 @@ test("override must override", () => {
     }
 
     expect(() => new Child()).toThrow(
-        /^\[MobX\] 'ObservableObject@\d+\.action' is annotated with 'override', but no such annotated member was found on prototype\./
+        /^\[MobX\] 'Child@\d+\.action' is annotated with 'override', but no such annotated member was found on prototype\./
+    )
+})
+
+test("@override must override", () => {
+    class Parent {
+        action() {
+            return "parent"
+        }
+    }
+
+    expect(() => {
+        class Child extends Parent {
+            constructor() {
+                super()
+                makeObservable(this)
+            }
+            @override
+            action() {
+                return `child of ${super.action()}`
+            }
+        }
+    }).toThrow(
+        /^\[MobX\] 'Child\.prototype\.action' is decorated with 'override', but no such decorated member was found on prototype\./
     )
 })
 
