@@ -28,9 +28,7 @@ test("throws on undeclared prop", () => {
 
     expect(() => {
         new Box()
-    }).toThrowErrorMatchingInlineSnapshot(
-        `"[MobX] Cannot decorate undefined property: 'notExisting'"`
-    )
+    }).toThrow(/Field not found/)
 })
 
 test("decorate should work", function () {
@@ -177,12 +175,6 @@ test("decorate should work with plain object", function () {
 
 test("decorate should work with Object.create", function () {
     const Box = {
-        uninitialized: undefined,
-        height: 20,
-        sizes: [2],
-        someFunc: function () {
-            return 2
-        },
         get width() {
             return (
                 this.undeclared *
@@ -201,6 +193,12 @@ test("decorate should work with Object.create", function () {
     }
 
     const box = Object.create(Box)
+    box.uninitialized = undefined
+    box.height = 20
+    box.sizes = [2]
+    box.someFunc = function () {
+        return 2
+    }
     makeObservable(box, {
         uninitialized: observable,
         height: observable,
@@ -343,7 +341,7 @@ test("decorate should work with inheritance through Object.create", () => {
     expect(child1.x).toBe(5)
 })
 
-test("decorate should not allow @observable on getter", function () {
+test("decorator requires correct types", function () {
     const obj = {
         x: 0,
         get y() {
@@ -355,25 +353,19 @@ test("decorate should not allow @observable on getter", function () {
         makeObservable(obj, {
             x: computed
         })
-    }).toThrowErrorMatchingInlineSnapshot(
-        `"[MobX] Cannot decorate 'x': computed can only be used on getter properties."`
-    )
+    }).toThrow(/can only be used on getter properties/)
 
     expect(() => {
         makeObservable(obj, {
             x: action
         })
-    }).toThrowErrorMatchingInlineSnapshot(
-        `"[MobX] Cannot decorate 'x': action can only be used on properties with a function value."`
-    )
+    }).toThrow(/can only be used on properties with a function value/)
 
     expect(() => {
         makeObservable(obj, {
             y: observable
         })
-    }).toThrowErrorMatchingInlineSnapshot(
-        `"[MobX] Cannot decorate 'y': observable cannot be used on setter / getter properties."`
-    )
+    }).toThrow(/cannot be used on getter\/setter properties/)
 })
 
 test("decorate a property with two decorators", function () {
@@ -427,5 +419,5 @@ test("expect warning for missing decorated getter", () => {
             // @ts-expect-error
             z: computed
         })
-    }).toThrowErrorMatchingInlineSnapshot(`"[MobX] Cannot decorate undefined property: 'z'"`)
+    }).toThrow(/Field not found/)
 })

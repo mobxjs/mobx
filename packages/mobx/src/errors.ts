@@ -2,7 +2,7 @@
 const niceErrors = {
     0: `Invalid value for configuration 'enforceActions', expected 'never', 'always' or 'observed'`,
     1(annotationType, fieldName) {
-        return `Cannot apply '${annotationType}' to: '${fieldName}': Field not found`
+        return `Cannot apply '${annotationType}' to '${fieldName}': Field not found.`
     },
     2(prop) {
         return `invalid decorator for '${prop.toString()}'`

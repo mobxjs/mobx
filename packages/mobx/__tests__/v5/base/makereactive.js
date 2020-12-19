@@ -667,9 +667,7 @@ test("double declare property", () => {
                 a: mobx.observable.ref
             }
         )
-    }).toThrowErrorMatchingInlineSnapshot(
-        `"[MobX] Cannot decorate 'a': the property is already decorated as observable."`
-    )
+    }).toThrow(/The field is already annotated/)
 })
 
 test("structural collections", () => {

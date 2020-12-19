@@ -78,9 +78,7 @@ test("should not be possible to use @action with getters", () => {
     }
     expect(() => {
         new A()
-    }).toThrowErrorMatchingInlineSnapshot(
-        `"[MobX] Cannot decorate 'Test': action can only be used on properties with a function value."`
-    )
+    }).toThrow(/can only be used on properties with a function value/)
 
     mobx._resetGlobalState()
 })
@@ -1040,9 +1038,11 @@ test("@computed.equals (Babel)", () => {
     disposeAutorun()
 })
 
-test("actions are reassignable", () => {
-    const __DEV__PREV = __DEV__
-    __DEV__ = false
+// 19.12.2020 @urugator:
+// All annotated non-observable fields are not writable.
+// All annotated fields of non-plain objects are non-configurable.
+// https://github.com/mobxjs/mobx/pull/2641
+test.skip("actions are reassignable", () => {
     // See #1398, make actions reassignable to support stubbing
     class A {
         constructor() {
@@ -1070,7 +1070,6 @@ test("actions are reassignable", () => {
     expect(isAction(a.m3)).toBe(false)
     a.m4 = () => {}
     expect(isAction(a.m4)).toBe(false)
-    __DEV__ = __DEV__PREV
 })
 
 test("it should support asyncAction (babel)", async () => {

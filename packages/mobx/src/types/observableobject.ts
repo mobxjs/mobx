@@ -38,7 +38,6 @@ import {
     die,
     hasProp,
     getDescriptor,
-    isFunction,
     storedAnnotationsSymbol,
     ownKeys,
     isOverride,
@@ -223,7 +222,6 @@ export class ObservableObjectAdministration
         if (annotation === false) {
             return
         }
-
         assertAnnotable(this, annotation, key)
         annotation.make_(this, key)
     }
@@ -266,14 +264,22 @@ export class ObservableObjectAdministration
                     this.defaultAnnotation_,
                     this.autoBind_
                 )
-                break
+                // if this is lone setter, the getter may be further in proto chain
+                if (annotation !== false || !descriptor.set) {
+                    break
+                }
             }
             current = Object.getPrototypeOf(current)
         }
 
+        // Not found (may be false, meaning ignore)
+        if (annotation === undefined) {
+            die(1, "true", key)
+        }
+
         // Cache the annotation.
         // Note we can do this only because annotation and field can't change.
-        if (!this.isPlainObject_ && annotation) {
+        if (!this.isPlainObject_) {
             // We could also place it on furthest proto, shoudn't matter
             const closestProto = Object.getPrototypeOf(this.target_)
             if (!hasProp(closestProto, inferredAnnotationsSymbol)) {
@@ -656,7 +662,7 @@ function assertAnnotable(
 ) {
     // Valid annotation
     if (__DEV__ && !isAnnotation(annotation)) {
-        die(`Cannot annotate '${adm.name_}.${key.toString()}': Invalid annotation`)
+        die(`Cannot annotate '${adm.name_}.${key.toString()}': Invalid annotation.`)
     }
 
     /*
@@ -696,7 +702,7 @@ function assertAnnotable(
         const requestedAnnotationType = annotation.annotationType_
         die(
             `Cannot apply '${requestedAnnotationType}' to '${fieldName}':` +
-                `\nthe field is already annotated with '${currentAnnotationType}'.` +
+                `\nThe field is already annotated with '${currentAnnotationType}'.` +
                 `\nRe-annotating fields is not allowed.` +
                 `\nUse 'override' annotation for methods overriden by subclass.`
         )

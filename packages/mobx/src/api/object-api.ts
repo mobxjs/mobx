@@ -150,7 +150,7 @@ export function get<T extends Object>(obj: T, key: string): any
 export function get(obj: any, key: any): any {
     if (!has(obj, key)) return undefined
     if (isObservableObject(obj)) {
-        return obj.get_(key)
+        return ((obj as any) as IIsObservableObject)[$mobx].get_(key)
     } else if (isObservableMap(obj)) {
         return obj.get(key)
     } else if (isObservableArray(obj)) {

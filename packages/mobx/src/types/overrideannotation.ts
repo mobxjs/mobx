@@ -13,7 +13,8 @@ export function isOverride(annotation: Annotation): boolean {
     return annotation.annotationType_ === OVERRIDE
 }
 
-function make_(adm, key): boolean {
+// TODO warn if used on plain object
+function make_(adm, key): void {
     // Must override something
     if (__DEV__ && !hasProp(adm[appliedAnnotationsSymbol], key)) {
         die(
@@ -21,7 +22,6 @@ function make_(adm, key): boolean {
                 `but no such annotated member was found on prototype.`
         )
     }
-    return true
 }
 
 function extend_(adm, key, descriptor, proxyTrap): boolean {

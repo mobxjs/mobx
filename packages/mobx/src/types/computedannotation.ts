@@ -15,7 +15,7 @@ export function createComputedAnnotation(name: string, options?: object): Annota
         extend_
     }
 }
-
+// TODO support getter/setter on different protos
 function make_(adm: ObservableObjectAdministration, key: PropertyKey): void {
     let source = adm.target_
     while (source && source !== objectPrototype) {

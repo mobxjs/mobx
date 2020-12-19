@@ -111,7 +111,7 @@ function createActionDescriptor(
     assertActionDescriptor(adm, annotation, key, descriptor)
     let { value } = descriptor
     if (bound) {
-        value = value.bind(adm.target_)
+        value = value.bind(adm.proxy_ ?? adm.target_)
     }
     return {
         value: createAction(
