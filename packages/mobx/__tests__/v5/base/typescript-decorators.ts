@@ -1187,7 +1187,10 @@ test("multiple inheritance should work", () => {
     expect(mobx.keys(new B())).toEqual(["x", "y"])
 })
 
-// Stubbing is only possible on production, dunno how to switch __DEV__ here
+// 19.12.2020 @urugator:
+// All annotated non-observable fields are not writable.
+// All annotated fields of non-plain objects are non-configurable.
+// https://github.com/mobxjs/mobx/pull/2641
 test.skip("actions are reassignable", () => {
     // See #1398 and #1545, make actions reassignable to support stubbing
     class A {

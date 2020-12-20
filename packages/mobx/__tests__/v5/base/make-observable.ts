@@ -1426,52 +1426,28 @@ test("@override must override", () => {
     )
 })
 
-test("cannot reannotate prop of dynamic object", () => {
-    /*
-    const o = makeObservable(
-        {
-            observable: "observable",
-            action() {},
-            get computed() {
-                return this.observable
-            },
-            *flow() {
-                return true
-            }
-        },
-        {
-            observable: true,
-            computed: true,
-            action: true,
-            flow: true
-        },
-        { name: "name" }
-    )
-    console.log(isObservable(o))
-    console.log(isObservableProp(o, "observable"))
-    console.log(isComputedProp(o, "computed"))
-    console.log(isFlow(o.flow))
-    console.log(isAction(o.action))
-    */
-    /*
-    // create dynamic object with observable prop
-    const o = observable({ foo: 1 as any })
-    // change it to function so it won't throw that action must be function
-    o.foo = () => {}
+test("computed setter/getter on different prototypes", () => {
+    class Parent {
+        observable = 0
+        constructor() {
+            makeObservable(this, {
+                observable: observable,
+                computed: computed
+            })
+        }
+        get computed() {
+            return this.observable + 1
+        }
+    }
 
-    //console.log(getAdministration(o).values_)
-    makeObservable(o, {
-        foo: action
-    })
-    console.log(o.foo)
-    console.log(isAction(o.foo))
-    console.log(isObservableProp(o, "foo"))
-    //console.log(getAdministration(o).values_)
-    /*
-    expect(() => {
-        makeObservable(o, {
-            foo: action
-        })
-    }).toThrow(/^\[MobX\] Cannot decorate/)
-    */
+    class Child extends Parent {
+        set computed(value) {
+            this.observable = value
+        }
+    }
+
+    const child = new Child()
+    expect(isComputedProp(child, "computed")).toBe(true)
+    child.computed = 5
+    expect(child.computed).toBe(6)
 })

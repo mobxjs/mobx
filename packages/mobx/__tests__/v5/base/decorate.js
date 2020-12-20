@@ -353,7 +353,7 @@ test("decorator requires correct types", function () {
         makeObservable(obj, {
             x: computed
         })
-    }).toThrow(/can only be used on getter properties/)
+    }).toThrow(/can only be used on getter\(\+setter\) properties/)
 
     expect(() => {
         makeObservable(obj, {

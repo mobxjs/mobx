@@ -1,3 +1,4 @@
+const { isAction, isObservable, isObservableProp } = require("../../../src/mobx")
 const mobx = require("../../../src/mobx.ts")
 const m = mobx
 const o = mobx.observable
@@ -233,11 +234,16 @@ test("observable5", function () {
     const three = function () {
         return 3
     }
+    // 20.12.2020 @urugator:
+    // Since https://github.com/mobxjs/mobx/pull/2641
+    // the non-observable field won't become suddenly observable on assigment.
+    // Firstly it doesn't make sense,
+    // secondly it's inconsistent - it works like this only for proxies/object api.
     x.nonReactive = three
     expect(b.toArray()).toEqual([
         [17, f, 17],
-        [18, f, 18],
-        [18, three, 3]
+        [18, f, 18]
+        //[18, three, 3]
     ])
 })
 

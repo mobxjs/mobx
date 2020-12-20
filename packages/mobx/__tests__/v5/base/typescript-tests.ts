@@ -979,7 +979,7 @@ test("enumerability", () => {
             return this.a
         } // non-enumerable, (and, ideally, on proto)
         m() {} // non-enumerable, on proto
-        m2 = () => {} // enumerable, on self
+        m2 = () => {} // non-enumerable, on self
     }
 
     const a = new A()
@@ -1788,7 +1788,10 @@ test("multiple inheritance should work", () => {
     expect(mobx.keys(new B())).toEqual(["x", "y"])
 })
 
-// Only possible with __DEV__ === false
+// 19.12.2020 @urugator:
+// All annotated non-observable fields are not writable.
+// All annotated fields of non-plain objects are non-configurable.
+// https://github.com/mobxjs/mobx/pull/2641
 test.skip("actions are reassignable", () => {
     // See #1398 and #1545, make actions reassignable to support stubbing
     class A {

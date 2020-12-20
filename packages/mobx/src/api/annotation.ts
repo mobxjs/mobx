@@ -50,7 +50,7 @@ export function inferAnnotationFromDescriptor(
     autoBind: boolean
 ): Annotation | false {
     if (desc.get) return computed
-    if (desc.set) return false // ignore setter w/o getter
+    if (desc.set) return false // ignore lone setter
     // if already wrapped in action/flow, don't do that another time, but assume it is already set up properly
     return isFunction(desc.value)
         ? isGenerator(desc.value)

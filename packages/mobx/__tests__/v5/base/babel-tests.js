@@ -794,7 +794,7 @@ test("enumerability", () => {
             return this.a
         } // non-enumerable, (and, ideally, on proto)
         m() {} // non-enumerable, on proto
-        m2 = () => {} // enumerable, on self
+        m2 = () => {} // non-enumerable, on self
     }
 
     const a = new A()
@@ -850,7 +850,7 @@ test("enumerability - workaround", () => {
             return this.a
         } // non-enumerable, (and, ideally, on proto)
         m() {} // non-enumerable, on proto
-        m2 = () => {} // enumerable, on self
+        m2 = () => {} // non-enumerable, on self
 
         constructor() {
             makeObservable(this, {
