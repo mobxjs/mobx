@@ -377,7 +377,7 @@ test("predictable 'this' - 2", () => {
     expect(a.computed).toBe(a)
 })
 
-test("1796 - deleting / recreate prop", () => {
+test.only("1796 - deleting / recreate prop", () => {
     let value = observable({
         foo: undefined // if foo is something like 'abc', it works.
     })

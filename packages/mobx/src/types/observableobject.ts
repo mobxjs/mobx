@@ -1,7 +1,7 @@
-import { isAnnotation } from "../api/annotation"
-import { getAnnotationFromOptions } from "../api/observable"
 import {
     CreateObservableOptions,
+    getAnnotationFromOptions,
+    isAnnotation,
     $mobx,
     Atom,
     Annotation,
@@ -170,22 +170,30 @@ export class ObservableObjectAdministration
     }
 
     get_(key: PropertyKey): any {
+        if (globalState.trackingDerivation && !hasProp(this.target_, key)) {
+            // Prop doesn't exist yet, subscribe for this key
+            this.has_(key)
+        }
         return this.target_[key]
     }
 
     set_(key: PropertyKey, value: any, proxyTrap: boolean = false): boolean | null {
         // faster than this.has_ - no need to subscribe for key here
         if (hasProp(this.target_, key)) {
+            // Existing prop
             if (this.values_.has(key)) {
-                // Can be intercepted
+                // Observable (can be intercepted)
                 return this.setObservablePropValue_(key, value)
             } else if (proxyTrap) {
+                // Non-observable - proxy
                 return Reflect.set(this.target_, key, value)
             } else {
+                // Non-observable
                 this.target_[key] = value
                 return true
             }
         } else {
+            // New prop
             return this.extend_(
                 key,
                 { value, enumerable: true, writable: true, configurable: true },
@@ -197,14 +205,17 @@ export class ObservableObjectAdministration
 
     // Returns false for non-enumerable by design!
     has_(key: PropertyKey): boolean {
-        // TODO: do this only in derivation, otherwise immediately return "key in this.target_"?
+        if (!globalState.trackingDerivation) {
+            // Skip key subscription outside derivation
+            return key in this.target_
+        }
         this.pendingKeys_ ||= new Map()
         let entry = this.pendingKeys_.get(key)
         if (!entry) {
             entry = new ObservableValue(
                 // It's handler for "in" operation,
                 // we care about all enumerable props,
-                // but we assume that prototype keys are stable
+                // we assume keys on prototypes are stable
                 key in this.target_,
                 referenceEnhancer,
                 `${this.name_}.${stringifyKey(key)}?`,
@@ -513,6 +524,8 @@ export class ObservableObjectAdministration
                 if (observable instanceof ObservableValue) {
                     value = observable.value_
                     observable.set(undefined)
+                    // #1796 deleting a prop that has an undefined value won't retrigger an observer
+                    observable.reportChanged()
                 }
             }
             // handle keys

@@ -20,32 +20,14 @@ function getAdm(target): ObservableObjectAdministration {
 // and skip either the internal values map, or the base object with its property descriptors!
 const objectProxyTraps: ProxyHandler<any> = {
     has(target: IIsObservableObject, name: PropertyKey): boolean {
-        if (name === $mobx || name === "constructor") return true
         if (__DEV__ && globalState.trackingDerivation)
             warnAboutProxyRequirement(
                 "detect new properties using the 'in' operator. Use 'has' from 'mobx' instead."
             )
         return getAdm(target).has_(name)
     },
-    // TODO (support non-observables)
-    get(target: IIsObservableObject, name: PropertyKey) {
-        if (name === $mobx || name === "constructor") return target[name]
-        const adm = getAdm(target)
-        const observable = adm.values_.get(name)
-        if (observable instanceof Atom) {
-            const result = (observable as any).get()
-            if (result === undefined) {
-                // This fixes #1796, because deleting a prop that has an
-                // undefined value won't retrigger a observer (no visible effect),
-                // the autorun wouldn't subscribe to future key changes (see also next comment)
-                adm.has_(name as any)
-            }
-            return result
-        }
-        // make sure we start listening to future keys
-        // note that we only do this here for optimization
-        if (isStringish(name)) adm.has_(name)
-        return target[name]
+    get(target: IIsObservableObject, name: PropertyKey): any {
+        return getAdm(target).get_(name)
     },
     set(target: IIsObservableObject, name: PropertyKey, value: any): boolean {
         if (!isStringish(name)) return false
@@ -64,7 +46,18 @@ const objectProxyTraps: ProxyHandler<any> = {
         if (!isStringish(name)) return false
         return getAdm(target).delete_(name, true) ?? true
     },
-    // TODO define property
+    // TODO tests + object-api
+    defineProperty(
+        target: IIsObservableObject,
+        name: PropertyKey,
+        descriptor: PropertyDescriptor
+    ): boolean {
+        if (__DEV__)
+            warnAboutProxyRequirement(
+                "define property on an observable object. Use 'defineProperty' from 'mobx' instead."
+            )
+        return getAdm(target).defineProperty_(name, descriptor) ?? true
+    },
     ownKeys(target: IIsObservableObject): PropertyKey[] {
         if (__DEV__ && globalState.trackingDerivation)
             warnAboutProxyRequirement(
