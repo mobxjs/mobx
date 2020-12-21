@@ -91,15 +91,6 @@ export function getAnnotationFromOptions(
         : undefined
 }
 
-/*
-const annotationToEnhancer = {
-    [OBSERVABLE]: deepEnhancer,
-    [OBSERVABLE_REF]: referenceEnhancer,
-    [OBSERVABLE_SHALLOW]: shallowEnhancer,
-    [OBSERVABLE_STRUCT]: refStructEnhancer
-}
-*/
-
 export function getEnhancerFromAnnotation(annotation?: Annotation): IEnhancer<any> {
     return !annotation ? deepEnhancer : annotation.options_?.enhancer ?? deepEnhancer
 }

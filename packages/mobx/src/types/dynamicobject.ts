@@ -35,6 +35,7 @@ const objectProxyTraps: ProxyHandler<any> = {
                 "add a new observable property through direct assignment. Use 'set' from 'mobx' instead."
             )
         }
+        // null (intercepted) -> true (success)
         return getAdm(target).set_(name, value, true) ?? true
     },
     deleteProperty(target: IIsObservableObject, name: PropertyKey): boolean {
