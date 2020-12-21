@@ -71,8 +71,7 @@ const observableStructAnnotation = createObservableAnnotation("observable.struct
 })
 const observableDecoratorAnnotation = createDecoratorAnnotation(observableAnnotation)
 
-// TODO trailing "s"
-export function getEnhancerFromOption(options: CreateObservableOptions): IEnhancer<any> {
+export function getEnhancerFromOptions(options: CreateObservableOptions): IEnhancer<any> {
     return options.deep === true
         ? deepEnhancer
         : options.deep === false
@@ -180,27 +179,27 @@ export interface IObservableFactory extends Annotation, PropertyDecorator {
 const observableFactories: IObservableFactory = {
     box<T = any>(value?: T, options?: CreateObservableOptions): IObservableValue<T> {
         const o = asCreateObservableOptions(options)
-        return new ObservableValue(value, getEnhancerFromOption(o), o.name, true, o.equals)
+        return new ObservableValue(value, getEnhancerFromOptions(o), o.name, true, o.equals)
     },
     array<T = any>(initialValues?: T[], options?: CreateObservableOptions): IObservableArray<T> {
         const o = asCreateObservableOptions(options)
         return (globalState.useProxies === false || o.proxy === false
             ? createLegacyArray
-            : createObservableArray)(initialValues, getEnhancerFromOption(o), o.name)
+            : createObservableArray)(initialValues, getEnhancerFromOptions(o), o.name)
     },
     map<K = any, V = any>(
         initialValues?: IObservableMapInitialValues<K, V>,
         options?: CreateObservableOptions
     ): ObservableMap<K, V> {
         const o = asCreateObservableOptions(options)
-        return new ObservableMap<K, V>(initialValues, getEnhancerFromOption(o), o.name)
+        return new ObservableMap<K, V>(initialValues, getEnhancerFromOptions(o), o.name)
     },
     set<T = any>(
         initialValues?: IObservableSetInitialValues<T>,
         options?: CreateObservableOptions
     ): ObservableSet<T> {
         const o = asCreateObservableOptions(options)
-        return new ObservableSet<T>(initialValues, getEnhancerFromOption(o), o.name)
+        return new ObservableSet<T>(initialValues, getEnhancerFromOptions(o), o.name)
     },
     object<T = any>(
         props: T,

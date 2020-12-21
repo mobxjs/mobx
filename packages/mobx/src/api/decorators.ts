@@ -2,36 +2,6 @@ import { Annotation, addHiddenProp, AnnotationsMap, hasProp, die, isOverride } f
 
 export const storedAnnotationsSymbol = Symbol("mobx-stored-annotations")
 
-// TODO delete
-//export const override: PropertyDecorator & Annotation = createDecoratorAnnotation("override")
-//export const OVERRIDE = "override"
-
-/**
- * Creates a function that acts as
- * - decorator
- * - decorator factory when called with single parameter
- * - annotation object
- * TODO:
- * Possibly get rid of this. It's only used for action.bound("name"), which is no longer supported?
- */
-/*
-export function createCallableDecoratorAnnotation<ArgType>(
-    type: Annotation["annotationType_"]
-): Annotation & PropertyDecorator & ((arg: ArgType) => PropertyDecorator & Annotation) {
-    function decoratorOrFactory(targetOrArg: any, property?: PropertyKey): any {
-        if (property === undefined) {
-            // @decorator(arg) member
-            return createDecoratorAnnotation(type, targetOrArg)
-        } else {
-            // @decorator member
-            storeAnnotation(targetOrArg, property!, type)
-        }
-    }
-    decoratorOrFactory.annotationType_ = type
-    return decoratorOrFactory as any
-}
-*/
-
 /**
  * Creates a function that acts as
  * - decorator

@@ -1,5 +1,11 @@
-import { createDecoratorAnnotation } from "../api/decorators"
-import { die, Annotation, hasProp, appliedAnnotationsSymbol } from "../internal"
+import {
+    die,
+    Annotation,
+    hasProp,
+    appliedAnnotationsSymbol,
+    createDecoratorAnnotation,
+    ObservableObjectAdministration
+} from "../internal"
 
 const OVERRIDE = "override"
 
@@ -13,8 +19,14 @@ export function isOverride(annotation: Annotation): boolean {
     return annotation.annotationType_ === OVERRIDE
 }
 
-// TODO warn if used on plain object
-function make_(adm, key): void {
+function make_(adm: ObservableObjectAdministration, key): void {
+    // Must not be plain object
+    if (__DEV__ && adm.isPlainObject_) {
+        die(
+            `Cannot apply '${this.annotationType_}' to '${adm.name_}.${key.toString()}':` +
+                `\n'${this.annotationType_}' cannot be used on plain objects.`
+        )
+    }
     // Must override something
     if (__DEV__ && !hasProp(adm[appliedAnnotationsSymbol], key)) {
         die(

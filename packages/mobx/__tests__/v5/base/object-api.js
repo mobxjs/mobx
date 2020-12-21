@@ -69,7 +69,10 @@ test("object - set, remove, values are reactive", () => {
     expect(snapshots).toEqual([[3], [3, 4], [5, 4], [5]])
 })
 
-test("object with symbol keys - set, remove, values are reactive", () => {
+// 21.12.2020 @urugator:
+// Since https://github.com/mobxjs/mobx/pull/2641
+// values() works like Object.values - symbols are not part of the result
+test.skip("object with symbol keys - set, remove, values are reactive", () => {
     const todos = observable({})
     const snapshots = []
     const x = Symbol()
@@ -127,7 +130,10 @@ test("object - set, remove, entries are reactive", () => {
     ])
 })
 
-test("object with symbols - set, remove, entries are reactive", () => {
+// 21.12.2020 @urugator:
+// Since https://github.com/mobxjs/mobx/pull/2641
+// entries() works like Object.entries - symbols are not part of the result
+test.skip("object with symbols - set, remove, entries are reactive", () => {
     const todos = observable({})
     const snapshots = []
     const x = Symbol()
@@ -182,7 +188,10 @@ test("object - set, remove, keys are reactive", () => {
     expect(snapshots).toEqual([["a", "x"], ["a", "x", "z"], ["a", "x"], ["x"]])
 })
 
-test("object with symbol keys - set, remove, keys are reactive", () => {
+// 21.12.2020 @urugator:
+// Since https://github.com/mobxjs/mobx/pull/2641
+// keys() works like Object.keys - symbols are not part of the result
+test.skip("object with symbol keys - set, remove, keys are reactive", () => {
     const snapshots = []
     const x = Symbol()
     const y = Symbol()
@@ -471,7 +480,10 @@ test("observe & intercept", () => {
             a: { title: "get coffee" }
         },
         {},
-        { deep: false }
+        {
+            deep: false,
+            name: "" // stable name for snapshot
+        }
     )
     mobx.observe(todos, c => {
         events.push({ observe: { ...c, object: "skip" } })
@@ -499,7 +511,7 @@ test("observe & intercept", () => {
 })
 
 test("observe & intercept set called multiple times", () => {
-    const a = mobx.observable({})
+    const a = mobx.observable({}, {}, { name: "" }) // stable name for snapshot
     const interceptLogs = []
     const observeLogs = []
 

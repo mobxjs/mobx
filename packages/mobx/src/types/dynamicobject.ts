@@ -1,16 +1,15 @@
 import {
     $mobx,
-    Atom,
     IIsObservableObject,
     ObservableObjectAdministration,
     warnAboutProxyRequirement,
     assertProxies,
     die,
-    isStringish
+    isStringish,
+    globalState,
+    CreateObservableOptions,
+    asObservableObject
 } from "../internal"
-import { globalState } from "../core/globalstate"
-import { CreateObservableOptions } from "../api/observable"
-import { asObservableObject } from "./observableobject"
 
 function getAdm(target): ObservableObjectAdministration {
     return target[$mobx]
@@ -39,11 +38,13 @@ const objectProxyTraps: ProxyHandler<any> = {
         return getAdm(target).set_(name, value, true) ?? true
     },
     deleteProperty(target: IIsObservableObject, name: PropertyKey): boolean {
-        if (__DEV__)
+        if (__DEV__) {
             warnAboutProxyRequirement(
                 "delete properties from an observable object. Use 'remove' from 'mobx' instead."
             )
+        }
         if (!isStringish(name)) return false
+        // null (intercepted) -> true (success)
         return getAdm(target).delete_(name, true) ?? true
     },
     // TODO tests + object-api
@@ -52,10 +53,12 @@ const objectProxyTraps: ProxyHandler<any> = {
         name: PropertyKey,
         descriptor: PropertyDescriptor
     ): boolean {
-        if (__DEV__)
+        if (__DEV__) {
             warnAboutProxyRequirement(
                 "define property on an observable object. Use 'defineProperty' from 'mobx' instead."
             )
+        }
+        // null (intercepted) -> true (success)
         return getAdm(target).defineProperty_(name, descriptor) ?? true
     },
     ownKeys(target: IIsObservableObject): PropertyKey[] {

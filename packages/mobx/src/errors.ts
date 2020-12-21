@@ -4,9 +4,9 @@ const niceErrors = {
     1(annotationType, fieldName) {
         return `Cannot apply '${annotationType}' to '${fieldName}': Field not found.`
     },
-    2(prop) {
+    /*2(prop) {
         return `invalid decorator for '${prop.toString()}'`
-    },
+    },*/
     /*3(prop, annotationType: string) {
         return `Cannot decorate '${prop.toString()}': ${annotationType} can only be used on properties with a function value.`
     },*/
@@ -69,7 +69,8 @@ const niceErrors = {
     36: "isolateGlobalState should be called before MobX is running any reactions",
     37(method) {
         return `[mobx] \`observableArray.${method}()\` mutates the array in-place, which is not allowed inside a derivation. Use \`array.slice().${method}()\` instead`
-    },
+    }
+    /*
     38(key, currentAnnotationType, requestedAnnotationType) {
         return (
             `Cannot re-annotate/re-decorate '${key.toString()}' to '${requestedAnnotationType}'` +
@@ -77,7 +78,7 @@ const niceErrors = {
             `\nEach member in prototype chain must be annotated/decorated only once.` +
             `\nMethods overriden by subclass can optionally use 'override' decorator/annotation for visual clue`
         )
-    }
+    }*/
 } as const
 
 const errors: typeof niceErrors = __DEV__ ? niceErrors : ({} as any)

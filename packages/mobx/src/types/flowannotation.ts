@@ -7,9 +7,9 @@ import {
     die,
     flow,
     isFlow,
-    recordAnnotationApplied
+    recordAnnotationApplied,
+    isFunction
 } from "../internal"
-import { isFunction } from "../utils/utils"
 
 export function createFlowAnnotation(name: string, options?: object): Annotation {
     return {

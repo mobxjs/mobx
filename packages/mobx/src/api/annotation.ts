@@ -37,10 +37,10 @@ export type AnnotationsMap<T, AdditionalFields extends PropertyKey> = {
 /**
  * Infers the best fitting annotation from property descriptor or false if the field shoudn't be annotated
  * - getter(+setter) -> computed
- * - setter w/o getter -> false
- * - flow -> false
+ * - setter w/o getter -> false (ignore)
+ * - flow -> false (ignore)
  * - generator -> flow
- * - action -> false
+ * - action -> false (ignore)
  * - function -> action (optionally bound)
  * - other -> defaultAnnotation
  */
@@ -51,7 +51,7 @@ export function inferAnnotationFromDescriptor(
 ): Annotation | false {
     if (desc.get) return computed
     if (desc.set) return false // ignore lone setter
-    // if already wrapped in action/flow, don't do that another time, but assume it is already set up properly
+    // If already wrapped in action/flow, don't do that another time, but assume it is already set up properly.
     return isFunction(desc.value)
         ? isGenerator(desc.value)
             ? isFlow(desc.value)

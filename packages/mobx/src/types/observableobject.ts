@@ -46,9 +46,7 @@ import {
     objectPrototype
 } from "../internal"
 
-// TODO is export needed?
 export const appliedAnnotationsSymbol = Symbol("mobx-applied-annotations")
-
 export const inferredAnnotationsSymbol = Symbol("mobx-inferred-annotations")
 
 export type IObjectDidChange<T = any> = {
@@ -87,9 +85,6 @@ export type IObjectWillChange<T = any> =
 
 const REMOVE = "remove"
 
-/**
- * TODO document proxyTrap option
- */
 export class ObservableObjectAdministration
     implements IInterceptable<IObjectWillChange>, IListenable {
     keysAtom_: IAtom
@@ -177,6 +172,13 @@ export class ObservableObjectAdministration
         return this.target_[key]
     }
 
+    /**
+     * @param {PropertyKey} key
+     * @param {any} value
+     * @param {Annotation|boolean} annotation true - infer from descriptor, false - copy as is
+     * @param {boolean} proxyTrap whether it's called from proxy trap
+     * @returns {boolean|null} true on success, false on failure (proxyTrap + non-configurable), null when cancelled by interceptor
+     */
     set_(key: PropertyKey, value: any, proxyTrap: boolean = false): boolean | null {
         // faster than this.has_ - no need to subscribe for key here
         if (hasProp(this.target_, key)) {
@@ -237,6 +239,13 @@ export class ObservableObjectAdministration
         annotation.make_(this, key)
     }
 
+    /**
+     * @param {PropertyKey} key
+     * @param {PropertyDescriptor} descriptor
+     * @param {Annotation|boolean} annotation true - infer from descriptor, false - copy as is
+     * @param {boolean} proxyTrap whether it's called from proxy trap
+     * @returns {boolean|null} true on success, false on failure (proxyTrap + non-configurable), null when cancelled by interceptor
+     */
     extend_(
         key: PropertyKey,
         descriptor: PropertyDescriptor,
@@ -302,6 +311,12 @@ export class ObservableObjectAdministration
         return annotation
     }
 
+    /**
+     * @param {PropertyKey} key
+     * @param {PropertyDescriptor} descriptor
+     * @param {boolean} proxyTrap whether it's called from proxy trap
+     * @returns {boolean|null} true on success, false on failure (proxyTrap + non-configurable), null when cancelled by interceptor
+     */
     defineProperty_(
         key: PropertyKey,
         descriptor: PropertyDescriptor,
@@ -476,6 +491,12 @@ export class ObservableObjectAdministration
         return true
     }
 
+    /**
+     * @param {PropertyKey} key
+     * @param {PropertyDescriptor} descriptor
+     * @param {boolean} proxyTrap whether it's called from proxy trap
+     * @returns {boolean|null} true on success, false on failure (proxyTrap + non-configurable), null when cancelled by interceptor
+     */
     delete_(key: PropertyKey, proxyTrap: boolean = false): boolean | null {
         // No such prop
         if (!hasProp(this.target_, key)) {
@@ -679,7 +700,8 @@ function assertAnnotable(
     }
 
     /*
-    // Configurable, not sealed not frozen
+    // Configurable, not sealed, not frozen
+    // Possibly not needed, just a little better error then the one thrown by engine
     if (__DEV__) {
         const configurable = getDescriptor(adm.target_, key)?.configurable
         const frozen = Object.isFrozen(adm.target_)

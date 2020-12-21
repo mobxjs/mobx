@@ -846,34 +846,33 @@ test("subclass - annotation", () => {
 
 test("subclass - decorator", () => {
     class Parent {
+        @observable
         ["observable"] = { nested: {} };
+        @observable.ref
         ["observable.ref"] = { nested: {} };
+        @observable.shallow
         ["observable.shallow"] = { nested: {} }
 
         constructor() {
-            makeObservable(this, {
-                observable: observable,
-                "observable.ref": observable.ref,
-                "observable.shallow": observable.shallow,
-                computed: computed,
-                action: action,
-                "action.bound": action.bound,
-                flow: flow
-            })
+            makeObservable(this)
         }
 
+        @computed
         get computed() {
             return this
         }
 
+        @action
         ["action"]() {
             return this
         }
 
+        @action.bound
         ["action.bound"]() {
             return this
         }
 
+        @flow
         *["flow"]() {
             return this
         }

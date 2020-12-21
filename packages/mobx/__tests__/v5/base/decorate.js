@@ -173,8 +173,17 @@ test("decorate should work with plain object", function () {
     expect(ar.slice()).toEqual([40, 20, 60, 210, 420, 700])
 })
 
+// 21.12.2020 @urugator:
+// Copying props from prototype to instance and making them observable doesn't make much sense.
+// Probably we shouldn't support this. TODO@major
 test("decorate should work with Object.create", function () {
     const Box = {
+        uninitialized: undefined,
+        height: 20,
+        sizes: [2],
+        someFunc: function () {
+            return 2
+        },
         get width() {
             return (
                 this.undeclared *
@@ -193,12 +202,6 @@ test("decorate should work with Object.create", function () {
     }
 
     const box = Object.create(Box)
-    box.uninitialized = undefined
-    box.height = 20
-    box.sizes = [2]
-    box.someFunc = function () {
-        return 2
-    }
     makeObservable(box, {
         uninitialized: observable,
         height: observable,

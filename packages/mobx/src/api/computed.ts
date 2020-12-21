@@ -13,9 +13,8 @@ import {
     comparer
 } from "../internal"
 
-// TODO
-//export const COMPUTED = "computed"
-//export const COMPUTED_STRUCT = "computed.struct"
+export const COMPUTED = "computed"
+export const COMPUTED_STRUCT = "computed.struct"
 
 export interface IComputedFactory extends Annotation, PropertyDecorator {
     // @computed(opts)
@@ -26,8 +25,8 @@ export interface IComputedFactory extends Annotation, PropertyDecorator {
     struct: Annotation & PropertyDecorator
 }
 
-const computedAnnotation = createComputedAnnotation("computed")
-const computedStructAnnotation = createComputedAnnotation("computed.struct", {
+const computedAnnotation = createComputedAnnotation(COMPUTED)
+const computedStructAnnotation = createComputedAnnotation(COMPUTED_STRUCT, {
     equals: comparer.structural
 })
 
@@ -42,7 +41,7 @@ export const computed: IComputedFactory = function computed(arg1, arg2) {
     }
     if (isPlainObject(arg1)) {
         // @computed({ options })
-        return createDecoratorAnnotation(createComputedAnnotation("computed", arg1))
+        return createDecoratorAnnotation(createComputedAnnotation(COMPUTED, arg1))
     }
 
     // computed(expr, options?)

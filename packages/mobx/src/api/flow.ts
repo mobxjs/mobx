@@ -6,8 +6,7 @@ import {
     Annotation,
     isStringish,
     storeAnnotation,
-    createFlowAnnotation,
-    isGenerator
+    createFlowAnnotation
 } from "../internal"
 
 export const FLOW = "flow"

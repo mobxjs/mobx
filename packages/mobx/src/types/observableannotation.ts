@@ -4,7 +4,8 @@ import {
     deepEnhancer,
     die,
     Annotation,
-    recordAnnotationApplied
+    recordAnnotationApplied,
+    objectPrototype
 } from "../internal"
 
 export function createObservableAnnotation(name: string, options?: object): Annotation {
@@ -17,20 +18,28 @@ export function createObservableAnnotation(name: string, options?: object): Anno
 }
 
 function make_(adm: ObservableObjectAdministration, key: PropertyKey): void {
-    const descriptor = getDescriptor(adm.target_, key)
-    if (descriptor) {
-        assertObservableDescriptor(adm, this, key, descriptor)
-        const definePropertyOutcome = adm.defineObservableProperty_(
-            key,
-            descriptor.value,
-            this.options_?.enhancer ?? deepEnhancer
-        )
-        if (!definePropertyOutcome) {
-            // Intercepted
+    let source = adm.target_
+    // Copy props from proto as well, see test:
+    // "decorate should work with Object.create"
+    while (source && source !== objectPrototype) {
+        const descriptor = getDescriptor(source, key)
+        if (descriptor) {
+            assertObservableDescriptor(adm, this, key, descriptor)
+            const definePropertyOutcome = adm.defineObservableProperty_(
+                key,
+                descriptor.value,
+                this.options_?.enhancer ?? deepEnhancer
+            )
+            if (!definePropertyOutcome) {
+                // Intercepted
+                return
+            }
+            recordAnnotationApplied(adm, this, key)
             return
         }
-        recordAnnotationApplied(adm, this, key)
-    } else if (!this.isDecorator_) {
+        source = Object.getPrototypeOf(source)
+    }
+    if (!this.isDecorator_) {
         // Throw on missing key, except for decorators:
         // Decorator annotations are collected from whole prototype chain.
         // When called from super() some props may not exist yet.
