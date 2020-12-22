@@ -262,7 +262,7 @@ class Store {
             this.projectsFetchSuccess,
             this.projectsFetchFailure
         )
-    )
+    }
 
     projectsFetchSuccess = (projects) => {
         const filteredProjects = somePreprocessing(projects)
@@ -305,9 +305,9 @@ class Store {
         } catch (e) {
             runInAction(() => {
                 this.state = "error"
-            }
+            })
         }
-    )
+    }
 }
 ```
 
