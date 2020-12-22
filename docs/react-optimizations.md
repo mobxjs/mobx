@@ -97,7 +97,7 @@ const CarNameDisplayer = observer(({ car }) => <DisplayName name={car.model} />)
 
 const ManufacturerNameDisplayer = observer({ car}) => (
     <DisplayName name={car.manufacturer.name} />
-))
+)
 ```
 
 This quickly becomes tedious if you have lots of data of different shape. An alternative is to use a function that returns the data that you want your `*Displayer` to render:
