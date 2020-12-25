@@ -114,7 +114,7 @@ increment(state)
 <!--runInAction(fn)-->
 
 ```javascript
-import { observable } from "mobx"
+import { observable, runInAction } from "mobx"
 
 const state = observable({ value: 0 })
 
