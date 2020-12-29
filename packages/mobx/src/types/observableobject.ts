@@ -1,6 +1,7 @@
 import {
     CreateObservableOptions,
     getAnnotationFromOptions,
+    propagateChanged,
     isAnnotation,
     $mobx,
     Atom,
@@ -166,7 +167,7 @@ export class ObservableObjectAdministration
 
     get_(key: PropertyKey): any {
         if (globalState.trackingDerivation && !hasProp(this.target_, key)) {
-            // Prop doesn't exist yet, subscribe for this key
+            // Key doesn't exist yet, subscribe for it in case it's added later
             this.has_(key)
         }
         return this.target_[key]
@@ -228,6 +229,10 @@ export class ObservableObjectAdministration
         return entry.get()
     }
 
+    /**
+     * @param {PropertyKey} key
+     * @param {Annotation|boolean} annotation true - infer from object or it's prototype, false - ignore
+     */
     make_(key: PropertyKey, annotation: Annotation | boolean): void {
         if (annotation === true) {
             annotation = this.inferAnnotation_(key)
@@ -541,13 +546,12 @@ export class ObservableObjectAdministration
             // Clear observable
             if (observable) {
                 this.values_.delete(key)
-                // could be computed
+                // for computed, value is undefined
                 if (observable instanceof ObservableValue) {
                     value = observable.value_
-                    observable.set(undefined)
-                    // #1796 deleting a prop that has an undefined value won't retrigger an observer
-                    observable.reportChanged()
                 }
+                // Notify: autorun(() => obj[key]), see #1796
+                propagateChanged(observable)
             }
             // handle keys
             this.keysAtom_.reportChanged()
