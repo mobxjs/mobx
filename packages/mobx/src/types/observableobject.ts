@@ -47,7 +47,9 @@ import {
     objectPrototype
 } from "../internal"
 
+// object[appliedAnnotationsSymbol] = { foo: annotation, ... }
 export const appliedAnnotationsSymbol = Symbol("mobx-applied-annotations")
+// adm[inferredAnnotationsSymbol] = { foo: annotation, ... }
 export const inferredAnnotationsSymbol = Symbol("mobx-inferred-annotations")
 
 export type IObjectDidChange<T = any> = {
@@ -99,10 +101,13 @@ export class ObservableObjectAdministration
         public target_: any,
         public values_ = new Map<PropertyKey, ObservableValue<any> | ComputedValue<any>>(),
         public name_: string,
+        // Used anytime annotation is not explicitely provided
         public defaultAnnotation_: Annotation = observable,
+        // Bind automatically inferred actions?
         public autoBind_: boolean = false
     ) {
         this.keysAtom_ = new Atom(name_ + ".keys")
+        // Optimization: we use this frequently
         this.isPlainObject_ = isPlainObject(this.target_)
         if (__DEV__ && !isAnnotation(this.defaultAnnotation_)) {
             die(`defaultAnnotation must be valid annotation`)
@@ -181,7 +186,7 @@ export class ObservableObjectAdministration
      * @returns {boolean|null} true on success, false on failure (proxyTrap + non-configurable), null when cancelled by interceptor
      */
     set_(key: PropertyKey, value: any, proxyTrap: boolean = false): boolean | null {
-        // faster than this.has_ - no need to subscribe for key here
+        // Don't use .has(key) - we care about own
         if (hasProp(this.target_, key)) {
             // Existing prop
             if (this.values_.has(key)) {
@@ -297,7 +302,7 @@ export class ObservableObjectAdministration
             current = Object.getPrototypeOf(current)
         }
 
-        // Not found (may be false, meaning ignore)
+        // Not found (false means ignore)
         if (annotation === undefined) {
             die(1, "true", key)
         }
@@ -525,7 +530,7 @@ export class ObservableObjectAdministration
             const notify = hasListeners(this)
             const notifySpy = __DEV__ && isSpyEnabled()
             const observable = this.values_.get(key)
-            // Value needed for spy/listeners
+            // Value needed for spies/listeners
             let value = undefined
             // Optimization: don't pull the value unless we will need it
             if (!observable && (notify || notifySpy)) {
@@ -553,13 +558,15 @@ export class ObservableObjectAdministration
                 // Notify: autorun(() => obj[key]), see #1796
                 propagateChanged(observable)
             }
-            // handle keys
+            // Notify "keys/entries/values" observers
             this.keysAtom_.reportChanged()
+            // Notify "has" observers
             if (this.pendingKeys_) {
                 const entry = this.pendingKeys_.get(key)
-                if (entry) entry.set(key in this.target_) // may still exist in proto
+                // "in" as it may still exist in proto
+                if (entry) entry.set(key in this.target_)
             }
-            // spy/listeners
+            // Notify spies/listeners
             if (notify || notifySpy) {
                 const change: IObjectDidChange = {
                     type: REMOVE,
@@ -705,7 +712,8 @@ function assertAnnotable(
 
     /*
     // Configurable, not sealed, not frozen
-    // Possibly not needed, just a little better error then the one thrown by engine
+    // Possibly not needed, just a little better error then the one thrown by engine.
+    // Cases where this would be useful the most (subclass field initializer) are not interceptable by this.
     if (__DEV__) {
         const configurable = getDescriptor(adm.target_, key)?.configurable
         const frozen = Object.isFrozen(adm.target_)
@@ -728,7 +736,6 @@ function assertAnnotable(
                     error += `all annotated fields of non-plain objects (classes) are not configurable.`
                 }
             }
-
             die(error)
         }
     }
