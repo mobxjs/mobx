@@ -37,9 +37,9 @@ If the derivations are pure (and they should be), having a getter or function wi
 
 The above example works fine despite `isSelected` not being a `computed`. The `observer` component will detect and subscribe to any observables that were read by `isSelected` because the function executes as part of rendering that is tracked.
 
-It is good to realize that all `Item` components in this case will respond to future selection changes,
+It is good to realize that all `Item` components, in this case, will respond to future selection changes,
 as they all subscribe directly to the observables that capture the selection.
-This is a worst case example. In general it is completely fine to have unmarked functions that derive information, and this is a good default strategy, until numbers prove anything else should be done.
+This is a worst-case example. In general, it is completely fine to have unmarked functions that derive information, and this is a good default strategy until numbers prove anything else should be done.
 
 ## 2. Close over the arguments
 
