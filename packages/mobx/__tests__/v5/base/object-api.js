@@ -72,7 +72,8 @@ test("object - set, remove, values are reactive", () => {
 // 21.12.2020 @urugator:
 // Since https://github.com/mobxjs/mobx/pull/2641
 // values() works like Object.values - symbols are not part of the result
-test.skip("object with symbol keys - set, remove, values are reactive", () => {
+// TODO description
+test("object with symbol keys - set, remove, values are reactive", () => {
     const todos = observable({})
     const snapshots = []
     const x = Symbol()
@@ -86,15 +87,15 @@ test.skip("object with symbol keys - set, remove, values are reactive", () => {
 
     expect(has(todos, x)).toBe(false)
     expect(get(todos, x)).toBe(undefined)
-    set(todos, x, 3)
+    set(todos, x, 3) // [3]
     expect(has(todos, x)).toBe(true)
     expect(get(todos, x)).toBe(3)
-    remove(todos, y)
-    set(todos, z, 4)
-    set(todos, x, 5)
-    remove(todos, z)
+    remove(todos, y) // [3]
+    set(todos, z, 4) // [3,4]
+    set(todos, x, 5) // [5,4]
+    remove(todos, z) // [5]
 
-    expect(snapshots).toEqual([[3], [3, 4], [5, 4], [5]])
+    expect(snapshots).toEqual([])
 })
 
 test("object - set, remove, entries are reactive", () => {
@@ -482,7 +483,7 @@ test("observe & intercept", () => {
         {},
         {
             deep: false,
-            name: "" // stable name for snapshot
+            name: "TestObject" // stable name for snapshot
         }
     )
     mobx.observe(todos, c => {
@@ -511,7 +512,7 @@ test("observe & intercept", () => {
 })
 
 test("observe & intercept set called multiple times", () => {
-    const a = mobx.observable({}, {}, { name: "" }) // stable name for snapshot
+    const a = mobx.observable({}, {}, { name: "TestObject" }) // stable name for snapshot
     const interceptLogs = []
     const observeLogs = []
 

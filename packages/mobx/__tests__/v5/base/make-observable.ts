@@ -579,19 +579,12 @@ test("class - annotations", () => {
 
         constructor() {
             makeObservable(this, {
-                // @ts-ignore
                 observable: observable,
-                // @ts-ignore
                 "observable.ref": observable.ref,
-                // @ts-ignore
                 "observable.shallow": observable.shallow,
-                // @ts-ignore
                 computed: computed,
-                // @ts-ignore
                 action: action,
-                // @ts-ignore
                 "action.bound": action.bound,
-                // @ts-ignore
                 flow: flow
             })
         }
@@ -752,19 +745,12 @@ test("subclass - annotation", () => {
         constructor() {
             super()
             makeObservable(this, {
-                // @ts-ignore
                 observable2: observable,
-                // @ts-ignore
                 "observable.ref2": observable.ref,
-                // @ts-ignore
                 "observable.shallow2": observable.shallow,
-                // @ts-ignore
                 computed2: computed,
-                // @ts-ignore
                 action2: action,
-                // @ts-ignore
                 "action.bound2": action.bound,
-                // @ts-ignore
                 flow2: flow
             })
         }
@@ -1423,30 +1409,4 @@ test("@override must override", () => {
     }).toThrow(
         /^\[MobX\] 'Child\.prototype\.action' is decorated with 'override', but no such decorated member was found on prototype\./
     )
-})
-
-test("computed setter/getter on different prototypes", () => {
-    class Parent {
-        observable = 0
-        constructor() {
-            makeObservable(this, {
-                observable: observable,
-                computed: computed
-            })
-        }
-        get computed() {
-            return this.observable + 1
-        }
-    }
-
-    class Child extends Parent {
-        set computed(value) {
-            this.observable = value
-        }
-    }
-
-    const child = new Child()
-    expect(isComputedProp(child, "computed")).toBe(true)
-    child.computed = 5
-    expect(child.computed).toBe(6)
 })

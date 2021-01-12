@@ -2,7 +2,6 @@ import {
     die,
     Annotation,
     hasProp,
-    appliedAnnotationsSymbol,
     createDecoratorAnnotation,
     ObservableObjectAdministration
 } from "../internal"
@@ -28,14 +27,14 @@ function make_(adm: ObservableObjectAdministration, key): void {
         )
     }
     // Must override something
-    if (__DEV__ && !hasProp(adm[appliedAnnotationsSymbol], key)) {
+    if (__DEV__ && !hasProp(adm.appliedAnnotations_!, key)) {
         die(
-            `'${adm.name_}.${key.toString()}' is annotated with 'override', ` +
+            `'${adm.name_}.${key.toString()}' is annotated with '${this.annotationType_}', ` +
                 `but no such annotated member was found on prototype.`
         )
     }
 }
 
 function extend_(adm, key, descriptor, proxyTrap): boolean {
-    die(`'override' can only be used with 'makeObservable'`)
+    die(`'${this.annotationType_}' can only be used with 'makeObservable'`)
 }

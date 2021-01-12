@@ -976,61 +976,6 @@ test("379, inheritable actions (babel)", () => {
     expect(isAction(c.method)).toBe(true)
 })
 
-// Changing annotation or it's configuration is not supported
-test.skip("379, inheritable actions - 2 (babel)", () => {
-    class A {
-        constructor() {
-            makeObservable(this, {
-                method: action("a method")
-            })
-        }
-
-        method() {
-            return 42
-        }
-    }
-
-    class B extends A {
-        constructor() {
-            super()
-
-            makeObservable(this, {
-                method: action("b method")
-            })
-        }
-
-        method() {
-            return super.method() * 2
-        }
-    }
-
-    class C extends B {
-        constructor() {
-            super()
-
-            makeObservable(this, {
-                method: action("c method")
-            })
-        }
-
-        method() {
-            return super.method() + 3
-        }
-    }
-
-    const b = new B()
-    expect(b.method()).toBe(84)
-    expect(isAction(b.method)).toBe(true)
-
-    const a = new A()
-    expect(a.method()).toBe(42)
-    expect(isAction(a.method)).toBe(true)
-
-    const c = new C()
-    expect(c.method()).toBe(87)
-    expect(isAction(c.method)).toBe(true)
-})
-
 test("505, don't throw when accessing subclass fields in super constructor (babel)", () => {
     const values = {}
     class A {

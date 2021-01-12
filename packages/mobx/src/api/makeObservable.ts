@@ -93,8 +93,11 @@ function collectAllKeys(object) {
 }
 */
 
-function collectAllKeys(object): PropertyKey[] {
-    const keys = ownKeys(object)
+function collectAllKeys(object, keys: Array<PropertyKey> = []): PropertyKey[] {
+    keys.push(...ownKeys(object))
     const proto = Object.getPrototypeOf(object)
-    return proto === objectPrototype ? keys : keys.concat(collectAllKeys(proto))
+    if (proto !== objectPrototype) {
+        collectAllKeys(proto, keys)
+    }
+    return keys
 }

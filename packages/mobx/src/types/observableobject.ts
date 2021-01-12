@@ -47,8 +47,6 @@ import {
     objectPrototype
 } from "../internal"
 
-// object[appliedAnnotationsSymbol] = { foo: annotation, ... }
-export const appliedAnnotationsSymbol = Symbol("mobx-applied-annotations")
 // adm[inferredAnnotationsSymbol] = { foo: annotation, ... }
 export const inferredAnnotationsSymbol = Symbol("mobx-inferred-annotations")
 
@@ -95,6 +93,7 @@ export class ObservableObjectAdministration
     interceptors_
     proxy_: any
     isPlainObject_: boolean
+    appliedAnnotations_?: object
     private pendingKeys_: undefined | Map<PropertyKey, ObservableValue<boolean>>
 
     constructor(
@@ -117,7 +116,7 @@ export class ObservableObjectAdministration
         }
         if (__DEV__) {
             // Prepare structure for tracking which fields were already annotated
-            addHiddenProp(this, appliedAnnotationsSymbol, {})
+            this.appliedAnnotations_ = {}
         }
     }
 
@@ -294,10 +293,7 @@ export class ObservableObjectAdministration
                     this.defaultAnnotation_,
                     this.autoBind_
                 )
-                // if this is lone setter, the getter may be further in proto chain
-                if (annotation !== false || !descriptor.set) {
-                    break
-                }
+                break
             }
             current = Object.getPrototypeOf(current)
         }
@@ -532,6 +528,8 @@ export class ObservableObjectAdministration
             const observable = this.values_.get(key)
             // Value needed for spies/listeners
             let value = undefined
+            // Needed for keysAtom reporting
+            const enumerable = key in this.target_
             // Optimization: don't pull the value unless we will need it
             if (!observable && (notify || notifySpy)) {
                 value = getDescriptor(this.target_, key)?.value
@@ -546,7 +544,7 @@ export class ObservableObjectAdministration
             }
             // Allow re-annotating this field
             if (__DEV__) {
-                delete this[appliedAnnotationsSymbol][key]
+                delete this.appliedAnnotations_![key]
             }
             // Clear observable
             if (observable) {
@@ -559,7 +557,10 @@ export class ObservableObjectAdministration
                 propagateChanged(observable)
             }
             // Notify "keys/entries/values" observers
-            this.keysAtom_.reportChanged()
+            // must be enumerable non-symbol prop
+            if (enumerable && typeof key !== "symbol") {
+                this.keysAtom_.reportChanged()
+            }
             // Notify "has" observers
             if (this.pendingKeys_) {
                 const entry = this.pendingKeys_.get(key)
@@ -626,7 +627,11 @@ export class ObservableObjectAdministration
             const entry = this.pendingKeys_.get(key)
             if (entry) entry.set(true)
         }
-        this.keysAtom_.reportChanged()
+        // Notify "keys/entries/values" observers
+        // must be enumerable non-symbol prop
+        if (key in this.target_ && typeof key !== "symbol") {
+            this.keysAtom_.reportChanged()
+        }
     }
 
     ownKeys_(): PropertyKey[] {
@@ -692,7 +697,7 @@ export function recordAnnotationApplied(
     key: PropertyKey
 ) {
     if (__DEV__) {
-        adm[appliedAnnotationsSymbol][key] = annotation
+        adm.appliedAnnotations_![key] = annotation
     }
     // Remove applied decorator annotation so we don't try to apply it again in subclass constructor
     if (annotation.isDecorator_) {
@@ -731,7 +736,7 @@ function assertAnnotable(
             if (!configurable) {
                 error += `\nproperty is not configurable.`
                 // Mention only if caused by us to avoid confusion
-                if (hasProp(adm[appliedAnnotationsSymbol], key)) {
+                if (hasProp(adm.appliedAnnotations!, key)) {
                     error += `\nTo prevent accidental re-definition of a field by a subclass, `
                     error += `all annotated fields of non-plain objects (classes) are not configurable.`
                 }
@@ -742,9 +747,9 @@ function assertAnnotable(
     */
 
     // Not annotated
-    if (__DEV__ && !isOverride(annotation) && hasProp(adm[appliedAnnotationsSymbol], key)) {
+    if (__DEV__ && !isOverride(annotation) && hasProp(adm.appliedAnnotations_!, key)) {
         const fieldName = `${adm.name_}.${key.toString()}`
-        const currentAnnotationType = adm[appliedAnnotationsSymbol][key].annotationType_
+        const currentAnnotationType = adm.appliedAnnotations_![key].annotationType_
         const requestedAnnotationType = annotation.annotationType_
         die(
             `Cannot apply '${requestedAnnotationType}' to '${fieldName}':` +

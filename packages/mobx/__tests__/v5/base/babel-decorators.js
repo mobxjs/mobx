@@ -554,38 +554,6 @@ test("inheritance", () => {
     expect(values).toEqual([10, 11, 12, 14, 18])
 })
 
-// Re-annotating and re-defining is no longer possible and is covered by other tests
-test.skip("inheritance overrides observable", () => {
-    class A {
-        @observable a = 2
-
-        constructor() {
-            makeObservable(this)
-        }
-    }
-
-    class B extends A {
-        @observable a = 5
-        @observable b = 3
-
-        constructor() {
-            super()
-            expect(() => {
-                makeObservable(this)
-            }).toThrowErrorMatchingInlineSnapshot(
-                `"[MobX] Cannot decorate 'a': the property is already decorated as observable."`
-            )
-        }
-
-        @computed
-        get c() {
-            return this.a + this.b
-        }
-    }
-
-    new B()
-})
-
 test("reusing initializers", () => {
     class A {
         @observable a = 3
@@ -789,56 +757,6 @@ test("379, inheritable actions (babel)", () => {
             makeObservable(this)
         }
 
-        method() {
-            return super.method() + 3
-        }
-    }
-
-    const b = new B()
-    expect(b.method()).toBe(84)
-    expect(isAction(b.method)).toBe(true)
-
-    const a = new A()
-    expect(a.method()).toBe(42)
-    expect(isAction(a.method)).toBe(true)
-
-    const c = new C()
-    expect(c.method()).toBe(87)
-    expect(isAction(c.method)).toBe(true)
-})
-
-// Changing annotation configuration is not supported
-test.skip("379, inheritable actions - 2 (babel)", () => {
-    class A {
-        constructor() {
-            makeObservable(this)
-        }
-
-        @action("a method")
-        method() {
-            return 42
-        }
-    }
-
-    class B extends A {
-        constructor() {
-            super()
-            makeObservable(this)
-        }
-
-        @action("b method")
-        method() {
-            return super.method() * 2
-        }
-    }
-
-    class C extends B {
-        constructor() {
-            super()
-            makeObservable(this)
-        }
-
-        @action("c method")
         method() {
             return super.method() + 3
         }
