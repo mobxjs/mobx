@@ -94,6 +94,8 @@ export class Reaction implements IDerivation, IReactionPublic {
         if (!this.isDisposed_) {
             startBatch()
             this.isScheduled_ = false
+            const prev = globalState.trackingContext
+            globalState.trackingContext = this
             if (shouldCompute(this)) {
                 this.isTrackPending_ = true
 
@@ -110,6 +112,7 @@ export class Reaction implements IDerivation, IReactionPublic {
                     this.reportExceptionInDerivation_(e)
                 }
             }
+            globalState.trackingContext = prev
             endBatch()
         }
     }
