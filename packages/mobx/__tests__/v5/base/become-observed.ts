@@ -397,7 +397,7 @@ test("#2686 - 3", () => {
 
     // APP
 
-    const network = observable({ model: null })
+    const network = observable({ model: null as any })
 
     // load
     const load = computed(() => {
@@ -405,10 +405,11 @@ test("#2686 - 3", () => {
         if (network.model) {
             return halfFirst(network.model)
         }
+        return undefined
     })
 
     // display
-    const result = computed(() => (load.get() ? load.get().get() : "loading"))
+    const result = computed(() => (load.get() ? load.get()!.get() : "loading"))
     autorun(() => {
         events.push("Current result: " + result.get())
     })
