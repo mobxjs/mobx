@@ -528,8 +528,6 @@ export class ObservableObjectAdministration
             const observable = this.values_.get(key)
             // Value needed for spies/listeners
             let value = undefined
-            // Needed for keysAtom reporting
-            const enumerable = key in this.target_
             // Optimization: don't pull the value unless we will need it
             if (!observable && (notify || notifySpy)) {
                 value = getDescriptor(this.target_, key)?.value
@@ -557,10 +555,8 @@ export class ObservableObjectAdministration
                 propagateChanged(observable)
             }
             // Notify "keys/entries/values" observers
-            // must be enumerable non-symbol prop
-            if (enumerable && typeof key !== "symbol") {
-                this.keysAtom_.reportChanged()
-            }
+            this.keysAtom_.reportChanged()
+
             // Notify "has" observers
             if (this.pendingKeys_) {
                 const entry = this.pendingKeys_.get(key)
@@ -628,10 +624,7 @@ export class ObservableObjectAdministration
             if (entry) entry.set(true)
         }
         // Notify "keys/entries/values" observers
-        // must be enumerable non-symbol prop
-        if (key in this.target_ && typeof key !== "symbol") {
-            this.keysAtom_.reportChanged()
-        }
+        this.keysAtom_.reportChanged()
     }
 
     ownKeys_(): PropertyKey[] {
@@ -640,6 +633,12 @@ export class ObservableObjectAdministration
     }
 
     keys_(): PropertyKey[] {
+        // Returns enumerable && own, but unfortunately keysAtom will report on ANY key change.
+        // There is no way to distinguish between Object.keys(object) and Reflect.ownKeys(object) - both are handled by ownKeys trap.
+        // We can either over-report in Object.keys(object) or under-report in Reflect.ownKeys(object)
+        // We choose to over-report in Object.keys(object), because:
+        // - typically it's used with simple data objects
+        // - when symbolic/non-enumerable keys are relevant Reflect.ownKeys works as expected
         this.keysAtom_.reportObserved()
         return Object.keys(this.target_)
     }

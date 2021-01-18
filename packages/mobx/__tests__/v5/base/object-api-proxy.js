@@ -1,5 +1,5 @@
 const mobx = require("../../../src/mobx")
-const { has, autorun, when, values, runInAction, entries, reaction, observable } = mobx
+const { has, autorun, when, runInAction, reaction, observable } = mobx
 
 test("keys should be observable when extending", () => {
     const todos = observable({})
@@ -51,78 +51,118 @@ test("toJS respects key changes", () => {
     ])
 })
 
-test("object - set, remove, values are reactive", () => {
+test("keys(object), values(object), entries(object)", () => {
     const todos = observable({})
-    const snapshots = []
+    const plain = {}
+    const keysSnapshots = []
+    const valuesSnapshots = []
+    const entriesSnapshots = []
+    const expectedKeysSnapshots = []
+    const expectedValuesSnapshots = []
+    const expectedEntriesSnapshots = []
 
-    reaction(
-        () => values(todos),
-        values => snapshots.push(values)
-    )
+    const s1 = Symbol()
+    const s2 = Symbol()
 
-    expect("x" in todos).toBe(false)
-    expect(todos.x).toBe(undefined)
-    todos.x = 3
-    expect("x" in todos).toBe(true)
-    expect(todos.x).toBe(3)
-    delete todos.y
-    todos.z = 4
-    todos.x = 5
-    delete todos.z
+    function expectEquality() {
+        expect(todos).toEqual(plain)
+    }
 
-    expect(snapshots).toEqual([[3], [3, 4], [5, 4], [5]])
-})
+    function expectKeysReaction() {
+        expectedKeysSnapshots.push(Object.keys(plain))
+    }
 
-test("object - set, remove, entries are reactive", () => {
-    const todos = observable({})
-    const snapshots = []
+    function expectValuesReaction() {
+        expectedValuesSnapshots.push(Object.values(plain))
+    }
 
-    reaction(
-        () => entries(todos),
-        entries => snapshots.push(entries)
-    )
-
-    expect("x" in todos).toBe(false)
-    expect(todos.x).toBe(undefined)
-    todos.x = 3
-    expect("x" in todos).toBe(true)
-    expect(todos.x).toBe(3)
-    delete todos.y
-    todos.z = 4
-    todos.x = 5
-    delete todos.z
-
-    expect(snapshots).toEqual([
-        [["x", 3]],
-        [
-            ["x", 3],
-            ["z", 4]
-        ],
-        [
-            ["x", 5],
-            ["z", 4]
-        ],
-        [["x", 5]]
-    ])
-})
-
-test("object - set, remove, keys are reactive", () => {
-    const todos = observable({ a: 3 })
-    const snapshots = []
+    function expectEntriesReaction() {
+        expectedEntriesSnapshots.push(Object.entries(plain))
+    }
 
     reaction(
         () => Object.keys(todos),
-        keys => snapshots.push(keys)
+        result => keysSnapshots.push(result)
     )
 
-    todos.x = 3
-    delete todos.y
-    todos.z = 4
-    todos.x = 5
-    delete todos.z
-    delete todos.a
+    reaction(
+        () => Object.values(todos),
+        result => valuesSnapshots.push(result)
+    )
 
-    expect(snapshots).toEqual([["a", "x"], ["a", "x", "z"], ["a", "x"], ["x"]])
+    reaction(
+        () => Object.entries(todos),
+        result => entriesSnapshots.push(result)
+    )
+
+    expectEquality()
+    // add
+    todos["k1"] = 1
+    plain["k1"] = 1
+    expectEquality()
+    expectKeysReaction()
+    expectValuesReaction()
+    expectEntriesReaction()
+    // add symbol
+    todos[s1] = 2
+    plain[s1] = 2
+    expectEquality()
+    // see ObservableObjectAdministration.keys() for explanation
+    expectKeysReaction()
+    expectValuesReaction()
+    expectEntriesReaction()
+    // delete non-existent
+    delete todos["-"]
+    delete plain["-"]
+    expectEquality()
+    // delete non-existent symbol
+    delete todos[Symbol()]
+    delete plain[Symbol()]
+    expectEquality()
+    // add second
+    todos["k2"] = 3
+    plain["k2"] = 3
+    expectEquality()
+    expectKeysReaction()
+    expectValuesReaction()
+    expectEntriesReaction()
+    // add second symbol
+    todos[s2] = 4
+    plain[s2] = 4
+    expectEquality()
+    // see ObservableObjectAdministration.keys() for explanation
+    expectKeysReaction()
+    expectValuesReaction()
+    expectEntriesReaction()
+    // update
+    todos["k1"] = 11
+    plain["k1"] = 11
+    expectEquality()
+    expectValuesReaction()
+    expectEntriesReaction()
+    // update symbol
+    todos[s1] = 22
+    plain[s1] = 22
+    expectEquality()
+    // delete
+    delete todos["k1"]
+    delete plain["k1"]
+    expectEquality()
+    expectKeysReaction()
+    expectValuesReaction()
+    expectEntriesReaction()
+    // delete symbol
+    delete todos[s1]
+    delete plain[s1]
+    expectEquality()
+    // see ObservableObjectAdministration.keys() for explanation
+    expectKeysReaction()
+    expectValuesReaction()
+    expectEntriesReaction()
+
+    expect(keysSnapshots).toEqual(expectedKeysSnapshots)
+    expect(valuesSnapshots).toEqual(expectedValuesSnapshots)
+    expect(entriesSnapshots).toEqual(expectedEntriesSnapshots)
 })
 
 test("dynamically adding properties should preserve the original modifiers of an object", () => {
@@ -166,8 +206,8 @@ test("computed props are considered part of collections", () => {
     expect(x.y).toBe(3)
     expect("y" in x).toBe(true) // `in` also checks proto type, so should return true!
     expect(Object.keys(x)).toEqual([])
-    expect(values(x)).toEqual([])
-    expect(entries(x)).toEqual([])
+    expect(Object.values(x)).toEqual([])
+    expect(Object.entries(x)).toEqual([])
 })
 
 test("#1739 - delete and undelete should work", () => {
