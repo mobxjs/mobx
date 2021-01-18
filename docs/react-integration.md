@@ -122,7 +122,7 @@ const TimerView = observer(() => {
 })
 
 ReactDOM.render(
-    <TimerContext.Provider value={new Timer()}
+    <TimerContext.Provider value={new Timer()}>
         <TimerView />
     </TimerContext.Provider>,
     document.body

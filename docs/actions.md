@@ -72,7 +72,7 @@ class Doubler {
 <!--action.bound-->
 
 ```javascript
-import { makeObservable, observable, computed, action } from "mobx"
+import { makeObservable, observable, action } from "mobx"
 
 class Doubler {
     value = 0
