@@ -28,7 +28,7 @@ Use `makeObservable` to declare a getter as computed. If you instead want all ge
 To help illustrate the point of computed values, the example below relies on [`autorun`](reactions.md#autorun) from the [Reactions {🚀}](reactions.md) advanced section.
 
 ```javascript
-import { makeObservable, observable, computed } from "mobx"
+import { makeObservable, observable, computed, autorun } from "mobx"
 
 class OrderLine {
     price = 0
