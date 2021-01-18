@@ -362,19 +362,20 @@ test("#2686 - 2", () => {
         if (options.useColors) {
             const isSelected = computed(() => selection.color === "blue")
             onBecomeObserved(isSelected, () => events.push("observing"))
-            onBecomeObserved(isSelected, () => events.push("unobserving"))
+            onBecomeUnobserved(isSelected, () => events.push("unobserving"))
             val = isSelected.get()
         }
         return { isSelected: val }
     })
 
-    const d = autorun(() => console.log(blue.get()))
+    const d = autorun(() => events.push(blue.get().isSelected ? "selected" : "unselected"))
 
     runInAction(() => {
         options.useColors = true
         selection.color = "blue"
     })
-    expect(events).toEqual(["observing", "unobserving"])
+    d()
+    expect(events).toEqual(["unselected", "observing", "selected", "unobserving"])
 })
 
 test("#2686 - 3", () => {
@@ -426,5 +427,84 @@ test("#2686 - 3", () => {
         "recalculating",
         "recalculating",
         "Current result: 3$"
+    ])
+})
+
+test("#2667", () => {
+    const events: any[] = []
+    class LazyInitializedList {
+        @observable
+        public items: string[] | undefined
+
+        @observable
+        public listName
+
+        public constructor(listName: string, lazyItems: string[]) {
+            makeObservable(this)
+            this.listName = listName
+            onBecomeObserved(
+                this,
+                "items",
+                action(() => {
+                    this.items = lazyItems
+                    events.push("onBecomeObserved" + listName)
+                })
+            )
+            onBecomeUnobserved(
+                this,
+                "items",
+                action(() => {
+                    this.items = undefined
+                    events.push("onBecomeUnobserved" + listName)
+                })
+            )
+        }
+    }
+
+    class ItemsStore {
+        @observable
+        private list: LazyInitializedList
+
+        public constructor() {
+            this.list = new LazyInitializedList("initial", ["a, b, c"])
+            makeObservable(this)
+        }
+
+        @action
+        public changeList = () => {
+            this.list = new LazyInitializedList("new", ["b, c, a"])
+        }
+
+        @computed
+        public get items(): string[] | undefined {
+            return this.list.items
+        }
+
+        @computed
+        public get activeListName(): string {
+            return this.list.listName
+        }
+    }
+
+    const store = new ItemsStore()
+
+    const d = autorun(() => {
+        events.push(store.items?.length ?? "-")
+        events.push(store.activeListName)
+    })
+
+    store.changeList()
+
+    d()
+
+    expect(events).toEqual([
+        "onBecomeObservedinitial",
+        1,
+        "initial",
+        "onBecomeObservednew",
+        1,
+        "new",
+        "onBecomeUnobservedinitial",
+        "onBecomeUnobservednew"
     ])
 })
