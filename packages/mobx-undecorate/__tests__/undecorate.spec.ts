@@ -875,39 +875,78 @@ describe("decorate", () => {
     })
 })
 
-test("handle privates in classes", () => {
-    expect(
-        convert(
-            `
-            import { observable, decorate, computed, action } from "mobx"
+describe("privates", () => {
+    test("create generic arguments for makeObservable", () => {
+        expect(
+            convert(
+                `
+                import { observable, decorate, computed, action } from "mobx"
+    
+    class TryToGetThis {
+        @observable
+        private privateField1: number = 1
+        @observable
+        protected privateField2 = 1
+        @observable
+        public publicField: string = "test"
+      }
+                `
+            )
+        ).toMatchInlineSnapshot(`
+            "import { observable, computed, action, makeObservable } from \\"mobx\\"
 
-class TryToGetThis {
-    @observable
-    private privateField1: number = 1
-    @observable
-    protected privateField2 = 1
-    @observable
-    public publicField: string = "test"
-  }
-            `
-        )
-    ).toMatchInlineSnapshot(`
-        "import { observable, computed, action, makeObservable } from \\"mobx\\"
+            class TryToGetThis {
+                        private privateField1: number = 1;
+                        protected privateField2 = 1;
+                        public publicField: string = \\"test\\";
 
-        class TryToGetThis {
-          private privateField1: number = 1;
-          protected privateField2 = 1;
-          public publicField: string = \\"test\\";
+                        constructor() {
+                                    makeObservable<TryToGetThis, \\"privateField1\\" | \\"privateField2\\">(this, {
+                                                privateField1: observable,
+                                                privateField2: observable,
+                                                publicField: observable
+                                    });
+                        }
+            }"
+        `)
+    })
 
-          constructor() {
-            makeObservable<TryToGetThis, \\"privateField1\\" | \\"privateField2\\">(this, {
-              privateField1: observable,
-              privateField2: observable,
-              publicField: observable
-            });
-          }
-        }"
-    `)
+    test("do not create generic arguments for makeObservable - keepDecorators", () => {
+        expect(
+            convert(
+                `
+                import { observable, decorate, computed, action } from "mobx"
+    
+    class TryToGetThis {
+        @observable
+        private privateField1: number = 1
+        @observable
+        protected privateField2 = 1
+        @observable
+        public publicField: string = "test"
+      }
+                `,
+                {
+                    keepDecorators: true
+                }
+            )
+        ).toMatchInlineSnapshot(`
+            "import { observable, computed, action, makeObservable } from \\"mobx\\"
+
+            class TryToGetThis {
+                        @observable
+                        private privateField1: number = 1
+                        @observable
+                        protected privateField2 = 1
+                        @observable
+                        public publicField: string = \\"test\\"
+
+                        constructor() {
+                                    makeObservable(this);
+                        }
+            }"
+        `)
+    })
 })
 
 describe("@observer", () => {

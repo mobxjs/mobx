@@ -319,7 +319,7 @@ export default function transform(
                 options?.keepDecorators ? [j.thisExpression()] : [j.thisExpression(), members]
             )
         )
-        if (privates.length) {
+        if (privates.length && !options?.keepDecorators) {
             // @ts-ignore
             initializeObservablesCall.expression.typeArguments = j.tsTypeParameterInstantiation([
                 j.tsTypeReference(j.identifier(clazz.id!.name)),
