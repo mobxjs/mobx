@@ -427,7 +427,7 @@ results of this test:
         t.end()
     })
 
-    test.only(`${version} - sort`, t => {
+    test(`${version} - sort`, t => {
         gc()
 
         function Item(a, b, c) {
