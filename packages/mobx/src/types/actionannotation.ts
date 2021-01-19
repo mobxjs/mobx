@@ -23,8 +23,6 @@ export function createActionAnnotation(name: string, options?: object): Annotati
 function make_(adm: ObservableObjectAdministration, key: PropertyKey): void {
     let annotated = false
     let source = adm.target_
-    // Bound action still applies normal action to prototypes,
-    // makes sure super.actionBound() is also action
     let bound = this.options_?.bound ?? false
     while (source && source !== objectPrototype) {
         const descriptor = getDescriptor(source, key)
@@ -33,15 +31,17 @@ function make_(adm: ObservableObjectAdministration, key: PropertyKey): void {
             // Keep first because the operation can be intercepted
             // and we don't want to end up with partially annotated proto chain
             if (source === adm.target_ || bound) {
-                const actionDescriptor = createActionDescriptor(adm, this, key, descriptor, bound)
+                const actionDescriptor = createActionDescriptor(adm, this, key, descriptor)
                 const definePropertyOutcome = adm.defineProperty_(key, actionDescriptor)
                 if (!definePropertyOutcome) {
                     // Intercepted
                     return
                 }
                 annotated = true
-                // Bind only the closest one
-                bound = false
+                // Don't annotate protos if bound
+                if (bound) {
+                    break
+                }
             }
             // Prototype
             if (source !== adm.target_) {
@@ -51,7 +51,7 @@ function make_(adm: ObservableObjectAdministration, key: PropertyKey): void {
                     annotated = true
                     break
                 }
-                const actionDescriptor = createActionDescriptor(adm, this, key, descriptor, false)
+                const actionDescriptor = createActionDescriptor(adm, this, key, descriptor)
                 defineProperty(source, key, actionDescriptor)
                 annotated = true
             }
@@ -76,13 +76,7 @@ function extend_(
     descriptor: PropertyDescriptor,
     proxyTrap: boolean
 ): boolean | null {
-    const actionDescriptor = createActionDescriptor(
-        adm,
-        this,
-        key,
-        descriptor,
-        this.options_?.bound ?? false
-    )
+    const actionDescriptor = createActionDescriptor(adm, this, key, descriptor)
     return adm.defineProperty_(key, actionDescriptor, proxyTrap)
 }
 
@@ -104,13 +98,11 @@ function createActionDescriptor(
     adm: ObservableObjectAdministration,
     annotation: Annotation,
     key: PropertyKey,
-    descriptor: PropertyDescriptor,
-    // Intentionall - 'action.bound' applies 'action' to prototypes
-    bound: boolean
+    descriptor: PropertyDescriptor
 ) {
     assertActionDescriptor(adm, annotation, key, descriptor)
     let { value } = descriptor
-    if (bound) {
+    if (annotation.options_?.bound) {
         value = value.bind(adm.proxy_ ?? adm.target_)
     }
     return {

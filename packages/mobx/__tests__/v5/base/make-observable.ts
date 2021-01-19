@@ -1009,8 +1009,8 @@ test("subclass - annotation - override", async () => {
     expect(child.action()).toBe("child of parent")
 
     // Action bound
-    expect(isAction(Parent.prototype["action.bound"])).toBe(true)
-    expect(isAction(Child.prototype["action.bound"])).toBe(true)
+    expect(isAction(Parent.prototype["action.bound"])).toBe(false)
+    expect(isAction(Child.prototype["action.bound"])).toBe(false)
     expect(isAction(child["action.bound"])).toBe(true)
 
     expect(child.hasOwnProperty("action.bound")).toBe(true)
@@ -1087,8 +1087,8 @@ test("subclass - decorator - override", async () => {
     expect(child.action()).toBe("child of parent")
 
     // Action bound
-    expect(isAction(Parent.prototype["action.bound"])).toBe(true)
-    expect(isAction(Child.prototype["action.bound"])).toBe(true)
+    expect(isAction(Parent.prototype["action.bound"])).toBe(false)
+    expect(isAction(Child.prototype["action.bound"])).toBe(false)
     expect(isAction(child["action.bound"])).toBe(true)
 
     expect(child.hasOwnProperty("action.bound")).toBe(true)
