@@ -283,7 +283,7 @@ export class ObservableObjectAdministration
 
     inferAnnotation_(key: PropertyKey): Annotation | false {
         // Inherited is fine - annotation cannot differ in subclass
-        let annotation = this[inferredAnnotationsSymbol]?.[key]
+        let annotation = this.target_[inferredAnnotationsSymbol]?.[key]
         if (annotation) return annotation
 
         let current = this.target_

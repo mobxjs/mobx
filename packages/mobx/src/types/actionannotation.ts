@@ -107,7 +107,7 @@ function createActionDescriptor(
     }
     return {
         value: createAction(
-            annotation.options_?.name ?? key,
+            annotation.options_?.name ?? key.toString(),
             value,
             annotation.options_?.autoAction ?? false
         ),

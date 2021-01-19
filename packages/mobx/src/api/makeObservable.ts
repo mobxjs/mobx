@@ -62,42 +62,24 @@ export function makeAutoObservable<T extends object, AdditionalKeys extends Prop
                 adm.make_(key, target[inferredAnnotationsSymbol][key])
             }
         } else {
-            const keys = new Set(collectAllKeys(target))
-            keys.forEach(key => {
-                if (key === "constructor" || key === $mobx) return
+            const ignoreKeys = { [$mobx]: 1, constructor: 1 }
+            const make = key => {
+                if (ignoreKeys[key]) return
+                ignoreKeys[key] = 1
                 adm.make_(
                     key,
                     // must pass "undefined" for { key: undefined }
                     !overrides ? true : key in overrides ? overrides[key] : true
                 )
-            })
+            }
+            let current = target
+            while (current && current !== objectPrototype) {
+                ownKeys(current).forEach(make)
+                current = Object.getPrototypeOf(current)
+            }
         }
     } finally {
         endBatch()
     }
     return target
-}
-
-/*
-TODO check if faster
-function collectAllKeys(object) {
-    const keys = {}
-    let current = object
-    const collect = key => (keys[key] = true)
-    while (current && current !== objectPrototype) {
-        Object.getOwnPropertyNames(current).forEach(collect)
-        Object.getOwnPropertySymbols(current).forEach(collect)
-        current = Object.getPrototypeOf(current)
-    }
-    return keys
-}
-*/
-
-function collectAllKeys(object, keys: Array<PropertyKey> = []): PropertyKey[] {
-    keys.push(...ownKeys(object))
-    const proto = Object.getPrototypeOf(object)
-    if (proto !== objectPrototype) {
-        collectAllKeys(proto, keys)
-    }
-    return keys
 }
