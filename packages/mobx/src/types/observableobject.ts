@@ -50,6 +50,8 @@ import {
 // adm[inferredAnnotationsSymbol] = { foo: annotation, ... }
 export const inferredAnnotationsSymbol = Symbol("mobx-inferred-annotations")
 
+const descriptorCache = Object.create(null)
+
 export type IObjectDidChange<T = any> = {
     observableKind: "object"
     name: PropertyKey
@@ -401,7 +403,7 @@ export class ObservableObjectAdministration
                 if (!change) return null
                 value = (change as any).newValue
             }
-
+            /*
             const descriptor = {
                 configurable: this.isPlainObject_,
                 enumerable: true,
@@ -411,6 +413,13 @@ export class ObservableObjectAdministration
                 set(value) {
                     return this[$mobx].setObservablePropValue_(key, value)
                 }
+            }*/
+            const cachedDescriptor = getCachedObservablePropDescriptor(key)
+            const descriptor = {
+                configurable: this.isPlainObject_,
+                enumerable: true,
+                get: cachedDescriptor.get,
+                set: cachedDescriptor.set
             }
 
             // Define
@@ -467,15 +476,12 @@ export class ObservableObjectAdministration
             }
             options.name ||= `${this.name_}.${stringifyKey(key)}`
             options.context = this.proxy_ || this.target_
+            const cachedDescriptor = getCachedObservablePropDescriptor(key)
             const descriptor = {
                 configurable: this.isPlainObject_,
                 enumerable: false,
-                get() {
-                    return this[$mobx].getObservablePropValue_(key)
-                },
-                set(value) {
-                    this[$mobx].setObservablePropValue_(key, value)
-                }
+                get: cachedDescriptor.get,
+                set: cachedDescriptor.set
             }
 
             // Define
@@ -682,6 +688,20 @@ const isObservableObjectAdministration = createInstanceofPredicate(
     "ObservableObjectAdministration",
     ObservableObjectAdministration
 )
+
+function getCachedObservablePropDescriptor(key) {
+    return (
+        descriptorCache[key] ||
+        (descriptorCache[key] = {
+            get() {
+                return this[$mobx].getObservablePropValue_(key)
+            },
+            set(value) {
+                return this[$mobx].setObservablePropValue_(key, value)
+            }
+        })
+    )
+}
 
 export function isObservableObject(thing: any): boolean {
     if (isObject(thing)) {
