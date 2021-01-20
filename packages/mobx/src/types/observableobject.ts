@@ -403,17 +403,7 @@ export class ObservableObjectAdministration
                 if (!change) return null
                 value = (change as any).newValue
             }
-            /*
-            const descriptor = {
-                configurable: this.isPlainObject_,
-                enumerable: true,
-                get() {
-                    return this[$mobx].getObservablePropValue_(key)
-                },
-                set(value) {
-                    return this[$mobx].setObservablePropValue_(key, value)
-                }
-            }*/
+
             const cachedDescriptor = getCachedObservablePropDescriptor(key)
             const descriptor = {
                 configurable: this.isPlainObject_,
@@ -564,11 +554,9 @@ export class ObservableObjectAdministration
             this.keysAtom_.reportChanged()
 
             // Notify "has" observers
-            if (this.pendingKeys_) {
-                const entry = this.pendingKeys_.get(key)
-                // "in" as it may still exist in proto
-                if (entry) entry.set(key in this.target_)
-            }
+            // "in" as it may still exist in proto
+            this.pendingKeys_?.get(key)?.set(key in this.target_)
+
             // Notify spies/listeners
             if (notify || notifySpy) {
                 const change: IObjectDidChange = {
@@ -625,10 +613,8 @@ export class ObservableObjectAdministration
             if (__DEV__ && notifySpy) spyReportEnd()
         }
 
-        if (this.pendingKeys_) {
-            const entry = this.pendingKeys_.get(key)
-            if (entry) entry.set(true)
-        }
+        this.pendingKeys_?.get(key)?.set(true)
+
         // Notify "keys/entries/values" observers
         this.keysAtom_.reportChanged()
     }

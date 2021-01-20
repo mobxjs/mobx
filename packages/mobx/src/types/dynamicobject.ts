@@ -48,7 +48,6 @@ const objectProxyTraps: ProxyHandler<any> = {
         // null (intercepted) -> true (success)
         return getAdm(target).delete_(name, true) ?? true
     },
-    // TODO tests + object-api
     defineProperty(
         target: IIsObservableObject,
         name: PropertyKey,

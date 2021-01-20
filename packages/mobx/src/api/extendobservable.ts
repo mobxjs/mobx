@@ -35,6 +35,9 @@ export function extendObservable<A extends Object, B extends Object>(
     startBatch()
     try {
         const descriptors = getOwnPropertyDescriptors(properties)
+        // TODO@major use `ownKeys` - better perf + aligned with makeObservable
+        // Once done, change make[Auto]Observable(o) so it delegates to extendObservable(o, o)
+        // when "o" is plain object (better perf)
         getPlainObjectKeys(descriptors).forEach(key =>
             adm.extend_(
                 key,

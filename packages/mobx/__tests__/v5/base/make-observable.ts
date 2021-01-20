@@ -1304,7 +1304,6 @@ test("subclass - cannot redefine property", () => {
 })
 
 test("@override", () => {
-    // TODO computed + action.bound
     class Parent {
         constructor() {
             makeObservable(this)

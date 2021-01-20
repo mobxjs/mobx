@@ -848,53 +848,6 @@ test("379, inheritable actions (typescript)", () => {
     t.equal(isAction(c.method), true)
 })
 
-// Changing annotation configuration is not supported
-test.skip("379, inheritable actions - 2 (typescript)", () => {
-    class A {
-        @action("a method")
-        method() {
-            return 42
-        }
-        constructor() {
-            makeObservable(this)
-        }
-    }
-
-    class B extends A {
-        @action("b method")
-        method() {
-            return super.method() * 2
-        }
-        constructor() {
-            super()
-            makeObservable(this)
-        }
-    }
-
-    class C extends B {
-        @action("c method")
-        method() {
-            return super.method() + 3
-        }
-        constructor() {
-            super()
-            makeObservable(this)
-        }
-    }
-
-    const b = new B()
-    t.equal(b.method(), 84)
-    t.equal(isAction(b.method), true)
-
-    const a = new A()
-    t.equal(a.method(), 42)
-    t.equal(isAction(a.method), true)
-
-    const c = new C()
-    t.equal(c.method(), 87)
-    t.equal(isAction(c.method), true)
-})
-
 test("373 - fix isObservable for unused computed", () => {
     class Bla {
         @computed

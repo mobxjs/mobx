@@ -707,44 +707,6 @@ test("inheritance - 2", () => {
     expect(values).toEqual([10, 11, 12, 14, 18])
 })
 
-// Re-annotating and re-defining is no longer possible and is covered by other tests
-test.skip("inheritance overrides observable", () => {
-    class A {
-        a = 2
-
-        constructor() {
-            makeObservable(this, {
-                a: observable
-            })
-        }
-    }
-
-    class B extends A {
-        a = 5
-        b = 3
-
-        constructor() {
-            super()
-
-            expect(() => {
-                makeObservable(this, {
-                    a: observable,
-                    b: observable,
-                    c: computed
-                })
-            }).toThrowErrorMatchingInlineSnapshot(
-                `"[MobX] Cannot decorate 'a': the property is already decorated as observable."`
-            )
-        }
-
-        get c() {
-            return this.a + this.b
-        }
-    }
-
-    const b1 = new B()
-})
-
 test("reusing initializers", () => {
     class A {
         a = 3

@@ -1,18 +1,8 @@
-// TODO remove unused
 const niceErrors = {
     0: `Invalid value for configuration 'enforceActions', expected 'never', 'always' or 'observed'`,
     1(annotationType, fieldName) {
         return `Cannot apply '${annotationType}' to '${fieldName}': Field not found.`
     },
-    /*2(prop) {
-        return `invalid decorator for '${prop.toString()}'`
-    },*/
-    /*3(prop, annotationType: string) {
-        return `Cannot decorate '${prop.toString()}': ${annotationType} can only be used on properties with a function value.`
-    },*/
-    /*4(prop) {
-        return `Cannot decorate '${prop.toString()}': computed can only be used on getter properties.`
-    },*/
     5: "'keys()' can only be used on observable objects, arrays, sets and maps",
     6: "'values()' can only be used on observable objects, arrays, sets and maps",
     7: "'entries()' can only be used on observable objects, arrays and maps",
@@ -70,15 +60,6 @@ const niceErrors = {
     37(method) {
         return `[mobx] \`observableArray.${method}()\` mutates the array in-place, which is not allowed inside a derivation. Use \`array.slice().${method}()\` instead`
     }
-    /*
-    38(key, currentAnnotationType, requestedAnnotationType) {
-        return (
-            `Cannot re-annotate/re-decorate '${key.toString()}' to '${requestedAnnotationType}'` +
-            `\nThe member is already annotated/decorated with '${currentAnnotationType}'` +
-            `\nEach member in prototype chain must be annotated/decorated only once.` +
-            `\nMethods overriden by subclass can optionally use 'override' decorator/annotation for visual clue`
-        )
-    }*/
 } as const
 
 const errors: typeof niceErrors = __DEV__ ? niceErrors : ({} as any)
