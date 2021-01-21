@@ -212,7 +212,7 @@ export class ObservableObjectAdministration
         }
     }
 
-    // Returns false for non-enumerable by design!
+    // Trap for "in"
     has_(key: PropertyKey): boolean {
         if (!globalState.trackingDerivation) {
             // Skip key subscription outside derivation
