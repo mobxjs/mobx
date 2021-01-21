@@ -222,9 +222,6 @@ export class ObservableObjectAdministration
         let entry = this.pendingKeys_.get(key)
         if (!entry) {
             entry = new ObservableValue(
-                // It's handler for "in" operation,
-                // we care about all enumerable props,
-                // we assume keys on prototypes are stable
                 key in this.target_,
                 referenceEnhancer,
                 `${this.name_}.${stringifyKey(key)}?`,
