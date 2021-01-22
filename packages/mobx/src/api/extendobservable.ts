@@ -31,12 +31,13 @@ export function extendObservable<A extends Object, B extends Object>(
         if (isObservable(properties) || isObservable(annotations))
             die(`Extending an object with another observable (object) is not supported`)
     }
+    // Pull descriptors first, so we don't have to deal with props added by administration ($mobx)
+    const descriptors = getOwnPropertyDescriptors(properties)
+
     const adm: ObservableObjectAdministration = asObservableObject(target, options)[$mobx]
     startBatch()
     try {
-        const descriptors = getOwnPropertyDescriptors(properties)
-        ownKeys(properties).forEach(key => {
-            if (key === $mobx) return
+        ownKeys(descriptors).forEach(key => {
             adm.extend_(
                 key,
                 descriptors[key as any],
