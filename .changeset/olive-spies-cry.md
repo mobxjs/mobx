@@ -2,4 +2,4 @@
 "mobx": patch
 ---
 
-`CreateObservableOptions` is now exported
+The TypeScript type `CreateObservableOptions` is now exported.
