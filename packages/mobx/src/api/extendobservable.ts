@@ -8,11 +8,11 @@ import {
     isPlainObject,
     ObservableObjectAdministration,
     isObservable,
-    getPlainObjectKeys,
     die,
     getOwnPropertyDescriptors,
     $mobx
 } from "../internal"
+import { ownKeys } from "../utils/utils"
 
 export function extendObservable<A extends Object, B extends Object>(
     target: A,
@@ -35,17 +35,15 @@ export function extendObservable<A extends Object, B extends Object>(
     startBatch()
     try {
         const descriptors = getOwnPropertyDescriptors(properties)
-        // TODO@major use `ownKeys` - better perf + aligned with makeObservable
-        // Once done, change make[Auto]Observable(o) so it delegates to extendObservable(o, o)
-        // when "o" is plain object (better perf)
-        getPlainObjectKeys(descriptors).forEach(key =>
+        ownKeys(properties).forEach(key => {
+            if (key === $mobx) return
             adm.extend_(
                 key,
                 descriptors[key as any],
                 // must pass "undefined" for { key: undefined }
                 !annotations ? true : key in annotations ? annotations[key] : true
             )
-        )
+        })
     } finally {
         endBatch()
     }

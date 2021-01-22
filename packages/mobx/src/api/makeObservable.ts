@@ -14,6 +14,7 @@ import {
     objectPrototype,
     inferredAnnotationsSymbol
 } from "../internal"
+import { extendObservable } from "./extendobservable"
 
 // Hack based on https://github.com/Microsoft/TypeScript/issues/14829#issuecomment-322267089
 // We need this, because otherwise, AdditionalKeys is going to be inferred to be any
@@ -53,8 +54,13 @@ export function makeAutoObservable<T extends object, AdditionalKeys extends Prop
             die(`makeAutoObservable can only be used on objects not already made observable`)
     }
 
-    const adm: ObservableObjectAdministration = asObservableObject(target, options)[$mobx]
+    // Optimization (avoids visiting protos)
+    // assumes that annotation.make_/.extend_ works the same for plain objects
+    if (Object.getPrototypeOf(target) === objectPrototype) {
+        return extendObservable(target, target, overrides, options)
+    }
 
+    const adm: ObservableObjectAdministration = asObservableObject(target, options)[$mobx]
     startBatch()
     try {
         if (target[inferredAnnotationsSymbol]) {
