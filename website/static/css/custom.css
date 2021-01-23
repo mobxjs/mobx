@@ -116,19 +116,6 @@ details[open] > summary {
     margin-right: 40px;
 }
 
-/* BLM */
-.slidingNav::before {
-	content: "Black Lives Matter";
-	position: fixed;
-	left: 0;
-	width: 100vw;
-	top: 13px;
-	text-align: center;
-	pointer-events: none;
-	text-transform: uppercase;
-	font-weight: bold;
-}
-
 @media (max-width: 480px) {
   .slidingNav::before {
     text-align: left;
