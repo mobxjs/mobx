@@ -10,9 +10,9 @@ import {
     isObservable,
     die,
     getOwnPropertyDescriptors,
-    $mobx
+    $mobx,
+    ownKeys
 } from "../internal"
-import { ownKeys } from "../utils/utils"
 
 export function extendObservable<A extends Object, B extends Object>(
     target: A,

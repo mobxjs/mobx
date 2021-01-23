@@ -12,9 +12,9 @@ import {
     die,
     ownKeys,
     objectPrototype,
-    inferredAnnotationsSymbol
+    inferredAnnotationsSymbol,
+    extendObservable
 } from "../internal"
-import { extendObservable } from "./extendobservable"
 
 // Hack based on https://github.com/Microsoft/TypeScript/issues/14829#issuecomment-322267089
 // We need this, because otherwise, AdditionalKeys is going to be inferred to be any
@@ -56,7 +56,7 @@ export function makeAutoObservable<T extends object, AdditionalKeys extends Prop
 
     // Optimization (avoids visiting protos)
     // assumes that annotation.make_/.extend_ works the same for plain objects
-    if (Object.getPrototypeOf(target) === objectPrototype) {
+    if (isPlainObject(target)) {
         return extendObservable(target, target, overrides, options)
     }
 
