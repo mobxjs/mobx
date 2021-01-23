@@ -47,7 +47,8 @@ This is a more efficient implementation compared to the original.
 
 ```javascript
 import * as React from 'react'
-import { observer, computed } from 'mobx-react-lite'
+import { computed } from 'mobx'
+import { observer } from 'mobx-react-lite'
 
 const Item = observer(({ item, store }) => {
     const isSelected = computed(() => store.isSelected(item.id)).get()

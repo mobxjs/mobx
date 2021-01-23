@@ -22,7 +22,6 @@
         "README.md",
         "batching*"
     ],
-    "sideEffects": false,
     "repository": {
         "type": "git",
         "url": "https://github.com/mobxjs/mobx.git"
