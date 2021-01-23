@@ -1,5 +1,11 @@
 # mobx-undecorate
 
+## 1.0.5
+
+### Patch Changes
+
+-   [`695108c3`](https://github.com/mobxjs/mobx/commit/695108c38d60a05cc9cef01b07e06109b1333017) [#2727](https://github.com/mobxjs/mobx/pull/2727) Thanks [@vkrol](https://github.com/vkrol)! - Do not create generic arguments if `keepDecorators` passed
+
 ## 1.0.4
 
 ### Patch Changes
