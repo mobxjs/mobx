@@ -1,4 +1,4 @@
-import React from "react"
+import React, { ClassAttributes } from "react"
 import { observer } from "./observer"
 import { copyStaticProperties } from "./utils/utils"
 import { MobXProviderContext } from "./Provider"
@@ -53,7 +53,7 @@ function getInjectName(component: IReactComponent<any>, injectNames: string): st
 
 function grabStoresByName(
     storeNames: Array<string>
-): (baseStores: IValueMap, nextProps: React.Props<any>) => React.PropsWithRef<any> | undefined {
+): (baseStores: IValueMap, nextProps: ClassAttributes<any>) => React.PropsWithRef<any> | undefined {
     return function (baseStores, nextProps) {
         storeNames.forEach(function (storeName) {
             if (
