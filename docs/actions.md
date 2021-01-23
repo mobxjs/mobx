@@ -22,7 +22,7 @@ MobX requires that you declare your actions, although [`makeAutoObservable`](obs
 
 2. By default, it is not allowed to change the state outside of actions. This helps to clearly identify in your code base where the state updates happen.
 
-The `action` annotation should only be used on functions that intend to _modify_ the state. Functions that derive information (performing lookups or filtering data) should _not_ be marked as actions, to allow MobX to track their invocations. `flow` annotated members will be non-enumerable.
+The `action` annotation should only be used on functions that intend to _modify_ the state. Functions that derive information (performing lookups or filtering data) should _not_ be marked as actions, to allow MobX to track their invocations. `action` annotated members will be non-enumerable.
 
 ## Examples
 
