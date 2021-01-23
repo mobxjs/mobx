@@ -85,6 +85,8 @@ Install support for decorators: `npm i --save-dev @babel/plugin-proposal-class-p
 }
 ```
 
+Tip: make sure your babel-preset-env [disable "loose" transformations](https://babeljs.io/docs/en/babel-preset-env#loose), by default is disabled.
+
 ### Decorator syntax and Create React App (v2)
 
 Decorators are only supported out of the box when using TypeScript in `create-react-app@^2.1.1` and newer. In older versions or when using vanilla JavaScript use eject, or the [customize-cra](https://github.com/arackaf/customize-cra) package.
@@ -94,7 +96,7 @@ Decorators are only supported out of the box when using TypeScript in `create-re
 _The current transpiler implementations of decorator syntax are quite limited and don't behave exactly the same.
 Also, many compositional patterns are currently not possible with decorators, until the stage-2 proposal has been implemented by all transpilers.
 For this reason the scope of decorator syntax support in MobX is currently scoped to make sure that the supported features
-behave consistently accross all environments._
+behave consistently across all environments._
 
 The following patterns are not officially supported by the MobX community:
 
