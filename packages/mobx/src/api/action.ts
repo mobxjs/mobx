@@ -19,9 +19,9 @@ const ACTION_UNNAMED = "<unnamed action>"
 
 export interface IActionFactory extends Annotation, PropertyDecorator {
     // nameless actions
-    <T extends Function>(fn: T): T
+    <T extends Function | undefined | null>(fn: T): T
     // named actions
-    <T extends Function>(name: string, fn: T): T
+    <T extends Function | undefined | null>(name: string, fn: T): T
 
     // named decorator
     (customName: string): PropertyDecorator & Annotation

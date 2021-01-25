@@ -1,5 +1,21 @@
 # mobx
 
+## 6.0.5
+
+### Patch Changes
+
+-   [`6b304232`](https://github.com/mobxjs/mobx/commit/6b30423266e5418a3f20389d0bd0eae31f3384d2) [#2644](https://github.com/mobxjs/mobx/pull/2644) Thanks [@rokoroku](https://github.com/rokoroku)! - Fix broken error reference in errors.ts
+
+*   [`83b84fd3`](https://github.com/mobxjs/mobx/commit/83b84fd354f2253fdd8ea556e217a92fc2633c00) [#2740](https://github.com/mobxjs/mobx/pull/2740) Thanks [@iChenLei](https://github.com/iChenLei)! - Infer optional / promise `action` args type correctly
+
+-   [`65c7b73b`](https://github.com/mobxjs/mobx/commit/65c7b73b7f0b1a69a1a2786b5f484419d129d10b) [#2717](https://github.com/mobxjs/mobx/pull/2717) Thanks [@ahoisl](https://github.com/ahoisl)! - The TypeScript type `CreateObservableOptions` is now exported.
+
+*   [`989390d4`](https://github.com/mobxjs/mobx/commit/989390d46bbe9941b61ac6c6d1292f96445e7cc3) [#2594](https://github.com/mobxjs/mobx/pull/2594) Thanks [@urugator](https://github.com/urugator)! - Fixed [#2579](https://github.com/mobxjs/mobx/issues/2579) - `observable` does not ignore class instances
+
+-   [`dea1cf18`](https://github.com/mobxjs/mobx/commit/dea1cf189b0f43929f4f626229d34a80bd10212e) [#2726](https://github.com/mobxjs/mobx/pull/2726) Thanks [@mweststrate](https://github.com/mweststrate)! - fix: `onBecomeObserved` was not triggered correctly for computed dependencies of computeds. Fixes #2686, #2667
+
+*   [`592e6e99`](https://github.com/mobxjs/mobx/commit/592e6e996c2d5264e162cfb0921a071c1d815c92) [#2743](https://github.com/mobxjs/mobx/pull/2743) Thanks [@vkrol](https://github.com/vkrol)! - Remove `sideEffects` section in `mobx-react-lite` `package.json`
+
 > 🚨🚨🚨 If you are upgrading from V4/V5, please follow [the migration guide](https://mobx.js.org/migrating-from-4-or-5.html).
 
 ## 6.0.4

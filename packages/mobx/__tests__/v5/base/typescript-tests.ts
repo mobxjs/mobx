@@ -2086,19 +2086,40 @@ test("type inference of the action callback", () => {
     )
 
     // Promises
-    // TODO: re-enable
-    // Promise.resolve(1).then(
-    //     action(arg => {
-    //         assert<IsExact<typeof arg, number>>(true)
-    //     })
-    // )
+    Promise.resolve(1).then(
+        action(arg => {
+            assert<IsExact<typeof arg, number>>(true)
+        })
+    )
 
-    // // Promises with names actions
-    // Promise.resolve(1).then(
-    //     action("named action", arg => {
-    //         assert<IsExact<typeof arg, number>>(true)
-    //     })
-    // )
+    // Promises with names actions
+    Promise.resolve(1).then(
+        action("named action", arg => {
+            assert<IsExact<typeof arg, number>>(true)
+        })
+    )
+
+    // optional
+    const optionalActionTypeInfer: {
+        a?: (a1: number, a2: string, a3: boolean) => void
+    } = {
+        a: action((a1, a2, a3) => {
+            assert<IsExact<typeof a1, number>>(true)
+            assert<IsExact<typeof a2, string>>(true)
+            assert<IsExact<typeof a3, boolean>>(true)
+        })
+    }
+
+    // optional with names actions
+    const optionalNamedActionTypeInfer: {
+        a?: (a1: number, a2: string, a3: boolean) => void
+    } = {
+        a: action("named action", (a1, a2, a3) => {
+            assert<IsExact<typeof a1, number>>(true)
+            assert<IsExact<typeof a2, string>>(true)
+            assert<IsExact<typeof a3, boolean>>(true)
+        })
+    }
 })
 
 test("TS - it should support flow as function wrapper", done => {

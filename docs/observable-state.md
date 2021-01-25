@@ -237,6 +237,7 @@ The above APIs take an optional `options` argument which is an object that suppo
 -   `autoBind: true` automatically binds all created actions to the instance.
 -   `deep: false` uses `observable.ref` by default, rather than `observable` to create new observable members.
 -   `name: <string>` gives the object a debug name that is printed in error messages and reflection APIs.
+-   `proxy: false` skips Proxy creating. This is a good option if the shape of the object will not change over time, as non-proxied objects are easier to debug and faster. See [avoiding proxies](#avoid-proxies).
 
 ## Converting observables back to vanilla JavaScript collections
 
