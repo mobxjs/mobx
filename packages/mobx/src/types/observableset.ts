@@ -74,7 +74,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
     constructor(
         initialData?: IObservableSetInitialValues<T>,
         enhancer: IEnhancer<T> = deepEnhancer,
-        public name_ = "ObservableSet@" + getNextId()
+        public name_ = __DEV__ ? "ObservableSet@" + getNextId() : "ObservableSet"
     ) {
         if (!isFunction(Set)) {
             die(22)

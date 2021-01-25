@@ -33,7 +33,7 @@ export class Atom implements IAtom {
      * Create a new atom. For debugging purposes it is recommended to give it a name.
      * The onBecomeObserved and onBecomeUnobserved callbacks can be used for resource management.
      */
-    constructor(public name_ = "Atom@" + getNextId()) {}
+    constructor(public name_ = __DEV__ ? "Atom@" + getNextId() : "Atom") {}
 
     // onBecomeObservedListeners
     public onBOL: Set<Lambda> | undefined

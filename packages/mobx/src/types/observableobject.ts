@@ -89,7 +89,7 @@ export class ObservableObjectAdministration
         public name_: string,
         public defaultEnhancer_: IEnhancer<any>
     ) {
-        this.keysAtom_ = new Atom(name_ + ".keys")
+        this.keysAtom_ = new Atom(__DEV__ ? name_ + ".keys" : "ObservableObject.keys")
     }
 
     read_(key: PropertyKey) {
@@ -152,7 +152,7 @@ export class ObservableObjectAdministration
             entry = new ObservableValue(
                 exists,
                 referenceEnhancer,
-                `${this.name_}.${stringifyKey(key)}?`,
+                __DEV__ ? `${this.name_}.${stringifyKey(key)}?` : "ObservableValue.key?",
                 false
             )
             map.set(key, entry)
@@ -181,7 +181,7 @@ export class ObservableObjectAdministration
         const observable = new ObservableValue(
             newValue,
             enhancer,
-            `${this.name_}.${stringifyKey(propName)}`,
+            __DEV__ ? `${this.name_}.${stringifyKey(propName)}` : "ObservableValue.propName",
             false
         )
         this.values_.set(propName, observable)
@@ -327,9 +327,11 @@ export function asObservableObject(
 
     if (!name) {
         if (isPlainObject(target)) {
-            name = "ObservableObject@" + getNextId()
+            name = __DEV__ ? "ObservableObject@" + getNextId() : "ObservableObject"
         } else {
-            name = (target.constructor.name || "ObservableObject") + "@" + getNextId()
+            name = __DEV__
+                ? (target.constructor.name || "ObservableObject") + "@" + getNextId()
+                : "ObservableObject"
         }
     }
 
