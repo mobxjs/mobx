@@ -73,6 +73,7 @@ export {
     transaction,
     observable,
     IObservableFactory,
+    CreateObservableOptions,
     computed,
     isObservable,
     isObservableProp,

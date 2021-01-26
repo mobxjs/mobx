@@ -16,7 +16,7 @@ There are two types of React bindings, `mobx-react-lite` supports only functiona
 
 **NPM:** `npm install --save mobx`
 
-**CDN:** https://cdnjs.com/libraries/mobx / https://unpkg.com/mobx/lib/mobx.umd.js
+**CDN:** https://cdnjs.com/libraries/mobx / https://unpkg.com/mobx/dist/mobx.umd.production.min.js
 
 ## Use spec compliant transpilation for class properties
 

@@ -22,7 +22,7 @@ MobX requires that you declare your actions, although [`makeAutoObservable`](obs
 
 2. By default, it is not allowed to change the state outside of actions. This helps to clearly identify in your code base where the state updates happen.
 
-The `action` annotation should only be used on functions that intend to _modify_ the state. Functions that derive information (performing lookups or filtering data) should _not_ be marked as actions, to allow MobX to track their invocations.
+The `action` annotation should only be used on functions that intend to _modify_ the state. Functions that derive information (performing lookups or filtering data) should _not_ be marked as actions, to allow MobX to track their invocations. `action` annotated members will be non-enumerable.
 
 ## Examples
 
@@ -72,7 +72,7 @@ class Doubler {
 <!--action.bound-->
 
 ```javascript
-import { makeObservable, observable, computed, action } from "mobx"
+import { makeObservable, observable, action } from "mobx"
 
 class Doubler {
     value = 0
@@ -114,7 +114,7 @@ increment(state)
 <!--runInAction(fn)-->
 
 ```javascript
-import { observable } from "mobx"
+import { observable, runInAction } from "mobx"
 
 const state = observable({ value: 0 })
 
@@ -258,19 +258,16 @@ class Store {
     fetchProjects() {
         this.githubProjects = []
         this.state = "pending"
-        fetchGithubProjectsSomehow().then(
-            this.projectsFetchSuccess,
-            this.projectsFetchFailure
-        )
-    )
+        fetchGithubProjectsSomehow().then(this.projectsFetchSuccess, this.projectsFetchFailure)
+    }
 
-    projectsFetchSuccess = (projects) => {
+    projectsFetchSuccess = projects => {
         const filteredProjects = somePreprocessing(projects)
         this.githubProjects = filteredProjects
         this.state = "done"
     }
 
-    projectsFetchFailure = (error) => {
+    projectsFetchFailure = error => {
         this.state = "error"
     }
 }
@@ -305,9 +302,9 @@ class Store {
         } catch (e) {
             runInAction(() => {
                 this.state = "error"
-            }
+            })
         }
-    )
+    }
 }
 ```
 
@@ -373,7 +370,7 @@ Note that the `flowResult` function is only needed when using TypeScript.
 Since decorating a method with `flow`, it will wrap the returned generator in a promise.
 However, TypeScript isn't aware of that transformation, so `flowResult` will make sure that TypeScript is aware of that type change.
 
-`makeAutoObservable` and friends will automatically infer generators to be `flow`s.
+`makeAutoObservable` and friends will automatically infer generators to be `flow`s. `flow` annotated members will be non-enumerable.
 
 <details id="flow-wrap"><summary>{🚀} **Note:** using flow on object fields<a href="#flow-wrap" class="tip-anchor"></a></summary>
 `flow`, like `action`, can be used to wrap functions directly. The above example could also have been written as follows:
