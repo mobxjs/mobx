@@ -2,6 +2,7 @@ module.exports = {
     parser: "@typescript-eslint/parser",
     plugins: ["@typescript-eslint"],
     extends: "eslint:recommended",
+    ignorePatterns: ["**/__tests__/**/*"],
     env: {
         browser: true,
         es6: true,

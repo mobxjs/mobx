@@ -1,3 +1,4 @@
+const { isAction, isObservable, isObservableProp } = require("../../../src/mobx")
 const mobx = require("../../../src/mobx.ts")
 const m = mobx
 const o = mobx.observable
@@ -233,11 +234,16 @@ test("observable5", function () {
     const three = function () {
         return 3
     }
+    // 20.12.2020 @urugator:
+    // Since https://github.com/mobxjs/mobx/pull/2641
+    // the non-observable field won't become suddenly observable on assigment.
+    // Firstly it doesn't make sense,
+    // secondly it's inconsistent - it works like this only for proxies/object api.
     x.nonReactive = three
     expect(b.toArray()).toEqual([
         [17, f, 17],
-        [18, f, 18],
-        [18, three, 3]
+        [18, f, 18]
+        //[18, three, 3]
     ])
 })
 
@@ -450,63 +456,6 @@ test("as structure view", function () {
     expect(cc).toBe(2)
 })
 
-// This test doesn't make much sense anymore with proxies;
-// creating non configurable props on dynamic observable object
-// will break the invariants of proxies (when trying to determine keys)
-// which is not unfixiable in itself,
-// but definitely a pattern we don't want to encourage
-test("ES5 non reactive props", function () {
-    expect(function () {
-        m.extendObservable(false, { notConfigurable: 1 })
-    }).toThrow(/'extendObservable' expects an object as first argument/)
-    let te = m.observable({})
-    Object.defineProperty(te, "nonConfigurable", {
-        enumerable: true,
-        configurable: false,
-        writable: true,
-        value: "static"
-    })
-    // should skip non-configurable / writable props when using `observable`
-    expect(() => {
-        te = m.set(te, te)
-    }).toThrow(
-        /Cannot make property 'nonConfigurable' observable, it is not configurable and writable in the target object/
-    )
-    const d1 = Object.getOwnPropertyDescriptor(te, "nonConfigurable")
-    expect(d1.value).toBe("static")
-
-    const te2 = m.observable({})
-    Object.defineProperty(te2, "notWritable", {
-        enumerable: true,
-        configurable: true,
-        writable: false,
-        value: "static"
-    })
-    // should throw if trying to reconfigure an existing non-writable prop
-    expect(function () {
-        m.set(te2, { notWritable: 1 })
-    }).toThrow(/Cannot make property 'notWritable' observable/)
-    const d2 = Object.getOwnPropertyDescriptor(te2, "notWritable")
-    expect(d2.value).toBe("static")
-
-    // should not throw for other props
-    expect(m.extendObservable(te, { bla: 3 }).bla).toBe(3)
-})
-
-test("ES5 non reactive props - 2", function () {
-    const te = {}
-    Object.defineProperty(te, "nonConfigurable", {
-        enumerable: true,
-        configurable: false,
-        writable: true,
-        value: "static"
-    })
-    // should skip non-configurable / writable props when using `observable`
-    expect(() => {
-        makeObservable(te, { nonConfigurable: m.observable })
-    }).toThrow(/Cannot make property 'nonConfigurable' observable/)
-})
-
 test("540 - extendobservable should not report cycles", function () {
     expect(() => m.extendObservable(Object.freeze({}), {})).toThrowError(
         /Cannot make the designated object observable/
@@ -662,9 +611,7 @@ test("double declare property", () => {
                 a: mobx.observable.ref
             }
         )
-    }).toThrowErrorMatchingInlineSnapshot(
-        `"[MobX] Cannot decorate 'a': the property is already decorated as observable."`
-    )
+    }).toThrow(/The field is already annotated/)
 })
 
 test("structural collections", () => {

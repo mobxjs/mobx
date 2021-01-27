@@ -12,7 +12,7 @@ Object {
     "configurable": true,
     "enumerable": false,
     "value": [Function],
-    "writable": true,
+    "writable": false,
   },
   "x": Object {
     "configurable": true,
@@ -47,7 +47,7 @@ Object {
     "configurable": true,
     "enumerable": false,
     "value": [Function],
-    "writable": true,
+    "writable": false,
   },
   "x": Object {
     "configurable": true,
@@ -82,7 +82,7 @@ Object {
     "configurable": true,
     "enumerable": false,
     "value": [Function],
-    "writable": true,
+    "writable": false,
   },
   "x": Object {
     "configurable": true,

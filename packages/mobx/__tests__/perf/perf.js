@@ -482,7 +482,7 @@ results of this test:
 
         ar()
 
-        log("expensive sort: disposed" + (now() - start))
+        log("expensive sort: disposed " + (now() - start))
 
         const plain = mobx.toJS(items, false)
         t.equal(plain.length, MAX)

@@ -36,8 +36,8 @@ export function intercept<K, V>(
     property: K,
     handler: IInterceptor<IValueWillChange<V>>
 ): Lambda
-export function intercept(object: Object, handler: IInterceptor<IObjectWillChange>): Lambda
-export function intercept<T extends Object, K extends keyof T>(
+export function intercept(object: object, handler: IInterceptor<IObjectWillChange>): Lambda
+export function intercept<T extends object, K extends keyof T>(
     object: T,
     property: K,
     handler: IInterceptor<IValueWillChange<any>>

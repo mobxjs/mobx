@@ -7,9 +7,6 @@ Object {
       "name": "ObservableObject@1.euro",
     },
     Object {
-      "name": "ObservableObject@1.pound?",
-    },
-    Object {
       "dependencies": Array [
         Object {
           "name": "ObservableObject@1.euro",

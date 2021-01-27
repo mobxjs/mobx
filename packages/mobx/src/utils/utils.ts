@@ -114,18 +114,6 @@ export function addHiddenFinalProp(object: any, propName: PropertyKey, value: an
     })
 }
 
-export function assertPropertyConfigurable(object: any, prop: PropertyKey) {
-    if (__DEV__) {
-        const descriptor = getDescriptor(object, prop)
-        if (descriptor?.configurable === false || descriptor?.writable === false)
-            die(
-                `Cannot make property '${stringifyKey(
-                    prop
-                )}' observable, it is not configurable and writable in the target object`
-            )
-    }
-}
-
 export function createInstanceofPredicate<T>(
     name: string,
     theClass: new (...args: any[]) => T
@@ -148,7 +136,7 @@ export function isES6Set(thing): thing is Set<any> {
 const hasGetOwnPropertySymbols = typeof Object.getOwnPropertySymbols !== "undefined"
 
 /**
- * Returns the following: own keys, prototype keys & own symbol keys, if they are enumerable.
+ * Returns the following: own enumerable keys and symbols.
  */
 export function getPlainObjectKeys(object) {
     const keys = Object.keys(object)

@@ -377,7 +377,7 @@ test("predictable 'this' - 2", () => {
     expect(a.computed).toBe(a)
 })
 
-test("1796 - deleting / recreate prop", () => {
+test("1796 - delete -> recreate observable prop", () => {
     let value = observable({
         foo: undefined // if foo is something like 'abc', it works.
     })
@@ -394,4 +394,27 @@ test("1796 - deleting / recreate prop", () => {
         undefined, // ideally  not, but ok..
         "def"
     ])
+})
+
+test("1796 - delete -> recreate computed prop", () => {
+    let value = observable({
+        foo: undefined,
+        get bar() {
+            return this.foo
+        }
+    })
+
+    expect(isComputedProp(value, "bar")).toBe(true)
+
+    const events = []
+
+    autorun(() => {
+        events.push(value.bar)
+    })
+    delete value.bar
+    value.bar = "def"
+    expect(isObservableProp(value, "bar")).toBe(true)
+    expect(isComputedProp(value, "bar")).toBe(false)
+
+    expect(events).toEqual([undefined, undefined, "def"])
 })

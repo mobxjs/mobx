@@ -27,9 +27,9 @@ import {
     assertProxies,
     reserveArrayBuffer,
     hasProp,
-    die
+    die,
+    globalState
 } from "../internal"
-import { globalState } from "../core/globalstate"
 
 const SPLICE = "splice"
 export const UPDATE = "update"
