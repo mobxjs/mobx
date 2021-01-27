@@ -2,25 +2,41 @@
 
 ## 6.1.0
 
+This release fixes a plethora of bugs related to sub-classing and reflecting / iterating on observable objects.
+The behavior of MobX is in many edge cases much more explicitly defined now.
+
+A new annotation was introduced: `@override` / `override` to support re-defining actions and computed values(!) on sub classses.
+
+For idiomatic MobX usage this release should have little impact, but if you are using a lot of sub-classing, reflection APIs or direct object manipulations like `defineProperty`,
+this might release might introduce previously unseen errors for cases that silently failed before, or even worked successfully even though the correct behavior wasn't specified earlier.
+
+If you are migrating from MobX 4/5 we strongly recommend to go to 6.1 in one go, and skip 6.0.\*, as some buggy behavior compared to the previous majors has been correct.
+
+As always, our libraries come as-is and are maintained by volunteers. Upgrades are at own risk and voluntary. Bug reports require a minimal reproductions and a correctly filled out issue template.
+
+Support the ongoing maintenance at: https://opencollective.com/mobx
+
 ### Minor Changes
 
--   [`28f8a11d`](https://github.com/mobxjs/mobx/commit/28f8a11d8b94f1aca2eec4ae9c5f45c5ea2f4362) [#2641](https://github.com/mobxjs/mobx/pull/2641) Thanks [@urugator](https://github.com/urugator)! - `action`, `computed`, `flow` defined on prototype can be overriden by subclass via `override` annotation/decorator. Previously broken.
-    Overriding anything defined on instance itself (`this`) is not supported and should throw. Previously partially possible or broken.
-    Attempt to re-annotate property always throws. Previously mostly undefined outcome.
-    All annotated and non-observable props (action/flow) are non-writable. Previously writable.
-    All annotated props of non-plain object are non-configurable. Previously configurable.
-    Observable object should now work more reliably in various (edge) cases.
-    Proxied objects now support `Object.defineProperty`. Previously unsupported/broken.
-    `extendObservable/makeObservable/defineProperty` notifies observers/listeners/interceptors about added props. Peviously inconsistent.
-    `keys/values/entries` works like `Object.keys/values/entries`. Previously included only observables.
-    `has` works like `in`. Previously reported `true` only for existing own observable props.
-    `set` no longer transforms existing non-observable prop to observable prop, but simply sets the value.
-    `remove/delete` works with non-observable and computed props. Previously unsupported/broken.
-    Passing `options` to `observable/extendObservable/makeObservable` throws if the object is already observable . Previously passed options were mostly ignored.
-    `autoBind` option is now sticky - same as `deep` and `name` option.
-    `observable/extendObservable` now also picks non-enumerable keys (same as `make[Auto]Observable`).
-    Removed deprecated `action.bound("name")`
-    Proxied objects should be compatible with `Reflect` API. Previously throwing instead of returning booleans.
+[`28f8a11d`](https://github.com/mobxjs/mobx/commit/28f8a11d8b94f1aca2eec4ae9c5f45c5ea2f4362) [#2641](https://github.com/mobxjs/mobx/pull/2641) Thanks [@urugator](https://github.com/urugator)!
+
+-   `action`, `computed`, `flow` defined on prototype can be overriden by subclass via `override` annotation/decorator. Previously broken.
+-   Overriding anything defined on instance itself (`this`) is not supported and should throw. Previously partially possible or broken.
+-   Attempt to re-annotate property always throws. Previously mostly undefined outcome.
+-   All annotated and non-observable props (action/flow) are non-writable. Previously writable.
+-   All annotated props of non-plain object are non-configurable. Previously configurable.
+-   Observable object should now work more reliably in various (edge) cases.
+-   Proxied objects now support `Object.defineProperty`. Previously unsupported/broken.
+-   `extendObservable/makeObservable/defineProperty` notifies observers/listeners/interceptors about added props. Previously inconsistent.
+-   `keys/values/entries` works like `Object.keys/values/entries`. Previously included only observables.
+-   `has` works like `in`. Previously reported `true` only for existing own observable props.
+-   `set` no longer transforms existing non-observable prop to observable prop, but simply sets the value.
+-   `remove/delete` works with non-observable and computed props. Previously unsupported/broken.
+-   Passing `options` to `observable/extendObservable/makeObservable` throws if the object is already observable . Previously passed options were mostly ignored.
+-   `autoBind` option is now sticky - same as `deep` and `name` option.
+-   `observable/extendObservable` now also picks non-enumerable keys (same as `make[Auto]Observable`).
+-   Removed deprecated `action.bound("name")`
+-   Proxied objects should be compatible with `Reflect` API. Previously throwing instead of returning booleans.
 
 ## 6.0.5
 
@@ -1031,7 +1047,7 @@ A deprecation message will now be printed if creating computed properties while 
 
 ```javascript
 const x = observable({
-    computedProp: function() {
+    computedProp: function () {
         return someComputation
     }
 })
@@ -1056,7 +1072,7 @@ or alternatively:
 
 ```javascript
 observable({
-    computedProp: computed(function() {
+    computedProp: computed(function () {
         return someComputation
     })
 })
@@ -1074,7 +1090,7 @@ N.B. If you want to introduce actions on an observable that modify its state, us
 ```javascript
 observable({
     counter: 0,
-    increment: action(function() {
+    increment: action(function () {
         this.counter++
     })
 })
@@ -1200,10 +1216,10 @@ function Square() {
     extendObservable(this, {
         length: 2,
         squared: computed(
-            function() {
+            function () {
                 return this.squared * this.squared
             },
-            function(surfaceSize) {
+            function (surfaceSize) {
                 this.length = Math.sqrt(surfaceSize)
             }
         )
