@@ -1,6 +1,6 @@
 {
     "name": "mobx-react",
-    "version": "8.0.0",
+    "version": "7.1.0",
     "description": "React bindings for MobX. Create fully reactive components.",
     "source": "src/index.ts",
     "main": "dist/index.js",
@@ -36,7 +36,7 @@
     },
     "homepage": "http://mobx.js.org/",
     "dependencies": {
-        "mobx-react-lite": "^4.0.0"
+        "mobx-react-lite": "^3.2.0"
     },
     "peerDependencies": {
         "mobx": "^6.1.0",
