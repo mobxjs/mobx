@@ -1,5 +1,12 @@
 # mobx-react-lite
 
+## 3.2.0
+
+### Patch Changes
+
+-   Updated dependencies [[`28f8a11d`](https://github.com/mobxjs/mobx/commit/28f8a11d8b94f1aca2eec4ae9c5f45c5ea2f4362)]:
+    -   mobx@6.1.0
+
 ## 3.1.7
 
 ### Patch Changes
