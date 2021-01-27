@@ -47,78 +47,118 @@ test("toJS respects key changes", () => {
     ])
 })
 
-test("object - set, remove, values are reactive", () => {
+test("keys(object), values(object), entries(object)", () => {
     const todos = observable({})
-    const snapshots = []
+    const plain = {}
+    const keysSnapshots = []
+    const valuesSnapshots = []
+    const entriesSnapshots = []
+    const expectedKeysSnapshots = []
+    const expectedValuesSnapshots = []
+    const expectedEntriesSnapshots = []
 
-    reaction(
-        () => values(todos),
-        values => snapshots.push(values)
-    )
+    const s1 = Symbol()
+    const s2 = Symbol()
 
-    expect(has(todos, "x")).toBe(false)
-    expect(get(todos, "x")).toBe(undefined)
-    set(todos, "x", 3)
-    expect(has(todos, "x")).toBe(true)
-    expect(get(todos, "x")).toBe(3)
-    remove(todos, "y")
-    set(todos, "z", 4)
-    set(todos, "x", 5)
-    remove(todos, "z")
+    function expectEquality() {
+        expect(todos).toEqual(plain)
+    }
 
-    expect(snapshots).toEqual([[3], [3, 4], [5, 4], [5]])
-})
+    function expectKeysReaction() {
+        expectedKeysSnapshots.push(Object.keys(plain))
+    }
 
-test("object - set, remove, entries are reactive", () => {
-    const todos = observable({})
-    const snapshots = []
+    function expectValuesReaction() {
+        expectedValuesSnapshots.push(Object.values(plain))
+    }
 
-    reaction(
-        () => entries(todos),
-        entries => snapshots.push(entries)
-    )
-
-    expect(has(todos, "x")).toBe(false)
-    expect(get(todos, "x")).toBe(undefined)
-    set(todos, "x", 3)
-    expect(has(todos, "x")).toBe(true)
-    expect(get(todos, "x")).toBe(3)
-    remove(todos, "y")
-    set(todos, "z", 4)
-    set(todos, "x", 5)
-    remove(todos, "z")
-
-    expect(snapshots).toEqual([
-        [["x", 3]],
-        [
-            ["x", 3],
-            ["z", 4]
-        ],
-        [
-            ["x", 5],
-            ["z", 4]
-        ],
-        [["x", 5]]
-    ])
-})
-
-test("object - set, remove, keys are reactive", () => {
-    const todos = observable({ a: 3 })
-    const snapshots = []
+    function expectEntriesReaction() {
+        expectedEntriesSnapshots.push(Object.entries(plain))
+    }
 
     reaction(
         () => keys(todos),
-        keys => snapshots.push(keys)
+        result => keysSnapshots.push(result)
     )
 
-    set(todos, "x", 3)
-    remove(todos, "y")
-    set(todos, "z", 4)
-    set(todos, "x", 5)
-    remove(todos, "z")
-    remove(todos, "a")
+    reaction(
+        () => values(todos),
+        result => valuesSnapshots.push(result)
+    )
 
-    expect(snapshots).toEqual([["a", "x"], ["a", "x", "z"], ["a", "x"], ["x"]])
+    reaction(
+        () => entries(todos),
+        result => entriesSnapshots.push(result)
+    )
+
+    expectEquality()
+    // add
+    set(todos, "k1", 1)
+    plain["k1"] = 1
+    expectEquality()
+    expectKeysReaction()
+    expectValuesReaction()
+    expectEntriesReaction()
+    // add symbol
+    set(todos, s1, 2)
+    plain[s1] = 2
+    expectEquality()
+    // see ObservableObjectAdministration.keys() for explanation
+    expectKeysReaction()
+    expectValuesReaction()
+    expectEntriesReaction()
+    // delete non-existent
+    remove(todos, "-")
+    delete plain["-"]
+    expectEquality()
+    // delete non-existent symbol
+    remove(todos, Symbol())
+    delete plain[Symbol()]
+    expectEquality()
+    // add second
+    set(todos, "k2", 3)
+    plain["k2"] = 3
+    expectEquality()
+    expectKeysReaction()
+    expectValuesReaction()
+    expectEntriesReaction()
+    // add second symbol
+    set(todos, s2, 4)
+    plain[s2] = 4
+    expectEquality()
+    // see ObservableObjectAdministration.keys() for explanation
+    expectKeysReaction()
+    expectValuesReaction()
+    expectEntriesReaction()
+    // update
+    set(todos, "k1", 11)
+    plain["k1"] = 11
+    expectEquality()
+    expectValuesReaction()
+    expectEntriesReaction()
+    // update symbol
+    set(todos, s1, 22)
+    plain[s1] = 22
+    expectEquality()
+    // delete
+    remove(todos, "k1")
+    delete plain["k1"]
+    expectEquality()
+    expectKeysReaction()
+    expectValuesReaction()
+    expectEntriesReaction()
+    // delete symbol
+    remove(todos, s1)
+    delete plain[s1]
+    expectEquality()
+    // see ObservableObjectAdministration.keys() for explanation
+    expectKeysReaction()
+    expectValuesReaction()
+    expectEntriesReaction()
+
+    expect(keysSnapshots).toEqual(expectedKeysSnapshots)
+    expect(valuesSnapshots).toEqual(expectedValuesSnapshots)
+    expect(entriesSnapshots).toEqual(expectedEntriesSnapshots)
 })
 
 test("map - set, remove, values are reactive", () => {
@@ -303,7 +343,7 @@ test("observe & intercept", () => {
             a: { title: "get coffee" }
         },
         {},
-        { deep: false }
+        { deep: false, name: "TestObject" }
     )
     mobx.observe(todos, c => events.push({ observe: c }))
     const d = mobx.intercept(todos, c => {

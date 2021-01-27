@@ -83,9 +83,7 @@ test("should not be possible to use @action with getters", () => {
             get Test() {}
         }
         return new A()
-    }).toThrowErrorMatchingInlineSnapshot(
-        `"[MobX] Cannot decorate 'Test': action can only be used on properties with a function value."`
-    )
+    }).toThrow(/can only be used on properties with a function value/)
 
     mobx._resetGlobalState()
 })
@@ -709,43 +707,6 @@ test("inheritance - 2", () => {
     expect(values).toEqual([10, 11, 12, 14, 18])
 })
 
-test("inheritance overrides observable", () => {
-    class A {
-        a = 2
-
-        constructor() {
-            makeObservable(this, {
-                a: observable
-            })
-        }
-    }
-
-    class B extends A {
-        a = 5
-        b = 3
-
-        constructor() {
-            super()
-
-            expect(() => {
-                makeObservable(this, {
-                    a: observable,
-                    b: observable,
-                    c: computed
-                })
-            }).toThrowErrorMatchingInlineSnapshot(
-                `"[MobX] Cannot decorate 'a': the property is already decorated as observable."`
-            )
-        }
-
-        get c() {
-            return this.a + this.b
-        }
-    }
-
-    const b1 = new B()
-})
-
 test("reusing initializers", () => {
     class A {
         a = 3
@@ -953,82 +914,12 @@ test("379, inheritable actions (babel)", () => {
     }
 
     class B extends A {
-        constructor() {
-            super()
-
-            makeObservable(this, {
-                method: action
-            })
-        }
-
         method() {
             return super.method() * 2
         }
     }
 
     class C extends B {
-        constructor() {
-            super()
-
-            makeObservable(this, {
-                method: action
-            })
-        }
-
-        method() {
-            return super.method() + 3
-        }
-    }
-
-    const b = new B()
-    expect(b.method()).toBe(84)
-    expect(isAction(b.method)).toBe(true)
-
-    const a = new A()
-    expect(a.method()).toBe(42)
-    expect(isAction(a.method)).toBe(true)
-
-    const c = new C()
-    expect(c.method()).toBe(87)
-    expect(isAction(c.method)).toBe(true)
-})
-
-test("379, inheritable actions - 2 (babel)", () => {
-    class A {
-        constructor() {
-            makeObservable(this, {
-                method: action("a method")
-            })
-        }
-
-        method() {
-            return 42
-        }
-    }
-
-    class B extends A {
-        constructor() {
-            super()
-
-            makeObservable(this, {
-                method: action("b method")
-            })
-        }
-
-        method() {
-            return super.method() * 2
-        }
-    }
-
-    class C extends B {
-        constructor() {
-            super()
-
-            makeObservable(this, {
-                method: action("c method")
-            })
-        }
-
         method() {
             return super.method() + 3
         }
@@ -1398,7 +1289,11 @@ test("computed comparer works with decorate (babel) - 3", () => {
     disposeAutorun()
 })
 
-test("actions are reassignable", () => {
+// 19.12.2020 @urugator:
+// All annotated non-observable fields are not writable.
+// All annotated fields of non-plain objects are non-configurable.
+// https://github.com/mobxjs/mobx/pull/2641
+test.skip("actions are reassignable", () => {
     // See #1398, make actions reassignable to support stubbing
     class A {
         constructor() {

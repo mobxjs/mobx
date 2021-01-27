@@ -449,42 +449,6 @@ test("as structure view", function () {
     expect(cc).toBe(2)
 })
 
-test("ES5 non reactive props", function () {
-    expect(function () {
-        m.extendObservable(false, { notConfigurable: 1 })
-    }).toThrow(/'extendObservable' expects an object as first argument/)
-    let te = m.observable({})
-    Object.defineProperty(te, "nonConfigurable", {
-        enumerable: true,
-        configurable: false,
-        writable: true,
-        value: "static"
-    })
-    // should skip non-configurable / writable props when using `observable`
-    expect(() => {
-        te = m.set(te, te)
-    }).toThrow(/Cannot make property 'nonConfigurable' observable/)
-    const d1 = Object.getOwnPropertyDescriptor(te, "nonConfigurable")
-    expect(d1.value).toBe("static")
-
-    const te2 = m.observable({})
-    Object.defineProperty(te2, "notWritable", {
-        enumerable: true,
-        configurable: true,
-        writable: false,
-        value: "static"
-    })
-    // should throw if trying to reconfigure an existing non-writable prop
-    expect(function () {
-        m.set(te2, { notWritable: 1 })
-    }).toThrow(/Cannot make property 'notWritable' observable/)
-    const d2 = Object.getOwnPropertyDescriptor(te2, "notWritable")
-    expect(d2.value).toBe("static")
-
-    // should not throw for other props
-    expect(m.extendObservable(te, { bla: 3 }).bla).toBe(3)
-})
-
 test("540 - extendobservable should not report cycles", function () {
     expect(() => m.extendObservable(Object.freeze({}), {})).toThrowError(
         /Cannot make the designated object observable/

@@ -66,6 +66,8 @@
         "build": "node ../../scripts/build.js mobx",
         "build:test": "yarn build --target test",
         "perf": "scripts/perf.sh",
+        "perf-legacy": "node --expose-gc ./__tests__/perf/index.js legacy",
+        "perf-proxy": "node --expose-gc ./__tests__/perf/index.js proxy",
         "test:performance": "yarn perf proxy && yarn perf legacy",
         "test:mixed-versions": "yarn test --testRegex mixed-versions",
         "test:types": "tsc --noEmit",

@@ -443,7 +443,7 @@ test("extendObservable respects action decorators", () => {
 test("expect warning for invalid decorator", () => {
     expect(() => {
         mobx.observable({ x: 1 }, { x: undefined })
-    }).toThrow(/invalid decorator for 'x'/)
+    }).toThrow(/Invalid annotation/)
 })
 
 test("bound actions bind", () => {

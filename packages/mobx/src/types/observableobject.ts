@@ -1,6 +1,11 @@
 import {
+    CreateObservableOptions,
+    getAnnotationFromOptions,
+    propagateChanged,
+    isAnnotation,
     $mobx,
     Atom,
+    Annotation,
     ComputedValue,
     IAtom,
     IComputedValueOptions,
@@ -10,9 +15,7 @@ import {
     Lambda,
     ObservableValue,
     addHiddenProp,
-    assertPropertyConfigurable,
     createInstanceofPredicate,
-    deepEnhancer,
     endBatch,
     getNextId,
     hasInterceptors,
@@ -30,12 +33,24 @@ import {
     startBatch,
     stringifyKey,
     globalState,
+    observable,
     ADD,
     UPDATE,
     die,
+    hasProp,
+    getDescriptor,
+    storedAnnotationsSymbol,
+    ownKeys,
+    isOverride,
     defineProperty,
-    hasProp
+    inferAnnotationFromDescriptor,
+    objectPrototype
 } from "../internal"
+
+// adm[inferredAnnotationsSymbol] = { foo: annotation, ... }
+export const inferredAnnotationsSymbol = Symbol("mobx-inferred-annotations")
+
+const descriptorCache = Object.create(null)
 
 export type IObjectDidChange<T = any> = {
     observableKind: "object"
@@ -79,40 +94,54 @@ export class ObservableObjectAdministration
     changeListeners_
     interceptors_
     proxy_: any
+    isPlainObject_: boolean
+    appliedAnnotations_?: object
     private pendingKeys_: undefined | Map<PropertyKey, ObservableValue<boolean>>
-    private keysValue_: PropertyKey[] = []
-    private isStaledKeysValue_ = true
 
     constructor(
         public target_: any,
         public values_ = new Map<PropertyKey, ObservableValue<any> | ComputedValue<any>>(),
         public name_: string,
-        public defaultEnhancer_: IEnhancer<any>
+        // Used anytime annotation is not explicitely provided
+        public defaultAnnotation_: Annotation = observable,
+        // Bind automatically inferred actions?
+        public autoBind_: boolean = false
     ) {
         this.keysAtom_ = new Atom(name_ + ".keys")
+        // Optimization: we use this frequently
+        this.isPlainObject_ = isPlainObject(this.target_)
+        if (__DEV__ && !isAnnotation(this.defaultAnnotation_)) {
+            die(`defaultAnnotation must be valid annotation`)
+        }
+        if (__DEV__ && typeof this.autoBind_ !== "boolean") {
+            die(`autoBind must be boolean`)
+        }
+        if (__DEV__) {
+            // Prepare structure for tracking which fields were already annotated
+            this.appliedAnnotations_ = {}
+        }
     }
 
-    read_(key: PropertyKey) {
+    getObservablePropValue_(key: PropertyKey): any {
         return this.values_.get(key)!.get()
     }
 
-    write_(key: PropertyKey, newValue) {
-        const instance = this.target_
+    setObservablePropValue_(key: PropertyKey, newValue): boolean | null {
         const observable = this.values_.get(key)
         if (observable instanceof ComputedValue) {
             observable.set(newValue)
-            return
+            return true
         }
 
         // intercept
         if (hasInterceptors(this)) {
             const change = interceptChange<IObjectWillChange>(this, {
                 type: UPDATE,
-                object: this.proxy_ || instance,
+                object: this.proxy_ || this.target_,
                 name: key,
                 newValue
             })
-            if (!change) return
+            if (!change) return null
             newValue = (change as any).newValue
         }
         newValue = (observable as any).prepareNewValue_(newValue)
@@ -127,7 +156,7 @@ export class ObservableObjectAdministration
                           type: UPDATE,
                           observableKind: "object",
                           debugObjectName: this.name_,
-                          object: this.proxy_ || instance,
+                          object: this.proxy_ || this.target_,
                           oldValue: (observable as any).value_,
                           name: key,
                           newValue
@@ -139,116 +168,410 @@ export class ObservableObjectAdministration
             if (notify) notifyListeners(this, change)
             if (__DEV__ && notifySpy) spyReportEnd()
         }
+        return true
     }
 
-    has_(key: PropertyKey) {
-        const map = this.pendingKeys_ || (this.pendingKeys_ = new Map())
-        let entry = map.get(key)
-        if (entry) return entry.get()
-        else {
-            const exists = !!this.values_.get(key)
-            // Possible optimization: Don't have a separate map for non existing keys,
-            // but store them in the values map instead, using a special symbol to denote "not existing"
+    get_(key: PropertyKey): any {
+        if (globalState.trackingDerivation && !hasProp(this.target_, key)) {
+            // Key doesn't exist yet, subscribe for it in case it's added later
+            this.has_(key)
+        }
+        return this.target_[key]
+    }
+
+    /**
+     * @param {PropertyKey} key
+     * @param {any} value
+     * @param {Annotation|boolean} annotation true - infer from descriptor, false - copy as is
+     * @param {boolean} proxyTrap whether it's called from proxy trap
+     * @returns {boolean|null} true on success, false on failure (proxyTrap + non-configurable), null when cancelled by interceptor
+     */
+    set_(key: PropertyKey, value: any, proxyTrap: boolean = false): boolean | null {
+        // Don't use .has(key) - we care about own
+        if (hasProp(this.target_, key)) {
+            // Existing prop
+            if (this.values_.has(key)) {
+                // Observable (can be intercepted)
+                return this.setObservablePropValue_(key, value)
+            } else if (proxyTrap) {
+                // Non-observable - proxy
+                return Reflect.set(this.target_, key, value)
+            } else {
+                // Non-observable
+                this.target_[key] = value
+                return true
+            }
+        } else {
+            // New prop
+            return this.extend_(
+                key,
+                { value, enumerable: true, writable: true, configurable: true },
+                this.defaultAnnotation_,
+                proxyTrap
+            )
+        }
+    }
+
+    // Trap for "in"
+    has_(key: PropertyKey): boolean {
+        if (!globalState.trackingDerivation) {
+            // Skip key subscription outside derivation
+            return key in this.target_
+        }
+        this.pendingKeys_ ||= new Map()
+        let entry = this.pendingKeys_.get(key)
+        if (!entry) {
             entry = new ObservableValue(
-                exists,
+                key in this.target_,
                 referenceEnhancer,
                 `${this.name_}.${stringifyKey(key)}?`,
                 false
             )
-            map.set(key, entry)
-            return entry.get() // read to subscribe
+            this.pendingKeys_.set(key, entry)
         }
+        return entry.get()
     }
 
-    addObservableProp_(
-        propName: PropertyKey,
-        newValue,
-        enhancer: IEnhancer<any> = this.defaultEnhancer_
-    ) {
-        const { target_: target } = this
-        if (__DEV__) assertPropertyConfigurable(target, propName)
+    /**
+     * @param {PropertyKey} key
+     * @param {Annotation|boolean} annotation true - infer from object or it's prototype, false - ignore
+     */
+    make_(key: PropertyKey, annotation: Annotation | boolean): void {
+        if (annotation === true) {
+            annotation = this.inferAnnotation_(key)
+        }
+        if (annotation === false) {
+            return
+        }
+        assertAnnotable(this, annotation, key)
+        annotation.make_(this, key)
+    }
 
+    /**
+     * @param {PropertyKey} key
+     * @param {PropertyDescriptor} descriptor
+     * @param {Annotation|boolean} annotation true - infer from descriptor, false - copy as is
+     * @param {boolean} proxyTrap whether it's called from proxy trap
+     * @returns {boolean|null} true on success, false on failure (proxyTrap + non-configurable), null when cancelled by interceptor
+     */
+    extend_(
+        key: PropertyKey,
+        descriptor: PropertyDescriptor,
+        annotation: Annotation | boolean,
+        proxyTrap: boolean = false
+    ): boolean | null {
+        if (annotation === true) {
+            annotation = inferAnnotationFromDescriptor(
+                descriptor,
+                this.defaultAnnotation_,
+                this.autoBind_
+            )
+        }
+        if (annotation === false) {
+            return this.defineProperty_(key, descriptor, proxyTrap)
+        }
+        assertAnnotable(this, annotation, key)
+        const outcome = annotation.extend_(this, key, descriptor, proxyTrap)
+        if (outcome) {
+            recordAnnotationApplied(this, annotation, key)
+        }
+        return outcome
+    }
+
+    inferAnnotation_(key: PropertyKey): Annotation | false {
+        // Inherited is fine - annotation cannot differ in subclass
+        let annotation = this.target_[inferredAnnotationsSymbol]?.[key]
+        if (annotation) return annotation
+
+        let current = this.target_
+        while (current && current !== objectPrototype) {
+            const descriptor = getDescriptor(current, key)
+            if (descriptor) {
+                annotation = inferAnnotationFromDescriptor(
+                    descriptor,
+                    this.defaultAnnotation_,
+                    this.autoBind_
+                )
+                break
+            }
+            current = Object.getPrototypeOf(current)
+        }
+
+        // Not found (false means ignore)
+        if (annotation === undefined) {
+            die(1, "true", key)
+        }
+
+        // Cache the annotation.
+        // Note we can do this only because annotation and field can't change.
+        if (!this.isPlainObject_) {
+            // We could also place it on furthest proto, shoudn't matter
+            const closestProto = Object.getPrototypeOf(this.target_)
+            if (!hasProp(closestProto, inferredAnnotationsSymbol)) {
+                addHiddenProp(closestProto, inferredAnnotationsSymbol, {})
+            }
+            closestProto[inferredAnnotationsSymbol][key] = annotation
+        }
+
+        return annotation
+    }
+
+    /**
+     * @param {PropertyKey} key
+     * @param {PropertyDescriptor} descriptor
+     * @param {boolean} proxyTrap whether it's called from proxy trap
+     * @returns {boolean|null} true on success, false on failure (proxyTrap + non-configurable), null when cancelled by interceptor
+     */
+    defineProperty_(
+        key: PropertyKey,
+        descriptor: PropertyDescriptor,
+        proxyTrap: boolean = false
+    ): boolean | null {
+        try {
+            startBatch()
+
+            // Delete
+            const deleteOutcome = this.delete_(key)
+            if (!deleteOutcome) {
+                // Failure or intercepted
+                return deleteOutcome
+            }
+
+            // ADD interceptor
+            if (hasInterceptors(this)) {
+                const change = interceptChange<IObjectWillChange>(this, {
+                    object: this.proxy_ || this.target_,
+                    name: key,
+                    type: ADD,
+                    newValue: descriptor.value
+                })
+                if (!change) return null
+                const { newValue } = change as any
+                if (descriptor.value !== newValue) {
+                    descriptor = {
+                        ...descriptor,
+                        value: newValue
+                    }
+                }
+            }
+
+            // Define
+            if (proxyTrap) {
+                if (!Reflect.defineProperty(this.target_, key, descriptor)) {
+                    return false
+                }
+            } else {
+                defineProperty(this.target_, key, descriptor)
+            }
+
+            // Notify
+            this.notifyPropertyAddition_(key, descriptor.value)
+        } finally {
+            endBatch()
+        }
+        return true
+    }
+
+    // If original descriptor becomes relevant, move this to annotation directly
+    defineObservableProperty_(
+        key: PropertyKey,
+        value: any,
+        enhancer: IEnhancer<any>,
+        proxyTrap: boolean = false
+    ): boolean | null {
+        try {
+            startBatch()
+
+            // Delete
+            const deleteOutcome = this.delete_(key)
+            if (!deleteOutcome) {
+                // Failure or intercepted
+                return deleteOutcome
+            }
+
+            // ADD interceptor
+            if (hasInterceptors(this)) {
+                const change = interceptChange<IObjectWillChange>(this, {
+                    object: this.proxy_ || this.target_,
+                    name: key,
+                    type: ADD,
+                    newValue: value
+                })
+                if (!change) return null
+                value = (change as any).newValue
+            }
+
+            const cachedDescriptor = getCachedObservablePropDescriptor(key)
+            const descriptor = {
+                configurable: this.isPlainObject_,
+                enumerable: true,
+                get: cachedDescriptor.get,
+                set: cachedDescriptor.set
+            }
+
+            // Define
+            if (proxyTrap) {
+                if (!Reflect.defineProperty(this.target_, key, descriptor)) {
+                    return false
+                }
+            } else {
+                defineProperty(this.target_, key, descriptor)
+            }
+
+            const observable = new ObservableValue(
+                value,
+                enhancer,
+                `${this.name_}.${stringifyKey(key)}`,
+                false
+            )
+
+            this.values_.set(key, observable)
+
+            // Notify (value possibly changed by ObservableValue)
+            this.notifyPropertyAddition_(key, observable.value_)
+        } finally {
+            endBatch()
+        }
+        return true
+    }
+
+    // If original descriptor becomes relevant, move this to annotation directly
+    defineComputedProperty_(
+        key: PropertyKey,
+        options: IComputedValueOptions<any>,
+        proxyTrap: boolean = false
+    ): boolean | null {
+        try {
+            startBatch()
+
+            // Delete
+            const deleteOutcome = this.delete_(key)
+            if (!deleteOutcome) {
+                // Failure or intercepted
+                return deleteOutcome
+            }
+
+            // ADD interceptor
+            if (hasInterceptors(this)) {
+                const change = interceptChange<IObjectWillChange>(this, {
+                    object: this.proxy_ || this.target_,
+                    name: key,
+                    type: ADD,
+                    newValue: undefined
+                })
+                if (!change) return null
+            }
+            options.name ||= `${this.name_}.${stringifyKey(key)}`
+            options.context = this.proxy_ || this.target_
+            const cachedDescriptor = getCachedObservablePropDescriptor(key)
+            const descriptor = {
+                configurable: this.isPlainObject_,
+                enumerable: false,
+                get: cachedDescriptor.get,
+                set: cachedDescriptor.set
+            }
+
+            // Define
+            if (proxyTrap) {
+                if (!Reflect.defineProperty(this.target_, key, descriptor)) {
+                    return false
+                }
+            } else {
+                defineProperty(this.target_, key, descriptor)
+            }
+
+            this.values_.set(key, new ComputedValue(options))
+
+            // Notify
+            this.notifyPropertyAddition_(key, undefined)
+        } finally {
+            endBatch()
+        }
+        return true
+    }
+
+    /**
+     * @param {PropertyKey} key
+     * @param {PropertyDescriptor} descriptor
+     * @param {boolean} proxyTrap whether it's called from proxy trap
+     * @returns {boolean|null} true on success, false on failure (proxyTrap + non-configurable), null when cancelled by interceptor
+     */
+    delete_(key: PropertyKey, proxyTrap: boolean = false): boolean | null {
+        // No such prop
+        if (!hasProp(this.target_, key)) {
+            return true
+        }
+
+        // Intercept
         if (hasInterceptors(this)) {
             const change = interceptChange<IObjectWillChange>(this, {
-                object: this.proxy_ || target,
-                name: propName,
-                type: ADD,
-                newValue
-            })
-            if (!change) return
-            newValue = (change as any).newValue
-        }
-        const observable = new ObservableValue(
-            newValue,
-            enhancer,
-            `${this.name_}.${stringifyKey(propName)}`,
-            false
-        )
-        this.values_.set(propName, observable)
-        newValue = (observable as any).value_ // observableValue might have changed it
-
-        defineProperty(target, propName, generateObservablePropConfig(propName))
-        this.notifyPropertyAddition_(propName, newValue)
-    }
-
-    addComputedProp_(
-        propertyOwner: any, // where is the property declared?
-        propName: PropertyKey,
-        options: IComputedValueOptions<any>
-    ) {
-        const { target_: target } = this
-        options.name = options.name || `${this.name_}.${stringifyKey(propName)}`
-        options.context = this.proxy_ || target
-        this.values_.set(propName, new ComputedValue(options))
-        // Doesn't seem we need this condition:
-        // if (propertyOwner === target || isPropertyConfigurable(propertyOwner, propName))
-        defineProperty(propertyOwner, propName, generateComputedPropConfig(propName))
-    }
-
-    remove_(key: PropertyKey) {
-        if (!this.values_.has(key)) return
-        const { target_: target } = this
-        if (hasInterceptors(this)) {
-            const change = interceptChange<IObjectWillChange>(this, {
-                object: this.proxy_ || target,
+                object: this.proxy_ || this.target_,
                 name: key,
                 type: REMOVE
             })
-            if (!change) return
+            // Cancelled
+            if (!change) return null
         }
+
+        // Delete
         try {
             startBatch()
             const notify = hasListeners(this)
             const notifySpy = __DEV__ && isSpyEnabled()
-            const oldObservable = this.values_.get(key)
-            const oldValue = oldObservable && oldObservable.get()
-            oldObservable && oldObservable.set(undefined)
-            // notify key and keyset listeners
-            this.reportKeysChanged()
-            this.values_.delete(key)
-            if (this.pendingKeys_) {
-                const entry = this.pendingKeys_.get(key)
-                if (entry) entry.set(false)
+            const observable = this.values_.get(key)
+            // Value needed for spies/listeners
+            let value = undefined
+            // Optimization: don't pull the value unless we will need it
+            if (!observable && (notify || notifySpy)) {
+                value = getDescriptor(this.target_, key)?.value
             }
-            // delete the prop
-            delete this.target_[key]
-            const change: IObjectDidChange | null =
-                notify || notifySpy
-                    ? ({
-                          type: REMOVE,
-                          observableKind: "object",
-                          object: this.proxy_ || target,
-                          debugObjectName: this.name_,
-                          oldValue: oldValue,
-                          name: key
-                      } as const)
-                    : null
-            if (__DEV__ && notifySpy) spyReportStart(change!)
-            if (notify) notifyListeners(this, change)
-            if (__DEV__ && notifySpy) spyReportEnd()
+            // delete prop (do first, may fail)
+            if (proxyTrap) {
+                if (!Reflect.deleteProperty(this.target_, key)) {
+                    return false
+                }
+            } else {
+                delete this.target_[key]
+            }
+            // Allow re-annotating this field
+            if (__DEV__) {
+                delete this.appliedAnnotations_![key]
+            }
+            // Clear observable
+            if (observable) {
+                this.values_.delete(key)
+                // for computed, value is undefined
+                if (observable instanceof ObservableValue) {
+                    value = observable.value_
+                }
+                // Notify: autorun(() => obj[key]), see #1796
+                propagateChanged(observable)
+            }
+            // Notify "keys/entries/values" observers
+            this.keysAtom_.reportChanged()
+
+            // Notify "has" observers
+            // "in" as it may still exist in proto
+            this.pendingKeys_?.get(key)?.set(key in this.target_)
+
+            // Notify spies/listeners
+            if (notify || notifySpy) {
+                const change: IObjectDidChange = {
+                    type: REMOVE,
+                    observableKind: "object",
+                    object: this.proxy_ || this.target_,
+                    debugObjectName: this.name_,
+                    oldValue: value,
+                    name: key
+                }
+                if (__DEV__ && notifySpy) spyReportStart(change!)
+                if (notify) notifyListeners(this, change)
+                if (__DEV__ && notifySpy) spyReportEnd()
+            }
         } finally {
             endBatch()
         }
+        return true
     }
 
     /**
@@ -266,48 +589,47 @@ export class ObservableObjectAdministration
         return registerInterceptor(this, handler)
     }
 
-    notifyPropertyAddition_(key: PropertyKey, newValue) {
+    notifyPropertyAddition_(key: PropertyKey, value: any) {
         const notify = hasListeners(this)
         const notifySpy = __DEV__ && isSpyEnabled()
-        const change: IObjectDidChange | null =
-            notify || notifySpy
-                ? ({
-                      type: ADD,
-                      observableKind: "object",
-                      debugObjectName: this.name_,
-                      object: this.proxy_ || this.target_,
-                      name: key,
-                      newValue
-                  } as const)
-                : null
+        if (notify || notifySpy) {
+            const change: IObjectDidChange | null =
+                notify || notifySpy
+                    ? ({
+                          type: ADD,
+                          observableKind: "object",
+                          debugObjectName: this.name_,
+                          object: this.proxy_ || this.target_,
+                          name: key,
+                          newValue: value
+                      } as const)
+                    : null
 
-        if (__DEV__ && notifySpy) spyReportStart(change!)
-        if (notify) notifyListeners(this, change)
-        if (__DEV__ && notifySpy) spyReportEnd()
-        if (this.pendingKeys_) {
-            const entry = this.pendingKeys_.get(key)
-            if (entry) entry.set(true)
+            if (__DEV__ && notifySpy) spyReportStart(change!)
+            if (notify) notifyListeners(this, change)
+            if (__DEV__ && notifySpy) spyReportEnd()
         }
-        this.reportKeysChanged()
-    }
 
-    getKeys_(): PropertyKey[] {
-        this.keysAtom_.reportObserved()
-        if (!this.isStaledKeysValue_) {
-            return this.keysValue_
-        }
-        // return Reflect.ownKeys(this.values) as any
-        this.keysValue_ = []
-        for (const [key, value] of this.values_)
-            if (value instanceof ObservableValue) this.keysValue_.push(key)
-        if (__DEV__) Object.freeze(this.keysValue_)
-        this.isStaledKeysValue_ = false
-        return this.keysValue_
-    }
+        this.pendingKeys_?.get(key)?.set(true)
 
-    private reportKeysChanged() {
-        this.isStaledKeysValue_ = true
+        // Notify "keys/entries/values" observers
         this.keysAtom_.reportChanged()
+    }
+
+    ownKeys_(): PropertyKey[] {
+        this.keysAtom_.reportObserved()
+        return ownKeys(this.target_)
+    }
+
+    keys_(): PropertyKey[] {
+        // Returns enumerable && own, but unfortunately keysAtom will report on ANY key change.
+        // There is no way to distinguish between Object.keys(object) and Reflect.ownKeys(object) - both are handled by ownKeys trap.
+        // We can either over-report in Object.keys(object) or under-report in Reflect.ownKeys(object)
+        // We choose to over-report in Object.keys(object), because:
+        // - typically it's used with simple data objects
+        // - when symbolic/non-enumerable keys are relevant Reflect.ownKeys works as expected
+        this.keysAtom_.reportObserved()
+        return Object.keys(this.target_)
     }
 }
 
@@ -317,65 +639,32 @@ export interface IIsObservableObject {
 
 export function asObservableObject(
     target: any,
-    name: PropertyKey = "",
-    defaultEnhancer: IEnhancer<any> = deepEnhancer
-): ObservableObjectAdministration {
-    if (hasProp(target, $mobx)) return target[$mobx]
+    options?: CreateObservableOptions
+): IIsObservableObject {
+    if (__DEV__ && options && isObservableObject(target)) {
+        die(`Options can't be provided for already observable objects.`)
+    }
+
+    if (hasProp(target, $mobx)) return target
 
     if (__DEV__ && !Object.isExtensible(target))
         die("Cannot make the designated object observable; it is not extensible")
 
-    if (!name) {
-        if (isPlainObject(target)) {
-            name = "ObservableObject@" + getNextId()
-        } else {
-            name = (target.constructor.name || "ObservableObject") + "@" + getNextId()
-        }
-    }
+    const name =
+        options?.name ??
+        `${isPlainObject(target) ? "ObservableObject" : target.constructor.name}@${getNextId()}`
 
     const adm = new ObservableObjectAdministration(
         target,
         new Map(),
         stringifyKey(name),
-        defaultEnhancer
+        getAnnotationFromOptions(options),
+        options?.autoBind
     )
+
     addHiddenProp(target, $mobx, adm)
-    return adm
-}
 
-const observablePropertyConfigs = Object.create(null)
-const computedPropertyConfigs = Object.create(null)
-
-export function generateObservablePropConfig(propName) {
-    return (
-        observablePropertyConfigs[propName] ||
-        (observablePropertyConfigs[propName] = {
-            configurable: true,
-            enumerable: true,
-            get() {
-                return this[$mobx].read_(propName)
-            },
-            set(v) {
-                this[$mobx].write_(propName, v)
-            }
-        })
-    )
-}
-
-export function generateComputedPropConfig(propName) {
-    return (
-        computedPropertyConfigs[propName] ||
-        (computedPropertyConfigs[propName] = {
-            configurable: true,
-            enumerable: false,
-            get() {
-                return this[$mobx].read_(propName)
-            },
-            set(v) {
-                this[$mobx].write_(propName, v)
-            }
-        })
-    )
+    return target
 }
 
 const isObservableObjectAdministration = createInstanceofPredicate(
@@ -383,9 +672,92 @@ const isObservableObjectAdministration = createInstanceofPredicate(
     ObservableObjectAdministration
 )
 
+function getCachedObservablePropDescriptor(key) {
+    return (
+        descriptorCache[key] ||
+        (descriptorCache[key] = {
+            get() {
+                return this[$mobx].getObservablePropValue_(key)
+            },
+            set(value) {
+                return this[$mobx].setObservablePropValue_(key, value)
+            }
+        })
+    )
+}
+
 export function isObservableObject(thing: any): boolean {
     if (isObject(thing)) {
         return isObservableObjectAdministration((thing as any)[$mobx])
     }
     return false
+}
+
+export function recordAnnotationApplied(
+    adm: ObservableObjectAdministration,
+    annotation: Annotation,
+    key: PropertyKey
+) {
+    if (__DEV__) {
+        adm.appliedAnnotations_![key] = annotation
+    }
+    // Remove applied decorator annotation so we don't try to apply it again in subclass constructor
+    if (annotation.isDecorator_) {
+        delete adm.target_[storedAnnotationsSymbol][key]
+    }
+}
+
+function assertAnnotable(
+    adm: ObservableObjectAdministration,
+    annotation: Annotation,
+    key: PropertyKey
+) {
+    // Valid annotation
+    if (__DEV__ && !isAnnotation(annotation)) {
+        die(`Cannot annotate '${adm.name_}.${key.toString()}': Invalid annotation.`)
+    }
+
+    /*
+    // Configurable, not sealed, not frozen
+    // Possibly not needed, just a little better error then the one thrown by engine.
+    // Cases where this would be useful the most (subclass field initializer) are not interceptable by this.
+    if (__DEV__) {
+        const configurable = getDescriptor(adm.target_, key)?.configurable
+        const frozen = Object.isFrozen(adm.target_)
+        const sealed = Object.isSealed(adm.target_)
+        if (!configurable || frozen || sealed) {
+            const fieldName = `${adm.name_}.${key.toString()}`
+            const requestedAnnotationType = annotation.annotationType_
+            let error = `Cannot apply '${requestedAnnotationType}' to '${fieldName}':`
+            if (frozen) {
+                error += `\nObject is frozen.`
+            }
+            if (sealed) {
+                error += `\nObject is sealed.`
+            }
+            if (!configurable) {
+                error += `\nproperty is not configurable.`
+                // Mention only if caused by us to avoid confusion
+                if (hasProp(adm.appliedAnnotations!, key)) {
+                    error += `\nTo prevent accidental re-definition of a field by a subclass, `
+                    error += `all annotated fields of non-plain objects (classes) are not configurable.`
+                }
+            }
+            die(error)
+        }
+    }
+    */
+
+    // Not annotated
+    if (__DEV__ && !isOverride(annotation) && hasProp(adm.appliedAnnotations_!, key)) {
+        const fieldName = `${adm.name_}.${key.toString()}`
+        const currentAnnotationType = adm.appliedAnnotations_![key].annotationType_
+        const requestedAnnotationType = annotation.annotationType_
+        die(
+            `Cannot apply '${requestedAnnotationType}' to '${fieldName}':` +
+                `\nThe field is already annotated with '${currentAnnotationType}'.` +
+                `\nRe-annotating fields is not allowed.` +
+                `\nUse 'override' annotation for methods overriden by subclass.`
+        )
+    }
 }
