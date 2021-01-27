@@ -8,9 +8,9 @@ The behavior of MobX is in many edge cases much more explicitly defined now.
 A new annotation was introduced: `@override` / `override` to support re-defining actions and computed values(!) on sub classses.
 
 For idiomatic MobX usage this release should have little impact, but if you are using a lot of sub-classing, reflection APIs or direct object manipulations like `defineProperty`,
-this might release might introduce previously unseen errors for cases that silently failed before, or even worked successfully even though the correct behavior wasn't specified earlier.
+this release might introduce previously unseen errors for cases that silently failed before, or even worked successfully even though the correct behavior wasn't specified earlier.
 
-If you are migrating from MobX 4/5 we strongly recommend to go to 6.1 in one go, and skip 6.0.\*, as some buggy behavior compared to the previous majors has been correct.
+If you are migrating from MobX 4/5 we strongly recommend to go to 6.1 in one go, and skip 6.0.\*, as some buggy behavior compared to the previous majors has been corrected.
 
 As always, our libraries come as-is and are maintained by volunteers. Upgrades are at own risk and voluntary. Bug reports require a minimal reproductions and a correctly filled out issue template.
 
