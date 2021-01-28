@@ -68,7 +68,7 @@ export function makeAutoObservable<T extends object, AdditionalKeys extends Prop
                 adm.make_(key, target[inferredAnnotationsSymbol][key])
             }
         } else {
-            const ignoreKeys = { [$mobx]: 1, constructor: 1 }
+            const ignoreKeys = { [$mobx]: 1, [inferredAnnotationsSymbol]: 1, constructor: 1 }
             const make = key => {
                 if (ignoreKeys[key]) return
                 ignoreKeys[key] = 1
