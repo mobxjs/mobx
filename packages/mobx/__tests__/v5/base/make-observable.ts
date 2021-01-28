@@ -16,7 +16,8 @@ import {
     _getAdministration,
     configure,
     flow,
-    override
+    override,
+    $mobx
 } from "../../../src/mobx"
 
 test("makeObservable picks up decorators", () => {
@@ -1408,4 +1409,17 @@ test("@override must override", () => {
     }).toThrow(
         /^\[MobX\] 'Child\.prototype\.action' is decorated with 'override', but no such decorated member was found on prototype\./
     )
+})
+
+test("makeAutoObservable + production build #2751", () => {
+    const mobx = require(`../../../dist/mobx.cjs.production.min.js`)
+    class Foo {
+        x = "x"
+        constructor() {
+            mobx.makeAutoObservable(this)
+        }
+    }
+    const foo = new Foo()
+    expect(mobx.isObservableObject(foo)).toBe(true)
+    expect(mobx.isObservableProp(foo, "x")).toBe(true)
 })
