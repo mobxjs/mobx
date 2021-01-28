@@ -1,5 +1,13 @@
 # mobx
 
+## 6.1.1
+
+### Patch Changes
+
+-   [`39eca50d`](https://github.com/mobxjs/mobx/commit/39eca50de3936807037cb1205bbab29a3e328bc0) [#2757](https://github.com/mobxjs/mobx/pull/2757) Thanks [@urugator](https://github.com/urugator)! - Fix error stringification on minified build
+    Fix `isObservableProp` not supporting `Symbols`
+    Fix `makeAutoObservable` not ignoring `inferredAnnotationsSymbol`
+
 ## 6.1.0
 
 This release fixes a plethora of bugs related to sub-classing and reflecting / iterating on observable objects.
@@ -1047,7 +1055,7 @@ A deprecation message will now be printed if creating computed properties while 
 
 ```javascript
 const x = observable({
-    computedProp: function () {
+    computedProp: function() {
         return someComputation
     }
 })
@@ -1072,7 +1080,7 @@ or alternatively:
 
 ```javascript
 observable({
-    computedProp: computed(function () {
+    computedProp: computed(function() {
         return someComputation
     })
 })
@@ -1090,7 +1098,7 @@ N.B. If you want to introduce actions on an observable that modify its state, us
 ```javascript
 observable({
     counter: 0,
-    increment: action(function () {
+    increment: action(function() {
         this.counter++
     })
 })
@@ -1216,10 +1224,10 @@ function Square() {
     extendObservable(this, {
         length: 2,
         squared: computed(
-            function () {
+            function() {
                 return this.squared * this.squared
             },
-            function (surfaceSize) {
+            function(surfaceSize) {
                 this.length = Math.sqrt(surfaceSize)
             }
         )

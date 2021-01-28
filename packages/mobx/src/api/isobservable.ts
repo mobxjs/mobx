@@ -10,7 +10,7 @@ import {
     isStringish
 } from "../internal"
 
-function _isObservable(value, property?: string): boolean {
+function _isObservable(value, property?: PropertyKey): boolean {
     if (!value) return false
     if (property !== undefined) {
         if (__DEV__ && (isObservableMap(value) || isObservableArray(value)))
@@ -40,7 +40,7 @@ export function isObservable(value: any): boolean {
     return _isObservable(value)
 }
 
-export function isObservableProp(value: any, propName: string): boolean {
+export function isObservableProp(value: any, propName: PropertyKey): boolean {
     if (__DEV__ && !isStringish(propName)) return die(`expected a property name as second argument`)
     return _isObservable(value, propName)
 }
