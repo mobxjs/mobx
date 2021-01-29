@@ -143,6 +143,13 @@ export class MobXGlobals {
      * print warnings about code that would fail if proxies weren't available
      */
     verifyProxies = false
+
+    /**
+     * False forces all object's descriptors to
+     * writable: true
+     * configurable: true
+     */
+    safeDescriptors = true
 }
 
 let canMergeGlobalState = true
