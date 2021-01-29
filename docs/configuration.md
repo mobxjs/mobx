@@ -72,7 +72,7 @@ Also, occassionally you will have a case where you have to supress the warnings 
 That is fine, there are good exceptions to these recommendations.
 Don't be fundamentalistic about them.
 
-#### `enforceActions`
+#### `enforceActions: "observed" | "always" | "never" = "observed"`
 
 The goal of _enforceActions_ is that you don't forget to wrap event handlers in [`action`](actions.md).
 
@@ -88,7 +88,7 @@ Since state should in principle always be created from some event handlers, and 
 
 In the rare case where you create observables lazily, for example in a computed property, you can wrap the creation ad-hoc in an action using `runInAction`.
 
-#### `computedRequiresReaction: boolean`
+#### `computedRequiresReaction: boolean = false`
 
 Forbids the direct access of any unobserved computed value from outside an action or reaction.
 This guarantees you aren't using computed values in a way where MobX won't cache them. In the following example, MobX won't cache the computed value in the first code block, but will cache the result in the second and third block:
@@ -129,7 +129,7 @@ const clock = new Clock()
 }
 ```
 
-#### `observableRequiresReaction: boolean`
+#### `observableRequiresReaction: boolean = false`
 
 Warns about any unobserved observable access.
 Use this if you want to check whether you are using observables without a "MobX context".
@@ -141,7 +141,7 @@ configure({ observableRequiresReaction: true })
 
 **Note:** using propTypes on components that are wrapped with `observer` might trigger false positives for this rule.
 
-#### `reactionRequiresObservable: boolean`
+#### `reactionRequiresObservable: boolean = false`
 
 Warns when a reaction (e.g. `autorun`) is created without accessing any observables.
 Use this to check whether you are unnecessarily wrapping React components with `observer`, wrapping functions with `action`, or find cases where you simply forgot to make some data structures or properties observable.
@@ -150,7 +150,7 @@ Use this to check whether you are unnecessarily wrapping React components with `
 configure({ reactionRequiresObservable: true })
 ```
 
-#### `disableErrorBoundaries: boolean`
+#### `disableErrorBoundaries: boolean = false`
 
 By default, MobX will catch and re-throw exceptions happening in your code to make sure that a reaction in one exception does not prevent the scheduled execution of other, possibly unrelated, reactions. This means exceptions are not propagated back to the original causing code and therefore you won't be able to catch them using try/catch.
 
@@ -177,9 +177,20 @@ afterEach(() => {
 })
 ```
 
+### `safeDescriptors: boolean = true`
+
+MobX makes some fields **non**-`configurable` or **non**-`writable` to prevent you from doing things that are not supported or would most likely break your code. However this can also prevent spying/mocking/stubbing in your tests.
+`configure({ safeDescriptors: false })` disables this safety measure, making everything `configurable` and `writable`.
+Note it doesn't affect existing observables, only the ones created after it's been configured.
+<span style="color:red">Use with caution</span> and only when needed - do not turn this off globally for all tests, otherwise you risk false positives (passing tests with broken code).
+
+```javascript
+configure({ safeDescriptors: false })
+```
+
 ## Further configuration options
 
-#### `isolateGlobalState: boolean`
+#### `isolateGlobalState: boolean = false`
 
 Isolates the global state of MobX when there are multiple instances of MobX active in the same environment. This is useful when you have an encapsulated library that is using MobX, living in the same page as the app that is using MobX. The reactivity inside the library will remain self-contained when you call `configure({ isolateGlobalState: true })` from it.
 
@@ -189,7 +200,7 @@ Without this option, if multiple MobX instances are active, their internal state
 configure({ isolateGlobalState: true })
 ```
 
-#### `reactionScheduler: (f: () => void) => void`
+#### `reactionScheduler: (f: () => void) => void = f => f()`
 
 Sets a new function that executes all MobX reactions.
 By default `reactionScheduler` just runs the `f` reaction without any other behavior.

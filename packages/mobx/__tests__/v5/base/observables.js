@@ -2092,3 +2092,48 @@ test("observable ignores class instances #2579", () => {
     const c = new C()
     expect(observable(c)).toBe(c)
 })
+
+test("configure({ safeDescriptors: false })", () => {
+    function checkDescriptors(thing) {
+        Reflect.ownKeys(thing).forEach(key => {
+            const { get, set, writable, configurable } = Object.getOwnPropertyDescriptor(thing, key)
+            expect(get || set || writable).toBeTruthy()
+            expect(configurable).toBe(true)
+        })
+    }
+
+    const globalState = mobx._getGlobalState()
+    expect(globalState.safeDescriptors).toBe(true)
+    mobx.configure({ safeDescriptors: false })
+    expect(globalState.safeDescriptors).toBe(false)
+
+    class Clazz {
+        observable = 0
+        action() {}
+        get computed() {}
+        *flow() {}
+        constructor() {
+            mobx.makeObservable(this, {
+                observable: mobx.observable,
+                action: mobx.action,
+                computed: mobx.computed,
+                flow: mobx.flow
+            })
+        }
+    }
+    checkDescriptors(Clazz.prototype)
+    const clazz = new Clazz()
+    checkDescriptors(clazz)
+
+    const plain = mobx.observable({
+        observable: 0,
+        action() {},
+        get computed() {},
+        *flow() {}
+    })
+
+    checkDescriptors(plain)
+
+    mobx.configure({ safeDescriptors: true })
+    expect(globalState.safeDescriptors).toBe(true)
+})

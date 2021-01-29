@@ -43,7 +43,8 @@ export function configure(options: {
         "computedRequiresReaction",
         "reactionRequiresObservable",
         "observableRequiresReaction",
-        "disableErrorBoundaries"
+        "disableErrorBoundaries",
+        "safeDescriptors"
     ].forEach(key => {
         if (key in options) globalState[key] = !!options[key]
     })

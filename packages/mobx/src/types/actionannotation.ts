@@ -8,7 +8,8 @@ import {
     die,
     isFunction,
     Annotation,
-    recordAnnotationApplied
+    recordAnnotationApplied,
+    globalState
 } from "../internal"
 
 export function createActionAnnotation(name: string, options?: object): Annotation {
@@ -113,11 +114,11 @@ function createActionDescriptor(
         ),
         // Non-configurable for classes
         // prevents accidental field redefinition in subclass
-        configurable: adm.isPlainObject_,
+        configurable: globalState.safeDescriptors ? adm.isPlainObject_ : true,
         // https://github.com/mobxjs/mobx/pull/2641#issuecomment-737292058
         enumerable: false,
         // Non-obsevable, therefore non-writable
         // Also prevents rewriting in subclass constructor
-        writable: false
+        writable: globalState.safeDescriptors ? false : true
     }
 }

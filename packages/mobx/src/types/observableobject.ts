@@ -403,7 +403,7 @@ export class ObservableObjectAdministration
 
             const cachedDescriptor = getCachedObservablePropDescriptor(key)
             const descriptor = {
-                configurable: this.isPlainObject_,
+                configurable: globalState.safeDescriptors ? this.isPlainObject_ : true,
                 enumerable: true,
                 get: cachedDescriptor.get,
                 set: cachedDescriptor.set
@@ -465,7 +465,7 @@ export class ObservableObjectAdministration
             options.context = this.proxy_ || this.target_
             const cachedDescriptor = getCachedObservablePropDescriptor(key)
             const descriptor = {
-                configurable: this.isPlainObject_,
+                configurable: globalState.safeDescriptors ? this.isPlainObject_ : true,
                 enumerable: false,
                 get: cachedDescriptor.get,
                 set: cachedDescriptor.set
