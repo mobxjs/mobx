@@ -18,6 +18,7 @@ export function configure(options: {
     observableRequiresReaction?: boolean
     isolateGlobalState?: boolean
     disableErrorBoundaries?: boolean
+    safeDescriptors?: boolean
     reactionScheduler?: (f: () => void) => void
     useProxies?: "always" | "never" | "ifavailable"
 }): void {
