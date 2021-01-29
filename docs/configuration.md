@@ -88,7 +88,7 @@ Since state should in principle always be created from some event handlers, and 
 
 In the rare case where you create observables lazily, for example in a computed property, you can wrap the creation ad-hoc in an action using `runInAction`.
 
-#### `computedRequiresReaction`
+#### `computedRequiresReaction: boolean`
 
 Forbids the direct access of any unobserved computed value from outside an action or reaction.
 This guarantees you aren't using computed values in a way where MobX won't cache them. **Default: `false`**.
