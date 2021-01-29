@@ -1,5 +1,11 @@
 # mobx
 
+## 6.1.2
+
+### Patch Changes
+
+-   [`ca09f2f5`](https://github.com/mobxjs/mobx/commit/ca09f2f5744f438b0b6572b60e055ca8b59646de) [#2761](https://github.com/mobxjs/mobx/pull/2761) Thanks [@urugator](https://github.com/urugator)! - `configure({ safeDescriptors: false })` now forces all props of observable objects to be writable and configurable
+
 ## 6.1.1
 
 ### Patch Changes
