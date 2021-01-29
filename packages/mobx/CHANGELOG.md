@@ -1,5 +1,11 @@
 # mobx
 
+## 6.1.3
+
+### Patch Changes
+
+-   [`d2a2a52e`](https://github.com/mobxjs/mobx/commit/d2a2a52e59e1cf5867bf72e49e7f134c7055ac5d) [#2763](https://github.com/mobxjs/mobx/pull/2763) Thanks [@vkrol](https://github.com/vkrol)! - Add `safeDescriptors` to `configure` options type
+
 ## 6.1.2
 
 ### Patch Changes
