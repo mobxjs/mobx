@@ -29,7 +29,7 @@ configure({
 
 Accepted values for the `useProxies` configuration are:
 
--   `"always"` (default): MobX expects to run only in environments with [`Proxy` support](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) and it will error if such an environment is not available.
+-   `"always"` (**default**): MobX expects to run only in environments with [`Proxy` support](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) and it will error if such an environment is not available.
 -   `"never"`: Proxies are not used and MobX falls back on non-proxy alternatives. This is compatible with all ES5 environments, but causes various [limitations](#limitations-without-proxy-support).
 -   `"ifavailable"` (experimental): Proxies are used if they are available, and otherwise MobX falls back to non-proxy alternatives. The benefit of this mode is that MobX will try to warn if APIs or language features that wouldn't work in ES5 environments are used, triggering errors when hitting an ES5 limitation running on a modern environment.
 
@@ -72,13 +72,13 @@ Also, occassionally you will have a case where you have to supress the warnings 
 That is fine, there are good exceptions to these recommendations.
 Don't be fundamentalistic about them.
 
-#### `enforceActions: "observed" | "always" | "never" = "observed"`
+#### `enforceActions`
 
 The goal of _enforceActions_ is that you don't forget to wrap event handlers in [`action`](actions.md).
 
 Possible options:
 
--   `"observed"` (default): All state that is observed _somewhere_ needs to be changed through actions. This is the default, and the recommended strictness mode in non-trivial applications.
+-   `"observed"` (**default**): All state that is observed _somewhere_ needs to be changed through actions. This is the default, and the recommended strictness mode in non-trivial applications.
 -   `"never"`: State can be changed from anywhere.
 -   `"always"`: State always needs to be changed through actions, which in practice also includes creation.
 
@@ -88,10 +88,12 @@ Since state should in principle always be created from some event handlers, and 
 
 In the rare case where you create observables lazily, for example in a computed property, you can wrap the creation ad-hoc in an action using `runInAction`.
 
-#### `computedRequiresReaction: boolean = false`
+#### `computedRequiresReaction`
 
 Forbids the direct access of any unobserved computed value from outside an action or reaction.
-This guarantees you aren't using computed values in a way where MobX won't cache them. In the following example, MobX won't cache the computed value in the first code block, but will cache the result in the second and third block:
+This guarantees you aren't using computed values in a way where MobX won't cache them. **Default: `false`**.
+
+In the following example, MobX won't cache the computed value in the first code block, but will cache the result in the second and third block:
 
 ```javascript
 class Clock {
@@ -129,11 +131,11 @@ const clock = new Clock()
 }
 ```
 
-#### `observableRequiresReaction: boolean = false`
+#### `observableRequiresReaction: boolean`
 
 Warns about any unobserved observable access.
 Use this if you want to check whether you are using observables without a "MobX context".
-This is a great way to find any missing `observer` wrappers, for example in React components. But it will find missing actions as well.
+This is a great way to find any missing `observer` wrappers, for example in React components. But it will find missing actions as well. **Default: `false`**
 
 ```javascript
 configure({ observableRequiresReaction: true })
@@ -141,20 +143,21 @@ configure({ observableRequiresReaction: true })
 
 **Note:** using propTypes on components that are wrapped with `observer` might trigger false positives for this rule.
 
-#### `reactionRequiresObservable: boolean = false`
+#### `reactionRequiresObservable: boolean`
 
 Warns when a reaction (e.g. `autorun`) is created without accessing any observables.
-Use this to check whether you are unnecessarily wrapping React components with `observer`, wrapping functions with `action`, or find cases where you simply forgot to make some data structures or properties observable.
+Use this to check whether you are unnecessarily wrapping React components with `observer`, wrapping functions with `action`, or find cases where you simply forgot to make some data structures or properties observable. **Default: `false`**
 
 ```javascript
 configure({ reactionRequiresObservable: true })
 ```
 
-#### `disableErrorBoundaries: boolean = false`
+#### `disableErrorBoundaries: boolean`
 
 By default, MobX will catch and re-throw exceptions happening in your code to make sure that a reaction in one exception does not prevent the scheduled execution of other, possibly unrelated, reactions. This means exceptions are not propagated back to the original causing code and therefore you won't be able to catch them using try/catch.
 
-By disabling error boundaries, exceptions can escape derivations. This might ease debugging, but might leave MobX and by extension your application in an unrecoverable broken state.
+By disabling error boundaries, exceptions can escape derivations. This might ease debugging, but might leave MobX and by extension your application in an unrecoverable broken state. **Default: `false`**.
+
 This option is great for unit tests, but remember to call `_resetGlobalState` after each test, for example by using `afterEach` in jest, for example:
 
 ```js
@@ -177,12 +180,12 @@ afterEach(() => {
 })
 ```
 
-### `safeDescriptors: boolean = true`
+#### `safeDescriptors: boolean`
 
-MobX makes some fields **non**-`configurable` or **non**-`writable` to prevent you from doing things that are not supported or would most likely break your code. However this can also prevent spying/mocking/stubbing in your tests.
-`configure({ safeDescriptors: false })` disables this safety measure, making everything `configurable` and `writable`.
+MobX makes some fields **non-configurable** or **non-writable** to prevent you from doing things that are not supported or would most likely break your code. However this can also prevent **spying/mocking/stubbing** in your tests.
+`configure({ safeDescriptors: false })` disables this safety measure, making everything **configurable** and **writable**.
 Note it doesn't affect existing observables, only the ones created after it's been configured.
-<span style="color:red">Use with caution</span> and only when needed - do not turn this off globally for all tests, otherwise you risk false positives (passing tests with broken code).
+<span style="color:red">**Use with caution**</span> and only when needed - do not turn this off globally for all tests, otherwise you risk false positives (passing tests with broken code). **Default: `true`**
 
 ```javascript
 configure({ safeDescriptors: false })
@@ -190,21 +193,22 @@ configure({ safeDescriptors: false })
 
 ## Further configuration options
 
-#### `isolateGlobalState: boolean = false`
+#### `isolateGlobalState: boolean`
 
 Isolates the global state of MobX when there are multiple instances of MobX active in the same environment. This is useful when you have an encapsulated library that is using MobX, living in the same page as the app that is using MobX. The reactivity inside the library will remain self-contained when you call `configure({ isolateGlobalState: true })` from it.
 
 Without this option, if multiple MobX instances are active, their internal state will be shared. The benefit is that observables from both instances work together, the downside is that the MobX versions have to match.
+**Default: `false`**
 
 ```javascript
 configure({ isolateGlobalState: true })
 ```
 
-#### `reactionScheduler: (f: () => void) => void = f => f()`
+#### `reactionScheduler: (f: () => void) => void`
 
 Sets a new function that executes all MobX reactions.
 By default `reactionScheduler` just runs the `f` reaction without any other behavior.
-This can be useful for basic debugging, or slowing down reactions to visualize application updates.
+This can be useful for basic debugging, or slowing down reactions to visualize application updates. **Default: `f => f()`**
 
 ```javascript
 configure({
