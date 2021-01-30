@@ -1,5 +1,11 @@
 # mobx
 
+## 6.1.4
+
+### Patch Changes
+
+-   [`0677c0e7`](https://github.com/mobxjs/mobx/commit/0677c0e788bc11ceba909bba16b2b009e90a4c97) [#2766](https://github.com/mobxjs/mobx/pull/2766) Thanks [@urugator](https://github.com/urugator)! - Fix: Inherited annotated fields are not assignable
+
 ## 6.1.3
 
 ### Patch Changes
