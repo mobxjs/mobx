@@ -402,15 +402,19 @@ export default function transform(
         if (process.env.NODE_ENV === "test") {
             return
         }
-        const line = lines[node.loc!.start.line - 1]
-        const shortline = line.replace(/^\s*/, "")
-        console.warn(
-            `[mobx:undecorate] ${msg} at (${fileInfo.path}:${node.loc!.start.line}:${
-                node.loc!.start.column
-            }):\n\t${shortline}\n\t${"^".padStart(
-                node.loc!.start.column + 1 - line.indexOf(shortline),
-                " "
-            )}\n`
-        )
+        if (node.loc) {
+            const line = lines[node.loc.start.line - 1]
+            const shortline = line.replace(/^\s*/, "")
+            console.warn(
+                `[mobx:undecorate] ${msg} at (${fileInfo.path}:${node.loc.start.line}:${
+                    node.loc.start.column
+                }):\n\t${shortline}\n\t${"^".padStart(
+                    node.loc.start.column + 1 - line.indexOf(shortline),
+                    " "
+                )}\n`
+            )
+        } else {
+            console.warn(`[mobx:undecorate] ${msg} at (${fileInfo.path})\n`)
+        }
     }
 }
