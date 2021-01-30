@@ -1423,3 +1423,29 @@ test("makeAutoObservable + production build #2751", () => {
     expect(mobx.isObservableObject(foo)).toBe(true)
     expect(mobx.isObservableProp(foo, "x")).toBe(true)
 })
+
+// Makes sure that we don't define properties on proto as non-writable,
+// as that would prevent initializing prop on instance via assigment.
+test("inherited fields are assignable before makeObservable", () => {
+    class Foo {
+        constructor() {
+            this.action = () => {}
+            this.flow = function* flow() {}
+            makeObservable(this, {
+                action,
+                flow
+            })
+        }
+
+        action() {}
+        *flow() {}
+    }
+
+    const foo1 = new Foo()
+    expect(isAction(foo1.action)).toBe(true)
+    expect(isFlow(foo1.flow)).toBe(true)
+
+    const foo2 = new Foo()
+    expect(isAction(foo2.action)).toBe(true)
+    expect(isFlow(foo2.flow)).toBe(true)
+})
