@@ -17,7 +17,8 @@ import {
     configure,
     flow,
     override,
-    $mobx
+    ObservableSet,
+    ObservableMap
 } from "../../../src/mobx"
 
 test("makeObservable picks up decorators", () => {
@@ -221,6 +222,35 @@ test("makeObservable supports autoBind", () => {
     expect(isAction(t.bound)).toBe(true)
     expect(t.unbound.call(undefined)).toBe(undefined)
     expect(t.bound.call(undefined)).toBe(t)
+})
+
+test("Extending builtins is not support #2765", () => {
+    class ObservableMapLimitedSize extends ObservableMap {
+        limitSize = 0
+        constructor() {
+            super()
+            makeObservable(this, {
+                limitSize: observable
+            })
+        }
+    }
+
+    class ObservableSetLimitedSize extends ObservableSet {
+        limitSize = 0
+        constructor() {
+            super()
+            makeObservable(this, {
+                limitSize: observable
+            })
+        }
+    }
+
+    expect(() => {
+        new ObservableMapLimitedSize()
+    }).toThrowErrorMatchingInlineSnapshot(`"[MobX] Extending builtins is not support"`)
+    expect(() => {
+        new ObservableSetLimitedSize()
+    }).toThrowErrorMatchingInlineSnapshot(`"[MobX] Extending builtins is not support"`)
 })
 
 test("makeAutoObservable has sane defaults", () => {

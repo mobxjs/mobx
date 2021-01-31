@@ -1,4 +1,4 @@
-import { globalState, die } from "../internal"
+import { globalState, die, ObservableMap, ObservableSet } from "../internal"
 
 // We shorten anything used > 5 times
 export const assign = Object.assign
@@ -131,6 +131,13 @@ export function isES6Map(thing): boolean {
 
 export function isES6Set(thing): thing is Set<any> {
     return thing instanceof Set
+}
+
+export function isExtendBuiltin<T extends object>(sub: T): boolean {
+    if (isFunction(sub.constructor)) {
+        return [ObservableMap, ObservableSet].some(parent => sub instanceof parent)
+    }
+    return false
 }
 
 const hasGetOwnPropertySymbols = typeof Object.getOwnPropertySymbols !== "undefined"
