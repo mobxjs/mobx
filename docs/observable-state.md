@@ -40,6 +40,7 @@ Subclassing is supported with [limitations](#limitations). Most notably you can 
 If you see this, you're probably trying to **override arrow function** in subclass `x = () => {}`. That's not possible because **all annotated** fields of classes are **non-configurable** ([see limitations](#limitations)). You have two options:
 
 <details><summary>1. Move function to prototype and use `action.bound` annotation instead</summary>
+
 ```javascript
 class Parent {
     // action = () => {};
@@ -48,34 +49,33 @@ class Parent {
 
     constructor() {
         makeObservable(this, {
-             action: action.bound
+            action: action.bound
         })
     }
-
 }
 class Child {
-action() {}
+    action() {}
 
     constructor() {
         makeObservable(this, {
-             action: override
+            action: override
         })
     }
-
 }
+```
 
-````
 </details>
 <details><summary>2. Remove `action` annotation and wrap the function in action manually: `x = action(() => {})`</summary>
+
 ```javascript
 class Parent {
-   // action = () => {};
-   // =>
-   action = action(() => {})
+    // action = () => {};
+    // =>
+    action = action(() => {})
 
-   constructor() {
-       makeObservable(this, {}) // <-- annotation removed
-   }
+    constructor() {
+        makeObservable(this, {}) // <-- annotation removed
+    }
 }
 class Child {
     action = action(() => {})
@@ -84,7 +84,7 @@ class Child {
         makeObservable(this, {}) // <-- annotation removed
     }
 }
-````
+```
 
 </details>
 
