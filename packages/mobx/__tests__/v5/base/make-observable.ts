@@ -247,10 +247,14 @@ test("Extending builtins is not support #2765", () => {
 
     expect(() => {
         new ObservableMapLimitedSize()
-    }).toThrowErrorMatchingInlineSnapshot(`"[MobX] Extending builtins is not support"`)
+    }).toThrowErrorMatchingInlineSnapshot(
+        `"[MobX] Cannot convert 'ObservableMap@10' into observable object: The target is already observable of different type. Extending builtins is not supported."`
+    )
     expect(() => {
         new ObservableSetLimitedSize()
-    }).toThrowErrorMatchingInlineSnapshot(`"[MobX] Extending builtins is not support"`)
+    }).toThrowErrorMatchingInlineSnapshot(
+        `"[MobX] Cannot convert 'ObservableSet@11' into observable object: The target is already observable of different type. Extending builtins is not supported."`
+    )
 })
 
 test("makeAutoObservable has sane defaults", () => {

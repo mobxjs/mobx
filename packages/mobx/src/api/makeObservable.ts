@@ -9,7 +9,6 @@ import {
     collectStoredAnnotations,
     isPlainObject,
     isObservableObject,
-    isExtendBuiltin,
     die,
     ownKeys,
     objectPrototype,
@@ -29,9 +28,6 @@ export function makeObservable<T extends object, AdditionalKeys extends Property
     annotations?: AnnotationsMap<T, NoInfer<AdditionalKeys>>,
     options?: CreateObservableOptions
 ): T {
-    if (__DEV__ && isExtendBuiltin(target)) {
-        die("Extending builtins is not support")
-    }
     const adm: ObservableObjectAdministration = asObservableObject(target, options)[$mobx]
     startBatch()
     try {
