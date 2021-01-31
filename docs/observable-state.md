@@ -31,35 +31,42 @@ The `annotations` argument maps [annotations](#available-annotations) to each me
 Methods that derive information and take arguments (for example `findUsersOlderThan(age: number): User[]`) don't need any annotation.
 Their read operations will still be tracked when they are called from a reaction, but their output won't be memoized to avoid memory leaks. Check out [MobX-utils computedFn {🚀}](https://github.com/mobxjs/mobx-utils#computedfn) as well.
 
-#### <span style="color: firebrick">`TypeError: Cannot redefine property: x`</span>
+### Subclassing
+
+Subclassing is supported with [limitations](#limitations). Most notably you can only **override actions/flows/computeds on prototype** - you cannot override _[field declarations](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes#field_declarations)_. Use `override` annotation for methods/getters overriden in subclass - see example below. Try to keep things simple and prefer composition over inheritance.
+
+#### `TypeError: Cannot redefine property`
 
 If you see this, you're probably trying to **override arrow function** in subclass `x = () => {}`. That's not possible because **all annotated** fields of classes are **non-configurable** ([see limitations](#limitations)). You have two options:
 
-<details><summary>Move function to prototype and use `action.bound` annotation instead (*recommended*)</summary>
+<details><summary>1. Move function to prototype and use `action.bound` annotation instead</summary>
 ```javascript
 class Parent {
-   // action = () => {};
-   // =>
-   action() {}
+    // action = () => {};
+    // =>
+    action() {}
 
-constructor() {
-makeObservable(this, {
-action: action.bound
-})
-}
+    constructor() {
+        makeObservable(this, {
+             action: action.bound
+        })
+    }
+
 }
 class Child {
 action() {}
 
     constructor() {
-        action: override
+        makeObservable(this, {
+             action: override
+        })
     }
 
 }
 
 ````
 </details>
-<details><summary>Remove `action` annotation and wrap the function in action manually: `x = action(() => {})`</summary>
+<details><summary>2. Remove `action` annotation and wrap the function in action manually: `x = action(() => {})`</summary>
 ```javascript
 class Parent {
    // action = () => {};
@@ -94,7 +101,8 @@ class Doubler {
         makeObservable(this, {
             value: observable,
             double: computed,
-            increment: action
+            increment: action,
+            fetch: flow
         })
         this.value = value
     }
@@ -105,6 +113,11 @@ class Doubler {
 
     increment() {
         this.value++
+    }
+
+    *fetch() {
+        const response = yield fetch("/api/value")
+        this.value = response.json()
     }
 }
 ```
@@ -118,14 +131,14 @@ class Doubler {
 import { makeObservable, observable, computed, action } from "mobx"
 
 class Parent {
-    // Annotated own fields are NOT overridable
+    // Annotated instance fields are NOT overridable
     observable = 0
     arrowAction = () => {}
 
-    // Non-annotated fields are overridable
+    // Non-annotated instance fields are overridable
     overridableArrowAction = action(() => {})
 
-    // Annotated prototype fields are overridable
+    // Annotated prototype methods/getters are overridable
     action() {}
     actionBound() {}
     get computed() {}
@@ -322,7 +335,7 @@ Making class members observable is considered the responsibility of the class co
 
 The primary difference between `make(Auto)Observable` and `observable` is that the first one modifies the object you are passing in as first argument, while `observable` creates a _clone_ that is made observable.
 
-The second difference is that `observable` creates a `Proxy` object, to be able to trap future property additions in case you use the object as a dynamic lookup map.
+The second difference is that `observable` creates a [`Proxy`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) object, to be able to trap future property additions in case you use the object as a dynamic lookup map.
 If the object you want to make observable has a regular structure where all members are known up-front, we recommend to use `makeObservable` as non proxied objects are a little faster, and they are easier to inspect in the debugger and `console.log`.
 
 Because of that, `make(Auto)Observable` is the recommended API to use in factory functions.
@@ -350,19 +363,22 @@ Note that it is possible to pass `{ proxy: false }` as an option to `observable`
 
 ## Limitations
 
-1. `make(Auto)Observable` only supports properties that are already defined. Make sure your compiler configuration is [correct](installation.md#use-spec-compliant-transpilation-for-class-properties), or as work-around, that a value is assigned to all properties before using `make(Auto)Observable`. Without correct configuration, fields that are declared but not initialized (like in `class X { y; }`) will not be picked up correctly.
+1. `make(Auto)Observable` only supports properties that are already defined. Make sure your [**compiler configuration** is correct](installation.md#use-spec-compliant-transpilation-for-class-properties), or as work-around, that a value is assigned to all properties before using `make(Auto)Observable`. Without correct configuration, fields that are declared but not initialized (like in `class X { y; }`) will not be picked up correctly.
 1. `makeObservable` can only annotate properties declared by its own class definition. If a sub- or superclass introduces observable fields, it will have to call `makeObservable` for those properties itself.
 1. `options` argument can be provided only once. Passed `options` are _"sticky"_ and can NOT be changed later (eg. in subclass).
-1. Every field can be annotated only once (except for `override`). The field annotation or configuration can't change in subclass.
+1. **Every field can be annotated only once** (except for `override`). The field annotation or configuration can't change in subclass.
 1. **All annotated** fields of non-plain objects (**classes**) are **non-configurable**.<br>
    [Can be disabled with `configure({ safeDescriptors: false })` {🚀☣️} ](configuration.md#safedescriptors-boolean).
 1. **All non-observable** (stateless) fields (`action`, `flow`) are **non-writable**.<br>
    [Can be disabled with `configure({ safeDescriptors: false })` {🚀☣️} ](configuration.md#safedescriptors-boolean).
 1. Only **`action`, `computed`, `flow`, `action.bound`** defined **on prototype** can be **overriden** by subclass.
 1. By default _TypeScript_ will not allow you to annotate **private** fields. This can be overcome by explicitly passing the relevant private fields as generic argument, like this: `makeObservable<MyStore, "privateField" | "privateField2">(this, { privateField: observable, privateField2: observable })`
-1. Calling `make(Auto)Observable` and providing annotations must be done unconditionally, as this makes it possible to cache the inference results.
-1. _EcmaScript_ **private** fields (`#field`) are **not supported**. When using _TypeScript_, it is recommended to use the `private` modifier instead.
+1. **Calling `make(Auto)Observable`** and providing annotations must be done **unconditionally**, as this makes it possible to cache the inference results.
+1. **Modifying prototypes** after **`make(Auto)Observable`** has been called is **not supported**.
+1. _EcmaScript_ **private** fields (**`#field`**) are **not supported**. When using _TypeScript_, it is recommended to use the `private` modifier instead.
 1. **Mixing annotations and decorators** within single inheritance chain is **not supported** - eg. you can't use decorators for superclass and annotations for subclass.
+1. `makeObservable`,`extendObservable` cannot be used on other builtin observable types (`ObservableMap`, `ObservableSet`, `ObservableArray`, etc)
+1. `makeObservable(Object.create(prototype))` copies properties from `prototype` to created object and makes them `observable`. This behavior is wrong, unexpected and therefore **deprecated** and will likely change in future versions. Don't rely on it.
 
 ## Options {🚀}
 
@@ -371,12 +387,13 @@ The above APIs take an optional `options` argument which is an object that suppo
 -   **`autoBind: true`** uses `action.bound` by default, rather than `action`. Does not affect explicitely annotated members.
 -   **`deep: false`** uses `observable.ref` by default, rather than `observable`. Does not affect explicitely annotated members.
 -   **`name: <string>`** gives the object a debug name that is printed in error messages and reflection APIs. Ignored on production.
--   **`proxy: false`** forces `observable(thing)` to use non-proxy implementation. This is a good option if the shape of the object will not change over time, as non-proxied objects are easier to debug and faster. See [avoiding proxies](#avoid-proxies).
+-   **`proxy: false`** forces `observable(thing)` to use non-[**proxy**](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) implementation. This is a good option if the shape of the object will not change over time, as non-proxied objects are easier to debug and faster. See [avoiding proxies](#avoid-proxies).
 
-<details id="one-options-per-target"><summary>**Note:** options can be provided only once<a href="#one-options-per-target" class="tip-anchor"></a></summary>
-`options` argument can be provided only for `target` that isn't observable yet.<br>
-It's not possible to change options once the observable object was initialized.<br>
-Options are stored on target and respected by subsequent operations.
+<details id="one-options-per-target"><summary>**Note:** options are *sticky* and can be provided only once<a href="#one-options-per-target" class="tip-anchor"></a></summary>
+`options` argument can be provided only for `target` that is NOT observable yet.<br>
+It is NOT possible to change options once the observable object was initialized.<br>
+Options are stored on target and respected by subsequent `makeObservable`/`extendObservable` calls.<br>
+You can't pass different options in subclass.
 </details>
 
 ## Converting observables back to vanilla JavaScript collections

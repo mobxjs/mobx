@@ -197,13 +197,42 @@ Usage:
 Use this utility to create a temporarily action that is immediately invoked. Can be useful in asynchronous processes.
 Check out the [above code block](#examples) for an example.
 
-## Arrow actions and inheritance
+## Actions and inheritance
 
-Any function can become an action, but keep in mind Arrow actions are supported, but prefer `action.bound` instead.
+Only actions defined **on prototype** can be **overriden** by subclass:
 
-```javasript
+```javascript
+class Parent {
+    // on instance
+    arrowAction = () => {}
 
+    // on prototype
+    action() {}
+
+    constructor() {
+        makeObservable(this, {
+            arrowAction: action
+            action: action,
+        })
+    }
+}
+class Child {
+    // THROWS: TypeError: Cannot redefine property: arrowAction
+    arrowAction = () => {}
+
+    // OK
+    action() {}
+
+    constructor() {
+        makeObservable(this, {
+            arrowAction: override,
+            action: override,
+        })
+    }
+}
 ```
+
+For more information see [subclassing](observable-state.md#subclassing)
 
 ## Asynchronous actions
 
