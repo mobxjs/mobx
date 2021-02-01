@@ -208,11 +208,13 @@ class Parent {
 
     // on prototype
     action() {}
+    boundAction() {}
 
     constructor() {
         makeObservable(this, {
             arrowAction: action
             action: action,
+            boundAction: action.bound,
         })
     }
 }
@@ -222,18 +224,21 @@ class Child {
 
     // OK
     action() {}
+    boundAction() {}
 
     constructor() {
         super()
         makeObservable(this, {
             arrowAction: override,
             action: override,
+            boundAction: override,
         })
     }
 }
 ```
 
-For more information see [subclassing](observable-state.md#subclassing)
+To **bind** a single _action_ to `this`, `action.bound` can be used instead of _arrow functions_.<br>
+For more information see [**subclassing**](observable-state.md#subclassing).
 
 ## Asynchronous actions
 

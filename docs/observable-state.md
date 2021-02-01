@@ -31,65 +31,6 @@ The `annotations` argument maps [annotations](#available-annotations) to each me
 Methods that derive information and take arguments (for example `findUsersOlderThan(age: number): User[]`) don't need any annotation.
 Their read operations will still be tracked when they are called from a reaction, but their output won't be memoized to avoid memory leaks. Check out [MobX-utils computedFn {🚀}](https://github.com/mobxjs/mobx-utils#computedfn) as well.
 
-### Subclassing
-
-Subclassing is supported with [limitations](#limitations). Most notably you can only **override actions/flows/computeds on prototype** - you cannot override _[field declarations](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes#field_declarations)_. Use `override` annotation for methods/getters overriden in subclass - see example below. Try to keep things simple and prefer composition over inheritance.
-
-#### `TypeError: Cannot redefine property`
-
-If you see this, you're probably trying to **override arrow function** in subclass `x = () => {}`. That's not possible because **all annotated** fields of classes are **non-configurable** ([see limitations](#limitations)). You have two options:
-
-<details><summary>1. Move function to prototype and use `action.bound` annotation instead</summary>
-
-```javascript
-class Parent {
-    // action = () => {};
-    // =>
-    action() {}
-
-    constructor() {
-        makeObservable(this, {
-            action: action.bound
-        })
-    }
-}
-class Child {
-    action() {}
-
-    constructor() {
-        super()
-        makeObservable(this, {
-            action: override
-        })
-    }
-}
-```
-
-</details>
-<details><summary>2. Remove `action` annotation and wrap the function in action manually: `x = action(() => {})`</summary>
-
-```javascript
-class Parent {
-    // action = () => {};
-    // =>
-    action = action(() => {})
-
-    constructor() {
-        makeObservable(this, {}) // <-- annotation removed
-    }
-}
-class Child {
-    action = action(() => {})
-
-    constructor() {
-        super()
-        makeObservable(this, {}) // <-- annotation removed
-    }
-}
-```
-
-</details>
-
 <!--DOCUSAURUS_CODE_TABS-->
 <!--class + makeObservable-->
 
@@ -126,79 +67,6 @@ class Doubler {
 
 **All annotated** fields are **non-configurable**.<br>
 **All non-observable** (stateless) fields (`action`, `flow`) are **non-writable**.
-
-<!--subclass + makeObservable-->
-
-```javascript
-import { makeObservable, observable, computed, action } from "mobx"
-
-class Parent {
-    // Annotated instance fields are NOT overridable
-    observable = 0
-    arrowAction = () => {}
-
-    // Non-annotated instance fields are overridable
-    overridableArrowAction = action(() => {})
-
-    // Annotated prototype methods/getters are overridable
-    action() {}
-    actionBound() {}
-    get computed() {}
-
-    constructor(value) {
-        makeObservable(this, {
-            observable: observable,
-            arrowAction: action
-            action: action,
-            actionBound: action.bound,
-            computed: computed,
-        })
-    }
-}
-
-class Child extends Parent {
-    /* --- INHERITED --- */
-    // THROWS - TypeError: Cannot redefine property
-    // observable = 5
-    // arrowAction = () = {}
-
-    // OK - not annotated
-    overridableArrowAction = action(() => {})
-
-    // OK - prototype
-    action() {}
-    actionBound() {}
-    get computed() {}
-
-    /* --- NEW --- */
-    childObservable = 0;
-    childArrowAction = () => {}
-    childAction() {}
-    childActionBound() {}
-    get childComputed() {}
-
-    constructor(value) {
-        super()
-        makeObservable(this, {
-            // inherited
-            action: override,
-            actionBound: override,
-            computed: override,
-            // new
-            childObservable: observable,
-            childArrowAction: action
-            childAction: action,
-            childActionBound: action.bound,
-            childComputed: computed,
-        })
-    }
-}
-```
-
-**All annotated** fields are **non-configurable**.<br>
-**All non-observable** (stateless) fields (`action`, `flow`) are **non-writable**.<br>
-Only `action`, `computed`, `flow`, `action.bound` defined **on prototype** can be **overriden** by subclass.
-Field can't be re-annotated in subclass, except with `override`.
 
 <!--factory function + makeAutoObservable-->
 
@@ -424,3 +292,133 @@ Also, `instanceof` checks are really powerful for type inference, and class inst
 Finally, classes benefit from a lot of engine optimizations, since their shape is predictable, and methods are shared on the prototype.
 But heavy inheritance patterns can easily become foot-guns, so if you use classes, keep them simple.
 So, even though there is a slight preference to use classes, we definitely want to encourage you to deviate from this style if that suits you better.
+
+### Subclassing
+
+Subclassing is supported with [limitations](#limitations). Most notably you can only **override actions/flows/computeds on prototype** - you cannot override _[field declarations](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes#field_declarations)_. Use `override` annotation for methods/getters overriden in subclass - see example below. Try to keep things simple and prefer composition over inheritance.
+
+#### `TypeError: Cannot redefine property`
+
+If you see this, you're probably trying to **override arrow function** in subclass `x = () => {}`. That's not possible because **all annotated** fields of classes are **non-configurable** ([see limitations](#limitations)). You have two options:
+
+<details><summary>1. Move function to prototype and use `action.bound` annotation instead</summary>
+
+```javascript
+class Parent {
+    // action = () => {};
+    // =>
+    action() {}
+
+    constructor() {
+        makeObservable(this, {
+            action: action.bound
+        })
+    }
+}
+class Child {
+    action() {}
+
+    constructor() {
+        super()
+        makeObservable(this, {
+            action: override
+        })
+    }
+}
+```
+
+</details>
+<details><summary>2. Remove `action` annotation and wrap the function in action manually: `x = action(() => {})`</summary>
+
+```javascript
+class Parent {
+    // action = () => {};
+    // =>
+    action = action(() => {})
+
+    constructor() {
+        makeObservable(this, {}) // <-- annotation removed
+    }
+}
+class Child {
+    action = action(() => {})
+
+    constructor() {
+        super()
+        makeObservable(this, {}) // <-- annotation removed
+    }
+}
+```
+
+</details>
+
+```javascript
+import { makeObservable, observable, computed, action } from "mobx"
+
+class Parent {
+    // Annotated instance fields are NOT overridable
+    observable = 0
+    arrowAction = () => {}
+
+    // Non-annotated instance fields are overridable
+    overridableArrowAction = action(() => {})
+
+    // Annotated prototype methods/getters are overridable
+    action() {}
+    actionBound() {}
+    get computed() {}
+
+    constructor(value) {
+        makeObservable(this, {
+            observable: observable,
+            arrowAction: action
+            action: action,
+            actionBound: action.bound,
+            computed: computed,
+        })
+    }
+}
+
+class Child extends Parent {
+    /* --- INHERITED --- */
+    // THROWS - TypeError: Cannot redefine property
+    // observable = 5
+    // arrowAction = () = {}
+
+    // OK - not annotated
+    overridableArrowAction = action(() => {})
+
+    // OK - prototype
+    action() {}
+    actionBound() {}
+    get computed() {}
+
+    /* --- NEW --- */
+    childObservable = 0;
+    childArrowAction = () => {}
+    childAction() {}
+    childActionBound() {}
+    get childComputed() {}
+
+    constructor(value) {
+        super()
+        makeObservable(this, {
+            // inherited
+            action: override,
+            actionBound: override,
+            computed: override,
+            // new
+            childObservable: observable,
+            childArrowAction: action
+            childAction: action,
+            childActionBound: action.bound,
+            childComputed: computed,
+        })
+    }
+}
+```
+
+**All annotated** fields are **non-configurable**.<br>
+**All non-observable** (stateless) fields (`action`, `flow`) are **non-writable**.<br>
+Only `action`, `computed`, `flow`, `action.bound` defined **on prototype** can be **overriden** by subclass.<br>
+Field can't be re-annotated in subclass, except with `override`.
