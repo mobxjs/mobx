@@ -650,9 +650,9 @@ export function asObservableObject(
     if (hasProp(target, $mobx)) {
         if (__DEV__ && !(getAdministration(target) instanceof ObservableObjectAdministration)) {
             die(
-                `Cannot convert '${getDebugName(
-                    target
-                )}' into observable object: The target is already observable of different type. Extending builtins is not supported.`
+                `Cannot convert '${getDebugName(target)}' into observable object:` +
+                    `\nThe target is already observable of different type.` +
+                    `\nExtending builtins is not supported.`
             )
         }
         return target
