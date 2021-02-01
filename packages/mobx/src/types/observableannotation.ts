@@ -5,7 +5,8 @@ import {
     die,
     Annotation,
     recordAnnotationApplied,
-    objectPrototype
+    objectPrototype,
+    storedAnnotationsSymbol
 } from "../internal"
 
 export function createObservableAnnotation(name: string, options?: object): Annotation {
@@ -39,7 +40,7 @@ function make_(adm: ObservableObjectAdministration, key: PropertyKey): void {
         }
         source = Object.getPrototypeOf(source)
     }
-    if (!this.isDecorator_) {
+    if (!adm.target_[storedAnnotationsSymbol]) {
         // Throw on missing key, except for decorators:
         // Decorator annotations are collected from whole prototype chain.
         // When called from super() some props may not exist yet.

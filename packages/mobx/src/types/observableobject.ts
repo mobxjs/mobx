@@ -702,9 +702,7 @@ export function recordAnnotationApplied(
         adm.appliedAnnotations_![key] = annotation
     }
     // Remove applied decorator annotation so we don't try to apply it again in subclass constructor
-    if (annotation.isDecorator_) {
-        delete adm.target_[storedAnnotationsSymbol][key]
-    }
+    delete adm.target_[storedAnnotationsSymbol]?.[key]
 }
 
 function assertAnnotable(
