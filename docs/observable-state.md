@@ -57,6 +57,7 @@ class Child {
     action() {}
 
     constructor() {
+        super()
         makeObservable(this, {
             action: override
         })
@@ -81,6 +82,7 @@ class Child {
     action = action(() => {})
 
     constructor() {
+        super()
         makeObservable(this, {}) // <-- annotation removed
     }
 }
@@ -176,6 +178,7 @@ class Child extends Parent {
     get childComputed() {}
 
     constructor(value) {
+        super()
         makeObservable(this, {
             // inherited
             action: override,

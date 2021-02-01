@@ -224,6 +224,7 @@ class Child {
     action() {}
 
     constructor() {
+        super()
         makeObservable(this, {
             arrowAction: override,
             action: override,
