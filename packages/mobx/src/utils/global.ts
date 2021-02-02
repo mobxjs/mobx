@@ -4,6 +4,9 @@ declare const self: any
 const mockGlobal = {}
 
 export function getGlobal() {
+    if (typeof globalThis !== "undefined") {
+        return globalThis
+    }
     if (typeof window !== "undefined") {
         return window
     }
