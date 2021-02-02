@@ -238,7 +238,7 @@ class Child {
 ```
 
 To **bind** a single _action_ to `this`, `action.bound` can be used instead of _arrow functions_.<br>
-For more information see [**subclassing**](observable-state.md#subclassing).
+See [**subclassing**](subclassing.md) for more information.
 
 ## Asynchronous actions
 

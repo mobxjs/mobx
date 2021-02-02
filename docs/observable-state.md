@@ -31,6 +31,8 @@ The `annotations` argument maps [annotations](#available-annotations) to each me
 Methods that derive information and take arguments (for example `findUsersOlderThan(age: number): User[]`) don't need any annotation.
 Their read operations will still be tracked when they are called from a reaction, but their output won't be memoized to avoid memory leaks. Check out [MobX-utils computedFn {🚀}](https://github.com/mobxjs/mobx-utils#computedfn) as well.
 
+[Subclassing is supported with some limitations](subclassing.md) via `override` annotation.
+
 <!--DOCUSAURUS_CODE_TABS-->
 <!--class + makeObservable-->
 
@@ -125,7 +127,7 @@ Usage:
 In particular `false` can be used to exclude a property or method from being processed entirely.
 Check out the code tabs above for an example.
 The `makeAutoObservable` function can be more compact and easier to maintain than using `makeObservable`, since new members don't have to be mentioned explicitly.
-However, `makeAutoObservable` cannot be used on classes that have super or are subclassed.
+However, `makeAutoObservable` cannot be used on classes that have super or are [subclassed](subclassing.md).
 
 Inference rules:
 
@@ -229,20 +231,20 @@ Note that it is possible to pass `{ proxy: false }` as an option to `observable`
 | `true`                             | Infer the best annotation. Check out [makeAutoObservable](#makeautoobservable) for more details.                                                                                                                           |
 | `false`                            | Explicitly do not annotate this property.                                                                                                                                                                                  |
 | `flow`                             | Creates a `flow` to manage asynchronous processes. Check out [flow](actions.md#using-flow-instead-of-async--await-) for more details. Note that the inferred return type in TypeScript might be off. Non-writable.         |
-| `override`                         | Applicable to inherited `action`, `flow`, `computed`, `action.bound` overriden by subclass.                                                                                                                                |
+| `override`                         | [Applicable to inherited `action`, `flow`, `computed`, `action.bound` overriden by subclass](subclassing.md).                                                                                                              |
 | `autoAction`                       | Should not be used explicitly, but is used under the hood by `makeAutoObservable` to mark methods that can act as action or derivation, based on their calling context.                                                    |
 
 ## Limitations
 
 1. `make(Auto)Observable` only supports properties that are already defined. Make sure your [**compiler configuration** is correct](installation.md#use-spec-compliant-transpilation-for-class-properties), or as work-around, that a value is assigned to all properties before using `make(Auto)Observable`. Without correct configuration, fields that are declared but not initialized (like in `class X { y; }`) will not be picked up correctly.
 1. `makeObservable` can only annotate properties declared by its own class definition. If a sub- or superclass introduces observable fields, it will have to call `makeObservable` for those properties itself.
-1. `options` argument can be provided only once. Passed `options` are _"sticky"_ and can NOT be changed later (eg. in subclass).
-1. **Every field can be annotated only once** (except for `override`). The field annotation or configuration can't change in subclass.
+1. `options` argument can be provided only once. Passed `options` are _"sticky"_ and can NOT be changed later (eg. in [subclass](subclassing.md)).
+1. **Every field can be annotated only once** (except for `override`). The field annotation or configuration can't change in [subclass](subclassing.md).
 1. **All annotated** fields of non-plain objects (**classes**) are **non-configurable**.<br>
    [Can be disabled with `configure({ safeDescriptors: false })` {🚀☣️} ](configuration.md#safedescriptors-boolean).
 1. **All non-observable** (stateless) fields (`action`, `flow`) are **non-writable**.<br>
    [Can be disabled with `configure({ safeDescriptors: false })` {🚀☣️} ](configuration.md#safedescriptors-boolean).
-1. Only **`action`, `computed`, `flow`, `action.bound`** defined **on prototype** can be **overriden** by subclass.
+1. [Only **`action`, `computed`, `flow`, `action.bound`** defined **on prototype** can be **overriden** by subclass](subclassing.md).
 1. By default _TypeScript_ will not allow you to annotate **private** fields. This can be overcome by explicitly passing the relevant private fields as generic argument, like this: `makeObservable<MyStore, "privateField" | "privateField2">(this, { privateField: observable, privateField2: observable })`
 1. **Calling `make(Auto)Observable`** and providing annotations must be done **unconditionally**, as this makes it possible to cache the inference results.
 1. **Modifying prototypes** after **`make(Auto)Observable`** has been called is **not supported**.
@@ -264,7 +266,7 @@ The above APIs take an optional `options` argument which is an object that suppo
 `options` argument can be provided only for `target` that is NOT observable yet.<br>
 It is NOT possible to change options once the observable object was initialized.<br>
 Options are stored on target and respected by subsequent `makeObservable`/`extendObservable` calls.<br>
-You can't pass different options in subclass.
+You can't pass different options in [subclass](subclassing.md).
 </details>
 
 ## Converting observables back to vanilla JavaScript collections
@@ -292,133 +294,3 @@ Also, `instanceof` checks are really powerful for type inference, and class inst
 Finally, classes benefit from a lot of engine optimizations, since their shape is predictable, and methods are shared on the prototype.
 But heavy inheritance patterns can easily become foot-guns, so if you use classes, keep them simple.
 So, even though there is a slight preference to use classes, we definitely want to encourage you to deviate from this style if that suits you better.
-
-### Subclassing
-
-Subclassing is supported with [limitations](#limitations). Most notably you can only **override actions/flows/computeds on prototype** - you cannot override _[field declarations](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes#field_declarations)_. Use `override` annotation for methods/getters overriden in subclass - see example below. Try to keep things simple and prefer composition over inheritance.
-
-#### `TypeError: Cannot redefine property`
-
-If you see this, you're probably trying to **override arrow function** in subclass `x = () => {}`. That's not possible because **all annotated** fields of classes are **non-configurable** ([see limitations](#limitations)). You have two options:
-
-<details><summary>1. Move function to prototype and use `action.bound` annotation instead</summary>
-
-```javascript
-class Parent {
-    // action = () => {};
-    // =>
-    action() {}
-
-    constructor() {
-        makeObservable(this, {
-            action: action.bound
-        })
-    }
-}
-class Child {
-    action() {}
-
-    constructor() {
-        super()
-        makeObservable(this, {
-            action: override
-        })
-    }
-}
-```
-
-</details>
-<details><summary>2. Remove `action` annotation and wrap the function in action manually: `x = action(() => {})`</summary>
-
-```javascript
-class Parent {
-    // action = () => {};
-    // =>
-    action = action(() => {})
-
-    constructor() {
-        makeObservable(this, {}) // <-- annotation removed
-    }
-}
-class Child {
-    action = action(() => {})
-
-    constructor() {
-        super()
-        makeObservable(this, {}) // <-- annotation removed
-    }
-}
-```
-
-</details>
-
-```javascript
-import { makeObservable, observable, computed, action } from "mobx"
-
-class Parent {
-    // Annotated instance fields are NOT overridable
-    observable = 0
-    arrowAction = () => {}
-
-    // Non-annotated instance fields are overridable
-    overridableArrowAction = action(() => {})
-
-    // Annotated prototype methods/getters are overridable
-    action() {}
-    actionBound() {}
-    get computed() {}
-
-    constructor(value) {
-        makeObservable(this, {
-            observable: observable,
-            arrowAction: action
-            action: action,
-            actionBound: action.bound,
-            computed: computed,
-        })
-    }
-}
-
-class Child extends Parent {
-    /* --- INHERITED --- */
-    // THROWS - TypeError: Cannot redefine property
-    // observable = 5
-    // arrowAction = () = {}
-
-    // OK - not annotated
-    overridableArrowAction = action(() => {})
-
-    // OK - prototype
-    action() {}
-    actionBound() {}
-    get computed() {}
-
-    /* --- NEW --- */
-    childObservable = 0;
-    childArrowAction = () => {}
-    childAction() {}
-    childActionBound() {}
-    get childComputed() {}
-
-    constructor(value) {
-        super()
-        makeObservable(this, {
-            // inherited
-            action: override,
-            actionBound: override,
-            computed: override,
-            // new
-            childObservable: observable,
-            childArrowAction: action
-            childAction: action,
-            childActionBound: action.bound,
-            childComputed: computed,
-        })
-    }
-}
-```
-
-**All annotated** fields are **non-configurable**.<br>
-**All non-observable** (stateless) fields (`action`, `flow`) are **non-writable**.<br>
-Only `action`, `computed`, `flow`, `action.bound` defined **on prototype** can be **overriden** by subclass.<br>
-Field can't be re-annotated in subclass, except with `override`.
