@@ -63,10 +63,9 @@ export function makeAutoObservable<T extends object, AdditionalKeys extends Prop
     const adm: ObservableObjectAdministration = asObservableObject(target, options)[$mobx]
     startBatch()
     try {
+        // Use cached inferred annotations if available (only in classes)
         if (target[inferredAnnotationsSymbol]) {
-            for (let key in target[inferredAnnotationsSymbol]) {
-                adm.make_(key, target[inferredAnnotationsSymbol][key])
-            }
+            target[inferredAnnotationsSymbol].forEach((value, key) => adm.make_(key, value))
         } else {
             const ignoreKeys = { [$mobx]: 1, [inferredAnnotationsSymbol]: 1, constructor: 1 }
             const make = key => {
