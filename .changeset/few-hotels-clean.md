@@ -1,0 +1,5 @@
+---
+"mobx": patch
+---
+
+Decorators optimization

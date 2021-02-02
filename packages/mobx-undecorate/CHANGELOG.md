@@ -1,5 +1,11 @@
 # mobx-undecorate
 
+## 1.0.6
+
+### Patch Changes
+
+-   [`3f5087c0`](https://github.com/mobxjs/mobx/commit/3f5087c000cb92ef3c234af365db747e35487c10) [#2767](https://github.com/mobxjs/mobx/pull/2767) Thanks [@iChenLei](https://github.com/iChenLei)! - mobx-undecorate don't crash when node's loc is null
+
 ## 1.0.5
 
 ### Patch Changes

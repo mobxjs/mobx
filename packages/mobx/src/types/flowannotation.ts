@@ -9,7 +9,8 @@ import {
     isFlow,
     recordAnnotationApplied,
     isFunction,
-    globalState
+    globalState,
+    storedAnnotationsSymbol
 } from "../internal"
 
 export function createFlowAnnotation(name: string, options?: object): Annotation {
@@ -35,7 +36,7 @@ function make_(adm: ObservableObjectAdministration, key: PropertyKey): void {
                     annotated = true
                     break
                 }
-                const flowDescriptor = createFlowDescriptor(adm, this, key, descriptor)
+                const flowDescriptor = createFlowDescriptor(adm, this, key, descriptor, false)
                 defineProperty(source, key, flowDescriptor)
             } else {
                 const flowDescriptor = createFlowDescriptor(adm, this, key, descriptor)
@@ -51,7 +52,7 @@ function make_(adm: ObservableObjectAdministration, key: PropertyKey): void {
     }
     if (annotated) {
         recordAnnotationApplied(adm, this, key)
-    } else if (!this.isDecorator_) {
+    } else if (!adm.target_[storedAnnotationsSymbol]?.[key]) {
         // Throw on missing key, except for decorators:
         // Decorator annotations are collected from whole prototype chain.
         // When called from super() some props may not exist yet.
@@ -89,18 +90,20 @@ function createFlowDescriptor(
     adm: ObservableObjectAdministration,
     annotation: Annotation,
     key: PropertyKey,
-    descriptor: PropertyDescriptor
+    descriptor: PropertyDescriptor,
+    // provides ability to disable safeDescriptors for prototypes
+    safeDescriptors: boolean = globalState.safeDescriptors
 ): PropertyDescriptor {
     assertFlowDescriptor(adm, annotation, key, descriptor)
     return {
         value: flow(descriptor.value),
         // Non-configurable for classes
         // prevents accidental field redefinition in subclass
-        configurable: globalState.safeDescriptors ? adm.isPlainObject_ : true,
+        configurable: safeDescriptors ? adm.isPlainObject_ : true,
         // https://github.com/mobxjs/mobx/pull/2641#issuecomment-737292058
         enumerable: false,
         // Non-obsevable, therefore non-writable
         // Also prevents rewriting in subclass constructor
-        writable: globalState.safeDescriptors ? false : true
+        writable: safeDescriptors ? false : true
     }
 }

@@ -38,10 +38,7 @@ export function storeAnnotation(prototype: any, key: PropertyKey, annotation: An
 
     // Ignore override
     if (!isOverride(annotation)) {
-        prototype[storedAnnotationsSymbol][key] = {
-            ...annotation,
-            isDecorator_: true
-        }
+        prototype[storedAnnotationsSymbol][key] = annotation
     }
 }
 
