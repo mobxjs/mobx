@@ -62,7 +62,7 @@ function make_(adm: ObservableObjectAdministration, key: PropertyKey): void {
     }
     if (annotated) {
         recordAnnotationApplied(adm, this, key)
-    } else if (!adm.target_[storedAnnotationsSymbol]) {
+    } else if (!adm.target_[storedAnnotationsSymbol]?.[key]) {
         // Throw on missing key, except for decorators:
         // Decorator annotations are collected from whole prototype chain.
         // When called from super() some props may not exist yet.

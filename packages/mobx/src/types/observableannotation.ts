@@ -40,7 +40,7 @@ function make_(adm: ObservableObjectAdministration, key: PropertyKey): void {
         }
         source = Object.getPrototypeOf(source)
     }
-    if (!adm.target_[storedAnnotationsSymbol]) {
+    if (!adm.target_[storedAnnotationsSymbol]?.[key]) {
         // Throw on missing key, except for decorators:
         // Decorator annotations are collected from whole prototype chain.
         // When called from super() some props may not exist yet.
