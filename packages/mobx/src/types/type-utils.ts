@@ -12,7 +12,7 @@ import {
     isFunction
 } from "../internal"
 
-export function getAtom(thing: any, property?: string): IDepTreeNode {
+export function getAtom(thing: any, property?: PropertyKey): IDepTreeNode {
     if (typeof thing === "object" && thing !== null) {
         if (isObservableArray(thing)) {
             if (property !== undefined) die(23)

@@ -1449,3 +1449,29 @@ test("inherited fields are assignable before makeObservable", () => {
     expect(isAction(foo2.action)).toBe(true)
     expect(isFlow(foo2.flow)).toBe(true)
 })
+
+test("makeAutoObservable + symbolic keys", () => {
+    const observableSymbol = Symbol()
+    const computedSymbol = Symbol()
+    const actionSymbol = Symbol()
+
+    class Foo {
+        observable = "observable";
+        [observableSymbol] = "observableSymbol"
+        get [computedSymbol]() {
+            return this.observable
+        }
+        [actionSymbol]() {}
+
+        constructor() {
+            makeAutoObservable(this)
+        }
+    }
+
+    ;[new Foo(), new Foo()].forEach(foo => {
+        expect(isObservableProp(foo, "observable")).toBe(true)
+        expect(isObservableProp(foo, observableSymbol)).toBe(true)
+        expect(isComputedProp(foo, computedSymbol)).toBe(true)
+        expect(isAction(foo[actionSymbol])).toBe(true)
+    })
+})
