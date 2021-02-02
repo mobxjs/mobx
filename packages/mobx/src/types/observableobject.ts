@@ -47,7 +47,7 @@ import {
     objectPrototype
 } from "../internal"
 
-// adm[inferredAnnotationsSymbol] = { foo: annotation, ... }
+// closestPrototypeofTarget[inferredAnnotationsSymbol] = new Map<PropertyKes, Annotation>()
 export const inferredAnnotationsSymbol = Symbol("mobx-inferred-annotations")
 
 const descriptorCache = Object.create(null)
@@ -280,7 +280,7 @@ export class ObservableObjectAdministration
 
     inferAnnotation_(key: PropertyKey): Annotation | false {
         // Inherited is fine - annotation cannot differ in subclass
-        let annotation = this.target_[inferredAnnotationsSymbol]?.[key]
+        let annotation = this.target_[inferredAnnotationsSymbol]?.get(key)
         if (annotation) return annotation
 
         let current = this.target_
@@ -308,9 +308,9 @@ export class ObservableObjectAdministration
             // We could also place it on furthest proto, shoudn't matter
             const closestProto = Object.getPrototypeOf(this.target_)
             if (!hasProp(closestProto, inferredAnnotationsSymbol)) {
-                addHiddenProp(closestProto, inferredAnnotationsSymbol, {})
+                addHiddenProp(closestProto, inferredAnnotationsSymbol, new Map())
             }
-            closestProto[inferredAnnotationsSymbol][key] = annotation
+            closestProto[inferredAnnotationsSymbol].set(key, annotation)
         }
 
         return annotation
