@@ -46,6 +46,7 @@ import {
     inferAnnotationFromDescriptor,
     objectPrototype
 } from "../internal"
+import { autoAnnotation } from "./autoannotation"
 
 // closestPrototypeofTarget[inferredAnnotationsSymbol] = new Map<PropertyKes, Annotation>()
 export const inferredAnnotationsSymbol = Symbol("mobx-inferred-annotations")
@@ -103,8 +104,9 @@ export class ObservableObjectAdministration
         public values_ = new Map<PropertyKey, ObservableValue<any> | ComputedValue<any>>(),
         public name_: string,
         // Used anytime annotation is not explicitely provided
-        public defaultAnnotation_: Annotation = observable,
+        public defaultAnnotation_: Annotation = autoAnnotation,
         // Bind automatically inferred actions?
+        // TODO delete not needed
         public autoBind_: boolean = false
     ) {
         this.keysAtom_ = new Atom(name_ + ".keys")
@@ -238,7 +240,9 @@ export class ObservableObjectAdministration
      */
     make_(key: PropertyKey, annotation: Annotation | boolean): void {
         if (annotation === true) {
-            annotation = this.inferAnnotation_(key)
+            // TODO
+            //annotation = this.inferAnnotation_(key)
+            annotation = this.defaultAnnotation_
         }
         if (annotation === false) {
             return
@@ -261,11 +265,13 @@ export class ObservableObjectAdministration
         proxyTrap: boolean = false
     ): boolean | null {
         if (annotation === true) {
-            annotation = inferAnnotationFromDescriptor(
+            // TODO
+            /*annotation = inferAnnotationFromDescriptor(
                 descriptor,
                 this.defaultAnnotation_,
                 this.autoBind_
-            )
+            )*/
+            annotation = this.defaultAnnotation_
         }
         if (annotation === false) {
             return this.defineProperty_(key, descriptor, proxyTrap)
@@ -659,7 +665,7 @@ export function asObservableObject(
         new Map(),
         stringifyKey(name),
         getAnnotationFromOptions(options),
-        options?.autoBind
+        options?.autoBind // TODO remove
     )
 
     addHiddenProp(target, $mobx, adm)

@@ -103,6 +103,7 @@ export {
     onBecomeObserved,
     onBecomeUnobserved,
     flow,
+    isFlow,
     flowResult,
     FlowCancellationError,
     isFlowCancellationError,

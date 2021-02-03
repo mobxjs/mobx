@@ -30,6 +30,7 @@ import {
     isStringish,
     createObservableAnnotation
 } from "../internal"
+import { autoAnnotation, createAutoAnnotation } from "../types/autoannotation"
 
 export const OBSERVABLE = "observable"
 export const OBSERVABLE_REF = "observable.ref"
@@ -82,6 +83,9 @@ export function getEnhancerFromOptions(options: CreateObservableOptions): IEnhan
 export function getAnnotationFromOptions(
     options?: CreateObservableOptions
 ): Annotation | undefined {
+    return options ? options.defaultDecorator ?? createAutoAnnotation(options) : undefined
+    // TODO
+    /*
     return options
         ? options.deep === true
             ? observableAnnotation
@@ -89,6 +93,7 @@ export function getAnnotationFromOptions(
             ? observableRefAnnotation
             : options.defaultDecorator
         : undefined
+        */
 }
 
 export function getEnhancerFromAnnotation(annotation?: Annotation): IEnhancer<any> {

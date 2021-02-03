@@ -465,14 +465,14 @@ test("it should support flow in makeAutoObservable", done => {
     }
 
     const x = new X()
+    expect(mobx.isFlow(X.prototype.f)).toBe(true)
+    expect(x.hasOwnProperty("f")).toBe(false)
+
     mobx.reaction(
         () => x.a,
         v => values.push(v),
         { fireImmediately: true }
     )
-
-    const x2 = new X()
-    expect(x2.f).toBe(x.f) // shared!
 
     setTimeout(() => {
         x.f(2).then(v => {
