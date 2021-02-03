@@ -19,7 +19,6 @@ export type Annotation = {
         proxyTrap: boolean
     ): boolean | null
     options_?: any
-    isDecorator_?: boolean
 }
 
 export type AnnotationMapEntry =

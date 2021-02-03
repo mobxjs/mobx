@@ -9,7 +9,8 @@ import {
     isFlow,
     recordAnnotationApplied,
     isFunction,
-    globalState
+    globalState,
+    storedAnnotationsSymbol
 } from "../internal"
 
 export function createFlowAnnotation(name: string, options?: object): Annotation {
@@ -51,7 +52,7 @@ function make_(adm: ObservableObjectAdministration, key: PropertyKey): void {
     }
     if (annotated) {
         recordAnnotationApplied(adm, this, key)
-    } else if (!this.isDecorator_) {
+    } else if (!adm.target_[storedAnnotationsSymbol]?.[key]) {
         // Throw on missing key, except for decorators:
         // Decorator annotations are collected from whole prototype chain.
         // When called from super() some props may not exist yet.

@@ -19,6 +19,7 @@
     "Tips & Tricks": [
       "defining-data-stores",
       "understanding-reactivity",
+      "subclassing",
       "analyzing-reactivity",
       "computeds-with-args",
       "mobx-utils",

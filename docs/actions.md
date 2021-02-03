@@ -167,8 +167,7 @@ Usage:
 
 The `action.bound` annotation can be used to automatically bind a method to the correct instance, so that `this` is always correctly bound inside the function.
 
-<details id="avoid-bound"><summary>**Tip:** prefer arrow functions over `action.bound`<a href="#avoid-bound" class="tip-anchor"></a></summary>
-If you want to bind actions in combination with `makeAutoObservable`, it is usually simpler to use arrow functions instead.
+<details id="auto-bind"><summary>**Tip:** use `makeAutoObservable(o, {}, { autoBind: true })` to bind all actions automatically<a href="#avoid-bound" class="tip-anchor"></a></summary>
 
 ```javascript
 import { makeAutoObservable } from "mobx"
@@ -197,6 +196,49 @@ Usage:
 
 Use this utility to create a temporarily action that is immediately invoked. Can be useful in asynchronous processes.
 Check out the [above code block](#examples) for an example.
+
+## Actions and inheritance
+
+Only actions defined **on prototype** can be **overriden** by subclass:
+
+```javascript
+class Parent {
+    // on instance
+    arrowAction = () => {}
+
+    // on prototype
+    action() {}
+    boundAction() {}
+
+    constructor() {
+        makeObservable(this, {
+            arrowAction: action
+            action: action,
+            boundAction: action.bound,
+        })
+    }
+}
+class Child {
+    // THROWS: TypeError: Cannot redefine property: arrowAction
+    arrowAction = () => {}
+
+    // OK
+    action() {}
+    boundAction() {}
+
+    constructor() {
+        super()
+        makeObservable(this, {
+            arrowAction: override,
+            action: override,
+            boundAction: override,
+        })
+    }
+}
+```
+
+To **bind** a single _action_ to `this`, `action.bound` can be used instead of _arrow functions_.<br>
+See [**subclassing**](subclassing.md) for more information.
 
 ## Asynchronous actions
 
