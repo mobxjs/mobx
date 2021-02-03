@@ -28,9 +28,9 @@ import {
     globalState,
     assign,
     isStringish,
-    createObservableAnnotation
+    createObservableAnnotation,
+    createAutoAnnotation
 } from "../internal"
-import { autoAnnotation, createAutoAnnotation } from "../types/autoannotation"
 
 export const OBSERVABLE = "observable"
 export const OBSERVABLE_REF = "observable.ref"

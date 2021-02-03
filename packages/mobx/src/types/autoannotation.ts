@@ -149,18 +149,10 @@ function extend_(
         // other
         let { value } = descriptor
 
-        // TODO seems like we can bind generators as well
         if (typeof value === "function" && this.options_?.autoBind) {
             // if function respect autoBind option
             value = value.bind(adm.proxy_ ?? adm.target_)
         }
-        /*
-        // Must be done here, because isGenerator(genFn.bind(this)) is false,
-        // meaning the enhancer would fail
-        if (this.options_?.deep !== false && isGenerator(descriptor.value)) {
-            // before bind!
-            flow(value) // bound!
-        }*/
 
         return adm.defineObservableProperty_(
             key,

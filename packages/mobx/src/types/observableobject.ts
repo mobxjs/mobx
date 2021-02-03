@@ -33,7 +33,6 @@ import {
     startBatch,
     stringifyKey,
     globalState,
-    observable,
     ADD,
     UPDATE,
     die,
@@ -44,9 +43,9 @@ import {
     isOverride,
     defineProperty,
     inferAnnotationFromDescriptor,
-    objectPrototype
+    objectPrototype,
+    autoAnnotation
 } from "../internal"
-import { autoAnnotation } from "./autoannotation"
 
 // closestPrototypeofTarget[inferredAnnotationsSymbol] = new Map<PropertyKes, Annotation>()
 export const inferredAnnotationsSymbol = Symbol("mobx-inferred-annotations")
