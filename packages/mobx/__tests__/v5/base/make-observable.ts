@@ -1,4 +1,5 @@
 import { isFlow } from "../../../src/api/flow"
+import { deepEnhancer } from "../../../src/internal"
 import {
     makeObservable,
     action,
@@ -17,7 +18,8 @@ import {
     configure,
     flow,
     override,
-    $mobx
+    ObservableSet,
+    ObservableMap
 } from "../../../src/mobx"
 
 test("makeObservable picks up decorators", () => {
@@ -221,6 +223,43 @@ test("makeObservable supports autoBind", () => {
     expect(isAction(t.bound)).toBe(true)
     expect(t.unbound.call(undefined)).toBe(undefined)
     expect(t.bound.call(undefined)).toBe(t)
+})
+
+test("Extending builtins is not support #2765", () => {
+    class ObservableMapLimitedSize extends ObservableMap {
+        limitSize = 0
+        constructor(map: Map<any, any>, enhancer = deepEnhancer, name: string) {
+            super(map, enhancer, name)
+            makeObservable(this, {
+                limitSize: observable
+            })
+        }
+    }
+
+    class ObservableSetLimitedSize extends ObservableSet {
+        limitSize = 0
+        constructor(set: Set<any>, enhancer = deepEnhancer, name: string) {
+            super(set, enhancer, name)
+            makeObservable(this, {
+                limitSize: observable
+            })
+        }
+    }
+
+    expect(() => {
+        new ObservableMapLimitedSize(new Map([["key", "val"]]), deepEnhancer, "TestObject")
+    }).toThrowErrorMatchingInlineSnapshot(`
+        "[MobX] Cannot convert 'TestObject' into observable object:
+        The target is already observable of different type.
+        Extending builtins is not supported."
+    `)
+    expect(() => {
+        new ObservableSetLimitedSize(new Set(), deepEnhancer, "TestObject")
+    }).toThrowErrorMatchingInlineSnapshot(`
+        "[MobX] Cannot convert 'TestObject' into observable object:
+        The target is already observable of different type.
+        Extending builtins is not supported."
+    `)
 })
 
 test("makeAutoObservable has sane defaults", () => {

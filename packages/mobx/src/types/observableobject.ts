@@ -44,6 +44,8 @@ import {
     isOverride,
     defineProperty,
     inferAnnotationFromDescriptor,
+    getDebugName,
+    getAdministration,
     objectPrototype
 } from "../internal"
 
@@ -645,7 +647,16 @@ export function asObservableObject(
         die(`Options can't be provided for already observable objects.`)
     }
 
-    if (hasProp(target, $mobx)) return target
+    if (hasProp(target, $mobx)) {
+        if (__DEV__ && !(getAdministration(target) instanceof ObservableObjectAdministration)) {
+            die(
+                `Cannot convert '${getDebugName(target)}' into observable object:` +
+                    `\nThe target is already observable of different type.` +
+                    `\nExtending builtins is not supported.`
+            )
+        }
+        return target
+    }
 
     if (__DEV__ && !Object.isExtensible(target))
         die("Cannot make the designated object observable; it is not extensible")
