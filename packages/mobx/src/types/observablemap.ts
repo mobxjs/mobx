@@ -97,12 +97,12 @@ export class ObservableMap<K = any, V = any>
     constructor(
         initialData?: IObservableMapInitialValues<K, V>,
         public enhancer_: IEnhancer<V> = deepEnhancer,
-        public name_ = "ObservableMap@" + getNextId()
+        public name_ = __DEV__ ? "ObservableMap@" + getNextId() : "ObservableMap"
     ) {
         if (!isFunction(Map)) {
             die(18)
         }
-        this.keysAtom_ = createAtom(`${this.name_}.keys()`)
+        this.keysAtom_ = createAtom(__DEV__ ? `${this.name_}.keys()` : "ObservableMap.keys()")
         this.data_ = new Map()
         this.hasMap_ = new Map()
         this.merge(initialData)
@@ -120,7 +120,7 @@ export class ObservableMap<K = any, V = any>
             const newEntry = (entry = new ObservableValue(
                 this.has_(key),
                 referenceEnhancer,
-                `${this.name_}.${stringifyKey(key)}?`,
+                __DEV__ ? `${this.name_}.${stringifyKey(key)}?` : "ObservableValue.key?",
                 false
             ))
             this.hasMap_.set(key, newEntry)
@@ -228,7 +228,7 @@ export class ObservableMap<K = any, V = any>
             const observable = new ObservableValue(
                 newValue,
                 this.enhancer_,
-                `${this.name_}.${stringifyKey(key)}`,
+                __DEV__ ? `${this.name_}.${stringifyKey(key)}` : "ObservableValue.key",
                 false
             )
             this.data_.set(key, observable)
