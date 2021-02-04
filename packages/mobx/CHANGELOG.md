@@ -1,5 +1,18 @@
 # mobx
 
+## 6.1.5
+
+### Patch Changes
+
+-   [`3979bee3`](https://github.com/mobxjs/mobx/commit/3979bee36c82d342050978834197ea15a7ddbbf8) [#2773](https://github.com/mobxjs/mobx/pull/2773) Thanks [@urugator](https://github.com/urugator)! - Decorators optimization
+
+*   [`7820e5ea`](https://github.com/mobxjs/mobx/commit/7820e5eae0c9dcdfa1e69cf92e0bfa209b2b478b) [#2769](https://github.com/mobxjs/mobx/pull/2769) Thanks [@iChenLei](https://github.com/iChenLei)! - add warn for extending builtins
+
+-   [`a7c15171`](https://github.com/mobxjs/mobx/commit/a7c1517133915c2891e92a865fe5475627b6b89f) [#2775](https://github.com/mobxjs/mobx/pull/2775) Thanks [@pkit](https://github.com/pkit)! - use globalThis in global detection
+
+*   [`5d41b646`](https://github.com/mobxjs/mobx/commit/5d41b6462cf609df869a088e353bc485846c88f8) [#2774](https://github.com/mobxjs/mobx/pull/2774) Thanks [@urugator](https://github.com/urugator)! - Fix: `makeAutoObservable` now working properly with symbolic keys
+    Fix: `isComputedProp` and `getAtom` second arg type is incompatible with Symbols
+
 ## 6.1.4
 
 ### Patch Changes
