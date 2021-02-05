@@ -21,7 +21,6 @@ const AUTO = "true"
 
 export const autoAnnotation: Annotation = createAutoAnnotation()
 
-// TODO deep => enhancer?
 export function createAutoAnnotation(options?: object): Annotation {
     return {
         annotationType_: AUTO,
@@ -44,16 +43,31 @@ function make_(adm: ObservableObjectAdministration, key: PropertyKey): void {
                     set: descriptor.set
                 })
                 if (!definePropertyOutcome) {
-                    // intercepted
-                    return
+                    return // intercepted
                 }
                 annotated = true
                 break // use closest
             } else if (descriptor.set) {
-                // lone setter -> ignore
-                // TODO wrap setter in action
+                // lone setter -> action setter
+                const set = createAction(key.toString(), descriptor.set) as (v: any) => void
+                if (source === adm.target_) {
+                    // own
+                    const definePropertyOutcome = adm.defineProperty_(key, {
+                        configurable: globalState.safeDescriptors ? adm.isPlainObject_ : true,
+                        set
+                    })
+                    if (!definePropertyOutcome) {
+                        return // intercepted
+                    }
+                } else {
+                    // proto
+                    defineProperty(source, key, {
+                        configurable: true,
+                        set
+                    })
+                }
             } else if (source !== adm.target_ && typeof descriptor.value === "function") {
-                // function on proto
+                // function on proto -> auto action
                 if (isAction(descriptor.value) || isFlow(descriptor.value)) {
                     // already annotated
                     annotated = true
@@ -68,19 +82,18 @@ function make_(adm: ObservableObjectAdministration, key: PropertyKey): void {
                         enumerable: false,
                         value: isGenerator(value)
                             ? flow(value)
-                            : createAction(key.toString(), value)
+                            : createAction(key.toString(), value, true)
                     })
                     if (!definePropertyOutcome) {
-                        // intercepted
-                        return
+                        return // intercepted
                     }
                     annotated = true
                     break // use closest
                 } else {
                     // non-bound
                     defineProperty(source, key, {
-                        configurable: true,
-                        writable: true,
+                        configurable: true, // on proto
+                        writable: true, // on proto
                         enumerable: false,
                         value: isGenerator(descriptor.value)
                             ? flow(descriptor.value)
@@ -106,8 +119,7 @@ function make_(adm: ObservableObjectAdministration, key: PropertyKey): void {
                     this.options_?.deep === false ? referenceEnhancer : deepEnhancer
                 )
                 if (!definePropertyOutcome) {
-                    // intercepted
-                    return
+                    return // intercepted
                 }
                 annotated = true
                 break // use closest
@@ -134,19 +146,27 @@ function extend_(
     proxyTrap: boolean
 ): boolean | null {
     if (descriptor.get) {
-        // getter
-        return adm.defineComputedProperty_(key, {
-            get: descriptor.get,
-            set: descriptor.set
-        })
+        // getter -> computed
+        return adm.defineComputedProperty_(
+            key,
+            {
+                get: descriptor.get,
+                set: descriptor.set
+            },
+            proxyTrap
+        )
     } else if (descriptor.set) {
-        // setter
-        return adm.defineProperty_(key, {
-            configurable: globalState.safeDescriptors ? adm.isPlainObject_ : true,
-            set: createAction(key.toString(), descriptor.set) as (v: any) => void
-        })
+        // lone setter -> action setter
+        return adm.defineProperty_(
+            key,
+            {
+                configurable: globalState.safeDescriptors ? adm.isPlainObject_ : true,
+                set: createAction(key.toString(), descriptor.set) as (v: any) => void
+            },
+            proxyTrap
+        )
     } else {
-        // other
+        // other -> observable
         let { value } = descriptor
 
         if (typeof value === "function" && this.options_?.autoBind) {

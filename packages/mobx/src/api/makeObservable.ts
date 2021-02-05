@@ -11,9 +11,9 @@ import {
     isObservableObject,
     die,
     ownKeys,
-    objectPrototype,
     inferredAnnotationsSymbol,
-    extendObservable
+    extendObservable,
+    addHiddenProp
 } from "../internal"
 
 // Hack based on https://github.com/Microsoft/TypeScript/issues/14829#issuecomment-322267089
@@ -42,6 +42,7 @@ export function makeObservable<T extends object, AdditionalKeys extends Property
     return target
 }
 
+// TODO warn if there is an override for non-existent key
 export function makeAutoObservable<T extends object, AdditionalKeys extends PropertyKey = never>(
     target: T,
     overrides?: AnnotationsMap<T, NoInfer<AdditionalKeys>>,
@@ -63,25 +64,37 @@ export function makeAutoObservable<T extends object, AdditionalKeys extends Prop
     const adm: ObservableObjectAdministration = asObservableObject(target, options)[$mobx]
     startBatch()
     try {
-        // Use cached inferred annotations if available (only in classes)
+        // Following is possible because makeAutoObservable
+        // can be called only once per object and allows max 1 prototype
         if (target[inferredAnnotationsSymbol]) {
-            target[inferredAnnotationsSymbol].forEach((value, key) => adm.make_(key, value))
+            target[inferredAnnotationsSymbol].forEach(key =>
+                adm.make_(
+                    key,
+                    // must pass "undefined" for { key: undefined }
+                    !overrides ? true : key in overrides ? overrides[key] : true
+                )
+            )
         } else {
+            // prepare cache
+            const proto = Object.getPrototypeOf(target)
+            addHiddenProp(proto, inferredAnnotationsSymbol, [])
+
             const ignoreKeys = { [$mobx]: 1, [inferredAnnotationsSymbol]: 1, constructor: 1 }
             const make = key => {
+                // ignore
                 if (ignoreKeys[key]) return
                 ignoreKeys[key] = 1
+                // cache
+                proto[inferredAnnotationsSymbol].push(key)
+                // make
                 adm.make_(
                     key,
                     // must pass "undefined" for { key: undefined }
                     !overrides ? true : key in overrides ? overrides[key] : true
                 )
             }
-            let current = target
-            while (current && current !== objectPrototype) {
-                ownKeys(current).forEach(make)
-                current = Object.getPrototypeOf(current)
-            }
+            ownKeys(target).forEach(make)
+            ownKeys(proto).forEach(make)
         }
     } finally {
         endBatch()

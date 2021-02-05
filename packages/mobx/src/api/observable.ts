@@ -84,16 +84,6 @@ export function getAnnotationFromOptions(
     options?: CreateObservableOptions
 ): Annotation | undefined {
     return options ? options.defaultDecorator ?? createAutoAnnotation(options) : undefined
-    // TODO
-    /*
-    return options
-        ? options.deep === true
-            ? observableAnnotation
-            : options.deep === false
-            ? observableRefAnnotation
-            : options.defaultDecorator
-        : undefined
-        */
 }
 
 export function getEnhancerFromAnnotation(annotation?: Annotation): IEnhancer<any> {

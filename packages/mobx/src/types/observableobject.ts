@@ -47,6 +47,7 @@ import {
     autoAnnotation
 } from "../internal"
 
+// TODO
 // closestPrototypeofTarget[inferredAnnotationsSymbol] = new Map<PropertyKes, Annotation>()
 export const inferredAnnotationsSymbol = Symbol("mobx-inferred-annotations")
 
@@ -103,19 +104,13 @@ export class ObservableObjectAdministration
         public values_ = new Map<PropertyKey, ObservableValue<any> | ComputedValue<any>>(),
         public name_: string,
         // Used anytime annotation is not explicitely provided
-        public defaultAnnotation_: Annotation = autoAnnotation,
-        // Bind automatically inferred actions?
-        // TODO delete not needed
-        public autoBind_: boolean = false
+        public defaultAnnotation_: Annotation = autoAnnotation
     ) {
         this.keysAtom_ = new Atom(name_ + ".keys")
         // Optimization: we use this frequently
         this.isPlainObject_ = isPlainObject(this.target_)
         if (__DEV__ && !isAnnotation(this.defaultAnnotation_)) {
             die(`defaultAnnotation must be valid annotation`)
-        }
-        if (__DEV__ && typeof this.autoBind_ !== "boolean") {
-            die(`autoBind must be boolean`)
         }
         if (__DEV__) {
             // Prepare structure for tracking which fields were already annotated
@@ -235,12 +230,10 @@ export class ObservableObjectAdministration
 
     /**
      * @param {PropertyKey} key
-     * @param {Annotation|boolean} annotation true - infer from object or it's prototype, false - ignore
+     * @param {Annotation|boolean} annotation true - use default annotation
      */
     make_(key: PropertyKey, annotation: Annotation | boolean): void {
         if (annotation === true) {
-            // TODO
-            //annotation = this.inferAnnotation_(key)
             annotation = this.defaultAnnotation_
         }
         if (annotation === false) {
@@ -264,12 +257,6 @@ export class ObservableObjectAdministration
         proxyTrap: boolean = false
     ): boolean | null {
         if (annotation === true) {
-            // TODO
-            /*annotation = inferAnnotationFromDescriptor(
-                descriptor,
-                this.defaultAnnotation_,
-                this.autoBind_
-            )*/
             annotation = this.defaultAnnotation_
         }
         if (annotation === false) {
@@ -282,7 +269,8 @@ export class ObservableObjectAdministration
         }
         return outcome
     }
-
+    /*
+    // TODO
     inferAnnotation_(key: PropertyKey): Annotation | false {
         // Inherited is fine - annotation cannot differ in subclass
         let annotation = this.target_[inferredAnnotationsSymbol]?.get(key)
@@ -320,6 +308,7 @@ export class ObservableObjectAdministration
 
         return annotation
     }
+    */
 
     /**
      * @param {PropertyKey} key
@@ -663,8 +652,7 @@ export function asObservableObject(
         target,
         new Map(),
         stringifyKey(name),
-        getAnnotationFromOptions(options),
-        options?.autoBind // TODO remove
+        getAnnotationFromOptions(options)
     )
 
     addHiddenProp(target, $mobx, adm)

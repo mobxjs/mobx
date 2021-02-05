@@ -1475,22 +1475,3 @@ test("makeAutoObservable + symbolic keys", () => {
         expect(isAction(foo[actionSymbol])).toBe(true)
     })
 })
-
-test("TODO delete", () => {
-    const o = observable({
-        observable: 0,
-        get computed() {
-            return this.observable
-        },
-        observableAutoAction(val) {
-            this.observable = val
-        },
-        *observableFlow() {}
-    })
-    expect(isObservableProp(o, "observable")).toBe(true)
-    expect(isComputedProp(o, "computed")).toBe(true)
-    expect(isObservableProp(o, "observableAutoAction")).toBe(true)
-    expect(isObservableProp(o, "observableFlow")).toBe(true)
-    expect(isAction(o.observableAutoAction)).toBe(true)
-    expect(isFlow(o.observableFlow)).toBe(true)
-})

@@ -204,10 +204,9 @@ test("observable5", function () {
         x.set(7) // set not allowed
     }).toThrow(/It is not possible to assign a new value to a computed value/)
 
-    let f = function () {}
+    let f = m._autoAction(function () {})
     const x2 = m.observable.box(f)
-    // TODO
-    //expect(x2.get()).toBe(f)
+    expect(x2.get()).toBe(f)
     x2.set(null) // allowed
 
     f = function () {
