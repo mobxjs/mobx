@@ -88,7 +88,6 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     lastAccessedBy_ = 0
     lowestObserverState_ = IDerivationState_.UP_TO_DATE_
     unboundDepsCount_ = 0
-    mapid_ = __DEV__ ? "#" + getNextId() : "#"
     protected value_: T | undefined | CaughtException = new CaughtException(null)
     name_: string
     triggeredBy_?: string

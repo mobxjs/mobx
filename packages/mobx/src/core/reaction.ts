@@ -57,7 +57,6 @@ export class Reaction implements IDerivation, IReactionPublic {
     diffValue_ = 0
     runId_ = 0
     unboundDepsCount_ = 0
-    mapid_ = __DEV__ ? "#" + getNextId() : "#"
     isDisposed_ = false
     isScheduled_ = false
     isTrackPending_ = false

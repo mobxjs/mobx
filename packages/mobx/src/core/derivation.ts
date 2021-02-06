@@ -51,7 +51,6 @@ export interface IDerivation extends IDepTreeNode {
      * amount of dependencies used by the derivation in this run, which has not been bound yet.
      */
     unboundDepsCount_: number
-    mapid_: string
     onBecomeStale_(): void
     isTracing_: TraceMode
 
