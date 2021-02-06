@@ -42,14 +42,8 @@ import {
     ownKeys,
     isOverride,
     defineProperty,
-    inferAnnotationFromDescriptor,
-    objectPrototype,
     autoAnnotation
 } from "../internal"
-
-// TODO
-// closestPrototypeofTarget[inferredAnnotationsSymbol] = new Map<PropertyKes, Annotation>()
-export const inferredAnnotationsSymbol = Symbol("mobx-inferred-annotations")
 
 const descriptorCache = Object.create(null)
 
@@ -178,7 +172,7 @@ export class ObservableObjectAdministration
     /**
      * @param {PropertyKey} key
      * @param {any} value
-     * @param {Annotation|boolean} annotation true - infer from descriptor, false - copy as is
+     * @param {Annotation|boolean} annotation true - use default annotation, false - copy as is
      * @param {boolean} proxyTrap whether it's called from proxy trap
      * @returns {boolean|null} true on success, false on failure (proxyTrap + non-configurable), null when cancelled by interceptor
      */
@@ -230,7 +224,7 @@ export class ObservableObjectAdministration
 
     /**
      * @param {PropertyKey} key
-     * @param {Annotation|boolean} annotation true - use default annotation
+     * @param {Annotation|boolean} annotation true - use default annotation, false - ignore prop
      */
     make_(key: PropertyKey, annotation: Annotation | boolean): void {
         if (annotation === true) {
@@ -246,7 +240,7 @@ export class ObservableObjectAdministration
     /**
      * @param {PropertyKey} key
      * @param {PropertyDescriptor} descriptor
-     * @param {Annotation|boolean} annotation true - infer from descriptor, false - copy as is
+     * @param {Annotation|boolean} annotation true - use default annotation, false - copy as is
      * @param {boolean} proxyTrap whether it's called from proxy trap
      * @returns {boolean|null} true on success, false on failure (proxyTrap + non-configurable), null when cancelled by interceptor
      */
@@ -269,46 +263,6 @@ export class ObservableObjectAdministration
         }
         return outcome
     }
-    /*
-    // TODO
-    inferAnnotation_(key: PropertyKey): Annotation | false {
-        // Inherited is fine - annotation cannot differ in subclass
-        let annotation = this.target_[inferredAnnotationsSymbol]?.get(key)
-        if (annotation) return annotation
-
-        let current = this.target_
-        while (current && current !== objectPrototype) {
-            const descriptor = getDescriptor(current, key)
-            if (descriptor) {
-                annotation = inferAnnotationFromDescriptor(
-                    descriptor,
-                    this.defaultAnnotation_,
-                    this.autoBind_
-                )
-                break
-            }
-            current = Object.getPrototypeOf(current)
-        }
-
-        // Not found (false means ignore)
-        if (annotation === undefined) {
-            die(1, "true", key)
-        }
-
-        // Cache the annotation.
-        // Note we can do this only because annotation and field can't change.
-        if (!this.isPlainObject_) {
-            // We could also place it on furthest proto, shoudn't matter
-            const closestProto = Object.getPrototypeOf(this.target_)
-            if (!hasProp(closestProto, inferredAnnotationsSymbol)) {
-                addHiddenProp(closestProto, inferredAnnotationsSymbol, new Map())
-            }
-            closestProto[inferredAnnotationsSymbol].set(key, annotation)
-        }
-
-        return annotation
-    }
-    */
 
     /**
      * @param {PropertyKey} key

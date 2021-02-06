@@ -11,7 +11,6 @@ import {
     isObservableObject,
     die,
     ownKeys,
-    inferredAnnotationsSymbol,
     extendObservable,
     addHiddenProp
 } from "../internal"
@@ -42,7 +41,9 @@ export function makeObservable<T extends object, AdditionalKeys extends Property
     return target
 }
 
-// TODO warn if there is an override for non-existent key
+// proto[keysSymbol] = new Set<PropertyKey>()
+const keysSymbol = Symbol("mobx-keys")
+
 export function makeAutoObservable<T extends object, AdditionalKeys extends PropertyKey = never>(
     target: T,
     overrides?: AnnotationsMap<T, NoInfer<AdditionalKeys>>,
@@ -55,47 +56,33 @@ export function makeAutoObservable<T extends object, AdditionalKeys extends Prop
             die(`makeAutoObservable can only be used on objects not already made observable`)
     }
 
-    // Optimization (avoids visiting protos)
-    // assumes that annotation.make_/.extend_ works the same for plain objects
+    // Optimization: avoid visiting protos
+    // Assumes that annotation.make_/.extend_ works the same for plain objects
     if (isPlainObject(target)) {
         return extendObservable(target, target, overrides, options)
     }
 
     const adm: ObservableObjectAdministration = asObservableObject(target, options)[$mobx]
+
+    // Optimization: cache keys on proto
+    // Assumes makeAutoObservable can be called only once per object and can't be used in subclass
+    if (!target[keysSymbol]) {
+        const proto = Object.getPrototypeOf(target)
+        const keys = new Set([...ownKeys(target), ...ownKeys(proto)])
+        keys.delete("constructor")
+        keys.delete($mobx)
+        addHiddenProp(proto, keysSymbol, keys)
+    }
+
     startBatch()
     try {
-        // Following is possible because makeAutoObservable
-        // can be called only once per object and allows max 1 prototype
-        if (target[inferredAnnotationsSymbol]) {
-            target[inferredAnnotationsSymbol].forEach(key =>
-                adm.make_(
-                    key,
-                    // must pass "undefined" for { key: undefined }
-                    !overrides ? true : key in overrides ? overrides[key] : true
-                )
+        target[keysSymbol].forEach(key =>
+            adm.make_(
+                key,
+                // must pass "undefined" for { key: undefined }
+                !overrides ? true : key in overrides ? overrides[key] : true
             )
-        } else {
-            // prepare cache
-            const proto = Object.getPrototypeOf(target)
-            addHiddenProp(proto, inferredAnnotationsSymbol, [])
-
-            const ignoreKeys = { [$mobx]: 1, [inferredAnnotationsSymbol]: 1, constructor: 1 }
-            const make = key => {
-                // ignore
-                if (ignoreKeys[key]) return
-                ignoreKeys[key] = 1
-                // cache
-                proto[inferredAnnotationsSymbol].push(key)
-                // make
-                adm.make_(
-                    key,
-                    // must pass "undefined" for { key: undefined }
-                    !overrides ? true : key in overrides ? overrides[key] : true
-                )
-            }
-            ownKeys(target).forEach(make)
-            ownKeys(proto).forEach(make)
-        }
+        )
     } finally {
         endBatch()
     }

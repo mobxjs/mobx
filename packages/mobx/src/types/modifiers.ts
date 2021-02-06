@@ -30,8 +30,6 @@ export function deepEnhancer(v, _, name) {
     if (isPlainObject(v)) return observable.object(v, undefined, { name })
     if (isES6Map(v)) return observable.map(v, { name })
     if (isES6Set(v)) return observable.set(v, { name })
-    // TODO
-    // if (typeof v === "function" && !isAction(v)) return autoAction(name, v)
     if (typeof v === "function" && !isAction(v) && !isFlow(v)) {
         if (isGenerator(v)) {
             return flow(v)

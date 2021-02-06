@@ -2177,3 +2177,16 @@ test("generator props are observable flows", () => {
     expect(isObservableProp(o, "observableFlow")).toBe(true)
     expect(isFlow(o.observableFlow)).toBe(true)
 })
+
+test("options can be provided only once", () => {
+    const o = makeObservable({}, {}, { name: "TestObject" })
+    const error = `[MobX] Options can't be provided for already observable objects`
+    expect(() => {
+        extendObservable(o, { x: 0 }, {}, {})
+    }).toThrow(error)
+
+    expect(() => {
+        o.y = 0
+        makeObservable(o, { y: observable }, {})
+    }).toThrow(error)
+})
