@@ -15,14 +15,14 @@ test("treeD", function () {
     })
 
     const b = m.computed(() => a.get() * a.get())
-    const bName = "ComputedValue@3"
+    const bName = "ComputedValue@2"
     expect(dtree(b)).toEqual({
         name: bName
         // no dependencies yet, since it isn't observed yet
     })
 
     const c = m.autorun(() => b.get())
-    const cName = "Autorun@4"
+    const cName = "Autorun@3"
     expect(dtree(c[$mobx])).toEqual({
         name: cName,
         dependencies: [
@@ -62,19 +62,19 @@ test("treeD", function () {
     })
 
     expect(m.getDependencyTree(d[$mobx])).toEqual({
-        name: "Autorun@7",
+        name: "Autorun@5",
         dependencies: [
             {
-                name: "ObservableMap@6.keys()"
+                name: "ObservableMap@4.keys()"
             },
             {
-                name: "ObservableMap@6.temperature?"
+                name: "ObservableMap@4.temperature?"
             },
             {
-                name: "ObservableMap@6.temperature"
+                name: "ObservableMap@4.temperature"
             },
             {
-                name: "ObservableMap@6.absent?"
+                name: "ObservableMap@4.absent?"
             }
         ]
     })
@@ -126,8 +126,8 @@ test("names", function () {
     }
 
     const task = new Task()
-    expect(task[$mobx].name_).toBe("Task@8")
-    expect(task[$mobx].values_.get("title").name_).toBe("Task@8.title")
+    expect(task[$mobx].name_).toBe("Task@4")
+    expect(task[$mobx].values_.get("title").name_).toBe("Task@4.title")
 })
 
 function stripTrackerOutput(output) {
@@ -253,11 +253,11 @@ test("get debug name", function () {
     expect(name(d)).toBe("ObservableArray@4")
     expect(() => name(d, 0)).toThrowError(/It is not possible to get index atoms from arrays/)
 
-    expect(name(e)).toBe("ComputedValue@6")
-    expect(name(f)).toBe("Autorun@7")
+    expect(name(e)).toBe("ComputedValue@5")
+    expect(name(f)).toBe("Autorun@6")
 
-    expect(name(g)).toBe("Clazz@9")
-    expect(name(g, "a")).toBe("Clazz@9.a")
+    expect(name(g)).toBe("Clazz@7")
+    expect(name(g, "a")).toBe("Clazz@7.a")
 
     f()
 })
@@ -299,7 +299,7 @@ test("get administration", function () {
     expect(adm(h, "a")).toBe(ovClassName)
     expect(adm(h)).toBe(h[$mobx].constructor.name_)
     expect(() => adm(h, "b")).toThrowError(
-        /no observable property 'b' found on the observable object 'ObservableObject@10'/
+        /no observable property 'b' found on the observable object 'ObservableObject@8'/
     )
 
     expect(adm(c)).toBe(mapClassName)

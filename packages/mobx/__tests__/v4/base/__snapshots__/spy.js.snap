@@ -246,12 +246,12 @@ Array [
     "type": "report-end",
   },
   Object {
-    "name": "Autorun@7",
+    "name": "Autorun@6",
     "spyReportStart": true,
     "type": "reaction",
   },
   Object {
-    "debugObjectName": "ComputedValue@6",
+    "debugObjectName": "ComputedValue@5",
     "newValue": 6,
     "observableKind": "computed",
     "oldValue": CaughtException {
@@ -272,14 +272,14 @@ Array [
     "type": "update",
   },
   Object {
-    "debugObjectName": "ComputedValue@6",
+    "debugObjectName": "ComputedValue@5",
     "newValue": 8,
     "observableKind": "computed",
     "oldValue": 6,
     "type": "update",
   },
   Object {
-    "name": "Autorun@7",
+    "name": "Autorun@6",
     "spyReportStart": true,
     "type": "reaction",
   },
@@ -316,14 +316,14 @@ Array [
     "type": "report-end",
   },
   Object {
-    "debugObjectName": "ComputedValue@6",
+    "debugObjectName": "ComputedValue@5",
     "newValue": 12,
     "observableKind": "computed",
     "oldValue": 8,
     "type": "update",
   },
   Object {
-    "name": "Autorun@7",
+    "name": "Autorun@6",
     "spyReportStart": true,
     "type": "reaction",
   },
@@ -352,14 +352,14 @@ Array [
     "type": "report-end",
   },
   Object {
-    "debugObjectName": "ComputedValue@6",
+    "debugObjectName": "ComputedValue@5",
     "newValue": 14,
     "observableKind": "computed",
     "oldValue": 12,
     "type": "update",
   },
   Object {
-    "name": "Autorun@7",
+    "name": "Autorun@6",
     "spyReportStart": true,
     "type": "reaction",
   },
