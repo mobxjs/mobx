@@ -10,6 +10,13 @@ import {
     ObjectExpression
 } from "jscodeshift"
 
+interface MobxUndecorateOptions {
+    ignoreImports?: boolean
+    keepDecorators?: boolean
+    decoratorsAfterExport?: boolean
+    parseTsAsNonJsx?: boolean
+}
+
 const validPackages = ["mobx", "mobx-react", "mobx-react-lite"]
 const validDecorators = ["action", "observable", "computed", "observer", "inject"]
 
@@ -50,22 +57,50 @@ const defaultOptions = {
     ]
 }
 
+let decoratorsBeforeExport = true // hack to get the options into the parser
+
+const safeRemoveJsxPlugin = () => {
+    const jsxPluginIdx = defaultOptions.plugins.findIndex(plugin => plugin === "jsx")
+    jsxPluginIdx !== -1 && defaultOptions.plugins.splice(jsxPluginIdx, 1)
+}
+
+const safeAddJsxPlugin = () => {
+    const jsxPluginIdx = defaultOptions.plugins.findIndex(plugin => plugin === "jsx")
+    jsxPluginIdx === -1 && defaultOptions.plugins.push("jsx")
+}
+
+const checkParseTsAsNonJsxFlag = (fileInfo: FileInfo, options?: MobxUndecorateOptions) => {
+    if (options?.parseTsAsNonJsx && fileInfo?.path?.endsWith("ts")) {
+        safeRemoveJsxPlugin()
+    } else {
+        safeAddJsxPlugin()
+    }
+}
+
 export const parser = {
     parse(code) {
-        // @ts-ignore
-        defaultOptions.plugins[0][1].decoratorsBeforeExport = !!decoratorsBeforeExport
         return babylon.parse(code, defaultOptions)
     }
 }
 
-let decoratorsBeforeExport = true // hack to get the options into the parser
-
 export default function transform(
     fileInfo: FileInfo,
     api: API,
-    options?: { ignoreImports?: boolean; keepDecorators?: boolean; decoratorsAfterExport?: boolean }
+    options?: MobxUndecorateOptions
 ): any {
+    /**
+     * @summary for decoratorsBeforeExport flag
+     */
     decoratorsBeforeExport = !options?.decoratorsAfterExport
+    // @ts-ignore
+    defaultOptions.plugins[0][1].decoratorsBeforeExport = !!decoratorsBeforeExport
+    /**
+     * @summary for parseTsAsNonJsx flag
+     */
+    if (options?.parseTsAsNonJsx) {
+        checkParseTsAsNonJsxFlag(fileInfo, options)
+    }
+
     const j = api.jscodeshift
     const superCall = j.expressionStatement(j.callExpression(j.super(), []))
     superCall.comments = [
