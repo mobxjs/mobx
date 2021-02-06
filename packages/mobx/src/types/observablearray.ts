@@ -133,7 +133,7 @@ export class ObservableArrayAdministration
             __DEV__ ? name || "ObservableArray@" + getNextId() : "ObservableArray"
         )
         this.enhancer_ = (newV, oldV) =>
-            enhancer(newV, oldV, __DEV__ ? name + "[..]" : "ObservableArray[...]")
+            enhancer(newV, oldV, __DEV__ ? name + "[..]" : "ObservableArray[..]")
     }
 
     dehanceValue_(value: any): any {
