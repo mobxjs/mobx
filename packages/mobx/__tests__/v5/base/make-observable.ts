@@ -504,10 +504,10 @@ test("makeAutoObservable can be used late and support non-enumerable getters", (
         }
         makeAutoObservable(this)
     }
-    // check if annotations are cached // TODO use something better
+    // check if annotations are cached
     expect(Object.getOwnPropertySymbols(MyClass.prototype).length).toBe(0)
     const x = new MyClass()
-    // TODO expect(Object.getOwnPropertySymbols(MyClass.prototype).length).toBe(1)
+    expect(Object.getOwnPropertySymbols(MyClass.prototype).length).toBe(1)
 
     const i = new MyClass()
 
