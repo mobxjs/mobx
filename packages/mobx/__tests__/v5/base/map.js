@@ -673,7 +673,7 @@ test("issue 940, should not be possible to change maps outside strict mode", () 
                 m.set("x", 1)
             })
         ).toMatchInlineSnapshot(
-            `"<STDOUT> [MobX] Since strict-mode is enabled, changing (observed) observable values without using an action is not allowed. Tried to modify: ObservableMap@72.keys()"`
+            `"<STDOUT> [MobX] Since strict-mode is enabled, changing (observed) observable values without using an action is not allowed. Tried to modify: ObservableMap@56.keys()"`
         )
 
         expect(
@@ -681,7 +681,7 @@ test("issue 940, should not be possible to change maps outside strict mode", () 
                 m.set("x", 2)
             })
         ).toMatchInlineSnapshot(
-            `"<STDOUT> [MobX] Since strict-mode is enabled, changing (observed) observable values without using an action is not allowed. Tried to modify: ObservableMap@72.x"`
+            `"<STDOUT> [MobX] Since strict-mode is enabled, changing (observed) observable values without using an action is not allowed. Tried to modify: ObservableMap@56.x"`
         )
 
         expect(
@@ -689,7 +689,7 @@ test("issue 940, should not be possible to change maps outside strict mode", () 
                 m.delete("x")
             })
         ).toMatchInlineSnapshot(
-            `"<STDOUT> [MobX] Since strict-mode is enabled, changing (observed) observable values without using an action is not allowed. Tried to modify: ObservableMap@72.keys()"`
+            `"<STDOUT> [MobX] Since strict-mode is enabled, changing (observed) observable values without using an action is not allowed. Tried to modify: ObservableMap@56.keys()"`
         )
 
         d()

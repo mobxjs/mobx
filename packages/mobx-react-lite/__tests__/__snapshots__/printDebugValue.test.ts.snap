@@ -15,12 +15,12 @@ Object {
       "name": "ObservableObject@1.pound",
     },
   ],
-  "name": "Autorun@3",
+  "name": "Autorun@2",
 }
 `;
 
 exports[`printDebugValue 2`] = `
 Object {
-  "name": "Autorun@3",
+  "name": "Autorun@2",
 }
 `;

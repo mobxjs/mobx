@@ -42,7 +42,7 @@ class LegacyObservableArray<T> extends StubArray {
     constructor(
         initialValues: T[] | undefined,
         enhancer: IEnhancer<T>,
-        name = "ObservableArray@" + getNextId(),
+        name = __DEV__ ? "ObservableArray@" + getNextId() : "ObservableArray",
         owned = false
     ) {
         super()

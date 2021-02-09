@@ -129,8 +129,11 @@ export class ObservableArrayAdministration
         public owned_: boolean,
         public legacyMode_: boolean
     ) {
-        this.atom_ = new Atom(name || "ObservableArray@" + getNextId())
-        this.enhancer_ = (newV, oldV) => enhancer(newV, oldV, name + "[..]")
+        this.atom_ = new Atom(
+            __DEV__ ? name || "ObservableArray@" + getNextId() : "ObservableArray"
+        )
+        this.enhancer_ = (newV, oldV) =>
+            enhancer(newV, oldV, __DEV__ ? name + "[..]" : "ObservableArray[..]")
     }
 
     dehanceValue_(value: any): any {
@@ -340,7 +343,7 @@ export class ObservableArrayAdministration
 export function createObservableArray<T>(
     initialValues: T[] | undefined,
     enhancer: IEnhancer<T>,
-    name = "ObservableArray@" + getNextId(),
+    name = __DEV__ ? "ObservableArray@" + getNextId() : "ObservableArray",
     owned = false
 ): IObservableArray<T> {
     assertProxies()
