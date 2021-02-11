@@ -1,5 +1,11 @@
 # mobx
 
+## 6.1.6
+
+### Patch Changes
+
+-   [`9b195b17`](https://github.com/mobxjs/mobx/commit/9b195b17bd661b9c0c4ab3a8ef323e23c2f118e4) [#2780](https://github.com/mobxjs/mobx/pull/2780) Thanks [@iChenLei](https://github.com/iChenLei)! - The overall memory usage of MobX has been reduced in production builds by skipping the generation of debug identifiers. The internal `mapid_` field of Reaction has been removed as part of the change.
+
 ## 6.1.5
 
 ### Patch Changes
