@@ -226,7 +226,7 @@ export class ObservableObjectAdministration
             entry = new ObservableValue(
                 key in this.target_,
                 referenceEnhancer,
-                __DEV__ ? `${this.name_}.${stringifyKey(key)}?` : "ObservableValue.key?",
+                __DEV__ ? `${this.name_}.${stringifyKey(key)}?` : "ObservableObject.key?",
                 false
             )
             this.pendingKeys_.set(key, entry)
@@ -423,7 +423,7 @@ export class ObservableObjectAdministration
             const observable = new ObservableValue(
                 value,
                 enhancer,
-                __DEV__ ? `${this.name_}.${key.toString()}` : "ObservableProperty",
+                __DEV__ ? `${this.name_}.${key.toString()}` : "ObservableObject.key",
                 false
             )
 
@@ -463,7 +463,7 @@ export class ObservableObjectAdministration
                 })
                 if (!change) return null
             }
-            options.name ||= __DEV__ ? `${this.name_}.${key.toString()}` : "ComputedProperty"
+            options.name ||= __DEV__ ? `${this.name_}.${key.toString()}` : "ObservableObject.key"
             options.context = this.proxy_ || this.target_
             const cachedDescriptor = getCachedObservablePropDescriptor(key)
             const descriptor = {
