@@ -65,7 +65,8 @@ export function getDebugName(thing: any, property?: string): string {
     } else if (isObservableObject(thing) || isObservableMap(thing) || isObservableSet(thing)) {
         named = getAdministration(thing)
     } else {
+        // valid for arrays as well
         named = getAtom(thing)
-    } // valid for arrays as well
+    }
     return named.name_
 }
