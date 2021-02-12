@@ -42,9 +42,8 @@ export function autorun(
         if (isAction(view)) die("Autorun does not accept actions since actions are untrackable")
     }
 
-    const name: string = __DEV__
-        ? (opts && opts.name) || (view as any).name || "Autorun@" + getNextId()
-        : "Autorun"
+    const name: string =
+        opts?.name ?? (__DEV__ ? (view as any).name || "Autorun@" + getNextId() : "Autorun")
     const runSync = !opts.scheduler && !opts.delay
     let reaction: Reaction
 
@@ -112,7 +111,7 @@ export function reaction<T>(
             die("First and second argument to reaction should be functions")
         if (!isPlainObject(opts)) die("Third argument of reactions should be an object")
     }
-    const name = __DEV__ ? opts.name || "Reaction@" + getNextId() : "Reaction"
+    const name = opts.name ?? (__DEV__ ? "Reaction@" + getNextId() : "Reaction")
     const effectAction = action(
         name,
         opts.onError ? wrapErrorHandler(opts.onError, effect) : effect

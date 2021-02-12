@@ -116,7 +116,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     constructor(options: IComputedValueOptions<T>) {
         if (!options.get) die(31)
         this.derivation = options.get!
-        this.name_ = __DEV__ ? options.name || "ComputedValue@" + getNextId() : "ComputedValue"
+        this.name_ = options.name || (__DEV__ ? "ComputedValue@" + getNextId() : "ComputedValue")
         if (options.set) {
             this.setter_ = createAction(
                 __DEV__ ? this.name_ + "-setter" : "ComputedValue-setter",

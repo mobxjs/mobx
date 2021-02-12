@@ -874,3 +874,96 @@ test("comparer.shallow should work", () => {
     expect(sh(obs(new Map([[{}, 1]])), obs(new Map([[{}, 1]])))).toBe(false)
     expect(sh(obs(new Map([["a", {}]])), obs(new Map([["a", {}]])))).toBe(false)
 })
+
+test("getDebugName(action)", () => {
+    expect(mobx.getDebugName(mobx.action(() => {}))).toBe("<unnamed action>")
+    expect(mobx.getDebugName(mobx.action(function fn() {}))).toBe("fn")
+    expect(mobx.getDebugName(mobx.action("custom", function fn() {}))).toBe("custom")
+})
+
+test("Default debug names - development", () => {
+    expect(mobx.getDebugName(mobx.observable({ x() {} }).x)).toBe("x")
+    expect(/Atom@\d+/.test(mobx.getDebugName(mobx.createAtom()))).toBe(true)
+    expect(/ComputedValue@\d+/.test(mobx.getDebugName(mobx.computed(() => {})))).toBe(true)
+    expect(mobx.getDebugName(mobx.action(function fn() {}))).toBe("fn")
+    expect(/ObservableObject@\d+/.test(mobx.getDebugName(mobx.observable({})))).toBe(true)
+    expect(/ObservableObject@\d+.x/.test(mobx.getDebugName(mobx.observable({ x: "x" }), "x"))).toBe(
+        true
+    )
+    expect(
+        /ObservableObject@\d+.x/.test(mobx.getDebugName(mobx.observable({ get x() {} }), "x"))
+    ).toBe(true)
+    expect(/ObservableArray@\d+/.test(mobx.getDebugName(mobx.observable([])))).toBe(true)
+    expect(
+        /ObservableArray@\d+/.test(mobx.getDebugName(mobx.observable([], { proxy: false })))
+    ).toBe(true)
+    expect(/ObservableMap@\d+/.test(mobx.getDebugName(mobx.observable(new Map())))).toBe(true)
+    expect(/ObservableSet@\d+/.test(mobx.getDebugName(mobx.observable(new Set())))).toBe(true)
+    expect(/ObservableValue@\d+/.test(mobx.getDebugName(mobx.observable("x")))).toBe(true)
+    expect(
+        /Reaction@\d+/.test(
+            mobx.getDebugName(
+                mobx.reaction(
+                    () => {},
+                    () => {}
+                )
+            )
+        )
+    ).toBe(true)
+    expect(/Autorun@\d+/.test(mobx.getDebugName(mobx.autorun(() => {})))).toBe(true)
+})
+
+test("Default debug names - production", () => {
+    const mobx = require(`../../../dist/mobx.cjs.production.min.js`)
+
+    expect(mobx.getDebugName(mobx.observable({ x() {} }).x)).toBe("x") // perhaps should be "<unnamed action>"??
+    expect(mobx.getDebugName(mobx.createAtom())).toBe("Atom")
+    expect(mobx.getDebugName(mobx.computed(() => {}))).toBe("ComputedValue")
+    expect(mobx.getDebugName(mobx.action(function fn() {}))).toBe("fn")
+    expect(mobx.getDebugName(mobx.observable({}))).toBe("ObservableObject")
+    expect(mobx.getDebugName(mobx.observable({ x: "x" }), "x")).toBe("ObservableProperty")
+    expect(mobx.getDebugName(mobx.observable({ get x() {} }), "x")).toBe("ComputedProperty")
+    expect(mobx.getDebugName(mobx.observable([]))).toBe("ObservableArray")
+    expect(mobx.getDebugName(mobx.observable([], { proxy: false }))).toBe("ObservableArray")
+    expect(mobx.getDebugName(mobx.observable(new Map()))).toBe("ObservableMap")
+    expect(mobx.getDebugName(mobx.observable(new Set()))).toBe("ObservableSet")
+    expect(mobx.getDebugName(mobx.observable("x"))).toBe("ObservableValue")
+    expect(
+        mobx.getDebugName(
+            mobx.reaction(
+                () => {},
+                () => {}
+            )
+        )
+    ).toBe("Reaction")
+    expect(mobx.getDebugName(mobx.autorun(() => {}))).toBe("Autorun")
+})
+
+test("User provided debug names are always respected", () => {
+    const mobxDevelopment = mobx
+    const mobxProduction = require(`../../../dist/mobx.cjs.production.min.js`)
+
+    const name = "CustomName"
+
+    ;[mobxDevelopment, mobxProduction].forEach(mobx => {
+        expect(mobx.getDebugName(mobx.action(name, function fn() {}))).toBe(name)
+        expect(mobx.getDebugName(mobx.createAtom(name))).toBe(name)
+        expect(mobx.getDebugName(mobx.computed(() => {}, { name }))).toBe(name)
+        expect(mobx.getDebugName(mobx.observable({}, {}, { name }))).toBe(name)
+        expect(mobx.getDebugName(mobx.observable([], { name }))).toBe(name)
+        expect(mobx.getDebugName(mobx.observable([], { name, proxy: false }))).toBe(name)
+        expect(mobx.getDebugName(mobx.observable(new Map(), { name }))).toBe(name)
+        expect(mobx.getDebugName(mobx.observable(new Set(), { name }))).toBe(name)
+        expect(mobx.getDebugName(mobx.observable("x", { name }))).toBe(name)
+        expect(
+            mobx.getDebugName(
+                mobx.reaction(
+                    () => {},
+                    () => {},
+                    { name }
+                )
+            )
+        ).toBe(name)
+        expect(mobx.getDebugName(mobx.autorun(() => {}, { name }))).toBe(name)
+    })
+})
