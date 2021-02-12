@@ -23,7 +23,7 @@ Array [
     "type": "action",
   },
   Object {
-    "debugObjectName": "ObservableObject@10",
+    "debugObjectName": "ObservableObject@7",
     "name": "a",
     "newValue": 2,
     "observableKind": "object",
@@ -48,7 +48,7 @@ Array [
     "type": "action",
   },
   Object {
-    "debugObjectName": "ObservableObject@10",
+    "debugObjectName": "ObservableObject@7",
     "name": "a",
     "newValue": 5,
     "observableKind": "object",
@@ -61,7 +61,7 @@ Array [
     "type": "report-end",
   },
   Object {
-    "debugObjectName": "ObservableObject@10",
+    "debugObjectName": "ObservableObject@7",
     "name": "a",
     "newValue": 4,
     "observableKind": "object",
@@ -86,7 +86,7 @@ Array [
     "type": "action",
   },
   Object {
-    "debugObjectName": "ObservableObject@10",
+    "debugObjectName": "ObservableObject@7",
     "name": "a",
     "newValue": 3,
     "observableKind": "object",

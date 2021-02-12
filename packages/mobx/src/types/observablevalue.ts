@@ -71,7 +71,7 @@ export class ObservableValue<T>
     constructor(
         value: T,
         public enhancer: IEnhancer<T>,
-        public name_ = "ObservableValue@" + getNextId(),
+        public name_ = __DEV__ ? "ObservableValue@" + getNextId() : "ObservableValue",
         notifySpy = true,
         private equals: IEqualsComparer<any> = comparer.default
     ) {

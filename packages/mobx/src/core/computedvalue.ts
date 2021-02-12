@@ -88,7 +88,6 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     lastAccessedBy_ = 0
     lowestObserverState_ = IDerivationState_.UP_TO_DATE_
     unboundDepsCount_ = 0
-    mapid_ = "#" + getNextId()
     protected value_: T | undefined | CaughtException = new CaughtException(null)
     name_: string
     triggeredBy_?: string
@@ -117,8 +116,13 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     constructor(options: IComputedValueOptions<T>) {
         if (!options.get) die(31)
         this.derivation = options.get!
-        this.name_ = options.name || "ComputedValue@" + getNextId()
-        if (options.set) this.setter_ = createAction(this.name_ + "-setter", options.set) as any
+        this.name_ = __DEV__ ? options.name || "ComputedValue@" + getNextId() : "ComputedValue"
+        if (options.set) {
+            this.setter_ = createAction(
+                __DEV__ ? this.name_ + "-setter" : "ComputedValue-setter",
+                options.set
+            ) as any
+        }
         this.equals_ =
             options.equals ||
             ((options as any).compareStructural || (options as any).struct

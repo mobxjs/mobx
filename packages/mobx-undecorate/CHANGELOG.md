@@ -1,5 +1,11 @@
 # mobx-undecorate
 
+## 1.0.7
+
+### Patch Changes
+
+-   [`c6b1c5d4`](https://github.com/mobxjs/mobx/commit/c6b1c5d4062c332cb09fcb6c64ec1d2dee69a7a2) [#2785](https://github.com/mobxjs/mobx/pull/2785) Thanks [@iChenLei](https://github.com/iChenLei)! - add parseTsAsNonJsx flag for mobx-undecorate
+
 ## 1.0.6
 
 ### Patch Changes

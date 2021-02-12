@@ -43,8 +43,11 @@ function _when(predicate: () => boolean, effect: Lambda, opts: IWhenOptions): IR
         }, opts.timeout)
     }
 
-    opts.name = opts.name || "When@" + getNextId()
-    const effectAction = createAction(opts.name + "-effect", effect as Function)
+    opts.name = __DEV__ ? opts.name || "When@" + getNextId() : "When"
+    const effectAction = createAction(
+        __DEV__ ? opts.name + "-effect" : "When-effect",
+        effect as Function
+    )
     // eslint-disable-next-line
     var disposer = autorun(r => {
         // predicate should not change state

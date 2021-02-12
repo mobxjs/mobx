@@ -102,7 +102,7 @@ export class ObservableObjectAdministration
         // Used anytime annotation is not explicitely provided
         public defaultAnnotation_: Annotation = autoAnnotation
     ) {
-        this.keysAtom_ = new Atom(name_ + ".keys")
+        this.keysAtom_ = new Atom(__DEV__ ? name_ + ".keys" : "ObservableObject.keys")
         // Optimization: we use this frequently
         this.isPlainObject_ = isPlainObject(this.target_)
         if (__DEV__ && !isAnnotation(this.defaultAnnotation_)) {
@@ -216,7 +216,7 @@ export class ObservableObjectAdministration
             entry = new ObservableValue(
                 key in this.target_,
                 referenceEnhancer,
-                `${this.name_}.${stringifyKey(key)}?`,
+                __DEV__ ? `${this.name_}.${stringifyKey(key)}?` : "ObservableValue.key?",
                 false
             )
             this.pendingKeys_.set(key, entry)
@@ -609,9 +609,10 @@ export function asObservableObject(
     if (__DEV__ && !Object.isExtensible(target))
         die("Cannot make the designated object observable; it is not extensible")
 
-    const name =
-        options?.name ??
-        `${isPlainObject(target) ? "ObservableObject" : target.constructor.name}@${getNextId()}`
+    const name = __DEV__
+        ? options?.name ??
+          `${isPlainObject(target) ? "ObservableObject" : target.constructor.name}@${getNextId()}`
+        : "ObservableObject"
 
     const adm = new ObservableObjectAdministration(
         target,

@@ -57,7 +57,6 @@ export class Reaction implements IDerivation, IReactionPublic {
     diffValue_ = 0
     runId_ = 0
     unboundDepsCount_ = 0
-    mapid_ = "#" + getNextId()
     isDisposed_ = false
     isScheduled_ = false
     isTrackPending_ = false
@@ -65,7 +64,7 @@ export class Reaction implements IDerivation, IReactionPublic {
     isTracing_: TraceMode = TraceMode.NONE
 
     constructor(
-        public name_: string = "Reaction@" + getNextId(),
+        public name_: string = __DEV__ ? "Reaction@" + getNextId() : "Reaction",
         private onInvalidate_: () => void,
         private errorHandler_?: (error: any, derivation: IDerivation) => void,
         public requiresObservable_ = false
