@@ -20,7 +20,7 @@ module.exports = {
                         passes: 2,
                         keep_fargs: false,
                         pure_getters: true,
-                        unsafe: true
+                        unsafe: false
                     },
                     mangle: {
                         properties: {

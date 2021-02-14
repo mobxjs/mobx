@@ -124,14 +124,12 @@ export class ObservableArrayAdministration
     lastKnownLength_ = 0
 
     constructor(
-        name,
+        name = __DEV__ ? "ObservableArray@" + getNextId() : "ObservableArray",
         enhancer: IEnhancer<any>,
         public owned_: boolean,
         public legacyMode_: boolean
     ) {
-        this.atom_ = new Atom(
-            __DEV__ ? name || "ObservableArray@" + getNextId() : "ObservableArray"
-        )
+        this.atom_ = new Atom(name)
         this.enhancer_ = (newV, oldV) =>
             enhancer(newV, oldV, __DEV__ ? name + "[..]" : "ObservableArray[..]")
     }

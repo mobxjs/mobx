@@ -120,7 +120,7 @@ export class ObservableMap<K = any, V = any>
             const newEntry = (entry = new ObservableValue(
                 this.has_(key),
                 referenceEnhancer,
-                __DEV__ ? `${this.name_}.${stringifyKey(key)}?` : "ObservableValue.key?",
+                __DEV__ ? `${this.name_}.${stringifyKey(key)}?` : "ObservableMap.key?",
                 false
             ))
             this.hasMap_.set(key, newEntry)
@@ -228,7 +228,7 @@ export class ObservableMap<K = any, V = any>
             const observable = new ObservableValue(
                 newValue,
                 this.enhancer_,
-                __DEV__ ? `${this.name_}.${stringifyKey(key)}` : "ObservableValue.key",
+                __DEV__ ? `${this.name_}.${stringifyKey(key)}` : "ObservableMap.key",
                 false
             )
             this.data_.set(key, observable)
