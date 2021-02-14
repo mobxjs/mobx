@@ -1,5 +1,15 @@
 # mobx
 
+## 6.1.7
+
+### Patch Changes
+
+-   [`5640aa77`](https://github.com/mobxjs/mobx/commit/5640aa7794420a5fc2f99ac0819de11696d6ba71) [#2799](https://github.com/mobxjs/mobx/pull/2799) Thanks [@urugator](https://github.com/urugator)! - - fix: user provided debug names are not preserved on production
+    -   fix: property atom's debug name is dynamic on production
+    -   fix: `observable(primitive, options)` ignores `options`
+    -   fix: `getDebugName(action)` throws `[MobX] Cannot obtain atom from undefined`
+    -   [fix: terser using `unsafe: true`](https://github.com/mobxjs/mobx/issues/2751#issuecomment-778171773)
+
 ## 6.1.6
 
 ### Patch Changes
