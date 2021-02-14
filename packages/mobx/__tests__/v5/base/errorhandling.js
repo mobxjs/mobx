@@ -6,13 +6,13 @@ const { observable, computed, $mobx, autorun } = mobx
 
 const voidObserver = function () {}
 
-function checkGlobalState() {
+function checkGlobalState({ inBatch = 0, pendingUnobservations = 0 } = {}) {
     const gs = mobx._getGlobalState()
     expect(gs.isRunningReactions).toBe(false)
     expect(gs.trackingDerivation).toBe(null)
-    expect(gs.inBatch).toBe(0)
+    expect(gs.inBatch).toBe(inBatch)
     expect(gs.allowStateChanges).toBe(!gs.strictMode)
-    expect(gs.pendingUnobservations.length).toBe(0)
+    expect(gs.pendingUnobservations.length).toBe(pendingUnobservations)
 }
 
 test("exception1", function () {
@@ -240,13 +240,23 @@ test("throw error if modification loop", function () {
     checkGlobalState()
 })
 
-test("cycle1", function () {
+test("cycle1 - reaction", function () {
     const p = computed(function () {
         return p.get() * 2
     }) // thats a cycle!
     utils.consoleError(() => {
-        mobx.observe(p, voidObserver, true)
+        mobx.reaction(() => p.get(), voidObserver, { fireImmediately: true })
     }, /Cycle detected/)
+    checkGlobalState()
+})
+
+test("cycle1 - observe", function () {
+    const p = computed(function () {
+        return p.get() * 2
+    }) // thats a cycle!
+    expect(() => {
+        mobx.observe(p, voidObserver, true)
+    }).toThrowError(/Cycle detected/)
     checkGlobalState()
 })
 
@@ -273,7 +283,7 @@ test("cycle3", function () {
     checkGlobalState()
 })
 
-test("cycle4", function () {
+test("cycle4 - observe", function () {
     const z = observable.box(true)
     const a = computed(function () {
         return z.get() ? 1 : b.get() * 2
@@ -283,6 +293,26 @@ test("cycle4", function () {
     })
 
     m.observe(b, voidObserver)
+    expect(1).toBe(a.get())
+
+    expect(() => {
+        z.set(false) // introduces a cycle!
+    }).toThrowError(/Cycle detected/)
+    // globalState is in an improper state because the exception was thrown by
+    // the nested `b.get()` call
+    checkGlobalState({ inBatch: 1, pendingUnobservations: 1 })
+})
+
+test("cycle4 - reaction", function () {
+    const z = observable.box(true)
+    const a = computed(function () {
+        return z.get() ? 1 : b.get() * 2
+    })
+    const b = computed(function () {
+        return a.get() * 2
+    })
+
+    m.reaction(() => b.get(), voidObserver)
     expect(1).toBe(a.get())
 
     utils.consoleError(() => {

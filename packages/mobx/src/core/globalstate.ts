@@ -1,4 +1,4 @@
-import { IDerivation, IObservable, Reaction, die, getGlobal } from "../internal"
+import { IDerivation, IObservable, Reaction, die, getGlobal, Lambda } from "../internal"
 import { ComputedValue } from "./computedvalue"
 
 /**
@@ -70,6 +70,12 @@ export class MobXGlobals {
      * @type {IObservable[]}
      */
     pendingUnobservations: IObservable[] = []
+
+    /**
+     * List of scheduled, not yet executed, eager reactions (executed
+     * immediately ignoring transactions)
+     */
+    pendingListeners: Lambda[] = []
 
     /**
      * List of scheduled, not yet executed, reactions.

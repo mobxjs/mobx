@@ -3,6 +3,7 @@ import {
     IDerivation,
     IDerivationState_,
     IEqualsComparer,
+    IListenable,
     IObservable,
     Lambda,
     TraceMode,
@@ -24,12 +25,13 @@ import {
     startBatch,
     toPrimitive,
     trackDerivedFunction,
-    untrackedEnd,
-    untrackedStart,
     UPDATE,
     die,
     allowStateChangesStart,
-    allowStateChangesEnd
+    allowStateChangesEnd,
+    hasListeners,
+    registerListener,
+    notifyListeners
 } from "../internal"
 
 export interface IComputedValue<T> {
@@ -76,7 +78,7 @@ export type IComputedDidChange<T = any> = {
  *
  * If at any point it's outside batch and it isn't observed: reset everything and go to 1.
  */
-export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDerivation {
+export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDerivation, IListenable {
     dependenciesState_ = IDerivationState_.NOT_TRACKING_
     observing_: IObservable[] = [] // nodes we are looking at. Our value depends on these nodes
     newObserving_ = null // during tracking it's an array with new observed observers
@@ -100,6 +102,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     private equals_: IEqualsComparer<any>
     private requiresReaction_: boolean
     keepAlive_: boolean
+    changeListeners_: Function[] | undefined
 
     /**
      * Create a new computed value based on a function expression.
@@ -135,6 +138,21 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 
     onBecomeStale_() {
         propagateMaybeChanged(this)
+
+        if (hasListeners(this)) {
+            globalState.pendingListeners.push(() => {
+                const oldValue = this.value_
+                const newValue = this.get()
+                if (newValue !== oldValue) {
+                    notifyListeners(this, {
+                        type: UPDATE,
+                        object: this,
+                        newValue,
+                        oldValue
+                    })
+                }
+            })
+        }
     }
 
     public onBOL: Set<Lambda> | undefined
@@ -259,26 +277,22 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     }
 
     observe_(listener: (change: IComputedDidChange<T>) => void, fireImmediately?: boolean): Lambda {
-        let firstTime = true
-        let prevValue: T | undefined = undefined
-        return autorun(() => {
-            // TODO: why is this in a different place than the spyReport() function? in all other observables it's called in the same place
-            let newValue = this.get()
-            if (!firstTime || fireImmediately) {
-                const prevU = untrackedStart()
-                listener({
-                    observableKind: "computed",
-                    debugObjectName: this.name_,
-                    type: UPDATE,
-                    object: this,
-                    newValue,
-                    oldValue: prevValue
-                })
-                untrackedEnd(prevU)
-            }
-            firstTime = false
-            prevValue = newValue
-        })
+        if (fireImmediately) {
+            listener({
+                observableKind: "computed",
+                debugObjectName: this.name_,
+                object: this,
+                type: UPDATE,
+                newValue: this.get(),
+                oldValue: undefined
+            })
+        }
+        const disposeAutorun = autorun(() => void this.get())
+        const disposeListener = registerListener(this, listener)
+        return () => {
+            disposeAutorun()
+            disposeListener()
+        }
     }
 
     warnAboutUntrackedRead_() {

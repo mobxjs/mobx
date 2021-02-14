@@ -196,6 +196,16 @@ export function propagateChanged(observable: IObservable) {
         }
         d.dependenciesState_ = IDerivationState_.STALE_
     })
+
+    // Call all pending eager reactions
+    while (true) {
+        const listener = globalState.pendingListeners.pop()
+        if (listener) {
+            listener()
+        } else {
+            break
+        }
+    }
     // invariantLOS(observable, "changed end");
 }
 

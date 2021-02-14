@@ -1,4 +1,4 @@
-import { observable, observe, computed } from "../../../src/mobx"
+import { observable, observe, computed, runInAction } from "../../../src/mobx"
 
 test("observe object and map properties", () => {
     const map = observable.map({ a: 1 })
@@ -52,4 +52,37 @@ test("observe computed values", () => {
     f.set(10)
 
     expect(events).toEqual([[6, 0]])
+})
+
+test("observe computed value (fireImmediately)", () => {
+    const events: string[] = []
+
+    const v = observable.box(0)
+    const c = computed(() => v.get())
+
+    c.observe_(e => {
+        events.push(`observe ${e.oldValue} -> ${e.newValue}`)
+    }, true)
+
+    expect(events).toEqual(["observe undefined -> 0"])
+})
+
+test("observe computed value ignores transaction", () => {
+    const events: string[] = []
+
+    const v = observable.box(0)
+    const c = computed(() => v.get())
+
+    c.observe_(e => {
+        events.push(`observe ${e.oldValue} -> ${e.newValue}`)
+    })
+
+    runInAction(() => {
+        events.push("action start")
+        v.set(1)
+        v.set(2)
+        events.push("action end")
+    })
+
+    expect(events).toEqual(["action start", "observe 0 -> 1", "observe 1 -> 2", "action end"])
 })

@@ -64,7 +64,76 @@ test("basic2", function () {
     expect(mobx._isComputingDerivation()).toBe(false)
 })
 
-test("computed with asStructure modifier", function () {
+test("computed with asStructure modifier - reaction", function () {
+    const x1 = observable.box(3)
+    const x2 = observable.box(5)
+    const y = m.computed(
+        function () {
+            return {
+                sum: x1.get() + x2.get()
+            }
+        },
+        { compareStructural: true }
+    )
+    const b = []
+    m.reaction(
+        () => y.get(),
+        v => b.push(v),
+        { fireImmediately: true }
+    )
+
+    expect(8).toBe(y.get().sum)
+
+    x1.set(4)
+    expect(9).toBe(y.get().sum)
+
+    m.transaction(function () {
+        // swap values, computation result is structurally unchanged
+        x1.set(5)
+        x2.set(4)
+    })
+
+    expect(b).toEqual([{ sum: 8 }, { sum: 9 }])
+    expect(mobx._isComputingDerivation()).toBe(false)
+})
+
+test("computed with asStructure modifier - reaction + get computed value", function () {
+    const x1 = observable.box(3)
+    const x2 = observable.box(5)
+    const y = m.computed(
+        function () {
+            return {
+                sum: x1.get() + x2.get()
+            }
+        },
+        { compareStructural: true }
+    )
+    const b = []
+    m.reaction(
+        () => y.get(),
+        v => b.push(v),
+        { fireImmediately: true }
+    )
+
+    expect(8).toBe(y.get().sum)
+
+    x1.set(4)
+    expect(9).toBe(y.get().sum)
+
+    m.transaction(function () {
+        // swap values
+        x1.set(5)
+        y.get() // interferes with `compareStructural: true`
+        x2.set(4)
+    })
+
+    // Reaction is fired twice for `{ sum: 9 }` because of intermediate
+    // `y.get()`
+    expect(b).toEqual([{ sum: 8 }, { sum: 9 }, { sum: 9 }])
+    expect(mobx._isComputingDerivation()).toBe(false)
+})
+
+test("computed with asStructure modifier - observe", function () {
     const x1 = observable.box(3)
     const x2 = observable.box(5)
     const y = m.computed(
@@ -84,12 +153,13 @@ test("computed with asStructure modifier", function () {
     expect(9).toBe(y.get().sum)
 
     m.transaction(function () {
-        // swap values, computation results is structuraly unchanged
+        // swap values
         x1.set(5)
         x2.set(4)
     })
 
-    expect(b.toArray()).toEqual([{ sum: 8 }, { sum: 9 }])
+    // transaction is ignored because `observe` fires immediately
+    expect(b.toArray()).toEqual([{ sum: 8 }, { sum: 9 }, { sum: 10 }, { sum: 9 }])
     expect(mobx._isComputingDerivation()).toBe(false)
 })
 
@@ -222,7 +292,40 @@ test("readme1", function (done) {
     }
 })
 
-test("batch", function () {
+test("batch - reaction", function () {
+    const a = observable.box(2)
+    const b = observable.box(3)
+    const c = computed(function () {
+        return a.get() * b.get()
+    })
+    const d = computed(function () {
+        return c.get() * b.get()
+    })
+    const buf = []
+    m.reaction(
+        () => d.get(),
+        dv => buf.push(dv)
+    )
+
+    a.set(4)
+    b.set(5)
+    // Note, 60 should not happen! (that is d begin computed before c after update of b)
+    expect(buf).toEqual([36, 100])
+
+    const x = mobx.transaction(function () {
+        a.set(2)
+        b.set(3)
+        a.set(6)
+        expect(d.value_).toBe(100) // not updated; in transaction
+        expect(d.get()).toBe(54) // consistent due to inspection
+        return 2
+    })
+
+    expect(x).toBe(2) // test return value
+    expect(buf).toEqual([36, 100, 54]) // only one new value for d
+})
+
+test("batch - observe", function () {
     const a = observable.box(2)
     const b = observable.box(3)
     const c = computed(function () {
@@ -243,13 +346,13 @@ test("batch", function () {
         a.set(2)
         b.set(3)
         a.set(6)
-        expect(d.value_).toBe(100) // not updated; in transaction
+        expect(d.value_).toBe(54) // updated despite transaction
         expect(d.get()).toBe(54) // consistent due to inspection
         return 2
     })
 
     expect(x).toBe(2) // test return value
-    expect(buf.toArray()).toEqual([36, 100, 54]) // only one new value for d
+    expect(buf.toArray()).toEqual([36, 100, 50, 18, 54]) // transaction is ignored by `observe`
 })
 
 test("transaction with inspection", function () {
@@ -746,7 +849,45 @@ test("multiple view dependencies", function () {
     expect(buffer).toEqual([8, 11, 14])
 })
 
-test("nested observable2", function () {
+test("nested observable2 - reaction", function () {
+    const factor = observable.box(0)
+    const price = observable.box(100)
+    let totalCalcs = 0
+    let innerCalcs = 0
+
+    const total = computed(function () {
+        totalCalcs += 1 // outer observable shouldn't recalc if inner observable didn't publish a real change
+        return (
+            price.get() *
+            computed(function () {
+                innerCalcs += 1
+                return factor.get() % 2 === 0 ? 1 : 3
+            }).get()
+        )
+    })
+
+    const b = []
+    m.reaction(
+        () => total.get(),
+        v => b.push(v),
+        { fireImmediately: true }
+    )
+
+    expect(innerCalcs).toBe(1)
+
+    price.set(150)
+    factor.set(7) // triggers innerCalc twice, because changing the outcome triggers the outer calculation which recreates the inner calculation
+    factor.set(5) // doesn't trigger outer calc
+    factor.set(3) // doesn't trigger outer calc
+    factor.set(4) // triggers innerCalc twice
+    price.set(20)
+
+    expect(b).toEqual([100, 150, 450, 150, 20])
+    expect(innerCalcs).toBe(9)
+    expect(totalCalcs).toBe(5)
+})
+
+test("nested observable2 - observe", function () {
     const factor = observable.box(0)
     const price = observable.box(100)
     let totalCalcs = 0
@@ -772,19 +913,21 @@ test("nested observable2", function () {
         true
     )
 
+    expect(innerCalcs).toBe(2) // TODO: Why are there 2 and not 1 inner calls here?
+
     price.set(150)
     factor.set(7) // triggers innerCalc twice, because changing the outcome triggers the outer calculation which recreates the inner calculation
-    factor.set(5) // doesn't trigger outer calc
+    factor.set(5) // triggers outer calc because
     factor.set(3) // doesn't trigger outer calc
     factor.set(4) // triggers innerCalc twice
     price.set(20)
 
     expect(b).toEqual([100, 150, 450, 150, 20])
-    expect(innerCalcs).toBe(9)
-    expect(totalCalcs).toBe(5)
+    expect(innerCalcs).toBe(10) // TODO: Why are there 10 and not 9 inner calls here?
+    expect(totalCalcs).toBe(6) // TODO: Why are there 6 and not 5 outer calls here?
 })
 
-test("observe", function () {
+test("autorun", function () {
     const x = observable.box(3)
     const x2 = computed(function () {
         return x.get() * 2
