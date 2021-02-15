@@ -882,7 +882,7 @@ test("getDebugName(action)", () => {
 })
 
 test("Default debug names - development", () => {
-    expect(mobx.getDebugName(mobx.observable({ x() {} }).x)).toBe("x")
+    expect(mobx.getDebugName(mobx.observable({ x() {} }, { x: mobx.action }).x)).toBe("x")
     expect(/Atom@\d+/.test(mobx.getDebugName(mobx.createAtom()))).toBe(true)
     expect(/ComputedValue@\d+/.test(mobx.getDebugName(mobx.computed(() => {})))).toBe(true)
     expect(mobx.getDebugName(mobx.action(function fn() {}))).toBe("fn")
@@ -916,7 +916,7 @@ test("Default debug names - development", () => {
 test("Default debug names - production", () => {
     const mobx = require(`../../../dist/mobx.cjs.production.min.js`)
 
-    expect(mobx.getDebugName(mobx.observable({ x() {} }).x)).toBe("x") // perhaps should be "<unnamed action>"??
+    expect(mobx.getDebugName(mobx.observable({ x() {} }, { x: mobx.action }).x)).toBe("x") // perhaps should be "<unnamed action>"??
     expect(mobx.getDebugName(mobx.createAtom())).toBe("Atom")
     expect(mobx.getDebugName(mobx.computed(() => {}))).toBe("ComputedValue")
     expect(mobx.getDebugName(mobx.action(function fn() {}))).toBe("fn")
