@@ -120,7 +120,7 @@ function createObservable(v: any, arg2?: any, arg3?: any) {
     if (typeof v === "object" && v !== null) return v
 
     // anything else
-    return observable.box(v)
+    return observable.box(v, arg2)
 }
 Object.assign(createObservable, observableDecoratorAnnotation)
 

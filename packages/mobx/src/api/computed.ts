@@ -54,7 +54,7 @@ export const computed: IComputedFactory = function computed(arg1, arg2) {
     }
     const opts: IComputedValueOptions<any> = isPlainObject(arg2) ? arg2 : {}
     opts.get = arg1
-    opts.name = opts.name || arg1.name || "" /* for generated name */
+    opts.name ||= arg1.name || "" /* for generated name */
 
     return new ComputedValue(opts)
 } as any

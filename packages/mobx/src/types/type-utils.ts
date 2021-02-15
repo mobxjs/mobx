@@ -1,3 +1,4 @@
+import { isAction } from "../api/action"
 import {
     $mobx,
     IDepTreeNode,
@@ -57,9 +58,15 @@ export function getAdministration(thing: any, property?: string) {
 
 export function getDebugName(thing: any, property?: string): string {
     let named
-    if (property !== undefined) named = getAtom(thing, property)
-    else if (isObservableObject(thing) || isObservableMap(thing) || isObservableSet(thing))
+    if (property !== undefined) {
+        named = getAtom(thing, property)
+    } else if (isAction(thing)) {
+        return thing.name
+    } else if (isObservableObject(thing) || isObservableMap(thing) || isObservableSet(thing)) {
         named = getAdministration(thing)
-    else named = getAtom(thing) // valid for arrays as well
+    } else {
+        // valid for arrays as well
+        named = getAtom(thing)
+    }
     return named.name_
 }
