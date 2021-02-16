@@ -1,8 +1,17 @@
 import { ObservableObjectAdministration, isFunction } from "../internal"
 
+export const MAKE_CANCEL = 0
+export const MAKE_BREAK = 1
+export const MAKE_CONTINUE = 2
+
 export type Annotation = {
     annotationType_: string
-    make_(adm: ObservableObjectAdministration, key: PropertyKey): void
+    make_(
+        adm: ObservableObjectAdministration,
+        key: PropertyKey,
+        descriptor: PropertyDescriptor,
+        source: object
+    ): 0 | 1 | 2
     extend_(
         adm: ObservableObjectAdministration,
         key: PropertyKey,

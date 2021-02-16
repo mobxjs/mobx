@@ -3,7 +3,8 @@ import {
     Annotation,
     hasProp,
     createDecoratorAnnotation,
-    ObservableObjectAdministration
+    ObservableObjectAdministration,
+    MAKE_CANCEL
 } from "../internal"
 
 const OVERRIDE = "override"
@@ -18,7 +19,7 @@ export function isOverride(annotation: Annotation): boolean {
     return annotation.annotationType_ === OVERRIDE
 }
 
-function make_(adm: ObservableObjectAdministration, key): void {
+function make_(adm: ObservableObjectAdministration, key): 0 | 1 | 2 {
     // Must not be plain object
     if (__DEV__ && adm.isPlainObject_) {
         die(
@@ -33,6 +34,7 @@ function make_(adm: ObservableObjectAdministration, key): void {
                 `but no such annotated member was found on prototype.`
         )
     }
+    return MAKE_CANCEL
 }
 
 function extend_(adm, key, descriptor, proxyTrap): boolean {
