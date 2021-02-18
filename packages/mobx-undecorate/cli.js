@@ -1,9 +1,17 @@
 #!/usr/bin/env node
 const { spawn } = require("child_process")
-const path = require("path")
+
+if (process.argv.includes("--help")) {
+    console.log(`[MOBX-UNDECORATE]:
+  If experiencing problems, you may also install jscodeshift and mobx-undecorate locally and run 
+  npx jscodeshift -t ./node_modules/mobx-undecorate/src/undecorate.ts --extensions=js,jsx,ts,tsx <directory>
+
+[JSCODESHIFT HELP]:
+`)
+}
 
 spawn(
-    path.join("node_modules", ".bin", "jscodeshift"),
+    "jscodeshift",
     [
         "--extensions=js,jsx,ts,tsx",
         ...process.argv.filter(arg => arg.startsWith("--")),
