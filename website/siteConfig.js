@@ -43,7 +43,7 @@ const siteConfig = {
     // URL for editing docs, usage example: editUrl + 'en/doc1.md'.
     // If this field is omitted, there will be no "Edit this Doc" button
     // for each document.
-    editUrl: "https://github.com/mobxjs/mobx/edit/mobx6/docs/",
+    editUrl: "https://github.com/mobxjs/mobx/edit/main/docs/",
 
     // For top-level user or org sites, the organization is still the same.
     // e.g., for the https://JoelMarcey.github.io site, it would be set like...
