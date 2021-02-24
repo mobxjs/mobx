@@ -113,13 +113,13 @@ Like the `observable` annotation, but only reassignments will be tracked. The as
 
 [**Usage**](observable-state.md#available-annotations): `observable.shallow` _(annotation)_
 
-Like the `observable` annotation, except that any assigned value that is structurally equal to the current value will be ignored.
+Like the `observable.ref` annotation, but for collections. Any collection assigned will be made observable, but the contents of the collection itself won't become observable.
 
 ### `observable.struct`
 
 {🚀} [**Usage**](observable-state.md#available-annotations): `observable.struct` _(annotation)_
 
-Like the `observable.ref` annotation, but for collections. Any collection assigned will be made observable, but the contents of the collection itself won't become observable.
+Like the `observable` annotation, except that any assigned value that is structurally equal to the current value will be ignored.
 
 ### `observable.deep`
 
