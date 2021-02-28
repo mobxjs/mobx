@@ -60,11 +60,12 @@ export function makeAutoObservable<T extends object, AdditionalKeys extends Prop
         return extendObservable(target, target, overrides, options)
     }
 
+    const isValidOverrides = overrides && Object.keys(overrides).length > 0
     const adm: ObservableObjectAdministration = asObservableObject(target, options)[$mobx]
     startBatch()
     try {
         // Use cached inferred annotations if available (only in classes)
-        if (target[inferredAnnotationsSymbol]) {
+        if (target[inferredAnnotationsSymbol] && !isValidOverrides) {
             target[inferredAnnotationsSymbol].forEach((value, key) => adm.make_(key, value))
         } else {
             const ignoreKeys = { [$mobx]: 1, [inferredAnnotationsSymbol]: 1, constructor: 1 }

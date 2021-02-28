@@ -1514,3 +1514,24 @@ test("makeAutoObservable + symbolic keys", () => {
         expect(isAction(foo[actionSymbol])).toBe(true)
     })
 })
+
+test("makeAutoObservable cached inferred annotations #2832", () => {
+    class TestClass {
+        constructor() {
+            makeAutoObservable(this, {
+                setData: action,
+                name: observable.ref
+            })
+        }
+        name: string = "testObj"
+        data: string | null = null
+        setData = (data: string) => {
+            this.data = data
+        }
+    }
+    // @ts-ignore
+    const TestA = new TestClass()
+    const TestB = new TestClass()
+    expect(isAction(TestB["setData"])).toBe(true)
+    expect(isObservableProp(TestB, "name")).toBe(true)
+})
