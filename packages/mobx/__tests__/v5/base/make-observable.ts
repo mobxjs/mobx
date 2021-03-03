@@ -1514,3 +1514,22 @@ test("makeAutoObservable + symbolic keys", () => {
         expect(isAction(foo[actionSymbol])).toBe(true)
     })
 })
+
+test("makeAutoObservable + override + annotation cache #2832", () => {
+    class Clazz {
+        auto = []
+        override = []
+        constructor() {
+            makeAutoObservable(this, {
+                override: observable.ref
+            })
+        }
+    }
+
+    ;[new Clazz(), new Clazz()].forEach(x => {
+        expect(isObservableProp(x, "auto")).toBe(true)
+        expect(isObservable(x.auto)).toBe(true)
+        expect(isObservableProp(x, "override")).toBe(true)
+        expect(isObservable(x.override)).toBe(false)
+    })
+})

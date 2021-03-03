@@ -1,5 +1,11 @@
 # mobx
 
+## 6.1.8
+
+### Patch Changes
+
+-   [`ca4914f9`](https://github.com/mobxjs/mobx/commit/ca4914f978aef427e7b2223328fd66b82e522d89) [#2836](https://github.com/mobxjs/mobx/pull/2836) Thanks [@urugator](https://github.com/urugator)! - Fix [#2832](https://github.com/mobxjs/mobx/issues/2832) - annotation cache ignores overrides
+
 ## 6.1.7
 
 ### Patch Changes
