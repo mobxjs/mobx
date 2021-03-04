@@ -66,6 +66,15 @@ export function makeAutoObservable<T extends object, AdditionalKeys extends Prop
         // Use cached inferred annotations if available (only in classes)
         if (target[inferredAnnotationsSymbol]) {
             target[inferredAnnotationsSymbol].forEach((value, key) => adm.make_(key, value))
+            // Overrides are not cached, unless `true`, see #2832
+            if (overrides) {
+                ownKeys(overrides).forEach(key => {
+                    const annotation = overrides[key]
+                    if (annotation !== true) {
+                        adm.make_(key, annotation)
+                    }
+                })
+            }
         } else {
             const ignoreKeys = { [$mobx]: 1, [inferredAnnotationsSymbol]: 1, constructor: 1 }
             const make = key => {
