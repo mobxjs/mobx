@@ -86,7 +86,7 @@ function interpret_cli_args() {
   //use cwd as default, but will override it with user args if they exist for --dir or --path
   var PARSED_INPUT = ""
 
-  let is_arg_directory_only = fs.existsSync(path.resolve(process.cwd(), process.argv[2]))
+  let is_arg_directory_only = process.argv[2] && fs.existsSync(path.resolve(process.cwd(), (process.argv[2] || "")))
 
   if (is_arg_directory_only) {
     PARSED_INPUT = process.argv[2]
