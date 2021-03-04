@@ -34,7 +34,6 @@ const getCommandPath = binCommand => {
     throw new Error("cannot find jscodeshift path")
     process.exit(0)
   }
-  console.log(COMMAND_PATH)
   return COMMAND_PATH
 
 }
