@@ -1,5 +1,5 @@
 ---
-"mobx": patch
+"mobx": minor
 ---
 
 -   by default all functions are converted to `autoAction`s/`flow`s
