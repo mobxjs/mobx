@@ -3,7 +3,7 @@ const { spawn } = require("child_process")
 const path = require("path")
 
 spawn(
-    path.join("node_modules", ".bin", "jscodeshift"),
+    path.join("jscodeshift"),
     [
         "--extensions=js,jsx,ts,tsx",
         ...process.argv.filter(arg => arg.startsWith("--")),
