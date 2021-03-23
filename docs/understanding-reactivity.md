@@ -33,10 +33,10 @@ class Message {
     author
     likes
     constructor(title, author, likes) {
-        makeAutoObservable(this)
         this.title = title
         this.author = author
         this.likes = likes
+        makeAutoObservable(this)
     }
 
     updateTitle(title) {
