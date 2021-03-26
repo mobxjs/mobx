@@ -18,7 +18,7 @@ const MyComponent = observer(props => ReactElement)
 
 While MobX works independently from React, they are most commonly used together. In [The gist of MobX](the-gist-of-mobx.md) you have already seen the most important part of this integration: the `observer` [HoC](https://reactjs.org/docs/higher-order-components.html) that you can wrap around a React component.
 
-`observer` is provided by a separate React bindings package you choose [during installation](installation.md#installation). In this example, we're going to use the more lightweight [`mobx-react-lite` package](https://github.com/mobxjs/mobx-react-lite).
+`observer` is provided by a separate React bindings package you choose [during installation](installation.md#installation). In this example, we're going to use the more lightweight [`mobx-react-lite` package](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react-lite).
 
 ```javascript
 import React from "react"
