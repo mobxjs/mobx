@@ -135,7 +135,7 @@ Inference rules:
 -   All `get`ters become `computed`.
 -   All `set`ters become `action`.
 -   All *functions on prototype* become `autoAction`.
--   All *generator functions on prototype* become `flow`. (Note that generators functions are not detectable in some transpiler configurations, if flow doesn't work as expected, make sure to specify `flow` explicitly.)
+-   All *generator functions on prototype* become `flow`. (Note that generator functions are not detectable in some transpiler configurations, if flow doesn't work as expected, make sure to specify `flow` explicitly.)
 -   Members marked with `false` in the `overrides` argument will not be annotated. For example, using it for read only fields such as identifiers.
 
 ## `observable`
