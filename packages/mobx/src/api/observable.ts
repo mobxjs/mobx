@@ -28,7 +28,8 @@ import {
     globalState,
     assign,
     isStringish,
-    createObservableAnnotation
+    createObservableAnnotation,
+    createAutoAnnotation
 } from "../internal"
 
 export const OBSERVABLE = "observable"
@@ -82,13 +83,7 @@ export function getEnhancerFromOptions(options: CreateObservableOptions): IEnhan
 export function getAnnotationFromOptions(
     options?: CreateObservableOptions
 ): Annotation | undefined {
-    return options
-        ? options.deep === true
-            ? observableAnnotation
-            : options.deep === false
-            ? observableRefAnnotation
-            : options.defaultDecorator
-        : undefined
+    return options ? options.defaultDecorator ?? createAutoAnnotation(options) : undefined
 }
 
 export function getEnhancerFromAnnotation(annotation?: Annotation): IEnhancer<any> {

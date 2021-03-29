@@ -131,10 +131,11 @@ However, `makeAutoObservable` cannot be used on classes that have super or are [
 
 Inference rules:
 
--   Any (inherited) member that contains a `function` value will be annotated with `autoAction`.
--   Any `get`ter will be annotated with `computed`.
--   Any other _own_ field will be marked with `observable`.
--   Any (inherited) member that is a generator function will be annotated with `flow`. (Note that generators functions are not detectable in some transpiler configurations, if flow doesn't work as expected, make sure to specify `flow` explicitly.)
+-   All *own* properties become `observable`.
+-   All `get`ters become `computed`.
+-   All `set`ters become `action`.
+-   All *functions on prototype* become `autoAction`.
+-   All *generator functions on prototype* become `flow`. (Note that generator functions are not detectable in some transpiler configurations, if flow doesn't work as expected, make sure to specify `flow` explicitly.)
 -   Members marked with `false` in the `overrides` argument will not be annotated. For example, using it for read only fields such as identifiers.
 
 ## `observable`
@@ -220,8 +221,8 @@ Note that it is possible to pass `{ proxy: false }` as an option to `observable`
 
 | Annotation                         | Description                                                                                                                                                                                                                |
 | ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `observable`<br/>`observable.deep` | Defines a trackable field that stores state. Any value assigned to an `observable` field will be made recursively observable as well, if possible. That is, if and only if the value is a plain object, array, Map or Set. |
-| `observable.ref`                   | Like `observable`, but only reassignments will be tracked. The assigned values themselves won't be made observable automatically. For example, use this if you intend to store immutable data in an observable field.      |
+| `observable`<br/>`observable.deep` | Defines a trackable field that stores state. If possible, any value assigned to `observable` is automatically converted to (deep) `observable`, `autoAction` or `flow` based on it's type. Only `plain object`, `array`, `Map`, `Set`, `function`, `generator function` are convertible. Class instances and others are untouched. |
+| `observable.ref`                   | Like `observable`, but only reassignments will be tracked. The assigned values are completely ignored and will NOT be automatically converted to `observable`/`autoAction`/`flow`. For example, use this if you intend to store immutable data in an observable field. |
 | `observable.shallow`               | Like `observable.ref` but for collections. Any collection assigned will be made observable, but the contents of the collection itself won't become observable.                                                             |
 | `observable.struct`                | Like `observable`, except that any assigned value that is structurally equal to the current value will be ignored.                                                                                                         |
 | `action`                           | Mark a method as an action that will modify the state. Check out [actions](actions.md) for more details. Non-writable.                                                                                                     |

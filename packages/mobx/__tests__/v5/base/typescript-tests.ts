@@ -117,11 +117,12 @@ test("observable", () => {
 })
 
 test("annotations", () => {
+    const fn0 = () => 0
     class Order {
         price: number = 3
         amount: number = 2
         orders: string[] = []
-        aFunction = testFunction
+        aFunction = fn0
 
         constructor() {
             makeObservable(this, {
@@ -162,13 +163,11 @@ test("annotations", () => {
     order1.orders.pop()
     t.equal(order1.total, 6)
     t.deepEqual(order1totals, [6, 3, 9])
-
-    t.equal(order1.aFunction, testFunction)
-    const x = function () {
-        return 3
-    }
-    order1.aFunction = x
-    t.equal(order1.aFunction, x)
+    expect(isAction(order1.aFunction)).toBe(true)
+    expect(order1.aFunction()).toBe(0)
+    order1.aFunction = () => 1
+    expect(isAction(order1.aFunction)).toBe(true)
+    expect(order1.aFunction()).toBe(1)
 })
 
 test("scope", () => {

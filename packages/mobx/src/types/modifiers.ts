@@ -9,7 +9,12 @@ import {
     isObservableObject,
     isPlainObject,
     observable,
-    die
+    die,
+    isAction,
+    autoAction,
+    flow,
+    isFlow,
+    isGenerator
 } from "../internal"
 
 export interface IEnhancer<T> {
@@ -25,7 +30,13 @@ export function deepEnhancer(v, _, name) {
     if (isPlainObject(v)) return observable.object(v, undefined, { name })
     if (isES6Map(v)) return observable.map(v, { name })
     if (isES6Set(v)) return observable.set(v, { name })
-
+    if (typeof v === "function" && !isAction(v) && !isFlow(v)) {
+        if (isGenerator(v)) {
+            return flow(v)
+        } else {
+            return autoAction(name, v)
+        }
+    }
     return v
 }
 

@@ -2,7 +2,18 @@
 
 const mobx = require("../../../src/mobx")
 const m = mobx
-const { $mobx, observable, computed, transaction, autorun, extendObservable, makeObservable } = mobx
+const {
+    $mobx,
+    observable,
+    computed,
+    transaction,
+    autorun,
+    extendObservable,
+    makeObservable,
+    isAction,
+    isFlow,
+    isObservableProp
+} = mobx
 const utils = require("../../v5/utils/test-utils")
 
 const voidObserver = function () {}
@@ -2136,4 +2147,46 @@ test("configure({ safeDescriptors: false })", () => {
 
     mobx.configure({ safeDescriptors: true })
     expect(globalState.safeDescriptors).toBe(true)
+})
+
+test("function props are observable auto actions", () => {
+    const o = observable({
+        observable: 0,
+        observableAutoAction() {
+            return this.observable
+        }
+    })
+    expect(isObservableProp(o, "observable")).toBe(true)
+    expect(isObservableProp(o, "observableAutoAction")).toBe(true)
+    expect(isAction(o.observableAutoAction)).toBe(true)
+    const expectedValues = [0]
+    const values = []
+    autorun(() => values.push(o.observableAutoAction()))
+    o.observable++
+    expectedValues.push(1)
+})
+
+test("generator props are observable flows", () => {
+    const o = observable({
+        observable: 0,
+        *observableFlow() {
+            return this.observable
+        }
+    })
+    expect(isObservableProp(o, "observable")).toBe(true)
+    expect(isObservableProp(o, "observableFlow")).toBe(true)
+    expect(isFlow(o.observableFlow)).toBe(true)
+})
+
+test("options can be provided only once", () => {
+    const o = makeObservable({}, {}, { name: "TestObject" })
+    const error = `[MobX] Options can't be provided for already observable objects`
+    expect(() => {
+        extendObservable(o, { x: 0 }, {}, {})
+    }).toThrow(error)
+
+    expect(() => {
+        o.y = 0
+        makeObservable(o, { y: observable }, {})
+    }).toThrow(error)
 })

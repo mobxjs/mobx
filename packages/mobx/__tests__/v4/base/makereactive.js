@@ -202,14 +202,14 @@ test("observable5", function () {
         x.set(7) // set not allowed
     }).toThrow(/It is not possible to assign a new value to a computed value/)
 
-    let f = function () {}
+    let f = m._autoAction(function () {})
     const x2 = m.observable.box(f)
     expect(x2.get()).toBe(f)
     x2.set(null) // allowed
 
-    f = function () {
+    f = m._autoAction(function () {
         return this.price
-    }
+    })
     x = m.observable(
         {
             price: 17,
@@ -219,7 +219,7 @@ test("observable5", function () {
             nonReactive: f
         },
         {
-            nonReactive: m.observable
+            nonReactive: false
         }
     )
 
@@ -233,10 +233,10 @@ test("observable5", function () {
         return 3
     }
     x.nonReactive = three
+
     expect(b.toArray()).toEqual([
         [17, f, 17],
-        [18, f, 18],
-        [18, three, 3]
+        [18, f, 18]
     ])
 })
 
