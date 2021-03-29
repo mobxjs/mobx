@@ -75,6 +75,7 @@ export {
     IObservableFactory,
     CreateObservableOptions,
     computed,
+    IComputedFactory,
     isObservable,
     isObservableProp,
     isComputed,
