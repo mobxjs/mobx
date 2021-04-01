@@ -206,12 +206,16 @@ export function propagateChangeConfirmed(observable: IObservable) {
     observable.lowestObserverState_ = IDerivationState_.STALE_
 
     observable.observers_.forEach(d => {
-        if (d.dependenciesState_ === IDerivationState_.POSSIBLY_STALE_)
+        if (d.dependenciesState_ === IDerivationState_.POSSIBLY_STALE_) {
             d.dependenciesState_ = IDerivationState_.STALE_
-        else if (
+            if (__DEV__ && d.isTracing_ !== TraceMode.NONE) {
+                logTraceInfo(d, observable)
+            }
+        } else if (
             d.dependenciesState_ === IDerivationState_.UP_TO_DATE_ // this happens during computing of `d`, just keep lowestObserverState up to date.
-        )
+        ) {
             observable.lowestObserverState_ = IDerivationState_.UP_TO_DATE_
+        }
     })
     // invariantLOS(observable, "confirmed end");
 }
@@ -225,9 +229,6 @@ export function propagateMaybeChanged(observable: IObservable) {
     observable.observers_.forEach(d => {
         if (d.dependenciesState_ === IDerivationState_.UP_TO_DATE_) {
             d.dependenciesState_ = IDerivationState_.POSSIBLY_STALE_
-            if (__DEV__ && d.isTracing_ !== TraceMode.NONE) {
-                logTraceInfo(d, observable)
-            }
             d.onBecomeStale_()
         }
     })
