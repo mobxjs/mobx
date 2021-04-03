@@ -1,5 +1,35 @@
 # mobx
 
+## 6.2.0
+
+### Minor Changes
+
+-   [`bc8db3df`](https://github.com/mobxjs/mobx/commit/bc8db3df9405034999f8feb8c95ba8045c7ae008) [#2779](https://github.com/mobxjs/mobx/pull/2779) Thanks [@urugator](https://github.com/urugator)! - In mobx5 all own properties were by default observable regardless of their value. Since mobx6 we treat functional properties as `action`s or to be precise `autoAction`s. `autoAction` provides `action`'s benefits to your functions, without the need to explicitely annotate them as `actions`.
+    We think this is useful, but as a consequence, such properties are no longer `observable` and therefore non-writable and also non-enumerable. This turned out to be suprising and inconvinient to some users:
+    https://github.com/mobxjs/mobx/discussions/2760
+    https://github.com/mobxjs/mobx/discussions/2586
+    https://github.com/mobxjs/mobx/issues/2835
+    https://github.com/mobxjs/mobx/issues/2629
+    https://github.com/mobxjs/mobx/issues/2551
+    https://github.com/mobxjs/mobx/issues/2637
+    So we decided to change it: All _own_ props _including functions_ are `observable` (enumerable, writable) as in v5, but additionally all functions that become part of deeply observable structure are by default converted to `autoAction`/`flow`.
+    Note that `deep` option affects this conversion in the same way as it affects conversion of other values (object/array/map/set).
+
+    -   by default all functions are converted to `autoAction`s/`flow`s
+    -   by default all originally _own_ props are now observable and enumerable (as in pre v6)
+    -   `deep: false` ignores _all_ property values (including functions that would be previously converted to `autoAction`/`flow`)
+    -   by default _lone_ setters are converted to `action`s
+
+### Patch Changes
+
+-   [`16cab8b1`](https://github.com/mobxjs/mobx/commit/16cab8b14cf4a0d995d3f367123abfab5aed8326) [#2806](https://github.com/mobxjs/mobx/pull/2806) Thanks [@urugator](https://github.com/urugator)! - Annotations refactor - reduced code duplication
+
+*   [`6b324edc`](https://github.com/mobxjs/mobx/commit/6b324edc69e7e9041a01e20d2e86f424046f3e25) [#2873](https://github.com/mobxjs/mobx/pull/2873) Thanks [@urugator](https://github.com/urugator)! - Fix [#2871](https://github.com/mobxjs/mobx/issues/2871): `toJS` throws with `configure({ useProxies: "ifavailable" })`
+
+-   [`b5141883`](https://github.com/mobxjs/mobx/commit/b5141883434cba86b257d68a7badff5038c14296) [#2872](https://github.com/mobxjs/mobx/pull/2872) Thanks [@urugator](https://github.com/urugator)! - Fix [#2859](https://github.com/mobxjs/mobx/issues/2859): Trace log only if derivation is actually about to re-run
+
+*   [`0945c265`](https://github.com/mobxjs/mobx/commit/0945c26513057457e1534a80558a3eb98487dc96) [#2840](https://github.com/mobxjs/mobx/pull/2840) Thanks [@iChenLei](https://github.com/iChenLei)! - export IComputedFactory typescript type definition
+
 ## 6.1.8
 
 ### Patch Changes
@@ -1108,7 +1138,7 @@ A deprecation message will now be printed if creating computed properties while 
 
 ```javascript
 const x = observable({
-    computedProp: function () {
+    computedProp: function() {
         return someComputation
     }
 })
@@ -1133,7 +1163,7 @@ or alternatively:
 
 ```javascript
 observable({
-    computedProp: computed(function () {
+    computedProp: computed(function() {
         return someComputation
     })
 })
@@ -1151,7 +1181,7 @@ N.B. If you want to introduce actions on an observable that modify its state, us
 ```javascript
 observable({
     counter: 0,
-    increment: action(function () {
+    increment: action(function() {
         this.counter++
     })
 })
@@ -1277,10 +1307,10 @@ function Square() {
     extendObservable(this, {
         length: 2,
         squared: computed(
-            function () {
+            function() {
                 return this.squared * this.squared
             },
-            function (surfaceSize) {
+            function(surfaceSize) {
                 this.length = Math.sqrt(surfaceSize)
             }
         )
