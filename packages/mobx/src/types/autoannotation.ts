@@ -30,7 +30,7 @@ function make_(
     key: PropertyKey,
     descriptor: PropertyDescriptor,
     source: object
-): 0 | 1 | 2 {
+): MakeResult {
     // getter -> computed
     if (descriptor.get) {
         return computed.make_(adm, key, descriptor, source)

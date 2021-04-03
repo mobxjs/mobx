@@ -24,7 +24,7 @@ function make_(
     key: PropertyKey,
     descriptor: PropertyDescriptor,
     source: object
-): 0 | 1 | 2 {
+): MakeResult {
     // own
     if (source === adm.target_) {
         return this.extend_(adm, key, descriptor, false) === null

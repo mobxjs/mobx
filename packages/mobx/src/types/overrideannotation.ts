@@ -19,7 +19,7 @@ export function isOverride(annotation: Annotation): boolean {
     return annotation.annotationType_ === OVERRIDE
 }
 
-function make_(adm: ObservableObjectAdministration, key): 0 | 1 | 2 {
+function make_(adm: ObservableObjectAdministration, key): MakeResult {
     // Must not be plain object
     if (__DEV__ && adm.isPlainObject_) {
         die(

@@ -13,7 +13,7 @@ function make_(
     adm: ObservableObjectAdministration,
     key: PropertyKey,
     descriptor: PropertyDescriptor
-): 0 | 1 | 2 {
+): MakeResult {
     return this.extend_(adm, key, descriptor, false) === null ? MakeResult.Cancel : MakeResult.Break
 }
 
