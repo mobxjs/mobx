@@ -1,12 +1,13 @@
 import {
-    keys,
     isObservable,
     isObservableArray,
     isObservableValue,
     isObservableMap,
     isObservableSet,
-    getPlainObjectKeys,
-    die
+    die,
+    IIsObservableObject,
+    $mobx,
+    objectPrototype
 } from "../internal"
 
 function cache<K, V>(map: Map<any, any>, key: K, value: V): V {
@@ -49,10 +50,11 @@ function toJSHelper(source, __alreadySeen: Map<any, any>) {
         return res
     } else {
         // must be observable object
-        keys(source) // make sure keys are observed
         const res = cache(__alreadySeen, source, {})
-        getPlainObjectKeys(source).forEach((key: any) => {
-            res[key] = toJSHelper(source[key], __alreadySeen)
+        ;((source as any) as IIsObservableObject)[$mobx].ownKeys_().forEach((key: any) => {
+            if (objectPrototype.propertyIsEnumerable.call(source, key)) {
+                res[key] = toJSHelper(source[key], __alreadySeen)
+            }
         })
         return res
     }
