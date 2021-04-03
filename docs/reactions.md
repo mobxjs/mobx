@@ -124,6 +124,7 @@ It is important to note that the side effect _only_ reacts to data that was _acc
 
 The typical pattern is that you produce the things you need in your side effect
 in the _data_ function, and in that way control more precisely when the effect triggers.
+By default, the result of the _data_ function has to change in order for the _effect_ function to be triggered.
 Unlike `autorun`, the side effect won't run once when initialized, but only after the data expression returns a new value for the first time.
 
 <details id="reaction-example"><summary>**Example:** the data and effect functions<a href="#reaction-example" class="tip-anchor"></a></summary>
