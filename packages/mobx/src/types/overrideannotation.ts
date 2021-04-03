@@ -4,7 +4,7 @@ import {
     hasProp,
     createDecoratorAnnotation,
     ObservableObjectAdministration,
-    MAKE_CANCEL
+    MakeResult
 } from "../internal"
 
 const OVERRIDE = "override"
@@ -34,7 +34,7 @@ function make_(adm: ObservableObjectAdministration, key): 0 | 1 | 2 {
                 `but no such annotated member was found on prototype.`
         )
     }
-    return MAKE_CANCEL
+    return MakeResult.Cancel
 }
 
 function extend_(adm, key, descriptor, proxyTrap): boolean {

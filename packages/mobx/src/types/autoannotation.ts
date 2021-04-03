@@ -9,8 +9,7 @@ import {
     computed,
     autoAction,
     isGenerator,
-    MAKE_CANCEL,
-    MAKE_CONTINUE
+    MakeResult
 } from "../internal"
 
 const AUTO = "true"
@@ -46,15 +45,15 @@ function make_(
                 configurable: globalState.safeDescriptors ? adm.isPlainObject_ : true,
                 set
             }) === null
-                ? MAKE_CANCEL
-                : MAKE_CONTINUE
+                ? MakeResult.Cancel
+                : MakeResult.Continue
         }
         // proto
         defineProperty(source, key, {
             configurable: true,
             set
         })
-        return MAKE_CONTINUE
+        return MakeResult.Continue
     }
     // function on proto -> autoAction/flow
     if (source !== adm.target_ && typeof descriptor.value === "function") {

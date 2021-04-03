@@ -1,8 +1,10 @@
 import { ObservableObjectAdministration, isFunction } from "../internal"
 
-export const MAKE_CANCEL = 0
-export const MAKE_BREAK = 1
-export const MAKE_CONTINUE = 2
+export const enum MakeResult {
+    Cancel,
+    Break,
+    Continue
+}
 
 export type Annotation = {
     annotationType_: string
@@ -11,7 +13,7 @@ export type Annotation = {
         key: PropertyKey,
         descriptor: PropertyDescriptor,
         source: object
-    ): 0 | 1 | 2
+    ): MakeResult
     extend_(
         adm: ObservableObjectAdministration,
         key: PropertyKey,

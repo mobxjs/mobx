@@ -7,9 +7,7 @@ import {
     isFunction,
     Annotation,
     globalState,
-    MAKE_BREAK,
-    MAKE_CANCEL,
-    MAKE_CONTINUE
+    MakeResult
 } from "../internal"
 
 export function createActionAnnotation(name: string, options?: object): Annotation {
@@ -26,24 +24,28 @@ function make_(
     key: PropertyKey,
     descriptor: PropertyDescriptor,
     source: object
-): 0 | 1 | 2 {
+): MakeResult {
     // bound
     if (this.options_?.bound) {
-        return this.extend_(adm, key, descriptor, false) === null ? MAKE_CANCEL : MAKE_BREAK
+        return this.extend_(adm, key, descriptor, false) === null
+            ? MakeResult.Cancel
+            : MakeResult.Break
     }
     // own
     if (source === adm.target_) {
-        return this.extend_(adm, key, descriptor, false) === null ? MAKE_CANCEL : MAKE_CONTINUE
+        return this.extend_(adm, key, descriptor, false) === null
+            ? MakeResult.Cancel
+            : MakeResult.Continue
     }
     // prototype
     if (isAction(descriptor.value)) {
         // A prototype could have been annotated already by other constructor,
         // rest of the proto chain must be annotated already
-        return MAKE_BREAK
+        return MakeResult.Break
     }
     const actionDescriptor = createActionDescriptor(adm, this, key, descriptor, false)
     defineProperty(source, key, actionDescriptor)
-    return MAKE_CONTINUE
+    return MakeResult.Continue
 }
 
 function extend_(

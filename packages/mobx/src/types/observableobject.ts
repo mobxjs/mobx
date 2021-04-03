@@ -46,8 +46,7 @@ import {
     getAdministration,
     getDebugName,
     objectPrototype,
-    MAKE_BREAK,
-    MAKE_CANCEL
+    MakeResult
 } from "../internal"
 
 const descriptorCache = Object.create(null)
@@ -256,8 +255,8 @@ export class ObservableObjectAdministration
             const descriptor = getDescriptor(source, key)
             if (descriptor) {
                 const outcome = annotation.make_(this, key, descriptor, source)
-                if (outcome === MAKE_CANCEL) return
-                if (outcome === MAKE_BREAK) break
+                if (outcome === MakeResult.Cancel) return
+                if (outcome === MakeResult.Break) break
             }
             source = Object.getPrototypeOf(source)
         }

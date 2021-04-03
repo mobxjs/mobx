@@ -7,9 +7,7 @@ import {
     isFlow,
     isFunction,
     globalState,
-    MAKE_CANCEL,
-    MAKE_CONTINUE,
-    MAKE_BREAK
+    MakeResult
 } from "../internal"
 
 export function createFlowAnnotation(name: string, options?: object): Annotation {
@@ -29,17 +27,19 @@ function make_(
 ): 0 | 1 | 2 {
     // own
     if (source === adm.target_) {
-        return this.extend_(adm, key, descriptor, false) === null ? MAKE_CANCEL : MAKE_CONTINUE
+        return this.extend_(adm, key, descriptor, false) === null
+            ? MakeResult.Cancel
+            : MakeResult.Continue
     }
     // prototype
     if (isFlow(descriptor.value)) {
         // A prototype could have been annotated already by other constructor,
         // rest of the proto chain must be annotated already
-        return MAKE_BREAK
+        return MakeResult.Break
     }
     const flowDescriptor = createFlowDescriptor(adm, this, key, descriptor, false)
     defineProperty(source, key, flowDescriptor)
-    return MAKE_CONTINUE
+    return MakeResult.Continue
 }
 
 function extend_(

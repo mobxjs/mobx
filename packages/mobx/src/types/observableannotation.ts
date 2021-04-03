@@ -3,8 +3,7 @@ import {
     deepEnhancer,
     die,
     Annotation,
-    MAKE_CANCEL,
-    MAKE_BREAK
+    MakeResult
 } from "../internal"
 
 export function createObservableAnnotation(name: string, options?: object): Annotation {
@@ -21,7 +20,7 @@ function make_(
     key: PropertyKey,
     descriptor: PropertyDescriptor
 ): 0 | 1 | 2 {
-    return this.extend_(adm, key, descriptor, false) === null ? MAKE_CANCEL : MAKE_BREAK
+    return this.extend_(adm, key, descriptor, false) === null ? MakeResult.Cancel : MakeResult.Break
 }
 
 function extend_(

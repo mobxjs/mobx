@@ -1,10 +1,4 @@
-import {
-    ObservableObjectAdministration,
-    die,
-    Annotation,
-    MAKE_BREAK,
-    MAKE_CANCEL
-} from "../internal"
+import { ObservableObjectAdministration, die, Annotation, MakeResult } from "../internal"
 
 export function createComputedAnnotation(name: string, options?: object): Annotation {
     return {
@@ -20,7 +14,7 @@ function make_(
     key: PropertyKey,
     descriptor: PropertyDescriptor
 ): 0 | 1 | 2 {
-    return this.extend_(adm, key, descriptor, false) === null ? MAKE_CANCEL : MAKE_BREAK
+    return this.extend_(adm, key, descriptor, false) === null ? MakeResult.Cancel : MakeResult.Break
 }
 
 function extend_(
