@@ -3,14 +3,11 @@ import {
     createAction,
     isAction,
     defineProperty,
-    getDescriptor,
-    objectPrototype,
     die,
     isFunction,
     Annotation,
-    recordAnnotationApplied,
     globalState,
-    storedAnnotationsSymbol
+    MakeResult
 } from "../internal"
 
 export function createActionAnnotation(name: string, options?: object): Annotation {
@@ -22,54 +19,33 @@ export function createActionAnnotation(name: string, options?: object): Annotati
     }
 }
 
-function make_(adm: ObservableObjectAdministration, key: PropertyKey): void {
-    let annotated = false
-    let source = adm.target_
-    let bound = this.options_?.bound ?? false
-    while (source && source !== objectPrototype) {
-        const descriptor = getDescriptor(source, key)
-        if (descriptor) {
-            // Instance or bound
-            // Keep first because the operation can be intercepted
-            // and we don't want to end up with partially annotated proto chain
-            if (source === adm.target_ || bound) {
-                const actionDescriptor = createActionDescriptor(adm, this, key, descriptor)
-                const definePropertyOutcome = adm.defineProperty_(key, actionDescriptor)
-                if (!definePropertyOutcome) {
-                    // Intercepted
-                    return
-                }
-                annotated = true
-                // Don't annotate protos if bound
-                if (bound) {
-                    break
-                }
-            }
-            // Prototype
-            if (source !== adm.target_) {
-                if (isAction(descriptor.value)) {
-                    // A prototype could have been annotated already by other constructor,
-                    // rest of the proto chain must be annotated already
-                    annotated = true
-                    break
-                }
-                const actionDescriptor = createActionDescriptor(adm, this, key, descriptor, false)
-                defineProperty(source, key, actionDescriptor)
-                annotated = true
-            }
-        }
-        source = Object.getPrototypeOf(source)
+function make_(
+    adm: ObservableObjectAdministration,
+    key: PropertyKey,
+    descriptor: PropertyDescriptor,
+    source: object
+): MakeResult {
+    // bound
+    if (this.options_?.bound) {
+        return this.extend_(adm, key, descriptor, false) === null
+            ? MakeResult.Cancel
+            : MakeResult.Break
     }
-    if (annotated) {
-        recordAnnotationApplied(adm, this, key)
-    } else if (!adm.target_[storedAnnotationsSymbol]?.[key]) {
-        // Throw on missing key, except for decorators:
-        // Decorator annotations are collected from whole prototype chain.
-        // When called from super() some props may not exist yet.
-        // However we don't have to worry about missing prop,
-        // because the decorator must have been applied to something.
-        die(1, this.annotationType_, `${adm.name_}.${key.toString()}`)
+    // own
+    if (source === adm.target_) {
+        return this.extend_(adm, key, descriptor, false) === null
+            ? MakeResult.Cancel
+            : MakeResult.Continue
     }
+    // prototype
+    if (isAction(descriptor.value)) {
+        // A prototype could have been annotated already by other constructor,
+        // rest of the proto chain must be annotated already
+        return MakeResult.Break
+    }
+    const actionDescriptor = createActionDescriptor(adm, this, key, descriptor, false)
+    defineProperty(source, key, actionDescriptor)
+    return MakeResult.Continue
 }
 
 function extend_(

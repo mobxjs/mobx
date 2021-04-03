@@ -44,7 +44,9 @@ import {
     defineProperty,
     autoAnnotation,
     getAdministration,
-    getDebugName
+    getDebugName,
+    objectPrototype,
+    MakeResult
 } from "../internal"
 
 const descriptorCache = Object.create(null)
@@ -236,7 +238,29 @@ export class ObservableObjectAdministration
             return
         }
         assertAnnotable(this, annotation, key)
-        annotation.make_(this, key)
+        if (!(key in this.target_)) {
+            // Throw on missing key, except for decorators:
+            // Decorator annotations are collected from whole prototype chain.
+            // When called from super() some props may not exist yet.
+            // However we don't have to worry about missing prop,
+            // because the decorator must have been applied to something.
+            if (this.target_[storedAnnotationsSymbol]?.[key]) {
+                return // will be annotated by subclass constructor
+            } else {
+                die(1, annotation.annotationType_, `${this.name_}.${key.toString()}`)
+            }
+        }
+        let source = this.target_
+        while (source && source !== objectPrototype) {
+            const descriptor = getDescriptor(source, key)
+            if (descriptor) {
+                const outcome = annotation.make_(this, key, descriptor, source)
+                if (outcome === MakeResult.Cancel) return
+                if (outcome === MakeResult.Break) break
+            }
+            source = Object.getPrototypeOf(source)
+        }
+        recordAnnotationApplied(this, annotation, key)
     }
 
     /**
