@@ -463,3 +463,76 @@ test("set - set, remove, keys are reactive", () => {
 
     expect(snapshots).toEqual([[1, 2], [1], [1, 3], [1, 3, 4], [1, 4]])
 })
+
+test("defineProperty - configurable: false", () => {
+    const obj = mobx.observable({})
+    const desc = {
+        enumerable: true,
+        configurable: false,
+        writable: true,
+        value: 0
+    }
+    mobx.defineProperty(obj, "foo", desc)
+    expect(Object.getOwnPropertyDescriptor(obj, "foo")).toEqual(desc)
+    expect(mobx.isObservableProp(obj, "foo")).toBe(false)
+    obj.foo++
+    expect(obj.foo).toBe(1)
+    expect(() => mobx.extendObservable(obj, { foo: 0 })).toThrow(TypeError)
+    expect(() => mobx.makeObservable(obj, { foo: mobx.observable })).toThrow(TypeError)
+    expect(() => mobx.defineProperty(obj, "foo", { configurable: false })).toThrow(TypeError)
+})
+
+test("defineProperty - writable: false", () => {
+    const obj = mobx.observable({})
+    const desc = {
+        enumerable: true,
+        configurable: true,
+        writable: false,
+        value: 0
+    }
+    mobx.defineProperty(obj, "foo", desc)
+    expect(Object.getOwnPropertyDescriptor(obj, "foo")).toEqual(desc)
+    expect(mobx.isObservableProp(obj, "foo")).toBe(false)
+    expect(() => obj.foo++).toThrow(TypeError)
+    mobx.extendObservable(obj, { foo: 0 })
+    expect(mobx.isObservableProp(obj, "foo")).toBe(true)
+    obj.foo++
+    expect(obj.foo).toBe(1)
+})
+
+test("defineProperty - redefine observable", () => {
+    const obj = mobx.observable({ foo: 0 })
+    expect(mobx.isObservableProp(obj, "foo")).toBe(true)
+    const desc = {
+        enumerable: true,
+        configurable: true,
+        writable: false,
+        value: 0
+    }
+    mobx.defineProperty(obj, "foo", desc)
+    expect(Object.getOwnPropertyDescriptor(obj, "foo")).toEqual(desc)
+    expect(mobx.isObservableProp(obj, "foo")).toBe(false)
+})
+
+test("defineProperty notifies keys observers", () => {
+    const obj = mobx.observable({})
+    let reactionCount = 0
+    reaction(
+        () => mobx.keys(obj),
+        () => reactionCount++
+    )
+
+    const desc = {
+        enumerable: true,
+        configurable: true,
+        writable: true,
+        value: 0
+    }
+    mobx.defineProperty(obj, "foo", desc)
+    expect(Object.getOwnPropertyDescriptor(obj, "foo")).toEqual(desc)
+    expect(mobx.isObservableProp(obj, "foo")).toBe(false)
+    expect(reactionCount).toBe(1)
+    mobx.remove(obj, 'foo')
+    expect(obj.hasOwnProperty("foo")).toBe(false)
+    expect(reactionCount).toBe(2)
+})

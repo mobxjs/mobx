@@ -4,7 +4,7 @@ const utils = require("../../v5/utils/test-utils")
 
 const { observable, computed, $mobx, autorun } = mobx
 
-const voidObserver = function () {}
+const voidObserver = function () { }
 
 function checkGlobalState() {
     const gs = mobx._getGlobalState()
@@ -148,7 +148,7 @@ test("deny state changes in views", function () {
 
     m.reaction(
         () => z.get(),
-        () => {}
+        () => { }
     )
     expect(
         utils.grabConsole(() => {
@@ -194,7 +194,7 @@ test("deny array change in view", function (done) {
     }).not.toThrow()
     m.reaction(
         () => z.length,
-        () => {}
+        () => { }
     )
 
     expect(
@@ -854,7 +854,7 @@ describe("es5 compat warnings", () => {
             }
         })
         expect(e).toMatchInlineSnapshot(
-            `[Error: [MobX] MobX is currently configured to be able to run in ES5 mode, but in ES5 MobX won't be able to iterate keys to detect added / removed properties. Use \`keys\` from 'mobx' instead.]`
+            `[Error: [MobX] MobX is currently configured to be able to run in ES5 mode, but in ES5 MobX won't be able to iterate keys to detect added / removed properties. Use 'keys' from 'mobx' instead.]`
         )
     })
 
@@ -866,4 +866,4 @@ describe("es5 compat warnings", () => {
     })
 })
 
-test("should throw when adding properties in ES5 compat mode", () => {})
+test("should throw when adding properties in ES5 compat mode", () => { })

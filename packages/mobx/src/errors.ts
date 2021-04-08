@@ -3,6 +3,8 @@ const niceErrors = {
     1(annotationType, key: PropertyKey) {
         return `Cannot apply '${annotationType}' to '${key.toString()}': Field not found.`
     },
+    3: "'ownKeys()' can only be used on observable objects",
+    4: "'defineProperty()' can only be used on observable objects",
     5: "'keys()' can only be used on observable objects, arrays, sets and maps",
     6: "'values()' can only be used on observable objects, arrays, sets and maps",
     7: "'entries()' can only be used on observable objects, arrays and maps",
