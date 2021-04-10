@@ -1,5 +1,11 @@
 # mobx-undecorate
 
+## 1.1.0
+
+### Minor Changes
+
+-   [`737cc0bf`](https://github.com/mobxjs/mobx/commit/737cc0bf7ae787ec6c36e1550772a574f67e87d5) [#2818](https://github.com/mobxjs/mobx/pull/2818) Thanks [@jeremy-coleman](https://github.com/jeremy-coleman)! - modify cli to use system path for jscodeshift instead of relative path
+
 ## 1.0.7
 
 ### Patch Changes
