@@ -3,8 +3,17 @@ const niceErrors = {
     1(annotationType, key: PropertyKey) {
         return `Cannot apply '${annotationType}' to '${key.toString()}': Field not found.`
     },
-    3: "'ownKeys()' can only be used on observable objects",
-    4: "'defineProperty()' can only be used on observable objects",
+    /*
+    2(prop) {
+        return `invalid decorator for '${prop.toString()}'`
+    },
+    3(prop) {
+        return `Cannot decorate '${prop.toString()}': action can only be used on properties with a function value.`
+    },
+    4(prop) {
+        return `Cannot decorate '${prop.toString()}': computed can only be used on getter properties.`
+    },
+    */
     5: "'keys()' can only be used on observable objects, arrays, sets and maps",
     6: "'values()' can only be used on observable objects, arrays, sets and maps",
     7: "'entries()' can only be used on observable objects, arrays and maps",
@@ -61,7 +70,9 @@ const niceErrors = {
     36: "isolateGlobalState should be called before MobX is running any reactions",
     37(method) {
         return `[mobx] \`observableArray.${method}()\` mutates the array in-place, which is not allowed inside a derivation. Use \`array.slice().${method}()\` instead`
-    }
+    },
+    38: "'ownKeys()' can only be used on observable objects",
+    39: "'defineProperty()' can only be used on observable objects"
 } as const
 
 const errors: typeof niceErrors = __DEV__ ? niceErrors : ({} as any)
