@@ -163,12 +163,12 @@ export function apiDefineProperty(obj: Object, key: PropertyKey, descriptor: Pro
     if (isObservableObject(obj)) {
         return ((obj as any) as IIsObservableObject)[$mobx].defineProperty_(key, descriptor)
     }
-    die(4)
+    die(39)
 }
 
 export function apiOwnKeys(obj: Object) {
     if (isObservableObject(obj)) {
         return ((obj as any) as IIsObservableObject)[$mobx].ownKeys_()
     }
-    die(3)
+    die(38)
 }
