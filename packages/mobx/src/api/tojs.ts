@@ -5,8 +5,7 @@ import {
     isObservableMap,
     isObservableSet,
     die,
-    IIsObservableObject,
-    $mobx,
+    apiOwnKeys,
     objectPrototype
 } from "../internal"
 
@@ -51,7 +50,7 @@ function toJSHelper(source, __alreadySeen: Map<any, any>) {
     } else {
         // must be observable object
         const res = cache(__alreadySeen, source, {})
-        ;((source as any) as IIsObservableObject)[$mobx].ownKeys_().forEach((key: any) => {
+        apiOwnKeys(source).forEach((key: any) => {
             if (objectPrototype.propertyIsEnumerable.call(source, key)) {
                 res[key] = toJSHelper(source[key], __alreadySeen)
             }

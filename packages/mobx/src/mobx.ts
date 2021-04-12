@@ -100,6 +100,8 @@ export {
     remove,
     has,
     get,
+    apiOwnKeys as ownKeys,
+    apiDefineProperty as defineProperty,
     configure,
     onBecomeObserved,
     onBecomeUnobserved,
