@@ -37,7 +37,7 @@ Their read operations will still be tracked when they are called from a reaction
 <!--class + makeObservable-->
 
 ```javascript
-import { makeObservable, observable, computed, action } from "mobx"
+import { makeObservable, observable, computed, action, flow } from "mobx"
 
 class Doubler {
     value
