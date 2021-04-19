@@ -4,6 +4,7 @@ import {
     isObservableValue,
     isObservableMap,
     isObservableSet,
+    isComputedValue,
     die,
     apiOwnKeys,
     objectPrototype
@@ -23,7 +24,8 @@ function toJSHelper(source, __alreadySeen: Map<any, any>) {
     )
         return source
 
-    if (isObservableValue(source)) return toJSHelper(source.get(), __alreadySeen)
+    if (isObservableValue(source) || isComputedValue(source))
+        return toJSHelper(source.get(), __alreadySeen)
     if (__alreadySeen.has(source)) {
         return __alreadySeen.get(source)
     }
