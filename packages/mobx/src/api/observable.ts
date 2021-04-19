@@ -60,14 +60,14 @@ export function asCreateObservableOptions(thing: any): CreateObservableOptions {
     return thing || defaultCreateObservableOptions
 }
 
-const observableAnnotation = createObservableAnnotation("observable")
-const observableRefAnnotation = createObservableAnnotation("observable.ref", {
+const observableAnnotation = createObservableAnnotation(OBSERVABLE)
+const observableRefAnnotation = createObservableAnnotation(OBSERVABLE_REF, {
     enhancer: referenceEnhancer
 })
-const observableShallowAnnotation = createObservableAnnotation("observable.shallow", {
+const observableShallowAnnotation = createObservableAnnotation(OBSERVABLE_SHALLOW, {
     enhancer: shallowEnhancer
 })
-const observableStructAnnotation = createObservableAnnotation("observable.struct", {
+const observableStructAnnotation = createObservableAnnotation(OBSERVABLE_STRUCT, {
     enhancer: refStructEnhancer
 })
 const observableDecoratorAnnotation = createDecoratorAnnotation(observableAnnotation)
