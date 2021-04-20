@@ -175,12 +175,12 @@ Support the ongoing maintenance at: https://opencollective.com/mobx
 
 ### New features
 
--   [`makeObservable(target, annotations)`](./docs/observable-state.md#makeobservable) is now the recommended way to make objects with a fixed shape observable, such as classes.
--   [`makeAutoObservable(target)`](./docs/observable-state.md#makeautoobservable) will automatically determine the annotations used by `makeObservable`. Methods will be marked as 'autoAction', so that they can be used both from a computed value or as standalone method.
--   MobX 6 can be used in both modern environments, and environments that don't support Proxy. So both MobX 4 and 5 users can upgrade to 6. See [proxy support](./docs/configuration.md#proxy-support) for more details.
+-   [`makeObservable(target, annotations)`](../../docs/observable-state.md#makeobservable) is now the recommended way to make objects with a fixed shape observable, such as classes.
+-   [`makeAutoObservable(target)`](../../docs/observable-state.md#makeautoobservable) will automatically determine the annotations used by `makeObservable`. Methods will be marked as 'autoAction', so that they can be used both from a computed value or as standalone method.
+-   MobX 6 can be used in both modern environments, and environments that don't support Proxy. So both MobX 4 and 5 users can upgrade to 6. See [proxy support](../../docs/configuration.md#proxy-support) for more details.
 -   `observable.array` now supports `{ proxy: false }` as option.
 -   `reaction`'s effect function now receives the previous value seen by the reaction as second argument.
--   `flow` can now be used as annotation as well. You might need `flowResult` in case you use TypeScript to extract the correct result type. [details](./docs/actions.md#using-flow-instead-of-async--await-).
+-   `flow` can now be used as annotation as well. You might need `flowResult` in case you use TypeScript to extract the correct result type. [details](../../docs/actions.md#using-flow-instead-of-async--await-).
 
 ### Breaking changes
 
@@ -188,7 +188,7 @@ Support the ongoing maintenance at: https://opencollective.com/mobx
 
 -   The `decorate` API has been removed, and needs to be replaced by `makeObservable` in the constructor of the targeted class. It accepts the same arguments. The `mobx-undecorate` can transform this automatically.
 -   When using `extendObservable` / `observable`, fields that contained functions used to be turned into observables. This is no longer the case, they will be converted into `autoActions`.
--   [Strict mode](./docs/configuration.md#enforceactions) for actions is now enabled by default in `observed` mode.
+-   [Strict mode](../../docs/configuration.md#enforceactions) for actions is now enabled by default in `observed` mode.
 -   `toJS` no longer takes any options. It no longer converts Maps and Sets to plain data structures. Generic, flexible serialization of data structures is out of scope for the MobX project, and writing custom serialization methods is a much more scalable approach to serialization (tip: leverage `computed`s to define how class instances should be serialized).
 -   The methods `intercept` and `observe` are no longer exposed on observable arrays, maps and boxed observables. Import them as utility from mobx instead: `import { observe, intercept } from "mobx"`, and pass the collection as first argument: `observer(collection, callback)`. Note that we still recommend to avoid these APIs.
 -   `observableMap.toPOJO()`, `observableMap.toJS()` have been dropped. Use `new Map(observableMap)` instead if you want to convert an observable map to a plain Map shallowly.
