@@ -6,9 +6,9 @@ import {
     Annotation,
     isStringish,
     storeAnnotation,
-    createFlowAnnotation
+    createFlowAnnotation,
+    createDecoratorAnnotation
 } from "../internal"
-import { createDecoratorAnnotation } from "./decorators"
 
 export const FLOW = "flow"
 
