@@ -514,3 +514,12 @@ test("verify #2519", done => {
         })
     }, 10)
 })
+
+test("flow is called with correct context", async () => {
+    const thisArg = {}
+    const f = flow(function* () {
+        yield delay(100)
+        expect(this).toBe(thisArg)
+    })
+    await f.call(thisArg)
+})
