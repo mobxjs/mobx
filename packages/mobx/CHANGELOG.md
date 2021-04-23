@@ -1,5 +1,15 @@
 # mobx
 
+## 6.3.0
+
+### Minor Changes
+
+-   [`035bf409`](https://github.com/mobxjs/mobx/commit/035bf4096dd72d296af1fc25304adaade73cc7eb) [#2906](https://github.com/mobxjs/mobx/pull/2906) Thanks [@urugator](https://github.com/urugator)! - Provide `flow.bound` annotation/decorator
+
+### Patch Changes
+
+-   [`3dedb4d4`](https://github.com/mobxjs/mobx/commit/3dedb4d4b5376f3991183923838da942a9a81506) [#2904](https://github.com/mobxjs/mobx/pull/2904) Thanks [@ahoisl](https://github.com/ahoisl)! - Make toJS work with computed value props
+
 ## 6.2.0
 
 ### Minor Changes
