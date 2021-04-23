@@ -312,7 +312,7 @@ test("#285 non-mobx class instances with toJS", () => {
 })
 
 test("verify #566 solution", () => {
-    function MyClass() { }
+    function MyClass() {}
     const a = new MyClass()
     const b = mobx.observable({ x: 3 })
     const c = mobx.observable({ a: a, b: b })
@@ -369,12 +369,20 @@ describe("recurseEverything set to true", function () {
 })
 
 test("Does not throw on object with configure({ useProxies: 'ifavailable'}) #2871", () => {
-    const { useProxies } = mobx._resetGlobalState;
+    const { useProxies } = mobx._resetGlobalState
     mobx.configure({ useProxies: "ifavailable" })
     expect(() => {
-        const o = mobx.observable({ key: "value" });
+        const o = mobx.observable({ key: "value" })
         const dispose = mobx.autorun(() => mobx.toJS(o))
-        dispose();
-    }).not.toThrow();
+        dispose()
+    }).not.toThrow()
     mobx.configure({ useProxies })
+})
+
+test("Correctly converts observable objects with computed values", () => {
+    const a = observable({ key: "value" })
+    const c = observable({ computedValue: mobx.computed(() => a.key) })
+
+    const j = mobx.toJS(c)
+    expect(j).toMatchObject({ computedValue: "value" })
 })

@@ -356,3 +356,11 @@ test("map to JS", () => {
     }
     new MyClass()
 })
+
+test("Correctly converts observable objects with computed values", () => {
+    const a = observable({ key: "value" })
+    const c = observable({ computedValue: mobx.computed(() => a.key) })
+
+    const j = mobx.toJS(c)
+    expect(j).toMatchObject({ computedValue: "value" })
+})
