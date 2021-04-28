@@ -179,10 +179,10 @@ class Doubler {
         makeAutoObservable(this, {}, { autoBind: true })
     }
 
-    increment = () => {
+    increment() {
         this.value++
         this.value++
-    };
+    }
 
     *flow() {
         this.value = yield fetch("http://example.com/value")
