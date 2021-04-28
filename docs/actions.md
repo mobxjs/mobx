@@ -185,7 +185,8 @@ class Doubler {
     }
 
     *flow() {
-        this.value = yield fetch("http://example.com/value")
+        const response = yield fetch("http://example.com/value")
+        this.value = yield response.json()
     }
 }
 ```
