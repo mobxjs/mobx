@@ -10,7 +10,7 @@ hide_title: true
 
 Usage:
 
--   `action`, _(annotation)_
+-   `action` _(annotation)_
 -   `action(fn)`
 -   `action(name, fn)`
 
