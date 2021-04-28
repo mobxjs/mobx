@@ -131,11 +131,11 @@ However, `makeAutoObservable` cannot be used on classes that have super or are [
 
 Inference rules:
 
--   All *own* properties become `observable`.
+-   All _own_ properties become `observable`.
 -   All `get`ters become `computed`.
 -   All `set`ters become `action`.
--   All *functions on prototype* become `autoAction`.
--   All *generator functions on prototype* become `flow`. (Note that generator functions are not detectable in some transpiler configurations, if flow doesn't work as expected, make sure to specify `flow` explicitly.)
+-   All _functions on prototype_ become `autoAction`.
+-   All _generator functions on prototype_ become `flow`. (Note that generator functions are not detectable in some transpiler configurations, if flow doesn't work as expected, make sure to specify `flow` explicitly.)
 -   Members marked with `false` in the `overrides` argument will not be annotated. For example, using it for read only fields such as identifiers.
 
 ## `observable`
@@ -219,21 +219,22 @@ Note that it is possible to pass `{ proxy: false }` as an option to `observable`
 
 ## Available annotations
 
-| Annotation                         | Description                                                                                                                                                                                                                |
-| ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Annotation                         | Description                                                                                                                                                                                                                                                                                                                        |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `observable`<br/>`observable.deep` | Defines a trackable field that stores state. If possible, any value assigned to `observable` is automatically converted to (deep) `observable`, `autoAction` or `flow` based on it's type. Only `plain object`, `array`, `Map`, `Set`, `function`, `generator function` are convertible. Class instances and others are untouched. |
-| `observable.ref`                   | Like `observable`, but only reassignments will be tracked. The assigned values are completely ignored and will NOT be automatically converted to `observable`/`autoAction`/`flow`. For example, use this if you intend to store immutable data in an observable field. |
-| `observable.shallow`               | Like `observable.ref` but for collections. Any collection assigned will be made observable, but the contents of the collection itself won't become observable.                                                             |
-| `observable.struct`                | Like `observable`, except that any assigned value that is structurally equal to the current value will be ignored.                                                                                                         |
-| `action`                           | Mark a method as an action that will modify the state. Check out [actions](actions.md) for more details. Non-writable.                                                                                                     |
-| `action.bound`                     | Like action, but will also bind the action to the instance so that `this` will always be set. Non-writable.                                                                                                                |
-| `computed`                         | Can be used on a [getter](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get) to declare it as a derived value that can be cached. Check out [computeds](computeds.md) for more details.      |
-| `computed.struct`                  | Like `computed`, except that if after recomputing the result is structurally equal to the previous result, no observers will be notified.                                                                                  |
-| `true`                             | Infer the best annotation. Check out [makeAutoObservable](#makeautoobservable) for more details.                                                                                                                           |
-| `false`                            | Explicitly do not annotate this property.                                                                                                                                                                                  |
-| `flow`                             | Creates a `flow` to manage asynchronous processes. Check out [flow](actions.md#using-flow-instead-of-async--await-) for more details. Note that the inferred return type in TypeScript might be off. Non-writable.         |
-| `override`                         | [Applicable to inherited `action`, `flow`, `computed`, `action.bound` overriden by subclass](subclassing.md).                                                                                                              |
-| `autoAction`                       | Should not be used explicitly, but is used under the hood by `makeAutoObservable` to mark methods that can act as action or derivation, based on their calling context.                                                    |
+| `observable.ref`                   | Like `observable`, but only reassignments will be tracked. The assigned values are completely ignored and will NOT be automatically converted to `observable`/`autoAction`/`flow`. For example, use this if you intend to store immutable data in an observable field.                                                             |
+| `observable.shallow`               | Like `observable.ref` but for collections. Any collection assigned will be made observable, but the contents of the collection itself won't become observable.                                                                                                                                                                     |
+| `observable.struct`                | Like `observable`, except that any assigned value that is structurally equal to the current value will be ignored.                                                                                                                                                                                                                 |
+| `action`                           | Mark a method as an action that will modify the state. Check out [actions](actions.md) for more details. Non-writable.                                                                                                                                                                                                             |
+| `action.bound`                     | Like action, but will also bind the action to the instance so that `this` will always be set. Non-writable.                                                                                                                                                                                                                        |
+| `computed`                         | Can be used on a [getter](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get) to declare it as a derived value that can be cached. Check out [computeds](computeds.md) for more details.                                                                                                              |
+| `computed.struct`                  | Like `computed`, except that if after recomputing the result is structurally equal to the previous result, no observers will be notified.                                                                                                                                                                                          |
+| `true`                             | Infer the best annotation. Check out [makeAutoObservable](#makeautoobservable) for more details.                                                                                                                                                                                                                                   |
+| `false`                            | Explicitly do not annotate this property.                                                                                                                                                                                                                                                                                          |
+| `flow`                             | Creates a `flow` to manage asynchronous processes. Check out [flow](actions.md#using-flow-instead-of-async--await-) for more details. Note that the inferred return type in TypeScript might be off. Non-writable.                                                                                                                 |
+| `flow.bound`                       | Like flow, but will also bind the flow to the instance so that `this` will always be set. Non-writable.                                                                                                                                                                                                                            |
+| `override`                         | [Applicable to inherited `action`, `flow`, `computed`, `action.bound` overriden by subclass](subclassing.md).                                                                                                                                                                                                                      |
+| `autoAction`                       | Should not be used explicitly, but is used under the hood by `makeAutoObservable` to mark methods that can act as action or derivation, based on their calling context.                                                                                                                                                            |
 
 ## Limitations
 
@@ -258,9 +259,9 @@ Note that it is possible to pass `{ proxy: false }` as an option to `observable`
 
 The above APIs take an optional `options` argument which is an object that supports the following options:
 
--   **`autoBind: true`** uses `action.bound` by default, rather than `action`. Does not affect explicitely annotated members.
+-   **`autoBind: true`** uses `action.bound`/`flow.bound` by default, rather than `action`/`flow`. Does not affect explicitely annotated members.
 -   **`deep: false`** uses `observable.ref` by default, rather than `observable`. Does not affect explicitely annotated members.
--   **`name: <string>`** gives the object a debug name that is printed in error messages and reflection APIs. Ignored on production.
+-   **`name: <string>`** gives the object a debug name that is printed in error messages and reflection APIs.
 -   **`proxy: false`** forces `observable(thing)` to use non-[**proxy**](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) implementation. This is a good option if the shape of the object will not change over time, as non-proxied objects are easier to debug and faster. See [avoiding proxies](#avoid-proxies).
 
 <details id="one-options-per-target"><summary>**Note:** options are *sticky* and can be provided only once<a href="#one-options-per-target" class="tip-anchor"></a></summary>
