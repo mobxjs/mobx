@@ -167,7 +167,7 @@ Usage:
 
 The `action.bound` annotation can be used to automatically bind a method to the correct instance, so that `this` is always correctly bound inside the function.
 
-<details id="auto-bind"><summary>**Tip:** use `makeAutoObservable(o, {}, { autoBind: true })` to bind all actions automatically<a href="#avoid-bound" class="tip-anchor"></a></summary>
+<details id="auto-bind"><summary>**Tip:** use `makeAutoObservable(o, {}, { autoBind: true })` to bind all actions and flows automatically<a href="#avoid-bound" class="tip-anchor"></a></summary>
 
 ```javascript
 import { makeAutoObservable } from "mobx"
@@ -176,12 +176,17 @@ class Doubler {
     value = 0
 
     constructor(value) {
-        makeAutoObservable(this)
+        makeAutoObservable(this, {}, { autoBind: true })
     }
 
-    increment = () => {
+    increment() {
         this.value++
         this.value++
+    }
+
+    *flow() {
+        const response = yield fetch("http://example.com/value")
+        this.value = yield response.json()
     }
 }
 ```
@@ -218,7 +223,7 @@ class Parent {
         })
     }
 }
-class Child {
+class Child extends Parent {
     // THROWS: TypeError: Cannot redefine property: arrowAction
     arrowAction = () => {}
 
@@ -446,6 +451,15 @@ const projects = await store.fetchProjects()
 The upside is that we don't need `flowResult` anymore, the downside is that `this` needs to be typed to make sure its type is inferred correctly.
 
 </details>
+
+## `flow.bound`
+
+Usage:
+
+-   `flow.bound` _(annotation)_
+
+The `flow.bound` annotation can be used to automatically bind a method to the correct instance, so that `this` is always correctly bound inside the function.
+Similary to actions, flows can be bound by default using [`autoBind` option](#auto-bind).
 
 ## Cancelling flows {🚀}
 
