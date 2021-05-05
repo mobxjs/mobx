@@ -86,14 +86,14 @@ export function autorun(
     return reaction.getDisposer_()
 }
 
-export type IReactionOptions = IAutorunOptions & {
+export type IReactionOptions<T> = IAutorunOptions & {
     fireImmediately?: boolean
-    equals?: IEqualsComparer<any>
+    equals?: IEqualsComparer<T>
 }
 
 const run = (f: Lambda) => f()
 
-function createSchedulerFromOptions(opts: IReactionOptions) {
+function createSchedulerFromOptions(opts: IAutorunOptions) {
     return opts.scheduler
         ? opts.scheduler
         : opts.delay
@@ -104,7 +104,7 @@ function createSchedulerFromOptions(opts: IReactionOptions) {
 export function reaction<T>(
     expression: (r: IReactionPublic) => T,
     effect: (arg: T, prev: T, r: IReactionPublic) => void,
-    opts: IReactionOptions = EMPTY_OBJECT
+    opts: IReactionOptions<T> = EMPTY_OBJECT
 ): IReactionDisposer {
     if (__DEV__) {
         if (!isFunction(expression) || !isFunction(effect))
@@ -124,7 +124,7 @@ export function reaction<T>(
     let value: T
     let oldValue: T = undefined as any // only an issue with fireImmediately
 
-    const equals = (opts as any).compareStructural
+    const equals: IEqualsComparer<T> = (opts as any).compareStructural
         ? comparer.structural
         : opts.equals || comparer.default
 
