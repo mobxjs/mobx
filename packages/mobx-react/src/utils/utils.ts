@@ -56,6 +56,7 @@ const hoistBlackList = {
     getDerivedStateFromError: 1,
     getDerivedStateFromProps: 1,
     mixins: 1,
+    displayName: 1,
     propTypes: 1
 }
 
