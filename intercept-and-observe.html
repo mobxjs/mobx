@@ -1,0 +1,217 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Intercept &amp; Observe · MobX</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="&lt;script async type=&quot;text/javascript&quot; src=&quot;//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&amp;placement=mobxjsorg&quot; id=&quot;_carbonads_js&quot;&gt;&lt;/script&gt;"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Intercept &amp; Observe · MobX"/><meta property="og:type" content="website"/><meta property="og:url" content="https://mobx.js.org/index.html"/><meta property="og:description" content="&lt;script async type=&quot;text/javascript&quot; src=&quot;//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&amp;placement=mobxjsorg&quot; id=&quot;_carbonads_js&quot;&gt;&lt;/script&gt;"/><meta property="og:image" content="https://mobx.js.org/img/undraw_online.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://mobx.js.org/img/undraw_tweetstorm.svg"/><link rel="shortcut icon" href="/img/favicon.png"/><link rel="stylesheet" href="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.css"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script>
+              (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+              (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+              m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+              })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+              ga('create', 'UA-65632006-1', 'auto');
+              ga('send', 'pageview');
+            </script><script type="text/javascript" src="/js/scripts.js"></script><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><img class="logo" src="/img/mobx.png" alt="MobX"/><h2 class="headerTitleWithLogo">MobX</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class=""><a href="/api.html" target="_self">API Reference</a></li><li class=""><a href="https://zh.mobx.js.org" target="_self">中文(寻求翻译)</a></li><li class=""><a href="/backers-sponsors.html" target="_self">Sponsors</a></li><li class=""><a href="https://github.com/mobxjs/mobx" target="_self">GitHub</a></li><li class="navSearchWrapper reactNavSearchWrapper"><input type="text" id="search_input_react" placeholder="Search" title="Search"/></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Tips &amp; Tricks</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Introduction</h3><ul class=""><li class="navListItem"><a class="navItem" href="/README.html">About MobX</a></li><li class="navListItem"><a class="navItem" href="/about-this-documentation.html">About this documentation</a></li><li class="navListItem"><a class="navItem" href="/installation.html">Installation</a></li><li class="navListItem"><a class="navItem" href="/the-gist-of-mobx.html">The gist of MobX</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">MobX core</h3><ul class=""><li class="navListItem"><a class="navItem" href="/observable-state.html">Observable state</a></li><li class="navListItem"><a class="navItem" href="/actions.html">Actions</a></li><li class="navListItem"><a class="navItem" href="/computeds.html">Computeds</a></li><li class="navListItem"><a class="navItem" href="/reactions.html">Reactions {🚀}</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">MobX and React</h3><ul class=""><li class="navListItem"><a class="navItem" href="/react-integration.html">React integration</a></li><li class="navListItem"><a class="navItem" href="/react-optimizations.html">React optimizations {🚀}</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Tips &amp; Tricks</h3><ul class=""><li class="navListItem"><a class="navItem" href="/defining-data-stores.html">Defining data stores</a></li><li class="navListItem"><a class="navItem" href="/understanding-reactivity.html">Understanding reactivity</a></li><li class="navListItem"><a class="navItem" href="/subclassing.html">Subclassing</a></li><li class="navListItem"><a class="navItem" href="/analyzing-reactivity.html">Analyzing reactivity {🚀}</a></li><li class="navListItem"><a class="navItem" href="/computeds-with-args.html">Computeds with arguments {🚀}</a></li><li class="navListItem"><a class="navItem" href="/mobx-utils.html">MobX-utils {🚀}</a></li><li class="navListItem"><a class="navItem" href="/custom-observables.html">Custom observables {🚀}</a></li><li class="navListItem"><a class="navItem" href="/lazy-observables.html">Lazy observables {🚀}</a></li><li class="navListItem"><a class="navItem" href="/collection-utilities.html">Collection utilities {🚀}</a></li><li class="navListItem navListItemActive"><a class="navItem" href="/intercept-and-observe.html">Intercept &amp; Observe {🚀}</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Fine-tuning</h3><ul class=""><li class="navListItem"><a class="navItem" href="/configuration.html">Configuration {🚀}</a></li><li class="navListItem"><a class="navItem" href="/enabling-decorators.html">Enabling decorators {🚀}</a></li><li class="navListItem"><a class="navItem" href="/migrating-from-4-or-5.html">Migrating from MobX 4/5 {🚀}</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><a class="edit-page-link button" href="https://github.com/mobxjs/mobx/edit/main/docs/intercept-and-observe.md" target="_blank" rel="noreferrer noopener">Edit</a></header><article><div><span><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
+<h1><a class="anchor" aria-hidden="true" id="intercept--observe-"></a><a href="#intercept--observe-" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Intercept &amp; Observe {🚀}</h1>
+<p><em>⚠️ <strong>Warning</strong>: intercept and observe are low level utilities, and should not be needed in practice. Use some form of <a href="/reactions.html">reaction</a> instead, as <code>observe</code> doesn't respect transactions and doesn't support deep observing of changes. Using these utilities is an anti-pattern. If you intend to get access to the old and new value using <code>observe</code>, use <a href="/reactions.html#reaction"><code>reaction</code></a> instead. ⚠️</em></p>
+<p><code>observe</code> and <code>intercept</code> can be used to monitor the changes of a single observable, but they <strong><em>don't</em></strong> track nested observables.</p>
+<ul>
+<li><code>intercept</code> can be used to detect and modify mutations before they are applied to the observable (validating, normalizing or cancelling).</li>
+<li><code>observe</code> allows you to intercept changes after they have been made.</li>
+</ul>
+<h2><a class="anchor" aria-hidden="true" id="intercept"></a><a href="#intercept" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Intercept</h2>
+<p>Usage: <code>intercept(target, propertyName?, interceptor)</code></p>
+<p><em>Please avoid this API. It basically provides a bit of aspect-oriented programming, creating flows that are really hard to debug. Instead, do things like data validation <strong>before</strong> updating any state, rather than during.</em></p>
+<ul>
+<li><code>target</code>: the observable to guard.</li>
+<li><code>propertyName</code>: optional parameter to specify a specific property to intercept. Note that <code>intercept(user.name, interceptor)</code> is fundamentally different from <code>intercept(user, &quot;name&quot;, interceptor)</code>. The first tries to add an interceptor to the <em>current</em> <code>value</code> inside <code>user.name</code>, which might not be an observable at all. The latter intercepts changes to the <code>name</code> <em>property</em> of <code>user</code>.</li>
+<li><code>interceptor</code>: callback that is invoked for <em>each</em> change that is made to the observable. Receives a single change object describing the mutation.</li>
+</ul>
+<p>The <code>intercept</code> should tell MobX what needs to happen with the current change.
+Therefore it should do one of the following things:</p>
+<ol>
+<li>Return the received <code>change</code> object as-is from the function, in which case the mutation will be applied.</li>
+<li>Modify the <code>change</code> object and return it, for example to normalize the data. Not all fields are modifiable, see below.</li>
+<li>Return <code>null</code>, this indicates that the change can be ignored and shouldn't be applied. This is a powerful concept with which you can for example make your objects temporarily immutable.</li>
+<li>Throw an exception, if for example some invariant isn't met.</li>
+</ol>
+<p>The function returns a <code>disposer</code> function that can be used to cancel the interceptor when invoked.
+It is possible to register multiple interceptors to the same observable.
+They will be chained in registration order.
+If one of the interceptors returns <code>null</code> or throws an exception, the other interceptors won't be evaluated anymore.
+It is also possible to register an interceptor both on a parent object and on an individual property.
+In that case the parent object interceptors are run before the property interceptors.</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> theme = observable({
+    <span class="hljs-attr">backgroundColor</span>: <span class="hljs-string">"#ffffff"</span>
+})
+
+<span class="hljs-keyword">const</span> disposer = intercept(theme, <span class="hljs-string">"backgroundColor"</span>, change =&gt; {
+    <span class="hljs-keyword">if</span> (!change.newValue) {
+        <span class="hljs-comment">// Ignore attempts to unset the background color.</span>
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>
+    }
+    <span class="hljs-keyword">if</span> (change.newValue.length === <span class="hljs-number">6</span>) {
+        <span class="hljs-comment">// Correct missing '#' prefix.</span>
+        change.newValue = <span class="hljs-string">"#"</span> + change.newValue
+        <span class="hljs-keyword">return</span> change
+    }
+    <span class="hljs-keyword">if</span> (change.newValue.length === <span class="hljs-number">7</span>) {
+        <span class="hljs-comment">// This must be a properly formatted color code!</span>
+        <span class="hljs-keyword">return</span> change
+    }
+    <span class="hljs-keyword">if</span> (change.newValue.length &gt; <span class="hljs-number">10</span>) {
+        <span class="hljs-comment">// Stop intercepting future changes.</span>
+        disposer()
+    }
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">"This doesn't look like a color at all: "</span> + change.newValue)
+})
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="observe"></a><a href="#observe" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Observe</h2>
+<p>Usage: <code>observe(target, propertyName?, listener, invokeImmediately?)</code></p>
+<p><em>See above notice, please avoid this API and use <a href="/reactions.html#reaction"><code>reaction</code></a> instead.</em></p>
+<ul>
+<li><code>target</code>: the observable to observe.</li>
+<li><code>propertyName</code>: optional parameter to specify a specific property to observe. Note that <code>observe(user.name, listener)</code> is fundamentally different from <code>observe(user, &quot;name&quot;, listener)</code>. The first observes the <em>current</em> <code>value</code> inside <code>user.name</code>, which might not be an observable at all. The latter observes the <code>name</code> <em>property</em> of <code>user</code>.</li>
+<li><code>listener</code>: callback that will be invoked for <em>each</em> change that is made to the observable. Receives a single change object describing the mutation, except for boxed observables, which will invoke the <code>listener</code> with two parameters: <code>newValue, oldValue</code>.</li>
+<li><code>invokeImmediately</code>: <em>false</em> by default. Set it to <em>true</em> if you want <code>observe</code> to invoke the <code>listener</code> directly with the state of the observable, instead of waiting for the first change. Not supported (yet) by all kinds of observables.</li>
+</ul>
+<p>The function returns a <code>disposer</code> function that can be used to cancel the observer.
+Note that <code>transaction</code> does not affect the working of the <code>observe</code> method(s).
+This means that even inside a transaction <code>observe</code> will fire its listeners for each mutation.
+Hence <a href="/reactions.html#autorun"><code>autorun</code></a> is usually a more powerful and declarative alternative to <code>observe</code>.</p>
+<p><em><code>observe</code> reacts to <strong>mutations</strong> when they are being made, while reactions like <code>autorun</code> or <code>reaction</code> react to <strong>new values</strong> when they become available. In many cases the latter is sufficient.</em></p>
+<p>Example:</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { observable, observe } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx"</span>
+
+<span class="hljs-keyword">const</span> person = observable({
+    <span class="hljs-attr">firstName</span>: <span class="hljs-string">"Maarten"</span>,
+    <span class="hljs-attr">lastName</span>: <span class="hljs-string">"Luther"</span>
+})
+
+<span class="hljs-comment">// Observe all fields.</span>
+<span class="hljs-keyword">const</span> disposer = observe(person, change =&gt; {
+    <span class="hljs-built_in">console</span>.log(change.type, change.name, <span class="hljs-string">"from"</span>, change.oldValue, <span class="hljs-string">"to"</span>, change.object[change.name])
+})
+
+person.firstName = <span class="hljs-string">"Martin"</span>
+<span class="hljs-comment">// Prints: 'update firstName from Maarten to Martin'</span>
+
+<span class="hljs-comment">// Ignore any future updates.</span>
+disposer()
+
+<span class="hljs-comment">// Observe a single field.</span>
+<span class="hljs-keyword">const</span> disposer2 = observe(person, <span class="hljs-string">"lastName"</span>, change =&gt; {
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"LastName changed to "</span>, change.newValue)
+})
+</code></pre>
+<p>Related blog: <a href="https://medium.com/@mweststrate/object-observe-is-dead-long-live-mobservable-observe-ad96930140c5">Object.observe is dead. Long live mobx.observe</a></p>
+<h2><a class="anchor" aria-hidden="true" id="event-overview"></a><a href="#event-overview" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Event overview</h2>
+<p>The callbacks of <code>intercept</code> and <code>observe</code> will receive an event object which has at least the following properties:</p>
+<ul>
+<li><code>object</code>: the observable triggering the event.</li>
+<li><code>debugObjectName</code>: the name of the observable triggering the event (for debugging).</li>
+<li><code>observableKind</code>: the type of the observable (value, set, array, object, map, computed).</li>
+<li><code>type</code> (string): the type of the current event.</li>
+</ul>
+<p>These are the additional fields that are available per type:</p>
+<table>
+<thead>
+<tr><th>Observable type</th><th>Event type</th><th>Property</th><th>Description</th><th>Available during intercept</th><th>Can be modified by intercept</th></tr>
+</thead>
+<tbody>
+<tr><td>Object</td><td>add</td><td>name</td><td>Name of the property being added.</td><td>√</td><td></td></tr>
+<tr><td></td><td></td><td>newValue</td><td>The new value being assigned.</td><td>√</td><td>√</td></tr>
+<tr><td></td><td>update*</td><td>name</td><td>Name of the property being updated.</td><td>√</td><td></td></tr>
+<tr><td></td><td></td><td>newValue</td><td>The new value being assigned.</td><td>√</td><td>√</td></tr>
+<tr><td></td><td></td><td>oldValue</td><td>The value that is replaced.</td><td></td><td></td></tr>
+<tr><td>Array</td><td>splice</td><td>index</td><td>Starting index of the splice. Splices are also fired by <code>push</code>, <code>unshift</code>, <code>replace</code>, etc.</td><td>√</td><td></td></tr>
+<tr><td></td><td></td><td>removedCount</td><td>Amount of items being removed.</td><td>√</td><td>√</td></tr>
+<tr><td></td><td></td><td>added</td><td>Array with items being added.</td><td>√</td><td>√</td></tr>
+<tr><td></td><td></td><td>removed</td><td>Array with items that were removed.</td><td></td><td></td></tr>
+<tr><td></td><td></td><td>addedCount</td><td>Amount of items that were added.</td><td></td><td></td></tr>
+<tr><td></td><td>update</td><td>index</td><td>Index of the single entry being updated.</td><td>√</td><td></td></tr>
+<tr><td></td><td></td><td>newValue</td><td>The newValue that is / will be assigned.</td><td>√</td><td>√</td></tr>
+<tr><td></td><td></td><td>oldValue</td><td>The old value that was replaced.</td><td></td><td></td></tr>
+<tr><td>Map</td><td>add</td><td>name</td><td>The name of the entry that was added.</td><td>√</td><td></td></tr>
+<tr><td></td><td></td><td>newValue</td><td>The new value that is being assigned.</td><td>√</td><td>√</td></tr>
+<tr><td></td><td>update</td><td>name</td><td>The name of the entry being updated.</td><td>√</td><td></td></tr>
+<tr><td></td><td></td><td>newValue</td><td>The new value that is being assigned.</td><td>√</td><td>√</td></tr>
+<tr><td></td><td></td><td>oldValue</td><td>The value that has been replaced.</td><td></td><td></td></tr>
+<tr><td></td><td>delete</td><td>name</td><td>The name of the entry being removed.</td><td>√</td><td></td></tr>
+<tr><td></td><td></td><td>oldValue</td><td>The value of the entry that was removed.</td><td></td><td></td></tr>
+<tr><td>Boxed &amp; computed observables</td><td>create</td><td>newValue</td><td>The value that was assigned during creation. Only available as <code>spy</code> event for boxed observables.</td><td></td><td></td></tr>
+<tr><td></td><td>update</td><td>newValue</td><td>The new value being assigned.</td><td>√</td><td>√</td></tr>
+<tr><td></td><td></td><td>oldValue</td><td>The previous value of the observable.</td><td></td><td></td></tr>
+</tbody>
+</table>
+<p><strong>Note:</strong> object <code>update</code> events won't fire for updated computed values (as those aren't mutations). But it is possible to observe them by explicitly subscribing to the specific property using <code>observe(object, 'computedPropertyName', listener)</code>.</p>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/collection-utilities.html"><span class="arrow-prev">← </span><span>Collection utilities {🚀}</span></a><a class="docs-next button" href="/configuration.html"><span>Configuration {🚀}</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#intercept">Intercept</a></li><li><a href="#observe">Observe</a></li><li><a href="#event-overview">Event overview</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/mobx.png" alt="MobX" width="66" height="58"/></a><div><h5>Docs</h5><a href="/README.html#introduction">About MobX</a><a href="/the-gist-of-mobx.html">The gist of MobX</a></div><div><h5>Community</h5><a href="https://github.com/mobxjs/mobx/discussions" target="_blank" rel="noreferrer noopener">GitHub discussions (NEW)</a><a href="https://stackoverflow.com/questions/tagged/mobx" target="_blank" rel="noreferrer noopener">Stack Overflow</a></div><div><h5>More</h5><a class="github-button" href="https://github.com/mobxjs/mobx" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+                document.addEventListener('keyup', function(e) {
+                  if (e.target !== document.body) {
+                    return;
+                  }
+                  // keyCode for '/' (slash)
+                  if (e.keyCode === 191) {
+                    const search = document.getElementById('search_input_react');
+                    search && search.focus();
+                  }
+                });
+              </script><script>
+              var search = docsearch({
+                
+                apiKey: '500db32fbdbd53a814f42aafdfa26bd4',
+                indexName: 'mobxjs',
+                inputSelector: '#search_input_react'
+              });
+            </script></body></html>

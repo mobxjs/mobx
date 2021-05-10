@@ -1,0 +1,268 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Creating observable state · MobX</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="&lt;script async type=&quot;text/javascript&quot; src=&quot;//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&amp;placement=mobxjsorg&quot; id=&quot;_carbonads_js&quot;&gt;&lt;/script&gt;"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Creating observable state · MobX"/><meta property="og:type" content="website"/><meta property="og:url" content="https://mobx.js.org/index.html"/><meta property="og:description" content="&lt;script async type=&quot;text/javascript&quot; src=&quot;//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&amp;placement=mobxjsorg&quot; id=&quot;_carbonads_js&quot;&gt;&lt;/script&gt;"/><meta property="og:image" content="https://mobx.js.org/img/undraw_online.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://mobx.js.org/img/undraw_tweetstorm.svg"/><link rel="shortcut icon" href="/img/favicon.png"/><link rel="stylesheet" href="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.css"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script>
+              (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+              (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+              m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+              })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+              ga('create', 'UA-65632006-1', 'auto');
+              ga('send', 'pageview');
+            </script><script type="text/javascript" src="/js/scripts.js"></script><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><img class="logo" src="/img/mobx.png" alt="MobX"/><h2 class="headerTitleWithLogo">MobX</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class=""><a href="/api.html" target="_self">API Reference</a></li><li class=""><a href="https://zh.mobx.js.org" target="_self">中文(寻求翻译)</a></li><li class=""><a href="/backers-sponsors.html" target="_self">Sponsors</a></li><li class=""><a href="https://github.com/mobxjs/mobx" target="_self">GitHub</a></li><li class="navSearchWrapper reactNavSearchWrapper"><input type="text" id="search_input_react" placeholder="Search" title="Search"/></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>MobX core</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Introduction</h3><ul class=""><li class="navListItem"><a class="navItem" href="/README.html">About MobX</a></li><li class="navListItem"><a class="navItem" href="/about-this-documentation.html">About this documentation</a></li><li class="navListItem"><a class="navItem" href="/installation.html">Installation</a></li><li class="navListItem"><a class="navItem" href="/the-gist-of-mobx.html">The gist of MobX</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">MobX core</h3><ul class=""><li class="navListItem navListItemActive"><a class="navItem" href="/observable-state.html">Observable state</a></li><li class="navListItem"><a class="navItem" href="/actions.html">Actions</a></li><li class="navListItem"><a class="navItem" href="/computeds.html">Computeds</a></li><li class="navListItem"><a class="navItem" href="/reactions.html">Reactions {🚀}</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">MobX and React</h3><ul class=""><li class="navListItem"><a class="navItem" href="/react-integration.html">React integration</a></li><li class="navListItem"><a class="navItem" href="/react-optimizations.html">React optimizations {🚀}</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Tips &amp; Tricks</h3><ul class=""><li class="navListItem"><a class="navItem" href="/defining-data-stores.html">Defining data stores</a></li><li class="navListItem"><a class="navItem" href="/understanding-reactivity.html">Understanding reactivity</a></li><li class="navListItem"><a class="navItem" href="/subclassing.html">Subclassing</a></li><li class="navListItem"><a class="navItem" href="/analyzing-reactivity.html">Analyzing reactivity {🚀}</a></li><li class="navListItem"><a class="navItem" href="/computeds-with-args.html">Computeds with arguments {🚀}</a></li><li class="navListItem"><a class="navItem" href="/mobx-utils.html">MobX-utils {🚀}</a></li><li class="navListItem"><a class="navItem" href="/custom-observables.html">Custom observables {🚀}</a></li><li class="navListItem"><a class="navItem" href="/lazy-observables.html">Lazy observables {🚀}</a></li><li class="navListItem"><a class="navItem" href="/collection-utilities.html">Collection utilities {🚀}</a></li><li class="navListItem"><a class="navItem" href="/intercept-and-observe.html">Intercept &amp; Observe {🚀}</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Fine-tuning</h3><ul class=""><li class="navListItem"><a class="navItem" href="/configuration.html">Configuration {🚀}</a></li><li class="navListItem"><a class="navItem" href="/enabling-decorators.html">Enabling decorators {🚀}</a></li><li class="navListItem"><a class="navItem" href="/migrating-from-4-or-5.html">Migrating from MobX 4/5 {🚀}</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><a class="edit-page-link button" href="https://github.com/mobxjs/mobx/edit/main/docs/observable-state.md" target="_blank" rel="noreferrer noopener">Edit</a></header><article><div><span><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
+<h1><a class="anchor" aria-hidden="true" id="creating-observable-state"></a><a href="#creating-observable-state" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Creating observable state</h1>
+<p>Properties, entire objects, arrays, Maps and Sets can all be made observable.
+The basics of making objects observable is specifying an annotation per property using <code>makeObservable</code>.
+The most important annotations are:</p>
+<ul>
+<li><code>observable</code> defines a trackable field that stores the state.</li>
+<li><code>action</code> marks a method as action that will modify the state.</li>
+<li><code>computed</code> marks a getter that will derive new facts from the state and cache its output.</li>
+</ul>
+<p>Collections such as arrays, Maps and Sets are made observable automatically.</p>
+<h2><a class="anchor" aria-hidden="true" id="makeobservable"></a><a href="#makeobservable" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>makeObservable</code></h2>
+<p>Usage:</p>
+<ul>
+<li><code>makeObservable(target, annotations?, options?)</code></li>
+</ul>
+<p>It can be used to trap <em>existing</em> object properties and make them observable. Any JavaScript object (including class instances) can be passed into <code>target</code>.
+Typically <code>makeObservable</code> is used in the constructor of a class, and its first argument is <code>this</code>.
+The <code>annotations</code> argument maps <a href="#available-annotations">annotations</a> to each member. Note that when using <a href="/enabling-decorators.html">decorators</a>, the <code>annotations</code> argument can be omitted.</p>
+<p>Methods that derive information and take arguments (for example <code>findUsersOlderThan(age: number): User[]</code>) don't need any annotation.
+Their read operations will still be tracked when they are called from a reaction, but their output won't be memoized to avoid memory leaks. Check out <a href="https://github.com/mobxjs/mobx-utils#computedfn">MobX-utils computedFn {🚀}</a> as well.</p>
+<p><a href="/subclassing.html">Subclassing is supported with some limitations</a> via <code>override</code> annotation.</p>
+<div class="tabs"><div class="nav-tabs"><div id="tab-group-12-tab-13" class="nav-link active" data-group="group_12" data-tab="tab-group-12-content-13">class + makeObservable</div><div id="tab-group-12-tab-14" class="nav-link" data-group="group_12" data-tab="tab-group-12-content-14">factory function + makeAutoObservable</div><div id="tab-group-12-tab-15" class="nav-link" data-group="group_12" data-tab="tab-group-12-content-15">observable</div></div><div class="tab-content"><div id="tab-group-12-content-13" class="tab-pane active" data-group="group_12" tabindex="-1"><div><span><pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { makeObservable, observable, computed, action, flow } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx"</span><br /><br /><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Doubler</span> </span>{<br />    value<br /><br />    <span class="hljs-keyword">constructor</span>(value) {<br />        makeObservable(<span class="hljs-keyword">this</span>, {<br />            <span class="hljs-attr">value</span>: observable,<br />            <span class="hljs-attr">double</span>: computed,<br />            <span class="hljs-attr">increment</span>: action,<br />            <span class="hljs-attr">fetch</span>: flow<br />        })<br />        <span class="hljs-keyword">this</span>.value = value<br />    }<br /><br />    <span class="hljs-keyword">get</span> double() {<br />        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.value * <span class="hljs-number">2</span><br />    }<br /><br />    increment() {<br />        <span class="hljs-keyword">this</span>.value++<br />    }<br /><br />    *fetch() {<br />        <span class="hljs-keyword">const</span> response = <span class="hljs-keyword">yield</span> fetch(<span class="hljs-string">"/api/value"</span>)<br />        <span class="hljs-keyword">this</span>.value = response.json()<br />    }<br />}<br /></code></pre>
+<p><strong>All annotated</strong> fields are <strong>non-configurable</strong>.<br>
+<strong>All non-observable</strong> (stateless) fields (<code>action</code>, <code>flow</code>) are <strong>non-writable</strong>.</p>
+</span></div></div><div id="tab-group-12-content-14" class="tab-pane" data-group="group_12" tabindex="-1"><div><span><pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { makeAutoObservable } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx"</span><br /><br /><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">createDoubler</span>(<span class="hljs-params">value</span>) </span>{<br />    <span class="hljs-keyword">return</span> makeAutoObservable({<br />        value,<br />        <span class="hljs-keyword">get</span> double() {<br />            <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.value * <span class="hljs-number">2</span><br />        },<br />        increment() {<br />            <span class="hljs-keyword">this</span>.value++<br />        }<br />    })<br />}<br /></code></pre>
+<p>Note that classes can leverage <code>makeAutoObservable</code> as well.
+The difference in the examples just demonstrate how MobX can be applied to different programming styles.</p>
+</span></div></div><div id="tab-group-12-content-15" class="tab-pane" data-group="group_12" tabindex="-1"><div><span><pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { observable } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx"</span><br /><br /><span class="hljs-keyword">const</span> todosById = observable({<br />    <span class="hljs-string">"TODO-123"</span>: {<br />        <span class="hljs-attr">title</span>: <span class="hljs-string">"find a decent task management system"</span>,<br />        <span class="hljs-attr">done</span>: <span class="hljs-literal">false</span><br />    }<br />})<br /><br />todosById[<span class="hljs-string">"TODO-456"</span>] = {<br />    <span class="hljs-attr">title</span>: <span class="hljs-string">"close all tickets older than two weeks"</span>,<br />    <span class="hljs-attr">done</span>: <span class="hljs-literal">true</span><br />}<br /><br /><span class="hljs-keyword">const</span> tags = observable([<span class="hljs-string">"high prio"</span>, <span class="hljs-string">"medium prio"</span>, <span class="hljs-string">"low prio"</span>])<br />tags.push(<span class="hljs-string">"prio: for fun"</span>)<br /></code></pre>
+<p>In contrast to the first example with <code>makeObservable</code>, <code>observable</code> supports adding (and removing) <em>fields</em> to an object.
+This makes <code>observable</code> great for collections like dynamically keyed objects, arrays, Maps and Sets.</p>
+</span></div></div></div></div>
+<h2><a class="anchor" aria-hidden="true" id="makeautoobservable"></a><a href="#makeautoobservable" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>makeAutoObservable</code></h2>
+<p>Usage:</p>
+<ul>
+<li><code>makeAutoObservable(target, overrides?, options?)</code></li>
+</ul>
+<p><code>makeAutoObservable</code> is like <code>makeObservable</code> on steroids, as it infers all the properties by default. You can still use <code>overrides</code> to override the default behavior with specific annotations.
+In particular <code>false</code> can be used to exclude a property or method from being processed entirely.
+Check out the code tabs above for an example.
+The <code>makeAutoObservable</code> function can be more compact and easier to maintain than using <code>makeObservable</code>, since new members don't have to be mentioned explicitly.
+However, <code>makeAutoObservable</code> cannot be used on classes that have super or are <a href="/subclassing.html">subclassed</a>.</p>
+<p>Inference rules:</p>
+<ul>
+<li>All <em>own</em> properties become <code>observable</code>.</li>
+<li>All <code>get</code>ters become <code>computed</code>.</li>
+<li>All <code>set</code>ters become <code>action</code>.</li>
+<li>All <em>functions on prototype</em> become <code>autoAction</code>.</li>
+<li>All <em>generator functions on prototype</em> become <code>flow</code>. (Note that generator functions are not detectable in some transpiler configurations, if flow doesn't work as expected, make sure to specify <code>flow</code> explicitly.)</li>
+<li>Members marked with <code>false</code> in the <code>overrides</code> argument will not be annotated. For example, using it for read only fields such as identifiers.</li>
+</ul>
+<h2><a class="anchor" aria-hidden="true" id="observable"></a><a href="#observable" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>observable</code></h2>
+<p>Usage:</p>
+<ul>
+<li><code>observable(source, overrides?, options?)</code></li>
+</ul>
+<p>The <code>observable</code> annotation can also be called as a function to make an entire object observable at once.
+The <code>source</code> object will be cloned and all members will be made observable, similar to how it would be done by <code>makeAutoObservable</code>.
+Likewise, an <code>overrides</code> map can be provided to specify the annotations of specific members.
+Check out the above code block for an example.</p>
+<p>The object returned by <code>observable</code> will be a Proxy, which means that properties that are added later to the object will be picked up and made observable as well (except when <a href="/configuration.html#proxy-support">proxy usage</a> is disabled).</p>
+<p>The <code>observable</code> method can also be called with collections types like <a href="/api.html#observablearray">arrays</a>, <a href="/api.html#observablemap">Maps</a> and <a href="/api.html#observableset">Sets</a>. Those will be cloned as well and converted into their observable counterparts.</p>
+<p><details id="observable-array"><summary><strong>Example:</strong> observable array<a href="#observable-array" class="tip-anchor"></a></summary></p>
+<p>The following example creates an observable and observes it using <a href="/reactions.html#autorun"><code>autorun</code></a>.
+Working with Map and Set collections works similarly.</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { observable, autorun } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx"</span>
+
+<span class="hljs-keyword">const</span> todos = observable([
+    { <span class="hljs-attr">title</span>: <span class="hljs-string">"Spoil tea"</span>, <span class="hljs-attr">completed</span>: <span class="hljs-literal">true</span> },
+    { <span class="hljs-attr">title</span>: <span class="hljs-string">"Make coffee"</span>, <span class="hljs-attr">completed</span>: <span class="hljs-literal">false</span> }
+])
+
+autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(
+        <span class="hljs-string">"Remaining:"</span>,
+        todos
+            .filter(<span class="hljs-function"><span class="hljs-params">todo</span> =&gt;</span> !todo.completed)
+            .map(<span class="hljs-function"><span class="hljs-params">todo</span> =&gt;</span> todo.title)
+            .join(<span class="hljs-string">", "</span>)
+    )
+})
+<span class="hljs-comment">// Prints: 'Remaining: Make coffee'</span>
+
+todos[<span class="hljs-number">0</span>].completed = <span class="hljs-literal">false</span>
+<span class="hljs-comment">// Prints: 'Remaining: Spoil tea, Make coffee'</span>
+
+todos[<span class="hljs-number">2</span>] = { <span class="hljs-attr">title</span>: <span class="hljs-string">"Take a nap"</span>, <span class="hljs-attr">completed</span>: <span class="hljs-literal">false</span> }
+<span class="hljs-comment">// Prints: 'Remaining: Spoil tea, Make coffee, Take a nap'</span>
+
+todos.shift()
+<span class="hljs-comment">// Prints: 'Remaining: Make coffee, Take a nap'</span>
+</code></pre>
+<p>Observable arrays have some additional nifty utility functions:</p>
+<ul>
+<li><code>clear()</code> removes all current entries from the array.</li>
+<li><code>replace(newItems)</code> replaces all existing entries in the array with new ones.</li>
+<li><code>remove(value)</code> removes a single item by value from the array. Returns <code>true</code> if the item was found and removed.</li>
+</ul>
+<p></details></p>
+<p><details id="non-convertibles"><summary><strong>Note:</strong> primitives and class instances are never converted to observables<a href="#non-convertibles" class="tip-anchor"></a></summary></p>
+<p>Primitive values cannot be made observable by MobX since they are immutable in JavaScript (but they can be <a href="/api.html#observablebox">boxed</a>).
+Although there is typically no use for this mechanism outside libraries.</p>
+<p>Class instances will never be made observable automatically by passing them to <code>observable</code> or assigning them to an <code>observable</code> property.
+Making class members observable is considered the responsibility of the class constructor.</p>
+<p></details></p>
+<p><details id="avoid-proxies"><summary>{🚀} <strong>Tip:</strong> observable (proxied) versus makeObservable (unproxied)<a href="#avoid-proxies" class="tip-anchor"></a></summary></p>
+<p>The primary difference between <code>make(Auto)Observable</code> and <code>observable</code> is that the first one modifies the object you are passing in as first argument, while <code>observable</code> creates a <em>clone</em> that is made observable.</p>
+<p>The second difference is that <code>observable</code> creates a <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy"><code>Proxy</code></a> object, to be able to trap future property additions in case you use the object as a dynamic lookup map.
+If the object you want to make observable has a regular structure where all members are known up-front, we recommend to use <code>makeObservable</code> as non proxied objects are a little faster, and they are easier to inspect in the debugger and <code>console.log</code>.</p>
+<p>Because of that, <code>make(Auto)Observable</code> is the recommended API to use in factory functions.
+Note that it is possible to pass <code>{ proxy: false }</code> as an option to <code>observable</code> to get a non proxied clone.</p>
+<p></details></p>
+<h2><a class="anchor" aria-hidden="true" id="available-annotations"></a><a href="#available-annotations" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Available annotations</h2>
+<table>
+<thead>
+<tr><th>Annotation</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>observable</code><br/><code>observable.deep</code></td><td>Defines a trackable field that stores state. If possible, any value assigned to <code>observable</code> is automatically converted to (deep) <code>observable</code>, <code>autoAction</code> or <code>flow</code> based on it's type. Only <code>plain object</code>, <code>array</code>, <code>Map</code>, <code>Set</code>, <code>function</code>, <code>generator function</code> are convertible. Class instances and others are untouched.</td></tr>
+<tr><td><code>observable.ref</code></td><td>Like <code>observable</code>, but only reassignments will be tracked. The assigned values are completely ignored and will NOT be automatically converted to <code>observable</code>/<code>autoAction</code>/<code>flow</code>. For example, use this if you intend to store immutable data in an observable field.</td></tr>
+<tr><td><code>observable.shallow</code></td><td>Like <code>observable.ref</code> but for collections. Any collection assigned will be made observable, but the contents of the collection itself won't become observable.</td></tr>
+<tr><td><code>observable.struct</code></td><td>Like <code>observable</code>, except that any assigned value that is structurally equal to the current value will be ignored.</td></tr>
+<tr><td><code>action</code></td><td>Mark a method as an action that will modify the state. Check out <a href="/actions.html">actions</a> for more details. Non-writable.</td></tr>
+<tr><td><code>action.bound</code></td><td>Like action, but will also bind the action to the instance so that <code>this</code> will always be set. Non-writable.</td></tr>
+<tr><td><code>computed</code></td><td>Can be used on a <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get">getter</a> to declare it as a derived value that can be cached. Check out <a href="/computeds.html">computeds</a> for more details.</td></tr>
+<tr><td><code>computed.struct</code></td><td>Like <code>computed</code>, except that if after recomputing the result is structurally equal to the previous result, no observers will be notified.</td></tr>
+<tr><td><code>true</code></td><td>Infer the best annotation. Check out <a href="#makeautoobservable">makeAutoObservable</a> for more details.</td></tr>
+<tr><td><code>false</code></td><td>Explicitly do not annotate this property.</td></tr>
+<tr><td><code>flow</code></td><td>Creates a <code>flow</code> to manage asynchronous processes. Check out <a href="/actions.html#using-flow-instead-of-async--await-">flow</a> for more details. Note that the inferred return type in TypeScript might be off. Non-writable.</td></tr>
+<tr><td><code>flow.bound</code></td><td>Like flow, but will also bind the flow to the instance so that <code>this</code> will always be set. Non-writable.</td></tr>
+<tr><td><code>override</code></td><td><a href="/subclassing.html">Applicable to inherited <code>action</code>, <code>flow</code>, <code>computed</code>, <code>action.bound</code> overriden by subclass</a>.</td></tr>
+<tr><td><code>autoAction</code></td><td>Should not be used explicitly, but is used under the hood by <code>makeAutoObservable</code> to mark methods that can act as action or derivation, based on their calling context.</td></tr>
+</tbody>
+</table>
+<h2><a class="anchor" aria-hidden="true" id="limitations"></a><a href="#limitations" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Limitations</h2>
+<ol>
+<li><code>make(Auto)Observable</code> only supports properties that are already defined. Make sure your <a href="/installation.html#use-spec-compliant-transpilation-for-class-properties"><strong>compiler configuration</strong> is correct</a>, or as work-around, that a value is assigned to all properties before using <code>make(Auto)Observable</code>. Without correct configuration, fields that are declared but not initialized (like in <code>class X { y; }</code>) will not be picked up correctly.</li>
+<li><code>makeObservable</code> can only annotate properties declared by its own class definition. If a sub- or superclass introduces observable fields, it will have to call <code>makeObservable</code> for those properties itself.</li>
+<li><code>options</code> argument can be provided only once. Passed <code>options</code> are <em>&quot;sticky&quot;</em> and can NOT be changed later (eg. in <a href="/subclassing.html">subclass</a>).</li>
+<li><strong>Every field can be annotated only once</strong> (except for <code>override</code>). The field annotation or configuration can't change in <a href="/subclassing.html">subclass</a>.</li>
+<li><strong>All annotated</strong> fields of non-plain objects (<strong>classes</strong>) are <strong>non-configurable</strong>.<br>
+<a href="/configuration.html#safedescriptors-boolean">Can be disabled with <code>configure({ safeDescriptors: false })</code> {🚀☣️} </a>.</li>
+<li><strong>All non-observable</strong> (stateless) fields (<code>action</code>, <code>flow</code>) are <strong>non-writable</strong>.<br>
+<a href="/configuration.html#safedescriptors-boolean">Can be disabled with <code>configure({ safeDescriptors: false })</code> {🚀☣️} </a>.</li>
+<li><a href="/subclassing.html">Only <strong><code>action</code>, <code>computed</code>, <code>flow</code>, <code>action.bound</code></strong> defined <strong>on prototype</strong> can be <strong>overriden</strong> by subclass</a>.</li>
+<li>By default <em>TypeScript</em> will not allow you to annotate <strong>private</strong> fields. This can be overcome by explicitly passing the relevant private fields as generic argument, like this: <code>makeObservable&lt;MyStore, &quot;privateField&quot; | &quot;privateField2&quot;&gt;(this, { privateField: observable, privateField2: observable })</code></li>
+<li><strong>Calling <code>make(Auto)Observable</code></strong> and providing annotations must be done <strong>unconditionally</strong>, as this makes it possible to cache the inference results.</li>
+<li><strong>Modifying prototypes</strong> after <strong><code>make(Auto)Observable</code></strong> has been called is <strong>not supported</strong>.</li>
+<li><em>EcmaScript</em> <strong>private</strong> fields (<strong><code>#field</code></strong>) are <strong>not supported</strong>. When using <em>TypeScript</em>, it is recommended to use the <code>private</code> modifier instead.</li>
+<li><strong>Mixing annotations and decorators</strong> within single inheritance chain is <strong>not supported</strong> - eg. you can't use decorators for superclass and annotations for subclass.</li>
+<li><code>makeObservable</code>,<code>extendObservable</code> cannot be used on other builtin observable types (<code>ObservableMap</code>, <code>ObservableSet</code>, <code>ObservableArray</code>, etc)</li>
+<li><code>makeObservable(Object.create(prototype))</code> copies properties from <code>prototype</code> to created object and makes them <code>observable</code>. This behavior is wrong, unexpected and therefore <strong>deprecated</strong> and will likely change in future versions. Don't rely on it.</li>
+</ol>
+<h2><a class="anchor" aria-hidden="true" id="options-"></a><a href="#options-" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Options {🚀}</h2>
+<p>The above APIs take an optional <code>options</code> argument which is an object that supports the following options:</p>
+<ul>
+<li><strong><code>autoBind: true</code></strong> uses <code>action.bound</code>/<code>flow.bound</code> by default, rather than <code>action</code>/<code>flow</code>. Does not affect explicitely annotated members.</li>
+<li><strong><code>deep: false</code></strong> uses <code>observable.ref</code> by default, rather than <code>observable</code>. Does not affect explicitely annotated members.</li>
+<li><strong><code>name: &lt;string&gt;</code></strong> gives the object a debug name that is printed in error messages and reflection APIs.</li>
+<li><strong><code>proxy: false</code></strong> forces <code>observable(thing)</code> to use non-<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy"><strong>proxy</strong></a> implementation. This is a good option if the shape of the object will not change over time, as non-proxied objects are easier to debug and faster. See <a href="#avoid-proxies">avoiding proxies</a>.</li>
+</ul>
+<p><details id="one-options-per-target"><summary><strong>Note:</strong> options are <em>sticky</em> and can be provided only once<a href="#one-options-per-target" class="tip-anchor"></a></summary>
+<code>options</code> argument can be provided only for <code>target</code> that is NOT observable yet.<br>
+It is NOT possible to change options once the observable object was initialized.<br>
+Options are stored on target and respected by subsequent <code>makeObservable</code>/<code>extendObservable</code> calls.<br>
+You can't pass different options in <a href="/subclassing.html">subclass</a>.
+</details></p>
+<h2><a class="anchor" aria-hidden="true" id="converting-observables-back-to-vanilla-javascript-collections"></a><a href="#converting-observables-back-to-vanilla-javascript-collections" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Converting observables back to vanilla JavaScript collections</h2>
+<p>Sometimes it is necessary to convert observable data structures back to their vanilla counterparts.
+For example when passing observable objects to a React component that can't track observables, or to obtain a clone that should not be further mutated.</p>
+<p>To convert a collection shallowly, the usual JavaScript mechanisms work:</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> plainObject = { ...observableObject }
+<span class="hljs-keyword">const</span> plainArray = observableArray.slice()
+<span class="hljs-keyword">const</span> plainMap = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Map</span>(observableMap)
+</code></pre>
+<p>To convert a data tree recursively to plain objects, the <a href="/api.html#tojs"><code>toJS</code></a> utility can be used.
+For classes, it is recommend to implement a <code>toJSON()</code> method, as it will be picked up by <code>JSON.stringify</code>.</p>
+<h2><a class="anchor" aria-hidden="true" id="a-short-note-on-classes"></a><a href="#a-short-note-on-classes" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>A short note on classes</h2>
+<p>So far most examples above have been leaning towards the class syntax.
+MobX is in principle unopinionated about this, and there are probably just as many MobX users that use plain objects.
+However, a slight benefit of classes is that they have more easily discoverable APIs, e.g. TypeScript.
+Also, <code>instanceof</code> checks are really powerful for type inference, and class instances aren't wrapped in <code>Proxy</code> objects, giving them a better experience in debuggers.
+Finally, classes benefit from a lot of engine optimizations, since their shape is predictable, and methods are shared on the prototype.
+But heavy inheritance patterns can easily become foot-guns, so if you use classes, keep them simple.
+So, even though there is a slight preference to use classes, we definitely want to encourage you to deviate from this style if that suits you better.</p>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/the-gist-of-mobx.html"><span class="arrow-prev">← </span><span class="function-name-prevnext">The gist of MobX</span></a><a class="docs-next button" href="/actions.html"><span>Actions</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#makeobservable"><code>makeObservable</code></a></li><li><a href="#makeautoobservable"><code>makeAutoObservable</code></a></li><li><a href="#observable"><code>observable</code></a></li><li><a href="#available-annotations">Available annotations</a></li><li><a href="#limitations">Limitations</a></li><li><a href="#options-">Options {🚀}</a></li><li><a href="#converting-observables-back-to-vanilla-javascript-collections">Converting observables back to vanilla JavaScript collections</a></li><li><a href="#a-short-note-on-classes">A short note on classes</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/mobx.png" alt="MobX" width="66" height="58"/></a><div><h5>Docs</h5><a href="/README.html#introduction">About MobX</a><a href="/the-gist-of-mobx.html">The gist of MobX</a></div><div><h5>Community</h5><a href="https://github.com/mobxjs/mobx/discussions" target="_blank" rel="noreferrer noopener">GitHub discussions (NEW)</a><a href="https://stackoverflow.com/questions/tagged/mobx" target="_blank" rel="noreferrer noopener">Stack Overflow</a></div><div><h5>More</h5><a class="github-button" href="https://github.com/mobxjs/mobx" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+                document.addEventListener('keyup', function(e) {
+                  if (e.target !== document.body) {
+                    return;
+                  }
+                  // keyCode for '/' (slash)
+                  if (e.keyCode === 191) {
+                    const search = document.getElementById('search_input_react');
+                    search && search.focus();
+                  }
+                });
+              </script><script>
+              var search = docsearch({
+                
+                apiKey: '500db32fbdbd53a814f42aafdfa26bd4',
+                indexName: 'mobxjs',
+                inputSelector: '#search_input_react'
+              });
+            </script></body></html>

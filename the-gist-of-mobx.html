@@ -1,0 +1,235 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>The gist of MobX · MobX</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="&lt;script async type=&quot;text/javascript&quot; src=&quot;//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&amp;placement=mobxjsorg&quot; id=&quot;_carbonads_js&quot;&gt;&lt;/script&gt;"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="The gist of MobX · MobX"/><meta property="og:type" content="website"/><meta property="og:url" content="https://mobx.js.org/index.html"/><meta property="og:description" content="&lt;script async type=&quot;text/javascript&quot; src=&quot;//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&amp;placement=mobxjsorg&quot; id=&quot;_carbonads_js&quot;&gt;&lt;/script&gt;"/><meta property="og:image" content="https://mobx.js.org/img/undraw_online.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://mobx.js.org/img/undraw_tweetstorm.svg"/><link rel="shortcut icon" href="/img/favicon.png"/><link rel="stylesheet" href="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.css"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script>
+              (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+              (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+              m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+              })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+              ga('create', 'UA-65632006-1', 'auto');
+              ga('send', 'pageview');
+            </script><script type="text/javascript" src="/js/scripts.js"></script><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><img class="logo" src="/img/mobx.png" alt="MobX"/><h2 class="headerTitleWithLogo">MobX</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class=""><a href="/api.html" target="_self">API Reference</a></li><li class=""><a href="https://zh.mobx.js.org" target="_self">中文(寻求翻译)</a></li><li class=""><a href="/backers-sponsors.html" target="_self">Sponsors</a></li><li class=""><a href="https://github.com/mobxjs/mobx" target="_self">GitHub</a></li><li class="navSearchWrapper reactNavSearchWrapper"><input type="text" id="search_input_react" placeholder="Search" title="Search"/></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Introduction</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Introduction</h3><ul class=""><li class="navListItem"><a class="navItem" href="/README.html">About MobX</a></li><li class="navListItem"><a class="navItem" href="/about-this-documentation.html">About this documentation</a></li><li class="navListItem"><a class="navItem" href="/installation.html">Installation</a></li><li class="navListItem navListItemActive"><a class="navItem" href="/the-gist-of-mobx.html">The gist of MobX</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">MobX core</h3><ul class=""><li class="navListItem"><a class="navItem" href="/observable-state.html">Observable state</a></li><li class="navListItem"><a class="navItem" href="/actions.html">Actions</a></li><li class="navListItem"><a class="navItem" href="/computeds.html">Computeds</a></li><li class="navListItem"><a class="navItem" href="/reactions.html">Reactions {🚀}</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">MobX and React</h3><ul class=""><li class="navListItem"><a class="navItem" href="/react-integration.html">React integration</a></li><li class="navListItem"><a class="navItem" href="/react-optimizations.html">React optimizations {🚀}</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Tips &amp; Tricks</h3><ul class=""><li class="navListItem"><a class="navItem" href="/defining-data-stores.html">Defining data stores</a></li><li class="navListItem"><a class="navItem" href="/understanding-reactivity.html">Understanding reactivity</a></li><li class="navListItem"><a class="navItem" href="/subclassing.html">Subclassing</a></li><li class="navListItem"><a class="navItem" href="/analyzing-reactivity.html">Analyzing reactivity {🚀}</a></li><li class="navListItem"><a class="navItem" href="/computeds-with-args.html">Computeds with arguments {🚀}</a></li><li class="navListItem"><a class="navItem" href="/mobx-utils.html">MobX-utils {🚀}</a></li><li class="navListItem"><a class="navItem" href="/custom-observables.html">Custom observables {🚀}</a></li><li class="navListItem"><a class="navItem" href="/lazy-observables.html">Lazy observables {🚀}</a></li><li class="navListItem"><a class="navItem" href="/collection-utilities.html">Collection utilities {🚀}</a></li><li class="navListItem"><a class="navItem" href="/intercept-and-observe.html">Intercept &amp; Observe {🚀}</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Fine-tuning</h3><ul class=""><li class="navListItem"><a class="navItem" href="/configuration.html">Configuration {🚀}</a></li><li class="navListItem"><a class="navItem" href="/enabling-decorators.html">Enabling decorators {🚀}</a></li><li class="navListItem"><a class="navItem" href="/migrating-from-4-or-5.html">Migrating from MobX 4/5 {🚀}</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><a class="edit-page-link button" href="https://github.com/mobxjs/mobx/edit/main/docs/the-gist-of-mobx.md" target="_blank" rel="noreferrer noopener">Edit</a></header><article><div><span><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
+<h1><a class="anchor" aria-hidden="true" id="the-gist-of-mobx"></a><a href="#the-gist-of-mobx" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>The gist of MobX</h1>
+<h2><a class="anchor" aria-hidden="true" id="concepts"></a><a href="#concepts" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Concepts</h2>
+<p>MobX distinguishes between the following three concepts in your application:</p>
+<ol>
+<li>State</li>
+<li>Actions</li>
+<li>Derivations</li>
+</ol>
+<p>Let's take a closer look at these concepts below, or alternatively, in the <a href="https://mobx.js.org/getting-started">10 minute introduction to MobX and React</a>, where you can interactively dive deeper into these concepts step by step and build a simple Todo list app.</p>
+<h3><a class="anchor" aria-hidden="true" id="1-define-state-and-make-it-observable"></a><a href="#1-define-state-and-make-it-observable" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>1. Define state and make it observable</h3>
+<p><em>State</em> is the data that drives your application.
+Usually, there is <em>domain specific state</em> like a list of todo items, and there is <em>view state</em>, such as the currently selected element.
+State is like spreadsheet cells that hold a value.</p>
+<p>Store state in any data structure you like: plain objects, arrays, classes, cyclic data structures or references. It doesn't matter for the workings of MobX.
+Just make sure that all properties you want to change over time are marked as <code>observable</code> so MobX can track them.</p>
+<p>Here is a simple example:</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { makeObservable, observable, action } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx"</span>
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Todo</span> </span>{
+    id = <span class="hljs-built_in">Math</span>.random()
+    title = <span class="hljs-string">""</span>
+    finished = <span class="hljs-literal">false</span>
+
+    <span class="hljs-keyword">constructor</span>(title) {
+        makeObservable(<span class="hljs-keyword">this</span>, {
+            <span class="hljs-attr">title</span>: observable,
+            <span class="hljs-attr">finished</span>: observable,
+            <span class="hljs-attr">toggle</span>: action
+        })
+        <span class="hljs-keyword">this</span>.title = title
+    }
+
+    toggle() {
+        <span class="hljs-keyword">this</span>.finished = !<span class="hljs-keyword">this</span>.finished
+    }
+}
+</code></pre>
+<p><strong>Hint</strong>: this example can be shortened using <a href="/observable-state.html"><code>makeAutoObservable</code></a>, but by being explicit we can showcase the different concepts in greater detail.</p>
+<p>Using <code>observable</code> is like turning a property of an object into a spreadsheet cell.
+But unlike spreadsheets, these values can not only be primitive values, but also references, objects and arrays.</p>
+<p>But what about <code>toggle</code>, which we marked as <code>action</code>?</p>
+<h3><a class="anchor" aria-hidden="true" id="2-update-state-using-actions"></a><a href="#2-update-state-using-actions" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>2. Update state using actions</h3>
+<p>An <em>action</em> is any piece of code that changes the <em>state</em>. User events, backend data pushes, scheduled events, etc.
+An action is like a user that enters a new value into a spreadsheet cell.</p>
+<p>In the <code>Todo</code> model above you can see that we have a <code>toggle</code> method that changes the value of <code>finished</code>. <code>finished</code> is marked as <code>observable</code>. It is recommended that you mark any piece of code that changes <code>observable</code>'s as an <a href="/actions.html"><code>action</code></a>. That way MobX can automatically apply transactions for effortless optimal performance.</p>
+<p>Using actions helps you structure your code and prevents you from inadvertently changing state when you don't intend to.
+Methods that modify state are called <em>actions</em> in MobX terminology. In contrast to <em>views</em>, which compute new information based on the current state.
+Every method should serve at most one of those two goals.</p>
+<h3><a class="anchor" aria-hidden="true" id="3-create-derivations-that-automatically-respond-to-state-changes"></a><a href="#3-create-derivations-that-automatically-respond-to-state-changes" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>3. Create derivations that automatically respond to state changes</h3>
+<p><em>Anything</em> that can be derived from the <em>state</em> without any further interaction is a derivation.
+Derivations exist in many forms:</p>
+<ul>
+<li>The <em>user interface</em></li>
+<li><em>Derived data</em>, such as the number of remaining <code>todos</code></li>
+<li><em>Backend integrations</em>, e.g. sending changes to the server</li>
+</ul>
+<p>MobX distinguishes between two kinds of derivations:</p>
+<ul>
+<li><em>Computed values</em>, which can always be derived from the current observable state using a pure function</li>
+<li><em>Reactions</em>, side effects that need to happen automatically when the state changes (bridge between imperative and reactive programming)</li>
+</ul>
+<p>When starting with MobX, people tend to overuse reactions.
+The golden rule is, always use <code>computed</code> if you want to create a value based on the current state.</p>
+<h4><a class="anchor" aria-hidden="true" id="31-model-derived-values-using-computed"></a><a href="#31-model-derived-values-using-computed" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>3.1. Model derived values using computed</h4>
+<p>To create a <em>computed</em> value, define a property using a JS getter function <code>get</code> and mark it as <code>computed</code> with <code>makeObservable</code>.</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { makeObservable, observable, computed } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx"</span>
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TodoList</span> </span>{
+    todos = []
+    <span class="hljs-keyword">get</span> unfinishedTodoCount() {
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.todos.filter(<span class="hljs-function"><span class="hljs-params">todo</span> =&gt;</span> !todo.finished).length
+    }
+    <span class="hljs-keyword">constructor</span>(todos) {
+        makeObservable(<span class="hljs-keyword">this</span>, {
+            <span class="hljs-attr">todos</span>: observable,
+            <span class="hljs-attr">unfinishedTodoCount</span>: computed
+        })
+        <span class="hljs-keyword">this</span>.todos = todos
+    }
+}
+</code></pre>
+<p>MobX will ensure that <code>unfinishedTodoCount</code> is updated automatically when a todo is added or when one of the <code>finished</code> properties is modified.</p>
+<p>These computations resemble formulas in spreadsheet programs like MS Excel. They update automatically, but only when required. That is, if something is interested in their outcome.</p>
+<h4><a class="anchor" aria-hidden="true" id="32-model-side-effects-using-reactions"></a><a href="#32-model-side-effects-using-reactions" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>3.2. Model side effects using reactions</h4>
+<p>For you as a user to be able to see a change in state or computed values on the screen, a <em>reaction</em> that repaints a part of the GUI is needed.</p>
+<p>Reactions are similar to computed values, but instead of producing information, they produce side effects like printing to the console, making network requests, incrementally updating React component tree to patch the DOM, etc.</p>
+<p>In short, reactions bridge the worlds of <a href="https://en.wikipedia.org/wiki/Reactive_programming">reactive</a> and <a href="https://en.wikipedia.org/wiki/Imperative_programming">imperative</a> programming.</p>
+<p>By far the most used form of reactions are UI components.
+Note that it is possible to trigger side effects from both actions and reactions.
+Side effects that have a clear, explicit origin from which they can be triggered, such
+as making a network request when submitting a form, should be triggered explicitly from the relevant event handler.</p>
+<h4><a class="anchor" aria-hidden="true" id="33-reactive-react-components"></a><a href="#33-reactive-react-components" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>3.3. Reactive React components</h4>
+<p>If you are using React, you can make your components reactive by wrapping them with the <a href="/react-integration.html"><code>observer</code></a> function from the bindings package you've <a href="/installation.html#installation">chosen during installation</a>. In this example, we're going to use the more lightweight <code>mobx-react-lite</code> package.</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> React <span class="hljs-keyword">from</span> <span class="hljs-string">"react"</span>
+<span class="hljs-keyword">import</span> { render } <span class="hljs-keyword">from</span> <span class="hljs-string">"react-dom"</span>
+<span class="hljs-keyword">import</span> { observer } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx-react-lite"</span>
+
+<span class="hljs-keyword">const</span> TodoListView = observer(<span class="hljs-function">(<span class="hljs-params">{ todoList }</span>) =&gt;</span> (
+    <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">ul</span>&gt;</span>
+            {todoList.todos.map(todo =&gt; (
+                <span class="hljs-tag">&lt;<span class="hljs-name">TodoView</span> <span class="hljs-attr">todo</span>=<span class="hljs-string">{todo}</span> <span class="hljs-attr">key</span>=<span class="hljs-string">{todo.id}</span> /&gt;</span>
+            ))}
+        <span class="hljs-tag">&lt;/<span class="hljs-name">ul</span>&gt;</span>
+        Tasks left: {todoList.unfinishedTodoCount}
+    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
+))
+
+<span class="hljs-keyword">const</span> TodoView = observer(<span class="hljs-function">(<span class="hljs-params">{ todo }</span>) =&gt;</span> (
+    <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">li</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"checkbox"</span> <span class="hljs-attr">checked</span>=<span class="hljs-string">{todo.finished}</span> <span class="hljs-attr">onClick</span>=<span class="hljs-string">{()</span> =&gt;</span> todo.toggle()} /&gt;
+        {todo.title}
+    <span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span></span>
+))
+
+<span class="hljs-keyword">const</span> store = <span class="hljs-keyword">new</span> TodoList([<span class="hljs-keyword">new</span> Todo(<span class="hljs-string">"Get Coffee"</span>), <span class="hljs-keyword">new</span> Todo(<span class="hljs-string">"Write simpler code"</span>)])
+render(<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">TodoListView</span> <span class="hljs-attr">todoList</span>=<span class="hljs-string">{store}</span> /&gt;</span></span>, <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">"root"</span>))
+</code></pre>
+<p><code>observer</code> converts React components into derivations of the data they render.
+When using MobX there are no smart or dumb components.
+All components render smartly, but are defined in a dumb manner. MobX will simply make sure the components are always re-rendered whenever needed, and never more than that.</p>
+<p>So the <code>onClick</code> handler in the above example will force the proper <code>TodoView</code> component to re-render as it uses the <code>toggle</code> action, but will only cause the <code>TodoListView</code> component to re-render if the number of unfinished tasks has changed.
+And if you would remove the <code>Tasks left</code> line (or put it into a separate component), the <code>TodoListView</code> component would no longer re-render when ticking a task.</p>
+<p>To learn more about how React works with MobX, check out the <a href="/react-integration.html">React integration</a> section.</p>
+<h4><a class="anchor" aria-hidden="true" id="34-custom-reactions"></a><a href="#34-custom-reactions" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>3.4. Custom reactions</h4>
+<p>You will need them rarely, but they can be created using the <a href="/reactions.html#autorun"><code>autorun</code></a>,
+<a href="/reactions.html#reaction"><code>reaction</code></a> or <a href="/reactions.html#when"><code>when</code></a> functions to fit your specific situations.
+For example, the following <code>autorun</code> prints a log message every time the amount of <code>unfinishedTodoCount</code> changes:</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-comment">// A function that automatically observes the state.</span>
+autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Tasks left: "</span> + todos.unfinishedTodoCount)
+})
+</code></pre>
+<p>Why does a new message get printed every time the <code>unfinishedTodoCount</code> is changed? The answer is this rule of thumb:</p>
+<p><em>MobX reacts to any existing observable property that is read during the execution of a tracked function.</em></p>
+<p>To learn more about how MobX determines which observables need to be reacted to, check out the <a href="/understanding-reactivity.html">Understanding reactivity</a> section.</p>
+<h2><a class="anchor" aria-hidden="true" id="principles"></a><a href="#principles" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Principles</h2>
+<p>MobX uses a uni-directional data flow where <em>actions</em> change the <em>state</em>, which in turn updates all affected <em>views</em>.</p>
+<p><img src="/assets/action-state-view.png" alt="Action, State, View"></p>
+<ol>
+<li><p>All <em>derivations</em> are updated <strong>automatically</strong> and <strong>atomically</strong> when the <em>state</em> changes. As a result, it is never possible to observe intermediate values.</p></li>
+<li><p>All <em>derivations</em> are updated <strong>synchronously</strong> by default. This means that, for example, <em>actions</em> can safely inspect a computed value directly after altering the <em>state</em>.</p></li>
+<li><p><em>Computed values</em> are updated <strong>lazily</strong>. Any computed value that is not actively in use will not be updated until it is needed for a side effect (I/O).
+If a view is no longer in use it will be garbage collected automatically.</p></li>
+<li><p>All <em>computed values</em> should be <strong>pure</strong>. They are not supposed to change <em>state</em>.</p></li>
+</ol>
+<p>To learn more about the background context, check out <a href="https://hackernoon.com/the-fundamental-principles-behind-mobx-7a725f71f3e8">the fundamental principles behind MobX</a>.</p>
+<h2><a class="anchor" aria-hidden="true" id="try-it-out"></a><a href="#try-it-out" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Try it out!</h2>
+<p>You can play with the above examples yourself on <a href="https://codesandbox.io/s/concepts-principles-il8lt?file=/src/index.js:1161-1252">CodeSandbox</a>.</p>
+<h2><a class="anchor" aria-hidden="true" id="linting"></a><a href="#linting" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Linting</h2>
+<p>If you find it hard to adopt the mental model of MobX, configure it to be very strict and warn you at runtime whenever you deviate from these patterns. Check out the <a href="/configuration.html#linting-options">linting MobX</a> section.</p>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/installation.html"><span class="arrow-prev">← </span><span>Installation</span></a><a class="docs-next button" href="/observable-state.html"><span>Observable state</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#concepts">Concepts</a><ul class="toc-headings"><li><a href="#1-define-state-and-make-it-observable">1. Define state and make it observable</a></li><li><a href="#2-update-state-using-actions">2. Update state using actions</a></li><li><a href="#3-create-derivations-that-automatically-respond-to-state-changes">3. Create derivations that automatically respond to state changes</a></li></ul></li><li><a href="#principles">Principles</a></li><li><a href="#try-it-out">Try it out!</a></li><li><a href="#linting">Linting</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/mobx.png" alt="MobX" width="66" height="58"/></a><div><h5>Docs</h5><a href="/README.html#introduction">About MobX</a><a href="/the-gist-of-mobx.html">The gist of MobX</a></div><div><h5>Community</h5><a href="https://github.com/mobxjs/mobx/discussions" target="_blank" rel="noreferrer noopener">GitHub discussions (NEW)</a><a href="https://stackoverflow.com/questions/tagged/mobx" target="_blank" rel="noreferrer noopener">Stack Overflow</a></div><div><h5>More</h5><a class="github-button" href="https://github.com/mobxjs/mobx" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+                document.addEventListener('keyup', function(e) {
+                  if (e.target !== document.body) {
+                    return;
+                  }
+                  // keyCode for '/' (slash)
+                  if (e.keyCode === 191) {
+                    const search = document.getElementById('search_input_react');
+                    search && search.focus();
+                  }
+                });
+              </script><script>
+              var search = docsearch({
+                
+                apiKey: '500db32fbdbd53a814f42aafdfa26bd4',
+                indexName: 'mobxjs',
+                inputSelector: '#search_input_react'
+              });
+            </script></body></html>

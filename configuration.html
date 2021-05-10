@@ -1,0 +1,240 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Configuration · MobX</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="&lt;script async type=&quot;text/javascript&quot; src=&quot;//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&amp;placement=mobxjsorg&quot; id=&quot;_carbonads_js&quot;&gt;&lt;/script&gt;"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Configuration · MobX"/><meta property="og:type" content="website"/><meta property="og:url" content="https://mobx.js.org/index.html"/><meta property="og:description" content="&lt;script async type=&quot;text/javascript&quot; src=&quot;//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&amp;placement=mobxjsorg&quot; id=&quot;_carbonads_js&quot;&gt;&lt;/script&gt;"/><meta property="og:image" content="https://mobx.js.org/img/undraw_online.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://mobx.js.org/img/undraw_tweetstorm.svg"/><link rel="shortcut icon" href="/img/favicon.png"/><link rel="stylesheet" href="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.css"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script>
+              (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+              (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+              m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+              })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+              ga('create', 'UA-65632006-1', 'auto');
+              ga('send', 'pageview');
+            </script><script type="text/javascript" src="/js/scripts.js"></script><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><img class="logo" src="/img/mobx.png" alt="MobX"/><h2 class="headerTitleWithLogo">MobX</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class=""><a href="/api.html" target="_self">API Reference</a></li><li class=""><a href="https://zh.mobx.js.org" target="_self">中文(寻求翻译)</a></li><li class=""><a href="/backers-sponsors.html" target="_self">Sponsors</a></li><li class=""><a href="https://github.com/mobxjs/mobx" target="_self">GitHub</a></li><li class="navSearchWrapper reactNavSearchWrapper"><input type="text" id="search_input_react" placeholder="Search" title="Search"/></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Fine-tuning</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Introduction</h3><ul class=""><li class="navListItem"><a class="navItem" href="/README.html">About MobX</a></li><li class="navListItem"><a class="navItem" href="/about-this-documentation.html">About this documentation</a></li><li class="navListItem"><a class="navItem" href="/installation.html">Installation</a></li><li class="navListItem"><a class="navItem" href="/the-gist-of-mobx.html">The gist of MobX</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">MobX core</h3><ul class=""><li class="navListItem"><a class="navItem" href="/observable-state.html">Observable state</a></li><li class="navListItem"><a class="navItem" href="/actions.html">Actions</a></li><li class="navListItem"><a class="navItem" href="/computeds.html">Computeds</a></li><li class="navListItem"><a class="navItem" href="/reactions.html">Reactions {🚀}</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">MobX and React</h3><ul class=""><li class="navListItem"><a class="navItem" href="/react-integration.html">React integration</a></li><li class="navListItem"><a class="navItem" href="/react-optimizations.html">React optimizations {🚀}</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Tips &amp; Tricks</h3><ul class=""><li class="navListItem"><a class="navItem" href="/defining-data-stores.html">Defining data stores</a></li><li class="navListItem"><a class="navItem" href="/understanding-reactivity.html">Understanding reactivity</a></li><li class="navListItem"><a class="navItem" href="/subclassing.html">Subclassing</a></li><li class="navListItem"><a class="navItem" href="/analyzing-reactivity.html">Analyzing reactivity {🚀}</a></li><li class="navListItem"><a class="navItem" href="/computeds-with-args.html">Computeds with arguments {🚀}</a></li><li class="navListItem"><a class="navItem" href="/mobx-utils.html">MobX-utils {🚀}</a></li><li class="navListItem"><a class="navItem" href="/custom-observables.html">Custom observables {🚀}</a></li><li class="navListItem"><a class="navItem" href="/lazy-observables.html">Lazy observables {🚀}</a></li><li class="navListItem"><a class="navItem" href="/collection-utilities.html">Collection utilities {🚀}</a></li><li class="navListItem"><a class="navItem" href="/intercept-and-observe.html">Intercept &amp; Observe {🚀}</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Fine-tuning</h3><ul class=""><li class="navListItem navListItemActive"><a class="navItem" href="/configuration.html">Configuration {🚀}</a></li><li class="navListItem"><a class="navItem" href="/enabling-decorators.html">Enabling decorators {🚀}</a></li><li class="navListItem"><a class="navItem" href="/migrating-from-4-or-5.html">Migrating from MobX 4/5 {🚀}</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><a class="edit-page-link button" href="https://github.com/mobxjs/mobx/edit/main/docs/configuration.md" target="_blank" rel="noreferrer noopener">Edit</a></header><article><div><span><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
+<h1><a class="anchor" aria-hidden="true" id="configuration-"></a><a href="#configuration-" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Configuration {🚀}</h1>
+<p>MobX has several configurations depending on how you prefer to use it, which JavaScript engines you want to target, and whether you want MobX to hint at best practices.
+Most configuration options can be set by using the <code>configure</code> method.</p>
+<h2><a class="anchor" aria-hidden="true" id="proxy-support"></a><a href="#proxy-support" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Proxy support</h2>
+<p>By default, MobX uses proxies to make arrays and plain objects observable. Proxies provide the best performance and most consistent behavior across environments.
+However, if you are targetting an environment that doesn't support proxies, proxy support has to be disabled.
+Most notably this is the case when targetting Internet Explorer or React Native without using the Hermes engine.</p>
+<p>Proxy support can be disabled by using <code>configure</code>:</p>
+<pre><code class="hljs css language-typescript"><span class="hljs-keyword">import</span> { configure } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx"</span>
+
+configure({
+    useProxies: <span class="hljs-string">"never"</span>
+})
+</code></pre>
+<p>Accepted values for the <code>useProxies</code> configuration are:</p>
+<ul>
+<li><code>&quot;always&quot;</code> (<strong>default</strong>): MobX expects to run only in environments with <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy"><code>Proxy</code> support</a> and it will error if such an environment is not available.</li>
+<li><code>&quot;never&quot;</code>: Proxies are not used and MobX falls back on non-proxy alternatives. This is compatible with all ES5 environments, but causes various <a href="#limitations-without-proxy-support">limitations</a>.</li>
+<li><code>&quot;ifavailable&quot;</code> (experimental): Proxies are used if they are available, and otherwise MobX falls back to non-proxy alternatives. The benefit of this mode is that MobX will try to warn if APIs or language features that wouldn't work in ES5 environments are used, triggering errors when hitting an ES5 limitation running on a modern environment.</li>
+</ul>
+<p><strong>Note:</strong> before MobX 6, one had to pick either MobX 4 for older engines, or MobX 5 for new engines. However, MobX 6 supports both, although polyfills for certain APIs like Map will be required when targetting older JavaScript engines.
+Proxies cannot be polyfilled. Even though polyfills do exist, they don't support the full spec and are unsuitable for MobX. Don't use them.</p>
+<h3><a class="anchor" aria-hidden="true" id="limitations-without-proxy-support"></a><a href="#limitations-without-proxy-support" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Limitations without Proxy support</h3>
+<ol>
+<li>Observable arrays are not real arrays, so they won't pass the <code>Array.isArray()</code> check. The practical consequence is that you often need to <code>.slice()</code> the array first (to get a shallow copy of the real array) before passing it to third party libraries. For example, concatenating observable arrays doesn't work as expected, so <code>.slice()</code> them first.</li>
+<li>Adding or deleting properties of existing observable plain objects after creation is not automatically picked up. If you intend to use objects as index based lookup maps, in other words, as dynamic collections of things, use observable Maps instead.</li>
+</ol>
+<p>It is possible to dynamically add properties to objects, and detect their additions, even when Proxies aren't enabled.
+This can be achieved by using the <a href="/collection-utilities.html">Collection utilities {🚀}</a>. Make sure that (new) properties are set using the <code>set</code> utility, and that the objects are iterated using one of the <code>values</code> / <code>keys</code> or <code>entries</code> utilities, rather than the built-in JavaScript mechanisms.
+But, since this is really easy to forget, we instead recommend using observable Maps if possible.</p>
+<h2><a class="anchor" aria-hidden="true" id="decorator-support"></a><a href="#decorator-support" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Decorator support</h2>
+<p>For enabling experimental decorator support check out the <a href="/enabling-decorators.html">Enabling decorators {🚀}</a> section.</p>
+<h2><a class="anchor" aria-hidden="true" id="linting-options"></a><a href="#linting-options" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Linting options</h2>
+<p>To help you adopt the patterns advocated by MobX, a strict separation between actions, state and derivations, MobX can <em>&quot;lint&quot;</em> your coding patterns at runtime by hinting at smells. To make sure MobX is as strict as possible, adopt the following settings and read on for their explanations:</p>
+<pre><code class="hljs css language-typescript"><span class="hljs-keyword">import</span> { configure } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx"</span>
+
+configure({
+    enforceActions: <span class="hljs-string">"always"</span>,
+    computedRequiresReaction: <span class="hljs-literal">true</span>,
+    reactionRequiresObservable: <span class="hljs-literal">true</span>,
+    observableRequiresReaction: <span class="hljs-literal">true</span>,
+    disableErrorBoundaries: <span class="hljs-literal">true</span>
+})
+</code></pre>
+<p>At some point you will discover that this level of strictness can be pretty annoying.
+It is fine to disable these rules to gain productivity once you are sure you (and your colleagues) grokked the mental model of MobX.</p>
+<p>Also, occassionally you will have a case where you have to supress the warnings triggered by these rules (for example by wrapping in <code>runInAction</code>).
+That is fine, there are good exceptions to these recommendations.
+Don't be fundamentalistic about them.</p>
+<h4><a class="anchor" aria-hidden="true" id="enforceactions"></a><a href="#enforceactions" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>enforceActions</code></h4>
+<p>The goal of <em>enforceActions</em> is that you don't forget to wrap event handlers in <a href="/actions.html"><code>action</code></a>.</p>
+<p>Possible options:</p>
+<ul>
+<li><code>&quot;observed&quot;</code> (<strong>default</strong>): All state that is observed <em>somewhere</em> needs to be changed through actions. This is the default, and the recommended strictness mode in non-trivial applications.</li>
+<li><code>&quot;never&quot;</code>: State can be changed from anywhere.</li>
+<li><code>&quot;always&quot;</code>: State always needs to be changed through actions, which in practice also includes creation.</li>
+</ul>
+<p>The benefit of <code>&quot;observed&quot;</code> is that it allows you to create observables outside of actions and modify them freely, as long as they aren't used anywhere yet.</p>
+<p>Since state should in principle always be created from some event handlers, and event handlers should be wrapped, <code>&quot;always&quot;</code> captures this the best. But you probably don't want to use this mode in unit tests.</p>
+<p>In the rare case where you create observables lazily, for example in a computed property, you can wrap the creation ad-hoc in an action using <code>runInAction</code>.</p>
+<h4><a class="anchor" aria-hidden="true" id="computedrequiresreaction-boolean"></a><a href="#computedrequiresreaction-boolean" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>computedRequiresReaction: boolean</code></h4>
+<p>Forbids the direct access of any unobserved computed value from outside an action or reaction.
+This guarantees you aren't using computed values in a way where MobX won't cache them. <strong>Default: <code>false</code></strong>.</p>
+<p>In the following example, MobX won't cache the computed value in the first code block, but will cache the result in the second and third block:</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Clock</span> </span>{
+    seconds = <span class="hljs-number">0</span>
+
+    <span class="hljs-keyword">get</span> milliseconds() {
+        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"computing"</span>)
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.seconds * <span class="hljs-number">1000</span>
+    }
+
+    <span class="hljs-keyword">constructor</span>() {
+        makeAutoObservable(<span class="hljs-keyword">this</span>)
+    }
+}
+
+<span class="hljs-keyword">const</span> clock = <span class="hljs-keyword">new</span> Clock()
+{
+    <span class="hljs-comment">// This would compute twice, but is warned against by this flag.</span>
+    <span class="hljs-built_in">console</span>.log(clock.milliseconds)
+    <span class="hljs-built_in">console</span>.log(clock.milliseconds)
+}
+{
+    runInAction(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+        <span class="hljs-comment">// Will compute only once.</span>
+        <span class="hljs-built_in">console</span>.log(clock.milliseconds)
+        <span class="hljs-built_in">console</span>.log(clock.milliseconds)
+    })
+}
+{
+    autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+        <span class="hljs-comment">// Will compute only once.</span>
+        <span class="hljs-built_in">console</span>.log(clock.milliseconds)
+        <span class="hljs-built_in">console</span>.log(clock.milliseconds)
+    })
+}
+</code></pre>
+<h4><a class="anchor" aria-hidden="true" id="observablerequiresreaction-boolean"></a><a href="#observablerequiresreaction-boolean" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>observableRequiresReaction: boolean</code></h4>
+<p>Warns about any unobserved observable access.
+Use this if you want to check whether you are using observables without a &quot;MobX context&quot;.
+This is a great way to find any missing <code>observer</code> wrappers, for example in React components. But it will find missing actions as well. <strong>Default: <code>false</code></strong></p>
+<pre><code class="hljs css language-javascript">configure({ <span class="hljs-attr">observableRequiresReaction</span>: <span class="hljs-literal">true</span> })
+</code></pre>
+<p><strong>Note:</strong> using propTypes on components that are wrapped with <code>observer</code> might trigger false positives for this rule.</p>
+<h4><a class="anchor" aria-hidden="true" id="reactionrequiresobservable-boolean"></a><a href="#reactionrequiresobservable-boolean" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>reactionRequiresObservable: boolean</code></h4>
+<p>Warns when a reaction (e.g. <code>autorun</code>) is created without accessing any observables.
+Use this to check whether you are unnecessarily wrapping React components with <code>observer</code>, wrapping functions with <code>action</code>, or find cases where you simply forgot to make some data structures or properties observable. <strong>Default: <code>false</code></strong></p>
+<pre><code class="hljs css language-javascript">configure({ <span class="hljs-attr">reactionRequiresObservable</span>: <span class="hljs-literal">true</span> })
+</code></pre>
+<h4><a class="anchor" aria-hidden="true" id="disableerrorboundaries-boolean"></a><a href="#disableerrorboundaries-boolean" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>disableErrorBoundaries: boolean</code></h4>
+<p>By default, MobX will catch and re-throw exceptions happening in your code to make sure that a reaction in one exception does not prevent the scheduled execution of other, possibly unrelated, reactions. This means exceptions are not propagated back to the original causing code and therefore you won't be able to catch them using try/catch.</p>
+<p>By disabling error boundaries, exceptions can escape derivations. This might ease debugging, but might leave MobX and by extension your application in an unrecoverable broken state. <strong>Default: <code>false</code></strong>.</p>
+<p>This option is great for unit tests, but remember to call <code>_resetGlobalState</code> after each test, for example by using <code>afterEach</code> in jest, for example:</p>
+<pre><code class="hljs css language-js"><span class="hljs-keyword">import</span> { _resetGlobalState, observable, autorun, configure } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx"</span>
+
+configure({ <span class="hljs-attr">disableErrorBoundaries</span>: <span class="hljs-literal">true</span> })
+
+test(<span class="hljs-string">"Throw if age is negative"</span>, () =&gt; {
+    expect(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+        <span class="hljs-keyword">const</span> age = observable.box(<span class="hljs-number">10</span>)
+        autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+            <span class="hljs-keyword">if</span> (age.get() &lt; <span class="hljs-number">0</span>) <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">"Age should not be negative"</span>)
+        })
+        age.set(<span class="hljs-number">-1</span>)
+    }).toThrow(<span class="hljs-string">"Age should not be negative"</span>)
+})
+
+afterEach(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    _resetGlobalState()
+})
+</code></pre>
+<h4><a class="anchor" aria-hidden="true" id="safedescriptors-boolean"></a><a href="#safedescriptors-boolean" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>safeDescriptors: boolean</code></h4>
+<p>MobX makes some fields <strong>non-configurable</strong> or <strong>non-writable</strong> to prevent you from doing things that are not supported or would most likely break your code. However this can also prevent <strong>spying/mocking/stubbing</strong> in your tests.
+<code>configure({ safeDescriptors: false })</code> disables this safety measure, making everything <strong>configurable</strong> and <strong>writable</strong>.
+Note it doesn't affect existing observables, only the ones created after it's been configured.
+<span style="color:red"><strong>Use with caution</strong></span> and only when needed - do not turn this off globally for all tests, otherwise you risk false positives (passing tests with broken code). <strong>Default: <code>true</code></strong></p>
+<pre><code class="hljs css language-javascript">configure({ <span class="hljs-attr">safeDescriptors</span>: <span class="hljs-literal">false</span> })
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="further-configuration-options"></a><a href="#further-configuration-options" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Further configuration options</h2>
+<h4><a class="anchor" aria-hidden="true" id="isolateglobalstate-boolean"></a><a href="#isolateglobalstate-boolean" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>isolateGlobalState: boolean</code></h4>
+<p>Isolates the global state of MobX when there are multiple instances of MobX active in the same environment. This is useful when you have an encapsulated library that is using MobX, living in the same page as the app that is using MobX. The reactivity inside the library will remain self-contained when you call <code>configure({ isolateGlobalState: true })</code> from it.</p>
+<p>Without this option, if multiple MobX instances are active, their internal state will be shared. The benefit is that observables from both instances work together, the downside is that the MobX versions have to match. <strong>Default: <code>false</code></strong></p>
+<pre><code class="hljs css language-javascript">configure({ <span class="hljs-attr">isolateGlobalState</span>: <span class="hljs-literal">true</span> })
+</code></pre>
+<h4><a class="anchor" aria-hidden="true" id="reactionscheduler-f---void--void"></a><a href="#reactionscheduler-f---void--void" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>reactionScheduler: (f: () =&gt; void) =&gt; void</code></h4>
+<p>Sets a new function that executes all MobX reactions.
+By default <code>reactionScheduler</code> just runs the <code>f</code> reaction without any other behavior.
+This can be useful for basic debugging, or slowing down reactions to visualize application updates. <strong>Default: <code>f =&gt; f()</code></strong></p>
+<pre><code class="hljs css language-javascript">configure({
+    <span class="hljs-attr">reactionScheduler</span>: (f): <span class="hljs-function"><span class="hljs-params">void</span> =&gt;</span> {
+        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Running an event after a delay:"</span>, f)
+        setTimeout(f, <span class="hljs-number">100</span>)
+    }
+})
+</code></pre>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/intercept-and-observe.html"><span class="arrow-prev">← </span><span>Intercept &amp; Observe {🚀}</span></a><a class="docs-next button" href="/enabling-decorators.html"><span>Enabling decorators {🚀}</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#proxy-support">Proxy support</a><ul class="toc-headings"><li><a href="#limitations-without-proxy-support">Limitations without Proxy support</a></li></ul></li><li><a href="#decorator-support">Decorator support</a></li><li><a href="#linting-options">Linting options</a></li><li><a href="#further-configuration-options">Further configuration options</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/mobx.png" alt="MobX" width="66" height="58"/></a><div><h5>Docs</h5><a href="/README.html#introduction">About MobX</a><a href="/the-gist-of-mobx.html">The gist of MobX</a></div><div><h5>Community</h5><a href="https://github.com/mobxjs/mobx/discussions" target="_blank" rel="noreferrer noopener">GitHub discussions (NEW)</a><a href="https://stackoverflow.com/questions/tagged/mobx" target="_blank" rel="noreferrer noopener">Stack Overflow</a></div><div><h5>More</h5><a class="github-button" href="https://github.com/mobxjs/mobx" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+                document.addEventListener('keyup', function(e) {
+                  if (e.target !== document.body) {
+                    return;
+                  }
+                  // keyCode for '/' (slash)
+                  if (e.keyCode === 191) {
+                    const search = document.getElementById('search_input_react');
+                    search && search.focus();
+                  }
+                });
+              </script><script>
+              var search = docsearch({
+                
+                apiKey: '500db32fbdbd53a814f42aafdfa26bd4',
+                indexName: 'mobxjs',
+                inputSelector: '#search_input_react'
+              });
+            </script></body></html>

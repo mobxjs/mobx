@@ -1,0 +1,368 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Understanding reactivity · MobX</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="&lt;script async type=&quot;text/javascript&quot; src=&quot;//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&amp;placement=mobxjsorg&quot; id=&quot;_carbonads_js&quot;&gt;&lt;/script&gt;"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Understanding reactivity · MobX"/><meta property="og:type" content="website"/><meta property="og:url" content="https://mobx.js.org/index.html"/><meta property="og:description" content="&lt;script async type=&quot;text/javascript&quot; src=&quot;//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&amp;placement=mobxjsorg&quot; id=&quot;_carbonads_js&quot;&gt;&lt;/script&gt;"/><meta property="og:image" content="https://mobx.js.org/img/undraw_online.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://mobx.js.org/img/undraw_tweetstorm.svg"/><link rel="shortcut icon" href="/img/favicon.png"/><link rel="stylesheet" href="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.css"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script>
+              (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+              (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+              m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+              })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+              ga('create', 'UA-65632006-1', 'auto');
+              ga('send', 'pageview');
+            </script><script type="text/javascript" src="/js/scripts.js"></script><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><img class="logo" src="/img/mobx.png" alt="MobX"/><h2 class="headerTitleWithLogo">MobX</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class=""><a href="/api.html" target="_self">API Reference</a></li><li class=""><a href="https://zh.mobx.js.org" target="_self">中文(寻求翻译)</a></li><li class=""><a href="/backers-sponsors.html" target="_self">Sponsors</a></li><li class=""><a href="https://github.com/mobxjs/mobx" target="_self">GitHub</a></li><li class="navSearchWrapper reactNavSearchWrapper"><input type="text" id="search_input_react" placeholder="Search" title="Search"/></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Tips &amp; Tricks</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Introduction</h3><ul class=""><li class="navListItem"><a class="navItem" href="/README.html">About MobX</a></li><li class="navListItem"><a class="navItem" href="/about-this-documentation.html">About this documentation</a></li><li class="navListItem"><a class="navItem" href="/installation.html">Installation</a></li><li class="navListItem"><a class="navItem" href="/the-gist-of-mobx.html">The gist of MobX</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">MobX core</h3><ul class=""><li class="navListItem"><a class="navItem" href="/observable-state.html">Observable state</a></li><li class="navListItem"><a class="navItem" href="/actions.html">Actions</a></li><li class="navListItem"><a class="navItem" href="/computeds.html">Computeds</a></li><li class="navListItem"><a class="navItem" href="/reactions.html">Reactions {🚀}</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">MobX and React</h3><ul class=""><li class="navListItem"><a class="navItem" href="/react-integration.html">React integration</a></li><li class="navListItem"><a class="navItem" href="/react-optimizations.html">React optimizations {🚀}</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Tips &amp; Tricks</h3><ul class=""><li class="navListItem"><a class="navItem" href="/defining-data-stores.html">Defining data stores</a></li><li class="navListItem navListItemActive"><a class="navItem" href="/understanding-reactivity.html">Understanding reactivity</a></li><li class="navListItem"><a class="navItem" href="/subclassing.html">Subclassing</a></li><li class="navListItem"><a class="navItem" href="/analyzing-reactivity.html">Analyzing reactivity {🚀}</a></li><li class="navListItem"><a class="navItem" href="/computeds-with-args.html">Computeds with arguments {🚀}</a></li><li class="navListItem"><a class="navItem" href="/mobx-utils.html">MobX-utils {🚀}</a></li><li class="navListItem"><a class="navItem" href="/custom-observables.html">Custom observables {🚀}</a></li><li class="navListItem"><a class="navItem" href="/lazy-observables.html">Lazy observables {🚀}</a></li><li class="navListItem"><a class="navItem" href="/collection-utilities.html">Collection utilities {🚀}</a></li><li class="navListItem"><a class="navItem" href="/intercept-and-observe.html">Intercept &amp; Observe {🚀}</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Fine-tuning</h3><ul class=""><li class="navListItem"><a class="navItem" href="/configuration.html">Configuration {🚀}</a></li><li class="navListItem"><a class="navItem" href="/enabling-decorators.html">Enabling decorators {🚀}</a></li><li class="navListItem"><a class="navItem" href="/migrating-from-4-or-5.html">Migrating from MobX 4/5 {🚀}</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><a class="edit-page-link button" href="https://github.com/mobxjs/mobx/edit/main/docs/understanding-reactivity.md" target="_blank" rel="noreferrer noopener">Edit</a></header><article><div><span><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
+<h1><a class="anchor" aria-hidden="true" id="understanding-reactivity"></a><a href="#understanding-reactivity" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Understanding reactivity</h1>
+<p>MobX usually reacts to exactly the things you expect it to, which means that in 90% of your use cases MobX should &quot;just work&quot;.
+However, at some point you will encounter a case where it does not do what you expected.
+At that point it is invaluable to understand how MobX determines what to react to.</p>
+<blockquote>
+<p>MobX reacts to any <em>existing</em> <strong>observable</strong> <em>property</em> that is read during the execution of a tracked function.</p>
+</blockquote>
+<ul>
+<li><em>&quot;reading&quot;</em> is dereferencing an object's property, which can be done through &quot;dotting into&quot; it (eg. <code>user.name</code>) or using the bracket notation (eg. <code>user['name']</code>, <code>todos[3]</code>).</li>
+<li><em>&quot;tracked functions&quot;</em> are the expression of <code>computed</code>, the <em>rendering</em> of an <code>observer</code> React function component, the <code>render()</code> method of an <code>observer</code> based React class component, and the functions that are passed as the first param to <code>autorun</code>, <code>reaction</code> and <code>when</code>.</li>
+<li><em>&quot;during&quot;</em> means that only those observables that are read while the function is executing are tracked. It doesn't matter whether these values are used directly or indirectly by the tracked function. But things that have been 'spawned' from the function won't be tracked (e.g. <code>setTimeout</code>, <code>promise.then</code>, <code>await</code> etc).</li>
+</ul>
+<p>In other words, MobX will not react to:</p>
+<ul>
+<li>Values that are obtained from observables, but outside a tracked function</li>
+<li>Observables that are read in an asynchronously invoked code block</li>
+</ul>
+<h2><a class="anchor" aria-hidden="true" id="mobx-tracks-property-access-not-values"></a><a href="#mobx-tracks-property-access-not-values" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>MobX tracks property access, not values</h2>
+<p>To elaborate on the above rules with an example, suppose that you have the following observable instance:</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Message</span> </span>{
+    title
+    author
+    likes
+    <span class="hljs-keyword">constructor</span>(title, author, likes) {
+        makeAutoObservable(<span class="hljs-keyword">this</span>)
+        <span class="hljs-keyword">this</span>.title = title
+        <span class="hljs-keyword">this</span>.author = author
+        <span class="hljs-keyword">this</span>.likes = likes
+    }
+
+    updateTitle(title) {
+        <span class="hljs-keyword">this</span>.title = title
+    }
+}
+
+<span class="hljs-keyword">let</span> message = <span class="hljs-keyword">new</span> Message(<span class="hljs-string">"Foo"</span>, { <span class="hljs-attr">name</span>: <span class="hljs-string">"Michel"</span> }, [<span class="hljs-string">"Joe"</span>, <span class="hljs-string">"Sara"</span>])
+</code></pre>
+<p>In memory this looks as follows. The green boxes indicate <em>observable</em> properties. Note that the <em>values</em> themselves are not observable!</p>
+<p><img src="/assets/observed-refs.png" alt="MobX reacts to changing references"></p>
+<p>What MobX basically does is recording which <em>arrows</em> you use in your function. After that, it will re-run whenever one of these <em>arrows</em> changes; when they start to refer to something else.</p>
+<h2><a class="anchor" aria-hidden="true" id="examples"></a><a href="#examples" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Examples</h2>
+<p>Let's show that with a bunch of examples (based on the <code>message</code> variable defined above):</p>
+<h4><a class="anchor" aria-hidden="true" id="correct-dereference-inside-the-tracked-function"></a><a href="#correct-dereference-inside-the-tracked-function" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Correct: dereference inside the tracked function</h4>
+<pre><code class="hljs css language-javascript">autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(message.title)
+})
+message.updateTitle(<span class="hljs-string">"Bar"</span>)
+</code></pre>
+<p>This will react as expected. The <code>.title</code> property was dereferenced by the autorun, and changed afterwards, so this change is detected.</p>
+<p>You can verify what MobX will track by calling <a href="/analyzing-reactivity.html"><code>trace()</code></a> inside the tracked function. In the case of the above function it outputs the following:</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { trace } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx"</span>
+
+<span class="hljs-keyword">const</span> disposer = autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(message.title)
+    trace()
+})
+<span class="hljs-comment">// Outputs:</span>
+<span class="hljs-comment">// [mobx.trace] 'Autorun@2' tracing enabled</span>
+
+message.updateTitle(<span class="hljs-string">"Hello"</span>)
+<span class="hljs-comment">// Outputs:</span>
+<span class="hljs-comment">// [mobx.trace] 'Autorun@2' is invalidated due to a change in: 'Message@1.title'</span>
+Hello
+</code></pre>
+<p>It is also possible to get the internal dependency (or observer) tree by using <code>getDependencyTree</code>:</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { getDependencyTree } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx"</span>
+
+<span class="hljs-comment">// Prints the dependency tree of the reaction coupled to the disposer.</span>
+<span class="hljs-built_in">console</span>.log(getDependencyTree(disposer))
+<span class="hljs-comment">// Outputs:</span>
+<span class="hljs-comment">// { name: 'Autorun@2', dependencies: [ { name: 'Message@1.title' } ] }</span>
+</code></pre>
+<h4><a class="anchor" aria-hidden="true" id="incorrect-changing-a-non-observable-reference"></a><a href="#incorrect-changing-a-non-observable-reference" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Incorrect: changing a non-observable reference</h4>
+<pre><code class="hljs css language-javascript">autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(message.title)
+})
+message = <span class="hljs-keyword">new</span> Message(<span class="hljs-string">"Bar"</span>, { <span class="hljs-attr">name</span>: <span class="hljs-string">"Martijn"</span> }, [<span class="hljs-string">"Felicia"</span>, <span class="hljs-string">"Marcus"</span>])
+</code></pre>
+<p>This will <strong>not</strong> react. <code>message</code> was changed, but <code>message</code> is not an observable, just a variable which <em>refers to</em> an observable, but the variable (reference) itself is not observable.</p>
+<h4><a class="anchor" aria-hidden="true" id="incorrect-dereference-outside-of-a-tracked-function"></a><a href="#incorrect-dereference-outside-of-a-tracked-function" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Incorrect: dereference outside of a tracked function</h4>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">let</span> title = message.title
+autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(title)
+})
+message.updateMessage(<span class="hljs-string">"Bar"</span>)
+</code></pre>
+<p>This will <strong>not</strong> react. <code>message.title</code> was dereferenced outside of <code>autorun</code>, and just contains the value of <code>message.title</code> at the moment of dereferencing (the string <code>&quot;Foo&quot;</code>). <code>title</code> is not an observable so <code>autorun</code> will never react.</p>
+<h4><a class="anchor" aria-hidden="true" id="correct-dereference-inside-the-tracked-function-1"></a><a href="#correct-dereference-inside-the-tracked-function-1" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Correct: dereference inside the tracked function</h4>
+<pre><code class="hljs css language-javascript">autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(message.author.name)
+})
+
+runInAction(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    message.author.name = <span class="hljs-string">"Sara"</span>
+})
+runInAction(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    message.author = { <span class="hljs-attr">name</span>: <span class="hljs-string">"Joe"</span> }
+})
+</code></pre>
+<p>This reacts to both changes. Both <code>author</code> and <code>author.name</code> are dotted into, allowing MobX to track these references.</p>
+<p>Note that we had to use <code>runInAction</code> here to be allowed to make changes outside
+of an <code>action</code>.</p>
+<h4><a class="anchor" aria-hidden="true" id="incorrect-store-a-local-reference-to-an-observable-object-without-tracking"></a><a href="#incorrect-store-a-local-reference-to-an-observable-object-without-tracking" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Incorrect: store a local reference to an observable object without tracking</h4>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> author = message.author
+autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(author.name)
+})
+
+runInAction(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    message.author.name = <span class="hljs-string">"Sara"</span>
+})
+runInAction(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    message.author = { <span class="hljs-attr">name</span>: <span class="hljs-string">"Joe"</span> }
+})
+</code></pre>
+<p>The first change will be picked up, <code>message.author</code> and <code>author</code> are the same object, and the <code>.name</code> property is dereferenced in the autorun.
+However, the second change is <strong>not</strong> picked up, because the <code>message.author</code> relation is not tracked by the <code>autorun</code>. Autorun is still using the &quot;old&quot; <code>author</code>.</p>
+<h4><a class="anchor" aria-hidden="true" id="common-pitfall-consolelog"></a><a href="#common-pitfall-consolelog" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Common pitfall: console.log</h4>
+<pre><code class="hljs css language-javascript">autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(message)
+})
+
+<span class="hljs-comment">// Won't trigger a re-run.</span>
+message.updateTitle(<span class="hljs-string">"Hello world"</span>)
+</code></pre>
+<p>In the above example, the updated message title won't be printed, because it is not used inside the autorun.
+The autorun only depends on <code>message</code>, which is not an observable, but a variable. In other words, as far as MobX is concerned, <code>title</code> is not used in the <code>autorun</code>.</p>
+<p>If you use this in a web browser debugging tool, you may be able to find the
+updated value of <code>title</code> after all, but this is misleading -- autorun run after all has run once when it was first called. This happens because <code>console.log</code> is an asynchronous function and the object is only formatted later in time. This means that if you follow the title in the debugging toolbar, you can find the updated value. But the <code>autorun</code> does not track any updates.</p>
+<p>The way to make this work is to make sure to always pass immutable data or defensive copies to <code>console.log</code>. So the following solutions all react to changes in <code>message.title</code>:</p>
+<pre><code class="hljs css language-javascript">autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(message.title) <span class="hljs-comment">// Clearly, the `.title` observable is used.</span>
+})
+
+autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(mobx.toJS(message)) <span class="hljs-comment">// toJS creates a deep clone, and thus will read the message.</span>
+})
+
+autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log({ ...message }) <span class="hljs-comment">// Creates a shallow clone, also using `.title` in the process.</span>
+})
+
+autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-built_in">JSON</span>.stringify(message)) <span class="hljs-comment">// Also reads the entire structure.</span>
+})
+</code></pre>
+<h4><a class="anchor" aria-hidden="true" id="correct-access-array-properties-in-tracked-function"></a><a href="#correct-access-array-properties-in-tracked-function" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Correct: access array properties in tracked function</h4>
+<pre><code class="hljs css language-javascript">autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(message.likes.length)
+})
+message.likes.push(<span class="hljs-string">"Jennifer"</span>)
+</code></pre>
+<p>This will react as expected. <code>.length</code> counts towards a property.
+Note that this will react to <em>any</em> change in the array.
+Arrays are not tracked per index / property (like observable objects and maps), but as a whole.</p>
+<h4><a class="anchor" aria-hidden="true" id="incorrect-access-out-of-bounds-indices-in-tracked-function"></a><a href="#incorrect-access-out-of-bounds-indices-in-tracked-function" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Incorrect: access out-of-bounds indices in tracked function</h4>
+<pre><code class="hljs css language-javascript">autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(message.likes[<span class="hljs-number">0</span>])
+})
+message.likes.push(<span class="hljs-string">"Jennifer"</span>)
+</code></pre>
+<p>This will react with the above sample data because array indexes count as property access. But <strong>only</strong> if the provided <code>index &lt; length</code>.
+MobX does not track not-yet-existing array indices.
+So always guard your array index based access with a <code>.length</code> check.</p>
+<h4><a class="anchor" aria-hidden="true" id="correct-access-array-functions-in-tracked-function"></a><a href="#correct-access-array-functions-in-tracked-function" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Correct: access array functions in tracked function</h4>
+<pre><code class="hljs css language-javascript">autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(message.likes.join(<span class="hljs-string">", "</span>))
+})
+message.likes.push(<span class="hljs-string">"Jennifer"</span>)
+</code></pre>
+<p>This will react as expected. All array functions that do not mutate the array are tracked automatically.</p>
+<hr>
+<pre><code class="hljs css language-javascript">autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(message.likes.join(<span class="hljs-string">", "</span>))
+})
+message.likes[<span class="hljs-number">2</span>] = <span class="hljs-string">"Jennifer"</span>
+</code></pre>
+<p>This will react as expected. All array index assignments are detected, but only if <code>index &lt;= length</code>.</p>
+<h4><a class="anchor" aria-hidden="true" id="incorrect-use-an-observable-but-without-accessing-any-of-its-properties"></a><a href="#incorrect-use-an-observable-but-without-accessing-any-of-its-properties" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Incorrect: &quot;use&quot; an observable but without accessing any of its properties</h4>
+<pre><code class="hljs css language-javascript">autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    message.likes
+})
+message.likes.push(<span class="hljs-string">"Jennifer"</span>)
+</code></pre>
+<p>This will <strong>not</strong> react. Simply because the <code>likes</code> array itself is not being used by the <code>autorun</code>, only the reference to the array.
+So in contrast, <code>messages.likes = [&quot;Jennifer&quot;]</code> would be picked up; that statement does not modify the array, but the <code>likes</code> property itself.</p>
+<h4><a class="anchor" aria-hidden="true" id="correct-using-not-yet-existing-map-entries"></a><a href="#correct-using-not-yet-existing-map-entries" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Correct: using not yet existing map entries</h4>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> twitterUrls = observable.map({
+    <span class="hljs-attr">Joe</span>: <span class="hljs-string">"twitter.com/joey"</span>
+})
+
+autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(twitterUrls.get(<span class="hljs-string">"Sara"</span>))
+})
+
+runInAction(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    twitterUrls.set(<span class="hljs-string">"Sara"</span>, <span class="hljs-string">"twitter.com/horsejs"</span>)
+})
+</code></pre>
+<p>This <strong>will</strong> react. Observable maps support observing entries that may not exist.
+Note that this will initially print <code>undefined</code>.
+You can check for the existence of an entry first by using <code>twitterUrls.has(&quot;Sara&quot;)</code>.
+So in an environment without Proxy support for dynamically keyed collections always use observable maps. If you do have Proxy support you can use observable maps as well,
+but you also have the option to use plain objects.</p>
+<h4><a class="anchor" aria-hidden="true" id="mobx-does-not-track-asynchronously-accessed-data"></a><a href="#mobx-does-not-track-asynchronously-accessed-data" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>MobX does not track asynchronously accessed data</h4>
+<pre><code class="hljs css language-javascript"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">upperCaseAuthorName</span>(<span class="hljs-params">author</span>) </span>{
+    <span class="hljs-keyword">const</span> baseName = author.name
+    <span class="hljs-keyword">return</span> baseName.toUpperCase()
+}
+autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(upperCaseAuthorName(message.author))
+})
+
+runInAction(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    message.author.name = <span class="hljs-string">"Chesterton"</span>
+})
+</code></pre>
+<p>This will react. Even though <code>author.name</code> is not dereferenced by the function passed to <code>autorun</code> itself, MobX will still track the dereferencing that happens in <code>upperCaseAuthorName</code>, because it happens <em>during</em> the execution of the autorun.</p>
+<hr>
+<pre><code class="hljs css language-javascript">autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    setTimeout(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-built_in">console</span>.log(message.likes.join(<span class="hljs-string">", "</span>)), <span class="hljs-number">10</span>)
+})
+
+runInAction(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    message.likes.push(<span class="hljs-string">"Jennifer"</span>)
+})
+</code></pre>
+<p>This will <strong>not</strong> react because during the execution of the <code>autorun</code> no observables were accessed, only during the <code>setTimeout</code>, which is an asynchronous function.</p>
+<p>Check out the <a href="/actions.html#asynchronous-actions">Asynchronous actions</a> section as well.</p>
+<h4><a class="anchor" aria-hidden="true" id="using-non-observable-object-properties"></a><a href="#using-non-observable-object-properties" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Using non-observable object properties</h4>
+<pre><code class="hljs css language-javascript">autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(message.author.age)
+})
+
+runInAction(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    message.author.age = <span class="hljs-number">10</span>
+})
+</code></pre>
+<p>This <strong>will</strong> react if you run React in an environment that supports Proxy.
+Note that this is only done for objects created with <code>observable</code> or <code>observable.object</code>. New properties on class instances will not be made observable automatically.</p>
+<p><em>Environments without Proxy support</em></p>
+<p>This will <strong>not</strong> react. MobX can only track observable properties, and 'age' has not been defined as observable property above.</p>
+<p>However, it is possible to use the <code>get</code> and <code>set</code> methods as exposed by MobX to work around this:</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { <span class="hljs-keyword">get</span>, <span class="hljs-keyword">set</span> } from "mobx"
+
+autorun(() =&gt; {
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-keyword">get</span>(message.author, "age"))
+})
+<span class="hljs-keyword">set</span>(message.author, "age", 10)
+</code></pre>
+<h4><a class="anchor" aria-hidden="true" id="without-proxy-support-incorrect-using-not-yet-existing-observable-object-properties"></a><a href="#without-proxy-support-incorrect-using-not-yet-existing-observable-object-properties" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>[Without Proxy support] Incorrect: using not yet existing observable object properties</h4>
+<pre><code class="hljs css language-javascript">autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(message.author.age)
+})
+extendObservable(message.author, {
+    <span class="hljs-attr">age</span>: <span class="hljs-number">10</span>
+})
+</code></pre>
+<p>This will <strong>not</strong> react. MobX will not react to observable properties that did not exist when tracking started.
+If the two statements are swapped, or if any other observable causes the <code>autorun</code> to re-run, the <code>autorun</code> will start tracking the <code>age</code> as well.</p>
+<h4><a class="anchor" aria-hidden="true" id="without-proxy-support-correct-using-mobx-utilities-to-read--write-to-objects"></a><a href="#without-proxy-support-correct-using-mobx-utilities-to-read--write-to-objects" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>[Without Proxy support] Correct: using MobX utilities to read / write to objects</h4>
+<p>If you are in an environment without proxy support and still want to use observable
+objects as a dynamic collection, you can handle them using the MobX <code>get</code> and <code>set</code>
+API.</p>
+<p>The following will react as well:</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { <span class="hljs-keyword">get</span>, <span class="hljs-keyword">set</span>, observable } from "mobx"
+
+const twitterUrls = observable.object({
+    <span class="hljs-attr">Joe</span>: <span class="hljs-string">"twitter.com/joey"</span>
+})
+
+autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-keyword">get</span>(twitterUrls, "Sara")) // `<span class="hljs-keyword">get</span>` can track not yet existing properties.
+})
+
+runInAction(() =&gt; {
+    <span class="hljs-keyword">set</span>(twitterUrls, { Sara: <span class="hljs-string">"twitter.com/horsejs"</span> })
+})
+</code></pre>
+<p>Check out the <a href="/api.html#collection-utilities-">Collection utilities API</a> for more details.</p>
+<h4><a class="anchor" aria-hidden="true" id="tldr"></a><a href="#tldr" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>TL;DR</h4>
+<blockquote>
+<p>MobX reacts to any <em>existing</em> <strong>observable</strong> <em>property</em> that is read during the execution of a tracked function.</p>
+</blockquote>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/defining-data-stores.html"><span class="arrow-prev">← </span><span>Defining data stores</span></a><a class="docs-next button" href="/subclassing.html"><span>Subclassing</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#mobx-tracks-property-access-not-values">MobX tracks property access, not values</a></li><li><a href="#examples">Examples</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/mobx.png" alt="MobX" width="66" height="58"/></a><div><h5>Docs</h5><a href="/README.html#introduction">About MobX</a><a href="/the-gist-of-mobx.html">The gist of MobX</a></div><div><h5>Community</h5><a href="https://github.com/mobxjs/mobx/discussions" target="_blank" rel="noreferrer noopener">GitHub discussions (NEW)</a><a href="https://stackoverflow.com/questions/tagged/mobx" target="_blank" rel="noreferrer noopener">Stack Overflow</a></div><div><h5>More</h5><a class="github-button" href="https://github.com/mobxjs/mobx" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+                document.addEventListener('keyup', function(e) {
+                  if (e.target !== document.body) {
+                    return;
+                  }
+                  // keyCode for '/' (slash)
+                  if (e.keyCode === 191) {
+                    const search = document.getElementById('search_input_react');
+                    search && search.focus();
+                  }
+                });
+              </script><script>
+              var search = docsearch({
+                
+                apiKey: '500db32fbdbd53a814f42aafdfa26bd4',
+                indexName: 'mobxjs',
+                inputSelector: '#search_input_react'
+              });
+            </script></body></html>

@@ -1,0 +1,395 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>React integration · MobX</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="&lt;script async type=&quot;text/javascript&quot; src=&quot;//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&amp;placement=mobxjsorg&quot; id=&quot;_carbonads_js&quot;&gt;&lt;/script&gt;"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="React integration · MobX"/><meta property="og:type" content="website"/><meta property="og:url" content="https://mobx.js.org/index.html"/><meta property="og:description" content="&lt;script async type=&quot;text/javascript&quot; src=&quot;//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&amp;placement=mobxjsorg&quot; id=&quot;_carbonads_js&quot;&gt;&lt;/script&gt;"/><meta property="og:image" content="https://mobx.js.org/img/undraw_online.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://mobx.js.org/img/undraw_tweetstorm.svg"/><link rel="shortcut icon" href="/img/favicon.png"/><link rel="stylesheet" href="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.css"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script>
+              (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+              (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+              m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+              })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+              ga('create', 'UA-65632006-1', 'auto');
+              ga('send', 'pageview');
+            </script><script type="text/javascript" src="/js/scripts.js"></script><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><img class="logo" src="/img/mobx.png" alt="MobX"/><h2 class="headerTitleWithLogo">MobX</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class=""><a href="/api.html" target="_self">API Reference</a></li><li class=""><a href="https://zh.mobx.js.org" target="_self">中文(寻求翻译)</a></li><li class=""><a href="/backers-sponsors.html" target="_self">Sponsors</a></li><li class=""><a href="https://github.com/mobxjs/mobx" target="_self">GitHub</a></li><li class="navSearchWrapper reactNavSearchWrapper"><input type="text" id="search_input_react" placeholder="Search" title="Search"/></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>MobX and React</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Introduction</h3><ul class=""><li class="navListItem"><a class="navItem" href="/README.html">About MobX</a></li><li class="navListItem"><a class="navItem" href="/about-this-documentation.html">About this documentation</a></li><li class="navListItem"><a class="navItem" href="/installation.html">Installation</a></li><li class="navListItem"><a class="navItem" href="/the-gist-of-mobx.html">The gist of MobX</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">MobX core</h3><ul class=""><li class="navListItem"><a class="navItem" href="/observable-state.html">Observable state</a></li><li class="navListItem"><a class="navItem" href="/actions.html">Actions</a></li><li class="navListItem"><a class="navItem" href="/computeds.html">Computeds</a></li><li class="navListItem"><a class="navItem" href="/reactions.html">Reactions {🚀}</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">MobX and React</h3><ul class=""><li class="navListItem navListItemActive"><a class="navItem" href="/react-integration.html">React integration</a></li><li class="navListItem"><a class="navItem" href="/react-optimizations.html">React optimizations {🚀}</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Tips &amp; Tricks</h3><ul class=""><li class="navListItem"><a class="navItem" href="/defining-data-stores.html">Defining data stores</a></li><li class="navListItem"><a class="navItem" href="/understanding-reactivity.html">Understanding reactivity</a></li><li class="navListItem"><a class="navItem" href="/subclassing.html">Subclassing</a></li><li class="navListItem"><a class="navItem" href="/analyzing-reactivity.html">Analyzing reactivity {🚀}</a></li><li class="navListItem"><a class="navItem" href="/computeds-with-args.html">Computeds with arguments {🚀}</a></li><li class="navListItem"><a class="navItem" href="/mobx-utils.html">MobX-utils {🚀}</a></li><li class="navListItem"><a class="navItem" href="/custom-observables.html">Custom observables {🚀}</a></li><li class="navListItem"><a class="navItem" href="/lazy-observables.html">Lazy observables {🚀}</a></li><li class="navListItem"><a class="navItem" href="/collection-utilities.html">Collection utilities {🚀}</a></li><li class="navListItem"><a class="navItem" href="/intercept-and-observe.html">Intercept &amp; Observe {🚀}</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Fine-tuning</h3><ul class=""><li class="navListItem"><a class="navItem" href="/configuration.html">Configuration {🚀}</a></li><li class="navListItem"><a class="navItem" href="/enabling-decorators.html">Enabling decorators {🚀}</a></li><li class="navListItem"><a class="navItem" href="/migrating-from-4-or-5.html">Migrating from MobX 4/5 {🚀}</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><a class="edit-page-link button" href="https://github.com/mobxjs/mobx/edit/main/docs/react-integration.md" target="_blank" rel="noreferrer noopener">Edit</a></header><article><div><span><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
+<h1><a class="anchor" aria-hidden="true" id="react-integration"></a><a href="#react-integration" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>React integration</h1>
+<p>Usage:</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { observer } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx-react-lite"</span> <span class="hljs-comment">// Or "mobx-react".</span>
+
+<span class="hljs-keyword">const</span> MyComponent = observer(<span class="hljs-function"><span class="hljs-params">props</span> =&gt;</span> ReactElement)
+</code></pre>
+<p>While MobX works independently from React, they are most commonly used together. In <a href="/the-gist-of-mobx.html">The gist of MobX</a> you have already seen the most important part of this integration: the <code>observer</code> <a href="https://reactjs.org/docs/higher-order-components.html">HoC</a> that you can wrap around a React component.</p>
+<p><code>observer</code> is provided by a separate React bindings package you choose <a href="/installation.html#installation">during installation</a>. In this example, we're going to use the more lightweight <a href="https://github.com/mobxjs/mobx/tree/main/packages/mobx-react-lite"><code>mobx-react-lite</code> package</a>.</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> React <span class="hljs-keyword">from</span> <span class="hljs-string">"react"</span>
+<span class="hljs-keyword">import</span> ReactDOM <span class="hljs-keyword">from</span> <span class="hljs-string">"react-dom"</span>
+<span class="hljs-keyword">import</span> { makeAutoObservable } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx"</span>
+<span class="hljs-keyword">import</span> { observer } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx-react-lite"</span>
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Timer</span> </span>{
+    secondsPassed = <span class="hljs-number">0</span>
+
+    <span class="hljs-keyword">constructor</span>() {
+        makeAutoObservable(<span class="hljs-keyword">this</span>)
+    }
+
+    increaseTimer() {
+        <span class="hljs-keyword">this</span>.secondsPassed += <span class="hljs-number">1</span>
+    }
+}
+
+<span class="hljs-keyword">const</span> myTimer = <span class="hljs-keyword">new</span> Timer()
+
+<span class="hljs-comment">// A function component wrapped with `observer` will react</span>
+<span class="hljs-comment">// to any future change in an observable it used before.</span>
+<span class="hljs-keyword">const</span> TimerView = observer(<span class="hljs-function">(<span class="hljs-params">{ timer }</span>) =&gt;</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>Seconds passed: {timer.secondsPassed}<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span></span>)
+
+ReactDOM.render(<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">TimerView</span> <span class="hljs-attr">timer</span>=<span class="hljs-string">{myTimer}</span> /&gt;</span></span>, <span class="hljs-built_in">document</span>.body)
+
+setInterval(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    myTimer.increaseTimer()
+}, <span class="hljs-number">1000</span>)
+</code></pre>
+<p><strong>Hint:</strong> you can play with the above example yourself on <a href="https://codesandbox.io/s/minimal-observer-p9ti4?file=/src/index.tsx">CodeSandbox</a>.</p>
+<p>The <code>observer</code> HoC automatically subscribes React components to <em>any observables</em> that are used <em>during rendering</em>.
+As a result, components will automatically re-render when relevant observables change.
+It also makes sure that components don't re-render when there are <em>no relevant</em> changes.
+So, observables that are accessible by the component, but not actually read, won't ever cause a re-render.</p>
+<p>In practice this makes MobX applications very well optimized out of the box and they typically don't need any additional code to prevent excessive rendering.</p>
+<p>For <code>observer</code> to work, it doesn't matter <em>how</em> the observables arrive in the component, only that they are read.
+Reading observables deeply is fine, complex expression like <code>todos[0].author.displayName</code> work out of the box.
+This makes the subscription mechanism much more precise and efficient compared to other frameworks in which data dependencies have to be declared explicitly or be pre-computed (e.g. selectors).</p>
+<h2><a class="anchor" aria-hidden="true" id="local-and-external-state"></a><a href="#local-and-external-state" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Local and external state</h2>
+<p>There is great flexibility in how state is organized, since it doesn't matter (technically that is) which observables we read or where observables originated from.
+The examples below demonstrate different patterns on how external and local observable state can be used in components wrapped with <code>observer</code>.</p>
+<h3><a class="anchor" aria-hidden="true" id="using-external-state-in-observer-components"></a><a href="#using-external-state-in-observer-components" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Using external state in <code>observer</code> components</h3>
+<div class="tabs"><div class="nav-tabs"><div id="tab-group-16-tab-17" class="nav-link active" data-group="group_16" data-tab="tab-group-16-content-17">using props</div><div id="tab-group-16-tab-18" class="nav-link" data-group="group_16" data-tab="tab-group-16-content-18">using global variables</div><div id="tab-group-16-tab-19" class="nav-link" data-group="group_16" data-tab="tab-group-16-content-19">using React context</div></div><div class="tab-content"><div id="tab-group-16-content-17" class="tab-pane active" data-group="group_16" tabindex="-1"><div><span><p>Observables can be passed into components as props (as in the example above):</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { observer } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx-react-lite"</span><br /><br /><span class="hljs-keyword">const</span> myTimer = <span class="hljs-keyword">new</span> Timer() <span class="hljs-comment">// See the Timer definition above.</span><br /><br /><span class="hljs-keyword">const</span> TimerView = observer(<span class="hljs-function">(<span class="hljs-params">{ timer }</span>) =&gt;</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>Seconds passed: {timer.secondsPassed}<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span></span>)<br /><br /><span class="hljs-comment">// Pass myTimer as a prop.</span><br />ReactDOM.render(<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">TimerView</span> <span class="hljs-attr">timer</span>=<span class="hljs-string">{myTimer}</span> /&gt;</span></span>, <span class="hljs-built_in">document</span>.body)<br /></code></pre>
+</span></div></div><div id="tab-group-16-content-18" class="tab-pane" data-group="group_16" tabindex="-1"><div><span><p>Since it doesn't matter <em>how</em> we got the reference to an observable, we can consume
+observables from outer scopes directly (including from imports, etc.):</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> myTimer = <span class="hljs-keyword">new</span> Timer() <span class="hljs-comment">// See the Timer definition above.</span><br /><br /><span class="hljs-comment">// No props, `myTimer` is directly consumed from the closure.</span><br /><span class="hljs-keyword">const</span> TimerView = observer(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>Seconds passed: {myTimer.secondsPassed}<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span></span>)<br /><br />ReactDOM.render(<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">TimerView</span> /&gt;</span></span>, <span class="hljs-built_in">document</span>.body)<br /></code></pre>
+<p>Using observables directly works very well, but since this typically introduces module state, this pattern might complicate unit testing. Instead, we recommend using React Context instead.</p>
+</span></div></div><div id="tab-group-16-content-19" class="tab-pane" data-group="group_16" tabindex="-1"><div><span><p><a href="https://reactjs.org/docs/context.html">React Context</a> is a great mechanism to share observables with an entire subtree:</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> {observer} <span class="hljs-keyword">from</span> <span class="hljs-string">'mobx-react-lite'</span><br /><span class="hljs-keyword">import</span> {createContext, useContext} <span class="hljs-keyword">from</span> <span class="hljs-string">"react"</span><br /><br /><span class="hljs-keyword">const</span> TimerContext = createContext&lt;Timer&gt;()<br /><br /><span class="hljs-keyword">const</span> TimerView = observer(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {<br />    <span class="hljs-comment">// Grab the timer from the context.</span><br />    <span class="hljs-keyword">const</span> timer = useContext(TimerContext) <span class="hljs-comment">// See the Timer definition above.</span><br />    <span class="hljs-keyword">return</span> (<br />        <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>Seconds passed: {timer.secondsPassed}<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span></span><br />    )<br />})<br /><br />ReactDOM.render(<br />    <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">TimerContext.Provider</span> <span class="hljs-attr">value</span>=<span class="hljs-string">{new</span> <span class="hljs-attr">Timer</span>()}&gt;</span><br />        <span class="hljs-tag">&lt;<span class="hljs-name">TimerView</span> /&gt;</span><br />    <span class="hljs-tag">&lt;/<span class="hljs-name">TimerContext.Provider</span>&gt;</span></span>,<br />    <span class="hljs-built_in">document</span>.body<br />)<br /></code></pre>
+<p>Note that we don't recommend ever replacing the <code>value</code> of a <code>Provider</code> with a different one. Using MobX, there should be no need for that, since the observable that is shared can be updated itself.</p>
+</span></div></div></div></div>
+<h3><a class="anchor" aria-hidden="true" id="using-local-observable-state-in-observer-components"></a><a href="#using-local-observable-state-in-observer-components" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Using local observable state in <code>observer</code> components</h3>
+<p>Since observables used by <code>observer</code> can come from anywhere, they can be local state as well.
+Again, different options are available for us.</p>
+<div class="tabs"><div class="nav-tabs"><div id="tab-group-20-tab-21" class="nav-link active" data-group="group_20" data-tab="tab-group-20-content-21">`useState` with observable class</div><div id="tab-group-20-tab-22" class="nav-link" data-group="group_20" data-tab="tab-group-20-content-22">`useState` with local observable object</div><div id="tab-group-20-tab-23" class="nav-link" data-group="group_20" data-tab="tab-group-20-content-23">`useLocalObservable` hook</div></div><div class="tab-content"><div id="tab-group-20-content-21" class="tab-pane active" data-group="group_20" tabindex="-1"><div><span><p>The simplest way to use local observable state is to store a reference to an observable class with <code>useState</code>.
+Note that, since we typically don't want to replace the reference, we totally ignore the updater function returned by <code>useState</code>:</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { observer } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx-react-lite"</span><br /><span class="hljs-keyword">import</span> { useState } <span class="hljs-keyword">from</span> <span class="hljs-string">"react"</span><br /><br /><span class="hljs-keyword">const</span> TimerView = observer(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {<br />    <span class="hljs-keyword">const</span> [timer] = useState(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-keyword">new</span> Timer()) <span class="hljs-comment">// See the Timer definition above.</span><br />    <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>Seconds passed: {timer.secondsPassed}<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span></span><br />})<br /><br />ReactDOM.render(<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">TimerView</span> /&gt;</span></span>, <span class="hljs-built_in">document</span>.body)<br /></code></pre>
+<p>If you want to automatically update the timer like we did in the original example,
+<code>useEffect</code> could be used in typical React fashion:</p>
+<pre><code class="hljs css language-javascript">useEffect(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {<br />    <span class="hljs-keyword">const</span> handle = setInterval(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {<br />        myTimer.increaseTimer()<br />    }, <span class="hljs-number">1000</span>)<br />    <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {<br />        clearInterval(handle)<br />    }<br />}, [myTimer])<br /></code></pre>
+</span></div></div><div id="tab-group-20-content-22" class="tab-pane" data-group="group_20" tabindex="-1"><div><span><p>As stated before, instead of using classes, it is possible to directly create observable objects.
+We can leverage <a href="/observable-state.html#observable">observable</a> for that:</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { observer } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx-react-lite"</span><br /><span class="hljs-keyword">import</span> { observable } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx"</span><br /><span class="hljs-keyword">import</span> { useState } <span class="hljs-keyword">from</span> <span class="hljs-string">"react"</span><br /><br /><span class="hljs-keyword">const</span> TimerView = observer(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {<br />    <span class="hljs-keyword">const</span> [timer] = useState(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span><br />        observable({<br />            <span class="hljs-attr">secondsPassed</span>: <span class="hljs-number">0</span>,<br />            increaseTimer() {<br />                <span class="hljs-keyword">this</span>.secondsPassed++<br />            }<br />        })<br />    )<br />    <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>Seconds passed: {timer.secondsPassed}<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span></span><br />})<br /><br />ReactDOM.render(<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">TimerView</span> /&gt;</span></span>, <span class="hljs-built_in">document</span>.body)<br /></code></pre>
+</span></div></div><div id="tab-group-20-content-23" class="tab-pane" data-group="group_20" tabindex="-1"><div><span><p>The combination <code>const [store] = useState(() =&gt; observable({ /* something */}))</code> is
+quite common. To make this pattern simpler the <a href="https://github.com/mobxjs/mobx-react#uselocalobservable-hook"><code>useLocalObservable</code></a> hook is exposed from <code>mobx-react-lite</code> package, making it possible to simplify the earlier example to:</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { observer, useLocalObservable } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx-react-lite"</span><br /><span class="hljs-keyword">import</span> { useState } <span class="hljs-keyword">from</span> <span class="hljs-string">"react"</span><br /><br /><span class="hljs-keyword">const</span> TimerView = observer(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {<br />    <span class="hljs-keyword">const</span> timer = useLocalObservable(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> ({<br />        <span class="hljs-attr">secondsPassed</span>: <span class="hljs-number">0</span>,<br />        increaseTimer() {<br />            <span class="hljs-keyword">this</span>.secondsPassed++<br />        }<br />    }))<br />    <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>Seconds passed: {timer.secondsPassed}<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span></span><br />})<br /><br />ReactDOM.render(<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">TimerView</span> /&gt;</span></span>, <span class="hljs-built_in">document</span>.body)<br /></code></pre>
+</span></div></div></div></div>
+<h3><a class="anchor" aria-hidden="true" id="you-might-not-need-locally-observable-state"></a><a href="#you-might-not-need-locally-observable-state" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>You might not need locally observable state</h3>
+<p>In general, we recommend to not resort to MobX observables for local component state too quickly, as this can theoretically lock you out of some features of React's Suspense mechanism.
+As a rule of thumb, use MobX observables when the state captures domain data that is shared among components (including children). Such as todo items, users, bookings, etc.</p>
+<p>State that only captures UI state, like loading state, selections, etc, might be better served by the <a href="https://reactjs.org/docs/hooks-state.html"><code>useState</code> hook</a>, since this will allow you to leverage React suspense features in the future.</p>
+<p>Using observables inside React components adds value as soon as they are either 1) deep, 2) have computed values or 3) are shared with other <code>observer</code> components.</p>
+<h2><a class="anchor" aria-hidden="true" id="always-read-observables-inside-observer-components"></a><a href="#always-read-observables-inside-observer-components" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Always read observables inside <code>observer</code> components</h2>
+<p>You might be wondering, when do I apply <code>observer</code>? The rule of thumb is: <em>apply <code>observer</code> to all components that read observable data</em>.</p>
+<p><code>observer</code> only enhances the component you are decorating, not the components called by it. So usually all your components should be wrapped by <code>observer</code>. Don't worry, this is not inefficient. On the contrary, more <code>observer</code> components make rendering more efficient as updates become more fine-grained.</p>
+<h3><a class="anchor" aria-hidden="true" id="tip-grab-values-from-objects-as-late-as-possible"></a><a href="#tip-grab-values-from-objects-as-late-as-possible" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Tip: Grab values from objects as late as possible</h3>
+<p><code>observer</code> works best if you pass object references around as long as possible, and only read their properties inside the <code>observer</code> based components that are going to render them into the DOM / low-level components.
+In other words, <code>observer</code> reacts to the fact that you 'dereference' a value from an object.</p>
+<p>In the above example, the <code>TimerView</code> component would <strong>not</strong> react to future changes if it was defined
+as follows, because the <code>.secondsPassed</code> is not read inside the <code>observer</code> component, but outside, and is hence <em>not</em> tracked:</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> TimerView = observer(<span class="hljs-function">(<span class="hljs-params">{ secondsPassed }</span>) =&gt;</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>Seconds passed: {secondsPassed}<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span></span>)
+
+React.render(<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">TimerViewer</span> <span class="hljs-attr">secondPassed</span>=<span class="hljs-string">{myTimer.secondsPassed}</span> /&gt;</span></span>, <span class="hljs-built_in">document</span>.body)
+</code></pre>
+<p>Note that this is a different mindset from other libraries like <code>react-redux</code>, where it is a good practice to dereference early and pass primitives down, to better leverage memoization.
+If the problem is not entirely clear, make sure to check out the <a href="/understanding-reactivity.html">Understanding reactivity</a> section.</p>
+<h3><a class="anchor" aria-hidden="true" id="dont-pass-observables-into-components-that-arent-observer"></a><a href="#dont-pass-observables-into-components-that-arent-observer" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Don't pass observables into components that aren't <code>observer</code></h3>
+<p>Components wrapped with <code>observer</code> <em>only</em> subscribe to observables used during their <em>own</em> rendering of the component. So if observable objects / arrays / maps are passed to child components, those have to be wrapped with <code>observer</code> as well.
+This is also true for any callback based components.</p>
+<p>If you want to pass observables to a component that isn't an <code>observer</code>, either because it is a third-party component, or because you want to keep that component MobX agnostic, you will have to <a href="/observable-state.html#converting-observables-back-to-vanilla-javascript-collections">convert the observables to plain JavaScript values or structures</a> before passing them on.</p>
+<p>To elaborate on the above,
+take the following example observable <code>todo</code> object, a <code>TodoView</code> component (observer) and an imaginary <code>GridRow</code> component that takes a column / value mapping, but which isn't an <code>observer</code>:</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Todo</span> </span>{
+    title = <span class="hljs-string">"test"</span>
+    done = <span class="hljs-literal">true</span>
+
+    <span class="hljs-keyword">constructor</span>() {
+        makeAutoObservable(<span class="hljs-keyword">this</span>)
+    }
+}
+
+<span class="hljs-keyword">const</span> TodoView = observer(<span class="hljs-function">(<span class="hljs-params">{ todo }: { todo: Todo }</span>) =&gt;</span>
+   <span class="hljs-comment">// WRONG: GridRow won't pick up changes in todo.title / todo.done</span>
+   <span class="hljs-comment">//        since it isn't an observer.</span>
+   <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">GridRow</span> <span class="hljs-attr">data</span>=<span class="hljs-string">{todo}</span> /&gt;</span></span>
+
+   <span class="hljs-comment">// CORRECT: let `TodoView` detect relevant changes in `todo`,</span>
+   <span class="hljs-comment">//          and pass plain data down.</span>
+   <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">GridRow</span> <span class="hljs-attr">data</span>=<span class="hljs-string">{{</span>
+       <span class="hljs-attr">title:</span> <span class="hljs-attr">todo.title</span>,
+       <span class="hljs-attr">done:</span> <span class="hljs-attr">todo.done</span>
+   }} /&gt;</span></span>
+
+   <span class="hljs-comment">// CORRECT: using `toJS` works as well, but being explicit is typically better.</span>
+   <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">GridRow</span> <span class="hljs-attr">data</span>=<span class="hljs-string">{toJS(todo)}</span> /&gt;</span></span>
+)
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="callback-components-might-require-observer"></a><a href="#callback-components-might-require-observer" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Callback components might require <code>&lt;Observer&gt;</code></h3>
+<p>Imagine the same example, where <code>GridRow</code> takes an <code>onRender</code> callback instead.
+Since <code>onRender</code> is part of the rendering cycle of <code>GridRow</code>, rather than <code>TodoView</code>'s render (even though that is where it syntactically appears), we have to make sure that the callback component uses an <code>observer</code> component.
+Or, we can create an in-line anonymous observer using <a href="https://github.com/mobxjs/mobx-react#observer"><code>&lt;Observer /&gt;</code></a>:</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> TodoView = observer(<span class="hljs-function">(<span class="hljs-params">{ todo }: { todo: Todo }</span>) =&gt;</span> {
+    <span class="hljs-comment">// WRONG: GridRow.onRender won't pick up changes in todo.title / todo.done</span>
+    <span class="hljs-comment">//        since it isn't an observer.</span>
+    <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">GridRow</span> <span class="hljs-attr">onRender</span>=<span class="hljs-string">{()</span> =&gt;</span> <span class="hljs-tag">&lt;<span class="hljs-name">td</span>&gt;</span>{todo.title}<span class="hljs-tag">&lt;/<span class="hljs-name">td</span>&gt;</span>} /&gt;</span>
+
+    <span class="hljs-comment">// CORRECT: wrap the callback rendering in Observer to be able to detect changes.</span>
+    <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">GridRow</span> <span class="hljs-attr">onRender</span>=<span class="hljs-string">{()</span> =&gt;</span> <span class="hljs-tag">&lt;<span class="hljs-name">Observer</span>&gt;</span>{() =&gt; <span class="hljs-tag">&lt;<span class="hljs-name">td</span>&gt;</span>{todo.title}<span class="hljs-tag">&lt;/<span class="hljs-name">td</span>&gt;</span>}<span class="hljs-tag">&lt;/<span class="hljs-name">Observer</span>&gt;</span>} /&gt;</span>
+})
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="tips"></a><a href="#tips" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Tips</h2>
+<p><details id="static-rendering"><summary>Server Side Rendering (SSR)<a href="#static-rendering" class="tip-anchor"></a></summary>
+If <code>observer</code> is used in server side rendering context; make sure to call <code>enableStaticRendering(true)</code>, so that <code>observer</code> won't subscribe to any observables used, and no GC problems are introduced.
+</details></p>
+<p><details id="react-vs-lite"><summary><strong>Note:</strong> mobx-react vs. mobx-react-lite<a href="#react-vs-lite" class="tip-anchor"></a></summary>
+In this documentation we used <code>mobx-react-lite</code> as default.
+<a href="https://github.com/mobxjs/mobx-react/">mobx-react</a> is it's big brother, which uses <code>mobx-react-lite</code> under the hood.
+It offers a few more features which are typically not needed anymore in greenfield projects. The additional things offered by mobx-react:</p>
+<ol>
+<li>Support for React class components.</li>
+<li><code>Provider</code> and <code>inject</code>. MobX's own React.createContext predecessor which is not needed anymore.</li>
+<li>Observable specific <code>propTypes</code>.</li>
+</ol>
+<p>Note that <code>mobx-react</code> fully repackages and re-exports <code>mobx-react-lite</code>, including functional component support.
+If you use <code>mobx-react</code>, there is no need to add <code>mobx-react-lite</code> as a dependency or import from it anywhere.</p>
+<p></details></p>
+<p><details id="observer-vs-memo"><summary><strong>Note:</strong> <code>observer</code> or <code>React.memo</code>?<a href="#observer-vs-memo" class="tip-anchor"></a></summary>
+<code>observer</code> automatically applies <code>memo</code>, so <code>observer</code> components never need to be wrapped in <code>memo</code>.
+<code>memo</code> can be applied safely to observer components because mutations (deeply) inside the props will be picked up by <code>observer</code> anyway if relevant.
+</details></p>
+<p><details id="class-comp"><summary><strong>Tip:</strong> <code>observer</code> for class based React components<a href="#class-comp" class="tip-anchor"></a>
+</summary>
+As stated above, class based components are only supported through <code>mobx-react</code>, and not <code>mobx-react-lite</code>.
+Briefly, you can wrap class-based components in <code>observer</code> just like
+you can wrap function components:</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> React <span class="hljs-keyword">from</span> <span class="hljs-string">"React"</span>
+
+<span class="hljs-keyword">const</span> TimerView = observer(
+    <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TimerView</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">Component</span> </span>{
+        render() {
+            <span class="hljs-keyword">const</span> { timer } = <span class="hljs-keyword">this</span>.props
+            <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>Seconds passed: {timer.secondsPassed} <span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span></span>
+        }
+    }
+)
+</code></pre>
+<p>Check out <a href="https://github.com/mobxjs/mobx-react#api-documentation">mobx-react docs</a> for more information.</p>
+<p></details></p>
+<p><details id="displayname"><summary><strong>Tip:</strong> nice component names in React DevTools<a href="#displayname" class="tip-anchor"></a>
+</summary>
+<a href="https://reactjs.org/blog/2019/08/15/new-react-devtools.html">React DevTools</a> uses the display name information of components to properly display the component hierarchy.</p>
+<p>If you use:</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> MyComponent = observer(<span class="hljs-function"><span class="hljs-params">props</span> =&gt;</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>hi<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>)
+</code></pre>
+<p>then no display name will be visible in the DevTools.</p>
+<p><img src="/assets/devtools-noDisplayName.png" alt="devtools-noname"></p>
+<p>The following approaches can be used to fix this:</p>
+<ul>
+<li><p>use <code>function</code> with a name instead of an arrow function. <code>mobx-react</code> infers component name from the function name:</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> MyComponent = observer(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">MyComponent</span>(<span class="hljs-params">props</span>) </span>{
+    <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>hi<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
+})
+</code></pre></li>
+<li><p>Transpilers (like Babel or TypeScript) infer component name from the variable name:</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> _MyComponent = <span class="hljs-function"><span class="hljs-params">props</span> =&gt;</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>hi<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> MyComponent = observer(_MyComponent)
+</code></pre></li>
+<li><p>Infer from the variable name again, using default export:</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> MyComponent = <span class="hljs-function"><span class="hljs-params">props</span> =&gt;</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>hi<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> observer(MyComponent)
+</code></pre></li>
+<li><p>[<strong>Broken</strong>] Set <code>displayName</code> explicitly:</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> MyComponent = observer(<span class="hljs-function"><span class="hljs-params">props</span> =&gt;</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>hi<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>)
+MyComponent.displayName = <span class="hljs-string">"MyComponent"</span>
+</code></pre>
+<p>This is broken in React 16 at the time of writing; mobx-react <code>observer</code> uses a React.memo and runs into this bug: <a href="https://github.com/facebook/react/issues/18026">https://github.com/facebook/react/issues/18026</a>, but it will be fixed in React 17.</p></li>
+</ul>
+<p>Now you can see component names:</p>
+<p><img src="/assets/devtools-withDisplayName.png" alt="devtools-withname"></p>
+<p></details></p>
+<p><details id="wrap-order"><summary>{🚀} <strong>Tip:</strong> when combining <code>observer</code> with other higher-order-components, apply <code>observer</code> first<a href="#wrap-order" class="tip-anchor"></a></summary></p>
+<p>When <code>observer</code> needs to be combined with other decorators or higher-order-components, make sure that <code>observer</code> is the innermost (first applied) decorator;
+otherwise it might do nothing at all.</p>
+<p></details></p>
+<p><details id="computed-props"><summary>{🚀} <strong>Tip:</strong> deriving computeds from props<a href="#computed-props" class="tip-anchor"></a></summary>
+In some cases the computed values of your local observables might depend on some of the props your component receives.
+However, the set of props that a React component receives is in itself not observable, so changes to the props won't be reflected in any computed values. You have to manually update local observable state in order to properly derive computed values from latest data.</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { observer, useLocalObservable } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx-react-lite"</span>
+<span class="hljs-keyword">import</span> { useEffect } <span class="hljs-keyword">from</span> <span class="hljs-string">"react"</span>
+
+<span class="hljs-keyword">const</span> TimerView = observer(<span class="hljs-function">(<span class="hljs-params">{ offset }</span>) =&gt;</span> {
+    <span class="hljs-keyword">const</span> timer = useLocalObservable(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> ({
+        offset, <span class="hljs-comment">// The initial offset value</span>
+        <span class="hljs-attr">secondsPassed</span>: <span class="hljs-number">0</span>,
+        increaseTimer() {
+            <span class="hljs-keyword">this</span>.secondsPassed++
+        },
+        <span class="hljs-keyword">get</span> offsetTime() {
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.secondsPassed - <span class="hljs-keyword">this</span>.offset <span class="hljs-comment">// Not 'offset' from 'props'!</span>
+        }
+    }))
+
+    useEffect(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+        <span class="hljs-comment">// Sync the offset from 'props' into the observable 'timer'</span>
+        timer.offset = offset
+    }, [offset])
+
+    <span class="hljs-comment">// Effect to set up a timer, only for demo purposes.</span>
+    useEffect(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+        <span class="hljs-keyword">const</span> handle = setInterval(timer.increaseTimer, <span class="hljs-number">1000</span>)
+        <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+            clearInterval(handle)
+        }
+    }, [])
+
+    <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>Seconds passed: {timer.offsetTime}<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span></span>
+})
+
+ReactDOM.render(<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">TimerView</span> /&gt;</span></span>, <span class="hljs-built_in">document</span>.body)
+</code></pre>
+<p>In practice you will rarely need this pattern, since
+<code>return &lt;span&gt;Seconds passed: {timer.secondsPassed - offset}&lt;/span&gt;</code>
+is a much simpler, albeit slightly less efficient solution.</p>
+<p></details></p>
+<p><details id="useeffect"><summary>{🚀} <strong>Tip:</strong> useEffect and observables<a href="#useeffect" class="tip-anchor"></a></summary></p>
+<p><code>useEffect</code> can be used to set up side effects that need to happen, and which are bound to the life-cycle of the React component.
+Using <code>useEffect</code> requires specifying dependencies.
+With MobX that isn't really needed, since MobX has already a way to automatically determine the dependencies of an effect, <code>autorun</code>.
+Combining <code>autorun</code> and coupling it to the life-cycle of the component using <code>useEffect</code> is luckily straightforward:</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { observer, useLocalObservable, useAsObservableSource } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx-react-lite"</span>
+<span class="hljs-keyword">import</span> { useState } <span class="hljs-keyword">from</span> <span class="hljs-string">"react"</span>
+
+<span class="hljs-keyword">const</span> TimerView = observer(<span class="hljs-function">(<span class="hljs-params">{ offset }</span>) =&gt;</span> {
+    <span class="hljs-keyword">const</span> timer = useLocalObservable(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> ({
+        <span class="hljs-attr">secondsPassed</span>: <span class="hljs-number">0</span>,
+        increaseTimer() {
+            <span class="hljs-keyword">this</span>.secondsPassed++
+        }
+    }))
+
+    <span class="hljs-comment">// Effect that triggers upon observable changes.</span>
+    useEffect(
+        <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span>
+            autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+                <span class="hljs-keyword">if</span> (timer.secondsPassed &gt; <span class="hljs-number">60</span>) alert(<span class="hljs-string">"Still there. It's a minute already?!!"</span>)
+            }),
+        []
+    )
+
+    <span class="hljs-comment">// Effect to set up a timer, only for demo purposes.</span>
+    useEffect(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+        <span class="hljs-keyword">const</span> handle = setInterval(timer.increaseTimer, <span class="hljs-number">1000</span>)
+        <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+            clearInterval(handle)
+        }
+    }, [])
+
+    <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>Seconds passed: {timer.offsetTime}<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span></span>
+})
+
+ReactDOM.render(<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">TimerView</span> /&gt;</span></span>, <span class="hljs-built_in">document</span>.body)
+</code></pre>
+<p>Note that we return the disposer created by <code>autorun</code> from our effect function.
+This is important, since it makes sure the <code>autorun</code> gets cleaned up once the component unmounts!</p>
+<p>The dependency array can typically be left empty, unless a non-observable value should trigger a re-run of the autorun, in which case you will need to add it there.
+To make your linter happy, you can define <code>timer</code> (in the above example) as a dependency.
+That is safe and has no further effect, since the reference will never actually change.</p>
+<p>If you'd rather explicitly define which observables should trigger the effect, use <code>reaction</code> instead of <code>autorun</code>, beyond that the pattern remains identical.</p>
+<p></details></p>
+<h3><a class="anchor" aria-hidden="true" id="how-can-i-further-optimize-my-react-components"></a><a href="#how-can-i-further-optimize-my-react-components" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>How can I further optimize my React components?</h3>
+<p>Check out the <a href="/react-optimizations.html">React optimizations {🚀}</a> section.</p>
+<h2><a class="anchor" aria-hidden="true" id="troubleshooting"></a><a href="#troubleshooting" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Troubleshooting</h2>
+<p>Help! My component isn't re-rendering...</p>
+<ol>
+<li>Make sure you didn't forget <code>observer</code> (yes, this is the most common mistake).</li>
+<li>Verify that the thing you intend to react to is indeed observable. Use utilities like <a href="/api.html#isobservable"><code>isObservable</code></a>, <a href="/api.html#isobservableprop"><code>isObservableProp</code></a> if needed to verify this at runtime.</li>
+<li>Check the console logs in the browsers for any warnings or errors.</li>
+<li>Make sure you grok how tracking works in general. Check out the <a href="/understanding-reactivity.html">Understanding reactivity</a> section.</li>
+<li>Read the common pitfalls as described above.</li>
+<li><a href="/configuration.html#linting-options">Configure</a> MobX to warn you of unsound usage of mechanisms and check the console logs.</li>
+<li>Use <a href="/analyzing-reactivity.html">trace</a> to verify that you are subscribing to the right things or check what MobX is doing in general using <a href="/analyzing-reactivity.html#spy">spy</a> / the <a href="https://github.com/winterbe/mobx-logger">mobx-logger</a> package.</li>
+</ol>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/reactions.html"><span class="arrow-prev">← </span><span>Reactions {🚀}</span></a><a class="docs-next button" href="/react-optimizations.html"><span>React optimizations {🚀}</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#local-and-external-state">Local and external state</a><ul class="toc-headings"><li><a href="#using-external-state-in-observer-components">Using external state in <code>observer</code> components</a></li><li><a href="#using-local-observable-state-in-observer-components">Using local observable state in <code>observer</code> components</a></li><li><a href="#you-might-not-need-locally-observable-state">You might not need locally observable state</a></li></ul></li><li><a href="#always-read-observables-inside-observer-components">Always read observables inside <code>observer</code> components</a><ul class="toc-headings"><li><a href="#tip-grab-values-from-objects-as-late-as-possible">Tip: Grab values from objects as late as possible</a></li><li><a href="#dont-pass-observables-into-components-that-arent-observer">Don't pass observables into components that aren't <code>observer</code></a></li><li><a href="#callback-components-might-require-observer">Callback components might require <code>&lt;Observer&gt;</code></a></li></ul></li><li><a href="#tips">Tips</a><ul class="toc-headings"><li><a href="#how-can-i-further-optimize-my-react-components">How can I further optimize my React components?</a></li></ul></li><li><a href="#troubleshooting">Troubleshooting</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/mobx.png" alt="MobX" width="66" height="58"/></a><div><h5>Docs</h5><a href="/README.html#introduction">About MobX</a><a href="/the-gist-of-mobx.html">The gist of MobX</a></div><div><h5>Community</h5><a href="https://github.com/mobxjs/mobx/discussions" target="_blank" rel="noreferrer noopener">GitHub discussions (NEW)</a><a href="https://stackoverflow.com/questions/tagged/mobx" target="_blank" rel="noreferrer noopener">Stack Overflow</a></div><div><h5>More</h5><a class="github-button" href="https://github.com/mobxjs/mobx" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+                document.addEventListener('keyup', function(e) {
+                  if (e.target !== document.body) {
+                    return;
+                  }
+                  // keyCode for '/' (slash)
+                  if (e.keyCode === 191) {
+                    const search = document.getElementById('search_input_react');
+                    search && search.focus();
+                  }
+                });
+              </script><script>
+              var search = docsearch({
+                
+                apiKey: '500db32fbdbd53a814f42aafdfa26bd4',
+                indexName: 'mobxjs',
+                inputSelector: '#search_input_react'
+              });
+            </script></body></html>

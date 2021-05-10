@@ -1,0 +1,256 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Deriving information with computeds · MobX</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="&lt;script async type=&quot;text/javascript&quot; src=&quot;//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&amp;placement=mobxjsorg&quot; id=&quot;_carbonads_js&quot;&gt;&lt;/script&gt;"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Deriving information with computeds · MobX"/><meta property="og:type" content="website"/><meta property="og:url" content="https://mobx.js.org/index.html"/><meta property="og:description" content="&lt;script async type=&quot;text/javascript&quot; src=&quot;//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&amp;placement=mobxjsorg&quot; id=&quot;_carbonads_js&quot;&gt;&lt;/script&gt;"/><meta property="og:image" content="https://mobx.js.org/img/undraw_online.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://mobx.js.org/img/undraw_tweetstorm.svg"/><link rel="shortcut icon" href="/img/favicon.png"/><link rel="stylesheet" href="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.css"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script>
+              (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+              (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+              m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+              })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+              ga('create', 'UA-65632006-1', 'auto');
+              ga('send', 'pageview');
+            </script><script type="text/javascript" src="/js/scripts.js"></script><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><img class="logo" src="/img/mobx.png" alt="MobX"/><h2 class="headerTitleWithLogo">MobX</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class=""><a href="/api.html" target="_self">API Reference</a></li><li class=""><a href="https://zh.mobx.js.org" target="_self">中文(寻求翻译)</a></li><li class=""><a href="/backers-sponsors.html" target="_self">Sponsors</a></li><li class=""><a href="https://github.com/mobxjs/mobx" target="_self">GitHub</a></li><li class="navSearchWrapper reactNavSearchWrapper"><input type="text" id="search_input_react" placeholder="Search" title="Search"/></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>MobX core</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Introduction</h3><ul class=""><li class="navListItem"><a class="navItem" href="/README.html">About MobX</a></li><li class="navListItem"><a class="navItem" href="/about-this-documentation.html">About this documentation</a></li><li class="navListItem"><a class="navItem" href="/installation.html">Installation</a></li><li class="navListItem"><a class="navItem" href="/the-gist-of-mobx.html">The gist of MobX</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">MobX core</h3><ul class=""><li class="navListItem"><a class="navItem" href="/observable-state.html">Observable state</a></li><li class="navListItem"><a class="navItem" href="/actions.html">Actions</a></li><li class="navListItem navListItemActive"><a class="navItem" href="/computeds.html">Computeds</a></li><li class="navListItem"><a class="navItem" href="/reactions.html">Reactions {🚀}</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">MobX and React</h3><ul class=""><li class="navListItem"><a class="navItem" href="/react-integration.html">React integration</a></li><li class="navListItem"><a class="navItem" href="/react-optimizations.html">React optimizations {🚀}</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Tips &amp; Tricks</h3><ul class=""><li class="navListItem"><a class="navItem" href="/defining-data-stores.html">Defining data stores</a></li><li class="navListItem"><a class="navItem" href="/understanding-reactivity.html">Understanding reactivity</a></li><li class="navListItem"><a class="navItem" href="/subclassing.html">Subclassing</a></li><li class="navListItem"><a class="navItem" href="/analyzing-reactivity.html">Analyzing reactivity {🚀}</a></li><li class="navListItem"><a class="navItem" href="/computeds-with-args.html">Computeds with arguments {🚀}</a></li><li class="navListItem"><a class="navItem" href="/mobx-utils.html">MobX-utils {🚀}</a></li><li class="navListItem"><a class="navItem" href="/custom-observables.html">Custom observables {🚀}</a></li><li class="navListItem"><a class="navItem" href="/lazy-observables.html">Lazy observables {🚀}</a></li><li class="navListItem"><a class="navItem" href="/collection-utilities.html">Collection utilities {🚀}</a></li><li class="navListItem"><a class="navItem" href="/intercept-and-observe.html">Intercept &amp; Observe {🚀}</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Fine-tuning</h3><ul class=""><li class="navListItem"><a class="navItem" href="/configuration.html">Configuration {🚀}</a></li><li class="navListItem"><a class="navItem" href="/enabling-decorators.html">Enabling decorators {🚀}</a></li><li class="navListItem"><a class="navItem" href="/migrating-from-4-or-5.html">Migrating from MobX 4/5 {🚀}</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><a class="edit-page-link button" href="https://github.com/mobxjs/mobx/edit/main/docs/computeds.md" target="_blank" rel="noreferrer noopener">Edit</a></header><article><div><span><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
+<h1><a class="anchor" aria-hidden="true" id="deriving-information-with-computeds"></a><a href="#deriving-information-with-computeds" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Deriving information with computeds</h1>
+<p>Usage:</p>
+<ul>
+<li><code>computed</code> <em>(annotation)</em></li>
+<li><code>computed(options)</code> <em>(annotation)</em></li>
+<li><code>computed(fn, options?)</code></li>
+</ul>
+<p>Computed values can be used to derive information from other observables.
+They evaluate lazily, caching their output and only recomputing if one of the underlying observables has changed.
+If they are not observed by anything, they suspend entirely.</p>
+<p>Conceptually, they are very similar to formulas in spreadsheets, and can't be underestimated. They help in reducing the amount of state you have to store and are highly optimized. Use them wherever possible.</p>
+<h2><a class="anchor" aria-hidden="true" id="example"></a><a href="#example" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Example</h2>
+<p>Computed values can be created by annotating JavaScript <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get">getters</a> with <code>computed</code>.
+Use <code>makeObservable</code> to declare a getter as computed. If you instead want all getters to be automatically declared as <code>computed</code>, you can use either <code>makeAutoObservable</code>, <code>observable</code> or <code>extendObservable</code>.</p>
+<p>To help illustrate the point of computed values, the example below relies on <a href="/reactions.html#autorun"><code>autorun</code></a> from the <a href="/reactions.html">Reactions {🚀}</a> advanced section.</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { makeObservable, observable, computed, autorun } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx"</span>
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">OrderLine</span> </span>{
+    price = <span class="hljs-number">0</span>
+    amount = <span class="hljs-number">1</span>
+
+    <span class="hljs-keyword">constructor</span>(price) {
+        makeObservable(<span class="hljs-keyword">this</span>, {
+            <span class="hljs-attr">price</span>: observable,
+            <span class="hljs-attr">amount</span>: observable,
+            <span class="hljs-attr">total</span>: computed
+        })
+        <span class="hljs-keyword">this</span>.price = price
+    }
+
+    <span class="hljs-keyword">get</span> total() {
+        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Computing..."</span>)
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.price * <span class="hljs-keyword">this</span>.amount
+    }
+}
+
+<span class="hljs-keyword">const</span> order = <span class="hljs-keyword">new</span> OrderLine(<span class="hljs-number">0</span>)
+
+<span class="hljs-keyword">const</span> stop = autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Total: "</span> + order.total)
+})
+<span class="hljs-comment">// Computing...</span>
+<span class="hljs-comment">// Total: 0</span>
+
+<span class="hljs-built_in">console</span>.log(order.total)
+<span class="hljs-comment">// (No recomputing!)</span>
+<span class="hljs-comment">// 0</span>
+
+order.amount = <span class="hljs-number">5</span>
+<span class="hljs-comment">// Computing...</span>
+<span class="hljs-comment">// (No autorun)</span>
+
+order.price = <span class="hljs-number">2</span>
+<span class="hljs-comment">// Computing...</span>
+<span class="hljs-comment">// Total: 10</span>
+
+stop()
+
+order.price = <span class="hljs-number">3</span>
+<span class="hljs-comment">// Neither the computation nor autorun will be recomputed.</span>
+</code></pre>
+<p>The above example nicely demonstrates the benefits of a <code>computed</code> value, it acts as a caching point.
+Even though we change the <code>amount</code>, and this will trigger the <code>total</code> to recompute,
+it won't trigger the <code>autorun</code>, as <code>total</code> will detect its output hasn't been affected, so there is no need to update the <code>autorun</code>.</p>
+<p>In comparison, if <code>total</code> would not be annotated, the <code>autorun</code> would run its effect 3 times,
+as it would directly depend on <code>total</code> and <code>amount</code>. <a href="https://codesandbox.io/s/computed-3cjo9?file=/src/index.tsx">Try it out yourself</a>.</p>
+<p><img src="/assets/computed-example.png" alt="computed graph"></p>
+<p>This is the dependency graph that would be created for the above example.</p>
+<h2><a class="anchor" aria-hidden="true" id="rules"></a><a href="#rules" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Rules</h2>
+<p>When using computed values there are a couple of best practices to follow:</p>
+<ol>
+<li>They should not have side effects or update other observables.</li>
+<li>Avoid creating and returning new observables.</li>
+</ol>
+<h2><a class="anchor" aria-hidden="true" id="tips"></a><a href="#tips" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Tips</h2>
+<p><details id="computed-suspend"><summary><strong>Tip:</strong> computed values will be suspended if they are <em>not</em> observed<a href="#computed-suspend" class="tip-anchor"></a></summary></p>
+<p>It sometimes confuses people new to MobX, perhaps used to a library like <a href="https://github.com/reduxjs/reselect">Reselect</a>, that if you create a computed property but don't use it anywhere in a reaction, it is not memoized and appears to be recomputed more often than necessary.
+For example, if we extended the above example with calling <code>console.log(order.total)</code> twice, after we called <code>stop()</code>, the value would be recomputed twice.</p>
+<p>This allows MobX to automatically suspend computations that are not actively in use
+to avoid unnecessary updates to computed values that are not being accessed. But if a computed property is <em>not</em> in use by some reaction, then computed expressions are evaluated each time their value is requested, so they behave just like a normal property.</p>
+<p>If you only fiddle around computed properties might not seem efficient, but when applied in a project that uses <code>observer</code>, <code>autorun</code>, etc., they become very efficient.</p>
+<p>The following code demonstrates the issue:</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-comment">// OrderLine has a computed property `total`.</span>
+<span class="hljs-keyword">const</span> line = <span class="hljs-keyword">new</span> OrderLine(<span class="hljs-number">2.0</span>)
+
+<span class="hljs-comment">// If you access `line.total` outside of a reaction, it is recomputed every time.</span>
+setInterval(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(line.total)
+}, <span class="hljs-number">60</span>)
+</code></pre>
+<p>It can be overridden by setting the annotation with the <code>keepAlive</code> option (<a href="https://codesandbox.io/s/computed-3cjo9?file=/src/index.tsx">try it out yourself</a>) or by creating a no-op <code>autorun(() =&gt; { someObject.someComputed })</code>, which can be nicely cleaned up later if needed.
+Note that both solutions have the risk of creating memory leaks. Changing the default behavior here is an anti-pattern.</p>
+<p>MobX can also be configured with the <a href="/configuration.html#computedrequiresreaction-boolean"><code>computedRequiresReaction</code></a> option, to report an error when computeds are accessed outside of a reactive context.</p>
+<p></details></p>
+<p><details id="computed-setter"><summary><strong>Tip:</strong> computed values can have setters<a href="#computed-setter" class="tip-anchor"></a></summary></p>
+<p>It is possible to define a <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/set">setter</a> for computed values as well. Note that these setters cannot be used to alter the value of the computed property directly,
+but they can be used as an &quot;inverse&quot; of the derivation. Setters are automatically marked as actions. For example:</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Dimension</span> </span>{
+    length = <span class="hljs-number">2</span>
+
+    <span class="hljs-keyword">constructor</span>() {
+        makeAutoObservable(<span class="hljs-keyword">this</span>)
+    }
+
+    <span class="hljs-keyword">get</span> squared() {
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.length * <span class="hljs-keyword">this</span>.length
+    }
+    <span class="hljs-keyword">set</span> squared(value) {
+        <span class="hljs-keyword">this</span>.length = <span class="hljs-built_in">Math</span>.sqrt(value)
+    }
+}
+</code></pre>
+<p></details></p>
+<p><details id="computed-struct"><summary>{🚀} <strong>Tip:</strong> <code>computed.struct</code> for comparing output structurally <a href="#computed-struct" class="tip-anchor"></a></summary></p>
+<p>If the output of a computed value that is structurally equivalent to the previous computation doesn't need to notify observers, <code>computed.struct</code> can be used. It will make a structural comparison first, rather than a reference equality check, before notifying observers. For example:</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Box</span> </span>{
+    width = <span class="hljs-number">0</span>
+    height = <span class="hljs-number">0</span>
+
+    <span class="hljs-keyword">constructor</span>() {
+        makeObsevable(<span class="hljs-keyword">this</span>, {
+            <span class="hljs-attr">x</span>: observable,
+            <span class="hljs-attr">y</span>: observable,
+            <span class="hljs-attr">topRight</span>: computed.struct
+        })
+    }
+
+    <span class="hljs-keyword">get</span> topRight() {
+        <span class="hljs-keyword">return</span> {
+            <span class="hljs-attr">x</span>: <span class="hljs-keyword">this</span>.width,
+            <span class="hljs-attr">y</span>: <span class="hljs-keyword">this</span>.height
+        }
+    }
+}
+</code></pre>
+<p>By default, the output of a <code>computed</code> is compared by reference. Since <code>topRight</code> in the above example will always produce a new result object, it is never going to be considered equal to a previous output. Unless <code>computed.struct</code> is used.</p>
+<p>However, in the above example <em>we actually don't need <code>computed.struct</code></em>!
+Computed values normally only re-evaluate if the backing values change.
+That's why <code>topRight</code> will only react to changes in <code>width</code> or <code>height</code>.
+Since if any of those change, we would get a different <code>topRight</code> coordinate anyway. <code>computed.struct</code> would never have a cache hit and be a waste of effort, so we don't need it.</p>
+<p>In practice, <code>computed.struct</code> is less useful than it sounds. Only use it if changes in the underlying observables can still lead to the same output. For example, if we were rounding the coordinates first, the rounded coordinates might be equal to the previously rounded coordinates even though the underlying values aren't.</p>
+<p>Check out the <a href="#equals"><code>equals</code></a> option for further customizations on determining whether the output has changed.</p>
+<p></details></p>
+<p><details id="computed-with-args"><summary>{🚀} <strong>Tip:</strong> computed values with arguments<a href="#computed-with-args" class="tip-anchor"></a></summary></p>
+<p>Although getters don't take arguments, several strategies to work with derived values that need arguments are discusses <a href="/computeds-with-args.html">here</a>.</p>
+<p></details></p>
+<p><details id="standalone"><summary>{🚀} <strong>Tip:</strong> create standalone computed values with <code>computed(expression)</code><a href="#standalone" class="tip-anchor"></a></summary></p>
+<p><code>computed</code> can also be invoked directly as a function, just like <a href="/api.html#observablebox"><code>observable.box</code></a> creates a standalone computed value.
+Use <code>.get()</code> on the returned object to get the current value of the computation.
+This form of <code>computed</code> is not used very often, but in some cases where you need to pass a &quot;boxed&quot; computed value around it might prove itself useful, one such case is discussed <a href="/computeds-with-args.html">here</a>.</p>
+<p></details></p>
+<h2><a class="anchor" aria-hidden="true" id="options-"></a><a href="#options-" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Options {🚀}</h2>
+<p><code>computed</code> usually behaves the way you want it to out of the box, but it's possible to customize its behavior by passing in an <code>options</code> argument.</p>
+<h3><a class="anchor" aria-hidden="true" id="name"></a><a href="#name" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>name</code></h3>
+<p>This string is used as a debug name in the <a href="/analyzing-reactivity.html#spy">Spy event listeners</a> and <a href="https://github.com/mobxjs/mobx-devtools">MobX developer tools</a>.</p>
+<h3><a class="anchor" aria-hidden="true" id="equals"></a><a href="#equals" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>equals</code></h3>
+<p>Set to <code>comparer.default</code> by default. It acts as a comparison function for comparing the previous value with the next value. If this function considers the values to be equal, then the observers will not be re-evaluated.</p>
+<p>This is useful when working with structural data and types from other libraries. For example, a computed <a href="https://momentjs.com/">moment</a> instance could use <code>(a, b) =&gt; a.isSame(b)</code>. <code>comparer.structural</code> and <code>comparer.shallow</code> come in handy if you want to use structural / shallow comparison to determine whether the new value is different from the previous value, and as a result notify its observers.</p>
+<p>Check out the <a href="#computed-struct"><code>computed.struct</code></a> section above.</p>
+<h4><a class="anchor" aria-hidden="true" id="built-in-comparers"></a><a href="#built-in-comparers" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Built-in comparers</h4>
+<p>MobX provides four built-in <code>comparer</code> methods which should cover most needs of the <code>equals</code> option of <code>computed</code>:</p>
+<ul>
+<li><code>comparer.identity</code> uses the identity (<code>===</code>) operator to determine if two values are the same.</li>
+<li><code>comparer.default</code> is the same as <code>comparer.identity</code>, but also considers <code>NaN</code> to be equal to <code>NaN</code>.</li>
+<li><code>comparer.structural</code> performs deep structural comparison to determine if two values are the same.</li>
+<li><code>comparer.shallow</code> performs shallow structural comparison to determine if two values are the same.</li>
+</ul>
+<p>You can import <code>comparer</code> from <code>mobx</code> to access these methods. They can be used for <code>reaction</code> as well.</p>
+<h3><a class="anchor" aria-hidden="true" id="requiresreaction"></a><a href="#requiresreaction" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>requiresReaction</code></h3>
+<p>It is recommended to set this one to <code>true</code> on very expensive computed values. If you try to read its value outside of the reactive context, in which case it might not be cached, it will cause the computed to throw instead of doing an expensive re-evalution.</p>
+<h3><a class="anchor" aria-hidden="true" id="keepalive"></a><a href="#keepalive" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>keepAlive</code></h3>
+<p>This avoids suspending computed values when they are not being observed by anything (see the above explanation). Can potentially create memory leaks, similar to the ones discussed for <a href="/reactions.html#always-dispose-of-reactions">reactions</a>.</p>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/actions.html"><span class="arrow-prev">← </span><span>Actions</span></a><a class="docs-next button" href="/reactions.html"><span>Reactions {🚀}</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#example">Example</a></li><li><a href="#rules">Rules</a></li><li><a href="#tips">Tips</a></li><li><a href="#options-">Options {🚀}</a><ul class="toc-headings"><li><a href="#name"><code>name</code></a></li><li><a href="#equals"><code>equals</code></a></li><li><a href="#requiresreaction"><code>requiresReaction</code></a></li><li><a href="#keepalive"><code>keepAlive</code></a></li></ul></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/mobx.png" alt="MobX" width="66" height="58"/></a><div><h5>Docs</h5><a href="/README.html#introduction">About MobX</a><a href="/the-gist-of-mobx.html">The gist of MobX</a></div><div><h5>Community</h5><a href="https://github.com/mobxjs/mobx/discussions" target="_blank" rel="noreferrer noopener">GitHub discussions (NEW)</a><a href="https://stackoverflow.com/questions/tagged/mobx" target="_blank" rel="noreferrer noopener">Stack Overflow</a></div><div><h5>More</h5><a class="github-button" href="https://github.com/mobxjs/mobx" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+                document.addEventListener('keyup', function(e) {
+                  if (e.target !== document.body) {
+                    return;
+                  }
+                  // keyCode for '/' (slash)
+                  if (e.keyCode === 191) {
+                    const search = document.getElementById('search_input_react');
+                    search && search.focus();
+                  }
+                });
+              </script><script>
+              var search = docsearch({
+                
+                apiKey: '500db32fbdbd53a814f42aafdfa26bd4',
+                indexName: 'mobxjs',
+                inputSelector: '#search_input_react'
+              });
+            </script></body></html>

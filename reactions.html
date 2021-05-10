@@ -1,0 +1,381 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Running side effects with reactions · MobX</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="&lt;script async type=&quot;text/javascript&quot; src=&quot;//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&amp;placement=mobxjsorg&quot; id=&quot;_carbonads_js&quot;&gt;&lt;/script&gt;"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Running side effects with reactions · MobX"/><meta property="og:type" content="website"/><meta property="og:url" content="https://mobx.js.org/index.html"/><meta property="og:description" content="&lt;script async type=&quot;text/javascript&quot; src=&quot;//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&amp;placement=mobxjsorg&quot; id=&quot;_carbonads_js&quot;&gt;&lt;/script&gt;"/><meta property="og:image" content="https://mobx.js.org/img/undraw_online.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://mobx.js.org/img/undraw_tweetstorm.svg"/><link rel="shortcut icon" href="/img/favicon.png"/><link rel="stylesheet" href="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.css"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script>
+              (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+              (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+              m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+              })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+              ga('create', 'UA-65632006-1', 'auto');
+              ga('send', 'pageview');
+            </script><script type="text/javascript" src="/js/scripts.js"></script><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><img class="logo" src="/img/mobx.png" alt="MobX"/><h2 class="headerTitleWithLogo">MobX</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class=""><a href="/api.html" target="_self">API Reference</a></li><li class=""><a href="https://zh.mobx.js.org" target="_self">中文(寻求翻译)</a></li><li class=""><a href="/backers-sponsors.html" target="_self">Sponsors</a></li><li class=""><a href="https://github.com/mobxjs/mobx" target="_self">GitHub</a></li><li class="navSearchWrapper reactNavSearchWrapper"><input type="text" id="search_input_react" placeholder="Search" title="Search"/></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>MobX core</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Introduction</h3><ul class=""><li class="navListItem"><a class="navItem" href="/README.html">About MobX</a></li><li class="navListItem"><a class="navItem" href="/about-this-documentation.html">About this documentation</a></li><li class="navListItem"><a class="navItem" href="/installation.html">Installation</a></li><li class="navListItem"><a class="navItem" href="/the-gist-of-mobx.html">The gist of MobX</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">MobX core</h3><ul class=""><li class="navListItem"><a class="navItem" href="/observable-state.html">Observable state</a></li><li class="navListItem"><a class="navItem" href="/actions.html">Actions</a></li><li class="navListItem"><a class="navItem" href="/computeds.html">Computeds</a></li><li class="navListItem navListItemActive"><a class="navItem" href="/reactions.html">Reactions {🚀}</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">MobX and React</h3><ul class=""><li class="navListItem"><a class="navItem" href="/react-integration.html">React integration</a></li><li class="navListItem"><a class="navItem" href="/react-optimizations.html">React optimizations {🚀}</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Tips &amp; Tricks</h3><ul class=""><li class="navListItem"><a class="navItem" href="/defining-data-stores.html">Defining data stores</a></li><li class="navListItem"><a class="navItem" href="/understanding-reactivity.html">Understanding reactivity</a></li><li class="navListItem"><a class="navItem" href="/subclassing.html">Subclassing</a></li><li class="navListItem"><a class="navItem" href="/analyzing-reactivity.html">Analyzing reactivity {🚀}</a></li><li class="navListItem"><a class="navItem" href="/computeds-with-args.html">Computeds with arguments {🚀}</a></li><li class="navListItem"><a class="navItem" href="/mobx-utils.html">MobX-utils {🚀}</a></li><li class="navListItem"><a class="navItem" href="/custom-observables.html">Custom observables {🚀}</a></li><li class="navListItem"><a class="navItem" href="/lazy-observables.html">Lazy observables {🚀}</a></li><li class="navListItem"><a class="navItem" href="/collection-utilities.html">Collection utilities {🚀}</a></li><li class="navListItem"><a class="navItem" href="/intercept-and-observe.html">Intercept &amp; Observe {🚀}</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Fine-tuning</h3><ul class=""><li class="navListItem"><a class="navItem" href="/configuration.html">Configuration {🚀}</a></li><li class="navListItem"><a class="navItem" href="/enabling-decorators.html">Enabling decorators {🚀}</a></li><li class="navListItem"><a class="navItem" href="/migrating-from-4-or-5.html">Migrating from MobX 4/5 {🚀}</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><a class="edit-page-link button" href="https://github.com/mobxjs/mobx/edit/main/docs/reactions.md" target="_blank" rel="noreferrer noopener">Edit</a></header><article><div><span><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
+<h1><a class="anchor" aria-hidden="true" id="running-side-effects-with-reactions-"></a><a href="#running-side-effects-with-reactions-" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Running side effects with reactions {🚀}</h1>
+<p>Reactions are an important concept to understand, as it is where everything in MobX comes together.
+The goal of reactions is to model side effects that happen automatically.
+Their significance is in creating consumers for your observable state and <em>automatically</em> running side effects whenever something <em>relevant</em> changes.</p>
+<p>However, with that in mind, it is important to realize that the APIs discussed here should rarely be used.
+They are often abstracted away in other libraries (like mobx-react) or abstractions specific to your application.</p>
+<p>But, to grok MobX, let's take a look at how reactions can be created.
+The simplest way is to use the <a href="#autorun"><code>autorun</code></a> utility.
+Beyond that, there are also <a href="#reaction"><code>reaction</code></a> and <a href="#when"><code>when</code></a>.</p>
+<h2><a class="anchor" aria-hidden="true" id="autorun"></a><a href="#autorun" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Autorun</h2>
+<p>Usage:</p>
+<ul>
+<li><code>autorun(effect: (reaction) =&gt; void)</code></li>
+</ul>
+<p>The <code>autorun</code> function accepts one function that should run every time anything it observes changes.
+It also runs once when you create the <code>autorun</code> itself. It only responds to changes in observable state, things you have annotated <code>observable</code> or <code>computed</code>.</p>
+<h3><a class="anchor" aria-hidden="true" id="how-tracking-works"></a><a href="#how-tracking-works" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>How tracking works</h3>
+<p>Autorun works by running the <code>effect</code> in a <em>reactive context</em>. During the execution of the provided function, MobX keeps track of all observable and computed values that are directly or indirectly <em>read</em> by the effect.
+Once the function finishes, MobX will collect and subscribe to all observables that were read and wait until any of them changes again.
+Once they do, the <code>autorun</code> will trigger again, repeating the entire process.</p>
+<p><img src="/assets/autorun.png" alt="autorun"></p>
+<p>This is how the example below works like.</p>
+<h3><a class="anchor" aria-hidden="true" id="example"></a><a href="#example" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Example</h3>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { makeAutoObservable, autorun } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx"</span>
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Animal</span> </span>{
+    name
+    energyLevel
+
+    <span class="hljs-keyword">constructor</span>(name) {
+        <span class="hljs-keyword">this</span>.name = name
+        <span class="hljs-keyword">this</span>.energyLevel = <span class="hljs-number">100</span>
+        makeAutoObservable(<span class="hljs-keyword">this</span>)
+    }
+
+    reduceEnergy() {
+        <span class="hljs-keyword">this</span>.energyLevel -= <span class="hljs-number">10</span>
+    }
+
+    <span class="hljs-keyword">get</span> isHungry() {
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.energyLevel &lt; <span class="hljs-number">50</span>
+    }
+}
+
+<span class="hljs-keyword">const</span> giraffe = <span class="hljs-keyword">new</span> Animal(<span class="hljs-string">"Gary"</span>)
+
+autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Energy level:"</span>, giraffe.energyLevel)
+})
+
+autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    <span class="hljs-keyword">if</span> (giraffe.isHungry) {
+        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Now I'm hungry!"</span>)
+    } <span class="hljs-keyword">else</span> {
+        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"I'm not hungry!"</span>)
+    }
+})
+
+<span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Now let's change state!"</span>)
+<span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">10</span>; i++) {
+    giraffe.reduceEnergy()
+}
+</code></pre>
+<p>Running this code, you will get the following output:</p>
+<pre><code class="hljs"><span class="hljs-attr">Energy level:</span> <span class="hljs-number">100</span>
+<span class="hljs-string">I'm</span> <span class="hljs-string">not</span> <span class="hljs-string">hungry!</span>
+<span class="hljs-string">Now</span> <span class="hljs-string">let's</span> <span class="hljs-string">change</span> <span class="hljs-string">state!</span>
+<span class="hljs-attr">Energy level:</span> <span class="hljs-number">90</span>
+<span class="hljs-attr">Energy level:</span> <span class="hljs-number">80</span>
+<span class="hljs-attr">Energy level:</span> <span class="hljs-number">70</span>
+<span class="hljs-attr">Energy level:</span> <span class="hljs-number">60</span>
+<span class="hljs-attr">Energy level:</span> <span class="hljs-number">50</span>
+<span class="hljs-attr">Energy level:</span> <span class="hljs-number">40</span>
+<span class="hljs-string">Now</span> <span class="hljs-string">I'm</span> <span class="hljs-string">hungry!</span>
+<span class="hljs-attr">Energy level:</span> <span class="hljs-number">30</span>
+<span class="hljs-attr">Energy level:</span> <span class="hljs-number">20</span>
+<span class="hljs-attr">Energy level:</span> <span class="hljs-number">10</span>
+<span class="hljs-attr">Energy level:</span> <span class="hljs-number">0</span>
+</code></pre>
+<p>As you can see in the first two lines of the output above, both <code>autorun</code> functions run once when they are initialized. This is all you would see without the <code>for</code> loop.</p>
+<p>Once we run the <code>for</code> loop to change the <code>energyLevel</code> with the <code>reduceEnergy</code>
+action, we see a new log entry every time an <code>autorun</code> function observes a
+change in its observable state:</p>
+<ol>
+<li><p>For the <em>&quot;Energy level&quot;</em> function, this is every time the <code>energyLevel</code> observable changes, 10 times in total.</p></li>
+<li><p>For the <em>&quot;Now I'm hungry&quot;</em> function, this is every time the <code>isHungry</code> computed
+changes, only one time.</p></li>
+</ol>
+<h2><a class="anchor" aria-hidden="true" id="reaction"></a><a href="#reaction" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Reaction</h2>
+<p>Usage:</p>
+<ul>
+<li><code>reaction(() =&gt; value, (value, previousValue, reaction) =&gt; { sideEffect }, options?)</code>.</li>
+</ul>
+<p><code>reaction</code> is like <code>autorun</code>, but gives more fine grained control on which observables will be tracked.
+It takes two functions: the first, <em>data</em> function, is tracked and returns the data that is used as input for the second, <em>effect</em> function.
+It is important to note that the side effect <em>only</em> reacts to data that was <em>accessed</em> in the data function, which might be less than the data that is actually used in the effect function.</p>
+<p>The typical pattern is that you produce the things you need in your side effect
+in the <em>data</em> function, and in that way control more precisely when the effect triggers.
+By default, the result of the <em>data</em> function has to change in order for the <em>effect</em> function to be triggered.
+Unlike <code>autorun</code>, the side effect won't run once when initialized, but only after the data expression returns a new value for the first time.</p>
+<p><details id="reaction-example"><summary><strong>Example:</strong> the data and effect functions<a href="#reaction-example" class="tip-anchor"></a></summary></p>
+<p>In the example below, the reaction is only triggered once, when <code>isHungry</code> changes.
+Changes to <code>giraffe.energyLevel</code>, which is used by the <em>effect</em> function, do not cause the <em>effect</em> function to be executed. If you wanted <code>reaction</code> to respond to this
+as well, you would have to also access it in the <em>data</em> function and return it.</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { makeAutoObservable, reaction } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx"</span>
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Animal</span> </span>{
+    name
+    energyLevel
+
+    <span class="hljs-keyword">constructor</span>(name) {
+        <span class="hljs-keyword">this</span>.name = name
+        <span class="hljs-keyword">this</span>.energyLevel = <span class="hljs-number">100</span>
+        makeAutoObservable(<span class="hljs-keyword">this</span>)
+    }
+
+    reduceEnergy() {
+        <span class="hljs-keyword">this</span>.energyLevel -= <span class="hljs-number">10</span>
+    }
+
+    <span class="hljs-keyword">get</span> isHungry() {
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.energyLevel &lt; <span class="hljs-number">50</span>
+    }
+}
+
+<span class="hljs-keyword">const</span> giraffe = <span class="hljs-keyword">new</span> Animal(<span class="hljs-string">"Gary"</span>)
+
+reaction(
+    <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> giraffe.isHungry,
+    isHungry =&gt; {
+        <span class="hljs-keyword">if</span> (isHungry) {
+            <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Now I'm hungry!"</span>)
+        } <span class="hljs-keyword">else</span> {
+            <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"I'm not hungry!"</span>)
+        }
+        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Energy level:"</span>, giraffe.energyLevel)
+    }
+)
+
+<span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Now let's change state!"</span>)
+<span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">10</span>; i++) {
+    giraffe.reduceEnergy()
+}
+</code></pre>
+<p>Output:</p>
+<pre><code class="hljs">Now let's change <span class="hljs-keyword">state</span>!
+Now I'm hungry!
+Energy level: <span class="hljs-number">40</span>
+</code></pre>
+<p></details></p>
+<h2><a class="anchor" aria-hidden="true" id="when"></a><a href="#when" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>When</h2>
+<p>Usage:</p>
+<ul>
+<li><code>when(predicate: () =&gt; boolean, effect?: () =&gt; void, options?)</code></li>
+<li><code>when(predicate: () =&gt; boolean, options?): Promise</code></li>
+</ul>
+<p><code>when</code> observes and runs the given <em>predicate</em> function until it returns <code>true</code>.
+Once that happens, the given <em>effect</em> function is executed and the autorunner is disposed.</p>
+<p>The <code>when</code> function returns a disposer, allowing you to cancel it manually, unless you don't pass in a second <code>effect</code> function, in which case it returns a <code>Promise</code>.</p>
+<p><details id="when-example">
+<summary><strong>Example:</strong> dispose of things in a reactive way<a href="#when-example" class="tip-anchor"></a></summary></p>
+<p><code>when</code> is really useful for disposing or canceling of things in a reactive way.
+For example:</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { when, makeAutoObservable } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx"</span>
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyResource</span> </span>{
+    <span class="hljs-keyword">constructor</span>() {
+        makeAutoObservable(<span class="hljs-keyword">this</span>, { <span class="hljs-attr">dispose</span>: <span class="hljs-literal">false</span> })
+        when(
+            <span class="hljs-comment">// Once...</span>
+            <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> !<span class="hljs-keyword">this</span>.isVisible,
+            <span class="hljs-comment">// ... then.</span>
+            () =&gt; <span class="hljs-keyword">this</span>.dispose()
+        )
+    }
+
+    <span class="hljs-keyword">get</span> isVisible() {
+        <span class="hljs-comment">// Indicate whether this item is visible.</span>
+    }
+
+    dispose() {
+        <span class="hljs-comment">// Clean up some resources.</span>
+    }
+}
+</code></pre>
+<p>As soon as <code>isVisible</code> becomes <code>false</code>, the <code>dispose</code> method is called that
+then does some cleanup for <code>MyResource</code>.</p>
+<p></details></p>
+<h3><a class="anchor" aria-hidden="true" id="await-when"></a><a href="#await-when" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>await when(...)</code></h3>
+<p>If no <code>effect</code> function is provided, <code>when</code> returns a <code>Promise</code>. This combines nicely with <code>async / await</code> to let you wait for changes in observable state.</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+    <span class="hljs-keyword">await</span> when(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> that.isVisible)
+    <span class="hljs-comment">// etc...</span>
+}
+</code></pre>
+<p>To cancel <code>when</code> prematurely, it is possible to call <code>.cancel()</code> on the promise returned by itself.</p>
+<h2><a class="anchor" aria-hidden="true" id="rules"></a><a href="#rules" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Rules</h2>
+<p>There are a few rules that apply to any reactive context:</p>
+<ol>
+<li>Affected reactions run by default immediately (synchronously) if an observable is changed. However, they won't run before the end of the current outermost (trans)action.</li>
+<li>Autorun tracks only the observables that are read during the synchronous execution of the provided function, but it won't track anything that happens asynchronously.</li>
+<li>Autorun won't track observables that are read by an action invoked by the autorun, as actions are always <em>untracked</em>.</li>
+</ol>
+<p>For more examples on what precisely MobX will and will not react to, check out the <a href="/understanding-reactivity.html">Understanding reactivity</a> section.
+For a more detailed technical breakdown on how tracking works, read the blog post <a href="https://hackernoon.com/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254">Becoming fully reactive: an in-depth explanation of MobX</a>.</p>
+<h2><a class="anchor" aria-hidden="true" id="always-dispose-of-reactions"></a><a href="#always-dispose-of-reactions" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Always dispose of reactions</h2>
+<p>The functions passed to <code>autorun</code>, <code>reaction</code> and <code>when</code> are only garbage collected if all objects they observe are garbage collected themselves. In principle, they keep waiting forever for new changes to happen in the observables they use.
+To be able to stop them from waiting until forever has passed, they all return a disposer function that can be used to stop them and unsubscribe from any observables they used.</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">const</span> counter = observable({ <span class="hljs-attr">count</span>: <span class="hljs-number">0</span> })
+
+<span class="hljs-comment">// Sets up the autorun and prints 0.</span>
+<span class="hljs-keyword">const</span> disposer = autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(counter.count)
+})
+
+<span class="hljs-comment">// Prints: 1</span>
+counter.count++
+
+<span class="hljs-comment">// Stops the autorun.</span>
+disposer()
+
+<span class="hljs-comment">// Will not print.</span>
+counter.count++
+</code></pre>
+<p>We strongly recommend to always use the disposer function that is returned from these methods as soon as their side effect is no longer needed.
+Failing to do so can lead to memory leaks.</p>
+<p>The <code>reaction</code> argument that is passed as second argument to the effect functions of <code>reaction</code> and <code>autorun</code>, can be used to prematurely clean up the reaction as well by calling <code>reaction.dispose()</code>.</p>
+<p><details id="mem-leak-example"><summary><strong>Example:</strong> memory leak<a href="#mem-leak-example" class="tip-anchor"></a></summary></p>
+<pre><code class="hljs css language-javascript"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Vat</span> </span>{
+    value = <span class="hljs-number">1.2</span>
+
+    <span class="hljs-keyword">constructor</span>() {
+        makeAutoObservable(<span class="hljs-keyword">this</span>)
+    }
+}
+
+<span class="hljs-keyword">const</span> vat = <span class="hljs-keyword">new</span> Vat()
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">OrderLine</span> </span>{
+    price = <span class="hljs-number">10</span>
+    amount = <span class="hljs-number">1</span>
+    <span class="hljs-keyword">constructor</span>() {
+        makeAutoObservable(<span class="hljs-keyword">this</span>)
+
+        <span class="hljs-comment">// This autorun will be GC-ed together with the current orderline</span>
+        <span class="hljs-comment">// instance as it only uses observables from `this`. It's not strictly</span>
+        <span class="hljs-comment">// necessary to dispose of it once an OrderLine instance is deleted.</span>
+        <span class="hljs-keyword">this</span>.disposer1 = autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+            doSomethingWith(<span class="hljs-keyword">this</span>.price * <span class="hljs-keyword">this</span>.amount)
+        })
+
+        <span class="hljs-comment">// This autorun won't be GC-ed together with the current orderline</span>
+        <span class="hljs-comment">// instance, since vat keeps a reference to notify this autorun, which</span>
+        <span class="hljs-comment">// in turn keeps 'this' in scope.</span>
+        <span class="hljs-keyword">this</span>.disposer2 = autorun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+            doSomethingWith(<span class="hljs-keyword">this</span>.price * <span class="hljs-keyword">this</span>.amount * vat.value)
+        })
+    }
+
+    dispose() {
+        <span class="hljs-comment">// So, to avoid subtle memory issues, always call the</span>
+        <span class="hljs-comment">// disposers when the reactions are no longer needed.</span>
+        <span class="hljs-keyword">this</span>.disposer1()
+        <span class="hljs-keyword">this</span>.disposer2()
+    }
+}
+</code></pre>
+<p></details></p>
+<h2><a class="anchor" aria-hidden="true" id="use-reactions-sparingly"></a><a href="#use-reactions-sparingly" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Use reactions sparingly!</h2>
+<p>As it was already said, you won't create reactions very often.
+It might very well be that your application doesn't use any of these APIs directly, and the only way reactions are constructed is indirectly, through for example <code>observer</code> from the mobx-react bindings.</p>
+<p>Before you set up a reaction, it is good to first check if it conforms to the following principles:</p>
+<ol>
+<li><strong>Only use Reactions if there is no direct relation between cause and effect</strong>: If a side effect should happen in response to a very limited set of events / actions, it will often be clearer to directly trigger the effect from those specific actions. For example, if pressing a form submit button should lead to a network request to be posted, it is clearer to trigger this effect directly in response of the <code>onClick</code> event, rather than indirectly through a reaction. In contrast, if any change you make to the form state should automatically end up in local storage, then a reaction can be very useful, so that you don't have to trigger this effect from every individual <code>onChange</code> event.</li>
+<li><strong>Reactions shouldn't update other observables</strong>: Is the reaction going to modify other observables? If the answer is yes, typically the observable you want to update should be annotated as a <a href="/computeds.html"><code>computed</code></a> value instead. For example, if a collection of todos is altered, don't use a reaction to compute the amount of <code>remainingTodos</code>, but annotate <code>remainingTodos</code> as a computed value. That will lead to much clearer and easier to debug code. Reactions should not compute new data, but only cause effects.</li>
+<li><strong>Reactions should be independent</strong>: Does your code rely on some other reaction having to run first? If that is the case, you probably
+either violated the first rule, or the new reaction you are about to create should be merged into the one it is depending upon. MobX does not guarantee the order in which reactions will be run.</li>
+</ol>
+<p>There are real-life scenarios that do not fit in the above principles. That is why they are <em>principles</em>, not <em>laws</em>.
+But, the exceptions are rare so only violate them as a last resort.</p>
+<h2><a class="anchor" aria-hidden="true" id="options-"></a><a href="#options-" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Options {🚀}</h2>
+<p>The behavior of <code>autorun</code>, <code>reaction</code> and <code>when</code> can be further fine-tuned by passing in an <code>options</code> argument as shown in the usages above.</p>
+<h3><a class="anchor" aria-hidden="true" id="name"></a><a href="#name" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>name</code></h3>
+<p>This string is used as a debug name for this reaction in the <a href="/analyzing-reactivity.html#spy">Spy event listeners</a> and <a href="https://github.com/mobxjs/mobx-devtools">MobX developer tools</a>.</p>
+<h3><a class="anchor" aria-hidden="true" id="fireimmediately-_reaction_"></a><a href="#fireimmediately-_reaction_" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>fireImmediately</code> <em>(reaction)</em></h3>
+<p>Boolean indicating that the <em>effect</em> function should immediately be triggered after the first run of the <em>data</em> function. <code>false</code> by default.</p>
+<h3><a class="anchor" aria-hidden="true" id="delay-_autorun-reaction_"></a><a href="#delay-_autorun-reaction_" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>delay</code> <em>(autorun, reaction)</em></h3>
+<p>Number of milliseconds that can be used to throttle the effect function. If zero (default), no throttling happens.</p>
+<h3><a class="anchor" aria-hidden="true" id="timeout-_when_"></a><a href="#timeout-_when_" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>timeout</code> <em>(when)</em></h3>
+<p>Set a limited amount of time that <code>when</code> will wait for. If the deadline passes, <code>when</code> will reject / throw.</p>
+<h3><a class="anchor" aria-hidden="true" id="onerror"></a><a href="#onerror" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>onError</code></h3>
+<p>By default, any exception thrown inside an reaction will be logged, but not further thrown. This is to make sure that an exception in one reaction does not prevent the scheduled execution of other, possibly unrelated reactions. This also allows reactions to recover from exceptions. Throwing an exception does not break the tracking done by MobX, so subsequent runs of the reaction might complete normally again if the cause for the exception is removed. This option allows overriding that behavior. It is possible to set a global error handler or to disable catching errors completely using <a href="/configuration.html#disableerrorboundaries-boolean">configure</a>.</p>
+<h3><a class="anchor" aria-hidden="true" id="scheduler-_autorun-reaction_"></a><a href="#scheduler-_autorun-reaction_" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>scheduler</code> <em>(autorun, reaction)</em></h3>
+<p>Set a custom scheduler to determine how re-running the autorun function should be scheduled. It takes a function that should be invoked at some point in the future, for example: <code>{ scheduler: run =&gt; { setTimeout(run, 1000) }}</code></p>
+<h3><a class="anchor" aria-hidden="true" id="equals-reaction"></a><a href="#equals-reaction" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>equals</code>: (reaction)</h3>
+<p>Set to <code>comparer.default</code> by default. If specified, this comparer function is used to compare the previous and next values produced by the <em>data</em> function. The <em>effect</em> function is only invoked if this function returns false.</p>
+<p>Check out the <a href="/computeds.html#built-in-comparers">Built-in comparers</a> section.</p>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/computeds.html"><span class="arrow-prev">← </span><span>Computeds</span></a><a class="docs-next button" href="/react-integration.html"><span>React integration</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#autorun">Autorun</a><ul class="toc-headings"><li><a href="#how-tracking-works">How tracking works</a></li><li><a href="#example">Example</a></li></ul></li><li><a href="#reaction">Reaction</a></li><li><a href="#when">When</a><ul class="toc-headings"><li><a href="#await-when"><code>await when(...)</code></a></li></ul></li><li><a href="#rules">Rules</a></li><li><a href="#always-dispose-of-reactions">Always dispose of reactions</a></li><li><a href="#use-reactions-sparingly">Use reactions sparingly!</a></li><li><a href="#options-">Options {🚀}</a><ul class="toc-headings"><li><a href="#name"><code>name</code></a></li><li><a href="#fireimmediately-_reaction_"><code>fireImmediately</code> <em>(reaction)</em></a></li><li><a href="#delay-_autorun-reaction_"><code>delay</code> <em>(autorun, reaction)</em></a></li><li><a href="#timeout-_when_"><code>timeout</code> <em>(when)</em></a></li><li><a href="#onerror"><code>onError</code></a></li><li><a href="#scheduler-_autorun-reaction_"><code>scheduler</code> <em>(autorun, reaction)</em></a></li><li><a href="#equals-reaction"><code>equals</code>: (reaction)</a></li></ul></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/mobx.png" alt="MobX" width="66" height="58"/></a><div><h5>Docs</h5><a href="/README.html#introduction">About MobX</a><a href="/the-gist-of-mobx.html">The gist of MobX</a></div><div><h5>Community</h5><a href="https://github.com/mobxjs/mobx/discussions" target="_blank" rel="noreferrer noopener">GitHub discussions (NEW)</a><a href="https://stackoverflow.com/questions/tagged/mobx" target="_blank" rel="noreferrer noopener">Stack Overflow</a></div><div><h5>More</h5><a class="github-button" href="https://github.com/mobxjs/mobx" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+                document.addEventListener('keyup', function(e) {
+                  if (e.target !== document.body) {
+                    return;
+                  }
+                  // keyCode for '/' (slash)
+                  if (e.keyCode === 191) {
+                    const search = document.getElementById('search_input_react');
+                    search && search.focus();
+                  }
+                });
+              </script><script>
+              var search = docsearch({
+                
+                apiKey: '500db32fbdbd53a814f42aafdfa26bd4',
+                indexName: 'mobxjs',
+                inputSelector: '#search_input_react'
+              });
+            </script></body></html>

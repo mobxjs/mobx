@@ -1,0 +1,351 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Defining data stores · MobX</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="&lt;script async type=&quot;text/javascript&quot; src=&quot;//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&amp;placement=mobxjsorg&quot; id=&quot;_carbonads_js&quot;&gt;&lt;/script&gt;"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Defining data stores · MobX"/><meta property="og:type" content="website"/><meta property="og:url" content="https://mobx.js.org/index.html"/><meta property="og:description" content="&lt;script async type=&quot;text/javascript&quot; src=&quot;//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&amp;placement=mobxjsorg&quot; id=&quot;_carbonads_js&quot;&gt;&lt;/script&gt;"/><meta property="og:image" content="https://mobx.js.org/img/undraw_online.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://mobx.js.org/img/undraw_tweetstorm.svg"/><link rel="shortcut icon" href="/img/favicon.png"/><link rel="stylesheet" href="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.css"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script>
+              (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+              (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+              m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+              })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+              ga('create', 'UA-65632006-1', 'auto');
+              ga('send', 'pageview');
+            </script><script type="text/javascript" src="/js/scripts.js"></script><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><img class="logo" src="/img/mobx.png" alt="MobX"/><h2 class="headerTitleWithLogo">MobX</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class=""><a href="/api.html" target="_self">API Reference</a></li><li class=""><a href="https://zh.mobx.js.org" target="_self">中文(寻求翻译)</a></li><li class=""><a href="/backers-sponsors.html" target="_self">Sponsors</a></li><li class=""><a href="https://github.com/mobxjs/mobx" target="_self">GitHub</a></li><li class="navSearchWrapper reactNavSearchWrapper"><input type="text" id="search_input_react" placeholder="Search" title="Search"/></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Tips &amp; Tricks</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Introduction</h3><ul class=""><li class="navListItem"><a class="navItem" href="/README.html">About MobX</a></li><li class="navListItem"><a class="navItem" href="/about-this-documentation.html">About this documentation</a></li><li class="navListItem"><a class="navItem" href="/installation.html">Installation</a></li><li class="navListItem"><a class="navItem" href="/the-gist-of-mobx.html">The gist of MobX</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">MobX core</h3><ul class=""><li class="navListItem"><a class="navItem" href="/observable-state.html">Observable state</a></li><li class="navListItem"><a class="navItem" href="/actions.html">Actions</a></li><li class="navListItem"><a class="navItem" href="/computeds.html">Computeds</a></li><li class="navListItem"><a class="navItem" href="/reactions.html">Reactions {🚀}</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">MobX and React</h3><ul class=""><li class="navListItem"><a class="navItem" href="/react-integration.html">React integration</a></li><li class="navListItem"><a class="navItem" href="/react-optimizations.html">React optimizations {🚀}</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Tips &amp; Tricks</h3><ul class=""><li class="navListItem navListItemActive"><a class="navItem" href="/defining-data-stores.html">Defining data stores</a></li><li class="navListItem"><a class="navItem" href="/understanding-reactivity.html">Understanding reactivity</a></li><li class="navListItem"><a class="navItem" href="/subclassing.html">Subclassing</a></li><li class="navListItem"><a class="navItem" href="/analyzing-reactivity.html">Analyzing reactivity {🚀}</a></li><li class="navListItem"><a class="navItem" href="/computeds-with-args.html">Computeds with arguments {🚀}</a></li><li class="navListItem"><a class="navItem" href="/mobx-utils.html">MobX-utils {🚀}</a></li><li class="navListItem"><a class="navItem" href="/custom-observables.html">Custom observables {🚀}</a></li><li class="navListItem"><a class="navItem" href="/lazy-observables.html">Lazy observables {🚀}</a></li><li class="navListItem"><a class="navItem" href="/collection-utilities.html">Collection utilities {🚀}</a></li><li class="navListItem"><a class="navItem" href="/intercept-and-observe.html">Intercept &amp; Observe {🚀}</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Fine-tuning</h3><ul class=""><li class="navListItem"><a class="navItem" href="/configuration.html">Configuration {🚀}</a></li><li class="navListItem"><a class="navItem" href="/enabling-decorators.html">Enabling decorators {🚀}</a></li><li class="navListItem"><a class="navItem" href="/migrating-from-4-or-5.html">Migrating from MobX 4/5 {🚀}</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><a class="edit-page-link button" href="https://github.com/mobxjs/mobx/edit/main/docs/defining-data-stores.md" target="_blank" rel="noreferrer noopener">Edit</a></header><article><div><span><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
+<h1><a class="anchor" aria-hidden="true" id="defining-data-stores"></a><a href="#defining-data-stores" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Defining data stores</h1>
+<p>This section contains some of the best practices for building large scale maintainable projects we discovered at Mendix while working with MobX.
+This section is opinionated and you are in no way forced to apply these practices.
+There are many ways of working with MobX and React, and this is just one of them.</p>
+<p>This section focuses on an unobtrusive way of working with MobX, which works well in existing codebases, or with classic MVC patterns. Alternative, more opinionated ways of organizing stores are <a href="https://github.com/mobxjs/mobx-state-tree">mobx-state-tree</a> and <a href="https://mobx-keystone.js.org/">mobx-keystone</a>. Both ship with cool features such as structurally shared snapshots, action middlewares, JSON patch support etc. out of the box.</p>
+<h2><a class="anchor" aria-hidden="true" id="stores"></a><a href="#stores" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Stores</h2>
+<p>Stores can be found in any Flux architecture and can be compared a bit with controllers in the MVC pattern.
+The main responsibility of stores is to move <em>logic</em> and <em>state</em> out of your components into a standalone testable unit that can be used in both frontend and backend JavaScript.</p>
+<p>Most applications benefit from having at least two stores: one for the <em>domain state</em> and another one for the <em>UI state</em>. The advantage of separating those two is you can reuse and test <em>domain state</em> universally, and you might very well reuse it in other applications.</p>
+<h2><a class="anchor" aria-hidden="true" id="domain-stores"></a><a href="#domain-stores" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Domain Stores</h2>
+<p>Your application will contain one or multiple <em>domain</em> stores.
+These stores store the data your application is all about.
+Todo items, users, books, movies, orders, you name it.
+Your application will most probably have at least one domain store.</p>
+<p>A single domain store should be responsible for a single concept in your application. A single store is often organized as a tree structure with
+multiple domain objects inside.</p>
+<p>For example: one domain store for your products, and one for your orders and orderlines.
+As a rule of thumb: if the nature of the relationship between two items is containment, they should typically be in the same store.
+So a store just manages <em>domain objects</em>.</p>
+<p>These are the responsibilities of a store:</p>
+<ul>
+<li>Instantiate domain objects. Make sure domain objects know the store they belong to.</li>
+<li>Make sure there is only one instance of each of your domain objects.
+The same user, order or todo should not be stored twice in memory.
+This way you can safely use references and also be sure you are looking at the latest instance, without ever having to resolve a reference.
+This is fast, straightforward and convenient when debugging.</li>
+<li>Provide backend integration. Store data when needed.</li>
+<li>Update existing instances if updates are received from the backend.</li>
+<li>Provide a standalone, universal, testable component of your application.</li>
+<li>To make sure your store is testable and can be run server-side, you will probably move doing actual websocket / http requests to a separate object so that you can abstract over your communication layer.</li>
+<li>There should be only one instance of a store.</li>
+</ul>
+<h3><a class="anchor" aria-hidden="true" id="domain-objects"></a><a href="#domain-objects" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Domain objects</h3>
+<p>Each domain object should be expressed using its own class (or constructor function).
+There is no need to treat your client-side application state as some kind of database.
+Real references, cyclic data structures and instance methods are powerful concepts in JavaScript.
+Domain objects are allowed to refer directly to domain objects from other stores.
+Remember: we want to keep our actions and views as simple as possible and needing to manage references and doing garbage collection yourself might be a step backward.
+Unlike many Flux architectures such as Redux, with MobX there is no need to normalize your data, and this makes it a lot simpler to build the <em>essentially</em> complex parts of your application:
+your business rules, actions and user interface.</p>
+<p>Domain objects can delegate all their logic to the store they belong to if that suits your application well.
+It is possible to express your domain objects as plain objects, but classes have some important advantages over plain objects:</p>
+<ul>
+<li>They can have methods.
+This makes your domain concepts easier to use standalone and reduces the amount of contextual awareness that is needed in your application.
+Just pass objects around.
+You don't have to pass stores around, or have to figure out which actions can be applied to an object if they are just available as instance methods.
+This is especially important in large applications.</li>
+<li>They offer fine grained control over the visibility of attributes and methods.</li>
+<li>Objects created using a constructor function can freely mix observable properties and methods, and non-observable properties and methods.</li>
+<li>They are easily recognizable and can be strictly type-checked.</li>
+</ul>
+<h3><a class="anchor" aria-hidden="true" id="example-domain-store"></a><a href="#example-domain-store" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Example domain store</h3>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { makeAutoObservable, autorun, runInAction } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx"</span>
+<span class="hljs-keyword">import</span> uuid <span class="hljs-keyword">from</span> <span class="hljs-string">"node-uuid"</span>
+
+<span class="hljs-keyword">export</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TodoStore</span> </span>{
+    authorStore
+    transportLayer
+    todos = []
+    isLoading = <span class="hljs-literal">true</span>
+
+    <span class="hljs-keyword">constructor</span>(transportLayer, authorStore) {
+        makeAutoObservable(<span class="hljs-keyword">this</span>)
+        <span class="hljs-keyword">this</span>.authorStore = authorStore <span class="hljs-comment">// Store that can resolve authors.</span>
+        <span class="hljs-keyword">this</span>.transportLayer = transportLayer <span class="hljs-comment">// Thing that can make server requests.</span>
+        <span class="hljs-keyword">this</span>.transportLayer.onReceiveTodoUpdate(<span class="hljs-function"><span class="hljs-params">updatedTodo</span> =&gt;</span>
+            <span class="hljs-keyword">this</span>.updateTodoFromServer(updatedTodo)
+        )
+        <span class="hljs-keyword">this</span>.loadTodos()
+    }
+
+    <span class="hljs-comment">// Fetches all Todos from the server.</span>
+    loadTodos() {
+        <span class="hljs-keyword">this</span>.isLoading = <span class="hljs-literal">true</span>
+        <span class="hljs-keyword">this</span>.transportLayer.fetchTodos().then(<span class="hljs-function"><span class="hljs-params">fetchedTodos</span> =&gt;</span> {
+            runInAction(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+                fetchedTodos.forEach(<span class="hljs-function"><span class="hljs-params">json</span> =&gt;</span> <span class="hljs-keyword">this</span>.updateTodoFromServer(json))
+                <span class="hljs-keyword">this</span>.isLoading = <span class="hljs-literal">false</span>
+            })
+        })
+    }
+
+    <span class="hljs-comment">// Update a Todo with information from the server. Guarantees a Todo only</span>
+    <span class="hljs-comment">// exists once. Might either construct a new Todo, update an existing one,</span>
+    <span class="hljs-comment">// or remove a Todo if it has been deleted on the server.</span>
+    updateTodoFromServer(json) {
+        <span class="hljs-keyword">let</span> todo = <span class="hljs-keyword">this</span>.todos.find(<span class="hljs-function"><span class="hljs-params">todo</span> =&gt;</span> todo.id === json.id)
+        <span class="hljs-keyword">if</span> (!todo) {
+            todo = <span class="hljs-keyword">new</span> Todo(<span class="hljs-keyword">this</span>, json.id)
+            <span class="hljs-keyword">this</span>.todos.push(todo)
+        }
+        <span class="hljs-keyword">if</span> (json.isDeleted) {
+            <span class="hljs-keyword">this</span>.removeTodo(todo)
+        } <span class="hljs-keyword">else</span> {
+            todo.updateFromJson(json)
+        }
+    }
+
+    <span class="hljs-comment">// Creates a fresh Todo on the client and the server.</span>
+    createTodo() {
+        <span class="hljs-keyword">const</span> todo = <span class="hljs-keyword">new</span> Todo(<span class="hljs-keyword">this</span>)
+        <span class="hljs-keyword">this</span>.todos.push(todo)
+        <span class="hljs-keyword">return</span> todo
+    }
+
+    <span class="hljs-comment">// A Todo was somehow deleted, clean it from the client memory.</span>
+    removeTodo(todo) {
+        <span class="hljs-keyword">this</span>.todos.splice(<span class="hljs-keyword">this</span>.todos.indexOf(todo), <span class="hljs-number">1</span>)
+        todo.dispose()
+    }
+}
+
+<span class="hljs-comment">// Domain object Todo.</span>
+<span class="hljs-keyword">export</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Todo</span> </span>{
+    id = <span class="hljs-literal">null</span> <span class="hljs-comment">// Unique id of this Todo, immutable.</span>
+    completed = <span class="hljs-literal">false</span>
+    task = <span class="hljs-string">""</span>
+    author = <span class="hljs-literal">null</span> <span class="hljs-comment">// Reference to an Author object (from the authorStore).</span>
+    store = <span class="hljs-literal">null</span>
+    autoSave = <span class="hljs-literal">true</span> <span class="hljs-comment">// Indicator for submitting changes in this Todo to the server.</span>
+    saveHandler = <span class="hljs-literal">null</span> <span class="hljs-comment">// Disposer of the side effect auto-saving this Todo (dispose).</span>
+
+    <span class="hljs-keyword">constructor</span>(store, id = uuid.v4()) {
+        makeAutoObservable(<span class="hljs-keyword">this</span>, {
+            <span class="hljs-attr">id</span>: <span class="hljs-literal">false</span>,
+            <span class="hljs-attr">store</span>: <span class="hljs-literal">false</span>,
+            <span class="hljs-attr">autoSave</span>: <span class="hljs-literal">false</span>,
+            <span class="hljs-attr">saveHandler</span>: <span class="hljs-literal">false</span>,
+            <span class="hljs-attr">dispose</span>: <span class="hljs-literal">false</span>
+        })
+        <span class="hljs-keyword">this</span>.store = store
+        <span class="hljs-keyword">this</span>.id = id
+
+        <span class="hljs-keyword">this</span>.saveHandler = reaction(
+            <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-keyword">this</span>.asJson, <span class="hljs-comment">// Observe everything that is used in the JSON.</span>
+            json =&gt; {
+                <span class="hljs-comment">// If autoSave is true, send JSON to the server.</span>
+                <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.autoSave) {
+                    <span class="hljs-keyword">this</span>.store.transportLayer.saveTodo(json)
+                }
+            }
+        )
+    }
+
+    <span class="hljs-comment">// Remove this Todo from the client and the server.</span>
+    <span class="hljs-keyword">delete</span>() {
+        <span class="hljs-keyword">this</span>.store.transportLayer.deleteTodo(<span class="hljs-keyword">this</span>.id)
+        <span class="hljs-keyword">this</span>.store.removeTodo(<span class="hljs-keyword">this</span>)
+    }
+
+    <span class="hljs-keyword">get</span> asJson() {
+        <span class="hljs-keyword">return</span> {
+            <span class="hljs-attr">id</span>: <span class="hljs-keyword">this</span>.id,
+            <span class="hljs-attr">completed</span>: <span class="hljs-keyword">this</span>.completed,
+            <span class="hljs-attr">task</span>: <span class="hljs-keyword">this</span>.task,
+            <span class="hljs-attr">authorId</span>: <span class="hljs-keyword">this</span>.author ? <span class="hljs-keyword">this</span>.author.id : <span class="hljs-literal">null</span>
+        }
+    }
+
+    <span class="hljs-comment">// Update this Todo with information from the server.</span>
+    updateFromJson(json) {
+        <span class="hljs-keyword">this</span>.autoSave = <span class="hljs-literal">false</span> <span class="hljs-comment">// Prevent sending of our changes back to the server.</span>
+        <span class="hljs-keyword">this</span>.completed = json.completed
+        <span class="hljs-keyword">this</span>.task = json.task
+        <span class="hljs-keyword">this</span>.author = <span class="hljs-keyword">this</span>.store.authorStore.resolveAuthor(json.authorId)
+        <span class="hljs-keyword">this</span>.autoSave = <span class="hljs-literal">true</span>
+    }
+
+    <span class="hljs-comment">// Clean up the observer.</span>
+    dispose() {
+        <span class="hljs-keyword">this</span>.saveHandler()
+    }
+}
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="ui-stores"></a><a href="#ui-stores" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>UI stores</h2>
+<p>The <em>ui-state-store</em> is often very specific for your application, but usually very simple as well.
+This store typically doesn't have much logic in it, but will store a plethora of loosely coupled pieces of information about the UI.
+This is ideal as most applications will change the UI state often during the development process.</p>
+<p>Things you will typically find in UI stores:</p>
+<ul>
+<li>Session information</li>
+<li>Information about how far your application has loaded</li>
+<li>Information that will not be stored in the backend</li>
+<li>Information that affects the UI globally
+<ul>
+<li>Window dimensions</li>
+<li>Accessibility information</li>
+<li>Current language</li>
+<li>Currently active theme</li>
+</ul></li>
+<li>User interface state as soon as it affects multiple, further unrelated components:
+<ul>
+<li>Current selection</li>
+<li>Visibility of toolbars, etc.</li>
+<li>State of a wizard</li>
+<li>State of a global overlay</li>
+</ul></li>
+</ul>
+<p>It might very well be that these pieces of information start as internal state of a specific component (for example the visibility of a toolbar), but after a while you discover that you need this information somewhere else in your application.
+Instead of pushing state in such a case upwards in the component tree, like you would do in plain React apps, you just move that state to the <em>ui-state-store</em>.</p>
+<p>For isomorphic applications you might also want to provide a stub implementation of this store with sane defaults so that all components render as expected.
+You might distribute the <em>ui-state-store</em> through your application by passing it as React context.</p>
+<p>Example of a store (using ES6 syntax):</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-keyword">import</span> { makeAutoObservable, observable, computed, asStructure } <span class="hljs-keyword">from</span> <span class="hljs-string">"mobx"</span>
+
+<span class="hljs-keyword">export</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UiState</span> </span>{
+    language = <span class="hljs-string">"en_US"</span>
+    pendingRequestCount = <span class="hljs-number">0</span>
+
+    <span class="hljs-comment">// .struct makes sure observer won't be signaled unless the</span>
+    <span class="hljs-comment">// dimensions object changed in a deepEqual manner.</span>
+    windowDimensions = {
+        <span class="hljs-attr">width</span>: <span class="hljs-built_in">window</span>.innerWidth,
+        <span class="hljs-attr">height</span>: <span class="hljs-built_in">window</span>.innerHeight
+    }
+
+    <span class="hljs-keyword">constructor</span>() {
+        makeAutoObservable(<span class="hljs-keyword">this</span>, { <span class="hljs-attr">windowDimensions</span>: observable.struct })
+        <span class="hljs-built_in">window</span>.onresize = <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+            <span class="hljs-keyword">this</span>.windowDimensions = getWindowDimensions()
+        }
+    }
+
+    <span class="hljs-keyword">get</span> appIsInSync() {
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.pendingRequestCount === <span class="hljs-number">0</span>
+    }
+}
+</code></pre>
+<h2><a class="anchor" aria-hidden="true" id="combining-multiple-stores"></a><a href="#combining-multiple-stores" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Combining multiple stores</h2>
+<p>An often asked question is how to combine multiple stores without using singletons. How will they know about each other?</p>
+<p>An effective pattern is to create a <code>RootStore</code> that instantiates all stores, and share references. The advantage of this pattern is:</p>
+<ol>
+<li>Simple to set up.</li>
+<li>Supports strong typing well.</li>
+<li>Makes complex unit tests easy as you just have to instantiate a root store.</li>
+</ol>
+<p>Example:</p>
+<pre><code class="hljs css language-javascript"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">RootStore</span> </span>{
+    <span class="hljs-keyword">constructor</span>() {
+        <span class="hljs-keyword">this</span>.userStore = <span class="hljs-keyword">new</span> UserStore(<span class="hljs-keyword">this</span>)
+        <span class="hljs-keyword">this</span>.todoStore = <span class="hljs-keyword">new</span> TodoStore(<span class="hljs-keyword">this</span>)
+    }
+}
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UserStore</span> </span>{
+    <span class="hljs-keyword">constructor</span>(rootStore) {
+        <span class="hljs-keyword">this</span>.rootStore = rootStore
+    }
+
+    getTodos(user) {
+        <span class="hljs-comment">// Access todoStore through the root store.</span>
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.rootStore.todoStore.todos.filter(<span class="hljs-function"><span class="hljs-params">todo</span> =&gt;</span> todo.author === user)
+    }
+}
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TodoStore</span> </span>{
+    todos = []
+    rootStore
+
+    <span class="hljs-keyword">constructor</span>(rootStore) {
+        makeAutoObservable(<span class="hljs-keyword">this</span>, { <span class="hljs-attr">rootStore</span>: <span class="hljs-literal">false</span> })
+        <span class="hljs-keyword">this</span>.rootStore = rootStore
+    }
+}
+</code></pre>
+<p>When using React, this root store is typically inserted into the component tree by using React context.</p>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/react-optimizations.html"><span class="arrow-prev">← </span><span>React optimizations {🚀}</span></a><a class="docs-next button" href="/understanding-reactivity.html"><span>Understanding reactivity</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#stores">Stores</a></li><li><a href="#domain-stores">Domain Stores</a><ul class="toc-headings"><li><a href="#domain-objects">Domain objects</a></li><li><a href="#example-domain-store">Example domain store</a></li></ul></li><li><a href="#ui-stores">UI stores</a></li><li><a href="#combining-multiple-stores">Combining multiple stores</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/mobx.png" alt="MobX" width="66" height="58"/></a><div><h5>Docs</h5><a href="/README.html#introduction">About MobX</a><a href="/the-gist-of-mobx.html">The gist of MobX</a></div><div><h5>Community</h5><a href="https://github.com/mobxjs/mobx/discussions" target="_blank" rel="noreferrer noopener">GitHub discussions (NEW)</a><a href="https://stackoverflow.com/questions/tagged/mobx" target="_blank" rel="noreferrer noopener">Stack Overflow</a></div><div><h5>More</h5><a class="github-button" href="https://github.com/mobxjs/mobx" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section></footer></div><script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script><script>
+                document.addEventListener('keyup', function(e) {
+                  if (e.target !== document.body) {
+                    return;
+                  }
+                  // keyCode for '/' (slash)
+                  if (e.keyCode === 191) {
+                    const search = document.getElementById('search_input_react');
+                    search && search.focus();
+                  }
+                });
+              </script><script>
+              var search = docsearch({
+                
+                apiKey: '500db32fbdbd53a814f42aafdfa26bd4',
+                indexName: 'mobxjs',
+                inputSelector: '#search_input_react'
+              });
+            </script></body></html>
