@@ -1,5 +1,11 @@
 # mobx
 
+## 6.3.1
+
+### Patch Changes
+
+-   [`d678ebd7`](https://github.com/mobxjs/mobx/commit/d678ebd7e54efb3aeae4541f87f5bcf93a623ec6) [#2944](https://github.com/mobxjs/mobx/pull/2944) Thanks [@urugator](https://github.com/urugator)! - Fix [#2941](https://github.com/mobxjs/mobx/issues/2941) - flow.bound replaces method on proto with bound function
+
 ## 6.3.0
 
 ### Minor Changes
