@@ -41,7 +41,7 @@ function make_(
         // rest of the proto chain must be annotated already
         return MakeResult.Break
     }
-    const flowDescriptor = createFlowDescriptor(adm, this, key, descriptor, false)
+    const flowDescriptor = createFlowDescriptor(adm, this, key, descriptor, false, false)
     defineProperty(source, key, flowDescriptor)
     return MakeResult.Continue
 }
@@ -52,7 +52,7 @@ function extend_(
     descriptor: PropertyDescriptor,
     proxyTrap: boolean
 ): boolean | null {
-    const flowDescriptor = createFlowDescriptor(adm, this, key, descriptor)
+    const flowDescriptor = createFlowDescriptor(adm, this, key, descriptor, this.options_?.bound)
     return adm.defineProperty_(key, flowDescriptor, proxyTrap)
 }
 
@@ -75,12 +75,13 @@ function createFlowDescriptor(
     annotation: Annotation,
     key: PropertyKey,
     descriptor: PropertyDescriptor,
+    bound: boolean,
     // provides ability to disable safeDescriptors for prototypes
     safeDescriptors: boolean = globalState.safeDescriptors
 ): PropertyDescriptor {
     assertFlowDescriptor(adm, annotation, key, descriptor)
     let { value } = descriptor
-    if (annotation.options_?.bound) {
+    if (bound) {
         value = value.bind(adm.proxy_ ?? adm.target_)
     }
     return {

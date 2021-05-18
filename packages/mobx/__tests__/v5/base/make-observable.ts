@@ -1617,3 +1617,20 @@ test("makeAutoObservable + override + annotation cache #2832", () => {
         expect(isObservable(x.override)).toBe(false)
     })
 })
+
+test("flow.bound #2941", async () => {
+    class Clazz {
+        constructor() {
+            makeObservable(this, {
+                flowBound: flow.bound
+            })
+        }
+        *flowBound() {
+            return this
+        }
+    }
+    new Clazz()
+    new Clazz()
+    expect(isFlow(Clazz.prototype.flowBound)).toBe(true)
+    expect(await Clazz.prototype.flowBound.call("ctx")).toBe("ctx")
+})
