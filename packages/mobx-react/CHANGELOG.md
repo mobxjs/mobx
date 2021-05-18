@@ -1,5 +1,11 @@
 # mobx-react
 
+## 7.2.0
+
+### Minor Changes
+
+-   [`87b3e1de`](https://github.com/mobxjs/mobx/commit/87b3e1de58069617a39552d71a4d5c5c134cbbaf) [#2930](https://github.com/mobxjs/mobx/pull/2930) Thanks [@vkrol](https://github.com/vkrol)! - inject shouldn't change original displayName of component that uses forwardRef
+
 ## 7.1.0
 
 ### Patch Changes
