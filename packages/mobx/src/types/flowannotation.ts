@@ -76,6 +76,7 @@ function createFlowDescriptor(
     key: PropertyKey,
     descriptor: PropertyDescriptor,
     bound: boolean,
+    // provides ability to disable safeDescriptors for prototypes
     safeDescriptors: boolean = globalState.safeDescriptors
 ): PropertyDescriptor {
     assertFlowDescriptor(adm, annotation, key, descriptor)
