@@ -58,7 +58,8 @@ function make_(
     // function on proto -> autoAction/flow
     if (source !== adm.target_ && typeof descriptor.value === "function") {
         if (isGenerator(descriptor.value)) {
-            return flow.make_(adm, key, descriptor, source)
+            const flowAnnotation = this.options_?.autoBind ? flow.bound : flow
+            return flowAnnotation.make_(adm, key, descriptor, source)
         }
         const actionAnnotation = this.options_?.autoBind ? autoAction.bound : autoAction
         return actionAnnotation.make_(adm, key, descriptor, source)

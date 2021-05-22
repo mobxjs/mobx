@@ -193,13 +193,21 @@ test("makeObservable has sane defaults", () => {
     expect(t.bound.call(undefined)).toBe(t)
 })
 
-test("makeObservable supports autoBind", () => {
+test("makeObservable supports autoBind", async () => {
     class Test {
-        unbound() {
+        action() {
             return this
         }
 
-        bound() {
+        actionBound() {
+            return this
+        }
+
+        *flow() {
+            return this
+        }
+
+        *flowBound() {
             return this
         }
 
@@ -207,8 +215,10 @@ test("makeObservable supports autoBind", () => {
             makeObservable(
                 this,
                 {
-                    unbound: action,
-                    bound: true
+                    action: action,
+                    actionBound: true,
+                    flow: flow,
+                    flowBound: true
                 },
                 {
                     autoBind: true
@@ -219,10 +229,14 @@ test("makeObservable supports autoBind", () => {
 
     const t = new Test()
     expect(isObservableObject(t)).toBe(true)
-    expect(isAction(t.unbound)).toBe(true)
-    expect(isAction(t.bound)).toBe(true)
-    expect(t.unbound.call(undefined)).toBe(undefined)
-    expect(t.bound.call(undefined)).toBe(t)
+    expect(isAction(t.action)).toBe(true)
+    expect(isAction(t.actionBound)).toBe(true)
+    expect(t.action.call(undefined)).toBe(undefined)
+    expect(t.actionBound.call(undefined)).toBe(t)
+    expect(isFlow(t.flow)).toBe(true)
+    expect(isFlow(t.flowBound)).toBe(true)
+    expect(await t.flow.call(undefined)).toBe(undefined)
+    expect(await t.flowBound.call(undefined)).toBe(t)
 })
 
 test("Extending builtins is not support #2765", () => {
@@ -296,33 +310,27 @@ test("makeAutoObservable has sane defaults", () => {
     expect(t.bound.call(undefined)).toBe(undefined)
 })
 
-test("makeAutoObservable supports autoBind", () => {
+test("makeAutoObservable supports autoBind", async () => {
     class Test {
-        unbound() {
+        action() {
             return this
         }
 
-        bound() {
+        *flow() {
             return this
         }
 
         constructor() {
-            makeAutoObservable(
-                this,
-                {
-                    unbound: false
-                },
-                { autoBind: true }
-            )
+            makeAutoObservable(this, {}, { autoBind: true })
         }
     }
 
     const t = new Test()
     expect(isObservableObject(t)).toBe(true)
-    expect(isAction(t.unbound)).toBe(false)
-    expect(isAction(t.bound)).toBe(true)
-    expect(t.unbound.call(undefined)).toBe(undefined)
-    expect(t.bound.call(undefined)).toBe(t)
+    expect(isAction(t.action)).toBe(true)
+    expect(isFlow(t.flow)).toBe(true)
+    expect(t.action.call(undefined)).toBe(t)
+    expect(await t.flow.call(undefined)).toBe(t)
 })
 
 test("makeAutoObservable allows overrides", () => {
