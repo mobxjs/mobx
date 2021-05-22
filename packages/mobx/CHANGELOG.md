@@ -1,5 +1,11 @@
 # mobx
 
+## 6.3.2
+
+### Patch Changes
+
+-   [`4011b378`](https://github.com/mobxjs/mobx/commit/4011b3789d57e3dab0b85a835fe2979033133ce9) [#2949](https://github.com/mobxjs/mobx/pull/2949) Thanks [@urugator](https://github.com/urugator)! - fix #2948: flow ignores `autoBind` option
+
 ## 6.3.1
 
 ### Patch Changes
