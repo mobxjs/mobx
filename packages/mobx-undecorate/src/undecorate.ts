@@ -31,6 +31,7 @@ const defaultOptions = {
     plugins: [
         // "estree",
         ["decorators", { decoratorsBeforeExport: true }],
+        "flow",
         "asyncGenerators",
         "bigInt",
         "classProperties",
@@ -52,7 +53,6 @@ const defaultOptions = {
         "optionalChaining",
         ["pipelineOperator", { proposal: "minimal" }],
         "throwExpressions",
-        "typescript",
         "jsx"
     ]
 }
@@ -323,7 +323,7 @@ export default function transform(
         }
         const expr = decorator.expression
         if (j.Identifier.check(expr) && !decoratorsUsed.has(expr.name)) {
-            warn(`Found non-mobx decorator @${expr.name}`, decorator)
+            // warn(`Found non-mobx decorator @${expr.name}`, decorator)
             return property
         }
         if (property.static) {
@@ -365,20 +365,12 @@ export default function transform(
             ])
         }
 
-        const needsSuper = !!clazz.superClass
         let constructorIndex = clazz.body.body.findIndex(
             member => j.ClassMethod.check(member) && member.kind === "constructor"
         )
 
         // create a constructor
         if (constructorIndex === -1) {
-            if (needsSuper) {
-                warn(
-                    `Generated new constructor for class ${clazz.id?.name}. But since the class does have a base class, it might be needed to revisit the arguments that are passed to \`super()\``,
-                    clazz
-                )
-            }
-
             let superClassName = j.Identifier.check(clazz.superClass)
                 ? clazz.superClass.name
                 : j.MemberExpression.check(clazz.superClass)
@@ -386,28 +378,79 @@ export default function transform(
                     ? clazz.superClass.property.name
                     : ""
                 : ""
-
             // if this clazz is a react component, we now that the constructor and super call have one argument, the props
             let isReactComponent =
                 hasReact && ["Component", "PureComponent"].includes(superClassName)
+            let isModel = superClassName === 'Model'
+            let isCollection = superClassName === 'Collection'
+            let isForm = superClassName === 'Form'
+
+            const needsSuper = !!clazz.superClass
+
+            if (needsSuper && !(isReactComponent || isModel || isCollection || isForm)) {
+                warn(
+                    `Generated new constructor for class ${clazz.id?.name}. But since the class does have a base class, it might be needed to revisit the arguments that are passed to \`super()\``,
+                    clazz
+                )
+            }
+
             let propsType = isReactComponent && clazz.superTypeParameters?.params[0]
             const propsParam = j.identifier("props")
             // reuse the generic if we found it
-            if (propsType) propsParam.typeAnnotation = j.tsTypeAnnotation(propsType as any)
+            if (propsType) propsParam.typeAnnotation = j.typeAnnotation(propsType as any)
             // create the constructor
+
+            // >> CUSTOM STUFF
+            const dataParam = j.identifier("data")
+            const dataParamT = j.identifier("data")
+            dataParamT.typeAnnotation = j.typeAnnotation(j.anyTypeAnnotation())
+
+            const attrParam = j.identifier("attr")
+            const attrParamT = j.identifier("attr")
+            attrParamT.typeAnnotation = j.typeAnnotation(j.anyTypeAnnotation())
+
+            const defaultAttrParam = j.identifier("defaultAttr")
+            const defaultAttrParamT = j.identifier("defaultAttr")
+            defaultAttrParamT.typeAnnotation = j.typeAnnotation(j.anyTypeAnnotation())
+
+            const valuesParam = j.identifier("values")
+            const valuesParamT = j.identifier("values")
+            valuesParamT.typeAnnotation = j.typeAnnotation(j.anyTypeAnnotation())
+
+            const schemaParam = j.identifier("schema")
+            const schemaParamT = j.identifier("schema")
+            schemaParamT.typeAnnotation = j.typeAnnotation(j.anyTypeAnnotation())
+
+            const collectionSuperCall = j.expressionStatement(j.callExpression(j.super(), [dataParam]))
+            const modelSuperCall = j.expressionStatement(j.callExpression(j.super(), [attrParam, defaultAttrParam]))
+            const formSuperCall = j.expressionStatement(j.callExpression(j.super(), [valuesParam, schemaParam]))
+            // << CUSTOM STUFF
+
             const constructorDecl = j.methodDefinition(
                 "constructor",
                 j.identifier("constructor"),
                 j.functionExpression(
                     null,
-                    isReactComponent ? [propsParam] : [],
+                    isReactComponent ? [propsParam] : (
+                        isModel ? [attrParamT, defaultAttrParamT] : (
+                            isCollection ? [dataParamT] : (
+                                isForm ? [valuesParamT, schemaParamT] : []
+                            )
+                        )
+                    ),
                     j.blockStatement(
-                        needsSuper
-                            ? [
-                                  isReactComponent ? reactSuperCall : superCall,
-                                  initializeObservablesCall
-                              ]
-                            : [initializeObservablesCall]
+                        !needsSuper ? [initializeObservablesCall] : (
+                            [
+                                isReactComponent ? reactSuperCall : (
+                                    isModel ? modelSuperCall : (
+                                        isCollection ? collectionSuperCall : (
+                                            isForm ? formSuperCall : superCall
+                                        )
+                                    )
+                                ),
+                                initializeObservablesCall
+                            ]
+                        )
                     )
                 )
             )
