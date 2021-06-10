@@ -29,7 +29,8 @@ import {
     assign,
     isStringish,
     createObservableAnnotation,
-    createAutoAnnotation
+    createAutoAnnotation,
+    die
 } from "../internal"
 
 export const OBSERVABLE = "observable"
@@ -111,7 +112,10 @@ function createObservable(v: any, arg2?: any, arg3?: any) {
     if (Array.isArray(v)) return observable.array(v, arg2)
 
     // Map
-    if (isES6Map(v)) return observable.map(v, arg2)
+    if (isES6Map(v)) {
+        if (v.constructor !== Map) die(19, v)
+        return observable.map(v, arg2)
+    }
 
     // Set
     if (isES6Set(v)) return observable.set(v, arg2)

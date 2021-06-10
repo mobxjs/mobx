@@ -934,13 +934,22 @@ test("#1583 map.size not reactive", () => {
     expect(sizes).toEqual([0, 1, 2])
 })
 
-test("#1858 Map should not be inherited", () => {
+test("#1858 Map should not be inherited when decorated", () => {
+    class MyMap extends Map {}
+
+    const map = new MyMap()
+    expect(() => {
+        mobx.observable(map)
+    }).toThrow("Cannot initialize from classes that inherit from Map: MyMap")
+})
+
+test("#2980 Map can be inherited when used in plain function", () => {
     class MyMap extends Map {}
 
     const map = new MyMap()
     expect(() => {
         mobx.observable.map(map)
-    }).toThrow("Cannot initialize from classes that inherit from Map: MyMap")
+    }).not.toThrow()
 })
 
 test("#2274", () => {
