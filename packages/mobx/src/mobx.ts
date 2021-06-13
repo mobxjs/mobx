@@ -17,7 +17,7 @@
  */
 import { die } from "./errors"
 import { getGlobal } from "./utils/global"
-;["Symbol", "Map", "Set", "Symbol"].forEach(m => {
+;["Symbol", "Map", "Set"].forEach(m => {
     let g = getGlobal()
     if (typeof g[m] === "undefined") {
         die(`MobX requires global '${m}' to be available or polyfilled`)
