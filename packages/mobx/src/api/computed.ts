@@ -14,6 +14,7 @@ import {
 } from "../internal"
 
 export const COMPUTED = "computed"
+export const COMPUTED_SHALLOW = "computed.shallow"
 export const COMPUTED_STRUCT = "computed.struct"
 
 export interface IComputedFactory extends Annotation, PropertyDecorator {
@@ -22,10 +23,14 @@ export interface IComputedFactory extends Annotation, PropertyDecorator {
     // computed(fn, opts)
     <T>(func: () => T, options?: IComputedValueOptions<T>): IComputedValue<T>
 
+    shallow: Annotation & PropertyDecorator
     struct: Annotation & PropertyDecorator
 }
 
 const computedAnnotation = createComputedAnnotation(COMPUTED)
+const computedShallowAnnotation = createComputedAnnotation(COMPUTED_SHALLOW, {
+    equals: comparer.shallow
+})
 const computedStructAnnotation = createComputedAnnotation(COMPUTED_STRUCT, {
     equals: comparer.structural
 })
@@ -61,4 +66,5 @@ export const computed: IComputedFactory = function computed(arg1, arg2) {
 
 Object.assign(computed, computedAnnotation)
 
+computed.shallow = createDecoratorAnnotation(computedShallowAnnotation)
 computed.struct = createDecoratorAnnotation(computedStructAnnotation)
