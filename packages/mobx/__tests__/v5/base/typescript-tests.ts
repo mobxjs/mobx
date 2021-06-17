@@ -2055,6 +2055,23 @@ test("type inference of the action callback", () => {
     }
 })
 
+test("TS - type inference of reaction opts.equals", () => {
+    const data = observable({ a: 23 })
+    mobx.reaction(
+        () => data.a,
+        a => {},
+        {
+            equals: (a, b) => {
+                assert<IsExact<typeof a, string>>(false)
+                assert<IsExact<typeof b, string>>(false)
+                assert<IsExact<typeof a, number>>(true)
+                assert<IsExact<typeof b, number>>(true)
+                return a === b
+            }
+        }
+    )
+})
+
 test("TS - it should support flow as function wrapper", done => {
     const values: number[] = []
 
