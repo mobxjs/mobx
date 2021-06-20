@@ -1,6 +1,5 @@
 import { Reaction } from "mobx"
 import React from "react"
-
 import { printDebugValue } from "./utils/printDebugValue"
 import {
     addReactionToTrack,
@@ -8,7 +7,6 @@ import {
     recordReactionAsCommitted
 } from "./utils/reactionCleanupTracking"
 import { isUsingStaticRendering } from "./staticRendering"
-import { useForceUpdate } from "./utils/utils"
 
 function observerComponentNameFor(baseComponentName: string) {
     return `observer${baseComponentName}`
@@ -29,8 +27,9 @@ export function useObserver<T>(fn: () => T, baseComponentName: string = "observe
     }
 
     const [objectRetainedByReact] = React.useState(objectToBeRetainedByReactFactory)
-
-    const forceUpdate = useForceUpdate()
+    // Force update, see #2982
+    const [, setState] = React.useState()
+    const forceUpdate = () => setState([] as any)
 
     // StrictMode/ConcurrentMode/Suspense may mean that our component is
     // rendered and abandoned multiple times, so we need to track leaked
