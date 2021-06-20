@@ -19,12 +19,16 @@ function observerComponentNameFor(baseComponentName: string) {
  */
 class ObjectToBeRetainedByReact {}
 
+function objectToBeRetainedByReactFactory() {
+    return new ObjectToBeRetainedByReact()
+}
+
 export function useObserver<T>(fn: () => T, baseComponentName: string = "observed"): T {
     if (isUsingStaticRendering()) {
         return fn()
     }
 
-    const [objectRetainedByReact] = React.useState(new ObjectToBeRetainedByReact())
+    const [objectRetainedByReact] = React.useState(objectToBeRetainedByReactFactory)
 
     const forceUpdate = useForceUpdate()
 
