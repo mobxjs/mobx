@@ -46,7 +46,7 @@ test("verify issue 806", () => {
         x.a.toString()
         expect(console.warn).toBeCalledTimes(1)
         expect(console.warn).toHaveBeenCalledWith(
-            "[mobx] Observable ObservableObject@1.a being read outside a reactive context"
+            "[mobx] Observable 'ObservableObject@1.a' being read outside a reactive context."
         )
     })
 })
