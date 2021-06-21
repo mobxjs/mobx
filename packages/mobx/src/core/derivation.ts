@@ -149,7 +149,9 @@ export function checkIfStateModificationsAreAllowed(atom: IAtom) {
 
 export function checkIfStateReadsAreAllowed(observable: IObservable) {
     if (__DEV__ && !globalState.allowStateReads && globalState.observableRequiresReaction) {
-        console.warn(`[mobx] Observable ${observable.name_} being read outside a reactive context`)
+        console.warn(
+            `[mobx] Observable '${observable.name_}' being read outside a reactive context.`
+        )
     }
 }
 
@@ -195,7 +197,7 @@ function warnAboutDerivationWithoutDependencies(derivation: IDerivation) {
 
     if (globalState.reactionRequiresObservable || derivation.requiresObservable_) {
         console.warn(
-            `[mobx] Derivation ${derivation.name_} is created/updated without reading any observable value`
+            `[mobx] Derivation '${derivation.name_}' is created/updated without reading any observable value.`
         )
     }
 }
