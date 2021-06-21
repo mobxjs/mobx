@@ -102,6 +102,17 @@ describe("inject based context", () => {
         expect(C.displayName).toBe("inject(ComponentC)")
     })
 
+    test.only("shouldn't change original displayName of component that uses forwardRef", () => {
+        const FancyComp = React.forwardRef((_: any, ref: React.Ref<HTMLDivElement>) => {
+            return <div ref={ref} />
+        })
+        FancyComp.displayName = "FancyComp"
+
+        inject("bla")(FancyComp)
+
+        expect(FancyComp.displayName).toBe("FancyComp")
+    })
+
     // FIXME: see other comments related to error catching in React
     // test does work as expected when running manually
     test("store should be available", () => {

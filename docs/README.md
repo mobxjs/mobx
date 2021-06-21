@@ -28,9 +28,9 @@ MobX is made possible by the generosity of the sponsors below, and many other [i
 <a href="https://coinbase.com/"><img src="https://mobx.js.org/assets/coinbase.jpeg" align="center" width="100" title="Coinbase" alt="Coinbase" /></a>
 <a href="https://www.canva.com/"><img src="https://mobx.js.org/assets/canva.png" align="center" width="100" title="Canva" alt="Canva" /></a>
 
-**🥈 Silver sponsors (\$100+ pm):**<br/>
+**🥈 Silver sponsors (\$100+ per month):**<br/>
 <a href="https://www.codefirst.co.uk/"><img src="https://mobx.js.org/assets/codefirst.png" align="center" width="100" title="CodeFirst" alt="CodeFirst"/></a>
-<a href="https://www.dcslsoftware.com/"><img src="https://mobx.js.org/assets/dcsl.png" align="center" width="100" title="DCSL Software" alt="DCSL Software"/></a>
+<a href="https://www.dcsl.com/"><img src="https://mobx.js.org/assets/dcsl.png" align="center" width="100" title="DCSL Guidesmiths" alt="DCSL Guidesmiths"/></a>
 <a href="https://www.bugsnag.com/platforms/react-error-reporting?utm_source=MobX&utm_medium=Website&utm_content=open-source&utm_campaign=2019-community&utm_term=20190913"><img src="https://mobx.js.org/assets/bugsnag.jpg" align="center" width="100" title="Bugsnag" alt="Bugsnag"/></a>
 <a href="https://curology.com/blog/tech"><img src="https://mobx.js.org/assets/curology.png" align="center" width="100" title="Curology" alt="Curology"/></a>
 <a href="https://modulz.app/"><img src="https://mobx.js.org/assets/modulz.png" align="center" width="100" title="Modulz" alt="Modulz"/></a>

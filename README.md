@@ -17,7 +17,7 @@ _Simple, scalable state management._
 
 MobX is made possible by the generosity of the sponsors below, and many other [individual backers](docs/backers-sponsors.md#backers). Sponsoring directly impacts the longevity of this project.
 
-**🥇Gold sponsors (\$3000+ total contribution):** <br/>
+**🥇 Gold sponsors (\$3000+ total contribution):** <br/>
 <a href="https://mendix.com/"><img src="https://mobx.js.org/assets/mendix-logo.png" align="center" width="100" title="Mendix" alt="Mendix" /></a>
 <a href="https://frontendmasters.com/"><img src="https://mobx.js.org/assets/frontendmasters.jpg" align="center" width="100" title="Frontend Masters" alt="Frontend Masters"></a>
 <a href="https://opensource.facebook.com/"><img src="https://mobx.js.org/assets/fbos.jpeg" align="center" width="100" title="Facebook Open Source" alt="Facebook Open Source" /></a>
@@ -26,15 +26,15 @@ MobX is made possible by the generosity of the sponsors below, and many other [i
 <a href="https://coinbase.com/"><img src="https://mobx.js.org/assets/coinbase.jpeg" align="center" width="100" title="Coinbase" alt="Coinbase" /></a>
 <a href="https://www.canva.com/"><img src="https://mobx.js.org/assets/canva.png" align="center" width="100" title="Canva" alt="Canva" /></a>
 
-**🥈Silver sponsors (\$100+ pm):**<br/>
+**🥈 Silver sponsors (\$100+ per month):**<br/>
 <a href="https://www.codefirst.co.uk/"><img src="https://mobx.js.org/assets/codefirst.png" align="center" width="100" title="CodeFirst" alt="CodeFirst"/></a>
-<a href="https://www.dcslsoftware.com/"><img src="https://mobx.js.org/assets/dcsl.png" align="center" width="100" title="DCSL Software" alt="DCSL Software"/></a>
+<a href="https://www.dcsl.com/"><img src="https://mobx.js.org/assets/dcsl.png" align="center" width="100" title="DCSL Guidesmiths" alt="DCSL Guidesmiths"/></a>
 <a href="https://www.bugsnag.com/platforms/react-error-reporting?utm_source=MobX&utm_medium=Website&utm_content=open-source&utm_campaign=2019-community&utm_term=20190913"><img src="https://mobx.js.org/assets/bugsnag.jpg" align="center" width="100" title="Bugsnag" alt="Bugsnag"/></a>
 <a href="https://curology.com/blog/tech"><img src="https://mobx.js.org/assets/curology.png" align="center" width="100" title="Curology" alt="Curology"/></a>
 <a href="https://modulz.app/"><img src="https://mobx.js.org/assets/modulz.png" align="center" width="100" title="Modulz" alt="Modulz"/></a>
 <a href="https://space307.com/?utm_source=sponsorship&utm_medium=mobx&utm_campaign=readme"><img src="https://mobx.js.org/assets/space307.png" align="center" width="100" title="Space307" alt="Space307"/></a>
 
-**🥉Bronze sponsors (\$500+ total contributions):**<br/>
+**🥉 Bronze sponsors (\$500+ total contributions):**<br/>
 <a href="https://mantro.net/jobs/warlock"><img src="https://mobx.js.org/assets/mantro.png" align="center" width="100" title="mantro GmbH" alt="mantro GmbH"></a>
 <a href="https://www.algolia.com/"><img src="https://mobx.js.org/assets/algolia.jpg" align="center" width="100" title="Algolia" alt="Algolia" /></a>
 <a href="https://talentplot.com/"><img src="https://mobx.js.org/assets/talentplot.png" align="center" width="100" title="talentplot" alt="talentplot"></a>

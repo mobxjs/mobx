@@ -6,7 +6,8 @@ import {
     Annotation,
     isStringish,
     storeAnnotation,
-    createFlowAnnotation
+    createFlowAnnotation,
+    createDecoratorAnnotation
 } from "../internal"
 
 export const FLOW = "flow"
@@ -28,9 +29,11 @@ interface Flow extends Annotation, PropertyDecorator {
     <R, Args extends any[]>(
         generator: (...args: Args) => Generator<any, R, any> | AsyncGenerator<any, R, any>
     ): (...args: Args) => CancellablePromise<R>
+    bound: Annotation & PropertyDecorator
 }
 
 const flowAnnotation = createFlowAnnotation("flow")
+const flowBoundAnnotation = createFlowAnnotation("flow.bound", { bound: true })
 
 export const flow: Flow = Object.assign(
     function flow(arg1, arg2?) {
@@ -122,6 +125,8 @@ export const flow: Flow = Object.assign(
     } as any,
     flowAnnotation
 )
+
+flow.bound = createDecoratorAnnotation(flowBoundAnnotation)
 
 function cancelPromise(promise) {
     if (isFunction(promise.cancel)) promise.cancel()

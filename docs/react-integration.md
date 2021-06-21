@@ -162,12 +162,12 @@ If you want to automatically update the timer like we did in the original exampl
 ```javascript
 useEffect(() => {
     const handle = setInterval(() => {
-        myTimer.increaseTimer()
+        timer.increaseTimer()
     }, 1000)
     return () => {
         clearInterval(handle)
     }
-}, [myTimer])
+}, [timer])
 ```
 
 <!--`useState` with local observable object-->
