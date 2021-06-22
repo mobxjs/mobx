@@ -22,8 +22,17 @@ There are two types of React bindings, `mobx-react-lite` supports only functiona
 
 ⚠️ **Warning:** When using MobX with TypeScript and Babel, and you plan to use classes; make sure to update your configuration to use a TC-39 spec compliant transpilation for class fields, since this is not the default. Without this, class fields cannot be made observable before they are initialized.
 
--   For Babel: Make sure to use at least version 7.12. Use the plugin `["@babel/plugin-proposal-class-properties", { "loose": false }]`
--   For TypeScript, set the compiler option `"useDefineForClassFields": true`
+-   **TypeScript**: Set the compiler option `"useDefineForClassFields": true`.
+-   **Babel**: Make sure to use at least version 7.12, with the following configuration:
+    ```json
+    {
+        "plugins": [["@babel/plugin-proposal-class-properties", { "loose": false }]],
+        // Babel >= 7.13.0 (https://babeljs.io/docs/en/assumptions)
+        "assumptions": {
+            "setPublicClassFields": false
+        }
+    }
+    ```
 
 ## MobX on older JavaScript environments
 

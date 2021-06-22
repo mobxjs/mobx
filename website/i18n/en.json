@@ -170,6 +170,10 @@
       "refguide/set": {
         "title": "Observable Sets"
       },
+      "subclassing": {
+        "title": "Subclassing",
+        "sidebar_label": "Subclassing"
+      },
       "the-gist-of-mobx": {
         "title": "The gist of MobX",
         "sidebar_label": "The gist of MobX"
@@ -181,7 +185,7 @@
     },
     "links": {
       "API Reference": "API Reference",
-      "中文": "中文",
+      "中文(寻求翻译)": "中文(寻求翻译)",
       "Sponsors": "Sponsors",
       "GitHub": "GitHub"
     },
