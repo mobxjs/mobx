@@ -170,6 +170,10 @@
       "refguide/set": {
         "title": "Observable Sets"
       },
+      "subclassing": {
+        "title": "Subclassing",
+        "sidebar_label": "Subclassing"
+      },
       "the-gist-of-mobx": {
         "title": "The gist of MobX",
         "sidebar_label": "The gist of MobX"
