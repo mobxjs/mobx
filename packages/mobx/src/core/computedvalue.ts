@@ -255,6 +255,11 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         if (!this.keepAlive_) {
             clearObserving(this)
             this.value_ = undefined // don't hold on to computed value!
+            if (this.isTracing_ !== TraceMode.NONE) {
+                console.log(
+                    `[mobx.trace] Computed value '${this.name_}' was suspended and it will recompute on the next access.`
+                )
+            }
         }
     }
 
@@ -283,17 +288,14 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 
     warnAboutUntrackedRead_() {
         if (!__DEV__) return
-        if (this.requiresReaction_ === true) {
-            die(`[mobx] Computed value ${this.name_} is read outside a reactive context`)
-        }
         if (this.isTracing_ !== TraceMode.NONE) {
             console.log(
-                `[mobx.trace] '${this.name_}' is being read outside a reactive context. Doing a full recompute`
+                `[mobx.trace] Computed value '${this.name_}' is being read outside a reactive context. Doing a full recompute.`
             )
         }
-        if (globalState.computedRequiresReaction) {
+        if (globalState.computedRequiresReaction || this.requiresReaction_) {
             console.warn(
-                `[mobx] Computed value ${this.name_} is being read outside a reactive context. Doing a full recompute`
+                `[mobx] Computed value '${this.name_}' is being read outside a reactive context. Doing a full recompute.`
             )
         }
     }

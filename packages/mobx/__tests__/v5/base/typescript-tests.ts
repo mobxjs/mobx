@@ -1671,39 +1671,57 @@ test("issue #1122", done => {
     }, 100)
 })
 
-test("unread computed reads should trow with requiresReaction enabled", () => {
-    class A {
-        x = 0
-
-        constructor() {
-            makeObservable(this, {
-                x: observable,
-                y: computed({ requiresReaction: true })
-            })
-        }
-
-        get y() {
-            return this.x * 2
-        }
+test("unobserved computed reads should warn with requiresReaction enabled", () => {
+    const consoleWarn = console.warn
+    const warnings: string[] = []
+    console.warn = function (...args) {
+        warnings.push(...args)
     }
+    try {
+        const expectedWarnings: string[] = []
 
-    const a = new A()
-    expect(() => {
-        a.y
-    }).toThrow(/is read outside a reactive context/)
+        class A {
+            x = 0
+            get y() {
+                return this.x * 2
+            }
+            constructor() {
+                makeObservable(
+                    this,
+                    {
+                        x: observable,
+                        y: computed({ requiresReaction: true })
+                    },
+                    { name: "a" }
+                )
+            }
+        }
 
-    const d = mobx.reaction(
-        () => a.y,
-        () => {}
-    )
-    expect(() => {
-        a.y
-    }).not.toThrow()
+        const a = new A()
 
-    d()
-    expect(() => {
         a.y
-    }).toThrow(/is read outside a reactive context/)
+        expectedWarnings.push(
+            `[mobx] Computed value 'a.y' is being read outside a reactive context. Doing a full recompute.`
+        )
+
+        const d = mobx.reaction(
+            () => a.y,
+            () => {}
+        )
+
+        a.y
+
+        d()
+
+        a.y
+        expectedWarnings.push(
+            `[mobx] Computed value 'a.y' is being read outside a reactive context. Doing a full recompute.`
+        )
+
+        expect(warnings).toEqual(expectedWarnings)
+    } finally {
+        console.warn = consoleWarn
+    }
 })
 
 test("multiple inheritance should work", () => {
