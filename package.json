@@ -7,6 +7,10 @@
     "resolutions": {
         "typescript": "^4.0.2"
     },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/mobxjs/mobx.git"
+    },
     "scripts": {
         "test": "jest",
         "coverage": "jest --coverage",
