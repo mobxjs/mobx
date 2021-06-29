@@ -18,7 +18,7 @@ All applications have actions. An action is any piece of code that modifies the 
 
 MobX requires that you declare your actions, although [`makeAutoObservable`](observable-state.md#makeautoobservable) can automate much of this job. Actions help you structure your code better and offer the following performance benefits:
 
-1. They are run inside [transactions](api.md#transaction). No observers will be updated until the outer-most action has finished, guaranteeing that intermediate or incomplete values produced during an action are not visible to the rest of the application until the action has completed.
+1. They are run inside [transactions](api.md#transaction). No reactions will be run until the outer-most action has finished, guaranteeing that intermediate or incomplete values produced during an action are not visible to the rest of the application until the action has completed. However, computeds will update when they have become stale and are read during an action.
 
 2. By default, it is not allowed to change the state outside of actions. This helps to clearly identify in your code base where the state updates happen.
 
