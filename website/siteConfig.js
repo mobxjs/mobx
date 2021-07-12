@@ -53,7 +53,7 @@ const siteConfig = {
     headerLinks: [
         { doc: "api", label: "API Reference" },
         { href: "https://zh.mobx.js.org", label: "中文" },
-        { href: "https://ko.mobx.js.org", label: "한국어" }
+        { href: "https://ko.mobx.js.org", label: "한국어" },
         { doc: "backers-sponsors", label: "Sponsors" },
         { href: "https://github.com/mobxjs/mobx", label: "GitHub" }
     ],
