@@ -18,7 +18,8 @@
         "experimentalDecorators": true,
         "useDefineForClassFields": true,
         "jsx": "react",
-        "esModuleInterop": true
+        "esModuleInterop": true,
+        "skipLibCheck": true
     },
     "exclude": ["__tests__"]
 }
