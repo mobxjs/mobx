@@ -1,5 +1,13 @@
 # mobx-react-lite
 
+## 3.2.1
+
+### Patch Changes
+
+-   [`320544a5`](https://github.com/mobxjs/mobx/commit/320544a5d0defb1a1524c83c7a5d0a9dee9de001) [#2983](https://github.com/mobxjs/mobx/pull/2983) Thanks [@urugator](https://github.com/urugator)! - Allow force update to be called infinitely times
+
+*   [`10c762cc`](https://github.com/mobxjs/mobx/commit/10c762cce4871f3599bac6acc2c56776e0b4badd) [#2995](https://github.com/mobxjs/mobx/pull/2995) Thanks [@Bnaya](https://github.com/Bnaya)! - Reduce useObserver gc pressure
+
 ## 3.2.0
 
 ### Patch Changes
