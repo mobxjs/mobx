@@ -141,7 +141,7 @@ export function checkIfStateModificationsAreAllowed(atom: IAtom) {
         console.warn(
             "[MobX] " +
                 (globalState.enforceActions
-                    ? "Since strict-mode is enabled, changing (observed) observable values without using an action is not allowed. Tried to modify: "
+                    ? "Since strict-mode is enabled, changing (observed) observable values without using an action is not allowed. Also action decorated async functions will not react to code following the 'await' keyword. Tried to modify: "
                     : "Side effects like changing state are not allowed at this point. Are you trying to modify state from, for example, a computed value or the render function of a React component? You can wrap side effects in 'runInAction' (or decorate functions with 'action') if needed. Tried to modify: ") +
                 atom.name_
         )
