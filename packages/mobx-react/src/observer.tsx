@@ -51,7 +51,7 @@ export function observer<T extends IReactComponent>(component: T): T {
         !component["isReactClass"] &&
         !Object.prototype.isPrototypeOf.call(React.Component, component)
     ) {
-        return observerLite(component as React.StatelessComponent<any>) as T
+        return observerLite(component as React.FunctionComponent<any>) as T
     }
 
     return makeClassComponentObserver(component as React.ComponentClass<any, any>) as T

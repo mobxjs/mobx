@@ -8,7 +8,7 @@ export interface IObserverOptions {
 }
 
 export function observer<P extends object, TRef = {}>(
-    baseComponent: React.RefForwardingComponent<TRef, P>,
+    baseComponent: React.ForwardRefRenderFunction<TRef, P>,
     options: IObserverOptions & { forwardRef: true }
 ): React.MemoExoticComponent<
     React.ForwardRefExoticComponent<React.PropsWithoutRef<P> & React.RefAttributes<TRef>>
@@ -20,13 +20,13 @@ export function observer<P extends object>(
 ): React.FunctionComponent<P>
 
 export function observer<
-    C extends React.FunctionComponent<any> | React.RefForwardingComponent<any>,
+    C extends React.FunctionComponent<any> | React.ForwardRefRenderFunction<any>,
     Options extends IObserverOptions
 >(
     baseComponent: C,
     options?: Options
 ): Options extends { forwardRef: true }
-    ? C extends React.RefForwardingComponent<infer TRef, infer P>
+    ? C extends React.ForwardRefRenderFunction<infer TRef, infer P>
         ? C &
               React.MemoExoticComponent<
                   React.ForwardRefExoticComponent<
@@ -38,7 +38,7 @@ export function observer<
 
 // n.b. base case is not used for actual typings or exported in the typing files
 export function observer<P extends object, TRef = {}>(
-    baseComponent: React.RefForwardingComponent<TRef, P> | React.FunctionComponent<P>,
+    baseComponent: React.ForwardRefRenderFunction<TRef, P> | React.FunctionComponent<P>,
     options?: IObserverOptions
 ) {
     // The working of observer is explained step by step in this talk: https://www.youtube.com/watch?v=cPF4iBedoF0&feature=youtu.be&t=1307
