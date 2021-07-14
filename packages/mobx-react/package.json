@@ -34,7 +34,7 @@
     "bugs": {
         "url": "https://github.com/mobxjs/mobx/issues"
     },
-    "homepage": "http://mobx.js.org/",
+    "homepage": "https://mobx.js.org/",
     "dependencies": {
         "mobx-react-lite": "^3.2.0"
     },
