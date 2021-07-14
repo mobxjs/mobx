@@ -482,7 +482,7 @@ Returns the backing atom.
 
 _Transaction is a low-level API. It is recommended to use [`action`](#action) or [`runInAction`](#runinaction) instead._
 
-Used to batch a bunch of updates without notifying any observers until the end of the transaction. Like [`untracked`](#untracked), it is automatically applied by `action`, so usually it makes more sense to use actions than to use `transaction` directly.
+Used to batch a bunch of updates without running any reactions until the end of the transaction. Like [`untracked`](#untracked), it is automatically applied by `action`, so usually it makes more sense to use actions than to use `transaction` directly.
 
 It takes a single, parameterless `worker` function as an argument, and returns any value that was returned by it.
 Note that `transaction` runs completely synchronously and can be nested. Only after completing the outermost `transaction`, the pending reactions will be run.
