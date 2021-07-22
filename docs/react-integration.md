@@ -469,7 +469,7 @@ Combining `autorun` and coupling it to the life-cycle of the component using `us
 import { observer, useLocalObservable, useAsObservableSource } from "mobx-react-lite"
 import { useState } from "react"
 
-const TimerView = observer(({ offset }) => {
+const TimerView = observer(() => {
     const timer = useLocalObservable(() => ({
         secondsPassed: 0,
         increaseTimer() {
@@ -494,7 +494,7 @@ const TimerView = observer(({ offset }) => {
         }
     }, [])
 
-    return <span>Seconds passed: {timer.offsetTime}</span>
+    return <span>Seconds passed: {timer.secondsPassed}</span>
 })
 
 ReactDOM.render(<TimerView />, document.body)
