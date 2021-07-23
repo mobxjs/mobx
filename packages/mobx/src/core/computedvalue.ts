@@ -255,7 +255,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         if (!this.keepAlive_) {
             clearObserving(this)
             this.value_ = undefined // don't hold on to computed value!
-            if (this.isTracing_ !== TraceMode.NONE) {
+            if (__DEV__ && this.isTracing_ !== TraceMode.NONE) {
                 console.log(
                     `[mobx.trace] Computed value '${this.name_}' was suspended and it will recompute on the next access.`
                 )
