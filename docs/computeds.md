@@ -158,7 +158,7 @@ class Box {
     height = 0
 
     constructor() {
-        makeObsevable(this, {
+        makeObservable(this, {
             x: observable,
             y: observable,
             topRight: computed.struct
