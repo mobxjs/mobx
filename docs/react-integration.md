@@ -245,7 +245,7 @@ as follows, because the `.secondsPassed` is not read inside the `observer` compo
 ```javascript
 const TimerView = observer(({ secondsPassed }) => <span>Seconds passed: {secondsPassed}</span>)
 
-React.render(<TimerViewer secondsPassed={myTimer.secondsPassed} />, document.body)
+React.render(<TimerView secondsPassed={myTimer.secondsPassed} />, document.body)
 ```
 
 Note that this is a different mindset from other libraries like `react-redux`, where it is a good practice to dereference early and pass primitives down, to better leverage memoization.
@@ -469,7 +469,7 @@ Combining `autorun` and coupling it to the life-cycle of the component using `us
 import { observer, useLocalObservable, useAsObservableSource } from "mobx-react-lite"
 import { useState } from "react"
 
-const TimerView = observer(({ offset }) => {
+const TimerView = observer(() => {
     const timer = useLocalObservable(() => ({
         secondsPassed: 0,
         increaseTimer() {
@@ -494,7 +494,7 @@ const TimerView = observer(({ offset }) => {
         }
     }, [])
 
-    return <span>Seconds passed: {timer.offsetTime}</span>
+    return <span>Seconds passed: {timer.secondsPassed}</span>
 })
 
 ReactDOM.render(<TimerView />, document.body)

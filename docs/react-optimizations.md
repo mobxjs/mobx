@@ -95,7 +95,7 @@ const PersonNameDisplayer = observer(({ person }) => <DisplayName name={person.n
 
 const CarNameDisplayer = observer(({ car }) => <DisplayName name={car.model} />)
 
-const ManufacturerNameDisplayer = observer({ car}) => (
+const ManufacturerNameDisplayer = observer(({ car }) => 
     <DisplayName name={car.manufacturer.name} />
 )
 ```
