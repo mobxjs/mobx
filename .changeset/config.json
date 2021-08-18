@@ -1,9 +1,0 @@
-{
-    "changelog": ["@changesets/changelog-github", { "repo": "mobxjs/mobx" }],
-    "commit": false,
-    "access": "public",
-    "baseBranch": "main",
-    "___experimentalUnsafeOptions_WILL_CHANGE_IN_PATCH": {
-        "onlyUpdatePeerDependentsWhenOutOfRange": true
-    }
-}
