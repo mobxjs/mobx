@@ -10,38 +10,53 @@ makeObservable({
   o: 5,
   a() { },
   get c() { },
+  set c() { },
+  "lit": 1,
+  [cmp()]() { },
 });
 
 makeObservable({
   o: 5,
   a() { },
   get c() { },
+  set c() { },
+  "lit": 1,
 }, {
   o: observable,
   a: action,
   c: computed,
+  "lit": 1,
+  [cmp()]() { },
 });
 
 class Exhaustive1 {
+  constructor() {
+    makeObservable(this, {})
+  }
+
   o = 5;
   a() { };
   get c() { };
-
-  constructor() {
-    makeObservable(this)
-  }
+  set c() { };
+  "lit" = 1;
+  [cmp()]() { };
 }
 
 class Exhaustive2 {
   o = 5;
   a() { };
   get c() { };
+  set c() { };
+  "lit" = 1;
+  [cmp()]() { };
 
   constructor() {
     makeObservable(this, {
       o: observable,
       a: action,
       c: computed,
+      "lit": 1,
+      [cmp()]() { },
     })
   }
 }
