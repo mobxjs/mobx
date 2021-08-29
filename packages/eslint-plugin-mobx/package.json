@@ -1,0 +1,45 @@
+{
+    "name": "eslint-plugin-mobx",
+    "version": "0.0.1",
+    "description": "ESLint rules for MobX",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/mobxjs/mobx.git",
+        "directory": "packages/eslint-plugin-mobx"
+    },
+    "license": "MIT",
+    "funding": {
+        "type": "opencollective",
+        "url": "https://opencollective.com/mobx"
+    },
+    "bugs": {
+        "url": "https://github.com/mobxjs/mobx/issues"
+    },
+    "files": [
+        "src",
+        "LICENSE",
+        "README.md"
+    ],
+    "homepage": "https://mobx.js.org/",
+    "dependencies": {
+        "esquery": "^1.4.0",
+        "@typescript-eslint/visitor-keys": "^4.29.3"        
+    },
+    "peerDependencies": {
+        "eslint": "^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0"
+    },
+    "devDependencies": {
+        "eslint": "^7.0.0",   
+        "@typescript-eslint/parser": "^4.0.0",
+        "@typescript-eslint/eslint-plugin": "^4.29.3"   
+    },
+    "keywords": [
+        "eslint",
+        "eslint-plugin",
+        "eslintplugin",
+        "mobx"
+    ],
+    "scripts": {
+        "test": "jest"
+    }
+}
