@@ -33,11 +33,9 @@ module.exports = {
   meta: {
     type: 'problem',
     docs: {
-      description: 'enforce all fields being listen in `makeObservable`',
+      description: 'disallows calling `makeObservable(this)` conditionally inside constructors',
       recommended: true,
     },
   },
   create,
 }
-
-module.exports = rule;

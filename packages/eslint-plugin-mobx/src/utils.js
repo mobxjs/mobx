@@ -1,6 +1,6 @@
 'use strict';
 
-const mobxDecorators = new Set('observable', 'computed', 'action', 'override');
+const mobxDecorators = new Set(['observable', 'computed', 'action', 'flow', 'override']);
 
 function isMobxDecorator(decorator) {
   return mobxDecorators.has(decorator.expression.name) // @foo

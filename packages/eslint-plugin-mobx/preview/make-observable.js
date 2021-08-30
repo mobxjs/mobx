@@ -118,3 +118,31 @@ class Unconditional2 {
     }
   }
 }
+
+class MissingMakeObservable1 {
+  @observable o = 5;
+}
+
+class MissingMakeObservable2 {
+  @observable o = 5;
+  constructor() { }
+}
+
+class MissingMakeObservable3 {
+  @observable o = 5;
+  constructor() {
+    const foo = makeObservable({ o: 1 })
+  }
+}
+
+class MissingMakeObservable4 {
+  @observable o = 5;
+  constructor()
+}
+
+class MissingMakeObservable5 {
+  @observable o = 5;
+  constructor() {
+    makeObservable()
+  }
+}

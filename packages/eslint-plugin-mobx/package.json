@@ -22,8 +22,7 @@
     ],
     "homepage": "https://mobx.js.org/",
     "dependencies": {
-        "esquery": "^1.4.0",
-        "@typescript-eslint/visitor-keys": "^4.29.3"        
+        "esquery": "^1.4.0"               
     },
     "peerDependencies": {
         "eslint": "^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0"
