@@ -66,46 +66,28 @@ function create(context) {
       }
       */
 
-      const createFix = (key, annotation) => fixer => {
-        if (!secondArg) {
-          return fixer.insertTextAfter(firstArg, `, { ${key}: ${annotation} }`);
-        } else if (secondArg.type !== 'ObjectExpression') {
-          return fixer.replaceText(secondArg, `{ ${key}: ${annotation} }`);
-        } else {
-          // we place it at the beginning, because we don't have to worry about comma
-          // TODO? replace with insertAfter(sourceCode.getFirstToken(secondArg))
-          const openingBracketPosition = secondArg.range[0] + 1;
-          return fixer.insertTextAfterRange([openingBracketPosition, openingBracketPosition], `${key}: ${annotation},`);
+      if (!hasAnyDecorator && nonAnnotatedMembers.length) {
+        // Set avoids reporting twice for setter+getter pair or actual duplicates
+        const keys = [...new Set(nonAnnotatedMembers.map(fieldToKey))];
+        const keyList = keys.map(key => `\`${key}\``).join(', ');
+
+        const fix = fixer => {
+          const annotationList = keys.map(key => `${key}: true`).join(', ') + ',';
+          if (!secondArg) {
+            return fixer.insertTextAfter(firstArg, `, { ${annotationList} }`);
+          } else if (secondArg.type !== 'ObjectExpression') {
+            return fixer.replaceText(secondArg, `{ ${annotationList} }`);
+          } else {
+            const openingBracket = sourceCode.getFirstToken(secondArg)
+            return fixer.insertTextAfter(openingBracket, ` ${annotationList} `);
+          }
         }
-      }
 
-      const createSuggestion = (key, annotation) => {
-        return {
-          desc: 'Add `{{ key }}: {{ annotation }}` to `makeObservable`',
-          data: { key, annotation },
-          fix: createFix(key),
-        }
-      }
-
-      if (!hasAnyDecorator) {
-        // Avoids reporting twice for setter+getter pair and actual duplicates
-        const reportedKeys = new Set();
-
-        nonAnnotatedMembers.forEach(member => {
-          const key = fieldToKey(member);
-          if (reportedKeys.has(key)) return;
-          reportedKeys.add(key);
-
-          context.report({
-            node: makeObservable,
-            message: 'Missing annotation for `{{ key }}`.',
-            data: { key },
-            fix: createFix(key, 'true'),
-            // Does not work well in VSCode atm
-            suggest: [
-              createSuggestion(key, 'true'),
-            ],
-          })
+        context.report({
+          node: makeObservable,
+          message: 'Missing annotation for {{ keyList }}. To exclude a field, use `false` as annotation.',
+          data: { keyList },
+          fix,
         })
       }
     },
@@ -116,10 +98,11 @@ module.exports = {
   meta: {
     type: 'suggestion',
     fixable: 'code',
-  },
-  docs: {
-    recommended: true,
-    suggestion: true,
+    docs: {
+      description: 'enforce all fields being listen in `makeObservable`',
+      recommended: true,
+      suggestion: false,
+    },
   },
   create,
 };
