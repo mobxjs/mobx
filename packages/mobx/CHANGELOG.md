@@ -1,5 +1,22 @@
 # mobx
 
+## 6.3.3
+
+### Patch Changes
+
+-   [`d78a1592`](https://github.com/mobxjs/mobx/commit/d78a15929052b96698b3355a0b4c8335750422db) [#2902](https://github.com/mobxjs/mobx/pull/2902) Thanks [@z3rog](https://github.com/z3rog)! - chore: observable use internal constants
+
+*   [`db21d85f`](https://github.com/mobxjs/mobx/commit/db21d85fcd41c6c142998f53e722ee0a0e9b5c18) [#2998](https://github.com/mobxjs/mobx/pull/2998) Thanks [@urugator](https://github.com/urugator)! - `trace()`: log when computed becomes suspended
+    `requiresReaction` warns instead of throwing
+
+-   [`b9fa119c`](https://github.com/mobxjs/mobx/commit/b9fa119c90e23d4b327763189f24c00be2fb2c26) [#3056](https://github.com/mobxjs/mobx/pull/3056) Thanks [@upsuper](https://github.com/upsuper)! - Create WHEN_TIMEOUT error earlier to capture useful stack
+
+*   [`99491ec2`](https://github.com/mobxjs/mobx/commit/99491ec2d315a3a01cdbe40d9a24d920a09cbd0e) [#2972](https://github.com/mobxjs/mobx/pull/2972) Thanks [@kk-gjyang](https://github.com/kk-gjyang)! - Polyfill `Object.is` for old/unsupported browsers
+
+-   [`0d28db8a`](https://github.com/mobxjs/mobx/commit/0d28db8a0ba99f5cce744bb83b5bd88ec45a7e41) [#2927](https://github.com/mobxjs/mobx/pull/2927) Thanks [@upsuper](https://github.com/upsuper)! - Give proper typing to opts.equals of reaction
+
+*   [`c6dc925c`](https://github.com/mobxjs/mobx/commit/c6dc925c6cf7eeff9237ee07c55927a7bbc14cb7) [#2985](https://github.com/mobxjs/mobx/pull/2985) Thanks [@fecqs](https://github.com/fecqs)! - Remove duplicate global property check
+
 ## 6.3.2
 
 ### Patch Changes
