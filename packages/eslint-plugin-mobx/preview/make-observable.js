@@ -5,7 +5,6 @@ makeAutoObservable();
 makeAutoObservable(foo, {});
 makeAutoObservable(this, {});
 
-// Exhaustive
 makeObservable({
   o: 5,
   a() { },
@@ -15,6 +14,7 @@ makeObservable({
   [cmp()]() { },
 });
 
+// ok
 makeObservable({
   o: 5,
   a() { },
@@ -30,16 +30,16 @@ makeObservable({
 });
 
 class Exhaustive1 {
-  constructor() {
-    makeObservable(this, {})
-  }
-
   o = 5;
   a() { };
   get c() { };
   set c() { };
   "lit" = 1;
   [cmp()]() { };
+
+  constructor() {
+    makeObservable(this, {})
+  }
 }
 
 class Exhaustive2 {
@@ -51,6 +51,7 @@ class Exhaustive2 {
   [cmp()]() { };
 
   constructor() {
+    // ok
     makeObservable(this, {
       o: observable,
       a: action,
@@ -87,6 +88,16 @@ class Exhaustive4 {
     function a() {
       makeObservable(this) // ok - `this` doesn't refer to class instance  
     }
+  }
+}
+
+class Exhaustive4 {
+  o = 5;
+  a() { };
+  get c() { };
+
+  constructor() {
+    makeObservable({}); // ok - not making `this` observable 
   }
 }
 
@@ -131,7 +142,7 @@ class MissingMakeObservable2 {
 class MissingMakeObservable3 {
   @observable o = 5;
   constructor() {
-    const foo = makeObservable({ o: 1 })
+    makeObservable({})
   }
 }
 
@@ -140,9 +151,10 @@ class MissingMakeObservable4 {
   constructor()
 }
 
+// ok
 class MissingMakeObservable5 {
   @observable o = 5;
   constructor() {
-    makeObservable()
+    makeObservable(this)
   }
 }

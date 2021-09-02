@@ -83,11 +83,11 @@ function create(context) {
             const openingBracket = sourceCode.getFirstToken(secondArg)
             return fixer.insertTextAfter(openingBracket, ` ${annotationList} `);
           }
-        }
+        };
 
         context.report({
           node: makeObservable,
-          message: 'Missing annotation for {{ keyList }}. To exclude a field, use `false` as annotation.',
+          messageId: 'missingAnnotation',
           data: { keyList },
           fix,
         })
@@ -104,6 +104,9 @@ module.exports = {
       description: 'enforce all fields being listen in `makeObservable`',
       recommended: true,
       suggestion: false,
+    },
+    messages: {
+      'missingAnnotation': 'Missing annotation for {{ keyList }}. To exclude a field, use `false` as annotation.',
     },
   },
   create,

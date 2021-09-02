@@ -2,122 +2,261 @@ import { RuleTester } from "eslint";
 
 import rule from "../src/exhaustive-make-observable.js";
 
-//console.log();
 const tester = new RuleTester({
   parser: require.resolve('@typescript-eslint/parser'),
-  parserOptions: {
-    //ecmaVersion: 2021
-    //lib: ['ESNext'],
-    //project: require.resolve('../tsconfig.json'),
-
-  }
+  parserOptions: {}
 });
 
-const valid1 = `
+const fields = [
+  'o = 5',
+  'get c() {}',
+  'set c() {}',
+  'a() {}',
+  '*f() {}',
+];
+
+const decoratedFields = [
+  '@observable o = 5',
+  '@observable.ref or = []',
+  '@observable.shallow os = []',
+  '@observable.deep od = {}',
+  '@computed get c() {}',
+  '@computed.struct get cs() {}',
+  '@computed({ equals }) get co() {}',
+  '@action a() {}',
+  '@action.bound ab() {}',
+  '@flow *f() {}',
+  '@flow.bound *fb() {}',
+];
+
+const valid1 = decoratedFields.map(field => `
 class C {     
-  @observable o = 5; 
-  
+  ${field}
+
   constructor() {
     makeObservable(this) 
   }      
 }
-`
-const valid2 = `
+`).map(code => ({ code }))
+
+const valid2 = {
+  code: `
 class C {     
-  @observable.shallow o = [];   
+  o = 5
+  get c() {}
+  a() {}
+  *f() {}
   
-  constructor() {
-    makeObservable(this) 
-  }      
-}
-`
-const valid3 = `
-class C {     
-  @action a() {};     
-  
-  constructor() {
-    makeObservable(this) 
-  }      
-}
-`
-const valid4 = `
-class C {     
-  @computed() get c() {};    
-  
-  constructor() {
-    makeObservable(this) 
-  }      
-}
-`
-const valid5 = `
-class C {     
-  @action.bound a() {};    
-  
-  constructor() {
-    makeObservable(this) 
-  }      
-}
-`
-const valid6 = `
-class C {     
-  o = 5;  
   constructor() {
     makeObservable(this, {
-      o: observable,
-      a: action,
-      c: computed,
+      o: true,
+      a: true,
+      c: true,
+      f: true,
     }) 
-  }     
-  a() {};   
-  get c() {};
+  }  
 }
 `
-const invalid1 = `
+}
+
+const valid3 = {
+  code: `
 class C {     
-  o = 5;  
+  o = 5
+  get c() {}
+  a() {}
+  *f() {}
+  
   constructor() {
-    makeObservable(this, {}) 
-  }     
-  a() {};
-  get c() {};   
+    makeObservable({})
+  }  
 }
 `
-const invalid2 = `
-class C { 
-  o = 5;    
+}
+
+const invalid1 = {
+  code: `
+class C {
+  o = 5
+  get c() {}
+  a() {}
+  *f() {}
+  
   constructor() {
-    makeObservable(this) 
-  }     
-  a() {}; 
-  get c() {}; 
+    makeObservable(this, {
+      a: true,
+      c: true,
+      f: true,
+    })
+  }
+}
+`,
+  errors: [{ messageId: 'missingAnnotation' }],
+  output: `
+class C {
+  o = 5
+  get c() {}
+  a() {}
+  *f() {}
+  
+  constructor() {
+    makeObservable(this, { o: true, 
+      a: true,
+      c: true,
+      f: true,
+    })
+  }
 }
 `
+}
+
+const invalid2 = {
+  code: `
+class C {
+  o = 5
+  get c() {}
+  a() {}
+  *f() {}
+  
+  constructor() {
+    makeObservable(this, {
+      o: true,
+      c: true,
+      f: true,
+    })
+  }
+}
+`,
+  errors: [{ messageId: 'missingAnnotation' }],
+  output: `
+class C {
+  o = 5
+  get c() {}
+  a() {}
+  *f() {}
+  
+  constructor() {
+    makeObservable(this, { a: true, 
+      o: true,
+      c: true,
+      f: true,
+    })
+  }
+}
+`
+}
+
+const invalid3 = {
+  code: `
+class C {
+  o = 5
+  get c() {}
+  a() {}
+  *f() {}
+  
+  constructor() {
+    makeObservable(this, {
+      o: true,
+      a: true,
+      f: true,
+    })
+  }
+}
+`,
+  errors: [{ messageId: 'missingAnnotation' }],
+  output: `
+class C {
+  o = 5
+  get c() {}
+  a() {}
+  *f() {}
+  
+  constructor() {
+    makeObservable(this, { c: true, 
+      o: true,
+      a: true,
+      f: true,
+    })
+  }
+}
+`
+}
+
+const invalid4 = {
+  code: `
+class C {
+  o = 5
+  get c() {}
+  a() {}
+  *f() {}
+  
+  constructor() {
+    makeObservable(this, {
+      o: true,
+      a: true,
+      c: true,
+    })
+  }
+}
+`,
+  errors: [{ messageId: 'missingAnnotation' }],
+  output: `
+class C {
+  o = 5
+  get c() {}
+  a() {}
+  *f() {}
+  
+  constructor() {
+    makeObservable(this, { f: true, 
+      o: true,
+      a: true,
+      c: true,
+    })
+  }
+}
+`
+}
+
+const invalid5 = {
+  code: `
+class C {
+  o = 5
+  get c() {}
+  a() {}
+  *f() {}
+  
+  constructor() {
+    makeObservable(this)
+  }
+}
+`,
+  errors: [{ messageId: 'missingAnnotation' }],
+  output: `
+class C {
+  o = 5
+  get c() {}
+  a() {}
+  *f() {}
+  
+  constructor() {
+    makeObservable(this, { o: true, c: true, a: true, f: true, })
+  }
+}
+`
+}
+
 tester.run("exhaustive-make-observable", rule, {
   valid: [
-    { code: valid1 },
-    { code: valid2 },
-    { code: valid3 },
-    { code: valid4 },
-    { code: valid5 },
-    { code: valid6 },
+    ...valid1,
+    valid2,
+    valid3,
   ],
   invalid: [
-    {
-      code: invalid1,
-      errors: [
-        { message: 'Missing annotation for `o`.' },
-        { message: 'Missing annotation for `a`.' },
-        { message: 'Missing annotation for `c`.' },
-      ],
-    },
-    {
-      code: invalid2,
-      errors: [
-        { message: 'Second argument must be object literal in form of `{ prop: annotation }`.' },
-        { message: 'Missing annotation for `o`.' },
-        { message: 'Missing annotation for `a`.' },
-        { message: 'Missing annotation for `c`.' },
-      ],
-    },
+    invalid1,
+    invalid2,
+    invalid3,
+    invalid4,
+    invalid5,
   ],
 });

@@ -31,15 +31,15 @@ function create(context) {
           if (constructor?.value.type === 'TSEmptyBodyFunctionExpression') {
             // constructor() - yes this a thing
             const closingBracket = sourceCode.getLastToken(constructor.value);
-            fixer.insertTextAfter(closingBracket, ' { makeObservable(this); }')
+            return fixer.insertTextAfter(closingBracket, ' { makeObservable(this); }')
           } else if (constructor) {
             // constructor() {}
             const closingBracket = sourceCode.getLastToken(constructor.value.body);
-            fixer.insertTextBefore(closingBracket, '\nmakeObservable(this);')
+            return fixer.insertTextBefore(closingBracket, ';makeObservable(this);')
           } else {
             // class C {}
             const openingBracket = sourceCode.getFirstToken(clazz.body);
-            fixer.insertTextAfter(openingBracket, 'constructor() { makeObservable(this); }')
+            return fixer.insertTextAfter(openingBracket, 'constructor() { makeObservable(this); }')
           }
         };
 

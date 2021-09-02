@@ -9,6 +9,7 @@ const tester = new RuleTester({
 
 const fields = [
   '@observable o = 5',
+  '@observable.ref or = []',
   '@observable.shallow os = []',
   '@observable.deep od = {}',
   '@computed get c() {}',
@@ -26,6 +27,31 @@ class C {
 
   constructor() {
     makeObservable(this) 
+  }      
+}
+`).map(code => ({ code }))
+
+const valid2 = {
+  code: `
+class C {       
+  o = 5;
+  get c() {};
+  a() {};
+  *f() {};
+
+  constructor() {
+    makeObservable(this, {}) 
+  }      
+}
+`
+}
+
+const valid3 = fields.map(field => `
+class C {     
+  ${field}
+
+  constructor() {
+    makeObservable(this, null, { name: 'foo' }) 
   }      
 }
 `).map(code => ({ code }))
@@ -59,7 +85,7 @@ class C {
   ${field}
 
   constructor() {
-    const foo = makeObservable({ a: 5 });
+    makeObservable({ a: 5 });
   }       
 }
 `).map(code => ({
@@ -69,15 +95,47 @@ class C {
   ]
 }))
 
+const invalid4 = fields.map(field => `
+class C {     
+  ${field}
+
+  constructor()
+}
+`).map(code => ({
+  code,
+  errors: [
+    { messageId: 'missingMakeObservable' },
+  ]
+}))
+
+
+const invalid5 = fields.map(field => `
+class C {     
+  ${field}
+
+  constructor() {
+    makeObservable(this, { o: observable.ref });
+  }       
+}
+`).map(code => ({
+  code,
+  errors: [
+    { messageId: 'secondArgMustBeNullish' },
+  ]
+}))
+
+
 tester.run("missing-make-observable", rule, {
   valid: [
-    valid1[0],
-    //...valid1,
+    ...valid1,
+    valid2,
+    ...valid3,
   ],
   invalid: [
-    invalid1[0],
-    /*...invalid1,
+    ...invalid1,
     ...invalid2,
-    ...invalid3,*/
+    ...invalid3,
+    ...invalid4,
+    ...invalid5,
   ],
 });

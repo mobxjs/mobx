@@ -19,7 +19,7 @@ function create(context) {
       if (makeObservable.parent.parent.parent !== closestFunction) {
         context.report({
           node: makeObservable,
-          message: '`{{ name }}` must be called unconditionally inside constructor.',
+          messageId: 'mustCallUnconditionally',
           data: {
             name: makeObservable.callee.name,
           }
@@ -36,6 +36,9 @@ module.exports = {
       description: 'disallows calling `makeObservable(this)` conditionally inside constructors',
       recommended: true,
     },
+    messages: {
+      mustCallUnconditionally: '`{{ name }}` must be called unconditionally inside constructor.',
+    }
   },
   create,
 }
