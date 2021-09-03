@@ -56,72 +56,94 @@ class C {
 }
 `).map(code => ({ code }))
 
-const invalid1 = fields.map(field => `
-class C {     
-  ${field}  
+const invalid1 = fields.map(field => ({
+  code: `
+class C {
+  ${field}
 }
-`).map(code => ({
-  code,
+`,
   errors: [
     { messageId: 'missingMakeObservable' },
-  ]
+  ],
+  output: `
+class C {
+constructor() { makeObservable(this); }
+  ${field}
+}
+`
 }))
 
-const invalid2 = fields.map(field => `
-class C {     
+const invalid2 = fields.map(field => ({
+  code: `
+class C {
   ${field}
-
-  constructor() {}       
+  constructor() {}
 }
-`).map(code => ({
-  code,
+`,
   errors: [
     { messageId: 'missingMakeObservable' },
-  ]
+  ],
+  output: `
+class C {
+  ${field}
+  constructor() {;makeObservable(this);}
+}
+`,
 }))
 
-const invalid3 = fields.map(field => `
-class C {     
+const invalid3 = fields.map(field => ({
+  code: `
+class C {
   ${field}
-
   constructor() {
     makeObservable({ a: 5 });
-  }       
+  }
 }
-`).map(code => ({
-  code,
+`,
   errors: [
     { messageId: 'missingMakeObservable' },
-  ]
+  ],
+  output: `
+class C {
+  ${field}
+  constructor() {
+    makeObservable({ a: 5 });
+  ;makeObservable(this);}
+}
+`,
 }))
 
-const invalid4 = fields.map(field => `
-class C {     
+const invalid4 = fields.map(field => ({
+  code: `
+class C {
   ${field}
-
   constructor()
 }
-`).map(code => ({
-  code,
+`,
   errors: [
     { messageId: 'missingMakeObservable' },
-  ]
+  ],
+  output: `
+class C {
+  ${field}
+  constructor() { makeObservable(this); }
+}
+`,
 }))
 
 
-const invalid5 = fields.map(field => `
-class C {     
+const invalid5 = fields.map(field => ({
+  code: `
+class C {
   ${field}
-
   constructor() {
     makeObservable(this, { o: observable.ref });
-  }       
+  }
 }
-`).map(code => ({
-  code,
+`,
   errors: [
     { messageId: 'secondArgMustBeNullish' },
-  ]
+  ],
 }))
 
 

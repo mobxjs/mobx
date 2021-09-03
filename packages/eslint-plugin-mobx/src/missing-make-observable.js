@@ -39,7 +39,7 @@ function create(context) {
           } else {
             // class C {}
             const openingBracket = sourceCode.getFirstToken(clazz.body);
-            return fixer.insertTextAfter(openingBracket, 'constructor() { makeObservable(this); }')
+            return fixer.insertTextAfter(openingBracket, '\nconstructor() { makeObservable(this); }')
           }
         };
 
