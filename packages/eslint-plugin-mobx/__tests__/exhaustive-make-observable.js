@@ -7,14 +7,6 @@ const tester = new RuleTester({
   parserOptions: {}
 });
 
-const fields = [
-  'o = 5',
-  'get c() {}',
-  'set c() {}',
-  'a() {}',
-  '*f() {}',
-];
-
 const decoratedFields = [
   '@observable o = 5',
   '@observable.ref or = []',
