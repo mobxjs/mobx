@@ -55,7 +55,7 @@ export function makeClassComponentObserver(
         const displayName = getDisplayName(target)
         throw new Error(
             `[mobx-react] class component (${displayName}) is missing \`render\` method.`
-            + `\n\`observer\` requires \`render\` being a method defined on prototype.`
+            + `\n\`observer\` requires \`render\` being a function defined on prototype.`
             + `\n\`render = () => {}\` or \`render = function() {}\` is not supported.`
         )
     }
