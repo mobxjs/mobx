@@ -51,7 +51,7 @@ export function makeClassComponentObserver(
     makeObservableProp(target, "state")
 
     const baseRender = target.render
-    if (!baseRender) {
+    if (typeof baseRender !== 'function') {
         const displayName = getDisplayName(target)
         throw new Error(
             `[mobx-react] class component (${displayName}) is missing \`render\` method.`
