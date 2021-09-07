@@ -8,7 +8,7 @@ function create(context) {
   return {
     'Decorator': decorator => {
       if (!isMobxDecorator(decorator)) return;
-      const clazz = findAncestor(decorator, node => node.type === 'ClassDeclaration');
+      const clazz = findAncestor(decorator, node => node.type === 'ClassDeclaration' || node.type === 'ClassExpression');
       if (!clazz) return;
       // ClassDeclaration > ClassBody > []
       const constructor = clazz.body.body.find(node => node.kind === 'constructor');
@@ -23,7 +23,6 @@ function create(context) {
           context.report({
             node: makeObservable,
             messageId: 'secondArgMustBeNullish',
-            data: { className: clazz.id.name },
           })
         }
       } else {

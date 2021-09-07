@@ -21,8 +21,7 @@ module.exports = {
       // these values are the same as recommended
       'mobx/exhaustive-make-observable': 'warn',      
       'mobx/missing-make-observable': 'error',
-      'mobx/unconditional-make-observable': 'error',
-      'mobx/no-arrow-render': 'error',
+      'mobx/unconditional-make-observable': 'error',      
     },
 };
 ```
@@ -44,8 +43,3 @@ Does not warn about annotated non-exsiting fields (there is a runtime check, but
 ### mobx/unconditional-make-observable
 
 Makes sure the `make(Auto)Observable(this)` is called unconditionally inside a constructor.
-
-### mobx/no-render-expression
-
-When using react's class components, the `observer` requires `render` being a method defined on prototype, rather than own property with a function expression `render = () => {}`/`render = function() {}`.
-Class component is considered anything that extends from `Component`, `PureComponent`, `React.Component`, `React.PureComponent`.
