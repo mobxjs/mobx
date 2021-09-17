@@ -126,7 +126,7 @@ export function reaction<T, FireImmediately extends boolean = false>(
     let firstTime = true
     let isScheduled = false
     let value: T
-    let oldValue: T = undefined as any // only an issue with fireImmediately
+    let oldValue: T | undefined
 
     const equals: IEqualsComparer<T> = (opts as any).compareStructural
         ? comparer.structural
@@ -156,8 +156,10 @@ export function reaction<T, FireImmediately extends boolean = false>(
             oldValue = value
             value = nextValue
         })
-        if (firstTime && opts.fireImmediately!) effectAction(value, oldValue, r)
-        else if (!firstTime && changed) effectAction(value, oldValue, r)
+        // this casting is necessary prior to TS < 4.4
+        type OldValue = FireImmediately extends true ? T | undefined : T
+        if (firstTime && opts.fireImmediately!) effectAction(value, oldValue as OldValue, r)
+        else if (!firstTime && changed) effectAction(value, oldValue as OldValue, r)
         firstTime = false
     }
 
