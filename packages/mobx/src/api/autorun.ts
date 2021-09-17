@@ -86,8 +86,8 @@ export function autorun(
     return reaction.getDisposer_()
 }
 
-export type IReactionOptions<T> = IAutorunOptions & {
-    fireImmediately?: boolean
+export type IReactionOptions<T, FireImmediately extends boolean> = IAutorunOptions & {
+    fireImmediately?: FireImmediately
     equals?: IEqualsComparer<T>
 }
 
@@ -101,10 +101,14 @@ function createSchedulerFromOptions(opts: IAutorunOptions) {
         : run
 }
 
-export function reaction<T>(
+export function reaction<T, FireImmediately extends boolean = false>(
     expression: (r: IReactionPublic) => T,
-    effect: (arg: T, prev: T, r: IReactionPublic) => void,
-    opts: IReactionOptions<T> = EMPTY_OBJECT
+    effect: (
+        arg: T,
+        prev: FireImmediately extends true ? T | undefined : T,
+        r: IReactionPublic
+    ) => void,
+    opts: IReactionOptions<T, FireImmediately> = EMPTY_OBJECT
 ): IReactionDisposer {
     if (__DEV__) {
         if (!isFunction(expression) || !isFunction(effect))
