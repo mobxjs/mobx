@@ -156,7 +156,8 @@ export function reaction<T, FireImmediately extends boolean = false>(
             oldValue = value
             value = nextValue
         })
-        // this casting is necessary prior to TS < 4.4
+
+        // This casting is nesessary as TS cannot infer proper type in current funciton implementation
         type OldValue = FireImmediately extends true ? T | undefined : T
         if (firstTime && opts.fireImmediately!) effectAction(value, oldValue as OldValue, r)
         else if (!firstTime && changed) effectAction(value, oldValue as OldValue, r)
