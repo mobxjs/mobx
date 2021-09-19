@@ -191,7 +191,7 @@ export class ObservableMap<K = any, V = any>
     }
 
     private updateHasMapEntry_(key: K, value: boolean) {
-        let entry = this.hasMap_.get(key)
+        const entry = this.hasMap_.get(key)
         if (entry) {
             entry.setNewValue_(value)
         }
