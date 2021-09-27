@@ -178,7 +178,7 @@ export class ObservableMap<K = any, V = any>
             if (__DEV__ && notifySpy) spyReportStart(change!)
             transaction(() => {
                 this.keysAtom_.reportChanged()
-                this.updateHasMapEntry_(key, false)
+                this.hasMap_.get(key)?.setNewValue_(false)
                 const observable = this.data_.get(key)!
                 observable.setNewValue_(undefined as any)
                 this.data_.delete(key)
@@ -188,13 +188,6 @@ export class ObservableMap<K = any, V = any>
             return true
         }
         return false
-    }
-
-    private updateHasMapEntry_(key: K, value: boolean) {
-        let entry = this.hasMap_.get(key)
-        if (entry) {
-            entry.setNewValue_(value)
-        }
     }
 
     private updateValue_(key: K, newValue: V | undefined) {
@@ -233,7 +226,7 @@ export class ObservableMap<K = any, V = any>
             )
             this.data_.set(key, observable)
             newValue = (observable as any).value_ // value might have been changed
-            this.updateHasMapEntry_(key, true)
+            this.hasMap_.get(key)?.setNewValue_(true)
             this.keysAtom_.reportChanged()
         })
         const notifySpy = isSpyEnabled()
