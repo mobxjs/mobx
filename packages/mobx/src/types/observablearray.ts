@@ -175,7 +175,7 @@ export class ObservableArrayAdministration
     }
 
     setArrayLength_(newLength: number) {
-        if (typeof newLength !== "number" || newLength < 0) die("Out of range: " + newLength)
+        if (typeof newLength !== "number" || isNaN(newLength) || newLength < 0) die("Out of range: " + newLength)
         let currentLength = this.values_.length
         if (newLength === currentLength) return
         else if (newLength > currentLength) {
