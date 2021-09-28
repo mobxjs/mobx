@@ -2094,7 +2094,7 @@ test("extendObservable should not accept complex objects as second argument", ()
     expect(() => {
         extendObservable({}, new X())
     }).toThrowErrorMatchingInlineSnapshot(
-        `"[MobX] 'extendObservabe' only accepts plain objects as second argument"`
+        `"[MobX] 'extendObservable' only accepts plain objects as second argument"`
     )
 })
 
