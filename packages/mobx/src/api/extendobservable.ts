@@ -27,7 +27,7 @@ export function extendObservable<A extends Object, B extends Object>(
         if (isObservableMap(target))
             die("'extendObservable' should not be used on maps, use map.merge instead")
         if (!isPlainObject(properties))
-            die(`'extendObservabe' only accepts plain objects as second argument`)
+            die(`'extendObservable' only accepts plain objects as second argument`)
         if (isObservable(properties) || isObservable(annotations))
             die(`Extending an object with another observable (object) is not supported`)
     }
