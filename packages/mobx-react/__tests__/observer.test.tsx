@@ -880,3 +880,12 @@ test("Redeclaring an existing observer component as an observer should log a war
     observer(AlreadyObserver)
     expect(warn).toHaveBeenCalled()
 })
+
+test("Missing render should throw", () => {        
+    class Component extends React.Component<any, any> {
+        render = function() {
+            return <div />
+        }   
+    }          
+    expect(() => observer(Component)).toThrow();
+})

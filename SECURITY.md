@@ -9,4 +9,4 @@ Security issues must be reported against latest version of each package (as foun
 
 ## Reporting a Vulnerability
 
-Please report vulnerability issues using the [issue tracker](https://github.com/mobxjs/mobx/issues), but without providing details, and we'll let you know where to send any disclosure. 
+Security issues can be reported at info@michel.codes. Since this software is provided as-is no follow up, remediation or time lines are guaranteed.

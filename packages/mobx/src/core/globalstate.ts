@@ -162,6 +162,8 @@ export let globalState: MobXGlobals = (function () {
         canMergeGlobalState = false
 
     if (!canMergeGlobalState) {
+        // Because this is a IIFE we need to let isolateCalled a chance to change
+        // so we run it after the event loop completed at least 1 iteration
         setTimeout(() => {
             if (!isolateCalled) {
                 die(35)
