@@ -1,13 +1,13 @@
 import { $mobx, getAtom, isComputedValue, isObservableObject, die, isStringish } from "../internal"
 
 export function _isComputed(value, property?: PropertyKey): boolean {
-    if (property !== undefined) {
-        if (isObservableObject(value) === false) return false
-        if (!value[$mobx].values_.has(property)) return false
-        const atom = getAtom(value, property)
-        return isComputedValue(atom)
+    if (property === undefined) {
+        return isComputedValue(value)
     }
-    return isComputedValue(value)
+    if (isObservableObject(value) === false) return false
+    if (!value[$mobx].values_.has(property)) return false
+    const atom = getAtom(value, property)
+    return isComputedValue(atom)
 }
 
 export function isComputed(value: any): boolean {
