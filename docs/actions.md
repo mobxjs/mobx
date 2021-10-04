@@ -140,7 +140,7 @@ const ResetButton = ({ formState }) => (
         onClick={action(e => {
             formState.resetPendingUploads()
             formState.resetValues()
-            e.stopPropagation()
+            e.preventDefault()
         })}
     >
         Reset form
