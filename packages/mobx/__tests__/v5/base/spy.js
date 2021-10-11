@@ -125,7 +125,7 @@ test("bound actions report correct object (discussions/3140)", () => {
 
     mobx.spy((event) => {
         if (event.type !== 'action') return;
-        expect(event.object).toEqual(appState);
+        expect(event.object).toBe(appState);
     });
 
     actionBound();
