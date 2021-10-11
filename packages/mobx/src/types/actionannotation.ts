@@ -67,7 +67,7 @@ function assertActionDescriptor(
     if (__DEV__ && !isFunction(value)) {
         die(
             `Cannot apply '${annotationType_}' to '${adm.name_}.${key.toString()}':` +
-                `\n'${annotationType_}' can only be used on properties with a function value.`
+            `\n'${annotationType_}' can only be used on properties with a function value.`
         )
     }
 }
@@ -89,7 +89,9 @@ export function createActionDescriptor(
         value: createAction(
             annotation.options_?.name ?? key.toString(),
             value,
-            annotation.options_?.autoAction ?? false
+            annotation.options_?.autoAction ?? false,
+            // https://github.com/mobxjs/mobx/discussions/3140
+            annotation.options_?.bound ? (adm.proxy_ ?? adm.target_) : undefined,
         ),
         // Non-configurable for classes
         // prevents accidental field redefinition in subclass

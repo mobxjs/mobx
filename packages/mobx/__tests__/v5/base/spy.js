@@ -104,6 +104,30 @@ test("spy error", () => {
 
 test("spy stop listen from handler, #1459", () => {
     const stop = mobx.spy(() => stop())
-    mobx.spy(() => {})
+    mobx.spy(() => { })
     doStuff()
+})
+
+test("bound actions report correct object (discussions/3140)", () => {
+    class AppState {
+        constructor() {
+            mobx.makeAutoObservable(this, {
+                actionBound: mobx.action.bound,
+            }, { autoBind: true });
+        }
+
+        actionBound() { }
+        autoActionBound() { }
+    }
+
+    const appState = new AppState();
+    const { actionBound, autoActionBound } = appState;
+
+    mobx.spy((event) => {
+        if (event.type !== 'action') return;
+        expect(event.object).toBe(appState);
+    });
+
+    actionBound();
+    autoActionBound();
 })
