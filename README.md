@@ -136,7 +136,7 @@ Changes in the observable state are propagated precisely to all _computations_ a
 
 This conceptual picture can be applied to the above example, or any other application using MobX.
 
-To learn about the core concepts of MobX using a larger example, check out [The gist of MobX](docs/the-gist-of-mobx.md) section, or take the [10 minute interactive introduction to MobX and React](https://mobx.js.org/getting-started).
+To learn about the core concepts of MobX using a larger example, check out [The gist of MobX](https://mobx.js.org/the-gist-of-mobx.html) section, or take the [10 minute interactive introduction to MobX and React](https://mobx.js.org/getting-started).
 The philosophy and benefits of the mental model provided by MobX are also described in great detail in the blog posts [UI as an afterthought](https://michel.codes/blogs/ui-as-an-afterthought) and [How to decouple state and UI (a.k.a. you don’t need componentWillMount)](https://hackernoon.com/how-to-decouple-state-and-ui-a-k-a-you-dont-need-componentwillmount-cc90b787aa37).
 
 <div class="cheat"><a href="https://gum.co/fSocU"><button title="Download the MobX 6 cheat sheet and sponsor the project">Download the MobX 6 cheat sheet</button></a></div>
