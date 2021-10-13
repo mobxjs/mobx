@@ -107,11 +107,11 @@ function interpret_cli_args() {
 spawnBin("jscodeshift", [
   "--extensions=js,jsx,ts,tsx",
   ...process.argv.filter(arg => arg.startsWith("--")),
-  "-t", path.join(__dirname, "src", "undecorate.ts"),
-    
+  "-t", `"${path.join(__dirname, "src", "undecorate.ts")}"`,
+
   //this is arg to tell jscodeshift the dir to transform or fallback to process.cwd()
   //originally just hard coded to process.cwd()
-  path.join(process.cwd(), interpret_cli_args())
+  `"${path.join(process.cwd(), interpret_cli_args())}"`
 
 ]);
 
