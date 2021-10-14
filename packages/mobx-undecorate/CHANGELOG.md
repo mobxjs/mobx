@@ -1,5 +1,11 @@
 # mobx-undecorate
 
+## 1.1.1
+
+### Patch Changes
+
+-   [`6273bfb8`](https://github.com/mobxjs/mobx/commit/6273bfb8076347687010cbd046dc740f5744e691) [#3145](https://github.com/mobxjs/mobx/pull/3145) Thanks [@urugator](https://github.com/urugator)! - fix #3142 allow white spaces in cwd
+
 ## 1.1.0
 
 ### Minor Changes
