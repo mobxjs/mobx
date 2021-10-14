@@ -204,17 +204,6 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
             /* see #1208 */ this.dependenciesState_ === IDerivationState_.NOT_TRACKING_
         const newValue = this.computeValue_(true)
 
-        if (__DEV__ && isSpyEnabled()) {
-            spyReport({
-                observableKind: "computed",
-                debugObjectName: this.name_,
-                object: this.scope_,
-                type: "update",
-                oldValue: this.value_,
-                newValue
-            } as IComputedDidChange)
-        }
-
         const changed =
             wasSuspended ||
             isCaughtException(oldValue) ||
@@ -223,6 +212,17 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 
         if (changed) {
             this.value_ = newValue
+
+            if (__DEV__ && isSpyEnabled()) {
+                spyReport({
+                    observableKind: "computed",
+                    debugObjectName: this.name_,
+                    object: this.scope_,
+                    type: "update",
+                    oldValue,
+                    newValue
+                } as IComputedDidChange)
+            }
         }
 
         return changed
