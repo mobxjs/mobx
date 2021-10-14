@@ -139,7 +139,7 @@ test("bound actions report correct object (discussions/3140)", () => {
     }
 })
 
-test.only("computed shouldn't report update unless the value changed #3109", () => {
+test("computed shouldn't report update unless the value changed #3109", () => {
     const number = mobx.observable({
         value: 0,
         get isEven() {
