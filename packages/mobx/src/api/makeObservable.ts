@@ -12,9 +12,9 @@ import {
     die,
     ownKeys,
     extendObservable,
-    addHiddenProp
+    addHiddenProp,
+    storedAnnotationsSymbol
 } from "../internal"
-import { storedAnnotationsSymbol } from "./decorators"
 
 // Hack based on https://github.com/Microsoft/TypeScript/issues/14829#issuecomment-322267089
 // We need this, because otherwise, AdditionalKeys is going to be inferred to be any
