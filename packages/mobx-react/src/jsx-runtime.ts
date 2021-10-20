@@ -18,7 +18,7 @@ export function checkMissingObserver(type, props) {
         console.warn(
           `[mobx-react] Prop \`${key}\` is observable, but \`${componentName}\` is not an observer.`
           + `\nEither wrap the component with \`observer\` or use \`toJS\` utility to pass non-observable copy instead, eg:`
-          + `\n\`<${componentName} ${key}={toJS(value)} />\``
+          + `\n\`<NotObserver ${key}={toJS(value)} />\``
           + `\nSee: https://mobx.js.org/react-integration.html#dont-pass-observables-into-components-that-arent-observer`
         );
       }
