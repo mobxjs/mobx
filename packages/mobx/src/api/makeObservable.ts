@@ -14,6 +14,7 @@ import {
     extendObservable,
     addHiddenProp
 } from "../internal"
+import { storedAnnotationsSymbol } from "./decorators"
 
 // Hack based on https://github.com/Microsoft/TypeScript/issues/14829#issuecomment-322267089
 // We need this, because otherwise, AdditionalKeys is going to be inferred to be any
@@ -30,6 +31,11 @@ export function makeObservable<T extends object, AdditionalKeys extends Property
     const adm: ObservableObjectAdministration = asObservableObject(target, options)[$mobx]
     startBatch()
     try {
+        if (__DEV__ && annotations && target[storedAnnotationsSymbol]) {
+            die(
+                `makeObservable second arg must be nullish when using decorators. Mixing @decorator syntax with annotations is not supported.`
+            )
+        }
         // Default to decorators
         annotations ??= collectStoredAnnotations(target)
 
