@@ -12,7 +12,7 @@ import { isUsingStaticRendering } from "mobx-react-lite"
 import { newSymbol, shallowEqual, setHiddenProp, patch } from "./utils/utils"
 
 const mobxAdminProperty = $mobx || "$mobx"
-const mobxObserverProperty = newSymbol("isMobXReactObserver")
+export const mobxObserverProperty = newSymbol("isMobXReactObserver")
 const mobxIsUnmounted = newSymbol("isUnmounted")
 const skipRenderKey = newSymbol("skipRender")
 const isForcingUpdateKey = newSymbol("isForcingUpdate")
@@ -81,7 +81,7 @@ export function makeClassComponentObserver(
 }
 
 // Generates a friendly name for debugging
-function getDisplayName(comp: any) {
+export function getDisplayName(comp: any) {
     return (
         comp.displayName ||
         comp.name ||

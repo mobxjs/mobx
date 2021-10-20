@@ -1,7 +1,7 @@
 import * as React from "react"
 import { observer as observerLite, Observer } from "mobx-react-lite"
 
-import { makeClassComponentObserver } from "./observerClass"
+import { makeClassComponentObserver, mobxObserverProperty } from "./observerClass"
 import { IReactComponent } from "./types/IReactComponent"
 
 const hasSymbol = typeof Symbol === "function" && Symbol.for
@@ -51,7 +51,8 @@ export function observer<T extends IReactComponent>(component: T): T {
         !component["isReactClass"] &&
         !Object.prototype.isPrototypeOf.call(React.Component, component)
     ) {
-        return observerLite(component as React.StatelessComponent<any>) as T
+        const observerComponent = observerLite(component as React.StatelessComponent<any>) as T
+        observerComponent[mobxObserverProperty] = true;
     }
 
     return makeClassComponentObserver(component as React.ComponentClass<any, any>) as T
