@@ -30,8 +30,8 @@ To elaborate on the above rules with an example, suppose that you have the follo
 ```javascript
 class Message {
     title
-    author
-    likes
+    author = {}
+    likes = []
     constructor(title, author, likes) {
         makeAutoObservable(this)
         this.title = title
