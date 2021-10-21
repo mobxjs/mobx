@@ -33,6 +33,10 @@ There are two types of React bindings, `mobx-react-lite` supports only functiona
         }
     }
     ```
+For verification insert this piece of code at the beginning of your sources (eg. `index.js`)
+```javascript
+if (!new class { x }().hasOwnProperty('x')) throw new Error('Transpiler is not configured correctly');
+```
 
 ## MobX on older JavaScript environments
 
