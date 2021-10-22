@@ -21,6 +21,7 @@
         "mobx-react": "yarn workspace mobx-react",
         "mobx-react-lite": "yarn workspace mobx-react-lite",
         "mobx-undecorate": "yarn workspace mobx-undecorate",
+        "eslint-plugin-mobx": "yarn workspace eslint-plugin-mobx",
         "docs:build": "yarn --cwd website build",
         "docs:start": "yarn --cwd website start",
         "docs:publish": "yarn --cwd website publish-gh-pages",
