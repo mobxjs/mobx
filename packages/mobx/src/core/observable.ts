@@ -268,6 +268,6 @@ function printDepTree(tree: IDependencyTree, lines: string[], depth: number) {
         lines.push("(and many more)")
         return
     }
-    lines.push(`${new Array(depth).join("\t")}${tree.name}`) // MWE: not the fastest, but the easiest way :)
+    lines.push(`${"\t".repeat(depth - 1)}${tree.name}`)
     if (tree.dependencies) tree.dependencies.forEach(child => printDepTree(child, lines, depth + 1))
 }

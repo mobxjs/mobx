@@ -378,7 +378,7 @@ test("makeAutoObservable allows overrides", () => {
 })
 
 test("makeAutoObservable cannot be used on subclasses", () => {
-    class A {}
+    class A { }
 
     class B extends A {
         constructor() {
@@ -1232,10 +1232,10 @@ test("subclass - cannot re-annotate", () => {
                 computed: computed
             })
         }
-        action() {}
-        actionBound() {}
-        *flow() {}
-        *flowBound() {}
+        action() { }
+        actionBound() { }
+        *flow() { }
+        *flowBound() { }
         get computed() {
             return this
         }
@@ -1248,7 +1248,7 @@ test("subclass - cannot re-annotate", () => {
                 action: action
             })
         }
-        action() {}
+        action() { }
     }
 
     class ChildActionBound extends Parent {
@@ -1258,7 +1258,7 @@ test("subclass - cannot re-annotate", () => {
                 actionBound: action.bound
             })
         }
-        actionBound() {}
+        actionBound() { }
     }
 
     class ChildFlow extends Parent {
@@ -1268,7 +1268,7 @@ test("subclass - cannot re-annotate", () => {
                 flow: flow
             })
         }
-        *flow() {}
+        *flow() { }
     }
 
     class ChildFlowBound extends Parent {
@@ -1278,7 +1278,7 @@ test("subclass - cannot re-annotate", () => {
                 flowBound: flow.bound
             })
         }
-        *flowBound() {}
+        *flowBound() { }
     }
 
     class ChildObservable extends Parent {
@@ -1319,13 +1319,13 @@ test("subclass - cannot re-decorate", () => {
             makeObservable(this)
         }
         @action
-        action() {}
+        action() { }
         @action.bound
-        actionBound() {}
+        actionBound() { }
         @flow
-        *flow() {}
+        *flow() { }
         @flow.bound
-        *flowBound() {}
+        *flowBound() { }
         @computed
         get computed() {
             return this
@@ -1339,7 +1339,7 @@ test("subclass - cannot re-decorate", () => {
                 makeObservable(this)
             }
             @action
-            action() {}
+            action() { }
         }
     }).toThrow(/^\[MobX\] Cannot apply/)
 
@@ -1350,7 +1350,7 @@ test("subclass - cannot re-decorate", () => {
                 makeObservable(this)
             }
             @action.bound
-            actionBound() {}
+            actionBound() { }
         }
     }).toThrow(/^\[MobX\] Cannot apply/)
 
@@ -1361,7 +1361,7 @@ test("subclass - cannot re-decorate", () => {
                 makeObservable(this)
             }
             @flow
-            *flow() {}
+            *flow() { }
         }
     }).toThrow(/^\[MobX\] Cannot apply/)
 
@@ -1372,7 +1372,7 @@ test("subclass - cannot re-decorate", () => {
                 makeObservable(this)
             }
             @flow.bound
-            *flowBound() {}
+            *flowBound() { }
         }
     }).toThrow(/^\[MobX\] Cannot apply/)
 
@@ -1411,14 +1411,14 @@ test("subclass - cannot redefine property", () => {
                 computed: computed
             })
         }
-        action = () => {}
+        action = () => { }
         get computed() {
             return this
         }
     }
 
     class ChildAction extends Parent {
-        action = () => {}
+        action = () => { }
     }
 
     class ChildObservable extends Parent {
@@ -1560,16 +1560,16 @@ test("makeAutoObservable + production build #2751", () => {
 test("inherited fields are assignable before makeObservable", () => {
     class Foo {
         constructor() {
-            this.action = () => {}
-            this.flow = function* flow() {}
+            this.action = () => { }
+            this.flow = function* flow() { }
             makeObservable(this, {
                 action,
                 flow
             })
         }
 
-        action() {}
-        *flow() {}
+        action() { }
+        *flow() { }
     }
 
     const foo1 = new Foo()
@@ -1592,7 +1592,7 @@ test("makeAutoObservable + symbolic keys", () => {
         get [computedSymbol]() {
             return this.observable
         }
-        [actionSymbol]() {}
+        [actionSymbol]() { }
 
         constructor() {
             makeAutoObservable(this)
@@ -1641,4 +1641,16 @@ test("flow.bound #2941", async () => {
     new Clazz()
     expect(isFlow(Clazz.prototype.flowBound)).toBe(true)
     expect(await Clazz.prototype.flowBound.call("ctx")).toBe("ctx")
+})
+
+test("makeObservable throws when mixing @decorators with annotations", () => {
+    class Test {
+        @observable x = 3
+
+        constructor() {
+            makeObservable(this, {})
+        }
+    }
+
+    expect(() => new Test()).toThrow(/makeObservable second arg must be nullish when using decorators/);
 })

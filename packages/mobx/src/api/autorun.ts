@@ -86,8 +86,8 @@ export function autorun(
     return reaction.getDisposer_()
 }
 
-export type IReactionOptions<T> = IAutorunOptions & {
-    fireImmediately?: boolean
+export type IReactionOptions<T, FireImmediately extends boolean> = IAutorunOptions & {
+    fireImmediately?: FireImmediately
     equals?: IEqualsComparer<T>
 }
 
@@ -101,10 +101,14 @@ function createSchedulerFromOptions(opts: IAutorunOptions) {
         : run
 }
 
-export function reaction<T>(
+export function reaction<T, FireImmediately extends boolean = false>(
     expression: (r: IReactionPublic) => T,
-    effect: (arg: T, prev: T, r: IReactionPublic) => void,
-    opts: IReactionOptions<T> = EMPTY_OBJECT
+    effect: (
+        arg: T,
+        prev: FireImmediately extends true ? T | undefined : T,
+        r: IReactionPublic
+    ) => void,
+    opts: IReactionOptions<T, FireImmediately> = EMPTY_OBJECT
 ): IReactionDisposer {
     if (__DEV__) {
         if (!isFunction(expression) || !isFunction(effect))
@@ -122,7 +126,7 @@ export function reaction<T>(
     let firstTime = true
     let isScheduled = false
     let value: T
-    let oldValue: T = undefined as any // only an issue with fireImmediately
+    let oldValue: T | undefined
 
     const equals: IEqualsComparer<T> = (opts as any).compareStructural
         ? comparer.structural
@@ -152,8 +156,11 @@ export function reaction<T>(
             oldValue = value
             value = nextValue
         })
-        if (firstTime && opts.fireImmediately!) effectAction(value, oldValue, r)
-        else if (!firstTime && changed) effectAction(value, oldValue, r)
+
+        // This casting is nesessary as TS cannot infer proper type in current funciton implementation
+        type OldValue = FireImmediately extends true ? T | undefined : T
+        if (firstTime && opts.fireImmediately!) effectAction(value, oldValue as OldValue, r)
+        else if (!firstTime && changed) effectAction(value, oldValue as OldValue, r)
         firstTime = false
     }
 

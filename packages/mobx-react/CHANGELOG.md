@@ -1,5 +1,11 @@
 # mobx-react
 
+## 7.2.1
+
+### Patch Changes
+
+-   [`8a1ff856`](https://github.com/mobxjs/mobx/commit/8a1ff856043d59396f623f8ca209822b1331d85f) [#3103](https://github.com/mobxjs/mobx/pull/3103) Thanks [@urugator](https://github.com/urugator)! - Missing `render` on component prototype throws.
+
 ## 7.2.0
 
 ### Minor Changes

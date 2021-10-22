@@ -1,5 +1,17 @@
 # mobx
 
+## 6.3.5
+
+### Patch Changes
+
+-   [`4ac6b454`](https://github.com/mobxjs/mobx/commit/4ac6b45473c2e3b07c8e683cd395bc5edfaa8e15) [#3146](https://github.com/mobxjs/mobx/pull/3146) Thanks [@urugator](https://github.com/urugator)! - fix #3109: spy: computed shouldn't report update unless the value changed
+
+## 6.3.4
+
+### Patch Changes
+
+-   [`0dbf3eb6`](https://github.com/mobxjs/mobx/commit/0dbf3eb6eecfa9cd6cd9dc7d707e8d70927e79bf) [#3141](https://github.com/mobxjs/mobx/pull/3141) Thanks [@urugator](https://github.com/urugator)! - [spy: bound actions report correct object](https://github.com/mobxjs/mobx/discussions/3140)
+
 ## 6.3.3
 
 ### Patch Changes
