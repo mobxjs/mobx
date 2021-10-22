@@ -2,8 +2,6 @@
 
 const { findAncestor, isMobxDecorator } = require('./utils.js');
 
-//const superImportPath = context.getScope().references.find(r => r.identifier === classNode.superClass).resolved.defs[0].parent.source.value;
-
 // TODO support this.foo = 5; in constructor
 // TODO? report on field as well
 function create(context) {

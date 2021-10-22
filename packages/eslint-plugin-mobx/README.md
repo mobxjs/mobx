@@ -1,5 +1,7 @@
 # eslint-plugin-mobx
 
+Mobx specific linting rules for `eslint`.
+
 ## Installation
 
 ```
@@ -8,7 +10,7 @@ npm install --save-dev eslint @typescript-eslint/parser eslint-plugin-mobx
 
 ## Configuration
 
-```
+```javascript
 // .eslintrc.js
 module.exports = {
     parser: "@typescript-eslint/parser",
@@ -30,15 +32,16 @@ module.exports = {
 
 ### mobx/exhaustive-make-observable
 
-Makes sure that `makeObservable` annotates all fields defined on class or object literal.
-Autofix adds `field: true` for each missing field.
-To exclude a field, annotate it using `field: false`.
-Does not support fields introduced by constructor (`this.foo = 5`).
-Does not warn about annotated non-exsiting fields (there is a runtime check, but the autofix removing the field could be handy...).
+Makes sure that `makeObservable` annotates all fields defined on class or object literal.<br>
+Autofix adds `field: true` for each missing field.<br>
+To exclude a field, annotate it using `field: false`.<br>
+Does not support fields introduced by constructor (`this.foo = 5`).<br>
+Does not warn about annotated non-existing fields (there is a runtime check, but the autofix removing the field could be handy...).
 
 ### mobx/missing-make-observable
 
-*When using decorators (eg `@observable foo = 5`)*, makes sure that `makeObservable(this)` is being called in a constructor.
+*When using decorators (eg `@observable foo = 5`)*, makes sure that `makeObservable(this)` is called in a constructor.<br>
+Autofix creates a constructor if necessary and adds `makeObservable(this)` at it's end.
 
 ### mobx/unconditional-make-observable
 
