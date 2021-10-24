@@ -421,7 +421,7 @@ However, the set of props that a React component receives is in itself not obser
 import { observer, useLocalObservable } from "mobx-react-lite"
 import { useEffect } from "react"
 
-const TimerView = observer(({ offset }) => {
+const TimerView = observer(({ offset = 0 }) => {
     const timer = useLocalObservable(() => ({
         offset, // The initial offset value
         secondsPassed: 0,
