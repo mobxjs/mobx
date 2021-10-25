@@ -7,7 +7,8 @@ import {
     Node,
     ClassDeclaration,
     ClassMethod,
-    ObjectExpression
+    ObjectExpression,
+    Identifier
 } from "jscodeshift"
 
 interface MobxUndecorateOptions {
@@ -266,6 +267,7 @@ export default function transform(
     function handleObserverAndInject(clazzPath: ASTPath<ClassDeclaration>) {
         const clazz = clazzPath.value
         const decorators = (clazz as any).decorators ?? []
+        const defaultExportPath = source.find(j.ExportDefaultDeclaration).paths()[0]
 
         const isObserver = dec =>
             j.Decorator.check(dec) &&
@@ -281,22 +283,76 @@ export default function transform(
         const hasObserverOrInject = decorators.some(dec => isObserver(dec) || isInject(dec))
         if (!hasObserverOrInject) return
 
-        // re-create the class
-        let newClassDefExpr: any = j.classExpression(clazz.id, clazz.body, clazz.superClass)
-        newClassDefExpr.superTypeParameters = clazz.superTypeParameters
-        newClassDefExpr.typeParameters = clazz.typeParameters
-        newClassDefExpr.implements = clazz.implements
-        // wrap with decorators
-        newClassDefExpr = decorators.reduceRight((newClassDefExpr, dec) => {
-            return j.callExpression(dec.expression, [newClassDefExpr])
-        }, newClassDefExpr)
+        // If module uses default export
+        if (defaultExportPath && clazz.id) {
+            // If class is exported directly on the class declaration (`export default class ...`)
+            if (j.ClassDeclaration.check(defaultExportPath.node.declaration)) {
+                let newDefaultExportDefExpr = j.exportDefaultSpecifier(clazz.id)
 
-        changed = true
-        const decl = j.variableDeclaration("const", [
-            j.variableDeclarator(j.identifier(clazz.id!.name), newClassDefExpr)
-        ])
-        decl.comments = clazz.comments
-        clazzPath.replace(decl)
+                newDefaultExportDefExpr.exported = decorators.reduceRight(
+                    (newDefaultExportId, dec) => {
+                        return j.callExpression(dec.expression, [newDefaultExportId])
+                    },
+                    newDefaultExportDefExpr.exported
+                )
+
+                const exportDecl = j.exportDefaultDeclaration(newDefaultExportDefExpr.exported)
+
+                // re-create the class
+                let newClassDefExpr = j.classExpression(clazz.id, clazz.body, clazz.superClass)
+                newClassDefExpr.superTypeParameters = clazz.superTypeParameters
+                newClassDefExpr.typeParameters = clazz.typeParameters
+                newClassDefExpr.implements = clazz.implements
+
+                const newClassDefDecl = j.classDeclaration(
+                    newClassDefExpr.id,
+                    newClassDefExpr.body,
+                    newClassDefExpr.superClass
+                )
+
+                // Insert module default export after class declaration
+                defaultExportPath.insertAfter(exportDecl)
+                // Replace old class with new class
+                defaultExportPath.replace(newClassDefDecl)
+
+                changed = true
+            } else {
+                const newDefaultExportDefExpr = j.exportDefaultSpecifier(clazz.id!)
+                const decorators = (clazz as any).decorators ?? []
+                const newClassExport = decorators.reduceRight((newDefaultExportId, dec) => {
+                    return j.callExpression(dec.expression, [newDefaultExportId])
+                }, newDefaultExportDefExpr.exported)
+
+                source
+                    .find(j.ExportDefaultDeclaration)
+                    .find(j.Identifier, (value: Identifier) => value.name === clazz.id!.name)
+                    .replaceWith(newClassExport)
+
+                const newDecorators = decorators.some(dec => !isObserver(dec) && !isInject(dec))
+
+                ;(clazz as any).decorators = newDecorators
+
+                changed = true
+            }
+        } else {
+            // re-create the class
+            let newClassDefExpr: any = j.classExpression(clazz.id, clazz.body, clazz.superClass)
+            newClassDefExpr.superTypeParameters = clazz.superTypeParameters
+            newClassDefExpr.typeParameters = clazz.typeParameters
+            newClassDefExpr.implements = clazz.implements
+            // wrap with decorators
+            newClassDefExpr = decorators.reduceRight((newClassDefExpr, dec) => {
+                return j.callExpression(dec.expression, [newClassDefExpr])
+            }, newClassDefExpr)
+
+            const decl = j.variableDeclaration("const", [
+                j.variableDeclarator(j.identifier(clazz.id!.name), newClassDefExpr)
+            ])
+            decl.comments = clazz.comments
+            clazzPath.replace(decl)
+
+            changed = true
+        }
     }
 
     function handleProperty(
