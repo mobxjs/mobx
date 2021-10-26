@@ -72,7 +72,7 @@ function whenPromise(
         let disposer = _when(predicate, resolve, { ...opts, onError: reject })
         cancel = () => {
             disposer()
-            reject("WHEN_CANCELLED")
+            reject(new Error("WHEN_CANCELLED"))
         }
     })
     ;(res as any).cancel = cancel
