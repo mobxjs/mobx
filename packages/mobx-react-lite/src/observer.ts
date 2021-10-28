@@ -27,13 +27,13 @@ export function observer<
     options?: Options
 ): Options extends { forwardRef: true }
     ? C extends React.RefForwardingComponent<infer TRef, infer P>
-        ? C &
-              React.MemoExoticComponent<
-                  React.ForwardRefExoticComponent<
-                      React.PropsWithoutRef<P> & React.RefAttributes<TRef>
-                  >
-              >
-        : never /* forwardRef set for a non forwarding component */
+    ? C &
+    React.MemoExoticComponent<
+        React.ForwardRefExoticComponent<
+            React.PropsWithoutRef<P> & React.RefAttributes<TRef>
+        >
+    >
+    : never /* forwardRef set for a non forwarding component */
     : C & { displayName: string }
 
 // n.b. base case is not used for actual typings or exported in the typing files
@@ -57,6 +57,11 @@ export function observer<P extends object, TRef = {}>(
         return useObserver(() => baseComponent(props, ref), baseComponentName)
     }
     wrappedComponent.displayName = baseComponentName
+
+    // Support legacy context: `contextTypes` must be applied before `memo`       
+    if ((baseComponent as any).contextTypes) {
+        wrappedComponent.contextTypes = (baseComponent as any).contextTypes;
+    }
 
     // memo; we are not interested in deep updates
     // in props; we assume that if deep objects are changed,

@@ -948,3 +948,36 @@ it("dependencies should not become temporarily unobserved", async () => {
     expect(renders).toBe(2)
     expect(doubleDisposed).toBeCalledTimes(1)
 })
+
+it("Legacy context support", () => {    
+    const contextKey = 'key';
+    const contextValue = 'value';
+
+    function ContextConsumer(_, context) {
+        expect(context[contextKey]).toBe(contextValue);
+        return null;
+    }
+
+    ContextConsumer.contextTypes = {
+      [contextKey]: () => null,
+    }
+
+    const ObserverContextConsumer = observer(ContextConsumer);   
+
+    class ContextProvider extends React.Component {
+        getChildContext() {
+          return { [contextKey]: contextValue };
+        }
+      
+        render() {
+          return (<ObserverContextConsumer />);
+        }
+    }
+
+    // @ts-ignore
+    ContextProvider.childContextTypes = {
+      [contextKey]: () => null, 
+    };
+       
+    render(<ContextProvider />);    
+})
