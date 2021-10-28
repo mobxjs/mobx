@@ -80,6 +80,14 @@ export function observer<P extends object, TRef = {}>(
     copyStaticProperties(baseComponent, memoComponent)
     memoComponent.displayName = baseComponentName
 
+    if ("production" !== process.env.NODE_ENV) {
+        Object.defineProperty(memoComponent, 'contextTypes', {
+            set() {
+                throw new Error(`[mobx-react-lite] \`${this.displayName || 'Component'}.contextTypes\` must be set before applying \`observer\`.`);
+            }
+        })
+    }
+
     return memoComponent
 }
 

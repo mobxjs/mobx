@@ -973,11 +973,21 @@ it("Legacy context support", () => {
           return (<ObserverContextConsumer />);
         }
     }
-
-    // @ts-ignore
-    ContextProvider.childContextTypes = {
+    
+    (ContextProvider as any).childContextTypes = {
       [contextKey]: () => null, 
     };
        
     render(<ContextProvider />);    
+})
+
+it("Throw when trying to set contextType on observer", () => {        
+    const NamedObserver = observer(function TestCmp() { return null });
+    const AnonymousObserver = observer(() => null);
+    expect(() => {
+        (NamedObserver as any).contextTypes = {};        
+    }).toThrow(/\[mobx-react-lite\] `TestCmp.contextTypes` must be set before applying `observer`./);
+    expect(() => {
+        (AnonymousObserver as any).contextTypes = {};        
+    }).toThrow(/\[mobx-react-lite\] `Component.contextTypes` must be set before applying `observer`./);
 })
