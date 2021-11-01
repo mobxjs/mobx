@@ -1,5 +1,11 @@
 # mobx-undecorate
 
+## 1.2.0
+
+### Minor Changes
+
+-   [`be5684b2`](https://github.com/mobxjs/mobx/commit/be5684b2421ab7c72bb9a2bdc2f40761e9c53c41) [#3164](https://github.com/mobxjs/mobx/pull/3164) Thanks [@Grsmto](https://github.com/Grsmto)! - add support for default export classes + fix eslint-plugin-react compatibility
+
 ## 1.1.1
 
 ### Patch Changes

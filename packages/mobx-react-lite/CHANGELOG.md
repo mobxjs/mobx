@@ -1,5 +1,11 @@
 # mobx-react-lite
 
+## 3.2.2
+
+### Patch Changes
+
+-   [`2dcfec09`](https://github.com/mobxjs/mobx/commit/2dcfec093533bd12bb564580b14ce6037ee1ebac) [#3172](https://github.com/mobxjs/mobx/pull/3172) Thanks [@urugator](https://github.com/urugator)! - support legacy context
+
 ## 3.2.1
 
 ### Patch Changes
