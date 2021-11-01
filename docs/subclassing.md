@@ -11,7 +11,7 @@ hide_title: true
 Subclassing is supported with [limitations](#limitations). Most notably you can only **override actions/flows/computeds on prototype** - you cannot override _[field declarations](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes#field_declarations)_. Use `override` annotation for methods/getters overriden in subclass - see example below. Try to keep things simple and prefer composition over inheritance.
 
 ```javascript
-import { makeObservable, observable, computed, action } from "mobx"
+import { makeObservable, observable, computed, action, override } from "mobx"
 
 class Parent {
     // Annotated instance fields are NOT overridable
