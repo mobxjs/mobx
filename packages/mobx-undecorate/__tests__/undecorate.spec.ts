@@ -1342,3 +1342,39 @@ test("makeObservable not added to imports #2540", () => {
         }"
     `)
 })
+
+test("class default export comp with observer and inject", () => {
+    expect(
+        convert(`
+        import {observer, inject} from 'mobx-react'
+        
+        @inject("test") @observer export default class X extends React.Component {}
+    `)
+    ).toMatchInlineSnapshot(`
+        "import {observer, inject} from 'mobx-react'
+        
+        class X extends React.Component {}
+        export default inject(\\"test\\")(observer(X));"
+    `)
+})
+
+test("class default export comp with observer and inject", () => {
+    expect(
+        convert(`
+        import {observer, inject} from 'mobx-react'
+        import {withRouter} from 'react-router-dom'
+
+        @inject("test") @observer class X extends React.Component {}
+
+        export default withRouter(X)
+
+    `)
+    ).toMatchInlineSnapshot(`
+        "import {observer, inject} from 'mobx-react'
+        import {withRouter} from 'react-router-dom'
+
+        class X extends React.Component {}
+        
+        export default withRouter(inject(\\"test\\")(observer(X)))"
+    `)
+})
