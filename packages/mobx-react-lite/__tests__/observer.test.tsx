@@ -948,3 +948,46 @@ it("dependencies should not become temporarily unobserved", async () => {
     expect(renders).toBe(2)
     expect(doubleDisposed).toBeCalledTimes(1)
 })
+
+it("Legacy context support", () => {    
+    const contextKey = 'key';
+    const contextValue = 'value';
+
+    function ContextConsumer(_, context) {
+        expect(context[contextKey]).toBe(contextValue);
+        return null;
+    }
+
+    ContextConsumer.contextTypes = {
+      [contextKey]: () => null,
+    }
+
+    const ObserverContextConsumer = observer(ContextConsumer);   
+
+    class ContextProvider extends React.Component {
+        getChildContext() {
+          return { [contextKey]: contextValue };
+        }
+      
+        render() {
+          return (<ObserverContextConsumer />);
+        }
+    }
+    
+    (ContextProvider as any).childContextTypes = {
+      [contextKey]: () => null, 
+    };
+       
+    render(<ContextProvider />);    
+})
+
+it("Throw when trying to set contextType on observer", () => {        
+    const NamedObserver = observer(function TestCmp() { return null });
+    const AnonymousObserver = observer(() => null);
+    expect(() => {
+        (NamedObserver as any).contextTypes = {};        
+    }).toThrow(/\[mobx-react-lite\] `TestCmp.contextTypes` must be set before applying `observer`./);
+    expect(() => {
+        (AnonymousObserver as any).contextTypes = {};        
+    }).toThrow(/\[mobx-react-lite\] `Component.contextTypes` must be set before applying `observer`./);
+})
