@@ -1,5 +1,11 @@
 # mobx
 
+## 6.3.7
+
+### Patch Changes
+
+-   [`3a7dee6f`](https://github.com/mobxjs/mobx/commit/3a7dee6fdaddbb4b79205b054601a8020c226fcc) [#3180](https://github.com/mobxjs/mobx/pull/3180) Thanks [@kubk](https://github.com/kubk)! - Fix type inference of observe function
+
 ## 6.3.6
 
 ### Patch Changes
