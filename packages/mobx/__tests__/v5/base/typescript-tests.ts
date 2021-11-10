@@ -25,10 +25,12 @@ import {
     createAtom,
     runInAction,
     flow,
+    IMapDidChange,
+    IValueDidChange,
+    ISetDidChange,
     flowResult
 } from "../../../src/mobx"
 import * as mobx from "../../../src/mobx"
-// @ts-ignore
 import { assert, IsExact } from "conditional-type-checks"
 
 const v = observable.box(3)
@@ -2071,6 +2073,48 @@ test("type inference of the action callback", () => {
             assert<IsExact<typeof a3, boolean>>(true)
         })
     }
+})
+
+test("TS - type inference of observe function", () => {
+    const store = observable({
+        map: new Map<string, number>([["testKey", 1]]),
+        mapMobxFactory: observable.map<string, number>([["testKey", 1]]),
+        regularObject: { numberKey: 1, stringKey: "string" },
+        set: new Set<number>(),
+        setMobxFactory: observable.set<number>()
+    })
+
+    // Regular object
+    observe(store.regularObject, argument => {
+        assert<IsExact<typeof argument, IObjectDidChange>>(true)
+    })
+
+    observe(store.regularObject, "numberKey", argument => {
+        assert<IsExact<typeof argument, IValueDidChange<number>>>(true)
+    })
+
+    // Regular map
+    observe(store.map, argument => {
+        assert<IsExact<typeof argument, IMapDidChange<string, number>>>(true)
+    })
+
+    observe(store.map, "testKey", argument => {
+        assert<IsExact<typeof argument, IValueDidChange<number>>>(true)
+    })
+
+    // Map created with observable.map
+    observe(store.mapMobxFactory, argument => {
+        assert<IsExact<typeof argument, IMapDidChange<string, number>>>(true)
+    })
+
+    observe(store.mapMobxFactory, "testKey", argument => {
+        assert<IsExact<typeof argument, IValueDidChange<number>>>(true)
+    })
+
+    // Regular set
+    observe(store.set, argument => {
+        assert<IsExact<typeof argument, ISetDidChange<number>>>(true)
+    })
 })
 
 test("TS - type inference of reaction opts.equals", () => {

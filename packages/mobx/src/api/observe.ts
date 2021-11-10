@@ -25,17 +25,17 @@ export function observe<T>(
     fireImmediately?: boolean
 ): Lambda
 export function observe<V>(
-    observableMap: ObservableSet<V>,
+    observableMap: ObservableSet<V> | Set<V>,
     listener: (change: ISetDidChange<V>) => void,
     fireImmediately?: boolean
 ): Lambda
 export function observe<K, V>(
-    observableMap: ObservableMap<K, V>,
+    observableMap: ObservableMap<K, V> | Map<K, V>,
     listener: (change: IMapDidChange<K, V>) => void,
     fireImmediately?: boolean
 ): Lambda
 export function observe<K, V>(
-    observableMap: ObservableMap<K, V>,
+    observableMap: ObservableMap<K, V> | Map<K, V>,
     property: K,
     listener: (change: IValueDidChange<V>) => void,
     fireImmediately?: boolean
