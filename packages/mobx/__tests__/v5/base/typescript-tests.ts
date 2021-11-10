@@ -2115,6 +2115,11 @@ test("TS - type inference of observe function", () => {
     observe(store.set, argument => {
         assert<IsExact<typeof argument, ISetDidChange<number>>>(true)
     })
+
+    // set created with observable.set
+    observe(store.setMobxFactory, argument => {
+        assert<IsExact<typeof argument, ISetDidChange<number>>>(true)
+    })
 })
 
 test("TS - type inference of reaction opts.equals", () => {
