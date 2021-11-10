@@ -14,7 +14,7 @@
 
 -   [ ] Added/updated unit tests
 -   [ ] Updated `/docs`. For new functionality, at least `API.md` should be updated
--   [ ] Verified that there is no significant performance drop (`npm run perf`)
+-   [ ] Verified that there is no significant performance drop (`yarn mobx test:performance`)
 
 <!--
     Feel free to ask help with any of these boxes!
