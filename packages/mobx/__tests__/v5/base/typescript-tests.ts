@@ -28,6 +28,8 @@ import {
     IMapDidChange,
     IValueDidChange,
     ISetDidChange,
+    ISetWillChange,
+    IValueWillChange,
     flowResult
 } from "../../../src/mobx"
 import * as mobx from "../../../src/mobx"
@@ -206,32 +208,6 @@ test("scope", () => {
     t.equal(x3.z, 8)
 })
 
-test("typing", () => {
-    const ar: IObservableArray<number> = observable([1, 2])
-    mobx.intercept(ar, (c: IArrayWillChange<number> | IArrayWillSplice<number>) => {
-        // console.log(c.type)
-        return null
-    })
-    mobx.observe(ar, (d: IArrayDidChange<number>) => {
-        // console.log(d.type)
-    })
-
-    const ar2: IObservableArray<number> = observable([1, 2])
-    mobx.intercept(ar2, (c: IArrayWillChange<number> | IArrayWillSplice<number>) => {
-        // console.log(c.type)
-        return null
-    })
-    mobx.observe(ar2, (d: IArrayDidChange<number>) => {
-        // console.log(d.type)
-    })
-
-    const x: IObservableValue<number> = observable.box(3)
-})
-
-const state: any = observable({
-    authToken: null
-})
-
 test("box", () => {
     class Box {
         uninitialized: any
@@ -280,6 +256,8 @@ test("box", () => {
     t.deepEqual(ar.slice(), [40, 20, 60, 210, 420])
     box.addSize()
     expect(ar.slice()).toEqual([40, 20, 60, 210, 420, 700])
+
+    const x: IObservableValue<number> = observable.box(3)
 })
 
 test("computed setter should succeed", () => {
@@ -2075,50 +2053,81 @@ test("type inference of the action callback", () => {
     }
 })
 
-test("TS - type inference of observe function", () => {
+test("TS - type inference of observe & intercept functions", () => {
     const store = observable({
         map: new Map<string, number>([["testKey", 1]]),
-        mapMobxFactory: observable.map<string, number>([["testKey", 1]]),
         regularObject: { numberKey: 1, stringKey: "string" },
-        set: new Set<number>(),
-        setMobxFactory: observable.set<number>()
+        set: new Set<number>()
     })
+    const mapMobxFactory = observable.map<string, number>([["testKey", 1]])
+    const setMobxFactory = observable.set<number>()
 
-    // Regular object
-    observe(store.regularObject, argument => {
+    // Observe regular object
+    mobx.observe(store.regularObject, argument => {
         assert<IsExact<typeof argument, IObjectDidChange>>(true)
     })
 
-    observe(store.regularObject, "numberKey", argument => {
+    // Observe regular object key
+    mobx.observe(store.regularObject, "numberKey", argument => {
         assert<IsExact<typeof argument, IValueDidChange<number>>>(true)
     })
 
-    // Regular map
-    observe(store.map, argument => {
+    // Intercept regular object key
+    mobx.intercept(store.regularObject, "numberKey", argument => {
+        assert<IsExact<typeof argument, IValueWillChange<number>>>(true)
+        return null
+    })
+
+    // Observe regular map
+    mobx.observe(store.map, argument => {
         assert<IsExact<typeof argument, IMapDidChange<string, number>>>(true)
     })
 
-    observe(store.map, "testKey", argument => {
+    // Observe regular map key
+    mobx.observe(store.map, "testKey", argument => {
         assert<IsExact<typeof argument, IValueDidChange<number>>>(true)
     })
 
-    // Map created with observable.map
-    observe(store.mapMobxFactory, argument => {
+    // Intercept regular map key
+    mobx.intercept(store.map, "testKey", argument => {
+        assert<IsExact<typeof argument, IValueWillChange<number>>>(true)
+        return null
+    })
+
+    // Observe map created with observable.map
+    mobx.observe(mapMobxFactory, argument => {
         assert<IsExact<typeof argument, IMapDidChange<string, number>>>(true)
     })
 
-    observe(store.mapMobxFactory, "testKey", argument => {
+    // Observe map key created with observable.map
+    mobx.observe(mapMobxFactory, "testKey", argument => {
         assert<IsExact<typeof argument, IValueDidChange<number>>>(true)
     })
 
-    // Regular set
-    observe(store.set, argument => {
+    // Observe regular set
+    mobx.observe(store.set, argument => {
         assert<IsExact<typeof argument, ISetDidChange<number>>>(true)
     })
 
-    // Set created with observable.set
-    observe(store.setMobxFactory, argument => {
+    // Intercept regular set
+    mobx.intercept(store.set, argument => {
+        assert<IsExact<typeof argument, ISetWillChange<number>>>(true)
+        return null
+    })
+
+    // Observe set created with observable.set
+    mobx.observe(setMobxFactory, argument => {
         assert<IsExact<typeof argument, ISetDidChange<number>>>(true)
+    })
+
+    const ar: IObservableArray<number> = observable([1, 2])
+    mobx.observe(ar, d => {
+        assert<IsExact<typeof d, IArrayDidChange<number>>>(true)
+    })
+
+    mobx.intercept(ar, c => {
+        assert<IsExact<typeof c, IArrayWillChange<number> | IArrayWillSplice<number>>>(true)
+        return null
     })
 })
 
