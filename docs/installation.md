@@ -20,7 +20,7 @@ There are two types of React bindings, `mobx-react-lite` supports only functiona
 
 ## Use spec compliant transpilation for class properties
 
-⚠️ **Warning:** When using MobX with TypeScript and Babel, and you plan to use classes; make sure to update your configuration to use a TC-39 spec compliant transpilation for class fields, since this is not the default. Without this, class fields cannot be made observable before they are initialized.
+⚠️ **Warning:** When using MobX with TypeScript or Babel, and you plan to use classes; make sure to update your configuration to use a TC-39 spec compliant transpilation for class fields, since this is not the default. Without this, class fields cannot be made observable before they are initialized.
 
 -   **TypeScript**: Set the compiler option `"useDefineForClassFields": true`.
 -   **Babel**: Make sure to use at least version 7.12, with the following configuration:
@@ -55,6 +55,16 @@ configure({ useProxies: "never" }) // Or "ifavailable".
 If you have used MobX before, or if you followed online tutorials, you probably saw MobX with decorators like `@observable`.
 In MobX 6, we have chosen to move away from decorators by default, for maximum compatibility with standard JavaScript.
 They can still be used if you [enable them](enabling-decorators.md) though.
+
+## Development vs production
+
+Unless you're using pre-build distribution ending with `.[production|developent].min.js`, Mobx uses `process.env.NODE_ENV` variable to detect the environment. Make sure it's set to `"production"` on production. This is usually done by your favourite bundler:
+[webpack](https://reactjs.org/docs/optimizing-performance.html#webpack)
+[Rollup](https://reactjs.org/docs/optimizing-performance.html#rollup)
+[Browserify](https://reactjs.org/docs/optimizing-performance.html#browserify)
+[Brunch](https://reactjs.org/docs/optimizing-performance.html#brunch)
+
+Most of the safety checks, like [`enforceAction`](https://mobx.js.org/configuration.html#enforceactions) and similar, happens on development only.
 
 ## MobX on other frameworks / platforms
 
