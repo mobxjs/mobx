@@ -58,7 +58,7 @@ They can still be used if you [enable them](enabling-decorators.md) though.
 
 ## Development vs production
 
-Unless you're using pre-build distribution ending with `.[production|developent].min.js`, Mobx uses `process.env.NODE_ENV` variable to detect the environment. Make sure it's set to `"production"` on production. This is usually done by your favourite bundler:
+Unless you're using pre-build distribution ending with `.[production|development].min.js`, Mobx uses `process.env.NODE_ENV` variable to detect the environment. Make sure it's set to `"production"` on production. This is usually done by your favourite bundler:
 [webpack](https://reactjs.org/docs/optimizing-performance.html#webpack)
 [Rollup](https://reactjs.org/docs/optimizing-performance.html#rollup)
 [Browserify](https://reactjs.org/docs/optimizing-performance.html#browserify)
