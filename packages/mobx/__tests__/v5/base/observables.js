@@ -15,6 +15,7 @@ const {
     isObservableProp
 } = mobx
 const utils = require("../../v5/utils/test-utils")
+const { MAX_SPLICE_SIZE } = require("../../../src/internal")
 
 const voidObserver = function () {}
 
@@ -2189,4 +2190,26 @@ test("options can be provided only once", () => {
         o.y = 0
         makeObservable(o, { y: observable }, {})
     }).toThrow(error)
+})
+
+test("observablearray.replace ", () => {
+    // two paths to check:
+    // - arrays smaller MAX_SPLICE_SIZE
+    const ar1 = observable([1])
+    const del1 = ar1.replace([2])
+    expect([2]).toEqual(ar1.toJSON())
+    expect([1]).toEqual(del1)
+
+    // - arrays larger than MAX_SPLICE_SIZE
+    //   - replacement is larger than current array
+    const ar2 = observable(new Array(MAX_SPLICE_SIZE))
+    const del2 = ar2.replace(new Array(MAX_SPLICE_SIZE + 1))
+    expect(MAX_SPLICE_SIZE + 1).toEqual(ar2.length)
+    expect(MAX_SPLICE_SIZE).toEqual(del2.length)
+
+    //   - replacement is smaller than current array
+    const ar3 = observable(new Array(MAX_SPLICE_SIZE + 1))
+    const del3 = ar3.replace(new Array(MAX_SPLICE_SIZE))
+    expect(MAX_SPLICE_SIZE).toEqual(ar3.length)
+    expect(MAX_SPLICE_SIZE + 1).toEqual(del3.length)
 })

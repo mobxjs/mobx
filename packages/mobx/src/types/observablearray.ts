@@ -175,7 +175,8 @@ export class ObservableArrayAdministration
     }
 
     setArrayLength_(newLength: number) {
-        if (typeof newLength !== "number" || isNaN(newLength) || newLength < 0) die("Out of range: " + newLength)
+        if (typeof newLength !== "number" || isNaN(newLength) || newLength < 0)
+            die("Out of range: " + newLength)
         let currentLength = this.values_.length
         if (newLength === currentLength) return
         else if (newLength > currentLength) {
@@ -237,7 +238,7 @@ export class ObservableArrayAdministration
         } else {
             const res = this.values_.slice(index, index + deleteCount)
             let oldItems = this.values_.slice(index + deleteCount)
-            this.values_.length = index + newItems.length - deleteCount
+            this.values_.length = index + newItems.length
             for (let i = 0; i < newItems.length; i++) this.values_[index + i] = newItems[i]
             for (let i = 0; i < oldItems.length; i++)
                 this.values_[index + newItems.length + i] = oldItems[i]
