@@ -2192,34 +2192,60 @@ test("options can be provided only once", () => {
     }).toThrow(error)
 })
 
-test("observablearray.replace", () => {
+test("ObservableArray.replace", () => {
     // both lists are small
     let ar = observable([1])
     let del = ar.replace([2])
-    expect([2]).toEqual(ar.toJSON())
-    expect([1]).toEqual(del)
+    expect(ar.toJSON()).toEqual([2])
+    expect(del).toEqual([1])
 
     // the replacement is large
     ar = observable([1])
     del = ar.replace(new Array(MAX_SPLICE_SIZE))
-    expect(MAX_SPLICE_SIZE).toEqual(ar.length)
-    expect([1]).toEqual(del)
+    expect(ar.length).toEqual(MAX_SPLICE_SIZE)
+    expect(del).toEqual([1])
 
     // the original is large
     ar = observable(new Array(MAX_SPLICE_SIZE))
     del = ar.replace([2])
-    expect([2]).toEqual(ar)
-    expect(MAX_SPLICE_SIZE).toEqual(del.length)
+    expect(ar).toEqual([2])
+    expect(del.length).toEqual(MAX_SPLICE_SIZE)
 
     // both are large; original larger than replacement
     ar = observable(new Array(MAX_SPLICE_SIZE + 1))
     del = ar.replace(new Array(MAX_SPLICE_SIZE))
-    expect(MAX_SPLICE_SIZE).toEqual(ar.length)
-    expect(MAX_SPLICE_SIZE + 1).toEqual(del.length)
+    expect(ar.length).toEqual(MAX_SPLICE_SIZE)
+    expect(del.length).toEqual(MAX_SPLICE_SIZE + 1)
 
     // both are large; replacement larger than original
     ar = observable(new Array(MAX_SPLICE_SIZE))
     del = ar.replace(new Array(MAX_SPLICE_SIZE + 1))
-    expect(MAX_SPLICE_SIZE + 1).toEqual(ar.length)
-    expect(MAX_SPLICE_SIZE).toEqual(del.length)
+    expect(ar.length).toEqual(MAX_SPLICE_SIZE + 1)
+    expect(del.length).toEqual(MAX_SPLICE_SIZE)
+})
+
+test("ObservableArray.splice", () => {
+    // Deleting 1 item from a large list
+    let ar = observable(new Array(MAX_SPLICE_SIZE + 1))
+    let del = ar.splice(1, 1)
+    expect(ar.length).toEqual(MAX_SPLICE_SIZE)
+    expect(del.length).toEqual(1)
+
+    // Deleting many items from a large list
+    ar = observable(new Array(MAX_SPLICE_SIZE + 2))
+    del = ar.splice(1, MAX_SPLICE_SIZE + 1)
+    expect(ar.length).toEqual(1)
+    expect(del.length).toEqual(MAX_SPLICE_SIZE + 1)
+
+    // Deleting 1 item from a large list and inserting many items
+    ar = observable(new Array(MAX_SPLICE_SIZE + 1))
+    del = ar.splice(1, 1, ...new Array(MAX_SPLICE_SIZE + 1))
+    expect(ar.length).toEqual(MAX_SPLICE_SIZE * 2 + 1)
+    expect(del.length).toEqual(1)
+
+    // Deleting many items from a large list and inserting many items
+    ar = observable(new Array(MAX_SPLICE_SIZE + 10))
+    del = ar.splice(1, MAX_SPLICE_SIZE + 1, ...new Array(MAX_SPLICE_SIZE + 1))
+    expect(ar.length).toEqual(MAX_SPLICE_SIZE + 10)
+    expect(del.length).toEqual(MAX_SPLICE_SIZE + 1)
 })

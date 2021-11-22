@@ -236,9 +236,12 @@ export class ObservableArrayAdministration
         if (newItems.length < MAX_SPLICE_SIZE) {
             return this.values_.splice(index, deleteCount, ...newItems)
         } else {
+            // The items removed by the splice
             const res = this.values_.slice(index, index + deleteCount)
+            // The items that that should remain at the end of the array
             let oldItems = this.values_.slice(index + deleteCount)
-            this.values_.length = index + newItems.length
+            // New length is the previous length + addition count - deletion count
+            this.values_.length += newItems.length - deleteCount
             for (let i = 0; i < newItems.length; i++) this.values_[index + i] = newItems[i]
             for (let i = 0; i < oldItems.length; i++)
                 this.values_[index + newItems.length + i] = oldItems[i]
