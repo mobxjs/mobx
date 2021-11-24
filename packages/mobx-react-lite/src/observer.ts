@@ -58,8 +58,8 @@ export function observer<P extends object, TRef = {}>(
     }
 
     // Don't set `displayName` for anonymous components,
-    // so the `displayName` can be customized by user, see #2721.
-    if (baseComponentName != '') {
+    // so the `displayName` can be customized by user, see #3192.
+    if (baseComponentName !== '') {
         wrappedComponent.displayName = baseComponentName
     }
 
@@ -102,7 +102,7 @@ const hoistBlackList: any = {
     compare: true,
     type: true,
     // Don't redefine `displayName`, 
-    // it's defined as getter-setter pair on `memo` (see #2721).
+    // it's defined as getter-setter pair on `memo` (see #3192).
     displayName: true,
 }
 
