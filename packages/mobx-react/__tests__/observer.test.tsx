@@ -336,7 +336,7 @@ test("correctly wraps display name of child component", () => {
     })
 
     expect(A.name).toEqual("ObserverClass")
-    expect(B.displayName).toEqual("StatelessObserver")
+    expect((B as any).type.displayName).toEqual("StatelessObserver")
 })
 
 describe("124 - react to changes in this.props via computed", () => {
