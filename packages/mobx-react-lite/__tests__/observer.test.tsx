@@ -562,8 +562,7 @@ it("should hoist known statics only", () => {
     MyHipsterComponent.compare = "Nope!"
     MyHipsterComponent.render = "Nope!"
 
-    const wrapped = observer(MyHipsterComponent)
-    expect(wrapped.displayName).toBe("MyHipsterComponent")
+    const wrapped = observer(MyHipsterComponent)    
     expect(wrapped.randomStaticThing).toEqual(3)
     expect(wrapped.defaultProps).toEqual({ x: 3 })
     expect(wrapped.propTypes).toEqual({ x: isNumber })
@@ -576,7 +575,7 @@ it("should have the correct displayName", () => {
     const TestComponent = observer(function MyComponent() {
         return null
     })
-
+    
     expect((TestComponent as any).type.displayName).toBe("MyComponent")
 })
 
