@@ -254,7 +254,7 @@ message.likes.push("Jennifer")
 ```
 
 This will **not** react. Simply because the `likes` array itself is not being used by the `autorun`, only the reference to the array.
-So in contrast, `messages.likes = ["Jennifer"]` would be picked up; that statement does not modify the array, but the `likes` property itself.
+So in contrast, `message.likes = ["Jennifer"]` would be picked up; that statement does not modify the array, but the `likes` property itself.
 
 #### Correct: using not yet existing map entries
 
