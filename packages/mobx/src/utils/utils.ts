@@ -34,7 +34,7 @@ export function warnAboutProxyRequirement(msg: string) {
     if (__DEV__ && globalState.verifyProxies) {
         die(
             "MobX is currently configured to be able to run in ES5 mode, but in ES5 MobX won't be able to " +
-                msg
+            msg
         )
     }
 }
@@ -55,7 +55,7 @@ export function once(func: Lambda): Lambda {
     }
 }
 
-export const noop = () => {}
+export const noop = () => { }
 
 export function isFunction(fn: any): fn is Function {
     return typeof fn === "function"
@@ -84,7 +84,8 @@ export function isPlainObject(value) {
     if (!isObject(value)) return false
     const proto = Object.getPrototypeOf(value)
     if (proto == null) return true
-    return proto.constructor?.toString() === plainObjectString
+    const protoConstructor = Object.hasOwnProperty.call(proto, 'constructor') && proto.constructor;
+    return typeof protoConstructor === "function" && protoConstructor.toString() === plainObjectString
 }
 
 // https://stackoverflow.com/a/37865170
@@ -153,8 +154,8 @@ export const ownKeys: (target: any) => PropertyKey[] =
     typeof Reflect !== "undefined" && Reflect.ownKeys
         ? Reflect.ownKeys
         : hasGetOwnPropertySymbols
-        ? obj => Object.getOwnPropertyNames(obj).concat(Object.getOwnPropertySymbols(obj) as any)
-        : /* istanbul ignore next */ Object.getOwnPropertyNames
+            ? obj => Object.getOwnPropertyNames(obj).concat(Object.getOwnPropertySymbols(obj) as any)
+            : /* istanbul ignore next */ Object.getOwnPropertyNames
 
 export function stringifyKey(key: any): string {
     if (typeof key === "string") return key
