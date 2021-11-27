@@ -2,6 +2,15 @@
     "name": "eslint-plugin-mobx",
     "version": "0.0.2",
     "description": "ESLint rules for MobX",
+    "main": "dist/index.js",
+    "umd:main": "dist/eslintpluginmobx.umd.production.min.js",
+    "unpkg": "dist/eslintpluginmobx.umd.production.min.js",
+    "jsdelivr": "dist/eslintpluginmobx.umd.production.min.js",
+    "jsnext:main": "dist/eslintpluginmobx.esm.production.min.js",
+    "module": "dist/eslintpluginmobx.esm.js",
+    "react-native": "dist/eslintpluginmobx.esm.js",
+    "types": "dist/index.d.ts",
+    "typings": "dist/index.d.ts",
     "repository": {
         "type": "git",
         "url": "https://github.com/mobxjs/mobx.git",
@@ -17,7 +26,9 @@
     },
     "files": [
         "src",
+        "dist",
         "LICENSE",
+        "CHANGELOG.md",
         "README.md"
     ],
     "homepage": "https://mobx.js.org/",
