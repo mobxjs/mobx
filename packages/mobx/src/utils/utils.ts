@@ -84,7 +84,7 @@ export function isPlainObject(value) {
     if (!isObject(value)) return false
     const proto = Object.getPrototypeOf(value)
     if (proto == null) return true
-    const protoConstructor = Object.hasOwnProperty.call(proto, 'constructor') && proto.constructor;
+    const protoConstructor = Object.hasOwnProperty.call(proto, "constructor") && proto.constructor;
     return typeof protoConstructor === "function" && protoConstructor.toString() === plainObjectString
 }
 
