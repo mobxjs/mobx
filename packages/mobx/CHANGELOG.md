@@ -1,5 +1,13 @@
 # mobx
 
+## 6.3.8
+
+### Patch Changes
+
+-   [`9d5e65cb`](https://github.com/mobxjs/mobx/commit/9d5e65cbd612f262d925e57cebb559f5cf36c502) [#3193](https://github.com/mobxjs/mobx/pull/3193) Thanks [@ChocolateLoverRaj](https://github.com/ChocolateLoverRaj)! - Make `IAtom['reportObserved']` return `boolean`
+
+*   [`55508af6`](https://github.com/mobxjs/mobx/commit/55508af690fa875e6affaf30f34280b3f27b6126) [#3189](https://github.com/mobxjs/mobx/pull/3189) Thanks [@RvanderLaan](https://github.com/RvanderLaan)! - Fix for RangeError in ObservableArray.replace for large arrays
+
 ## 6.3.7
 
 ### Patch Changes

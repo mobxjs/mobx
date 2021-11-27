@@ -1,6 +1,6 @@
 {
     "name": "eslint-plugin-mobx",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "description": "ESLint rules for MobX",
     "main": "dist/index.js",
     "umd:main": "dist/eslintpluginmobx.umd.production.min.js",
