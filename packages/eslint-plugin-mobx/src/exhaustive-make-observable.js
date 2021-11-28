@@ -41,7 +41,7 @@ function create(context) {
             }
 
             const annotationProps = secondArg?.properties || []
-            const nonAnnotatedMembers: any[] = []
+            const nonAnnotatedMembers = []
             let hasAnyDecorator = false
 
             members.forEach(member => {
