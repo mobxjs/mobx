@@ -1,8 +1,8 @@
 {
     "name": "eslint-plugin-mobx",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "description": "ESLint rules for MobX",
-    "main": "dist/index.js",        
+    "main": "dist/index.js",
     "repository": {
         "type": "git",
         "url": "https://github.com/mobxjs/mobx.git",
@@ -30,7 +30,7 @@
     "devDependencies": {
         "@typescript-eslint/eslint-plugin": "^4.29.3",
         "@typescript-eslint/parser": "^4.0.0",
-        "eslint": "^7.0.0",        
+        "eslint": "^7.0.0",
         "@babel/core": "^7.16.0",
         "@babel/preset-env": "^7.16.4",
         "rollup": "^2.60.2",
