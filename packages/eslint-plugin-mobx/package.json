@@ -2,15 +2,7 @@
     "name": "eslint-plugin-mobx",
     "version": "0.0.3",
     "description": "ESLint rules for MobX",
-    "main": "dist/index.js",
-    "umd:main": "dist/eslintpluginmobx.umd.production.min.js",
-    "unpkg": "dist/eslintpluginmobx.umd.production.min.js",
-    "jsdelivr": "dist/eslintpluginmobx.umd.production.min.js",
-    "jsnext:main": "dist/eslintpluginmobx.esm.production.min.js",
-    "module": "dist/eslintpluginmobx.esm.js",
-    "react-native": "dist/eslintpluginmobx.esm.js",
-    "types": "dist/index.d.ts",
-    "typings": "dist/index.d.ts",
+    "main": "dist/index.js",        
     "repository": {
         "type": "git",
         "url": "https://github.com/mobxjs/mobx.git",
@@ -32,14 +24,19 @@
         "README.md"
     ],
     "homepage": "https://mobx.js.org/",
-    "dependencies": {},
     "peerDependencies": {
-        "eslint": "^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0"
+        "eslint": "^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0"
     },
     "devDependencies": {
-        "eslint": "^7.0.0",
+        "@typescript-eslint/eslint-plugin": "^4.29.3",
         "@typescript-eslint/parser": "^4.0.0",
-        "@typescript-eslint/eslint-plugin": "^4.29.3"
+        "eslint": "^7.0.0",        
+        "@babel/core": "^7.16.0",
+        "@babel/preset-env": "^7.16.4",
+        "rollup": "^2.60.2",
+        "@rollup/plugin-babel": "^5.3.0",
+        "@rollup/plugin-commonjs": "^21.0.1",
+        "@rollup/plugin-node-resolve": "13.0.6"
     },
     "keywords": [
         "eslint",
@@ -49,7 +46,7 @@
     ],
     "scripts": {
         "test": "jest",
-        "build": "node ../../scripts/build.js eslintPluginMobx",
-        "prepublish": "yarn build --target publish"
+        "build": "yarn rollup --config",
+        "prepublish": "yarn build"
     }
 }
