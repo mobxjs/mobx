@@ -19,7 +19,9 @@ function shallowComparer<T>(a: T, b: T): boolean {
 function defaultComparer<T>(a: T, b: T): boolean {
     if (Object.is) return Object.is(a, b)
 
-    return a === b ? (a as any) !== 0 || 1 / (a as any) === 1 / (b as any) : a !== a && b !== b
+    return a === b
+        ? (a as any) !== 0 || 1 / (a as any) === 1 / (b as any)
+        : a !== a && b !== b
 }
 
 export const comparer = {
