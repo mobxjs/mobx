@@ -2,4 +2,4 @@
 "mobx": patch
 ---
 
-`requiresReactions` always takes precedence over global `computedRequiresReaction`
+`requiresReaction` always takes precedence over global `computedRequiresReaction`
