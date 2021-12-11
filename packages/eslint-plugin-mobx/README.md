@@ -48,7 +48,7 @@ Autofix creates a constructor if necessary and adds `makeObservable(this)` at it
 Makes sure the `make(Auto)Observable(this)` is called unconditionally inside a constructor.
 
 ### mobx/missing-observer
-Makes sure every React component is wrapped with `observer`. A React component is considered to be any *class* extending from `React` or `React.Component` and any *function* which name has first letter capitalized (for anonymous functions the name is inferred from variable). These are all considered components:
+Makes sure every React component is wrapped with `observer`. A React component is considered to be any *class* extending from `Component` or `React.Component` and any *function* which name has first letter capitalized (for anonymous functions the name is inferred from variable). These are all considered components:
 ```javascript
 class Cmp extends React.Component { }
 class Cmp extends Component { }
