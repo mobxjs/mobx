@@ -46,3 +46,32 @@ Autofix creates a constructor if necessary and adds `makeObservable(this)` at it
 ### mobx/unconditional-make-observable
 
 Makes sure the `make(Auto)Observable(this)` is called unconditionally inside a constructor.
+
+### mobx/missing-observer
+Makes sure every React component is wrapped with `observer`. A React component is considered to be any *class* extending from `React` or `React.Component` and any *function* which name has first letter capitalized (for anonymous functions the name is inferred from variable). These are all considered components:
+```javascript
+class Cmp extends React.Component { }
+class Cmp extends Component { }
+const Cmp = class extends React.Component { }
+const Cmp = class extends Component { }
+class extends Component { }
+class extends React.Component { }
+
+function Named() { }
+const foo = function Named() { }
+const Anonym = function () { };
+const Arrow = () => { };
+```
+Autofix wraps the component with `observer` and if necessary declares a constant of the same name: `const Name = observer(function Name() {})`.
+Highly suggested, but not part of the recommended, because it's a bit opinionated and can lead to a lot of false positives depending on your conventions. You will probably want to combine this rule with `overrides` option, eg:
+```javascript
+// .eslintrc.js
+"overrides": [
+  {
+    "files": ["*.jsx"],
+    "rules": {
+      "mobx/missing-observer": "error"
+    }
+  }
+]
+```
