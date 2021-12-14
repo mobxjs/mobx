@@ -53,7 +53,7 @@ module.exports = {
     fixable: 'code',
     docs: {
       description: 'prevents missing `observer` on react component',
-      recommended: false,
+      recommended: true,
     },
     messages: {
       missingObserver: "Component `{{ name }}` is missing `observer`.",

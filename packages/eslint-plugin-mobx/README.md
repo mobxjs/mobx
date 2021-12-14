@@ -21,9 +21,11 @@ module.exports = {
     // ...or specify and customize individual rules:
     rules: {
       // these values are the same as recommended
-      'mobx/exhaustive-make-observable': 'warn',      
+      'mobx/exhaustive-make-observable': 'warn',
+      'mobx/unconditional-make-observable': 'error',
       'mobx/missing-make-observable': 'error',
-      'mobx/unconditional-make-observable': 'error',      
+      'mobx/no-missing-observer': 'warn',
+      'mobx/no-anonymous-observer': 'warn',     
     },
 };
 ```
@@ -64,7 +66,7 @@ const Anonym = function () { };
 const Arrow = () => { };
 ```
 **Autofix** wraps the component with `observer` and if necessary declares a constant of the same name: `const Name = observer(function Name() {})`.
-Highly suggested, but not part of the recommended, because it's a bit opinionated and can lead to a lot of false positives depending on your conventions. You will probably want to combine this rule with `overrides` option, eg:
+It's a bit opinionated and can lead to a lot of false positives depending on your conventions. You will probably want to combine this rule with `overrides` option, eg:
 ```javascript
 // .eslintrc.js
 "overrides": [

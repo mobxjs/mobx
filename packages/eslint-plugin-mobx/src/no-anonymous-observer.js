@@ -47,7 +47,7 @@ module.exports = {
     fixable: 'code',
     docs: {
       description: 'forbids anonymous functions or classes as `observer` components',
-      recommended: false,
+      recommended: true,
     },
     messages: {
       observerComponentMustHaveName: "`observer` component must have a name.",
