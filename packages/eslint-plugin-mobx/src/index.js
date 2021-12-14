@@ -4,6 +4,7 @@ const exhaustiveMakeObservable = require('./exhaustive-make-observable.js');
 const unconditionalMakeObservable = require('./unconditional-make-observable.js');
 const missingMakeObservable = require('./missing-make-observable.js');
 const missingObserver = require('./missing-observer');
+const noAnonymousObserver = require('./no-anonymous-observer.js');
 
 module.exports = {
   configs: {
@@ -21,5 +22,6 @@ module.exports = {
     'unconditional-make-observable': unconditionalMakeObservable,
     'missing-make-observable': missingMakeObservable,
     'missing-observer': missingObserver,
+    'no-anonymous-observer': noAnonymousObserver,
   }
 }

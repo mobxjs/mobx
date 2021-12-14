@@ -1,3 +1,7 @@
+/* eslint mobx/exhaustive-make-observable: "error" */
+/* eslint mobx/missing-make-observable: "error" */
+/* eslint mobx/unconditional-make-observable: "error" */
+
 makeObservable();
 makeObservable(foo, {});
 makeObservable(this, {});

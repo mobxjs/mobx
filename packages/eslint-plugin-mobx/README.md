@@ -33,7 +33,7 @@ module.exports = {
 ### mobx/exhaustive-make-observable
 
 Makes sure that `makeObservable` annotates all fields defined on class or object literal.<br>
-Autofix adds `field: true` for each missing field.<br>
+**Autofix** adds `field: true` for each missing field.<br>
 To exclude a field, annotate it using `field: false`.<br>
 Does not support fields introduced by constructor (`this.foo = 5`).<br>
 Does not warn about annotated non-existing fields (there is a runtime check, but the autofix removing the field could be handy...).
@@ -41,13 +41,14 @@ Does not warn about annotated non-existing fields (there is a runtime check, but
 ### mobx/missing-make-observable
 
 *When using decorators (eg `@observable foo = 5`)*, makes sure that `makeObservable(this)` is called in a constructor.<br>
-Autofix creates a constructor if necessary and adds `makeObservable(this)` at it's end.
+**Autofix** creates a constructor if necessary and adds `makeObservable(this)` at it's end.
 
 ### mobx/unconditional-make-observable
 
 Makes sure the `make(Auto)Observable(this)` is called unconditionally inside a constructor.
 
 ### mobx/missing-observer
+
 Makes sure every React component is wrapped with `observer`. A React component is considered to be any *class* extending from `Component` or `React.Component` and any *function* which name has the first letter capitalized (for anonymous functions the name is inferred from variable). These are all considered components:
 ```javascript
 class Cmp extends React.Component { }
@@ -62,7 +63,7 @@ const foo = function Named() { }
 const Anonym = function () { };
 const Arrow = () => { };
 ```
-Autofix wraps the component with `observer` and if necessary declares a constant of the same name: `const Name = observer(function Name() {})`.
+**Autofix** wraps the component with `observer` and if necessary declares a constant of the same name: `const Name = observer(function Name() {})`.
 Highly suggested, but not part of the recommended, because it's a bit opinionated and can lead to a lot of false positives depending on your conventions. You will probably want to combine this rule with `overrides` option, eg:
 ```javascript
 // .eslintrc.js
@@ -75,3 +76,11 @@ Highly suggested, but not part of the recommended, because it's a bit opinionate
   }
 ]
 ```
+
+### mobx/no-anonymous-observer
+
+Forbids anonymous functions or classes as `observer` components. 
+Improves debugging experience and [avoids problem with inability to customize `displayName`](https://github.com/mobxjs/mobx/issues/2721).
+Plays nice with `eslint-plugin-react-hooks` and `mobx/missing-observer` as both of these don't not recognize anonymous function as component.
+**Autofix** infers the name from variable if possible.
+

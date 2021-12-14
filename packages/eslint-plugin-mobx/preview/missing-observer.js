@@ -1,3 +1,5 @@
+/* eslint mobx/missing-observer: "error" */
+
 function Named() { }
 const foo = function Named() { }
 const Anonym = function () { };

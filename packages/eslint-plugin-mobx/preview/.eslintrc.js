@@ -19,6 +19,6 @@ module.exports = {
     "rules": {
         //'mobx/exhaustive-make-observable': 'off',
         //'mobx/unconditional-make-observable': 'off',
-        'mobx/missing-observer': 'error',
+        //'mobx/missing-observer': 'off',
     }
 };
