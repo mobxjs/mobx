@@ -1,5 +1,13 @@
 # mobx
 
+## 6.3.9
+
+### Patch Changes
+
+-   [`87e5a037`](https://github.com/mobxjs/mobx/commit/87e5a03735dbc1930e54a15b5ce88ad684bc3dc1) [#3214](https://github.com/mobxjs/mobx/pull/3214) Thanks [@urugator](https://github.com/urugator)! - `requiresReaction` always takes precedence over global `computedRequiresReaction`
+
+*   [`9b90e25c`](https://github.com/mobxjs/mobx/commit/9b90e25c7bc0cdc0a07d1f847683604e86790f24) [#3198](https://github.com/mobxjs/mobx/pull/3198) Thanks [@urugator](https://github.com/urugator)! - fix `isPlainObject` impl (fixes #3197)
+
 ## 6.3.8
 
 ### Patch Changes
