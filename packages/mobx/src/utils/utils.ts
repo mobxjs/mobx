@@ -149,7 +149,7 @@ export function getPlainObjectKeys(object) {
 
 // From Immer utils
 // Returns all own keys, including non-enumerable and symbolic
-export const ownKeys: (target: any) => PropertyKey[] =
+export const ownKeys: (target: any) => Array<string | symbol> =
     typeof Reflect !== "undefined" && Reflect.ownKeys
         ? Reflect.ownKeys
         : hasGetOwnPropertySymbols

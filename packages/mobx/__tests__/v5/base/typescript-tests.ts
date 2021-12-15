@@ -2169,7 +2169,7 @@ test("TS - it should support flow as function wrapper", done => {
                 yield delay(100, 0)
                 this.a = 4
             } catch (e) {
-                this.a = e
+                this.a = e as number
             }
             return this.a
         })
@@ -2220,7 +2220,7 @@ test("TS - it should support flow as annotation", done => {
                 yield delay(100, 0)
                 this.a = 4
             } catch (e) {
-                this.a = e
+                this.a = e as number
             }
             return this.a
         }
@@ -2271,7 +2271,7 @@ test("TS - it should support flow as decorator", done => {
                 yield delay(100, 0)
                 this.a = 4
             } catch (e) {
-                this.a = e
+                this.a = e as number
             }
             return this.a
         }

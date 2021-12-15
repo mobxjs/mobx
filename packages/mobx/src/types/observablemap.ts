@@ -33,7 +33,8 @@ import {
     die,
     isFunction,
     UPDATE,
-    IAtom
+    IAtom,
+    PureSpyEvent
 } from "../internal"
 
 export interface IKeyValueMap<V = any> {
@@ -85,7 +86,8 @@ export type IObservableMapInitialValues<K = any, V = any> =
 // just extend Map? See also https://gist.github.com/nestharus/13b4d74f2ef4a2f4357dbd3fc23c1e54
 // But: https://github.com/mobxjs/mobx/issues/1556
 export class ObservableMap<K = any, V = any>
-    implements Map<K, V>, IInterceptable<IMapWillChange<K, V>>, IListenable {
+    implements Map<K, V>, IInterceptable<IMapWillChange<K, V>>, IListenable
+{
     [$mobx] = ObservableMapMarker
     data_: Map<K, ObservableValue<V>>
     hasMap_: Map<K, ObservableValue<boolean>> // hasMap, not hashMap >-).
@@ -175,7 +177,7 @@ export class ObservableMap<K = any, V = any>
                       }
                     : null
 
-            if (__DEV__ && notifySpy) spyReportStart(change!)
+            if (__DEV__ && notifySpy) spyReportStart(change! as PureSpyEvent) // TODO fix type
             transaction(() => {
                 this.keysAtom_.reportChanged()
                 this.hasMap_.get(key)?.setNewValue_(false)
@@ -208,7 +210,7 @@ export class ObservableMap<K = any, V = any>
                           newValue
                       }
                     : null
-            if (__DEV__ && notifySpy) spyReportStart(change!)
+            if (__DEV__ && notifySpy) spyReportStart(change! as PureSpyEvent) // TODO fix type
             observable.setNewValue_(newValue as V)
             if (notify) notifyListeners(this, change)
             if (__DEV__ && notifySpy) spyReportEnd()
@@ -242,7 +244,7 @@ export class ObservableMap<K = any, V = any>
                       newValue
                   }
                 : null
-        if (__DEV__ && notifySpy) spyReportStart(change!)
+        if (__DEV__ && notifySpy) spyReportStart(change! as PureSpyEvent) // TODO fix type
         if (notify) notifyListeners(this, change)
         if (__DEV__ && notifySpy) spyReportEnd()
     }
@@ -308,7 +310,7 @@ export class ObservableMap<K = any, V = any>
         transaction(() => {
             if (isPlainObject(other))
                 getPlainObjectKeys(other).forEach((key: any) =>
-                    this.set((key as any) as K, other[key])
+                    this.set(key as any as K, other[key])
                 )
             else if (Array.isArray(other)) other.forEach(([key, value]) => this.set(key, value))
             else if (isES6Map(other)) {
