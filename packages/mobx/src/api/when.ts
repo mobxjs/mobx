@@ -69,7 +69,7 @@ function whenPromise(
         return die(`the options 'onError' and 'promise' cannot be combined`)
     let cancel
     const res = new Promise((resolve, reject) => {
-        let disposer = _when(predicate, resolve, { ...opts, onError: reject })
+        let disposer = _when(predicate, resolve as Lambda, { ...opts, onError: reject })
         cancel = () => {
             disposer()
             reject(new Error("WHEN_CANCELLED"))
