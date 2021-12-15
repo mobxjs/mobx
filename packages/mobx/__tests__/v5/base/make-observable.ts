@@ -1654,3 +1654,18 @@ test("makeObservable throws when mixing @decorators with annotations", () => {
 
     expect(() => new Test()).toThrow(/makeObservable second arg must be nullish when using decorators/);
 })
+
+test("makeAutoObservable + Object.create #3197", () => {
+    const proto = {
+        action() { },
+        *flow() { },
+        get computed() { return null },
+    };
+    const o = Object.create(proto);
+    o.observable = 5;
+    makeAutoObservable(o);
+    expect(isAction(proto.action)).toBe(true);
+    expect(isFlow(proto.flow)).toBe(true);
+    expect(isComputedProp(o, "computed")).toBe(true);
+    expect(isObservableProp(o, "observable")).toBe(true);
+});
