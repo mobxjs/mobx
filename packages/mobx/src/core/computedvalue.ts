@@ -98,7 +98,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     isTracing_: TraceMode = TraceMode.NONE
     scope_: Object | undefined
     private equals_: IEqualsComparer<any>
-    private requiresReaction_: boolean
+    private requiresReaction_: boolean | undefined
     keepAlive_: boolean
 
     /**
@@ -129,7 +129,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
                 ? comparer.structural
                 : comparer.default)
         this.scope_ = options.context
-        this.requiresReaction_ = !!options.requiresReaction
+        this.requiresReaction_ = options.requiresReaction
         this.keepAlive_ = !!options.keepAlive
     }
 
@@ -293,7 +293,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
                 `[mobx.trace] Computed value '${this.name_}' is being read outside a reactive context. Doing a full recompute.`
             )
         }
-        if (globalState.computedRequiresReaction || this.requiresReaction_) {
+        if (typeof this.requiresReaction_ === "boolean" ? this.requiresReaction_ : globalState.computedRequiresReaction) {
             console.warn(
                 `[mobx] Computed value '${this.name_}' is being read outside a reactive context. Doing a full recompute.`
             )
