@@ -1,5 +1,11 @@
 # eslint-plugin-mobx
 
+## 0.0.6
+
+### Patch Changes
+
+-   [`4b1337ec`](https://github.com/mobxjs/mobx/commit/4b1337ecd64c7bfc904a04063bd1b07e62e392f1) [#3228](https://github.com/mobxjs/mobx/pull/3228) Thanks [@ahoisl](https://github.com/ahoisl)! - fix name for missing-observer rule in recommended
+
 ## 0.0.5
 
 ### Patch Changes
