@@ -11,7 +11,8 @@ function create(context) {
       const clazz = findAncestor(decorator, node => node.type === 'ClassDeclaration' || node.type === 'ClassExpression');
       if (!clazz) return;
       // ClassDeclaration > ClassBody > []
-      const constructor = clazz.body.body.find(node => node.kind === 'constructor');
+      const constructor = clazz.body.body.find(node => node.kind === 'constructor' && node.value.type === 'FunctionExpression') ??
+        clazz.body.body.find(node => node.kind === 'constructor');
       // MethodDefinition > FunctionExpression > BlockStatement > []
       const isMakeObservable = node => node.expression?.callee?.name === 'makeObservable' && node.expression?.arguments[0]?.type === 'ThisExpression';
       const makeObservable = constructor?.value.body?.body.find(isMakeObservable)?.expression;
