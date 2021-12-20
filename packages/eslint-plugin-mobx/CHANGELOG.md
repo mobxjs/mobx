@@ -1,5 +1,11 @@
 # eslint-plugin-mobx
 
+## 0.0.7
+
+### Patch Changes
+
+-   [`0aaf1831`](https://github.com/mobxjs/mobx/commit/0aaf183131f3eadd40c05ccc94139282bd8d7d56) [#3231](https://github.com/mobxjs/mobx/pull/3231) Thanks [@ahoisl](https://github.com/ahoisl)! - fix(lint): fix 'missing-make-observable' rule with constructor overloads
+
 ## 0.0.6
 
 ### Patch Changes
