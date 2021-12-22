@@ -61,7 +61,7 @@ const objectProxyTraps: ProxyHandler<any> = {
         // null (intercepted) -> true (success)
         return getAdm(target).defineProperty_(name, descriptor) ?? true
     },
-    ownKeys(target: IIsObservableObject): PropertyKey[] {
+    ownKeys(target: IIsObservableObject): ArrayLike<string | symbol> {
         if (__DEV__ && globalState.trackingDerivation)
             warnAboutProxyRequirement(
                 "iterate keys to detect added / removed properties. Use 'keys' from 'mobx' instead."

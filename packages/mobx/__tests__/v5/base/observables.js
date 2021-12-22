@@ -17,7 +17,7 @@ const {
 const utils = require("../../v5/utils/test-utils")
 const { MAX_SPLICE_SIZE } = require("../../../src/internal")
 
-const voidObserver = function () {}
+const voidObserver = function () { }
 
 function buffer() {
     const b = []
@@ -2100,7 +2100,7 @@ test("extendObservable should not accept complex objects as second argument", ()
 })
 
 test("observable ignores class instances #2579", () => {
-    class C {}
+    class C { }
     const c = new C()
     expect(observable(c)).toBe(c)
 })
@@ -2121,9 +2121,9 @@ test("configure({ safeDescriptors: false })", () => {
 
     class Clazz {
         observable = 0
-        action() {}
-        get computed() {}
-        *flow() {}
+        action() { }
+        get computed() { }
+        *flow() { }
         constructor() {
             mobx.makeObservable(this, {
                 observable: mobx.observable,
@@ -2139,9 +2139,9 @@ test("configure({ safeDescriptors: false })", () => {
 
     const plain = mobx.observable({
         observable: 0,
-        action() {},
-        get computed() {},
-        *flow() {}
+        action() { },
+        get computed() { },
+        *flow() { }
     })
 
     checkDescriptors(plain)
@@ -2248,4 +2248,37 @@ test("ObservableArray.splice", () => {
     del = ar.splice(1, MAX_SPLICE_SIZE + 1, ...new Array(MAX_SPLICE_SIZE + 1))
     expect(ar.length).toEqual(MAX_SPLICE_SIZE + 10)
     expect(del.length).toEqual(MAX_SPLICE_SIZE + 1)
+})
+
+describe("`requiresReaction` takes precedence over global `computedRequiresReaction`", () => {
+    let warnMsg = "[mobx] Computed value 'TestComputed' is being read outside a reactive context. Doing a full recompute.";
+    let consoleWarnSpy;
+    beforeEach(() => {
+        consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation()
+    })
+    afterEach(() => {
+        consoleWarnSpy.mockRestore()
+        mobx._resetGlobalState();
+    })
+
+    test('`undefined`', () => {
+        mobx.configure({ computedRequiresReaction: true })
+        const c = mobx.computed(() => { }, { name: 'TestComputed' });
+        c.get();
+        expect(consoleWarnSpy).toHaveBeenLastCalledWith(warnMsg);
+    })
+
+    test('`true` over `false`', () => {
+        mobx.configure({ computedRequiresReaction: false })
+        const c = mobx.computed(() => { }, { name: 'TestComputed', requiresReaction: true });
+        c.get();
+        expect(consoleWarnSpy).toHaveBeenLastCalledWith(warnMsg);
+    })
+
+    test('`false` over `true`', () => {
+        mobx.configure({ computedRequiresReaction: true })
+        const c = mobx.computed(() => { }, { name: 'TestComputed', requiresReaction: false });
+        c.get();
+        expect(consoleWarnSpy).not.toHaveBeenCalled();
+    })
 })

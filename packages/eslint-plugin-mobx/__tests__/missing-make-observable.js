@@ -56,6 +56,18 @@ class C {
 }
 `).map(code => ({ code }))
 
+const valid4 = fields.map(field => `
+class C {     
+  ${field}
+
+  constructor(aString: string);
+  constructor(aNum: number);
+  constructor(stringOrNum: string | number) {
+    makeObservable(this, null, { name: 'foo' }) 
+  }      
+}
+`).map(code => ({ code }))
+
 const invalid1 = fields.map(field => ({
   code: `
 class C {
@@ -152,6 +164,7 @@ tester.run("missing-make-observable", rule, {
     ...valid1,
     valid2,
     ...valid3,
+    ...valid4,
   ],
   invalid: [
     ...invalid1,

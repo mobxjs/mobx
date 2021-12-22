@@ -88,7 +88,8 @@ export type IObjectWillChange<T = any> =
 const REMOVE = "remove"
 
 export class ObservableObjectAdministration
-    implements IInterceptable<IObjectWillChange>, IListenable {
+    implements IInterceptable<IObjectWillChange>, IListenable
+{
     keysAtom_: IAtom
     changeListeners_
     interceptors_
@@ -590,7 +591,7 @@ export class ObservableObjectAdministration
         this.keysAtom_.reportChanged()
     }
 
-    ownKeys_(): PropertyKey[] {
+    ownKeys_(): ArrayLike<string | symbol> {
         this.keysAtom_.reportObserved()
         return ownKeys(this.target_)
     }
