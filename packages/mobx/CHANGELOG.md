@@ -1,5 +1,11 @@
 # mobx
 
+## 6.3.10
+
+### Patch Changes
+
+-   [`2d70798e`](https://github.com/mobxjs/mobx/commit/2d70798eb327187d93757757ceaf410a608735b2) [#3233](https://github.com/mobxjs/mobx/pull/3233) Thanks [@anderlaw](https://github.com/anderlaw)! - `eq.ts` fix comparer logic
+
 ## 6.3.9
 
 ### Patch Changes
