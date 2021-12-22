@@ -51,12 +51,12 @@ export function makeClassComponentObserver(
     makeObservableProp(target, "state")
 
     const baseRender = target.render
-    if (typeof baseRender !== 'function') {
+    if (typeof baseRender !== "function") {
         const displayName = getDisplayName(target)
         throw new Error(
-            `[mobx-react] class component (${displayName}) is missing \`render\` method.`
-            + `\n\`observer\` requires \`render\` being a function defined on prototype.`
-            + `\n\`render = () => {}\` or \`render = function() {}\` is not supported.`
+            `[mobx-react] class component (${displayName}) is missing \`render\` method.` +
+                `\n\`observer\` requires \`render\` being a function defined on prototype.` +
+                `\n\`render = () => {}\` or \`render = function() {}\` is not supported.`
         )
     }
     target.render = function () {
@@ -135,7 +135,7 @@ function makeComponentReactive(render: any) {
 
     function reactiveRender() {
         isRenderingPending = false
-        let exception = undefined
+        let exception: unknown = undefined
         let rendering = undefined
         reaction.track(() => {
             try {
@@ -185,11 +185,15 @@ function makeObservableProp(target: any, propName: string): void {
         get: function () {
             let prevReadState = false
 
+            // Why this check? BC?
+            // @ts-expect-error
             if (_allowStateReadsStart && _allowStateReadsEnd) {
                 prevReadState = _allowStateReadsStart(true)
             }
             getAtom.call(this).reportObserved()
 
+            // Why this check? BC?
+            // @ts-expect-error
             if (_allowStateReadsStart && _allowStateReadsEnd) {
                 _allowStateReadsEnd(prevReadState)
             }

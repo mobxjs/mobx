@@ -52,7 +52,7 @@
     },
     "devDependencies": {
         "mobx": "^6.3.4",
-        "mobx-react-lite": "^4.0.0"
+        "mobx-react-lite": "^3.2.0"
     },
     "keywords": [
         "mobx",

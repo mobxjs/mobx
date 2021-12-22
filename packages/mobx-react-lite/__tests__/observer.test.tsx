@@ -282,9 +282,10 @@ function runTestSuite(mode: "observer" | "useObserver") {
                 try {
                     data.set(4) // wouldn't throw first time for lack of observers.. (could we tighten this?)
                 } catch (err) {
-                    expect(
-                        /Side effects like changing state are not allowed at this point/.test(err)
-                    ).toBeTruthy()
+                    expect(err).toBeInstanceOf(Error)
+                    expect(err).toMatch(
+                        /Side effects like changing state are not allowed at this point/
+                    )
                 }
             }
             return <div>{data.get()}</div>
@@ -881,7 +882,7 @@ it("dependencies should not become temporarily unobserved", async () => {
     React.useEffect.mockImplementation(effect => {
         console.warn("delaying useEffect call")
         p.push(
-            new Promise(resolve => {
+            new Promise<void>(resolve => {
                 setTimeout(() => {
                     act(() => {
                         cleanups.push(effect())
@@ -948,45 +949,49 @@ it("dependencies should not become temporarily unobserved", async () => {
     expect(doubleDisposed).toBeCalledTimes(1)
 })
 
-it("Legacy context support", () => {    
-    const contextKey = 'key';
-    const contextValue = 'value';
+it("Legacy context support", () => {
+    const contextKey = "key"
+    const contextValue = "value"
 
     function ContextConsumer(_, context) {
-        expect(context[contextKey]).toBe(contextValue);
-        return null;
+        expect(context[contextKey]).toBe(contextValue)
+        return null
     }
 
     ContextConsumer.contextTypes = {
-      [contextKey]: () => null,
+        [contextKey]: () => null
     }
 
-    const ObserverContextConsumer = observer(ContextConsumer);   
+    const ObserverContextConsumer = observer(ContextConsumer)
 
     class ContextProvider extends React.Component {
         getChildContext() {
-          return { [contextKey]: contextValue };
+            return { [contextKey]: contextValue }
         }
-      
+
         render() {
-          return (<ObserverContextConsumer />);
+            return <ObserverContextConsumer />
         }
     }
-    
-    (ContextProvider as any).childContextTypes = {
-      [contextKey]: () => null, 
-    };
-       
-    render(<ContextProvider />);    
+
+    ;(ContextProvider as any).childContextTypes = {
+        [contextKey]: () => null
+    }
+
+    render(<ContextProvider />)
 })
 
-it("Throw when trying to set contextType on observer", () => {        
-    const NamedObserver = observer(function TestCmp() { return null });
-    const AnonymousObserver = observer(() => null);
+it("Throw when trying to set contextType on observer", () => {
+    const NamedObserver = observer(function TestCmp() {
+        return null
+    })
+    const AnonymousObserver = observer(() => null)
     expect(() => {
-        (NamedObserver as any).contextTypes = {};        
-    }).toThrow(/\[mobx-react-lite\] `TestCmp.contextTypes` must be set before applying `observer`./);
+        ;(NamedObserver as any).contextTypes = {}
+    }).toThrow(/\[mobx-react-lite\] `TestCmp.contextTypes` must be set before applying `observer`./)
     expect(() => {
-        (AnonymousObserver as any).contextTypes = {};        
-    }).toThrow(/\[mobx-react-lite\] `Component.contextTypes` must be set before applying `observer`./);
+        ;(AnonymousObserver as any).contextTypes = {}
+    }).toThrow(
+        /\[mobx-react-lite\] `Component.contextTypes` must be set before applying `observer`./
+    )
 })

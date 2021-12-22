@@ -1,4 +1,5 @@
 // @ts-check
+// Why @ts-check?
 
 import {
     observable,
@@ -397,7 +398,7 @@ test("decorate a property with two decorators", function () {
 
     expect(isObservableProp(obj, "x")).toBe(true)
     expect(updatedByAutorun).toEqual(0)
-
+    // @ts-ignore
     obj.x++
 
     expect(obj.x).toEqual(1)

@@ -280,9 +280,10 @@ test("changing state in render should fail", () => {
             try {
                 data.set(4) // wouldn't throw first time for lack of observers.. (could we tighten this?)
             } catch (err) {
-                expect(
-                    /Side effects like changing state are not allowed at this point/.test(err)
-                ).toBeTruthy()
+                expect(err).toBeInstanceOf(Error)
+                expect(err).toMatch(
+                    /Side effects like changing state are not allowed at this point/
+                )
             }
         }
         return <div>{data.get()}</div>
@@ -881,11 +882,11 @@ test("Redeclaring an existing observer component as an observer should log a war
     expect(warn).toHaveBeenCalled()
 })
 
-test("Missing render should throw", () => {        
+test("Missing render should throw", () => {
     class Component extends React.Component<any, any> {
-        render = function() {
+        render = function () {
             return <div />
-        }   
-    }          
-    expect(() => observer(Component)).toThrow();
+        }
+    }
+    expect(() => observer(Component)).toThrow()
 })
