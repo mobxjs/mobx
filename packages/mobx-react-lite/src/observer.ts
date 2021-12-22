@@ -27,13 +27,13 @@ export function observer<
     options?: Options
 ): Options extends { forwardRef: true }
     ? C extends React.RefForwardingComponent<infer TRef, infer P>
-    ? C &
-    React.MemoExoticComponent<
-        React.ForwardRefExoticComponent<
-            React.PropsWithoutRef<P> & React.RefAttributes<TRef>
-        >
-    >
-    : never /* forwardRef set for a non forwarding component */
+        ? C &
+              React.MemoExoticComponent<
+                  React.ForwardRefExoticComponent<
+                      React.PropsWithoutRef<P> & React.RefAttributes<TRef>
+                  >
+              >
+        : never /* forwardRef set for a non forwarding component */
     : C & { displayName: string }
 
 // n.b. base case is not used for actual typings or exported in the typing files
@@ -41,6 +41,7 @@ export function observer<P extends object, TRef = {}>(
     baseComponent: React.RefForwardingComponent<TRef, P> | React.FunctionComponent<P>,
     options?: IObserverOptions
 ) {
+    console.log("PR3192") // TODO remove this line before merging to main
     // The working of observer is explained step by step in this talk: https://www.youtube.com/watch?v=cPF4iBedoF0&feature=youtu.be&t=1307
     if (isUsingStaticRendering()) {
         return baseComponent
@@ -59,13 +60,13 @@ export function observer<P extends object, TRef = {}>(
 
     // Don't set `displayName` for anonymous components,
     // so the `displayName` can be customized by user, see #3192.
-    if (baseComponentName !== '') {
+    if (baseComponentName !== "") {
         wrappedComponent.displayName = baseComponentName
     }
 
-    // Support legacy context: `contextTypes` must be applied before `memo`       
+    // Support legacy context: `contextTypes` must be applied before `memo`
     if ((baseComponent as any).contextTypes) {
-        wrappedComponent.contextTypes = (baseComponent as any).contextTypes;
+        wrappedComponent.contextTypes = (baseComponent as any).contextTypes
     }
 
     // memo; we are not interested in deep updates
@@ -85,9 +86,13 @@ export function observer<P extends object, TRef = {}>(
     copyStaticProperties(baseComponent, memoComponent)
 
     if ("production" !== process.env.NODE_ENV) {
-        Object.defineProperty(memoComponent, 'contextTypes', {
+        Object.defineProperty(memoComponent, "contextTypes", {
             set() {
-                throw new Error(`[mobx-react-lite] \`${this.displayName || this.type?.displayName || 'Component'}.contextTypes\` must be set before applying \`observer\`.`);
+                throw new Error(
+                    `[mobx-react-lite] \`${
+                        this.displayName || this.type?.displayName || "Component"
+                    }.contextTypes\` must be set before applying \`observer\`.`
+                )
             }
         })
     }
@@ -101,9 +106,9 @@ const hoistBlackList: any = {
     render: true,
     compare: true,
     type: true,
-    // Don't redefine `displayName`, 
+    // Don't redefine `displayName`,
     // it's defined as getter-setter pair on `memo` (see #3192).
-    displayName: true,
+    displayName: true
 }
 
 function copyStaticProperties(base: any, target: any) {

@@ -563,7 +563,7 @@ it("should hoist known statics only", () => {
     MyHipsterComponent.compare = "Nope!"
     MyHipsterComponent.render = "Nope!"
 
-    const wrapped = observer(MyHipsterComponent)    
+    const wrapped = observer(MyHipsterComponent)
     expect(wrapped.randomStaticThing).toEqual(3)
     expect(wrapped.defaultProps).toEqual({ x: 3 })
     expect(wrapped.propTypes).toEqual({ x: isNumber })
@@ -576,7 +576,7 @@ it("should have the correct displayName", () => {
     const TestComponent = observer(function MyComponent() {
         return null
     })
-    
+
     expect((TestComponent as any).type.displayName).toBe("MyComponent")
 })
 
@@ -995,3 +995,21 @@ it("Throw when trying to set contextType on observer", () => {
         /\[mobx-react-lite\] `Component.contextTypes` must be set before applying `observer`./
     )
 })
+
+/*
+test("WIP displayName", () => {
+    // @ts-ignore
+    const MemoCmp = React.memo(() => {
+        // missing return to warn
+        return undefined;
+    })
+    MemoCmp.displayName = 'Test';
+
+    // @ts-ignore
+    const ObserverCmp = observer(() => {})
+    ObserverCmp.displayName = 'Test';
+
+    //render(<MemoCmp />)
+    render(<ObserverCmp />)
+})
+*/
