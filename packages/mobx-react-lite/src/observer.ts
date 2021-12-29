@@ -41,7 +41,6 @@ export function observer<P extends object, TRef = {}>(
     baseComponent: React.RefForwardingComponent<TRef, P> | React.FunctionComponent<P>,
     options?: IObserverOptions
 ) {
-    console.log("PR3192") // TODO remove this line before merging to main
     // The working of observer is explained step by step in this talk: https://www.youtube.com/watch?v=cPF4iBedoF0&feature=youtu.be&t=1307
     if (isUsingStaticRendering()) {
         return baseComponent
