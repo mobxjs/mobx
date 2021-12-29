@@ -564,7 +564,6 @@ it("should hoist known statics only", () => {
     MyHipsterComponent.render = "Nope!"
 
     const wrapped = observer(MyHipsterComponent)
-    expect(wrapped.displayName).toBe("MyHipsterComponent")
     expect(wrapped.randomStaticThing).toEqual(3)
     expect(wrapped.defaultProps).toEqual({ x: 3 })
     expect(wrapped.propTypes).toEqual({ x: isNumber })
@@ -995,4 +994,43 @@ it("Throw when trying to set contextType on observer", () => {
     }).toThrow(
         /\[mobx-react-lite\] `Component.contextTypes` must be set before applying `observer`./
     )
+})
+
+test("Anonymous component displayName #3192", () => {
+    // React prints errors even if we catch em
+    const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {})
+
+    // Simulate:
+    // Error: n_a_m_e(...): Nothing was returned from render. This usually means a return statement is missing. Or, to render nothing, return null.
+    // The point is to get correct displayName in error msg.
+
+    let memoError
+    let observerError
+
+    // @ts-ignore
+    const MemoCmp = React.memo(() => {})
+    // @ts-ignore
+    const ObserverCmp = observer(() => {})
+
+    ObserverCmp.displayName = MemoCmp.displayName = "n_a_m_e"
+
+    try {
+        render(<MemoCmp />)
+    } catch (error) {
+        memoError = error
+    }
+
+    try {
+        render(<ObserverCmp />)
+    } catch (error) {
+        observerError = error
+    }
+
+    expect(memoError).toBeInstanceOf(Error)
+    expect(observerError).toBeInstanceOf(Error)
+
+    expect(memoError.message.includes(MemoCmp.displayName))
+    expect(MemoCmp.displayName).toEqual(ObserverCmp.displayName)
+    expect(observerError.message).toEqual(memoError.message)
+    consoleErrorSpy.mockRestore()
 })
