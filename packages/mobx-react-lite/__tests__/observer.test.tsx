@@ -996,7 +996,7 @@ it("Throw when trying to set contextType on observer", () => {
     )
 })
 
-test.only("Anonymous component displayName #3192", () => {
+test("Anonymous component displayName #3192", () => {
     // React prints errors even if we catch em
     const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {})
 
