@@ -28,7 +28,7 @@ function eq(a: any, b: any, depth: number, aStack?: any[], bStack?: any[]) {
     if (a !== a) return b !== b
     // Exhaust primitive checks
     const type = typeof a
-    if (!isFunction(type) && type !== "object" && typeof b != "object") return false
+    if (type !== "function" && type !== "object" && typeof b != "object") return false
 
     // Compare `[[Class]]` names.
     const className = toString.call(a)
