@@ -1,5 +1,11 @@
 # mobx-react-lite
 
+## 3.2.3
+
+### Patch Changes
+
+-   [`4887d200`](https://github.com/mobxjs/mobx/commit/4887d200ba5e1563717a0b4f55e09b9984437990) [#3192](https://github.com/mobxjs/mobx/pull/3192) Thanks [@urugator](https://github.com/urugator)! - Support customizing `displayName` on anonymous components [#2721](https://github.com/mobxjs/mobx/issues/2721).
+
 ## 3.2.2
 
 ### Patch Changes
