@@ -14,7 +14,7 @@ At that point it is invaluable to understand how MobX determines what to react t
 
 > MobX reacts to any _existing_ **observable** _property_ that is read during the execution of a tracked function.
 
--   _"reading"_ is dereferencing an object's property, which can be done through "dotting into" it (eg. `user.name`) or using the bracket notation (eg. `user['name']`, `todos[3]`).
+-   _"reading"_ is dereferencing an object's property, which can be done through "dotting into" it (eg. `user.name`) or using the bracket notation (eg. `user['name']`, `todos[3]`) or destructuring (eg. `const {name} = user`).
 -   _"tracked functions"_ are the expression of `computed`, the _rendering_ of an `observer` React function component, the `render()` method of an `observer` based React class component, and the functions that are passed as the first param to `autorun`, `reaction` and `when`.
 -   _"during"_ means that only those observables that are read while the function is executing are tracked. It doesn't matter whether these values are used directly or indirectly by the tracked function. But things that have been 'spawned' from the function won't be tracked (e.g. `setTimeout`, `promise.then`, `await` etc).
 
