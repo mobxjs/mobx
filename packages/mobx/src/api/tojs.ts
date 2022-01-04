@@ -62,11 +62,10 @@ function toJSHelper(source, __alreadySeen: Map<any, any>) {
 }
 
 /**
- * Basically, a deep clone, so that no reactive property will exist anymore.
- * Note that this function will only deep clone observables. If it finds a 
- * non-observable (e.g., plain object), it will not clone that. 
- * If you use classes that mixes observables with non-observables, you will
- * need to clone the non-observables by hand.
+ * Recursively converts an observable to it's non-observable native counterpart.
+ * It does NOT recurse into non-observables, these are left as they are, even if they contain observables.
+ * Computed and other non-enumerable properties are completely ignored.
+ * Complex scenarios require custom solution, eg implementing `toJSON` or using `serializr` lib.
  */
 export function toJS<T>(source: T, options?: any): T {
     if (__DEV__ && options) die("toJS no longer supports options")
