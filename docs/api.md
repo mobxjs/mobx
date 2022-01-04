@@ -284,9 +284,12 @@ Hook for when something stops being observed.
 ### `toJS`
 
 [**Usage**](observable-state.md#converting-observables-back-to-vanilla-javascript-collections): `toJS(value)`
+ 
+Recursively converts an observable object to a JavaScript _object_. Supports observable arrays, objects, Maps and primitives.
 
-Recursively converts an observable object to a JavaScript _structure_. Supports observable arrays, objects, Maps and primitives.
-Computed values and other non-enumerable properties won't be part of the result.
+It does NOT recurse into non-observables, these are left as they are, even if they contain observables.
+Computed and other non-enumerable properties are completely ignored and won't be returned.
+
 For more complex (de)serialization scenarios, it is recommended to give classes a (computed) `toJSON` method, or use a serialization library like [serializr](https://github.com/mobxjs/serializr).
 
 ```javascript
