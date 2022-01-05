@@ -1,5 +1,11 @@
 # mobx
 
+## 6.3.12
+
+### Patch Changes
+
+-   [`654a2013`](https://github.com/mobxjs/mobx/commit/654a2013107ac6e5bbe3851e4eed22f0c9130525) [#3257](https://github.com/mobxjs/mobx/pull/3257) Thanks [@urugator](https://github.com/urugator)! - fix: observable map initialization violates `enforceActions: "always"`
+
 ## 6.3.11
 
 ### Patch Changes
