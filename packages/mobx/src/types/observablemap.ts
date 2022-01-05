@@ -34,7 +34,8 @@ import {
     isFunction,
     UPDATE,
     IAtom,
-    PureSpyEvent
+    PureSpyEvent,
+    allowStateChanges
 } from "../internal"
 
 export interface IKeyValueMap<V = any> {
@@ -107,7 +108,9 @@ export class ObservableMap<K = any, V = any>
         this.keysAtom_ = createAtom(__DEV__ ? `${this.name_}.keys()` : "ObservableMap.keys()")
         this.data_ = new Map()
         this.hasMap_ = new Map()
-        this.merge(initialData)
+        allowStateChanges(true, () => {
+            this.merge(initialData)
+        })
     }
 
     private has_(key: K): boolean {

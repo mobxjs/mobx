@@ -8,7 +8,9 @@ import {
     computed,
     action,
     when,
-    runInAction
+    runInAction,
+    configure,
+    _resetGlobalState
 } from "../../../src/mobx.ts"
 
 const map = mobx.observable.map
@@ -1334,4 +1336,14 @@ test("2346 - subscribe to not yet existing map keys", async () => {
 
     await when(() => events.length > 1)
     expect(events).toEqual([42, 84])
+})
+
+test('initialization should not violate `enforceActions: "always"` - discussion #3255', async () => {
+    const consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation(() => {
+        throw new Error("console.warn called")
+    })
+    configure({ enforceActions: "always" })
+    observable(new Map([["x", "x"]]))
+    _resetGlobalState()
+    consoleWarnSpy.mockRestore()
 })
