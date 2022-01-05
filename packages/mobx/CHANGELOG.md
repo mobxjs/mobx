@@ -1,5 +1,11 @@
 # mobx
 
+## 6.3.11
+
+### Patch Changes
+
+-   [`bf5da6ba`](https://github.com/mobxjs/mobx/commit/bf5da6bad982dc3d955d5f27f7fea6f94b041ea7) [#3239](https://github.com/mobxjs/mobx/pull/3239) Thanks [@bernardobelchior](https://github.com/bernardobelchior)! - Improved `toJS` jsdoc
+
 ## 6.3.10
 
 ### Patch Changes
