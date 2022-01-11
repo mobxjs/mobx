@@ -38,6 +38,8 @@ For verification insert this piece of code at the beginning of your sources (eg.
 if (!new class { x }().hasOwnProperty('x')) throw new Error('Transpiler is not configured correctly');
 ```
 
+Note that for Next.js you must [customize Babel](https://nextjs.org/docs/advanced-features/customizing-babel-config) instead of TypeScript, even if your project is set up to use TypeScript. 
+
 ## MobX on older JavaScript environments
 
 By default, MobX uses proxies for optimal performance and compatibility. However, on older JavaScript engines `Proxy` is not available (check out [Proxy support](https://kangax.github.io/compat-table/es6/#test-Proxy)). Examples of such are Internet Explorer (before Edge), Node.js < 6, iOS < 10, Android before RN 0.59, or Android on iOS.
