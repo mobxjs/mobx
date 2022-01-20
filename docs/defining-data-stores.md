@@ -73,7 +73,7 @@ It is possible to express your domain objects as plain objects, but classes have
 ### Example domain store
 
 ```javascript
-import { makeAutoObservable, autorun, runInAction, reaction } from "mobx"
+import { makeAutoObservable, runInAction, reaction } from "mobx"
 import uuid from "node-uuid"
 
 export class TodoStore {
