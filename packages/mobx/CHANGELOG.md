@@ -1,5 +1,11 @@
 # mobx
 
+## 6.3.13
+
+### Patch Changes
+
+-   [`23803202`](https://github.com/mobxjs/mobx/commit/2380320263f5edcd06d7ba6bdf02aff3fd7d305a) [#3273](https://github.com/mobxjs/mobx/pull/3273) Thanks [@urugator](https://github.com/urugator)! - fix `flow.bound` #3271
+
 ## 6.3.12
 
 ### Patch Changes
