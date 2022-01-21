@@ -93,7 +93,6 @@ function createFlowDescriptor(
         value.isMobXFlow = true
     }
     return {
-        //value: flow(value),
         value,
         // Non-configurable for classes
         // prevents accidental field redefinition in subclass
