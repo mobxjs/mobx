@@ -7,7 +7,8 @@ import {
     isFlow,
     isFunction,
     globalState,
-    MakeResult
+    MakeResult,
+    hasProp
 } from "../internal"
 
 export function createFlowAnnotation(name: string, options?: object): Annotation {
@@ -33,7 +34,7 @@ function make_(
     }
     // prototype
     // bound - must annotate protos to support super.flow()
-    if (this.options_?.bound && !isFlow(adm.target_[key])) {
+    if (this.options_?.bound && (!hasProp(adm.target_, key) || !isFlow(adm.target_[key]))) {
         if (this.extend_(adm, key, descriptor, false) === null) return MakeResult.Cancel
     }
     if (isFlow(descriptor.value)) {
@@ -81,11 +82,19 @@ function createFlowDescriptor(
 ): PropertyDescriptor {
     assertFlowDescriptor(adm, annotation, key, descriptor)
     let { value } = descriptor
+    // In case of flow.bound, the descriptor can be from already annotated prototype
+    if (!isFlow(value)) {
+        value = flow(value)
+    }
     if (bound) {
+        // We do not keep original function around, so we bind the existing flow
         value = value.bind(adm.proxy_ ?? adm.target_)
+        // This is normally set by `flow`, but `bind` returns new function...
+        value.isMobXFlow = true
     }
     return {
-        value: flow(value),
+        //value: flow(value),
+        value,
         // Non-configurable for classes
         // prevents accidental field redefinition in subclass
         configurable: safeDescriptors ? adm.isPlainObject_ : true,
