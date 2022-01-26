@@ -35,6 +35,7 @@ MobX is made possible by the generosity of the sponsors below, and many other [i
 <a href="https://curology.com/blog/tech"><img src="https://mobx.js.org/assets/curology.png" align="center" width="100" title="Curology" alt="Curology"/></a>
 <a href="https://modulz.app/"><img src="https://mobx.js.org/assets/modulz.png" align="center" width="100" title="Modulz" alt="Modulz"/></a>
 <a href="https://space307.com/?utm_source=sponsorship&utm_medium=mobx&utm_campaign=readme"><img src="https://mobx.js.org/assets/space307.png" align="center" width="100" title="Space307" alt="Space307"/></a>
+<a href="https://casinosites.ltd.uk/?utm_source=sponsorship&utm_medium=mobx&utm_campaign=readme"><img src="https://mobx.js.org/assets/casino2.png" align="center" width="100" title="Casino Sites" alt="Casino Sites"/></a>
 
 **🥉 Bronze sponsors (\$500+ total contributions):**<br/>
 <a href="https://mantro.net/jobs/warlock"><img src="https://mobx.js.org/assets/mantro.png" align="center" width="100" title="mantro GmbH" alt="mantro GmbH"></a>
