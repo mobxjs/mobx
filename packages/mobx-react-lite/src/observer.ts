@@ -3,6 +3,18 @@ import { forwardRef, memo } from "react"
 import { isUsingStaticRendering } from "./staticRendering"
 import { useObserver } from "./useObserver"
 
+let warnObserverOptionsDeprecated = true
+
+const hasSymbol = typeof Symbol === "function" && Symbol.for
+// Using react-is had some issues (and operates on elements, not on types), see #608 / #609
+const ReactForwardRefSymbol = hasSymbol
+    ? Symbol.for("react.forward_ref")
+    : typeof forwardRef === "function" && forwardRef((props: any) => null)["$$typeof"]
+
+const ReactMemoSymbol = hasSymbol
+    ? Symbol.for("react.memo")
+    : typeof memo === "function" && memo((props: any) => null)["$$typeof"]
+
 export interface IObserverOptions {
     readonly forwardRef?: boolean
 }
@@ -10,6 +22,14 @@ export interface IObserverOptions {
 export function observer<P extends object, TRef = {}>(
     baseComponent: React.RefForwardingComponent<TRef, P>,
     options: IObserverOptions & { forwardRef: true }
+): React.MemoExoticComponent<
+    React.ForwardRefExoticComponent<React.PropsWithoutRef<P> & React.RefAttributes<TRef>>
+>
+
+export function observer<P extends object, TRef = {}>(
+    baseComponent: React.ForwardRefExoticComponent<
+        React.PropsWithoutRef<P> & React.RefAttributes<TRef>
+    >
 ): React.MemoExoticComponent<
     React.ForwardRefExoticComponent<React.PropsWithoutRef<P> & React.RefAttributes<TRef>>
 >
@@ -38,54 +58,81 @@ export function observer<
 
 // n.b. base case is not used for actual typings or exported in the typing files
 export function observer<P extends object, TRef = {}>(
-    baseComponent: React.RefForwardingComponent<TRef, P> | React.FunctionComponent<P>,
+    baseComponent:
+        | React.RefForwardingComponent<TRef, P>
+        | React.FunctionComponent<P>
+        | React.ForwardRefExoticComponent<React.PropsWithoutRef<P> & React.RefAttributes<TRef>>,
+    // TODO remove in next major
     options?: IObserverOptions
 ) {
+    if (process.env.NODE_ENV !== "production" && warnObserverOptionsDeprecated && options) {
+        warnObserverOptionsDeprecated = false
+        console.warn(
+            `[mobx-react-lite] \`observer(fn, { forwardRef: true })\` is depreacted, use \`observer(React.forwardRef(fn))\``
+        )
+    }
+
+    if (ReactMemoSymbol && baseComponent["$$typeof"] === ReactMemoSymbol) {
+        throw new Error(
+            `[mobx-react-lite] You are trying to use \`observer\` on a function component wrapped in either another \`observer\` or \`React.memo\`. The observer already applies 'React.memo' for you.`
+        )
+    }
+
     // The working of observer is explained step by step in this talk: https://www.youtube.com/watch?v=cPF4iBedoF0&feature=youtu.be&t=1307
     if (isUsingStaticRendering()) {
         return baseComponent
     }
 
-    const realOptions = {
-        forwardRef: false,
-        ...options
-    }
+    let useForwardRef = options?.forwardRef ?? false
+    let render = baseComponent
 
     const baseComponentName = baseComponent.displayName || baseComponent.name
 
-    const wrappedComponent = (props: P, ref: React.Ref<TRef>) => {
-        return useObserver(() => baseComponent(props, ref), baseComponentName)
+    // If already wrapped with forwardRef, unwrap,
+    // so we can patch render and apply memo
+    if (ReactForwardRefSymbol && baseComponent["$$typeof"] === ReactForwardRefSymbol) {
+        useForwardRef = true
+        render = baseComponent["render"]
+        if (typeof render !== "function") {
+            throw new Error(
+                `[mobx-react-lite] \`render\` property of ForwardRef was not a function`
+            )
+        }
+    }
+
+    let observerComponent = (props: P, ref: React.Ref<TRef>) => {
+        return useObserver(() => render(props, ref), baseComponentName)
     }
 
     // Don't set `displayName` for anonymous components,
     // so the `displayName` can be customized by user, see #3192.
     if (baseComponentName !== "") {
-        wrappedComponent.displayName = baseComponentName
+        ;(observerComponent as React.FunctionComponent).displayName = baseComponentName
     }
 
     // Support legacy context: `contextTypes` must be applied before `memo`
     if ((baseComponent as any).contextTypes) {
-        wrappedComponent.contextTypes = (baseComponent as any).contextTypes
+        ;(observerComponent as React.FunctionComponent).contextTypes = (
+            baseComponent as any
+        ).contextTypes
+    }
+
+    if (useForwardRef) {
+        // `forwardRef` must be applied prior `memo`
+        // `forwardRef(observer(cmp))` throws:
+        // "forwardRef requires a render function but received a `memo` component. Instead of forwardRef(memo(...)), use memo(forwardRef(...))"
+        observerComponent = forwardRef(observerComponent)
     }
 
     // memo; we are not interested in deep updates
     // in props; we assume that if deep objects are changed,
     // this is in observables, which would have been tracked anyway
-    let memoComponent
-    if (realOptions.forwardRef) {
-        // we have to use forwardRef here because:
-        // 1. it cannot go before memo, only after it
-        // 2. forwardRef converts the function into an actual component, so we can't let the baseComponent do it
-        //    since it wouldn't be a callable function anymore
-        memoComponent = memo(forwardRef(wrappedComponent))
-    } else {
-        memoComponent = memo(wrappedComponent)
-    }
+    observerComponent = memo(observerComponent)
 
-    copyStaticProperties(baseComponent, memoComponent)
+    copyStaticProperties(baseComponent, observerComponent)
 
     if ("production" !== process.env.NODE_ENV) {
-        Object.defineProperty(memoComponent, "contextTypes", {
+        Object.defineProperty(observerComponent, "contextTypes", {
             set() {
                 throw new Error(
                     `[mobx-react-lite] \`${
@@ -96,7 +143,7 @@ export function observer<P extends object, TRef = {}>(
         })
     }
 
-    return memoComponent
+    return observerComponent
 }
 
 // based on https://github.com/mridgway/hoist-non-react-statics/blob/master/src/index.js

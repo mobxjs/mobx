@@ -481,7 +481,7 @@ function runTestSuite(mode: "observer" | "useObserver") {
 runTestSuite("observer")
 runTestSuite("useObserver")
 
-test("useImperativeHandle and forwardRef should work with observer", () => {
+test("observer(cmp, { forwardRef: true }) + useImperativeHandle", () => {
     interface IMethods {
         focus(): void
     }
@@ -505,6 +505,38 @@ test("useImperativeHandle and forwardRef should work with observer", () => {
             return <input ref={inputRef} defaultValue={props.value} />
         },
         { forwardRef: true }
+    )
+
+    const cr = React.createRef<IMethods>()
+    render(<FancyInput ref={cr} value="" />)
+    expect(cr).toBeTruthy()
+    expect(cr.current).toBeTruthy()
+    expect(typeof cr.current!.focus).toBe("function")
+})
+
+test("observer(forwardRef(cmp)) + useImperativeHandle", () => {
+    interface IMethods {
+        focus(): void
+    }
+
+    interface IProps {
+        value: string
+    }
+
+    const FancyInput = observer(
+        React.forwardRef((props: IProps, ref: React.Ref<IMethods>) => {
+            const inputRef = React.useRef<HTMLInputElement>(null)
+            React.useImperativeHandle(
+                ref,
+                () => ({
+                    focus: () => {
+                        inputRef.current!.focus()
+                    }
+                }),
+                []
+            )
+            return <input ref={inputRef} defaultValue={props.value} />
+        })
     )
 
     const cr = React.createRef<IMethods>()
