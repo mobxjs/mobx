@@ -1,13 +1,35 @@
 'use strict';
 
-const { findAncestor, isMobxDecorator } = require('./utils.js');
+const {findAncestor, isMobxDecorator} = require('./utils.js');
 
 function create(context) {
   const sourceCode = context.getSourceCode();
 
+  let namespaceImportName = undefined; // is 'mobxFoo' when import * as mobxFoo from 'mobx'
+  let makeObserverImportName = undefined; // is 'mobxFoo' when import * as mobxFoo from 'mobx'
+  let lastSpecifierImport = undefined;
+
   return {
+    'ImportDeclaration': node => {
+      if (node.source.value !== 'mobx') return;
+
+      // Collect the imports
+
+      for (const specifier of node.specifiers) {
+        if (specifier.type === 'ImportNamespaceSpecifier') {
+          namespaceImportName = specifier.local.name;
+        }
+
+        if (specifier.type === 'ImportSpecifier') {
+          lastSpecifierImport = specifier;
+          if (specifier.imported.name === 'makeObservable') {
+            makeObserverImportName = specifier.local.name;
+          }
+        }
+      }
+    },
     'Decorator': decorator => {
-      if (!isMobxDecorator(decorator)) return;
+      if (!isMobxDecorator(decorator, namespaceImportName)) return;
       const clazz = findAncestor(decorator, node => node.type === 'ClassDeclaration' || node.type === 'ClassExpression');
       if (!clazz) return;
       // ClassDeclaration > ClassBody > []
@@ -28,19 +50,34 @@ function create(context) {
         }
       } else {
         const fix = fixer => {
+
+          const fixes = [];
+          let makeObservableExpr = 'makeObservable';
+
+          // Insert the makeObservable import if required
+          if (!namespaceImportName && !makeObserverImportName && lastSpecifierImport) {
+            fixes.push(fixer.insertTextAfter(lastSpecifierImport, ', makeObservable'));
+          } else if (namespaceImportName) {
+            makeObservableExpr = `${namespaceImportName}.makeObservable`;
+          } else if (makeObserverImportName) {
+            makeObservableExpr = makeObserverImportName;
+          }
+
           if (constructor?.value.type === 'TSEmptyBodyFunctionExpression') {
             // constructor() - yes this a thing
             const closingBracket = sourceCode.getLastToken(constructor.value);
-            return fixer.insertTextAfter(closingBracket, ' { makeObservable(this); }')
+            fixes.push(fixer.insertTextAfter(closingBracket, ` { ${makeObservableExpr}(this); }`));
           } else if (constructor) {
             // constructor() {}
             const closingBracket = sourceCode.getLastToken(constructor.value.body);
-            return fixer.insertTextBefore(closingBracket, ';makeObservable(this);')
+            fixes.push(fixer.insertTextBefore(closingBracket, `;${makeObservableExpr}(this);`));
           } else {
             // class C {}
             const openingBracket = sourceCode.getFirstToken(clazz.body);
-            return fixer.insertTextAfter(openingBracket, '\nconstructor() { makeObservable(this); }')
+            fixes.push(fixer.insertTextAfter(openingBracket, `\nconstructor() { ${makeObservableExpr}(this); }`));
           }
+
+          return fixes;
         };
 
         context.report({
