@@ -248,6 +248,54 @@ constructor() { makeBanana(this); }
   }
 ))
 
+const invalid10 = fields.map(field => ({
+    code: `
+class C extends Component {
+  @${field}
+}
+`,
+    errors: [
+      { messageId: 'missingMakeObservable' },
+    ],
+    output: `
+class C extends Component {
+constructor(props) { super(props); makeObservable(this); }
+  @${field}
+}
+`,
+  }
+))
+
+const invalid11 = fields.map(field => ({
+    code: `
+class C extends React.Component<{ foo: string }> {
+  @${field}
+}
+`,
+    errors: [
+      { messageId: 'missingMakeObservable' },
+    ],
+    output: `
+class C extends React.Component<{ foo: string }> {
+constructor(props: { foo: string }) { super(props); makeObservable(this); }
+  @${field}
+}
+`,
+  }
+))
+
+const invalid12 = fields.map(field => ({
+    code: `
+class C extends Banana {
+  @${field}
+}
+`,
+    errors: [
+      { messageId: 'missingMakeObservableSuper' },
+    ],
+  }
+))
+
 tester.run("missing-make-observable", rule, {
   valid: [
     ...valid1,
@@ -265,5 +313,8 @@ tester.run("missing-make-observable", rule, {
     ...invalid7,
     ...invalid8,
     ...invalid9,
+    ...invalid10,
+    ...invalid11,
+    ...invalid12,
   ],
 });

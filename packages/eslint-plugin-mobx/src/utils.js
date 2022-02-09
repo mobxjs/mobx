@@ -13,7 +13,7 @@ function isMobxDecorator(decorator, namespace) {
       memberExpression = decorator.expression.callee;
     }
 
-    if (memberExpression.object.name === namespace || memberExpression.object.object?.name === namespace) {
+    if (memberExpression?.object.name === namespace || memberExpression?.object.object?.name === namespace) {
       return true;
     }
   }
