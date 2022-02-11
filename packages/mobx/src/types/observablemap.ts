@@ -306,14 +306,14 @@ export class ObservableMap<K = any, V = any>
     }
 
     /** Merge another object into this object, returns this. */
-    merge(other: ObservableMap<K, V> | IKeyValueMap<V> | any): ObservableMap<K, V> {
+    merge(other?: IObservableMapInitialValues<K, V>): ObservableMap<K, V> {
         if (isObservableMap(other)) {
             other = new Map(other)
         }
         transaction(() => {
             if (isPlainObject(other))
                 getPlainObjectKeys(other).forEach((key: any) =>
-                    this.set(key as any as K, other[key])
+                    this.set(key as K, (other as IKeyValueMap)[key])
                 )
             else if (Array.isArray(other)) other.forEach(([key, value]) => this.set(key, value))
             else if (isES6Map(other)) {
@@ -332,7 +332,7 @@ export class ObservableMap<K = any, V = any>
         })
     }
 
-    replace(values: ObservableMap<K, V> | IKeyValueMap<V> | any): ObservableMap<K, V> {
+    replace(values: IObservableMapInitialValues<K, V>): ObservableMap<K, V> {
         // Implementation requirements:
         // - respect ordering of replacement map
         // - allow interceptors to run and potentially prevent individual operations
