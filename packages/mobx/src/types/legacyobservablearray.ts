@@ -85,7 +85,6 @@ class LegacyObservableArray<T> extends StubArray {
         let nextIndex = 0
         return makeIterable({
             next() {
-                // @ts-ignore
                 return nextIndex < self.length
                     ? { value: self[nextIndex++], done: false }
                     : { done: true, value: undefined }
