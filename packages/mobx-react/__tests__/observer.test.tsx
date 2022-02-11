@@ -742,7 +742,7 @@ test("use PureComponent", () => {
     try {
         observer(
             class X extends React.PureComponent {
-                return() {
+                render() {
                     return <div />
                 }
             }
