@@ -7,9 +7,23 @@
     "umd:main": "dist/mobx.umd.production.min.js",
     "unpkg": "dist/mobx.umd.production.min.js",
     "jsdelivr": "dist/mobx.umd.production.min.js",
-    "jsnext:main": "dist/mobx.esm.production.min.js",
-    "module": "dist/mobx.esm.js",
-    "react-native": "dist/mobx.esm.js",
+    "jsnext:main": "dist/mobx.esm.production.min.mjs",
+    "module": "dist/mobx.esm.mjs",
+    "react-native": "dist/mobx.esm.mjs",
+    "exports": {
+        ".": {
+            "import": {
+                "development": "./dist/mobx.esm.development.mjs",
+                "production": "./dist/mobx.esm.production.min.mjs",
+                "default": "./dist/mobx.esm.mjs"
+            },
+            "require": {
+                "development": "./dist/mobx.cjs.development.js",
+                "production": "./dist/mobx.cjs.production.min.js",
+                "default": "./dist/index.js"
+            }
+        }
+    },
     "types": "dist/mobx.d.ts",
     "typings": "dist/mobx.d.ts",
     "files": [
