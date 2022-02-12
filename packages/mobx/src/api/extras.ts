@@ -18,8 +18,9 @@ function nodeToDependencyTree(node: IDepTreeNode): IDependencyTree {
     const result: IDependencyTree = {
         name: node.name_
     }
-    if (node.observing_ && node.observing_.length > 0)
+    if (node.observing_ && node.observing_.length > 0) {
         result.dependencies = unique(node.observing_).map(nodeToDependencyTree)
+    }
     return result
 }
 
@@ -31,8 +32,9 @@ function nodeToObserverTree(node: IDepTreeNode): IObserverTree {
     const result: IObserverTree = {
         name: node.name_
     }
-    if (hasObservers(node as any))
+    if (hasObservers(node as any)) {
         result.observers = Array.from(<any>getObservers(node as any)).map(<any>nodeToObserverTree)
+    }
     return result
 }
 

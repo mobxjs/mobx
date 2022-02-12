@@ -18,7 +18,9 @@ export function registerInterceptor<T>(
     interceptors.push(handler)
     return once(() => {
         const idx = interceptors.indexOf(handler)
-        if (idx !== -1) interceptors.splice(idx, 1)
+        if (idx !== -1) {
+            interceptors.splice(idx, 1)
+        }
     })
 }
 
@@ -32,8 +34,12 @@ export function interceptChange<T>(
         const interceptors = [...(interceptable.interceptors_ || [])]
         for (let i = 0, l = interceptors.length; i < l; i++) {
             change = interceptors[i](change)
-            if (change && !(change as any).type) die(14)
-            if (!change) break
+            if (change && !(change as any).type) {
+                die(14)
+            }
+            if (!change) {
+                break
+            }
         }
         return change
     } finally {

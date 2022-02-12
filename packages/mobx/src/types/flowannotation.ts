@@ -35,7 +35,9 @@ function make_(
     // prototype
     // bound - must annotate protos to support super.flow()
     if (this.options_?.bound && (!hasProp(adm.target_, key) || !isFlow(adm.target_[key]))) {
-        if (this.extend_(adm, key, descriptor, false) === null) return MakeResult.Cancel
+        if (this.extend_(adm, key, descriptor, false) === null) {
+            return MakeResult.Cancel
+        }
     }
     if (isFlow(descriptor.value)) {
         // A prototype could have been annotated already by other constructor,

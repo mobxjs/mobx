@@ -94,7 +94,9 @@ class LegacyObservableArray<T> extends StubArray {
 }
 
 Object.entries(arrayExtensions).forEach(([prop, fn]) => {
-    if (prop !== "concat") addHiddenProp(LegacyObservableArray.prototype, prop, fn)
+    if (prop !== "concat") {
+        addHiddenProp(LegacyObservableArray.prototype, prop, fn)
+    }
 })
 
 function createArrayEntryDescriptor(index: number) {
@@ -116,8 +118,9 @@ function createArrayBufferItem(index: number) {
 
 export function reserveArrayBuffer(max: number) {
     if (max > OBSERVABLE_ARRAY_BUFFER_SIZE) {
-        for (let index = OBSERVABLE_ARRAY_BUFFER_SIZE; index < max + 100; index++)
+        for (let index = OBSERVABLE_ARRAY_BUFFER_SIZE; index < max + 100; index++) {
             createArrayBufferItem(index)
+        }
         OBSERVABLE_ARRAY_BUFFER_SIZE = max
     }
 }

@@ -102,22 +102,34 @@ function createObservable(v: any, arg2?: any, arg3?: any) {
     }
 
     // already observable - ignore
-    if (isObservable(v)) return v
+    if (isObservable(v)) {
+        return v
+    }
 
     // plain object
-    if (isPlainObject(v)) return observable.object(v, arg2, arg3)
+    if (isPlainObject(v)) {
+        return observable.object(v, arg2, arg3)
+    }
 
     // Array
-    if (Array.isArray(v)) return observable.array(v, arg2)
+    if (Array.isArray(v)) {
+        return observable.array(v, arg2)
+    }
 
     // Map
-    if (isES6Map(v)) return observable.map(v, arg2)
+    if (isES6Map(v)) {
+        return observable.map(v, arg2)
+    }
 
     // Set
-    if (isES6Set(v)) return observable.set(v, arg2)
+    if (isES6Set(v)) {
+        return observable.set(v, arg2)
+    }
 
     // other object - ignore
-    if (typeof v === "object" && v !== null) return v
+    if (typeof v === "object" && v !== null) {
+        return v
+    }
 
     // anything else
     return observable.box(v, arg2)
@@ -169,9 +181,11 @@ const observableFactories: IObservableFactory = {
     },
     array<T = any>(initialValues?: T[], options?: CreateObservableOptions): IObservableArray<T> {
         const o = asCreateObservableOptions(options)
-        return (globalState.useProxies === false || o.proxy === false
-            ? createLegacyArray
-            : createObservableArray)(initialValues, getEnhancerFromOptions(o), o.name)
+        return (
+            globalState.useProxies === false || o.proxy === false
+                ? createLegacyArray
+                : createObservableArray
+        )(initialValues, getEnhancerFromOptions(o), o.name)
     },
     map<K = any, V = any>(
         initialValues?: IObservableMapInitialValues<K, V>,

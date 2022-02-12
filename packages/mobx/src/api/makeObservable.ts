@@ -56,10 +56,12 @@ export function makeAutoObservable<T extends object, AdditionalKeys extends Prop
     options?: CreateObservableOptions
 ): T {
     if (__DEV__) {
-        if (!isPlainObject(target) && !isPlainObject(Object.getPrototypeOf(target)))
+        if (!isPlainObject(target) && !isPlainObject(Object.getPrototypeOf(target))) {
             die(`'makeAutoObservable' can only be used for classes that don't have a superclass`)
-        if (isObservableObject(target))
+        }
+        if (isObservableObject(target)) {
             die(`makeAutoObservable can only be used on objects not already made observable`)
+        }
     }
 
     // Optimization: avoid visiting protos

@@ -42,8 +42,9 @@ export const flow: Flow = Object.assign(
             return storeAnnotation(arg1, arg2, flowAnnotation)
         }
         // flow(fn)
-        if (__DEV__ && arguments.length !== 1)
+        if (__DEV__ && arguments.length !== 1) {
             die(`Flow expects single argument with generator function`)
+        }
         const generator = arg1
         const name = generator.name || "<unnamed flow>"
 
@@ -95,7 +96,9 @@ export const flow: Flow = Object.assign(
                         ret.then(next, reject)
                         return
                     }
-                    if (ret.done) return resolve(ret.value)
+                    if (ret.done) {
+                        return resolve(ret.value)
+                    }
                     pendingPromise = Promise.resolve(ret.value) as any
                     return pendingPromise!.then(onFulfilled, onRejected)
                 }
@@ -105,7 +108,9 @@ export const flow: Flow = Object.assign(
 
             promise.cancel = action(`${name} - runid: ${runId} - cancel`, function () {
                 try {
-                    if (pendingPromise) cancelPromise(pendingPromise)
+                    if (pendingPromise) {
+                        cancelPromise(pendingPromise)
+                    }
                     // Finally block can return (or yield) stuff..
                     const res = gen.return!(undefined as any)
                     // eat anything that promise would do, it's cancelled!
@@ -129,7 +134,9 @@ export const flow: Flow = Object.assign(
 flow.bound = createDecoratorAnnotation(flowBoundAnnotation)
 
 function cancelPromise(promise) {
-    if (isFunction(promise.cancel)) promise.cancel()
+    if (isFunction(promise.cancel)) {
+        promise.cancel()
+    }
 }
 
 export function flowResult<T>(

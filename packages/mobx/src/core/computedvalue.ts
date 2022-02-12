@@ -114,7 +114,9 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
      * This is useful for working with vectors, mouse coordinates etc.
      */
     constructor(options: IComputedValueOptions<T>) {
-        if (!options.get) die(31)
+        if (!options.get) {
+            die(31)
+        }
         this.derivation = options.get!
         this.name_ = options.name || (__DEV__ ? "ComputedValue@" + getNextId() : "ComputedValue")
         if (options.set) {
@@ -157,7 +159,9 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
      * Will evaluate its computation first if needed.
      */
     public get(): T {
-        if (this.isComputing_) die(32, this.name_, this.derivation)
+        if (this.isComputing_) {
+            die(32, this.name_, this.derivation)
+        }
         if (
             globalState.inBatch === 0 &&
             // !globalState.trackingDerivatpion &&
@@ -174,27 +178,37 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
             reportObserved(this)
             if (shouldCompute(this)) {
                 let prevTrackingContext = globalState.trackingContext
-                if (this.keepAlive_ && !prevTrackingContext) globalState.trackingContext = this
-                if (this.trackAndCompute()) propagateChangeConfirmed(this)
+                if (this.keepAlive_ && !prevTrackingContext) {
+                    globalState.trackingContext = this
+                }
+                if (this.trackAndCompute()) {
+                    propagateChangeConfirmed(this)
+                }
                 globalState.trackingContext = prevTrackingContext
             }
         }
         const result = this.value_!
 
-        if (isCaughtException(result)) throw result.cause
+        if (isCaughtException(result)) {
+            throw result.cause
+        }
         return result
     }
 
     public set(value: T) {
         if (this.setter_) {
-            if (this.isRunningSetter_) die(33, this.name_)
+            if (this.isRunningSetter_) {
+                die(33, this.name_)
+            }
             this.isRunningSetter_ = true
             try {
                 this.setter_.call(this.scope_, value)
             } finally {
                 this.isRunningSetter_ = false
             }
-        } else die(34, this.name_)
+        } else {
+            die(34, this.name_)
+        }
     }
 
     trackAndCompute(): boolean {
@@ -287,13 +301,19 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     }
 
     warnAboutUntrackedRead_() {
-        if (!__DEV__) return
+        if (!__DEV__) {
+            return
+        }
         if (this.isTracing_ !== TraceMode.NONE) {
             console.log(
                 `[mobx.trace] Computed value '${this.name_}' is being read outside a reactive context. Doing a full recompute.`
             )
         }
-        if (typeof this.requiresReaction_ === "boolean" ? this.requiresReaction_ : globalState.computedRequiresReaction) {
+        if (
+            typeof this.requiresReaction_ === "boolean"
+                ? this.requiresReaction_
+                : globalState.computedRequiresReaction
+        ) {
             console.warn(
                 `[mobx] Computed value '${this.name_}' is being read outside a reactive context. Doing a full recompute.`
             )
