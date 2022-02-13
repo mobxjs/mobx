@@ -32,8 +32,7 @@ export type AnnotationMapEntry =
 // declare annotations for private/ protected members, see #2339
 export type AnnotationsMap<T, AdditionalFields extends PropertyKey> = {
     [P in Exclude<keyof T, "toString">]?: AnnotationMapEntry
-} &
-    Record<AdditionalFields, AnnotationMapEntry>
+} & Record<AdditionalFields, AnnotationMapEntry>
 
 export function isAnnotation(thing: any) {
     return (

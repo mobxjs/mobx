@@ -84,8 +84,12 @@ export interface IArrayWillSplice<T = any> {
 const arrayTraps = {
     get(target, name) {
         const adm: ObservableArrayAdministration = target[$mobx]
-        if (name === $mobx) return adm
-        if (name === "length") return adm.getArrayLength_()
+        if (name === $mobx) {
+            return adm
+        }
+        if (name === "length") {
+            return adm.getArrayLength_()
+        }
         if (typeof name === "string" && !isNaN(name as any)) {
             return adm.get_(parseInt(name))
         }
@@ -113,7 +117,8 @@ const arrayTraps = {
 }
 
 export class ObservableArrayAdministration
-    implements IInterceptable<IArrayWillChange<any> | IArrayWillSplice<any>>, IListenable {
+    implements IInterceptable<IArrayWillChange<any> | IArrayWillSplice<any>>, IListenable
+{
     atom_: IAtom
     readonly values_: any[] = [] // this is the prop that gets proxied, so can't replace it!
     interceptors_
@@ -135,13 +140,16 @@ export class ObservableArrayAdministration
     }
 
     dehanceValue_(value: any): any {
-        if (this.dehancer !== undefined) return this.dehancer(value)
+        if (this.dehancer !== undefined) {
+            return this.dehancer(value)
+        }
         return value
     }
 
     dehanceValues_(values: any[]): any[] {
-        if (this.dehancer !== undefined && values.length > 0)
+        if (this.dehancer !== undefined && values.length > 0) {
             return values.map(this.dehancer) as any
+        }
         return values
     }
 
@@ -175,36 +183,56 @@ export class ObservableArrayAdministration
     }
 
     setArrayLength_(newLength: number) {
-        if (typeof newLength !== "number" || isNaN(newLength) || newLength < 0)
+        if (typeof newLength !== "number" || isNaN(newLength) || newLength < 0) {
             die("Out of range: " + newLength)
+        }
         let currentLength = this.values_.length
-        if (newLength === currentLength) return
-        else if (newLength > currentLength) {
+        if (newLength === currentLength) {
+            return
+        } else if (newLength > currentLength) {
             const newItems = new Array(newLength - currentLength)
-            for (let i = 0; i < newLength - currentLength; i++) newItems[i] = undefined // No Array.fill everywhere...
+            for (let i = 0; i < newLength - currentLength; i++) {
+                newItems[i] = undefined
+            } // No Array.fill everywhere...
             this.spliceWithArray_(currentLength, 0, newItems)
-        } else this.spliceWithArray_(newLength, currentLength - newLength)
+        } else {
+            this.spliceWithArray_(newLength, currentLength - newLength)
+        }
     }
 
     updateArrayLength_(oldLength: number, delta: number) {
-        if (oldLength !== this.lastKnownLength_) die(16)
+        if (oldLength !== this.lastKnownLength_) {
+            die(16)
+        }
         this.lastKnownLength_ += delta
-        if (this.legacyMode_ && delta > 0) reserveArrayBuffer(oldLength + delta + 1)
+        if (this.legacyMode_ && delta > 0) {
+            reserveArrayBuffer(oldLength + delta + 1)
+        }
     }
 
     spliceWithArray_(index: number, deleteCount?: number, newItems?: any[]): any[] {
         checkIfStateModificationsAreAllowed(this.atom_)
         const length = this.values_.length
 
-        if (index === undefined) index = 0
-        else if (index > length) index = length
-        else if (index < 0) index = Math.max(0, length + index)
+        if (index === undefined) {
+            index = 0
+        } else if (index > length) {
+            index = length
+        } else if (index < 0) {
+            index = Math.max(0, length + index)
+        }
 
-        if (arguments.length === 1) deleteCount = length - index
-        else if (deleteCount === undefined || deleteCount === null) deleteCount = 0
-        else deleteCount = Math.max(0, Math.min(deleteCount, length - index))
+        if (arguments.length === 1) {
+            deleteCount = length - index
+        } else if (deleteCount === undefined || deleteCount === null) {
+            deleteCount = 0
+        } else {
+            deleteCount = Math.max(0, Math.min(deleteCount, length - index))
+        }
 
-        if (newItems === undefined) newItems = EMPTY_ARRAY
+        if (newItems === undefined) {
+            newItems = EMPTY_ARRAY
+        }
 
         if (hasInterceptors(this)) {
             const change = interceptChange<IArrayWillSplice<any>>(this as any, {
@@ -214,7 +242,9 @@ export class ObservableArrayAdministration
                 removedCount: deleteCount,
                 added: newItems
             })
-            if (!change) return EMPTY_ARRAY
+            if (!change) {
+                return EMPTY_ARRAY
+            }
             deleteCount = change.removedCount
             newItems = change.added
         }
@@ -227,8 +257,9 @@ export class ObservableArrayAdministration
         }
         const res = this.spliceItemsIntoValues_(index, deleteCount, newItems)
 
-        if (deleteCount !== 0 || newItems.length !== 0)
+        if (deleteCount !== 0 || newItems.length !== 0) {
             this.notifyArraySplice_(index, newItems, res)
+        }
         return this.dehanceValues_(res)
     }
 
@@ -242,9 +273,12 @@ export class ObservableArrayAdministration
             let oldItems = this.values_.slice(index + deleteCount)
             // New length is the previous length + addition count - deletion count
             this.values_.length += newItems.length - deleteCount
-            for (let i = 0; i < newItems.length; i++) this.values_[index + i] = newItems[i]
-            for (let i = 0; i < oldItems.length; i++)
+            for (let i = 0; i < newItems.length; i++) {
+                this.values_[index + i] = newItems[i]
+            }
+            for (let i = 0; i < oldItems.length; i++) {
                 this.values_[index + newItems.length + i] = oldItems[i]
+            }
             return res
         }
     }
@@ -267,10 +301,16 @@ export class ObservableArrayAdministration
 
         // The reason why this is on right hand side here (and not above), is this way the uglifier will drop it, but it won't
         // cause any runtime overhead in development mode without NODE_ENV set, unless spying is enabled
-        if (__DEV__ && notifySpy) spyReportStart(change!)
+        if (__DEV__ && notifySpy) {
+            spyReportStart(change!)
+        }
         this.atom_.reportChanged()
-        if (notify) notifyListeners(this, change)
-        if (__DEV__ && notifySpy) spyReportEnd()
+        if (notify) {
+            notifyListeners(this, change)
+        }
+        if (__DEV__ && notifySpy) {
+            spyReportEnd()
+        }
     }
 
     notifyArraySplice_(index: number, added: any[], removed: any[]) {
@@ -291,11 +331,17 @@ export class ObservableArrayAdministration
                   } as const)
                 : null
 
-        if (__DEV__ && notifySpy) spyReportStart(change!)
+        if (__DEV__ && notifySpy) {
+            spyReportStart(change!)
+        }
         this.atom_.reportChanged()
         // conform: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
-        if (notify) notifyListeners(this, change)
-        if (__DEV__ && notifySpy) spyReportEnd()
+        if (notify) {
+            notifyListeners(this, change)
+        }
+        if (__DEV__ && notifySpy) {
+            spyReportEnd()
+        }
     }
 
     get_(index: number): any | undefined {
@@ -323,7 +369,9 @@ export class ObservableArrayAdministration
                     index,
                     newValue
                 })
-                if (!change) return
+                if (!change) {
+                    return
+                }
                 newValue = change.newValue
             }
             newValue = this.enhancer_(newValue, oldValue)

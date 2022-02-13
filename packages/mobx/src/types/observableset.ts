@@ -96,7 +96,9 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
     clear() {
         transaction(() => {
             untracked(() => {
-                for (const value of this.data_.values()) this.delete(value)
+                for (const value of this.data_.values()) {
+                    this.delete(value)
+                }
             })
         })
     }
@@ -120,7 +122,9 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
                 object: this,
                 newValue: value
             })
-            if (!change) return this
+            if (!change) {
+                return this
+            }
             // ideally, value = change.value would be done here, so that values can be
             // changed by interceptor. Same applies for other Set and Map api's.
         }
@@ -141,9 +145,15 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
                           newValue: value
                       }
                     : null
-            if (notifySpy && __DEV__) spyReportStart(change!)
-            if (notify) notifyListeners(this, change)
-            if (notifySpy && __DEV__) spyReportEnd()
+            if (notifySpy && __DEV__) {
+                spyReportStart(change!)
+            }
+            if (notify) {
+                notifyListeners(this, change)
+            }
+            if (notifySpy && __DEV__) {
+                spyReportEnd()
+            }
         }
 
         return this
@@ -156,7 +166,9 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
                 object: this,
                 oldValue: value
             })
-            if (!change) return false
+            if (!change) {
+                return false
+            }
         }
         if (this.has(value)) {
             const notifySpy = __DEV__ && isSpyEnabled()
@@ -172,13 +184,19 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
                       }
                     : null
 
-            if (notifySpy && __DEV__) spyReportStart(change!)
+            if (notifySpy && __DEV__) {
+                spyReportStart(change!)
+            }
             transaction(() => {
                 this.atom_.reportChanged()
                 this.data_.delete(value)
             })
-            if (notify) notifyListeners(this, change)
-            if (notifySpy && __DEV__) spyReportEnd()
+            if (notify) {
+                notifyListeners(this, change)
+            }
+            if (notifySpy && __DEV__) {
+                spyReportEnd()
+            }
             return true
         }
         return false
@@ -243,8 +261,9 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
     }
     observe_(listener: (changes: ISetDidChange<T>) => void, fireImmediately?: boolean): Lambda {
         // ... 'fireImmediately' could also be true?
-        if (__DEV__ && fireImmediately === true)
+        if (__DEV__ && fireImmediately === true) {
             die("`observe` doesn't support fireImmediately=true in combination with sets.")
+        }
         return registerListener(this, listener)
     }
 

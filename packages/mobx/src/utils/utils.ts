@@ -49,7 +49,9 @@ export function getNextId() {
 export function once(func: Lambda): Lambda {
     let invoked = false
     return function () {
-        if (invoked) return
+        if (invoked) {
+            return
+        }
         invoked = true
         return (func as any).apply(this, arguments)
     }
@@ -81,9 +83,13 @@ export function isObject(value: any): value is Object {
 }
 
 export function isPlainObject(value: any) {
-    if (!isObject(value)) return false
+    if (!isObject(value)) {
+        return false
+    }
     const proto = Object.getPrototypeOf(value)
-    if (proto == null) return true
+    if (proto == null) {
+        return true
+    }
     const protoConstructor = Object.hasOwnProperty.call(proto, "constructor") && proto.constructor
     return (
         typeof protoConstructor === "function" && protoConstructor.toString() === plainObjectString
@@ -93,9 +99,15 @@ export function isPlainObject(value: any) {
 // https://stackoverflow.com/a/37865170
 export function isGenerator(obj: any): boolean {
     const constructor = obj?.constructor
-    if (!constructor) return false
-    if ("GeneratorFunction" === constructor.name || "GeneratorFunction" === constructor.displayName)
+    if (!constructor) {
+        return false
+    }
+    if (
+        "GeneratorFunction" === constructor.name ||
+        "GeneratorFunction" === constructor.displayName
+    ) {
         return true
+    }
     return false
 }
 
@@ -144,9 +156,13 @@ const hasGetOwnPropertySymbols = typeof Object.getOwnPropertySymbols !== "undefi
 export function getPlainObjectKeys(object: any) {
     const keys = Object.keys(object)
     // Not supported in IE, so there are not going to be symbol props anyway...
-    if (!hasGetOwnPropertySymbols) return keys
+    if (!hasGetOwnPropertySymbols) {
+        return keys
+    }
     const symbols = Object.getOwnPropertySymbols(object)
-    if (!symbols.length) return keys
+    if (!symbols.length) {
+        return keys
+    }
     return [...keys, ...symbols.filter(s => objectPrototype.propertyIsEnumerable.call(object, s))]
 }
 
@@ -160,8 +176,12 @@ export const ownKeys: (target: any) => Array<string | symbol> =
         : /* istanbul ignore next */ Object.getOwnPropertyNames
 
 export function stringifyKey(key: any): string {
-    if (typeof key === "string") return key
-    if (typeof key === "symbol") return key.toString()
+    if (typeof key === "string") {
+        return key
+    }
+    if (typeof key === "symbol") {
+        return key.toString()
+    }
     return new String(key).toString()
 }
 

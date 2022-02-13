@@ -69,8 +69,9 @@ export function addObserver(observable: IObservable, node: IDerivation) {
     // invariantObservers(observable);
 
     observable.observers_.add(node)
-    if (observable.lowestObserverState_ > node.dependenciesState_)
+    if (observable.lowestObserverState_ > node.dependenciesState_) {
         observable.lowestObserverState_ = node.dependenciesState_
+    }
 
     // invariantObservers(observable);
     // invariant(observable._observers.indexOf(node) !== -1, "INTERNAL ERROR didn't add node");
@@ -183,7 +184,9 @@ export function reportObserved(observable: IObservable): boolean {
 // Called by Atom when its value changes
 export function propagateChanged(observable: IObservable) {
     // invariantLOS(observable, "changed start");
-    if (observable.lowestObserverState_ === IDerivationState_.STALE_) return
+    if (observable.lowestObserverState_ === IDerivationState_.STALE_) {
+        return
+    }
     observable.lowestObserverState_ = IDerivationState_.STALE_
 
     // Ideally we use for..of here, but the downcompiled version is really slow...
@@ -202,7 +205,9 @@ export function propagateChanged(observable: IObservable) {
 // Called by ComputedValue when it recalculate and its value changed
 export function propagateChangeConfirmed(observable: IObservable) {
     // invariantLOS(observable, "confirmed start");
-    if (observable.lowestObserverState_ === IDerivationState_.STALE_) return
+    if (observable.lowestObserverState_ === IDerivationState_.STALE_) {
+        return
+    }
     observable.lowestObserverState_ = IDerivationState_.STALE_
 
     observable.observers_.forEach(d => {
@@ -223,7 +228,9 @@ export function propagateChangeConfirmed(observable: IObservable) {
 // Used by computed when its dependency changed, but we don't wan't to immediately recompute.
 export function propagateMaybeChanged(observable: IObservable) {
     // invariantLOS(observable, "maybe start");
-    if (observable.lowestObserverState_ !== IDerivationState_.UP_TO_DATE_) return
+    if (observable.lowestObserverState_ !== IDerivationState_.UP_TO_DATE_) {
+        return
+    }
     observable.lowestObserverState_ = IDerivationState_.POSSIBLY_STALE_
 
     observable.observers_.forEach(d => {
@@ -269,5 +276,7 @@ function printDepTree(tree: IDependencyTree, lines: string[], depth: number) {
         return
     }
     lines.push(`${"\t".repeat(depth - 1)}${tree.name}`)
-    if (tree.dependencies) tree.dependencies.forEach(child => printDepTree(child, lines, depth + 1))
+    if (tree.dependencies) {
+        tree.dependencies.forEach(child => printDepTree(child, lines, depth + 1))
+    }
 }

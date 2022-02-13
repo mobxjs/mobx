@@ -25,14 +25,22 @@ export type PureSpyEvent =
 type SpyEvent = PureSpyEvent & { spyReportStart?: true }
 
 export function spyReport(event: SpyEvent) {
-    if (!__DEV__) return // dead code elimination can do the rest
-    if (!globalState.spyListeners.length) return
+    if (!__DEV__) {
+        return
+    } // dead code elimination can do the rest
+    if (!globalState.spyListeners.length) {
+        return
+    }
     const listeners = globalState.spyListeners
-    for (let i = 0, l = listeners.length; i < l; i++) listeners[i](event)
+    for (let i = 0, l = listeners.length; i < l; i++) {
+        listeners[i](event)
+    }
 }
 
 export function spyReportStart(event: PureSpyEvent) {
-    if (!__DEV__) return
+    if (!__DEV__) {
+        return
+    }
     const change = { ...event, spyReportStart: true as const }
     spyReport(change)
 }
@@ -40,9 +48,14 @@ export function spyReportStart(event: PureSpyEvent) {
 const END_EVENT: SpyEvent = { type: "report-end", spyReportEnd: true }
 
 export function spyReportEnd(change?: { time?: number }) {
-    if (!__DEV__) return
-    if (change) spyReport({ ...change, type: "report-end", spyReportEnd: true })
-    else spyReport(END_EVENT)
+    if (!__DEV__) {
+        return
+    }
+    if (change) {
+        spyReport({ ...change, type: "report-end", spyReportEnd: true })
+    } else {
+        spyReport(END_EVENT)
+    }
 }
 
 export function spy(listener: (change: SpyEvent) => void): Lambda {

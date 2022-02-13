@@ -53,9 +53,11 @@ export function observe<T, K extends keyof T>(
     fireImmediately?: boolean
 ): Lambda
 export function observe(thing, propOrCb?, cbOrFire?, fireImmediately?): Lambda {
-    if (isFunction(cbOrFire))
+    if (isFunction(cbOrFire)) {
         return observeObservableProperty(thing, propOrCb, cbOrFire, fireImmediately)
-    else return observeObservable(thing, propOrCb, cbOrFire)
+    } else {
+        return observeObservable(thing, propOrCb, cbOrFire)
+    }
 }
 
 function observeObservable(thing, listener, fireImmediately: boolean) {

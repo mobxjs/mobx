@@ -136,7 +136,9 @@ export class ObservableObjectAdministration
                 name: key,
                 newValue
             })
-            if (!change) return null
+            if (!change) {
+                return null
+            }
             newValue = (change as any).newValue
         }
         newValue = (observable as any).prepareNewValue_(newValue)
@@ -158,10 +160,16 @@ export class ObservableObjectAdministration
                       }
                     : null
 
-            if (__DEV__ && notifySpy) spyReportStart(change!)
+            if (__DEV__ && notifySpy) {
+                spyReportStart(change!)
+            }
             ;(observable as ObservableValue<any>).setNewValue_(newValue)
-            if (notify) notifyListeners(this, change)
-            if (__DEV__ && notifySpy) spyReportEnd()
+            if (notify) {
+                notifyListeners(this, change)
+            }
+            if (__DEV__ && notifySpy) {
+                spyReportEnd()
+            }
         }
         return true
     }
@@ -256,8 +264,12 @@ export class ObservableObjectAdministration
             const descriptor = getDescriptor(source, key)
             if (descriptor) {
                 const outcome = annotation.make_(this, key, descriptor, source)
-                if (outcome === MakeResult.Cancel) return
-                if (outcome === MakeResult.Break) break
+                if (outcome === MakeResult.Cancel) {
+                    return
+                }
+                if (outcome === MakeResult.Break) {
+                    break
+                }
             }
             source = Object.getPrototypeOf(source)
         }
@@ -320,7 +332,9 @@ export class ObservableObjectAdministration
                     type: ADD,
                     newValue: descriptor.value
                 })
-                if (!change) return null
+                if (!change) {
+                    return null
+                }
                 const { newValue } = change as any
                 if (descriptor.value !== newValue) {
                     descriptor = {
@@ -372,7 +386,9 @@ export class ObservableObjectAdministration
                     type: ADD,
                     newValue: value
                 })
-                if (!change) return null
+                if (!change) {
+                    return null
+                }
                 value = (change as any).newValue
             }
 
@@ -434,7 +450,9 @@ export class ObservableObjectAdministration
                     type: ADD,
                     newValue: undefined
                 })
-                if (!change) return null
+                if (!change) {
+                    return null
+                }
             }
             options.name ||= __DEV__ ? `${this.name_}.${key.toString()}` : "ObservableObject.key"
             options.context = this.proxy_ || this.target_
@@ -485,7 +503,9 @@ export class ObservableObjectAdministration
                 type: REMOVE
             })
             // Cancelled
-            if (!change) return null
+            if (!change) {
+                return null
+            }
         }
 
         // Delete
@@ -539,9 +559,15 @@ export class ObservableObjectAdministration
                     oldValue: value,
                     name: key
                 }
-                if (__DEV__ && notifySpy) spyReportStart(change!)
-                if (notify) notifyListeners(this, change)
-                if (__DEV__ && notifySpy) spyReportEnd()
+                if (__DEV__ && notifySpy) {
+                    spyReportStart(change!)
+                }
+                if (notify) {
+                    notifyListeners(this, change)
+                }
+                if (__DEV__ && notifySpy) {
+                    spyReportEnd()
+                }
             }
         } finally {
             endBatch()
@@ -555,8 +581,9 @@ export class ObservableObjectAdministration
      * for callback details
      */
     observe_(callback: (changes: IObjectDidChange) => void, fireImmediately?: boolean): Lambda {
-        if (__DEV__ && fireImmediately === true)
+        if (__DEV__ && fireImmediately === true) {
             die("`observe` doesn't support the fire immediately property for observable objects.")
+        }
         return registerListener(this, callback)
     }
 
@@ -580,9 +607,15 @@ export class ObservableObjectAdministration
                       } as const)
                     : null
 
-            if (__DEV__ && notifySpy) spyReportStart(change!)
-            if (notify) notifyListeners(this, change)
-            if (__DEV__ && notifySpy) spyReportEnd()
+            if (__DEV__ && notifySpy) {
+                spyReportStart(change!)
+            }
+            if (notify) {
+                notifyListeners(this, change)
+            }
+            if (__DEV__ && notifySpy) {
+                spyReportEnd()
+            }
         }
 
         this.pendingKeys_?.get(key)?.set(true)
@@ -631,8 +664,9 @@ export function asObservableObject(
         return target
     }
 
-    if (__DEV__ && !Object.isExtensible(target))
+    if (__DEV__ && !Object.isExtensible(target)) {
         die("Cannot make the designated object observable; it is not extensible")
+    }
 
     const name =
         options?.name ??

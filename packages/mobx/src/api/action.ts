@@ -45,10 +45,13 @@ export interface IActionFactory extends Annotation, PropertyDecorator {
 function createActionFactory(autoAction: boolean): IActionFactory {
     const res: IActionFactory = function action(arg1, arg2?): any {
         // action(fn() {})
-        if (isFunction(arg1))
+        if (isFunction(arg1)) {
             return createAction(arg1.name || DEFAULT_ACTION_NAME, arg1, autoAction)
+        }
         // action("name", fn() {})
-        if (isFunction(arg2)) return createAction(arg1, arg2, autoAction)
+        if (isFunction(arg2)) {
+            return createAction(arg1, arg2, autoAction)
+        }
         // @action
         if (isStringish(arg2)) {
             return storeAnnotation(arg1, arg2, autoAction ? autoActionAnnotation : actionAnnotation)
@@ -63,7 +66,9 @@ function createActionFactory(autoAction: boolean): IActionFactory {
             )
         }
 
-        if (__DEV__) die("Invalid arguments for `action`")
+        if (__DEV__) {
+            die("Invalid arguments for `action`")
+        }
     } as IActionFactory
     return res
 }

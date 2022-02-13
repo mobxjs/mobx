@@ -21,18 +21,28 @@ export function deepEqual(a: any, b: any, depth: number = -1): boolean {
 function eq(a: any, b: any, depth: number, aStack?: any[], bStack?: any[]) {
     // Identical objects are equal. `0 === -0`, but they aren't identical.
     // See the [Harmony `egal` proposal](http://wiki.ecmascript.org/doku.php?id=harmony:egal).
-    if (a === b) return a !== 0 || 1 / a === 1 / b
+    if (a === b) {
+        return a !== 0 || 1 / a === 1 / b
+    }
     // `null` or `undefined` only equal to itself (strict comparison).
-    if (a == null || b == null) return false
+    if (a == null || b == null) {
+        return false
+    }
     // `NaN`s are equivalent, but non-reflexive.
-    if (a !== a) return b !== b
+    if (a !== a) {
+        return b !== b
+    }
     // Exhaust primitive checks
     const type = typeof a
-    if (type !== "function" && type !== "object" && typeof b != "object") return false
+    if (type !== "function" && type !== "object" && typeof b != "object") {
+        return false
+    }
 
     // Compare `[[Class]]` names.
     const className = toString.call(a)
-    if (className !== toString.call(b)) return false
+    if (className !== toString.call(b)) {
+        return false
+    }
     switch (className) {
         // Strings, numbers, regular expressions, dates, and booleans are compared by value.
         case "[object RegExp]":
@@ -44,7 +54,9 @@ function eq(a: any, b: any, depth: number, aStack?: any[], bStack?: any[]) {
         case "[object Number]":
             // `NaN`s are equivalent, but non-reflexive.
             // Object(NaN) is equivalent to NaN.
-            if (+a !== +a) return +b !== +b
+            if (+a !== +a) {
+                return +b !== +b
+            }
             // An `egal` comparison is performed for other numeric values.
             return +a === 0 ? 1 / +a === 1 / b : +a === +b
         case "[object Date]":
@@ -72,7 +84,9 @@ function eq(a: any, b: any, depth: number, aStack?: any[], bStack?: any[]) {
 
     const areArrays = className === "[object Array]"
     if (!areArrays) {
-        if (typeof a != "object" || typeof b != "object") return false
+        if (typeof a != "object" || typeof b != "object") {
+            return false
+        }
 
         // Objects with different constructors are not equivalent, but `Object`s or `Array`s
         // from different frames are.
@@ -110,7 +124,9 @@ function eq(a: any, b: any, depth: number, aStack?: any[], bStack?: any[]) {
     while (length--) {
         // Linear search. Performance is inversely proportional to the number of
         // unique nested structures.
-        if (aStack[length] === a) return bStack[length] === b
+        if (aStack[length] === a) {
+            return bStack[length] === b
+        }
     }
 
     // Add the first object to the stack of traversed objects.
@@ -121,10 +137,14 @@ function eq(a: any, b: any, depth: number, aStack?: any[], bStack?: any[]) {
     if (areArrays) {
         // Compare array lengths to determine if a deep comparison is necessary.
         length = a.length
-        if (length !== b.length) return false
+        if (length !== b.length) {
+            return false
+        }
         // Deep compare the contents, ignoring non-numeric properties.
         while (length--) {
-            if (!eq(a[length], b[length], depth - 1, aStack, bStack)) return false
+            if (!eq(a[length], b[length], depth - 1, aStack, bStack)) {
+                return false
+            }
         }
     } else {
         // Deep compare objects.
@@ -132,11 +152,15 @@ function eq(a: any, b: any, depth: number, aStack?: any[], bStack?: any[]) {
         let key
         length = keys.length
         // Ensure that both objects contain the same number of properties before comparing deep equality.
-        if (Object.keys(b).length !== length) return false
+        if (Object.keys(b).length !== length) {
+            return false
+        }
         while (length--) {
             // Deep compare each member
             key = keys[length]
-            if (!(hasProp(b, key) && eq(a[key], b[key], depth - 1, aStack, bStack))) return false
+            if (!(hasProp(b, key) && eq(a[key], b[key], depth - 1, aStack, bStack))) {
+                return false
+            }
         }
     }
     // Remove the first object from the stack of traversed objects.
@@ -146,8 +170,14 @@ function eq(a: any, b: any, depth: number, aStack?: any[], bStack?: any[]) {
 }
 
 function unwrap(a: any) {
-    if (isObservableArray(a)) return a.slice()
-    if (isES6Map(a) || isObservableMap(a)) return Array.from(a.entries())
-    if (isES6Set(a) || isObservableSet(a)) return Array.from(a.entries())
+    if (isObservableArray(a)) {
+        return a.slice()
+    }
+    if (isES6Map(a) || isObservableMap(a)) {
+        return Array.from(a.entries())
+    }
+    if (isES6Set(a) || isObservableSet(a)) {
+        return Array.from(a.entries())
+    }
     return a
 }

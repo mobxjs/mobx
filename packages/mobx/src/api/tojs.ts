@@ -21,11 +21,13 @@ function toJSHelper(source, __alreadySeen: Map<any, any>) {
         typeof source !== "object" ||
         source instanceof Date ||
         !isObservable(source)
-    )
+    ) {
         return source
+    }
 
-    if (isObservableValue(source) || isComputedValue(source))
+    if (isObservableValue(source) || isComputedValue(source)) {
         return toJSHelper(source.get(), __alreadySeen)
+    }
     if (__alreadySeen.has(source)) {
         return __alreadySeen.get(source)
     }
@@ -68,6 +70,8 @@ function toJSHelper(source, __alreadySeen: Map<any, any>) {
  * Complex scenarios require custom solution, eg implementing `toJSON` or using `serializr` lib.
  */
 export function toJS<T>(source: T, options?: any): T {
-    if (__DEV__ && options) die("toJS no longer supports options")
+    if (__DEV__ && options) {
+        die("toJS no longer supports options")
+    }
     return toJSHelper(source, new Map())
 }

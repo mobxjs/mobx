@@ -46,11 +46,14 @@ export const computed: IComputedFactory = function computed(arg1, arg2) {
 
     // computed(expr, options?)
     if (__DEV__) {
-        if (!isFunction(arg1)) die("First argument to `computed` should be an expression.")
-        if (isFunction(arg2))
+        if (!isFunction(arg1)) {
+            die("First argument to `computed` should be an expression.")
+        }
+        if (isFunction(arg2)) {
             die(
                 "A setter as second argument is no longer supported, use `{ set: fn }` option instead"
             )
+        }
     }
     const opts: IComputedValueOptions<any> = isPlainObject(arg2) ? arg2 : {}
     opts.get = arg1

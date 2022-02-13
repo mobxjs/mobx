@@ -13,14 +13,18 @@ export function registerListener(listenable: IListenable, handler: Function): La
     listeners.push(handler)
     return once(() => {
         const idx = listeners.indexOf(handler)
-        if (idx !== -1) listeners.splice(idx, 1)
+        if (idx !== -1) {
+            listeners.splice(idx, 1)
+        }
     })
 }
 
 export function notifyListeners<T>(listenable: IListenable, change: T) {
     const prevU = untrackedStart()
     let listeners = listenable.changeListeners_
-    if (!listeners) return
+    if (!listeners) {
+        return
+    }
     listeners = listeners.slice()
     for (let i = 0, l = listeners.length; i < l; i++) {
         listeners[i](change)

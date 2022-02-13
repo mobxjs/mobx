@@ -15,6 +15,7 @@ module.exports = {
     rules: {
         "no-fallthrough": "off",
         "no-constant-condition": "off",
+        curly: "error",
         "getter-return": "off",
         "no-console": "off",
         "no-var": "error",
