@@ -71,7 +71,7 @@ The philosophy behind MobX is simple:
             <p>
                 All changes to and uses of your data are tracked at runtime, building a dependency tree that captures all relations between state and output.
                 This guarantees that computations depending on your state, like React components, run only when strictly needed.
-                There is no need to manually optimize components with error-prone and sub-optimal techniques like memoization and selectors.
+                There is no need to manually optimize components with error-prone and sub-optimal techniques like memorization and selectors.
             </p>
         </div>
     </div>
