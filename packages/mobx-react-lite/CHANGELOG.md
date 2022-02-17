@@ -1,5 +1,11 @@
 # mobx-react-lite
 
+## 3.3.0
+
+### Minor Changes
+
+-   [`59b42c28`](https://github.com/mobxjs/mobx/commit/59b42c2826208435353ce6bf154ae59077edcc05) [#3282](https://github.com/mobxjs/mobx/pull/3282) Thanks [@urugator](https://github.com/urugator)! - support `observable(forwardRef(fn))`, deprecate `observable(fn, { forwardRef: true })`, solve #2527, #3267
+
 ## 3.2.3
 
 ### Patch Changes

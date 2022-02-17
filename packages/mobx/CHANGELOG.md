@@ -1,5 +1,15 @@
 # mobx
 
+## 6.4.0
+
+### Minor Changes
+
+-   [`6b926833`](https://github.com/mobxjs/mobx/commit/6b926833ac7abbf92ff5c309613d2345f72527ee) [#3287](https://github.com/mobxjs/mobx/pull/3287) Thanks [@kubk](https://github.com/kubk)! - Remove any from 'merge' and 'replace' methods of ObservableMap
+
+### Patch Changes
+
+-   [`dee35be4`](https://github.com/mobxjs/mobx/commit/dee35be427989b6adc3c8f7ae8dc632ea66f3538) [#3300](https://github.com/mobxjs/mobx/pull/3300) Thanks [@kubk](https://github.com/kubk)! - Make the error message about Object.freeze more informative
+
 ## 6.3.13
 
 ### Patch Changes

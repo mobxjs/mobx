@@ -1,5 +1,16 @@
 # mobx-react
 
+## 7.3.0
+
+### Minor Changes
+
+-   [`59b42c28`](https://github.com/mobxjs/mobx/commit/59b42c2826208435353ce6bf154ae59077edcc05) [#3282](https://github.com/mobxjs/mobx/pull/3282) Thanks [@urugator](https://github.com/urugator)! - `observer(forwardRef(fn))` no longer generates extra `<Observer>` element and applies `memo` correctly
+
+### Patch Changes
+
+-   Updated dependencies [[`59b42c28`](https://github.com/mobxjs/mobx/commit/59b42c2826208435353ce6bf154ae59077edcc05)]:
+    -   mobx-react-lite@3.3.0
+
 ## 7.2.1
 
 ### Patch Changes
