@@ -22,9 +22,9 @@ const niceErrors = {
     10: "'has()' can only be used on observable objects, arrays and maps",
     11: "'get()' can only be used on observable objects, arrays and maps",
     12: `Invalid annotation`,
-    13: `Dynamic observable objects cannot be frozen`,
+    13: `Dynamic observable objects cannot be frozen. If you're passing observables to 3rd party component/function that calls Object.freeze, pass copy instead: toJS(observable)`,
     14: "Intercept handlers should return nothing or a change object",
-    15: `Observable arrays cannot be frozen`,
+    15: `Observable arrays cannot be frozen. If you're passing observables to 3rd party component/function that calls Object.freeze, pass copy instead: toJS(observable)`,
     16: `Modification exception: the internal structure of an observable array was changed.`,
     17(index, length) {
         return `[mobx.array] Index out of bounds, ${index} is larger than ${length}`
