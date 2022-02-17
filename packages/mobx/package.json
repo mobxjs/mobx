@@ -1,6 +1,6 @@
 {
     "name": "mobx",
-    "version": "6.3.13",
+    "version": "6.4.0",
     "description": "Simple, scalable state management.",
     "source": "src/mobx.ts",
     "main": "dist/index.js",
