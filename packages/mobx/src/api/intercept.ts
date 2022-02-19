@@ -20,7 +20,7 @@ export function intercept<T>(
     handler: IInterceptor<IValueWillChange<T>>
 ): Lambda
 export function intercept<T>(
-    observableArray: IObservableArray<T>,
+    observableArray: IObservableArray<T> | Array<T>,
     handler: IInterceptor<IArrayWillChange<T> | IArrayWillSplice<T>>
 ): Lambda
 export function intercept<K, V>(

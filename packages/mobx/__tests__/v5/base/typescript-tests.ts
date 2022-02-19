@@ -7,10 +7,11 @@ import {
     autorun,
     extendObservable,
     action,
-    IObservableArray,
     IArrayDidChange,
     IArrayWillChange,
     IArrayWillSplice,
+    IMapWillChange,
+    ISetWillChange,
     IObservableValue,
     isObservable,
     isObservableProp,
@@ -28,9 +29,9 @@ import {
     IMapDidChange,
     IValueDidChange,
     ISetDidChange,
-    ISetWillChange,
     IValueWillChange,
-    flowResult
+    flowResult,
+    IObjectWillChange
 } from "../../../src/mobx"
 import * as mobx from "../../../src/mobx"
 import { assert, IsExact } from "conditional-type-checks"
@@ -2054,80 +2055,114 @@ test("type inference of the action callback", () => {
 })
 
 test("TS - type inference of observe & intercept functions", () => {
-    const store = observable({
-        map: new Map<string, number>([["testKey", 1]]),
-        regularObject: { numberKey: 1, stringKey: "string" },
-        set: new Set<number>()
-    })
-    const mapMobxFactory = observable.map<string, number>([["testKey", 1]])
-    const setMobxFactory = observable.set<number>()
+    const array = [1, 2]
+    const object = { numberKey: 1, stringKey: "string" }
+    const map = new Map([["testKey", 1]])
+    const set = new Set([1])
 
-    // Observe regular object
-    mobx.observe(store.regularObject, argument => {
+    const { regularArray, regularObject, regularMap, regularSet } = observable({
+        regularArray: array,
+        regularObject: object,
+        regularMap: map,
+        regularSet: set
+    })
+
+    const observableArray = observable(array)
+    const observableObject = observable(object)
+    const observableMap = observable(map)
+    const observableSet = observable(set)
+
+    // Array
+    mobx.observe(regularArray, argument => {
+        assert<IsExact<typeof argument, IArrayDidChange<number>>>(true)
+    })
+    mobx.intercept(regularArray, argument => {
+        assert<IsExact<typeof argument, IArrayWillChange<number> | IArrayWillSplice<number>>>(true)
+        return argument
+    })
+    // ObservableArray
+    mobx.observe(observableArray, argument => {
+        assert<IsExact<typeof argument, IArrayDidChange<number>>>(true)
+    })
+    mobx.intercept(observableArray, argument => {
+        assert<IsExact<typeof argument, IArrayWillChange<number> | IArrayWillSplice<number>>>(true)
+        return argument
+    })
+    // Object
+    mobx.observe(regularObject, argument => {
         assert<IsExact<typeof argument, IObjectDidChange>>(true)
     })
-
-    // Observe regular object key
-    mobx.observe(store.regularObject, "numberKey", argument => {
+    mobx.intercept(regularObject, argument => {
+        assert<IsExact<typeof argument, IObjectWillChange>>(true)
+        return argument
+    })
+    mobx.observe(regularObject, "numberKey", argument => {
         assert<IsExact<typeof argument, IValueDidChange<number>>>(true)
     })
-
-    // Intercept regular object key
-    mobx.intercept(store.regularObject, "numberKey", argument => {
+    mobx.intercept(regularObject, "numberKey", argument => {
         assert<IsExact<typeof argument, IValueWillChange<number>>>(true)
-        return null
+        return argument
     })
-
-    // Observe regular map
-    mobx.observe(store.map, argument => {
+    // ObservableObject
+    mobx.observe(observableObject, argument => {
+        assert<IsExact<typeof argument, IObjectDidChange>>(true)
+    })
+    mobx.intercept(observableObject, argument => {
+        assert<IsExact<typeof argument, IObjectWillChange>>(true)
+        return argument
+    })
+    mobx.observe(observableObject, "numberKey", argument => {
+        assert<IsExact<typeof argument, IValueDidChange<number>>>(true)
+    })
+    mobx.intercept(observableObject, "numberKey", argument => {
+        assert<IsExact<typeof argument, IValueWillChange<number>>>(true)
+        return argument
+    })
+    // Map
+    mobx.observe(regularMap, argument => {
         assert<IsExact<typeof argument, IMapDidChange<string, number>>>(true)
     })
-
-    // Observe regular map key
-    mobx.observe(store.map, "testKey", argument => {
+    mobx.intercept(regularMap, argument => {
+        assert<IsExact<typeof argument, IMapWillChange<string, number>>>(true)
+        return argument
+    })
+    mobx.observe(regularMap, "testKey", argument => {
         assert<IsExact<typeof argument, IValueDidChange<number>>>(true)
     })
-
-    // Intercept regular map key
-    mobx.intercept(store.map, "testKey", argument => {
+    mobx.intercept(regularMap, "testKey", argument => {
         assert<IsExact<typeof argument, IValueWillChange<number>>>(true)
-        return null
+        return argument
     })
-
-    // Observe map created with observable.map
-    mobx.observe(mapMobxFactory, argument => {
+    // ObservableMap
+    mobx.observe(observableMap, argument => {
         assert<IsExact<typeof argument, IMapDidChange<string, number>>>(true)
     })
-
-    // Observe map key created with observable.map
-    mobx.observe(mapMobxFactory, "testKey", argument => {
+    mobx.intercept(observableMap, argument => {
+        assert<IsExact<typeof argument, IMapWillChange<string, number>>>(true)
+        return argument
+    })
+    mobx.observe(observableMap, "testKey", argument => {
         assert<IsExact<typeof argument, IValueDidChange<number>>>(true)
     })
-
-    // Observe regular set
-    mobx.observe(store.set, argument => {
+    mobx.intercept(observableMap, "testKey", argument => {
+        assert<IsExact<typeof argument, IValueWillChange<number>>>(true)
+        return argument
+    })
+    // Set
+    mobx.observe(regularSet, argument => {
         assert<IsExact<typeof argument, ISetDidChange<number>>>(true)
     })
-
-    // Intercept regular set
-    mobx.intercept(store.set, argument => {
+    mobx.intercept(regularSet, argument => {
         assert<IsExact<typeof argument, ISetWillChange<number>>>(true)
-        return null
+        return argument
     })
-
-    // Observe set created with observable.set
-    mobx.observe(setMobxFactory, argument => {
+    // ObservableSet
+    mobx.observe(observableSet, argument => {
         assert<IsExact<typeof argument, ISetDidChange<number>>>(true)
     })
-
-    const ar: IObservableArray<number> = observable([1, 2])
-    mobx.observe(ar, d => {
-        assert<IsExact<typeof d, IArrayDidChange<number>>>(true)
-    })
-
-    mobx.intercept(ar, c => {
-        assert<IsExact<typeof c, IArrayWillChange<number> | IArrayWillSplice<number>>>(true)
-        return null
+    mobx.intercept(observableSet, argument => {
+        assert<IsExact<typeof argument, ISetWillChange<number>>>(true)
+        return argument
     })
 })
 
