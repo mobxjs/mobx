@@ -20,7 +20,7 @@ export function observe<T>(
     fireImmediately?: boolean
 ): Lambda
 export function observe<T>(
-    observableArray: IObservableArray<T>,
+    observableArray: IObservableArray<T> | Array<T>,
     listener: (change: IArrayDidChange<T>) => void,
     fireImmediately?: boolean
 ): Lambda
