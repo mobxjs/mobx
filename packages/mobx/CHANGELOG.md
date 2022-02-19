@@ -1,5 +1,11 @@
 # mobx
 
+## 6.4.1
+
+### Patch Changes
+
+-   [`d6fa9a19`](https://github.com/mobxjs/mobx/commit/d6fa9a1970ebfb8a8adaf5bf0dc73125acec2dee) [#3306](https://github.com/mobxjs/mobx/pull/3306) Thanks [@urugator](https://github.com/urugator)! - fix missing type inferrence of `observe` and `intercept` for arrays
+
 ## 6.4.0
 
 ### Minor Changes
