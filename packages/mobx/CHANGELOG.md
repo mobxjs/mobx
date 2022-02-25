@@ -1,5 +1,11 @@
 # mobx
 
+## 6.4.2
+
+### Patch Changes
+
+-   [`2caf7e1a`](https://github.com/mobxjs/mobx/commit/2caf7e1a3504dde3d7c9bde3c6fb56ca85168018) [#3316](https://github.com/mobxjs/mobx/pull/3316) Thanks [@urugator](https://github.com/urugator)! - `requiresObservable` always takes precedence over global `reactionRequiresObservable`
+
 ## 6.4.1
 
 ### Patch Changes
