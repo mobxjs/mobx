@@ -67,7 +67,7 @@ export class Reaction implements IDerivation, IReactionPublic {
         public name_: string = __DEV__ ? "Reaction@" + getNextId() : "Reaction",
         private onInvalidate_: () => void,
         private errorHandler_?: (error: any, derivation: IDerivation) => void,
-        public requiresObservable_ = false
+        public requiresObservable_?
     ) {}
 
     onBecomeStale_() {
@@ -169,7 +169,7 @@ export class Reaction implements IDerivation, IReactionPublic {
         if (!globalState.suppressReactionErrors) {
             console.error(message, error)
             /** If debugging brought you here, please, read the above message :-). Tnx! */
-        } else if (__DEV__) {console.warn(`[mobx] (error in reaction '${this.name_}' suppressed, fix error of causing action below)`)} // prettier-ignore
+        } else if (__DEV__) { console.warn(`[mobx] (error in reaction '${this.name_}' suppressed, fix error of causing action below)`) } // prettier-ignore
 
         if (__DEV__ && isSpyEnabled()) {
             spyReport({
