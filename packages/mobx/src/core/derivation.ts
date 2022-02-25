@@ -203,7 +203,11 @@ function warnAboutDerivationWithoutDependencies(derivation: IDerivation) {
         return
     }
 
-    if (globalState.reactionRequiresObservable || derivation.requiresObservable_) {
+    if (
+        typeof derivation.requiresObservable_ === "boolean"
+            ? derivation.requiresObservable_
+            : globalState.reactionRequiresObservable
+    ) {
         console.warn(
             `[mobx] Derivation '${derivation.name_}' is created/updated without reading any observable value.`
         )

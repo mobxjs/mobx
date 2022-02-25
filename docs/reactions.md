@@ -23,7 +23,7 @@ Beyond that, there are also [`reaction`](#reaction) and [`when`](#when).
 
 Usage:
 
--   `autorun(effect: (reaction) => void)`
+-   `autorun(effect: (reaction) => void, options?)`
 
 The `autorun` function accepts one function that should run every time anything it observes changes.
 It also runs once when you create the `autorun` itself. It only responds to changes in observable state, things you have annotated `observable` or `computed`.
