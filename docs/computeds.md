@@ -92,6 +92,7 @@ When using computed values there are a couple of best practices to follow:
 
 1. They should not have side effects or update other observables.
 2. Avoid creating and returning new observables.
+3. They should not depend on non-observable values.
 
 ## Tips
 
