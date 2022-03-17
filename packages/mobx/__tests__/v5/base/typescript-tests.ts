@@ -2057,6 +2057,8 @@ test("type inference of the action callback", () => {
 test("TS - type inference of Set", () => {
     const set = observable.set<number>()
     set.add(1)
+    set.has(1)
+    set.delete(1)
     // @ts-expect-error
     set.add("1")
     // @ts-expect-error
