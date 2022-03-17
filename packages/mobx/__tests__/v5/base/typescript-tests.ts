@@ -2054,6 +2054,17 @@ test("type inference of the action callback", () => {
     }
 })
 
+test("TS - type inference of Set", () => {
+    const set = observable.set<number>()
+    set.add(1)
+    // @ts-expect-error
+    set.add("1")
+    // @ts-expect-error
+    set.has("1")
+    // @ts-expect-error
+    set.delete("1")
+})
+
 test("TS - type inference of observe & intercept functions", () => {
     const array = [1, 2]
     const object = { numberKey: 1, stringKey: "string" }
