@@ -1,5 +1,11 @@
 # mobx
 
+## 6.5.0
+
+### Minor Changes
+
+-   [`767baff0`](https://github.com/mobxjs/mobx/commit/767baff0373e5a5e2b7da274b25042078f9a205c) [#3338](https://github.com/mobxjs/mobx/pull/3338) Thanks [@kubk](https://github.com/kubk)! - Replace any with a generic in Set methods
+
 ## 6.4.2
 
 ### Patch Changes
