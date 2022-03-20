@@ -242,8 +242,8 @@ observableTodoStore.todos[0].task = "grok MobX tutorial";
                         <p>Ok, so far we made a silly report reactive. Time to build a reactive user interface around this very
                             same store. React components are (despite their name) not reactive out of the box.
                             The <code>observer</code> HoC wrapper from the <code>mobx-react-lite</code> package fixes that by
-                            basically wrapping the React component in <code>autorun</code>. To automatically
-                            keep components in sync with the state. This is conceptually not different from what we did
+                            basically wrapping the React component in <code>autorun</code>. This
+                            keeps the component in sync with the state. This is conceptually not different from what we did
                             with the <code>report</code> before.
                         </p>
                         <p>
