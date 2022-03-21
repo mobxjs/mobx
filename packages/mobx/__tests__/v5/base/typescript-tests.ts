@@ -1887,6 +1887,18 @@ test("flow support throwing async generators", async () => {
     }
 })
 
+test("allow 'as const' for creating tuples for map.replace and friends", () => {
+    const map = mobx.observable.map<string, number>()
+    const srcValues = mobx.observable.array<string>()
+
+    const dispose = mobx.reaction(
+        () => Array.from(srcValues, (value, index) => [value, index] as const),
+        entries => map.replace(entries)
+    )
+
+    dispose()
+})
+
 test("toJS bug #1413 (TS)", () => {
     class X {
         test = {
