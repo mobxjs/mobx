@@ -252,7 +252,7 @@ And since observable objects are mutable, it is generally safe to keep reference
 However, every step (tick) that updates observables in an asynchronous process should be marked as `action`.
 This can be achieved in multiple ways by leveraging the above APIs, as shown below.
 
-For example, when handling promises, the handlers that update state should be wrapped using `action` or be actions, as shown below.
+For example, when handling promises, the handlers that update state should be actions or should be wrapped using `action`, as shown below.
 
 <!--DOCUSAURUS_CODE_TABS-->
 <!--Wrap handlers in `action`-->
