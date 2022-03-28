@@ -199,7 +199,7 @@ Usage:
 
 -   `runInAction(fn)`
 
-Use this utility to create a temporarily action that is immediately invoked. Can be useful in asynchronous processes.
+Use this utility to create a temporary action that is immediately invoked. Can be useful in asynchronous processes.
 Check out the [above code block](#examples) for an example.
 
 ## Actions and inheritance
