@@ -5,12 +5,15 @@ import { act, cleanup, fireEvent, render } from "@testing-library/react"
 
 import { Observer, observer, useLocalObservable } from "../src"
 import { useEffect, useState } from "react"
-import { autorun } from "mobx"
+import { autorun, observable } from "mobx"
 import { useObserver } from "../src/useObserver"
 
 afterEach(cleanup)
 
-afterEach(cleanup)
+let consoleWarnMock: jest.SpyInstance | undefined
+afterEach(() => {
+    consoleWarnMock?.mockRestore()
+})
 
 test("base useLocalStore should work", () => {
     let counterRender = 0
@@ -478,28 +481,36 @@ describe("enforcing actions", () => {
 
     it("'always' should work", () => {
         mobx.configure({ enforceActions: "always" })
-        const warn = jest.spyOn(console, "warn").mockImplementation(() => {})
+        consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
 
         const { result } = renderHook(() => {
             const [multiplier, setMultiplier] = React.useState(2)
-            const store = useLocalObservable(() => ({
-                multiplier,
-                count: 10,
-                get multiplied() {
-                    return this.multiplier * this.count
-                },
-                inc() {
-                    this.count += 1
-                }
-            }))
+
+            const [store] = useState(() =>
+                observable(
+                    {
+                        multiplier,
+                        count: 10,
+                        get multiplied() {
+                            return this.multiplier * this.count
+                        },
+                        inc() {
+                            this.count += 1
+                        }
+                    },
+                    {},
+                    { name: "StoreTestAlways" }
+                )
+            )
+
             useEffect(() => {
                 store.multiplier = multiplier
             }, [multiplier])
+
             useEffect(() => setMultiplier(3), [])
         })
 
         expect(result.error).not.toBeDefined()
-        expect(warn).toHaveBeenCalledTimes(2)
-        warn.mockReset()
+        expect(consoleWarnMock).toMatchSnapshot()
     })
 })

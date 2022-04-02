@@ -1,5 +1,23 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`#797 - replacing this.render should trigger a warning 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      "The reactive render of an observer class component (Component) 
+                was overriden after MobX attached. This may result in a memory leak if the 
+                overriden reactive render was not properly disposed.",
+    ],
+  ],
+  "results": Array [
+    Object {
+      "type": "return",
+      "value": undefined,
+    },
+  ],
+}
+`;
+
 exports[`issue 12 1`] = `
 <div>
   <div>

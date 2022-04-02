@@ -9,10 +9,13 @@ import { autorun } from "mobx"
 
 afterEach(cleanup)
 
-afterEach(cleanup)
+let consoleWarnMock: jest.SpyInstance | undefined
+afterEach(() => {
+    consoleWarnMock?.mockRestore()
+})
 
 test("base useLocalStore should work", () => {
-    const warn = jest.spyOn(console, "warn").mockImplementation(() => {})
+    consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
     let counterRender = 0
     let observerRender = 0
     let outerStoreRef: any
@@ -70,8 +73,7 @@ test("base useLocalStore should work", () => {
     expect(counterRender).toBe(1)
     expect(observerRender).toBe(3)
 
-    expect(warn).toBeCalledTimes(1)
-    warn.mockReset()
+    expect(consoleWarnMock).toMatchSnapshot()
 })
 
 describe("is used to keep observable within component body", () => {
@@ -243,7 +245,7 @@ describe("is used to keep observable within component body", () => {
 
     describe("with props", () => {
         it("and useObserver", () => {
-            const warn = jest.spyOn(console, "warn").mockImplementation(() => {})
+            consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
             let counterRender = 0
             let observerRender = 0
 
@@ -311,8 +313,7 @@ describe("is used to keep observable within component body", () => {
             expect(counterRender).toBe(2)
             expect(observerRender).toBe(3)
 
-            expect(warn).toBeCalledTimes(1)
-            warn.mockReset()
+            expect(consoleWarnMock).toMatchSnapshot()
         })
 
         it("with <Observer>", () => {

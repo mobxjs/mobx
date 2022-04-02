@@ -1,0 +1,24 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`enforcing actions 'always' should work 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      "[MobX] Since strict-mode is enabled, changing (observed) observable values without using an action is not allowed. Tried to modify: StoreTestAlways.multiplier",
+    ],
+    Array [
+      "[MobX] Since strict-mode is enabled, changing (observed) observable values without using an action is not allowed. Tried to modify: StoreTestAlways.multiplier",
+    ],
+  ],
+  "results": Array [
+    Object {
+      "type": "return",
+      "value": undefined,
+    },
+    Object {
+      "type": "return",
+      "value": undefined,
+    },
+  ],
+}
+`;

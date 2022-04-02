@@ -9,6 +9,11 @@ const getDNode = (obj: any, prop?: string) => mobx.getObserverTree(obj, prop)
 
 afterEach(cleanup)
 
+let consoleWarnMock: jest.SpyInstance | undefined
+afterEach(() => {
+    consoleWarnMock?.mockRestore()
+})
+
 function runTestSuite(mode: "observer" | "useObserver") {
     function obsComponent<P extends object>(
         component: React.FunctionComponent<P>,
@@ -270,10 +275,9 @@ function runTestSuite(mode: "observer" | "useObserver") {
 
     describe("issue 309", () => {
         test("isObserverBatched is still defined and yields true by default", () => {
-            const warn = jest.spyOn(console, "warn").mockImplementation(() => {})
+            consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
             expect(isObserverBatched()).toBe(true)
-            expect(warn).toHaveBeenCalled()
-            warn.mockReset()
+            expect(consoleWarnMock).toMatchSnapshot()
         })
     })
 
@@ -482,9 +486,9 @@ function runTestSuite(mode: "observer" | "useObserver") {
 }
 
 runTestSuite("observer")
-runTestSuite("useObserver")
 
 test("observer(cmp, { forwardRef: true }) + useImperativeHandle", () => {
+    consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
     interface IMethods {
         focus(): void
     }
@@ -515,6 +519,7 @@ test("observer(cmp, { forwardRef: true }) + useImperativeHandle", () => {
     expect(cr).toBeTruthy()
     expect(cr.current).toBeTruthy()
     expect(typeof cr.current!.focus).toBe("function")
+    expect(consoleWarnMock).toMatchSnapshot()
 })
 
 test("observer(forwardRef(cmp)) + useImperativeHandle", () => {
@@ -558,6 +563,8 @@ test("useImperativeHandle and forwardRef should work with useObserver", () => {
         value: string
     }
 
+    consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
+
     const FancyInput = React.memo(
         React.forwardRef((props: IProps, ref: React.Ref<IMethods>) => {
             const inputRef = React.useRef<HTMLInputElement>(null)
@@ -581,6 +588,7 @@ test("useImperativeHandle and forwardRef should work with useObserver", () => {
     expect(cr).toBeTruthy()
     expect(cr.current).toBeTruthy()
     expect(typeof cr.current!.focus).toBe("function")
+    expect(consoleWarnMock).toMatchSnapshot()
 })
 
 it("should hoist known statics only", () => {

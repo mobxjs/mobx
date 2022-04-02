@@ -19,6 +19,11 @@ afterEach(() => {
     jest.useRealTimers()
 })
 
+let consoleWarnMock: jest.SpyInstance | undefined
+afterEach(() => {
+    consoleWarnMock?.mockRestore()
+})
+
 /*
  use TestUtils.renderIntoDocument will re-mounted the component with different props
  some misunderstanding will be cause？
@@ -848,7 +853,7 @@ test.skip("#709 - applying observer on React.memo component", () => {
 })
 
 test("#797 - replacing this.render should trigger a warning", () => {
-    const warn = jest.spyOn(console, "warn").mockImplementation(() => {})
+    consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
     @observer
     class Component extends React.Component {
         render() {
@@ -866,23 +871,7 @@ test("#797 - replacing this.render should trigger a warning", () => {
     compRef.current?.swapRenderFunc()
     unmount()
 
-    expect(warn).toHaveBeenCalledTimes(1)
-    warn.mockReset()
-})
-
-test("Redeclaring an existing observer component as an observer should log a warning", () => {
-    const warn = jest.spyOn(console, "warn").mockImplementation(() => {})
-    @observer
-    class AlreadyObserver extends React.Component<any, any> {
-        render() {
-            return <div />
-        }
-    }
-
-    observer(AlreadyObserver)
-
-    expect(warn).toHaveBeenCalledTimes(1)
-    warn.mockReset()
+    expect(consoleWarnMock).toMatchSnapshot()
 })
 
 test("Missing render should throw", () => {
