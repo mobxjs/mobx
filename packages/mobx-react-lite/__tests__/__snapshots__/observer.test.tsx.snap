@@ -8,7 +8,30 @@ exports[`changing state in render should fail 1`] = `
 </div>
 `;
 
+exports[`changing state in render should fail 2`] = `
+<div>
+  <div>
+    4
+  </div>
+</div>
+`;
+
 exports[`issue 12 init state is correct 1`] = `
+<div>
+  <div>
+    <span>
+      coffee
+      !
+    </span>
+    <span>
+      tea
+      
+    </span>
+  </div>
+</div>
+`;
+
+exports[`issue 12 init state is correct 2`] = `
 <div>
   <div>
     <span>
@@ -34,7 +57,34 @@ exports[`issue 12 run transaction 1`] = `
 </div>
 `;
 
+exports[`issue 12 run transaction 2`] = `
+<div>
+  <div>
+    <span>
+      soup
+      
+    </span>
+  </div>
+</div>
+`;
+
 exports[`issue 309 isObserverBatched is still defined and yields true by default 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      "[MobX] Deprecated",
+    ],
+  ],
+  "results": Array [
+    Object {
+      "type": "return",
+      "value": undefined,
+    },
+  ],
+}
+`;
+
+exports[`issue 309 isObserverBatched is still defined and yields true by default 2`] = `
 [MockFunction] {
   "calls": Array [
     Array [
@@ -66,18 +116,4 @@ exports[`observer(cmp, { forwardRef: true }) + useImperativeHandle 1`] = `
 }
 `;
 
-exports[`useImperativeHandle and forwardRef should work with useObserver 1`] = `
-[MockFunction] {
-  "calls": Array [
-    Array [
-      "[mobx-react-lite] 'useObserver(fn)' is deprecated. Use \`<Observer>{fn}</Observer>\` instead, or wrap the entire component in \`observer\`.",
-    ],
-  ],
-  "results": Array [
-    Object {
-      "type": "return",
-      "value": undefined,
-    },
-  ],
-}
-`;
+exports[`useImperativeHandle and forwardRef should work with useObserver 1`] = `[MockFunction]`;

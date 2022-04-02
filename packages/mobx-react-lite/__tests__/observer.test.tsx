@@ -23,6 +23,7 @@ function runTestSuite(mode: "observer" | "useObserver") {
             return observer(component)
         } else {
             const c = (props: P) => {
+                consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
                 return useObserver(() => {
                     return component(props)
                 })
@@ -486,6 +487,7 @@ function runTestSuite(mode: "observer" | "useObserver") {
 }
 
 runTestSuite("observer")
+runTestSuite("useObserver")
 
 test("observer(cmp, { forwardRef: true }) + useImperativeHandle", () => {
     consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
