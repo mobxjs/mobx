@@ -665,7 +665,10 @@ test("very long arrays can be safely passed to nativeArray.concat #2379", () => 
     expect(longObservableArray).toEqual(longNativeArray)
     expect(longObservableArray[9000]).toBe(longNativeArray[9000])
     expect(longObservableArray[9999]).toBe(longNativeArray[9999])
+    const warn = jest.spyOn(console, "warn").mockImplementation(() => {})
     expect(longObservableArray[10000]).toBe(longNativeArray[10000])
+    expect(warn).toMatchSnapshot()
+    warn.mockReset()
 
     const expectedArray = nativeArray.concat(longNativeArray)
     const actualArray = nativeArray.concat(longObservableArray)

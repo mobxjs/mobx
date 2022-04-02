@@ -475,8 +475,11 @@ describe("enforcing actions", () => {
         })
         expect(result.error).not.toBeDefined()
     })
+
     it("'always' should work", () => {
         mobx.configure({ enforceActions: "always" })
+        const warn = jest.spyOn(console, "warn").mockImplementation(() => {})
+
         const { result } = renderHook(() => {
             const [multiplier, setMultiplier] = React.useState(2)
             const store = useLocalObservable(() => ({
@@ -494,6 +497,9 @@ describe("enforcing actions", () => {
             }, [multiplier])
             useEffect(() => setMultiplier(3), [])
         })
+
         expect(result.error).not.toBeDefined()
+        expect(warn).toHaveBeenCalledTimes(2)
+        warn.mockReset()
     })
 })

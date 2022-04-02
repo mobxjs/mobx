@@ -8,6 +8,7 @@ afterEach(() => {
 
 test("computed properties react to props when using hooks", async () => {
     jest.useFakeTimers()
+    const warn = jest.spyOn(console, "warn").mockImplementation(() => {})
 
     const seen: Array<string> = []
 
@@ -43,6 +44,9 @@ test("computed properties react to props when using hooks", async () => {
     jest.runAllTimers()
     expect(seen).toEqual(["parent", 0, "parent", 2])
     expect(container).toHaveTextContent("2")
+
+    expect(warn).toHaveBeenCalledTimes(2)
+    warn.mockReset()
 })
 
 test("computed properties result in double render when using observer instead of Observer", async () => {

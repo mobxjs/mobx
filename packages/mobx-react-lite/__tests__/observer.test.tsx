@@ -270,7 +270,10 @@ function runTestSuite(mode: "observer" | "useObserver") {
 
     describe("issue 309", () => {
         test("isObserverBatched is still defined and yields true by default", () => {
+            const warn = jest.spyOn(console, "warn").mockImplementation(() => {})
             expect(isObserverBatched()).toBe(true)
+            expect(warn).toHaveBeenCalled()
+            warn.mockReset()
         })
     })
 
@@ -912,7 +915,6 @@ it("dependencies should not become temporarily unobserved", async () => {
 
     // @ts-ignore
     React.useEffect.mockImplementation(effect => {
-        console.warn("delaying useEffect call")
         p.push(
             new Promise<void>(resolve => {
                 setTimeout(() => {

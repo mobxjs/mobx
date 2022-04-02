@@ -12,6 +12,8 @@ afterEach(resetMobx)
 
 describe("base useAsObservableSource should work", () => {
     it("with <Observer>", () => {
+        const warn = jest.spyOn(console, "warn").mockImplementation(() => {})
+
         let counterRender = 0
         let observerRender = 0
 
@@ -76,6 +78,8 @@ describe("base useAsObservableSource should work", () => {
         expect(container.querySelector("span")!.innerHTML).toBe("22")
         expect(counterRender).toBe(2)
         expect(observerRender).toBe(3)
+        expect(warn).toBeCalledTimes(2)
+        warn.mockReset()
     })
 
     it("with observer()", () => {
