@@ -18,6 +18,23 @@ exports[`#797 - replacing this.render should trigger a warning 1`] = `
 }
 `;
 
+exports[`Redeclaring an existing observer component as an observer should log a warning 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      "The provided component class (AlreadyObserver) 
+                has already been declared as an observer component.",
+    ],
+  ],
+  "results": Array [
+    Object {
+      "type": "return",
+      "value": undefined,
+    },
+  ],
+}
+`;
+
 exports[`issue 12 1`] = `
 <div>
   <div>

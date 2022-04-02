@@ -870,7 +870,19 @@ test("#797 - replacing this.render should trigger a warning", () => {
     const { unmount } = render(<Component ref={compRef} />)
     compRef.current?.swapRenderFunc()
     unmount()
+    expect(consoleWarnMock).toMatchSnapshot()
+})
 
+test("Redeclaring an existing observer component as an observer should log a warning", () => {
+    consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
+    @observer
+    class AlreadyObserver extends React.Component<any, any> {
+        render() {
+            return <div />
+        }
+    }
+
+    observer(AlreadyObserver)
     expect(consoleWarnMock).toMatchSnapshot()
 })
 
