@@ -15,7 +15,7 @@ afterEach(() => {
     consoleWarnMock?.mockRestore()
 })
 
-test("base useLocalStore should work", () => {
+test("base useLocalObservable should work", () => {
     let counterRender = 0
     let observerRender = 0
     let outerStoreRef: any
