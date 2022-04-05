@@ -68,7 +68,7 @@ export function observer<P extends object, TRef = {}>(
     if (process.env.NODE_ENV !== "production" && warnObserverOptionsDeprecated && options) {
         warnObserverOptionsDeprecated = false
         console.warn(
-            `[mobx-react-lite] \`observer(fn, { forwardRef: true })\` is depreacted, use \`observer(React.forwardRef(fn))\``
+            `[mobx-react-lite] \`observer(fn, { forwardRef: true })\` is deprecated, use \`observer(React.forwardRef(fn))\``
         )
     }
 
