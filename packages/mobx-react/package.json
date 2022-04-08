@@ -40,7 +40,7 @@
     },
     "peerDependencies": {
         "mobx": "^6.1.0",
-        "react": "^16.8.0 || ^17"
+        "react": "^18"
     },
     "peerDependenciesMeta": {
         "react-dom": {
