@@ -8,6 +8,7 @@ module.exports = function buildConfig(packageDirectory, pkgConfig) {
     const packageTsconfig = path.resolve(packageDirectory, tsConfig)
     return {
         preset: "ts-jest/presets/js-with-ts",
+        testEnvironment: "jest-environment-jsdom-fifteen",
         globals: {
             __DEV__: true,
             "ts-jest": {
