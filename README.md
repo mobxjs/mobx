@@ -15,7 +15,7 @@ _Simple, scalable state management._
 
 > Documentation for older **unsupported** V4/V5 can be [found here](https://github.com/mobxjs/mobx/blob/mobx4and5/docs/README.md), but be sure to read about [current documentation first](https://mobx.js.org/about-this-documentation.html).
 
-MobX is made possible by the generosity of the sponsors below, and many other [individual backers](docs/backers-sponsors.md#backers). Sponsoring directly impacts the longevity of this project.
+MobX is made possible by the generosity of the sponsors below, and many other [individual backers](https://github.com/mobxjs/mobx/blob/main/docs/backers-sponsors.md#backers). Sponsoring directly impacts the longevity of this project.
 
 **🥇 Gold sponsors (\$3000+ total contribution):** <br/>
 <a href="https://mendix.com/"><img src="https://mobx.js.org/assets/mendix-logo.png" align="center" width="100" title="Mendix" alt="Mendix" /></a>
