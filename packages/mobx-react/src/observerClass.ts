@@ -153,7 +153,7 @@ function makeComponentReactive(render: any) {
     return reactiveRender.call(this)
 }
 
-function observerSCU(nextProps: React.Props<any>, nextState: any): boolean {
+function observerSCU(nextProps: React.ClassAttributes<any>, nextState: any): boolean {
     if (isUsingStaticRendering()) {
         console.warn(
             "[mobx-react] It seems that a re-rendering of a React component is triggered while in static (server-side) mode. Please make sure components are rendered only once server-side."
