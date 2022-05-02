@@ -2,7 +2,6 @@ import { act, cleanup, render } from "@testing-library/react"
 import mockConsole from "jest-mock-console"
 import * as mobx from "mobx"
 import * as React from "react"
-import ReactDOM from "react-dom"
 
 import { useObserver } from "../src/useObserver"
 
@@ -42,36 +41,32 @@ test("uncommitted observing components should not attempt state changes", () => 
     }
 })
 
-const strictModeValues = [true, false]
+const strictModeValues = [true]
 strictModeValues.forEach(strictMode => {
     const modeName = strictMode ? "StrictMode" : "non-StrictMode"
 
-    test(`observable changes before first commit are not lost (${modeName})`, () => {
+    test(`observable changes before first commit are not lost (${modeName})`, async () => {
         const store = mobx.observable({ value: "initial" })
 
-        const TestComponent = () => useObserver(() => <div>{store.value}</div>)
+        const TestComponent = () =>
+            useObserver(() => {
+                const res = <div>{store.value}</div>
+                // Change our observable. This is happening between the initial render of
+                // our component and its initial commit, so it isn't fully mounted yet.
+                // We want to ensure that the change isn't lost.
+                store.value = "changed"
+                return res
+            })
 
-        // Render our observing component wrapped in StrictMode, but using
-        // raw ReactDOM.render (not react-testing-library render) because we
-        // don't want the useEffect calls to have run just yet...
         const rootNode = document.createElement("div")
+        document.body.appendChild(rootNode)
 
         let elem = <TestComponent />
         if (strictMode) {
             elem = <React.StrictMode>{elem}</React.StrictMode>
         }
+        const rendering = render(elem)
 
-        ReactDOM.render(elem, rootNode)
-
-        // Change our observable. This is happening between the initial render of
-        // our component and its initial commit, so it isn't fully mounted yet.
-        // We want to ensure that the change isn't lost.
-        store.value = "changed"
-
-        act(() => {
-            // no-op
-        })
-
-        expect(rootNode.textContent).toBe("changed")
+        expect(rendering.baseElement.textContent).toBe("changed")
     })
 })
