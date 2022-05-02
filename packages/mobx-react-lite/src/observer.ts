@@ -100,7 +100,7 @@ export function observer<P extends object, TRef = {}>(
         }
     }
 
-    let observerComponent = (props: P, ref: React.Ref<TRef>) => {
+    let observerComponent = (props: any, ref: React.Ref<TRef>) => {
         return useObserver(() => render(props, ref), baseComponentName)
     }
 

@@ -430,7 +430,7 @@ function runTestSuite(mode: "observer" | "useObserver") {
             const x = mobx.observable.box(1)
             const errorsSeen: any[] = []
 
-            class ErrorBoundary extends React.Component {
+            class ErrorBoundary extends React.Component<{ children: any }> {
                 public static getDerivedStateFromError() {
                     return { hasError: true }
                 }
@@ -488,9 +488,10 @@ test("observer(cmp, { forwardRef: true }) + useImperativeHandle", () => {
 
     interface IProps {
         value: string
+        ref: React.Ref<IMethods>
     }
 
-    const FancyInput = observer(
+    const FancyInput = observer<IProps>(
         (props: IProps, ref: React.Ref<IMethods>) => {
             const inputRef = React.useRef<HTMLInputElement>(null)
             React.useImperativeHandle(
@@ -673,7 +674,7 @@ test("parent / childs render in the right order", done => {
     render(<Parent />)
 
     tryLogout()
-    expect(events).toEqual(["parent", "child", "parent"])
+    expect(events).toEqual(["parent", "child"])
     done()
 })
 
@@ -681,7 +682,7 @@ it("should have overload for props with children", () => {
     interface IProps {
         value: string
     }
-    const TestComponent = observer<IProps>(({ value, children }) => {
+    const TestComponent = observer<IProps>(({ value }) => {
         return null
     })
 
@@ -697,7 +698,7 @@ it("should have overload for empty options", () => {
     interface IProps {
         value: string
     }
-    const TestComponent = observer<IProps>(({ value, children }) => {
+    const TestComponent = observer<IProps>(({ value }) => {
         return null
     }, {})
 
@@ -715,7 +716,7 @@ it("should have overload for props with children when forwardRef", () => {
         value: string
     }
     const TestComponent = observer<IProps, IMethods>(
-        ({ value, children }, ref) => {
+        ({ value }, ref) => {
             return null
         },
         { forwardRef: true }
@@ -1032,17 +1033,21 @@ test("Anonymous component displayName #3192", () => {
     // React prints errors even if we catch em
     const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {})
 
-    // Simulate:
-    // Error: n_a_m_e(...): Nothing was returned from render. This usually means a return statement is missing. Or, to render nothing, return null.
+    // Simulate returning something not renderable:
+    // Error: n_a_m_e(...):
     // The point is to get correct displayName in error msg.
 
     let memoError
     let observerError
 
     // @ts-ignore
-    const MemoCmp = React.memo(() => {})
+    const MemoCmp = React.memo(() => {
+        return { hello: "world" }
+    })
     // @ts-ignore
-    const ObserverCmp = observer(() => {})
+    const ObserverCmp = observer(() => {
+        return { hello: "world" }
+    })
 
     ObserverCmp.displayName = MemoCmp.displayName = "n_a_m_e"
 
@@ -1053,6 +1058,7 @@ test("Anonymous component displayName #3192", () => {
     }
 
     try {
+        // @ts-ignore
         render(<ObserverCmp />)
     } catch (error) {
         observerError = error
