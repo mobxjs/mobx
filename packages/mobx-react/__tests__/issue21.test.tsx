@@ -10,7 +10,7 @@ import {
 } from "mobx"
 import { observer } from "../src"
 import _ from "lodash"
-import { render } from "@testing-library/react"
+import { act, render } from "@testing-library/react"
 
 let topRenderCount = 0
 
@@ -110,7 +110,7 @@ const WizardStep = observer(
 
 /** END RENDERERS **/
 
-const changeStep = stepNumber => wizardModel.setActiveStep(wizardModel.steps[stepNumber])
+const changeStep = stepNumber => act(() => wizardModel.setActiveStep(wizardModel.steps[stepNumber]))
 
 test("verify issue 21", () => {
     render(<Wizard model={wizardModel} />)
@@ -180,13 +180,15 @@ test("verify prop changes are picked up", () => {
     const Wrapper = () => <Parent />
 
     function changeStuff() {
-        transaction(() => {
-            data.items[0].label = "hello" // schedules state change for Child
-            data.items[0] = createItem(2, "test") // Child should still receive new prop!
-        })
+        act(() => {
+            transaction(() => {
+                data.items[0].label = "hello" // schedules state change for Child
+                data.items[0] = createItem(2, "test") // Child should still receive new prop!
+            })
 
-        // @ts-ignore
-        this.setState({}) // trigger update
+            // @ts-ignore
+            this.setState({}) // trigger update
+        })
     }
 
     const { container } = render(<Wrapper />)
@@ -207,6 +209,7 @@ test("verify prop changes are picked up", () => {
             ["render", 2, "1.2.test.0"]
         ].sort()
     )
+    expect(container.textContent).toMatchInlineSnapshot(`"1.2.test.0"`)
 })
 
 test("verify props is reactive", () => {
@@ -288,9 +291,11 @@ test("verify props is reactive", () => {
     const Wrapper = () => <Parent />
 
     function changeStuff() {
-        transaction(() => {
-            // components start rendeirng a new item, but computed is still based on old value
-            data.items = [createItem(2, "test")]
+        act(() => {
+            transaction(() => {
+                // components start rendeirng a new item, but computed is still based on old value
+                data.items = [createItem(2, "test")]
+            })
         })
     }
 
@@ -366,8 +371,10 @@ test("no re-render for shallow equal props", async () => {
     const Wrapper = () => <Parent nonObservable={{}} />
 
     function changeStuff() {
-        data.items[0].label = "hi" // no change.
-        data.parentValue = 1 // rerender parent
+        act(() => {
+            data.items[0].label = "hi" // no change.
+            data.parentValue = 1 // rerender parent
+        })
     }
 
     const { container } = render(<Wrapper />)
@@ -398,7 +405,7 @@ test("lifecycle callbacks called with correct arguments", () => {
     const Root = class T extends React.Component<any, any> {
         state = { counter: 0 }
         onButtonClick = () => {
-            this.setState({ counter: (this.state.counter || 0) + 1 })
+            act(() => this.setState({ counter: (this.state.counter || 0) + 1 }))
         }
         render() {
             return <Comp counter={this.state.counter || 0} onClick={this.onButtonClick} />

@@ -1,7 +1,7 @@
 import React from "react"
 import { extendObservable, observable } from "mobx"
 import { observer } from "../src"
-import { render } from "@testing-library/react"
+import { act, render } from "@testing-library/react"
 
 test("issue mobx 405", () => {
     function ExampleState() {
@@ -79,9 +79,9 @@ test("#85 Should handle state changing in constructors", () => {
     const { container } = render(<ParentWrapper />)
     expect(container).toHaveTextContent("child:3 - parent:3")
 
-    a.set(5)
+    act(() => a.set(5))
     expect(container).toHaveTextContent("child:5 - parent:5")
 
-    a.set(7)
+    act(() => a.set(7))
     expect(container).toHaveTextContent("child:7 - parent:7")
 })

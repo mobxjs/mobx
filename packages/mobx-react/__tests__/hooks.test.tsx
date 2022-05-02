@@ -40,7 +40,9 @@ test("computed properties react to props when using hooks", async () => {
     const { container } = render(<Parent />)
     expect(container).toHaveTextContent("0")
 
-    jest.runAllTimers()
+    act(() => {
+        jest.runAllTimers()
+    })
     expect(seen).toEqual(["parent", 0, "parent", 2])
     expect(container).toHaveTextContent("2")
 })
@@ -78,7 +80,9 @@ test("computed properties result in double render when using observer instead of
     const { container } = render(<Parent />)
     expect(container).toHaveTextContent("0")
 
-    jest.runAllTimers()
+    act(() => {
+        jest.runAllTimers()
+    })
     expect(seen).toEqual([
         "parent",
         0,
