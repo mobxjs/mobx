@@ -41,32 +41,27 @@ test("uncommitted observing components should not attempt state changes", () => 
     }
 })
 
-const strictModeValues = [true]
-strictModeValues.forEach(strictMode => {
-    const modeName = strictMode ? "StrictMode" : "non-StrictMode"
+test(`observable changes before first commit are not lost`, async () => {
+    const store = mobx.observable({ value: "initial" })
 
-    test(`observable changes before first commit are not lost (${modeName})`, async () => {
-        const store = mobx.observable({ value: "initial" })
+    const TestComponent = () =>
+        useObserver(() => {
+            const res = <div>{store.value}</div>
+            // Change our observable. This is happening between the initial render of
+            // our component and its initial commit, so it isn't fully mounted yet.
+            // We want to ensure that the change isn't lost.
+            store.value = "changed"
+            return res
+        })
 
-        const TestComponent = () =>
-            useObserver(() => {
-                const res = <div>{store.value}</div>
-                // Change our observable. This is happening between the initial render of
-                // our component and its initial commit, so it isn't fully mounted yet.
-                // We want to ensure that the change isn't lost.
-                store.value = "changed"
-                return res
-            })
+    const rootNode = document.createElement("div")
+    document.body.appendChild(rootNode)
 
-        const rootNode = document.createElement("div")
-        document.body.appendChild(rootNode)
+    const rendering = render(
+        <React.StrictMode>
+            <TestComponent />
+        </React.StrictMode>
+    )
 
-        let elem = <TestComponent />
-        if (strictMode) {
-            elem = <React.StrictMode>{elem}</React.StrictMode>
-        }
-        const rendering = render(elem)
-
-        expect(rendering.baseElement.textContent).toBe("changed")
-    })
+    expect(rendering.baseElement.textContent).toBe("changed")
 })
