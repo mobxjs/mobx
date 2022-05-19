@@ -1,4 +1,4 @@
-import React from "react"
+import React, { createContext } from "react"
 import { inject, observer, Observer, enableStaticRendering } from "../src"
 import { render, act } from "@testing-library/react"
 import {
@@ -907,4 +907,72 @@ test("Missing render should throw", () => {
         }
     }
     expect(() => observer(Component)).toThrow()
+})
+
+test("this.context is not observable if ComponentName.contextType is not set", () => {
+    const store = observable({ counter: 0 })
+
+    const Context = createContext(store)
+
+    @observer
+    class Component extends React.Component {
+        context = { counter: 0 }
+
+        @computed
+        get counterAsString() {
+            return String((this.context as any).counter)
+        }
+
+        render() {
+            return <div />
+        }
+    }
+
+    const compRef = React.createRef<Component>()
+
+    const { unmount } = render(
+        <Context.Provider value={store}>
+            <Component ref={compRef} />
+        </Context.Provider>
+    )
+
+    store.counter = 1
+
+    expect(compRef.current?.counterAsString).not.toBe("1")
+    unmount()
+})
+
+test("this.context is observable if ComponentName.contextType is set", () => {
+    const store = observable({ counter: 0 })
+
+    const Context = createContext(store)
+
+    @observer
+    class Component extends React.Component {
+        static contextType = Context
+
+        @computed
+        get counterAsString() {
+            return String((this.context as any).counter)
+        }
+
+        render() {
+            return <div />
+        }
+    }
+
+    const compRef = React.createRef<Component>()
+
+    const { unmount } = render(
+        <Context.Provider value={store}>
+            <Component ref={compRef} />
+        </Context.Provider>
+    )
+
+    store.counter = 1
+
+    console.log(compRef.current?.counterAsString)
+
+    expect(compRef.current?.counterAsString).toBe("1")
+    unmount()
 })
