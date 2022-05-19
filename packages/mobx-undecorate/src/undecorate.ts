@@ -163,7 +163,7 @@ export default function transform(
                 const decorators = callPath.value.arguments[1]
 
                 if (!j.Identifier.check(target)) {
-                    // not targetting a class, just swap it with makeObservable
+                    // not targeting a class, just swap it with makeObservable
                     changed = true
                     // @ts-ignore // TODO: or "observable" ?
                     callPath.value.callee.name = "makeObservable"
@@ -180,7 +180,7 @@ export default function transform(
                 }
                 const targetDeclaration = declarations[0].parentPath.value
                 if (!j.ClassDeclaration.check(targetDeclaration)) {
-                    // not targetting a class, just swap it with makeObservable
+                    // not targeting a class, just swap it with makeObservable
                     changed = true
                     // @ts-ignore // TODO: or "observable" ?
                     callPath.value.callee.name = "makeObservable"
