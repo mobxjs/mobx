@@ -22,10 +22,7 @@ function objectToBeRetainedByReactFactory() {
 }
 
 export function useObserver<T>(fn: () => T, baseComponentName: string = "observed"): T {
-    if (isUsingStaticRendering()) {
-        return fn()
-    }
-
+    const staticRendering = isUsingStaticRendering();
     const [objectRetainedByReact] = React.useState(objectToBeRetainedByReactFactory)
     // Force update, see #2982
     const [, setState] = React.useState()
@@ -36,7 +33,7 @@ export function useObserver<T>(fn: () => T, baseComponentName: string = "observe
     // Reactions.
     const reactionTrackingRef = React.useRef<IReactionTracking | null>(null)
 
-    if (!reactionTrackingRef.current) {
+    if (!staticRendering && !reactionTrackingRef.current) {
         // First render for this component (or first time since a previous
         // reaction from an abandoned render was disposed).
 
@@ -63,10 +60,16 @@ export function useObserver<T>(fn: () => T, baseComponentName: string = "observe
         )
     }
 
-    const { reaction } = reactionTrackingRef.current!
+    const { reaction } = !staticRendering ? reactionTrackingRef.current! : { reaction: null }
+    
     React.useDebugValue(reaction, printDebugValue)
 
     React.useEffect(() => {
+        // When static rendering ignore reactions.
+        if(staticRendering) {
+            return
+        }
+
         // Called on first mount only
         recordReactionAsCommitted(reactionTrackingRef)
 
@@ -104,6 +107,10 @@ export function useObserver<T>(fn: () => T, baseComponentName: string = "observe
             reactionTrackingRef.current = null
         }
     }, [])
+
+    if (staticRendering) {
+        return fn() 
+    }
 
     // render the original component, but have the
     // reaction track the observables, so that rendering
