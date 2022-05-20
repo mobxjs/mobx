@@ -1,0 +1,9 @@
+{
+    "extends": "../tsconfig.json",
+    "compilerOptions": {
+        "strict": true,
+        "allowJs": true,
+        "rootDir": "v5"
+    },
+    "include": ["v5"]
+}

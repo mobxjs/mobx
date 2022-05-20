@@ -136,6 +136,11 @@ function createObservable(v: any, arg2?: any, arg3?: any) {
 }
 Object.assign(createObservable, observableDecoratorAnnotation)
 
+export interface IObservableValueFactory {
+    <T>(value: T, options?: CreateObservableOptions): IObservableValue<T>
+    <T>(value?: T, options?: CreateObservableOptions): IObservableValue<T | undefined>
+}
+
 export interface IObservableFactory extends Annotation, PropertyDecorator {
     <T = any>(value: T[], options?: CreateObservableOptions): IObservableArray<T>
     <T = any>(value: Set<T>, options?: CreateObservableOptions): ObservableSet<T>
@@ -146,7 +151,7 @@ export interface IObservableFactory extends Annotation, PropertyDecorator {
         options?: CreateObservableOptions
     ): T
 
-    box: <T = any>(value?: T, options?: CreateObservableOptions) => IObservableValue<T>
+    box: IObservableValueFactory
     array: <T = any>(initialValues?: T[], options?: CreateObservableOptions) => IObservableArray<T>
     set: <T = any>(
         initialValues?: IObservableSetInitialValues<T>,
@@ -181,11 +186,9 @@ const observableFactories: IObservableFactory = {
     },
     array<T = any>(initialValues?: T[], options?: CreateObservableOptions): IObservableArray<T> {
         const o = asCreateObservableOptions(options)
-        return (
-            globalState.useProxies === false || o.proxy === false
-                ? createLegacyArray
-                : createObservableArray
-        )(initialValues, getEnhancerFromOptions(o), o.name)
+        return (globalState.useProxies === false || o.proxy === false
+            ? createLegacyArray
+            : createObservableArray)(initialValues, getEnhancerFromOptions(o), o.name)
     },
     map<K = any, V = any>(
         initialValues?: IObservableMapInitialValues<K, V>,
