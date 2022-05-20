@@ -175,7 +175,7 @@ export interface IObservableFactory extends Annotation, PropertyDecorator {
 }
 
 const observableFactories: IObservableFactory = {
-    box<T = any>(value?: T, options?: CreateObservableOptions): IObservableValue<T> {
+    box<T = any>(value: T, options?: CreateObservableOptions): IObservableValue<T> {
         const o = asCreateObservableOptions(options)
         return new ObservableValue(value, getEnhancerFromOptions(o), o.name, true, o.equals)
     },
