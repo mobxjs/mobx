@@ -2,8 +2,7 @@
     "extends": "../tsconfig.json",
     "compilerOptions": {
         "strict": true,
-        "allowJs": true,
-        "rootDir": "v5"
+        "rootDir": ".."
     },
-    "include": ["v5"]
+    "include": ["./v5/base/typescript-tests.ts"]
 }

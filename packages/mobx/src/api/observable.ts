@@ -186,9 +186,11 @@ const observableFactories: IObservableFactory = {
     },
     array<T = any>(initialValues?: T[], options?: CreateObservableOptions): IObservableArray<T> {
         const o = asCreateObservableOptions(options)
-        return (globalState.useProxies === false || o.proxy === false
-            ? createLegacyArray
-            : createObservableArray)(initialValues, getEnhancerFromOptions(o), o.name)
+        return (
+            globalState.useProxies === false || o.proxy === false
+                ? createLegacyArray
+                : createObservableArray
+        )(initialValues, getEnhancerFromOptions(o), o.name)
     },
     map<K = any, V = any>(
         initialValues?: IObservableMapInitialValues<K, V>,
