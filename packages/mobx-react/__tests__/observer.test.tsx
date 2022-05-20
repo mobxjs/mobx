@@ -909,51 +909,28 @@ test("Missing render should throw", () => {
     expect(() => observer(Component)).toThrow()
 })
 
-test("this.context is not observable if ComponentName.contextType is not set", () => {
-    const store = observable({ counter: 0 })
+test("this.context is observable if ComponentName.contextType is set", () => {
+    const Context = createContext({})
 
-    const Context = createContext(store)
+    class Parent extends React.Component<any> {
+        state = { counter: 0 }
 
-    @observer
-    class Component extends React.Component {
-        context = { counter: 0 }
-
-        @computed
-        get counterAsString() {
-            return String((this.context as any).counter)
+        componentDidMount() {
+            this.setState({ counter: 1 })
         }
 
         render() {
-            return <div />
+            return <Context.Provider value={this.state}>{this.props.children}</Context.Provider>
         }
     }
 
-    const compRef = React.createRef<Component>()
-
-    const { unmount } = render(
-        <Context.Provider value={store}>
-            <Component ref={compRef} />
-        </Context.Provider>
-    )
-
-    store.counter = 1
-
-    expect(compRef.current?.counterAsString).not.toBe("1")
-    unmount()
-})
-
-test("this.context is observable if ComponentName.contextType is set", () => {
-    const store = observable({ counter: 0 })
-
-    const Context = createContext(store)
-
     @observer
-    class Component extends React.Component {
+    class Child extends React.Component {
         static contextType = Context
 
         @computed
-        get counterAsString() {
-            return String((this.context as any).counter)
+        get counterValue() {
+            return (this.context as any).counter
         }
 
         render() {
@@ -961,18 +938,16 @@ test("this.context is observable if ComponentName.contextType is set", () => {
         }
     }
 
-    const compRef = React.createRef<Component>()
+    const compRef = React.createRef<Child>()
 
     const { unmount } = render(
-        <Context.Provider value={store}>
-            <Component ref={compRef} />
-        </Context.Provider>
+        <Parent>
+            <Child ref={compRef} />
+        </Parent>
     )
 
-    store.counter = 1
+    console.log(compRef.current?.counterValue)
 
-    console.log(compRef.current?.counterAsString)
-
-    expect(compRef.current?.counterAsString).toBe("1")
+    expect(compRef.current?.counterValue).toBe(1)
     unmount()
 })
