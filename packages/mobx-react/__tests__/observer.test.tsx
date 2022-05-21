@@ -957,11 +957,10 @@ test("this.context is observable if ComponentName.contextType is set", () => {
     }
 
     const parentRef = React.createRef<Parent>()
-    const childRef = React.createRef<Child>()
 
     const app = (
         <Parent ref={parentRef}>
-            <Child ref={childRef} />
+            <Child />
         </Parent>
     )
 
