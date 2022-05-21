@@ -912,15 +912,27 @@ test("Missing render should throw", () => {
 test("this.context is observable if ComponentName.contextType is set", () => {
     const Context = createContext({})
 
-    class Parent extends React.Component<any> {
-        state = { counter: 0 }
+    let renderCounter = 0
 
-        componentDidMount() {
-            this.setState({ counter: 1 })
+    @observer
+    class Parent extends React.Component<any> {
+        constructor(props: any) {
+            super(props)
+            makeObservable(this)
+        }
+
+        @observable
+        counter = 0
+
+        @computed
+        get contextValue() {
+            return { counter: this.counter }
         }
 
         render() {
-            return <Context.Provider value={this.state}>{this.props.children}</Context.Provider>
+            return (
+                <Context.Provider value={this.contextValue}>{this.props.children}</Context.Provider>
+            )
         }
     }
 
@@ -928,26 +940,40 @@ test("this.context is observable if ComponentName.contextType is set", () => {
     class Child extends React.Component {
         static contextType = Context
 
+        constructor(props: any) {
+            super(props)
+            makeObservable(this)
+        }
+
         @computed
         get counterValue() {
             return (this.context as any).counter
         }
 
         render() {
-            return <div />
+            renderCounter++
+            return <div>{this.counterValue}</div>
         }
     }
 
-    const compRef = React.createRef<Child>()
+    const parentRef = React.createRef<Parent>()
+    const childRef = React.createRef<Child>()
 
-    const { unmount } = render(
-        <Parent>
-            <Child ref={compRef} />
+    const app = (
+        <Parent ref={parentRef}>
+            <Child ref={childRef} />
         </Parent>
     )
 
-    console.log(compRef.current?.counterValue)
+    const { unmount, container } = render(app)
 
-    expect(compRef.current?.counterValue).toBe(1)
+    act(() => {
+        if (parentRef.current) {
+            parentRef.current!.counter = 1
+        }
+    })
+
+    expect(renderCounter).toBe(2)
+    expect(container).toHaveTextContent("1")
     unmount()
 })
