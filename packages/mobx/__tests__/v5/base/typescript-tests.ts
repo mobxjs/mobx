@@ -2414,6 +2414,8 @@ test("#2485", () => {
     expect(new Color(1, 2, 3, 4).toString()).toMatchInlineSnapshot(`"rgba(1, 2, 3, 4)"`)
 })
 
+const notNull: string = null;
+
 test("argumentless observable adds undefined to the output type", () => {
     const a = observable.box<string>()
     // @ts-expect-error
