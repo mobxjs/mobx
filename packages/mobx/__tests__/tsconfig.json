@@ -1,8 +1,0 @@
-{
-    "extends": "../tsconfig.json",
-    "compilerOptions": {
-        "strict": true,
-        "rootDir": ".."
-    },
-    "include": ["./v5/base/typescript-tests.ts"]
-}
