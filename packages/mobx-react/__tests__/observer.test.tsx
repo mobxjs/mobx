@@ -1,4 +1,4 @@
-import React from "react"
+import React, { createContext } from "react"
 import { inject, observer, Observer, enableStaticRendering } from "../src"
 import { render, act } from "@testing-library/react"
 import {
@@ -907,4 +907,72 @@ test("Missing render should throw", () => {
         }
     }
     expect(() => observer(Component)).toThrow()
+})
+
+test("this.context is observable if ComponentName.contextType is set", () => {
+    const Context = createContext({})
+
+    let renderCounter = 0
+
+    @observer
+    class Parent extends React.Component<any> {
+        constructor(props: any) {
+            super(props)
+            makeObservable(this)
+        }
+
+        @observable
+        counter = 0
+
+        @computed
+        get contextValue() {
+            return { counter: this.counter }
+        }
+
+        render() {
+            return (
+                <Context.Provider value={this.contextValue}>{this.props.children}</Context.Provider>
+            )
+        }
+    }
+
+    @observer
+    class Child extends React.Component {
+        static contextType = Context
+
+        constructor(props: any) {
+            super(props)
+            makeObservable(this)
+        }
+
+        @computed
+        get counterValue() {
+            return (this.context as any).counter
+        }
+
+        render() {
+            renderCounter++
+            return <div>{this.counterValue}</div>
+        }
+    }
+
+    const parentRef = React.createRef<Parent>()
+
+    const app = (
+        <Parent ref={parentRef}>
+            <Child />
+        </Parent>
+    )
+
+    const { unmount, container } = render(app)
+
+    act(() => {
+        if (parentRef.current) {
+            parentRef.current!.counter = 1
+        }
+    })
+
+    expect(renderCounter).toBe(2)
+    expect(container).toHaveTextContent("1")
+    unmount()
 })
