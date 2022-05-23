@@ -1,5 +1,11 @@
 # mobx-react
 
+## 7.5.0
+
+### Minor Changes
+
+-   [`1470b8e4`](https://github.com/mobxjs/mobx/commit/1470b8e4273d6b4046f3107b7f6c30fcffc70eeb) [#3404](https://github.com/mobxjs/mobx/pull/3404) Thanks [@pixelkritzel](https://github.com/pixelkritzel)! - `this.context` is observable if static contextType is set
+
 ## 7.4.0
 
 ### Minor Changes
