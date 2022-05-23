@@ -2414,21 +2414,17 @@ test("#2485", () => {
     expect(new Color(1, 2, 3, 4).toString()).toMatchInlineSnapshot(`"rgba(1, 2, 3, 4)"`)
 })
 
-const notNull: string = null;
-
 test("argumentless observable adds undefined to the output type", () => {
     const a = observable.box<string>()
-    // @ts-expect-error
-    expect(() => a.get().includes("hello_world")).toThrowError()
+    assert<IsExact<typeof a, IObservableValue<string | undefined>>>(true)
 })
 
 test("with initial value observable does not adds undefined to the output type", () => {
     const a = observable.box<string>("hello")
-    expect(() => a.get().includes("hello_world")).not.toThrowError()
+    assert<IsExact<typeof a, IObservableValue<string>>>(true)
 })
 
 test("observable.box should keep track of undefined and null in type", () => {
     const a = observable.box<string | undefined>()
-    // @ts-expect-error
-    expect(() => a.get().includes("hello_world")).toThrowError()
+    assert<IsExact<typeof a, IObservableValue<string | undefined>>>(true)
 })
