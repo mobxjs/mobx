@@ -1,5 +1,11 @@
 # mobx
 
+## 6.6.0
+
+### Minor Changes
+
+-   [`8e204c7b`](https://github.com/mobxjs/mobx/commit/8e204c7b7d1dbad597761fa83beda77f027ee34c) [#3409](https://github.com/mobxjs/mobx/pull/3409) Thanks [@Nokel81](https://github.com/Nokel81)! - Remove observable.box type inconsistancy
+
 ## 6.5.0
 
 ### Minor Changes
