@@ -117,8 +117,8 @@ export function useObserver<T>(fn: () => T, baseComponentName: string = "observe
             exception = e
         }
     })
-
     if (exception) {
+        console.error("Caught exception in observer: ", exception)
         throw exception // re-throw any exceptions caught during rendering
     }
 
