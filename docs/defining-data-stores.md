@@ -227,7 +227,7 @@ You might distribute the _ui-state-store_ through your application by passing it
 Example of a store (using ES6 syntax):
 
 ```javascript
-import { makeAutoObservable, observable, computed, asStructure } from "mobx"
+import { makeAutoObservable, observable, computed } from "mobx"
 
 export class UiState {
     language = "en_US"
