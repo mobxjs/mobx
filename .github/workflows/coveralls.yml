@@ -2,8 +2,14 @@ name: Coveralls
 
 on: ["push", "pull_request"]
 
+permissions:
+  contents: read
+
 jobs:
   mobx:
+    permissions:
+      checks: write  # for coverallsapp/github-action to create new checks
+      contents: read  # for actions/checkout to fetch code
     name: Packages coverage
     runs-on: ubuntu-latest
     steps:
