@@ -82,9 +82,23 @@ It's a bit opinionated and can lead to a lot of false positives depending on you
 ]
 ```
 
-### mobx/no-anonymous-observer
+### mobx/no-anonymous-observer (deprecated)
 
 Forbids anonymous functions or classes as `observer` components.
 Improves debugging experience and [avoids problem with inability to customize `displayName`](https://github.com/mobxjs/mobx/issues/2721).
 Plays nice with `eslint-plugin-react-hooks` and `mobx/missing-observer` as both of these don't not recognize anonymous function as component.
 **Autofix** infers the name from variable if possible.
+
+_Note: Due to known [issues](https://github.com/mobxjs/mobx/issues/3422), it ts preferably to use [react/display-name](https://github.com/jsx-eslint/eslint-plugin-react/blob/master/docs/rules/display-name.md) with [componentWrapperFunctions](https://github.com/jsx-eslint/eslint-plugin-react). So your .eslintrc config could look like this:_
+```
+{
+  "rules": {
+    "react/display-name": "warn"
+  },
+  "settings": {
+    "componentWrapperFunctions": [
+      "observer"
+    ]
+  }
+}
+```
