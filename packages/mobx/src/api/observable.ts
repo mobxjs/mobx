@@ -206,7 +206,7 @@ const observableFactories: IObservableFactory = {
         const o = asCreateObservableOptions(options)
         return new ObservableSet<T>(initialValues, getEnhancerFromOptions(o), o.name)
     },
-    object<T = any>(
+    object<T extends object = any>(
         props: T,
         decorators?: AnnotationsMap<T, never>,
         options?: CreateObservableOptions
