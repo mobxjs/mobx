@@ -4,7 +4,6 @@ import * as mobx from "mobx"
 import React from "react"
 
 import { observer, useObserver, isObserverBatched, enableStaticRendering } from "../src"
-import { useConsoleWarnMock } from "./utils"
 
 const getDNode = (obj: any, prop?: string) => mobx.getObserverTree(obj, prop)
 
