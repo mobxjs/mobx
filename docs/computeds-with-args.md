@@ -16,11 +16,13 @@ and the application supports multi-selection.
 How can we implement a derivation like `store.isSelected(item.id)`?
 
 ```javascript
-import * as React from "react"
-import { observer } from "mobx-react-lite"
+import * as React from 'react'
+import { observer } from 'mobx-react-lite'
 
 const Item = observer(({ item, store }) => (
-    <div className={store.isSelected(item.id) ? "selected" : ""}>{item.title}</div>
+    <div className={store.isSelected(item.id) ? "selected" : ""}>
+        {item.title}
+    </div>
 ))
 ```
 
@@ -44,13 +46,17 @@ This is a worst-case example. In general, it is completely fine to have unmarked
 This is a more efficient implementation compared to the original.
 
 ```javascript
-import * as React from "react"
-import { computed } from "mobx"
-import { observer } from "mobx-react-lite"
+import * as React from 'react'
+import { computed } from 'mobx'
+import { observer } from 'mobx-react-lite'
 
 const Item = observer(({ item, store }) => {
     const isSelected = computed(() => store.isSelected(item.id)).get()
-    return <div className={isSelected ? "selected" : ""}>{item.title}</div>
+    return (
+        <div className={isSelected ? "selected" : ""}>
+            {item.title}
+        </div>
+    )
 })
 ```
 
