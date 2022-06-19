@@ -491,7 +491,6 @@ runTestSuite("useObserver")
 
 test("observer(cmp, { forwardRef: true }) + useImperativeHandle", () => {
     consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
-    consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
 
     interface IMethods {
         focus(): void
