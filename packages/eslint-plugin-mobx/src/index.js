@@ -14,8 +14,7 @@ module.exports = {
                 "mobx/exhaustive-make-observable": "warn",
                 "mobx/unconditional-make-observable": "error",
                 "mobx/missing-make-observable": "error",
-                "mobx/missing-observer": "warn",
-                "mobx/no-anonymous-observer": "warn"
+                "mobx/missing-observer": "warn"
             }
         }
     },

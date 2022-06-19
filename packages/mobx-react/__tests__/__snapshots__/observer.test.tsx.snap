@@ -4,8 +4,8 @@ exports[`#797 - replacing this.render should trigger a warning 1`] = `
 [MockFunction] {
   "calls": Array [
     Array [
-      "The reactive render of an observer class component (Component) 
-                was overriden after MobX attached. This may result in a memory leak if the 
+      "The reactive render of an observer class component (Component)
+                was overriden after MobX attached. This may result in a memory leak if the
                 overriden reactive render was not properly disposed.",
     ],
   ],
@@ -22,7 +22,7 @@ exports[`Redeclaring an existing observer component as an observer should log a 
 [MockFunction] {
   "calls": Array [
     Array [
-      "The provided component class (AlreadyObserver) 
+      "The provided component class (AlreadyObserver)
                 has already been declared as an observer component.",
     ],
   ],
@@ -44,7 +44,6 @@ exports[`issue 12 1`] = `
     </span>
     <span>
       tea
-      
     </span>
   </div>
 </div>
@@ -55,7 +54,6 @@ exports[`issue 12 2`] = `
   <div>
     <span>
       soup
-      
     </span>
   </div>
 </div>

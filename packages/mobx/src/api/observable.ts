@@ -136,6 +136,11 @@ function createObservable(v: any, arg2?: any, arg3?: any) {
 }
 Object.assign(createObservable, observableDecoratorAnnotation)
 
+export interface IObservableValueFactory {
+    <T>(value: T, options?: CreateObservableOptions): IObservableValue<T>
+    <T>(value?: T, options?: CreateObservableOptions): IObservableValue<T | undefined>
+}
+
 export interface IObservableFactory extends Annotation, PropertyDecorator {
     <T = any>(value: T[], options?: CreateObservableOptions): IObservableArray<T>
     <T = any>(value: Set<T>, options?: CreateObservableOptions): ObservableSet<T>
@@ -146,7 +151,7 @@ export interface IObservableFactory extends Annotation, PropertyDecorator {
         options?: CreateObservableOptions
     ): T
 
-    box: <T = any>(value?: T, options?: CreateObservableOptions) => IObservableValue<T>
+    box: IObservableValueFactory
     array: <T = any>(initialValues?: T[], options?: CreateObservableOptions) => IObservableArray<T>
     set: <T = any>(
         initialValues?: IObservableSetInitialValues<T>,
@@ -175,7 +180,7 @@ export interface IObservableFactory extends Annotation, PropertyDecorator {
 }
 
 const observableFactories: IObservableFactory = {
-    box<T = any>(value?: T, options?: CreateObservableOptions): IObservableValue<T> {
+    box<T = any>(value: T, options?: CreateObservableOptions): IObservableValue<T> {
         const o = asCreateObservableOptions(options)
         return new ObservableValue(value, getEnhancerFromOptions(o), o.name, true, o.equals)
     },
@@ -201,7 +206,7 @@ const observableFactories: IObservableFactory = {
         const o = asCreateObservableOptions(options)
         return new ObservableSet<T>(initialValues, getEnhancerFromOptions(o), o.name)
     },
-    object<T = any>(
+    object<T extends object = any>(
         props: T,
         decorators?: AnnotationsMap<T, never>,
         options?: CreateObservableOptions

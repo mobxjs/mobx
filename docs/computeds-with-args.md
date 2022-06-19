@@ -16,14 +16,12 @@ and the application supports multi-selection.
 How can we implement a derivation like `store.isSelected(item.id)`?
 
 ```javascript
-import * as React from 'react'
-import { observer } from 'mobx-react-lite'
+import * as React from "react"
+import { observer } from "mobx-react-lite"
 
 const Item = observer(({ item, store }) => (
-    <div className={store.isSelected(item.id) ? "selected" : ""}>
-        {item.title}
-    </div>
-)
+    <div className={store.isSelected(item.id) ? "selected" : ""}>{item.title}</div>
+))
 ```
 
 There are four ways in which we can approach this. You can try the solutions below in [this CodeSandbox](https://codesandbox.io/s/multi-selection-odup1?file=/src/index.tsx).
@@ -46,18 +44,14 @@ This is a worst-case example. In general, it is completely fine to have unmarked
 This is a more efficient implementation compared to the original.
 
 ```javascript
-import * as React from 'react'
-import { computed } from 'mobx'
-import { observer } from 'mobx-react-lite'
+import * as React from "react"
+import { computed } from "mobx"
+import { observer } from "mobx-react-lite"
 
 const Item = observer(({ item, store }) => {
     const isSelected = computed(() => store.isSelected(item.id)).get()
-    return (
-        <div className={isSelected ? "selected" : ""}>
-            {item.title}
-        </div>
-    )
-}
+    return <div className={isSelected ? "selected" : ""}>{item.title}</div>
+})
 ```
 
 We create a fresh computed value in the middle of a reaction. This works fine and does introduce that additional caching point, avoiding all components having to directly respond to every selection change.

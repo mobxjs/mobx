@@ -82,7 +82,24 @@ It's a bit opinionated and can lead to a lot of false positives depending on you
 ]
 ```
 
-### mobx/no-anonymous-observer
+### mobx/no-anonymous-observer (deprecated)
+
+_Deprecated in favor of [react/display-name](https://github.com/jsx-eslint/eslint-plugin-react/blob/master/docs/rules/display-name.md) + [componentWrapperFunctions](https://github.com/jsx-eslint/eslint-plugin-react). Example of **.eslintrc**:_
+
+```
+{
+  "rules": {
+    "react/display-name": "warn"
+  },
+  "settings": {
+    "componentWrapperFunctions": [
+      "observer"
+    ]
+  }
+}
+```
+
+---
 
 Forbids anonymous functions or classes as `observer` components.
 Improves debugging experience and [avoids problem with inability to customize `displayName`](https://github.com/mobxjs/mobx/issues/2721).

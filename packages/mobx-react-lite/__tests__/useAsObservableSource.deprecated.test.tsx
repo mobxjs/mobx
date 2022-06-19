@@ -18,7 +18,6 @@ afterEach(() => {
 describe("base useAsObservableSource should work", () => {
     it("with <Observer>", () => {
         consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
-
         let counterRender = 0
         let observerRender = 0
 

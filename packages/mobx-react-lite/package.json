@@ -1,6 +1,6 @@
 {
     "name": "mobx-react-lite",
-    "version": "3.3.0",
+    "version": "3.4.0",
     "description": "Lightweight React bindings for MobX based on React 16.8+ and Hooks",
     "source": "src/index.ts",
     "main": "dist/index.js",
@@ -39,7 +39,7 @@
     "dependencies": {},
     "peerDependencies": {
         "mobx": "^6.1.0",
-        "react": "^16.8.0 || ^17"
+        "react": "^16.8.0 || ^17 || ^18"
     },
     "peerDependenciesMeta": {
         "react-dom": {

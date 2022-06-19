@@ -2,7 +2,7 @@
  * (c) Michel Weststrate 2015 - 2020
  * MIT Licensed
  *
- * Welcome to the mobx sources! To get an global overview of how MobX internally works,
+ * Welcome to the mobx sources! To get a global overview of how MobX internally works,
  * this is a good place to start:
  * https://medium.com/@mweststrate/becoming-fully-reactive-an-in-depth-explanation-of-mobservable-55995262a254#.xvbh6qd74
  *

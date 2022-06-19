@@ -16,3 +16,11 @@ export function sleep(time: number) {
         setTimeout(res, time)
     })
 }
+
+export function useConsoleWarnMock() {
+    let consoleWarnMock: jest.SpyInstance | undefined
+    afterEach(() => {
+        consoleWarnMock?.mockRestore()
+    })
+    return consoleWarnMock
+}

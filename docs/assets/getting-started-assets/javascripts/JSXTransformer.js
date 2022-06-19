@@ -116,7 +116,7 @@
                     }
 
                     /**
-                     * This method returns a nicely formated line of code pointing to the exact
+                     * This method returns a nicely formatted line of code pointing to the exact
                      * location of the error `e`. The line is limited in size so big lines of code
                      * are also shown in a readable way.
                      *
@@ -7200,7 +7200,7 @@
 
                             // If the 'async' keyword is not followed by a '(' character or an
                             // identifier, then it can't be an arrow function modifier, and we
-                            // should interpret it as a normal identifer.
+                            // should interpret it as a normal identifier.
                             if (possiblyAsync && !match("(") && token.type !== Token.Identifier) {
                                 possiblyAsync = false
                                 rewind(backtrackToken)
@@ -11755,7 +11755,7 @@
                          *
                          *   - version: Which version of the source map spec this map is following.
                          *   - sources: An array of URLs to the original source files.
-                         *   - names: An array of identifiers which can be referrenced by individual mappings.
+                         *   - names: An array of identifiers which can be referenced by individual mappings.
                          *   - sourceRoot: Optional. The URL root from which all sources are relative.
                          *   - sourcesContent: Optional. An array of contents of the original source files.
                          *   - mappings: A string of base64 VLQs which contain the actual mappings.
@@ -12412,7 +12412,7 @@
                          * Applies the mappings of a sub-source-map for a specific source file to the
                          * source map being generated. Each mapping to the supplied source file is
                          * rewritten using the supplied source map. Note: The resolution for the
-                         * resulting mappings is the minimium of this map and the supplied map.
+                         * resulting mappings is the minimum of this map and the supplied map.
                          *
                          * @param aSourceMapConsumer The source map to be applied.
                          * @param aSourceFile Optional. The filename of the source file.
@@ -14881,7 +14881,7 @@
 
                     function renderParams(traverse, node, path, state) {
                         // To preserve inline typechecking directives, we
-                        // distinguish between parens-free and paranthesized single param.
+                        // distinguish between parens-free and parenthesized single param.
                         if (isParensFreeSingleParam(node, state) || !node.params.length) {
                             utils.append("(", state)
                         }
@@ -15734,7 +15734,7 @@
                     /*global exports:true*/
 
                     /**
-                     * Implements ES6 destructuring assignment and pattern matchng.
+                     * Implements ES6 destructuring assignment and pattern matching.
                      *
                      * function init({port, ip, coords: [x, y]}) {
                      *   return (x && y) ? {id, port} : {ip};
@@ -16703,7 +16703,7 @@
                     })
 
                     /**
-                     * This list should not grow as new reserved words are introdued. This list is
+                     * This list should not grow as new reserved words are introduced. This list is
                      * of words that need to be quoted because ES3-ish browsers do not allow their
                      * use as identifier names.
                      */

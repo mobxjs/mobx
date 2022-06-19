@@ -9,6 +9,8 @@ import { autorun } from "mobx"
 
 afterEach(cleanup)
 
+afterEach(cleanup)
+
 let consoleWarnMock: jest.SpyInstance | undefined
 afterEach(() => {
     consoleWarnMock?.mockRestore()
@@ -72,7 +74,6 @@ test("base useLocalStore should work", () => {
     expect(container.querySelector("span")!.innerHTML).toBe("2")
     expect(counterRender).toBe(1)
     expect(observerRender).toBe(3)
-
     expect(consoleWarnMock).toMatchSnapshot()
 })
 
@@ -312,7 +313,6 @@ describe("is used to keep observable within component body", () => {
             expect(container.querySelector("span")!.innerHTML).toBe("22")
             expect(counterRender).toBe(2)
             expect(observerRender).toBe(3)
-
             expect(consoleWarnMock).toMatchSnapshot()
         })
 

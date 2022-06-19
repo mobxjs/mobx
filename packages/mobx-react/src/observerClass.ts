@@ -25,7 +25,7 @@ export function makeClassComponentObserver(
     if (componentClass[mobxObserverProperty]) {
         const displayName = getDisplayName(target)
         console.warn(
-            `The provided component class (${displayName}) 
+            `The provided component class (${displayName})
                 has already been declared as an observer component.`
         )
     } else {
@@ -49,6 +49,9 @@ export function makeClassComponentObserver(
     // However, this solution is not without it's own problems: https://github.com/mobxjs/mobx-react/issues?utf8=%E2%9C%93&q=is%3Aissue+label%3Aobservable-props-or-not+
     makeObservableProp(target, "props")
     makeObservableProp(target, "state")
+    if (componentClass.contextType) {
+        makeObservableProp(target, "context")
+    }
 
     const baseRender = target.render
     if (typeof baseRender !== "function") {
@@ -71,8 +74,8 @@ export function makeClassComponentObserver(
             // Render may have been hot-swapped and/or overriden by a subclass.
             const displayName = getDisplayName(this)
             console.warn(
-                `The reactive render of an observer class component (${displayName}) 
-                was overriden after MobX attached. This may result in a memory leak if the 
+                `The reactive render of an observer class component (${displayName})
+                was overriden after MobX attached. This may result in a memory leak if the
                 overriden reactive render was not properly disposed.`
             )
         }
@@ -153,7 +156,7 @@ function makeComponentReactive(render: any) {
     return reactiveRender.call(this)
 }
 
-function observerSCU(nextProps: React.Props<any>, nextState: any): boolean {
+function observerSCU(nextProps: React.ClassAttributes<any>, nextState: any): boolean {
     if (isUsingStaticRendering()) {
         console.warn(
             "[mobx-react] It seems that a re-rendering of a React component is triggered while in static (server-side) mode. Please make sure components are rendered only once server-side."

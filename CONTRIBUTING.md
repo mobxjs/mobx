@@ -30,3 +30,13 @@ In addition to reporting issues, a great way to contribute to MobX is to respond
 ### Small bug fixes
 
 For a small bug fix change (less than 20 lines of code changed), feel free to open a pull request. We’ll try to merge it as fast as possible and ideally publish a new release on the same day. The only requirement is, make sure you also add a test that verifies the bug you are trying to fix.
+
+#### Getting things running
+
+```
+git clone git@github.com:mobxjs/mobx.git
+cd mobx
+yarn install
+yarn lerna run build
+yarn test
+```
