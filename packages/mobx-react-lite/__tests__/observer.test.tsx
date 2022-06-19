@@ -4,10 +4,16 @@ import * as mobx from "mobx"
 import React from "react"
 
 import { observer, useObserver, isObserverBatched, enableStaticRendering } from "../src"
+import { useConsoleWarnMock } from "./utils"
 
 const getDNode = (obj: any, prop?: string) => mobx.getObserverTree(obj, prop)
 
 afterEach(cleanup)
+
+let consoleWarnMock: jest.SpyInstance | undefined
+afterEach(() => {
+    consoleWarnMock?.mockRestore()
+})
 
 function runTestSuite(mode: "observer" | "useObserver") {
     function obsComponent<P extends object>(
@@ -18,6 +24,7 @@ function runTestSuite(mode: "observer" | "useObserver") {
             return observer(component)
         } else {
             const c = (props: P) => {
+                consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
                 return useObserver(() => {
                     return component(props)
                 })
@@ -270,7 +277,9 @@ function runTestSuite(mode: "observer" | "useObserver") {
 
     describe("issue 309", () => {
         test("isObserverBatched is still defined and yields true by default", () => {
+            consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
             expect(isObserverBatched()).toBe(true)
+            expect(consoleWarnMock).toMatchSnapshot()
         })
     })
 
@@ -482,6 +491,9 @@ runTestSuite("observer")
 runTestSuite("useObserver")
 
 test("observer(cmp, { forwardRef: true }) + useImperativeHandle", () => {
+    consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
+    consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
+
     interface IMethods {
         focus(): void
     }
@@ -513,6 +525,7 @@ test("observer(cmp, { forwardRef: true }) + useImperativeHandle", () => {
     expect(cr).toBeTruthy()
     expect(cr.current).toBeTruthy()
     expect(typeof cr.current!.focus).toBe("function")
+    expect(consoleWarnMock).toMatchSnapshot()
 })
 
 test("observer(forwardRef(cmp)) + useImperativeHandle", () => {
@@ -548,6 +561,7 @@ test("observer(forwardRef(cmp)) + useImperativeHandle", () => {
 })
 
 test("useImperativeHandle and forwardRef should work with useObserver", () => {
+    consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
     interface IMethods {
         focus(): void
     }
@@ -579,6 +593,7 @@ test("useImperativeHandle and forwardRef should work with useObserver", () => {
     expect(cr).toBeTruthy()
     expect(cr.current).toBeTruthy()
     expect(typeof cr.current!.focus).toBe("function")
+    expect(consoleWarnMock).toMatchSnapshot()
 })
 
 it("should hoist known statics only", () => {
@@ -913,7 +928,6 @@ it("dependencies should not become temporarily unobserved", async () => {
 
     // @ts-ignore
     React.useEffect.mockImplementation(effect => {
-        console.warn("delaying useEffect call")
         p.push(
             new Promise<void>(resolve => {
                 setTimeout(() => {

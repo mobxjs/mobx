@@ -63,3 +63,53 @@ exports[`issue 12 run transaction 2`] = `
   </div>
 </div>
 `;
+
+exports[`issue 309 isObserverBatched is still defined and yields true by default 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      "[MobX] Deprecated",
+    ],
+  ],
+  "results": Array [
+    Object {
+      "type": "return",
+      "value": undefined,
+    },
+  ],
+}
+`;
+
+exports[`issue 309 isObserverBatched is still defined and yields true by default 2`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      "[MobX] Deprecated",
+    ],
+  ],
+  "results": Array [
+    Object {
+      "type": "return",
+      "value": undefined,
+    },
+  ],
+}
+`;
+
+exports[`observer(cmp, { forwardRef: true }) + useImperativeHandle 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      "[mobx-react-lite] \`observer(fn, { forwardRef: true })\` is deprecated, use \`observer(React.forwardRef(fn))\`",
+    ],
+  ],
+  "results": Array [
+    Object {
+      "type": "return",
+      "value": undefined,
+    },
+  ],
+}
+`;
+
+exports[`useImperativeHandle and forwardRef should work with useObserver 1`] = `[MockFunction]`;

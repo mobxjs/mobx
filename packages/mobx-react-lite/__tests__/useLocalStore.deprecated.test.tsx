@@ -11,7 +11,13 @@ afterEach(cleanup)
 
 afterEach(cleanup)
 
+let consoleWarnMock: jest.SpyInstance | undefined
+afterEach(() => {
+    consoleWarnMock?.mockRestore()
+})
+
 test("base useLocalStore should work", () => {
+    consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
     let counterRender = 0
     let observerRender = 0
     let outerStoreRef: any
@@ -68,6 +74,7 @@ test("base useLocalStore should work", () => {
     expect(container.querySelector("span")!.innerHTML).toBe("2")
     expect(counterRender).toBe(1)
     expect(observerRender).toBe(3)
+    expect(consoleWarnMock).toMatchSnapshot()
 })
 
 describe("is used to keep observable within component body", () => {
@@ -239,6 +246,7 @@ describe("is used to keep observable within component body", () => {
 
     describe("with props", () => {
         it("and useObserver", () => {
+            consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
             let counterRender = 0
             let observerRender = 0
 
@@ -305,6 +313,7 @@ describe("is used to keep observable within component body", () => {
             expect(container.querySelector("span")!.innerHTML).toBe("22")
             expect(counterRender).toBe(2)
             expect(observerRender).toBe(3)
+            expect(consoleWarnMock).toMatchSnapshot()
         })
 
         it("with <Observer>", () => {
