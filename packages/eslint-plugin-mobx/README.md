@@ -73,12 +73,12 @@ It's a bit opinionated and can lead to a lot of false positives depending on you
 ```javascript
 // .eslintrc.js
 "overrides": [
-  {
-    "files": ["*.jsx"],
-    "rules": {
-      "mobx/missing-observer": "error"
+    {
+        "files": ["*.jsx"],
+        "rules": {
+            "mobx/missing-observer": "error"
+        }
     }
-  }
 ]
 ```
 
