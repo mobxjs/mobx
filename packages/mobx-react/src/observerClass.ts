@@ -74,7 +74,7 @@ export function makeClassComponentObserver(
     patch(target, "componentDidMount", function () {
         this[mobxIsUnmounted] = false
         if (!this.render[mobxAdminProperty]) {
-            // Re-mounted (#3393).
+            // Re-mounted (#3395).
             // We have to force update, because we don't know if state changed while the component was unmounted.
             // Reaction will be automatically recreated during next render.
             Component.prototype.forceUpdate.call(this)
@@ -164,7 +164,7 @@ function createReactiveRender(render: any) {
 
     function reactiveRender() {
         isRenderingPending = false
-        // Create reaction lazily to support re-mounting #3393
+        // Create reaction lazily to support re-mounting #3395
         const reaction = (reactiveRender[mobxAdminProperty] ??= createReaction())
         let exception: unknown = undefined
         let rendering = undefined
