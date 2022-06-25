@@ -991,10 +991,9 @@ test("class observer supports re-mounting #3395", () => {
         }
     }
 
-    const ref = React.createRef<TestCmp>()
     const app = (
         <StrictMode>
-            <TestCmp ref={ref} />
+            <TestCmp />
         </StrictMode>
     )
 
