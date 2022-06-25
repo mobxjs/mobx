@@ -1,4 +1,4 @@
-import React, { createContext } from "react"
+import React, { createContext, StrictMode } from "react"
 import { inject, observer, Observer, enableStaticRendering } from "../src"
 import { render, act } from "@testing-library/react"
 import {
@@ -974,5 +974,39 @@ test("this.context is observable if ComponentName.contextType is set", () => {
 
     expect(renderCounter).toBe(2)
     expect(container).toHaveTextContent("1")
+    unmount()
+})
+
+test("class observer supports re-mounting #3395", () => {
+    const state = observable.box(1)
+    let mountCounter = 0
+
+    @observer
+    class TestCmp extends React.Component<any> {
+        componentDidMount() {
+            mountCounter++
+        }
+        render() {
+            return state.get()
+        }
+    }
+
+    const ref = React.createRef<TestCmp>()
+    const app = (
+        <StrictMode>
+            <TestCmp ref={ref} />
+        </StrictMode>
+    )
+
+    const { unmount, container } = render(app)
+
+    expect(mountCounter).toBe(2)
+    expect(container).toHaveTextContent("1")
+    act(() => {
+        state.set(2)
+    })
+    expect(mountCounter).toBe(2)
+    expect(container).toHaveTextContent("2")
+
     unmount()
 })

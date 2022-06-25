@@ -11,7 +11,7 @@ import { isUsingStaticRendering } from "mobx-react-lite"
 
 import { newSymbol, shallowEqual, setHiddenProp, patch } from "./utils/utils"
 
-const mobxAdminProperty = $mobx || "$mobx"
+const mobxAdminProperty = $mobx || "$mobx" // BC
 const mobxObserverProperty = newSymbol("isMobXReactObserver")
 const mobxIsUnmounted = newSymbol("isUnmounted")
 const skipRenderKey = newSymbol("skipRender")
@@ -32,15 +32,18 @@ export function makeClassComponentObserver(
         componentClass[mobxObserverProperty] = true
     }
 
-    if (target.componentWillReact)
+    if (target.componentWillReact) {
         throw new Error("The componentWillReact life-cycle event is no longer supported")
+    }
     if (componentClass["__proto__"] !== PureComponent) {
-        if (!target.shouldComponentUpdate) target.shouldComponentUpdate = observerSCU
-        else if (target.shouldComponentUpdate !== observerSCU)
+        if (!target.shouldComponentUpdate) {
+            target.shouldComponentUpdate = observerSCU
+        } else if (target.shouldComponentUpdate !== observerSCU) {
             // n.b. unequal check, instead of existence check, as @observer might be on superclass as well
             throw new Error(
                 "It is not allowed to use shouldComponentUpdate in observer based components."
             )
+        }
     }
 
     // this.props and this.state are made observable, just to make sure @computed fields that
@@ -53,8 +56,8 @@ export function makeClassComponentObserver(
         makeObservableProp(target, "context")
     }
 
-    const baseRender = target.render
-    if (typeof baseRender !== "function") {
+    const originalRender = target.render
+    if (typeof originalRender !== "function") {
         const displayName = getDisplayName(target)
         throw new Error(
             `[mobx-react] class component (${displayName}) is missing \`render\` method.` +
@@ -63,14 +66,31 @@ export function makeClassComponentObserver(
         )
     }
     target.render = function () {
-        return makeComponentReactive.call(this, baseRender)
+        if (!isUsingStaticRendering()) {
+            this.render = createReactiveRender.call(this, originalRender)
+        }
+        return this.render()
     }
-    patch(target, "componentWillUnmount", function () {
-        if (isUsingStaticRendering() === true) return
-        this.render[mobxAdminProperty]?.dispose()
-        this[mobxIsUnmounted] = true
-
+    patch(target, "componentDidMount", function () {
+        this[mobxIsUnmounted] = false
         if (!this.render[mobxAdminProperty]) {
+            // Re-mounted (#3393).
+            // We have to force update, because we don't know if state changed while the component was unmounted.
+            // Reaction will be automatically recreated during next render.
+            Component.prototype.forceUpdate.call(this)
+        }
+    })
+    patch(target, "componentWillUnmount", function () {
+        if (isUsingStaticRendering()) {
+            return
+        }
+
+        const reaction = this.render[mobxAdminProperty]
+        if (reaction) {
+            reaction.dispose()
+            // Forces reaction to be re-created on next render
+            this.render[mobxAdminProperty] = null
+        } else {
             // Render may have been hot-swapped and/or overriden by a subclass.
             const displayName = getDisplayName(this)
             console.warn(
@@ -79,6 +99,8 @@ export function makeClassComponentObserver(
                 overriden reactive render was not properly disposed.`
             )
         }
+
+        this[mobxIsUnmounted] = true
     })
     return componentClass
 }
@@ -93,9 +115,7 @@ function getDisplayName(comp: any) {
     )
 }
 
-function makeComponentReactive(render: any) {
-    if (isUsingStaticRendering() === true) return render.call(this)
-
+function createReactiveRender(render: any) {
     /**
      * If props are shallowly modified, react will render anyway,
      * so atom.reportChanged() should not result in yet another re-render
@@ -108,41 +128,51 @@ function makeComponentReactive(render: any) {
     setHiddenProp(this, isForcingUpdateKey, false)
 
     const initialName = getDisplayName(this)
-    const baseRender = render.bind(this)
+    const originalRender = render.bind(this)
 
     let isRenderingPending = false
 
-    const reaction = new Reaction(`${initialName}.render()`, () => {
-        if (!isRenderingPending) {
-            // N.B. Getting here *before mounting* means that a component constructor has side effects (see the relevant test in misc.js)
-            // This unidiomatic React usage but React will correctly warn about this so we continue as usual
-            // See #85 / Pull #44
-            isRenderingPending = true
-            if (this[mobxIsUnmounted] !== true) {
-                let hasError = true
-                try {
-                    setHiddenProp(this, isForcingUpdateKey, true)
-                    if (!this[skipRenderKey]) Component.prototype.forceUpdate.call(this)
-                    hasError = false
-                } finally {
-                    setHiddenProp(this, isForcingUpdateKey, false)
-                    if (hasError) reaction.dispose()
+    const createReaction = () => {
+        const reaction = new Reaction(`${initialName}.render()`, () => {
+            if (!isRenderingPending) {
+                // N.B. Getting here *before mounting* means that a component constructor has side effects (see the relevant test in misc.test.tsx)
+                // This unidiomatic React usage but React will correctly warn about this so we continue as usual
+                // See #85 / Pull #44
+                isRenderingPending = true
+                if (this[mobxIsUnmounted] !== true) {
+                    let hasError = true
+                    try {
+                        setHiddenProp(this, isForcingUpdateKey, true)
+                        if (!this[skipRenderKey]) {
+                            Component.prototype.forceUpdate.call(this)
+                        }
+                        hasError = false
+                    } finally {
+                        setHiddenProp(this, isForcingUpdateKey, false)
+                        if (hasError) {
+                            reaction.dispose()
+                            // Forces reaction to be re-created on next render
+                            this.render[mobxAdminProperty] = null
+                        }
+                    }
                 }
             }
-        }
-    })
-
-    reaction["reactComponent"] = this
-    reactiveRender[mobxAdminProperty] = reaction
-    this.render = reactiveRender
+        })
+        reaction["reactComponent"] = this
+        return reaction
+    }
 
     function reactiveRender() {
         isRenderingPending = false
+        // Create reaction lazily to support re-mounting #3393
+        const reaction = (reactiveRender[mobxAdminProperty] ??= createReaction())
         let exception: unknown = undefined
         let rendering = undefined
         reaction.track(() => {
             try {
-                rendering = _allowStateChanges(false, baseRender)
+                // TODO@major
+                // Optimization: replace with _allowStateChangesStart/End (not available in mobx@6.0.0)
+                rendering = _allowStateChanges(false, originalRender)
             } catch (e) {
                 exception = e
             }
@@ -153,7 +183,7 @@ function makeComponentReactive(render: any) {
         return rendering
     }
 
-    return reactiveRender.call(this)
+    return reactiveRender
 }
 
 function observerSCU(nextProps: React.ClassAttributes<any>, nextState: any): boolean {
