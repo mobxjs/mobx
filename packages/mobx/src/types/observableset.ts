@@ -159,7 +159,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
         return this
     }
 
-    delete(value: any) {
+    delete(value: T) {
         if (hasInterceptors(this)) {
             const change = interceptChange<ISetWillChange<T>>(this, {
                 type: DELETE,
@@ -202,7 +202,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
         return false
     }
 
-    has(value: any) {
+    has(value: T) {
         this.atom_.reportObserved()
         return this.data_.has(this.dehanceValue_(value))
     }

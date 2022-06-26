@@ -2054,6 +2054,19 @@ test("type inference of the action callback", () => {
     }
 })
 
+test("TS - type inference of Set", () => {
+    const set = observable.set<number>()
+    set.add(1)
+    set.has(1)
+    set.delete(1)
+    // @ts-expect-error
+    set.add("1")
+    // @ts-expect-error
+    set.has("1")
+    // @ts-expect-error
+    set.delete("1")
+})
+
 test("TS - type inference of observe & intercept functions", () => {
     const array = [1, 2]
     const object = { numberKey: 1, stringKey: "string" }
@@ -2399,4 +2412,19 @@ test("#2485", () => {
     }
 
     expect(new Color(1, 2, 3, 4).toString()).toMatchInlineSnapshot(`"rgba(1, 2, 3, 4)"`)
+})
+
+test("argumentless observable adds undefined to the output type", () => {
+    const a = observable.box<string>()
+    assert<IsExact<typeof a, IObservableValue<string | undefined>>>(true)
+})
+
+test("with initial value observable does not adds undefined to the output type", () => {
+    const a = observable.box<string>("hello")
+    assert<IsExact<typeof a, IObservableValue<string>>>(true)
+})
+
+test("observable.box should keep track of undefined and null in type", () => {
+    const a = observable.box<string | undefined>()
+    assert<IsExact<typeof a, IObservableValue<string | undefined>>>(true)
 })

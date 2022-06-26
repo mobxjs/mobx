@@ -190,7 +190,7 @@ Check out the [`equals`](#equals) option for further customizations on determini
 
 <details id="computed-with-args"><summary>{🚀} **Tip:** computed values with arguments<a href="#computed-with-args" class="tip-anchor"></a></summary>
 
-Although getters don't take arguments, several strategies to work with derived values that need arguments are discusses [here](computeds-with-args.md).
+Although getters don't take arguments, several strategies to work with derived values that need arguments are discussed [here](computeds-with-args.md).
 
 </details>
 
