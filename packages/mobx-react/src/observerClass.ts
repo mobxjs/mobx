@@ -114,7 +114,7 @@ function getDisplayName(comp: any) {
     )
 }
 
-function createReactiveRender(render: any) {
+function createReactiveRender(originalRender: any) {
     /**
      * If props are shallowly modified, react will render anyway,
      * so atom.reportChanged() should not result in yet another re-render
@@ -127,7 +127,7 @@ function createReactiveRender(render: any) {
     setHiddenProp(this, isForcingUpdateKey, false)
 
     const initialName = getDisplayName(this)
-    const originalRender = render.bind(this)
+    const boundOriginalRender = originalRender.bind(this)
 
     let isRenderingPending = false
 
@@ -171,7 +171,7 @@ function createReactiveRender(render: any) {
             try {
                 // TODO@major
                 // Optimization: replace with _allowStateChangesStart/End (not available in mobx@6.0.0)
-                rendering = _allowStateChanges(false, originalRender)
+                rendering = _allowStateChanges(false, boundOriginalRender)
             } catch (e) {
                 exception = e
             }
