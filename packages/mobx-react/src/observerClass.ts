@@ -74,9 +74,8 @@ export function makeClassComponentObserver(
     patch(target, "componentDidMount", function () {
         this[mobxIsUnmounted] = false
         if (!this.render[mobxAdminProperty]) {
-            // Re-mounted (#3395).
-            // We have to force update, because we don't know if state changed while the component was unmounted.
-            // Reaction will be automatically recreated during next render.
+            // Reaction is re-created automatically during render, but a component can re-mount and skip render #3395.
+            // To re-create the reaction and re-subscribe to relevant observables we have to force an update.
             Component.prototype.forceUpdate.call(this)
         }
     })
