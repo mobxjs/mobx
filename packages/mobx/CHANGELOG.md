@@ -1,5 +1,11 @@
 # mobx
 
+## 6.6.1
+
+### Patch Changes
+
+-   [`63698d06`](https://github.com/mobxjs/mobx/commit/63698d0681988194bac5fc01851882b417b35f18) [#3427](https://github.com/mobxjs/mobx/pull/3427) Thanks [@RyanCavanaugh](https://github.com/RyanCavanaugh)! - Apply 'object' constraint where required
+
 ## 6.6.0
 
 ### Minor Changes
