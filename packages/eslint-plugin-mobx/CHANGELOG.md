@@ -1,5 +1,11 @@
 # eslint-plugin-mobx
 
+## 0.0.9
+
+### Patch Changes
+
+-   [`e63c2df0`](https://github.com/mobxjs/mobx/commit/e63c2df0ef166868675bce21892cd686a46db953) [#3443](https://github.com/mobxjs/mobx/pull/3443) Thanks [@urugator](https://github.com/urugator)! - changeset for PR #3423: deprecate no-anonymous-observer
+
 ## 0.0.8
 
 ### Patch Changes
