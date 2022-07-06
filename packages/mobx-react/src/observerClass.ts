@@ -69,7 +69,7 @@ export function makeClassComponentObserver(
         if (!isUsingStaticRendering()) {
             this.render = createReactiveRender.call(this, originalRender)
         }
-        return this.render()
+        return originalRender.call(this)
     }
     patch(target, "componentDidMount", function () {
         this[mobxIsUnmounted] = false
