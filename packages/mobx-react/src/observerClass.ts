@@ -66,9 +66,9 @@ export function makeClassComponentObserver(
         )
     }
     target.render = function () {
-        if (!isUsingStaticRendering()) {
-            this.render = createReactiveRender.call(this, originalRender)
-        }
+        this.render = isUsingStaticRendering()
+            ? originalRender
+            : createReactiveRender.call(this, originalRender)
         return this.render()
     }
     patch(target, "componentDidMount", function () {
