@@ -1,5 +1,5 @@
 import React, { createContext, StrictMode } from "react"
-import { inject, observer, Observer, enableStaticRendering } from "../src"
+import { inject, observer, Observer, enableStaticRendering, useStaticRendering } from "../src"
 import { render, act } from "@testing-library/react"
 import {
     getObserverTree,
@@ -1007,5 +1007,22 @@ test("class observer supports re-mounting #3395", () => {
     expect(mountCounter).toBe(2)
     expect(container).toHaveTextContent("2")
 
+    unmount()
+})
+
+test("SSR works #3448", () => {
+    @observer
+    class TestCmp extends React.Component<any> {
+        render() {
+            return ":)"
+        }
+    }
+
+    const app = <TestCmp />
+
+    enableStaticRendering(true)
+    const { unmount, container } = render(app)
+    expect(container).toHaveTextContent(":)")
+    enableStaticRendering(false)
     unmount()
 })
