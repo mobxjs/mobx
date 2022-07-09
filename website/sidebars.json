@@ -10,7 +10,8 @@
       "observable-state",
       "actions",
       "computeds",
-      "reactions"
+      "reactions",
+      "api"
     ],
     "MobX and React": [
       "react-integration",
