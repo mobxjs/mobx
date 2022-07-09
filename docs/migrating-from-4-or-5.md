@@ -40,7 +40,7 @@ Check out [makeObservable / makeAutoObservable](observable-state.md) for more de
 Some specifics to note:
 
 1. Using `makeObservable` / `makeAutoObservable` needs to be done in every class definition that declares MobX based members. So if a sub-class and super-class both introduce observable members, they will both have to call `makeObservable`.
-2. `makeAutoObservable` will mark methods using a new decorator `autoAction`, that will apply `action` only if it is not in a derivation context. This makes it safe to call automatically decorated methods also from computed properties.
+2. `makeAutoObservable` will mark methods using a new decorator [`autoAction`](observable-state.md#autoAction), that will apply `action` only if it is not in a derivation context. This makes it safe to call automatically decorated methods also from computed properties.
 
 Migrating a large code base with lots of classes might be daunting. But no worries, there is a code-mod available that will automate the above process!!
 

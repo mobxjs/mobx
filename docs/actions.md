@@ -154,7 +154,7 @@ For debugging purposes, we recommend to either name the wrapped function, or pas
 
 Another feature of actions is that they are [untracked](api.md#untracked). When an action is called from inside a side effect or a computed value (very rare!), observables read by the action won't be counted towards the dependencies of the derivation
 
-`makeAutoObservable`, `extendObservable` and `observable` use a special flavour of `action` called `autoAction`,
+`makeAutoObservable`, `extendObservable` and `observable` use a special flavour of `action` called [`autoAction`](observable-state.md#autoAction),
 that will determine at runtime if the function is a derivation or action.
 
 </details>
