@@ -50,7 +50,7 @@ describe("Provider", () => {
             return (
                 <Provider overridable="original" nonOverridable="original">
                     <B />
-                    <Provider overridable="overriden">
+                    <Provider overridable="overridden">
                         <B />
                     </Provider>
                 </Provider>
@@ -60,7 +60,7 @@ describe("Provider", () => {
         expect(container).toMatchInlineSnapshot(`
 <div>
   original original
-  overriden original
+  overridden original
 </div>
 `)
     })

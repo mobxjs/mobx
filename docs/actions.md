@@ -204,7 +204,7 @@ Check out the [above code block](#examples) for an example.
 
 ## Actions and inheritance
 
-Only actions defined **on prototype** can be **overriden** by subclass:
+Only actions defined **on prototype** can be **overridden** by subclass:
 
 ```javascript
 class Parent {

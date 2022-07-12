@@ -51,7 +51,7 @@ function assertNotDecorated(prototype: object, annotation: Annotation, key: Prop
             `Cannot apply '@${requestedAnnotationType}' to '${fieldName}':` +
                 `\nThe field is already decorated with '@${currentAnnotationType}'.` +
                 `\nRe-decorating fields is not allowed.` +
-                `\nUse '@override' decorator for methods overriden by subclass.`
+                `\nUse '@override' decorator for methods overridden by subclass.`
         )
     }
 }

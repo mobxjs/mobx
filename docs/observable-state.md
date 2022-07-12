@@ -28,7 +28,7 @@ The `annotations` argument maps [annotations](#available-annotations) to each me
 
 Methods that derive information and take arguments (for example `findUsersOlderThan(age: number): User[]`) can not be annotated as `computed` – their read operations will still be tracked when they are called from a reaction, but their output won't be memoized to avoid memory leaks. To memoize such methods you can use [MobX-utils computedFn {🚀}](https://github.com/mobxjs/mobx-utils#computedfn) instead.
 
-[Subclassing is supported with some limitations](subclassing.md) via the [`override`](api.md#observable) argument to [`observable`](api.md#observable).
+[Subclassing is supported with some limitations](subclassing.md) by using the `override` annotation (see the example [here](subclassing.md)).
 
 <!--DOCUSAURUS_CODE_TABS-->
 <!--class + makeObservable-->
@@ -231,7 +231,7 @@ Note that it is possible to pass `{ proxy: false }` as an option to `observable`
 | `false`                            | Explicitly do not annotate this property.                                                                                                                                                                                                                                                                                          |
 | `flow`                             | Creates a `flow` to manage asynchronous processes. Check out [flow](actions.md#using-flow-instead-of-async--await-) for more details. Note that the inferred return type in TypeScript might be off. Non-writable.                                                                                                                 |
 | `flow.bound`                       | Like flow, but will also bind the flow to the instance so that `this` will always be set. Non-writable.                                                                                                                                                                                                                            |
-| `override`                         | [Applicable to inherited `action`, `flow`, `computed`, `action.bound` overriden by subclass](subclassing.md).                                                                                                                                                                                                                      |
+| `override`                         | [Applicable to inherited `action`, `flow`, `computed`, `action.bound` overridden by subclass](subclassing.md).                                                                                                                                                                                                                      |
 | <span id="autoAction"></span> `autoAction`                       | Should not be used explicitly, but is used under the hood by `makeAutoObservable` to mark methods that can act as action or derivation, based on their calling context. It will be determined at runtime if the function is a derivation or action. |
 
 ## Limitations
@@ -244,7 +244,7 @@ Note that it is possible to pass `{ proxy: false }` as an option to `observable`
    [Can be disabled with `configure({ safeDescriptors: false })` {🚀☣️} ](configuration.md#safedescriptors-boolean).
 1. **All non-observable** (stateless) fields (`action`, `flow`) are **non-writable**.<br>
    [Can be disabled with `configure({ safeDescriptors: false })` {🚀☣️} ](configuration.md#safedescriptors-boolean).
-1. [Only **`action`, `computed`, `flow`, `action.bound`** defined **on prototype** can be **overriden** by subclass](subclassing.md).
+1. [Only **`action`, `computed`, `flow`, `action.bound`** defined **on prototype** can be **overridden** by subclass](subclassing.md).
 1. By default _TypeScript_ will not allow you to annotate **private** fields. This can be overcome by explicitly passing the relevant private fields as generic argument, like this: `makeObservable<MyStore, "privateField" | "privateField2">(this, { privateField: observable, privateField2: observable })`
 1. **Calling `make(Auto)Observable`** and providing annotations must be done **unconditionally**, as this makes it possible to cache the inference results.
 1. **Modifying prototypes** after **`make(Auto)Observable`** has been called is **not supported**.

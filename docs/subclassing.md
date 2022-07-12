@@ -8,7 +8,7 @@ hide_title: true
 
 # Subclassing
 
-Subclassing is supported with [limitations](#limitations). Most notably you can only **override actions/flows/computeds on prototype** - you cannot override _[field declarations](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes#field_declarations)_. Use `override` annotation for methods/getters overriden in subclass - see example below. Try to keep things simple and prefer composition over inheritance.
+Subclassing is supported with [limitations](#limitations). Most notably you can only **override actions/flows/computeds on prototype** - you cannot override _[field declarations](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes#field_declarations)_. Use the `override` annotation for methods/getters overridden in a subclass - see example below. Try to keep things simple and prefer composition over inheritance.
 
 ```javascript
 import { makeObservable, observable, computed, action, override } from "mobx"
@@ -78,7 +78,7 @@ class Child extends Parent {
 
 ## Limitations
 
-1. Only `action`, `computed`, `flow`, `action.bound` defined **on prototype** can be **overriden** by subclass.
+1. Only `action`, `computed`, `flow`, `action.bound` defined **on prototype** can be **overridden** by subclass.
 1. Field can't be re-annotated in subclass, except with `override`.
 1. `makeAutoObservable` does not support subclassing.
 1. Extending builtins (`ObservableMap`, `ObservableArray`, etc) is not supported.
