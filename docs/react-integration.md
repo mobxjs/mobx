@@ -64,6 +64,85 @@ For `observer` to work, it doesn't matter _how_ the observables arrive in the co
 Reading observables deeply is fine, complex expression like `todos[0].author.displayName` work out of the box.
 This makes the subscription mechanism much more precise and efficient compared to other frameworks in which data dependencies have to be declared explicitly or be pre-computed (e.g. selectors).
 
+
+## Always read observables inside `observer` components
+
+You might be wondering, when do I apply `observer`? The rule of thumb is: _apply `observer` to all components that read observable data_.
+
+`observer` only enhances the component you are decorating, not the components called by it. So usually all your components should be wrapped by `observer`. Don't worry, this is not inefficient. On the contrary, more `observer` components make rendering more efficient as updates become more fine-grained.
+
+### Tip: Grab values from objects as late as possible
+
+`observer` works best if you pass object references around as long as possible, and only read their properties inside the `observer` based components that are going to render them into the DOM / low-level components.
+In other words, `observer` reacts to the fact that you 'dereference' a value from an object.
+
+In the above example, the `TimerView` component would **not** react to future changes if it was defined
+as follows, because the `.secondsPassed` is not read inside the `observer` component, but outside, and is hence _not_ tracked:
+
+```javascript
+const TimerView = observer(({ secondsPassed }) => <span>Seconds passed: {secondsPassed}</span>)
+
+React.render(<TimerView secondsPassed={myTimer.secondsPassed} />, document.body)
+```
+
+Note that this is a different mindset from other libraries like `react-redux`, where it is a good practice to dereference early and pass primitives down, to better leverage memoization.
+If the problem is not entirely clear, make sure to check out the [Understanding reactivity](understanding-reactivity.md) section.
+
+### Don't pass observables into components that aren't `observer`
+
+Components wrapped with `observer` _only_ subscribe to observables used during their _own_ rendering of the component. So if observable objects / arrays / maps are passed to child components, those have to be wrapped with `observer` as well.
+This is also true for any callback based components.
+
+If you want to pass observables to a component that isn't an `observer`, either because it is a third-party component, or because you want to keep that component MobX agnostic, you will have to [convert the observables to plain JavaScript values or structures](observable-state.md#converting-observables-back-to-vanilla-javascript-collections) before passing them on.
+
+To elaborate on the above,
+take the following example observable `todo` object, a `TodoView` component (observer) and an imaginary `GridRow` component that takes a column / value mapping, but which isn't an `observer`:
+
+```javascript
+class Todo {
+    title = "test"
+    done = true
+
+    constructor() {
+        makeAutoObservable(this)
+    }
+}
+
+const TodoView = observer(({ todo }: { todo: Todo }) =>
+   // WRONG: GridRow won't pick up changes in todo.title / todo.done
+   //        since it isn't an observer.
+   return <GridRow data={todo} />
+
+   // CORRECT: let `TodoView` detect relevant changes in `todo`,
+   //          and pass plain data down.
+   return <GridRow data={{
+       title: todo.title,
+       done: todo.done
+   }} />
+
+   // CORRECT: using `toJS` works as well, but being explicit is typically better.
+   return <GridRow data={toJS(todo)} />
+)
+```
+
+### Callback components might require `<Observer>`
+
+Imagine the same example, where `GridRow` takes an `onRender` callback instead.
+Since `onRender` is part of the rendering cycle of `GridRow`, rather than `TodoView`'s render (even though that is where it syntactically appears), we have to make sure that the callback component uses an `observer` component.
+Or, we can create an in-line anonymous observer using [`<Observer />`](https://github.com/mobxjs/mobx-react#observer):
+
+```javascript
+const TodoView = observer(({ todo }: { todo: Todo }) => {
+    // WRONG: GridRow.onRender won't pick up changes in todo.title / todo.done
+    //        since it isn't an observer.
+    return <GridRow onRender={() => <td>{todo.title}</td>} />
+
+    // CORRECT: wrap the callback rendering in Observer to be able to detect changes.
+    return <GridRow onRender={() => <Observer>{() => <td>{todo.title}</td>}</Observer>} />
+})
+```
+
+
 ## Local and external state
 
 There is great flexibility in how state is organized, since it doesn't matter (technically that is) which observables we read or where observables originated from.
@@ -227,83 +306,6 @@ As a rule of thumb, use MobX observables when the state captures domain data tha
 State that only captures UI state, like loading state, selections, etc, might be better served by the [`useState` hook](https://reactjs.org/docs/hooks-state.html), since this will allow you to leverage React suspense features in the future.
 
 Using observables inside React components adds value as soon as they are either 1) deep, 2) have computed values or 3) are shared with other `observer` components.
-
-## Always read observables inside `observer` components
-
-You might be wondering, when do I apply `observer`? The rule of thumb is: _apply `observer` to all components that read observable data_.
-
-`observer` only enhances the component you are decorating, not the components called by it. So usually all your components should be wrapped by `observer`. Don't worry, this is not inefficient. On the contrary, more `observer` components make rendering more efficient as updates become more fine-grained.
-
-### Tip: Grab values from objects as late as possible
-
-`observer` works best if you pass object references around as long as possible, and only read their properties inside the `observer` based components that are going to render them into the DOM / low-level components.
-In other words, `observer` reacts to the fact that you 'dereference' a value from an object.
-
-In the above example, the `TimerView` component would **not** react to future changes if it was defined
-as follows, because the `.secondsPassed` is not read inside the `observer` component, but outside, and is hence _not_ tracked:
-
-```javascript
-const TimerView = observer(({ secondsPassed }) => <span>Seconds passed: {secondsPassed}</span>)
-
-React.render(<TimerView secondsPassed={myTimer.secondsPassed} />, document.body)
-```
-
-Note that this is a different mindset from other libraries like `react-redux`, where it is a good practice to dereference early and pass primitives down, to better leverage memoization.
-If the problem is not entirely clear, make sure to check out the [Understanding reactivity](understanding-reactivity.md) section.
-
-### Don't pass observables into components that aren't `observer`
-
-Components wrapped with `observer` _only_ subscribe to observables used during their _own_ rendering of the component. So if observable objects / arrays / maps are passed to child components, those have to be wrapped with `observer` as well.
-This is also true for any callback based components.
-
-If you want to pass observables to a component that isn't an `observer`, either because it is a third-party component, or because you want to keep that component MobX agnostic, you will have to [convert the observables to plain JavaScript values or structures](observable-state.md#converting-observables-back-to-vanilla-javascript-collections) before passing them on.
-
-To elaborate on the above,
-take the following example observable `todo` object, a `TodoView` component (observer) and an imaginary `GridRow` component that takes a column / value mapping, but which isn't an `observer`:
-
-```javascript
-class Todo {
-    title = "test"
-    done = true
-
-    constructor() {
-        makeAutoObservable(this)
-    }
-}
-
-const TodoView = observer(({ todo }: { todo: Todo }) =>
-   // WRONG: GridRow won't pick up changes in todo.title / todo.done
-   //        since it isn't an observer.
-   return <GridRow data={todo} />
-
-   // CORRECT: let `TodoView` detect relevant changes in `todo`,
-   //          and pass plain data down.
-   return <GridRow data={{
-       title: todo.title,
-       done: todo.done
-   }} />
-
-   // CORRECT: using `toJS` works as well, but being explicit is typically better.
-   return <GridRow data={toJS(todo)} />
-)
-```
-
-### Callback components might require `<Observer>`
-
-Imagine the same example, where `GridRow` takes an `onRender` callback instead.
-Since `onRender` is part of the rendering cycle of `GridRow`, rather than `TodoView`'s render (even though that is where it syntactically appears), we have to make sure that the callback component uses an `observer` component.
-Or, we can create an in-line anonymous observer using [`<Observer />`](https://github.com/mobxjs/mobx-react#observer):
-
-```javascript
-const TodoView = observer(({ todo }: { todo: Todo }) => {
-    // WRONG: GridRow.onRender won't pick up changes in todo.title / todo.done
-    //        since it isn't an observer.
-    return <GridRow onRender={() => <td>{todo.title}</td>} />
-
-    // CORRECT: wrap the callback rendering in Observer to be able to detect changes.
-    return <GridRow onRender={() => <Observer>{() => <td>{todo.title}</td>}</Observer>} />
-})
-```
 
 ## Tips
 
@@ -519,10 +521,11 @@ Check out the [React optimizations {🚀}](react-optimizations.md) section.
 
 Help! My component isn't re-rendering...
 
-1. Make sure you didn't forget `observer` (yes, this is the most common mistake).
+1. Make sure you didn't forget `observer`. Remember, it have to wrap the component itself, not the ancestors.
 1. Verify that the thing you intend to react to is indeed observable. Use utilities like [`isObservable`](api.md#isobservable), [`isObservableProp`](api.md#isobservableprop) if needed to verify this at runtime.
 1. Check the console logs in the browsers for any warnings or errors.
 1. Make sure you grok how tracking works in general. Check out the [Understanding reactivity](understanding-reactivity.md) section.
 1. Read the common pitfalls as described above.
 1. [Configure](configuration.md#linting-options) MobX to warn you of unsound usage of mechanisms and check the console logs.
 1. Use [trace](analyzing-reactivity.md) to verify that you are subscribing to the right things or check what MobX is doing in general using [spy](analyzing-reactivity.md#spy) / the [mobx-logger](https://github.com/winterbe/mobx-logger) package.
+
