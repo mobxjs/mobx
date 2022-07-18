@@ -1,6 +1,4 @@
-import * as mobx from "mobx"
 import * as React from "react"
-import { renderHook } from "@testing-library/react-hooks"
 import { act, cleanup, fireEvent, render } from "@testing-library/react"
 
 import { Observer, observer, useLocalStore } from "../src"
@@ -9,9 +7,13 @@ import { autorun } from "mobx"
 
 afterEach(cleanup)
 
-afterEach(cleanup)
+let consoleWarnMock: jest.SpyInstance | undefined
+afterEach(() => {
+    consoleWarnMock?.mockRestore()
+})
 
 test("base useLocalStore should work", () => {
+    consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
     let counterRender = 0
     let observerRender = 0
     let outerStoreRef: any
@@ -68,6 +70,7 @@ test("base useLocalStore should work", () => {
     expect(container.querySelector("span")!.innerHTML).toBe("2")
     expect(counterRender).toBe(1)
     expect(observerRender).toBe(3)
+    expect(consoleWarnMock).toMatchSnapshot()
 })
 
 describe("is used to keep observable within component body", () => {
@@ -239,6 +242,7 @@ describe("is used to keep observable within component body", () => {
 
     describe("with props", () => {
         it("and useObserver", () => {
+            consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
             let counterRender = 0
             let observerRender = 0
 
@@ -305,6 +309,7 @@ describe("is used to keep observable within component body", () => {
             expect(container.querySelector("span")!.innerHTML).toBe("22")
             expect(counterRender).toBe(2)
             expect(observerRender).toBe(3)
+            expect(consoleWarnMock).toMatchSnapshot()
         })
 
         it("with <Observer>", () => {
@@ -433,68 +438,5 @@ describe("is used to keep observable within component body", () => {
             expect(container.querySelector("span")!.innerHTML).toBe("22")
             expect(counterRender).toBe(4) // TODO: should be 3
         })
-    })
-})
-
-describe("enforcing actions", () => {
-    it("'never' should work", () => {
-        mobx.configure({ enforceActions: "never" })
-        const { result } = renderHook(() => {
-            const [multiplier, setMultiplier] = React.useState(2)
-            useLocalStore(
-                props => ({
-                    count: 10,
-                    get multiplied() {
-                        return props.multiplier * this.count
-                    },
-                    inc() {
-                        this.count += 1
-                    }
-                }),
-                { multiplier }
-            )
-            useEffect(() => setMultiplier(3), [])
-        })
-        expect(result.error).not.toBeDefined()
-    })
-    it("only when 'observed' should work", () => {
-        mobx.configure({ enforceActions: "observed" })
-        const { result } = renderHook(() => {
-            const [multiplier, setMultiplier] = React.useState(2)
-            useLocalStore(
-                props => ({
-                    count: 10,
-                    get multiplied() {
-                        return props.multiplier * this.count
-                    },
-                    inc() {
-                        this.count += 1
-                    }
-                }),
-                { multiplier }
-            )
-            useEffect(() => setMultiplier(3), [])
-        })
-        expect(result.error).not.toBeDefined()
-    })
-    it("'always' should work", () => {
-        mobx.configure({ enforceActions: "always" })
-        const { result } = renderHook(() => {
-            const [multiplier, setMultiplier] = React.useState(2)
-            useLocalStore(
-                props => ({
-                    count: 10,
-                    get multiplied() {
-                        return props.multiplier * this.count
-                    },
-                    inc() {
-                        this.count += 1
-                    }
-                }),
-                { multiplier }
-            )
-            useEffect(() => setMultiplier(3), [])
-        })
-        expect(result.error).not.toBeDefined()
     })
 })
