@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`very long arrays can be safely passed to nativeArray.concat #2379 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      "[mobx] Out of bounds read: 10000",
+    ],
+  ],
+  "results": Array [
+    Object {
+      "type": "return",
+      "value": undefined,
+    },
+  ],
+}
+`;
