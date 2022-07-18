@@ -1,5 +1,17 @@
 # mobx-react
 
+## 7.5.2
+
+### Patch Changes
+
+-   [`a23aaf3f`](https://github.com/mobxjs/mobx/commit/a23aaf3ff50217c40729e0d58c85767911323ebe) [#3452](https://github.com/mobxjs/mobx/pull/3452) Thanks [@urugator](https://github.com/urugator)! - fix #3448 regression: static rendering + class component
+
+## 7.5.1
+
+### Patch Changes
+
+-   [`bbcb12dc`](https://github.com/mobxjs/mobx/commit/bbcb12dc754524552181b177a52ffdbe80ecb953) [#3434](https://github.com/mobxjs/mobx/pull/3434) Thanks [@urugator](https://github.com/urugator)! - Support re-mounting of class components. Fixes #3395: observer not working with React@18 &lt;StrictMode&gt;.
+
 ## 7.5.0
 
 ### Minor Changes

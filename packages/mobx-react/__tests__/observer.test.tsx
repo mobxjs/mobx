@@ -1,5 +1,5 @@
-import React, { createContext } from "react"
-import { inject, observer, Observer, enableStaticRendering } from "../src"
+import React, { createContext, StrictMode } from "react"
+import { inject, observer, Observer, enableStaticRendering, useStaticRendering } from "../src"
 import { render, act } from "@testing-library/react"
 import {
     getObserverTree,
@@ -981,5 +981,55 @@ test("this.context is observable if ComponentName.contextType is set", () => {
 
     expect(renderCounter).toBe(2)
     expect(container).toHaveTextContent("1")
+    unmount()
+})
+
+test("class observer supports re-mounting #3395", () => {
+    const state = observable.box(1)
+    let mountCounter = 0
+
+    @observer
+    class TestCmp extends React.Component<any> {
+        componentDidMount() {
+            mountCounter++
+        }
+        render() {
+            return state.get()
+        }
+    }
+
+    const app = (
+        <StrictMode>
+            <TestCmp />
+        </StrictMode>
+    )
+
+    const { unmount, container } = render(app)
+
+    expect(mountCounter).toBe(2)
+    expect(container).toHaveTextContent("1")
+    act(() => {
+        state.set(2)
+    })
+    expect(mountCounter).toBe(2)
+    expect(container).toHaveTextContent("2")
+
+    unmount()
+})
+
+test("SSR works #3448", () => {
+    @observer
+    class TestCmp extends React.Component<any> {
+        render() {
+            return ":)"
+        }
+    }
+
+    const app = <TestCmp />
+
+    enableStaticRendering(true)
+    const { unmount, container } = render(app)
+    expect(container).toHaveTextContent(":)")
+    enableStaticRendering(false)
     unmount()
 })
