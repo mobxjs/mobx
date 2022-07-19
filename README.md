@@ -53,7 +53,7 @@ MobX is made possible by the generosity of the sponsors below, and many other [i
 
 _Anything that can be derived from the application state, should be. Automatically._
 
-MobX is a battle-tested library that makes state management simple and scalable by transparently applying the principles of functional reactive programming.
+MobX is a battle-tested library that makes state management simple and scalable by transparently applying functional reactive programming.
 The philosophy behind MobX is simple:
 
 <div class="benefits">
@@ -175,6 +175,6 @@ The **[MobX Quick Start Guide](https://www.packtpub.com/product/mobx-quick-start
 
 ## Credits
 
-MobX is inspired by reactive programming principles, which are for example used in spreadsheets. It is inspired by model–view–viewmodel frameworks like [MeteorJS's Tracker](https://docs.meteor.com/api/tracker.html), [Knockout](https://knockoutjs.com/) and [Vue.js](https://vuejs.org/), but MobX brings functional reactive programming (FRP) to the next level and provides a standalone implementation. It implements FRP in a glitch-free, synchronous, predictable and efficient manner.
+MobX is inspired by reactive programming principles, which are for example used in spreadsheets. It is inspired by model–view–viewmodel frameworks like [MeteorJS's Tracker](https://docs.meteor.com/api/tracker.html), [Knockout](https://knockoutjs.com/) and [Vue.js](https://vuejs.org/), but MobX brings _Transparent Functional Reactive Programming_ (TFRP) to the next level and provides a standalone implementation. It implements TFRP in a glitch-free, synchronous, predictable and efficient manner.
 
 A ton of credit goes to [Mendix](https://github.com/mendix), for providing the flexibility and support to maintain MobX and the chance to prove the philosophy of MobX in a real, complex, performance critical applications.
