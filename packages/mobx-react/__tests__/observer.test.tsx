@@ -1,5 +1,5 @@
-import React, { createContext } from "react"
-import { inject, observer, Observer, enableStaticRendering } from "../src"
+import React, { createContext, StrictMode } from "react"
+import { inject, observer, Observer, enableStaticRendering, useStaticRendering } from "../src"
 import { render, act } from "@testing-library/react"
 import {
     getObserverTree,
@@ -17,6 +17,11 @@ import { withConsole } from "./utils/withConsole"
 
 afterEach(() => {
     jest.useRealTimers()
+})
+
+let consoleWarnMock: jest.SpyInstance | undefined
+afterEach(() => {
+    consoleWarnMock?.mockRestore()
 })
 
 /*
@@ -866,7 +871,8 @@ test.skip("#709 - applying observer on React.memo component", () => {
 })
 
 test("#797 - replacing this.render should trigger a warning", () => {
-    const warn = jest.spyOn(global.console, "warn")
+    consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
+
     @observer
     class Component extends React.Component {
         render() {
@@ -884,11 +890,12 @@ test("#797 - replacing this.render should trigger a warning", () => {
     compRef.current?.swapRenderFunc()
     unmount()
 
-    expect(warn).toHaveBeenCalled()
+    expect(consoleWarnMock).toMatchSnapshot()
 })
 
 test("Redeclaring an existing observer component as an observer should log a warning", () => {
-    const warn = jest.spyOn(global.console, "warn")
+    consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
+
     @observer
     class AlreadyObserver extends React.Component<any, any> {
         render() {
@@ -897,7 +904,7 @@ test("Redeclaring an existing observer component as an observer should log a war
     }
 
     observer(AlreadyObserver)
-    expect(warn).toHaveBeenCalled()
+    expect(consoleWarnMock).toMatchSnapshot()
 })
 
 test("Missing render should throw", () => {
@@ -974,5 +981,55 @@ test("this.context is observable if ComponentName.contextType is set", () => {
 
     expect(renderCounter).toBe(2)
     expect(container).toHaveTextContent("1")
+    unmount()
+})
+
+test("class observer supports re-mounting #3395", () => {
+    const state = observable.box(1)
+    let mountCounter = 0
+
+    @observer
+    class TestCmp extends React.Component<any> {
+        componentDidMount() {
+            mountCounter++
+        }
+        render() {
+            return state.get()
+        }
+    }
+
+    const app = (
+        <StrictMode>
+            <TestCmp />
+        </StrictMode>
+    )
+
+    const { unmount, container } = render(app)
+
+    expect(mountCounter).toBe(2)
+    expect(container).toHaveTextContent("1")
+    act(() => {
+        state.set(2)
+    })
+    expect(mountCounter).toBe(2)
+    expect(container).toHaveTextContent("2")
+
+    unmount()
+})
+
+test("SSR works #3448", () => {
+    @observer
+    class TestCmp extends React.Component<any> {
+        render() {
+            return ":)"
+        }
+    }
+
+    const app = <TestCmp />
+
+    enableStaticRendering(true)
+    const { unmount, container } = render(app)
+    expect(container).toHaveTextContent(":)")
+    enableStaticRendering(false)
     unmount()
 })

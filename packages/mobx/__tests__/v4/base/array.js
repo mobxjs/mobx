@@ -4,6 +4,11 @@ const mobx = require("../mobx4")
 const { observable, _getAdministration, reaction, makeObservable } = mobx
 const iterall = require("iterall")
 
+let consoleWarnMock
+afterEach(() => {
+    consoleWarnMock?.mockRestore()
+})
+
 test("test1", function () {
     const a = observable.array([])
     expect(a.length).toBe(0)
@@ -592,7 +597,9 @@ test("very long arrays can be safely passed to nativeArray.concat #2379", () => 
     expect(longObservableArray).toEqual(longNativeArray)
     expect(longObservableArray[9000]).toBe(longNativeArray[9000])
     expect(longObservableArray[9999]).toBe(longNativeArray[9999])
+    consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
     expect(longObservableArray[10000]).toBe(longNativeArray[10000])
+    expect(consoleWarnMock).toMatchSnapshot()
 
     const expectedArray = nativeArray.concat(longNativeArray)
     const actualArray = nativeArray.concat(longObservableArray.slice()) // NOTE: in MobX4 slice is needed
