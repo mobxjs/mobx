@@ -1,0 +1,24 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`base useAsObservableSource should work with <Observer> 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      "[mobx-react-lite] 'useAsObservableSource' is deprecated, please store the values directly in an observable, for example by using 'useLocalObservable', and sync future updates using 'useEffect' when needed. See the README for examples.",
+    ],
+    Array [
+      "[mobx-react-lite] 'useLocalStore' is deprecated, use 'useLocalObservable' instead.",
+    ],
+  ],
+  "results": Array [
+    Object {
+      "type": "return",
+      "value": undefined,
+    },
+    Object {
+      "type": "return",
+      "value": undefined,
+    },
+  ],
+}
+`;
