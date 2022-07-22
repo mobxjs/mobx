@@ -776,7 +776,7 @@ function assertAnnotable(
             `Cannot apply '${requestedAnnotationType}' to '${fieldName}':` +
                 `\nThe field is already annotated with '${currentAnnotationType}'.` +
                 `\nRe-annotating fields is not allowed.` +
-                `\nUse 'override' annotation for methods overriden by subclass.`
+                `\nUse 'override' annotation for methods overridden by subclass.`
         )
     }
 }

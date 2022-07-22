@@ -90,12 +90,12 @@ export function makeClassComponentObserver(
             // Forces reaction to be re-created on next render
             this.render[mobxAdminProperty] = null
         } else {
-            // Render may have been hot-swapped and/or overriden by a subclass.
+            // Render may have been hot-swapped and/or overridden by a subclass.
             const displayName = getDisplayName(this)
             console.warn(
                 `The reactive render of an observer class component (${displayName})
-                was overriden after MobX attached. This may result in a memory leak if the
-                overriden reactive render was not properly disposed.`
+                was overridden after MobX attached. This may result in a memory leak if the
+                overridden reactive render was not properly disposed.`
             )
         }
 

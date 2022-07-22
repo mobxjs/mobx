@@ -233,3 +233,15 @@ details[open] > summary {
 .tip-anchor::after {
     content: "∞"
 }
+
+blockquote {
+    color: #444a50;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+small {
+    font-size: smaller;
+}

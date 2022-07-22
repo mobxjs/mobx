@@ -256,7 +256,7 @@ Support the ongoing maintenance at: https://opencollective.com/mobx
 
 [`28f8a11d`](https://github.com/mobxjs/mobx/commit/28f8a11d8b94f1aca2eec4ae9c5f45c5ea2f4362) [#2641](https://github.com/mobxjs/mobx/pull/2641) Thanks [@urugator](https://github.com/urugator)!
 
--   `action`, `computed`, `flow` defined on prototype can be overriden by subclass via `override` annotation/decorator. Previously broken.
+-   `action`, `computed`, `flow` defined on prototype can be overridden by subclass via `override` annotation/decorator. Previously broken.
 -   Overriding anything defined on instance itself (`this`) is not supported and should throw. Previously partially possible or broken.
 -   Attempt to re-annotate property always throws. Previously mostly undefined outcome.
 -   All annotated and non-observable props (action/flow) are non-writable. Previously writable.
@@ -1517,7 +1517,7 @@ function Square() {
 
 -   Fixed #360: Removed expensive cycle detection (cycles are still detected, but a bit later)
 -   Fixed #377: `toJS` serialization of Dates and Regexes preserves the original values
--   Fixed #379: `@action` decorated methods can now be inherited / overriden
+-   Fixed #379: `@action` decorated methods can now be inherited / overridden
 
 ## 2.3.3
 

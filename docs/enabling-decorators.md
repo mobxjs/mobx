@@ -44,7 +44,7 @@ class TodoList {
 }
 ```
 
-MobX before version 6 did not require the `makeObservable(this)` call in the constructor, but because it makes the implementation of decorator simpler and more compatible, it now does. This instructs MobX to make the instances observable following the information in the decorators -- the decorators take the place of the second argument to `makeObservable`.
+MobX before version 6 did not require the `makeObservable(this)` call in the constructor, but because it makes the implementation of decorator simpler and more compatible, it now does. This instructs MobX to make the instances observable following the information in the decorators – the decorators take the place of the second argument to `makeObservable`.
 
 We intend to continue to support decorators in this form.
 Any existing MobX 4/5 codebase can be migrated to use `makeObservable` calls by our [code-mod](https://www.npmjs.com/package/mobx-undecorate).
@@ -52,7 +52,7 @@ When migrating from MobX 4/5 to 6, we recommend to always run the code-mod, to m
 
 Check out the [Migrating from MobX 4/5 {🚀}](migrating-from-4-or-5.md) section.
 
-## Using `observer` as decorator
+## Using `observer` as a decorator
 
 The `observer` function from `mobx-react` is both a function and a decorator that can be used on class components:
 
@@ -89,12 +89,12 @@ Install support for decorators: `npm i --save-dev @babel/plugin-proposal-class-p
 
 Decorators are only supported out of the box when using TypeScript in `create-react-app@^2.1.1` and newer. In older versions or when using vanilla JavaScript use eject, or the [customize-cra](https://github.com/arackaf/customize-cra) package.
 
-## Disclaimer: Limitations of decorator syntax:
+## Disclaimer: Limitations of the decorator syntax
 
-_The current transpiler implementations of decorator syntax are quite limited and don't behave exactly the same.
+The current transpiler implementations of the decorator syntax are quite limited and don't behave exactly the same.
 Also, many compositional patterns are currently not possible with decorators, until the stage-2 proposal has been implemented by all transpilers.
 For this reason the scope of decorator syntax support in MobX is currently scoped to make sure that the supported features
-behave consistently across all environments._
+behave consistently across all environments.
 
 The following patterns are not officially supported by the MobX community:
 

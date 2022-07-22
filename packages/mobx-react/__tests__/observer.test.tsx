@@ -1018,6 +1018,8 @@ test("class observer supports re-mounting #3395", () => {
 })
 
 test("SSR works #3448", () => {
+    consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
+
     @observer
     class TestCmp extends React.Component<any> {
         render() {
@@ -1032,4 +1034,6 @@ test("SSR works #3448", () => {
     expect(container).toHaveTextContent(":)")
     enableStaticRendering(false)
     unmount()
+
+    expect(consoleWarnMock).toMatchSnapshot()
 })

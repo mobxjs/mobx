@@ -8,19 +8,17 @@ hide_title: true
 
 # Creating custom observables {🚀}
 
-## Atoms
-
 At some point you might want to have more data structures or other things (like streams) that can be used in reactive computations.
-Achieving this is pretty simple by using the concept of atoms.
-Atoms can be used to signal MobX that some observable data source has been observed or changed, and MobX will signal the atom whenever it is used or no longer in use.
+Achieving this is pretty simple by using **atoms**, which is the class that MobX uses internally for all observable data types.
+Atoms can be used to signal to MobX that some observable data source has been observed or changed, and MobX will let the atom know when it's being used and when it's not.
 
-_**Tip**: in many cases you can avoid the need to create your own atoms just by creating a normal observable, and using
+> _**Tip**: In many cases you can avoid the need to create your own atoms just by creating a normal observable, and using
 the [`onBecomeObserved`](lazy-observables.md) utility to be notified when MobX starts tracking it._
 
 The following example demonstrates how you can create an observable `Clock` that returns the current date-time, which can then be used in reactive functions.
 This clock will only actually tick if it is being observed by someone.
 
-The complete API of the `Atom` class is demonstrated by this example.
+The complete API of the `Atom` class is demonstrated by this example. For further information, see [`createAtom`](api.md#createAtom).
 
 ```javascript
 import { createAtom, autorun } from "mobx"
