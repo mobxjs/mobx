@@ -471,6 +471,80 @@ describe("action", () => {
                                                 }"
                                 `)
     })
+
+    test("method - override", () => {
+        expect(
+            convert(`
+            import { action } from "mobx"
+
+            class Box extends Shape {
+                constructor(arg) {
+                    super(arg)
+                }
+
+                @action
+                override method(arg: number): boolean {
+                    console.log('hi')
+                    return true
+                }
+            }
+            `)
+        ).toMatchInlineSnapshot(`
+                                                "import { action, override, makeObservable } from \\"mobx\\";
+
+                                                class Box extends Shape {
+                                                    constructor(arg) {
+                                                        super(arg)
+                                                        makeObservable(this, {
+                                                            method: override
+                                                        });
+                                                    }
+
+                                                    override method(arg: number): boolean {
+                                                        console.log('hi')
+                                                        return true
+                                                    }
+                                                }"
+                                `)
+    })
+
+    test.only("method - override - keepDecorators", () => {
+        expect(
+            convert(
+                `
+            import { action } from "mobx"
+
+            class Box extends Shape {
+                constructor(arg) {
+                    super(arg)
+                }
+
+                @action
+                override method(arg: number): boolean {
+                    console.log('hi')
+                    return true
+                }
+            }
+            `,
+                { keepDecorators: true }
+            )
+        ).toMatchInlineSnapshot(`
+                                                "import { action, override, makeObservable } from \\"mobx\\";
+
+                                                class Box extends Shape {
+                                                    constructor(arg) {
+                                                        super(arg)
+                                                        makeObservable(this);
+                                                    }
+
+                                                    @override
+                                                    override method(arg: number): boolean {
+                                                        console.log('hi')
+                                                        return true
+                                                    }
+                                                }"
+                                `)
+    })
 })
 
 describe("observable", () => {
