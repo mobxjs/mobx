@@ -11,10 +11,6 @@ import {
     Identifier
 } from "jscodeshift"
 
-//const { def, or } = require("ast-types").Type
-//def("PropertyDefinition").bases("ClassProperty").build()
-//def("ClassBody").field("body", [or(def("MethodDefinition"), def("PropertyDefinition"))])
-
 interface MobxUndecorateOptions {
     ignoreImports?: boolean
     keepDecorators?: boolean
