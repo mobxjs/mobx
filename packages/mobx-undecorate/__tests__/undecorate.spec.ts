@@ -508,7 +508,7 @@ describe("action", () => {
                                 `)
     })
 
-    test.only("method - override - keepDecorators", () => {
+    test("method - override - keepDecorators", () => {
         expect(
             convert(
                 `
