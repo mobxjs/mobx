@@ -1,5 +1,5 @@
 import { observable, AnnotationsMap } from "mobx"
-import { useState, useRef } from "react"
+import { useRef } from "react"
 
 export function useLocalObservable<TStore extends Record<string, any>>(
     initializer: () => TStore,
