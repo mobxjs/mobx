@@ -5,11 +5,11 @@ export function useLocalObservable<TStore extends Record<string, any>>(
     initializer: () => TStore,
     annotations?: AnnotationsMap<TStore, never>
 ): TStore {
-    const value = useRef(null)
+    const value = useRef<TStore | null>(null)
     
     if (value.current == null) {
         value.current = observable(initializer(), annotations, { autoBind: true })
     }
     
-    return value.current as TStore
+    return value.current
 }
