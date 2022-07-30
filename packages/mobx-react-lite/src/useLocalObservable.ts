@@ -11,5 +11,5 @@ export function useLocalObservable<TStore extends Record<string, any>>(
         value.current = observable(initializer(), annotations, { autoBind: true })
     }
     
-    return value.current
+    return value.current as TStore
 }
