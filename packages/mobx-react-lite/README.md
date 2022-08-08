@@ -89,7 +89,7 @@ function Measurement({ unit }) {
         get lengthWithUnit() {
             // lengthWithUnit can only depend on observables, hence the above conversion with `useAsObservableSource`
             return observableProps.unit === "inch"
-                ? `${this.length * 2.54} inch`
+                ? `${this.length / 2.54} inch`
                 : `${this.length} cm`
         }
     }))
@@ -104,7 +104,7 @@ function Measurement({ unit }) {
         length: 0,
         get lengthWithUnit() {
             // lengthWithUnit can only depend on observables, hence the above conversion with `useAsObservableSource`
-            return this.unit === "inch" ? `${this.length * 2.54} inch` : `${this.length} cm`
+            return this.unit === "inch" ? `${this.length / 2.54} inch` : `${this.length} cm`
         }
     }))
 
