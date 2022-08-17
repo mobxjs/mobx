@@ -239,7 +239,7 @@ You might be wondering, when do I apply `observer`? The rule of thumb is: _apply
 `observer` works best if you pass object references around as long as possible, and only read their properties inside the `observer` based components that are going to render them into the DOM / low-level components.
 In other words, `observer` reacts to the fact that you 'dereference' a value from an object.
 
-In the above example, the `TimerView` component would **not** react to future changes if it was defined
+In the example below, the `TimerView` component would **not** react to future changes if it was defined
 as follows, because the `.secondsPassed` is not read inside the `observer` component, but outside, and is hence _not_ tracked:
 
 ```javascript
