@@ -79,6 +79,7 @@ Install support for decorators: `npm i --save-dev @babel/plugin-proposal-class-p
 {
     "plugins": [
         ["@babel/plugin-proposal-decorators", { "legacy": true }],
+        //["@babel/plugin-transform-flow-strip-types"], //for those using react, this plugin is required to avoid a certain error in flatlists. see https://github.com/facebook/react-native/issues/21154
         ["@babel/plugin-proposal-class-properties", { "loose": false }]
         // In contrast to MobX 4/5, "loose" must be false!    ^
     ]
