@@ -1,4 +1,4 @@
-import { PureComponent, Component } from "react"
+import { PureComponent, Component, createRef } from "react"
 import {
     createAtom,
     _allowStateChanges,
@@ -10,6 +10,11 @@ import {
 import { isUsingStaticRendering } from "mobx-react-lite"
 
 import { newSymbol, shallowEqual, setHiddenProp, patch } from "./utils/utils"
+import {
+    addReactionToTrack,
+    reactionToTrackSymbol,
+    recordReactionAsCommitted
+} from "mobx-react-lite"
 
 const mobxAdminProperty = $mobx || "$mobx" // BC
 const mobxObserverProperty = newSymbol("isMobXReactObserver")
@@ -66,6 +71,9 @@ export function makeClassComponentObserver(
         )
     }
     target.render = function () {
+        if (!this[reactionToTrackSymbol]) {
+            this[reactionToTrackSymbol] = createRef()
+        }
         this.render = isUsingStaticRendering()
             ? originalRender
             : createReactiveRender.call(this, originalRender)
@@ -73,7 +81,30 @@ export function makeClassComponentObserver(
     }
     patch(target, "componentDidMount", function () {
         this[mobxIsUnmounted] = false
-        if (!this.render[mobxAdminProperty]) {
+        recordReactionAsCommitted(this[reactionToTrackSymbol])
+        let hasUpdated = false
+        if (this[reactionToTrackSymbol].current) {
+            this[reactionToTrackSymbol].current.mounted = true
+            if (this[reactionToTrackSymbol].current.changedBeforeMount) {
+                this[reactionToTrackSymbol].current.changedBeforeMount = false
+                hasUpdated = true
+                Component.prototype.forceUpdate.call(this)
+            }
+            !this.render[mobxAdminProperty]
+        } else {
+            const initialName = getDisplayName(this)
+            this[reactionToTrackSymbol].current = {
+                reaction: new Reaction(`${initialName}.render()`, () => {
+                    Component.prototype.forceUpdate.call(this)
+                }),
+                mounted: true,
+                changedBeforeMount: false,
+                cleanAt: Infinity
+            }
+            hasUpdated = true
+            Component.prototype.forceUpdate.call(this)
+        }
+        if (!this.render[mobxAdminProperty] && !hasUpdated) {
             // Reaction is re-created automatically during render, but a component can re-mount and skip render #3395.
             // To re-create the reaction and re-subscribe to relevant observables we have to force an update.
             Component.prototype.forceUpdate.call(this)
@@ -83,6 +114,8 @@ export function makeClassComponentObserver(
         if (isUsingStaticRendering()) {
             return
         }
+
+        this[reactionToTrackSymbol].current = null
 
         const reaction = this.render[mobxAdminProperty]
         if (reaction) {
@@ -143,13 +176,18 @@ function createReactiveRender(originalRender: any) {
                     try {
                         setHiddenProp(this, isForcingUpdateKey, true)
                         if (!this[skipRenderKey]) {
-                            Component.prototype.forceUpdate.call(this)
+                            if (this[reactionToTrackSymbol].current.mounted) {
+                                Component.prototype.forceUpdate.call(this)
+                            } else {
+                                this[reactionToTrackSymbol].current.changedBeforeMount = true
+                            }
                         }
                         hasError = false
                     } finally {
                         setHiddenProp(this, isForcingUpdateKey, false)
                         if (hasError) {
                             reaction.dispose()
+                            this[reactionToTrackSymbol].current = null
                             // Forces reaction to be re-created on next render
                             this.render[mobxAdminProperty] = null
                         }
@@ -165,6 +203,11 @@ function createReactiveRender(originalRender: any) {
         isRenderingPending = false
         // Create reaction lazily to support re-mounting #3395
         const reaction = (reactiveRender[mobxAdminProperty] ??= createReaction())
+
+        if (!this[reactionToTrackSymbol].current) {
+            addReactionToTrack(this[reactionToTrackSymbol], reaction, {})
+        }
+
         let exception: unknown = undefined
         let rendering = undefined
         reaction.track(() => {
