@@ -14,6 +14,21 @@ import {
     defineProperty
 } from "../internal"
 
+// Bug in safari 9.* (or iOS 9 safari mobile). See #364
+const ENTRY_0 = createArrayEntryDescriptor(0)
+
+const safariPrototypeSetterInheritanceBug = (() => {
+    let v = false
+    const p = {}
+    Object.defineProperty(p, "0", {
+        set: () => {
+            v = true
+        }
+    })
+    Object.create(p)["0"] = 1
+    return v === false
+})()
+
 /**
  * This array buffer contains two lists of properties, so that all arrays
  * can recycle their property definitions, which significantly improves performance of creating
@@ -56,6 +71,12 @@ class LegacyObservableArray<T> extends StubArray {
             // @ts-ignore
             this.spliceWithArray(0, 0, initialValues)
             allowStateChangesEnd(prev)
+        }
+
+        if (safariPrototypeSetterInheritanceBug) {
+            // Seems that Safari won't use numeric prototype setter untill any * numeric property is
+            // defined on the instance. After that it works fine, even if this property is deleted.
+            Object.defineProperty(this, "0", ENTRY_0)
         }
     }
 

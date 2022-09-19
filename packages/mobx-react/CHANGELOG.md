@@ -1,5 +1,11 @@
 # mobx-react
 
+## 7.5.3
+
+### Patch Changes
+
+-   [`78d1aa23`](https://github.com/mobxjs/mobx/commit/78d1aa2362b4dc5d521518688d6ac7e2d4f7ad3a) [#3458](https://github.com/mobxjs/mobx/pull/3458) Thanks [@egilll](https://github.com/egilll)! - A slight revamp of the README, wording, and clearer links
+
 ## 7.5.2
 
 ### Patch Changes
