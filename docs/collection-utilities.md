@@ -31,7 +31,7 @@ Mutation:
 If you use the access APIs in an environment without `Proxy` support, then also use the mutation APIs so they can detect the changes.
 
 ```javascript
-import { get, set, observable, values } from "mobx"
+import { autorun, get, set, observable, values } from "mobx"
 
 const twitterUrls = observable.object({
     Joe: "twitter.com/joey"
