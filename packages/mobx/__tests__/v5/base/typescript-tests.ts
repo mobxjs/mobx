@@ -1806,6 +1806,20 @@ test("promised when can be cancelled", async () => {
     }
 })
 
+test("promised when can be aborted", async () => {
+    const x = mobx.observable.box(1)
+
+    try {
+        const ac = new AbortController()
+        const p = mobx.when(() => x.get() === 3, { signal: ac.signal })
+        setTimeout(() => ac.abort(), 100)
+        await p
+        fail("should abort")
+    } catch (e) {
+        expect("" + e).toMatch(/WHEN_ABORTED/)
+    }
+})
+
 test("it should support asyncAction as decorator (ts)", async () => {
     mobx.configure({ enforceActions: "observed" })
 
