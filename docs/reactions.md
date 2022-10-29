@@ -364,6 +364,10 @@ Number of milliseconds that can be used to throttle the effect function. If zero
 
 Set a limited amount of time that `when` will wait for. If the deadline passes, `when` will reject / throw.
 
+### `signal` _(when)_
+
+An AbortSignal object instance; allows you to abort waiting for the reaction via an AbortController. This will also cause the returned promise to reject with an error "WHEN_ABORTED". This option is ignored when using an effect function, and only applies with the promised based version.
+
 ### `onError`
 
 By default, any exception thrown inside an reaction will be logged, but not further thrown. This is to make sure that an exception in one reaction does not prevent the scheduled execution of other, possibly unrelated reactions. This also allows reactions to recover from exceptions. Throwing an exception does not break the tracking done by MobX, so subsequent runs of the reaction might complete normally again if the cause for the exception is removed. This option allows overriding that behavior. It is possible to set a global error handler or to disable catching errors completely using [configure](configuration.md#disableerrorboundaries-boolean).
