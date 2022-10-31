@@ -345,19 +345,24 @@ export class ObservableArrayAdministration
     }
 
     get_(index: number): any | undefined {
-        if (index < this.values_.length) {
-            this.atom_.reportObserved()
-            return this.dehanceValue_(this.values_[index])
+        if (this.legacyMode_ && index >= this.values_.length) {
+            console.warn(
+                __DEV__
+                    ? `[mobx] Out of bounds read: ${index}`
+                    : `[mobx.array] Attempt to read an array index (${index}) that is out of bounds (${this.values_.length}). Please check length first. Out of bound indices will not be tracked by MobX`
+            )
+            return undefined
         }
-        console.warn(
-            __DEV__
-                ? `[mobx] Out of bounds read: ${index}`
-                : `[mobx.array] Attempt to read an array index (${index}) that is out of bounds (${this.values_.length}). Please check length first. Out of bound indices will not be tracked by MobX`
-        )
+        this.atom_.reportObserved()
+        return this.dehanceValue_(this.values_[index])
     }
 
     set_(index: number, newValue: any) {
         const values = this.values_
+        if (this.legacyMode_ && index > values.length) {
+            // out of bounds
+            die(17, index, values.length)
+        }
         if (index < values.length) {
             // update at index in range
             checkIfStateModificationsAreAllowed(this.atom_)
@@ -380,12 +385,16 @@ export class ObservableArrayAdministration
                 values[index] = newValue
                 this.notifyArrayChildUpdate_(index, newValue, oldValue)
             }
-        } else if (index === values.length) {
-            // add a new item
-            this.spliceWithArray_(index, 0, [newValue])
         } else {
-            // out of bounds
-            die(17, index, values.length)
+            // For out of bound index, we don't create an actual sparse array,
+            // but rather fill the holes with undefined (same as setArrayLength_).
+            // This could be considered a bug.
+            const newItems = new Array(index + 1 - values.length)
+            for (let i = 0; i < newItems.length - 1; i++) {
+                newItems[i] = undefined
+            } // No Array.fill everywhere...
+            newItems[newItems.length - 1] = newValue
+            this.spliceWithArray_(values.length, 0, newItems)
         }
     }
 }
