@@ -13,6 +13,7 @@ export interface IWhenOptions {
     name?: string
     timeout?: number
     onError?: (error: any) => void
+    signal?: AbortSignal
 }
 
 export function when(
@@ -74,14 +75,23 @@ function whenPromise(
     if (__DEV__ && opts && opts.onError) {
         return die(`the options 'onError' and 'promise' cannot be combined`)
     }
+    if (opts?.signal?.aborted) {
+        return Object.assign(Promise.reject(new Error("WHEN_ABORTED")), { cancel: () => null })
+    }
     let cancel
+    let abort
     const res = new Promise((resolve, reject) => {
         let disposer = _when(predicate, resolve as Lambda, { ...opts, onError: reject })
         cancel = () => {
             disposer()
             reject(new Error("WHEN_CANCELLED"))
         }
-    })
+        abort = () => {
+            disposer()
+            reject(new Error("WHEN_ABORTED"))
+        }
+        opts?.signal?.addEventListener("abort", abort)
+    }).finally(() => opts?.signal?.removeEventListener("abort", abort))
     ;(res as any).cancel = cancel
     return res as any
 }
