@@ -896,6 +896,4 @@ test("proxied arrays can access out-bound indices", () => {
     array[1001] = "foo"
     expect(array.length).toBe(1002)
     expect(array[1001]).toBe("foo")
-
-    consoleWarnSpy.mockRestore()
 })
