@@ -644,7 +644,7 @@ test("correct array should be passed to callbacks #2326", () => {
 
 test("very long arrays can be safely passed to nativeArray.concat #2379", () => {
     const nativeArray = ["a", "b"]
-    const longNativeArray = [...Array(10000).keys()]
+    const longNativeArray = [...Array(10000).keys()] // MAX_SPLICE_SIZE seems to be the threshold
     const longObservableArray = observable(longNativeArray)
     expect(longObservableArray.length).toBe(10000)
     expect(longObservableArray).toEqual(longNativeArray)
@@ -846,7 +846,7 @@ test("reduce without initial value #2432", () => {
     expect(arrayReducerArgs).toEqual(observableArrayReducerArgs)
 })
 
-test("accessing out of bound values does NOT throw", () => {
+test("accessing out of bound indices is supported", () => {
     consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation(() => {
         throw new Error(`Unexpected console.warn call`)
     })
