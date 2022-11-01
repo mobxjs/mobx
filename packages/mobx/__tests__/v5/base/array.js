@@ -884,7 +884,7 @@ test("reduce without initial value #2432", () => {
     expect(arrayReducerArgs).toEqual(observableArrayReducerArgs)
 })
 
-test("proxied arrays can access out-bound indices", () => {
+test("proxied arrays can access out of bound indices", () => {
     consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation(() => {
         throw new Error(`Unexpected console.warn call`)
     })
