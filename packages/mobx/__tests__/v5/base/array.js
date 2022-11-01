@@ -4,9 +4,9 @@ const mobx = require("../../../src/mobx.ts")
 const { observable, when, _getAdministration, reaction, computed, makeObservable, autorun } = mobx
 const iterall = require("iterall")
 
-let consoleWarnMock
+let consoleWarnSpy
 afterEach(() => {
-    consoleWarnMock?.mockRestore()
+    consoleWarnSpy?.mockRestore()
 })
 
 test("test1", function () {
@@ -402,26 +402,6 @@ test("array exposes correct keys", () => {
     expect(keys).toEqual(["0", "1"])
 })
 
-test("accessing out of bound values throws", () => {
-    const a = mobx.observable([])
-
-    let warns = 0
-    const baseWarn = console.warn
-    console.warn = () => {
-        warns++
-    }
-
-    a[0] // out of bounds
-    a[1] // out of bounds
-
-    expect(warns).toBe(2)
-
-    expect(() => (a[0] = 3)).not.toThrow()
-    expect(() => (a[2] = 4)).toThrow(/Index out of bounds, 2 is larger than 1/)
-
-    console.warn = baseWarn
-})
-
 test("replace can handle large arrays", () => {
     const a = mobx.observable([])
     const b = []
@@ -670,9 +650,7 @@ test("very long arrays can be safely passed to nativeArray.concat #2379", () => 
     expect(longObservableArray).toEqual(longNativeArray)
     expect(longObservableArray[9000]).toBe(longNativeArray[9000])
     expect(longObservableArray[9999]).toBe(longNativeArray[9999])
-    consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
     expect(longObservableArray[10000]).toBe(longNativeArray[10000])
-    expect(consoleWarnMock).toMatchSnapshot()
 
     const expectedArray = nativeArray.concat(longNativeArray)
     const actualArray = nativeArray.concat(longObservableArray)
@@ -866,4 +844,18 @@ test("reduce without initial value #2432", () => {
     expect(arraySum).toEqual(1 + 2 + 3)
     expect(observableArraySum).toEqual(arraySum)
     expect(arrayReducerArgs).toEqual(observableArrayReducerArgs)
+})
+
+test("accessing out of bound indices is supported", () => {
+    consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation(() => {
+        throw new Error(`Unexpected console.warn call`)
+    })
+
+    const array = observable([])
+
+    array[1]
+    array[2]
+    array[1001] = "foo"
+    expect(array.length).toBe(1002)
+    expect(array[1001]).toBe("foo")
 })
