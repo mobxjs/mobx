@@ -402,26 +402,6 @@ test("array exposes correct keys", () => {
     expect(keys).toEqual(["0", "1"])
 })
 
-test("legacy array: accessing out of bound values throws", () => {
-    const a = mobx.observable([], { proxy: false })
-
-    let warns = 0
-    const baseWarn = console.warn
-    console.warn = () => {
-        warns++
-    }
-
-    a[0] // out of bounds
-    a[1] // out of bounds
-
-    expect(warns).toBe(2)
-
-    expect(() => (a[0] = 3)).not.toThrow()
-    expect(() => (a[2] = 4)).toThrow(/Index out of bounds, 2 is larger than 1/)
-
-    console.warn = baseWarn
-})
-
 test("replace can handle large arrays", () => {
     const a = mobx.observable([])
     const b = []
@@ -664,43 +644,25 @@ test("correct array should be passed to callbacks #2326", () => {
 
 test("very long arrays can be safely passed to nativeArray.concat #2379", () => {
     const nativeArray = ["a", "b"]
-    const longNativeArray = [...Array(10000).keys()] // MAX_SPLICE_SIZE seems to be the threshold
+    const longNativeArray = [...Array(10000).keys()]
     const longObservableArray = observable(longNativeArray)
-    const longLegacyArray = observable(longNativeArray, { proxy: false })
     expect(longObservableArray.length).toBe(10000)
-    expect(longLegacyArray.length).toBe(10000)
-
     expect(longObservableArray).toEqual(longNativeArray)
-    expect(longLegacyArray).toEqual(longNativeArray)
-
     expect(longObservableArray[9000]).toBe(longNativeArray[9000])
-    expect(longLegacyArray[9000]).toBe(longNativeArray[9000])
-
     expect(longObservableArray[9999]).toBe(longNativeArray[9999])
-    expect(longLegacyArray[9999]).toBe(longNativeArray[9999])
-
     expect(longObservableArray[10000]).toBe(longNativeArray[10000])
-    consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation(() => {}) // Out of bound warn
-    expect(longLegacyArray[10000]).toBe(longNativeArray[10000])
-    expect(consoleWarnSpy).toMatchSnapshot()
 
-    const expectedNativeArray = nativeArray.concat(longNativeArray)
-    const actualObservableArray = nativeArray.concat(longObservableArray)
-    const actualLegacyArray = nativeArray.concat(longLegacyArray.slice()) // .slice because legacy isn't concat spreadable
+    const expectedArray = nativeArray.concat(longNativeArray)
+    const actualArray = nativeArray.concat(longObservableArray)
 
-    expect(actualObservableArray).toEqual(expectedNativeArray)
-    expect(actualLegacyArray).toEqual(expectedNativeArray)
+    expect(actualArray).toEqual(expectedArray)
 
-    const anotherNativeArray = [0, 1, 2, 3, 4, 5]
-    const anotherObservableArray = observable(anotherNativeArray)
-    const anotherLegacyArray = observable(anotherNativeArray)
-    const r1 = anotherNativeArray.splice(2, 2, ...longNativeArray)
-    const r2 = anotherObservableArray.splice(2, 2, ...longNativeArray)
-    const r3 = anotherLegacyArray.splice(2, 2, ...longNativeArray)
+    const anotherArray = [0, 1, 2, 3, 4, 5]
+    const observableArray = observable(anotherArray)
+    const r1 = anotherArray.splice(2, 2, ...longNativeArray)
+    const r2 = observableArray.splice(2, 2, ...longNativeArray)
     expect(r2).toEqual(r1)
-    expect(r3).toEqual(r1)
-    expect(anotherObservableArray).toEqual(anotherNativeArray)
-    expect(anotherLegacyArray).toEqual(anotherNativeArray)
+    expect(observableArray).toEqual(anotherArray)
 })
 
 describe("dehances", () => {
@@ -884,7 +846,7 @@ test("reduce without initial value #2432", () => {
     expect(arrayReducerArgs).toEqual(observableArrayReducerArgs)
 })
 
-test("proxied arrays can access out of bound indices", () => {
+test("accessing out of bound values does NOT throw", () => {
     consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation(() => {
         throw new Error(`Unexpected console.warn call`)
     })
