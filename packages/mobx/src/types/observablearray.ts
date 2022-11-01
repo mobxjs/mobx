@@ -348,8 +348,8 @@ export class ObservableArrayAdministration
         if (this.legacyMode_ && index >= this.values_.length) {
             console.warn(
                 __DEV__
-                    ? `[mobx] Out of bounds read: ${index}`
-                    : `[mobx.array] Attempt to read an array index (${index}) that is out of bounds (${this.values_.length}). Please check length first. Out of bound indices will not be tracked by MobX`
+                    ? `[mobx.array] Attempt to read an array index (${index}) that is out of bounds (${this.values_.length}). Please check length first. Out of bound indices will not be tracked by MobX`
+                    : `[mobx] Out of bounds read: ${index}`
             )
             return undefined
         }
