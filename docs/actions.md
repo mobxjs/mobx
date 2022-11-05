@@ -360,8 +360,6 @@ class Store {
 ```javascript
 import { flow, makeAutoObservable, flowResult } from "mobx"
 
-type ProjectList = string[]
-
 class Store {
     githubProjects = []
     state = "pending"
@@ -378,7 +376,7 @@ class Store {
         this.state = "pending"
         try {
             // Yield instead of await.
-            const projects: ProjectList = yield fetchGithubProjectsSomehow()
+            const projects = yield fetchGithubProjectsSomehow()
             const filteredProjects = somePreprocessing(projects)
             this.state = "done"
             this.githubProjects = filteredProjects
