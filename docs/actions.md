@@ -380,6 +380,7 @@ class Store {
             const filteredProjects = somePreprocessing(projects)
             this.state = "done"
             this.githubProjects = filteredProjects
+            return projects
         } catch (error) {
             this.state = "error"
         }
