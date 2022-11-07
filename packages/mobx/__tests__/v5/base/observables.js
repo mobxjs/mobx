@@ -1400,6 +1400,49 @@ test("atom events #427", () => {
     expect(stop).toBe(2)
 })
 
+test("#3563 reportObserved in batch", () => {
+    let start = 0
+    let stop = 0
+    let computed = 0
+    let observed = 0
+
+    const a = mobx.createAtom(
+        "test",
+        () => start++,
+        () => stop++
+    )
+    const c = mobx.computed(() => {
+        computed += 1
+        observed += a.reportObserved() ? 1 : 0
+    })
+    c.get()
+    expect(start).toBe(0)
+    expect(stop).toBe(0)
+    expect(computed).toBe(1)
+    expect(observed).toBe(0)
+
+    mobx.runInAction(() => {
+        c.get()
+        expect(start).toBe(0)
+        expect(stop).toBe(0)
+        expect(computed).toBe(2)
+        expect(observed).toBe(0)
+
+        c.get()
+        expect(computed).toBe(2)
+        expect(observed).toBe(0)
+    })
+
+    const c2 = mobx.computed(() => {
+        c.get()
+    })
+    c2.get()
+    expect(start).toBe(0)
+    expect(stop).toBe(0)
+    expect(computed).toBe(3)
+    expect(observed).toBe(0)
+})
+
 test("verify calculation count", () => {
     const calcs = []
     const a = observable.box(1)
