@@ -80,7 +80,7 @@ export function inject(
 ): <T extends IReactComponent<any>>(
     target: T
 ) => T & (T extends IReactComponent<infer P> ? IWrappedComponent<P> : never)
-export function inject<S, P, I, C>(
+export function inject<S extends IValueMap = {}, P extends IValueMap = {}, I extends IValueMap = {}, C extends IValueMap = {}>(
     fn: IStoresToProps<S, P, I, C>
 ): <T extends IReactComponent>(target: T) => T & IWrappedComponent<P>
 
