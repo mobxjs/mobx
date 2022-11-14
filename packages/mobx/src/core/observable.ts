@@ -151,7 +151,7 @@ export function reportObserved(observable: IObservable): boolean {
                 observable.onBO()
             }
         }
-        return true
+        return observable.isBeingObserved_
     } else if (observable.observers_.size === 0 && globalState.inBatch > 0) {
         queueForUnobservation(observable)
     }
