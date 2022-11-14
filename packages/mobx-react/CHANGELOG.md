@@ -1,5 +1,11 @@
 # mobx-react
 
+## 7.6.0
+
+### Minor Changes
+
+-   [`7aab223e`](https://github.com/mobxjs/mobx/commit/7aab223e99bdd453365103782dba2047e77e41d0) [#3565](https://github.com/mobxjs/mobx/pull/3565) Thanks [@kubk](https://github.com/kubk)! - Make mobx-react compatible with TS 4.8+
+
 ## 7.5.3
 
 ### Patch Changes
