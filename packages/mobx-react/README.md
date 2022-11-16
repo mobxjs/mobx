@@ -9,7 +9,7 @@
 Package with React component wrapper for combining React with MobX.
 Exports the `observer` decorator and other utilities.
 For documentation, see the [MobX](https://mobx.js.org) project.
-This package supports both React and React Native. `mobx-react` is a repackage of the smaller [mobx-react-lite](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react-lite) package + following features from the `mobx-react` package added:
+This package supports both React and React Native. `mobx-react` is a repackage of the smaller [mobx-react-lite](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react-lite) package + following features added:
 
 -   Support for class based components for `observer` and `@observer`
 -   `Provider / inject` to pass stores around (but consider to use `React.createContext` instead)
