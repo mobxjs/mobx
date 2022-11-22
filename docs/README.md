@@ -40,7 +40,7 @@ MobX is made possible by the generosity of the sponsors below, and many other [i
 
 **🥈 Silver sponsors (\$100+ per month):**<br/>
 <a href="https://casinosites.ltd.uk/?utm_source=sponsorship&utm_medium=mobx&utm_campaign=readme"><img src="https://mobx.js.org/assets/casino2.png" align="center" width="80" title="Casino Sites" alt="Casino Sites"/></a>
-<a href="https://upper.co"><img src="https://mobx.js.org/assets/upper.png" align="center" width="80" title="UPPER" alt="UPPER"/></a>
+<a href="https://upper.co/?utm_source=github_mobxjs_sponsorship&utm_medium=paid_acquisition&utm_campaign=sponsorship"><img src="https://mobx.js.org/assets/upper.png" align="center" width="80" title="UPPER" alt="UPPER"/></a>
 
 **🥉 Bronze sponsors (\$500+ total contributions):**<br/>
 <a href="https://www.bugsnag.com/platforms/react-error-reporting?utm_source=MobX&utm_medium=Website&utm_content=open-source&utm_campaign=2019-community&utm_term=20190913"><img src="https://mobx.js.org/assets/bugsnag.jpg" align="center" width="80" title="Bugsnag" alt="Bugsnag"/></a>
