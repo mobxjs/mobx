@@ -9,7 +9,7 @@ import {
     allowStateChanges
 } from "../internal"
 
-// See https://github.com/mobxjs/mobx/issues/3582
+// https://github.com/mobxjs/mobx/issues/3582
 export interface GenericAbortSignal {
     readonly aborted: boolean
     onabort?: ((...args: any) => any) | null
