@@ -11,9 +11,9 @@ Exports the `observer` decorator and other utilities.
 For documentation, see the [MobX](https://mobx.js.org) project.
 This package supports both React and React Native.
 
-## Choosing your version
+## Compatibility matrix
 
-There are currently two actively maintained versions of mobx-react:
+Only the latest version is actively maintained. If you're missing a fix or a feature in older version, consider upgrading or using [patch-package](https://www.npmjs.com/package/patch-package)
 
 | NPM Version | Support MobX version | Supported React versions | Supports hook based components                                                   |
 | ----------- | -------------------- | ------------------------ | -------------------------------------------------------------------------------- |
