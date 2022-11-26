@@ -1,4 +1,4 @@
-import { Reaction } from "mobx"
+import { Reaction, _getGlobalState } from "mobx"
 import React from "react"
 import { printDebugValue } from "./utils/printDebugValue"
 import {
@@ -7,10 +7,17 @@ import {
     recordReactionAsCommitted
 } from "./utils/reactionCleanupTracking"
 import { isUsingStaticRendering } from "./staticRendering"
+import { ObserverInstance } from "./observer"
+import { observerFinalizationRegistry } from "./utils/observerFinalizationRegistry"
 
 function observerComponentNameFor(baseComponentName: string) {
     return `observer${baseComponentName}`
 }
+
+const mobxGlobalState = _getGlobalState()
+
+// BC
+const globalStateVersionIsAvailable = typeof mobxGlobalState.globalVersion !== "undefined"
 
 /**
  * We use class to make it easier to detect in heap snapshots by name
@@ -21,7 +28,7 @@ function objectToBeRetainedByReactFactory() {
     return new ObjectToBeRetainedByReact()
 }
 
-export function useObserver<T>(fn: () => T, baseComponentName: string = "observed"): T {
+export function useLegacyObserver<T>(fn: () => T, baseComponentName: string = "observed"): T {
     if (isUsingStaticRendering()) {
         return fn()
     }
@@ -123,4 +130,93 @@ export function useObserver<T>(fn: () => T, baseComponentName: string = "observe
     }
 
     return rendering
+}
+
+function createReaction(instance: ObserverInstance) {
+    instance.reaction = new Reaction(observerComponentNameFor(instance.componentName), () => {
+        if (!globalStateVersionIsAvailable) {
+            // BC
+            instance.stateVersion = Symbol()
+        }
+        instance.forceUpdate?.()
+    })
+}
+
+function scheduleReactionDisposal(instance: ObserverInstance) {}
+
+function cancelReactionDisposal(instance: ObserverInstance) {}
+
+function disposeReaction(instance: ObserverInstance) {
+    instance.reaction?.dispose()
+    instance.reaction = null
+}
+
+// reset/tearDown/suspend/detach
+function dispose(instance: ObserverInstance) {
+    instance.forceUpdate = null
+    disposeReaction(instance)
+}
+
+export function useObserver<T>(render: () => T, baseComponentName: string = "observed"): T {
+    if (isUsingStaticRendering()) {
+        return render()
+    }
+
+    // StrictMode/ConcurrentMode/Suspense may mean that our component is
+    // rendered and abandoned multiple times, so we need to track leaked
+    // Reactions.
+    const instanceRef = React.useRef<ObserverInstance | null>(null)
+
+    if (!instanceRef.current) {
+        const instance: ObserverInstance = {
+            reaction: null,
+            forceUpdate: null,
+            stateVersion: Symbol(),
+            componentName: baseComponentName
+        }
+
+        createReaction(instance)
+
+        instanceRef.current = instance
+        observerFinalizationRegistry.register(instanceRef, instance, instanceRef)
+    }
+
+    const { reaction } = instanceRef.current!
+    React.useDebugValue(reaction!, printDebugValue)
+
+    React.useSyncExternalStore(
+        onStoreChange => {
+            observerFinalizationRegistry.unregister(instanceRef)
+            const instance = instanceRef.current!
+            instance.forceUpdate = onStoreChange
+            if (!instance.reaction) {
+                createReaction(instance)
+            }
+
+            return () => dispose(instanceRef.current!)
+        },
+        () =>
+            globalStateVersionIsAvailable
+                ? mobxGlobalState.stateVersion
+                : instanceRef.current?.stateVersion
+    )
+
+    // render the original component, but have the
+    // reaction track the observables, so that rendering
+    // can be invalidated (see above) once a dependency changes
+    let renderResult!: T
+    let exception
+    reaction!.track(() => {
+        try {
+            renderResult = render()
+        } catch (e) {
+            exception = e
+        }
+    })
+
+    if (exception) {
+        throw exception // re-throw any exceptions caught during rendering
+    }
+
+    return renderResult
 }

@@ -1,3 +1,4 @@
+import { Reaction } from "mobx"
 import { forwardRef, memo } from "react"
 
 import { isUsingStaticRendering } from "./staticRendering"
@@ -163,4 +164,15 @@ function copyStaticProperties(base: any, target: any) {
             Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(base, key)!)
         }
     })
+}
+
+export type ObserverInstance = {
+    reaction: Reaction | null // also works as disposed flag
+    forceUpdate: Function | null // also works as mounted flag
+    // BC: we will use local state version if global isn't available.
+    // It should behave as previous implementation - tearing is still present,
+    // because there is no cross component synchronization,
+    // but we can use `useExternalSyncStore` API.
+    stateVersion: any
+    componentName: string
 }
