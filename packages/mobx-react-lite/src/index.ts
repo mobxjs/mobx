@@ -5,7 +5,7 @@ import { observerBatching } from "./utils/observerBatching"
 import { useDeprecated } from "./utils/utils"
 import { useObserver as useObserverOriginal } from "./useObserver"
 import { enableStaticRendering } from "./staticRendering"
-
+import { observerFinalizationRegistry } from "./utils/observerFinalizationRegistry"
 observerBatching(batch)
 
 export { isUsingStaticRendering, enableStaticRendering } from "./staticRendering"
@@ -14,7 +14,9 @@ export { Observer } from "./ObserverComponent"
 export { useLocalObservable } from "./useLocalObservable"
 export { useLocalStore } from "./useLocalStore"
 export { useAsObservableSource } from "./useAsObservableSource"
-export { resetCleanupScheduleForTests as clearTimers } from "./utils/reactionCleanupTracking"
+//export { resetCleanupScheduleForTests as clearTimers } from "./utils/reactionCleanupTracking"
+
+export const clearTimes = observerFinalizationRegistry["finalizeAllImmediately"] ?? (() => {})
 
 export function useObserver<T>(fn: () => T, baseComponentName: string = "observed"): T {
     if ("production" !== process.env.NODE_ENV) {

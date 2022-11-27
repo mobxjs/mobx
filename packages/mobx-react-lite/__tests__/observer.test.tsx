@@ -1084,3 +1084,86 @@ test("Anonymous component displayName #3192", () => {
     expect(observerError.message).toEqual(memoError.message)
     consoleErrorSpy.mockRestore()
 })
+
+describe.skip("simple TODO del", () => {
+    let state = {}
+    let onStoreUpdate = () => {}
+
+    function updateStore(newState) {
+        state = newState
+        onStoreUpdate()
+    }
+
+    const subscribe = _onStoreUpdate => {
+        console.log("SUBSCRIBE")
+        onStoreUpdate = _onStoreUpdate
+        return () => {
+            console.log("UNSUBSCRIBE")
+            onStoreUpdate = () => {}
+        }
+    }
+
+    const getSnapshot = () => state
+
+    function TestCmp() {
+        console.log("RENDER")
+
+        React.useEffect(() => {
+            console.log("MOUNT")
+            return () => console.log("UNMOUNT")
+        }, [])
+
+        React.useSyncExternalStore(subscribe, getSnapshot)
+
+        return null
+    }
+
+    test("", async () => {
+        render(<TestCmp />)
+
+        act(() => {
+            //console.log('before update')
+            updateStore({})
+            //console.log('after update')
+        })
+        // console.log('before await');
+        // await (new Promise(resolve =>setTimeout(resolve, 1000)));
+        // console.log('after await');
+        // act(()=> {
+        //     //console.log('before update')
+        //     updateStore({});
+        //     //console.log('after update')
+        // })
+
+        console.log("after act")
+    })
+
+    const execute = () => {
+        const renderings = {
+            child: 0,
+            parent: 0
+        }
+        const data = { x: 1 }
+        const odata = mobx.observable({ y: 1 })
+
+        const Child = observer((props: any) => {
+            renderings.child++
+            return <span>{props.data.x}</span>
+        })
+        const TestCmp = observer(() => {
+            renderings.parent++
+            return <span>{odata.y}</span>
+        })
+        return { ...render(<TestCmp />), renderings, odata }
+    }
+
+    test("prd", () => {
+        const { container, renderings, odata } = execute()
+        expect(renderings.parent).toBe(1)
+        act(() => {
+            odata.y++
+        })
+        expect(renderings.parent).toBe(2)
+        expect(container.querySelector("span")!.innerHTML).toBe("1")
+    })
+})

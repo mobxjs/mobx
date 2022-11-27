@@ -17,7 +17,8 @@ function observerComponentNameFor(baseComponentName: string) {
 const mobxGlobalState = _getGlobalState()
 
 // BC
-const globalStateVersionIsAvailable = typeof mobxGlobalState.globalVersion !== "undefined"
+const globalStateVersionIsAvailable = typeof mobxGlobalState.globalVersion !== "undefined" // TODO
+//const globalStateVersionIsAvailable = false; // TODO
 
 /**
  * We use class to make it easier to detect in heap snapshots by name
@@ -138,14 +139,18 @@ function createReaction(instance: ObserverInstance) {
             // BC
             instance.stateVersion = Symbol()
         }
+        // Force update won't be avaliable until the component "mounts".
+        // If state changes in between initial render and mount,
+        // `useExternalSyncStore` should handle that by checking the state version and issuing update.
         instance.forceUpdate?.()
     })
 }
 
+/*
 function scheduleReactionDisposal(instance: ObserverInstance) {}
 
 function cancelReactionDisposal(instance: ObserverInstance) {}
-
+*/
 function disposeReaction(instance: ObserverInstance) {
     instance.reaction?.dispose()
     instance.reaction = null
@@ -162,10 +167,15 @@ export function useObserver<T>(render: () => T, baseComponentName: string = "obs
         return render()
     }
 
+    // Force update, see #2982
+    const [, setState] = React.useState()
+    const forceUpdate = () => setState([] as any)
+
     // StrictMode/ConcurrentMode/Suspense may mean that our component is
     // rendered and abandoned multiple times, so we need to track leaked
     // Reactions.
     const instanceRef = React.useRef<ObserverInstance | null>(null)
+    const [finalizationRegistryTarget] = React.useState(objectToBeRetainedByReactFactory)
 
     if (!instanceRef.current) {
         const instance: ObserverInstance = {
@@ -174,31 +184,78 @@ export function useObserver<T>(render: () => T, baseComponentName: string = "obs
             stateVersion: Symbol(),
             componentName: baseComponentName
         }
+        // Opt: instead of useMemo we keep these on instance
+        // @ts-ignore
+        ;(instance.subscribe = (onStoreChange: () => void) => {
+            // Do NOT access instanceRef here!
+            //console.log('SUBSCRIBE');
+            observerFinalizationRegistry.unregister(instance)
+            //const instance = instanceRef.current!
+            instance.forceUpdate = onStoreChange
+            if (!instance.reaction) {
+                createReaction(instance)
+                // We've lost our reaction and therefore all the subscriptions.
+                // We have to schedule re-render to recreate subscriptions,
+                // even if state did not change.
+                // TODO or we could jus transfer dependencies
+                //console.log('REACTION  LOST, FORCING UPDATE');
+                instance.forceUpdate()
+            }
+
+            return () => {
+                // Do NOT access instanceRef here!
+                //console.log('UNSUBSCRIBE');
+                //dispose(instanceRef.current!)
+                dispose(instance)
+            }
+        }),
+            // @ts-ignore
+            (instance.getSnapshot = () =>
+                globalStateVersionIsAvailable
+                    ? mobxGlobalState.stateVersion
+                    : //: instanceRef.current?.stateVersion
+                      instance.stateVersion)
 
         createReaction(instance)
 
         instanceRef.current = instance
-        observerFinalizationRegistry.register(instanceRef, instance, instanceRef)
+        observerFinalizationRegistry.register(instanceRef, instance, instance)
     }
 
-    const { reaction } = instanceRef.current!
-    React.useDebugValue(reaction!, printDebugValue)
+    const instance = instanceRef.current!
+    React.useDebugValue(instance.reaction!, printDebugValue)
+
+    // const subscribe = React.useCallback((onStoreChange: () => void) => {
+    //     console.log('SUBSCRIBE');
+    //     observerFinalizationRegistry.unregister(instanceRef)
+    //     const instance = instanceRef.current!
+    //     instance.forceUpdate = onStoreChange
+    //     if (!instance.reaction) {
+    //         createReaction(instance)
+    //         // We've lost our reaction and therefore all the subscriptions.
+    //         // We have to schedule re-render to recreate subscriptions,
+    //         // even if state did not change.
+    //         // TODO our we could jus transfer dependencies
+    //         console.log('REACTION  LOST, FORCING UPDATE');
+    //         instance.forceUpdate();
+    //     }
+
+    //     return () => {
+    //         console.log('UNSUBSCRIBE');
+    //         dispose(instanceRef.current!)
+    //     }
+    // }, []);
 
     React.useSyncExternalStore(
-        onStoreChange => {
-            observerFinalizationRegistry.unregister(instanceRef)
-            const instance = instanceRef.current!
-            instance.forceUpdate = onStoreChange
-            if (!instance.reaction) {
-                createReaction(instance)
-            }
-
-            return () => dispose(instanceRef.current!)
-        },
-        () =>
-            globalStateVersionIsAvailable
-                ? mobxGlobalState.stateVersion
-                : instanceRef.current?.stateVersion
+        // Both of these must be stable, otherwise it would keep resubscribing every render.
+        // @ts-ignore
+        instance.subscribe,
+        // @ts-ignore
+        instance.getSnapshot
+        // () =>
+        //     globalStateVersionIsAvailable
+        //         ? mobxGlobalState.stateVersion
+        //         : instanceRef.current?.stateVersion
     )
 
     // render the original component, but have the
@@ -206,7 +263,7 @@ export function useObserver<T>(render: () => T, baseComponentName: string = "obs
     // can be invalidated (see above) once a dependency changes
     let renderResult!: T
     let exception
-    reaction!.track(() => {
+    instance.reaction!.track(() => {
         try {
             renderResult = render()
         } catch (e) {

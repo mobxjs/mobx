@@ -1,4 +1,4 @@
-declare class FinalizationRegistryType<T> {
+export declare class FinalizationRegistryType<T> {
     constructor(finalize: (value: T) => void)
     register(target: object, value: T, token?: object): void
     unregister(token: object): void
@@ -15,7 +15,7 @@ export class TimerBasedFinalizationRegistry<T> implements FinalizationRegistryTy
 
     constructor(private readonly finalize: (value: T) => void) {}
 
-    register(target, value, token) {
+    register(target: object, value: T, token?: object) {
         this.registrations.set(token, {
             value,
             registeredAt: Date.now()
@@ -34,7 +34,7 @@ export class TimerBasedFinalizationRegistry<T> implements FinalizationRegistryTy
 
         const now = Date.now()
         this.registrations.forEach((registration, token) => {
-            if (now - registration.registeredAt > maxAge) {
+            if (now - registration.registeredAt >= maxAge) {
                 this.finalize(registration.value)
                 this.registrations.delete(token)
             }
@@ -45,7 +45,7 @@ export class TimerBasedFinalizationRegistry<T> implements FinalizationRegistryTy
         }
     }
 
-    public finalizeAllImmediately() {
+    finalizeAllImmediately = () => {
         this.sweep(0)
     }
 
