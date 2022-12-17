@@ -52,7 +52,8 @@
     },
     "devDependencies": {
         "mobx": "^6.7.0",
-        "mobx-react-lite": "^3.4.0"
+        "mobx-react-lite": "^3.4.0",
+        "expose-gc": "^1.0.0"
     },
     "keywords": [
         "mobx",

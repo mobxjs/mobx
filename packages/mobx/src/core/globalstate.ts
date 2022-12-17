@@ -152,7 +152,7 @@ export class MobXGlobals {
     safeDescriptors = true
 
     /**
-     * Changes with each state update, used by useMutableSyncStore
+     * Changes with each state update, used by useSyncExternalStore
      */
     stateVersion = Symbol()
 }

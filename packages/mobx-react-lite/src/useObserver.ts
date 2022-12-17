@@ -10,6 +10,7 @@ import { isUsingStaticRendering } from "./staticRendering"
 import { ObserverInstance } from "./observer"
 import { observerFinalizationRegistry } from "./utils/observerFinalizationRegistry"
 
+// TODO rename, it's only used for reaction
 function observerComponentNameFor(baseComponentName: string) {
     return `observer${baseComponentName}`
 }
@@ -179,7 +180,7 @@ export function useObserver<T>(render: () => T, baseComponentName: string = "obs
             stateVersion: Symbol(),
             componentName: baseComponentName
         }
-        // Opt: instead of useMemo we keep these on instance
+        // Opt: instead of useMemo we keep subscribe/getSnapshot on instance
         // @ts-ignore
         instance.subscribe = (onStoreChange: () => void) => {
             // Do NOT access instanceRef here!
@@ -188,11 +189,12 @@ export function useObserver<T>(render: () => T, baseComponentName: string = "obs
             //const instance = instanceRef.current!
             instance.forceUpdate = onStoreChange
             if (!instance.reaction) {
+                // TODO probably we can create reaction lazily in render and therefore simply issue forceUpdate,
+                // but keep in mind we don't want to use finalization registry at this point (we are mounted).
                 createReaction(instance)
                 // We've lost our reaction and therefore all the subscriptions.
                 // We have to schedule re-render to recreate subscriptions,
                 // even if state did not change.
-                // TODO or we could jus transfer dependencies
                 //console.log('REACTION  LOST, FORCING UPDATE');
                 instance.forceUpdate()
             }

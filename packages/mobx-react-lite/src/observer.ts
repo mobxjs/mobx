@@ -166,6 +166,9 @@ function copyStaticProperties(base: any, target: any) {
     })
 }
 
+// TODO rename to ObserverAdministration
+// Make sure NOT to store `this` or `instanceRef` (not even as part of a closure!) on this object,
+// otherwise it will prevent GC and therefore reaction disposal via FinalizationRegistry.
 export type ObserverInstance = {
     reaction: Reaction | null // also works as disposed flag
     forceUpdate: Function | null // also works as mounted flag
@@ -174,5 +177,5 @@ export type ObserverInstance = {
     // because there is no cross component synchronization,
     // but we can use `useExternalSyncStore` API.
     stateVersion: any
-    componentName: string
+    componentName: string // TODO just name
 }

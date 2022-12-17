@@ -1,6 +1,6 @@
-import React, { createContext, StrictMode } from "react"
-import { inject, observer, Observer, enableStaticRendering, useStaticRendering } from "../src"
-import { render, act } from "@testing-library/react"
+import React, { createContext, Fragment, StrictMode, Suspense } from "react"
+import { inject, observer, Observer, enableStaticRendering } from "../src"
+import { render, act, waitFor } from "@testing-library/react"
 import {
     getObserverTree,
     _resetGlobalState,
@@ -870,7 +870,8 @@ test.skip("#709 - applying observer on React.memo component", () => {
     render(<Observed />, { wrapper: ErrorCatcher })
 })
 
-test("#797 - replacing this.render should trigger a warning", () => {
+// TODO explain skip
+test.skip("#797 - replacing this.render should trigger a warning", () => {
     consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
 
     @observer
@@ -1032,8 +1033,69 @@ test("SSR works #3448", () => {
     enableStaticRendering(true)
     const { unmount, container } = render(app)
     expect(container).toHaveTextContent(":)")
-    enableStaticRendering(false)
     unmount()
+    enableStaticRendering(false)
 
+    expect(consoleWarnMock).toMatchSnapshot()
+})
+
+test("#3492 should not cause warning by calling forceUpdate on uncommited components", async () => {
+    consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
+
+    const o = observable({ x: 0 })
+    let aConstructorCount = 0
+    let aMountCount = 0
+    let aRenderCount = 0
+
+    @observer
+    class A extends React.Component<any> {
+        constructor(props) {
+            super(props)
+            aConstructorCount++
+        }
+        componentDidMount(): void {
+            aMountCount++
+        }
+        render() {
+            aRenderCount++
+            return (
+                <Suspense fallback="fallback">
+                    <LazyB />
+                    {o.x}
+                </Suspense>
+            )
+        }
+    }
+
+    class B extends React.Component {
+        render() {
+            return "B"
+        }
+    }
+
+    const LazyA = React.lazy(() => Promise.resolve({ default: A }))
+    const LazyB = React.lazy(() => Promise.resolve({ default: B }))
+
+    function App() {
+        return (
+            <Suspense fallback="fallback">
+                <LazyA />
+            </Suspense>
+        )
+    }
+
+    const { unmount, container } = render(<App />)
+
+    expect(container).toHaveTextContent("fallback")
+    await waitFor(() => expect(container).toHaveTextContent("B0"))
+    act(() => {
+        o.x++
+    })
+    expect(container).toHaveTextContent("B1")
+    // React throws away the first instance, therefore the mismatch
+    expect(aConstructorCount).toBe(2)
+    expect(aMountCount).toBe(1)
+    expect(aRenderCount).toBe(3)
+    unmount()
     expect(consoleWarnMock).toMatchSnapshot()
 })

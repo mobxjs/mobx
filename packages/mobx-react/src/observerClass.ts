@@ -1,44 +1,84 @@
-import { PureComponent, Component } from "react"
+import { PureComponent, Component, ComponentClass, ClassAttributes } from "react"
 import {
     createAtom,
     _allowStateChanges,
     Reaction,
-    $mobx,
+    //$mobx, // TODO
     _allowStateReadsStart,
-    _allowStateReadsEnd
+    _allowStateReadsEnd,
+    _getGlobalState,
+    IAtom
 } from "mobx"
-import { isUsingStaticRendering } from "mobx-react-lite"
+import {
+    isUsingStaticRendering,
+    _observerFinalizationRegistry as observerFinalizationRegistry
+} from "mobx-react-lite"
+import { shallowEqual, patch } from "./utils/utils"
 
-import { newSymbol, shallowEqual, setHiddenProp, patch } from "./utils/utils"
+// TODO symbols
 
-const mobxAdminProperty = $mobx || "$mobx" // BC
-const mobxObserverProperty = newSymbol("isMobXReactObserver")
-const mobxIsUnmounted = newSymbol("isUnmounted")
-const skipRenderKey = newSymbol("skipRender")
-const isForcingUpdateKey = newSymbol("isForcingUpdate")
+const administrationSymbol = Symbol("ObserverAdministration")
+//const mobxAdminProperty = $mobx // TODO
+const isMobXReactObserverSymbol = Symbol("isMobXReactObserver")
+
+type ObserverAdministration = {
+    reaction: Reaction | null // also serves as disposed flag
+    forceUpdate: Function | null
+    mounted: boolean // we could use forceUpdate as mounted flag
+    name: string
+    propsAtom: IAtom
+    stateAtom: IAtom
+    contextAtom: IAtom
+    props: any
+    state: any
+    context: any
+    // Setting this.props causes forceUpdate, because this.props is observable.
+    // forceUpdate sets this.props.
+    // This flag is used to avoid the loop.
+    isUpdating: boolean
+}
+
+function getAdministration(component: Component): ObserverAdministration {
+    // We create administration lazily, because we can't patch constructor
+    // and the exact moment of initialization partially depends on React internals.
+    // At the time of writing this, the first thing invoked is one of the observable getter/setter (state/props/context).
+    return (component[administrationSymbol] ??= {
+        reaction: null,
+        mounted: false,
+        forceUpdate: null,
+        name: getDisplayName(component.constructor as ComponentClass),
+        state: undefined,
+        props: undefined,
+        context: undefined,
+        propsAtom: createAtom("props"),
+        stateAtom: createAtom("state"),
+        contextAtom: createAtom("context"),
+        isUpdating: false
+    })
+}
 
 export function makeClassComponentObserver(
-    componentClass: React.ComponentClass<any, any>
-): React.ComponentClass<any, any> {
-    const target = componentClass.prototype
+    componentClass: ComponentClass<any, any>
+): ComponentClass<any, any> {
+    const { prototype } = componentClass
 
-    if (componentClass[mobxObserverProperty]) {
-        const displayName = getDisplayName(target)
+    if (componentClass[isMobXReactObserverSymbol]) {
+        const displayName = getDisplayName(componentClass)
         console.warn(
             `The provided component class (${displayName})
                 has already been declared as an observer component.`
         )
     } else {
-        componentClass[mobxObserverProperty] = true
+        componentClass[isMobXReactObserverSymbol] = true
     }
 
-    if (target.componentWillReact) {
+    if (prototype.componentWillReact) {
         throw new Error("The componentWillReact life-cycle event is no longer supported")
     }
     if (componentClass["__proto__"] !== PureComponent) {
-        if (!target.shouldComponentUpdate) {
-            target.shouldComponentUpdate = observerSCU
-        } else if (target.shouldComponentUpdate !== observerSCU) {
+        if (!prototype.shouldComponentUpdate) {
+            prototype.shouldComponentUpdate = observerSCU
+        } else if (prototype.shouldComponentUpdate !== observerSCU) {
             // n.b. unequal check, instead of existence check, as @observer might be on superclass as well
             throw new Error(
                 "It is not allowed to use shouldComponentUpdate in observer based components."
@@ -50,142 +90,156 @@ export function makeClassComponentObserver(
     // are defined inside the component, and which rely on state or props, re-compute if state or props change
     // (otherwise the computed wouldn't update and become stale on props change, since props are not observable)
     // However, this solution is not without it's own problems: https://github.com/mobxjs/mobx-react/issues?utf8=%E2%9C%93&q=is%3Aissue+label%3Aobservable-props-or-not+
-    makeObservableProp(target, "props")
-    makeObservableProp(target, "state")
-    if (componentClass.contextType) {
-        makeObservableProp(target, "context")
-    }
+    Object.defineProperties(prototype, {
+        props: observablePropsDescriptor,
+        state: observableStateDescriptor,
+        context: observableContextDescriptor
+    })
 
-    const originalRender = target.render
+    const originalRender = prototype.render
     if (typeof originalRender !== "function") {
-        const displayName = getDisplayName(target)
+        const displayName = getDisplayName(componentClass)
         throw new Error(
             `[mobx-react] class component (${displayName}) is missing \`render\` method.` +
                 `\n\`observer\` requires \`render\` being a function defined on prototype.` +
                 `\n\`render = () => {}\` or \`render = function() {}\` is not supported.`
         )
     }
-    target.render = function () {
-        this.render = isUsingStaticRendering()
-            ? originalRender
-            : createReactiveRender.call(this, originalRender)
+
+    prototype.render = function () {
+        Object.defineProperty(this, "render", {
+            // There is no safe way to replace render, therefore it's forbidden.
+            configurable: false,
+            writable: false,
+            value: isUsingStaticRendering()
+                ? originalRender
+                : createReactiveRender.call(this, originalRender)
+        })
         return this.render()
     }
-    patch(target, "componentDidMount", function () {
-        this[mobxIsUnmounted] = false
-        if (!this.render[mobxAdminProperty]) {
-            // Reaction is re-created automatically during render, but a component can re-mount and skip render #3395.
-            // To re-create the reaction and re-subscribe to relevant observables we have to force an update.
-            Component.prototype.forceUpdate.call(this)
+
+    patch(prototype, "componentDidMount", function () {
+        // `componentDidMount` may not be called at all. React can abandon the instance after `render`.
+        // That's why we use finalization registry to dispose reaction created during render.
+        // Happens with `<Suspend>` see #3492
+        //
+        // `componentDidMount` can be called immediately after `componentWillUnmount` without calling `render` in between.
+        // Happens with `<StrictMode>`see #3395.
+        //
+        // If `componentDidMount` is called, it's guaranteed to run synchronously with render (similary to `useLayoutEffect`).
+        // Therefore we don't have to worry about external (observable) state being updated before mount (no state version checking).
+        //
+        // Things may change: "In the future, React will provide a feature that lets components preserve state between unmounts"
+
+        const admin = getAdministration(this)
+
+        admin.mounted = true
+
+        // Component instance committed, prevent reaction disposal.
+        observerFinalizationRegistry.unregister(admin)
+
+        // We don't set forceUpdate before mount because it requires a reference to `this`,
+        // therefore `this` could NOT be garbage collected before mount,
+        // preventing reaction disposal by FinalizationRegistry and leading to memory leak.
+        // As an alternative we could have `admin.instanceRef = new WeakRef(this)`, but lets avoid it if possible.
+        admin.forceUpdate = () => this.forceUpdate()
+
+        if (!admin.reaction) {
+            // 1. Instance was unmounted (reaction disposed) and immediately remounted without running render #3395.
+            // 2. Reaction was disposed by finalization registry before mount. Shouldn't ever happen for class components:
+            // `componentDidMount` runs synchronously after render, but our registry are deferred (can't run in between).
+            // In any case we lost subscriptions to observables, so we have to create new reaction and re-render to resubscribe.
+            // The reaction will be created lazily by following render.
+            admin.forceUpdate()
         }
     })
-    patch(target, "componentWillUnmount", function () {
+
+    patch(prototype, "componentWillUnmount", function () {
         if (isUsingStaticRendering()) {
             return
         }
-
-        const reaction = this.render[mobxAdminProperty]
-        if (reaction) {
-            reaction.dispose()
-            // Forces reaction to be re-created on next render
-            this.render[mobxAdminProperty] = null
-        } else {
-            // Render may have been hot-swapped and/or overridden by a subclass.
-            const displayName = getDisplayName(this)
-            console.warn(
-                `The reactive render of an observer class component (${displayName})
-                was overridden after MobX attached. This may result in a memory leak if the
-                overridden reactive render was not properly disposed.`
-            )
-        }
-
-        this[mobxIsUnmounted] = true
+        const admin = getAdministration(this)
+        admin.reaction?.dispose()
+        admin.reaction = null
+        admin.forceUpdate = null
+        admin.mounted = false
     })
+
     return componentClass
 }
 
 // Generates a friendly name for debugging
-function getDisplayName(comp: any) {
-    return (
-        comp.displayName ||
-        comp.name ||
-        (comp.constructor && (comp.constructor.displayName || comp.constructor.name)) ||
-        "<component>"
-    )
+function getDisplayName(componentClass: ComponentClass) {
+    return componentClass.displayName || componentClass.name || "<component>"
 }
 
 function createReactiveRender(originalRender: any) {
-    /**
-     * If props are shallowly modified, react will render anyway,
-     * so atom.reportChanged() should not result in yet another re-render
-     */
-    setHiddenProp(this, skipRenderKey, false)
-    /**
-     * forceUpdate will re-assign this.props. We don't want that to cause a loop,
-     * so detect these changes
-     */
-    setHiddenProp(this, isForcingUpdateKey, false)
-
-    const initialName = getDisplayName(this)
     const boundOriginalRender = originalRender.bind(this)
 
-    let isRenderingPending = false
-
-    const createReaction = () => {
-        const reaction = new Reaction(`${initialName}.render()`, () => {
-            if (!isRenderingPending) {
-                // N.B. Getting here *before mounting* means that a component constructor has side effects (see the relevant test in misc.test.tsx)
-                // This unidiomatic React usage but React will correctly warn about this so we continue as usual
-                // See #85 / Pull #44
-                isRenderingPending = true
-                if (this[mobxIsUnmounted] !== true) {
-                    let hasError = true
-                    try {
-                        setHiddenProp(this, isForcingUpdateKey, true)
-                        if (!this[skipRenderKey]) {
-                            Component.prototype.forceUpdate.call(this)
-                        }
-                        hasError = false
-                    } finally {
-                        setHiddenProp(this, isForcingUpdateKey, false)
-                        if (hasError) {
-                            reaction.dispose()
-                            // Forces reaction to be re-created on next render
-                            this.render[mobxAdminProperty] = null
-                        }
-                    }
-                }
-            }
-        })
-        reaction["reactComponent"] = this
-        return reaction
-    }
+    const admin = getAdministration(this)
 
     function reactiveRender() {
-        isRenderingPending = false
-        // Create reaction lazily to support re-mounting #3395
-        const reaction = (reactiveRender[mobxAdminProperty] ??= createReaction())
-        let exception: unknown = undefined
-        let rendering = undefined
-        reaction.track(() => {
+        if (!admin.reaction) {
+            // Create reaction lazily to support re-mounting #3395
+            admin.reaction = createReaction(admin)
+            if (!admin.mounted) {
+                // React can abandon this instance and never call `componentDidMount`/`componentWillUnmount`,
+                // we have to make sure reaction will be disposed.
+                observerFinalizationRegistry.register(this, admin, this)
+            }
+        }
+
+        let error: unknown = undefined
+        let renderResult = undefined
+        admin.reaction.track(() => {
             try {
                 // TODO@major
                 // Optimization: replace with _allowStateChangesStart/End (not available in mobx@6.0.0)
-                rendering = _allowStateChanges(false, boundOriginalRender)
+                renderResult = _allowStateChanges(false, boundOriginalRender)
             } catch (e) {
-                exception = e
+                error = e
             }
         })
-        if (exception) {
-            throw exception
+        if (error) {
+            throw error
         }
-        return rendering
+        return renderResult
     }
 
     return reactiveRender
 }
 
-function observerSCU(nextProps: React.ClassAttributes<any>, nextState: any): boolean {
+function createReaction(admin: ObserverAdministration) {
+    return new Reaction(`${admin.name}.render()`, () => {
+        if (admin.isUpdating) {
+            // Reaction is suppressed when setting new state/props/context,
+            // this is when component is already being updated.
+            return
+        }
+
+        if (!admin.mounted) {
+            // This is neccessary to avoid react warning about calling forceUpdate on component that isn't mounted yet.
+            // This happens when component is abandoned after render - our reaction is already created and reacts to changes.
+            // Due to the synchronous nature of `componenDidMount`, we don't have to worry that component could eventually mount and require update.
+            return
+        }
+
+        try {
+            // forceUpdate sets new `props`, since we made it observable, they would `reportChanged`, causing a loop.
+            //admin.observablesSuppressed = true
+            admin.isUpdating = true
+            admin.forceUpdate?.()
+        } catch (error) {
+            admin.reaction?.dispose()
+            admin.reaction = null
+        } finally {
+            admin.isUpdating = false
+            //admin.observablesSuppressed = false
+        }
+    })
+}
+
+function observerSCU(nextProps: ClassAttributes<any>, nextState: any): boolean {
     if (isUsingStaticRendering()) {
         console.warn(
             "[mobx-react] It seems that a re-rendering of a React component is triggered while in static (server-side) mode. Please make sure components are rendered only once server-side."
@@ -202,45 +256,41 @@ function observerSCU(nextProps: React.ClassAttributes<any>, nextState: any): boo
     return !shallowEqual(this.props, nextProps)
 }
 
-function makeObservableProp(target: any, propName: string): void {
-    const valueHolderKey = newSymbol(`reactProp_${propName}_valueHolder`)
-    const atomHolderKey = newSymbol(`reactProp_${propName}_atomHolder`)
-    function getAtom() {
-        if (!this[atomHolderKey]) {
-            setHiddenProp(this, atomHolderKey, createAtom("reactive " + propName))
-        }
-        return this[atomHolderKey]
-    }
-    Object.defineProperty(target, propName, {
+function createObservablePropDescriptor(key: "props" | "state" | "context") {
+    const atomKey = `${key}Atom`
+    return {
         configurable: true,
         enumerable: true,
-        get: function () {
-            let prevReadState = false
+        get() {
+            const admin = getAdministration(this)
 
-            // Why this check? BC?
-            // @ts-expect-error
-            if (_allowStateReadsStart && _allowStateReadsEnd) {
-                prevReadState = _allowStateReadsStart(true)
-            }
-            getAtom.call(this).reportObserved()
+            let prevReadState = _allowStateReadsStart(true)
 
-            // Why this check? BC?
-            // @ts-expect-error
-            if (_allowStateReadsStart && _allowStateReadsEnd) {
-                _allowStateReadsEnd(prevReadState)
-            }
+            admin[atomKey].reportObserved()
 
-            return this[valueHolderKey]
+            _allowStateReadsEnd(prevReadState)
+
+            return admin[key]
         },
-        set: function set(v) {
-            if (!this[isForcingUpdateKey] && !shallowEqual(this[valueHolderKey], v)) {
-                setHiddenProp(this, valueHolderKey, v)
-                setHiddenProp(this, skipRenderKey, true)
-                getAtom.call(this).reportChanged()
-                setHiddenProp(this, skipRenderKey, false)
+        set(value) {
+            const admin = getAdministration(this)
+            // Observables are suppressed if forceUpdate was issues by reaction
+            // TODO !admin.observablesSuppressed
+            if (!admin.isUpdating && !shallowEqual(admin[key], value)) {
+                admin[key] = value
+                // This notifies all observers including our component,
+                // but we don't want to cause `forceUpdate`, because component is already updating,
+                // therefore supress component reaction.
+                admin.isUpdating = true
+                admin[atomKey].reportChanged()
+                admin.isUpdating = false
             } else {
-                setHiddenProp(this, valueHolderKey, v)
+                admin[key] = value
             }
         }
-    })
+    }
 }
+
+const observablePropsDescriptor = createObservablePropDescriptor("props")
+const observableStateDescriptor = createObservablePropDescriptor("state")
+const observableContextDescriptor = createObservablePropDescriptor("context")

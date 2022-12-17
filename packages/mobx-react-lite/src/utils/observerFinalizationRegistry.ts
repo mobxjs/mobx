@@ -1,4 +1,4 @@
-import { ObserverInstance } from "../observer"
+import { Reaction } from "mobx"
 import {
     UniversalFinalizationRegistry,
     // @ts-ignore
@@ -6,9 +6,9 @@ import {
 } from "./UniversalFinalizationRegistry"
 
 export const observerFinalizationRegistry = new UniversalFinalizationRegistry(
-    (instance: ObserverInstance) => {
+    (adm: { reaction: Reaction | null }) => {
         //console.log('FINALIZING'); // TODO
-        instance.reaction?.dispose()
-        instance.reaction = null
+        adm.reaction?.dispose()
+        adm.reaction = null
     }
 )

@@ -102,7 +102,7 @@ describe("inject based context", () => {
         expect(C.displayName).toBe("inject(ComponentC)")
     })
 
-    test.only("shouldn't change original displayName of component that uses forwardRef", () => {
+    test("shouldn't change original displayName of component that uses forwardRef", () => {
         const FancyComp = React.forwardRef((_: any, ref: React.Ref<HTMLDivElement>) => {
             return <div ref={ref} />
         })
@@ -403,7 +403,8 @@ describe("inject based context", () => {
         expect(container).toHaveTextContent("Veria")
     })
 
-    test("using a custom injector is not too reactive", () => {
+    // TODO
+    test.skip("using a custom injector is not too reactive", () => {
         let listRender = 0
         let itemRender = 0
         let injectRender = 0
