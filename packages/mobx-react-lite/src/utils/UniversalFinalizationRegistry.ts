@@ -28,6 +28,7 @@ export class TimerBasedFinalizationRegistry<T> implements FinalizationRegistryTy
         this.registrations.delete(token)
     }
 
+    // Bound so it can be used directly as setTimeout callback.
     sweep = (maxAge = REGISTRY_FINALIZE_AFTER) => {
         // cancel timeout so we can force sweep anytime
         clearTimeout(this.sweepTimeout)
@@ -46,6 +47,7 @@ export class TimerBasedFinalizationRegistry<T> implements FinalizationRegistryTy
         }
     }
 
+    // Bound so it can be exported directly as clearTimers test utility.
     finalizeAllImmediately = () => {
         this.sweep(0)
     }

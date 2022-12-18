@@ -225,8 +225,7 @@ function createReaction(admin: ObserverAdministration) {
         }
 
         try {
-            // forceUpdate sets new `props`, since we made it observable, they would `reportChanged`, causing a loop.
-            //admin.observablesSuppressed = true
+            // forceUpdate sets new `props`, since we made it observable, it would `reportChanged`, causing a loop.
             admin.isUpdating = true
             admin.forceUpdate?.()
         } catch (error) {
@@ -234,7 +233,6 @@ function createReaction(admin: ObserverAdministration) {
             admin.reaction = null
         } finally {
             admin.isUpdating = false
-            //admin.observablesSuppressed = false
         }
     })
 }
