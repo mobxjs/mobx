@@ -1,4 +1,3 @@
-import { Reaction } from "mobx"
 import { forwardRef, memo } from "react"
 
 import { isUsingStaticRendering } from "./staticRendering"
