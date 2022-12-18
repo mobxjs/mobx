@@ -15,6 +15,7 @@ export class TimerBasedFinalizationRegistry<T> implements FinalizationRegistryTy
 
     constructor(private readonly finalize: (value: T) => void) {}
 
+    // Token is actually required with this impl
     register(target: object, value: T, token?: object) {
         this.registrations.set(token, {
             value,

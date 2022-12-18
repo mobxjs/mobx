@@ -6,7 +6,7 @@ import { useDeprecated } from "./utils/utils"
 import { useObserver as useObserverOriginal } from "./useObserver"
 import { enableStaticRendering } from "./staticRendering"
 import { observerFinalizationRegistry } from "./utils/observerFinalizationRegistry"
-export { observerFinalizationRegistry as _observerFinalizationRegistry }
+
 observerBatching(batch)
 
 export { isUsingStaticRendering, enableStaticRendering } from "./staticRendering"
@@ -16,6 +16,7 @@ export { useLocalObservable } from "./useLocalObservable"
 export { useLocalStore } from "./useLocalStore"
 export { useAsObservableSource } from "./useAsObservableSource"
 
+export { observerFinalizationRegistry as _observerFinalizationRegistry }
 export const clearTimes = observerFinalizationRegistry["finalizeAllImmediately"] ?? (() => {})
 
 export function useObserver<T>(fn: () => T, baseComponentName: string = "observed"): T {
