@@ -403,8 +403,7 @@ describe("inject based context", () => {
         expect(container).toHaveTextContent("Veria")
     })
 
-    // TODO
-    test.skip("using a custom injector is not too reactive", () => {
+    test("using a custom injector is not too reactive", () => {
         let listRender = 0
         let itemRender = 0
         let injectRender = 0
@@ -499,12 +498,21 @@ describe("inject based context", () => {
         expect(injectRender).toBe(6)
         expect(itemRender).toBe(6)
 
-        container.querySelectorAll(".hl_ItemB").forEach((e: Element) => (e as HTMLElement).click())
+        act(() => {
+            container
+                .querySelectorAll(".hl_ItemB")
+                .forEach((e: Element) => (e as HTMLElement).click())
+        })
+
         expect(listRender).toBe(1)
         expect(injectRender).toBe(12) // ideally, 7
         expect(itemRender).toBe(7)
+        act(() => {
+            container
+                .querySelectorAll(".hl_ItemF")
+                .forEach((e: Element) => (e as HTMLElement).click())
+        })
 
-        container.querySelectorAll(".hl_ItemF").forEach((e: Element) => (e as HTMLElement).click())
         expect(listRender).toBe(1)
         expect(injectRender).toBe(18) // ideally, 9
         expect(itemRender).toBe(9)
