@@ -2362,7 +2362,9 @@ describe("`requiresObservable` takes precedence over global `reactionRequiresObs
 })
 
 test("state version updates correctly", () => {
-    // The current implementation updates state version at the end of batch.
+    // This test was designed around the idea of updating version only at the end of batch,
+    // which is NOT an implementation we've settled on, but the test is still valid.
+
     // This test demonstrates that the version is correctly updated with each state mutations:
     // 1. Even without wrapping mutation in batch explicitely.
     // 2. Even in self-invoking recursive derivation.
