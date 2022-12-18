@@ -13,7 +13,7 @@ type ObserverAdministration = {
     // BC: we will use local state version if global isn't available.
     // It should behave as previous implementation - tearing is still present,
     // because there is no cross component synchronization,
-    // but we can use `useExternalSyncStore` API.
+    // but we can use `useSyncExternalStore` API.
     stateVersion: any
     name: string
     // These don't depend on state/props, therefore we can keep them here instead of `useCallback`
@@ -34,7 +34,7 @@ function createReaction(adm: ObserverAdministration) {
         }
         // Force update won't be avaliable until the component "mounts".
         // If state changes in between initial render and mount,
-        // `useExternalSyncStore` should handle that by checking the state version and issuing update.
+        // `useSyncExternalStore` should handle that by checking the state version and issuing update.
         adm.forceUpdate?.()
     })
 }
