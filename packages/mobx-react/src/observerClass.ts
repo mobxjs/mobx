@@ -274,8 +274,8 @@ function createObservablePropDescriptor(key: "props" | "state" | "context") {
         },
         set(value) {
             const admin = getAdministration(this)
-            // Observables are suppressed if forceUpdate was issues by reaction
-            // TODO !admin.observablesSuppressed
+            // forceUpdate issued by reaction sets new props.
+            // It sets isUpdating to true to prevent loop.
             if (!admin.isUpdating && !shallowEqual(admin[key], value)) {
                 admin[key] = value
                 // This notifies all observers including our component,

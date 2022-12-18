@@ -870,7 +870,7 @@ test.skip("#709 - applying observer on React.memo component", () => {
     render(<Observed />, { wrapper: ErrorCatcher })
 })
 
-// TODO explain skip
+// this.render is made non-configurable, therefore can't be replaced
 test.skip("#797 - replacing this.render should trigger a warning", () => {
     consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
 
