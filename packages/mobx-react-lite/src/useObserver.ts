@@ -3,6 +3,7 @@ import React from "react"
 import { printDebugValue } from "./utils/printDebugValue"
 import { isUsingStaticRendering } from "./staticRendering"
 import { observerFinalizationRegistry } from "./utils/observerFinalizationRegistry"
+import { useSyncExternalStore } from "use-sync-external-store/shim"
 
 // Do not store `admRef` (even as part of a closure!) on this object,
 // otherwise it will prevent GC and therefore reaction disposal via FinalizationRegistry.
@@ -91,7 +92,7 @@ export function useObserver<T>(render: () => T, baseComponentName: string = "obs
     const adm = admRef.current!
     React.useDebugValue(adm.reaction!, printDebugValue)
 
-    React.useSyncExternalStore(
+    useSyncExternalStore(
         // Both of these must be stable, otherwise it would keep resubscribing every render.
         adm.subscribe,
         adm.getSnapshot
