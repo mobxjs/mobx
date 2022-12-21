@@ -495,6 +495,7 @@ describe("action", () => {
                                                 class Box extends Shape {
                                                     constructor(arg) {
                                                         super(arg)
+
                                                         makeObservable(this, {
                                                             method: override
                                                         });

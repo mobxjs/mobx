@@ -33,7 +33,7 @@
         "@babel/preset-typescript": "^7.9.0",
         "@babel/runtime": "^7.9.2",
         "dedent-js": "^1.0.1",
-        "jscodeshift": "^0.13.1"
+        "jscodeshift": "^0.14.0"
     },
     "devDependencies": {
         "@types/jscodeshift": "^0.11.5"
