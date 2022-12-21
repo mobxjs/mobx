@@ -1,5 +1,27 @@
 # mobx
 
+## 6.7.0
+
+### Minor Changes
+
+-   [`8cf4784f`](https://github.com/mobxjs/mobx/commit/8cf4784f53857cc977aed641bd778f2c14a080f5) [#3559](https://github.com/mobxjs/mobx/pull/3559) Thanks [@urugator](https://github.com/urugator)! - Proxied observable arrays can now safely read/write out of bound indices. See https://github.com/mobxjs/mobx/discussions/3537
+
+*   [`223e3688`](https://github.com/mobxjs/mobx/commit/223e3688631528a327c79d39e2f497c6e1506165) [#3551](https://github.com/mobxjs/mobx/pull/3551) Thanks [@deadbeef84](https://github.com/deadbeef84)! - Added new option `signal` to `when()`, to support abortion using an AbortSignal / AbortController.
+
+### Patch Changes
+
+-   [`fe25cfed`](https://github.com/mobxjs/mobx/commit/fe25cfede0aee3bddd7fa434a14ed4b40a57ee26) [#3566](https://github.com/mobxjs/mobx/pull/3566) Thanks [@upsuper](https://github.com/upsuper)! - Make return value of reportObserved match invoke of onBecomeObserved
+
+## 6.6.2
+
+### Patch Changes
+
+-   [`b375535c`](https://github.com/mobxjs/mobx/commit/b375535c422453963f5d3485a2ef5233568c12a6) [#3344](https://github.com/mobxjs/mobx/pull/3344) Thanks [@Nokel81](https://github.com/Nokel81)! - Allow readonly tuples as part of IObservableMapInitialValues
+
+*   [`7260cd41`](https://github.com/mobxjs/mobx/commit/7260cd413b1e52449523826ac239c2a197b2880f) [#3516](https://github.com/mobxjs/mobx/pull/3516) Thanks [@urugator](https://github.com/urugator)! - fix regression #3514: LegacyObservableArray compat with Safari 9.\*
+
+-   [`78d1aa23`](https://github.com/mobxjs/mobx/commit/78d1aa2362b4dc5d521518688d6ac7e2d4f7ad3a) [#3458](https://github.com/mobxjs/mobx/pull/3458) Thanks [@egilll](https://github.com/egilll)! - A slight revamp of the README, wording, and clearer links
+
 ## 6.6.1
 
 ### Patch Changes

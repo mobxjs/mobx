@@ -326,7 +326,7 @@ test("observer component can be injected", () => {
     )
 
     // N.B, the injected component will be observer since mobx-react 4.0!
-    inject(() => {})(
+    inject(() => ({}))(
         observer(
             class T extends React.Component {
                 render() {

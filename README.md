@@ -8,6 +8,7 @@ _Simple, scalable state management._
 [![OpenCollective](https://opencollective.com/mobx/backers/badge.svg)](docs/backers-sponsors.md#backers)
 [![OpenCollective](https://opencollective.com/mobx/sponsors/badge.svg)](docs/backers-sponsors.md#sponsors)
 [![Discuss on Github](https://img.shields.io/badge/discuss%20on-GitHub-orange)](https://github.com/mobxjs/mobx/discussions)
+[![Coverage Status](https://coveralls.io/repos/github/mobxjs/mobx/badge.svg?branch=main)](https://coveralls.io/github/mobxjs/mobx?branch=main)
 [![View changelog](https://img.shields.io/badge/changelogs.xyz-Explore%20Changelog-brightgreen)](https://changelogs.xyz/mobx)
 
 ---
@@ -24,23 +25,27 @@ MobX is made possible by the generosity of the sponsors below, and many other [i
 
 **🥇 Gold sponsors (\$3000+ total contribution):** <br/>
 <a href="https://mendix.com/"><img src="https://mobx.js.org/assets/mendix-logo.png" align="center" width="100" title="Mendix" alt="Mendix" /></a>
-<a href="https://frontendmasters.com/"><img src="https://mobx.js.org/assets/frontendmasters.jpg" align="center" width="100" title="Frontend Masters" alt="Frontend Masters"></a>
-<a href="https://opensource.facebook.com/"><img src="https://mobx.js.org/assets/fbos.jpeg" align="center" width="100" title="Facebook Open Source" alt="Facebook Open Source" /></a>
-<a href="http://auctionfrontier.com/"><img src="https://mobx.js.org/assets/auctionfrontier.jpeg" align="center" width="100" title="Auction Frontier" alt="Auction Frontier"></a>
 <a href="https://www.guilded.gg/"><img src="https://mobx.js.org/assets/guilded.jpg" align="center" width="100" title="Guilded" alt="Guilded" /></a>
+<a href="https://www.getparallax.com/"><img src="https://mobx.js.org/assets/parallax.png" align="center" width="100" title="Parallax" alt="Parallax" /></a>
+<a href="https://frontendmasters.com/"><img src="https://mobx.js.org/assets/frontendmasters.jpg" align="center" width="100" title="Frontend Masters" alt="Frontend Masters"></a>
+<a href="https://www.one-beyond.com"><img src="https://mobx.js.org/assets/dcsl.png" align="center" width="100" title="One Beyond" alt="One Beyond"/></a>
+<a href="http://auctionfrontier.com/"><img src="https://mobx.js.org/assets/auctionfrontier.jpeg" align="center" width="100" title="Auction Frontier" alt="Auction Frontier"></a>
+<a href="https://www.codefirst.co.uk/"><img src="https://mobx.js.org/assets/codefirst.png" align="center" width="100" title="CodeFirst" alt="CodeFirst"/></a>
+<a href="https://modulz.app/"><img src="https://mobx.js.org/assets/modulz.png" align="center" width="100" title="Modulz" alt="Modulz"/></a>
 <a href="https://coinbase.com/"><img src="https://mobx.js.org/assets/coinbase.jpeg" align="center" width="100" title="Coinbase" alt="Coinbase" /></a>
+<a href="https://curology.com/blog/tech"><img src="https://mobx.js.org/assets/curology.png" align="center" width="100" title="Curology" alt="Curology"/></a>
+<a href="https://opensource.facebook.com/"><img src="https://mobx.js.org/assets/fbos.jpeg" align="center" width="100" title="Facebook Open Source" alt="Facebook Open Source" /></a>
 <a href="https://www.canva.com/"><img src="https://mobx.js.org/assets/canva.png" align="center" width="100" title="Canva" alt="Canva" /></a>
 
 **🥈 Silver sponsors (\$100+ per month):**<br/>
-<a href="https://www.codefirst.co.uk/"><img src="https://mobx.js.org/assets/codefirst.png" align="center" width="100" title="CodeFirst" alt="CodeFirst"/></a>
-<a href="https://www.dcsl.com/"><img src="https://mobx.js.org/assets/dcsl.png" align="center" width="100" title="DCSL Guidesmiths" alt="DCSL Guidesmiths"/></a>
-<a href="https://www.bugsnag.com/platforms/react-error-reporting?utm_source=MobX&utm_medium=Website&utm_content=open-source&utm_campaign=2019-community&utm_term=20190913"><img src="https://mobx.js.org/assets/bugsnag.jpg" align="center" width="100" title="Bugsnag" alt="Bugsnag"/></a>
-<a href="https://curology.com/blog/tech"><img src="https://mobx.js.org/assets/curology.png" align="center" width="100" title="Curology" alt="Curology"/></a>
-<a href="https://modulz.app/"><img src="https://mobx.js.org/assets/modulz.png" align="center" width="100" title="Modulz" alt="Modulz"/></a>
-<a href="https://space307.com/?utm_source=sponsorship&utm_medium=mobx&utm_campaign=readme"><img src="https://mobx.js.org/assets/space307.png" align="center" width="100" title="Space307" alt="Space307"/></a>
+
 <a href="https://casinosites.ltd.uk/?utm_source=sponsorship&utm_medium=mobx&utm_campaign=readme"><img src="https://mobx.js.org/assets/casino2.png" align="center" width="100" title="Casino Sites" alt="Casino Sites"/></a>
+<a href="https://upper.co/?utm_source=github_mobxjs_sponsorship&utm_medium=paid_acquisition&utm_campaign=sponsorship"><img src="https://mobx.js.org/assets/upper.png" align="center" width="100" title="UPPER" alt="UPPER"/></a>
+<a href="https://www.easeus.com/?utm_source=github_mobxjs_sponsorship&utm_medium=readme&utm_campaign=sponsorship"><img src="https://mobx.js.org/assets/easeus.png" align="center" width="100" title="EaseUS" alt="EaseUS"/></a>
 
 **🥉 Bronze sponsors (\$500+ total contributions):**<br/>
+<a href="https://www.bugsnag.com/platforms/react-error-reporting?utm_source=MobX&utm_medium=Website&utm_content=open-source&utm_campaign=2019-community&utm_term=20190913"><img src="https://mobx.js.org/assets/bugsnag.jpg" align="center" width="100" title="Bugsnag" alt="Bugsnag"/></a>
+<a href="https://space307.com/?utm_source=sponsorship&utm_medium=mobx&utm_campaign=readme"><img src="https://mobx.js.org/assets/space307.png" align="center" width="100" title="Space307" alt="Space307"/></a>
 <a href="https://mantro.net/jobs/warlock"><img src="https://mobx.js.org/assets/mantro.png" align="center" width="100" title="mantro GmbH" alt="mantro GmbH"></a>
 <a href="https://www.algolia.com/"><img src="https://mobx.js.org/assets/algolia.jpg" align="center" width="100" title="Algolia" alt="Algolia" /></a>
 <a href="https://talentplot.com/"><img src="https://mobx.js.org/assets/talentplot.png" align="center" width="100" title="talentplot" alt="talentplot"></a>

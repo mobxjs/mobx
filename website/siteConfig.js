@@ -25,7 +25,7 @@ const siteConfig = {
         apiKey: '500db32fbdbd53a814f42aafdfa26bd4',
         indexName: 'mobxjs',
     },
-    title: "MobX", // Title for your website.
+    title: "MobX 🇺🇦", // Title for your website.
     tagline: "Simple, scalable state management",
 
     // For github.io type URLs, you would set the url and baseUrl like:

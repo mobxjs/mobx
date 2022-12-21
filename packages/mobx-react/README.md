@@ -3,9 +3,6 @@
 [![CircleCI](https://circleci.com/gh/mobxjs/mobx-react.svg?style=svg)](https://circleci.com/gh/mobxjs/mobx-react)
 [![CDNJS](https://img.shields.io/cdnjs/v/mobx-react.svg)](https://cdnjs.com/libraries/mobx-react)
 [![Minzipped size](https://img.shields.io/bundlephobia/minzip/mobx-react.svg)](https://bundlephobia.com/result?p=mobx-react)
-
-[![TypeScript](https://badges.frapsoft.com/typescript/code/typescript.svg?v=101)](https://github.com/ellerbrock/typescript-badges/)[![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
-
 [![Discuss on Github](https://img.shields.io/badge/discuss%20on-GitHub-orange)](https://github.com/mobxjs/mobx/discussions)
 [![View changelog](https://img.shields.io/badge/changelogs.xyz-Explore%20Changelog-brightgreen)](https://changelogs.xyz/mobx-react)
 
@@ -14,9 +11,9 @@ Exports the `observer` decorator and other utilities.
 For documentation, see the [MobX](https://mobx.js.org) project.
 This package supports both React and React Native.
 
-## Choosing your version
+## Compatibility matrix
 
-There are currently two actively maintained versions of mobx-react:
+Only the latest version is actively maintained. If you're missing a fix or a feature in older version, consider upgrading or using [patch-package](https://www.npmjs.com/package/patch-package)
 
 | NPM Version | Support MobX version | Supported React versions | Supports hook based components                                                   |
 | ----------- | -------------------- | ------------------------ | -------------------------------------------------------------------------------- |
