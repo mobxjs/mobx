@@ -21,12 +21,12 @@ function runDisposersOnWillUnmount() {
 }
 
 /**
- * @deprecated
+ * @deprecated `disposeOnUnmount` is not compatible with React 18 and higher.
  */
 export function disposeOnUnmount(target: React.Component<any, any>, propertyKey: PropertyKey): void
 
 /**
- * @deprecated
+ * @deprecated `disposeOnUnmount` is not compatible with React 18 and higher.
  */
 export function disposeOnUnmount<TF extends Disposer | Array<Disposer>>(
     target: React.Component<any, any>,
@@ -34,7 +34,7 @@ export function disposeOnUnmount<TF extends Disposer | Array<Disposer>>(
 ): TF
 
 /**
- * @deprecated
+ * @deprecated `disposeOnUnmount` is not compatible with React 18 and higher.
  */
 export function disposeOnUnmount(
     target: React.Component<any, any>,
@@ -47,7 +47,7 @@ export function disposeOnUnmount(
     if (!warnedAboutDisposeOnUnmountDeprecated) {
         if (reactMajorVersion >= 18) {
             console.error(
-                "[mobx-react] disposeOnUnmount is not compatible with React 18. Don't use it."
+                "[mobx-react] disposeOnUnmount is not compatible with React 18 and higher. Don't use it."
             )
         } else {
             console.warn(
