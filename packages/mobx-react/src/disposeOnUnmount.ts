@@ -54,9 +54,8 @@ export function disposeOnUnmount(
                 "[mobx-react] disposeOnUnmount is deprecated. It won't work correctly with React 18 and higher."
             )
         }
+        warnedAboutDisposeOnUnmountDeprecated = true
     }
-
-    warnedAboutDisposeOnUnmountDeprecated = true
 
     const c = Object.getPrototypeOf(target).constructor
     const c2 = Object.getPrototypeOf(target.constructor)
