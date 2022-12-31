@@ -1,15 +1,28 @@
 import { Reaction } from "mobx"
 import React from "react"
 import { printDebugValue } from "./utils/printDebugValue"
-import {
-    addReactionToTrack,
-    IReactionTracking,
-    recordReactionAsCommitted
-} from "./utils/reactionCleanupTracking"
+import { observerFinalizationRegistry } from "./utils/observerFinalizationRegistry"
 import { isUsingStaticRendering } from "./staticRendering"
 
 function observerComponentNameFor(baseComponentName: string) {
     return `observer${baseComponentName}`
+}
+
+type ObserverAdministration = {
+    /** The Reaction created during first render, which may be leaked */
+    reaction: Reaction | null
+
+    /**
+     * Whether the component has yet completed mounting (for us, whether
+     * its useEffect has run)
+     */
+    mounted: boolean
+
+    /**
+     * Whether the observables that the component is tracking changed between
+     * the first render and the first useEffect.
+     */
+    changedBeforeMount: boolean
 }
 
 /**
@@ -34,50 +47,51 @@ export function useObserver<T>(fn: () => T, baseComponentName: string = "observe
     // StrictMode/ConcurrentMode/Suspense may mean that our component is
     // rendered and abandoned multiple times, so we need to track leaked
     // Reactions.
-    const reactionTrackingRef = React.useRef<IReactionTracking | null>(null)
+    const admRef = React.useRef<ObserverAdministration | null>(null)
 
-    if (!reactionTrackingRef.current) {
-        // First render for this component (or first time since a previous
-        // reaction from an abandoned render was disposed).
+    if (!admRef.current) {
+        // First render
+        admRef.current = {
+            reaction: null,
+            mounted: false,
+            changedBeforeMount: false
+        }
+    }
 
-        const newReaction = new Reaction(observerComponentNameFor(baseComponentName), () => {
+    const adm = admRef.current!
+
+    if (!adm.reaction) {
+        // First render or component was not committed and reaction was disposed by registry
+        adm.reaction = new Reaction(observerComponentNameFor(baseComponentName), () => {
             // Observable has changed, meaning we want to re-render
             // BUT if we're a component that hasn't yet got to the useEffect()
             // stage, we might be a component that _started_ to render, but
             // got dropped, and we don't want to make state changes then.
             // (It triggers warnings in StrictMode, for a start.)
-            if (trackingData.mounted) {
+            if (adm.mounted) {
                 // We have reached useEffect(), so we're mounted, and can trigger an update
                 forceUpdate()
             } else {
                 // We haven't yet reached useEffect(), so we'll need to trigger a re-render
                 // when (and if) useEffect() arrives.
-                trackingData.changedBeforeMount = true
+                adm.changedBeforeMount = true
             }
         })
 
-        const trackingData = addReactionToTrack(
-            reactionTrackingRef,
-            newReaction,
-            objectRetainedByReact
-        )
+        observerFinalizationRegistry.register(objectRetainedByReact, adm, adm)
     }
 
-    const { reaction } = reactionTrackingRef.current!
-    React.useDebugValue(reaction, printDebugValue)
+    React.useDebugValue(adm.reaction, printDebugValue)
 
     React.useEffect(() => {
-        // Called on first mount only
-        recordReactionAsCommitted(reactionTrackingRef)
+        observerFinalizationRegistry.unregister(adm)
 
-        if (reactionTrackingRef.current) {
-            // Great. We've already got our reaction from our render;
-            // all we need to do is to record that it's now mounted,
-            // to allow future observable changes to trigger re-renders
-            reactionTrackingRef.current.mounted = true
-            // Got a change before first mount, force an update
-            if (reactionTrackingRef.current.changedBeforeMount) {
-                reactionTrackingRef.current.changedBeforeMount = false
+        adm.mounted = true
+
+        if (adm.reaction) {
+            if (adm.changedBeforeMount) {
+                // Got a change before mount, force an update
+                adm.changedBeforeMount = false
                 forceUpdate()
             }
         } else {
@@ -87,21 +101,17 @@ export function useObserver<T>(fn: () => T, baseComponentName: string = "observe
             // reaction got cleaned up
 
             // Re-create the reaction
-            reactionTrackingRef.current = {
-                reaction: new Reaction(observerComponentNameFor(baseComponentName), () => {
-                    // We've definitely already been mounted at this point
-                    forceUpdate()
-                }),
-                mounted: true,
-                changedBeforeMount: false,
-                cleanAt: Infinity
-            }
+            adm.reaction = new Reaction(observerComponentNameFor(baseComponentName), () => {
+                // We've definitely already been mounted at this point
+                forceUpdate()
+            })
             forceUpdate()
         }
 
         return () => {
-            reactionTrackingRef.current!.reaction.dispose()
-            reactionTrackingRef.current = null
+            adm.reaction!.dispose()
+            adm.reaction = null
+            adm.mounted = false
         }
     }, [])
 
@@ -110,7 +120,7 @@ export function useObserver<T>(fn: () => T, baseComponentName: string = "observe
     // can be invalidated (see above) once a dependency changes
     let rendering!: T
     let exception
-    reaction.track(() => {
+    adm.reaction.track(() => {
         try {
             rendering = fn()
         } catch (e) {
