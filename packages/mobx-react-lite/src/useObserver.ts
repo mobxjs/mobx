@@ -47,6 +47,7 @@ export function useObserver<T>(render: () => T, baseComponentName: string = "obs
     const admRef = React.useRef<ObserverAdministration | null>(null)
 
     if (!admRef.current) {
+        // First render
         const adm: ObserverAdministration = {
             reaction: null,
             forceUpdate: null,
@@ -79,17 +80,20 @@ export function useObserver<T>(render: () => T, baseComponentName: string = "obs
             }
         }
 
-        createReaction(adm)
-
         admRef.current = adm
+    }
 
+    const adm = admRef.current!
+
+    if (!adm.reaction) {
+        // First render or reaction was disposed by registry before subscribe
+        createReaction(adm)
         // StrictMode/ConcurrentMode/Suspense may mean that our component is
         // rendered and abandoned multiple times, so we need to track leaked
         // Reactions.
         observerFinalizationRegistry.register(admRef, adm, adm)
     }
 
-    const adm = admRef.current!
     React.useDebugValue(adm.reaction!, printDebugValue)
 
     useSyncExternalStore(
