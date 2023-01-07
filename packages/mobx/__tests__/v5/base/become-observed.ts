@@ -509,3 +509,20 @@ test("#2667", () => {
         "onBecomeUnobservednew"
     ])
 })
+
+test("works with ObservableSet #3595", () => {
+    const onSetObserved = jest.fn()
+    const onSetUnobserved = jest.fn()
+
+    const set = observable.set()
+
+    const disposeOBO = onBecomeObserved(set, onSetObserved)
+    const disposeOBU = onBecomeUnobserved(set, onSetUnobserved)
+    const diposeAutorun = autorun(() => set.size)
+    diposeAutorun()
+    disposeOBO()
+    disposeOBU()
+
+    expect(onSetObserved).toBeCalledTimes(1)
+    expect(onSetUnobserved).toBeCalledTimes(1)
+})
