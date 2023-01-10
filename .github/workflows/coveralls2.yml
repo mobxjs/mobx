@@ -1,0 +1,14 @@
+name: Coveralls 2
+
+on: ["push"]
+
+jobs:
+  mobx:
+    name: Packages coverage
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@master
+
+      - name: Test
+        run: echo hello
