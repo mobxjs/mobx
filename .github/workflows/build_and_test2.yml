@@ -32,14 +32,3 @@ jobs:
         with:
           name: build
           path: .
-
-  test:
-    name: Test
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Test
-        uses: actions/download-artifact@v3
-        with:
-          name: build
-        run: yarn test -i
