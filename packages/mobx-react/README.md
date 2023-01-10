@@ -266,7 +266,7 @@ Notes:
 #### "The set of provided stores has changed" error
 
 Values provided through `Provider` should be final. Make sure that if you put things in `context` that might change over time, that they are `@observable` or provide some other means to listen to changes, like callbacks. However, if your stores will change over time, like an observable value of another store, MobX will throw an error.
-This restriction exists mainly for legacy reasons. If you have a scenario where you need to modify the set of stores, please leave a comment about it in this issue https://github.com/mobxjs/mobx-react/issues/745.
+This restriction exists mainly for legacy reasons. If you have a scenario where you need to modify the set of stores, please leave a comment about it in this issue https://github.com/mobxjs/mobx-react/issues/745. Or a preferred way is to [use React Context](https://reactjs.org/docs/context.html) directly which does not have this restriction.
 
 #### Inject as function
 
