@@ -26,3 +26,20 @@ jobs:
 
       - name: Build test
         run: yarn lerna run build:test
+
+      - name: Upload build result
+        uses: actions/upload-artifact@v3
+        with:
+          name: build
+          path: .
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Test
+        uses: actions/download-artifact@v3
+        with:
+          name: build
+        run: yarn test -i
