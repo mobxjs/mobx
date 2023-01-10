@@ -1,0 +1,74 @@
+name: Build and test
+
+on: ["push", "pull_request"]
+
+jobs:
+  build:
+    name: Build
+    env:
+      CI: true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@master
+
+      - name: Setup Node.js 14.x
+        uses: actions/setup-node@master
+        with:
+          node-version: 14.x
+
+      - name: Install Dependencies
+        run: yarn --frozen-lockfile --ignore-scripts
+
+      - name: Lint
+        run: yarn lint
+
+      - name: Build check
+        run: yarn lerna run build:check
+
+      - name: Build test
+        run: yarn lerna run build:test
+
+      - name: Upload build result
+        uses: actions/upload-artifact@v3
+        with:
+          name: build
+          path: .
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Test
+        uses: actions/download-artifact@v3
+        with:
+          name: build
+        run: yarn test -i
+
+      - name: Test size
+        uses: actions/download-artifact@v3
+        with:
+          name: build
+        run: yarn lerna run test:size
+
+  mobx-test:
+    name: Test
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Test flow
+        uses: actions/download-artifact@v3
+        with:
+          name: build
+        run: yarn mobx test:flow
+
+      - name: Test performance
+        uses: actions/download-artifact@v3
+        with:
+          name: build
+        run: yarn mobx test:performance
+
+
+
+
