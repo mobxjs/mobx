@@ -1,6 +1,11 @@
 name: Build and test
 
-on: ["push", "pull_request"]
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches: [main]
 
 jobs:
   build:
@@ -68,7 +73,3 @@ jobs:
         with:
           name: build
         run: yarn mobx test:performance
-
-
-
-
