@@ -24,7 +24,7 @@ jobs:
       - name: Build check
         run: yarn lerna run build:check
 
-      - name: Build test
+      - name: Build packages
         run: yarn lerna run build:test
 
       - name: Test
