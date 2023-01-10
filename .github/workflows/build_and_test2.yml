@@ -1,4 +1,4 @@
-name: Coveralls 2
+name: Build and test 2
 
 on: ["push"]
 
