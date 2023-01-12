@@ -3,6 +3,8 @@ import { createReactionCleanupTrackingUsingFinalizationRegister } from "./create
 import { createTimerBasedReactionCleanupTracking } from "./createTimerBasedReactionCleanupTracking"
 export { IReactionTracking } from "./reactionCleanupTrackingCommon"
 
+export const reactionToTrackSymbol = Symbol.for("reactionToTrackSymbol")
+
 const {
     addReactionToTrack,
     recordReactionAsCommitted,
