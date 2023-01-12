@@ -22,7 +22,7 @@ export function getAtom(thing: any, property?: PropertyKey): IDepTreeNode {
             return (thing as any)[$mobx].atom_
         }
         if (isObservableSet(thing)) {
-            return (thing as any)[$mobx]
+            return thing.atom_
         }
         if (isObservableMap(thing)) {
             if (property === undefined) {
