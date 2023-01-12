@@ -37,8 +37,8 @@ export type IValueDidChange<T = any> = {
     observableKind: "value"
     object: IObservableValue<T>
     debugObjectName: string
-    newValue: unknown
-    oldValue: unknown
+    newValue: T
+    oldValue: T | undefined
 }
 export type IBoxDidChange<T = any> =
     | {
@@ -46,7 +46,7 @@ export type IBoxDidChange<T = any> =
           observableKind: "value"
           object: IObservableValue<T>
           debugObjectName: string
-          newValue: unknown
+          newValue: T
       }
     | IValueDidChange<T>
 
