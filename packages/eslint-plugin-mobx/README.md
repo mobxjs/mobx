@@ -101,5 +101,5 @@ _Deprecated in favor of [react/display-name](https://github.com/jsx-eslint/eslin
 
 Forbids anonymous functions or classes as `observer` components.
 Improves debugging experience and [avoids problem with inability to customize `displayName`](https://github.com/mobxjs/mobx/issues/2721).
-Plays nice with `eslint-plugin-react-hooks` and `mobx/missing-observer` as both of these don't not recognize anonymous function as component.
+Plays nice with `eslint-plugin-react-hooks` and `mobx/missing-observer` as both of these don't recognize anonymous function as component.
 **Autofix** infers the name from variable if possible.
