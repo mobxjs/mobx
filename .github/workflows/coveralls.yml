@@ -1,6 +1,6 @@
 name: Coveralls
 
-on: ["push", "pull_request"]
+on: ["push"]
 
 jobs:
   mobx:
