@@ -53,8 +53,6 @@ export type IBoxDidChange<T = any> =
 export interface IObservableValue<T> {
     get(): T
     set(value: T): void
-    intercept_(handler: IInterceptor<IValueWillChange<T>>): Lambda
-    observe_(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda
 }
 
 const CREATE = "create"
