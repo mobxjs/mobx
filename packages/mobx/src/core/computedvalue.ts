@@ -35,7 +35,6 @@ import {
 export interface IComputedValue<T> {
     get(): T
     set(value: T): void
-    observe_(listener: (change: IComputedDidChange<T>) => void, fireImmediately?: boolean): Lambda
 }
 
 export interface IComputedValueOptions<T> {
