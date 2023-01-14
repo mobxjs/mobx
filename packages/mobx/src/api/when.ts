@@ -9,11 +9,19 @@ import {
     allowStateChanges
 } from "../internal"
 
+// https://github.com/mobxjs/mobx/issues/3582
+interface GenericAbortSignal {
+    readonly aborted: boolean
+    onabort?: ((...args: any) => any) | null
+    addEventListener?: (...args: any) => any
+    removeEventListener?: (...args: any) => any
+}
+
 export interface IWhenOptions {
     name?: string
     timeout?: number
     onError?: (error: any) => void
-    signal?: AbortSignal
+    signal?: GenericAbortSignal
 }
 
 export function when(
@@ -90,8 +98,8 @@ function whenPromise(
             disposer()
             reject(new Error("WHEN_ABORTED"))
         }
-        opts?.signal?.addEventListener("abort", abort)
-    }).finally(() => opts?.signal?.removeEventListener("abort", abort))
+        opts?.signal?.addEventListener?.("abort", abort)
+    }).finally(() => opts?.signal?.removeEventListener?.("abort", abort))
     ;(res as any).cancel = cancel
     return res as any
 }
