@@ -112,6 +112,7 @@ export function useObserver<T>(fn: () => T, baseComponentName: string = "observe
             adm.reaction!.dispose()
             adm.reaction = null
             adm.mounted = false
+            adm.changedBeforeMount = false
         }
     }, [])
 
