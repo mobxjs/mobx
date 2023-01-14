@@ -37,8 +37,8 @@ export type IValueDidChange<T = any> = {
     observableKind: "value"
     object: IObservableValue<T>
     debugObjectName: string
-    newValue: unknown
-    oldValue: unknown
+    newValue: T
+    oldValue: T | undefined
 }
 export type IBoxDidChange<T = any> =
     | {
@@ -46,15 +46,13 @@ export type IBoxDidChange<T = any> =
           observableKind: "value"
           object: IObservableValue<T>
           debugObjectName: string
-          newValue: unknown
+          newValue: T
       }
     | IValueDidChange<T>
 
 export interface IObservableValue<T> {
     get(): T
     set(value: T): void
-    intercept_(handler: IInterceptor<IValueWillChange<T>>): Lambda
-    observe_(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda
 }
 
 const CREATE = "create"
