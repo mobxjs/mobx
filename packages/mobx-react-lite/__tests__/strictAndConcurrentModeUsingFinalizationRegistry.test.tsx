@@ -1,21 +1,20 @@
 import { cleanup, render } from "@testing-library/react"
 import * as mobx from "mobx"
 import * as React from "react"
-
 import { useObserver } from "../src/useObserver"
 import { sleep } from "./utils"
-import { FinalizationRegistry } from "../src/utils/FinalizationRegistryWrapper"
-
-// @ts-ignore
 import gc from "expose-gc/function"
+import { observerFinalizationRegistry } from "../src/utils/observerFinalizationRegistry"
+
+if (typeof globalThis.FinalizationRegistry !== "function") {
+    throw new Error("This test must run with node >= 14")
+}
+
+expect(observerFinalizationRegistry).toBeInstanceOf(globalThis.FinalizationRegistry)
 
 afterEach(cleanup)
 
 test("uncommitted components should not leak observations", async () => {
-    if (!FinalizationRegistry) {
-        throw new Error("This test must run with node >= 14")
-    }
-
     const store = mobx.observable({ count1: 0, count2: 0 })
 
     // Track whether counts are observed
