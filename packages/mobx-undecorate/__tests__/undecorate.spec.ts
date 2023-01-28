@@ -1390,11 +1390,11 @@ test("non-null assertion operator is preserved", () => {
     ).toMatchInlineSnapshot(`
         "import { observable, makeObservable } from 'mobx';
         class X {
-          todos!: ObservableMap<string, TodoModel>
+          todos!: ObservableMap<string, TodoModel>;
 
           constructor() {
             makeObservable(this, {
-              todos: observable,
+              todos: observable
             });
           }
         }"
