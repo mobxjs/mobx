@@ -120,6 +120,8 @@ export default function transform(
     let usesDecorate = options?.ignoreImports ? true : false
     let hasReact = options?.ignoreImports ? true : false
 
+    // error TS2321: Excessive stack depth comparing types 'ArrayType<ImportDeclaration>' and 'ArrayType<T>'
+    // @ts-ignore
     source.find(j.ImportDeclaration).forEach(im => {
         if (im.value.source.value === "react") {
             hasReact = true
