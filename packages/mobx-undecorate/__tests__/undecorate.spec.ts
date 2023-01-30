@@ -1378,3 +1378,25 @@ test("class default export comp with observer and inject", () => {
         export default withRouter(inject(\\"test\\")(observer(X)))"
     `)
 })
+
+test("non-null assertion operator is preserved", () => {
+    expect(
+        convert(`
+        import { observable } from 'mobx';
+        class X {
+          @observable todos!: ObservableMap<string, TodoModel>
+        }
+    `)
+    ).toMatchInlineSnapshot(`
+        "import { observable, makeObservable } from 'mobx';
+        class X {
+          todos!: ObservableMap<string, TodoModel>;
+
+          constructor() {
+            makeObservable(this, {
+              todos: observable
+            });
+          }
+        }"
+    `)
+})
