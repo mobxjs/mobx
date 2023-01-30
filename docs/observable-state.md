@@ -24,7 +24,7 @@ Usage:
 
 This function can be used to make _existing_ object properties observable. Any JavaScript object (including class instances) can be passed into `target`.
 Typically `makeObservable` is used in the constructor of a class, and its first argument is `this`.
-The `annotations` argument maps [annotations](#available-annotations) to each member. Note that when using [decorators](enabling-decorators.md), the `annotations` argument can be omitted.
+The `annotations` argument maps [annotations](#available-annotations) to each member. Only annotated members are affected. Note that when using [decorators](enabling-decorators.md), the `annotations` argument can be omitted.
 
 Methods that derive information and take arguments (for example `findUsersOlderThan(age: number): User[]`) can not be annotated as `computed` – their read operations will still be tracked when they are called from a reaction, but their output won't be memoized to avoid memory leaks. To memoize such methods you can use [MobX-utils computedFn {🚀}](https://github.com/mobxjs/mobx-utils#computedfn) instead.
 
@@ -132,8 +132,8 @@ Inference rules:
 -   All _own_ properties become `observable`.
 -   All `get`ters become `computed`.
 -   All `set`ters become `action`.
--   All _functions on prototype_ become [`autoAction`](#autoAction).
--   All _generator functions on prototype_ become `flow`. (Note that generator functions are not detectable in some transpiler configurations, if flow doesn't work as expected, make sure to specify `flow` explicitly.)
+-   All _functions_ become [`autoAction`](#autoAction).
+-   All _generator_ functions become `flow`. (Note that generator functions are not detectable in some transpiler configurations, if flow doesn't work as expected, make sure to specify `flow` explicitly.)
 -   Members marked with `false` in the `overrides` argument will not be annotated. For example, using it for read only fields such as identifiers.
 
 ## `observable`
