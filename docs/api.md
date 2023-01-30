@@ -107,6 +107,8 @@ Creates a new observable [ES6 Set](https://developer.mozilla.org/en-US/docs/Web/
 
 If the values in the Set should not be turned into observables automatically, use the `{ deep: false }` option to make the Set shallowly observable.
 
+Unlike Map keys, Set values are [not tracked individually](https://github.com/mobxjs/mobx/issues/2336#issuecomment-616128089).
+
 ### `observable.ref`
 
 Usage: `observable.ref` _(annotation)_
