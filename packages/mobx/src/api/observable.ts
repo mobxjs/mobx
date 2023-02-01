@@ -134,7 +134,7 @@ function createObservable(v: any, arg2?: any, arg3?: any) {
     // anything else
     return observable.box(v, arg2)
 }
-Object.assign(createObservable, observableDecoratorAnnotation)
+assign(createObservable, observableDecoratorAnnotation)
 
 export interface IObservableValueFactory {
     <T>(value: T, options?: CreateObservableOptions): IObservableValue<T>
