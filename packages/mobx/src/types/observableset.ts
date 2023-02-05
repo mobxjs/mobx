@@ -65,7 +65,7 @@ export type ISetWillChange<T = any> =
 export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillChange>, IListenable {
     [$mobx] = ObservableSetMarker
     private data_: Set<any> = new Set()
-    private atom_: IAtom
+    atom_: IAtom
     changeListeners_
     interceptors_
     dehancer: any

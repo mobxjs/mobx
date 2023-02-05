@@ -36,7 +36,7 @@
         "jscodeshift": "^0.14.0"
     },
     "devDependencies": {
-        "@types/jscodeshift": "^0.11.5"
+        "@types/jscodeshift": "^0.11.6"
     },
     "keywords": [
         "mobx"

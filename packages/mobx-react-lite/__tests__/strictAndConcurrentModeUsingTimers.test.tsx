@@ -2,21 +2,22 @@ import "./utils/killFinalizationRegistry"
 import { act, cleanup, render } from "@testing-library/react"
 import * as mobx from "mobx"
 import * as React from "react"
-
 import { useObserver } from "../src/useObserver"
 import {
-    forceCleanupTimerToRunNowForTests,
-    resetCleanupScheduleForTests
-} from "../src/utils/reactionCleanupTracking"
-import {
-    CLEANUP_LEAKED_REACTIONS_AFTER_MILLIS,
-    CLEANUP_TIMER_LOOP_MILLIS
-} from "../src/utils/reactionCleanupTrackingCommon"
+    REGISTRY_FINALIZE_AFTER,
+    REGISTRY_SWEEP_INTERVAL
+} from "../src/utils/UniversalFinalizationRegistry"
+import { observerFinalizationRegistry } from "../src/utils/observerFinalizationRegistry"
+import { TimerBasedFinalizationRegistry } from "../src/utils/UniversalFinalizationRegistry"
+
+expect(observerFinalizationRegistry).toBeInstanceOf(TimerBasedFinalizationRegistry)
+
+const registry = observerFinalizationRegistry as TimerBasedFinalizationRegistry<unknown>
 
 afterEach(cleanup)
 
 test("uncommitted components should not leak observations", async () => {
-    resetCleanupScheduleForTests()
+    registry.finalizeAllImmediately()
 
     // Unfortunately, Jest fake timers don't mock out Date.now, so we fake
     // that out in parallel to Jest useFakeTimers
@@ -51,7 +52,7 @@ test("uncommitted components should not leak observations", async () => {
     )
 
     // Allow any reaction-disposal cleanup timers to run
-    const skip = Math.max(CLEANUP_LEAKED_REACTIONS_AFTER_MILLIS, CLEANUP_TIMER_LOOP_MILLIS)
+    const skip = Math.max(REGISTRY_FINALIZE_AFTER, REGISTRY_SWEEP_INTERVAL)
     fakeNow += skip
     jest.advanceTimersByTime(skip)
 
@@ -72,7 +73,7 @@ test("cleanup timer should not clean up recently-pended reactions", () => {
     // 5. The commit phase runs for component A, but reaction R2 has already been disposed. Game over.
 
     // This unit test attempts to replicate that scenario:
-    resetCleanupScheduleForTests()
+    registry.finalizeAllImmediately()
 
     // Unfortunately, Jest fake timers don't mock out Date.now, so we fake
     // that out in parallel to Jest useFakeTimers
@@ -106,7 +107,7 @@ test("cleanup timer should not clean up recently-pended reactions", () => {
     // We force our cleanup loop to run even though enough time hasn't _really_
     // elapsed.  In theory, it won't do anything because not enough time has
     // elapsed since the reactions were queued, and so they won't be disposed.
-    forceCleanupTimerToRunNowForTests()
+    registry.sweep()
 
     // Advance time enough to allow any timer-queued effects to run
     jest.advanceTimersByTime(500)
@@ -137,7 +138,7 @@ test.skip("component should recreate reaction if necessary", () => {
 
     // This unit test attempts to replicate that scenario:
 
-    resetCleanupScheduleForTests()
+    registry.finalizeAllImmediately()
 
     // Unfortunately, Jest fake timers don't mock out Date.now, so we fake
     // that out in parallel to Jest useFakeTimers
@@ -166,9 +167,9 @@ test.skip("component should recreate reaction if necessary", () => {
     // and _then_ the component commits.
 
     // Force everything to be disposed.
-    const skip = Math.max(CLEANUP_LEAKED_REACTIONS_AFTER_MILLIS, CLEANUP_TIMER_LOOP_MILLIS)
+    const skip = Math.max(REGISTRY_FINALIZE_AFTER, REGISTRY_SWEEP_INTERVAL)
     fakeNow += skip
-    forceCleanupTimerToRunNowForTests()
+    registry.sweep()
 
     // The reaction should have been cleaned up.
     expect(countIsObserved).toBeFalsy()

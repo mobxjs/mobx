@@ -121,6 +121,8 @@ export default function transform(
     let usesDecorate = options?.ignoreImports ? true : false
     let hasReact = options?.ignoreImports ? true : false
 
+    // error TS2321: Excessive stack depth comparing types 'ArrayType<ImportDeclaration>' and 'ArrayType<T>'
+    // @ts-ignore
     source.find(j.ImportDeclaration).forEach(im => {
         if (im.value.source.value === "react") {
             hasReact = true
@@ -131,6 +133,7 @@ export default function transform(
                 // imported decorator
                 if (
                     j.ImportSpecifier.check(specifier) &&
+                    typeof specifier.imported.name === "string" && // dunno what IdentifierKind is
                     validDecorators.includes(specifier.imported.name)
                 ) {
                     decoratorsUsed.add(specifier.imported.name)
@@ -359,7 +362,7 @@ export default function transform(
             }, newClassDefExpr)
 
             const decl = j.variableDeclaration("const", [
-                j.variableDeclarator(j.identifier(clazz.id!.name), newClassDefExpr)
+                j.variableDeclarator(j.identifier(clazz.id!.name.toString()), newClassDefExpr)
             ])
             decl.comments = clazz.comments
             clazzPath.replace(decl)
@@ -435,6 +438,9 @@ export default function transform(
             )
         )
         if (privates.length && !options?.keepDecorators) {
+            if (typeof clazz.id!.name !== "string") {
+                throw new Error("Unexpected type")
+            }
             // @ts-ignore
             initializeObservablesCall.expression.typeArguments = j.tsTypeParameterInstantiation([
                 j.tsTypeReference(j.identifier(clazz.id!.name)),

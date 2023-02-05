@@ -17,9 +17,9 @@ Only the latest version is actively maintained. If you're missing a fix or a fea
 
 | NPM Version | Support MobX version | Supported React versions | Supports hook based components                                                   |
 | ----------- | -------------------- | ------------------------ | -------------------------------------------------------------------------------- |
-| v7          | 6.\*                 | 16.8+                    | Yes                                                                              |
-| v6          | 4._ / 5._            | 16.8+                    | Yes                                                                              |
-| v5          | 4._ / 5._            | 0.13+                    | No, but it is possible to use `<Observer>` sections inside hook based components |
+| v7          | 6.\*                 | >16.8                    | Yes                                                                              |
+| v6          | 4.\* / 5.\*          | >16.8 <18                | Yes                                                                              |
+| v5          | 4.\* / 5.\*          | >0.13 <18                | No, but it is possible to use `<Observer>` sections inside hook based components |
 
 mobx-react 6 / 7 is a repackage of the smaller [mobx-react-lite](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react-lite) package + following features from the `mobx-react@5` package added:
 
@@ -136,8 +136,6 @@ person.name = "Mike" // will cause the Observer region to re-render
 
 ### `useLocalObservable` hook
 
-[User guide](https://mobx-react.js.org/state-local)
-
 Local observable state can be introduced by using the `useLocalObservable` hook, that runs once to create an observable store. A quick example would be:
 
 ```javascript
@@ -218,8 +216,6 @@ Use `import { PropTypes } from "mobx-react"` to import them, then use for exampl
 
 ### `Provider` and `inject`
 
-See also [the migration guide to React Hooks](https://mobx-react.js.org/recipes-migration).
-
 _Note: usually there is no need anymore to use `Provider` / `inject` in new code bases; most of its features are now covered by `React.createContext`._
 
 `Provider` is a component that can pass stores (or other stuff) using React's context mechanism to child components.
@@ -270,7 +266,7 @@ Notes:
 #### "The set of provided stores has changed" error
 
 Values provided through `Provider` should be final. Make sure that if you put things in `context` that might change over time, that they are `@observable` or provide some other means to listen to changes, like callbacks. However, if your stores will change over time, like an observable value of another store, MobX will throw an error.
-This restriction exists mainly for legacy reasons. If you have a scenario where you need to modify the set of stores, please leave a comment about it in this issue https://github.com/mobxjs/mobx-react/issues/745. Or a preferred way is to [use React Context](https://mobx-react.js.org/recipes-context) directly which does not have this restriction.
+This restriction exists mainly for legacy reasons. If you have a scenario where you need to modify the set of stores, please leave a comment about it in this issue https://github.com/mobxjs/mobx-react/issues/745. Or a preferred way is to [use React Context](https://reactjs.org/docs/context.html) directly which does not have this restriction.
 
 #### Inject as function
 
@@ -397,8 +393,6 @@ public render() {
    // ...
 }
 ```
-
-By [migrating to React Hooks](https://mobx-react.js.org/recipes-migration) you can avoid problems with TypeScript.
 
 #### Testing store injection
 
