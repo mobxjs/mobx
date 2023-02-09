@@ -1,5 +1,11 @@
 # mobx-react-lite
 
+## 3.4.1
+
+### Patch Changes
+
+-   [`4ef8ff3f`](https://github.com/mobxjs/mobx/commit/4ef8ff3f84ec8ae893d8c84031664ea388d78091) [#3598](https://github.com/mobxjs/mobx/pull/3598) Thanks [@urugator](https://github.com/urugator)! - refactor reaction tracking
+
 ## 3.4.0
 
 ### Minor Changes
