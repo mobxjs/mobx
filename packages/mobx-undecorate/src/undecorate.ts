@@ -116,6 +116,7 @@ export default function transform(
     const lines = fileInfo.source.split("\n")
     let changed = false
     let needsInitializeImport = false
+    let importOverride = false
     const decoratorsUsed = new Set<String>(options?.ignoreImports ? validDecorators : [])
     let usesDecorate = options?.ignoreImports ? true : false
     let hasReact = options?.ignoreImports ? true : false
@@ -228,6 +229,9 @@ export default function transform(
                     const { comments, ...k } = key
                     const { comments: comments2, ...v } = value
                     const prop = j.objectProperty(k, v)
+                    if (v.name === "override") {
+                        importOverride = true
+                    }
                     prop.computed = !!computed
                     if (isPrivate) {
                         privates.push(k.name)
@@ -260,6 +264,9 @@ export default function transform(
         } else {
             if (!mobxImport.specifiers) {
                 mobxImport.specifiers = []
+            }
+            if (importOverride) {
+                mobxImport.specifiers.push(j.importSpecifier(j.identifier("override")))
             }
             mobxImport.specifiers.push(j.importSpecifier(j.identifier("makeObservable")))
         }
@@ -308,7 +315,7 @@ export default function transform(
                 const exportDecl = j.exportDefaultDeclaration(newDefaultExportDefExpr.exported)
 
                 // re-create the class
-                let newClassDefExpr = j.classExpression(clazz.id, clazz.body, clazz.superClass)
+                const newClassDefExpr = j.classExpression(clazz.id, clazz.body, clazz.superClass)
                 newClassDefExpr.superTypeParameters = clazz.superTypeParameters
                 newClassDefExpr.typeParameters = clazz.typeParameters
                 newClassDefExpr.implements = clazz.implements
@@ -386,7 +393,7 @@ export default function transform(
         if (!j.Decorator.check(decorator)) {
             return property
         }
-        const expr = decorator.expression
+        let expr = decorator.expression
         if (j.Identifier.check(expr) && !decoratorsUsed.has(expr.name)) {
             warn(`Found non-mobx decorator @${expr.name}`, decorator)
             return property
@@ -398,6 +405,15 @@ export default function transform(
 
         if (options?.keepDecorators !== true) {
             property.decorators.splice(0)
+        }
+
+        // Replace decorator with @override
+        if ((property as any).override) {
+            const overrideDecorator = j.decorator(j.identifier("override"))
+            if (options?.keepDecorators) {
+                property.decorators[0] = overrideDecorator
+            }
+            expr = overrideDecorator.expression
         }
 
         effects.membersMap.push([
