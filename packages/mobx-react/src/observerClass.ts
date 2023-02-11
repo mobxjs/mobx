@@ -3,7 +3,6 @@ import {
     createAtom,
     _allowStateChanges,
     Reaction,
-    //$mobx, // TODO
     _allowStateReadsStart,
     _allowStateReadsEnd,
     _getGlobalState,
@@ -15,10 +14,7 @@ import {
 } from "mobx-react-lite"
 import { shallowEqual, patch } from "./utils/utils"
 
-// TODO symbols
-
 const administrationSymbol = Symbol("ObserverAdministration")
-//const mobxAdminProperty = $mobx // TODO
 const isMobXReactObserverSymbol = Symbol("isMobXReactObserver")
 
 type ObserverAdministration = {
