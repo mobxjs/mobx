@@ -43,7 +43,7 @@ test("uncommitted components should not leak observations", async () => {
 
     // Allow gc to kick in in case to let finalization registry cleanup
     gc()
-    await sleep(300)
+    await sleep(300) // < 300 fails on CI
 
     // count1 should still be being observed by Component1,
     // but count2 should have had its reaction cleaned up.
