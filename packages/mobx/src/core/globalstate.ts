@@ -154,7 +154,7 @@ export class MobXGlobals {
     /**
      * Changes with each state update, used by useSyncExternalStore
      */
-    stateVersion = Symbol()
+    stateVersion = Number.MIN_SAFE_INTEGER
 }
 
 let canMergeGlobalState = true

@@ -69,7 +69,10 @@ export class Atom implements IAtom {
         propagateChanged(this)
         // We could update state version only at the end of batch,
         // but we would still have to switch some global flag here to signal a change.
-        globalState.stateVersion = Symbol()
+        globalState.stateVersion =
+            globalState.stateVersion < Number.MAX_SAFE_INTEGER
+                ? globalState.stateVersion + 1
+                : Number.MIN_SAFE_INTEGER
         endBatch()
     }
 
