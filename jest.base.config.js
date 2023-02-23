@@ -1,9 +1,11 @@
 const fs = require("fs")
 const path = require("path")
 
-const tsConfig = "tsconfig.test.json"
-
-module.exports = function buildConfig(packageDirectory, pkgConfig) {
+module.exports = function buildConfig(
+    packageDirectory,
+    pkgConfig,
+    tsConfig = "tsconfig.test.json"
+) {
     const packageName = require(`${packageDirectory}/package.json`).name
     const packageTsconfig = path.resolve(packageDirectory, tsConfig)
     return {

@@ -707,6 +707,22 @@ function getCachedObservablePropDescriptor(key) {
     )
 }
 
+const fallthroughDescriptorCache = Object.create(null)
+
+export function getCachedFallthroughPropDescriptor(key) {
+    return (
+        fallthroughDescriptorCache[key] ||
+        (fallthroughDescriptorCache[key] = {
+            get() {
+                return Reflect.get(Object.getPrototypeOf(this), key, this)
+            },
+            set(v) {
+                return Reflect.set(Object.getPrototypeOf(this), key, v, this)
+            }
+        })
+    )
+}
+
 export function isObservableObject(thing: any): boolean {
     if (isObject(thing)) {
         return isObservableObjectAdministration((thing as any)[$mobx])

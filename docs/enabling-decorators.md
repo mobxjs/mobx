@@ -6,11 +6,69 @@ hide_title: true
 
 <script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
-# Enabling decorators {🚀}
+# Enabling Decorators
 
-MobX before version 6 encouraged the use of ES.next decorators to mark things as `observable`, `computed` and `action`. However, decorators are currently not an ES standard, and the process of standardization is taking a long time. It also looks like the standard will be different from the way decorators were implemented previously. In the interest of compatibility we have chosen to move away from them in MobX 6, and recommend the use of [`makeObservable` / `makeAutoObservable`](observable-state.md) instead.
+After years of alterations, ES decorators have finally reached Stage 3 in the TC39 process, meaning that they are quite stable and won't undergo breaking changes again like the previous decorator proposals have. MobX has implemented support for this new "2022.3/Stage 3" decorator syntax. If you're looking for information on "legacy" decorators, look below or refer to older versions of the documentation.
 
-But many existing codebases use decorators, and a lot of the documentation and tutorial material online uses them as well. The rule is that anything you can use as an annotation to `makeObservable`, such as `observable`, `action` and `computed`, you can also use as a decorator. So let's examine what that looks like:
+2022.3 Decorators are supported in Babel (see https://babeljs.io/docs/babel-plugin-proposal-decorators) and in TypeScript (5.0+).
+
+## Usage
+
+```javascript
+import { makeObservable, observable, computed, action } from "mobx"
+
+class Todo {
+    id = Math.random()
+    @observable accessor title = ""
+    @observable accessor finished = false
+
+    @action
+    toggle() {
+        this.finished = !finished
+    }
+}
+
+class TodoList {
+    @observable accessor todos = []
+
+    @computed
+    get unfinishedTodoCount() {
+        return this.todos.filter(todo => !todo.finished).length
+    }
+}
+```
+
+Notice the usage of the new `accessor` keyword when using `@observable`.
+It is part of the 2022.3 spec and is required if you want to use decorators without `makeObservable()`.
+That being said, you _can_ do without it if you continue to call `makeObservable()` like so:
+
+```javascript
+class Todo {
+    @observable title = ""
+
+    constructor() {
+        makeObservable(this)
+    }
+}
+```
+
+## Changes/Gotchas
+
+MobX' 2022.3 Decorators are very similar to the pre-MobX 6 decorators, so usage is mostly the same, but there are some gotchas:
+
+-   `@observable accessor` decorators are _not_ enumerable. `accessor`s do not have a direct equivalent in the past - they're a new concept in the language. We've chosen to make them non-enumerable, non-own properties in order to better follow the spirit of the ES language and what `accessor` means.  
+    The main cases for enumerability seem to have been around serialization and rest destructuring.
+    -   Regarding serialization, implicitly serializing all properties probably isn't ideal in an OOP-world anyway, so this doesn't seem like a substantial issue (consider implementing `toJSON` or using `serializr` as possible alternatives)
+    -   Addressing rest-destructuring, such is an anti-pattern in MobX - doing so would (likely unwantedly) touch all observables and make the observer overly-reactive).
+-   `@action some_field = () => {}` was and is valid usage (_if_ `makeObservable()` is also used). However, `@action accessor some_field = () => {}` is never valid.
+
+## Legacy Decorators
+
+We do not recommend new codebases that use MobX use legacy decorators until the point when they become an official part of the language, but you can still use them. It does require setup for transpilation so you have to use Babel or TypeScript.
+
+## MobX Core decorators {🚀}
+
+MobX before version 6 encouraged the use of ES.next decorators to mark things as `observable`, `computed` and `action`. While MobX 6 recomneds against using these decorators (an instead using [`makeObservable` / `makeAutoObservable`](observable-state.md)), it is still possible.
 
 ```javascript
 import { makeObservable, observable, computed, action } from "mobx"
@@ -52,7 +110,7 @@ When migrating from MobX 4/5 to 6, we recommend to always run the code-mod, to m
 
 Check out the [Migrating from MobX 4/5 {🚀}](migrating-from-4-or-5.md) section.
 
-## Using `observer` as a decorator
+### Using `observer` as a decorator
 
 The `observer` function from `mobx-react` is both a function and a decorator that can be used on class components:
 
@@ -62,10 +120,6 @@ class Timer extends React.Component {
     /* ... */
 }
 ```
-
-## How to enable decorator support
-
-We do not recommend new codebases that use MobX use decorators until the point when they become an official part of the language, but you can still use them. It does require setup for transpilation so you have to use Babel or TypeScript.
 
 ### TypeScript
 
@@ -89,7 +143,7 @@ Install support for decorators: `npm i --save-dev @babel/plugin-proposal-class-p
 
 Decorators are only supported out of the box when using TypeScript in `create-react-app@^2.1.1` and newer. In older versions or when using vanilla JavaScript use eject, or the [customize-cra](https://github.com/arackaf/customize-cra) package.
 
-## Disclaimer: Limitations of the decorator syntax
+### Disclaimer: Limitations of the legacy decorator syntax
 
 The current transpiler implementations of the decorator syntax are quite limited and don't behave exactly the same.
 Also, many compositional patterns are currently not possible with decorators, until the stage-2 proposal has been implemented by all transpilers.

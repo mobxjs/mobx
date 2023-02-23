@@ -7,8 +7,11 @@ import {
     isFunction,
     isStringish,
     createDecoratorAnnotation,
-    createActionAnnotation
+    createActionAnnotation,
+    is20223Decorator
 } from "../internal"
+
+import type { ClassFieldDecorator, ClassMethodDecorator } from "../types/decorator_fills"
 
 export const ACTION = "action"
 export const ACTION_BOUND = "action.bound"
@@ -29,17 +32,24 @@ const autoActionBoundAnnotation = createActionAnnotation(AUTOACTION_BOUND, {
     bound: true
 })
 
-export interface IActionFactory extends Annotation, PropertyDecorator {
+export interface IActionFactory
+    extends Annotation,
+        PropertyDecorator,
+        ClassMethodDecorator,
+        ClassFieldDecorator {
     // nameless actions
     <T extends Function | undefined | null>(fn: T): T
     // named actions
     <T extends Function | undefined | null>(name: string, fn: T): T
 
     // named decorator
-    (customName: string): PropertyDecorator & Annotation
+    (customName: string): PropertyDecorator &
+        Annotation &
+        ClassMethodDecorator &
+        ClassFieldDecorator
 
     // decorator (name no longer supported)
-    bound: Annotation & PropertyDecorator
+    bound: Annotation & PropertyDecorator & ClassMethodDecorator & ClassFieldDecorator
 }
 
 function createActionFactory(autoAction: boolean): IActionFactory {
@@ -51,6 +61,13 @@ function createActionFactory(autoAction: boolean): IActionFactory {
         // action("name", fn() {})
         if (isFunction(arg2)) {
             return createAction(arg1, arg2, autoAction)
+        }
+        // @action (2022.3 Decorators)
+        if (is20223Decorator(arg2)) {
+            return (autoAction ? autoActionAnnotation : actionAnnotation).decorate_20223_(
+                arg1,
+                arg2
+            )
         }
         // @action
         if (isStringish(arg2)) {

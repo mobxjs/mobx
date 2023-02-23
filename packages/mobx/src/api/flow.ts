@@ -7,8 +7,11 @@ import {
     isStringish,
     storeAnnotation,
     createFlowAnnotation,
-    createDecoratorAnnotation
+    createDecoratorAnnotation,
+    is20223Decorator
 } from "../internal"
+
+import type { ClassMethodDecorator } from "../types/decorator_fills"
 
 export const FLOW = "flow"
 
@@ -25,11 +28,11 @@ export function isFlowCancellationError(error: Error) {
 
 export type CancellablePromise<T> = Promise<T> & { cancel(): void }
 
-interface Flow extends Annotation, PropertyDecorator {
+interface Flow extends Annotation, PropertyDecorator, ClassMethodDecorator {
     <R, Args extends any[]>(
         generator: (...args: Args) => Generator<any, R, any> | AsyncGenerator<any, R, any>
     ): (...args: Args) => CancellablePromise<R>
-    bound: Annotation & PropertyDecorator
+    bound: Annotation & PropertyDecorator & ClassMethodDecorator
 }
 
 const flowAnnotation = createFlowAnnotation("flow")
@@ -37,6 +40,10 @@ const flowBoundAnnotation = createFlowAnnotation("flow.bound", { bound: true })
 
 export const flow: Flow = Object.assign(
     function flow(arg1, arg2?) {
+        // @flow (2022.3 Decorators)
+        if (is20223Decorator(arg2)) {
+            return flowAnnotation.decorate_20223_(arg1, arg2)
+        }
         // @flow
         if (isStringish(arg2)) {
             return storeAnnotation(arg1, arg2, flowAnnotation)

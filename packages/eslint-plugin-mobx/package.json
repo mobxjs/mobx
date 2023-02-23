@@ -28,8 +28,8 @@
         "eslint": "^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0"
     },
     "devDependencies": {
-        "@typescript-eslint/eslint-plugin": "^4.29.3",
-        "@typescript-eslint/parser": "^4.0.0",
+        "@typescript-eslint/eslint-plugin": "^5.0.0",
+        "@typescript-eslint/parser": "^5.0.0",
         "eslint": "^7.0.0",
         "@babel/core": "^7.16.0",
         "@babel/preset-env": "^7.16.4",
