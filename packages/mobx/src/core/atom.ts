@@ -11,10 +11,31 @@ import {
     propagateChanged,
     reportObserved,
     startBatch,
-    Lambda
+    Lambda,
+    StrongWeakSet,
+    queueForUnobservation
 } from "../internal"
 
 export const $mobx = Symbol("mobx administration")
+
+export function createObserverStore(observee: IObservable): Set<IDerivation> {
+    if (
+        typeof WeakRef != "undefined" &&
+        typeof FinalizationRegistry != "undefined" &&
+        typeof Symbol != "undefined"
+    ) {
+        const store = new StrongWeakSet<IDerivation>(() => {
+            if (store.size === 0) {
+                startBatch()
+                queueForUnobservation(observee)
+                endBatch()
+            }
+        })
+        return store
+    } else {
+        return new Set<IDerivation>()
+    }
+}
 
 export interface IAtom extends IObservable {
     reportObserved(): boolean
@@ -24,7 +45,7 @@ export interface IAtom extends IObservable {
 export class Atom implements IAtom {
     isPendingUnobservation_ = false // for effective unobserving. BaseAtom has true, for extra optimization, so its onBecomeUnobserved never gets called, because it's not needed
     isBeingObserved_ = false
-    observers_ = new Set<IDerivation>()
+    observers_ = createObserverStore(this)
 
     diffValue_ = 0
     lastAccessedBy_ = 0

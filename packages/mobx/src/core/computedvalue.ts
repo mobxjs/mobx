@@ -29,7 +29,8 @@ import {
     UPDATE,
     die,
     allowStateChangesStart,
-    allowStateChangesEnd
+    allowStateChangesEnd,
+    createObserverStore
 } from "../internal"
 
 export interface IComputedValue<T> {
@@ -45,6 +46,12 @@ export interface IComputedValueOptions<T> {
     context?: any
     requiresReaction?: boolean
     keepAlive?: boolean
+    /**
+     * Stop any observees from preventing this computed from being garbage collected
+     *
+     * This is an advanced feature and primarily intended for use with `keepAlive` computeds.
+     */
+    weak?: boolean
 }
 
 export type IComputedDidChange<T = any> = {
@@ -81,7 +88,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     newObserving_ = null // during tracking it's an array with new observed observers
     isBeingObserved_ = false
     isPendingUnobservation_: boolean = false
-    observers_ = new Set<IDerivation>()
+    observers_ = createObserverStore(this)
     diffValue_ = 0
     runId_ = 0
     lastAccessedBy_ = 0
@@ -99,6 +106,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     private equals_: IEqualsComparer<any>
     private requiresReaction_: boolean | undefined
     keepAlive_: boolean
+    weak_: boolean
 
     /**
      * Create a new computed value based on a function expression.
@@ -132,6 +140,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         this.scope_ = options.context
         this.requiresReaction_ = options.requiresReaction
         this.keepAlive_ = !!options.keepAlive
+        this.weak_ = !!options.weak
     }
 
     onBecomeStale_() {
