@@ -61,6 +61,11 @@ The `observer` function from `mobx-react` is both a function and a decorator tha
 class Timer extends React.Component {
     /* ... */
 }
+
+@observer({ ...options })
+class Timer extends React.Component {
+    /* ... */
+}
 ```
 
 ## How to enable decorator support

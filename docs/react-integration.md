@@ -349,6 +349,22 @@ const TimerView = observer(
 )
 ```
 
+Additional options can be passed like so:
+
+```javascript
+// Default for all further calls:
+observer.default_class_options = {
+    ...options
+}
+
+// Per Component:
+TimerView = observer(ClassComponent, { ...options })
+```
+
+Available Options:
+
+-   `observable_props` - (Default `false`) This will install some additional logic to make passed `props` fully observable - with this disabled, any prop changes will trigger a re-render, even if your component isn't using that prop. With this enabled, `props` becomes a fully observable object. Note that this will have side effects with some of the component lifecycle (if you're that deep into things, `observable_props: true` changes `shouldComponentUpdate` so that it "returns true if and only if newState !== oldState").
+
 Check out [mobx-react docs](https://github.com/mobxjs/mobx-react#api-documentation) for more information.
 
 </details>

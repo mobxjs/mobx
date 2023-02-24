@@ -5,7 +5,9 @@ import {
     Reaction,
     $mobx,
     _allowStateReadsStart,
-    _allowStateReadsEnd
+    _allowStateReadsEnd,
+    _isComputingDerivation,
+    observable
 } from "mobx"
 import { isUsingStaticRendering } from "mobx-react-lite"
 
@@ -17,8 +19,13 @@ const mobxIsUnmounted = newSymbol("isUnmounted")
 const skipRenderKey = newSymbol("skipRender")
 const isForcingUpdateKey = newSymbol("isForcingUpdate")
 
+export interface ClassObserverOptions {
+    observable_props?: boolean
+}
+
 export function makeClassComponentObserver(
-    componentClass: React.ComponentClass<any, any>
+    componentClass: React.ComponentClass<any, any>,
+    options: ClassObserverOptions = {}
 ): React.ComponentClass<any, any> {
     const target = componentClass.prototype
 
@@ -36,9 +43,10 @@ export function makeClassComponentObserver(
         throw new Error("The componentWillReact life-cycle event is no longer supported")
     }
     if (componentClass["__proto__"] !== PureComponent) {
+        const scu = options.observable_props ? reactivePropsObserverSCU : observerSCU
         if (!target.shouldComponentUpdate) {
-            target.shouldComponentUpdate = observerSCU
-        } else if (target.shouldComponentUpdate !== observerSCU) {
+            target.shouldComponentUpdate = scu
+        } else if (target.shouldComponentUpdate !== scu) {
             // n.b. unequal check, instead of existence check, as @observer might be on superclass as well
             throw new Error(
                 "It is not allowed to use shouldComponentUpdate in observer based components."
@@ -50,7 +58,7 @@ export function makeClassComponentObserver(
     // are defined inside the component, and which rely on state or props, re-compute if state or props change
     // (otherwise the computed wouldn't update and become stale on props change, since props are not observable)
     // However, this solution is not without it's own problems: https://github.com/mobxjs/mobx-react/issues?utf8=%E2%9C%93&q=is%3Aissue+label%3Aobservable-props-or-not+
-    makeObservableProp(target, "props")
+    makeObservableProp(target, "props", options.observable_props)
     makeObservableProp(target, "state")
     if (componentClass.contextType) {
         makeObservableProp(target, "context")
@@ -202,45 +210,96 @@ function observerSCU(nextProps: React.ClassAttributes<any>, nextState: any): boo
     return !shallowEqual(this.props, nextProps)
 }
 
-function makeObservableProp(target: any, propName: string): void {
+function reactivePropsObserverSCU(nextProps: React.ClassAttributes<any>, nextState: any): boolean {
+    if (isUsingStaticRendering()) {
+        console.warn(
+            "[mobx-react] It seems that a re-rendering of a React component is triggered while in static (server-side) mode. Please make sure components are rendered only once server-side."
+        )
+    }
+    // update on any state changes (as is the default)
+    if (this.state !== nextState) {
+        return true
+    }
+    return false
+}
+
+function makeObservableProp(target: any, propName: string, fully_reactive: boolean = false): void {
     const valueHolderKey = newSymbol(`reactProp_${propName}_valueHolder`)
     const atomHolderKey = newSymbol(`reactProp_${propName}_atomHolder`)
-    function getAtom() {
-        if (!this[atomHolderKey]) {
-            setHiddenProp(this, atomHolderKey, createAtom("reactive " + propName))
+
+    if (fully_reactive) {
+        function getSValue() {
+            if (!this[atomHolderKey]) {
+                setHiddenProp(this, atomHolderKey, observable({}, {}, { deep: false }))
+            }
+            return this[atomHolderKey]
         }
-        return this[atomHolderKey]
+
+        Object.defineProperty(target, propName, {
+            configurable: true,
+            enumerable: true,
+            get: function get() {
+                if (_isComputingDerivation()) {
+                    return getSValue.call(this)
+                } else {
+                    return this[valueHolderKey]
+                }
+            },
+            set: function set(v) {
+                if (!this[isForcingUpdateKey] && !shallowEqual(this[valueHolderKey], v)) {
+                    setHiddenProp(this, valueHolderKey, v)
+                    if (v) {
+                        var syncTo = getSValue.call(this)
+                        var newKeys = Object.keys(v)
+                        Object.keys(syncTo).forEach(k => {
+                            if (newKeys.includes(k)) return
+                            delete syncTo[k]
+                        })
+                        Object.assign(syncTo, v)
+                    }
+                } else {
+                    setHiddenProp(this, valueHolderKey, v)
+                }
+            }
+        })
+    } else {
+        function getAtom() {
+            if (!this[atomHolderKey]) {
+                setHiddenProp(this, atomHolderKey, createAtom("reactive " + propName))
+            }
+            return this[atomHolderKey]
+        }
+        Object.defineProperty(target, propName, {
+            configurable: true,
+            enumerable: true,
+            get: function () {
+                let prevReadState = false
+
+                // Why this check? BC?
+                // @ts-expect-error
+                if (_allowStateReadsStart && _allowStateReadsEnd) {
+                    prevReadState = _allowStateReadsStart(true)
+                }
+                getAtom.call(this).reportObserved()
+
+                // Why this check? BC?
+                // @ts-expect-error
+                if (_allowStateReadsStart && _allowStateReadsEnd) {
+                    _allowStateReadsEnd(prevReadState)
+                }
+
+                return this[valueHolderKey]
+            },
+            set: function set(v) {
+                if (!this[isForcingUpdateKey] && !shallowEqual(this[valueHolderKey], v)) {
+                    setHiddenProp(this, valueHolderKey, v)
+                    setHiddenProp(this, skipRenderKey, true)
+                    getAtom.call(this).reportChanged()
+                    setHiddenProp(this, skipRenderKey, false)
+                } else {
+                    setHiddenProp(this, valueHolderKey, v)
+                }
+            }
+        })
     }
-    Object.defineProperty(target, propName, {
-        configurable: true,
-        enumerable: true,
-        get: function () {
-            let prevReadState = false
-
-            // Why this check? BC?
-            // @ts-expect-error
-            if (_allowStateReadsStart && _allowStateReadsEnd) {
-                prevReadState = _allowStateReadsStart(true)
-            }
-            getAtom.call(this).reportObserved()
-
-            // Why this check? BC?
-            // @ts-expect-error
-            if (_allowStateReadsStart && _allowStateReadsEnd) {
-                _allowStateReadsEnd(prevReadState)
-            }
-
-            return this[valueHolderKey]
-        },
-        set: function set(v) {
-            if (!this[isForcingUpdateKey] && !shallowEqual(this[valueHolderKey], v)) {
-                setHiddenProp(this, valueHolderKey, v)
-                setHiddenProp(this, skipRenderKey, true)
-                getAtom.call(this).reportChanged()
-                setHiddenProp(this, skipRenderKey, false)
-            } else {
-                setHiddenProp(this, valueHolderKey, v)
-            }
-        }
-    })
 }

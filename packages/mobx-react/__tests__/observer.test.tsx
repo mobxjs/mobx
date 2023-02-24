@@ -659,6 +659,78 @@ test("Observer should not re-render on shallow equal new props", () => {
     expect(container).toHaveTextContent("1")
 })
 
+test("[observable_props] Observer should not re-render if unused props change", () => {
+    let childRendering = 0
+    let parentRendering = 0
+    const data = { x: 1 }
+    const odata = observable({ y: 1 })
+
+    @observer({ observable_props: true })
+    class Child extends React.Component<any, any> {
+        render() {
+            const { data } = this.props
+            childRendering++
+            return <span>{data.x}</span>
+        }
+    }
+
+    const Parent = observer(() => {
+        parentRendering++
+        odata.y /// depend
+        return <Child data={data} parentRender={parentRendering} />
+    })
+
+    const { container } = render(<Parent />)
+
+    expect(parentRendering).toBe(1)
+    expect(childRendering).toBe(1)
+    expect(container).toHaveTextContent("1")
+
+    act(() => {
+        odata.y++
+    })
+
+    expect(parentRendering).toBe(2)
+    expect(childRendering).toBe(1)
+    expect(container).toHaveTextContent("1")
+})
+
+test("[observable_props] Observer should re-render if used props change", () => {
+    let childRendering = 0
+    let parentRendering = 0
+    const data = { x: 1 }
+    const odata = observable({ y: 1 })
+
+    @observer({ observable_props: true })
+    class Child extends React.Component<any, any> {
+        render() {
+            const { parentRender } = this.props
+            childRendering++
+            return <span>{parentRender}</span>
+        }
+    }
+
+    const Parent = observer(() => {
+        parentRendering++
+        odata.y /// depend
+        return <Child data={data} parentRender={parentRendering} />
+    })
+
+    const { container } = render(<Parent />)
+
+    expect(parentRendering).toBe(1)
+    expect(childRendering).toBe(1)
+    expect(container).toHaveTextContent("1")
+
+    act(() => {
+        odata.y++
+    })
+
+    expect(parentRendering).toBe(2)
+    expect(childRendering).toBe(2)
+    expect(container).toHaveTextContent("2")
+})
+
 test("parent / childs render in the right order", () => {
     // See: https://jsfiddle.net/gkaemmer/q1kv7hbL/13/
     let events: Array<any> = []
