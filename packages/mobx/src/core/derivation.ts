@@ -7,6 +7,7 @@ import {
     isComputedValue,
     removeObserver
 } from "../internal"
+import { warn } from "../warnings"
 
 export enum IDerivationState_ {
     // before being run or (outside batch and not being observed)
@@ -141,21 +142,15 @@ export function checkIfStateModificationsAreAllowed(atom: IAtom) {
         !globalState.allowStateChanges &&
         (hasObservers || globalState.enforceActions === "always")
     ) {
-        console.warn(
-            "[MobX] " +
-                (globalState.enforceActions
-                    ? "Since strict-mode is enabled, changing (observed) observable values without using an action is not allowed. Tried to modify: "
-                    : "Side effects like changing state are not allowed at this point. Are you trying to modify state from, for example, a computed value or the render function of a React component? You can wrap side effects in 'runInAction' (or decorate functions with 'action') if needed. Tried to modify: ") +
-                atom.name_
-        )
+        globalState.enforceActions
+            ? warn("enforceActionsStrict", atom.name_)
+            : warn("enforceActionsNonStrict", atom.name_)
     }
 }
 
 export function checkIfStateReadsAreAllowed(observable: IObservable) {
     if (__DEV__ && !globalState.allowStateReads && globalState.observableRequiresReaction) {
-        console.warn(
-            `[mobx] Observable '${observable.name_}' being read outside a reactive context.`
-        )
+        warn("observableRequiresReaction", observable.name_)
     }
 }
 
@@ -208,9 +203,7 @@ function warnAboutDerivationWithoutDependencies(derivation: IDerivation) {
             ? derivation.requiresObservable_
             : globalState.reactionRequiresObservable
     ) {
-        console.warn(
-            `[mobx] Derivation '${derivation.name_}' is created/updated without reading any observable value.`
-        )
+        warn("derivationWithoutDependencies", derivation.name_)
     }
 }
 

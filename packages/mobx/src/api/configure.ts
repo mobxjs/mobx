@@ -1,4 +1,5 @@
 import { globalState, isolateGlobalState, setReactionScheduler } from "../internal"
+import { WarningSeverity } from "../warnings"
 
 const NEVER = "never"
 const ALWAYS = "always"
@@ -16,6 +17,7 @@ export function configure(options: {
      * Warn if observables are accessed outside a reactive context
      */
     observableRequiresReaction?: boolean
+    warningSeverity?: WarningSeverity
     isolateGlobalState?: boolean
     disableErrorBoundaries?: boolean
     safeDescriptors?: boolean
@@ -58,6 +60,9 @@ export function configure(options: {
         console.warn(
             "WARNING: Debug feature only. MobX will NOT recover from errors when `disableErrorBoundaries` is enabled."
         )
+    }
+    if (options.warningSeverity) {
+        globalState.warningSeverity = { ...globalState.warningSeverity, ...options.warningSeverity }
     }
     if (options.reactionScheduler) {
         setReactionScheduler(options.reactionScheduler)

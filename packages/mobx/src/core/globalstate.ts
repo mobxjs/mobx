@@ -1,5 +1,6 @@
 import { IDerivation, IObservable, Reaction, die, getGlobal } from "../internal"
 import { ComputedValue } from "./computedvalue"
+import { WarningSeverity } from "../warnings"
 
 /**
  * These values will persist if global state is reset
@@ -11,6 +12,7 @@ const persistentKeys: (keyof MobXGlobals)[] = [
     "computedRequiresReaction",
     "reactionRequiresObservable",
     "observableRequiresReaction",
+    "warningSeverity",
     "allowStateReads",
     "disableErrorBoundaries",
     "runId",
@@ -125,6 +127,12 @@ export class MobXGlobals {
      * Warn if observables are accessed outside a reactive context
      */
     observableRequiresReaction = false
+
+    /**
+     * Allows consumers to override the behaviour when a warning occurs. This can include promoting console warnings
+     * to errors.
+     */
+    warningSeverity: WarningSeverity = {}
 
     /*
      * Don't catch and rethrow exceptions. This is useful for inspecting the state of

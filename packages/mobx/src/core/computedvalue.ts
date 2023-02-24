@@ -31,6 +31,7 @@ import {
     allowStateChangesStart,
     allowStateChangesEnd
 } from "../internal"
+import { warn } from "../warnings"
 
 export interface IComputedValue<T> {
     get(): T
@@ -313,9 +314,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
                 ? this.requiresReaction_
                 : globalState.computedRequiresReaction
         ) {
-            console.warn(
-                `[mobx] Computed value '${this.name_}' is being read outside a reactive context. Doing a full recompute.`
-            )
+            warn("computedRequiresReaction", this.name_)
         }
     }
 

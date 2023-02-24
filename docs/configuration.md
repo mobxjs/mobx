@@ -222,3 +222,19 @@ configure({
     }
 })
 ```
+
+#### `warningSeverity: object`
+
+MobX reports common development issues using `console.warn`. This configuration option allows you to promote specific warnings to `throw` rather than `warn`. **Default: `{ [key: string]: 'warn' }`**
+
+```javascript
+configure({
+    warningSeverity: {
+        computedRequiresReaction: "throw",
+        enforceActionsStrict: "throw",
+        enforceActionsNonStrict: "throw",
+        observableRequiresReaction: "throw",
+        derivationWithoutDependencies: "throw"
+    }
+})
+```
