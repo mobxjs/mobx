@@ -117,7 +117,7 @@ export default function transform(
     let changed = false
     let needsInitializeImport = false
     let importOverride = false
-    const decoratorsUsed = new Set<String>(options?.ignoreImports ? validDecorators : [])
+    const decoratorsUsed = new Set<string>(options?.ignoreImports ? validDecorators : [])
     let usesDecorate = options?.ignoreImports ? true : false
     let hasReact = options?.ignoreImports ? true : false
 
