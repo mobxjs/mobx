@@ -1,5 +1,11 @@
 # mobx-react-lite
 
+## 3.4.2
+
+### Patch Changes
+
+-   [`7acaf305`](https://github.com/mobxjs/mobx/commit/7acaf305f81ac5457a8de272e42dd5634a97eb88) [#3645](https://github.com/mobxjs/mobx/pull/3645) Thanks [@urugator](https://github.com/urugator)! - fix FinalizationRegistry support check #3643
+
 ## 3.4.1
 
 ### Patch Changes
