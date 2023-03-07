@@ -16,7 +16,7 @@ exports[`changing state in render should fail 2`] = `
 </div>
 `;
 
-exports[`enableStaticRendering doesn't warn with observableRequiresReaction/computedRequiresReaction 1`] = `[MockFunction]`;
+exports[`#3648 enableStaticRendering doesn't warn with observableRequiresReaction/computedRequiresReaction 1`] = `[MockFunction]`;
 
 exports[`issue 12 init state is correct 1`] = `
 <div>
