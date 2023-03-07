@@ -67,7 +67,14 @@ export function makeClassComponentObserver(
     }
     target.render = function () {
         this.render = isUsingStaticRendering()
-            ? originalRender
+            ? function () {
+                  let allowStateReads = _allowStateReadsStart?.(true)
+                  try {
+                      return originalRender()
+                  } finally {
+                      _allowStateReadsEnd?.(allowStateReads)
+                  }
+              }
             : createReactiveRender.call(this, originalRender)
         return this.render()
     }

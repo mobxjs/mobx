@@ -18,6 +18,8 @@ exports[`#797 - replacing this.render should trigger a warning 1`] = `
 }
 `;
 
+exports[`#3648 enableStaticRendering doesn't warn with observableRequiresReaction/computedRequiresReaction 1`] = `[MockFunction]`;
+
 exports[`Redeclaring an existing observer component as an observer should log a warning 1`] = `
 [MockFunction] {
   "calls": Array [

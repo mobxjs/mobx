@@ -1,4 +1,4 @@
-import { Reaction } from "mobx"
+import { Reaction, _allowStateReadsEnd, _allowStateReadsStart } from "mobx"
 import React from "react"
 import { printDebugValue } from "./utils/printDebugValue"
 import { observerFinalizationRegistry } from "./utils/observerFinalizationRegistry"
@@ -36,7 +36,12 @@ function objectToBeRetainedByReactFactory() {
 
 export function useObserver<T>(fn: () => T, baseComponentName: string = "observed"): T {
     if (isUsingStaticRendering()) {
-        return fn()
+        let allowStateReads = _allowStateReadsStart?.(true)
+        try {
+            return fn()
+        } finally {
+            _allowStateReadsEnd?.(allowStateReads)
+        }
     }
 
     const [objectRetainedByReact] = React.useState(objectToBeRetainedByReactFactory)

@@ -8,7 +8,8 @@ import {
     computed,
     observable,
     transaction,
-    makeObservable
+    makeObservable,
+    configure
 } from "mobx"
 import { withConsole } from "./utils/withConsole"
 /**
@@ -1036,4 +1037,31 @@ test("SSR works #3448", () => {
     unmount()
 
     expect(consoleWarnMock).toMatchSnapshot()
+})
+
+test("#3648 enableStaticRendering doesn't warn with observableRequiresReaction/computedRequiresReaction", () => {
+    consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
+    try {
+        enableStaticRendering(true)
+        configure({ observableRequiresReaction: true, computedRequiresReaction: true })
+        const o = observable.box(0, { name: "o" })
+        const c = computed(() => o.get(), { name: "c" })
+
+        @observer
+        class TestCmp extends React.Component<any> {
+            render() {
+                return o.get() + c.get()
+            }
+        }
+
+        const { unmount, container } = render(<TestCmp />)
+        expect(container).toHaveTextContent("0")
+        unmount()
+
+        expect(consoleWarnMock).toMatchSnapshot()
+    } finally {
+        enableStaticRendering(false)
+        _resetGlobalState()
+        consoleWarnMock.mockRestore()
+    }
 })
