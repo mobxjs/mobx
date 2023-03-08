@@ -1,5 +1,11 @@
 # mobx-react-lite
 
+## 3.4.3
+
+### Patch Changes
+
+-   [`dfeb1f5d`](https://github.com/mobxjs/mobx/commit/dfeb1f5d18acb8a995d4fa78374173d419fec16e) [#3651](https://github.com/mobxjs/mobx/pull/3651) Thanks [@urugator](https://github.com/urugator)! - fix #3650 regression clearTimers -> clearTimes
+
 ## 3.4.2
 
 ### Patch Changes
