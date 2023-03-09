@@ -646,3 +646,18 @@ test("auto action should not update state from inside a derivation", async () =>
     })
     d()
 })
+
+test("action forwards toString of underlying function", async () => {
+    const fn = () => {
+        /* not actually doing anything */
+    }
+    fn.a = 42
+    fn.toString = function () {
+        return `toString referencing this, a=${this.a}`
+    }
+
+    const act = mobx.action(fn)
+
+    expect(fn.toString()).toBe("toString referencing this, a=42")
+    expect(act.toString()).toBe("toString referencing this, a=42")
+})

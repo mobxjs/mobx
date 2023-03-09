@@ -50,6 +50,7 @@ export function createAction(
         return executeAction(actionName, autoAction, fn, ref || this, arguments)
     }
     res.isMobxAction = true
+    res.toString = () => fn.toString()
     if (isFunctionNameConfigurable) {
         tmpNameDescriptor.value = actionName
         defineProperty(res, "name", tmpNameDescriptor)
