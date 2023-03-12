@@ -1,7 +1,6 @@
 ---
-"mobx-react": minor
-"mobx-react-lite": minor
-"mobx": patch
+"mobx-react-lite": major
 ---
 
-TODO
+Components now use `useSyncExternalStore`, which should prevent tearing - you have to update mobx, otherwise it should behave as previously.
+Improved displayName/name handling as discussed in #3438.
