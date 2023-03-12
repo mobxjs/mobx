@@ -50,7 +50,7 @@
         }
     },
     "devDependencies": {
-        "mobx": "^6.9.0",
+        "mobx": "^6.8.0",
         "expose-gc": "^1.0.0",
         "use-sync-external-store": "^1.2.0"
     },
