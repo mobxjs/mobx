@@ -1,5 +1,23 @@
 # mobx-react-lite
 
+## 3.4.3
+
+### Patch Changes
+
+-   [`dfeb1f5d`](https://github.com/mobxjs/mobx/commit/dfeb1f5d18acb8a995d4fa78374173d419fec16e) [#3651](https://github.com/mobxjs/mobx/pull/3651) Thanks [@urugator](https://github.com/urugator)! - fix #3650 regression clearTimers -> clearTimes
+
+## 3.4.2
+
+### Patch Changes
+
+-   [`7acaf305`](https://github.com/mobxjs/mobx/commit/7acaf305f81ac5457a8de272e42dd5634a97eb88) [#3645](https://github.com/mobxjs/mobx/pull/3645) Thanks [@urugator](https://github.com/urugator)! - fix FinalizationRegistry support check #3643
+
+## 3.4.1
+
+### Patch Changes
+
+-   [`4ef8ff3f`](https://github.com/mobxjs/mobx/commit/4ef8ff3f84ec8ae893d8c84031664ea388d78091) [#3598](https://github.com/mobxjs/mobx/pull/3598) Thanks [@urugator](https://github.com/urugator)! - refactor reaction tracking
+
 ## 3.4.0
 
 ### Minor Changes

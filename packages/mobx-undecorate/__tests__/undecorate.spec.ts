@@ -471,6 +471,81 @@ describe("action", () => {
                                                 }"
                                 `)
     })
+
+    test("method - override", () => {
+        expect(
+            convert(`
+            import { action } from "mobx"
+
+            class Box extends Shape {
+                constructor(arg) {
+                    super(arg)
+                }
+
+                @action
+                override method(arg: number): boolean {
+                    console.log('hi')
+                    return true
+                }
+            }
+            `)
+        ).toMatchInlineSnapshot(`
+                                                "import { action, override, makeObservable } from \\"mobx\\";
+
+                                                class Box extends Shape {
+                                                    constructor(arg) {
+                                                        super(arg)
+
+                                                        makeObservable(this, {
+                                                            method: override
+                                                        });
+                                                    }
+
+                                                    override method(arg: number): boolean {
+                                                        console.log('hi')
+                                                        return true
+                                                    }
+                                                }"
+                                `)
+    })
+
+    test("method - override - keepDecorators", () => {
+        expect(
+            convert(
+                `
+            import { action } from "mobx"
+
+            class Box extends Shape {
+                constructor(arg) {
+                    super(arg)
+                }
+
+                @action
+                override method(arg: number): boolean {
+                    console.log('hi')
+                    return true
+                }
+            }
+            `,
+                { keepDecorators: true }
+            )
+        ).toMatchInlineSnapshot(`
+                                                "import { action, override, makeObservable } from \\"mobx\\";
+
+                                                class Box extends Shape {
+                                                    constructor(arg) {
+                                                        super(arg)
+                                                        makeObservable(this);
+                                                    }
+
+                                                    @override
+                                                    override method(arg: number): boolean {
+                                                        console.log('hi')
+                                                        return true
+                                                    }
+                                                }"
+                                `)
+    })
 })
 
 describe("observable", () => {
@@ -1376,5 +1451,27 @@ test("class default export comp with observer and inject", () => {
         class X extends React.Component {}
         
         export default withRouter(inject(\\"test\\")(observer(X)))"
+    `)
+})
+
+test("non-null assertion operator is preserved", () => {
+    expect(
+        convert(`
+        import { observable } from 'mobx';
+        class X {
+          @observable todos!: ObservableMap<string, TodoModel>
+        }
+    `)
+    ).toMatchInlineSnapshot(`
+        "import { observable, makeObservable } from 'mobx';
+        class X {
+          todos!: ObservableMap<string, TodoModel>;
+
+          constructor() {
+            makeObservable(this, {
+              todos: observable
+            });
+          }
+        }"
     `)
 })

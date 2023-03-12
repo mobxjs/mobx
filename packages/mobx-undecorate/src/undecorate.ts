@@ -116,18 +116,24 @@ export default function transform(
     const lines = fileInfo.source.split("\n")
     let changed = false
     let needsInitializeImport = false
-    const decoratorsUsed = new Set<String>(options?.ignoreImports ? validDecorators : [])
+    let importOverride = false
+    const decoratorsUsed = new Set<string>(options?.ignoreImports ? validDecorators : [])
     let usesDecorate = options?.ignoreImports ? true : false
     let hasReact = options?.ignoreImports ? true : false
 
+    // error TS2321: Excessive stack depth comparing types 'ArrayType<ImportDeclaration>' and 'ArrayType<T>'
+    // @ts-ignore
     source.find(j.ImportDeclaration).forEach(im => {
-        if (im.value.source.value === "react") hasReact = true
+        if (im.value.source.value === "react") {
+            hasReact = true
+        }
         if (validPackages.includes(im.value.source.value as string)) {
             let decorateIndex = -1
-            im.value.specifiers.forEach((specifier, idx) => {
+            im.value.specifiers?.forEach((specifier, idx) => {
                 // imported decorator
                 if (
                     j.ImportSpecifier.check(specifier) &&
+                    typeof specifier.imported.name === "string" && // dunno what IdentifierKind is
                     validDecorators.includes(specifier.imported.name)
                 ) {
                     decoratorsUsed.add(specifier.imported.name)
@@ -139,7 +145,7 @@ export default function transform(
                 }
             })
             if (decorateIndex !== -1) {
-                im.value.specifiers.splice(decorateIndex, 1)
+                im.value.specifiers?.splice(decorateIndex, 1)
             }
         }
     })
@@ -223,8 +229,13 @@ export default function transform(
                     const { comments, ...k } = key
                     const { comments: comments2, ...v } = value
                     const prop = j.objectProperty(k, v)
+                    if (v.name === "override") {
+                        importOverride = true
+                    }
                     prop.computed = !!computed
-                    if (isPrivate) privates.push(k.name)
+                    if (isPrivate) {
+                        privates.push(k.name)
+                    }
                     return prop
                 })
             )
@@ -254,6 +265,9 @@ export default function transform(
             if (!mobxImport.specifiers) {
                 mobxImport.specifiers = []
             }
+            if (importOverride) {
+                mobxImport.specifiers.push(j.importSpecifier(j.identifier("override")))
+            }
             mobxImport.specifiers.push(j.importSpecifier(j.identifier("makeObservable")))
         }
     }
@@ -281,7 +295,9 @@ export default function transform(
             dec.expression.callee.name === "inject"
 
         const hasObserverOrInject = decorators.some(dec => isObserver(dec) || isInject(dec))
-        if (!hasObserverOrInject) return
+        if (!hasObserverOrInject) {
+            return
+        }
 
         // If module uses default export
         if (defaultExportPath && clazz.id) {
@@ -299,13 +315,13 @@ export default function transform(
                 const exportDecl = j.exportDefaultDeclaration(newDefaultExportDefExpr.exported)
 
                 // re-create the class
-                let newClassDefExpr = j.classExpression(clazz.id, clazz.body, clazz.superClass)
+                const newClassDefExpr = j.classExpression(clazz.id, clazz.body, clazz.superClass)
                 newClassDefExpr.superTypeParameters = clazz.superTypeParameters
                 newClassDefExpr.typeParameters = clazz.typeParameters
                 newClassDefExpr.implements = clazz.implements
 
                 const newClassDefDecl = j.classDeclaration(
-                    newClassDefExpr.id,
+                    newClassDefExpr.id ?? null,
                     newClassDefExpr.body,
                     newClassDefExpr.superClass
                 )
@@ -346,7 +362,7 @@ export default function transform(
             }, newClassDefExpr)
 
             const decl = j.variableDeclaration("const", [
-                j.variableDeclarator(j.identifier(clazz.id!.name), newClassDefExpr)
+                j.variableDeclarator(j.identifier(clazz.id!.name.toString()), newClassDefExpr)
             ])
             decl.comments = clazz.comments
             clazzPath.replace(decl)
@@ -377,7 +393,7 @@ export default function transform(
         if (!j.Decorator.check(decorator)) {
             return property
         }
-        const expr = decorator.expression
+        let expr = decorator.expression
         if (j.Identifier.check(expr) && !decoratorsUsed.has(expr.name)) {
             warn(`Found non-mobx decorator @${expr.name}`, decorator)
             return property
@@ -387,12 +403,23 @@ export default function transform(
             return property
         }
 
-        if (options?.keepDecorators !== true) property.decorators.splice(0)
+        if (options?.keepDecorators !== true) {
+            property.decorators.splice(0)
+        }
+
+        // Replace decorator with @override
+        if ((property as any).override) {
+            const overrideDecorator = j.decorator(j.identifier("override"))
+            if (options?.keepDecorators) {
+                property.decorators[0] = overrideDecorator
+            }
+            expr = overrideDecorator.expression
+        }
 
         effects.membersMap.push([
             property.key,
             expr,
-            property.computed,
+            property.computed ?? false,
             property.accessibility === "private" || property.accessibility === "protected"
         ])
         return property
@@ -411,6 +438,9 @@ export default function transform(
             )
         )
         if (privates.length && !options?.keepDecorators) {
+            if (typeof clazz.id!.name !== "string") {
+                throw new Error("Unexpected type")
+            }
             // @ts-ignore
             initializeObservablesCall.expression.typeArguments = j.tsTypeParameterInstantiation([
                 j.tsTypeReference(j.identifier(clazz.id!.name)),
@@ -449,7 +479,9 @@ export default function transform(
             let propsType = isReactComponent && clazz.superTypeParameters?.params[0]
             const propsParam = j.identifier("props")
             // reuse the generic if we found it
-            if (propsType) propsParam.typeAnnotation = j.tsTypeAnnotation(propsType as any)
+            if (propsType) {
+                propsParam.typeAnnotation = j.tsTypeAnnotation(propsType as any)
+            }
             // create the constructor
             const constructorDecl = j.methodDefinition(
                 "constructor",

@@ -28,6 +28,6 @@ jobs:
         run: yarn coverage
 
       - name: Upload to coveralls
-        uses: coverallsapp/github-action@1.1.3 
+        uses: coverallsapp/github-action@v1.2.4 
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}

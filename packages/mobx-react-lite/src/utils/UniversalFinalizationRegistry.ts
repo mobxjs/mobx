@@ -59,4 +59,7 @@ export class TimerBasedFinalizationRegistry<T> implements FinalizationRegistryTy
     }
 }
 
-export const UniversalFinalizationRegistry = FinalizationRegistry ?? TimerBasedFinalizationRegistry
+export const UniversalFinalizationRegistry =
+    typeof FinalizationRegistry !== "undefined"
+        ? FinalizationRegistry
+        : TimerBasedFinalizationRegistry

@@ -14,7 +14,8 @@ import {
     ACTION,
     EMPTY_ARRAY,
     die,
-    getDescriptor
+    getDescriptor,
+    defineProperty
 } from "../internal"
 
 // we don't use globalState for these in order to avoid possible issues with multiple
@@ -51,7 +52,7 @@ export function createAction(
     res.isMobxAction = true
     if (isFunctionNameConfigurable) {
         tmpNameDescriptor.value = actionName
-        Object.defineProperty(res, "name", tmpNameDescriptor)
+        defineProperty(res, "name", tmpNameDescriptor)
     }
     return res
 }

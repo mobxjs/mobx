@@ -35,7 +35,7 @@ import { makeObservable, observable, action } from "mobx"
 class Doubler {
     value = 0
 
-    constructor(value) {
+    constructor() {
         makeObservable(this, {
             value: observable,
             increment: action
@@ -58,7 +58,7 @@ import { makeAutoObservable } from "mobx"
 class Doubler {
     value = 0
 
-    constructor(value) {
+    constructor() {
         makeAutoObservable(this)
     }
 
@@ -77,7 +77,7 @@ import { makeObservable, observable, action } from "mobx"
 class Doubler {
     value = 0
 
-    constructor(value) {
+    constructor() {
         makeObservable(this, {
             value: observable,
             increment: action.bound
@@ -175,7 +175,7 @@ import { makeAutoObservable } from "mobx"
 class Doubler {
     value = 0
 
-    constructor(value) {
+    constructor() {
         makeAutoObservable(this, {}, { autoBind: true })
     }
 

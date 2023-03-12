@@ -1,5 +1,19 @@
 # mobx
 
+## 6.8.0
+
+### Minor Changes
+
+-   [`fed3ff14`](https://github.com/mobxjs/mobx/commit/fed3ff14ca4dcbc788c4678e6d3f4edf747ffdb0) [#3608](https://github.com/mobxjs/mobx/pull/3608) Thanks [@emereum](https://github.com/emereum)! - Do not expose the methods `observe_` or `intercept_` on computed values and observable values.
+
+### Patch Changes
+
+-   [`42f8ac05`](https://github.com/mobxjs/mobx/commit/42f8ac057ec70c508232339016cc7249123f0fd0) [#3596](https://github.com/mobxjs/mobx/pull/3596) Thanks [@urugator](https://github.com/urugator)! - fix #3595 onBecomeObserved is not called for ObservableSet
+
+*   [`2bccc5b3`](https://github.com/mobxjs/mobx/commit/2bccc5b3ca1df6444c942c715718519d590281e0) [#3583](https://github.com/mobxjs/mobx/pull/3583) Thanks [@urugator](https://github.com/urugator)! - fix #3582: AbortSignal leaks @types/node
+
+-   [`7095fa45`](https://github.com/mobxjs/mobx/commit/7095fa4569afb538b7f153ce2b2a8078f2dbe1fc) [#3609](https://github.com/mobxjs/mobx/pull/3609) Thanks [@emereum](https://github.com/emereum)! - Restore generic types for newValue and oldValue on IValueDidChange and IBoxDidChange.
+
 ## 6.7.0
 
 ### Minor Changes
@@ -1305,7 +1319,7 @@ A deprecation message will now be printed if creating computed properties while 
 
 ```javascript
 const x = observable({
-    computedProp: function() {
+    computedProp: function () {
         return someComputation
     }
 })
@@ -1330,7 +1344,7 @@ or alternatively:
 
 ```javascript
 observable({
-    computedProp: computed(function() {
+    computedProp: computed(function () {
         return someComputation
     })
 })
@@ -1348,7 +1362,7 @@ N.B. If you want to introduce actions on an observable that modify its state, us
 ```javascript
 observable({
     counter: 0,
-    increment: action(function() {
+    increment: action(function () {
         this.counter++
     })
 })
@@ -1474,10 +1488,10 @@ function Square() {
     extendObservable(this, {
         length: 2,
         squared: computed(
-            function() {
+            function () {
                 return this.squared * this.squared
             },
-            function(surfaceSize) {
+            function (surfaceSize) {
                 this.length = Math.sqrt(surfaceSize)
             }
         )
