@@ -18,7 +18,8 @@ test("correct api should be exposed", function () {
             "useObserver",
             "isObserverBatched",
             "observerBatching",
-            "useStaticRendering"
+            "useStaticRendering",
+            "_observerFinalizationRegistry"
         ].sort()
     )
 })
