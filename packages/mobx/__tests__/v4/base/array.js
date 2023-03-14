@@ -1,5 +1,6 @@
 "use strict"
 
+const { LegacyObservableArray } = require("../../../src/internal")
 const mobx = require("../mobx4")
 const { observable, _getAdministration, reaction, makeObservable } = mobx
 const iterall = require("iterall")
@@ -8,6 +9,15 @@ let consoleWarnMock
 afterEach(() => {
     consoleWarnMock?.mockRestore()
 })
+
+expect.addEqualityTesters([
+    function (a, b, ...rest) {
+        if (a instanceof LegacyObservableArray || b instanceof LegacyObservableArray) {
+            return this.equals([...a], [...b], ...rest)
+        }
+        return undefined
+    }
+])
 
 test("test1", function () {
     const a = observable.array([])
