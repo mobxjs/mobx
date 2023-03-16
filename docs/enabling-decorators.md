@@ -68,7 +68,7 @@ We do not recommend new codebases that use MobX use legacy decorators until the 
 
 ## MobX Core decorators {🚀}
 
-MobX before version 6 encouraged the use of ES.next decorators to mark things as `observable`, `computed` and `action`. While MobX 6 recomneds against using these decorators (an instead using [`makeObservable` / `makeAutoObservable`](observable-state.md)), it is still possible.
+MobX before version 6 encouraged the use of ES.next decorators to mark things as `observable`, `computed` and `action`. While MobX 6 recommends against using these decorators (and instead using [`makeObservable` / `makeAutoObservable`](observable-state.md)), it is still possible.
 
 ```javascript
 import { makeObservable, observable, computed, action } from "mobx"
