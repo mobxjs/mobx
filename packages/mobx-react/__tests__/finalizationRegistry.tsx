@@ -14,7 +14,7 @@ function sleep(time: number) {
     })
 }
 
-// TODO dunno why it's not available
+// TODO remove once https://github.com/mobxjs/mobx/pull/3620 is merged.
 declare class WeakRef<T> {
     constructor(object: T)
     deref(): T | undefined
