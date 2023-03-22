@@ -871,30 +871,6 @@ test.skip("#709 - applying observer on React.memo component", () => {
     render(<Observed />, { wrapper: ErrorCatcher })
 })
 
-// this.render is made non-configurable, therefore can't be replaced
-test.skip("#797 - replacing this.render should trigger a warning", () => {
-    consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
-
-    @observer
-    class Component extends React.Component {
-        render() {
-            return <div />
-        }
-        swapRenderFunc() {
-            this.render = () => {
-                return <span />
-            }
-        }
-    }
-
-    const compRef = React.createRef<Component>()
-    const { unmount } = render(<Component ref={compRef} />)
-    compRef.current?.swapRenderFunc()
-    unmount()
-
-    expect(consoleWarnMock).toMatchSnapshot()
-})
-
 test("Redeclaring an existing observer component as an observer should log a warning", () => {
     consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
 
