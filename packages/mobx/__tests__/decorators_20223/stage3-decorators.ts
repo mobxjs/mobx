@@ -774,6 +774,8 @@ test("verify object assign (2022.3) (legacy/field decorator)", () => {
 
 test("373 - fix isObservable for unused computed", () => {
     class Bla {
+        ts_53332_workaround: string = ""
+
         @computed
         get computedVal() {
             return 3
