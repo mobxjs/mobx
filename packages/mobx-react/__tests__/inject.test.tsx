@@ -102,7 +102,7 @@ describe("inject based context", () => {
         expect(C.displayName).toBe("inject(ComponentC)")
     })
 
-    test.only("shouldn't change original displayName of component that uses forwardRef", () => {
+    test("shouldn't change original displayName of component that uses forwardRef", () => {
         const FancyComp = React.forwardRef((_: any, ref: React.Ref<HTMLDivElement>) => {
             return <div ref={ref} />
         })
@@ -498,12 +498,21 @@ describe("inject based context", () => {
         expect(injectRender).toBe(6)
         expect(itemRender).toBe(6)
 
-        container.querySelectorAll(".hl_ItemB").forEach((e: Element) => (e as HTMLElement).click())
+        act(() => {
+            container
+                .querySelectorAll(".hl_ItemB")
+                .forEach((e: Element) => (e as HTMLElement).click())
+        })
+
         expect(listRender).toBe(1)
         expect(injectRender).toBe(12) // ideally, 7
         expect(itemRender).toBe(7)
+        act(() => {
+            container
+                .querySelectorAll(".hl_ItemF")
+                .forEach((e: Element) => (e as HTMLElement).click())
+        })
 
-        container.querySelectorAll(".hl_ItemF").forEach((e: Element) => (e as HTMLElement).click())
         expect(listRender).toBe(1)
         expect(injectRender).toBe(18) // ideally, 9
         expect(itemRender).toBe(9)

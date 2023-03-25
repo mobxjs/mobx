@@ -1,10 +1,13 @@
 import React from "react"
-import { patch, newSymbol } from "./utils/utils"
+import { patch } from "./utils/utils"
+
+const reactMajorVersion = Number.parseInt(React.version.split(".")[0])
+let warnedAboutDisposeOnUnmountDeprecated = false
 
 type Disposer = () => void
 
-const protoStoreKey = newSymbol("disposeOnUnmountProto")
-const instStoreKey = newSymbol("disposeOnUnmountInst")
+const protoStoreKey = Symbol("disposeOnUnmountProto")
+const instStoreKey = Symbol("disposeOnUnmountInst")
 
 function runDisposersOnWillUnmount() {
     ;[...(this[protoStoreKey] || []), ...(this[instStoreKey] || [])].forEach(propKeyOrFunction => {
@@ -17,18 +20,41 @@ function runDisposersOnWillUnmount() {
     })
 }
 
+/**
+ * @deprecated `disposeOnUnmount` is not compatible with React 18 and higher.
+ */
 export function disposeOnUnmount(target: React.Component<any, any>, propertyKey: PropertyKey): void
+
+/**
+ * @deprecated `disposeOnUnmount` is not compatible with React 18 and higher.
+ */
 export function disposeOnUnmount<TF extends Disposer | Array<Disposer>>(
     target: React.Component<any, any>,
     fn: TF
 ): TF
 
+/**
+ * @deprecated `disposeOnUnmount` is not compatible with React 18 and higher.
+ */
 export function disposeOnUnmount(
     target: React.Component<any, any>,
     propertyKeyOrFunction: PropertyKey | Disposer | Array<Disposer>
 ): PropertyKey | Disposer | Array<Disposer> | void {
     if (Array.isArray(propertyKeyOrFunction)) {
         return propertyKeyOrFunction.map(fn => disposeOnUnmount(target, fn))
+    }
+
+    if (!warnedAboutDisposeOnUnmountDeprecated) {
+        if (reactMajorVersion >= 18) {
+            console.error(
+                "[mobx-react] disposeOnUnmount is not compatible with React 18 and higher. Don't use it."
+            )
+        } else {
+            console.warn(
+                "[mobx-react] disposeOnUnmount is deprecated. It won't work correctly with React 18 and higher."
+            )
+        }
+        warnedAboutDisposeOnUnmountDeprecated = true
     }
 
     const c = Object.getPrototypeOf(target).constructor

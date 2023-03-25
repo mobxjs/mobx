@@ -104,11 +104,13 @@ export function observer<P extends object, TRef = {}>(
         return useObserver(() => render(props, ref), baseComponentName)
     }
 
-    // Don't set `displayName` for anonymous components,
-    // so the `displayName` can be customized by user, see #3192.
-    if (baseComponentName !== "") {
-        ;(observerComponent as React.FunctionComponent).displayName = baseComponentName
-    }
+    // Inherit original name and displayName, see #3438
+    ;(observerComponent as React.FunctionComponent).displayName = baseComponent.displayName
+    Object.defineProperty(observerComponent, "name", {
+        value: baseComponent.name,
+        writable: true,
+        configurable: true
+    })
 
     // Support legacy context: `contextTypes` must be applied before `memo`
     if ((baseComponent as any).contextTypes) {
@@ -136,7 +138,7 @@ export function observer<P extends object, TRef = {}>(
             set() {
                 throw new Error(
                     `[mobx-react-lite] \`${
-                        this.displayName || this.type?.displayName || "Component"
+                        this.displayName || this.type?.displayName || this.type?.name || "Component"
                     }.contextTypes\` must be set before applying \`observer\`.`
                 )
             }

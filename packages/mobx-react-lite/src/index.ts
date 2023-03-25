@@ -16,6 +16,7 @@ export { useLocalObservable } from "./useLocalObservable"
 export { useLocalStore } from "./useLocalStore"
 export { useAsObservableSource } from "./useAsObservableSource"
 
+export { observerFinalizationRegistry as _observerFinalizationRegistry }
 export const clearTimers = observerFinalizationRegistry["finalizeAllImmediately"] ?? (() => {})
 
 export function useObserver<T>(fn: () => T, baseComponentName: string = "observed"): T {

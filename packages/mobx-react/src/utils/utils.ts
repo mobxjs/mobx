@@ -1,21 +1,3 @@
-let symbolId = 0
-function createSymbol(name: string): symbol | string {
-    if (typeof Symbol === "function") {
-        return Symbol(name)
-    }
-    const symbol = `__$mobx-react ${name} (${symbolId})`
-    symbolId++
-    return symbol
-}
-
-const createdSymbols = {}
-export function newSymbol(name: string): symbol | string {
-    if (!createdSymbols[name]) {
-        createdSymbols[name] = createSymbol(name)
-    }
-    return createdSymbols[name]
-}
-
 export function shallowEqual(objA: any, objB: any): boolean {
     //From: https://github.com/facebook/fbjs/blob/c69904a511b900266935168223063dd8772dfc40/packages/fbjs/src/core/shallowEqual.js
     if (is(objA, objB)) {
@@ -96,8 +78,8 @@ export function setHiddenProp(target: object, prop: any, value: any): void {
  * Utilities for patching componentWillUnmount, to make sure @disposeOnUnmount works correctly icm with user defined hooks
  * and the handler provided by mobx-react
  */
-const mobxMixins = newSymbol("patchMixins")
-const mobxPatchedDefinition = newSymbol("patchedDefinition")
+const mobxMixins = Symbol("patchMixins")
+const mobxPatchedDefinition = Symbol("patchedDefinition")
 
 export interface Mixins extends Record<string, any> {
     locks: number
@@ -175,6 +157,7 @@ function createDefinition(
     let wrappedFunc = wrapFunction(originalMethod, mixins)
 
     return {
+        // @ts-ignore
         [mobxPatchedDefinition]: true,
         get: function () {
             return wrappedFunc
