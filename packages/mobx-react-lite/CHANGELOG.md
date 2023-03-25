@@ -1,5 +1,12 @@
 # mobx-react-lite
 
+## 4.0.0
+
+### Major Changes
+
+-   [`44a2cf42`](https://github.com/mobxjs/mobx/commit/44a2cf42dec7635f639ddbfb19202ebc710bac54) [#3590](https://github.com/mobxjs/mobx/pull/3590) Thanks [@urugator](https://github.com/urugator)! - Components now use `useSyncExternalStore`, which should prevent tearing - you have to update mobx, otherwise it should behave as previously.<br>
+    Improved displayName/name handling as discussed in #3438.<br>
+
 ## 3.4.3
 
 ### Patch Changes
