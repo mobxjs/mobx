@@ -75,6 +75,6 @@
         "test:size": "yarn import-size --report . observer useLocalObservable",
         "test:types": "tsc --noEmit",
         "test:check": "yarn test:types",
-        "prepublish": "yarn build --target publish && yarn build:cjs && yarn build:es"
+        "prepublish": "cd ../mobx && yarn build --target publish && cd ../mobx-react-lite && yarn build --target publish && yarn build:cjs && yarn build:es"
     }
 }
