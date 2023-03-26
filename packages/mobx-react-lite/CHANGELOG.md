@@ -1,5 +1,11 @@
 # mobx-react-lite
 
+## 4.0.2
+
+### Patch Changes
+
+-   [`f86df867`](https://github.com/mobxjs/mobx/commit/f86df86784fa92d793ca4d1b97a3dd954355f7dd) [#3667](https://github.com/mobxjs/mobx/pull/3667) Thanks [@tony](https://github.com/tony)! - Fix package dependency for use-sync-external-store.
+
 ## 4.0.1
 
 ### Patch Changes
