@@ -1,5 +1,11 @@
 # mobx-react-lite
 
+## 4.0.1
+
+### Patch Changes
+
+-   [`8e58fa95`](https://github.com/mobxjs/mobx/commit/8e58fa958908f632a2c49d22c259fda135781455) [#3664](https://github.com/mobxjs/mobx/pull/3664) Thanks [@mweststrate](https://github.com/mweststrate)! - (Hopefully) fixed release process for mobx-react-lite
+
 ## 4.0.0
 
 ### Major Changes
