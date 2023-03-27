@@ -2,7 +2,6 @@ import { cleanup, render, waitFor } from "@testing-library/react"
 import * as mobx from "mobx"
 import * as React from "react"
 import { useObserver } from "../src/useObserver"
-import { sleep } from "./utils"
 import gc from "expose-gc/function"
 import { observerFinalizationRegistry } from "../src/utils/observerFinalizationRegistry"
 
