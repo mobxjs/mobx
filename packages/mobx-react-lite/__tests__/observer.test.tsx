@@ -1,7 +1,7 @@
 import { act, cleanup, fireEvent, render } from "@testing-library/react"
 import mockConsole from "jest-mock-console"
 import * as mobx from "mobx"
-import React from "react"
+import React, { StrictMode } from "react"
 
 import { observer, useObserver, isObserverBatched, enableStaticRendering } from "../src"
 
@@ -1086,4 +1086,27 @@ test("Anonymous component displayName #3192", () => {
     expect(MemoCmp.displayName).toEqual(ObserverCmp.displayName)
     expect(observerError.message).toEqual(memoError.message)
     consoleErrorSpy.mockRestore()
+})
+
+test("StritMode #3671", async () => {
+    const o = mobx.observable({ x: 0 })
+
+    const Cmp = observer(() => o.x as any)
+
+    const { container, unmount } = render(
+        <StrictMode>
+            <Cmp />
+        </StrictMode>
+    )
+    //const { container, unmount } = render(<Cmp />);
+    expect(container).toHaveTextContent("0")
+    act(
+        mobx.action(() => {
+            console.log("BE", mobx._getGlobalState().stateVersion)
+            o.x++
+            console.log("AF", mobx._getGlobalState().stateVersion)
+        })
+    )
+    expect(container).toHaveTextContent("1")
+    //console.log(result);
 })
