@@ -1098,15 +1098,12 @@ test("StritMode #3671", async () => {
             <Cmp />
         </StrictMode>
     )
-    //const { container, unmount } = render(<Cmp />);
+
     expect(container).toHaveTextContent("0")
     act(
         mobx.action(() => {
-            console.log("BE", mobx._getGlobalState().stateVersion)
             o.x++
-            console.log("AF", mobx._getGlobalState().stateVersion)
         })
     )
     expect(container).toHaveTextContent("1")
-    //console.log(result);
 })
