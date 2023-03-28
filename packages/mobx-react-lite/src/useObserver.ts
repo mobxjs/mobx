@@ -5,6 +5,9 @@ import { isUsingStaticRendering } from "./staticRendering"
 import { observerFinalizationRegistry } from "./utils/observerFinalizationRegistry"
 import { useSyncExternalStore } from "use-sync-external-store/shim"
 
+// Required by SSR when hydrating #3669
+const getServerSnapshot = () => {}
+
 // Do not store `admRef` (even as part of a closure!) on this object,
 // otherwise it will prevent GC and therefore reaction disposal via FinalizationRegistry.
 type ObserverAdministration = {
@@ -99,7 +102,8 @@ export function useObserver<T>(render: () => T, baseComponentName: string = "obs
     useSyncExternalStore(
         // Both of these must be stable, otherwise it would keep resubscribing every render.
         adm.subscribe,
-        adm.getSnapshot
+        adm.getSnapshot,
+        getServerSnapshot
     )
 
     // render the original component, but have the
