@@ -231,7 +231,7 @@ autorun(() => {
 message.likes.push("Jennifer")
 ```
 
-This will react as expected. All array functions that do not mutate the array are tracked automatically.
+This will react as expected. All array functions that mutate the array are tracked automatically.
 
 ---
 
