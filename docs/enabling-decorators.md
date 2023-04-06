@@ -26,7 +26,7 @@ class Todo {
 
     @action
     toggle() {
-        this.finished = !finished
+        this.finished = !this.finished
     }
 }
 
