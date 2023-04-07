@@ -1,12 +1,12 @@
 import React, { createElement } from "react"
 import {
-    computed,
     isObservable,
     observable,
     reaction,
     transaction,
     IReactionDisposer,
-    makeObservable
+    makeObservable,
+    computed
 } from "mobx"
 import { observer } from "../src"
 import _ from "lodash"
@@ -245,12 +245,6 @@ test("verify props is reactive", () => {
     const events: Array<any> = []
 
     class Child extends React.Component<any, any> {
-        constructor(p) {
-            super(p)
-            makeObservable(this)
-        }
-
-        @computed
         get computedLabel() {
             events.push(["computed label", this.props.item.subid])
             return this.props.item.label
@@ -301,7 +295,13 @@ test("verify props is reactive", () => {
 
     const { container } = render(<Wrapper />)
     expect(events.sort()).toEqual(
-        [["mount"], ["compute", 1], ["computed label", 1], ["render", 1, "1.1.hi.0", "hi"]].sort()
+        [
+            ["mount"],
+            ["compute", 1],
+            ["computed label", 1],
+            ["computed label", 1],
+            ["render", 1, "1.1.hi.0", "hi"]
+        ].sort()
     )
 
     events.splice(0)
@@ -313,6 +313,7 @@ test("verify props is reactive", () => {
             ["compute", 1],
             ["update", 1, 2],
             ["compute", 2],
+            ["computed label", 2],
             ["computed label", 2],
             ["render", 2, "1.2.test.0", "test"]
         ].sort()
@@ -422,17 +423,25 @@ test("verify props are reactive in constructor", () => {
 
     const Component = observer(
         class Component extends React.Component<any, any> {
+            propCopy: any = undefined
+
             disposer: IReactionDisposer
-            constructor(props, context) {
-                super(props, context)
+            constructor(props) {
+                super(props)
+                makeObservable(this, { propCopy: observable })
+                this.propCopy = this.props.prop
                 constructorCallsCount++
                 this.disposer = reaction(
-                    () => this.props.prop,
+                    () => this.propCopy,
                     prop => propValues.push(prop),
                     {
                         fireImmediately: true
                     }
                 )
+            }
+
+            componentDidUpdate(): void {
+                this.propCopy = this.props.prop
             }
 
             componentWillUnmount() {
@@ -451,4 +460,65 @@ test("verify props are reactive in constructor", () => {
     rerender(<Component prop="4" />)
     expect(constructorCallsCount).toEqual(1)
     expect(propValues).toEqual(["1", "2", "3", "4"])
+})
+
+test("verify using props in computed throws", () => {
+    const Component = observer(
+        class Component extends React.Component<any, any> {
+            get double() {
+                return this.props.prop * 2
+            }
+
+            constructor(props) {
+                super(props)
+                makeObservable(this, { double: computed })
+            }
+
+            render() {
+                return <div>{this.double}</div>
+            }
+        }
+    )
+
+    expect(() => {
+        render(<Component prop="1" />)
+    }).toThrowErrorMatchingInlineSnapshot(
+        `"Cannot read \\"props\\" in a reactive context, as it isn't observable. Please use component lifecycle to copy the value into an observable first"`
+    )
+})
+
+test("verify using props in reaction throws", () => {
+    let caughtError
+
+    const Component = observer(
+        class Component extends React.Component<any, any> {
+            disposer: IReactionDisposer
+            constructor(props) {
+                super(props)
+                this.disposer = reaction(
+                    () => this.props.prop,
+                    _prop => {},
+                    {
+                        fireImmediately: true,
+                        onError: e => {
+                            caughtError = e
+                        }
+                    }
+                )
+            }
+
+            componentWillUnmount() {
+                this.disposer()
+            }
+
+            render() {
+                return <div />
+            }
+        }
+    )
+
+    render(<Component prop="1" />)
+    expect(caughtError).toMatchInlineSnapshot(
+        `[Error: Cannot read "props" in a reactive context, as it isn't observable. Please use component lifecycle to copy the value into an observable first]`
+    )
 })

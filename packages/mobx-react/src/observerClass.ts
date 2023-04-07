@@ -1,12 +1,10 @@
 import { PureComponent, Component, ComponentClass, ClassAttributes } from "react"
 import {
-    createAtom,
     _allowStateChanges,
     Reaction,
     _allowStateReadsStart,
     _allowStateReadsEnd,
-    _getGlobalState,
-    IAtom
+    _getGlobalState
 } from "mobx"
 import {
     isUsingStaticRendering,
@@ -22,9 +20,6 @@ type ObserverAdministration = {
     forceUpdate: Function | null
     mounted: boolean // we could use forceUpdate as mounted flag
     name: string
-    propsAtom: IAtom
-    stateAtom: IAtom
-    contextAtom: IAtom
     props: any
     state: any
     context: any
@@ -46,9 +41,6 @@ function getAdministration(component: Component): ObserverAdministration {
         state: undefined,
         props: undefined,
         context: undefined,
-        propsAtom: createAtom("props"),
-        stateAtom: createAtom("state"),
-        contextAtom: createAtom("context"),
         isUpdating: false
     })
 }
@@ -82,10 +74,6 @@ export function makeClassComponentObserver(
         }
     }
 
-    // this.props and this.state are made observable, just to make sure @computed fields that
-    // are defined inside the component, and which rely on state or props, re-compute if state or props change
-    // (otherwise the computed wouldn't update and become stale on props change, since props are not observable)
-    // However, this solution is not without it's own problems: https://github.com/mobxjs/mobx-react/issues?utf8=%E2%9C%93&q=is%3Aissue+label%3Aobservable-props-or-not+
     Object.defineProperties(prototype, {
         props: observablePropsDescriptor,
         state: observableStateDescriptor,
@@ -250,37 +238,24 @@ function observerSCU(nextProps: ClassAttributes<any>, nextState: any): boolean {
     return !shallowEqual(this.props, nextProps)
 }
 
+// TOOD: only create those in __DEV__?
 function createObservablePropDescriptor(key: "props" | "state" | "context") {
-    const atomKey = `${key}Atom`
     return {
         configurable: true,
         enumerable: true,
         get() {
             const admin = getAdministration(this)
-
-            let prevReadState = _allowStateReadsStart(true)
-
-            admin[atomKey].reportObserved()
-
-            _allowStateReadsEnd(prevReadState)
-
+            const derivation = _getGlobalState().trackingDerivation
+            if (derivation && derivation !== admin.reaction) {
+                throw new Error(
+                    `Cannot read "${key}" in a reactive context, as it isn't observable. Please use component lifecycle to copy the value into an observable first`
+                )
+            }
             return admin[key]
         },
         set(value) {
             const admin = getAdministration(this)
-            // forceUpdate issued by reaction sets new props.
-            // It sets isUpdating to true to prevent loop.
-            if (!admin.isUpdating && !shallowEqual(admin[key], value)) {
-                admin[key] = value
-                // This notifies all observers including our component,
-                // but we don't want to cause `forceUpdate`, because component is already updating,
-                // therefore supress component reaction.
-                admin.isUpdating = true
-                admin[atomKey].reportChanged()
-                admin.isUpdating = false
-            } else {
-                admin[key] = value
-            }
+            admin[key] = value
         }
     }
 }

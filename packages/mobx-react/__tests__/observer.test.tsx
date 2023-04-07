@@ -925,12 +925,6 @@ test("this.context is observable if ComponentName.contextType is set", () => {
     class Child extends React.Component {
         static contextType = Context
 
-        constructor(props: any) {
-            super(props)
-            makeObservable(this)
-        }
-
-        @computed
         get counterValue() {
             return (this.context as any).counter
         }
