@@ -13,10 +13,11 @@ export function useLocalStore<TStore extends Record<string, any>, TSource extend
     initializer: (source?: TSource) => TStore,
     current?: TSource
 ): TStore {
-    if ("production" !== process.env.NODE_ENV)
+    if ("production" !== process.env.NODE_ENV) {
         useDeprecated(
             "[mobx-react-lite] 'useLocalStore' is deprecated, use 'useLocalObservable' instead."
         )
+    }
     const source = current && useAsObservableSource(current)
     return useState(() => observable(initializer(source), undefined, { autoBind: true }))[0]
 }
