@@ -17,6 +17,8 @@ const isPublish = target === "publish"
 // for running tests in CI we need CJS only
 const isTest = target === "test"
 
+const esmExtension = packageName === "mobx" ? ".mjs" : ".js"
+
 const run = async () => {
     // TSDX converts passed name argument to lowercase for file name
     const pkgPrefix = `${packageName.toLowerCase()}.`
@@ -38,13 +40,13 @@ const run = async () => {
         // and these builds cannot be run in parallel because tsdx doesn't allow to change target dir
         await build("esm", "development")
         // tsdx will purge dist folder, so it's necessary to move these
-        await tempMove(`esm.development.js`)
-        await tempMove(`esm.development.js.map`)
+        await tempMove(`esm.development${esmExtension}`)
+        await tempMove(`esm.development${esmExtension}.map`)
 
         // cannot build these concurrently
         await build("esm", "production")
-        await tempMove(`esm.production.min.js`)
-        await tempMove(`esm.production.min.js.map`)
+        await tempMove(`esm.production.min${esmExtension}`)
+        await tempMove(`esm.production.min${esmExtension}.map`)
     }
 
     await build(isTest ? "cjs" : "esm,cjs,umd").catch(err => {
@@ -53,10 +55,10 @@ const run = async () => {
 
     if (isPublish) {
         // move ESM bundles back to dist folder and remove temp
-        await moveTemp(`esm.development.js`)
-        await moveTemp(`esm.development.js.map`)
-        await moveTemp(`esm.production.min.js`)
-        await moveTemp(`esm.production.min.js.map`)
+        await moveTemp(`esm.development${esmExtension}`)
+        await moveTemp(`esm.development${esmExtension}.map`)
+        await moveTemp(`esm.production.min${esmExtension}`)
+        await moveTemp(`esm.production.min${esmExtension}.map`)
         await fs.remove("temp")
     }
 }

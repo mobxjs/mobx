@@ -3,6 +3,10 @@ const { terser } = require("rollup-plugin-terser")
 module.exports = {
     // This function will run for each entry/format/env combination
     rollup(config, options) {
+        if (options.format === "esm" && typeof config.output.file === "string") {
+            config.output.file = config.output.file.replace(/\.js$/, ".mjs")
+        }
+
         // MWE: disabled minifying esm builds as source maps aren't too reliable.
         // It is a shame because mangle properties saves quite a bit (1 KB gzipped)
         // For comparison:
