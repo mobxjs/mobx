@@ -15,7 +15,7 @@ After years of alterations, ES decorators have finally reached Stage 3 in the TC
 ## Usage
 
 ```javascript
-import { makeObservable, observable, computed, action } from "mobx"
+import { observable, computed, action } from "mobx"
 
 class Todo {
     id = Math.random()
@@ -24,7 +24,7 @@ class Todo {
 
     @action
     toggle() {
-        this.finished = !finished
+        this.finished = !this.finished
     }
 }
 
