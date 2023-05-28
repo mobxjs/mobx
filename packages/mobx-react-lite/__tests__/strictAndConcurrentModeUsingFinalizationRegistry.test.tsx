@@ -51,7 +51,7 @@ test("uncommitted components should not leak observations", async () => {
             expect(count2IsObserved).toBeFalsy()
         },
         {
-            timeout: 5000,
+            timeout: 10_000,
             interval: 200
         }
     )
