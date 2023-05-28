@@ -4,8 +4,7 @@ import {
     Reaction,
     _allowStateReadsStart,
     _allowStateReadsEnd,
-    _getGlobalState,
-    IAtom
+    _getGlobalState
 } from "mobx"
 import {
     isUsingStaticRendering,
