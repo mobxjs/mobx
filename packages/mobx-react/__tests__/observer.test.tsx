@@ -1,11 +1,4 @@
-import React, {
-    createContext,
-    Fragment,
-    ReactChildren,
-    ReactNode,
-    StrictMode,
-    Suspense
-} from "react"
+import React, { StrictMode, Suspense } from "react"
 import { inject, observer, Observer, enableStaticRendering } from "../src"
 import { render, act, waitFor } from "@testing-library/react"
 import {
@@ -21,7 +14,6 @@ import {
     IReactionDisposer
 } from "mobx"
 import { withConsole } from "./utils/withConsole"
-import { ReactElementLike, ReactNodeLike } from "prop-types"
 /**
  *  some test suite is too tedious
  */

@@ -30,9 +30,7 @@ type ObserverAdministration = {
     forceUpdate: Function | null
     mounted: boolean // we could use forceUpdate as mounted flag
     name: string
-    propsAtom: IAtom
-    stateAtom: IAtom
-    contextAtom: IAtom
+    // Used only on __DEV__
     props: any
     state: any
     context: any
