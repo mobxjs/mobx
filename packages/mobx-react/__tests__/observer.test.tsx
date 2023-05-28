@@ -1066,3 +1066,23 @@ test("#3492 should not cause warning by calling forceUpdate on uncommited compon
         consoleErrorSpy.mockRestore()
     })
 })
+
+test(`Component react's to observable changes in componenDidMount #3691`, () => {
+    const o = observable.box(0)
+
+    const TestCmp = observer(
+        class TestCmp extends React.Component {
+            componentDidMount(): void {
+                o.set(o.get() + 1)
+            }
+
+            render() {
+                return o.get()
+            }
+        }
+    )
+
+    const { container, unmount } = render(<TestCmp />)
+    expect(container).toHaveTextContent("1")
+    unmount()
+})

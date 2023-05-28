@@ -105,7 +105,16 @@ export function makeClassComponentObserver(
         return this.render()
     }
 
-    patch(prototype, "componentDidMount", function () {
+    const originalComponentDidMount = prototype.componentDidMount
+    prototype.componentDidMount = function () {
+        if (__DEV__ && this.componentDidMount !== Object.getPrototypeOf(this).componentDidMount) {
+            const displayName = getDisplayName(componentClass)
+            throw new Error(
+                `[mobx-react] \`observer(${displayName}).componentDidMount\` must be defined on prototype.` +
+                    `\n\`componentDidMount = () => {}\` or \`componentDidMount = function() {}\` is not supported.`
+            )
+        }
+
         // `componentDidMount` may not be called at all. React can abandon the instance after `render`.
         // That's why we use finalization registry to dispose reaction created during render.
         // Happens with `<Suspend>` see #3492
@@ -139,8 +148,10 @@ export function makeClassComponentObserver(
             // The reaction will be created lazily by following render.
             admin.forceUpdate()
         }
-    })
+        return originalComponentDidMount?.apply(this, arguments)
+    }
 
+    // TODO@major Overly complicated "patch" is only needed to support the deprecated @disposeOnUnmount
     patch(prototype, "componentWillUnmount", function () {
         if (isUsingStaticRendering()) {
             return
