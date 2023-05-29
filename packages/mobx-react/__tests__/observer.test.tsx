@@ -11,9 +11,12 @@ import {
     transaction,
     makeObservable,
     autorun,
-    IReactionDisposer
+    IReactionDisposer,
+    reaction,
+    configure
 } from "mobx"
 import { withConsole } from "./utils/withConsole"
+import { shallowEqual } from "../src/utils/utils"
 /**
  *  some test suite is too tedious
  */
@@ -1113,4 +1116,148 @@ test(`Observable changes in componenWillUnmount don't cause any warnings or erro
 
     consoleErrorSpy.mockRestore()
     consoleWarnSpy.mockRestore()
+})
+
+// TODO
+test(`Observable prop workaround`, () => {
+    configure({
+        enforceActions: "observed"
+    })
+
+    const propValues: Array<any> = []
+
+    const TestCmp = observer(
+        class TestCmp extends React.Component<{ prop: number }> {
+            disposeReaction: IReactionDisposer | undefined
+            observableProp: number
+
+            get computed() {
+                return this.observableProp + 100
+            }
+
+            constructor(props) {
+                super(props)
+                // Synchronize our observableProp with the actual prop on the first render.
+                this.observableProp = this.props.prop
+                makeObservable(this, {
+                    observableProp: observable,
+                    computed: computed,
+                    // Mutates observable therefore must be action
+                    componentDidUpdate: action
+                })
+            }
+
+            componentDidMount(): void {
+                // Reactions/autoruns must be created in componenDidMount (not in constructor).
+                this.disposeReaction = reaction(
+                    () => this.observableProp,
+                    prop => propValues.push(prop),
+                    {
+                        fireImmediately: true
+                    }
+                )
+            }
+
+            componentDidUpdate(): void {
+                // Synchronize our observableProp with the actual prop on every update.
+                this.observableProp = this.props.prop
+            }
+
+            componentWillUnmount(): void {
+                this.disposeReaction?.()
+            }
+
+            render() {
+                return this.computed
+            }
+        }
+    )
+
+    const { container, unmount, rerender } = render(<TestCmp prop={1} />)
+    expect(container).toHaveTextContent("101")
+    rerender(<TestCmp prop={2} />)
+    expect(container).toHaveTextContent("102")
+    rerender(<TestCmp prop={3} />)
+    expect(container).toHaveTextContent("103")
+    rerender(<TestCmp prop={4} />)
+    expect(container).toHaveTextContent("104")
+    expect(propValues).toEqual([1, 2, 3, 4])
+    unmount()
+})
+
+// TODO
+test.skip(`Observable props/state/context workaround`, () => {
+    configure({
+        enforceActions: "observed"
+    })
+
+    const propValues: Array<string> = []
+
+    const TestCmp = observer(
+        class TestCmp extends React.Component<any> {
+            disposeReaction: IReactionDisposer | undefined
+            observableProps: any
+            observableState: any
+            observableContext: any
+
+            constructor(props) {
+                super(props)
+                this.state = {
+                    x: 0
+                }
+                this.observableState = this.state
+                this.observableProps = this.props
+                this.observableContext = this.context
+                makeObservable(this, {
+                    observableProps: observable,
+                    observableState: observable,
+                    observableContext: observable,
+                    computed: computed,
+                    componentDidUpdate: action
+                })
+            }
+
+            get computed() {
+                return `${this.observableProps?.x}${this.observableState?.x}${this.observableContext}`
+            }
+
+            componentDidMount(): void {
+                this.disposeReaction = reaction(
+                    () => this.computed,
+                    prop => propValues.push(prop),
+                    {
+                        fireImmediately: true
+                    }
+                )
+            }
+
+            componentDidUpdate(): void {
+                // Props are different object with every update
+                if (!shallowEqual(this.observableProps, this.props)) {
+                    this.observableProps = this.props
+                }
+                if (!shallowEqual(this.observableState, this.state)) {
+                    this.observableState = this.state
+                }
+                if (!shallowEqual(this.observableContext, this.context)) {
+                    this.observableContext = this.context
+                }
+            }
+
+            componentWillUnmount(): void {
+                this.disposeReaction?.()
+            }
+
+            render() {
+                return this.computed
+            }
+        }
+    )
+
+    const { unmount, rerender } = render(<TestCmp prop={1} />)
+    // rerender(<TestCmp prop={2} />)
+    // rerender(<TestCmp prop={3} />)
+    // rerender(<TestCmp prop={4} />)
+    // expect(propValues).toEqual([1,2,3,4])
+    unmount()
 })
