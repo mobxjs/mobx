@@ -13,6 +13,16 @@ expect(observerFinalizationRegistry).toBeInstanceOf(globalThis.FinalizationRegis
 
 afterEach(cleanup)
 
+function nextFrame() {
+    return new Promise(accept => setTimeout(accept, 1))
+}
+
+async function gc_cycle() {
+    await nextFrame()
+    gc()
+    await nextFrame()
+}
+
 test("uncommitted components should not leak observations", async () => {
     const store = mobx.observable({ count1: 0, count2: 0 })
 
@@ -41,7 +51,8 @@ test("uncommitted components should not leak observations", async () => {
     )
 
     // Allow gc to kick in in case to let finalization registry cleanup
-    gc()
+    await gc_cycle()
+
     // Can take a while (especially on CI) before gc actually calls the registry
     await waitFor(
         () => {
@@ -51,7 +62,7 @@ test("uncommitted components should not leak observations", async () => {
             expect(count2IsObserved).toBeFalsy()
         },
         {
-            timeout: 5000,
+            timeout: 3000,
             interval: 200
         }
     )
