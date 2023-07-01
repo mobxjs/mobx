@@ -61,6 +61,8 @@ When using component classes, `this.props` and `this.state` will be made observa
 
 `shouldComponentUpdate` is not supported. As such, it is recommended that class components extend `React.PureComponent`. The `observer` will automatically patch non-pure class components with an internal implementation of `React.PureComponent` if necessary.
 
+Extending `observer` class components is not supported. Always apply `observer` only on the last class in the inheritance chain.
+
 See the [MobX](https://mobx.js.org/react-integration.html#react-integration) documentation for more details.
 
 ```javascript

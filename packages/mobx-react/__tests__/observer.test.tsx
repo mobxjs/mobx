@@ -877,9 +877,7 @@ test.skip("#709 - applying observer on React.memo component", () => {
     render(<Observed />, { wrapper: ErrorCatcher })
 })
 
-test("Redeclaring an existing observer component as an observer should log a warning", () => {
-    consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
-
+test("Redeclaring an existing observer component as an observer should throw", () => {
     @observer
     class AlreadyObserver extends React.Component<any, any> {
         render() {
@@ -887,8 +885,7 @@ test("Redeclaring an existing observer component as an observer should log a war
         }
     }
 
-    observer(AlreadyObserver)
-    expect(consoleWarnMock).toMatchSnapshot()
+    expect(() => observer(AlreadyObserver)).toThrowErrorMatchingSnapshot()
 })
 
 test("Missing render should throw", () => {
@@ -1118,7 +1115,6 @@ test(`Observable changes in componenWillUnmount don't cause any warnings or erro
     consoleWarnSpy.mockRestore()
 })
 
-// TODO
 test(`Observable prop workaround`, () => {
     configure({
         enforceActions: "observed"
@@ -1185,23 +1181,26 @@ test(`Observable prop workaround`, () => {
     unmount()
 })
 
-// TODO
-test.skip(`Observable props/state/context workaround`, () => {
+test(`Observable props/state/context workaround`, () => {
     configure({
         enforceActions: "observed"
     })
 
-    const propValues: Array<string> = []
+    const reactionResults: Array<string> = []
+
+    const ContextType = React.createContext(0)
 
     const TestCmp = observer(
-        class TestCmp extends React.Component<any> {
+        class TestCmp extends React.Component<any, any> {
+            static contextType = ContextType
+
             disposeReaction: IReactionDisposer | undefined
             observableProps: any
             observableState: any
             observableContext: any
 
-            constructor(props) {
-                super(props)
+            constructor(props, context) {
+                super(props, context)
                 this.state = {
                     x: 0
                 }
@@ -1224,7 +1223,7 @@ test.skip(`Observable props/state/context workaround`, () => {
             componentDidMount(): void {
                 this.disposeReaction = reaction(
                     () => this.computed,
-                    prop => propValues.push(prop),
+                    prop => reactionResults.push(prop),
                     {
                         fireImmediately: true
                     }
@@ -1249,15 +1248,47 @@ test.skip(`Observable props/state/context workaround`, () => {
             }
 
             render() {
-                return this.computed
+                return (
+                    <span
+                        id="updateState"
+                        onClick={() => this.setState(state => ({ x: state.x + 1 }))}
+                    >
+                        {this.computed}
+                    </span>
+                )
             }
         }
     )
 
-    const { unmount, rerender } = render(<TestCmp prop={1} />)
-    // rerender(<TestCmp prop={2} />)
-    // rerender(<TestCmp prop={3} />)
-    // rerender(<TestCmp prop={4} />)
-    // expect(propValues).toEqual([1,2,3,4])
+    const App = () => {
+        const [context, setContext] = React.useState(0)
+        const [prop, setProp] = React.useState(0)
+        return (
+            <ContextType.Provider value={context}>
+                <span id="updateContext" onClick={() => setContext(val => val + 1)}></span>
+                <span id="updateProp" onClick={() => setProp(val => val + 1)}></span>
+                <TestCmp x={prop}></TestCmp>
+            </ContextType.Provider>
+        )
+    }
+
+    const { container, unmount } = render(<App />)
+
+    const updateProp = () =>
+        act(() => (container.querySelector("#updateProp") as HTMLElement).click())
+    const updateState = () =>
+        act(() => (container.querySelector("#updateState") as HTMLElement).click())
+    const updateContext = () =>
+        act(() => (container.querySelector("#updateContext") as HTMLElement).click())
+
+    expect(container).toHaveTextContent("000")
+    updateProp()
+    expect(container).toHaveTextContent("100")
+    updateState()
+    expect(container).toHaveTextContent("110")
+    updateContext()
+    expect(container).toHaveTextContent("111")
+
+    expect(reactionResults).toEqual(["000", "100", "110", "111"])
     unmount()
 })

@@ -57,9 +57,8 @@ export function makeClassComponentObserver(
 
     if (componentClass[isMobXReactObserverSymbol]) {
         const displayName = getDisplayName(componentClass)
-        console.warn(
-            `The provided component class (${displayName})
-                has already been declared as an observer component.`
+        throw new Error(
+            `The provided component class (${displayName}) has already been declared as an observer component.`
         )
     } else {
         componentClass[isMobXReactObserverSymbol] = true
