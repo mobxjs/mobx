@@ -283,7 +283,7 @@ const plainMap = new Map(observableMap)
 ```
 
 To convert a data tree recursively to plain objects, the [`toJS`](api.md#tojs) utility can be used.
-For classes, it is recommend to implement a `toJSON()` method, as it will be picked up by `JSON.stringify`.
+For classes, it is recommended to implement a `toJSON()` method, as it will be picked up by `JSON.stringify`.
 
 ## A short note on classes
 
