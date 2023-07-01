@@ -35,7 +35,7 @@ function createReaction(adm: ObserverAdministration) {
             // BC
             adm.stateVersion = Symbol()
         }
-        // Force update won't be avaliable until the component "mounts".
+        // onStoreChange won't be avaliable until the component "mounts".
         // If state changes in between initial render and mount,
         // `useSyncExternalStore` should handle that by checking the state version and issuing update.
         adm.onStoreChange?.()
