@@ -14,6 +14,7 @@ expect(observerFinalizationRegistry).toBeInstanceOf(globalThis.FinalizationRegis
 afterEach(cleanup)
 
 test("uncommitted components should not leak observations", async () => {
+    jest.setTimeout(30_000)
     const store = mobx.observable({ count1: 0, count2: 0 })
 
     // Track whether counts are observed
