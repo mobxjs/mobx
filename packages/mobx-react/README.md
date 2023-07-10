@@ -122,7 +122,9 @@ class Alerter extends React.Component<{ counter: number }> {
 
     constructor(props) {
         this.observableCounter = counter
+    }
 
+    componentDidMount() {
         // set up a reaction, by observing the observable,
         // rather than the prop which is non-reactive:
         this.reactionDisposer = autorun(() => {
@@ -137,12 +139,12 @@ class Alerter extends React.Component<{ counter: number }> {
         this.observableCounter = this.props.counter
     }
 
-    render() {
-        return <div>{this.props.counter}</div>
-    }
-
     componentWillUnmount() {
         this.reactionDisposer()
+    }
+
+    render() {
+        return <div>{this.props.counter}</div>
     }
 }
 ```

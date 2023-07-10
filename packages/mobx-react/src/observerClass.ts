@@ -252,7 +252,7 @@ function createObservablePropDescriptor(key: "props" | "state" | "context") {
                 throw new Error(
                     `[mobx-react] Cannot read "${admin.name}.${key}" in a reactive context, as it isn't observable.
                     Please use component lifecycle method to copy the value into a local observable first.
-                    See TODO doc link`
+                    See https://github.com/mobxjs/mobx/blob/main/packages/mobx-react/README.md#note-on-using-props-and-state-in-derivations`
                 )
             }
             return admin[key]
