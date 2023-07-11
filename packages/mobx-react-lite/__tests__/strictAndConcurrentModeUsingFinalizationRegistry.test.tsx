@@ -42,7 +42,9 @@ test("uncommitted components should not leak observations", async () => {
     )
 
     // Allow gc to kick in in case to let finalization registry cleanup
+    await new Promise(resolve => setTimeout(resolve, 0))
     gc()
+    await new Promise(resolve => setTimeout(resolve, 0))
     // Can take a while (especially on CI) before gc actually calls the registry
     await waitFor(
         () => {
