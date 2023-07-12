@@ -5,7 +5,7 @@ export function trace(thing?: any, enterBreakPoint?: boolean): void
 export function trace(enterBreakPoint?: boolean): void
 export function trace(...args: any[]): void {
     if (!__DEV__) {
-        die(`trace() is not available in production builds`)
+        return
     }
     let enterBreakPoint = false
     if (typeof args[args.length - 1] === "boolean") {
