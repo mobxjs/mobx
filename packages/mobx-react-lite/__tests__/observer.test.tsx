@@ -1087,3 +1087,23 @@ test("Anonymous component displayName #3192", () => {
     expect(observerError.message).toEqual(memoError.message)
     consoleErrorSpy.mockRestore()
 })
+
+test("StrictMode #3671", async () => {
+    const o = mobx.observable({ x: 0 })
+
+    const Cmp = observer(() => o.x as any)
+
+    const { container, unmount } = render(
+        <React.StrictMode>
+            <Cmp />
+        </React.StrictMode>
+    )
+
+    expect(container).toHaveTextContent("0")
+    act(
+        mobx.action(() => {
+            o.x++
+        })
+    )
+    expect(container).toHaveTextContent("1")
+})

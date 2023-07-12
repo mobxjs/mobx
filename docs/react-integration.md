@@ -349,7 +349,7 @@ const TimerView = observer(
 )
 ```
 
-Check out [mobx-react docs](https://github.com/mobxjs/mobx-react#api-documentation) for more information.
+Check out [mobx-react docs](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react#class-components) for more information.
 
 </details>
 

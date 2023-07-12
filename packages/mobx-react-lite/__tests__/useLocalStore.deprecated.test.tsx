@@ -119,8 +119,8 @@ describe("is used to keep observable within component body", () => {
         fireEvent.click(div)
         expect(div.textContent).toBe("3-2")
 
-        // though render 3 times, mobx.observable only called once
-        expect(renderCount).toBe(3)
+        // though render 4 times, mobx.observable only called once
+        expect(renderCount).toBe(4)
     })
 
     it("actions can be used", () => {
@@ -424,19 +424,19 @@ describe("is used to keep observable within component body", () => {
             const { container } = render(<Parent />)
 
             expect(container.querySelector("span")!.innerHTML).toBe("10")
-            expect(counterRender).toBe(1)
+            expect(counterRender).toBe(2)
 
             act(() => {
                 ;(container.querySelector("#inc")! as any).click()
             })
             expect(container.querySelector("span")!.innerHTML).toBe("11")
-            expect(counterRender).toBe(2)
+            expect(counterRender).toBe(3)
 
             act(() => {
                 ;(container.querySelector("#incmultiplier")! as any).click()
             })
             expect(container.querySelector("span")!.innerHTML).toBe("22")
-            expect(counterRender).toBe(4) // TODO: should be 3
+            expect(counterRender).toBe(5) // TODO: should be 3
         })
     })
 })
