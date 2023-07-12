@@ -1,5 +1,36 @@
 # mobx-react
 
+## 9.0.0
+
+### Major Changes
+
+-   [`473cb3f5`](https://github.com/mobxjs/mobx/commit/473cb3f5fc8bf43abdd1c9c7857fe2820d2291fe) [#3718](https://github.com/mobxjs/mobx/pull/3718) Thanks [@mweststrate](https://github.com/mweststrate)! - - Fixed `observer` in `StrictMode` #3671
+    -   **[BREAKING CHANGE]** Class component's `props`/`state`/`context` are no longer observable. Attempt to use these in any derivation other than component's `render` throws and error. For details see https://github.com/mobxjs/mobx/blob/main/packages/mobx-react/README.md#note-on-using-props-and-state-in-derivations
+    -   Extending or applying `observer` classes is now explicitly forbidden
+
+### Patch Changes
+
+-   Updated dependencies [[`58bb052c`](https://github.com/mobxjs/mobx/commit/58bb052ca41b8592e5bd5c3003b68ec52da53f33), [`473cb3f5`](https://github.com/mobxjs/mobx/commit/473cb3f5fc8bf43abdd1c9c7857fe2820d2291fe)]:
+    -   mobx-react-lite@4.0.3
+
+## 8.0.0
+
+### Major Changes
+
+-   [`44a2cf42`](https://github.com/mobxjs/mobx/commit/44a2cf42dec7635f639ddbfb19202ebc710bac54) [#3590](https://github.com/mobxjs/mobx/pull/3590) Thanks [@urugator](https://github.com/urugator)! - Functional components now use `useSyncExternalStore`, which should prevent tearing - you have to update mobx, otherwise it should behave as previously.<br>
+    Improved displayName/name handling of functional components as discussed in #3438.<br>
+    Reactions of uncommited class components are now correctly disposed, fixes #3492.<br>
+    Reactions don't notify uncommited class components, avoiding the warning, fixes #3492.<br>
+    Removed symbol "polyfill" and replaced with actual Symbols.<br>
+    Removed `this.render` replacement detection + warning. `this.render` is no longer configurable/writable (possibly BC).<br>
+    Class component instance is no longer exposed as `component[$mobx]["reactcomponent"]` (possibly BC).<br>
+    Deprecated `disposeOnUnmount`, it's not compatible with remounting.<br>
+
+### Patch Changes
+
+-   Updated dependencies [[`44a2cf42`](https://github.com/mobxjs/mobx/commit/44a2cf42dec7635f639ddbfb19202ebc710bac54)]:
+    -   mobx-react-lite@4.0.0
+
 ## 7.6.0
 
 ### Minor Changes

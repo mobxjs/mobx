@@ -150,6 +150,11 @@ export class MobXGlobals {
      * configurable: true
      */
     safeDescriptors = true
+
+    /**
+     * Changes with each state update, used by useSyncExternalStore
+     */
+    stateVersion = Number.MIN_SAFE_INTEGER
 }
 
 let canMergeGlobalState = true

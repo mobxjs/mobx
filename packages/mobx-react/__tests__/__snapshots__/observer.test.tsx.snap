@@ -1,57 +1,10 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`#797 - replacing this.render should trigger a warning 1`] = `
-[MockFunction] {
-  "calls": Array [
-    Array [
-      "The reactive render of an observer class component (Component)
-                was overridden after MobX attached. This may result in a memory leak if the
-                overridden reactive render was not properly disposed.",
-    ],
-  ],
-  "results": Array [
-    Object {
-      "type": "return",
-      "value": undefined,
-    },
-  ],
-}
-`;
+exports[`#3492 should not cause warning by calling forceUpdate on uncommited components 1`] = `[MockFunction]`;
 
-exports[`Redeclaring an existing observer component as an observer should log a warning 1`] = `
-[MockFunction] {
-  "calls": Array [
-    Array [
-      "The provided component class (AlreadyObserver)
-                has already been declared as an observer component.",
-    ],
-  ],
-  "results": Array [
-    Object {
-      "type": "return",
-      "value": undefined,
-    },
-  ],
-}
-`;
+exports[`Redeclaring an existing observer component as an observer should throw 1`] = `"The provided component class (AlreadyObserver) has already been declared as an observer component."`;
 
-exports[`SSR works #3448 1`] = `
-[MockFunction] {
-  "calls": Array [
-    Array [
-      "The reactive render of an observer class component (TestCmp)
-                was overridden after MobX attached. This may result in a memory leak if the
-                overridden reactive render was not properly disposed.",
-    ],
-  ],
-  "results": Array [
-    Object {
-      "type": "return",
-      "value": undefined,
-    },
-  ],
-}
-`;
+exports[`SSR works #3448 1`] = `[MockFunction]`;
 
 exports[`issue 12 1`] = `
 <div>

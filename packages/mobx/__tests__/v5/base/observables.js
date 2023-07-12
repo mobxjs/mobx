@@ -15,7 +15,7 @@ const {
     isObservableProp
 } = mobx
 const utils = require("../../v5/utils/test-utils")
-const { MAX_SPLICE_SIZE } = require("../../../src/internal")
+const { MAX_SPLICE_SIZE, getGlobalState } = require("../../../src/internal")
 
 const voidObserver = function () {}
 
@@ -2359,4 +2359,31 @@ describe("`requiresObservable` takes precedence over global `reactionRequiresObs
         dispose()
         expect(consoleWarnSpy).not.toHaveBeenCalled()
     })
+})
+
+test("state version updates correctly", () => {
+    // This test was designed around the idea of updating version only at the end of batch,
+    // which is NOT an implementation we've settled on, but the test is still valid.
+
+    // This test demonstrates that the version is correctly updated with each state mutations:
+    // 1. Even without wrapping mutation in batch explicitely.
+    // 2. Even in self-invoking recursive derivation.
+    const o = mobx.observable({ x: 0 })
+    let prevStateVersion
+
+    const disposeAutorun = mobx.autorun(() => {
+        if (o.x === 5) {
+            disposeAutorun()
+            return
+        }
+        const currentStateVersion = getGlobalState().stateVersion
+        expect(prevStateVersion).not.toBe(currentStateVersion)
+        prevStateVersion = currentStateVersion
+        o.x++
+    })
+
+    prevStateVersion = getGlobalState().stateVersion
+    o.x++
+    expect(o.x).toBe(5)
+    expect(prevStateVersion).not.toBe(getGlobalState().stateVersion)
 })
