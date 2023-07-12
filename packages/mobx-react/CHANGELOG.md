@@ -1,5 +1,18 @@
 # mobx-react
 
+## 9.0.0
+
+### Major Changes
+
+-   [`473cb3f5`](https://github.com/mobxjs/mobx/commit/473cb3f5fc8bf43abdd1c9c7857fe2820d2291fe) [#3718](https://github.com/mobxjs/mobx/pull/3718) Thanks [@mweststrate](https://github.com/mweststrate)! - - Fixed `observer` in `StrictMode` #3671
+    -   **[BREAKING CHANGE]** Class component's `props`/`state`/`context` are no longer observable. Attempt to use these in any derivation other than component's `render` throws and error. For details see https://github.com/mobxjs/mobx/blob/main/packages/mobx-react/README.md#note-on-using-props-and-state-in-derivations
+    -   Extending or applying `observer` classes is now explicitly forbidden
+
+### Patch Changes
+
+-   Updated dependencies [[`58bb052c`](https://github.com/mobxjs/mobx/commit/58bb052ca41b8592e5bd5c3003b68ec52da53f33), [`473cb3f5`](https://github.com/mobxjs/mobx/commit/473cb3f5fc8bf43abdd1c9c7857fe2820d2291fe)]:
+    -   mobx-react-lite@4.0.3
+
 ## 8.0.0
 
 ### Major Changes
