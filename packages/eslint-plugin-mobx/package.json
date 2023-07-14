@@ -47,6 +47,6 @@
     "scripts": {
         "test": "jest",
         "build": "yarn rollup --config",
-        "prepublish": "yarn build"
+        "prepublishOnly": "yarn build"
     }
 }

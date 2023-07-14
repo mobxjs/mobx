@@ -1,5 +1,11 @@
 # mobx
 
+## 6.9.1
+
+### Patch Changes
+
+-   [`4792303e`](https://github.com/mobxjs/mobx/commit/4792303ec9119c1ba54134fff7e845d21a1d9337) [#3709](https://github.com/mobxjs/mobx/pull/3709) Thanks [@kubk](https://github.com/kubk)! - Make trace() noop in production build
+
 ## 6.9.0
 
 ### Minor Changes
