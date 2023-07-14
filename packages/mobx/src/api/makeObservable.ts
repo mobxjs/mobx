@@ -23,11 +23,6 @@ import {
 // Fixes: https://github.com/mobxjs/mobx/issues/2325#issuecomment-691070022
 type NoInfer<T> = [T][T extends any ? 0 : never]
 
-// Options property "proxy" designs for "observable" function,
-// and makeObservable and makeAutoObservable is not Supported
-// const foo = observable({}), foo.bar = 1 will be monitored,
-// const foo = observable({}, {proxy: false}), foo.bar = 1 will be not monitored
-// The summary is that proxy is an invalid option for makeObservable and makeAutoObservable
 type MakeObservableOptions = Omit<CreateObservableOptions, "proxy">
 
 export function makeObservable<T extends object, AdditionalKeys extends PropertyKey = never>(
