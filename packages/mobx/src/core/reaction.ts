@@ -18,7 +18,7 @@ import {
     spyReportStart,
     startBatch,
     trace,
-    trackDerivedFunction
+    trackDerivedFunction, GenericAbortSignal
 } from "../internal"
 
 /**
@@ -195,10 +195,23 @@ export class Reaction implements IDerivation, IReactionPublic {
         }
     }
 
-    getDisposer_(): IReactionDisposer {
+    getDisposer_(abortSignal?: GenericAbortSignal): IReactionDisposer {
         const r = this.dispose.bind(this) as IReactionDisposer
         r[$mobx] = this
-        return r
+
+        if(!abortSignal) {
+            return r
+        }
+
+        const onAbort = (() => {
+            r()
+            abortSignal!.removeEventListener?.("abort", onAbort)
+        }) as IReactionDisposer
+
+        abortSignal.addEventListener?.("abort", onAbort)
+        onAbort[$mobx] = this
+
+        return onAbort
     }
 
     toString() {
