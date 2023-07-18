@@ -2,4 +2,4 @@
 "mobx": minor
 ---
 
-Added support for `signal` (AbortSignal) in `autorun` and `reaction` options to dispose those
+Added support for `signal` (AbortSignal) in `autorun`, `reaction` and sync `when` options to dispose them
