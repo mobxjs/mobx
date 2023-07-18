@@ -367,7 +367,7 @@ Set a limited amount of time that `when` will wait for. If the deadline passes, 
 ### `signal`
 
 An AbortSignal object instance; can be used as an alternative method for disposal.<br>
-in the promise version of `when` when aborted, the promise rejects with the "WHEN_ABORTED" error.
+When used with promise version of `when`, the promise rejects with the "WHEN_ABORTED" error.
 
 ### `onError`
 
