@@ -196,22 +196,14 @@ export class Reaction implements IDerivation, IReactionPublic {
     }
 
     getDisposer_(abortSignal?: GenericAbortSignal): IReactionDisposer {
-        const r = this.dispose.bind(this) as IReactionDisposer
-        r[$mobx] = this
-
-        if(!abortSignal) {
-            return r
-        }
-
-        const onAbort = (() => {
-            r()
-            abortSignal!.removeEventListener?.("abort", onAbort)
+        const dispose = (() => {
+            this.dispose()
+            abortSignal?.removeEventListener?.("abort", dispose)
         }) as IReactionDisposer
+        abortSignal?.addEventListener?.("abort", dispose)
+        dispose[$mobx] = this
 
-        abortSignal.addEventListener?.("abort", onAbort)
-        onAbort[$mobx] = this
-
-        return onAbort
+        return dispose
     }
 
     toString() {
