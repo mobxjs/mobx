@@ -218,7 +218,7 @@ function createReaction(admin: ObserverAdministration) {
         if (!admin.mounted) {
             // This is neccessary to avoid react warning about calling forceUpdate on component that isn't mounted yet.
             // This happens when component is abandoned after render - our reaction is already created and reacts to changes.
-            // `componenDidMount` runs synchronously after `render`, so unlike functional component, there is no delay during which the reaction could be invalided.
+            // `componenDidMount` runs synchronously after `render`, so unlike functional component, there is no delay during which the reaction could be invalidated.
             // However `componentDidMount` runs AFTER it's descendants' `componentDidMount`, which CAN invalidate the reaction, see #3730. Therefore remember and forceUpdate on mount.
             admin.reactionInvalidatedBeforeMount = true
             return
