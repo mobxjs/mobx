@@ -2387,3 +2387,15 @@ test("state version updates correctly", () => {
     expect(o.x).toBe(5)
     expect(prevStateVersion).not.toBe(getGlobalState().stateVersion)
 })
+
+test.only("state version is not updated on observable creation", () => {
+    const globalState = getGlobalState()
+    let prevStateVersion = globalState.stateVersion
+    //mobx.observable({ x: 0 })
+    // mobx.observable.box(0)
+    //mobx.observable.map([["key", "val"]])
+    mobx.configure({ enforceActions: "always" })
+    mobx.makeAutoObservable({ x: "x" })
+
+    expect(prevStateVersion).toBe(globalState.stateVersion)
+})
