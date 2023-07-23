@@ -150,7 +150,7 @@ export function makeClassComponentObserver(
             // The reaction will be created lazily by following render.
 
             // Reaction invalidated before mount:
-            // 1. A descendant's `componenDidUpdate` invalidated it's parent #3730
+            // 1. A descendant's `componenDidMount` invalidated it's parent #3730
 
             admin.forceUpdate()
         }
@@ -167,6 +167,7 @@ export function makeClassComponentObserver(
         admin.reaction = null
         admin.forceUpdate = null
         admin.mounted = false
+        admin.reactionInvalidatedBeforeMount = false
     })
 
     return componentClass
