@@ -11,7 +11,8 @@ import {
     IEnhancer,
     isObservableArray,
     IObservableArray,
-    defineProperty
+    defineProperty,
+    globalState
 } from "../internal"
 
 // Bug in safari 9.* (or iOS 9 safari mobile). See #364
@@ -67,10 +68,15 @@ class LegacyObservableArray<T> extends StubArray {
         addHiddenFinalProp(this, $mobx, adm)
 
         if (initialValues && initialValues.length) {
-            const prev = allowStateChangesStart(true)
-            // @ts-ignore
-            this.spliceWithArray(0, 0, initialValues)
-            allowStateChangesEnd(prev)
+            const allowStateChanges = allowStateChangesStart(true)
+            globalState.suppressReportChanged = true
+            try {
+                // @ts-ignore
+                this.spliceWithArray(0, 0, initialValues)
+            } finally {
+                globalState.suppressReportChanged = false
+                allowStateChangesEnd(allowStateChanges)
+            }
         }
 
         if (safariPrototypeSetterInheritanceBug) {

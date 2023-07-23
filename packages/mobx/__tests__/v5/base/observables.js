@@ -2388,14 +2388,98 @@ test("state version updates correctly", () => {
     expect(prevStateVersion).not.toBe(getGlobalState().stateVersion)
 })
 
-test.only("state version is not updated on observable creation", () => {
-    const globalState = getGlobalState()
-    let prevStateVersion = globalState.stateVersion
-    //mobx.observable({ x: 0 })
-    // mobx.observable.box(0)
-    //mobx.observable.map([["key", "val"]])
-    mobx.configure({ enforceActions: "always" })
-    mobx.makeAutoObservable({ x: "x" })
+test('Observables initialization does not violate `enforceActions: "always"`', () => {
+    const consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation(() => {})
 
-    expect(prevStateVersion).toBe(globalState.stateVersion)
+    const check = cb => {
+        cb()
+        expect(consoleWarnSpy).not.toBeCalled()
+    }
+
+    class MakeObservable {
+        x = 0
+        constructor() {
+            mobx.makeObservable(this, { x: true })
+        }
+    }
+    class MakeAutoObservable {
+        x = 0
+        constructor() {
+            mobx.makeAutoObservable(this)
+        }
+    }
+
+    try {
+        mobx.configure({ enforceActions: "always" })
+        check(() => mobx.observable(0))
+        check(() => new MakeObservable())
+        check(() => mobx.makeObservable({ x: 0 }, { x: true }))
+        check(() => new MakeAutoObservable())
+        check(() => mobx.makeAutoObservable({ x: 0 }))
+        check(() => mobx.observable(new Set([0])))
+        check(() => mobx.observable(new Map([[0, 0]])))
+        check(() => mobx.observable({ x: 0 }, { proxy: false }))
+        check(() => mobx.observable({ x: 0 }, { proxy: true }))
+        check(() => mobx.observable([0], { proxy: false }))
+        check(() => mobx.observable([0], { proxy: true }))
+        check(() => mobx.computed(() => 0))
+    } finally {
+        consoleWarnSpy.mockRestore()
+        mobx._resetGlobalState()
+    }
+})
+
+test("enforceAction is respected when changing keys of observable object", () => {
+    const consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation(() => {})
+    try {
+        mobx.configure({ enforceActions: "always" })
+        const o = mobx.observable({ x: 0 })
+
+        o.y = 0
+        expect(consoleWarnSpy).toBeCalled()
+
+        consoleWarnSpy.mockClear()
+
+        delete o.x
+        expect(consoleWarnSpy).toBeCalled()
+    } finally {
+        consoleWarnSpy.mockRestore()
+        mobx._resetGlobalState()
+    }
+})
+
+test("state version does not update on observable creation", () => {
+    const globalState = getGlobalState()
+
+    const check = cb => {
+        const prevStateVersion = globalState.stateVersion
+        cb()
+        expect(prevStateVersion).toBe(globalState.stateVersion)
+    }
+
+    class MakeObservable {
+        x = 0
+        constructor() {
+            mobx.makeObservable(this, { x: true })
+        }
+    }
+    class MakeAutoObservable {
+        x = 0
+        constructor() {
+            mobx.makeAutoObservable(this)
+        }
+    }
+
+    check(() => mobx.observable(0))
+    check(() => new MakeObservable())
+    check(() => mobx.makeObservable({ x: 0 }, { x: true }))
+    check(() => new MakeAutoObservable())
+    check(() => mobx.makeAutoObservable({ x: 0 }))
+    check(() => mobx.observable(new Set([0])))
+    check(() => mobx.observable(new Map([[0, 0]])))
+    check(() => mobx.observable({ x: 0 }, { proxy: false }))
+    check(() => mobx.observable({ x: 0 }, { proxy: true }))
+    check(() => mobx.observable([0], { proxy: false }))
+    check(() => mobx.observable([0], { proxy: true }))
+    check(() => mobx.computed(() => 0))
 })

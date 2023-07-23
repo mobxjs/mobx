@@ -27,7 +27,10 @@ import {
     DELETE,
     ADD,
     die,
-    isFunction
+    isFunction,
+    allowStateChangesStart,
+    globalState,
+    allowStateChangesEnd
 } from "../internal"
 
 const ObservableSetMarker = {}
@@ -82,7 +85,14 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
         this.atom_ = createAtom(this.name_)
         this.enhancer_ = (newV, oldV) => enhancer(newV, oldV, name_)
         if (initialData) {
-            this.replace(initialData)
+            const allowStateChanges = allowStateChangesStart(true)
+            globalState.suppressReportChanged = true
+            try {
+                this.replace(initialData)
+            } finally {
+                globalState.suppressReportChanged = false
+                allowStateChangesEnd(allowStateChanges)
+            }
         }
     }
 

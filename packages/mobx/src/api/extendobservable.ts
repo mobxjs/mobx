@@ -11,7 +11,10 @@ import {
     die,
     getOwnPropertyDescriptors,
     $mobx,
-    ownKeys
+    ownKeys,
+    globalState,
+    allowStateChangesStart,
+    allowStateChangesEnd
 } from "../internal"
 
 export function extendObservable<A extends Object, B extends Object>(
@@ -41,6 +44,8 @@ export function extendObservable<A extends Object, B extends Object>(
     const descriptors = getOwnPropertyDescriptors(properties)
 
     const adm: ObservableObjectAdministration = asObservableObject(target, options)[$mobx]
+    const allowStateChanges = allowStateChangesStart(true)
+    globalState.suppressReportChanged = true
     startBatch()
     try {
         ownKeys(descriptors).forEach(key => {
@@ -52,6 +57,8 @@ export function extendObservable<A extends Object, B extends Object>(
             )
         })
     } finally {
+        globalState.suppressReportChanged = false
+        allowStateChangesEnd(allowStateChanges)
         endBatch()
     }
     return target as any

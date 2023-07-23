@@ -13,7 +13,10 @@ import {
     ownKeys,
     extendObservable,
     addHiddenProp,
-    storedAnnotationsSymbol
+    storedAnnotationsSymbol,
+    globalState,
+    allowStateChangesStart,
+    allowStateChangesEnd
 } from "../internal"
 
 // Hack based on https://github.com/Microsoft/TypeScript/issues/14829#issuecomment-322267089
@@ -31,7 +34,9 @@ export function makeObservable<T extends object, AdditionalKeys extends Property
     options?: MakeObservableOptions
 ): T {
     const adm: ObservableObjectAdministration = asObservableObject(target, options)[$mobx]
-    startBatch()
+    startBatch() // TODO useless?
+    const allowStateChanges = allowStateChangesStart(true)
+    globalState.suppressReportChanged = true
     try {
         if (__DEV__ && annotations && target[storedAnnotationsSymbol]) {
             die(
@@ -44,6 +49,8 @@ export function makeObservable<T extends object, AdditionalKeys extends Property
         // Annotate
         ownKeys(annotations).forEach(key => adm.make_(key, annotations![key]))
     } finally {
+        globalState.suppressReportChanged = false
+        allowStateChangesEnd(allowStateChanges)
         endBatch()
     }
     return target
@@ -84,7 +91,9 @@ export function makeAutoObservable<T extends object, AdditionalKeys extends Prop
         addHiddenProp(proto, keysSymbol, keys)
     }
 
-    startBatch()
+    const allowStateChanges = allowStateChangesStart(true)
+    globalState.suppressReportChanged = true
+    startBatch() // TODO useless?
     try {
         target[keysSymbol].forEach(key =>
             adm.make_(
@@ -94,6 +103,8 @@ export function makeAutoObservable<T extends object, AdditionalKeys extends Prop
             )
         )
     } finally {
+        globalState.suppressReportChanged = false
+        allowStateChangesEnd(allowStateChanges)
         endBatch()
     }
     return target

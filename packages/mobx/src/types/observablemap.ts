@@ -35,7 +35,8 @@ import {
     UPDATE,
     IAtom,
     PureSpyEvent,
-    allowStateChanges
+    allowStateChangesStart,
+    allowStateChangesEnd
 } from "../internal"
 
 export interface IKeyValueMap<V = any> {
@@ -90,7 +91,8 @@ export type IObservableMapInitialValues<K = any, V = any> =
 // just extend Map? See also https://gist.github.com/nestharus/13b4d74f2ef4a2f4357dbd3fc23c1e54
 // But: https://github.com/mobxjs/mobx/issues/1556
 export class ObservableMap<K = any, V = any>
-    implements Map<K, V>, IInterceptable<IMapWillChange<K, V>>, IListenable {
+    implements Map<K, V>, IInterceptable<IMapWillChange<K, V>>, IListenable
+{
     [$mobx] = ObservableMapMarker
     data_: Map<K, ObservableValue<V>>
     hasMap_: Map<K, ObservableValue<boolean>> // hasMap, not hashMap >-).
@@ -110,9 +112,16 @@ export class ObservableMap<K = any, V = any>
         this.keysAtom_ = createAtom(__DEV__ ? `${this.name_}.keys()` : "ObservableMap.keys()")
         this.data_ = new Map()
         this.hasMap_ = new Map()
-        allowStateChanges(true, () => {
-            this.merge(initialData)
-        })
+        if (initialData) {
+            const allowStateChanges = allowStateChangesStart(true)
+            globalState.suppressReportChanged = true
+            try {
+                this.merge(initialData)
+            } finally {
+                globalState.suppressReportChanged = false
+                allowStateChangesEnd(allowStateChanges)
+            }
+        }
     }
 
     private has_(key: K): boolean {

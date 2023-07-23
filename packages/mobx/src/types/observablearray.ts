@@ -411,9 +411,14 @@ export function createObservableArray<T>(
     const proxy = new Proxy(adm.values_, arrayTraps) as any
     adm.proxy_ = proxy
     if (initialValues && initialValues.length) {
-        const prev = allowStateChangesStart(true)
-        adm.spliceWithArray_(0, 0, initialValues)
-        allowStateChangesEnd(prev)
+        const allowStateChanges = allowStateChangesStart(true)
+        globalState.suppressReportChanged = true
+        try {
+            adm.spliceWithArray_(0, 0, initialValues)
+        } finally {
+            globalState.suppressReportChanged = false
+            allowStateChangesEnd(allowStateChanges)
+        }
     }
     return proxy
 }
