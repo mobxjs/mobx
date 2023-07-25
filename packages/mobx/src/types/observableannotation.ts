@@ -85,30 +85,26 @@ function decorate_20223_(
         initializedObjects.add(target)
     }
 
-    if (kind == "accessor") {
-        return {
-            get() {
-                if (!initializedObjects.has(this)) {
-                    initializeObservable(this, desc.get.call(this))
-                }
-                return this[$mobx].getObservablePropValue_(name)
-            },
-            set(value) {
-                if (!initializedObjects.has(this)) {
-                    initializeObservable(this, value)
-                }
-                return this[$mobx].setObservablePropValue_(name, value)
-            },
-            init(value) {
-                if (!initializedObjects.has(this)) {
-                    initializeObservable(this, value)
-                }
-                return value
+    return {
+        get() {
+            if (!initializedObjects.has(this)) {
+                initializeObservable(this, desc.get.call(this))
             }
+            return this[$mobx].getObservablePropValue_(name)
+        },
+        set(value) {
+            if (!initializedObjects.has(this)) {
+                initializeObservable(this, value)
+            }
+            return this[$mobx].setObservablePropValue_(name, value)
+        },
+        init(value) {
+            if (!initializedObjects.has(this)) {
+                initializeObservable(this, value)
+            }
+            return value
         }
     }
-
-    return
 }
 
 function assertObservableDescriptor(

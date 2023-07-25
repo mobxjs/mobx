@@ -62,9 +62,11 @@ MobX' 2022.3 Decorators are very similar to the pre-MobX 6 decorators, so usage 
     -   Addressing rest-destructuring, such is an anti-pattern in MobX - doing so would (likely unwantedly) touch all observables and make the observer overly-reactive).
 -   `@action some_field = () => {}` was and is valid usage (_if_ `makeObservable()` is also used). However, `@action accessor some_field = () => {}` is never valid.
 
-## Legacy Decorators
+<details id="legacy-decorators"><summary>Legacy Decorators<a href="#legacy-decorators" class="tip-anchor"></a></summary>
 
 We do not recommend new codebases that use MobX use legacy decorators until the point when they become an official part of the language, but you can still use them. It does require setup for transpilation so you have to use Babel or TypeScript.
+
+</details>
 
 ## MobX Core decorators {🚀}
 

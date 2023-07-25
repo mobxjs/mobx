@@ -682,13 +682,13 @@ test("reusing initializers", () => {
 
 test("enumerability", () => {
     class A {
-        @observable accessor a = 1 // enumerable, on proto
+        @observable accessor a = 1
         @computed
         get b() {
             return this.a
-        } // non-enumerable, (and, ideally, on proto)
+        }
         @action
-        m() {} // non-enumerable, on proto
+        m() {}
     }
 
     const a = new A()
