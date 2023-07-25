@@ -1,19 +1,19 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`observe & intercept 1`] = `
-Array [
-  Object {
-    "intercept": Object {
+[
+  {
+    "intercept": {
       "name": "b",
-      "newValue": Object {
+      "newValue": {
         "title": "get tea",
       },
       "object": "skip",
       "type": "add",
     },
   },
-  Object {
-    "intercept": Object {
+  {
+    "intercept": {
       "name": "a",
       "object": "skip",
       "type": "remove",
@@ -23,12 +23,12 @@ Array [
 `;
 
 exports[`observe & intercept 2`] = `
-Array [
-  Object {
-    "observe": Object {
+[
+  {
+    "observe": {
       "debugObjectName": "TestObject",
       "name": "b",
-      "newValue": Object {
+      "newValue": {
         "title": "get tea",
       },
       "object": "skip",
@@ -36,13 +36,13 @@ Array [
       "type": "add",
     },
   },
-  Object {
-    "observe": Object {
+  {
+    "observe": {
       "debugObjectName": "TestObject",
       "name": "a",
       "object": "skip",
       "observableKind": "object",
-      "oldValue": Object {
+      "oldValue": {
         "title": "get coffee",
       },
       "type": "remove",

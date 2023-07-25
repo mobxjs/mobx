@@ -13,6 +13,16 @@ expect(observerFinalizationRegistry).toBeInstanceOf(globalThis.FinalizationRegis
 
 afterEach(cleanup)
 
+function nextFrame() {
+    return new Promise(accept => setTimeout(accept, 1))
+}
+
+async function gc_cycle() {
+    await nextFrame()
+    gc()
+    await nextFrame()
+}
+
 test("uncommitted components should not leak observations", async () => {
     jest.setTimeout(30_000)
     const store = mobx.observable({ count1: 0, count2: 0 })
@@ -42,9 +52,8 @@ test("uncommitted components should not leak observations", async () => {
     )
 
     // Allow gc to kick in in case to let finalization registry cleanup
-    await new Promise(resolve => setTimeout(resolve, 0))
-    gc()
-    await new Promise(resolve => setTimeout(resolve, 0))
+    await gc_cycle()
+
     // Can take a while (especially on CI) before gc actually calls the registry
     await waitFor(
         () => {

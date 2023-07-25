@@ -1,5 +1,7 @@
 import { Annotation, addHiddenProp, AnnotationsMap, hasProp, die, isOverride } from "../internal"
 
+import type { Decorator } from "../types/decorator_fills"
+
 export const storedAnnotationsSymbol = Symbol("mobx-stored-annotations")
 
 /**
@@ -7,11 +9,17 @@ export const storedAnnotationsSymbol = Symbol("mobx-stored-annotations")
  * - decorator
  * - annotation object
  */
-export function createDecoratorAnnotation(annotation: Annotation): PropertyDecorator & Annotation {
+export function createDecoratorAnnotation<D extends Decorator = Decorator>(
+    annotation: Annotation
+): PropertyDecorator & Annotation & D {
     function decorator(target, property) {
-        storeAnnotation(target, property, annotation)
+        if (is20223Decorator(property)) {
+            return annotation.decorate_20223_(target, property)
+        } else {
+            storeAnnotation(target, property, annotation)
+        }
     }
-    return Object.assign(decorator, annotation)
+    return Object.assign(decorator, annotation) as any
 }
 
 /**
@@ -61,13 +69,26 @@ function assertNotDecorated(prototype: object, annotation: Annotation, key: Prop
  */
 export function collectStoredAnnotations(target): AnnotationsMap<any, any> {
     if (!hasProp(target, storedAnnotationsSymbol)) {
-        if (__DEV__ && !target[storedAnnotationsSymbol]) {
-            die(
-                `No annotations were passed to makeObservable, but no decorated members have been found either`
-            )
-        }
+        // if (__DEV__ && !target[storedAnnotationsSymbol]) {
+        //     die(
+        //         `No annotations were passed to makeObservable, but no decorated members have been found either`
+        //     )
+        // }
         // We need a copy as we will remove annotation from the list once it's applied.
         addHiddenProp(target, storedAnnotationsSymbol, { ...target[storedAnnotationsSymbol] })
     }
     return target[storedAnnotationsSymbol]
+}
+
+export function is20223Decorator(context): context is DecoratorContext {
+    return typeof context == "object" && typeof context["kind"] == "string"
+}
+
+export function assert20223DecoratorType(
+    context: DecoratorContext,
+    types: DecoratorContext["kind"][]
+) {
+    if (__DEV__ && !types.includes(context.kind)) {
+        die(`Decorator may not be used like this`)
+    }
 }

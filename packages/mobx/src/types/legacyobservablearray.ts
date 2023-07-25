@@ -53,7 +53,7 @@ inherit(StubArray, Array.prototype)
 // but it is unclear why the hack is need as MobX never changed the prototype
 // anyway, so removed it in V6
 
-class LegacyObservableArray<T> extends StubArray {
+export class LegacyObservableArray<T> extends StubArray {
     constructor(
         initialValues: T[] | undefined,
         enhancer: IEnhancer<T>,
