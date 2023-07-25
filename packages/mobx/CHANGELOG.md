@@ -1,5 +1,21 @@
 # mobx
 
+## 6.10.0
+
+### Minor Changes
+
+-   [`bebd5f05`](https://github.com/mobxjs/mobx/commit/bebd5f0507a109145f401c78630ed9d59e4a1101) [#3727](https://github.com/mobxjs/mobx/pull/3727) Thanks [@rluvaton](https://github.com/rluvaton)! - Added support for `signal` (AbortSignal) in `autorun`, `reaction` and sync `when` options to dispose them
+
+### Patch Changes
+
+-   [`55f78ddc`](https://github.com/mobxjs/mobx/commit/55f78ddc20e84f38a7aa88b99a51ad994e558241) [#3717](https://github.com/mobxjs/mobx/pull/3717) Thanks [@liucan233](https://github.com/liucan233)! - remove proxy option for makeObservable and makeAutoObservable
+
+## 6.9.1
+
+### Patch Changes
+
+-   [`4792303e`](https://github.com/mobxjs/mobx/commit/4792303ec9119c1ba54134fff7e845d21a1d9337) [#3709](https://github.com/mobxjs/mobx/pull/3709) Thanks [@kubk](https://github.com/kubk)! - Make trace() noop in production build
+
 ## 6.9.0
 
 ### Minor Changes

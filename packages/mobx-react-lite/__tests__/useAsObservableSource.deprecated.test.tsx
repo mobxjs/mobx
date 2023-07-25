@@ -126,19 +126,19 @@ describe("base useAsObservableSource should work", () => {
         const { container } = render(<Parent />)
 
         expect(container.querySelector("span")!.innerHTML).toBe("10")
-        expect(counterRender).toBe(1)
+        expect(counterRender).toBe(2)
 
         act(() => {
             ;(container.querySelector("#inc")! as any).click()
         })
         expect(container.querySelector("span")!.innerHTML).toBe("11")
-        expect(counterRender).toBe(2)
+        expect(counterRender).toBe(3)
 
         act(() => {
             ;(container.querySelector("#incmultiplier")! as any).click()
         })
         expect(container.querySelector("span")!.innerHTML).toBe("22")
-        expect(counterRender).toBe(4) // TODO: should be 3
+        expect(counterRender).toBe(5) // TODO: should be 3
     })
 })
 
@@ -271,7 +271,7 @@ describe("combining observer with props and stores", () => {
             store.x = 10
         })
 
-        expect(renderedValues).toEqual([10, 15, 15, 20]) // TODO: should have one 15 less
+        expect(renderedValues).toEqual([10, 10, 15, 15, 20]) // TODO: should have one 15 less
 
         // TODO: re-enable this line. When debugging, the correct value is returned from render,
         // which is also visible with renderedValues, however, querying the dom doesn't show the correct result

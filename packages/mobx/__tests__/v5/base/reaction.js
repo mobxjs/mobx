@@ -260,6 +260,48 @@ test("can dispose reaction on first run", () => {
     expect(valuesEffect).toEqual([])
 })
 
+test("can dispose reaction with AbortSignal", () => {
+    const a = mobx.observable.box(1)
+    const ac = new AbortController()
+    const values = []
+
+    reaction(
+        () => a.get(),
+        (newValue, oldValue) => {
+            values.push([newValue, oldValue])
+        },
+        { signal: ac.signal }
+    )
+
+    a.set(2)
+    a.set(3)
+    ac.abort()
+    a.set(4)
+
+    expect(values).toEqual([
+        [2, 1],
+        [3, 2]
+    ])
+})
+
+test("fireImmediately should not be honored when passed already aborted AbortSignal", () => {
+    const a = mobx.observable.box(1)
+    const ac = new AbortController()
+    const values = []
+
+    ac.abort()
+
+    reaction(
+        () => a.get(),
+        (newValue) => {
+            values.push(newValue)
+        },
+        { signal: ac.signal, fireImmediately: true }
+    )
+
+    expect(values).toEqual([])
+})
+
 test("#278 do not rerun if expr output doesn't change", () => {
     const a = mobx.observable.box(1)
     const values = []

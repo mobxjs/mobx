@@ -12,7 +12,7 @@ const getServerSnapshot = () => {}
 // otherwise it will prevent GC and therefore reaction disposal via FinalizationRegistry.
 type ObserverAdministration = {
     reaction: Reaction | null // also serves as disposed flag
-    forceUpdate: Function | null // also serves as mounted flag
+    onStoreChange: Function | null // also serves as mounted flag
     // BC: we will use local state version if global isn't available.
     // It should behave as previous implementation - tearing is still present,
     // because there is no cross component synchronization,
@@ -27,7 +27,7 @@ type ObserverAdministration = {
 const mobxGlobalState = _getGlobalState()
 
 // BC
-const globalStateVersionIsAvailable = typeof mobxGlobalState.globalVersion !== "undefined"
+const globalStateVersionIsAvailable = typeof mobxGlobalState.stateVersion !== "undefined"
 
 function createReaction(adm: ObserverAdministration) {
     adm.reaction = new Reaction(`observer${adm.name}`, () => {
@@ -35,10 +35,10 @@ function createReaction(adm: ObserverAdministration) {
             // BC
             adm.stateVersion = Symbol()
         }
-        // Force update won't be avaliable until the component "mounts".
+        // onStoreChange won't be available until the component "mounts".
         // If state changes in between initial render and mount,
         // `useSyncExternalStore` should handle that by checking the state version and issuing update.
-        adm.forceUpdate?.()
+        adm.onStoreChange?.()
     })
 }
 
@@ -49,28 +49,34 @@ export function useObserver<T>(render: () => T, baseComponentName: string = "obs
 
     const admRef = React.useRef<ObserverAdministration | null>(null)
 
+    // Provides ability to force component update without changing state version
+    const [, forceUpdate] = React.useState<Symbol>()
+
     if (!admRef.current) {
         // First render
         const adm: ObserverAdministration = {
             reaction: null,
-            forceUpdate: null,
+            onStoreChange: null,
             stateVersion: Symbol(),
             name: baseComponentName,
             subscribe(onStoreChange: () => void) {
                 // Do NOT access admRef here!
                 observerFinalizationRegistry.unregister(adm)
-                adm.forceUpdate = onStoreChange
+                adm.onStoreChange = onStoreChange
                 if (!adm.reaction) {
-                    // We've lost our reaction and therefore all subscriptions.
+                    // We've lost our reaction and therefore all subscriptions, occurs when:
+                    // 1. Timer based finalization registry disposed reaction before component mounted.
+                    // 2. React "re-mounts" same component without calling render in between (typically <StrictMode>).
                     // We have to recreate reaction and schedule re-render to recreate subscriptions,
                     // even if state did not change.
                     createReaction(adm)
-                    adm.forceUpdate()
+                    // `onStoreChange` won't force update if subsequent `getSnapshot` returns same value.
+                    forceUpdate(Symbol())
                 }
 
                 return () => {
                     // Do NOT access admRef here!
-                    adm.forceUpdate = null
+                    adm.onStoreChange = null
                     adm.reaction?.dispose()
                     adm.reaction = null
                 }

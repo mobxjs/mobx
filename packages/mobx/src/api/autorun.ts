@@ -12,7 +12,8 @@ import {
     isFunction,
     isPlainObject,
     die,
-    allowStateChanges
+    allowStateChanges,
+    GenericAbortSignal
 } from "../internal"
 
 export interface IAutorunOptions {
@@ -25,6 +26,7 @@ export interface IAutorunOptions {
     requiresObservable?: boolean
     scheduler?: (callback: () => void) => any
     onError?: (error: any) => void
+    signal?: GenericAbortSignal
 }
 
 /**
@@ -88,8 +90,10 @@ export function autorun(
         view(reaction)
     }
 
-    reaction.schedule_()
-    return reaction.getDisposer_()
+    if(!opts?.signal?.aborted) {
+        reaction.schedule_()
+    }
+    return reaction.getDisposer_(opts?.signal)
 }
 
 export type IReactionOptions<T, FireImmediately extends boolean> = IAutorunOptions & {
@@ -178,8 +182,10 @@ export function reaction<T, FireImmediately extends boolean = false>(
         firstTime = false
     }
 
-    r.schedule_()
-    return r.getDisposer_()
+    if(!opts?.signal?.aborted) {
+        r.schedule_()
+    }
+    return r.getDisposer_(opts?.signal)
 }
 
 function wrapErrorHandler(errorHandler, baseFn) {
