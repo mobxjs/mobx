@@ -1107,3 +1107,24 @@ test("StrictMode #3671", async () => {
     )
     expect(container).toHaveTextContent("1")
 })
+
+test("`isolateGlobalState` shouldn't break reactivity #3734", async () => {
+    mobx.configure({ isolateGlobalState: true })
+
+    const o = mobx.observable({ x: 0 })
+
+    const Cmp = observer(() => o.x as any)
+
+    const { container, unmount } = render(<Cmp />)
+
+    expect(container).toHaveTextContent("0")
+    act(
+        mobx.action(() => {
+            o.x++
+        })
+    )
+    expect(container).toHaveTextContent("1")
+    unmount()
+
+    mobx._resetGlobalState()
+})
