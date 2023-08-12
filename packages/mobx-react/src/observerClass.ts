@@ -28,6 +28,7 @@ type ObserverAdministration = {
     reaction: Reaction | null // also serves as disposed flag
     forceUpdate: Function | null
     mounted: boolean // we could use forceUpdate as mounted flag
+    reactionInvalidatedBeforeMount: boolean
     name: string
     // Used only on __DEV__
     props: any
@@ -42,6 +43,7 @@ function getAdministration(component: Component): ObserverAdministration {
     return (component[administrationSymbol] ??= {
         reaction: null,
         mounted: false,
+        reactionInvalidatedBeforeMount: false,
         forceUpdate: null,
         name: getDisplayName(component.constructor as ComponentClass),
         state: undefined,
@@ -139,12 +141,17 @@ export function makeClassComponentObserver(
         // As an alternative we could have `admin.instanceRef = new WeakRef(this)`, but lets avoid it if possible.
         admin.forceUpdate = () => this.forceUpdate()
 
-        if (!admin.reaction) {
+        if (!admin.reaction || admin.reactionInvalidatedBeforeMount) {
+            // Missing reaction:
             // 1. Instance was unmounted (reaction disposed) and immediately remounted without running render #3395.
             // 2. Reaction was disposed by finalization registry before mount. Shouldn't ever happen for class components:
             // `componentDidMount` runs synchronously after render, but our registry are deferred (can't run in between).
             // In any case we lost subscriptions to observables, so we have to create new reaction and re-render to resubscribe.
             // The reaction will be created lazily by following render.
+
+            // Reaction invalidated before mount:
+            // 1. A descendant's `componenDidMount` invalidated it's parent #3730
+
             admin.forceUpdate()
         }
         return originalComponentDidMount?.apply(this, arguments)
@@ -160,6 +167,7 @@ export function makeClassComponentObserver(
         admin.reaction = null
         admin.forceUpdate = null
         admin.mounted = false
+        admin.reactionInvalidatedBeforeMount = false
     })
 
     return componentClass
@@ -211,7 +219,9 @@ function createReaction(admin: ObserverAdministration) {
         if (!admin.mounted) {
             // This is neccessary to avoid react warning about calling forceUpdate on component that isn't mounted yet.
             // This happens when component is abandoned after render - our reaction is already created and reacts to changes.
-            // Due to the synchronous nature of `componenDidMount`, we don't have to worry that component could eventually mount and require update.
+            // `componenDidMount` runs synchronously after `render`, so unlike functional component, there is no delay during which the reaction could be invalidated.
+            // However `componentDidMount` runs AFTER it's descendants' `componentDidMount`, which CAN invalidate the reaction, see #3730. Therefore remember and forceUpdate on mount.
+            admin.reactionInvalidatedBeforeMount = true
             return
         }
 

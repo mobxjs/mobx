@@ -19,7 +19,7 @@ export const $mobx = Symbol("mobx administration")
 
 export interface IAtom extends IObservable {
     reportObserved(): boolean
-    reportChanged()
+    reportChanged(): void
 }
 
 export class Atom implements IAtom {
