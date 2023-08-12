@@ -2388,6 +2388,15 @@ test("state version updates correctly", () => {
     expect(prevStateVersion).not.toBe(getGlobalState().stateVersion)
 })
 
+test("Atom.reportChanged does change state version when called from the batch the atom was created in", () => {
+    mobx.transaction(() => {
+        const prevStateVersion = getGlobalState().stateVersion
+        const atom = mobx.createAtom()
+        atom.reportChanged()
+        expect(prevStateVersion).toBe(getGlobalState().stateVersion)
+    })
+})
+
 test('Observables initialization does not violate `enforceActions: "always"`', () => {
     const consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation(() => {})
 
@@ -2416,6 +2425,7 @@ test('Observables initialization does not violate `enforceActions: "always"`', (
         check(() => mobx.makeObservable({ x: 0 }, { x: true }))
         check(() => new MakeAutoObservable())
         check(() => mobx.makeAutoObservable({ x: 0 }))
+        check(() => mobx.extendObservable({}, { x: 0 }))
         check(() => mobx.observable(new Set([0])))
         check(() => mobx.observable(new Map([[0, 0]])))
         check(() => mobx.observable({ x: 0 }, { proxy: false }))
@@ -2470,11 +2480,23 @@ test("state version does not update on observable creation", () => {
         }
     }
 
+    class MakeObservableSubclass extends MakeObservable {
+        y = 0
+        constructor() {
+            super()
+            mobx.makeObservable(this, { y: true })
+        }
+    }
+
     check(() => mobx.observable(0))
     check(() => new MakeObservable())
+    // Batch is required by design - without batch reactions can be created/invoked inbetween individual constructors and they must see updated state version.
+    // https://github.com/mobxjs/mobx/pull/3732#discussion_r1285099080
+    check(mobx.action(() => new MakeObservableSubclass()))
     check(() => mobx.makeObservable({ x: 0 }, { x: true }))
     check(() => new MakeAutoObservable())
     check(() => mobx.makeAutoObservable({ x: 0 }))
+    check(() => mobx.extendObservable({}, { x: 0 }))
     check(() => mobx.observable(new Set([0])))
     check(() => mobx.observable(new Map([[0, 0]])))
     check(() => mobx.observable({ x: 0 }, { proxy: false }))

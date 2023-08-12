@@ -116,7 +116,7 @@ describe("is used to keep observable within component body", () => {
         fireEvent.click(div)
         expect(div.textContent).toBe("3-2")
 
-        expect(renderCount).toBe(4)
+        expect(renderCount).toBe(3)
     })
 
     it("actions can be used", () => {
@@ -418,19 +418,19 @@ describe("is used to keep observable within component body", () => {
             const { container } = render(<Parent />)
 
             expect(container.querySelector("span")!.innerHTML).toBe("10")
-            expect(counterRender).toBe(2)
+            expect(counterRender).toBe(1)
 
             act(() => {
                 ;(container.querySelector("#inc")! as any).click()
             })
             expect(container.querySelector("span")!.innerHTML).toBe("11")
-            expect(counterRender).toBe(3)
+            expect(counterRender).toBe(2)
 
             act(() => {
                 ;(container.querySelector("#incmultiplier")! as any).click()
             })
             expect(container.querySelector("span")!.innerHTML).toBe("22")
-            expect(counterRender).toBe(5) // TODO: should be 3
+            expect(counterRender).toBe(4) // One from props, second from updating local observable with effect
         })
     })
 })

@@ -35,8 +35,7 @@ import {
     UPDATE,
     IAtom,
     PureSpyEvent,
-    allowStateChangesStart,
-    allowStateChangesEnd
+    initObservable
 } from "../internal"
 
 export interface IKeyValueMap<V = any> {
@@ -94,9 +93,9 @@ export class ObservableMap<K = any, V = any>
     implements Map<K, V>, IInterceptable<IMapWillChange<K, V>>, IListenable
 {
     [$mobx] = ObservableMapMarker
-    data_: Map<K, ObservableValue<V>>
-    hasMap_: Map<K, ObservableValue<boolean>> // hasMap, not hashMap >-).
-    keysAtom_: IAtom
+    data_!: Map<K, ObservableValue<V>>
+    hasMap_!: Map<K, ObservableValue<boolean>> // hasMap, not hashMap >-).
+    keysAtom_!: IAtom
     interceptors_
     changeListeners_
     dehancer: any
@@ -109,19 +108,14 @@ export class ObservableMap<K = any, V = any>
         if (!isFunction(Map)) {
             die(18)
         }
-        this.keysAtom_ = createAtom(__DEV__ ? `${this.name_}.keys()` : "ObservableMap.keys()")
-        this.data_ = new Map()
-        this.hasMap_ = new Map()
-        if (initialData) {
-            const allowStateChanges = allowStateChangesStart(true)
-            globalState.suppressReportChanged = true
-            try {
+        initObservable(() => {
+            this.keysAtom_ = createAtom(__DEV__ ? `${this.name_}.keys()` : "ObservableMap.keys()")
+            this.data_ = new Map()
+            this.hasMap_ = new Map()
+            if (initialData) {
                 this.merge(initialData)
-            } finally {
-                globalState.suppressReportChanged = false
-                allowStateChangesEnd(allowStateChanges)
             }
-        }
+        })
     }
 
     private has_(key: K): boolean {

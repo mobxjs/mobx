@@ -22,13 +22,12 @@ import {
     registerListener,
     spyReportEnd,
     spyReportStart,
-    allowStateChangesStart,
-    allowStateChangesEnd,
     assertProxies,
     reserveArrayBuffer,
     hasProp,
     die,
-    globalState
+    globalState,
+    initObservable
 } from "../internal"
 
 const SPLICE = "splice"
@@ -406,21 +405,16 @@ export function createObservableArray<T>(
     owned = false
 ): IObservableArray<T> {
     assertProxies()
-    const adm = new ObservableArrayAdministration(name, enhancer, owned, false)
-    addHiddenFinalProp(adm.values_, $mobx, adm)
-    const proxy = new Proxy(adm.values_, arrayTraps) as any
-    adm.proxy_ = proxy
-    if (initialValues && initialValues.length) {
-        const allowStateChanges = allowStateChangesStart(true)
-        globalState.suppressReportChanged = true
-        try {
+    return initObservable(() => {
+        const adm = new ObservableArrayAdministration(name, enhancer, owned, false)
+        addHiddenFinalProp(adm.values_, $mobx, adm)
+        const proxy = new Proxy(adm.values_, arrayTraps) as any
+        adm.proxy_ = proxy
+        if (initialValues && initialValues.length) {
             adm.spliceWithArray_(0, 0, initialValues)
-        } finally {
-            globalState.suppressReportChanged = false
-            allowStateChangesEnd(allowStateChanges)
         }
-    }
-    return proxy
+        return proxy
+    })
 }
 
 // eslint-disable-next-line

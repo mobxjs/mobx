@@ -29,7 +29,8 @@ import {
     assign,
     isStringish,
     createObservableAnnotation,
-    createAutoAnnotation
+    createAutoAnnotation,
+    initObservable
 } from "../internal"
 
 export const OBSERVABLE = "observable"
@@ -211,12 +212,14 @@ const observableFactories: IObservableFactory = {
         decorators?: AnnotationsMap<T, never>,
         options?: CreateObservableOptions
     ): T {
-        return extendObservable(
-            globalState.useProxies === false || options?.proxy === false
-                ? asObservableObject({}, options)
-                : asDynamicObservableObject({}, options),
-            props,
-            decorators
+        return initObservable(() =>
+            extendObservable(
+                globalState.useProxies === false || options?.proxy === false
+                    ? asObservableObject({}, options)
+                    : asDynamicObservableObject({}, options),
+                props,
+                decorators
+            )
         )
     },
     ref: createDecoratorAnnotation(observableRefAnnotation),

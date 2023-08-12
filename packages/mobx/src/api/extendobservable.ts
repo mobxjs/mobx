@@ -2,8 +2,6 @@ import {
     CreateObservableOptions,
     isObservableMap,
     AnnotationsMap,
-    startBatch,
-    endBatch,
     asObservableObject,
     isPlainObject,
     ObservableObjectAdministration,
@@ -12,9 +10,7 @@ import {
     getOwnPropertyDescriptors,
     $mobx,
     ownKeys,
-    globalState,
-    allowStateChangesStart,
-    allowStateChangesEnd
+    initObservable
 } from "../internal"
 
 export function extendObservable<A extends Object, B extends Object>(
@@ -43,11 +39,8 @@ export function extendObservable<A extends Object, B extends Object>(
     // Pull descriptors first, so we don't have to deal with props added by administration ($mobx)
     const descriptors = getOwnPropertyDescriptors(properties)
 
-    const adm: ObservableObjectAdministration = asObservableObject(target, options)[$mobx]
-    const allowStateChanges = allowStateChangesStart(true)
-    globalState.suppressReportChanged = true
-    startBatch()
-    try {
+    initObservable(() => {
+        const adm: ObservableObjectAdministration = asObservableObject(target, options)[$mobx]
         ownKeys(descriptors).forEach(key => {
             adm.extend_(
                 key,
@@ -56,10 +49,7 @@ export function extendObservable<A extends Object, B extends Object>(
                 !annotations ? true : key in annotations ? annotations[key] : true
             )
         })
-    } finally {
-        globalState.suppressReportChanged = false
-        allowStateChangesEnd(allowStateChanges)
-        endBatch()
-    }
+    })
+
     return target as any
 }
