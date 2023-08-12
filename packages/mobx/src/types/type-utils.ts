@@ -113,7 +113,7 @@ export function initObservable<T>(cb: () => T): T {
         return cb()
     } finally {
         endBatch()
-        untrackedEnd(derivation)
         allowStateChangesEnd(allowStateChanges)
+        untrackedEnd(derivation)
     }
 }
