@@ -24,10 +24,8 @@ type ObserverAdministration = {
     getSnapshot: Parameters<typeof React.useSyncExternalStore>[1]
 }
 
-const mobxGlobalState = _getGlobalState()
-
 // BC
-const globalStateVersionIsAvailable = typeof mobxGlobalState.stateVersion !== "undefined"
+const globalStateVersionIsAvailable = typeof _getGlobalState().stateVersion !== "undefined"
 
 function createReaction(adm: ObserverAdministration) {
     adm.reaction = new Reaction(`observer${adm.name}`, () => {
@@ -84,7 +82,7 @@ export function useObserver<T>(render: () => T, baseComponentName: string = "obs
             getSnapshot() {
                 // Do NOT access admRef here!
                 return globalStateVersionIsAvailable
-                    ? mobxGlobalState.stateVersion
+                    ? _getGlobalState().stateVersion
                     : adm.stateVersion
             }
         }
