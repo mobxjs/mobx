@@ -1,5 +1,13 @@
 # mobx
 
+## 6.10.1
+
+### Patch Changes
+
+-   [`3ceeb865`](https://github.com/mobxjs/mobx/commit/3ceeb8651e328c4c7211c875696b3f5269fea834) [#3732](https://github.com/mobxjs/mobx/pull/3732) Thanks [@urugator](https://github.com/urugator)! - - fix: #3728: Observable initialization updates state version.
+    -   fix: Observable set initialization violates `enforceActions: "always"`.
+    -   fix: Changing keys of observable object does not respect `enforceActions`.
+
 ## 6.10.0
 
 ### Minor Changes
