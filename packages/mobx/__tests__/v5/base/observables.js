@@ -2388,7 +2388,7 @@ test("state version updates correctly", () => {
     expect(prevStateVersion).not.toBe(getGlobalState().stateVersion)
 })
 
-test("Atom.reportChanged does change state version when called from the batch the atom was created in", () => {
+test("Atom.reportChanged does not change state version when called from the batch the atom was created in", () => {
     mobx.transaction(() => {
         const prevStateVersion = getGlobalState().stateVersion
         const atom = mobx.createAtom()
