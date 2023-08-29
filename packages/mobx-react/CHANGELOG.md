@@ -1,5 +1,14 @@
 # mobx-react
 
+## 9.0.1
+
+### Patch Changes
+
+-   [`d813746c`](https://github.com/mobxjs/mobx/commit/d813746cfaa18d80daddee3724562fed6b307c0a) [#3731](https://github.com/mobxjs/mobx/pull/3731) Thanks [@urugator](https://github.com/urugator)! - fix #3730: class component does not react to state changes performed before mount
+
+-   Updated dependencies [[`3ceeb865`](https://github.com/mobxjs/mobx/commit/3ceeb8651e328c4c7211c875696b3f5269fea834)]:
+    -   mobx-react-lite@4.0.4
+
 ## 9.0.0
 
 ### Major Changes

@@ -192,19 +192,19 @@ describe("base useAsObservableSource should work", () => {
         const { container } = render(<Parent />)
 
         expect(container.querySelector("span")!.innerHTML).toBe("10")
-        expect(counterRender).toBe(2)
+        expect(counterRender).toBe(1)
 
         act(() => {
             ;(container.querySelector("#inc")! as any).click()
         })
         expect(container.querySelector("span")!.innerHTML).toBe("11")
-        expect(counterRender).toBe(3)
+        expect(counterRender).toBe(2)
 
         act(() => {
             ;(container.querySelector("#incmultiplier")! as any).click()
         })
         expect(container.querySelector("span")!.innerHTML).toBe("22")
-        expect(counterRender).toBe(5) // TODO: should be 3
+        expect(counterRender).toBe(4) // One from props, second from updating local observable with effect
     })
 })
 
@@ -337,7 +337,12 @@ describe("combining observer with props and stores", () => {
             store.x = 10
         })
 
-        expect(renderedValues).toEqual([10, 10, 15, 15, 20]) // TODO: should have one 15 less
+        expect(renderedValues).toEqual([
+            10,
+            15, // props change
+            15, // local observable change during render (localStore.y = props.y)
+            20
+        ])
 
         expect(container.querySelector("div")!.textContent).toBe("20")
     })

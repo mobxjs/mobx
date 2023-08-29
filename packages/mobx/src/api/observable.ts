@@ -30,7 +30,8 @@ import {
     isStringish,
     createObservableAnnotation,
     createAutoAnnotation,
-    is20223Decorator
+    is20223Decorator,
+    initObservable
 } from "../internal"
 
 import type { ClassAccessorDecorator, ClassFieldDecorator } from "../types/decorator_fills"
@@ -224,12 +225,14 @@ const observableFactories: IObservableFactory = {
         decorators?: AnnotationsMap<T, never>,
         options?: CreateObservableOptions
     ): T {
-        return extendObservable(
-            globalState.useProxies === false || options?.proxy === false
-                ? asObservableObject({}, options)
-                : asDynamicObservableObject({}, options),
-            props,
-            decorators
+        return initObservable(() =>
+            extendObservable(
+                globalState.useProxies === false || options?.proxy === false
+                    ? asObservableObject({}, options)
+                    : asDynamicObservableObject({}, options),
+                props,
+                decorators
+            )
         )
     },
     ref: createDecoratorAnnotation(observableRefAnnotation),

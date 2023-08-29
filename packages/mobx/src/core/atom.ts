@@ -27,6 +27,7 @@ export class Atom implements IAtom {
     isBeingObserved_ = false
     observers_ = new Set<IDerivation>()
 
+    batchId_: number
     diffValue_ = 0
     lastAccessedBy_ = 0
     lowestObserverState_ = IDerivationState_.NOT_TRACKING_
@@ -34,7 +35,9 @@ export class Atom implements IAtom {
      * Create a new atom. For debugging purposes it is recommended to give it a name.
      * The onBecomeObserved and onBecomeUnobserved callbacks can be used for resource management.
      */
-    constructor(public name_ = __DEV__ ? "Atom@" + getNextId() : "Atom") {}
+    constructor(public name_ = __DEV__ ? "Atom@" + getNextId() : "Atom") {
+        this.batchId_ = globalState.inBatch ? globalState.batchId : NaN
+    }
 
     // onBecomeObservedListeners
     public onBOL: Set<Lambda> | undefined
@@ -65,6 +68,13 @@ export class Atom implements IAtom {
      * Invoke this method _after_ this method has changed to signal mobx that all its observers should invalidate.
      */
     public reportChanged() {
+        if (globalState.inBatch && this.batchId_ === globalState.batchId) {
+            // Called from the same batch this atom was created in.
+            return
+        }
+        // Avoids the possibility of hitting the same globalState.batchId when it cycled through all integers (necessary?)
+        this.batchId_ = NaN
+
         startBatch()
         propagateChanged(this)
         // We could update state version only at the end of batch,

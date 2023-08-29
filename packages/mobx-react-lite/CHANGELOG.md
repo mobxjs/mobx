@@ -1,5 +1,11 @@
 # mobx-react-lite
 
+## 4.0.4
+
+### Patch Changes
+
+-   [`3ceeb865`](https://github.com/mobxjs/mobx/commit/3ceeb8651e328c4c7211c875696b3f5269fea834) [#3732](https://github.com/mobxjs/mobx/pull/3732) Thanks [@urugator](https://github.com/urugator)! - fix: #3734: `isolateGlobalState: true` makes observer stop to react to store changes
+
 ## 4.0.3
 
 ### Patch Changes
