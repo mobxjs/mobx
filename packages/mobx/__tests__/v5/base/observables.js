@@ -2382,6 +2382,7 @@ test("state version updates correctly", () => {
         o.x++
     })
 
+    // expect(o.x).toBe(4) is 1?
     prevStateVersion = getGlobalState().stateVersion
     o.x++
     expect(o.x).toBe(5)
