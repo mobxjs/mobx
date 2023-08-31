@@ -68,21 +68,19 @@ export class Atom implements IAtom {
      * Invoke this method _after_ this method has changed to signal mobx that all its observers should invalidate.
      */
     public reportChanged() {
-        if (globalState.inBatch && this.batchId_ === globalState.batchId) {
-            // Called from the same batch this atom was created in.
-            return
+        if (!globalState.inBatch || this.batchId_ !== globalState.batchId) {
+            // We could update state version only at the end of batch,
+            // but we would still have to switch some global flag here to signal a change.
+            globalState.stateVersion =
+                globalState.stateVersion < Number.MAX_SAFE_INTEGER
+                    ? globalState.stateVersion + 1
+                    : Number.MIN_SAFE_INTEGER
+            // Avoids the possibility of hitting the same globalState.batchId when it cycled through all integers (necessary?)
+            this.batchId_ = NaN
         }
-        // Avoids the possibility of hitting the same globalState.batchId when it cycled through all integers (necessary?)
-        this.batchId_ = NaN
 
         startBatch()
         propagateChanged(this)
-        // We could update state version only at the end of batch,
-        // but we would still have to switch some global flag here to signal a change.
-        globalState.stateVersion =
-            globalState.stateVersion < Number.MAX_SAFE_INTEGER
-                ? globalState.stateVersion + 1
-                : Number.MIN_SAFE_INTEGER
         endBatch()
     }
 

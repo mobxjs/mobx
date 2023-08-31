@@ -2382,6 +2382,7 @@ test("state version updates correctly", () => {
         o.x++
     })
 
+    // expect(o.x).toBe(4) is 1?
     prevStateVersion = getGlobalState().stateVersion
     o.x++
     expect(o.x).toBe(5)
@@ -2504,4 +2505,14 @@ test("state version does not update on observable creation", () => {
     check(() => mobx.observable([0], { proxy: false }))
     check(() => mobx.observable([0], { proxy: true }))
     check(() => mobx.computed(() => 0))
+})
+
+test("#3747", () => {
+    mobx.runInAction(() => {
+        const o = observable.box(0)
+        const c = computed(() => o.get())
+        expect(c.get()).toBe(0)
+        o.set(1)
+        expect(c.get()).toBe(1) // would fail
+    })
 })
