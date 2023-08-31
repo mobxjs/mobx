@@ -1,5 +1,11 @@
 # mobx
 
+## 6.10.2
+
+### Patch Changes
+
+-   [`c8d9374d`](https://github.com/mobxjs/mobx/commit/c8d9374d4f3b05cfec0d690e0eb3ada4f619ff0b) [#3748](https://github.com/mobxjs/mobx/pull/3748) Thanks [@mweststrate](https://github.com/mweststrate)! - Fixed: #3747, computed values becoming stale if the underlying observable was created and updated outside a reactive context
+
 ## 6.10.1
 
 ### Patch Changes
