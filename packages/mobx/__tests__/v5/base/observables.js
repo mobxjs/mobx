@@ -2505,3 +2505,13 @@ test("state version does not update on observable creation", () => {
     check(() => mobx.observable([0], { proxy: true }))
     check(() => mobx.computed(() => 0))
 })
+
+test("#3747", () => {
+    mobx.runInAction(() => {
+        const o = observable.box(0)
+        const c = computed(() => o.get())
+        expect(c.get()).toBe(0)
+        o.set(1)
+        expect(c.get()).toBe(1) // would fail
+    })
+})
