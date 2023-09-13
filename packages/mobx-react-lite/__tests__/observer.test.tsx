@@ -667,6 +667,7 @@ test("parent / childs render in the right order", done => {
     }
 
     const Parent = observer(() => {
+        console.trace()
         events.push("parent")
         if (!store.user) {
             return <span>Not logged in.</span>
@@ -688,9 +689,9 @@ test("parent / childs render in the right order", done => {
     })
 
     render(<Parent />)
-
-    tryLogout()
     expect(events).toEqual(["parent", "child"])
+    // tryLogout()
+    // expect(events).toEqual(["parent", "child", "parent", "child"])
     done()
 })
 

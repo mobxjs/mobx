@@ -24,7 +24,7 @@ type ObserverAdministration = {
     // It should behave as previous implementation - tearing is still present,
     // because there is no cross component synchronization,
     // but we can use `useSyncExternalStore` API.
-    stateVersion: any
+    stateVersion: number
     name: string
     // These don't depend on state/props, therefore we can keep them here instead of `useCallback`
     subscribe: Parameters<typeof React.useSyncExternalStore>[0]
@@ -37,6 +37,10 @@ const globalStateVersionIsAvailable = typeof _getGlobalState().stateVersion !== 
 
 function createReaction(adm: ObserverAdministration) {
     adm.reaction = new Reaction(`observer${adm.name}`, () => {
+        adm.stateVersion++
+        // @ts-expect-error TODO FIX
+        adm.lastSnapshot = adm.getSnapshot()
+
         // if (!globalStateVersionIsAvailable) {
         //     // BC
         //     adm.stateVersion = Symbol()
@@ -75,9 +79,11 @@ export function useObserver<T>(render: () => T, baseComponentName: string = "obs
         const adm: ObserverAdministration = {
             reaction: null,
             onStoreChange: null,
-            stateVersion: Symbol(),
+            stateVersion: 0,
             name: baseComponentName,
+
             subscribe(onStoreChange: () => void) {
+                // console.trace("schedule")
                 // Do NOT access admRef here!
                 observerFinalizationRegistry.unregister(adm)
                 adm.onStoreChange = onStoreChange
@@ -88,12 +94,11 @@ export function useObserver<T>(render: () => T, baseComponentName: string = "obs
                     // We have to recreate reaction and schedule re-render to recreate subscriptions,
                     // even if state did not change.
                     createReaction(adm)
+                    // adm.stateVersion--
                     // adm!.lastSnapshot = adm.getSnapshot();
                     // `onStoreChange` won't force update if subsequent `getSnapshot` returns same value.
                     forceUpdate(Symbol())
                 }
-                // @ts-expect-error TODO FIX
-                adm.lastSnapshot = adm.getSnapshot()
 
                 return () => {
                     // Do NOT access admRef here!
@@ -103,15 +108,10 @@ export function useObserver<T>(render: () => T, baseComponentName: string = "obs
                     adm.lastSnapshot = undefined
                 }
             },
+            // TODO: same for serverSnapshot
             getSnapshot(): any[] {
-                const { reaction } = adm
-                if (!reaction) {
-                    return []
-                }
-                const depValues = getDepValues(reaction)
-                return adm.lastSnapshot && comparer.shallow(depValues, adm.lastSnapshot)
-                    ? adm.lastSnapshot
-                    : depValues
+                // @ts-ignore
+                return adm.stateVersion
             }
         }
 
@@ -152,7 +152,7 @@ export function useObserver<T>(render: () => T, baseComponentName: string = "obs
     })
     // this is the snapshot we rendered with
     // @ts-ignore TODO: remove
-    adm.lastSnapshot = adm.getSnapshot()
+    // adm.lastSnapshot = adm.getSnapshot()
 
     if (exception) {
         throw exception // re-throw any exceptions caught during rendering
