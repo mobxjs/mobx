@@ -1,4 +1,12 @@
-import { $mobx, getAtom, isComputedValue, isObservableObject, die, isStringish } from "../internal"
+import {
+    $mobx,
+    getAtom,
+    isComputedValue,
+    isObservableObject,
+    die,
+    isStringish,
+    IComputedValue
+} from "../internal"
 
 export function _isComputed(value, property?: PropertyKey): boolean {
     if (property === undefined) {
@@ -14,7 +22,7 @@ export function _isComputed(value, property?: PropertyKey): boolean {
     return isComputedValue(atom)
 }
 
-export function isComputed(value: any): boolean {
+export function isComputed(value: any): value is IComputedValue<any> {
     if (__DEV__ && arguments.length > 1) {
         return die(
             `isComputed expects only 1 argument. Use isComputedProp to inspect the observability of a property`

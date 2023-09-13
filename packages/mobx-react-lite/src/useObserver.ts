@@ -1,4 +1,11 @@
-import { Reaction, _getGlobalState } from "mobx"
+import {
+    IComputedValue,
+    isBoxedObservable,
+    isComputed,
+    Reaction,
+    _getGlobalState,
+    comparer
+} from "mobx"
 import React from "react"
 import { printDebugValue } from "./utils/printDebugValue"
 import { isUsingStaticRendering } from "./staticRendering"
@@ -22,6 +29,7 @@ type ObserverAdministration = {
     // These don't depend on state/props, therefore we can keep them here instead of `useCallback`
     subscribe: Parameters<typeof React.useSyncExternalStore>[0]
     getSnapshot: Parameters<typeof React.useSyncExternalStore>[1]
+    lastSnapshot?: Array<any>
 }
 
 // BC
@@ -29,15 +37,27 @@ const globalStateVersionIsAvailable = typeof _getGlobalState().stateVersion !== 
 
 function createReaction(adm: ObserverAdministration) {
     adm.reaction = new Reaction(`observer${adm.name}`, () => {
-        if (!globalStateVersionIsAvailable) {
-            // BC
-            adm.stateVersion = Symbol()
-        }
+        // if (!globalStateVersionIsAvailable) {
+        //     // BC
+        //     adm.stateVersion = Symbol()
+        // }
         // onStoreChange won't be available until the component "mounts".
         // If state changes in between initial render and mount,
         // `useSyncExternalStore` should handle that by checking the state version and issuing update.
         adm.onStoreChange?.()
     })
+}
+
+function getDepValues(reaction: Reaction): any[] {
+    return reaction.observing_.map(dep =>
+        isBoxedObservable(dep)
+            ? dep.get()
+            : isComputed(dep)
+            ? // @ts-expect-error isComputedSignature needs update ^
+              (dep as IComputedValue<any>).get()
+            : // TODO: different kind of atom, not sure what to do with it...
+              dep
+    )
 }
 
 export function useObserver<T>(render: () => T, baseComponentName: string = "observed"): T {
@@ -68,22 +88,30 @@ export function useObserver<T>(render: () => T, baseComponentName: string = "obs
                     // We have to recreate reaction and schedule re-render to recreate subscriptions,
                     // even if state did not change.
                     createReaction(adm)
+                    // adm!.lastSnapshot = adm.getSnapshot();
                     // `onStoreChange` won't force update if subsequent `getSnapshot` returns same value.
                     forceUpdate(Symbol())
                 }
+                // @ts-expect-error TODO FIX
+                adm.lastSnapshot = adm.getSnapshot()
 
                 return () => {
                     // Do NOT access admRef here!
                     adm.onStoreChange = null
                     adm.reaction?.dispose()
                     adm.reaction = null
+                    adm.lastSnapshot = undefined
                 }
             },
-            getSnapshot() {
-                // Do NOT access admRef here!
-                return globalStateVersionIsAvailable
-                    ? _getGlobalState().stateVersion
-                    : adm.stateVersion
+            getSnapshot(): any[] {
+                const { reaction } = adm
+                if (!reaction) {
+                    return []
+                }
+                const depValues = getDepValues(reaction)
+                return adm.lastSnapshot && comparer.shallow(depValues, adm.lastSnapshot)
+                    ? adm.lastSnapshot
+                    : depValues
             }
         }
 
@@ -122,6 +150,9 @@ export function useObserver<T>(render: () => T, baseComponentName: string = "obs
             exception = e
         }
     })
+    // this is the snapshot we rendered with
+    // @ts-ignore TODO: remove
+    adm.lastSnapshot = adm.getSnapshot()
 
     if (exception) {
         throw exception // re-throw any exceptions caught during rendering
