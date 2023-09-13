@@ -1,9 +1,16 @@
 import { act, cleanup, fireEvent, render } from "@testing-library/react"
 import mockConsole from "jest-mock-console"
 import * as mobx from "mobx"
-import React from "react"
+import { action } from "mobx"
+import React, { StrictMode, useEffect, useState } from "react"
 
-import { observer, useObserver, isObserverBatched, enableStaticRendering } from "../src"
+import {
+    observer,
+    useObserver,
+    isObserverBatched,
+    enableStaticRendering,
+    useLocalObservable
+} from "../src"
 
 const getDNode = (obj: any, prop?: string) => mobx.getObserverTree(obj, prop)
 
@@ -1128,4 +1135,38 @@ test("`isolateGlobalState` shouldn't break reactivity #3734", async () => {
     unmount()
 
     mobx._resetGlobalState()
+})
+
+test("`#3728", async () => {
+    const createModel = () => ({
+        element: [] as Array<unknown>
+    })
+
+    const Sub = observer((props: { element: Array<unknown> }) => {
+        const store = useLocalObservable(createModel)
+
+        useEffect(
+            action(() => {
+                Object.assign(store, props)
+            })
+        )
+
+        return <h2>Placeholder</h2>
+    })
+
+    const App = observer(() => {
+        return (
+            <>
+                <h1>Hello</h1>
+                <Sub element={[]} />
+            </>
+        )
+    })
+
+    // TODO: fix test to fail before
+    render(
+        <StrictMode>
+            <App />
+        </StrictMode>
+    )
 })
