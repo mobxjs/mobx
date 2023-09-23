@@ -25,7 +25,7 @@ type ObserverAdministration = {
 }
 
 // BC
-const globalStateVersionIsAvailable = typeof _getGlobalState().stateVersion !== "undefined"
+const globalStateVersionIsAvailable = false // See #3728; TODO: typeof _getGlobalState().stateVersion !== "undefined"
 
 function createReaction(adm: ObserverAdministration) {
     adm.reaction = new Reaction(`observer${adm.name}`, () => {
