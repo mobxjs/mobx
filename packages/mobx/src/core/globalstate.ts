@@ -1,4 +1,4 @@
-import { IDerivation, IObservable, Reaction, die, getGlobal } from "../internal"
+import { IDerivation, IObservable, Reaction, die, getGlobal, ObservableValue } from "../internal"
 import { ComputedValue } from "./computedvalue"
 
 /**
@@ -19,6 +19,68 @@ const persistentKeys: (keyof MobXGlobals)[] = [
 ]
 
 export type IUNCHANGED = {}
+
+export class Snapshot {
+    private pristine = true
+    private states: Map<ObservableValue<any>, any>
+    private base?: Snapshot = undefined
+
+    static firstSnapshot() {
+        const res = new Snapshot(undefined)
+        res.pristine = false
+        return res
+    }
+
+    constructor(base?: Snapshot) {
+        this.base = base
+        if (base) {
+            this.states = new Map(base.states)
+        } else {
+            this.states = new Map()
+        }
+    }
+
+    isCurrent(): boolean {
+        return globalState.currentSnapshot === this
+    }
+
+    write<T>(observable: ObservableValue<T>, value: T) {
+        if (this.pristine) {
+            this.pristine = false
+            this.base = undefined // prevent mem leaks to old snapshots
+        }
+        this.states.set(observable, value)
+    }
+
+    read<T>(observable: ObservableValue<T>): T {
+        if (!this.states.has(observable)) {
+            throw new Error("Not available in snapshot " + observable.name_)
+        }
+        return this.states.get(observable)
+    }
+
+    commit(): Snapshot {
+        if (this.pristine) {
+            return this.base! // reuse the old, nothing changed in the mean time
+        }
+        globalState.currentSnapshot = new Snapshot(this)
+        return this
+    }
+
+    executeWithSnapshot<T>(cb: () => T): T {
+        if (globalState.readSnapshot) {
+            throw new Error("can't nest snapshots")
+        }
+        if (!this.isCurrent()) {
+            globalState.readSnapshot = this
+        }
+        try {
+            return cb()
+        } finally {
+            globalState.readSnapshot = undefined
+        }
+    }
+}
 
 export class MobXGlobals {
     /**
@@ -150,6 +212,10 @@ export class MobXGlobals {
      * configurable: true
      */
     safeDescriptors = true
+
+    currentSnapshot = Snapshot.firstSnapshot()
+
+    readSnapshot?: Snapshot = undefined
 }
 
 let canMergeGlobalState = true

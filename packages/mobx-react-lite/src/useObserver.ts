@@ -22,6 +22,7 @@ type ObserverAdministration = {
     // These don't depend on state/props, therefore we can keep them here instead of `useCallback`
     subscribe: Parameters<typeof React.useSyncExternalStore>[0]
     getSnapshot: Parameters<typeof React.useSyncExternalStore>[1]
+    tracked: boolean
 }
 
 function createReaction(adm: ObserverAdministration) {
@@ -48,6 +49,7 @@ export function useObserver<T>(render: () => T, baseComponentName: string = "obs
             onStoreChange: null,
             stateVersion: Symbol(),
             name: baseComponentName,
+            tracked: false,
             subscribe(onStoreChange: () => void) {
                 // Do NOT access admRef here!
                 observerFinalizationRegistry.unregister(adm)
@@ -72,7 +74,7 @@ export function useObserver<T>(render: () => T, baseComponentName: string = "obs
             },
             getSnapshot() {
                 // Do NOT access admRef here!
-                return adm.stateVersion
+                return _getGlobalState().currentSnapshot.commit()
             }
         }
 
@@ -92,7 +94,7 @@ export function useObserver<T>(render: () => T, baseComponentName: string = "obs
 
     React.useDebugValue(adm.reaction!, printDebugValue)
 
-    useSyncExternalStore(
+    const snapshot = useSyncExternalStore(
         // Both of these must be stable, otherwise it would keep resubscribing every render.
         adm.subscribe,
         adm.getSnapshot,
@@ -104,13 +106,24 @@ export function useObserver<T>(render: () => T, baseComponentName: string = "obs
     // can be invalidated (see above) once a dependency changes
     let renderResult!: T
     let exception
-    adm.reaction!.track(() => {
-        try {
-            renderResult = render()
-        } catch (e) {
-            exception = e
-        }
-    })
+    if (snapshot.isCurrent() || !adm.tracked) {
+        adm.tracked = true
+        adm.reaction!.track(() => {
+            try {
+                renderResult = render()
+            } catch (e) {
+                exception = e
+            }
+        })
+    } else {
+        snapshot.executeWithSnapshot(() => {
+            try {
+                renderResult = render()
+            } catch (e) {
+                exception = e
+            }
+        })
+    }
 
     if (exception) {
         throw exception // re-throw any exceptions caught during rendering

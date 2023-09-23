@@ -175,6 +175,11 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
             }
         } else {
             reportObserved(this)
+            if (globalState.readSnapshot) {
+                // skip cache etc
+                // @ts-expect-error
+                return this.computeValue_(false)
+            }
             if (shouldCompute(this)) {
                 let prevTrackingContext = globalState.trackingContext
                 if (this.keepAlive_ && !prevTrackingContext) {

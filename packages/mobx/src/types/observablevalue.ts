@@ -76,6 +76,7 @@ export class ObservableValue<T>
     ) {
         super(name_)
         this.value_ = enhancer(value, undefined, name_)
+        globalState.currentSnapshot.write(this, this.value_)
         if (__DEV__ && notifySpy && isSpyEnabled()) {
             // only notify spy if this is a stand-alone observable
             spyReport({
@@ -138,6 +139,7 @@ export class ObservableValue<T>
     setNewValue_(newValue: T) {
         const oldValue = this.value_
         this.value_ = newValue
+        globalState.currentSnapshot.write(this, newValue)
         this.reportChanged()
         if (hasListeners(this)) {
             notifyListeners(this, {
@@ -151,7 +153,9 @@ export class ObservableValue<T>
 
     public get(): T {
         this.reportObserved()
-        return this.dehanceValue(this.value_)
+        return this.dehanceValue(
+            globalState.readSnapshot ? globalState.readSnapshot.read(this) : this.value_
+        )
     }
 
     intercept_(handler: IInterceptor<IValueWillChange<T>>): Lambda {
