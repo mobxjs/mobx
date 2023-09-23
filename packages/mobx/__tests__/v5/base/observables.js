@@ -2361,43 +2361,6 @@ describe("`requiresObservable` takes precedence over global `reactionRequiresObs
     })
 })
 
-test("state version updates correctly", () => {
-    // This test was designed around the idea of updating version only at the end of batch,
-    // which is NOT an implementation we've settled on, but the test is still valid.
-
-    // This test demonstrates that the version is correctly updated with each state mutations:
-    // 1. Even without wrapping mutation in batch explicitely.
-    // 2. Even in self-invoking recursive derivation.
-    const o = mobx.observable({ x: 0 })
-    let prevStateVersion
-
-    const disposeAutorun = mobx.autorun(() => {
-        if (o.x === 5) {
-            disposeAutorun()
-            return
-        }
-        const currentStateVersion = getGlobalState().stateVersion
-        expect(prevStateVersion).not.toBe(currentStateVersion)
-        prevStateVersion = currentStateVersion
-        o.x++
-    })
-
-    // expect(o.x).toBe(4) is 1?
-    prevStateVersion = getGlobalState().stateVersion
-    o.x++
-    expect(o.x).toBe(5)
-    expect(prevStateVersion).not.toBe(getGlobalState().stateVersion)
-})
-
-test("Atom.reportChanged does not change state version when called from the batch the atom was created in", () => {
-    mobx.transaction(() => {
-        const prevStateVersion = getGlobalState().stateVersion
-        const atom = mobx.createAtom()
-        atom.reportChanged()
-        expect(prevStateVersion).toBe(getGlobalState().stateVersion)
-    })
-})
-
 test('Observables initialization does not violate `enforceActions: "always"`', () => {
     const consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation(() => {})
 

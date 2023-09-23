@@ -24,18 +24,9 @@ type ObserverAdministration = {
     getSnapshot: Parameters<typeof React.useSyncExternalStore>[1]
 }
 
-// BC
-const globalStateVersionIsAvailable = false // See #3728; TODO: typeof _getGlobalState().stateVersion !== "undefined"
-
 function createReaction(adm: ObserverAdministration) {
     adm.reaction = new Reaction(`observer${adm.name}`, () => {
-        if (!globalStateVersionIsAvailable) {
-            // BC
-            adm.stateVersion = Symbol()
-        }
-        // onStoreChange won't be available until the component "mounts".
-        // If state changes in between initial render and mount,
-        // `useSyncExternalStore` should handle that by checking the state version and issuing update.
+        adm.stateVersion = Symbol()
         adm.onStoreChange?.()
     })
 }
@@ -81,9 +72,7 @@ export function useObserver<T>(render: () => T, baseComponentName: string = "obs
             },
             getSnapshot() {
                 // Do NOT access admRef here!
-                return globalStateVersionIsAvailable
-                    ? _getGlobalState().stateVersion
-                    : adm.stateVersion
+                return adm.stateVersion
             }
         }
 

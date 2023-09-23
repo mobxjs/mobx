@@ -64,12 +64,6 @@ export class MobXGlobals {
     inBatch: number = 0
 
     /**
-     * ID of the latest batch. Used to suppress reportChanged of newly created atoms.
-     * Note the value persists even after batch ended.
-     */
-    batchId: number = Number.MIN_SAFE_INTEGER
-
-    /**
      * Observables that don't have observers anymore, and are about to be
      * suspended, unless somebody else accesses it in the same batch
      *
@@ -156,11 +150,6 @@ export class MobXGlobals {
      * configurable: true
      */
     safeDescriptors = true
-
-    /**
-     * Changes with each state update, used by useSyncExternalStore
-     */
-    stateVersion = Number.MIN_SAFE_INTEGER
 }
 
 let canMergeGlobalState = true
