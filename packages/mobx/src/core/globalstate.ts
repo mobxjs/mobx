@@ -54,7 +54,8 @@ export class Snapshot {
 
     read<T>(observable: ObservableValue<T>): T {
         if (!this.states.has(observable)) {
-            throw new Error("Not available in snapshot " + observable.name_)
+            return observable.get()
+            // throw new Error("Not available in snapshot " + observable.name_)
         }
         return this.states.get(observable)
     }

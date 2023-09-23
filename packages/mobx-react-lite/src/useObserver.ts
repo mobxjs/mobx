@@ -106,16 +106,7 @@ export function useObserver<T>(render: () => T, baseComponentName: string = "obs
     // can be invalidated (see above) once a dependency changes
     let renderResult!: T
     let exception
-    if (snapshot.isCurrent() || !adm.tracked) {
-        adm.tracked = true
-        adm.reaction!.track(() => {
-            try {
-                renderResult = render()
-            } catch (e) {
-                exception = e
-            }
-        })
-    } else {
+    adm.reaction!.track(() => {
         snapshot.executeWithSnapshot(() => {
             try {
                 renderResult = render()
@@ -123,7 +114,7 @@ export function useObserver<T>(render: () => T, baseComponentName: string = "obs
                 exception = e
             }
         })
-    }
+    })
 
     if (exception) {
         throw exception // re-throw any exceptions caught during rendering
