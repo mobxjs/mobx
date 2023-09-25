@@ -1,4 +1,4 @@
-import { Reaction, _getGlobalState } from "mobx"
+import { Reaction } from "mobx"
 import React from "react"
 import { printDebugValue } from "./utils/printDebugValue"
 import { isUsingStaticRendering } from "./staticRendering"
@@ -13,10 +13,11 @@ const getServerSnapshot = () => {}
 type ObserverAdministration = {
     reaction: Reaction | null // also serves as disposed flag
     onStoreChange: Function | null // also serves as mounted flag
-    // BC: we will use local state version if global isn't available.
-    // It should behave as previous implementation - tearing is still present,
+    // stateVersion that 'ticks' for every time the reaction fires
+    // tearing is still present,
     // because there is no cross component synchronization,
     // but we can use `useSyncExternalStore` API.
+    // TODO: optimize to use number?
     stateVersion: any
     name: string
     // These don't depend on state/props, therefore we can keep them here instead of `useCallback`
@@ -27,6 +28,9 @@ type ObserverAdministration = {
 function createReaction(adm: ObserverAdministration) {
     adm.reaction = new Reaction(`observer${adm.name}`, () => {
         adm.stateVersion = Symbol()
+        // onStoreChange won't be available until the component "mounts".
+        // If state changes in between initial render and mount,
+        // `useSyncExternalStore` should handle that by checking the state version and issuing update.
         adm.onStoreChange?.()
     })
 }
@@ -37,9 +41,6 @@ export function useObserver<T>(render: () => T, baseComponentName: string = "obs
     }
 
     const admRef = React.useRef<ObserverAdministration | null>(null)
-
-    // Provides ability to force component update without changing state version
-    const [, forceUpdate] = React.useState<Symbol>()
 
     if (!admRef.current) {
         // First render
@@ -60,7 +61,8 @@ export function useObserver<T>(render: () => T, baseComponentName: string = "obs
                     // even if state did not change.
                     createReaction(adm)
                     // `onStoreChange` won't force update if subsequent `getSnapshot` returns same value.
-                    forceUpdate(Symbol())
+                    // So we make sure that is not the case
+                    adm.stateVersion = Symbol()
                 }
 
                 return () => {
