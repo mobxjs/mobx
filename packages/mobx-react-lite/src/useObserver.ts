@@ -1,4 +1,4 @@
-import { Reaction, _getGlobalState } from "mobx"
+import { Reaction } from "mobx"
 import React from "react"
 import { printDebugValue } from "./utils/printDebugValue"
 import { isUsingStaticRendering } from "./staticRendering"
@@ -24,15 +24,9 @@ type ObserverAdministration = {
     getSnapshot: Parameters<typeof React.useSyncExternalStore>[1]
 }
 
-// BC
-const globalStateVersionIsAvailable = false // See #3728; TODO: typeof _getGlobalState().stateVersion !== "undefined"
-
 function createReaction(adm: ObserverAdministration) {
     adm.reaction = new Reaction(`observer${adm.name}`, () => {
-        if (!globalStateVersionIsAvailable) {
-            // BC
-            adm.stateVersion = Symbol()
-        }
+        adm.stateVersion = Symbol()
         // onStoreChange won't be available until the component "mounts".
         // If state changes in between initial render and mount,
         // `useSyncExternalStore` should handle that by checking the state version and issuing update.
@@ -46,9 +40,6 @@ export function useObserver<T>(render: () => T, baseComponentName: string = "obs
     }
 
     const admRef = React.useRef<ObserverAdministration | null>(null)
-
-    // Provides ability to force component update without changing state version
-    const [, forceUpdate] = React.useState<Symbol>()
 
     if (!admRef.current) {
         // First render
@@ -69,7 +60,8 @@ export function useObserver<T>(render: () => T, baseComponentName: string = "obs
                     // even if state did not change.
                     createReaction(adm)
                     // `onStoreChange` won't force update if subsequent `getSnapshot` returns same value.
-                    forceUpdate(Symbol())
+                    // So we make sure that is not the case
+                    adm.stateVersion = Symbol()
                 }
 
                 return () => {
@@ -81,9 +73,7 @@ export function useObserver<T>(render: () => T, baseComponentName: string = "obs
             },
             getSnapshot() {
                 // Do NOT access admRef here!
-                return globalStateVersionIsAvailable
-                    ? _getGlobalState().stateVersion
-                    : adm.stateVersion
+                return adm.stateVersion
             }
         }
 
