@@ -2474,3 +2474,20 @@ test("observable.box should keep track of undefined and null in type", () => {
     const a = observable.box<string | undefined>()
     assert<IsExact<typeof a, IObservableValue<string | undefined>>>(true)
 })
+
+test("computed without a set function should not allow the consumer to set the value", () => {
+    const a = observable.box<string>("hello")
+    const b = computed(() => a.get())
+    assert<IsExact<typeof b, mobx.IComputedValue<string>>>(true)
+    // @ts-expect-error
+    b.set("world")
+})
+
+test("computed with a set function should allow the consumer to set the value", () => {
+    const a = observable.box<string>("hello")
+    const b = computed(() => a.get(), {
+        set: value => a.set(value)
+    })
+    assert<IsExact<typeof b, mobx.IComputedValue<string, true>>>(true)
+    b.set("world")
+})
