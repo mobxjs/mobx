@@ -97,7 +97,9 @@ export function isPlainObject(value: any) {
 }
 
 // https://stackoverflow.com/a/37865170
-export function isGenerator(obj: any): boolean {
+export function isGenerator(
+    obj: any
+): obj is (...args: any[]) => Generator<unknown, unknown, unknown> {
     const constructor = obj?.constructor
     if (!constructor) {
         return false

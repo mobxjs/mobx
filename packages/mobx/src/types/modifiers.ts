@@ -21,7 +21,7 @@ export interface IEnhancer<T> {
     (newValue: T, oldValue: T | undefined, name: string): T
 }
 
-export function deepEnhancer(v, _, name) {
+export function deepEnhancer<T>(v: T, _: T | undefined, name: string): T {
     // it is an observable already, done
     if (isObservable(v)) {
         return v
@@ -29,20 +29,20 @@ export function deepEnhancer(v, _, name) {
 
     // something that can be converted and mutated?
     if (Array.isArray(v)) {
-        return observable.array(v, { name })
+        return observable.array(v, { name }) as unknown as T
     }
     if (isPlainObject(v)) {
-        return observable.object(v, undefined, { name })
+        return observable.object(v as unknown as object, undefined, { name }) as unknown as T
     }
     if (isES6Map(v)) {
-        return observable.map(v, { name })
+        return observable.map(v, { name }) as unknown as T
     }
     if (isES6Set(v)) {
-        return observable.set(v, { name })
+        return observable.set(v, { name }) as unknown as T
     }
     if (typeof v === "function" && !isAction(v) && !isFlow(v)) {
         if (isGenerator(v)) {
-            return flow(v)
+            return flow(v) as unknown as T
         } else {
             return autoAction(name, v)
         }
@@ -50,7 +50,7 @@ export function deepEnhancer(v, _, name) {
     return v
 }
 
-export function shallowEnhancer(v, _, name): any {
+export function shallowEnhancer<T>(v: T, _: T, name: string): T {
     if (v === undefined || v === null) {
         return v
     }
@@ -58,16 +58,19 @@ export function shallowEnhancer(v, _, name): any {
         return v
     }
     if (Array.isArray(v)) {
-        return observable.array(v, { name, deep: false })
+        return observable.array(v, { name, deep: false }) as unknown as T
     }
     if (isPlainObject(v)) {
-        return observable.object(v, undefined, { name, deep: false })
+        return observable.object(v as unknown as object, undefined, {
+            name,
+            deep: false
+        }) as unknown as T
     }
     if (isES6Map(v)) {
-        return observable.map(v, { name, deep: false })
+        return observable.map(v, { name, deep: false }) as unknown as T
     }
     if (isES6Set(v)) {
-        return observable.set(v, { name, deep: false })
+        return observable.set(v, { name, deep: false }) as unknown as T
     }
 
     if (__DEV__) {
@@ -75,14 +78,16 @@ export function shallowEnhancer(v, _, name): any {
             "The shallow modifier / decorator can only used in combination with arrays, objects, maps and sets"
         )
     }
+
+    return v
 }
 
-export function referenceEnhancer(newValue?) {
+export function referenceEnhancer<T>(newValue: T): T {
     // never turn into an observable
     return newValue
 }
 
-export function refStructEnhancer(v, oldValue): any {
+export function refStructEnhancer<T>(v: T, oldValue: T): T {
     if (__DEV__ && isObservable(v)) {
         die(`observable.struct should not be used with observable values`)
     }

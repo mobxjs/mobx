@@ -10,7 +10,10 @@ import {
     MakeResult
 } from "../internal"
 
-export function createActionAnnotation(name: string, options?: object): Annotation {
+export function createActionAnnotation<Options>(
+    name: string,
+    options?: Options
+): Annotation<Options> {
     return {
         annotationType_: name,
         options_: options,
@@ -72,9 +75,15 @@ function assertActionDescriptor(
     }
 }
 
+export type ActionDescriptorOptions = {
+    bound?: boolean
+    name?: string
+    autoAction?: boolean
+}
+
 export function createActionDescriptor(
     adm: ObservableObjectAdministration,
-    annotation: Annotation,
+    annotation: Annotation<ActionDescriptorOptions>,
     key: PropertyKey,
     descriptor: PropertyDescriptor,
     // provides ability to disable safeDescriptors for prototypes

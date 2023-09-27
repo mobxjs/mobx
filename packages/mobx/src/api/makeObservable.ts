@@ -2,7 +2,7 @@ import {
     $mobx,
     asObservableObject,
     AnnotationsMap,
-    CreateObservableOptions,
+    CreateObservableObjectOptions,
     ObservableObjectAdministration,
     collectStoredAnnotations,
     isPlainObject,
@@ -22,7 +22,7 @@ import {
 // Fixes: https://github.com/mobxjs/mobx/issues/2325#issuecomment-691070022
 type NoInfer<T> = [T][T extends any ? 0 : never]
 
-type MakeObservableOptions = Omit<CreateObservableOptions, "proxy">
+type MakeObservableOptions = Omit<CreateObservableObjectOptions, "proxy">
 
 export function makeObservable<T extends object, AdditionalKeys extends PropertyKey = never>(
     target: T,
