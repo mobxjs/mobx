@@ -1,5 +1,11 @@
 # mobx-react-lite
 
+## 4.0.5
+
+### Patch Changes
+
+-   [`87e5dfb5`](https://github.com/mobxjs/mobx/commit/87e5dfb52a84869d62b6343887a1c8659aee595d) [#3763](https://github.com/mobxjs/mobx/pull/3763) Thanks [@mweststrate](https://github.com/mweststrate)! - Switched observer implementation from using global to local state version. Fixes #3728
+
 ## 4.0.4
 
 ### Patch Changes
