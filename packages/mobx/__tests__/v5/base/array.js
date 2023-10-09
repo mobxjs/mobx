@@ -178,6 +178,34 @@ test("find(findIndex) and remove", function () {
     expect(a.remove(20)).toBe(false)
 })
 
+test("findLast(findLastIndex) and remove", function () {
+    const a = mobx.observable([10, 20, 20])
+    let idx = -1
+    function predicate(item, index) {
+        if (item === 20) {
+            idx = index
+            return true
+        }
+        return false
+    }
+    ;[].findLastIndex;
+    expect(a.findLast(predicate)).toBe(20)
+    expect(a.findLastIndex(predicate)).toBe(2)
+    expect(a.findLast(predicate)).toBe(20)
+
+    expect(a.remove(20)).toBe(true)
+    expect(a.find(predicate)).toBe(20)
+    expect(idx).toBe(1)
+    expect(a.findIndex(predicate)).toBe(1)
+    idx = -1
+    expect(a.remove(20)).toBe(true)
+    expect(a.findLast(predicate)).toBe(undefined)
+    expect(idx).toBe(-1)
+    expect(a.findLastIndex(predicate)).toBe(-1)
+
+    expect(a.remove(20)).toBe(false)
+})
+
 test("concat should automatically slice observable arrays, #260", () => {
     const a1 = mobx.observable([1, 2])
     const a2 = mobx.observable([3, 4])
@@ -630,6 +658,8 @@ test("correct array should be passed to callbacks #2326", () => {
         "filter",
         "find",
         "findIndex",
+        "findLast",
+        "findLastIndex",
         "flatMap",
         "forEach",
         "map",
@@ -805,6 +835,26 @@ describe("dehances", () => {
 
     test("values", () => {
         expect([...array.values()]).toEqual([...dehanced.values()])
+    })
+
+    test("toReversed", () => {
+        expect(array.toReversed()).toEqual(dehanced.toReversed())
+    })
+
+    test("toSorted", () => {
+        expect(array.toSorted()).toEqual(dehanced.toSorted())
+    })
+
+    test("toSorted with args", () => {
+        expect(array.toSorted((a, b) => a - b)).toEqual(dehanced.toSorted((a, b) => a - b))
+    })
+
+    test("toSpliced", () => {
+        expect(array.toSpliced(1, 2)).toEqual(dehanced.toSpliced(1, 2))
+    })
+
+    test("with", () => {
+        expect(array.with(1, 5)).toEqual(dehanced.with(1, 5))
     })
 
     test("flat/flatMap", () => {
