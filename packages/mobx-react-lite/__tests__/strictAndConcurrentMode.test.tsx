@@ -67,7 +67,7 @@ test(`observable changes before first commit are not lost`, async () => {
     expect(rendering.baseElement.textContent).toBe("changed")
 })
 
-test("should destroy reaction when Promise is thrown", async doneCallback => {
+test("destroy reaction in the next animation frame if component destroyed", async doneCallback => {
     const o = mobx.observable({ x: 0, promise: null as Promise<void> | null })
     const Cmp = () =>
         useObserver(() => {
