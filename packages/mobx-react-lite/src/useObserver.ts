@@ -7,8 +7,6 @@ import { useSyncExternalStore } from "use-sync-external-store/shim"
 // Required by SSR when hydrating #3669
 const getServerSnapshot = () => {}
 
-// Do not store `admRef` (even as part of a closure!) on this object,
-// otherwise it will prevent GC and therefore reaction disposal via FinalizationRegistry.
 type ObserverAdministration = {
     reaction: Reaction | null // also serves as disposed flag
     onStoreChange: Function | null // also serves as mounted flag
@@ -46,52 +44,71 @@ export function useObserver<T>(render: () => T, baseComponentName: string = "obs
 
     const animationRequestIDRef = React.useRef<number | null>(null)
     const admRef = React.useRef<ObserverAdministration | null>(null)
+    let adm = admRef.current
 
-    if (!admRef.current) {
+    if (!adm) {
         // First render
-        const adm: ObserverAdministration = {
+        adm = {
             reaction: null,
             onStoreChange: null,
             stateVersion: Symbol(),
             name: baseComponentName,
             subscribe(onStoreChange: () => void) {
-                // Do NOT access admRef here!
-                adm.onStoreChange = onStoreChange
-                if (!adm.reaction) {
+                this.onStoreChange = onStoreChange
+                if (!this.reaction) {
                     // We've lost our reaction and therefore all subscriptions, occurs when:
-                    // 1. Timer based finalization registry disposed reaction before component mounted.
+                    // 1. requestAnimationFrame disposed reaction before component mounted.
                     // 2. React "re-mounts" same component without calling render in between (typically <StrictMode>).
                     // We have to recreate reaction and schedule re-render to recreate subscriptions,
                     // even if state did not change.
-                    createReaction(adm)
+                    createReaction(this)
                     // `onStoreChange` won't force update if subsequent `getSnapshot` returns same value.
                     // So we make sure that is not the case
-                    adm.stateVersion = Symbol()
+                    this.stateVersion = Symbol()
                 }
 
                 return () => {
-                    // Do NOT access admRef here!
-                    disposeReaction(adm)
+                    disposeReaction(this)
                 }
             },
             getSnapshot() {
-                // Do NOT access admRef here!
-                return adm.stateVersion
+                return this.stateVersion
             }
         }
+
+        adm.subscribe = adm.subscribe.bind(adm)
+        adm.getSnapshot = adm.getSnapshot.bind(adm)
 
         admRef.current = adm
     }
 
-    const adm = admRef.current!
-    const firstRender = !adm.reaction
-
-    if (firstRender) {
-        // First render or reaction was disposed by registry before subscribe
+    if (!adm.reaction) {
+        // First render or reaction was disposed before subscribe
         createReaction(adm)
     }
 
     React.useDebugValue(adm.reaction!, printDebugValue)
+
+    if (animationRequestIDRef.current !== null) {
+        // cancel previous animation frame
+        cancelAnimationFrame(animationRequestIDRef.current)
+        animationRequestIDRef.current = null
+    }
+
+    animationRequestIDRef.current = requestAnimationFrame(() => {
+        // 1. StrictMode/ConcurrentMode/Suspense may mean that our component is
+        //    rendered and abandoned multiple times, so we need to dispose leaked
+        //    Reactions.
+        // 2. The component haven't been rendered in the following animation frame.
+        disposeReaction(adm!)
+    })
+
+    const animationRequestID = animationRequestIDRef.current
+
+    useLayoutEffect(() => {
+        // Component mounted, we don't need to dispose reaction anymore
+        cancelAnimationFrame(animationRequestID)
+    })
 
     useSyncExternalStore(
         // Both of these must be stable, otherwise it would keep resubscribing every render.
@@ -113,28 +130,9 @@ export function useObserver<T>(render: () => T, baseComponentName: string = "obs
         }
     })
 
-    if (animationRequestIDRef.current !== null) {
-        // cancel previous animation frame
-        cancelAnimationFrame(animationRequestIDRef.current)
-        animationRequestIDRef.current = null
-    }
-
-    // StrictMode/ConcurrentMode/Suspense may mean that our component is
-    // rendered and abandoned multiple times, so we need to dispose leaked
-    // Reactions.
-    animationRequestIDRef.current = requestAnimationFrame(() => {
-        disposeReaction(adm)
-    })
-
     if (exception) {
         throw exception // re-throw any exceptions caught during rendering
     }
-
-    const animationRequestID = animationRequestIDRef.current
-
-    useLayoutEffect(() => {
-        cancelAnimationFrame(animationRequestID)
-    })
 
     return renderResult
 }
