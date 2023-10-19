@@ -1,8 +1,7 @@
 import { Reaction } from "mobx"
-import React from "react"
+import React, { useLayoutEffect } from "react"
 import { printDebugValue } from "./utils/printDebugValue"
 import { isUsingStaticRendering } from "./staticRendering"
-import { observerFinalizationRegistry } from "./utils/observerFinalizationRegistry"
 import { useSyncExternalStore } from "use-sync-external-store/shim"
 
 // Required by SSR when hydrating #3669
@@ -34,11 +33,18 @@ function createReaction(adm: ObserverAdministration) {
     })
 }
 
+function disposeReaction(adm: ObserverAdministration) {
+    adm.onStoreChange = null
+    adm.reaction?.dispose()
+    adm.reaction = null
+}
+
 export function useObserver<T>(render: () => T, baseComponentName: string = "observed"): T {
     if (isUsingStaticRendering()) {
         return render()
     }
 
+    const animationRequestIDRef = React.useRef<number | null>(null)
     const admRef = React.useRef<ObserverAdministration | null>(null)
 
     if (!admRef.current) {
@@ -50,7 +56,6 @@ export function useObserver<T>(render: () => T, baseComponentName: string = "obs
             name: baseComponentName,
             subscribe(onStoreChange: () => void) {
                 // Do NOT access admRef here!
-                observerFinalizationRegistry.unregister(adm)
                 adm.onStoreChange = onStoreChange
                 if (!adm.reaction) {
                     // We've lost our reaction and therefore all subscriptions, occurs when:
@@ -66,9 +71,7 @@ export function useObserver<T>(render: () => T, baseComponentName: string = "obs
 
                 return () => {
                     // Do NOT access admRef here!
-                    adm.onStoreChange = null
-                    adm.reaction?.dispose()
-                    adm.reaction = null
+                    disposeReaction(adm)
                 }
             },
             getSnapshot() {
@@ -81,14 +84,11 @@ export function useObserver<T>(render: () => T, baseComponentName: string = "obs
     }
 
     const adm = admRef.current!
+    const firstRender = !adm.reaction
 
-    if (!adm.reaction) {
+    if (firstRender) {
         // First render or reaction was disposed by registry before subscribe
         createReaction(adm)
-        // StrictMode/ConcurrentMode/Suspense may mean that our component is
-        // rendered and abandoned multiple times, so we need to track leaked
-        // Reactions.
-        observerFinalizationRegistry.register(admRef, adm, adm)
     }
 
     React.useDebugValue(adm.reaction!, printDebugValue)
@@ -113,9 +113,28 @@ export function useObserver<T>(render: () => T, baseComponentName: string = "obs
         }
     })
 
+    if (animationRequestIDRef.current !== null) {
+        // cancel previous animation frame
+        cancelAnimationFrame(animationRequestIDRef.current)
+        animationRequestIDRef.current = null
+    }
+
+    // StrictMode/ConcurrentMode/Suspense may mean that our component is
+    // rendered and abandoned multiple times, so we need to dispose leaked
+    // Reactions.
+    animationRequestIDRef.current = requestAnimationFrame(() => {
+        disposeReaction(adm)
+    })
+
     if (exception) {
         throw exception // re-throw any exceptions caught during rendering
     }
+
+    const animationRequestID = animationRequestIDRef.current
+
+    useLayoutEffect(() => {
+        cancelAnimationFrame(animationRequestID)
+    })
 
     return renderResult
 }

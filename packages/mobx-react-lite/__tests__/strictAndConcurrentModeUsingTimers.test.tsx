@@ -9,6 +9,7 @@ import {
 } from "../src/utils/UniversalFinalizationRegistry"
 import { observerFinalizationRegistry } from "../src/utils/observerFinalizationRegistry"
 import { TimerBasedFinalizationRegistry } from "../src/utils/UniversalFinalizationRegistry"
+import { requestAnimationFrameMock } from "./utils/RequestAnimationFrameMockSession"
 
 expect(observerFinalizationRegistry).toBeInstanceOf(TimerBasedFinalizationRegistry)
 
@@ -45,11 +46,13 @@ test("uncommitted components should not leak observations", async () => {
             <TestComponent2 />
         </React.StrictMode>
     )
+    requestAnimationFrameMock.triggerAllAnimationFrames()
     rendering.rerender(
         <React.StrictMode>
             <TestComponent1 />
         </React.StrictMode>
     )
+    requestAnimationFrameMock.triggerAllAnimationFrames()
 
     // Allow any reaction-disposal cleanup timers to run
     const skip = Math.max(REGISTRY_FINALIZE_AFTER, REGISTRY_SWEEP_INTERVAL)

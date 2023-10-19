@@ -4,6 +4,7 @@ import * as mobx from "mobx"
 import * as React from "react"
 
 import { useObserver } from "../src/useObserver"
+import { requestAnimationFrameMock } from "./utils/RequestAnimationFrameMockSession"
 
 afterEach(cleanup)
 
@@ -64,4 +65,54 @@ test(`observable changes before first commit are not lost`, async () => {
     )
 
     expect(rendering.baseElement.textContent).toBe("changed")
+})
+
+test("should destroy reaction when Promise is thrown", async doneCallback => {
+    const o = mobx.observable({ x: 0, promise: null as Promise<void> | null })
+    const Cmp = () =>
+        useObserver(() => {
+            o.x as any // establish dependency
+            if (o.promise) {
+                throw o.promise
+            }
+            return o.x as any
+        })
+
+    const observed = jest.fn()
+    const unobserved = jest.fn()
+    mobx.onBecomeObserved(o, "x", observed)
+    mobx.onBecomeUnobserved(o, "x", unobserved)
+
+    const { container, unmount } = render(
+        <React.Suspense fallback={"loading..."}>
+            <Cmp />
+        </React.Suspense>
+    )
+    requestAnimationFrameMock.triggerAllAnimationFrames()
+
+    expect(container).toHaveTextContent("0")
+    expect(observed).toBeCalledTimes(1)
+    expect(unobserved).toBeCalledTimes(0)
+    act(
+        mobx.action(() => {
+            o.promise = Promise.resolve()
+        })
+    )
+    requestAnimationFrameMock.triggerAllAnimationFrames()
+    expect(container).toHaveTextContent("loading...")
+    expect(observed).toBeCalledTimes(1)
+    expect(unobserved).toBeCalledTimes(1)
+    act(
+        mobx.action(() => {
+            o.x++
+            o.promise = null
+        })
+    )
+    requestAnimationFrameMock.triggerAllAnimationFrames()
+    await new Promise(resolve => setTimeout(resolve, 1))
+    expect(container).toHaveTextContent("1")
+    expect(observed).toBeCalledTimes(2)
+    expect(unobserved).toBeCalledTimes(1)
+
+    doneCallback()
 })

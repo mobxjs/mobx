@@ -4,6 +4,7 @@ import * as React from "react"
 import { useObserver } from "../src/useObserver"
 import gc from "expose-gc/function"
 import { observerFinalizationRegistry } from "../src/utils/observerFinalizationRegistry"
+import { requestAnimationFrameMock } from "./utils/RequestAnimationFrameMockSession"
 
 if (typeof globalThis.FinalizationRegistry !== "function") {
     throw new Error("This test must run with node >= 14")
@@ -35,11 +36,13 @@ test("uncommitted components should not leak observations", async () => {
             <TestComponent2 />
         </React.StrictMode>
     )
+    requestAnimationFrameMock.triggerAllAnimationFrames()
     rendering.rerender(
         <React.StrictMode>
             <TestComponent1 />
         </React.StrictMode>
     )
+    requestAnimationFrameMock.triggerAllAnimationFrames()
 
     // Allow gc to kick in in case to let finalization registry cleanup
     await new Promise(resolve => setTimeout(resolve, 100))
