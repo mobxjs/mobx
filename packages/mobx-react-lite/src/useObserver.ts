@@ -1,5 +1,5 @@
 import { Reaction } from "mobx"
-import React, { useLayoutEffect } from "react"
+import React from "react"
 import { printDebugValue } from "./utils/printDebugValue"
 import { isUsingStaticRendering } from "./staticRendering"
 import { useSyncExternalStore } from "use-sync-external-store/shim"
@@ -20,8 +20,8 @@ type ObserverAdministration = {
     getSnapshot: Parameters<typeof React.useSyncExternalStore>[1]
 }
 
-function createReaction(name: string, adm: ObserverAdministration) {
-    adm.reaction = new Reaction(`observer${name}`, () => forceUpdate(adm))
+function createReaction(name: string, adm: ObserverAdministration): Reaction {
+    return new Reaction(`observer${name}`, () => forceUpdate(adm))
 }
 
 function disposeReaction(adm: ObserverAdministration) {
@@ -55,7 +55,7 @@ function useReactionDisposer(adm: ObserverAdministration) {
         animationRequestIDRef.current = null
     })
 
-    useLayoutEffect(() => {
+    React.useLayoutEffect(() => {
         if (animationRequestIDRef.current !== null) {
             // Component mounted, we don't need to dispose reaction anymore
             cancelAnimationFrame(animationRequestIDRef.current)
@@ -110,15 +110,15 @@ export function useObserver<T>(render: () => T, baseComponentName: string = "obs
 
     if (!adm) {
         // First render
-        admRef.current = adm = createObserverAdministration()
+        adm = admRef.current = createObserverAdministration()
     }
 
     if (!adm.reaction) {
         // First render or reaction was disposed before subscribe
-        createReaction(baseComponentName, adm)
+        adm.reaction = createReaction(baseComponentName, adm)
     }
 
-    React.useDebugValue(adm.reaction!, printDebugValue)
+    React.useDebugValue(adm.reaction, printDebugValue)
 
     useReactionDisposer(adm)
 
@@ -134,7 +134,7 @@ export function useObserver<T>(render: () => T, baseComponentName: string = "obs
     // can be invalidated (see above) once a dependency changes
     let renderResult!: T
     let exception
-    adm.reaction!.track(() => {
+    adm.reaction.track(() => {
         try {
             renderResult = render()
         } catch (e) {
