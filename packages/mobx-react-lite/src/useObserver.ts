@@ -59,6 +59,7 @@ function useReactionDisposer(adm: ObserverAdministration) {
         if (animationRequestIDRef.current !== null) {
             // Component mounted, we don't need to dispose reaction anymore
             cancelAnimationFrame(animationRequestIDRef.current)
+            animationRequestIDRef.current = null
         }
 
         // In some rare cases reaction will be disposed before component mounted,
