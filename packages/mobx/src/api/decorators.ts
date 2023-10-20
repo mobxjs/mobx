@@ -89,6 +89,10 @@ export function assert20223DecoratorType(
     types: DecoratorContext["kind"][]
 ) {
     if (__DEV__ && !types.includes(context.kind)) {
-        die(`Decorator may not be used like this`)
+        die(
+            `The decorator applied to '${String(context.name)}' cannot be used on a ${
+                context.kind
+            } element`
+        )
     }
 }

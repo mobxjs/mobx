@@ -7,8 +7,7 @@ import {
     assert20223DecoratorType,
     ObservableValue,
     asObservableObject,
-    $mobx,
-    storeAnnotation
+    $mobx
 } from "../internal"
 
 export function createObservableAnnotation(name: string, options?: object): Annotation {
@@ -52,25 +51,25 @@ function decorate_20223_(
     context: ClassAccessorDecoratorContext | ClassFieldDecoratorContext
 ) {
     if (__DEV__) {
-        assert20223DecoratorType(context, ["accessor", "field"])
+        if (context.kind === "field")
+            throw die(
+                `Please use \`@observable accessor ${String(
+                    context.name
+                )}\` instead of \`@observable ${String(context.name)}\``
+            )
+        assert20223DecoratorType(context, ["accessor"])
     }
 
     const ann = this
-    const { kind, name, addInitializer } = context
-
-    // Backwards/Legacy behavior, expects makeObservable(this)
-    if (kind == "field") {
-        addInitializer(function () {
-            storeAnnotation(this, name, ann)
-        })
-        return
-    }
+    const { kind, name } = context
 
     // The laziness here is not ideal... It's a workaround to how 2022.3 Decorators are implemented:
     //   `addInitializer` callbacks are executed _before_ any accessors are defined (instead of the ideal-for-us right after each).
     //   This means that, if we were to do our stuff in an `addInitializer`, we'd attempt to read a private slot
     //   before it has been initialized. The runtime doesn't like that and throws a `Cannot read private member
     //   from an object whose class did not declare it` error.
+    // TODO: it seems that this will not be required anymore in the final version of the spec
+    // See TODO: link
     const initializedObjects = new WeakSet()
 
     function initializeObservable(target, value) {

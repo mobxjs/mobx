@@ -156,6 +156,7 @@ export interface IObservableFactory
         PropertyDecorator,
         ClassAccessorDecorator,
         ClassFieldDecorator {
+    // TODO: remove ClassFieldDecorator, this is only temporarily support for legacy decorators
     <T = any>(value: T[], options?: CreateObservableOptions): IObservableArray<T>
     <T = any>(value: Set<T>, options?: CreateObservableOptions): ObservableSet<T>
     <K = any, V = any>(value: Map<K, V>, options?: CreateObservableOptions): ObservableMap<K, V>

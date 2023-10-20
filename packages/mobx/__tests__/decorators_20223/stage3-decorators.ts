@@ -191,49 +191,21 @@ test("computed setter should succeed", () => {
     t.equal(b.propX, 8)
 })
 
-test("ClassFieldDecorators should work in conjunction with makeObservable()", () => {
-    class Order {
-        @observable price: number = 3
-        @observable amount: number = 2
-        @observable orders: string[] = []
-        @observable aFunction = testFunction
-
-        @computed
-        get total() {
-            return this.amount * this.price * (1 + this.orders.length)
+test("ClassFieldDecorators should NOT work without accessor without legacy compilation", () => {
+    expect(() => {
+        class Order {
+            @observable price: number = 3
         }
+    }).toThrowError("[MobX] Please use `@observable accessor price` instead of `@observable price`")
+})
 
-        constructor() {
-            makeObservable(this)
+test("Reasonable error for decorator kind mismatch", () => {
+    expect(() => {
+        class Order {
+            // @ts-ignore
+            @computed total = 3
         }
-    }
-
-    const o = new Order()
-    t.equal(isObservableObject(o), true)
-    t.equal(isObservableProp(o, "amount"), true)
-    t.equal(isObservableProp(o, "total"), true)
-
-    const events: any[] = []
-    const d1 = observe(o, (ev: IObjectDidChange) => events.push(ev.name, (ev as any).oldValue))
-    const d2 = observe(o, "price", ev => events.push(ev.newValue, ev.oldValue))
-    const d3 = observe(o, "total", ev => events.push(ev.newValue, ev.oldValue))
-
-    o.price = 4
-
-    d1()
-    d2()
-    d3()
-
-    o.price = 5
-
-    t.deepEqual(events, [
-        8, // new total
-        6, // old total
-        4, // new price
-        3, // old price
-        "price", // event name
-        3 // event oldValue
-    ])
+    }).toThrowError("[MobX] The decorator applied to 'total' cannot be used on a field element")
 })
 
 test("typescript: parameterized computed decorator", () => {
@@ -734,16 +706,20 @@ test("enumerability", () => {
     t.equal(a.hasOwnProperty("m"), false)
 })
 
-test("issue 285 (2022.3) (legacy/field decorator)", () => {
+// Re-enable when late initialization is supported in TS
+test.skip("issue 285 (2022.3)", () => {
     const { observable, toJS } = mobx
 
     class Todo {
         id = 1
-        @observable title: string
-        @observable finished = false
-        @observable childThings = [1, 2, 3]
+        @observable accessor title: string
+        @observable accessor finished = false
+        @observable accessor childThings = [1, 2, 3]
+        @computed get bla() {
+            return 3
+        }
+        @action someMethod() {}
         constructor(title: string) {
-            makeObservable(this)
             this.title = title
         }
     }
@@ -758,9 +734,10 @@ test("issue 285 (2022.3) (legacy/field decorator)", () => {
     })
 })
 
-test("verify object assign (2022.3) (legacy/field decorator)", () => {
+// Re-enable when late initialization is supported in TS
+test.skip("verify object assign (2022.3) (legacy/field decorator)", () => {
     class Todo {
-        @observable title = "test"
+        @observable accessor title = "test"
         @computed
         get upperCase() {
             return this.title.toUpperCase()
