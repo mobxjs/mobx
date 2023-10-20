@@ -1,4 +1,4 @@
-import { act, cleanup, render, waitFor } from "@testing-library/react"
+import { act, cleanup, render } from "@testing-library/react"
 import mockConsole from "jest-mock-console"
 import * as mobx from "mobx"
 import * as React from "react"
