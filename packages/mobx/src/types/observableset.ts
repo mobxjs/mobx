@@ -27,7 +27,8 @@ import {
     DELETE,
     ADD,
     die,
-    isFunction
+    isFunction,
+    initObservable
 } from "../internal"
 
 const ObservableSetMarker = {}
@@ -65,7 +66,7 @@ export type ISetWillChange<T = any> =
 export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillChange>, IListenable {
     [$mobx] = ObservableSetMarker
     private data_: Set<any> = new Set()
-    atom_: IAtom
+    atom_!: IAtom
     changeListeners_
     interceptors_
     dehancer: any
@@ -79,11 +80,13 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
         if (!isFunction(Set)) {
             die(22)
         }
-        this.atom_ = createAtom(this.name_)
         this.enhancer_ = (newV, oldV) => enhancer(newV, oldV, name_)
-        if (initialData) {
-            this.replace(initialData)
-        }
+        initObservable(() => {
+            this.atom_ = createAtom(this.name_)
+            if (initialData) {
+                this.replace(initialData)
+            }
+        })
     }
 
     private dehanceValue_<X extends T | undefined>(value: X): X {
