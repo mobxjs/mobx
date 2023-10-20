@@ -7,98 +7,76 @@ import { useSyncExternalStore } from "use-sync-external-store/shim"
 // Required by SSR when hydrating #3669
 const getServerSnapshot = () => {}
 
-type ObserverAdministration = {
+// will prevent disposing reaction of delayed components
+const DISPOSE_TIMEOUT = 100
+
+class ObserverAdministration {
     reaction: Reaction | null // also serves as disposed flag
     onStoreChange: Function | null // also serves as mounted flag
+    timeoutID: number | null
     // BC: we will use local state version if global isn't available.
     // It should behave as previous implementation - tearing is still present,
     // because there is no cross component synchronization,
     // but we can use `useSyncExternalStore` API.
     stateVersion: any
-    // These don't depend on state/props, therefore we can keep them here instead of `useCallback`
-    subscribe: Parameters<typeof React.useSyncExternalStore>[0]
-    getSnapshot: Parameters<typeof React.useSyncExternalStore>[1]
-}
 
-function createReaction(name: string, adm: ObserverAdministration): Reaction {
-    return new Reaction(`observer${name}`, () => forceUpdate(adm))
-}
+    constructor(name: string) {
+        this.forceUpdate = this.forceUpdate.bind(this)
+        this.subscribe = this.subscribe.bind(this)
+        this.getSnapshot = this.getSnapshot.bind(this)
+        this.dispose = this.dispose.bind(this)
 
-function disposeReaction(adm: ObserverAdministration) {
-    adm.reaction?.dispose()
-    adm.reaction = null
-}
+        this.reaction = new Reaction(`observer${name}`, this.forceUpdate)
+        this.onStoreChange = null
+        this.stateVersion = Symbol()
+        this.timeoutID = null
 
-function forceUpdate(adm: ObserverAdministration) {
-    adm.stateVersion = Symbol()
-    // onStoreChange won't be available until the component "mounts".
-    // If state changes in between initial render and mount,
-    // `useSyncExternalStore` should handle that by checking the state version and issuing update.
-    adm.onStoreChange?.()
-}
-
-function useReactionDisposer(adm: ObserverAdministration) {
-    const animationRequestIDRef = React.useRef<number | null>(null)
-
-    if (animationRequestIDRef.current !== null) {
-        // cancel previous animation frame
-        cancelAnimationFrame(animationRequestIDRef.current)
-        animationRequestIDRef.current = null
+        this.scheduleDispose()
     }
 
-    animationRequestIDRef.current = requestAnimationFrame(() => {
-        // 1. StrictMode/ConcurrentMode/Suspense may mean that our component is
-        //    rendered and abandoned multiple times, so we need to dispose leaked
-        //    Reactions.
-        // 2. The component haven't been rendered in the following animation frame.
-        disposeReaction(adm!)
-        animationRequestIDRef.current = null
-    })
-
-    React.useLayoutEffect(() => {
-        if (animationRequestIDRef.current !== null) {
-            // Component mounted, we don't need to dispose reaction anymore
-            cancelAnimationFrame(animationRequestIDRef.current)
-            animationRequestIDRef.current = null
+    subscribe(onStoreChange: () => void) {
+        this.cancelDispose()
+        this.onStoreChange = onStoreChange
+        if (!this.reaction) {
+            // We've lost our reaction and therefore all subscriptions, occurs when:
+            // 1. requestAnimationFrame disposed reaction before component mounted.
+            // 2. React "re-mounts" same component without calling render in between (typically <StrictMode>).
+            // We have to schedule re-render to recreate reaction and subscriptions, even if state did not change.
+            this.forceUpdate()
         }
 
-        // In some rare cases reaction will be disposed before component mounted,
-        // but we still need to recreate it.
-        if (adm && !adm.reaction) {
-            forceUpdate(adm)
-        }
-    })
-}
-
-function createObserverAdministration(): ObserverAdministration {
-    const adm: ObserverAdministration = {
-        reaction: null,
-        onStoreChange: null,
-        stateVersion: Symbol(),
-        subscribe(onStoreChange: () => void) {
-            this.onStoreChange = onStoreChange
-            if (!this.reaction) {
-                // We've lost our reaction and therefore all subscriptions, occurs when:
-                // 1. requestAnimationFrame disposed reaction before component mounted.
-                // 2. React "re-mounts" same component without calling render in between (typically <StrictMode>).
-                // We have to schedule re-render to recreate reaction and subscriptions, even if state did not change.
-                forceUpdate(this)
-            }
-
-            return () => {
-                this.onStoreChange = null
-                disposeReaction(this)
-            }
-        },
-        getSnapshot() {
-            return this.stateVersion
-        }
+        return this.dispose
     }
 
-    adm.subscribe = adm.subscribe.bind(adm)
-    adm.getSnapshot = adm.getSnapshot.bind(adm)
+    getSnapshot() {
+        return this.stateVersion
+    }
 
-    return adm
+    private forceUpdate() {
+        this.stateVersion = Symbol()
+        // onStoreChange won't be available until the component "mounts".
+        // If state changes in between initial render and mount,
+        // `useSyncExternalStore` should handle that by checking the state version and issuing update.
+        this.onStoreChange?.()
+    }
+
+    private dispose() {
+        this.reaction?.dispose()
+        this.reaction = null
+        this.onStoreChange = null
+        this.cancelDispose()
+    }
+
+    private scheduleDispose() {
+        this.timeoutID = setTimeout(() => this.dispose(), DISPOSE_TIMEOUT) as unknown as number
+    }
+
+    private cancelDispose() {
+        if (this.timeoutID !== null) {
+            clearTimeout(this.timeoutID)
+            this.timeoutID = null
+        }
+    }
 }
 
 export function useObserver<T>(render: () => T, baseComponentName: string = "observed"): T {
@@ -109,19 +87,12 @@ export function useObserver<T>(render: () => T, baseComponentName: string = "obs
     const admRef = React.useRef<ObserverAdministration | null>(null)
     let adm = admRef.current
 
-    if (!adm) {
-        // First render
-        adm = admRef.current = createObserverAdministration()
+    if (!adm?.reaction) {
+        // First render or reaction was disposed
+        adm = admRef.current = new ObserverAdministration(baseComponentName)
     }
 
-    if (!adm.reaction) {
-        // First render or reaction was disposed before subscribe
-        adm.reaction = createReaction(baseComponentName, adm)
-    }
-
-    React.useDebugValue(adm.reaction, printDebugValue)
-
-    useReactionDisposer(adm)
+    React.useDebugValue(adm.reaction!, printDebugValue)
 
     useSyncExternalStore(
         // Both of these must be stable, otherwise it would keep resubscribing every render.
@@ -135,7 +106,7 @@ export function useObserver<T>(render: () => T, baseComponentName: string = "obs
     // can be invalidated (see above) once a dependency changes
     let renderResult!: T
     let exception
-    adm.reaction.track(() => {
+    adm.reaction!.track(() => {
         try {
             renderResult = render()
         } catch (e) {

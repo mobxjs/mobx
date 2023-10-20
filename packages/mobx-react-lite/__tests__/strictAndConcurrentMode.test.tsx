@@ -1,13 +1,12 @@
-import { act, cleanup, render } from "@testing-library/react"
+import { act, cleanup, render, waitFor } from "@testing-library/react"
 import mockConsole from "jest-mock-console"
 import * as mobx from "mobx"
 import * as React from "react"
+import { ErrorBoundary } from "./utils/ErrorBoundary"
 
 import { useObserver } from "../src/useObserver"
-import { requestAnimationFrameMock } from "./utils/RequestAnimationFrameMockSession"
 
 afterEach(cleanup)
-afterEach(() => requestAnimationFrameMock.reset())
 
 test("uncommitted observing components should not attempt state changes", () => {
     const store = mobx.observable({ count: 0 })
@@ -68,15 +67,17 @@ test(`observable changes before first commit are not lost`, async () => {
     expect(rendering.baseElement.textContent).toBe("changed")
 })
 
-test("destroy reaction in the next animation frame if component destroyed", async doneCallback => {
+test("suspended components should not leak observations", () => {
     const o = mobx.observable({ x: 0, promise: null as Promise<void> | null })
     const Cmp = () =>
         useObserver(() => {
             o.x as any // establish dependency
+
             if (o.promise) {
                 throw o.promise
             }
-            return o.x as any
+
+            return <>{o.x}</>
         })
 
     const observed = jest.fn()
@@ -84,38 +85,52 @@ test("destroy reaction in the next animation frame if component destroyed", asyn
     mobx.onBecomeObserved(o, "x", observed)
     mobx.onBecomeUnobserved(o, "x", unobserved)
 
+    jest.useFakeTimers()
     const { container, unmount } = render(
         <React.Suspense fallback={"loading..."}>
             <Cmp />
         </React.Suspense>
     )
-    requestAnimationFrameMock.triggerAllAnimationFrames()
 
+    jest.runAllTimers()
     expect(container).toHaveTextContent("0")
     expect(observed).toBeCalledTimes(1)
-    expect(unobserved).toBeCalledTimes(0)
-    act(
-        mobx.action(() => {
-            o.promise = Promise.resolve()
-        })
-    )
-    requestAnimationFrameMock.triggerAllAnimationFrames()
+
+    let resolve: () => void
+    act(() => {
+        o.promise = new Promise(r => (resolve = r))
+    })
+
+    jest.runAllTimers()
     expect(container).toHaveTextContent("loading...")
     expect(observed).toBeCalledTimes(1)
-    expect(unobserved).toBeCalledTimes(1)
-    act(
-        mobx.action(() => {
-            o.x++
-            o.promise = null
-        })
-    )
-    requestAnimationFrameMock.triggerAllAnimationFrames()
-    await new Promise(resolve => setTimeout(resolve, 1))
-    expect(container).toHaveTextContent("1")
-    expect(observed).toBeCalledTimes(2)
-    expect(unobserved).toBeCalledTimes(1)
+    expect(unobserved).toBeCalledTimes(0)
 
-    doneCallback()
+    act(() => {
+        o.promise = null
+        resolve!()
+    })
+
+    jest.runAllTimers()
+    expect(container).toHaveTextContent(o.x + "")
+
+    // ensure that we using same reaction and component state
+    expect(observed).toBeCalledTimes(1)
+    expect(unobserved).toBeCalledTimes(0)
+
+    act(() => {
+        o.x++
+    })
+
+    jest.runAllTimers()
+    expect(container).toHaveTextContent(o.x + "")
+
+    unmount()
+
+    jest.runAllTimers()
+    expect(observed).toBeCalledTimes(1)
+    expect(unobserved).toBeCalledTimes(1)
+    jest.useRealTimers()
 })
 
 test("uncommitted components should not leak observations", async () => {
@@ -132,6 +147,7 @@ test("uncommitted components should not leak observations", async () => {
     const TestComponent1 = () => useObserver(() => <div>{store.count1}</div>)
     const TestComponent2 = () => useObserver(() => <div>{store.count2}</div>)
 
+    jest.useFakeTimers()
     // Render, then remove only #2
     const rendering = render(
         <React.StrictMode>
@@ -145,11 +161,41 @@ test("uncommitted components should not leak observations", async () => {
         </React.StrictMode>
     )
 
-    // Force reactions to be disposed
-    requestAnimationFrameMock.triggerAllAnimationFrames()
-
+    jest.runAllTimers()
     // count1 should still be being observed by Component1,
     // but count2 should have had its reaction cleaned up.
     expect(count1IsObserved).toBeTruthy()
     expect(count2IsObserved).toBeFalsy()
+
+    jest.useRealTimers()
+})
+
+test("abandoned components should not leak observations", async () => {
+    const store = mobx.observable({ count: 0 })
+
+    let countIsObserved = false
+    mobx.onBecomeObserved(store, "count", () => (countIsObserved = true))
+    mobx.onBecomeUnobserved(store, "count", () => (countIsObserved = false))
+
+    const TestComponent = () =>
+        useObserver(() => {
+            store.count // establish dependency
+            throw new Error("not rendered")
+        })
+
+    jest.useFakeTimers()
+
+    render(
+        <ErrorBoundary fallback="error">
+            <TestComponent />
+        </ErrorBoundary>
+    )
+
+    expect(countIsObserved).toBeTruthy()
+
+    jest.runAllTimers()
+
+    expect(countIsObserved).toBeFalsy()
+
+    jest.useRealTimers()
 })
