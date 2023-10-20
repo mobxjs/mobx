@@ -13,6 +13,8 @@ Usage:
 -   `computed` _(annotation)_
 -   `computed(options)` _(annotation)_
 -   `computed(fn, options?)`
+-   `@computed` _(getter decorator)_
+-   `@computed(options)` _(getter decorator)_
 
 Computed values can be used to derive information from other observables.
 They evaluate lazily, caching their output and only recomputing if one of the underlying observables has changed.

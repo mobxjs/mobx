@@ -59,7 +59,7 @@ MobX is made possible by the generosity of the sponsors below, and many other [i
 
 _Anything that can be derived from the application state, should be. Automatically._
 
-MobX is a battle-tested library that makes state management simple and scalable by transparently applying functional reactive programming.
+MobX is a signal based, battle-tested library that makes state management simple and scalable by transparently applying functional reactive programming.
 The philosophy behind MobX is simple:
 
 <div class="benefits">

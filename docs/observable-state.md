@@ -24,7 +24,9 @@ Usage:
 
 This function can be used to make _existing_ object properties observable. Any JavaScript object (including class instances) can be passed into `target`.
 Typically `makeObservable` is used in the constructor of a class, and its first argument is `this`.
-The `annotations` argument maps [annotations](#available-annotations) to each member. Only annotated members are affected. Note that when using [decorators](enabling-decorators.md), the `annotations` argument can be omitted.
+The `annotations` argument maps [annotations](#available-annotations) to each member. Only annotated members are affected.
+
+Alternatively, decorators like `@observable` can be used on class members instead of calling `makeObservable` in the constructor.
 
 Methods that derive information and take arguments (for example `findUsersOlderThan(age: number): User[]`) can not be annotated as `computed` – their read operations will still be tracked when they are called from a reaction, but their output won't be memoized to avoid memory leaks. To memoize such methods you can use [MobX-utils computedFn {🚀}](https://github.com/mobxjs/mobx-utils#computedfn) instead.
 
@@ -66,6 +68,40 @@ class Doubler {
 
 **All annotated** fields are **non-configurable**.<br>
 **All non-observable** (stateless) fields (`action`, `flow`) are **non-writable**.
+
+
+<!--class + decorators-->
+
+When using modern decorators, there is no need to call `makeObservable`, below is what a decorator based class looks like.
+Note that the `@observable` annotation should always be used in combination with the `accessor` keyword.
+
+```javascript
+import { observable, computed, action, flow } from "mobx"
+
+class Doubler {
+    @observable accessor value
+
+    constructor(value) {
+        this.value = value
+    }
+
+    @computed
+    get double() {
+        return this.value * 2
+    }
+
+    @action
+    increment() {
+        this.value++
+    }
+
+    @flow
+    *fetch() {
+        const response = yield fetch("/api/value")
+        this.value = response.json()
+    }
+}
+```
 
 <!--factory function + makeAutoObservable-->
 
@@ -112,6 +148,40 @@ tags.push("prio: for fun")
 In contrast to the first example with `makeObservable`, `observable` supports adding (and removing) _fields_ to an object.
 This makes `observable` great for collections like dynamically keyed objects, arrays, Maps and Sets.
 
+
+<!--class + decorators (legacy)-->
+
+To use legacy decorators, `makeObservable(this)` should be called in the constructor to make sure decorators work.
+
+```javascript
+import { observable, computed, action, flow } from "mobx"
+
+class Doubler {
+    @observable value
+
+    constructor(value) {
+        makeObservable(this)
+        this.value = value
+    }
+
+    @computed
+    get double() {
+        return this.value * 2
+    }
+
+    @action
+    increment() {
+        this.value++
+    }
+
+    @flow
+    *fetch() {
+        const response = yield fetch("/api/value")
+        this.value = response.json()
+    }
+}
+```
+
 <!--END_DOCUSAURUS_CODE_TABS-->
 
 ## `makeAutoObservable`
@@ -141,6 +211,7 @@ Inference rules:
 Usage:
 
 -   `observable(source, overrides?, options?)`
+-   `@observabe accessor` _(field decorator)_
 
 The `observable` annotation can also be called as a function to make an entire object observable at once.
 The `source` object will be cloned and all members will be made observable, similar to how it would be done by `makeAutoObservable`.

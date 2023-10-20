@@ -57,7 +57,7 @@ It is possible to use `extendObservable` to add observable fields to an existing
 
 ### `observable`
 
-Usage: `observable(source, overrides?, options?)` or `observable` _(annotation)_
+Usage: `observable(source, overrides?, options?)`, `observable` _(annotation)_ or `@observable accessor` _(field decorator)_.
 <small>(<b>[further information](observable-state.md#observable)</b>)</small>
 
 Clones an object and makes it observable. Source can be a plain object, array, Map or Set. By default, `observable` is applied recursively. If one of the encountered values is an object or array, that value will be passed through `observable` as well.
@@ -172,7 +172,7 @@ _An action is any piece of code that modifies the state._
 
 ### `action`
 
-Usage: `action(fn)` or `action` _(annotation)_
+Usage: `action(fn)`, `action` _(annotation)_ or `@action` _(method / field decorator)_
 <small>(<b>[further information](actions.md)</b>)</small>
 
 Use on functions that intend to modify the state.
@@ -186,7 +186,7 @@ Create a one-time action that is immediately invoked.
 
 ### `flow`
 
-Usage: `flow(fn)` or `flow` _(annotation)_
+Usage: `flow(fn)`, `flow` _(annotation)_ or `@flow` _(generator method decorator)_
 <small>(<b>[further information](actions.md#using-flow-instead-of-async--await-)</b>)</small>
 
 MobX friendly replacement for `async` / `await` that supports cancellation.
@@ -207,7 +207,7 @@ _Computed values can be used to derive information from other observables._
 
 ### `computed`
 
-Usage: `computed(fn, options?)` or `computed(options?)` _(annotation)_
+Usage: `computed(fn, options?)`, `computed(options?)` _(annotation)_ or `@computed` _(getter decorator)_
 <small>(<b>[further information](computeds.md)</b>)</small>
 
 Creates an observable value that is derived from other observables, but won't be recomputed unless one of the underlying observables changes.
