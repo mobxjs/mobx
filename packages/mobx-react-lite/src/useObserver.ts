@@ -37,15 +37,11 @@ class ObserverAdministration {
     subscribe(onStoreChange: () => void) {
         this.cancelDispose()
         this.onStoreChange = onStoreChange
-        if (!this.reaction) {
-            // We've lost our reaction and therefore all subscriptions, occurs when:
-            // 1. requestAnimationFrame disposed reaction before component mounted.
-            // 2. React "re-mounts" same component without calling render in between (typically <StrictMode>).
-            // We have to schedule re-render to recreate reaction and subscriptions, even if state did not change.
-            this.forceUpdate()
-        }
 
-        return this.dispose
+        return () => {
+            this.onStoreChange = null
+            this.dispose()
+        }
     }
 
     getSnapshot() {
@@ -61,6 +57,13 @@ class ObserverAdministration {
     }
 
     private dispose() {
+        // We've lost our reaction and therefore all subscriptions, occurs when:
+        // 1. scheduleDispose disposed reaction before component mounted.
+        // 2. React "re-mounts" same component without calling render in between (typically <StrictMode>).
+        // We have to schedule re-render to recreate reaction and subscriptions, even if state did not change.
+        // This will have no effect if component is not mounted.
+        this.stateVersion = Symbol()
+
         this.reaction?.dispose()
         this.reaction = null
         this.onStoreChange = null
@@ -68,7 +71,7 @@ class ObserverAdministration {
     }
 
     private scheduleDispose() {
-        this.timeoutID = setTimeout(() => this.dispose(), DISPOSE_TIMEOUT) as unknown as number
+        this.timeoutID = setTimeout(this.dispose, DISPOSE_TIMEOUT) as unknown as number
     }
 
     private cancelDispose() {
