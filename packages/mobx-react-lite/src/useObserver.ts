@@ -60,6 +60,7 @@ class ObserverAdministration {
         // We've lost our reaction and therefore all subscriptions, occurs when:
         // 1. scheduleDispose disposed reaction before component mounted.
         // 2. React "re-mounts" same component without calling render in between (typically <StrictMode>).
+        // 3. component was unmounted.
         // We have to schedule re-render to recreate reaction and subscriptions, even if state did not change.
         // This will have no effect if component is not mounted.
         this.stateVersion = Symbol()
