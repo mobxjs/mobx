@@ -430,7 +430,7 @@ describe("is used to keep observable within component body", () => {
                 ;(container.querySelector("#incmultiplier")! as any).click()
             })
             expect(container.querySelector("span")!.innerHTML).toBe("22")
-            expect(counterRender).toBe(4) // TODO: should be 3
+            expect(counterRender).toBe(4) // One from props, second from updating local observable with effect
         })
     })
 })

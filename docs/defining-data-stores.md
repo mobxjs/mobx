@@ -289,7 +289,7 @@ class TodoStore {
     rootStore
 
     constructor(rootStore) {
-        makeAutoObservable(this, { rootStore: false })
+        makeAutoObservable(this)
         this.rootStore = rootStore
     }
 }

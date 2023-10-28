@@ -36,12 +36,13 @@ MobX is made possible by the generosity of the sponsors below, and many other [i
 <a href="https://coinbase.com/"><img src="https://mobx.js.org/assets/coinbase.jpeg" align="center" width="80" title="Coinbase" alt="Coinbase" /></a>
 <a href="https://curology.com/blog/tech"><img src="https://mobx.js.org/assets/curology.png" align="center" width="80" title="Curology" alt="Curology"/></a>
 <a href="https://opensource.facebook.com/"><img src="https://mobx.js.org/assets/fbos.jpeg" align="center" width="80" title="Facebook Open Source" alt="Facebook Open Source" /></a>
-<a href="https://www.canva.com/"><img src="https://mobx.js.org/assets/canva.png" align="center" width="80" title="Canva" alt="Canva" /></a>
+<a href="https://www.canva.com/"><img src="https://mobx.js.org/assets/canva.svg" align="center" width="80" title="Canva" alt="Canva" /></a>
 
 **🥈 Silver sponsors (\$100+ per month):**<br/>
 <a href="https://casinosites.ltd.uk/?utm_source=sponsorship&utm_medium=mobx&utm_campaign=readme"><img src="https://mobx.js.org/assets/casino2.png" align="center" width="80" title="Casino Sites" alt="Casino Sites"/></a>
 <a href="https://upper.co/?utm_source=github_mobxjs_sponsorship&utm_medium=paid_acquisition&utm_campaign=sponsorship"><img src="https://mobx.js.org/assets/upper.png" align="center" width="80" title="UPPER" alt="UPPER"/></a>
 <a href="https://www.easeus.com/?utm_source=github_mobxjs_sponsorship&utm_medium=readme&utm_campaign=sponsorship"><img src="https://mobx.js.org/assets/easeus.png" align="center" width="80" title="EaseUS" alt="EaseUS"/></a>
+<a href="https://rxdb.info/?utm_source=github_mobxjs_sponsorship&utm_medium=readme&utm_campaign=sponsorship"><img src="https://mobx.js.org/assets/rxdb.png" align="center" width="80" title="RxDB" alt="RxDB JavaScript Database"/></a>
 
 **🥉 Bronze sponsors (\$500+ total contributions):**<br/>
 <a href="https://www.bugsnag.com/platforms/react-error-reporting?utm_source=MobX&utm_medium=Website&utm_content=open-source&utm_campaign=2019-community&utm_term=20190913"><img src="https://mobx.js.org/assets/bugsnag.jpg" align="center" width="80" title="Bugsnag" alt="Bugsnag"/></a>

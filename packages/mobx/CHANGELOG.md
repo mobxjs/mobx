@@ -1,5 +1,41 @@
 # mobx
 
+## 6.10.2
+
+### Patch Changes
+
+-   [`c8d9374d`](https://github.com/mobxjs/mobx/commit/c8d9374d4f3b05cfec0d690e0eb3ada4f619ff0b) [#3748](https://github.com/mobxjs/mobx/pull/3748) Thanks [@mweststrate](https://github.com/mweststrate)! - Fixed: #3747, computed values becoming stale if the underlying observable was created and updated outside a reactive context
+
+## 6.10.1
+
+### Patch Changes
+
+-   [`3ceeb865`](https://github.com/mobxjs/mobx/commit/3ceeb8651e328c4c7211c875696b3f5269fea834) [#3732](https://github.com/mobxjs/mobx/pull/3732) Thanks [@urugator](https://github.com/urugator)! - - fix: #3728: Observable initialization updates state version.
+    -   fix: Observable set initialization violates `enforceActions: "always"`.
+    -   fix: Changing keys of observable object does not respect `enforceActions`.
+
+## 6.10.0
+
+### Minor Changes
+
+-   [`bebd5f05`](https://github.com/mobxjs/mobx/commit/bebd5f0507a109145f401c78630ed9d59e4a1101) [#3727](https://github.com/mobxjs/mobx/pull/3727) Thanks [@rluvaton](https://github.com/rluvaton)! - Added support for `signal` (AbortSignal) in `autorun`, `reaction` and sync `when` options to dispose them
+
+### Patch Changes
+
+-   [`55f78ddc`](https://github.com/mobxjs/mobx/commit/55f78ddc20e84f38a7aa88b99a51ad994e558241) [#3717](https://github.com/mobxjs/mobx/pull/3717) Thanks [@liucan233](https://github.com/liucan233)! - remove proxy option for makeObservable and makeAutoObservable
+
+## 6.9.1
+
+### Patch Changes
+
+-   [`4792303e`](https://github.com/mobxjs/mobx/commit/4792303ec9119c1ba54134fff7e845d21a1d9337) [#3709](https://github.com/mobxjs/mobx/pull/3709) Thanks [@kubk](https://github.com/kubk)! - Make trace() noop in production build
+
+## 6.9.0
+
+### Minor Changes
+
+-   [`44a2cf42`](https://github.com/mobxjs/mobx/commit/44a2cf42dec7635f639ddbfb19202ebc710bac54) [#3590](https://github.com/mobxjs/mobx/pull/3590) Thanks [@urugator](https://github.com/urugator)! - Better support for React 18: Mobx now keeps track of a global state version, which updates with each mutation.
+
 ## 6.8.0
 
 ### Minor Changes
@@ -1319,7 +1355,7 @@ A deprecation message will now be printed if creating computed properties while 
 
 ```javascript
 const x = observable({
-    computedProp: function() {
+    computedProp: function () {
         return someComputation
     }
 })
@@ -1344,7 +1380,7 @@ or alternatively:
 
 ```javascript
 observable({
-    computedProp: computed(function() {
+    computedProp: computed(function () {
         return someComputation
     })
 })
@@ -1362,7 +1398,7 @@ N.B. If you want to introduce actions on an observable that modify its state, us
 ```javascript
 observable({
     counter: 0,
-    increment: action(function() {
+    increment: action(function () {
         this.counter++
     })
 })
@@ -1488,10 +1524,10 @@ function Square() {
     extendObservable(this, {
         length: 2,
         squared: computed(
-            function() {
+            function () {
                 return this.squared * this.squared
             },
-            function(surfaceSize) {
+            function (surfaceSize) {
                 this.length = Math.sqrt(surfaceSize)
             }
         )

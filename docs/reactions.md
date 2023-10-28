@@ -364,9 +364,10 @@ Number of milliseconds that can be used to throttle the effect function. If zero
 
 Set a limited amount of time that `when` will wait for. If the deadline passes, `when` will reject / throw.
 
-### `signal` _(when)_
+### `signal`
 
-An AbortSignal object instance; allows you to abort waiting for the reaction via an AbortController. This will also cause the returned promise to reject with an error "WHEN_ABORTED". This option is ignored when using an effect function, and only applies with the promised based version.
+An AbortSignal object instance; can be used as an alternative method for disposal.<br>
+When used with promise version of `when`, the promise rejects with the "WHEN_ABORTED" error.
 
 ### `onError`
 

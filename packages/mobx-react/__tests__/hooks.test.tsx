@@ -94,8 +94,8 @@ test("computed properties result in double render when using observer instead of
         "parent",
         0,
         "parent",
-        2,
-        2 // should contain "2" only once! But with hooks, one update is scheduled based the fact that props change, the other because the observable source changed.
+        2, // props changed
+        2 // observable source changed (setState during render)
     ])
     expect(container).toHaveTextContent("2")
 })

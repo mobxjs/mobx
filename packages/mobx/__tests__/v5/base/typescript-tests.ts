@@ -287,6 +287,7 @@ test("computed setter should succeed", () => {
 })
 
 test("atom clock example", done => {
+    // TODO randomly fails, rework
     let ticks = 0
     const time_factor = process.env.CI === "true" ? 300 : 100 // speed up / slow down tests
 
@@ -1818,6 +1819,22 @@ test("promised when can be aborted", async () => {
     } catch (e) {
         expect("" + e).toMatch(/WHEN_ABORTED/)
     }
+})
+
+test("sync when can be aborted", async () => {
+    const x = mobx.observable.box(1)
+
+    const ac = new AbortController()
+    mobx.when(
+        () => x.get() === 3,
+        () => {
+            fail("should abort")
+        },
+        { signal: ac.signal }
+    )
+    ac.abort()
+
+    x.set(3)
 })
 
 test("it should support asyncAction as decorator (ts)", async () => {

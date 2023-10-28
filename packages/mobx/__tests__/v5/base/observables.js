@@ -15,7 +15,7 @@ const {
     isObservableProp
 } = mobx
 const utils = require("../../v5/utils/test-utils")
-const { MAX_SPLICE_SIZE } = require("../../../src/internal")
+const { MAX_SPLICE_SIZE, getGlobalState } = require("../../../src/internal")
 
 const voidObserver = function () {}
 
@@ -2358,5 +2358,161 @@ describe("`requiresObservable` takes precedence over global `reactionRequiresObs
         const dispose = mobx.autorun(() => {}, { name, requiresObservable: false })
         dispose()
         expect(consoleWarnSpy).not.toHaveBeenCalled()
+    })
+})
+
+test("state version updates correctly", () => {
+    // This test was designed around the idea of updating version only at the end of batch,
+    // which is NOT an implementation we've settled on, but the test is still valid.
+
+    // This test demonstrates that the version is correctly updated with each state mutations:
+    // 1. Even without wrapping mutation in batch explicitely.
+    // 2. Even in self-invoking recursive derivation.
+    const o = mobx.observable({ x: 0 })
+    let prevStateVersion
+
+    const disposeAutorun = mobx.autorun(() => {
+        if (o.x === 5) {
+            disposeAutorun()
+            return
+        }
+        const currentStateVersion = getGlobalState().stateVersion
+        expect(prevStateVersion).not.toBe(currentStateVersion)
+        prevStateVersion = currentStateVersion
+        o.x++
+    })
+
+    // expect(o.x).toBe(4) is 1?
+    prevStateVersion = getGlobalState().stateVersion
+    o.x++
+    expect(o.x).toBe(5)
+    expect(prevStateVersion).not.toBe(getGlobalState().stateVersion)
+})
+
+test("Atom.reportChanged does not change state version when called from the batch the atom was created in", () => {
+    mobx.transaction(() => {
+        const prevStateVersion = getGlobalState().stateVersion
+        const atom = mobx.createAtom()
+        atom.reportChanged()
+        expect(prevStateVersion).toBe(getGlobalState().stateVersion)
+    })
+})
+
+test('Observables initialization does not violate `enforceActions: "always"`', () => {
+    const consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation(() => {})
+
+    const check = cb => {
+        cb()
+        expect(consoleWarnSpy).not.toBeCalled()
+    }
+
+    class MakeObservable {
+        x = 0
+        constructor() {
+            mobx.makeObservable(this, { x: true })
+        }
+    }
+    class MakeAutoObservable {
+        x = 0
+        constructor() {
+            mobx.makeAutoObservable(this)
+        }
+    }
+
+    try {
+        mobx.configure({ enforceActions: "always" })
+        check(() => mobx.observable(0))
+        check(() => new MakeObservable())
+        check(() => mobx.makeObservable({ x: 0 }, { x: true }))
+        check(() => new MakeAutoObservable())
+        check(() => mobx.makeAutoObservable({ x: 0 }))
+        check(() => mobx.extendObservable({}, { x: 0 }))
+        check(() => mobx.observable(new Set([0])))
+        check(() => mobx.observable(new Map([[0, 0]])))
+        check(() => mobx.observable({ x: 0 }, { proxy: false }))
+        check(() => mobx.observable({ x: 0 }, { proxy: true }))
+        check(() => mobx.observable([0], { proxy: false }))
+        check(() => mobx.observable([0], { proxy: true }))
+        check(() => mobx.computed(() => 0))
+    } finally {
+        consoleWarnSpy.mockRestore()
+        mobx._resetGlobalState()
+    }
+})
+
+test("enforceAction is respected when changing keys of observable object", () => {
+    const consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation(() => {})
+    try {
+        mobx.configure({ enforceActions: "always" })
+        const o = mobx.observable({ x: 0 })
+
+        o.y = 0
+        expect(consoleWarnSpy).toBeCalled()
+
+        consoleWarnSpy.mockClear()
+
+        delete o.x
+        expect(consoleWarnSpy).toBeCalled()
+    } finally {
+        consoleWarnSpy.mockRestore()
+        mobx._resetGlobalState()
+    }
+})
+
+test("state version does not update on observable creation", () => {
+    const globalState = getGlobalState()
+
+    const check = cb => {
+        const prevStateVersion = globalState.stateVersion
+        cb()
+        expect(prevStateVersion).toBe(globalState.stateVersion)
+    }
+
+    class MakeObservable {
+        x = 0
+        constructor() {
+            mobx.makeObservable(this, { x: true })
+        }
+    }
+    class MakeAutoObservable {
+        x = 0
+        constructor() {
+            mobx.makeAutoObservable(this)
+        }
+    }
+
+    class MakeObservableSubclass extends MakeObservable {
+        y = 0
+        constructor() {
+            super()
+            mobx.makeObservable(this, { y: true })
+        }
+    }
+
+    check(() => mobx.observable(0))
+    check(() => new MakeObservable())
+    // Batch is required by design - without batch reactions can be created/invoked inbetween individual constructors and they must see updated state version.
+    // https://github.com/mobxjs/mobx/pull/3732#discussion_r1285099080
+    check(mobx.action(() => new MakeObservableSubclass()))
+    check(() => mobx.makeObservable({ x: 0 }, { x: true }))
+    check(() => new MakeAutoObservable())
+    check(() => mobx.makeAutoObservable({ x: 0 }))
+    check(() => mobx.extendObservable({}, { x: 0 }))
+    check(() => mobx.observable(new Set([0])))
+    check(() => mobx.observable(new Map([[0, 0]])))
+    check(() => mobx.observable({ x: 0 }, { proxy: false }))
+    check(() => mobx.observable({ x: 0 }, { proxy: true }))
+    check(() => mobx.observable([0], { proxy: false }))
+    check(() => mobx.observable([0], { proxy: true }))
+    check(() => mobx.computed(() => 0))
+})
+
+test("#3747", () => {
+    mobx.runInAction(() => {
+        const o = observable.box(0)
+        const c = computed(() => o.get())
+        expect(c.get()).toBe(0)
+        o.set(1)
+        expect(c.get()).toBe(1) // would fail
     })
 })

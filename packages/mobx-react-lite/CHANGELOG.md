@@ -1,5 +1,52 @@
 # mobx-react-lite
 
+## 4.0.5
+
+### Patch Changes
+
+-   [`87e5dfb5`](https://github.com/mobxjs/mobx/commit/87e5dfb52a84869d62b6343887a1c8659aee595d) [#3763](https://github.com/mobxjs/mobx/pull/3763) Thanks [@mweststrate](https://github.com/mweststrate)! - Switched observer implementation from using global to local state version. Fixes #3728
+
+## 4.0.4
+
+### Patch Changes
+
+-   [`3ceeb865`](https://github.com/mobxjs/mobx/commit/3ceeb8651e328c4c7211c875696b3f5269fea834) [#3732](https://github.com/mobxjs/mobx/pull/3732) Thanks [@urugator](https://github.com/urugator)! - fix: #3734: `isolateGlobalState: true` makes observer stop to react to store changes
+
+## 4.0.3
+
+### Patch Changes
+
+-   [`58bb052c`](https://github.com/mobxjs/mobx/commit/58bb052ca41b8592e5bd5c3003b68ec52da53f33) [#3670](https://github.com/mobxjs/mobx/pull/3670) Thanks [@urugator](https://github.com/urugator)! - fix #3669: SSR: `useSyncExternalStore` throws due to missing `getServerSnapshot`
+
+*   [`473cb3f5`](https://github.com/mobxjs/mobx/commit/473cb3f5fc8bf43abdd1c9c7857fe2820d2291fe) [#3718](https://github.com/mobxjs/mobx/pull/3718) Thanks [@mweststrate](https://github.com/mweststrate)! - - Fixed `observer` in `StrictMode` #3671
+    -   **[BREAKING CHANGE]** Class component's `props`/`state`/`context` are no longer observable. Attempt to use these in any derivation other than component's `render` throws and error. For details see https://github.com/mobxjs/mobx/blob/main/packages/mobx-react/README.md#note-on-using-props-and-state-in-derivations
+    -   Extending or applying `observer` classes is now explicitly forbidden
+
+## 4.0.2
+
+### Patch Changes
+
+-   [`f86df867`](https://github.com/mobxjs/mobx/commit/f86df86784fa92d793ca4d1b97a3dd954355f7dd) [#3667](https://github.com/mobxjs/mobx/pull/3667) Thanks [@tony](https://github.com/tony)! - Fix package dependency for use-sync-external-store.
+
+## 4.0.1
+
+### Patch Changes
+
+-   [`8e58fa95`](https://github.com/mobxjs/mobx/commit/8e58fa958908f632a2c49d22c259fda135781455) [#3664](https://github.com/mobxjs/mobx/pull/3664) Thanks [@mweststrate](https://github.com/mweststrate)! - (Hopefully) fixed release process for mobx-react-lite
+
+## 4.0.0
+
+### Major Changes
+
+-   [`44a2cf42`](https://github.com/mobxjs/mobx/commit/44a2cf42dec7635f639ddbfb19202ebc710bac54) [#3590](https://github.com/mobxjs/mobx/pull/3590) Thanks [@urugator](https://github.com/urugator)! - Components now use `useSyncExternalStore`, which should prevent tearing - you have to update mobx, otherwise it should behave as previously.<br>
+    Improved displayName/name handling as discussed in #3438.<br>
+
+## 3.4.3
+
+### Patch Changes
+
+-   [`dfeb1f5d`](https://github.com/mobxjs/mobx/commit/dfeb1f5d18acb8a995d4fa78374173d419fec16e) [#3651](https://github.com/mobxjs/mobx/pull/3651) Thanks [@urugator](https://github.com/urugator)! - fix #3650 regression clearTimers -> clearTimes
+
 ## 3.4.2
 
 ### Patch Changes
