@@ -13,7 +13,8 @@ import {
     autorun,
     IReactionDisposer,
     reaction,
-    configure
+    configure,
+    runInAction
 } from "mobx"
 import { withConsole } from "./utils/withConsole"
 import { shallowEqual } from "../src/utils/utils"
@@ -1014,6 +1015,7 @@ test("#3492 should not cause warning by calling forceUpdate on uncommited compon
 
 test("#3648 enableStaticRendering doesn't warn with observableRequiresReaction/computedRequiresReaction", () => {
     consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
+    const { observableRequiresReaction, computedRequiresReaction } = _getGlobalState()
     try {
         enableStaticRendering(true)
         configure({ observableRequiresReaction: true, computedRequiresReaction: true })
@@ -1035,6 +1037,7 @@ test("#3648 enableStaticRendering doesn't warn with observableRequiresReaction/c
     } finally {
         enableStaticRendering(false)
         _resetGlobalState()
+        configure({ observableRequiresReaction, computedRequiresReaction })
         consoleWarnMock.mockRestore()
     }
 })
@@ -1326,7 +1329,7 @@ test("Class observer can react to changes made before mount #3730", () => {
     @observer
     class Child extends React.Component {
         componentDidMount(): void {
-            o.set(1)
+            runInAction(() => o.set(1))
         }
         render() {
             return ""
