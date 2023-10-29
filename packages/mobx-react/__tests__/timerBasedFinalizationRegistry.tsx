@@ -5,6 +5,8 @@ import * as React from "react"
 import { observer } from "../src"
 import { clearTimers } from "mobx-react-lite"
 
+expect(globalThis.FinalizationRegistry).toBeUndefined()
+
 afterEach(cleanup)
 
 test("should unregister from FinalizationRegistry once commited #3776", async () => {
