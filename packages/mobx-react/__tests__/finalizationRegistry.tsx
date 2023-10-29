@@ -8,12 +8,6 @@ import { observer } from "../src"
 
 afterEach(cleanup)
 
-function sleep(time: number) {
-    return new Promise<void>(res => {
-        setTimeout(res, time)
-    })
-}
-
 // TODO remove once https://github.com/mobxjs/mobx/pull/3620 is merged.
 declare class WeakRef<T> {
     constructor(object: T)
@@ -80,9 +74,12 @@ test("should not prevent GC of uncomitted components", async () => {
     expect(aConstructorCount).toBe(2)
     expect(aMountCount).toBe(1)
 
+    await Promise.resolve()
     gc()
-    await sleep(50)
-    expect(firstARef!.deref()).toBeUndefined()
+    await waitFor(() => expect(firstARef!.deref()).toBeUndefined(), {
+        timeout: 10_000,
+        interval: 150
+    })
 
     unmount()
 })

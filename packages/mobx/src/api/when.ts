@@ -6,16 +6,9 @@ import {
     createAction,
     getNextId,
     die,
-    allowStateChanges
+    allowStateChanges,
+    GenericAbortSignal
 } from "../internal"
-
-// https://github.com/mobxjs/mobx/issues/3582
-interface GenericAbortSignal {
-    readonly aborted: boolean
-    onabort?: ((...args: any) => any) | null
-    addEventListener?: (...args: any) => any
-    removeEventListener?: (...args: any) => any
-}
 
 export interface IWhenOptions {
     name?: string

@@ -104,6 +104,12 @@ export function queueForUnobservation(observable: IObservable) {
  * Avoids unnecessary recalculations.
  */
 export function startBatch() {
+    if (globalState.inBatch === 0) {
+        globalState.batchId =
+            globalState.batchId < Number.MAX_SAFE_INTEGER
+                ? globalState.batchId + 1
+                : Number.MIN_SAFE_INTEGER
+    }
     globalState.inBatch++
 }
 

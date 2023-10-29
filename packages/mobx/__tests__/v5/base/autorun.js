@@ -37,6 +37,37 @@ test("autorun can be disposed on first run", function () {
     expect(values).toEqual([1])
 })
 
+test("autorun can be disposed using AbortSignal", function () {
+    const a = mobx.observable.box(1)
+    const ac = new AbortController()
+    const values = []
+
+    mobx.autorun(() => {
+        values.push(a.get())
+    }, { signal: ac.signal })
+
+    a.set(2)
+    a.set(3)
+    ac.abort()
+    a.set(4)
+
+    expect(values).toEqual([1, 2, 3])
+})
+
+test("autorun should not run first time when passing already aborted AbortSignal", function () {
+    const a = mobx.observable.box(1)
+    const ac = new AbortController()
+    const values = []
+
+    ac.abort()
+
+    mobx.autorun(() => {
+        values.push(a.get())
+    }, { signal: ac.signal })
+
+    expect(values).toEqual([])
+})
+
 test("autorun warns when passed an action", function () {
     const action = mobx.action(() => {})
     expect.assertions(1)

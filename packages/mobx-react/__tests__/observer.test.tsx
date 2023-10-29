@@ -1292,3 +1292,33 @@ test(`Observable props/state/context workaround`, () => {
     expect(reactionResults).toEqual(["000", "100", "110", "111"])
     unmount()
 })
+
+test("Class observer can react to changes made before mount #3730", () => {
+    const o = observable.box(0)
+
+    @observer
+    class Child extends React.Component {
+        componentDidMount(): void {
+            o.set(1)
+        }
+        render() {
+            return ""
+        }
+    }
+
+    @observer
+    class Parent extends React.Component {
+        render() {
+            return (
+                <span>
+                    {o.get()}
+                    <Child />
+                </span>
+            )
+        }
+    }
+
+    const { container, unmount } = render(<Parent />)
+    expect(container).toHaveTextContent("1")
+    unmount()
+})

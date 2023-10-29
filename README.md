@@ -35,7 +35,7 @@ MobX is made possible by the generosity of the sponsors below, and many other [i
 <a href="https://coinbase.com/"><img src="https://mobx.js.org/assets/coinbase.jpeg" align="center" width="100" title="Coinbase" alt="Coinbase" /></a>
 <a href="https://curology.com/blog/tech"><img src="https://mobx.js.org/assets/curology.png" align="center" width="100" title="Curology" alt="Curology"/></a>
 <a href="https://opensource.facebook.com/"><img src="https://mobx.js.org/assets/fbos.jpeg" align="center" width="100" title="Facebook Open Source" alt="Facebook Open Source" /></a>
-<a href="https://www.canva.com/"><img src="https://mobx.js.org/assets/canva.png" align="center" width="100" title="Canva" alt="Canva" /></a>
+<a href="https://www.canva.com/"><img src="https://mobx.js.org/assets/canva.svg" align="center" width="100" title="Canva" alt="Canva" /></a>
 
 **🥈 Silver sponsors (\$100+ per month):**<br/>
 

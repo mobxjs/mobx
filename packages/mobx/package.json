@@ -1,6 +1,6 @@
 {
     "name": "mobx",
-    "version": "6.9.0",
+    "version": "6.10.2",
     "description": "Simple, scalable state management.",
     "source": "src/mobx.ts",
     "main": "dist/index.js",
@@ -75,6 +75,6 @@
         "test:coverage": "yarn test -i --coverage",
         "test:size": "yarn import-size --report . observable computed autorun action",
         "test:check": "yarn test:types",
-        "prepublish": "node ./scripts/prepublish.js && yarn build --target publish"
+        "prepublishOnly": "node ./scripts/prepublish.js && yarn build --target publish"
     }
 }
