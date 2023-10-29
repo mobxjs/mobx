@@ -100,14 +100,7 @@ export function makeClassComponentObserver(
             configurable: false,
             writable: false,
             value: isUsingStaticRendering()
-                ? function () {
-                      let allowStateReads = _allowStateReadsStart?.(true)
-                      try {
-                          return originalRender()
-                      } finally {
-                          _allowStateReadsEnd?.(allowStateReads)
-                      }
-                  }
+                ? createStaticRender.call(this, originalRender)
                 : createReactiveRender.call(this, originalRender)
         })
         return this.render()
@@ -183,6 +176,19 @@ export function makeClassComponentObserver(
 // Generates a friendly name for debugging
 function getDisplayName(componentClass: ComponentClass) {
     return componentClass.displayName || componentClass.name || "<component>"
+}
+
+function createStaticRender(originalRender: any) {
+    const boundOriginalRender = originalRender.bind(this)
+
+    return function staticRender() {
+        let allowStateReads = _allowStateReadsStart?.(true)
+        try {
+            return boundOriginalRender()
+        } finally {
+            _allowStateReadsEnd?.(allowStateReads)
+        }
+    }
 }
 
 function createReactiveRender(originalRender: any) {

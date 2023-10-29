@@ -1004,6 +1004,7 @@ test("#3648 enableStaticRendering doesn't warn with observableRequiresReaction/c
         @observer
         class TestCmp extends React.Component<any> {
             render() {
+                expect(this).toBeDefined()
                 return o.get() + c.get()
             }
         }
