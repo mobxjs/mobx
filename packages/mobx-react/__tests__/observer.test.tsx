@@ -1095,7 +1095,7 @@ test(`Component react's to observable changes in componenDidMount #3691`, () => 
     expect(container).toHaveTextContent("1")
     unmount()
 })
-// TODO
+
 test(`Observable changes in componenWillUnmount don't cause any warnings or errors`, () => {
     const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {})
     const consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation(() => {})
