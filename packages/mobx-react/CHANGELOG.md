@@ -1,5 +1,11 @@
 # mobx-react
 
+## 9.0.2
+
+### Patch Changes
+
+-   [`5063c38e`](https://github.com/mobxjs/mobx/commit/5063c38ead557624321e2bbeb1aff905438564b0) [#3776](https://github.com/mobxjs/mobx/pull/3776) Thanks [@wbercx](https://github.com/wbercx)! - Fixed premature disposal of class component observers.
+
 ## 9.0.1
 
 ### Patch Changes
