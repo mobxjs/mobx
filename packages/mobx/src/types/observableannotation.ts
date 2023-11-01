@@ -51,12 +51,13 @@ function decorate_20223_(
     context: ClassAccessorDecoratorContext | ClassFieldDecoratorContext
 ) {
     if (__DEV__) {
-        if (context.kind === "field")
+        if (context.kind === "field") {
             throw die(
                 `Please use \`@observable accessor ${String(
                     context.name
                 )}\` instead of \`@observable ${String(context.name)}\``
             )
+        }
         assert20223DecoratorType(context, ["accessor"])
     }
 
