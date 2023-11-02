@@ -8,12 +8,6 @@ import { observer } from "../src"
 
 afterEach(cleanup)
 
-// TODO remove once https://github.com/mobxjs/mobx/pull/3620 is merged.
-declare class WeakRef<T> {
-    constructor(object: T)
-    deref(): T | undefined
-}
-
 test("should not prevent GC of uncomitted components", async () => {
     expect(typeof globalThis.FinalizationRegistry).toBe("function")
 
