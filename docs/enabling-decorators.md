@@ -14,7 +14,28 @@ After years of alterations, ES decorators have finally reached Stage 3 in the TC
 
 2022.3 Decorators are supported in:
 * TypeScript (5.0 and higher, make sure that the `experimentalDecorators` flag is NOT enabled).
-* Babel (see https://babeljs.io/docs/babel-plugin-proposal-decorators)
+* For Babel make sure the plugin [`proposal-decorators`](https://babeljs.io/docs/babel-plugin-proposal-decorators) is enabled with the highest version (currently `2023-05`).
+
+```js
+// tsconfig.json
+{
+    "compilerOptions": {
+        "experimentalDecorators": false /* or just remove the flag */
+    }
+}
+
+// babel.config.json (or equivalent)
+{
+    "plugins": [
+        [
+            "@babel/plugin-proposal-decorators",
+            {
+                "version": "2023-05"
+            }
+        ]
+    ]
+}
+```
 
 ## Using decorators
 
