@@ -1,5 +1,4 @@
 import {
-    CreateObservableOptions,
     getAnnotationFromOptions,
     propagateChanged,
     isAnnotation,
@@ -47,7 +46,8 @@ import {
     getDebugName,
     objectPrototype,
     MakeResult,
-    checkIfStateModificationsAreAllowed
+    checkIfStateModificationsAreAllowed,
+    CreateObservableObjectOptions
 } from "../internal"
 
 const descriptorCache = Object.create(null)
@@ -652,7 +652,7 @@ export interface IIsObservableObject {
 
 export function asObservableObject(
     target: any,
-    options?: CreateObservableOptions
+    options?: CreateObservableObjectOptions
 ): IIsObservableObject {
     if (__DEV__ && options && isObservableObject(target)) {
         die(`Options can't be provided for already observable objects.`)

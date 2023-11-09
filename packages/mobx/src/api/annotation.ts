@@ -6,7 +6,7 @@ export const enum MakeResult {
     Continue
 }
 
-export type Annotation = {
+export type Annotation<Options = unknown> = {
     annotationType_: string
     make_(
         adm: ObservableObjectAdministration,
@@ -20,7 +20,7 @@ export type Annotation = {
         descriptor: PropertyDescriptor,
         proxyTrap: boolean
     ): boolean | null
-    options_?: any
+    options_?: Options
 }
 
 export type AnnotationMapEntry =
@@ -34,13 +34,16 @@ export type AnnotationsMap<T, AdditionalFields extends PropertyKey> = {
     [P in Exclude<keyof T, "toString">]?: AnnotationMapEntry
 } & Record<AdditionalFields, AnnotationMapEntry>
 
-export function isAnnotation(thing: any) {
+export function isAnnotation(thing: unknown): thing is Annotation {
+    if (!((typeof thing === "object" && thing) || typeof thing === "function")) {
+        return false
+    }
+
+    const t = thing as Annotation
+
     return (
         // Can be function
-        thing instanceof Object &&
-        typeof thing.annotationType_ === "string" &&
-        isFunction(thing.make_) &&
-        isFunction(thing.extend_)
+        typeof t.annotationType_ === "string" && isFunction(t.make_) && isFunction(t.extend_)
     )
 }
 

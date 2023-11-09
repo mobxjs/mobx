@@ -65,7 +65,7 @@ describe("trace", () => {
             "[mobx.trace] Computed value 'x.fullname' was suspended and it will recompute on the next access."
         ])
 
-        expect(expectedLogCalls).toEqual(consoleLogSpy.mock.calls)
+        expect(consoleLogSpy.mock.calls).toEqual(expectedLogCalls)
     })
 
     test("Log only if derivation is actually about to re-run #2859", () => {
@@ -121,7 +121,7 @@ describe("trace", () => {
             "[mobx.trace] Computed value 'x.fooIsGreaterThan5' was suspended and it will recompute on the next access."
         ])
 
-        expect(expectedLogCalls).toEqual(consoleLogSpy.mock.calls)
+        expect(consoleLogSpy.mock.calls).toEqual(expectedLogCalls)
     })
 
     test("1850", () => {

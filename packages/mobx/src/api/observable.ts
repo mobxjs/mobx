@@ -38,27 +38,25 @@ export const OBSERVABLE_REF = "observable.ref"
 export const OBSERVABLE_SHALLOW = "observable.shallow"
 export const OBSERVABLE_STRUCT = "observable.struct"
 
-export type CreateObservableOptions = {
+export type NameableOption = {
     name?: string
-    equals?: IEqualsComparer<any>
-    deep?: boolean
-    defaultDecorator?: Annotation
+}
+
+export type ComparableOption<T> = {
+    equals?: IEqualsComparer<T>
+}
+
+export type ProxyOption = {
     proxy?: boolean
+}
+
+export type AutoBindOption = {
     autoBind?: boolean
 }
 
-// Predefined bags of create observable options, to avoid allocating temporarily option objects
-// in the majority of cases
-export const defaultCreateObservableOptions: CreateObservableOptions = {
-    deep: true,
-    name: undefined,
-    defaultDecorator: undefined,
-    proxy: true
-}
-Object.freeze(defaultCreateObservableOptions)
-
-export function asCreateObservableOptions(thing: any): CreateObservableOptions {
-    return thing || defaultCreateObservableOptions
+export type EnhancerOption = {
+    defaultDecorator?: Annotation
+    deep?: boolean
 }
 
 const observableAnnotation = createObservableAnnotation(OBSERVABLE)
@@ -73,7 +71,7 @@ const observableStructAnnotation = createObservableAnnotation(OBSERVABLE_STRUCT,
 })
 const observableDecoratorAnnotation = createDecoratorAnnotation(observableAnnotation)
 
-export function getEnhancerFromOptions(options: CreateObservableOptions): IEnhancer<any> {
+export function getEnhancerFromOptions(options: EnhancerOption): IEnhancer<any> {
     return options.deep === true
         ? deepEnhancer
         : options.deep === false
@@ -81,21 +79,25 @@ export function getEnhancerFromOptions(options: CreateObservableOptions): IEnhan
         : getEnhancerFromAnnotation(options.defaultDecorator)
 }
 
-export function getAnnotationFromOptions(
-    options?: CreateObservableOptions
-): Annotation | undefined {
-    return options ? options.defaultDecorator ?? createAutoAnnotation(options) : undefined
+export function getAnnotationFromOptions(options?: EnhancerOption): Annotation | undefined {
+    return options?.defaultDecorator ?? createAutoAnnotation(options)
 }
 
-export function getEnhancerFromAnnotation(annotation?: Annotation): IEnhancer<any> {
-    return !annotation ? deepEnhancer : annotation.options_?.enhancer ?? deepEnhancer
+export function getEnhancerFromAnnotation<T>(annotation?: Annotation): IEnhancer<T> {
+    return (
+        (annotation?.options_ as { enhancer: IEnhancer<T> } | undefined)?.enhancer ?? deepEnhancer
+    )
 }
 
 /**
  * Turns an object, array or function into a reactive structure.
  * @param v the value which should become observable.
  */
-function createObservable(v: any, arg2?: any, arg3?: any) {
+function createObservable<T>(
+    v: T,
+    arg2?: string | number | symbol,
+    arg3?: CreateObservableObjectOptions
+) {
     // @observable someProp;
     if (isStringish(arg2)) {
         storeAnnotation(v, arg2, observableAnnotation)
@@ -109,7 +111,7 @@ function createObservable(v: any, arg2?: any, arg3?: any) {
 
     // plain object
     if (isPlainObject(v)) {
-        return observable.object(v, arg2, arg3)
+        return observable.object(v as unknown as object, arg2, arg3) as unknown as T
     }
 
     // Array
@@ -137,36 +139,118 @@ function createObservable(v: any, arg2?: any, arg3?: any) {
 }
 assign(createObservable, observableDecoratorAnnotation)
 
+export type CreateObservableValueOptions<T> = NameableOption & ComparableOption<T> & EnhancerOption
+
 export interface IObservableValueFactory {
-    <T>(value: T, options?: CreateObservableOptions): IObservableValue<T>
-    <T>(value?: T, options?: CreateObservableOptions): IObservableValue<T | undefined>
+    <T>(value: T, options?: CreateObservableValueOptions<T>): IObservableValue<T>
+    <T>(value?: T, options?: CreateObservableValueOptions<T>): IObservableValue<T | undefined>
 }
 
-export interface IObservableFactory extends Annotation, PropertyDecorator {
-    <T = any>(value: T[], options?: CreateObservableOptions): IObservableArray<T>
-    <T = any>(value: Set<T>, options?: CreateObservableOptions): ObservableSet<T>
-    <K = any, V = any>(value: Map<K, V>, options?: CreateObservableOptions): ObservableMap<K, V>
-    <T extends object>(
-        value: T,
-        decorators?: AnnotationsMap<T, never>,
-        options?: CreateObservableOptions
-    ): T
+const valueFactory: IObservableValueFactory = <T>(
+    value: T,
+    options?: CreateObservableValueOptions<T>
+) => {
+    const { name, equals, ...rest } = options ?? {}
 
-    box: IObservableValueFactory
-    array: <T = any>(initialValues?: T[], options?: CreateObservableOptions) => IObservableArray<T>
-    set: <T = any>(
+    return new ObservableValue(value, getEnhancerFromOptions(rest), name, true, equals)
+}
+
+export type CreateObservableArrayOptions = NameableOption & ProxyOption & EnhancerOption
+
+export interface IObservableArrayFactory {
+    <T>(initialValues?: T[], options?: CreateObservableArrayOptions): IObservableArray<T>
+}
+
+const arrayFactory: IObservableArrayFactory = <T>(
+    initialValues?: T[],
+    options?: CreateObservableArrayOptions
+) => {
+    const { proxy = true, name, ...rest } = options ?? {}
+
+    return (
+        globalState.useProxies === false || proxy === false
+            ? createLegacyArray
+            : createObservableArray
+    )(initialValues, getEnhancerFromOptions(rest), name)
+}
+
+export type CreateObservableSetOptions = NameableOption & EnhancerOption
+
+export interface IObservableSetFactory {
+    <T>(
         initialValues?: IObservableSetInitialValues<T>,
-        options?: CreateObservableOptions
-    ) => ObservableSet<T>
-    map: <K = any, V = any>(
+        options?: CreateObservableSetOptions
+    ): ObservableSet<T>
+}
+
+const setFactory: IObservableSetFactory = <T>(
+    initialValues?: IObservableSetInitialValues<T>,
+    options?: CreateObservableSetOptions
+) => {
+    const { name, ...rest } = options ?? {}
+
+    return new ObservableSet<T>(initialValues, getEnhancerFromOptions(rest), name)
+}
+
+export type CreateObservableMapOptions = NameableOption & EnhancerOption
+
+export interface IObservableMapFactory {
+    <K, V>(
         initialValues?: IObservableMapInitialValues<K, V>,
-        options?: CreateObservableOptions
-    ) => ObservableMap<K, V>
-    object: <T = any>(
+        options?: CreateObservableMapOptions
+    ): ObservableMap<K, V>
+}
+
+const mapFactory: IObservableMapFactory = <K, V>(
+    initialValues?: IObservableMapInitialValues<K, V>,
+    options?: CreateObservableMapOptions
+) => {
+    const { name, ...rest } = options ?? {}
+
+    return new ObservableMap<K, V>(initialValues, getEnhancerFromOptions(rest), name)
+}
+
+export type CreateObservableObjectOptions = NameableOption &
+    ProxyOption &
+    EnhancerOption &
+    AutoBindOption
+
+export interface IObservableObjectFactory {
+    <T extends object>(
         props: T,
         decorators?: AnnotationsMap<T, never>,
-        options?: CreateObservableOptions
-    ) => T
+        options?: CreateObservableObjectOptions
+    ): T
+}
+
+const objectFactory: IObservableObjectFactory = <T extends object>(
+    props: T,
+    decorators?: AnnotationsMap<T, never>,
+    options?: CreateObservableObjectOptions
+) => {
+    return initObservable(() =>
+        extendObservable(
+            globalState.useProxies === false || options?.proxy === false
+                ? asObservableObject({}, options)
+                : asDynamicObservableObject({}, options),
+            props,
+            decorators
+        )
+    )
+}
+
+export interface IObservableFactory
+    extends IObservableArrayFactory,
+        IObservableSetFactory,
+        IObservableObjectFactory,
+        IObservableMapFactory,
+        Annotation,
+        PropertyDecorator {
+    box: IObservableValueFactory
+    array: IObservableArrayFactory
+    set: IObservableSetFactory
+    map: IObservableMapFactory
+    object: IObservableObjectFactory
 
     /**
      * Decorator that creates an observable that only observes the references, but doesn't try to turn the assigned value into an observable.ts.
@@ -181,52 +265,15 @@ export interface IObservableFactory extends Annotation, PropertyDecorator {
 }
 
 const observableFactories: IObservableFactory = {
-    box<T = any>(value: T, options?: CreateObservableOptions): IObservableValue<T> {
-        const o = asCreateObservableOptions(options)
-        return new ObservableValue(value, getEnhancerFromOptions(o), o.name, true, o.equals)
-    },
-    array<T = any>(initialValues?: T[], options?: CreateObservableOptions): IObservableArray<T> {
-        const o = asCreateObservableOptions(options)
-        return (
-            globalState.useProxies === false || o.proxy === false
-                ? createLegacyArray
-                : createObservableArray
-        )(initialValues, getEnhancerFromOptions(o), o.name)
-    },
-    map<K = any, V = any>(
-        initialValues?: IObservableMapInitialValues<K, V>,
-        options?: CreateObservableOptions
-    ): ObservableMap<K, V> {
-        const o = asCreateObservableOptions(options)
-        return new ObservableMap<K, V>(initialValues, getEnhancerFromOptions(o), o.name)
-    },
-    set<T = any>(
-        initialValues?: IObservableSetInitialValues<T>,
-        options?: CreateObservableOptions
-    ): ObservableSet<T> {
-        const o = asCreateObservableOptions(options)
-        return new ObservableSet<T>(initialValues, getEnhancerFromOptions(o), o.name)
-    },
-    object<T extends object = any>(
-        props: T,
-        decorators?: AnnotationsMap<T, never>,
-        options?: CreateObservableOptions
-    ): T {
-        return initObservable(() =>
-            extendObservable(
-                globalState.useProxies === false || options?.proxy === false
-                    ? asObservableObject({}, options)
-                    : asDynamicObservableObject({}, options),
-                props,
-                decorators
-            )
-        )
-    },
+    box: valueFactory,
+    array: arrayFactory,
+    set: setFactory,
+    map: mapFactory,
+    object: objectFactory,
     ref: createDecoratorAnnotation(observableRefAnnotation),
     shallow: createDecoratorAnnotation(observableShallowAnnotation),
     deep: observableDecoratorAnnotation,
     struct: createDecoratorAnnotation(observableStructAnnotation)
 } as any
 
-// eslint-disable-next-line
-export var observable: IObservableFactory = assign(createObservable, observableFactories)
+export const observable: IObservableFactory = assign(createObservable, observableFactories)

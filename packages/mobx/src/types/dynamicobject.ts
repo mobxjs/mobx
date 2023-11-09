@@ -7,7 +7,7 @@ import {
     die,
     isStringish,
     globalState,
-    CreateObservableOptions,
+    CreateObservableObjectOptions,
     asObservableObject
 } from "../internal"
 
@@ -81,7 +81,7 @@ const objectProxyTraps: ProxyHandler<any> = {
 
 export function asDynamicObservableObject(
     target: any,
-    options?: CreateObservableOptions
+    options?: CreateObservableObjectOptions
 ): IIsObservableObject {
     assertProxies()
     target = asObservableObject(target, options)

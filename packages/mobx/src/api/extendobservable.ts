@@ -1,5 +1,5 @@
 import {
-    CreateObservableOptions,
+    CreateObservableObjectOptions,
     isObservableMap,
     AnnotationsMap,
     asObservableObject,
@@ -17,7 +17,7 @@ export function extendObservable<A extends Object, B extends Object>(
     target: A,
     properties: B,
     annotations?: AnnotationsMap<B, never>,
-    options?: CreateObservableOptions
+    options?: CreateObservableObjectOptions
 ): A & B {
     if (__DEV__) {
         if (arguments.length > 4) {
