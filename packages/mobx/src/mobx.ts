@@ -129,7 +129,6 @@ export {
     onReactionError,
     interceptReads as _interceptReads,
     IComputedValueOptions,
-    IActionRunInfo,
     _startAction,
     _endAction,
     allowStateReadsStart as _allowStateReadsStart,

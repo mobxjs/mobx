@@ -32,20 +32,19 @@ import {
     allowStateChangesEnd
 } from "../internal"
 
-export interface IComputedValue<T> {
+export interface IComputedValue<T, CanUpdate extends boolean = false> {
     get(): T
-    set(value: T): void
+    set: CanUpdate extends true ? (value: T) => void : undefined
 }
 
-export interface IComputedValueOptions<T> {
+export type IComputedValueOptions<T, CanUpdate extends boolean = false> = {
     get?: () => T
-    set?: (value: T) => void
     name?: string
     equals?: IEqualsComparer<T>
     context?: any
     requiresReaction?: boolean
     keepAlive?: boolean
-}
+} & (CanUpdate extends true ? { set: (value: T) => void } : { set?: undefined })
 
 export type IComputedDidChange<T = any> = {
     type: "update"
@@ -75,7 +74,7 @@ export type IComputedDidChange<T = any> = {
  *
  * If at any point it's outside batch and it isn't observed: reset everything and go to 1.
  */
-export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDerivation {
+export class ComputedValue<T> implements IObservable, IComputedValue<T, boolean>, IDerivation {
     dependenciesState_ = IDerivationState_.NOT_TRACKING_
     observing_: IObservable[] = [] // nodes we are looking at. Our value depends on these nodes
     newObserving_ = null // during tracking it's an array with new observed observers
@@ -112,7 +111,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
      * don't want to notify observers if it is structurally the same.
      * This is useful for working with vectors, mouse coordinates etc.
      */
-    constructor(options: IComputedValueOptions<T>) {
+    constructor(options: IComputedValueOptions<T, boolean>) {
         if (!options.get) {
             die(31)
         }

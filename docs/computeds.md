@@ -236,3 +236,8 @@ It is recommended to set this one to `true` on very expensive computed values. I
 ### `keepAlive`
 
 This avoids suspending computed values when they are not being observed by anything (see the above explanation). Can potentially create memory leaks, similar to the ones discussed for [reactions](reactions.md#always-dispose-of-reactions).
+
+### `set`
+
+This optional function allows the returned `IComputedValue<T>` to also act as something that knows how to update its backing data. When not provided, however, this function that is provided will throw an error.
+To help prevent runtime errors like this, especially when refactoring code from `IObservableValue<T>` to `IComputedValue<T>` the typescript types will are set up so that trying to call a function will result in a compile time error when this option is not set.

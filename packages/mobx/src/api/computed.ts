@@ -18,9 +18,11 @@ export const COMPUTED_STRUCT = "computed.struct"
 
 export interface IComputedFactory extends Annotation, PropertyDecorator {
     // @computed(opts)
-    <T>(options: IComputedValueOptions<T>): Annotation & PropertyDecorator
+    <T>(options: IComputedValueOptions<T, boolean>): Annotation & PropertyDecorator
     // computed(fn, opts)
-    <T>(func: () => T, options?: IComputedValueOptions<T>): IComputedValue<T>
+    <T>(func: () => T, options?: IComputedValueOptions<T, false>): IComputedValue<T, false>
+    <T>(func: () => T, options?: IComputedValueOptions<T, true>): IComputedValue<T, true>
+    <T>(func: () => T, options?: IComputedValueOptions<T, boolean>): IComputedValue<T, boolean>
 
     struct: Annotation & PropertyDecorator
 }
