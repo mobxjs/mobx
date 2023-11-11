@@ -178,6 +178,7 @@ The **[MobX Quick Start Guide](https://www.packtpub.com/product/mobx-quick-start
 -   [React Amsterdam 2016: State Management Is Easy](https://www.youtube.com/watch?v=ApmSsu3qnf0&feature=youtu.be) by Michel Weststrate, _20 min_, [slides](https://speakerdeck.com/mweststrate/state-management-is-easy-introduction-to-mobx).
 -   {🚀} [React Live 2019: Reinventing MobX](https://www.youtube.com/watch?v=P_WqKZxpX8g) by Max Gallo, _27 min_.
 
+
 ## Credits
 
 MobX is inspired by reactive programming principles, which are for example used in spreadsheets. It is inspired by model–view–viewmodel frameworks like [MeteorJS's Tracker](https://docs.meteor.com/api/tracker.html), [Knockout](https://knockoutjs.com/) and [Vue.js](https://vuejs.org/), but MobX brings _transparent functional reactive programming_ (TFRP, a concept which is further explained in the [MobX book](https://www.packtpub.com/product/mobx-quick-start-guide/9781789344837)) to the next level and provides a standalone implementation. It implements TFRP in a glitch-free, synchronous, predictable and efficient manner.
