@@ -11,10 +11,11 @@ hide_title: true
 ## Enabling decorators
 
 After years of alterations, ES decorators have finally reached Stage 3 in the TC39 process, meaning that they are quite stable and won't undergo breaking changes again like the previous decorator proposals have. MobX has implemented support for this new "2022.3/Stage 3" decorator syntax.
+With modern decorators, it is no longer needed to call `makeObservable` / `makeAutoObservable`.
 
 2022.3 Decorators are supported in:
-* TypeScript (5.0 and higher, make sure that the `experimentalDecorators` flag is NOT enabled).
-* For Babel make sure the plugin [`proposal-decorators`](https://babeljs.io/docs/babel-plugin-proposal-decorators) is enabled with the highest version (currently `2023-05`).
+* TypeScript (5.0 and higher, make sure that the `experimentalDecorators` flag is NOT enabled). [Example commit](https://github.com/mweststrate/currencies-demo/commit/acb9ac8c148e8beef88042c847bb395131e85d60).
+* For Babel make sure the plugin [`proposal-decorators`](https://babeljs.io/docs/babel-plugin-proposal-decorators) is enabled with the highest version (currently `2023-05`). [Example commit](https://github.com/mweststrate/currencies-demo/commit/4999d2228208f3e1e10bc00a272046eaefde8585).
 
 ```js
 // tsconfig.json
