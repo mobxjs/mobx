@@ -806,6 +806,11 @@ describe("dehances", () => {
         expect(array.with(1, 5)).toEqual(dehanced.with(1, 5))
     })
 
+    test("at", () => {
+        expect(array.at(1)).toEqual(dehanced.at(1))
+        expect(array.at(-1)).toEqual(dehanced.at(-1))
+    })
+
     test("flat/flatMap", () => {
         // not supported in V4
     })

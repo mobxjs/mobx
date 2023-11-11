@@ -518,6 +518,7 @@ export var arrayExtensions = {
  * Without this, everything works as well, but this works
  * faster as everything works on unproxied values
  */
+addArrayExtension("at", simpleFunc)
 addArrayExtension("concat", simpleFunc)
 addArrayExtension("flat", simpleFunc)
 addArrayExtension("includes", simpleFunc)
