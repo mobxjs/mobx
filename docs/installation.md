@@ -18,9 +18,18 @@ There are two types of React bindings, `mobx-react-lite` supports only functiona
 
 **CDN:** https://cdnjs.com/libraries/mobx / https://unpkg.com/mobx/dist/mobx.umd.production.min.js
 
+# Transpilation settings
+
+## MobX and Decorators
+
+Based on your preference, MobX can be used with or without decorators.
+Both the legacy implementation and the standardised TC-39 version of decorators are currently supported.
+See [enabling-decorators.md](enabling-decorators.md) for more details on how to enable them.
+Legacy decorator support will be removed in MobX 7, in favor of the standard.
+
 ## Use spec compliant transpilation for class properties
 
-⚠️ **Warning:** When using MobX with TypeScript or Babel, and you plan to use classes; make sure to update your configuration to use a TC-39 spec compliant transpilation for class fields, since this is not the default. Without this, class fields cannot be made observable before they are initialized.
+When using MobX with TypeScript or Babel, and you plan to use classes; make sure to update your configuration to use a TC-39 spec compliant transpilation for class fields, since this is not always the default. Without this, class fields cannot be made observable before they are initialized.
 
 -   **TypeScript**: Set the compiler option `"useDefineForClassFields": true`.
 -   **Babel**: Make sure to use at least version 7.12, with the following configuration:
@@ -28,7 +37,7 @@ There are two types of React bindings, `mobx-react-lite` supports only functiona
     {
         // Babel < 7.13.0
         "plugins": [["@babel/plugin-proposal-class-properties", { "loose": false }]],
-        
+
         // Babel >= 7.13.0 (https://babeljs.io/docs/en/assumptions)
         "plugins": [["@babel/plugin-proposal-class-properties"]],
         "assumptions": {
@@ -53,21 +62,7 @@ import { configure } from "mobx"
 configure({ useProxies: "never" }) // Or "ifavailable".
 ```
 
-## MobX and Decorators
-
-If you have used MobX before, or if you followed online tutorials, you probably saw MobX with decorators like `@observable`.
-In MobX 6, we have chosen to move away from decorators by default, for maximum compatibility with standard JavaScript.
-They can still be used if you [enable them](enabling-decorators.md) though.
-
-## Development vs production
-
-Unless you're using pre-build distribution ending with `.[production|development].min.js`, Mobx uses `process.env.NODE_ENV` variable to detect the environment. Make sure it's set to `"production"` on production. This is usually done by your favourite bundler:
-[webpack](https://reactjs.org/docs/optimizing-performance.html#webpack)
-[Rollup](https://reactjs.org/docs/optimizing-performance.html#rollup)
-[Browserify](https://reactjs.org/docs/optimizing-performance.html#browserify)
-[Brunch](https://reactjs.org/docs/optimizing-performance.html#brunch)
-
-Most of the safety checks, like [`enforceAction`](https://mobx.js.org/configuration.html#enforceactions) and similar, happens on development only.
+This option will be removed in MobX 7.
 
 ## MobX on other frameworks / platforms
 

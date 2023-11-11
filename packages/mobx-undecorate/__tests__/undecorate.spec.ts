@@ -25,20 +25,20 @@ describe("general", () => {
       field /*2 */ = /*3*/ 1 /*4*/
   }`)
         ).toMatchInlineSnapshot(`
-                                                            "import { observable, makeObservable } from \\"mobx\\";
+            "import { observable, makeObservable } from "mobx";
 
-                                                            class Box {
-                                                                /*0*/
-                                                                /*1*/
-                                                                field /*2 */ = /*3*/ 1; /*4*/
+            class Box {
+                /*0*/
+                /*1*/
+                field /*2 */ = /*3*/ 1; /*4*/
 
-                                                                constructor() {
-                                                                    makeObservable(this, {
-                                                                        field: observable
-                                                                    });
-                                                                }
-                                                            }"
-                                        `)
+                constructor() {
+                    makeObservable(this, {
+                        field: observable
+                    });
+                }
+            }"
+        `)
     })
 
     test("basic observable - skip imports", () => {
@@ -109,7 +109,7 @@ describe("general", () => {
           }
         `)
         ).toMatchInlineSnapshot(`
-            "import { observable, makeObservable } from \\"mobx\\";
+            "import { observable, makeObservable } from "mobx";
 
             class ExtendsHasMethod extends Box {
                 x = 1;
@@ -125,7 +125,7 @@ describe("general", () => {
 
                 // test
                 method() {
-                    console.log(\\"hi\\")
+                    console.log("hi")
                 }
             }"
         `)
@@ -144,20 +144,20 @@ describe("general", () => {
               }
           }`)
         ).toMatchInlineSnapshot(`
-                                                                        "import { observable, makeObservable } from \\"mobx\\";
+            "import { observable, makeObservable } from "mobx";
 
-                                                                        class ExtendsHasConstructor {
-                                                                            x = 1;
+            class ExtendsHasConstructor {
+                x = 1;
 
-                                                                            constructor() {
-                                                                                makeObservable(this, {
-                                                                                    x: observable
-                                                                                });
+                constructor() {
+                    makeObservable(this, {
+                        x: observable
+                    });
 
-                                                                                console.log(\\"hi\\")
-                                                                            }
-                                                                        }"
-                                                `)
+                    console.log("hi")
+                }
+            }"
+        `)
     })
 
     test("extended class with constructor", () => {
@@ -175,22 +175,22 @@ describe("general", () => {
           }
         `)
         ).toMatchInlineSnapshot(`
-                                                                        "import { observable, makeObservable } from \\"mobx\\";
+            "import { observable, makeObservable } from "mobx";
 
-                                                                        class ExtendsHasConstructorSuper extends Box {
-                                                                            x = 1;
+            class ExtendsHasConstructorSuper extends Box {
+                x = 1;
 
-                                                                            constructor() {
-                                                                                super()
+                constructor() {
+                    super()
 
-                                                                                makeObservable(this, {
-                                                                                    x: observable
-                                                                                });
+                    makeObservable(this, {
+                        x: observable
+                    });
 
-                                                                                console.log(\\"hi\\")
-                                                                            }
-                                                                        }"
-                                                `)
+                    console.log("hi")
+                }
+            }"
+        `)
     })
 })
 
@@ -208,20 +208,20 @@ describe("action", () => {
             }
             `)
         ).toMatchInlineSnapshot(`
-                                                                        "import { action, makeObservable } from \\"mobx\\";
+            "import { action, makeObservable } from "mobx";
 
-                                                                        class Box {
-                                                                            x = (arg: number) => {
-                                                                                console.log('hi')
-                                                                            };
+            class Box {
+                x = (arg: number) => {
+                    console.log('hi')
+                };
 
-                                                                            constructor() {
-                                                                                makeObservable(this, {
-                                                                                    x: action.bound(\\"test\\")
-                                                                                });
-                                                                            }
-                                                                        }"
-                                                `)
+                constructor() {
+                    makeObservable(this, {
+                        x: action.bound("test")
+                    });
+                }
+            }"
+        `)
     })
 
     test("method - bound - named", () => {
@@ -238,21 +238,21 @@ describe("action", () => {
             }
             `)
         ).toMatchInlineSnapshot(`
-                                                                        "import { action, makeObservable } from \\"mobx\\";
+            "import { action, makeObservable } from "mobx";
 
-                                                                        class Box {
-                                                                            constructor() {
-                                                                                makeObservable(this, {
-                                                                                    x: action.bound(\\"test\\")
-                                                                                });
-                                                                            }
+            class Box {
+                constructor() {
+                    makeObservable(this, {
+                        x: action.bound("test")
+                    });
+                }
 
-                                                                            async x(arg: number): boolean {
-                                                                                console.log('hi')
-                                                                                return true
-                                                                            }
-                                                                        }"
-                                                `)
+                async x(arg: number): boolean {
+                    console.log('hi')
+                    return true
+                }
+            }"
+        `)
     })
 
     test("method - bound - named - generator", () => {
@@ -269,21 +269,21 @@ describe("action", () => {
             }
             `)
         ).toMatchInlineSnapshot(`
-                                                                        "import { action, makeObservable } from \\"mobx\\";
+            "import { action, makeObservable } from "mobx";
 
-                                                                        class Box {
-                                                                            constructor() {
-                                                                                makeObservable(this, {
-                                                                                    x: action.bound(\\"test\\")
-                                                                                });
-                                                                            }
+            class Box {
+                constructor() {
+                    makeObservable(this, {
+                        x: action.bound("test")
+                    });
+                }
 
-                                                                            *x(arg: number): boolean {
-                                                                                console.log('hi')
-                                                                                return true
-                                                                            }
-                                                                        }"
-                                                `)
+                *x(arg: number): boolean {
+                    console.log('hi')
+                    return true
+                }
+            }"
+        `)
     })
 
     test("field - named", () => {
@@ -300,21 +300,21 @@ describe("action", () => {
             }
             `)
         ).toMatchInlineSnapshot(`
-                                                                        "import { action, makeObservable } from \\"mobx\\";
+            "import { action, makeObservable } from "mobx";
 
-                                                                        class Box {
-                                                                            x = async (arg: number): boolean => {
-                                                                                console.log('hi')
-                                                                                return true
-                                                                            };
+            class Box {
+                x = async (arg: number): boolean => {
+                    console.log('hi')
+                    return true
+                };
 
-                                                                            constructor() {
-                                                                                makeObservable(this, {
-                                                                                    x: action(\\"test\\")
-                                                                                });
-                                                                            }
-                                                                        }"
-                                                `)
+                constructor() {
+                    makeObservable(this, {
+                        x: action("test")
+                    });
+                }
+            }"
+        `)
     })
 
     test("field - unnamed", () => {
@@ -331,21 +331,21 @@ describe("action", () => {
             }
             `)
         ).toMatchInlineSnapshot(`
-                                                                        "import { action, makeObservable } from \\"mobx\\";
+            "import { action, makeObservable } from "mobx";
 
-                                                                        class Box {
-                                                                            x = (arg: number): boolean => {
-                                                                                console.log('hi')
-                                                                                return true
-                                                                            };
+            class Box {
+                x = (arg: number): boolean => {
+                    console.log('hi')
+                    return true
+                };
 
-                                                                            constructor() {
-                                                                                makeObservable(this, {
-                                                                                    x: action
-                                                                                });
-                                                                            }
-                                                                        }"
-                                                `)
+                constructor() {
+                    makeObservable(this, {
+                        x: action
+                    });
+                }
+            }"
+        `)
     })
 
     test("method - bound - unnamed", () => {
@@ -362,21 +362,21 @@ describe("action", () => {
             }
             `)
         ).toMatchInlineSnapshot(`
-                                                                        "import { action, makeObservable } from \\"mobx\\";
+            "import { action, makeObservable } from "mobx";
 
-                                                                        class Box {
-                                                                            constructor() {
-                                                                                makeObservable(this, {
-                                                                                    x: action.bound
-                                                                                });
-                                                                            }
+            class Box {
+                constructor() {
+                    makeObservable(this, {
+                        x: action.bound
+                    });
+                }
 
-                                                                            x(arg: number): boolean {
-                                                                                console.log('hi')
-                                                                                return true
-                                                                            }
-                                                                        }"
-                                                `)
+                x(arg: number): boolean {
+                    console.log('hi')
+                    return true
+                }
+            }"
+        `)
     })
 
     test("method - unbound - named", () => {
@@ -393,21 +393,21 @@ describe("action", () => {
             }
             `)
         ).toMatchInlineSnapshot(`
-                                                                        "import { action, makeObservable } from \\"mobx\\";
+            "import { action, makeObservable } from "mobx";
 
-                                                                        class Box {
-                                                                            constructor() {
-                                                                                makeObservable(this, {
-                                                                                    x: action(\\"test\\")
-                                                                                });
-                                                                            }
+            class Box {
+                constructor() {
+                    makeObservable(this, {
+                        x: action("test")
+                    });
+                }
 
-                                                                            x(arg: number): boolean {
-                                                                                console.log('hi')
-                                                                                return true
-                                                                            }
-                                                                        }"
-                                                `)
+                x(arg: number): boolean {
+                    console.log('hi')
+                    return true
+                }
+            }"
+        `)
     })
 
     test("method - unbound - unnamed", () => {
@@ -424,21 +424,21 @@ describe("action", () => {
             }
             `)
         ).toMatchInlineSnapshot(`
-                                                                        "import { action, makeObservable } from \\"mobx\\";
+            "import { action, makeObservable } from "mobx";
 
-                                                                        class Box {
-                                                                            constructor() {
-                                                                                makeObservable(this, {
-                                                                                    x: action
-                                                                                });
-                                                                            }
+            class Box {
+                constructor() {
+                    makeObservable(this, {
+                        x: action
+                    });
+                }
 
-                                                                            x(arg: number): boolean {
-                                                                                console.log('hi')
-                                                                                return true
-                                                                            }
-                                                                        }"
-                                                `)
+                x(arg: number): boolean {
+                    console.log('hi')
+                    return true
+                }
+            }"
+        `)
     })
 
     test("method - unbound - computed name", () => {
@@ -455,21 +455,21 @@ describe("action", () => {
             }
             `)
         ).toMatchInlineSnapshot(`
-                                                "import { action, makeObservable } from \\"mobx\\";
+            "import { action, makeObservable } from "mobx";
 
-                                                class Box {
-                                                    constructor() {
-                                                        makeObservable(this, {
-                                                            ['x' + 'y']: action
-                                                        });
-                                                    }
+            class Box {
+                constructor() {
+                    makeObservable(this, {
+                        ['x' + 'y']: action
+                    });
+                }
 
-                                                    ['x' + 'y'](arg: number): boolean {
-                                                        console.log('hi')
-                                                        return true
-                                                    }
-                                                }"
-                                `)
+                ['x' + 'y'](arg: number): boolean {
+                    console.log('hi')
+                    return true
+                }
+            }"
+        `)
     })
 
     test("method - override", () => {
@@ -490,23 +490,23 @@ describe("action", () => {
             }
             `)
         ).toMatchInlineSnapshot(`
-                                                "import { action, override, makeObservable } from \\"mobx\\";
+            "import { action, override, makeObservable } from "mobx";
 
-                                                class Box extends Shape {
-                                                    constructor(arg) {
-                                                        super(arg)
+            class Box extends Shape {
+                constructor(arg) {
+                    super(arg)
 
-                                                        makeObservable(this, {
-                                                            method: override
-                                                        });
-                                                    }
+                    makeObservable(this, {
+                        method: override
+                    });
+                }
 
-                                                    override method(arg: number): boolean {
-                                                        console.log('hi')
-                                                        return true
-                                                    }
-                                                }"
-                                `)
+                override method(arg: number): boolean {
+                    console.log('hi')
+                    return true
+                }
+            }"
+        `)
     })
 
     test("method - override - keepDecorators", () => {
@@ -530,21 +530,21 @@ describe("action", () => {
                 { keepDecorators: true }
             )
         ).toMatchInlineSnapshot(`
-                                                "import { action, override, makeObservable } from \\"mobx\\";
+            "import { action, override, makeObservable } from "mobx";
 
-                                                class Box extends Shape {
-                                                    constructor(arg) {
-                                                        super(arg)
-                                                        makeObservable(this);
-                                                    }
+            class Box extends Shape {
+                constructor(arg) {
+                    super(arg)
+                    makeObservable(this);
+                }
 
-                                                    @override
-                                                    override method(arg: number): boolean {
-                                                        console.log('hi')
-                                                        return true
-                                                    }
-                                                }"
-                                `)
+                @override
+                override method(arg: number): boolean {
+                    console.log('hi')
+                    return true
+                }
+            }"
+        `)
     })
 })
 
@@ -559,18 +559,18 @@ describe("observable", () => {
       }
     `)
         ).toMatchInlineSnapshot(`
-                                                                        "import { observable, makeObservable } from \\"mobx\\";
+            "import { observable, makeObservable } from "mobx";
 
-                                                                        class Box {
-                                                                            x = 1;
+            class Box {
+                x = 1;
 
-                                                                            constructor() {
-                                                                                makeObservable(this, {
-                                                                                    x: observable
-                                                                                });
-                                                                            }
-                                                                        }"
-                                                `)
+                constructor() {
+                    makeObservable(this, {
+                        x: observable
+                    });
+                }
+            }"
+        `)
     })
 
     test("observable - shallow ", () => {
@@ -583,7 +583,7 @@ describe("observable", () => {
         }
         `)
         ).toMatchInlineSnapshot(`
-            "import { observable, makeObservable } from \\"mobx\\";
+            "import { observable, makeObservable } from "mobx";
 
               class Box {
                 x = 1;
@@ -607,14 +607,14 @@ describe("observable", () => {
             }
             `)
         ).toMatchInlineSnapshot(`
-            "import { observable, makeObservable } from \\"mobx\\";
+            "import { observable, makeObservable } from "mobx";
 
               class Box {
                 ['x'] = 1;
 
                 constructor() {
                   makeObservable(this, {
-                    [\\"x\\"]: observable.shallow
+                    ["x"]: observable.shallow
                   });
                 }
               }"
@@ -635,20 +635,20 @@ describe("computed", () => {
       }
     `)
         ).toMatchInlineSnapshot(`
-                                                                        "import { computed, makeObservable } from \\"mobx\\";
+            "import { computed, makeObservable } from "mobx";
 
-                                                                        class Box {
-                                                                            constructor() {
-                                                                                makeObservable(this, {
-                                                                                    x: computed
-                                                                                });
-                                                                            }
+            class Box {
+                constructor() {
+                    makeObservable(this, {
+                        x: computed
+                    });
+                }
 
-                                                                            get x() {
-                                                                                return 1;
-                                                                            }
-                                                                        }"
-                                                `)
+                get x() {
+                    return 1;
+                }
+            }"
+        `)
     })
 
     test("computed - setter", () => {
@@ -666,23 +666,23 @@ describe("computed", () => {
       }
     `)
         ).toMatchInlineSnapshot(`
-                                                                        "import { computed, makeObservable } from \\"mobx\\";
+            "import { computed, makeObservable } from "mobx";
 
-                                                                        class Box {
-                                                                            constructor() {
-                                                                                makeObservable(this, {
-                                                                                    x: computed
-                                                                                });
-                                                                            }
+            class Box {
+                constructor() {
+                    makeObservable(this, {
+                        x: computed
+                    });
+                }
 
-                                                                            get x() {
-                                                                                return 1;
-                                                                            }
-                                                                            set x(v) {
-                                                                                console.log(v)
-                                                                            }
-                                                                        }"
-                                                `)
+                get x() {
+                    return 1;
+                }
+                set x(v) {
+                    console.log(v)
+                }
+            }"
+        `)
     })
 
     test("computed - setter - options", () => {
@@ -703,26 +703,26 @@ describe("computed", () => {
       }
     `)
         ).toMatchInlineSnapshot(`
-                                                                        "import { computed, makeObservable } from \\"mobx\\";
+            "import { computed, makeObservable } from "mobx";
 
-                                                                        class Box {
-                                                                            constructor() {
-                                                                                makeObservable(this, {
-                                                                                    x: computed({ name: \\"test\\" })
-                                                                                });
-                                                                            }
+            class Box {
+                constructor() {
+                    makeObservable(this, {
+                        x: computed({ name: "test" })
+                    });
+                }
 
-                                                                            get x() {
-                                                                                return 1;
-                                                                            }
-                                                                            set y(z) {
-                                                                                console.log(\\"wrong\\");
-                                                                            }
-                                                                            set x(v) {
-                                                                                console.log(v)
-                                                                            }
-                                                                        }"
-                                                `)
+                get x() {
+                    return 1;
+                }
+                set y(z) {
+                    console.log("wrong");
+                }
+                set x(v) {
+                    console.log(v)
+                }
+            }"
+        `)
     })
 
     test("computed - setter - struct", () => {
@@ -740,23 +740,23 @@ describe("computed", () => {
       }
     `)
         ).toMatchInlineSnapshot(`
-                                                                        "import { computed, makeObservable } from \\"mobx\\";
+            "import { computed, makeObservable } from "mobx";
 
-                                                                        class Box {
-                                                                            constructor() {
-                                                                                makeObservable(this, {
-                                                                                    x: computed.struct
-                                                                                });
-                                                                            }
+            class Box {
+                constructor() {
+                    makeObservable(this, {
+                        x: computed.struct
+                    });
+                }
 
-                                                                            get x() {
-                                                                                return 1;
-                                                                            }
-                                                                            set x(v) {
-                                                                                console.log(v)
-                                                                            }
-                                                                        }"
-                                                `)
+                get x() {
+                    return 1;
+                }
+                set x(v) {
+                    console.log(v)
+                }
+            }"
+        `)
     })
 })
 
@@ -789,7 +789,7 @@ describe("decorate", () => {
             })
         `)
         ).toMatchInlineSnapshot(`
-            "import { observable, computed, action, makeObservable } from \\"mobx\\"
+            "import { observable, computed, action, makeObservable } from "mobx"
 
             class Box {
                 width = 3
@@ -843,9 +843,9 @@ describe("decorate", () => {
             })
         `)
         ).toMatchInlineSnapshot(`
-            "import { observable, computed, action, makeObservable } from \\"mobx\\"
+            "import { observable, computed, action, makeObservable } from "mobx"
 
-            test(\\"a\\", () => {
+            test("a", () => {
                 class Box {
                     width = 3
 
@@ -857,7 +857,7 @@ describe("decorate", () => {
                 }
             })
 
-            test(\\"b\\", () => {
+            test("b", () => {
                 class Box {
                     constructor() {
                         makeObservable(this, {
@@ -887,7 +887,7 @@ describe("decorate", () => {
             })
         `)
         ).toMatchInlineSnapshot(`
-            "import { observable, computed, action, makeObservable } from \\"mobx\\"
+            "import { observable, computed, action, makeObservable } from "mobx"
 
             class Box {
                 constructor() {
@@ -916,7 +916,7 @@ describe("decorate", () => {
             })
         `)
         ).toMatchInlineSnapshot(`
-            "import { observable, computed, action, makeObservable } from \\"mobx\\"
+            "import { observable, computed, action, makeObservable } from "mobx"
 
             const box = {
 
@@ -940,13 +940,13 @@ describe("decorate", () => {
             })
         `)
         ).toMatchInlineSnapshot(`
-                        "import { observable, computed, action, makeObservable } from \\"mobx\\"
+            "import { observable, computed, action, makeObservable } from "mobx"
 
-                        makeObservable({}, {
-                            width: observable,
-                            height: observable.shallow,
-                        })"
-                `)
+            makeObservable({}, {
+                width: observable,
+                height: observable.shallow,
+            })"
+        `)
     })
 })
 
@@ -968,15 +968,15 @@ describe("privates", () => {
                 `
             )
         ).toMatchInlineSnapshot(`
-            "import { observable, computed, action, makeObservable } from \\"mobx\\"
+            "import { observable, computed, action, makeObservable } from "mobx"
 
             class TryToGetThis {
                         private privateField1: number = 1;
                         protected privateField2 = 1;
-                        public publicField: string = \\"test\\";
+                        public publicField: string = "test";
 
                         constructor() {
-                                    makeObservable<TryToGetThis, \\"privateField1\\" | \\"privateField2\\">(this, {
+                                    makeObservable<TryToGetThis, "privateField1" | "privateField2">(this, {
                                                 privateField1: observable,
                                                 privateField2: observable,
                                                 publicField: observable
@@ -1006,7 +1006,7 @@ describe("privates", () => {
                 }
             )
         ).toMatchInlineSnapshot(`
-            "import { observable, computed, action, makeObservable } from \\"mobx\\"
+            "import { observable, computed, action, makeObservable } from "mobx"
 
             class TryToGetThis {
                         @observable
@@ -1014,7 +1014,7 @@ describe("privates", () => {
                         @observable
                         protected privateField2 = 1
                         @observable
-                        public publicField: string = \\"test\\"
+                        public publicField: string = "test"
 
                         constructor() {
                                     makeObservable(this);
@@ -1116,7 +1116,7 @@ describe("@observer", () => {
 
 
             /* 1 */
-            export const X = inject(\\"test\\")(class /* 2 */ /* 3 */ X extends React.Component {
+            export const X = inject("test")(class /* 2 */ /* 3 */ X extends React.Component {
 
             });"
         `)
@@ -1139,7 +1139,7 @@ describe("@observer", () => {
 
 
             /* 1 */
-            export const X = inject(\\"test\\")(observer(class /* 2 */ /* 3 */ X extends React.Component {
+            export const X = inject("test")(observer(class /* 2 */ /* 3 */ X extends React.Component {
 
             }));"
         `)
@@ -1162,8 +1162,8 @@ describe("@observer", () => {
             )
         ).toMatchInlineSnapshot(`
             "import {observer, inject} from 'mobx-react'
-            import { observable, makeObservable } from \\"mobx\\";
-            import {Component} from \\"react\\"
+            import { observable, makeObservable } from "mobx";
+            import {Component} from "react"
 
             const X = observer(class X extends React.Component {
                 field = 1;
@@ -1196,8 +1196,8 @@ describe("@observer", () => {
             )
         ).toMatchInlineSnapshot(`
             "import {observer, inject} from 'mobx-react'
-            import { observable, makeObservable } from \\"mobx\\";
-            import {PureComponent} from \\"react\\"
+            import { observable, makeObservable } from "mobx";
+            import {PureComponent} from "react"
 
             const X = observer(class X extends PureComponent<{x: boolean}> {
                 field = 1;
@@ -1230,8 +1230,8 @@ describe("@observer", () => {
             )
         ).toMatchInlineSnapshot(`
             "import {observer, inject} from 'mobx-react'
-            import { observable, makeObservable } from \\"mobx\\";
-            import {PureComponent} from \\"react\\"
+            import { observable, makeObservable } from "mobx";
+            import {PureComponent} from "react"
 
             @observer class X extends PureComponent<{x: boolean}> {
                 @observable field =  1
@@ -1376,7 +1376,7 @@ test("class comp with observer, inject and decorator from another package", () =
         import {withRouter} from 'react-router-dom'
         /* 1 */
         export const X = withRouter(
-          inject(\\"test\\")(observer(class /* 2 */ /* 3 */ X extends React.Component {}))
+          inject("test")(observer(class /* 2 */ /* 3 */ X extends React.Component {}))
         );"
     `)
 })
@@ -1427,9 +1427,9 @@ test("class default export comp with observer and inject", () => {
     `)
     ).toMatchInlineSnapshot(`
         "import {observer, inject} from 'mobx-react'
-        
+
         class X extends React.Component {}
-        export default inject(\\"test\\")(observer(X));"
+        export default inject("test")(observer(X));"
     `)
 })
 
@@ -1449,8 +1449,8 @@ test("class default export comp with observer and inject", () => {
         import {withRouter} from 'react-router-dom'
 
         class X extends React.Component {}
-        
-        export default withRouter(inject(\\"test\\")(observer(X)))"
+
+        export default withRouter(inject("test")(observer(X)))"
     `)
 })
 

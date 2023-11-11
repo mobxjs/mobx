@@ -8,7 +8,8 @@ import {
     isFunction,
     globalState,
     MakeResult,
-    hasProp
+    hasProp,
+    assert20223DecoratorType
 } from "../internal"
 
 export function createFlowAnnotation(name: string, options?: object): Annotation {
@@ -16,11 +17,13 @@ export function createFlowAnnotation(name: string, options?: object): Annotation
         annotationType_: name,
         options_: options,
         make_,
-        extend_
+        extend_,
+        decorate_20223_
     }
 }
 
 function make_(
+    this: Annotation,
     adm: ObservableObjectAdministration,
     key: PropertyKey,
     descriptor: PropertyDescriptor,
@@ -50,6 +53,7 @@ function make_(
 }
 
 function extend_(
+    this: Annotation,
     adm: ObservableObjectAdministration,
     key: PropertyKey,
     descriptor: PropertyDescriptor,
@@ -57,6 +61,28 @@ function extend_(
 ): boolean | null {
     const flowDescriptor = createFlowDescriptor(adm, this, key, descriptor, this.options_?.bound)
     return adm.defineProperty_(key, flowDescriptor, proxyTrap)
+}
+
+function decorate_20223_(this: Annotation, mthd, context: ClassMethodDecoratorContext) {
+    if (__DEV__) {
+        assert20223DecoratorType(context, ["method"])
+    }
+    const { name, addInitializer } = context
+
+    if (!isFlow(mthd)) {
+        mthd = flow(mthd)
+    }
+
+    if (this.options_?.bound) {
+        addInitializer(function () {
+            const self = this as any
+            const bound = self[name].bind(self)
+            bound.isMobXFlow = true
+            self[name] = bound
+        })
+    }
+
+    return mthd
 }
 
 function assertFlowDescriptor(

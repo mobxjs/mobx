@@ -70,7 +70,7 @@ test("map crud", function () {
         ])
     )
     expect(JSON.stringify(m)).toMatchInlineSnapshot(
-        `"[[\\"1\\",\\"aa\\"],[1,\\"b\\"],[[\\"arr\\"],\\"arrVal\\"],[null,\\"symbol-value\\"]]"`
+        `"[["1","aa"],[1,"b"],[["arr"],"arrVal"],[null,"symbol-value"]]"`
     )
     expect(m.toString()).toBe("[object ObservableMap]")
     expect(m.size).toBe(4)

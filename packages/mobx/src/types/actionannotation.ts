@@ -7,7 +7,9 @@ import {
     isFunction,
     Annotation,
     globalState,
-    MakeResult
+    MakeResult,
+    assert20223DecoratorType,
+    storeAnnotation
 } from "../internal"
 
 export function createActionAnnotation(name: string, options?: object): Annotation {
@@ -15,11 +17,13 @@ export function createActionAnnotation(name: string, options?: object): Annotati
         annotationType_: name,
         options_: options,
         make_,
-        extend_
+        extend_,
+        decorate_20223_
     }
 }
 
 function make_(
+    this: Annotation,
     adm: ObservableObjectAdministration,
     key: PropertyKey,
     descriptor: PropertyDescriptor,
@@ -49,6 +53,7 @@ function make_(
 }
 
 function extend_(
+    this: Annotation,
     adm: ObservableObjectAdministration,
     key: PropertyKey,
     descriptor: PropertyDescriptor,
@@ -56,6 +61,47 @@ function extend_(
 ): boolean | null {
     const actionDescriptor = createActionDescriptor(adm, this, key, descriptor)
     return adm.defineProperty_(key, actionDescriptor, proxyTrap)
+}
+
+function decorate_20223_(this: Annotation, mthd, context: DecoratorContext) {
+    if (__DEV__) {
+        assert20223DecoratorType(context, ["method", "field"])
+    }
+    const { kind, name, addInitializer } = context
+    const ann = this
+
+    const _createAction = m =>
+        createAction(ann.options_?.name ?? name!.toString(), m, ann.options_?.autoAction ?? false)
+
+    // Backwards/Legacy behavior, expects makeObservable(this)
+    if (kind == "field") {
+        addInitializer(function () {
+            storeAnnotation(this, name, ann)
+        })
+        return
+    }
+
+    if (kind == "method") {
+        if (!isAction(mthd)) {
+            mthd = _createAction(mthd)
+        }
+
+        if (this.options_?.bound) {
+            addInitializer(function () {
+                const self = this as any
+                const bound = self[name].bind(self)
+                bound.isMobxAction = true
+                self[name] = bound
+            })
+        }
+
+        return mthd
+    }
+
+    die(
+        `Cannot apply '${ann.annotationType_}' to '${String(name)}' (kind: ${kind}):` +
+            `\n'${ann.annotationType_}' can only be used on properties with a function value.`
+    )
 }
 
 function assertActionDescriptor(

@@ -30,8 +30,11 @@ import {
     isStringish,
     createObservableAnnotation,
     createAutoAnnotation,
+    is20223Decorator,
     initObservable
 } from "../internal"
+
+import type { ClassAccessorDecorator, ClassFieldDecorator } from "../types/decorator_fills"
 
 export const OBSERVABLE = "observable"
 export const OBSERVABLE_REF = "observable.ref"
@@ -71,7 +74,8 @@ const observableShallowAnnotation = createObservableAnnotation(OBSERVABLE_SHALLO
 const observableStructAnnotation = createObservableAnnotation(OBSERVABLE_STRUCT, {
     enhancer: refStructEnhancer
 })
-const observableDecoratorAnnotation = createDecoratorAnnotation(observableAnnotation)
+const observableDecoratorAnnotation =
+    createDecoratorAnnotation<ClassAccessorDecorator>(observableAnnotation)
 
 export function getEnhancerFromOptions(options: CreateObservableOptions): IEnhancer<any> {
     return options.deep === true
@@ -96,6 +100,11 @@ export function getEnhancerFromAnnotation(annotation?: Annotation): IEnhancer<an
  * @param v the value which should become observable.
  */
 function createObservable(v: any, arg2?: any, arg3?: any) {
+    // @observable someProp; (2022.3 Decorators)
+    if (is20223Decorator(arg2)) {
+        return observableAnnotation.decorate_20223_(v, arg2)
+    }
+
     // @observable someProp;
     if (isStringish(arg2)) {
         storeAnnotation(v, arg2, observableAnnotation)
@@ -142,7 +151,12 @@ export interface IObservableValueFactory {
     <T>(value?: T, options?: CreateObservableOptions): IObservableValue<T | undefined>
 }
 
-export interface IObservableFactory extends Annotation, PropertyDecorator {
+export interface IObservableFactory
+    extends Annotation,
+        PropertyDecorator,
+        ClassAccessorDecorator,
+        ClassFieldDecorator {
+    // TODO: remove ClassFieldDecorator, this is only temporarily support for legacy decorators
     <T = any>(value: T[], options?: CreateObservableOptions): IObservableArray<T>
     <T = any>(value: Set<T>, options?: CreateObservableOptions): ObservableSet<T>
     <K = any, V = any>(value: Map<K, V>, options?: CreateObservableOptions): ObservableMap<K, V>
@@ -171,13 +185,13 @@ export interface IObservableFactory extends Annotation, PropertyDecorator {
     /**
      * Decorator that creates an observable that only observes the references, but doesn't try to turn the assigned value into an observable.ts.
      */
-    ref: Annotation & PropertyDecorator
+    ref: Annotation & PropertyDecorator & ClassAccessorDecorator & ClassFieldDecorator
     /**
      * Decorator that creates an observable converts its value (objects, maps or arrays) into a shallow observable structure
      */
-    shallow: Annotation & PropertyDecorator
-    deep: Annotation & PropertyDecorator
-    struct: Annotation & PropertyDecorator
+    shallow: Annotation & PropertyDecorator & ClassAccessorDecorator & ClassFieldDecorator
+    deep: Annotation & PropertyDecorator & ClassAccessorDecorator & ClassFieldDecorator
+    struct: Annotation & PropertyDecorator & ClassAccessorDecorator & ClassFieldDecorator
 }
 
 const observableFactories: IObservableFactory = {

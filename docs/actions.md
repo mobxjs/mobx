@@ -13,6 +13,7 @@ Usage:
 -   `action` _(annotation)_
 -   `action(fn)`
 -   `action(name, fn)`
+-   `@action` _(method / field decorator)_
 
 All applications have actions. An action is any piece of code that modifies the state. In principle, actions always happen in response to an event. For example, a button was clicked, some input changed, a websocket message arrived, etc.
 
@@ -42,6 +43,23 @@ class Doubler {
         })
     }
 
+    increment() {
+        // Intermediate states will not become visible to observers.
+        this.value++
+        this.value++
+    }
+}
+```
+
+<!--@action-->
+
+```javascript
+import { observable, action } from "mobx"
+
+class Doubler {
+    @observable accessor value = 0
+
+    @action
     increment() {
         // Intermediate states will not become visible to observers.
         this.value++
@@ -399,6 +417,7 @@ Usage:
 
 -   `flow` _(annotation)_
 -   `flow(function* (args) { })`
+-   `@flow` _(method decorator)_
 
 The `flow` wrapper is an optional alternative to `async` / `await` that makes it easier to
 work with MobX actions.

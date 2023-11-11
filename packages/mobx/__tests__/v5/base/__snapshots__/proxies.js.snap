@@ -1,32 +1,32 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`decorate proxies 1`] = `
-Object {
-  "b": Object {
+{
+  "b": {
     "configurable": true,
     "enumerable": true,
     "get": [Function],
     "set": [Function],
   },
-  "double": Object {
+  "double": {
     "configurable": true,
     "enumerable": false,
     "value": [Function],
     "writable": false,
   },
-  "x": Object {
+  "x": {
     "configurable": true,
     "enumerable": true,
     "get": [Function],
     "set": [Function],
   },
-  "y": Object {
+  "y": {
     "configurable": true,
     "enumerable": false,
     "get": [Function],
     "set": [Function],
   },
-  Symbol(mobx administration): Object {
+  Symbol(mobx administration): {
     "configurable": true,
     "enumerable": false,
     "value": "(omitted)",
@@ -36,32 +36,32 @@ Object {
 `;
 
 exports[`extend proxies 1`] = `
-Object {
-  "b": Object {
+{
+  "b": {
     "configurable": true,
     "enumerable": true,
     "get": [Function],
     "set": [Function],
   },
-  "double": Object {
+  "double": {
     "configurable": true,
     "enumerable": false,
     "value": [Function],
     "writable": false,
   },
-  "x": Object {
+  "x": {
     "configurable": true,
     "enumerable": true,
     "get": [Function],
     "set": [Function],
   },
-  "y": Object {
+  "y": {
     "configurable": true,
     "enumerable": false,
     "get": [Function],
     "set": [Function],
   },
-  Symbol(mobx administration): Object {
+  Symbol(mobx administration): {
     "configurable": true,
     "enumerable": false,
     "value": "(omitted)",
@@ -71,32 +71,32 @@ Object {
 `;
 
 exports[`non-proxied object 1`] = `
-Object {
-  "b": Object {
+{
+  "b": {
     "configurable": true,
     "enumerable": true,
     "value": 4,
     "writable": true,
   },
-  "double": Object {
+  "double": {
     "configurable": true,
     "enumerable": false,
     "value": [Function],
     "writable": false,
   },
-  "x": Object {
+  "x": {
     "configurable": true,
     "enumerable": true,
     "get": [Function],
     "set": [Function],
   },
-  "y": Object {
+  "y": {
     "configurable": true,
     "enumerable": false,
     "get": [Function],
     "set": [Function],
   },
-  Symbol(mobx administration): Object {
+  Symbol(mobx administration): {
     "configurable": true,
     "enumerable": false,
     "value": "(omitted)",

@@ -18,10 +18,6 @@ _Simple, scalable state management._
 
 ---
 
-> Documentation for the older **unsupported** V4/V5 can be [found here](https://github.com/mobxjs/mobx/blob/mobx4and5/docs/README.md), but be sure to read about the [current documentation first](https://mobx.js.org/about-this-documentation.html).
-
----
-
 MobX is made possible by the generosity of the sponsors below, and many other [individual backers](backers-sponsors.md#backers). Sponsoring directly impacts the longevity of this project.
 
 **🥇 Gold sponsors (\$3000+ total contribution):** <br/>
@@ -59,7 +55,7 @@ MobX is made possible by the generosity of the sponsors below, and many other [i
 
 _Anything that can be derived from the application state, should be. Automatically._
 
-MobX is a battle-tested library that makes state management simple and scalable by transparently applying functional reactive programming.
+MobX is a signal based, battle-tested library that makes state management simple and scalable by transparently applying functional reactive programming.
 The philosophy behind MobX is simple:
 
 <div class="benefits">
