@@ -196,6 +196,41 @@ results of this test:
         t.end()
     })
 
+    test(`${version} - array.es2023 findLastIndex methods`, function (t) {
+        gc()
+        let aCalc = 0
+        let bCalc = 0
+        const ar = observable([0])
+        const findLastIndexOfZero = computed(function () {
+            aCalc++
+            return ar.findLastIndex(x => x === 0);
+        })
+        const lastIndexOfZero = computed(function () {
+            bCalc++
+            return ar.lastIndexOf(0);
+        })
+        mobx.observe(findLastIndexOfZero, voidObserver, true)
+        mobx.observe(lastIndexOfZero, voidObserver, true)
+
+        const start = now()
+
+        t.equal(1, aCalc)
+        t.equal(1, bCalc)
+        for (let i = 1; i < 10000; i++) ar.push(i)
+
+        t.equal(0, lastIndexOfZero.get())
+        t.equal(0, findLastIndexOfZero.get())
+        t.equal(10000, aCalc)
+        t.equal(10000, bCalc)
+
+        const end = now()
+
+        log(
+            "Array findLastIndex loop -  Updated in " + (end - start) + " ms."
+        )
+        t.end()
+    })
+
     test(`${version} - array reduce`, function (t) {
         gc()
         let aCalc = 0
