@@ -2,4 +2,4 @@
 "mobx": minor
 ---
 
-Added es2023 array methods support to observablearray.
+Improve observablearray proxy pefromance for es2023.array and es2022.array methods
