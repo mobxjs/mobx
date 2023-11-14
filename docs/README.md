@@ -20,7 +20,7 @@ _Simple, scalable state management._
 
 MobX is made possible by the generosity of the sponsors below, and many other [individual backers](backers-sponsors.md#backers). Sponsoring directly impacts the longevity of this project.
 
-**🥇 Gold sponsors (\$3000+ total contribution):**
+**🥇 Gold sponsors (\$2500+ total contribution):**
 
 <br/>
 <a href="https://www.guilded.gg/"><img src="https://mobx.js.org/assets/guilded.jpg" align="center" width="100" title="Guilded" alt="Guilded" /></a>
