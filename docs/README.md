@@ -103,26 +103,22 @@ So what does code that uses MobX look like?
 import React from "react"
 import ReactDOM from "react-dom"
 import { makeAutoObservable } from "mobx"
-import { observer } from "mobx-react"
+import { observer } from "mobx-react-lite"
 
 // Model the application state.
-class Timer {
-    secondsPassed = 0
-
-    constructor() {
-        makeAutoObservable(this)
-    }
-
-    increase() {
-        this.secondsPassed += 1
-    }
-
-    reset() {
-        this.secondsPassed = 0
-    }
+function createTimer() {
+    return makeAutoObservable({
+        secondsPassed: 0,
+        increase() {
+            this.secondsPassed += 1
+        },
+        reset() {
+            this.secondsPassed = 0
+        }
+    })
 }
 
-const myTimer = new Timer()
+const myTimer = createTimer()
 
 // Build a "user interface" that uses the observable state.
 const TimerView = observer(({ timer }) => (

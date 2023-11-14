@@ -44,6 +44,7 @@ MobX is made possible by the generosity of the sponsors below, and many other [i
 <a href="https://www.easeus.com/?utm_source=github_mobxjs_sponsorship&utm_medium=readme&utm_campaign=sponsorship"><img src="https://mobx.js.org/assets/easeus.png" align="center" width="100" title="EaseUS" alt="EaseUS"/></a>
 
 **🥉 Bronze sponsors (\$500+ total contributions):**<br/>
+
 <a href="https://www.bugsnag.com/platforms/react-error-reporting?utm_source=MobX&utm_medium=Website&utm_content=open-source&utm_campaign=2019-community&utm_term=20190913"><img src="https://mobx.js.org/assets/bugsnag.jpg" align="center" width="100" title="Bugsnag" alt="Bugsnag"/></a>
 <a href="https://space307.com/?utm_source=sponsorship&utm_medium=mobx&utm_campaign=readme"><img src="https://mobx.js.org/assets/space307.png" align="center" width="100" title="Space307" alt="Space307"/></a>
 <a href="https://mantro.net/jobs/warlock"><img src="https://mobx.js.org/assets/mantro.png" align="center" width="100" title="mantro GmbH" alt="mantro GmbH"></a>
@@ -106,26 +107,22 @@ So what does code that uses MobX look like?
 import React from "react"
 import ReactDOM from "react-dom"
 import { makeAutoObservable } from "mobx"
-import { observer } from "mobx-react"
+import { observer } from "mobx-react-lite"
 
 // Model the application state.
-class Timer {
-    secondsPassed = 0
-
-    constructor() {
-        makeAutoObservable(this)
-    }
-
-    increase() {
-        this.secondsPassed += 1
-    }
-
-    reset() {
-        this.secondsPassed = 0
-    }
+function createTimer() {
+    return makeAutoObservable({
+        secondsPassed: 0,
+        increase() {
+            this.secondsPassed += 1
+        },
+        reset() {
+            this.secondsPassed = 0
+        }
+    })
 }
 
-const myTimer = new Timer()
+const myTimer = createTimer()
 
 // Build a "user interface" that uses the observable state.
 const TimerView = observer(({ timer }) => (
@@ -177,7 +174,6 @@ The **[MobX Quick Start Guide](https://www.packtpub.com/product/mobx-quick-start
 -   [HolyJS 2019: MobX and the unique symbiosis of predictability and speed](https://www.youtube.com/watch?v=NBYbBbjZeX4&list=PL8sJahqnzh8JJD7xahG5zXkjfM5GOgcPA&index=21&t=0s) by Michel Weststrate, _59 min_.
 -   [React Amsterdam 2016: State Management Is Easy](https://www.youtube.com/watch?v=ApmSsu3qnf0&feature=youtu.be) by Michel Weststrate, _20 min_, [slides](https://speakerdeck.com/mweststrate/state-management-is-easy-introduction-to-mobx).
 -   {🚀} [React Live 2019: Reinventing MobX](https://www.youtube.com/watch?v=P_WqKZxpX8g) by Max Gallo, _27 min_.
-
 
 ## Credits
 
