@@ -13,10 +13,11 @@ const getServerSnapshot = () => {}
 type ObserverAdministration = {
     reaction: Reaction | null // also serves as disposed flag
     onStoreChange: Function | null // also serves as mounted flag
-    // BC: we will use local state version if global isn't available.
-    // It should behave as previous implementation - tearing is still present,
+    // stateVersion that 'ticks' for every time the reaction fires
+    // tearing is still present,
     // because there is no cross component synchronization,
     // but we can use `useSyncExternalStore` API.
+    // TODO: optimize to use number?
     stateVersion: any
     name: string
     // These don't depend on state/props, therefore we can keep them here instead of `useCallback`
