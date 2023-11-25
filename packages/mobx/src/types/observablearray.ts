@@ -518,6 +518,7 @@ export var arrayExtensions = {
  * Without this, everything works as well, but this works
  * faster as everything works on unproxied values
  */
+addArrayExtension("at", simpleFunc)
 addArrayExtension("concat", simpleFunc)
 addArrayExtension("flat", simpleFunc)
 addArrayExtension("includes", simpleFunc)
@@ -527,15 +528,21 @@ addArrayExtension("lastIndexOf", simpleFunc)
 addArrayExtension("slice", simpleFunc)
 addArrayExtension("toString", simpleFunc)
 addArrayExtension("toLocaleString", simpleFunc)
+addArrayExtension("toSorted", simpleFunc)
+addArrayExtension("toSpliced", simpleFunc)
+addArrayExtension("with", simpleFunc)
 // map
 addArrayExtension("every", mapLikeFunc)
 addArrayExtension("filter", mapLikeFunc)
 addArrayExtension("find", mapLikeFunc)
 addArrayExtension("findIndex", mapLikeFunc)
+addArrayExtension("findLast", mapLikeFunc)
+addArrayExtension("findLastIndex", mapLikeFunc)
 addArrayExtension("flatMap", mapLikeFunc)
 addArrayExtension("forEach", mapLikeFunc)
 addArrayExtension("map", mapLikeFunc)
 addArrayExtension("some", mapLikeFunc)
+addArrayExtension("toReversed", mapLikeFunc)
 // reduce
 addArrayExtension("reduce", reduceLikeFunc)
 addArrayExtension("reduceRight", reduceLikeFunc)
