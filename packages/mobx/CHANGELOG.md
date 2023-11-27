@@ -1,5 +1,15 @@
 # mobx
 
+## 6.12.0
+
+### Minor Changes
+
+-   [`ec5db592`](https://github.com/mobxjs/mobx/commit/ec5db592d7756826c31e710b1c759d7e9406b153) [#3792](https://github.com/mobxjs/mobx/pull/3792) Thanks [@tonyraoul](https://github.com/tonyraoul)! - Improve observablearray proxy pefromance for es2023.array and es2022.array methods
+
+### Patch Changes
+
+-   [`86616c11`](https://github.com/mobxjs/mobx/commit/86616c11c108a511331eb05e55c08fc2c5a23f4d) [#3654](https://github.com/mobxjs/mobx/pull/3654) Thanks [@ahoisl](https://github.com/ahoisl)! - fix: action transparently forwards toString of underlying function
+
 ## 6.11.0
 
 ### Minor Changes
