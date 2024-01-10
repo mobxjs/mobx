@@ -139,7 +139,6 @@ export function reaction<T, FireImmediately extends boolean = false>(
     let firstTime = true
     let isScheduled = false
     let value: T
-    let oldValue: T | undefined
 
     const equals: IEqualsComparer<T> = (opts as any).compareStructural
         ? comparer.structural
@@ -165,10 +164,10 @@ export function reaction<T, FireImmediately extends boolean = false>(
             return
         }
         let changed: boolean = false
+        const oldValue = value
         r.track(() => {
             const nextValue = allowStateChanges(false, () => expression(r))
             changed = firstTime || !equals(value, nextValue)
-            oldValue = value
             value = nextValue
         })
 
