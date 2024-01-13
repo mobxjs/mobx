@@ -200,8 +200,8 @@ However, `makeAutoObservable` cannot be used on classes that have super or are [
 Inference rules:
 
 -   All _own_ properties become `observable`.
--   All `get`ters become `computed`.
--   All `set`ters become `action`.
+-   All `getters` become `computed`.
+-   All `setters` become `action`.
 -   All _functions_ become [`autoAction`](#autoAction).
 -   All _generator_ functions become `flow`. (Note that generator functions are not detectable in some transpiler configurations, if flow doesn't work as expected, make sure to specify `flow` explicitly.)
 -   Members marked with `false` in the `overrides` argument will not be annotated. For example, using it for read only fields such as identifiers.
