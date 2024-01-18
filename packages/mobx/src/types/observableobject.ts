@@ -647,7 +647,7 @@ export class ObservableObjectAdministration
 }
 
 export interface IIsObservableObject {
-    $mobx: ObservableObjectAdministration
+    [$mobx]: ObservableObjectAdministration
 }
 
 export function asObservableObject(
