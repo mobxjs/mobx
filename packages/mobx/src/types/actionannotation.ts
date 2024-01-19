@@ -75,10 +75,7 @@ function decorate_20223_(this: Annotation, mthd, context: DecoratorContext) {
 
     // Backwards/Legacy behavior, expects makeObservable(this)
     if (kind == "field") {
-        addInitializer(function () {
-            storeAnnotation(this, name, ann)
-        })
-        return
+        return _createAction
     }
 
     if (kind == "method") {
