@@ -63,7 +63,6 @@ export class Reaction implements IDerivation, IReactionPublic {
     isTrackPending_ = false
     isRunning_ = false
     isTracing_: TraceMode = TraceMode.NONE
-    scheduledTrack_ = false
     scheduledRunReaction_ = false
 
     constructor(
@@ -131,16 +130,6 @@ export class Reaction implements IDerivation, IReactionPublic {
     }
 
     track(fn: () => void) {
-        if (!this.scheduledTrack_) {
-            this.scheduledTrack_ = true
-            this.scheduler(() => {
-                this.scheduledTrack_ = false
-                this.trackImpl(fn)
-            })
-        }
-    }
-
-    private trackImpl(fn: () => void) {
         if (this.isDisposed_) {
             return
             // console.warn("Reaction already disposed") // Note: Not a warning / error in mobx 4 either
