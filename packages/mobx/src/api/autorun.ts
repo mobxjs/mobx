@@ -119,7 +119,8 @@ export function reaction<T, FireImmediately extends boolean = false>(
         () => reactionRunner(),
         opts.onError,
         opts.requiresObservable,
-        createSchedulerFromOptions(opts)
+        createSchedulerFromOptions(opts),
+        true
     )
 
     function reactionRunner() {
