@@ -64,7 +64,6 @@ export class Reaction implements IDerivation, IReactionPublic {
     isRunning_ = false
     isTracing_: TraceMode = TraceMode.NONE
     scheduledRunReaction_ = false
-    firstRun_ = true
 
     constructor(
         public name_: string = __DEV__ ? "Reaction@" + getNextId() : "Reaction",
