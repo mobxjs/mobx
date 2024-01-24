@@ -86,36 +86,50 @@ test("autorun 1", function (done) {
 })
 
 test("autorun re-calculates computed states only when required", function (done) {
-    let _result = null
-    let _cCalcs = 0
+    let autoruns = 0
+    let computedCalcs = 0
 
     const o = mobx.observable.box(0)
     const c = mobx.computed(() => {
-        _cCalcs++
+        computedCalcs++
         return o.get()
     })
 
     mobx.autorun(
         () => {
-            _result = c.get()
+            c.get()
+            autoruns++
         },
-        { delay: 100 }
+        { delay: 1000 }
     )
-
-    setTimeout(
-        mobx.action(() => o.set(1)),
-        30
-    )
-
-    expect(_cCalcs).toEqual(0)
-
-    setTimeout(() => mobx.action(() => o.set(2)), 30)
+    expect(computedCalcs).toBe(0)
 
     setTimeout(() => {
-        expect(_cCalcs).toEqual(1)
-        expect(_result).toEqual(1)
+        // We expect the first run to run the computed
+        expect(autoruns).toBe(1)
+        expect(computedCalcs).toBe(1)
+    }, 1100)
+
+    // We shouldn't eagerly calculate the state before the autorun runs.
+    // because the state can be mutated again before `delay` expires - if that
+    // happens, a re-calculation here would be wasted.
+    setTimeout(() => {
+        o.set(1)
+        expect(computedCalcs).toBe(1)
+    }, 1500)
+
+    // This will re-invalidate the state so we'll need to recalculate
+    // again when autorun runs (when `delay` expires).
+    setTimeout(() => {
+        o.set(3)
+        expect(computedCalcs).toBe(1)
+    }, 1600)
+
+    setTimeout(() => {
+        expect(autoruns).toBe(2)
+        expect(computedCalcs).toBe(2)
         done()
-    }, 200)
+    }, 3000)
 })
 
 test("autorun should not result in loop", function (done) {
