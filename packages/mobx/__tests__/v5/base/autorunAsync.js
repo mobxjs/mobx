@@ -85,6 +85,39 @@ test("autorun 1", function (done) {
     }, 30)
 })
 
+test("autorun re-calculates computed states only when required", function (done) {
+    let _result = null
+    let _cCalcs = 0
+
+    const o = mobx.observable.box(0)
+    const c = mobx.computed(() => {
+        _cCalcs++
+        return o.get()
+    })
+
+    mobx.autorun(
+        () => {
+            _result = c.get()
+        },
+        { delay: 100 }
+    )
+
+    setTimeout(
+        mobx.action(() => o.set(1)),
+        30
+    )
+
+    expect(_cCalcs).toEqual(0)
+
+    setTimeout(() => mobx.action(() => o.set(2)), 30)
+
+    setTimeout(() => {
+        expect(_cCalcs).toEqual(1)
+        expect(_result).toEqual(1)
+        done()
+    }, 200)
+})
+
 test("autorun should not result in loop", function (done) {
     let i = 0
     const a = mobx.observable({
