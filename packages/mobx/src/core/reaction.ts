@@ -18,7 +18,8 @@ import {
     spyReportStart,
     startBatch,
     trace,
-    trackDerivedFunction, GenericAbortSignal
+    trackDerivedFunction,
+    GenericAbortSignal
 } from "../internal"
 
 /**
@@ -62,12 +63,15 @@ export class Reaction implements IDerivation, IReactionPublic {
     isTrackPending_ = false
     isRunning_ = false
     isTracing_: TraceMode = TraceMode.NONE
+    scheduledTrack_ = false
+    scheduledRunReaction_ = false
 
     constructor(
         public name_: string = __DEV__ ? "Reaction@" + getNextId() : "Reaction",
         private onInvalidate_: () => void,
         private errorHandler_?: (error: any, derivation: IDerivation) => void,
-        public requiresObservable_?
+        public requiresObservable_?,
+        private scheduler: (callback: () => void) => any = f => f()
     ) {}
 
     onBecomeStale_() {
@@ -90,6 +94,16 @@ export class Reaction implements IDerivation, IReactionPublic {
      * internal, use schedule() if you intend to kick off a reaction
      */
     runReaction_() {
+        if (!this.scheduledRunReaction_) {
+            this.scheduledRunReaction_ = true
+            this.scheduler(() => {
+                this.scheduledRunReaction_ = false
+                this.runReactionImpl()
+            })
+        }
+    }
+
+    private runReactionImpl() {
         if (!this.isDisposed_) {
             startBatch()
             this.isScheduled_ = false
@@ -117,6 +131,16 @@ export class Reaction implements IDerivation, IReactionPublic {
     }
 
     track(fn: () => void) {
+        if (!this.scheduledTrack_) {
+            this.scheduledTrack_ = true
+            this.scheduler(() => {
+                this.scheduledTrack_ = false
+                this.trackImpl(fn)
+            })
+        }
+    }
+
+    private trackImpl(fn: () => void) {
         if (this.isDisposed_) {
             return
             // console.warn("Reaction already disposed") // Note: Not a warning / error in mobx 4 either

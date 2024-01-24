@@ -50,47 +50,21 @@ export function autorun(
 
     const name: string =
         opts?.name ?? (__DEV__ ? (view as any).name || "Autorun@" + getNextId() : "Autorun")
-    const runSync = !opts.scheduler && !opts.delay
-    let reaction: Reaction
-
-    if (runSync) {
-        // normal autorun
-        reaction = new Reaction(
-            name,
-            function (this: Reaction) {
-                this.track(reactionRunner)
-            },
-            opts.onError,
-            opts.requiresObservable
-        )
-    } else {
-        const scheduler = createSchedulerFromOptions(opts)
-        // debounced autorun
-        let isScheduled = false
-
-        reaction = new Reaction(
-            name,
-            () => {
-                if (!isScheduled) {
-                    isScheduled = true
-                    scheduler(() => {
-                        isScheduled = false
-                        if (!reaction.isDisposed_) {
-                            reaction.track(reactionRunner)
-                        }
-                    })
-                }
-            },
-            opts.onError,
-            opts.requiresObservable
-        )
-    }
+    const reaction = new Reaction(
+        name,
+        function (this: Reaction) {
+            this.track(reactionRunner)
+        },
+        opts.onError,
+        opts.requiresObservable,
+        createSchedulerFromOptions(opts)
+    )
 
     function reactionRunner() {
         view(reaction)
     }
 
-    if(!opts?.signal?.aborted) {
+    if (!opts?.signal?.aborted) {
         reaction.schedule_()
     }
     return reaction.getDisposer_(opts?.signal)
@@ -133,11 +107,7 @@ export function reaction<T, FireImmediately extends boolean = false>(
         name,
         opts.onError ? wrapErrorHandler(opts.onError, effect) : effect
     )
-    const runSync = !opts.scheduler && !opts.delay
-    const scheduler = createSchedulerFromOptions(opts)
-
     let firstTime = true
-    let isScheduled = false
     let value: T
 
     const equals: IEqualsComparer<T> = (opts as any).compareStructural
@@ -146,20 +116,13 @@ export function reaction<T, FireImmediately extends boolean = false>(
 
     const r = new Reaction(
         name,
-        () => {
-            if (firstTime || runSync) {
-                reactionRunner()
-            } else if (!isScheduled) {
-                isScheduled = true
-                scheduler!(reactionRunner)
-            }
-        },
+        () => reactionRunner(),
         opts.onError,
-        opts.requiresObservable
+        opts.requiresObservable,
+        createSchedulerFromOptions(opts)
     )
 
     function reactionRunner() {
-        isScheduled = false
         if (r.isDisposed_) {
             return
         }
@@ -181,7 +144,7 @@ export function reaction<T, FireImmediately extends boolean = false>(
         firstTime = false
     }
 
-    if(!opts?.signal?.aborted) {
+    if (!opts?.signal?.aborted) {
         r.schedule_()
     }
     return r.getDisposer_(opts?.signal)
