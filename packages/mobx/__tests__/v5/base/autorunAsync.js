@@ -100,7 +100,7 @@ test("autorun re-calculates computed states only when required", function (done)
             c.get()
             autoruns++
         },
-        { delay: 1000 }
+        { delay: 300 }
     )
     expect(computedCalcs).toBe(0)
 
@@ -108,7 +108,7 @@ test("autorun re-calculates computed states only when required", function (done)
         // We expect the first run to run the computed
         expect(autoruns).toBe(1)
         expect(computedCalcs).toBe(1)
-    }, 1100)
+    }, 400)
 
     // We shouldn't eagerly calculate the state before the autorun runs because
     // the state can be mutated again before `delay` expires - if that happens, a
@@ -116,20 +116,20 @@ test("autorun re-calculates computed states only when required", function (done)
     setTimeout(() => {
         o.set(1)
         expect(computedCalcs).toBe(1)
-    }, 1500)
+    }, 800)
 
     // This will re-invalidate the state so we'll need to recalculate
     // again when autorun runs (when `delay` expires).
     setTimeout(() => {
         o.set(3)
         expect(computedCalcs).toBe(1)
-    }, 1600)
+    }, 900)
 
     setTimeout(() => {
         expect(autoruns).toBe(2)
         expect(computedCalcs).toBe(2)
         done()
-    }, 3000)
+    }, 1600)
 })
 
 test("autorun should not result in loop", function (done) {
