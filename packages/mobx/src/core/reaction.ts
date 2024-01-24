@@ -71,8 +71,7 @@ export class Reaction implements IDerivation, IReactionPublic {
         private onInvalidate_: () => void,
         private errorHandler_?: (error: any, derivation: IDerivation) => void,
         public requiresObservable_?,
-        private scheduler: (callback: () => void) => any = f => f(),
-        private runFirstReactionImmediately = false
+        private scheduler: (callback: () => void) => any = f => f()
     ) {}
 
     onBecomeStale_() {
@@ -95,11 +94,6 @@ export class Reaction implements IDerivation, IReactionPublic {
      * internal, use schedule() if you intend to kick off a reaction
      */
     runReaction_() {
-        if (this.runFirstReactionImmediately && this.firstRun_) {
-            this.firstRun_ = false
-            this.runReactionImpl()
-            return
-        }
         if (!this.scheduledRunReaction_) {
             this.scheduledRunReaction_ = true
             this.scheduler(() => {

@@ -114,13 +114,22 @@ export function reaction<T, FireImmediately extends boolean = false>(
         ? comparer.structural
         : opts.equals || comparer.default
 
+    let firstRun = true
+    const scheduler = createSchedulerFromOptions(opts)
+
     const r = new Reaction(
         name,
         () => reactionRunner(),
         opts.onError,
         opts.requiresObservable,
-        createSchedulerFromOptions(opts),
-        true
+        (f: Lambda) => {
+            if (firstRun) {
+                firstRun = false
+                f()
+                return
+            }
+            scheduler(f)
+        }
     )
 
     function reactionRunner() {
