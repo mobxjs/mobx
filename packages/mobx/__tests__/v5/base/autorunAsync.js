@@ -110,9 +110,9 @@ test("autorun re-calculates computed states only when required", function (done)
         expect(computedCalcs).toBe(1)
     }, 1100)
 
-    // We shouldn't eagerly calculate the state before the autorun runs.
-    // because the state can be mutated again before `delay` expires - if that
-    // happens, a re-calculation here would be wasted.
+    // We shouldn't eagerly calculate the state before the autorun runs because
+    // the state can be mutated again before `delay` expires - if that happens, a
+    // re-calculation here would be wasted.
     setTimeout(() => {
         o.set(1)
         expect(computedCalcs).toBe(1)
