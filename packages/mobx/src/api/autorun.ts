@@ -50,16 +50,42 @@ export function autorun(
 
     const name: string =
         opts?.name ?? (__DEV__ ? (view as any).name || "Autorun@" + getNextId() : "Autorun")
-    const scheduler = createSchedulerFromOptions(opts)
-    const reaction = new Reaction(
-        name,
-        function (this: Reaction) {
-            this.track(reactionRunner)
-        },
-        opts.onError,
-        opts.requiresObservable,
-        f => scheduler(f)
-    )
+    const runSync = !opts.scheduler && !opts.delay
+    let reaction: Reaction
+
+    if (runSync) {
+        // normal autorun
+        reaction = new Reaction(
+            name,
+            function (this: Reaction) {
+                this.track(reactionRunner)
+            },
+            opts.onError,
+            opts.requiresObservable
+        )
+    } else {
+        const scheduler = createSchedulerFromOptions(opts)
+        // debounced autorun
+        let isScheduled = false
+
+        reaction = new Reaction(
+            name,
+            () => {
+                if (!isScheduled) {
+                    isScheduled = true
+                    scheduler(() => {
+                        isScheduled = false
+                        if (!reaction.isDisposed_) {
+                            reaction.track(reactionRunner)
+                        }
+                    })
+                }
+            },
+            opts.onError,
+            opts.requiresObservable,
+            opts.delay
+        )
+    }
 
     function reactionRunner() {
         view(reaction)
@@ -79,11 +105,7 @@ export type IReactionOptions<T, FireImmediately extends boolean> = IAutorunOptio
 const run = (f: Lambda) => f()
 
 function createSchedulerFromOptions(opts: IAutorunOptions) {
-    return opts.scheduler
-        ? opts.scheduler
-        : opts.delay
-        ? (f: Lambda) => setTimeout(f, opts.delay!)
-        : run
+    return opts.scheduler ? opts.scheduler : run
 }
 
 export function reaction<T, FireImmediately extends boolean = false>(
@@ -108,32 +130,35 @@ export function reaction<T, FireImmediately extends boolean = false>(
         name,
         opts.onError ? wrapErrorHandler(opts.onError, effect) : effect
     )
+
+    const runSync = !opts.scheduler && !opts.delay
+    const scheduler = createSchedulerFromOptions(opts)
+
     let firstTime = true
+    let isScheduled = false
     let value: T
 
     const equals: IEqualsComparer<T> = (opts as any).compareStructural
         ? comparer.structural
         : opts.equals || comparer.default
 
-    let firstRun = true
-    const scheduler = createSchedulerFromOptions(opts)
-
     const r = new Reaction(
         name,
-        () => reactionRunner(),
+        () => {
+            if (firstTime || runSync) {
+                reactionRunner()
+            } else if (!isScheduled) {
+                isScheduled = true
+                scheduler!(reactionRunner)
+            }
+        },
         opts.onError,
         opts.requiresObservable,
-        (f: Lambda) => {
-            if (firstRun) {
-                firstRun = false
-                f()
-                return
-            }
-            scheduler(f)
-        }
+        opts.delay
     )
 
     function reactionRunner() {
+        isScheduled = false
         if (r.isDisposed_) {
             return
         }

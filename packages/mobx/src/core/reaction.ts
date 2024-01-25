@@ -64,13 +64,14 @@ export class Reaction implements IDerivation, IReactionPublic {
     isRunning_ = false
     isTracing_: TraceMode = TraceMode.NONE
     scheduledRunReaction_ = false
+    delayTimeouts_: number[] = []
 
     constructor(
         public name_: string = __DEV__ ? "Reaction@" + getNextId() : "Reaction",
         private onInvalidate_: () => void,
         private errorHandler_?: (error: any, derivation: IDerivation) => void,
         public requiresObservable_?,
-        private scheduler: (callback: () => void) => any = f => f()
+        private delay = 0
     ) {}
 
     onBecomeStale_() {
@@ -93,12 +94,10 @@ export class Reaction implements IDerivation, IReactionPublic {
      * internal, use schedule() if you intend to kick off a reaction
      */
     runReaction_() {
-        if (!this.scheduledRunReaction_) {
-            this.scheduledRunReaction_ = true
-            this.scheduler(() => {
-                this.scheduledRunReaction_ = false
-                this.runReactionImpl()
-            })
+        if (this.delay) {
+            setTimeout(() => this.runReactionImpl(), this.delay)
+        } else {
+            this.runReactionImpl()
         }
     }
 
@@ -122,6 +121,10 @@ export class Reaction implements IDerivation, IReactionPublic {
                     }
                 } catch (e) {
                     this.reportExceptionInDerivation_(e)
+                } finally {
+                    if (this.delay) {
+                        this.delayTimeouts_ = []
+                    }
                 }
             }
             globalState.trackingContext = prev
