@@ -50,6 +50,7 @@ export function autorun(
 
     const name: string =
         opts?.name ?? (__DEV__ ? (view as any).name || "Autorun@" + getNextId() : "Autorun")
+    const scheduler = createSchedulerFromOptions(opts)
     const reaction = new Reaction(
         name,
         function (this: Reaction) {
@@ -57,7 +58,7 @@ export function autorun(
         },
         opts.onError,
         opts.requiresObservable,
-        createSchedulerFromOptions(opts)
+        f => scheduler(f)
     )
 
     function reactionRunner() {
