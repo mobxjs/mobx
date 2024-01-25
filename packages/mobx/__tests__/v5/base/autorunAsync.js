@@ -132,6 +132,60 @@ test("autorun re-calculates computed states only when required", function (done)
     }, 1600)
 })
 
+test("autorun with delay ignores unchanged derivation states", function (done) {
+    // See: https://github.com/mobxjs/mobx/issues/3724#issuecomment-1909418603
+
+    let exprCount = 0
+    let effectCount = 0
+
+    const box = mobx.observable.box(0)
+    mobx.reaction(
+        () => {
+            exprCount++
+            return Math.round(box.get())
+        },
+        () => {
+            box.get()
+            effectCount++
+        },
+        { delay: 100 }
+    )
+
+    // Initial expression run...
+    expect(exprCount).toBe(1)
+
+    setTimeout(() => {
+        box.set(0.1)
+        // We don't need to compute this value since we have
+        // a delay.
+        //
+        // Setting box to 0.1 results in no change to our
+        // expression due to Math.round().
+        expect(exprCount).toBe(1)
+    }, 140)
+
+    setTimeout(() => {
+        // Setting box to 0.9 results in our expression changing.
+        box.set(0.9)
+        expect(exprCount).toBe(1)
+        expect(effectCount).toBe(0)
+    }, 160)
+
+    setTimeout(() => {
+        // Ah, we're testing our expression now, but we actually don't know
+        // whether we've been invalidated by 140 or 190 so we just run the
+        // effect assuming that the change at 140 was correct....
+        expect(exprCount).toBe(2)
+        expect(effectCount).toBe(0) // <--- error here.
+    }, 245)
+
+    setTimeout(() => {
+        expect(exprCount).toBe(2)
+        expect(effectCount).toBe(1)
+        done()
+    }, 265)
+})
+
 test("autorun should not result in loop", function (done) {
     let i = 0
     const a = mobx.observable({

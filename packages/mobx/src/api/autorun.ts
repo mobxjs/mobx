@@ -130,7 +130,6 @@ export function reaction<T, FireImmediately extends boolean = false>(
         name,
         opts.onError ? wrapErrorHandler(opts.onError, effect) : effect
     )
-
     const runSync = !opts.scheduler && !opts.delay
     const scheduler = createSchedulerFromOptions(opts)
 
@@ -154,7 +153,8 @@ export function reaction<T, FireImmediately extends boolean = false>(
         },
         opts.onError,
         opts.requiresObservable,
-        opts.delay
+        opts.delay,
+        true
     )
 
     function reactionRunner() {

@@ -71,7 +71,8 @@ export class Reaction implements IDerivation, IReactionPublic {
         private onInvalidate_: () => void,
         private errorHandler_?: (error: any, derivation: IDerivation) => void,
         public requiresObservable_?,
-        private delay = 0
+        private delay = 0,
+        private runFirstImmediately = false
     ) {}
 
     onBecomeStale_() {
@@ -94,10 +95,11 @@ export class Reaction implements IDerivation, IReactionPublic {
      * internal, use schedule() if you intend to kick off a reaction
      */
     runReaction_() {
-        if (this.delay) {
+        if (this.delay && !this.runFirstImmediately) {
             setTimeout(() => this.runReactionImpl(), this.delay)
         } else {
             this.runReactionImpl()
+            this.runFirstImmediately = false
         }
     }
 
@@ -123,6 +125,7 @@ export class Reaction implements IDerivation, IReactionPublic {
                     this.reportExceptionInDerivation_(e)
                 } finally {
                     if (this.delay) {
+                        this.delayTimeouts_.forEach(i => clearTimeout(i))
                         this.delayTimeouts_ = []
                     }
                 }
@@ -202,6 +205,7 @@ export class Reaction implements IDerivation, IReactionPublic {
     dispose() {
         if (!this.isDisposed_) {
             this.isDisposed_ = true
+
             if (!this.isRunning_) {
                 // if disposed while running, clean up later. Maybe not optimal, but rare case
                 startBatch()
@@ -214,6 +218,7 @@ export class Reaction implements IDerivation, IReactionPublic {
     getDisposer_(abortSignal?: GenericAbortSignal): IReactionDisposer {
         const dispose = (() => {
             this.dispose()
+            this.delayTimeouts_.forEach(i => clearTimeout(i))
             abortSignal?.removeEventListener?.("abort", dispose)
         }) as IReactionDisposer
         abortSignal?.addEventListener?.("abort", dispose)
