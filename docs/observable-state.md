@@ -211,7 +211,7 @@ Inference rules:
 Usage:
 
 -   `observable(source, overrides?, options?)`
--   `@observabe accessor` _(field decorator)_
+-   `@observable accessor` _(field decorator)_
 
 The `observable` annotation can also be called as a function to make an entire object observable at once.
 The `source` object will be cloned and all members will be made observable, similar to how it would be done by `makeAutoObservable`.
