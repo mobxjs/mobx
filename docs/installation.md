@@ -24,7 +24,7 @@ There are two types of React bindings, `mobx-react-lite` supports only functiona
 
 Based on your preference, MobX can be used with or without decorators.
 Both the legacy implementation and the standardised TC-39 version of decorators are currently supported.
-See [enabling-decorators.md](enabling-decorators.md) for more details on how to enable them.
+See [enabling-decorators](enabling-decorators.md) for more details on how to enable them.
 Legacy decorator support will be removed in MobX 7, in favor of the standard.
 
 ## Use spec compliant transpilation for class properties
