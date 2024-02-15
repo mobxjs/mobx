@@ -19,8 +19,8 @@ Only the latest version is actively maintained. If you're missing a fix or a fea
 | ----------- | -------------------- | ------------------------ | -------------------------------------------------------------------------------- |
 | v9          | 6.\*                 | >16.8                    | Hooks, React 18.2 in strict mode                                                 |
 | v7          | 6.\*                 | >16.8 < 18.2             | Hooks                                                                            |
-| v6          | 4.\* / 5.\*          | >16.8 <18                | Hooks                                                                            |
-| v5          | 4.\* / 5.\*          | >0.13 <18                | No, but it is possible to use `<Observer>` sections inside hook based components |
+| v6          | 4.\* / 5.\*          | >16.8 <17                | Hooks                                                                            |
+| v5          | 4.\* / 5.\*          | >0.13 <17                | No, but it is possible to use `<Observer>` sections inside hook based components |
 
 mobx-react 6 / 7 is a repackage of the smaller [mobx-react-lite](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react-lite) package + following features from the `mobx-react@5` package added:
 
