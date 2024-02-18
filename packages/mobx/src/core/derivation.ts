@@ -166,10 +166,10 @@ export function checkIfStateReadsAreAllowed(observable: IObservable) {
  */
 export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T, context: any) {
     const prevAllowStateReads = allowStateReadsStart(true)
-    // pre allocate array allocation + room for variation in deps
-    // array will be trimmed by bindDependencies
     changeDependenciesStateTo0(derivation)
-    derivation.newObserving_ = new Array(derivation.observing_.length + 100)
+    // pre allocate array allocation + 20% extra room for variation in deps
+    // array will be trimmed by bindDependencies
+    derivation.newObserving_ = new Array(Math.ceil(derivation.observing_.length * 1.2))
     derivation.unboundDepsCount_ = 0
     derivation.runId_ = ++globalState.runId
     const prevTracking = globalState.trackingDerivation
