@@ -6,6 +6,9 @@ import { useObserver } from "./useObserver"
 let warnObserverOptionsDeprecated = true
 
 const hasSymbol = typeof Symbol === "function" && Symbol.for
+const isFunctionNameConfigurable =
+    Object.getOwnPropertyDescriptor(() => {}, "name")?.configurable ?? false
+
 // Using react-is had some issues (and operates on elements, not on types), see #608 / #609
 const ReactForwardRefSymbol = hasSymbol
     ? Symbol.for("react.forward_ref")
@@ -106,11 +109,14 @@ export function observer<P extends object, TRef = {}>(
 
     // Inherit original name and displayName, see #3438
     ;(observerComponent as React.FunctionComponent).displayName = baseComponent.displayName
-    Object.defineProperty(observerComponent, "name", {
-        value: baseComponent.name,
-        writable: true,
-        configurable: true
-    })
+
+    if (isFunctionNameConfigurable) {
+        Object.defineProperty(observerComponent, "name", {
+            value: baseComponent.name,
+            writable: true,
+            configurable: true
+        })
+    }
 
     // Support legacy context: `contextTypes` must be applied before `memo`
     if ((baseComponent as any).contextTypes) {
