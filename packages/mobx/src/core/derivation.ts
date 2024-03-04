@@ -169,9 +169,8 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T, con
     changeDependenciesStateTo0(derivation)
     // Preallocate array; will be trimmed by bindDependencies.
     derivation.newObserving_ = new Array(
-        derivation.observing_.length
-            ? Math.ceil(derivation.observing_.length * 1.2) // 20% extra room for variation in deps
-            : 100 // Establishing initial dependencies, preallocate constant space.
+        // Reserve constant space for initial dependencies (dynamic space otherwise).
+        derivation.runId_ === 0 ? 100 : Math.ceil(derivation.observing_.length)
     )
     derivation.unboundDepsCount_ = 0
     derivation.runId_ = ++globalState.runId
