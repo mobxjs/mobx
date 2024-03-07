@@ -166,10 +166,13 @@ export function checkIfStateReadsAreAllowed(observable: IObservable) {
  */
 export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T, context: any) {
     const prevAllowStateReads = allowStateReadsStart(true)
-    // pre allocate array allocation + room for variation in deps
-    // array will be trimmed by bindDependencies
     changeDependenciesStateTo0(derivation)
-    derivation.newObserving_ = new Array(derivation.observing_.length + 100)
+    // Preallocate array; will be trimmed by bindDependencies.
+    derivation.newObserving_ = new Array(
+        // Reserve constant space for initial dependencies, dynamic space otherwise.
+        // See https://github.com/mobxjs/mobx/pull/3833
+        derivation.runId_ === 0 ? 100 : derivation.observing_.length
+    )
     derivation.unboundDepsCount_ = 0
     derivation.runId_ = ++globalState.runId
     const prevTracking = globalState.trackingDerivation
