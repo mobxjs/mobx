@@ -6,7 +6,7 @@
     ],
     "resolutions": {
         "jest": "^29.5.0",
-        "typescript": "^5.0.2",
+        "typescript": "5.2.2",
         "recast": "^0.23.1"
     },
     "repository": {
@@ -41,8 +41,8 @@
         "@types/prop-types": "^15.5.2",
         "@types/react": "^18.0.0",
         "@types/react-dom": "^18.0.0",
-        "@typescript-eslint/eslint-plugin": "^5.0.0",
-        "@typescript-eslint/parser": "^5.0.0",
+        "@typescript-eslint/eslint-plugin": "6",
+        "@typescript-eslint/parser": "^6",
         "coveralls": "^3.1.0",
         "eslint": "^6.8.0",
         "execa": "^4.1.0",
@@ -68,7 +68,7 @@
         "tape": "^5.0.1",
         "ts-jest": "^29.0.5",
         "tsdx": "^0.14.1",
-        "typescript": "5.2"
+        "typescript": "^5.2.2"
     },
     "husky": {
         "hooks": {
