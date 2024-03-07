@@ -142,6 +142,21 @@ runInAction(() => {
 })
 ```
 
+<!--using _ = _action();-->
+
+```javascript
+import { observable, runInAction } from "mobx"
+
+const state = observable({ value: 0 })
+
+{
+  using _ = _action();
+  state.value++
+  state.value++
+}
+
+```
+
 <!--END_DOCUSAURUS_CODE_TABS-->
 
 ## Wrapping functions using `action`
@@ -218,6 +233,16 @@ Usage:
 -   `runInAction(fn)`
 
 Use this utility to create a temporary action that is immediately invoked. Can be useful in asynchronous processes.
+Check out the [above code block](#examples) for an example.
+
+## `_action()`
+
+Usage:
+
+-   ` using _ = _action();`
+
+Use this utility to create a temporary action. Can be useful in asynchronous processes.
+Behaves the same as `runInAction` but ends action after leaving current block scope.
 Check out the [above code block](#examples) for an example.
 
 ## Actions and inheritance
