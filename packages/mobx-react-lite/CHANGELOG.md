@@ -1,5 +1,13 @@
 # mobx-react-lite
 
+## 4.0.6
+
+### Patch Changes
+
+-   [`b970cbb4`](https://github.com/mobxjs/mobx/commit/b970cbb4dd2e43516d37f3f01c956cab3540d4d3) [#3830](https://github.com/mobxjs/mobx/pull/3830) Thanks [@dmitrytavern](https://github.com/dmitrytavern)! - fix #3826: components make two renders because of the different state of the snapshots
+
+*   [`1b8ab199`](https://github.com/mobxjs/mobx/commit/1b8ab199df5e73d384cc40ec2d13915a690c14f3) [#3831](https://github.com/mobxjs/mobx/pull/3831) Thanks [@kitsuned](https://github.com/kitsuned)! - fix: ensure observer component name is only set when configurable
+
 ## 4.0.5
 
 ### Patch Changes
