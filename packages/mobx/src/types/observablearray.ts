@@ -563,7 +563,7 @@ function simpleFunc(funcName) {
     }
 }
 
-// Make sure callbacks recieve correct array arg #2326
+// Make sure callbacks receive correct array arg #2326
 function mapLikeFunc(funcName) {
     return function (callback, thisArg) {
         const adm: ObservableArrayAdministration = this[$mobx]
@@ -575,7 +575,7 @@ function mapLikeFunc(funcName) {
     }
 }
 
-// Make sure callbacks recieve correct array arg #2326
+// Make sure callbacks receive correct array arg #2326
 function reduceLikeFunc(funcName) {
     return function () {
         const adm: ObservableArrayAdministration = this[$mobx]

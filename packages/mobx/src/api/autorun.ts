@@ -171,7 +171,7 @@ export function reaction<T, FireImmediately extends boolean = false>(
             value = nextValue
         })
 
-        // This casting is nesessary as TS cannot infer proper type in current funciton implementation
+        // This casting is nesessary as TS cannot infer proper type in current function implementation
         type OldValue = FireImmediately extends true ? T | undefined : T
         if (firstTime && opts.fireImmediately!) {
             effectAction(value, oldValue as OldValue, r)
