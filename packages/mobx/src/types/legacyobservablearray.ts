@@ -71,7 +71,7 @@ export class LegacyObservableArray<T> extends StubArray {
             }
 
             if (safariPrototypeSetterInheritanceBug) {
-                // Seems that Safari won't use numeric prototype setter untill any * numeric property is
+                // Seems that Safari won't use numeric prototype setter until any * numeric property is
                 // defined on the instance. After that it works fine, even if this property is deleted.
                 Object.defineProperty(this, "0", ENTRY_0)
             }
