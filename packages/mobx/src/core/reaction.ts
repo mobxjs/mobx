@@ -18,7 +18,8 @@ import {
     spyReportStart,
     startBatch,
     trace,
-    trackDerivedFunction, GenericAbortSignal
+    trackDerivedFunction,
+    GenericAbortSignal
 } from "../internal"
 
 /**
