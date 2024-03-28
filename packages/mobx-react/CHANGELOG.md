@@ -1,5 +1,14 @@
 # mobx-react
 
+## 9.1.1
+
+### Patch Changes
+
+-   [`61abc53f`](https://github.com/mobxjs/mobx/commit/61abc53ff10554d1d5ce3e85466f6beda4d63fa2) [#3852](https://github.com/mobxjs/mobx/pull/3852) Thanks [@mweststrate](https://github.com/mweststrate)! - Patched the release process, forcing release to get everything in pristine state.
+
+-   Updated dependencies [[`61abc53f`](https://github.com/mobxjs/mobx/commit/61abc53ff10554d1d5ce3e85466f6beda4d63fa2), [`7bbb523a`](https://github.com/mobxjs/mobx/commit/7bbb523a7b81229570e0e2a176b989bfc74c4634)]:
+    -   mobx-react-lite@4.0.7
+
 ## 9.1.0
 
 ### Minor Changes
