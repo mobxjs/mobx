@@ -18,7 +18,7 @@
         "coverage": "jest --coverage",
         "lint": "eslint packages/*/src/**/* --ext .js,.ts,.tsx",
         "prettier": "prettier --write **/*.{js,ts,md}",
-        "release": "yarn lerna run prepublish && yarn changeset publish",
+        "release": "yarn lerna run prepublishOnly && yarn changeset publish",
         "mobx": "yarn workspace mobx",
         "mobx-react": "yarn workspace mobx-react",
         "mobx-react-lite": "yarn workspace mobx-react-lite",
