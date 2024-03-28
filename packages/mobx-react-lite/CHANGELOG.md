@@ -1,5 +1,13 @@
 # mobx-react-lite
 
+## 4.0.7
+
+### Patch Changes
+
+-   [`61abc53f`](https://github.com/mobxjs/mobx/commit/61abc53ff10554d1d5ce3e85466f6beda4d63fa2) [#3852](https://github.com/mobxjs/mobx/pull/3852) Thanks [@mweststrate](https://github.com/mweststrate)! - Patched the release process, forcing release to get everything in pristine state.
+
+*   [`7bbb523a`](https://github.com/mobxjs/mobx/commit/7bbb523a7b81229570e0e2a176b989bfc74c4634) [#3842](https://github.com/mobxjs/mobx/pull/3842) Thanks [@r0b1n](https://github.com/r0b1n)! - Prevent warnings when using `mobx-react-lite` with Rollup
+
 ## 4.0.6
 
 ### Patch Changes
