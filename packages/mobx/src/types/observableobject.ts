@@ -629,7 +629,7 @@ export class ObservableObjectAdministration
         this.keysAtom_.reportChanged()
     }
 
-    ownKeys_(): ArrayLike<string | symbol> {
+    ownKeys_(): Array<string | symbol> {
         this.keysAtom_.reportObserved()
         return ownKeys(this.target_)
     }
@@ -647,7 +647,7 @@ export class ObservableObjectAdministration
 }
 
 export interface IIsObservableObject {
-    $mobx: ObservableObjectAdministration
+    [$mobx]: ObservableObjectAdministration
 }
 
 export function asObservableObject(
