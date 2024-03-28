@@ -8,7 +8,9 @@ import {
     isStringish,
     createDecoratorAnnotation,
     createActionAnnotation,
-    is20223Decorator
+    is20223Decorator,
+    _endAction,
+    _startAction
 } from "../internal"
 
 import type { ClassFieldDecorator, ClassMethodDecorator } from "../types/decorator_fills"
@@ -104,4 +106,14 @@ export function runInAction<T>(fn: () => T): T {
 
 export function isAction(thing: any) {
     return isFunction(thing) && thing.isMobxAction === true
+}
+
+export function _action() {
+    const runInfo = _startAction(DEFAULT_ACTION_NAME, false, this, undefined)
+
+    return {
+        [Symbol.dispose]() {
+            _endAction(runInfo)
+        }
+    }
 }
