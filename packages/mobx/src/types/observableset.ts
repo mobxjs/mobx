@@ -243,6 +243,44 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
         } as any)
     }
 
+    intersection(otherSet: Set<T>): IterableIterator<T> {
+        this.atom_.reportObserved()
+        const self = this
+        let nextIndex = 0
+        const observableValues = Array.from(this.data_.intersection(otherSet))
+        return makeIterable<T>({
+            next() {
+                return nextIndex < observableValues.length
+                    ? { value: self.dehanceValue_(observableValues[nextIndex++]), done: false }
+                    : { done: true }
+            }
+        } as any)
+    }
+
+    union(): IterableIterator<T> {
+        // TODO: implement
+    }
+
+    difference(): IterableIterator<T> {
+        // TODO: implement
+    }
+
+    symmetricDifference(): IterableIterator<T> {
+        // TODO: implement
+    }
+
+    isSubsetOf(): IterableIterator<T> {
+        // TODO: implement
+    }
+
+    isSupersetOf(): IterableIterator<T> {
+        // TODO: implement
+    }
+
+    isDisjointFrom(): IterableIterator<T> {
+        // TODO: implement
+    }
+
     replace(other: ObservableSet<T> | IObservableSetInitialValues<T>): ObservableSet<T> {
         if (isObservableSet(other)) {
             other = new Set(other)
