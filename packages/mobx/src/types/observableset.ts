@@ -243,12 +243,20 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
         } as any)
     }
 
-    intersection(otherSet: Set<T>): IterableIterator<T> {
+    intersection<U>(otherSet: ReadonlySetLike<U>): IterableIterator<T & U> {
         this.atom_.reportObserved()
         const self = this
         let nextIndex = 0
-        const observableValues = Array.from(this.data_.intersection(otherSet))
-        return makeIterable<T>({
+
+        let observableValues
+        if (typeof otherSet.intersection !== "function") {
+            observableValues = Array.from(otherSet.intersection(this.data_))
+        } else {
+            const dehancedSet = new Set(this)
+            observableValues = Array.from(dehancedSet.intersection(otherSet))
+        }
+
+        return makeIterable<T & U>({
             next() {
                 return nextIndex < observableValues.length
                     ? { value: self.dehanceValue_(observableValues[nextIndex++]), done: false }
