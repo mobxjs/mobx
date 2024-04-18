@@ -243,38 +243,48 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
         } as any)
     }
 
-    intersection<U>(otherSet: ReadonlySetLike<U>): IterableIterator<T & U> {
+    intersection<U>(otherSet: ReadonlySetLike<U>): Set<T & U> {
         this.atom_.reportObserved()
-        const self = this
-        let nextIndex = 0
 
-        let observableValues
         if (typeof otherSet.intersection !== "function") {
-            observableValues = Array.from(otherSet.intersection(this.data_))
+            return otherSet.intersection(this.data_)
         } else {
             const dehancedSet = new Set(this)
-            observableValues = Array.from(dehancedSet.intersection(otherSet))
+            return dehancedSet.intersection(otherSet)
         }
-
-        return makeIterable<T & U>({
-            next() {
-                return nextIndex < observableValues.length
-                    ? { value: self.dehanceValue_(observableValues[nextIndex++]), done: false }
-                    : { done: true }
-            }
-        } as any)
     }
 
-    union(): IterableIterator<T> {
-        // TODO: implement
+    union<U>(otherSet: ReadonlySetLike<U>): Set<T | U> {
+        this.atom_.reportObserved()
+
+        if (typeof otherSet.union !== "function") {
+            return otherSet.union(this.data_)
+        } else {
+            const dehancedSet = new Set(this)
+            return dehancedSet.union(otherSet)
+        }
     }
 
-    difference(): IterableIterator<T> {
-        // TODO: implement
+    difference<U>(otherSet: ReadonlySetLike<U>): Set<T> {
+        this.atom_.reportObserved()
+
+        if (typeof otherSet.difference !== "function") {
+            return otherSet.difference(this.data_)
+        } else {
+            const dehancedSet = new Set(this)
+            return dehancedSet.difference(otherSet)
+        }
     }
 
-    symmetricDifference(): IterableIterator<T> {
-        // TODO: implement
+    symmetricDifference<U>(otherSet: ReadonlySetLike<U>): Set<T | U> {
+        this.atom_.reportObserved()
+
+        if (typeof otherSet.symmetricDifference !== "function") {
+            return otherSet.symmetricDifference(this.data_)
+        } else {
+            const dehancedSet = new Set(this)
+            return dehancedSet.symmetricDifference(otherSet)
+        }
     }
 
     isSubsetOf(): IterableIterator<T> {
