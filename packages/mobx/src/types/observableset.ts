@@ -244,9 +244,8 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
     }
 
     intersection<U>(otherSet: ReadonlySetLike<U>): Set<T & U> {
-        this.atom_.reportObserved()
-
-        if (typeof otherSet.intersection !== "function") {
+        if (typeof otherSet.intersection === "function") {
+            this.atom_.reportObserved()
             return otherSet.intersection(this.data_)
         } else {
             const dehancedSet = new Set(this)
@@ -255,9 +254,8 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
     }
 
     union<U>(otherSet: ReadonlySetLike<U>): Set<T | U> {
-        this.atom_.reportObserved()
-
-        if (typeof otherSet.union !== "function") {
+        if (typeof otherSet.union === "function") {
+            this.atom_.reportObserved()
             return otherSet.union(this.data_)
         } else {
             const dehancedSet = new Set(this)
@@ -266,9 +264,8 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
     }
 
     difference<U>(otherSet: ReadonlySetLike<U>): Set<T> {
-        this.atom_.reportObserved()
-
-        if (typeof otherSet.difference !== "function") {
+        if (typeof otherSet.difference === "function") {
+            this.atom_.reportObserved()
             return otherSet.difference(this.data_)
         } else {
             const dehancedSet = new Set(this)
@@ -277,9 +274,8 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
     }
 
     symmetricDifference<U>(otherSet: ReadonlySetLike<U>): Set<T | U> {
-        this.atom_.reportObserved()
-
-        if (typeof otherSet.symmetricDifference !== "function") {
+        if (typeof otherSet.symmetricDifference === "function") {
+            this.atom_.reportObserved()
             return otherSet.symmetricDifference(this.data_)
         } else {
             const dehancedSet = new Set(this)
