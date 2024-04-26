@@ -58,6 +58,8 @@ Function (and decorator) that converts a React component definition, React compo
 
 #### Class Components
 
+When using component classes, `this.props` and `this.state` will be made observables, so the component will react to all changes in props and state that are used by `render`.
+
 `shouldComponentUpdate` is not supported. As such, it is recommended that class components extend `React.PureComponent`. The `observer` will automatically patch non-pure class components with an internal implementation of `React.PureComponent` if necessary.
 
 Extending `observer` class components is not supported. Always apply `observer` only on the last class in the inheritance chain.
@@ -86,92 +88,6 @@ class TodoView extends React.Component {
 
 // ---- or just use function components: ----
 const TodoView = observer(({ todo }) => <div>{todo.title}</div>)
-```
-
-##### Note on using props and state in derivations
-
-`mobx-react` version 6 and lower would automatically turn `this.state` and `this.props` into observables.
-This has the benefit that computed properties and reactions were able to observe those.
-However, since this pattern is fundamentally incompatible with `StrictMode` in React 18.2 and higher, this behavior has been removed in React 18.
-
-As a result, we recommend to no longer mark properties as `@computed` in observer components if they depend on `this.state` or `this.props`.
-
-```javascript
-@observer
-class Doubler extends React.Component<{ counter: number }> {
-    @computed // BROKEN! <-- @computed should be removed in mobx-react > 7
-    get doubleValue() {
-        // Changes to this.props will no longer be detected properly, to fix it,
-        // remove the @computed annotation.
-        return this.props * 2
-    }
-
-    render() {
-        return <div>{this.doubleValue}</div>
-    }
-}
-```
-
-Similarly, reactions will no longer respond to `this.state` / `this.props`. This can be overcome by creating an observable copy:
-
-```javascript
-@observer
-class Alerter extends React.Component<{ counter: number }> {
-    @observable observableCounter: number
-    reactionDisposer
-
-    constructor(props) {
-        this.observableCounter = counter
-    }
-
-    componentDidMount() {
-        // set up a reaction, by observing the observable,
-        // rather than the prop which is non-reactive:
-        this.reactionDisposer = autorun(() => {
-            if (this.observableCounter > 10) {
-                alert("Reached 10!")
-            }
-        })
-    }
-
-    componentDidUpdate() {
-        // sync the observable from props
-        this.observableCounter = this.props.counter
-    }
-
-    componentWillUnmount() {
-        this.reactionDisposer()
-    }
-
-    render() {
-        return <div>{this.props.counter}</div>
-    }
-}
-```
-
-MobX-react will try to detect cases where `this.props`, `this.state` or `this.context` are used by any other derivation than the `render` method of the owning component and throw.
-This is to make sure that neither computed properties, nor reactions, nor other components accidentally rely on those fields to be reactive.
-
-This includes cases where a render callback is passed to a child, that will read from the props or state of a parent component.
-As a result, passing a function that might later read a property of a parent in a reactive context will throw as well.
-Instead, when using a callback function that is being passed to an `observer` based child, the capture should be captured locally first:
-
-```javascript
-@observer
-class ChildWrapper extends React.Component<{ counter: number }> {
-    render() {
-        // Collapsible is an observer component that should respond to this.counter,
-        // if it is expanded
-
-        // BAD:
-        return <Collapsible onRenderContent={() => <h1>{this.props.counter}</h1>} />
-
-        // GOOD: (causes to pass down a fresh callback whenever counter changes,
-        // that doesn't depend on its parents props)
-        const counter = this.props.counter
-        return <Collapsible onRenderContent={() => <h1>{counter}</h1>} />
-    }
-}
 ```
 
 ### `Observer`
