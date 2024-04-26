@@ -283,16 +283,34 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
         }
     }
 
-    isSubsetOf(): IterableIterator<T> {
-        // TODO: implement
+    isSubsetOf(otherSet: ReadonlySetLike<unknown>): boolean {
+        if (typeof otherSet.isSubsetOf === "function") {
+            this.atom_.reportObserved()
+            return otherSet.isSubsetOf(this.data_)
+        } else {
+            const dehancedSet = new Set(this)
+            return dehancedSet.isSubsetOf(otherSet)
+        }
     }
 
-    isSupersetOf(): IterableIterator<T> {
-        // TODO: implement
+    isSupersetOf(otherSet: ReadonlySetLike<unknown>): boolean {
+        if (typeof otherSet.isSupersetOf === "function") {
+            this.atom_.reportObserved()
+            return otherSet.isSupersetOf(this.data_)
+        } else {
+            const dehancedSet = new Set(this)
+            return dehancedSet.isSupersetOf(otherSet)
+        }
     }
 
-    isDisjointFrom(): IterableIterator<T> {
-        // TODO: implement
+    isDisjointFrom(otherSet: ReadonlySetLike<unknown>): boolean {
+        if (typeof otherSet.isDisjointFrom === "function") {
+            this.atom_.reportObserved()
+            return otherSet.isDisjointFrom(this.data_)
+        } else {
+            const dehancedSet = new Set(this)
+            return dehancedSet.isDisjointFrom(otherSet)
+        }
     }
 
     replace(other: ObservableSet<T> | IObservableSetInitialValues<T>): ObservableSet<T> {
