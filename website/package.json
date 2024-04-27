@@ -14,7 +14,7 @@
   },
   "author": "Michel Weststrate",
   "license": "MIT",
-    "funding": {
+  "funding": {
     "type": "opencollective",
     "url": "https://opencollective.com/mobx"
   },
@@ -22,8 +22,10 @@
     "url": "https://github.com/mobxjs/mobx/issues"
   },
   "homepage": "https://mobx.js.org/",
-
   "devDependencies": {
     "docusaurus": "^1.14.4"
+  },
+  "dependencies": {
+    "@docusaurus/plugin-google-gtag": "^3.2.1"
   }
 }
