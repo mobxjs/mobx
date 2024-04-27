@@ -120,15 +120,8 @@ myOtherFont: [
     // You may provide arbitrary config keys to be used as needed by your
     // template. For example, if you need your repo's URL...
     repoUrl: "https://github.com/mobxjs/mobx",
-
-    plugins: [
-        [
-            '@docusaurus/plugin-google-gtag',
-            {
-                trackingID: 'G-7XBWTSGJ80',
-            },
-        ],
-    ],
+    gaGtag: true,
+    gaTrackingId: "G-7XBWTSGJ80",
 }
 
 module.exports = siteConfig
