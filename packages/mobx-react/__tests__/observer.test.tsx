@@ -1075,3 +1075,81 @@ test("#3492 should not cause warning by calling forceUpdate on uncommited compon
     unmount()
     expect(consoleWarnMock).toMatchSnapshot()
 })
+
+test(`Component react's to observable changes in componenDidMount #3691`, () => {
+    const o = observable.box(0)
+
+    const TestCmp = observer(
+        class TestCmp extends React.Component {
+            componentDidMount(): void {
+                o.set(o.get() + 1)
+            }
+
+            render() {
+                return o.get()
+            }
+        }
+    )
+
+    const { container, unmount } = render(<TestCmp />)
+    expect(container).toHaveTextContent("1")
+    unmount()
+})
+
+test(`Observable changes in componenWillUnmount don't cause any warnings or errors`, () => {
+    const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {})
+    const consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation(() => {})
+    const o = observable.box(0)
+
+    const TestCmp = observer(
+        class TestCmp extends React.Component {
+            componentWillUnmount(): void {
+                o.set(o.get() + 1)
+            }
+
+            render() {
+                return o.get()
+            }
+        }
+    )
+
+    const { container, unmount } = render(<TestCmp />)
+    expect(container).toHaveTextContent("0")
+    unmount()
+
+    expect(consoleErrorSpy).not.toBeCalled()
+    expect(consoleWarnSpy).not.toBeCalled()
+
+    consoleErrorSpy.mockRestore()
+    consoleWarnSpy.mockRestore()
+})
+
+test("Class observer can react to changes made before mount #3730", () => {
+    const o = observable.box(0)
+
+    @observer
+    class Child extends React.Component {
+        componentDidMount(): void {
+            o.set(1)
+        }
+        render() {
+            return ""
+        }
+    }
+
+    @observer
+    class Parent extends React.Component {
+        render() {
+            return (
+                <span>
+                    {o.get()}
+                    <Child />
+                </span>
+            )
+        }
+    }
+
+    const { container, unmount } = render(<Parent />)
+    expect(container).toHaveTextContent("1")
+    unmount()
+})
