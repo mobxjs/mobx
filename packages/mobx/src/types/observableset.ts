@@ -243,7 +243,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
         } as any)
     }
 
-    intersection<U>(otherSet: ReadonlySetLike<U>): Set<T & U> {
+    intersection<U>(otherSet: ReadonlySetLike<U> & Partial<Set<U>>): Set<T & U> {
         if (typeof otherSet.intersection === "function") {
             this.atom_.reportObserved()
             return otherSet.intersection(this.data_)
@@ -253,7 +253,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
         }
     }
 
-    union<U>(otherSet: ReadonlySetLike<U>): Set<T | U> {
+    union<U>(otherSet: ReadonlySetLike<U> & Partial<Set<U>>): Set<T | U> {
         if (typeof otherSet.union === "function") {
             this.atom_.reportObserved()
             return otherSet.union(this.data_)
@@ -263,7 +263,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
         }
     }
 
-    difference<U>(otherSet: ReadonlySetLike<U>): Set<T> {
+    difference<U>(otherSet: ReadonlySetLike<U> & Partial<Set<U>>): Set<T> {
         if (typeof otherSet.difference === "function") {
             this.atom_.reportObserved()
             return otherSet.difference(this.data_)
@@ -273,7 +273,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
         }
     }
 
-    symmetricDifference<U>(otherSet: ReadonlySetLike<U>): Set<T | U> {
+    symmetricDifference<U>(otherSet: ReadonlySetLike<U> & Partial<Set<U>>): Set<T | U> {
         if (typeof otherSet.symmetricDifference === "function") {
             this.atom_.reportObserved()
             return otherSet.symmetricDifference(this.data_)
@@ -283,7 +283,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
         }
     }
 
-    isSubsetOf(otherSet: ReadonlySetLike<unknown>): boolean {
+    isSubsetOf(otherSet: ReadonlySetLike<unknown> & Partial<Set<unknown>>): boolean {
         if (typeof otherSet.isSubsetOf === "function") {
             this.atom_.reportObserved()
             return otherSet.isSubsetOf(this.data_)
@@ -293,7 +293,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
         }
     }
 
-    isSupersetOf(otherSet: ReadonlySetLike<unknown>): boolean {
+    isSupersetOf(otherSet: ReadonlySetLike<unknown> & Partial<Set<unknown>>): boolean {
         if (typeof otherSet.isSupersetOf === "function") {
             this.atom_.reportObserved()
             return otherSet.isSupersetOf(this.data_)
@@ -303,7 +303,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
         }
     }
 
-    isDisjointFrom(otherSet: ReadonlySetLike<unknown>): boolean {
+    isDisjointFrom(otherSet: ReadonlySetLike<unknown> & Partial<Set<unknown>>): boolean {
         if (typeof otherSet.isDisjointFrom === "function") {
             this.atom_.reportObserved()
             return otherSet.isDisjointFrom(this.data_)
