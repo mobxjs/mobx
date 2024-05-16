@@ -202,7 +202,6 @@ quite common. To make this pattern simpler the [`useLocalObservable`](https://gi
 
 ```javascript
 import { observer, useLocalObservable } from "mobx-react-lite"
-import { useState } from "react"
 
 const TimerView = observer(() => {
     const timer = useLocalObservable(() => ({
