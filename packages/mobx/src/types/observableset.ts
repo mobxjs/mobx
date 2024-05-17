@@ -263,7 +263,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
         }
     }
 
-    difference<U>(otherSet: ReadonlySetLike<U> & Partial<Set<U>>): Set<T> {
+    difference<U>(otherSet: ReadonlySetLike<U> & Partial<Set<T>>): Set<T> {
         if (typeof otherSet.difference === "function") {
             this.atom_.reportObserved()
             return otherSet.difference(this.data_)
