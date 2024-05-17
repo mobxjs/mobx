@@ -35,7 +35,7 @@ module.exports = {
 ### mobx/exhaustive-make-observable
 
 Makes sure that `makeObservable` annotates all fields defined on class or object literal.<br>
-**Autofix** adds `field: true` for each missing field.<br>
+**Autofix** adds `field: false` for each missing field.<br>
 To exclude a field, annotate it using `field: false`.<br>
 Does not support fields introduced by constructor (`this.foo = 5`).<br>
 Does not warn about annotated non-existing fields (there is a runtime check, but the autofix removing the field could be handy...).

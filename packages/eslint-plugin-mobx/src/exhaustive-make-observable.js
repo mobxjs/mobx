@@ -72,7 +72,7 @@ function create(context) {
         const keyList = keys.map(key => `\`${key}\``).join(', ');
 
         const fix = fixer => {
-          const annotationList = keys.map(key => `${key}: true`).join(', ') + ',';
+          const annotationList = keys.map(key => `${key}: false`).join(', ') + ',';
           if (!secondArg) {
             return fixer.insertTextAfter(firstArg, `, { ${annotationList} }`);
           } else if (secondArg.type !== 'ObjectExpression') {
