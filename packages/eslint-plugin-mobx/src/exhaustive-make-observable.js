@@ -6,6 +6,7 @@ const { findAncestor, isMobxDecorator } = require("./utils.js")
 // TODO? report on field as well
 function create(context) {
     const sourceCode = context.getSourceCode()
+    const autofixAnnotation = context.options[0]?.autofixAnnotation ?? true
 
     function fieldToKey(field) {
         // TODO cache on field?
@@ -78,7 +79,8 @@ function create(context) {
                 const keyList = keys.map(key => `\`${key}\``).join(", ")
 
                 const fix = fixer => {
-                    const annotationList = keys.map(key => `${key}: true`).join(", ") + ","
+                    const annotationList =
+                        keys.map(key => `${key}: ${autofixAnnotation}`).join(", ") + ","
                     if (!secondArg) {
                         return fixer.insertTextAfter(firstArg, `, { ${annotationList} }`)
                     } else if (secondArg.type !== "ObjectExpression") {
@@ -104,6 +106,17 @@ module.exports = {
     meta: {
         type: "suggestion",
         fixable: "code",
+        schema: [
+            {
+                type: "object",
+                properties: {
+                    autofixAnnotation: {
+                        type: "boolean"
+                    }
+                },
+                additionalProperties: false
+            }
+        ],
         docs: {
             description: "enforce all fields being listen in `makeObservable`",
             recommended: true,
