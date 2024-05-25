@@ -35,10 +35,22 @@ module.exports = {
 ### mobx/exhaustive-make-observable
 
 Makes sure that `makeObservable` annotates all fields defined on class or object literal.<br>
-**Autofix** adds `field: true` for each missing field.<br>
 To exclude a field, annotate it using `field: false`.<br>
 Does not support fields introduced by constructor (`this.foo = 5`).<br>
-Does not warn about annotated non-existing fields (there is a runtime check, but the autofix removing the field could be handy...).
+Does not warn about annotated non-existing fields (there is a runtime check, but the autofix removing the field could be handy...).<br>
+**Autofix** adds `field: true` for each missing field by default. You can change this behaviour by specifying options in your eslint config:
+
+```json
+{
+    "rules": {
+        "mobx/exhaustive-make-observable": ["error", { "autofixAnnotation": false }]
+    }
+}
+```
+
+This is a boolean value that controls if the field is annotated with `true` or `false`.
+If you are migrating an existing project using `makeObservable` and do not want this rule to override
+your current usage (even if it may be wrong), you should run the autofix with the annotation set to `false` to maintain existing behaviour: `eslint --no-eslintrc --fix --rule='mobx/exhaustive-make-observable: [2, { "autofixAnnotation": false }]' .`
 
 ### mobx/missing-make-observable
 
