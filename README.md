@@ -33,9 +33,6 @@ MobX is made possible by the generosity of the sponsors below, and many other [i
 **🥇 Gold sponsors (\$2500+ total contribution):**
 
 <br/>
-<a href="https://www.guilded.gg/"><img src="https://mobx.js.org/assets/guilded.jpg" align="center" width="100" title="Guilded" alt="Guilded" /></a>
-<a href="https://www.canva.com/"><img src="https://mobx.js.org/assets/canva.svg" align="center" width="100" title="Canva" alt="Canva" /></a>
-<a href="https://www.getparallax.com/"><img src="https://mobx.js.org/assets/parallax.png" align="center" width="100" title="Parallax" alt="Parallax" /></a>
 <a href="https://www.one-beyond.com"><img src="https://mobx.js.org/assets/dcsl.png" align="center" width="100" title="One Beyond" alt="One Beyond"/></a>
 <a href="https://frontendmasters.com/"><img src="https://mobx.js.org/assets/frontendmasters.jpg" align="center" width="100" title="Frontend Masters" alt="Frontend Masters"></a>
 <a href="http://auctionfrontier.com/"><img src="https://mobx.js.org/assets/auctionfrontier.jpeg" align="center" width="100" title="Auction Frontier" alt="Auction Frontier"></a>
