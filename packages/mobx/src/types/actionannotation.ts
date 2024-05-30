@@ -8,8 +8,7 @@ import {
     Annotation,
     globalState,
     MakeResult,
-    assert20223DecoratorType,
-    storeAnnotation
+    assert20223DecoratorType
 } from "../internal"
 
 export function createActionAnnotation(name: string, options?: object): Annotation {
@@ -73,12 +72,8 @@ function decorate_20223_(this: Annotation, mthd, context: DecoratorContext) {
     const _createAction = m =>
         createAction(ann.options_?.name ?? name!.toString(), m, ann.options_?.autoAction ?? false)
 
-    // Backwards/Legacy behavior, expects makeObservable(this)
     if (kind == "field") {
-        addInitializer(function () {
-            storeAnnotation(this, name, ann)
-        })
-        return
+        return _createAction
     }
 
     if (kind == "method") {
