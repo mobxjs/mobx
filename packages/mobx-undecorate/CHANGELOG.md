@@ -1,5 +1,27 @@
 # mobx-undecorate
 
+## 1.3.0
+
+### Minor Changes
+
+-   [`c8f3b081`](https://github.com/mobxjs/mobx/commit/c8f3b0817fd74644e285909e2a40cea45a5cc013) [#3478](https://github.com/mobxjs/mobx/pull/3478) Thanks [@urugator](https://github.com/urugator)! - partial fix #3460: replace `action` with `override` if field uses override keyword
+
+### Patch Changes
+
+-   [`988aa3a1`](https://github.com/mobxjs/mobx/commit/988aa3a198f0e0fd33623cb21b33d75db6b2f70a) [#3617](https://github.com/mobxjs/mobx/pull/3617) Thanks [@urugator](https://github.com/urugator)! - fix: preserve non-null assertion operator on undecorated props
+
+## 1.2.0
+
+### Minor Changes
+
+-   [`be5684b2`](https://github.com/mobxjs/mobx/commit/be5684b2421ab7c72bb9a2bdc2f40761e9c53c41) [#3164](https://github.com/mobxjs/mobx/pull/3164) Thanks [@Grsmto](https://github.com/Grsmto)! - add support for default export classes + fix eslint-plugin-react compatibility
+
+## 1.1.1
+
+### Patch Changes
+
+-   [`6273bfb8`](https://github.com/mobxjs/mobx/commit/6273bfb8076347687010cbd046dc740f5744e691) [#3145](https://github.com/mobxjs/mobx/pull/3145) Thanks [@urugator](https://github.com/urugator)! - fix #3142 allow white spaces in cwd
+
 ## 1.1.0
 
 ### Minor Changes

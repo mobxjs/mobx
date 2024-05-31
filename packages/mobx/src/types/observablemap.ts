@@ -33,7 +33,9 @@ import {
     die,
     isFunction,
     UPDATE,
-    IAtom
+    IAtom,
+    PureSpyEvent,
+    initObservable
 } from "../internal"
 
 export interface IKeyValueMap<V = any> {
@@ -41,7 +43,9 @@ export interface IKeyValueMap<V = any> {
 }
 
 export type IMapEntry<K = any, V = any> = [K, V]
+export type IReadonlyMapEntry<K = any, V = any> = readonly [K, V]
 export type IMapEntries<K = any, V = any> = IMapEntry<K, V>[]
+export type IReadonlyMapEntries<K = any, V = any> = IReadonlyMapEntry<K, V>[]
 
 export type IMapDidChange<K = any, V = any> = { observableKind: "map"; debugObjectName: string } & (
     | {
@@ -79,17 +83,19 @@ export const DELETE = "delete"
 
 export type IObservableMapInitialValues<K = any, V = any> =
     | IMapEntries<K, V>
+    | IReadonlyMapEntries<K, V>
     | IKeyValueMap<V>
     | Map<K, V>
 
 // just extend Map? See also https://gist.github.com/nestharus/13b4d74f2ef4a2f4357dbd3fc23c1e54
 // But: https://github.com/mobxjs/mobx/issues/1556
 export class ObservableMap<K = any, V = any>
-    implements Map<K, V>, IInterceptable<IMapWillChange<K, V>>, IListenable {
+    implements Map<K, V>, IInterceptable<IMapWillChange<K, V>>, IListenable
+{
     [$mobx] = ObservableMapMarker
-    data_: Map<K, ObservableValue<V>>
-    hasMap_: Map<K, ObservableValue<boolean>> // hasMap, not hashMap >-).
-    keysAtom_: IAtom
+    data_!: Map<K, ObservableValue<V>>
+    hasMap_!: Map<K, ObservableValue<boolean>> // hasMap, not hashMap >-).
+    keysAtom_!: IAtom
     interceptors_
     changeListeners_
     dehancer: any
@@ -102,10 +108,14 @@ export class ObservableMap<K = any, V = any>
         if (!isFunction(Map)) {
             die(18)
         }
-        this.keysAtom_ = createAtom(__DEV__ ? `${this.name_}.keys()` : "ObservableMap.keys()")
-        this.data_ = new Map()
-        this.hasMap_ = new Map()
-        this.merge(initialData)
+        initObservable(() => {
+            this.keysAtom_ = createAtom(__DEV__ ? `${this.name_}.keys()` : "ObservableMap.keys()")
+            this.data_ = new Map()
+            this.hasMap_ = new Map()
+            if (initialData) {
+                this.merge(initialData)
+            }
+        })
     }
 
     private has_(key: K): boolean {
@@ -113,7 +123,9 @@ export class ObservableMap<K = any, V = any>
     }
 
     has(key: K): boolean {
-        if (!globalState.trackingDerivation) return this.has_(key)
+        if (!globalState.trackingDerivation) {
+            return this.has_(key)
+        }
 
         let entry = this.hasMap_.get(key)
         if (!entry) {
@@ -139,7 +151,9 @@ export class ObservableMap<K = any, V = any>
                 newValue: value,
                 name: key
             })
-            if (!change) return this
+            if (!change) {
+                return this
+            }
             value = change.newValue!
         }
         if (hasKey) {
@@ -158,7 +172,9 @@ export class ObservableMap<K = any, V = any>
                 object: this,
                 name: key
             })
-            if (!change) return false
+            if (!change) {
+                return false
+            }
         }
         if (this.has_(key)) {
             const notifySpy = isSpyEnabled()
@@ -175,26 +191,25 @@ export class ObservableMap<K = any, V = any>
                       }
                     : null
 
-            if (__DEV__ && notifySpy) spyReportStart(change!)
+            if (__DEV__ && notifySpy) {
+                spyReportStart(change! as PureSpyEvent)
+            } // TODO fix type
             transaction(() => {
                 this.keysAtom_.reportChanged()
-                this.updateHasMapEntry_(key, false)
+                this.hasMap_.get(key)?.setNewValue_(false)
                 const observable = this.data_.get(key)!
                 observable.setNewValue_(undefined as any)
                 this.data_.delete(key)
             })
-            if (notify) notifyListeners(this, change)
-            if (__DEV__ && notifySpy) spyReportEnd()
+            if (notify) {
+                notifyListeners(this, change)
+            }
+            if (__DEV__ && notifySpy) {
+                spyReportEnd()
+            }
             return true
         }
         return false
-    }
-
-    private updateHasMapEntry_(key: K, value: boolean) {
-        let entry = this.hasMap_.get(key)
-        if (entry) {
-            entry.setNewValue_(value)
-        }
     }
 
     private updateValue_(key: K, newValue: V | undefined) {
@@ -215,10 +230,16 @@ export class ObservableMap<K = any, V = any>
                           newValue
                       }
                     : null
-            if (__DEV__ && notifySpy) spyReportStart(change!)
+            if (__DEV__ && notifySpy) {
+                spyReportStart(change! as PureSpyEvent)
+            } // TODO fix type
             observable.setNewValue_(newValue as V)
-            if (notify) notifyListeners(this, change)
-            if (__DEV__ && notifySpy) spyReportEnd()
+            if (notify) {
+                notifyListeners(this, change)
+            }
+            if (__DEV__ && notifySpy) {
+                spyReportEnd()
+            }
         }
     }
 
@@ -233,7 +254,7 @@ export class ObservableMap<K = any, V = any>
             )
             this.data_.set(key, observable)
             newValue = (observable as any).value_ // value might have been changed
-            this.updateHasMapEntry_(key, true)
+            this.hasMap_.get(key)?.setNewValue_(true)
             this.keysAtom_.reportChanged()
         })
         const notifySpy = isSpyEnabled()
@@ -249,13 +270,21 @@ export class ObservableMap<K = any, V = any>
                       newValue
                   }
                 : null
-        if (__DEV__ && notifySpy) spyReportStart(change!)
-        if (notify) notifyListeners(this, change)
-        if (__DEV__ && notifySpy) spyReportEnd()
+        if (__DEV__ && notifySpy) {
+            spyReportStart(change! as PureSpyEvent)
+        } // TODO fix type
+        if (notify) {
+            notifyListeners(this, change)
+        }
+        if (__DEV__ && notifySpy) {
+            spyReportEnd()
+        }
     }
 
     get(key: K): V | undefined {
-        if (this.has(key)) return this.dehanceValue_(this.data_.get(key)!.get())
+        if (this.has(key)) {
+            return this.dehanceValue_(this.data_.get(key)!.get())
+        }
         return this.dehanceValue_(undefined)
     }
 
@@ -304,24 +333,31 @@ export class ObservableMap<K = any, V = any>
     }
 
     forEach(callback: (value: V, key: K, object: Map<K, V>) => void, thisArg?) {
-        for (const [key, value] of this) callback.call(thisArg, value, key, this)
+        for (const [key, value] of this) {
+            callback.call(thisArg, value, key, this)
+        }
     }
 
     /** Merge another object into this object, returns this. */
-    merge(other: ObservableMap<K, V> | IKeyValueMap<V> | any): ObservableMap<K, V> {
+    merge(other?: IObservableMapInitialValues<K, V>): ObservableMap<K, V> {
         if (isObservableMap(other)) {
             other = new Map(other)
         }
         transaction(() => {
-            if (isPlainObject(other))
+            if (isPlainObject(other)) {
                 getPlainObjectKeys(other).forEach((key: any) =>
-                    this.set((key as any) as K, other[key])
+                    this.set(key as K, (other as IKeyValueMap)[key])
                 )
-            else if (Array.isArray(other)) other.forEach(([key, value]) => this.set(key, value))
-            else if (isES6Map(other)) {
-                if (other.constructor !== Map) die(19, other)
+            } else if (Array.isArray(other)) {
+                other.forEach(([key, value]) => this.set(key, value))
+            } else if (isES6Map(other)) {
+                if (other.constructor !== Map) {
+                    die(19, other)
+                }
                 other.forEach((value, key) => this.set(key, value))
-            } else if (other !== null && other !== undefined) die(20, other)
+            } else if (other !== null && other !== undefined) {
+                die(20, other)
+            }
         })
         return this
     }
@@ -329,12 +365,14 @@ export class ObservableMap<K = any, V = any>
     clear() {
         transaction(() => {
             untracked(() => {
-                for (const key of this.keys()) this.delete(key)
+                for (const key of this.keys()) {
+                    this.delete(key)
+                }
             })
         })
     }
 
-    replace(values: ObservableMap<K, V> | IKeyValueMap<V> | any): ObservableMap<K, V> {
+    replace(values: IObservableMapInitialValues<K, V>): ObservableMap<K, V> {
         // Implementation requirements:
         // - respect ordering of replacement map
         // - allow interceptors to run and potentially prevent individual operations
@@ -435,8 +473,9 @@ export class ObservableMap<K = any, V = any>
      * for callback details
      */
     observe_(listener: (changes: IMapDidChange<K, V>) => void, fireImmediately?: boolean): Lambda {
-        if (__DEV__ && fireImmediately === true)
+        if (__DEV__ && fireImmediately === true) {
             die("`observe` doesn't support fireImmediately=true in combination with maps.")
+        }
         return registerListener(this, listener)
     }
 

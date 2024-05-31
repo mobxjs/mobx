@@ -13,12 +13,13 @@ Usage:
 -   `action` _(annotation)_
 -   `action(fn)`
 -   `action(name, fn)`
+-   `@action` _(method / field decorator)_
 
 All applications have actions. An action is any piece of code that modifies the state. In principle, actions always happen in response to an event. For example, a button was clicked, some input changed, a websocket message arrived, etc.
 
 MobX requires that you declare your actions, although [`makeAutoObservable`](observable-state.md#makeautoobservable) can automate much of this job. Actions help you structure your code better and offer the following performance benefits:
 
-1. They are run inside [transactions](api.md#transaction). No observers will be updated until the outer-most action has finished, guaranteeing that intermediate or incomplete values produced during an action are not visible to the rest of the application until the action has completed.
+1. They are run inside [transactions](api.md#transaction). No reactions will be run until the outer-most action has finished, guaranteeing that intermediate or incomplete values produced during an action are not visible to the rest of the application until the action has completed.
 
 2. By default, it is not allowed to change the state outside of actions. This helps to clearly identify in your code base where the state updates happen.
 
@@ -35,13 +36,30 @@ import { makeObservable, observable, action } from "mobx"
 class Doubler {
     value = 0
 
-    constructor(value) {
+    constructor() {
         makeObservable(this, {
             value: observable,
             increment: action
         })
     }
 
+    increment() {
+        // Intermediate states will not become visible to observers.
+        this.value++
+        this.value++
+    }
+}
+```
+
+<!--@action-->
+
+```javascript
+import { observable, action } from "mobx"
+
+class Doubler {
+    @observable accessor value = 0
+
+    @action
     increment() {
         // Intermediate states will not become visible to observers.
         this.value++
@@ -58,7 +76,7 @@ import { makeAutoObservable } from "mobx"
 class Doubler {
     value = 0
 
-    constructor(value) {
+    constructor() {
         makeAutoObservable(this)
     }
 
@@ -77,7 +95,7 @@ import { makeObservable, observable, action } from "mobx"
 class Doubler {
     value = 0
 
-    constructor(value) {
+    constructor() {
         makeObservable(this, {
             value: observable,
             increment: action.bound
@@ -140,7 +158,7 @@ const ResetButton = ({ formState }) => (
         onClick={action(e => {
             formState.resetPendingUploads()
             formState.resetValues()
-            e.stopPropagation()
+            e.preventDefault()
         })}
     >
         Reset form
@@ -154,7 +172,7 @@ For debugging purposes, we recommend to either name the wrapped function, or pas
 
 Another feature of actions is that they are [untracked](api.md#untracked). When an action is called from inside a side effect or a computed value (very rare!), observables read by the action won't be counted towards the dependencies of the derivation
 
-`makeAutoObservable`, `extendObservable` and `observable` use a special flavour of `action` called `autoAction`,
+`makeAutoObservable`, `extendObservable` and `observable` use a special flavour of `action` called [`autoAction`](observable-state.md#autoAction),
 that will determine at runtime if the function is a derivation or action.
 
 </details>
@@ -175,7 +193,7 @@ import { makeAutoObservable } from "mobx"
 class Doubler {
     value = 0
 
-    constructor(value) {
+    constructor() {
         makeAutoObservable(this, {}, { autoBind: true })
     }
 
@@ -199,12 +217,12 @@ Usage:
 
 -   `runInAction(fn)`
 
-Use this utility to create a temporarily action that is immediately invoked. Can be useful in asynchronous processes.
+Use this utility to create a temporary action that is immediately invoked. Can be useful in asynchronous processes.
 Check out the [above code block](#examples) for an example.
 
 ## Actions and inheritance
 
-Only actions defined **on prototype** can be **overriden** by subclass:
+Only actions defined **on prototype** can be **overridden** by subclass:
 
 ```javascript
 class Parent {
@@ -252,7 +270,7 @@ And since observable objects are mutable, it is generally safe to keep reference
 However, every step (tick) that updates observables in an asynchronous process should be marked as `action`.
 This can be achieved in multiple ways by leveraging the above APIs, as shown below.
 
-For example, when handling promises, the handlers that update state should be wrapped using `action` or be actions, as shown below.
+For example, when handling promises, the handlers that update state should be actions or should be wrapped using `action`, as shown below.
 
 <!--DOCUSAURUS_CODE_TABS-->
 <!--Wrap handlers in `action`-->
@@ -380,6 +398,7 @@ class Store {
             const filteredProjects = somePreprocessing(projects)
             this.state = "done"
             this.githubProjects = filteredProjects
+            return projects
         } catch (error) {
             this.state = "error"
         }
@@ -398,6 +417,7 @@ Usage:
 
 -   `flow` _(annotation)_
 -   `flow(function* (args) { })`
+-   `@flow` _(method decorator)_
 
 The `flow` wrapper is an optional alternative to `async` / `await` that makes it easier to
 work with MobX actions.

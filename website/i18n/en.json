@@ -19,7 +19,7 @@
       },
       "api": {
         "title": "MobX API Reference",
-        "sidebar_label": "MobX API Reference"
+        "sidebar_label": "API"
       },
       "backers-sponsors": {
         "title": "MobX Backers and Sponsors"
@@ -61,8 +61,8 @@
         "sidebar_label": "Defining data stores"
       },
       "enabling-decorators": {
-        "title": "Enabling decorators",
-        "sidebar_label": "Enabling decorators {🚀}"
+        "title": "Decorators",
+        "sidebar_label": "Decorators {🚀}"
       },
       "faq/migrate-to-6": {
         "title": "Migrating from MobX 4/5"
@@ -170,6 +170,10 @@
       "refguide/set": {
         "title": "Observable Sets"
       },
+      "subclassing": {
+        "title": "Subclassing",
+        "sidebar_label": "Subclassing"
+      },
       "the-gist-of-mobx": {
         "title": "The gist of MobX",
         "sidebar_label": "The gist of MobX"
@@ -182,6 +186,7 @@
     "links": {
       "API Reference": "API Reference",
       "中文": "中文",
+      "한국어": "한국어",
       "Sponsors": "Sponsors",
       "GitHub": "GitHub"
     },

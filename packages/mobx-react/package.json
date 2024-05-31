@@ -1,6 +1,6 @@
 {
     "name": "mobx-react",
-    "version": "7.2.0",
+    "version": "9.1.1",
     "description": "React bindings for MobX. Create fully reactive components.",
     "source": "src/index.ts",
     "main": "dist/index.js",
@@ -34,13 +34,13 @@
     "bugs": {
         "url": "https://github.com/mobxjs/mobx/issues"
     },
-    "homepage": "http://mobx.js.org/",
+    "homepage": "https://mobx.js.org",
     "dependencies": {
-        "mobx-react-lite": "^3.2.0"
+        "mobx-react-lite": "^4.0.7"
     },
     "peerDependencies": {
-        "mobx": "^6.1.0",
-        "react": "^16.8.0 || ^17"
+        "mobx": "^6.9.0",
+        "react": "^16.8.0 || ^17 || ^18"
     },
     "peerDependenciesMeta": {
         "react-dom": {
@@ -51,8 +51,9 @@
         }
     },
     "devDependencies": {
-        "mobx": "^6.3.1",
-        "mobx-react-lite": "^4.0.0"
+        "mobx": "^6.12.2",
+        "mobx-react-lite": "^4.0.7",
+        "expose-gc": "^1.0.0"
     },
     "keywords": [
         "mobx",
@@ -70,6 +71,6 @@
         "test:size": "yarn import-size --report . observer",
         "test:types": "tsc --noEmit",
         "test:check": "yarn test:types",
-        "prepublish": "yarn build --target publish"
+        "prepublishOnly": "yarn build --target publish"
     }
 }

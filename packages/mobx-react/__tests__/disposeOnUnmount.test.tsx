@@ -353,7 +353,7 @@ it("componentDidMount should be different between components", () => {
     doTest(false)
 })
 
-test("base cWU should not be called if overriden", () => {
+test("base cWU should not be called if overridden", () => {
     let baseCalled = 0
     let dCalled = 0
     let oCalled = 0

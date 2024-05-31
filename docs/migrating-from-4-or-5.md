@@ -40,7 +40,7 @@ Check out [makeObservable / makeAutoObservable](observable-state.md) for more de
 Some specifics to note:
 
 1. Using `makeObservable` / `makeAutoObservable` needs to be done in every class definition that declares MobX based members. So if a sub-class and super-class both introduce observable members, they will both have to call `makeObservable`.
-2. `makeAutoObservable` will mark methods using a new decorator `autoAction`, that will apply `action` only if it is not in a derivation context. This makes it safe to call automatically decorated methods also from computed properties.
+2. `makeAutoObservable` will mark methods using a new decorator [`autoAction`](observable-state.md#autoAction), that will apply `action` only if it is not in a derivation context. This makes it safe to call automatically decorated methods also from computed properties.
 
 Migrating a large code base with lots of classes might be daunting. But no worries, there is a code-mod available that will automate the above process!!
 
@@ -72,3 +72,9 @@ The tool will generate a `// TODO: [mobx-undecorate]` comment in these cases.
 
 We do have a special case for React class components to do the right thing and
 pass along `props` to the superclass.
+
+## Functions are auto-converted
+
+Functions that become part of a deep observable structure are automatically converted to [`autoAction`](observable-state.md#autoAction) or to [`flow`](actions.html#using-flow-instead-of-async--await-) if it's a generator function. See [inference rules](observable-state.html#makeautoobservable) for details.
+This means that the original function reference is not preserved - in the same spirit as the original array/object/set/map reference is lost when converted to observable. [This can be surprising in some situations](https://github.com/mobxjs/mobx/issues/3616).
+If this behavior is not desired use [`observable.shallow`](observable-state.html#available-annotations) / [`observable.ref`](observable-state.html#available-annotations) / [`false`](observable-state.html#available-annotations) / [`deep: flase`](observable-state.html#options-) to prevent the conversion process or make sure the function is already an `action` as shown in the issue.

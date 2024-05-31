@@ -34,7 +34,9 @@ export function configure(options: {
                 ? false
                 : typeof Proxy !== "undefined"
     }
-    if (useProxies === "ifavailable") globalState.verifyProxies = true
+    if (useProxies === "ifavailable") {
+        globalState.verifyProxies = true
+    }
     if (enforceActions !== undefined) {
         const ea = enforceActions === ALWAYS ? ALWAYS : enforceActions === OBSERVED
         globalState.enforceActions = ea
@@ -47,7 +49,9 @@ export function configure(options: {
         "disableErrorBoundaries",
         "safeDescriptors"
     ].forEach(key => {
-        if (key in options) globalState[key] = !!options[key]
+        if (key in options) {
+            globalState[key] = !!options[key]
+        }
     })
     globalState.allowStateReads = !globalState.observableRequiresReaction
     if (__DEV__ && globalState.disableErrorBoundaries === true) {

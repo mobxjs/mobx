@@ -37,8 +37,8 @@ export type IValueDidChange<T = any> = {
     observableKind: "value"
     object: IObservableValue<T>
     debugObjectName: string
-    newValue: unknown
-    oldValue: unknown
+    newValue: T
+    oldValue: T | undefined
 }
 export type IBoxDidChange<T = any> =
     | {
@@ -46,22 +46,21 @@ export type IBoxDidChange<T = any> =
           observableKind: "value"
           object: IObservableValue<T>
           debugObjectName: string
-          newValue: unknown
+          newValue: T
       }
     | IValueDidChange<T>
 
 export interface IObservableValue<T> {
     get(): T
     set(value: T): void
-    intercept_(handler: IInterceptor<IValueWillChange<T>>): Lambda
-    observe_(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda
 }
 
 const CREATE = "create"
 
 export class ObservableValue<T>
     extends Atom
-    implements IObservableValue<T>, IInterceptable<IValueWillChange<T>>, IListenable {
+    implements IObservableValue<T>, IInterceptable<IValueWillChange<T>>, IListenable
+{
     hasUnreportedChange_ = false
     interceptors_
     changeListeners_
@@ -90,7 +89,9 @@ export class ObservableValue<T>
     }
 
     private dehanceValue(value: T): T {
-        if (this.dehancer !== undefined) return this.dehancer(value)
+        if (this.dehancer !== undefined) {
+            return this.dehancer(value)
+        }
         return value
     }
 
@@ -110,7 +111,9 @@ export class ObservableValue<T>
                 })
             }
             this.setNewValue_(newValue)
-            if (__DEV__ && notifySpy) spyReportEnd()
+            if (__DEV__ && notifySpy) {
+                spyReportEnd()
+            }
         }
     }
 
@@ -122,7 +125,9 @@ export class ObservableValue<T>
                 type: UPDATE,
                 newValue
             })
-            if (!change) return globalState.UNCHANGED
+            if (!change) {
+                return globalState.UNCHANGED
+            }
             newValue = change.newValue
         }
         // apply modifier
@@ -154,7 +159,7 @@ export class ObservableValue<T>
     }
 
     observe_(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda {
-        if (fireImmediately)
+        if (fireImmediately) {
             listener({
                 observableKind: "value",
                 debugObjectName: this.name_,
@@ -163,6 +168,7 @@ export class ObservableValue<T>
                 newValue: this.value_,
                 oldValue: undefined
             })
+        }
         return registerListener(this, listener)
     }
 

@@ -27,7 +27,11 @@ A description of what happened, including a screenshot or copy-paste of any rela
 **How to reproduce the issue:**
 
 <!--
-If possible, please create a reproduction using https://codesandbox.io/s/minimal-mobx-react-project-ppgml and link to it here. If the issue is more complicated or not reproducible with React, feel free to create your CodeSandbox or your own GitHub repo with the code.
+Please create a reproduction and link to it here. You can use the following starters:
+- React: https://codesandbox.io/s/minimal-mobx-react-project-ppgml
+- React Native: https://snack.expo.dev/vEF39Ohnb
+
+If the issue is more complicated or not reproducible with React, feel free to create your CodeSandbox or your own GitHub repo with the code.
 
 Instructions for how the issue can be reproduced by a maintainer or contributor. Be as specific as possible, and only mention what is necessary to reproduce the bug. If possible, try to isolate the exact circumstances in which the bug occurs and avoid speculation over what the cause might be. Help us so we can help you quickly.
 -->

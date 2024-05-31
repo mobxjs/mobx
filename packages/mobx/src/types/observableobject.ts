@@ -46,7 +46,8 @@ import {
     getAdministration,
     getDebugName,
     objectPrototype,
-    MakeResult
+    MakeResult,
+    checkIfStateModificationsAreAllowed
 } from "../internal"
 
 const descriptorCache = Object.create(null)
@@ -88,7 +89,8 @@ export type IObjectWillChange<T = any> =
 const REMOVE = "remove"
 
 export class ObservableObjectAdministration
-    implements IInterceptable<IObjectWillChange>, IListenable {
+    implements IInterceptable<IObjectWillChange>, IListenable
+{
     keysAtom_: IAtom
     changeListeners_
     interceptors_
@@ -135,7 +137,9 @@ export class ObservableObjectAdministration
                 name: key,
                 newValue
             })
-            if (!change) return null
+            if (!change) {
+                return null
+            }
             newValue = (change as any).newValue
         }
         newValue = (observable as any).prepareNewValue_(newValue)
@@ -157,10 +161,16 @@ export class ObservableObjectAdministration
                       }
                     : null
 
-            if (__DEV__ && notifySpy) spyReportStart(change!)
+            if (__DEV__ && notifySpy) {
+                spyReportStart(change!)
+            }
             ;(observable as ObservableValue<any>).setNewValue_(newValue)
-            if (notify) notifyListeners(this, change)
-            if (__DEV__ && notifySpy) spyReportEnd()
+            if (notify) {
+                notifyListeners(this, change)
+            }
+            if (__DEV__ && notifySpy) {
+                spyReportEnd()
+            }
         }
         return true
     }
@@ -255,8 +265,12 @@ export class ObservableObjectAdministration
             const descriptor = getDescriptor(source, key)
             if (descriptor) {
                 const outcome = annotation.make_(this, key, descriptor, source)
-                if (outcome === MakeResult.Cancel) return
-                if (outcome === MakeResult.Break) break
+                if (outcome === MakeResult.Cancel) {
+                    return
+                }
+                if (outcome === MakeResult.Break) {
+                    break
+                }
             }
             source = Object.getPrototypeOf(source)
         }
@@ -301,6 +315,7 @@ export class ObservableObjectAdministration
         descriptor: PropertyDescriptor,
         proxyTrap: boolean = false
     ): boolean | null {
+        checkIfStateModificationsAreAllowed(this.keysAtom_)
         try {
             startBatch()
 
@@ -319,7 +334,9 @@ export class ObservableObjectAdministration
                     type: ADD,
                     newValue: descriptor.value
                 })
-                if (!change) return null
+                if (!change) {
+                    return null
+                }
                 const { newValue } = change as any
                 if (descriptor.value !== newValue) {
                     descriptor = {
@@ -353,6 +370,7 @@ export class ObservableObjectAdministration
         enhancer: IEnhancer<any>,
         proxyTrap: boolean = false
     ): boolean | null {
+        checkIfStateModificationsAreAllowed(this.keysAtom_)
         try {
             startBatch()
 
@@ -371,7 +389,9 @@ export class ObservableObjectAdministration
                     type: ADD,
                     newValue: value
                 })
-                if (!change) return null
+                if (!change) {
+                    return null
+                }
                 value = (change as any).newValue
             }
 
@@ -415,6 +435,7 @@ export class ObservableObjectAdministration
         options: IComputedValueOptions<any>,
         proxyTrap: boolean = false
     ): boolean | null {
+        checkIfStateModificationsAreAllowed(this.keysAtom_)
         try {
             startBatch()
 
@@ -433,7 +454,9 @@ export class ObservableObjectAdministration
                     type: ADD,
                     newValue: undefined
                 })
-                if (!change) return null
+                if (!change) {
+                    return null
+                }
             }
             options.name ||= __DEV__ ? `${this.name_}.${key.toString()}` : "ObservableObject.key"
             options.context = this.proxy_ || this.target_
@@ -471,6 +494,7 @@ export class ObservableObjectAdministration
      * @returns {boolean|null} true on success, false on failure (proxyTrap + non-configurable), null when cancelled by interceptor
      */
     delete_(key: PropertyKey, proxyTrap: boolean = false): boolean | null {
+        checkIfStateModificationsAreAllowed(this.keysAtom_)
         // No such prop
         if (!hasProp(this.target_, key)) {
             return true
@@ -484,7 +508,9 @@ export class ObservableObjectAdministration
                 type: REMOVE
             })
             // Cancelled
-            if (!change) return null
+            if (!change) {
+                return null
+            }
         }
 
         // Delete
@@ -538,9 +564,15 @@ export class ObservableObjectAdministration
                     oldValue: value,
                     name: key
                 }
-                if (__DEV__ && notifySpy) spyReportStart(change!)
-                if (notify) notifyListeners(this, change)
-                if (__DEV__ && notifySpy) spyReportEnd()
+                if (__DEV__ && notifySpy) {
+                    spyReportStart(change!)
+                }
+                if (notify) {
+                    notifyListeners(this, change)
+                }
+                if (__DEV__ && notifySpy) {
+                    spyReportEnd()
+                }
             }
         } finally {
             endBatch()
@@ -554,8 +586,9 @@ export class ObservableObjectAdministration
      * for callback details
      */
     observe_(callback: (changes: IObjectDidChange) => void, fireImmediately?: boolean): Lambda {
-        if (__DEV__ && fireImmediately === true)
+        if (__DEV__ && fireImmediately === true) {
             die("`observe` doesn't support the fire immediately property for observable objects.")
+        }
         return registerListener(this, callback)
     }
 
@@ -579,9 +612,15 @@ export class ObservableObjectAdministration
                       } as const)
                     : null
 
-            if (__DEV__ && notifySpy) spyReportStart(change!)
-            if (notify) notifyListeners(this, change)
-            if (__DEV__ && notifySpy) spyReportEnd()
+            if (__DEV__ && notifySpy) {
+                spyReportStart(change!)
+            }
+            if (notify) {
+                notifyListeners(this, change)
+            }
+            if (__DEV__ && notifySpy) {
+                spyReportEnd()
+            }
         }
 
         this.pendingKeys_?.get(key)?.set(true)
@@ -590,7 +629,7 @@ export class ObservableObjectAdministration
         this.keysAtom_.reportChanged()
     }
 
-    ownKeys_(): PropertyKey[] {
+    ownKeys_(): Array<string | symbol> {
         this.keysAtom_.reportObserved()
         return ownKeys(this.target_)
     }
@@ -608,7 +647,7 @@ export class ObservableObjectAdministration
 }
 
 export interface IIsObservableObject {
-    $mobx: ObservableObjectAdministration
+    [$mobx]: ObservableObjectAdministration
 }
 
 export function asObservableObject(
@@ -630,8 +669,9 @@ export function asObservableObject(
         return target
     }
 
-    if (__DEV__ && !Object.isExtensible(target))
+    if (__DEV__ && !Object.isExtensible(target)) {
         die("Cannot make the designated object observable; it is not extensible")
+    }
 
     const name =
         options?.name ??
@@ -741,7 +781,7 @@ function assertAnnotable(
             `Cannot apply '${requestedAnnotationType}' to '${fieldName}':` +
                 `\nThe field is already annotated with '${currentAnnotationType}'.` +
                 `\nRe-annotating fields is not allowed.` +
-                `\nUse 'override' annotation for methods overriden by subclass.`
+                `\nUse 'override' annotation for methods overridden by subclass.`
         )
     }
 }

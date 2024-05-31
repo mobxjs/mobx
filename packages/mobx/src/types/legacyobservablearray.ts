@@ -1,8 +1,6 @@
 import {
     getNextId,
     addHiddenFinalProp,
-    allowStateChangesStart,
-    allowStateChangesEnd,
     makeIterable,
     addHiddenProp,
     ObservableArrayAdministration,
@@ -11,8 +9,24 @@ import {
     IEnhancer,
     isObservableArray,
     IObservableArray,
-    defineProperty
+    defineProperty,
+    initObservable
 } from "../internal"
+
+// Bug in safari 9.* (or iOS 9 safari mobile). See #364
+const ENTRY_0 = createArrayEntryDescriptor(0)
+
+const safariPrototypeSetterInheritanceBug = (() => {
+    let v = false
+    const p = {}
+    Object.defineProperty(p, "0", {
+        set: () => {
+            v = true
+        }
+    })
+    Object.create(p)["0"] = 1
+    return v === false
+})()
 
 /**
  * This array buffer contains two lists of properties, so that all arrays
@@ -38,7 +52,7 @@ inherit(StubArray, Array.prototype)
 // but it is unclear why the hack is need as MobX never changed the prototype
 // anyway, so removed it in V6
 
-class LegacyObservableArray<T> extends StubArray {
+export class LegacyObservableArray<T> extends StubArray {
     constructor(
         initialValues: T[] | undefined,
         enhancer: IEnhancer<T>,
@@ -46,17 +60,22 @@ class LegacyObservableArray<T> extends StubArray {
         owned = false
     ) {
         super()
+        initObservable(() => {
+            const adm = new ObservableArrayAdministration(name, enhancer, owned, true)
+            adm.proxy_ = this as any
+            addHiddenFinalProp(this, $mobx, adm)
 
-        const adm = new ObservableArrayAdministration(name, enhancer, owned, true)
-        adm.proxy_ = this as any
-        addHiddenFinalProp(this, $mobx, adm)
+            if (initialValues && initialValues.length) {
+                // @ts-ignore
+                this.spliceWithArray(0, 0, initialValues)
+            }
 
-        if (initialValues && initialValues.length) {
-            const prev = allowStateChangesStart(true)
-            // @ts-ignore
-            this.spliceWithArray(0, 0, initialValues)
-            allowStateChangesEnd(prev)
-        }
+            if (safariPrototypeSetterInheritanceBug) {
+                // Seems that Safari won't use numeric prototype setter until any * numeric property is
+                // defined on the instance. After that it works fine, even if this property is deleted.
+                Object.defineProperty(this, "0", ENTRY_0)
+            }
+        })
     }
 
     concat(...arrays: T[][]): T[] {
@@ -85,7 +104,6 @@ class LegacyObservableArray<T> extends StubArray {
         let nextIndex = 0
         return makeIterable({
             next() {
-                // @ts-ignore
                 return nextIndex < self.length
                     ? { value: self[nextIndex++], done: false }
                     : { done: true, value: undefined }
@@ -95,7 +113,9 @@ class LegacyObservableArray<T> extends StubArray {
 }
 
 Object.entries(arrayExtensions).forEach(([prop, fn]) => {
-    if (prop !== "concat") addHiddenProp(LegacyObservableArray.prototype, prop, fn)
+    if (prop !== "concat") {
+        addHiddenProp(LegacyObservableArray.prototype, prop, fn)
+    }
 })
 
 function createArrayEntryDescriptor(index: number) {
@@ -117,8 +137,9 @@ function createArrayBufferItem(index: number) {
 
 export function reserveArrayBuffer(max: number) {
     if (max > OBSERVABLE_ARRAY_BUFFER_SIZE) {
-        for (let index = OBSERVABLE_ARRAY_BUFFER_SIZE; index < max + 100; index++)
+        for (let index = OBSERVABLE_ARRAY_BUFFER_SIZE; index < max + 100; index++) {
             createArrayBufferItem(index)
+        }
         OBSERVABLE_ARRAY_BUFFER_SIZE = max
     }
 }

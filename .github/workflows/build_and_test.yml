@@ -1,0 +1,45 @@
+name: Build and test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    name: Build and test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@master
+
+      - name: Setup Node.js 20.x
+        uses: actions/setup-node@master
+        with:
+          node-version: 20.x
+
+      - name: Install Dependencies
+        run: yarn --frozen-lockfile --ignore-scripts
+
+      - name: Lint
+        run: yarn lint
+
+      - name: Build check
+        run: yarn lerna run build:check
+
+      - name: Build packages
+        run: yarn lerna run build:test
+
+      - name: Test
+        run: yarn test -i
+
+      - name: Test size
+        run: yarn lerna run test:size
+
+      - name: Test flow
+        run: yarn mobx test:flow
+
+      - name: Test performance
+        run: yarn mobx test:performance

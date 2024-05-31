@@ -13,6 +13,8 @@ Usage:
 -   `computed` _(annotation)_
 -   `computed(options)` _(annotation)_
 -   `computed(fn, options?)`
+-   `@computed` _(getter decorator)_
+-   `@computed(options)` _(getter decorator)_
 
 Computed values can be used to derive information from other observables.
 They evaluate lazily, caching their output and only recomputing if one of the underlying observables has changed.
@@ -23,7 +25,7 @@ Conceptually, they are very similar to formulas in spreadsheets, and can't be un
 ## Example
 
 Computed values can be created by annotating JavaScript [getters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get) with `computed`.
-Use `makeObservable` to declare a getter as computed. If you instead want all getters to be automatically declared as `computed`, you can use either `makeAutoObservable`, `observable` or `extendObservable`.
+Use `makeObservable` to declare a getter as computed. If you instead want all getters to be automatically declared as `computed`, you can use either `makeAutoObservable`, `observable` or `extendObservable`. Computed getters become non-enumerable.
 
 To help illustrate the point of computed values, the example below relies on [`autorun`](reactions.md#autorun) from the [Reactions {🚀}](reactions.md) advanced section.
 
@@ -92,6 +94,7 @@ When using computed values there are a couple of best practices to follow:
 
 1. They should not have side effects or update other observables.
 2. Avoid creating and returning new observables.
+3. They should not depend on non-observable values.
 
 ## Tips
 
@@ -158,9 +161,9 @@ class Box {
     height = 0
 
     constructor() {
-        makeObsevable(this, {
-            x: observable,
-            y: observable,
+        makeObservable(this, {
+            width: observable,
+            height: observable,
             topRight: computed.struct
         })
     }
@@ -189,7 +192,7 @@ Check out the [`equals`](#equals) option for further customizations on determini
 
 <details id="computed-with-args"><summary>{🚀} **Tip:** computed values with arguments<a href="#computed-with-args" class="tip-anchor"></a></summary>
 
-Although getters don't take arguments, several strategies to work with derived values that need arguments are discusses [here](computeds-with-args.md).
+Although getters don't take arguments, several strategies to work with derived values that need arguments are discussed [here](computeds-with-args.md).
 
 </details>
 

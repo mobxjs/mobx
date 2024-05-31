@@ -3,21 +3,20 @@ import { join, dirname } from "path"
 import { readFileSync, writeFileSync, mkdirSync } from "fs"
 const dedent = require("dedent-js")
 
-test("run cli #2506", () => {
-    const testFile = join(__dirname, "fixtures", "some path", "some file.tsx")
+test("run cli #2506 #3142", () => {
+    // #3142 - the white space must be in cwd
+    const cwd = join(__dirname, "fixtures", "some path")
+    const testFile = join(cwd, "some file.tsx")
     const baseContent = dedent(`import { observable } from "mobx";
     class Test {
         @observable x = 1;
     }
     `)
-
-    mkdirSync(dirname(testFile))
+    mkdirSync(dirname(testFile), { recursive: true })
     writeFileSync(testFile, baseContent)
-    execSync("node ../../cli.js", {
-        cwd: join(__dirname, "fixtures")
-    })
+    execSync("node ../../../cli.js", { cwd })
     expect(readFileSync(testFile, "utf8")).toMatchInlineSnapshot(`
-        "import { observable, makeObservable } from \\"mobx\\";
+        "import { observable, makeObservable } from "mobx";
         class Test {
             x = 1;
 
@@ -58,15 +57,15 @@ test("run cli with --parseTsAsNonJsx #2754", () => {
         }
     `)
 
-    mkdirSync(dirname(testNonJsxFile))
+    mkdirSync(dirname(testNonJsxFile), { recursive: true })
     writeFileSync(testNonJsxFile, nonJsxContent)
     writeFileSync(testJsxFile, jsxContent)
     execSync("node ../../cli.js --parseTsAsNonJsx", {
         cwd: join(__dirname, "fixtures")
     })
     expect(readFileSync(testNonJsxFile, "utf8")).toMatchInlineSnapshot(`
-        "import { useSearch } from \\"./useSearch\\"
-        import { observable, makeObservable } from \\"mobx\\";
+        "import { useSearch } from "./useSearch"
+        import { observable, makeObservable } from "mobx";
 
         class Test {
             x = 1;
@@ -80,7 +79,7 @@ test("run cli with --parseTsAsNonJsx #2754", () => {
 
         export function useAlias(): string {
             const parsedSearch = useSearch()
-            return (<string>parsedSearch.alias || \\"\\").toUpperCase()
+            return (<string>parsedSearch.alias || "").toUpperCase()
         }"
     `)
     expect(readFileSync(testJsxFile, "utf8")).toMatchInlineSnapshot(`

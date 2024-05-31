@@ -1112,36 +1112,52 @@ test("1072 - @observable without initial value and observe before first access",
     observe(user, "loginCount", () => {})
 })
 
-test("unread computed reads should trow with requiresReaction enabled", () => {
-    class A {
-        @observable x = 0
-
-        @computed({ requiresReaction: true })
-        get y() {
-            return this.x * 2
-        }
-        constructor() {
-            makeObservable(this)
-        }
+test("unobserved computed reads should warn with requiresReaction enabled", () => {
+    const consoleWarn = console.warn
+    const warnings: string[] = []
+    console.warn = function (...args) {
+        warnings.push(...args)
     }
+    try {
+        const expectedWarnings: string[] = []
 
-    const a = new A()
-    expect(() => {
-        a.y
-    }).toThrow(/is read outside a reactive context/)
+        class A {
+            @observable x = 0
 
-    const d = mobx.reaction(
-        () => a.y,
-        () => {}
-    )
-    expect(() => {
-        a.y
-    }).not.toThrow()
+            @computed({ requiresReaction: true })
+            get y() {
+                return this.x * 2
+            }
+            constructor() {
+                makeObservable(this, undefined, { name: "a" })
+            }
+        }
 
-    d()
-    expect(() => {
+        const a = new A()
+
         a.y
-    }).toThrow(/is read outside a reactive context/)
+        expectedWarnings.push(
+            `[mobx] Computed value 'a.y' is being read outside a reactive context. Doing a full recompute.`
+        )
+
+        const d = mobx.reaction(
+            () => a.y,
+            () => {}
+        )
+
+        a.y
+
+        d()
+
+        a.y
+        expectedWarnings.push(
+            `[mobx] Computed value 'a.y' is being read outside a reactive context. Doing a full recompute.`
+        )
+
+        expect(warnings).toEqual(expectedWarnings)
+    } finally {
+        console.warn = consoleWarn
+    }
 })
 
 test("multiple inheritance should work", () => {

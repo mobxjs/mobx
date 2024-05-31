@@ -1,5 +1,235 @@
 # mobx
 
+## 6.12.2
+
+### Patch Changes
+
+-   [`61abc53f`](https://github.com/mobxjs/mobx/commit/61abc53ff10554d1d5ce3e85466f6beda4d63fa2) [#3852](https://github.com/mobxjs/mobx/pull/3852) Thanks [@mweststrate](https://github.com/mweststrate)! - Patched the release process, forcing release to get everything in pristine state.
+
+*   [`b28e0ebb`](https://github.com/mobxjs/mobx/commit/b28e0ebbfc9aa11293bc185216da92997e497fd3) [#3816](https://github.com/mobxjs/mobx/pull/3816) Thanks [@barroij](https://github.com/barroij)! - Fix `IReactionDisposer` and `IIsObservableObject` interface definition so that Typescript knows the property key `$mobx` is a symbol and not a string
+
+## 6.12.1
+
+### Patch Changes
+
+-   [`620f78c7`](https://github.com/mobxjs/mobx/commit/620f78c74e66bc532a96e28b26fd2d0ed1b67d54) [#3812](https://github.com/mobxjs/mobx/pull/3812) Thanks [@barroij](https://github.com/barroij)! - Prevent `reaction` from heeping a Reference to the OldValue that would prevent GC.
+
+*   [`6111b093`](https://github.com/mobxjs/mobx/commit/6111b0939d0d3c0d46dc325ba6bbd5f740a161d3) [#3833](https://github.com/mobxjs/mobx/pull/3833) Thanks [@realyze](https://github.com/realyze)! - Reduce memory overhead of tracking dependencies
+
+## 6.12.0
+
+### Minor Changes
+
+-   [`ec5db592`](https://github.com/mobxjs/mobx/commit/ec5db592d7756826c31e710b1c759d7e9406b153) [#3792](https://github.com/mobxjs/mobx/pull/3792) Thanks [@tonyraoul](https://github.com/tonyraoul)! - Improve observablearray proxy pefromance for es2023.array and es2022.array methods
+
+### Patch Changes
+
+-   [`86616c11`](https://github.com/mobxjs/mobx/commit/86616c11c108a511331eb05e55c08fc2c5a23f4d) [#3654](https://github.com/mobxjs/mobx/pull/3654) Thanks [@ahoisl](https://github.com/ahoisl)! - fix: action transparently forwards toString of underlying function
+
+## 6.11.0
+
+### Minor Changes
+
+-   [`c9260974`](https://github.com/mobxjs/mobx/commit/c9260974f726f58de0fd4974ea024c644d9b7c6f) [#3790](https://github.com/mobxjs/mobx/pull/3790) Thanks [@mweststrate](https://github.com/mweststrate)! - Added support for modern 2022.3 Decorators. [#3790](https://github.com/mobxjs/mobx/pull/3790)
+    -   [Installation / usage instruction](https://mobx.js.org/enabling-decorators.html).
+    -   [Introduction announcement](https://michel.codes/blogs/mobx-decorators)
+    -   Original PR by [@Matchlighter](https://github.com/Matchlighter) in [#3638](https://github.com/mobxjs/mobx/pull/3638),
+
+## 6.10.2
+
+### Patch Changes
+
+-   [`c8d9374d`](https://github.com/mobxjs/mobx/commit/c8d9374d4f3b05cfec0d690e0eb3ada4f619ff0b) [#3748](https://github.com/mobxjs/mobx/pull/3748) Thanks [@mweststrate](https://github.com/mweststrate)! - Fixed: #3747, computed values becoming stale if the underlying observable was created and updated outside a reactive context
+
+## 6.10.1
+
+### Patch Changes
+
+-   [`3ceeb865`](https://github.com/mobxjs/mobx/commit/3ceeb8651e328c4c7211c875696b3f5269fea834) [#3732](https://github.com/mobxjs/mobx/pull/3732) Thanks [@urugator](https://github.com/urugator)! - - fix: #3728: Observable initialization updates state version.
+    -   fix: Observable set initialization violates `enforceActions: "always"`.
+    -   fix: Changing keys of observable object does not respect `enforceActions`.
+
+## 6.10.0
+
+### Minor Changes
+
+-   [`bebd5f05`](https://github.com/mobxjs/mobx/commit/bebd5f0507a109145f401c78630ed9d59e4a1101) [#3727](https://github.com/mobxjs/mobx/pull/3727) Thanks [@rluvaton](https://github.com/rluvaton)! - Added support for `signal` (AbortSignal) in `autorun`, `reaction` and sync `when` options to dispose them
+
+### Patch Changes
+
+-   [`55f78ddc`](https://github.com/mobxjs/mobx/commit/55f78ddc20e84f38a7aa88b99a51ad994e558241) [#3717](https://github.com/mobxjs/mobx/pull/3717) Thanks [@liucan233](https://github.com/liucan233)! - remove proxy option for makeObservable and makeAutoObservable
+
+## 6.9.1
+
+### Patch Changes
+
+-   [`4792303e`](https://github.com/mobxjs/mobx/commit/4792303ec9119c1ba54134fff7e845d21a1d9337) [#3709](https://github.com/mobxjs/mobx/pull/3709) Thanks [@kubk](https://github.com/kubk)! - Make trace() noop in production build
+
+## 6.9.0
+
+### Minor Changes
+
+-   [`44a2cf42`](https://github.com/mobxjs/mobx/commit/44a2cf42dec7635f639ddbfb19202ebc710bac54) [#3590](https://github.com/mobxjs/mobx/pull/3590) Thanks [@urugator](https://github.com/urugator)! - Better support for React 18: Mobx now keeps track of a global state version, which updates with each mutation.
+
+## 6.8.0
+
+### Minor Changes
+
+-   [`fed3ff14`](https://github.com/mobxjs/mobx/commit/fed3ff14ca4dcbc788c4678e6d3f4edf747ffdb0) [#3608](https://github.com/mobxjs/mobx/pull/3608) Thanks [@emereum](https://github.com/emereum)! - Do not expose the methods `observe_` or `intercept_` on computed values and observable values.
+
+### Patch Changes
+
+-   [`42f8ac05`](https://github.com/mobxjs/mobx/commit/42f8ac057ec70c508232339016cc7249123f0fd0) [#3596](https://github.com/mobxjs/mobx/pull/3596) Thanks [@urugator](https://github.com/urugator)! - fix #3595 onBecomeObserved is not called for ObservableSet
+
+*   [`2bccc5b3`](https://github.com/mobxjs/mobx/commit/2bccc5b3ca1df6444c942c715718519d590281e0) [#3583](https://github.com/mobxjs/mobx/pull/3583) Thanks [@urugator](https://github.com/urugator)! - fix #3582: AbortSignal leaks @types/node
+
+-   [`7095fa45`](https://github.com/mobxjs/mobx/commit/7095fa4569afb538b7f153ce2b2a8078f2dbe1fc) [#3609](https://github.com/mobxjs/mobx/pull/3609) Thanks [@emereum](https://github.com/emereum)! - Restore generic types for newValue and oldValue on IValueDidChange and IBoxDidChange.
+
+## 6.7.0
+
+### Minor Changes
+
+-   [`8cf4784f`](https://github.com/mobxjs/mobx/commit/8cf4784f53857cc977aed641bd778f2c14a080f5) [#3559](https://github.com/mobxjs/mobx/pull/3559) Thanks [@urugator](https://github.com/urugator)! - Proxied observable arrays can now safely read/write out of bound indices. See https://github.com/mobxjs/mobx/discussions/3537
+
+*   [`223e3688`](https://github.com/mobxjs/mobx/commit/223e3688631528a327c79d39e2f497c6e1506165) [#3551](https://github.com/mobxjs/mobx/pull/3551) Thanks [@deadbeef84](https://github.com/deadbeef84)! - Added new option `signal` to `when()`, to support abortion using an AbortSignal / AbortController.
+
+### Patch Changes
+
+-   [`fe25cfed`](https://github.com/mobxjs/mobx/commit/fe25cfede0aee3bddd7fa434a14ed4b40a57ee26) [#3566](https://github.com/mobxjs/mobx/pull/3566) Thanks [@upsuper](https://github.com/upsuper)! - Make return value of reportObserved match invoke of onBecomeObserved
+
+## 6.6.2
+
+### Patch Changes
+
+-   [`b375535c`](https://github.com/mobxjs/mobx/commit/b375535c422453963f5d3485a2ef5233568c12a6) [#3344](https://github.com/mobxjs/mobx/pull/3344) Thanks [@Nokel81](https://github.com/Nokel81)! - Allow readonly tuples as part of IObservableMapInitialValues
+
+*   [`7260cd41`](https://github.com/mobxjs/mobx/commit/7260cd413b1e52449523826ac239c2a197b2880f) [#3516](https://github.com/mobxjs/mobx/pull/3516) Thanks [@urugator](https://github.com/urugator)! - fix regression #3514: LegacyObservableArray compat with Safari 9.\*
+
+-   [`78d1aa23`](https://github.com/mobxjs/mobx/commit/78d1aa2362b4dc5d521518688d6ac7e2d4f7ad3a) [#3458](https://github.com/mobxjs/mobx/pull/3458) Thanks [@egilll](https://github.com/egilll)! - A slight revamp of the README, wording, and clearer links
+
+## 6.6.1
+
+### Patch Changes
+
+-   [`63698d06`](https://github.com/mobxjs/mobx/commit/63698d0681988194bac5fc01851882b417b35f18) [#3427](https://github.com/mobxjs/mobx/pull/3427) Thanks [@RyanCavanaugh](https://github.com/RyanCavanaugh)! - Apply 'object' constraint where required
+
+## 6.6.0
+
+### Minor Changes
+
+-   [`8e204c7b`](https://github.com/mobxjs/mobx/commit/8e204c7b7d1dbad597761fa83beda77f027ee34c) [#3409](https://github.com/mobxjs/mobx/pull/3409) Thanks [@Nokel81](https://github.com/Nokel81)! - Remove observable.box type inconsistancy
+
+## 6.5.0
+
+### Minor Changes
+
+-   [`767baff0`](https://github.com/mobxjs/mobx/commit/767baff0373e5a5e2b7da274b25042078f9a205c) [#3338](https://github.com/mobxjs/mobx/pull/3338) Thanks [@kubk](https://github.com/kubk)! - Replace any with a generic in Set methods
+
+## 6.4.2
+
+### Patch Changes
+
+-   [`2caf7e1a`](https://github.com/mobxjs/mobx/commit/2caf7e1a3504dde3d7c9bde3c6fb56ca85168018) [#3316](https://github.com/mobxjs/mobx/pull/3316) Thanks [@urugator](https://github.com/urugator)! - `requiresObservable` always takes precedence over global `reactionRequiresObservable`
+
+## 6.4.1
+
+### Patch Changes
+
+-   [`d6fa9a19`](https://github.com/mobxjs/mobx/commit/d6fa9a1970ebfb8a8adaf5bf0dc73125acec2dee) [#3306](https://github.com/mobxjs/mobx/pull/3306) Thanks [@urugator](https://github.com/urugator)! - fix missing type inferrence of `observe` and `intercept` for arrays
+
+## 6.4.0
+
+### Minor Changes
+
+-   [`6b926833`](https://github.com/mobxjs/mobx/commit/6b926833ac7abbf92ff5c309613d2345f72527ee) [#3287](https://github.com/mobxjs/mobx/pull/3287) Thanks [@kubk](https://github.com/kubk)! - Remove any from 'merge' and 'replace' methods of ObservableMap
+
+### Patch Changes
+
+-   [`dee35be4`](https://github.com/mobxjs/mobx/commit/dee35be427989b6adc3c8f7ae8dc632ea66f3538) [#3300](https://github.com/mobxjs/mobx/pull/3300) Thanks [@kubk](https://github.com/kubk)! - Make the error message about Object.freeze more informative
+
+## 6.3.13
+
+### Patch Changes
+
+-   [`23803202`](https://github.com/mobxjs/mobx/commit/2380320263f5edcd06d7ba6bdf02aff3fd7d305a) [#3273](https://github.com/mobxjs/mobx/pull/3273) Thanks [@urugator](https://github.com/urugator)! - fix `flow.bound` #3271
+
+## 6.3.12
+
+### Patch Changes
+
+-   [`654a2013`](https://github.com/mobxjs/mobx/commit/654a2013107ac6e5bbe3851e4eed22f0c9130525) [#3257](https://github.com/mobxjs/mobx/pull/3257) Thanks [@urugator](https://github.com/urugator)! - fix: observable map initialization violates `enforceActions: "always"`
+
+## 6.3.11
+
+### Patch Changes
+
+-   [`bf5da6ba`](https://github.com/mobxjs/mobx/commit/bf5da6bad982dc3d955d5f27f7fea6f94b041ea7) [#3239](https://github.com/mobxjs/mobx/pull/3239) Thanks [@bernardobelchior](https://github.com/bernardobelchior)! - Improved `toJS` jsdoc
+
+## 6.3.10
+
+### Patch Changes
+
+-   [`2d70798e`](https://github.com/mobxjs/mobx/commit/2d70798eb327187d93757757ceaf410a608735b2) [#3233](https://github.com/mobxjs/mobx/pull/3233) Thanks [@anderlaw](https://github.com/anderlaw)! - `eq.ts` fix comparer logic
+
+## 6.3.9
+
+### Patch Changes
+
+-   [`87e5a037`](https://github.com/mobxjs/mobx/commit/87e5a03735dbc1930e54a15b5ce88ad684bc3dc1) [#3214](https://github.com/mobxjs/mobx/pull/3214) Thanks [@urugator](https://github.com/urugator)! - `requiresReaction` always takes precedence over global `computedRequiresReaction`
+
+*   [`9b90e25c`](https://github.com/mobxjs/mobx/commit/9b90e25c7bc0cdc0a07d1f847683604e86790f24) [#3198](https://github.com/mobxjs/mobx/pull/3198) Thanks [@urugator](https://github.com/urugator)! - fix `isPlainObject` impl (fixes #3197)
+
+## 6.3.8
+
+### Patch Changes
+
+-   [`9d5e65cb`](https://github.com/mobxjs/mobx/commit/9d5e65cbd612f262d925e57cebb559f5cf36c502) [#3193](https://github.com/mobxjs/mobx/pull/3193) Thanks [@ChocolateLoverRaj](https://github.com/ChocolateLoverRaj)! - Make `IAtom['reportObserved']` return `boolean`
+
+*   [`55508af6`](https://github.com/mobxjs/mobx/commit/55508af690fa875e6affaf30f34280b3f27b6126) [#3189](https://github.com/mobxjs/mobx/pull/3189) Thanks [@RvanderLaan](https://github.com/RvanderLaan)! - Fix for RangeError in ObservableArray.replace for large arrays
+
+## 6.3.7
+
+### Patch Changes
+
+-   [`3a7dee6f`](https://github.com/mobxjs/mobx/commit/3a7dee6fdaddbb4b79205b054601a8020c226fcc) [#3180](https://github.com/mobxjs/mobx/pull/3180) Thanks [@kubk](https://github.com/kubk)! - Fix type inference of observe function
+
+## 6.3.6
+
+### Patch Changes
+
+-   [`49468204`](https://github.com/mobxjs/mobx/commit/49468204d3bc28d15dbf383c0b7f874ca26dff30) [#3162](https://github.com/mobxjs/mobx/pull/3162) Thanks [@upsuper](https://github.com/upsuper)! - Have cancelled when reject with an error rather than a string
+
+*   [`4afb1ec2`](https://github.com/mobxjs/mobx/commit/4afb1ec24427cf8e1f768d0c6fc49d0f44f4ab8e) [#3154](https://github.com/mobxjs/mobx/pull/3154) Thanks [@urugator](https://github.com/urugator)! - `makeObservable` throws when mixing @decorator syntax with annotations
+
+## 6.3.5
+
+### Patch Changes
+
+-   [`4ac6b454`](https://github.com/mobxjs/mobx/commit/4ac6b45473c2e3b07c8e683cd395bc5edfaa8e15) [#3146](https://github.com/mobxjs/mobx/pull/3146) Thanks [@urugator](https://github.com/urugator)! - fix #3109: spy: computed shouldn't report update unless the value changed
+
+## 6.3.4
+
+### Patch Changes
+
+-   [`0dbf3eb6`](https://github.com/mobxjs/mobx/commit/0dbf3eb6eecfa9cd6cd9dc7d707e8d70927e79bf) [#3141](https://github.com/mobxjs/mobx/pull/3141) Thanks [@urugator](https://github.com/urugator)! - [spy: bound actions report correct object](https://github.com/mobxjs/mobx/discussions/3140)
+
+## 6.3.3
+
+### Patch Changes
+
+-   [`d78a1592`](https://github.com/mobxjs/mobx/commit/d78a15929052b96698b3355a0b4c8335750422db) [#2902](https://github.com/mobxjs/mobx/pull/2902) Thanks [@z3rog](https://github.com/z3rog)! - chore: observable use internal constants
+
+*   [`db21d85f`](https://github.com/mobxjs/mobx/commit/db21d85fcd41c6c142998f53e722ee0a0e9b5c18) [#2998](https://github.com/mobxjs/mobx/pull/2998) Thanks [@urugator](https://github.com/urugator)! - `trace()`: log when computed becomes suspended
+    `requiresReaction` warns instead of throwing
+
+-   [`b9fa119c`](https://github.com/mobxjs/mobx/commit/b9fa119c90e23d4b327763189f24c00be2fb2c26) [#3056](https://github.com/mobxjs/mobx/pull/3056) Thanks [@upsuper](https://github.com/upsuper)! - Create WHEN_TIMEOUT error earlier to capture useful stack
+
+*   [`99491ec2`](https://github.com/mobxjs/mobx/commit/99491ec2d315a3a01cdbe40d9a24d920a09cbd0e) [#2972](https://github.com/mobxjs/mobx/pull/2972) Thanks [@kk-gjyang](https://github.com/kk-gjyang)! - Polyfill `Object.is` for old/unsupported browsers
+
+-   [`0d28db8a`](https://github.com/mobxjs/mobx/commit/0d28db8a0ba99f5cce744bb83b5bd88ec45a7e41) [#2927](https://github.com/mobxjs/mobx/pull/2927) Thanks [@upsuper](https://github.com/upsuper)! - Give proper typing to opts.equals of reaction
+
+*   [`c6dc925c`](https://github.com/mobxjs/mobx/commit/c6dc925c6cf7eeff9237ee07c55927a7bbc14cb7) [#2985](https://github.com/mobxjs/mobx/pull/2985) Thanks [@fecqs](https://github.com/fecqs)! - Remove duplicate global property check
+
 ## 6.3.2
 
 ### Patch Changes
@@ -133,7 +363,7 @@ Support the ongoing maintenance at: https://opencollective.com/mobx
 
 [`28f8a11d`](https://github.com/mobxjs/mobx/commit/28f8a11d8b94f1aca2eec4ae9c5f45c5ea2f4362) [#2641](https://github.com/mobxjs/mobx/pull/2641) Thanks [@urugator](https://github.com/urugator)!
 
--   `action`, `computed`, `flow` defined on prototype can be overriden by subclass via `override` annotation/decorator. Previously broken.
+-   `action`, `computed`, `flow` defined on prototype can be overridden by subclass via `override` annotation/decorator. Previously broken.
 -   Overriding anything defined on instance itself (`this`) is not supported and should throw. Previously partially possible or broken.
 -   Attempt to re-annotate property always throws. Previously mostly undefined outcome.
 -   All annotated and non-observable props (action/flow) are non-writable. Previously writable.
@@ -1394,7 +1624,7 @@ function Square() {
 
 -   Fixed #360: Removed expensive cycle detection (cycles are still detected, but a bit later)
 -   Fixed #377: `toJS` serialization of Dates and Regexes preserves the original values
--   Fixed #379: `@action` decorated methods can now be inherited / overriden
+-   Fixed #379: `@action` decorated methods can now be inherited / overridden
 
 ## 2.3.3
 

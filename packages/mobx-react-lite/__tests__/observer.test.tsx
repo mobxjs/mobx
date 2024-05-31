@@ -9,6 +9,11 @@ const getDNode = (obj: any, prop?: string) => mobx.getObserverTree(obj, prop)
 
 afterEach(cleanup)
 
+let consoleWarnMock: jest.SpyInstance | undefined
+afterEach(() => {
+    consoleWarnMock?.mockRestore()
+})
+
 function runTestSuite(mode: "observer" | "useObserver") {
     function obsComponent<P extends object>(
         component: React.FunctionComponent<P>,
@@ -18,6 +23,7 @@ function runTestSuite(mode: "observer" | "useObserver") {
             return observer(component)
         } else {
             const c = (props: P) => {
+                consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
                 return useObserver(() => {
                     return component(props)
                 })
@@ -270,7 +276,9 @@ function runTestSuite(mode: "observer" | "useObserver") {
 
     describe("issue 309", () => {
         test("isObserverBatched is still defined and yields true by default", () => {
+            consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
             expect(isObserverBatched()).toBe(true)
+            expect(consoleWarnMock).toMatchSnapshot()
         })
     })
 
@@ -282,9 +290,10 @@ function runTestSuite(mode: "observer" | "useObserver") {
                 try {
                     data.set(4) // wouldn't throw first time for lack of observers.. (could we tighten this?)
                 } catch (err) {
-                    expect(
-                        /Side effects like changing state are not allowed at this point/.test(err)
-                    ).toBeTruthy()
+                    expect(err).toBeInstanceOf(Error)
+                    expect(err).toMatch(
+                        /Side effects like changing state are not allowed at this point/
+                    )
                 }
             }
             return <div>{data.get()}</div>
@@ -429,7 +438,7 @@ function runTestSuite(mode: "observer" | "useObserver") {
             const x = mobx.observable.box(1)
             const errorsSeen: any[] = []
 
-            class ErrorBoundary extends React.Component {
+            class ErrorBoundary extends React.Component<{ children: any }> {
                 public static getDerivedStateFromError() {
                     return { hasError: true }
                 }
@@ -480,16 +489,19 @@ function runTestSuite(mode: "observer" | "useObserver") {
 runTestSuite("observer")
 runTestSuite("useObserver")
 
-test("useImperativeHandle and forwardRef should work with observer", () => {
+test("observer(cmp, { forwardRef: true }) + useImperativeHandle", () => {
+    consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
+
     interface IMethods {
         focus(): void
     }
 
     interface IProps {
         value: string
+        ref: React.Ref<IMethods>
     }
 
-    const FancyInput = observer(
+    const FancyInput = observer<IProps>(
         (props: IProps, ref: React.Ref<IMethods>) => {
             const inputRef = React.useRef<HTMLInputElement>(null)
             React.useImperativeHandle(
@@ -511,9 +523,43 @@ test("useImperativeHandle and forwardRef should work with observer", () => {
     expect(cr).toBeTruthy()
     expect(cr.current).toBeTruthy()
     expect(typeof cr.current!.focus).toBe("function")
+    expect(consoleWarnMock).toMatchSnapshot()
+})
+
+test("observer(forwardRef(cmp)) + useImperativeHandle", () => {
+    interface IMethods {
+        focus(): void
+    }
+
+    interface IProps {
+        value: string
+    }
+
+    const FancyInput = observer(
+        React.forwardRef((props: IProps, ref: React.Ref<IMethods>) => {
+            const inputRef = React.useRef<HTMLInputElement>(null)
+            React.useImperativeHandle(
+                ref,
+                () => ({
+                    focus: () => {
+                        inputRef.current!.focus()
+                    }
+                }),
+                []
+            )
+            return <input ref={inputRef} defaultValue={props.value} />
+        })
+    )
+
+    const cr = React.createRef<IMethods>()
+    render(<FancyInput ref={cr} value="" />)
+    expect(cr).toBeTruthy()
+    expect(cr.current).toBeTruthy()
+    expect(typeof cr.current!.focus).toBe("function")
 })
 
 test("useImperativeHandle and forwardRef should work with useObserver", () => {
+    consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
     interface IMethods {
         focus(): void
     }
@@ -545,6 +591,7 @@ test("useImperativeHandle and forwardRef should work with useObserver", () => {
     expect(cr).toBeTruthy()
     expect(cr.current).toBeTruthy()
     expect(typeof cr.current!.focus).toBe("function")
+    expect(consoleWarnMock).toMatchSnapshot()
 })
 
 it("should hoist known statics only", () => {
@@ -563,7 +610,6 @@ it("should hoist known statics only", () => {
     MyHipsterComponent.render = "Nope!"
 
     const wrapped = observer(MyHipsterComponent)
-    expect(wrapped.displayName).toBe("MyHipsterComponent")
     expect(wrapped.randomStaticThing).toEqual(3)
     expect(wrapped.defaultProps).toEqual({ x: 3 })
     expect(wrapped.propTypes).toEqual({ x: isNumber })
@@ -572,12 +618,15 @@ it("should hoist known statics only", () => {
     expect(wrapped.render).toBe(undefined)
 })
 
-it("should have the correct displayName", () => {
-    const TestComponent = observer(function MyComponent() {
+it("should inherit original name/displayName #3438", () => {
+    function Name() {
         return null
-    })
+    }
+    Name.displayName = "DisplayName"
+    const TestComponent = observer(Name)
 
-    expect((TestComponent as any).type.displayName).toBe("MyComponent")
+    expect((TestComponent as any).type.name).toBe("Name")
+    expect((TestComponent as any).type.displayName).toBe("DisplayName")
 })
 
 test("parent / childs render in the right order", done => {
@@ -641,7 +690,7 @@ test("parent / childs render in the right order", done => {
     render(<Parent />)
 
     tryLogout()
-    expect(events).toEqual(["parent", "child", "parent"])
+    expect(events).toEqual(["parent", "child"])
     done()
 })
 
@@ -649,7 +698,7 @@ it("should have overload for props with children", () => {
     interface IProps {
         value: string
     }
-    const TestComponent = observer<IProps>(({ value, children }) => {
+    const TestComponent = observer<IProps>(({ value }) => {
         return null
     })
 
@@ -665,7 +714,7 @@ it("should have overload for empty options", () => {
     interface IProps {
         value: string
     }
-    const TestComponent = observer<IProps>(({ value, children }) => {
+    const TestComponent = observer<IProps>(({ value }) => {
         return null
     }, {})
 
@@ -683,7 +732,7 @@ it("should have overload for props with children when forwardRef", () => {
         value: string
     }
     const TestComponent = observer<IProps, IMethods>(
-        ({ value, children }, ref) => {
+        ({ value }, ref) => {
             return null
         },
         { forwardRef: true }
@@ -880,9 +929,8 @@ it("dependencies should not become temporarily unobserved", async () => {
 
     // @ts-ignore
     React.useEffect.mockImplementation(effect => {
-        console.warn("delaying useEffect call")
         p.push(
-            new Promise(resolve => {
+            new Promise<void>(resolve => {
                 setTimeout(() => {
                     act(() => {
                         cleanups.push(effect())
@@ -947,4 +995,136 @@ it("dependencies should not become temporarily unobserved", async () => {
     expect(computed).toBe(2)
     expect(renders).toBe(2)
     expect(doubleDisposed).toBeCalledTimes(1)
+})
+
+it("Legacy context support", () => {
+    const contextKey = "key"
+    const contextValue = "value"
+
+    function ContextConsumer(_, context) {
+        expect(context[contextKey]).toBe(contextValue)
+        return null
+    }
+
+    ContextConsumer.contextTypes = {
+        [contextKey]: () => null
+    }
+
+    const ObserverContextConsumer = observer(ContextConsumer)
+
+    class ContextProvider extends React.Component {
+        getChildContext() {
+            return { [contextKey]: contextValue }
+        }
+
+        render() {
+            return <ObserverContextConsumer />
+        }
+    }
+
+    ;(ContextProvider as any).childContextTypes = {
+        [contextKey]: () => null
+    }
+
+    render(<ContextProvider />)
+})
+
+it("Throw when trying to set contextType on observer", () => {
+    const NamedObserver = observer(function TestCmp() {
+        return null
+    })
+    const AnonymousObserver = observer(() => null)
+    expect(() => {
+        ;(NamedObserver as any).contextTypes = {}
+    }).toThrow(/\[mobx-react-lite\] `TestCmp.contextTypes` must be set before applying `observer`./)
+    expect(() => {
+        ;(AnonymousObserver as any).contextTypes = {}
+    }).toThrow(
+        /\[mobx-react-lite\] `Component.contextTypes` must be set before applying `observer`./
+    )
+})
+
+test("Anonymous component displayName #3192", () => {
+    // React prints errors even if we catch em
+    const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {})
+
+    // Simulate returning something not renderable:
+    // Error: n_a_m_e(...):
+    // The point is to get correct displayName in error msg.
+
+    let memoError
+    let observerError
+
+    // @ts-ignore
+    const MemoCmp = React.memo(() => {
+        return { hello: "world" }
+    })
+    // @ts-ignore
+    const ObserverCmp = observer(() => {
+        return { hello: "world" }
+    })
+
+    ObserverCmp.displayName = MemoCmp.displayName = "n_a_m_e"
+
+    try {
+        render(<MemoCmp />)
+    } catch (error) {
+        memoError = error
+    }
+
+    try {
+        // @ts-ignore
+        render(<ObserverCmp />)
+    } catch (error) {
+        observerError = error
+    }
+
+    expect(memoError).toBeInstanceOf(Error)
+    expect(observerError).toBeInstanceOf(Error)
+
+    expect(memoError.message.includes(MemoCmp.displayName))
+    expect(MemoCmp.displayName).toEqual(ObserverCmp.displayName)
+    expect(observerError.message).toEqual(memoError.message)
+    consoleErrorSpy.mockRestore()
+})
+
+test("StrictMode #3671", async () => {
+    const o = mobx.observable({ x: 0 })
+
+    const Cmp = observer(() => o.x as any)
+
+    const { container, unmount } = render(
+        <React.StrictMode>
+            <Cmp />
+        </React.StrictMode>
+    )
+
+    expect(container).toHaveTextContent("0")
+    act(
+        mobx.action(() => {
+            o.x++
+        })
+    )
+    expect(container).toHaveTextContent("1")
+})
+
+test("`isolateGlobalState` shouldn't break reactivity #3734", async () => {
+    mobx.configure({ isolateGlobalState: true })
+
+    const o = mobx.observable({ x: 0 })
+
+    const Cmp = observer(() => o.x as any)
+
+    const { container, unmount } = render(<Cmp />)
+
+    expect(container).toHaveTextContent("0")
+    act(
+        mobx.action(() => {
+            o.x++
+        })
+    )
+    expect(container).toHaveTextContent("1")
+    unmount()
+
+    mobx._resetGlobalState()
 })

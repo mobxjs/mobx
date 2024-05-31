@@ -21,11 +21,13 @@ function toJSHelper(source, __alreadySeen: Map<any, any>) {
         typeof source !== "object" ||
         source instanceof Date ||
         !isObservable(source)
-    )
+    ) {
         return source
+    }
 
-    if (isObservableValue(source) || isComputedValue(source))
+    if (isObservableValue(source) || isComputedValue(source)) {
         return toJSHelper(source.get(), __alreadySeen)
+    }
     if (__alreadySeen.has(source)) {
         return __alreadySeen.get(source)
     }
@@ -62,9 +64,14 @@ function toJSHelper(source, __alreadySeen: Map<any, any>) {
 }
 
 /**
- * Basically, a deep clone, so that no reactive property will exist anymore.
+ * Recursively converts an observable to it's non-observable native counterpart.
+ * It does NOT recurse into non-observables, these are left as they are, even if they contain observables.
+ * Computed and other non-enumerable properties are completely ignored.
+ * Complex scenarios require custom solution, eg implementing `toJSON` or using `serializr` lib.
  */
 export function toJS<T>(source: T, options?: any): T {
-    if (__DEV__ && options) die("toJS no longer supports options")
+    if (__DEV__ && options) {
+        die("toJS no longer supports options")
+    }
     return toJSHelper(source, new Map())
 }

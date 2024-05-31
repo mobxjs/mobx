@@ -137,7 +137,10 @@ export function checkIfStateModificationsAreAllowed(atom: IAtom) {
     }
     const hasObservers = atom.observers_.size > 0
     // Should not be possible to change observed state outside strict mode, except during initialization, see #563
-    if (!globalState.allowStateChanges && (hasObservers || globalState.enforceActions === "always"))
+    if (
+        !globalState.allowStateChanges &&
+        (hasObservers || globalState.enforceActions === "always")
+    ) {
         console.warn(
             "[MobX] " +
                 (globalState.enforceActions
@@ -145,11 +148,14 @@ export function checkIfStateModificationsAreAllowed(atom: IAtom) {
                     : "Side effects like changing state are not allowed at this point. Are you trying to modify state from, for example, a computed value or the render function of a React component? You can wrap side effects in 'runInAction' (or decorate functions with 'action') if needed. Tried to modify: ") +
                 atom.name_
         )
+    }
 }
 
 export function checkIfStateReadsAreAllowed(observable: IObservable) {
     if (__DEV__ && !globalState.allowStateReads && globalState.observableRequiresReaction) {
-        console.warn(`[mobx] Observable ${observable.name_} being read outside a reactive context`)
+        console.warn(
+            `[mobx] Observable '${observable.name_}' being read outside a reactive context.`
+        )
     }
 }
 
@@ -160,10 +166,13 @@ export function checkIfStateReadsAreAllowed(observable: IObservable) {
  */
 export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T, context: any) {
     const prevAllowStateReads = allowStateReadsStart(true)
-    // pre allocate array allocation + room for variation in deps
-    // array will be trimmed by bindDependencies
     changeDependenciesStateTo0(derivation)
-    derivation.newObserving_ = new Array(derivation.observing_.length + 100)
+    // Preallocate array; will be trimmed by bindDependencies.
+    derivation.newObserving_ = new Array(
+        // Reserve constant space for initial dependencies, dynamic space otherwise.
+        // See https://github.com/mobxjs/mobx/pull/3833
+        derivation.runId_ === 0 ? 100 : derivation.observing_.length
+    )
     derivation.unboundDepsCount_ = 0
     derivation.runId_ = ++globalState.runId
     const prevTracking = globalState.trackingDerivation
@@ -189,13 +198,21 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T, con
 }
 
 function warnAboutDerivationWithoutDependencies(derivation: IDerivation) {
-    if (!__DEV__) return
+    if (!__DEV__) {
+        return
+    }
 
-    if (derivation.observing_.length !== 0) return
+    if (derivation.observing_.length !== 0) {
+        return
+    }
 
-    if (globalState.reactionRequiresObservable || derivation.requiresObservable_) {
+    if (
+        typeof derivation.requiresObservable_ === "boolean"
+            ? derivation.requiresObservable_
+            : globalState.reactionRequiresObservable
+    ) {
         console.warn(
-            `[mobx] Derivation ${derivation.name_} is created/updated without reading any observable value`
+            `[mobx] Derivation '${derivation.name_}' is created/updated without reading any observable value.`
         )
     }
 }
@@ -220,14 +237,16 @@ function bindDependencies(derivation: IDerivation) {
         const dep = observing[i]
         if (dep.diffValue_ === 0) {
             dep.diffValue_ = 1
-            if (i0 !== i) observing[i0] = dep
+            if (i0 !== i) {
+                observing[i0] = dep
+            }
             i0++
         }
 
         // Upcast is 'safe' here, because if dep is IObservable, `dependenciesState` will be undefined,
         // not hitting the condition
-        if (((dep as any) as IDerivation).dependenciesState_ > lowestNewObservingDerivationState) {
-            lowestNewObservingDerivationState = ((dep as any) as IDerivation).dependenciesState_
+        if ((dep as any as IDerivation).dependenciesState_ > lowestNewObservingDerivationState) {
+            lowestNewObservingDerivationState = (dep as any as IDerivation).dependenciesState_
         }
     }
     observing.length = i0
@@ -270,7 +289,9 @@ export function clearObserving(derivation: IDerivation) {
     const obs = derivation.observing_
     derivation.observing_ = []
     let i = obs.length
-    while (i--) removeObserver(obs[i], derivation)
+    while (i--) {
+        removeObserver(obs[i], derivation)
+    }
 
     derivation.dependenciesState_ = IDerivationState_.NOT_TRACKING_
 }
@@ -309,10 +330,14 @@ export function allowStateReadsEnd(prev: boolean) {
  *
  */
 export function changeDependenciesStateTo0(derivation: IDerivation) {
-    if (derivation.dependenciesState_ === IDerivationState_.UP_TO_DATE_) return
+    if (derivation.dependenciesState_ === IDerivationState_.UP_TO_DATE_) {
+        return
+    }
     derivation.dependenciesState_ = IDerivationState_.UP_TO_DATE_
 
     const obs = derivation.observing_
     let i = obs.length
-    while (i--) obs[i].lowestObserverState_ = IDerivationState_.UP_TO_DATE_
+    while (i--) {
+        obs[i].lowestObserverState_ = IDerivationState_.UP_TO_DATE_
+    }
 }

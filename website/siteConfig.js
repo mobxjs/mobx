@@ -25,7 +25,7 @@ const siteConfig = {
         apiKey: '500db32fbdbd53a814f42aafdfa26bd4',
         indexName: 'mobxjs',
     },
-    title: "MobX", // Title for your website.
+    title: "MobX 🇺🇦", // Title for your website.
     tagline: "Simple, scalable state management",
 
     // For github.io type URLs, you would set the url and baseUrl like:
@@ -52,7 +52,8 @@ const siteConfig = {
     // For no header links in the top nav bar -> headerLinks: [],
     headerLinks: [
         { doc: "api", label: "API Reference" },
-        { href: "https://zh.mobx.js.org", label: "中文(寻求翻译)" },
+        { href: "https://zh.mobx.js.org", label: "中文" },
+        { href: "https://ko.mobx.js.org", label: "한국어" },
         { doc: "backers-sponsors", label: "Sponsors" },
         { href: "https://github.com/mobxjs/mobx", label: "GitHub" }
     ],
@@ -110,8 +111,6 @@ myOtherFont: [
     ogImage: "img/undraw_online.svg",
     twitterImage: "img/undraw_tweetstorm.svg",
 
-    gaTrackingId: "UA-65632006-1",
-
     // Show documentation's last contributor's name.
     // enableUpdateBy: true,
 
@@ -120,7 +119,9 @@ myOtherFont: [
 
     // You may provide arbitrary config keys to be used as needed by your
     // template. For example, if you need your repo's URL...
-    repoUrl: "https://github.com/mobxjs/mobx"
+    repoUrl: "https://github.com/mobxjs/mobx",
+    gaGtag: true,
+    gaTrackingId: "G-7XBWTSGJ80",
 }
 
 module.exports = siteConfig

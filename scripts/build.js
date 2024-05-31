@@ -1,8 +1,6 @@
 const fs = require("fs-extra")
-const path = require("path")
 const execa = require("execa")
 const minimist = require("minimist")
-const { basename } = require("path")
 
 const stdio = ["ignore", "inherit", "pipe"]
 const opts = { stdio }

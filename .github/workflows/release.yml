@@ -11,18 +11,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@master
+        uses: actions/checkout@main
         with:
           # This makes Actions fetch all Git history so that Changesets can generate changelogs with the correct commits
           fetch-depth: 0
 
-      - name: Setup Node.js 12.x
+      - name: Setup Node.js 20.x
         uses: actions/setup-node@master
         with:
-          node-version: 12.x
+          node-version: 20.x
 
       - name: Install Dependencies
         run: yarn
+
+      - name: Build packages
+        run: yarn lerna run build
 
       - name: Create Release Pull Request or Publish to npm
         id: changesets

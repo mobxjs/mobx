@@ -14,7 +14,8 @@ import {
     ACTION,
     EMPTY_ARRAY,
     die,
-    getDescriptor
+    getDescriptor,
+    defineProperty
 } from "../internal"
 
 // we don't use globalState for these in order to avoid possible issues with multiple
@@ -38,17 +39,21 @@ export function createAction(
     ref?: Object
 ): Function {
     if (__DEV__) {
-        if (!isFunction(fn)) die("`action` can only be invoked on functions")
-        if (typeof actionName !== "string" || !actionName)
+        if (!isFunction(fn)) {
+            die("`action` can only be invoked on functions")
+        }
+        if (typeof actionName !== "string" || !actionName) {
             die(`actions should have valid names, got: '${actionName}'`)
+        }
     }
     function res() {
         return executeAction(actionName, autoAction, fn, ref || this, arguments)
     }
     res.isMobxAction = true
+    res.toString = () => fn.toString()
     if (isFunctionNameConfigurable) {
         tmpNameDescriptor.value = actionName
-        Object.defineProperty(res, "name", tmpNameDescriptor)
+        defineProperty(res, "name", tmpNameDescriptor)
     }
     return res
 }
@@ -136,7 +141,9 @@ export function _endAction(runInfo: IActionRunInfo) {
     allowStateChangesEnd(runInfo.prevAllowStateChanges_)
     allowStateReadsEnd(runInfo.prevAllowStateReads_)
     endBatch()
-    if (runInfo.runAsAction_) untrackedEnd(runInfo.prevDerivation_)
+    if (runInfo.runAsAction_) {
+        untrackedEnd(runInfo.prevDerivation_)
+    }
     if (__DEV__ && runInfo.notifySpy_) {
         spyReportEnd({ time: Date.now() - runInfo.startTime_ })
     }

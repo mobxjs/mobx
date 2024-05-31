@@ -4,6 +4,11 @@ const mobx = require("../../../src/mobx.ts")
 const { observable, when, _getAdministration, reaction, computed, makeObservable, autorun } = mobx
 const iterall = require("iterall")
 
+let consoleWarnSpy
+afterEach(() => {
+    consoleWarnSpy?.mockRestore()
+})
+
 test("test1", function () {
     const a = observable.array([])
     expect(a.length).toBe(0)
@@ -169,6 +174,34 @@ test("find(findIndex) and remove", function () {
     expect(a.find(predicate)).toBe(undefined)
     expect(idx).toBe(-1)
     expect(a.findIndex(predicate)).toBe(-1)
+
+    expect(a.remove(20)).toBe(false)
+})
+
+test("findLast(findLastIndex) and remove", function () {
+    const a = mobx.observable([10, 20, 20])
+    let idx = -1
+    function predicate(item, index) {
+        if (item === 20) {
+            idx = index
+            return true
+        }
+        return false
+    }
+    ;[].findLastIndex;
+    expect(a.findLast(predicate)).toBe(20)
+    expect(a.findLastIndex(predicate)).toBe(2)
+    expect(a.findLast(predicate)).toBe(20)
+
+    expect(a.remove(20)).toBe(true)
+    expect(a.find(predicate)).toBe(20)
+    expect(idx).toBe(1)
+    expect(a.findIndex(predicate)).toBe(1)
+    idx = -1
+    expect(a.remove(20)).toBe(true)
+    expect(a.findLast(predicate)).toBe(undefined)
+    expect(idx).toBe(-1)
+    expect(a.findLastIndex(predicate)).toBe(-1)
 
     expect(a.remove(20)).toBe(false)
 })
@@ -395,26 +428,6 @@ test("array exposes correct keys", () => {
     for (const key in ar) keys.push(key)
 
     expect(keys).toEqual(["0", "1"])
-})
-
-test("accessing out of bound values throws", () => {
-    const a = mobx.observable([])
-
-    let warns = 0
-    const baseWarn = console.warn
-    console.warn = () => {
-        warns++
-    }
-
-    a[0] // out of bounds
-    a[1] // out of bounds
-
-    expect(warns).toBe(2)
-
-    expect(() => (a[0] = 3)).not.toThrow()
-    expect(() => (a[2] = 4)).toThrow(/Index out of bounds, 2 is larger than 1/)
-
-    console.warn = baseWarn
 })
 
 test("replace can handle large arrays", () => {
@@ -645,6 +658,8 @@ test("correct array should be passed to callbacks #2326", () => {
         "filter",
         "find",
         "findIndex",
+        "findLast",
+        "findLastIndex",
         "flatMap",
         "forEach",
         "map",
@@ -822,6 +837,31 @@ describe("dehances", () => {
         expect([...array.values()]).toEqual([...dehanced.values()])
     })
 
+    test("toReversed", () => {
+        expect(array.toReversed()).toEqual(dehanced.toReversed())
+    })
+
+    test("toSorted", () => {
+        expect(array.toSorted()).toEqual(dehanced.toSorted())
+    })
+
+    test("toSorted with args", () => {
+        expect(array.toSorted((a, b) => a - b)).toEqual(dehanced.toSorted((a, b) => a - b))
+    })
+
+    test("toSpliced", () => {
+        expect(array.toSpliced(1, 2)).toEqual(dehanced.toSpliced(1, 2))
+    })
+
+    test("with", () => {
+        expect(array.with(1, 5)).toEqual(dehanced.with(1, 5))
+    })
+
+    test("at", () => {
+        expect(array.at(1)).toEqual(dehanced.at(1))
+        expect(array.at(-1)).toEqual(dehanced.at(-1))
+    })
+
     test("flat/flatMap", () => {
         const nestedArray = [{ value: 1 }, [{ value: 2 }, [{ value: 3 }]]]
         const dehancedNestedArray = nestedArray.map(dehancer)
@@ -859,4 +899,18 @@ test("reduce without initial value #2432", () => {
     expect(arraySum).toEqual(1 + 2 + 3)
     expect(observableArraySum).toEqual(arraySum)
     expect(arrayReducerArgs).toEqual(observableArrayReducerArgs)
+})
+
+test("accessing out of bound indices is supported", () => {
+    consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation(() => {
+        throw new Error(`Unexpected console.warn call`)
+    })
+
+    const array = observable([])
+
+    array[1]
+    array[2]
+    array[1001] = "foo"
+    expect(array.length).toBe(1002)
+    expect(array[1001]).toBe("foo")
 })

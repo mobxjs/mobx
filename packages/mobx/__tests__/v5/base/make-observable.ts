@@ -1642,3 +1642,63 @@ test("flow.bound #2941", async () => {
     expect(isFlow(Clazz.prototype.flowBound)).toBe(true)
     expect(await Clazz.prototype.flowBound.call("ctx")).toBe("ctx")
 })
+
+test("makeObservable throws when mixing @decorators with annotations", () => {
+    class Test {
+        @observable x = 3
+
+        constructor() {
+            makeObservable(this, {})
+        }
+    }
+
+    expect(() => new Test()).toThrow(
+        /makeObservable second arg must be nullish when using decorators/
+    )
+})
+
+test("makeAutoObservable + Object.create #3197", () => {
+    const proto = {
+        action() {},
+        *flow() {},
+        get computed() {
+            return null
+        }
+    }
+    const o = Object.create(proto)
+    o.observable = 5
+    makeAutoObservable(o)
+    expect(isAction(proto.action)).toBe(true)
+    expect(isFlow(proto.flow)).toBe(true)
+    expect(isComputedProp(o, "computed")).toBe(true)
+    expect(isObservableProp(o, "observable")).toBe(true)
+})
+
+test("flow.bound #3271", async () => {
+    class Test {
+        constructor() {
+            makeObservable(this, { flowBound: flow.bound })
+        }
+        *flowBound() {
+            return this
+        }
+    }
+
+    const t1 = new Test()
+    const t2 = new Test()
+
+    // Make sure flow is actually bindable
+    expect(
+        await flow(function* () {
+            return this
+        }).bind(t1)()
+    ).toBe(t1)
+
+    expect(t1.hasOwnProperty("flowBound")).toBe(true)
+    expect(t2.hasOwnProperty("flowBound")).toBe(true)
+
+    expect(t1.flowBound !== t2.flowBound).toBe(true)
+
+    expect(await t1.flowBound.call(null)).toBe(t1)
+    expect(await t2.flowBound.call(null)).toBe(t2)
+})

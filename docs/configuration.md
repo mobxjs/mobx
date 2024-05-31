@@ -14,8 +14,8 @@ Most configuration options can be set by using the `configure` method.
 ## Proxy support
 
 By default, MobX uses proxies to make arrays and plain objects observable. Proxies provide the best performance and most consistent behavior across environments.
-However, if you are targetting an environment that doesn't support proxies, proxy support has to be disabled.
-Most notably this is the case when targetting Internet Explorer or React Native without using the Hermes engine.
+However, if you are targeting an environment that doesn't support proxies, proxy support has to be disabled.
+Most notably this is the case when targeting Internet Explorer or React Native without using the Hermes engine.
 
 Proxy support can be disabled by using `configure`:
 
@@ -68,9 +68,14 @@ configure({
 At some point you will discover that this level of strictness can be pretty annoying.
 It is fine to disable these rules to gain productivity once you are sure you (and your colleagues) grokked the mental model of MobX.
 
-Also, occassionally you will have a case where you have to supress the warnings triggered by these rules (for example by wrapping in `runInAction`).
+Also, occasionally you will have a case where you have to suppress the warnings triggered by these rules (for example by wrapping in `runInAction`).
 That is fine, there are good exceptions to these recommendations.
-Don't be fundamentalistic about them.
+Don't be fundamentalist about them.
+
+Make sure to also try our [`eslint` plugin](https://github.com/mobxjs/mobx/blob/main/packages/eslint-plugin-mobx/README.md).
+While some problems are discoverable statically, others are detectable only at runtime.
+The plugin is intended to complement these rules, not to replace them.
+The autofix feature can also help with the boilerplate code.
 
 #### `enforceActions`
 

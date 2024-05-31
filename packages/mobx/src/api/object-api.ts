@@ -20,9 +20,9 @@ export function keys<T>(set: ObservableSet<T>): ReadonlyArray<T>
 export function keys<T extends Object>(obj: T): ReadonlyArray<PropertyKey>
 export function keys(obj: any): any {
     if (isObservableObject(obj)) {
-        return (((obj as any) as IIsObservableObject)[
-            $mobx
-        ] as ObservableObjectAdministration).keys_()
+        return (
+            (obj as any as IIsObservableObject)[$mobx] as ObservableObjectAdministration
+        ).keys_()
     }
     if (isObservableMap(obj) || isObservableSet(obj)) {
         return Array.from(obj.keys())
@@ -86,26 +86,36 @@ export function set(obj: any, key: any, value?: any): void {
         startBatch()
         const values = key
         try {
-            for (let key in values) set(obj, key, values[key])
+            for (let key in values) {
+                set(obj, key, values[key])
+            }
         } finally {
             endBatch()
         }
         return
     }
     if (isObservableObject(obj)) {
-        ;((obj as any) as IIsObservableObject)[$mobx].set_(key, value)
+        ;(obj as any as IIsObservableObject)[$mobx].set_(key, value)
     } else if (isObservableMap(obj)) {
         obj.set(key, value)
     } else if (isObservableSet(obj)) {
         obj.add(key)
     } else if (isObservableArray(obj)) {
-        if (typeof key !== "number") key = parseInt(key, 10)
-        if (key < 0) die(`Invalid index: '${key}'`)
+        if (typeof key !== "number") {
+            key = parseInt(key, 10)
+        }
+        if (key < 0) {
+            die(`Invalid index: '${key}'`)
+        }
         startBatch()
-        if (key >= obj.length) obj.length = key + 1
+        if (key >= obj.length) {
+            obj.length = key + 1
+        }
         obj[key] = value
         endBatch()
-    } else die(8)
+    } else {
+        die(8)
+    }
 }
 
 export function remove<K, V>(obj: ObservableMap<K, V>, key: K)
@@ -114,13 +124,15 @@ export function remove<T>(obj: IObservableArray<T>, index: number)
 export function remove<T extends Object>(obj: T, key: string)
 export function remove(obj: any, key: any): void {
     if (isObservableObject(obj)) {
-        ;((obj as any) as IIsObservableObject)[$mobx].delete_(key)
+        ;(obj as any as IIsObservableObject)[$mobx].delete_(key)
     } else if (isObservableMap(obj)) {
         obj.delete(key)
     } else if (isObservableSet(obj)) {
         obj.delete(key)
     } else if (isObservableArray(obj)) {
-        if (typeof key !== "number") key = parseInt(key, 10)
+        if (typeof key !== "number") {
+            key = parseInt(key, 10)
+        }
         obj.splice(key, 1)
     } else {
         die(9)
@@ -133,7 +145,7 @@ export function has<T>(obj: IObservableArray<T>, index: number): boolean
 export function has<T extends Object>(obj: T, key: string): boolean
 export function has(obj: any, key: any): boolean {
     if (isObservableObject(obj)) {
-        return ((obj as any) as IIsObservableObject)[$mobx].has_(key)
+        return (obj as any as IIsObservableObject)[$mobx].has_(key)
     } else if (isObservableMap(obj)) {
         return obj.has(key)
     } else if (isObservableSet(obj)) {
@@ -148,9 +160,11 @@ export function get<K, V>(obj: ObservableMap<K, V>, key: K): V | undefined
 export function get<T>(obj: IObservableArray<T>, index: number): T | undefined
 export function get<T extends Object>(obj: T, key: string): any
 export function get(obj: any, key: any): any {
-    if (!has(obj, key)) return undefined
+    if (!has(obj, key)) {
+        return undefined
+    }
     if (isObservableObject(obj)) {
-        return ((obj as any) as IIsObservableObject)[$mobx].get_(key)
+        return (obj as any as IIsObservableObject)[$mobx].get_(key)
     } else if (isObservableMap(obj)) {
         return obj.get(key)
     } else if (isObservableArray(obj)) {
@@ -161,14 +175,14 @@ export function get(obj: any, key: any): any {
 
 export function apiDefineProperty(obj: Object, key: PropertyKey, descriptor: PropertyDescriptor) {
     if (isObservableObject(obj)) {
-        return ((obj as any) as IIsObservableObject)[$mobx].defineProperty_(key, descriptor)
+        return (obj as any as IIsObservableObject)[$mobx].defineProperty_(key, descriptor)
     }
     die(39)
 }
 
 export function apiOwnKeys(obj: Object) {
     if (isObservableObject(obj)) {
-        return ((obj as any) as IIsObservableObject)[$mobx].ownKeys_()
+        return (obj as any as IIsObservableObject)[$mobx].ownKeys_()
     }
     die(38)
 }

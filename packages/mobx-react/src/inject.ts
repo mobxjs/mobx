@@ -53,7 +53,10 @@ function getInjectName(component: IReactComponent<any>, injectNames: string): st
 
 function grabStoresByName(
     storeNames: Array<string>
-): (baseStores: IValueMap, nextProps: React.Props<any>) => React.PropsWithRef<any> | undefined {
+): (
+    baseStores: IValueMap,
+    nextProps: React.ClassAttributes<any>
+) => React.PropsWithRef<any> | undefined {
     return function (baseStores, nextProps) {
         storeNames.forEach(function (storeName) {
             if (
@@ -77,7 +80,7 @@ export function inject(
 ): <T extends IReactComponent<any>>(
     target: T
 ) => T & (T extends IReactComponent<infer P> ? IWrappedComponent<P> : never)
-export function inject<S, P, I, C>(
+export function inject<S extends IValueMap = {}, P extends IValueMap = {}, I extends IValueMap = {}, C extends IValueMap = {}>(
     fn: IStoresToProps<S, P, I, C>
 ): <T extends IReactComponent>(target: T) => T & IWrappedComponent<P>
 

@@ -18,7 +18,8 @@ import {
     spyReportStart,
     startBatch,
     trace,
-    trackDerivedFunction
+    trackDerivedFunction,
+    GenericAbortSignal
 } from "../internal"
 
 /**
@@ -47,7 +48,7 @@ export interface IReactionPublic {
 
 export interface IReactionDisposer {
     (): void
-    $mobx: Reaction
+    [$mobx]: Reaction
 }
 
 export class Reaction implements IDerivation, IReactionPublic {
@@ -67,7 +68,7 @@ export class Reaction implements IDerivation, IReactionPublic {
         public name_: string = __DEV__ ? "Reaction@" + getNextId() : "Reaction",
         private onInvalidate_: () => void,
         private errorHandler_?: (error: any, derivation: IDerivation) => void,
-        public requiresObservable_ = false
+        public requiresObservable_?
     ) {}
 
     onBecomeStale_() {
@@ -142,7 +143,9 @@ export class Reaction implements IDerivation, IReactionPublic {
             // disposed during last run. Clean up everything that was bound after the dispose call.
             clearObserving(this)
         }
-        if (isCaughtException(result)) this.reportExceptionInDerivation_(result.cause)
+        if (isCaughtException(result)) {
+            this.reportExceptionInDerivation_(result.cause)
+        }
         if (__DEV__ && notify) {
             spyReportEnd({
                 time: Date.now() - startTime
@@ -157,7 +160,9 @@ export class Reaction implements IDerivation, IReactionPublic {
             return
         }
 
-        if (globalState.disableErrorBoundaries) throw error
+        if (globalState.disableErrorBoundaries) {
+            throw error
+        }
 
         const message = __DEV__
             ? `[mobx] Encountered an uncaught exception that was thrown by a reaction or observer component, in: '${this}'`
@@ -165,7 +170,7 @@ export class Reaction implements IDerivation, IReactionPublic {
         if (!globalState.suppressReactionErrors) {
             console.error(message, error)
             /** If debugging brought you here, please, read the above message :-). Tnx! */
-        } else if (__DEV__) console.warn(`[mobx] (error in reaction '${this.name_}' suppressed, fix error of causing action below)`) // prettier-ignore
+        } else if (__DEV__) { console.warn(`[mobx] (error in reaction '${this.name_}' suppressed, fix error of causing action below)`) } // prettier-ignore
 
         if (__DEV__ && isSpyEnabled()) {
             spyReport({
@@ -191,10 +196,15 @@ export class Reaction implements IDerivation, IReactionPublic {
         }
     }
 
-    getDisposer_(): IReactionDisposer {
-        const r = this.dispose.bind(this) as IReactionDisposer
-        r[$mobx] = this
-        return r
+    getDisposer_(abortSignal?: GenericAbortSignal): IReactionDisposer {
+        const dispose = (() => {
+            this.dispose()
+            abortSignal?.removeEventListener?.("abort", dispose)
+        }) as IReactionDisposer
+        abortSignal?.addEventListener?.("abort", dispose)
+        dispose[$mobx] = this
+
+        return dispose
     }
 
     toString() {
@@ -210,7 +220,9 @@ export function onReactionError(handler: (error: any, derivation: IDerivation) =
     globalState.globalReactionErrorHandlers.push(handler)
     return () => {
         const idx = globalState.globalReactionErrorHandlers.indexOf(handler)
-        if (idx >= 0) globalState.globalReactionErrorHandlers.splice(idx, 1)
+        if (idx >= 0) {
+            globalState.globalReactionErrorHandlers.splice(idx, 1)
+        }
     }
 }
 
@@ -225,7 +237,9 @@ let reactionScheduler: (fn: () => void) => void = f => f()
 
 export function runReactions() {
     // Trampolining, if runReactions are already running, new reactions will be picked up
-    if (globalState.inBatch > 0 || globalState.isRunningReactions) return
+    if (globalState.inBatch > 0 || globalState.isRunningReactions) {
+        return
+    }
     reactionScheduler(runReactionsHelper)
 }
 
@@ -248,8 +262,9 @@ function runReactionsHelper() {
             allReactions.splice(0) // clear reactions
         }
         let remainingReactions = allReactions.splice(0)
-        for (let i = 0, l = remainingReactions.length; i < l; i++)
+        for (let i = 0, l = remainingReactions.length; i < l; i++) {
             remainingReactions[i].runReaction_()
+        }
     }
     globalState.isRunningReactions = false
 }

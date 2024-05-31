@@ -1,8 +1,23 @@
 "use strict"
 
+const { LegacyObservableArray } = require("../../../src/internal")
 const mobx = require("../mobx4")
 const { observable, _getAdministration, reaction, makeObservable } = mobx
 const iterall = require("iterall")
+
+let consoleWarnMock
+afterEach(() => {
+    consoleWarnMock?.mockRestore()
+})
+
+expect.addEqualityTesters([
+    function (a, b, ...rest) {
+        if (a instanceof LegacyObservableArray || b instanceof LegacyObservableArray) {
+            return this.equals([...a], [...b], ...rest)
+        }
+        return undefined
+    }
+])
 
 test("test1", function () {
     const a = observable.array([])
@@ -135,6 +150,34 @@ test("find(findIndex) and remove", function () {
     expect(a.find(predicate)).toBe(undefined)
     expect(idx).toBe(-1)
     expect(a.findIndex(predicate)).toBe(-1)
+
+    expect(a.remove(20)).toBe(false)
+})
+
+test("findLast(findLastIndex) and remove", function () {
+    const a = mobx.observable([10, 20, 20])
+    let idx = -1
+    function predicate(item, index) {
+        if (item === 20) {
+            idx = index
+            return true
+        }
+        return false
+    }
+    ;[].findLastIndex;
+    expect(a.findLast(predicate)).toBe(20)
+    expect(a.findLastIndex(predicate)).toBe(2)
+    expect(a.findLast(predicate)).toBe(20)
+
+    expect(a.remove(20)).toBe(true)
+    expect(a.find(predicate)).toBe(20)
+    expect(idx).toBe(1)
+    expect(a.findIndex(predicate)).toBe(1)
+    idx = -1
+    expect(a.remove(20)).toBe(true)
+    expect(a.findLast(predicate)).toBe(undefined)
+    expect(idx).toBe(-1)
+    expect(a.findLastIndex(predicate)).toBe(-1)
 
     expect(a.remove(20)).toBe(false)
 })
@@ -572,6 +615,8 @@ test("correct array should be passed to callbacks #2326", () => {
         "filter",
         "find",
         "findIndex",
+        "findLast",
+        "findLastIndex",
         "flatMap",
         "forEach",
         "map",
@@ -592,7 +637,9 @@ test("very long arrays can be safely passed to nativeArray.concat #2379", () => 
     expect(longObservableArray).toEqual(longNativeArray)
     expect(longObservableArray[9000]).toBe(longNativeArray[9000])
     expect(longObservableArray[9999]).toBe(longNativeArray[9999])
+    consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
     expect(longObservableArray[10000]).toBe(longNativeArray[10000])
+    expect(consoleWarnMock).toMatchSnapshot()
 
     const expectedArray = nativeArray.concat(longNativeArray)
     const actualArray = nativeArray.concat(longObservableArray.slice()) // NOTE: in MobX4 slice is needed
@@ -747,6 +794,31 @@ describe("dehances", () => {
 
     test("values", () => {
         expect([...array.values()]).toEqual([...dehanced.values()])
+    })
+
+    test("toReversed", () => {
+        expect(array.toReversed()).toEqual(dehanced.toReversed())
+    })
+ 
+     test("toSorted", () => {
+        expect(array.toSorted()).toEqual(dehanced.toSorted())
+    })
+ 
+     test("toSorted with args", () => {
+        expect(array.toSorted((a, b) => a - b)).toEqual(dehanced.toSorted((a, b) => a - b))
+    })
+ 
+     test("toSpliced", () => {
+        expect(array.toSpliced(1, 2)).toEqual(dehanced.toSpliced(1, 2))
+    })
+ 
+     test("with", () => {
+        expect(array.with(1, 5)).toEqual(dehanced.with(1, 5))
+    })
+
+    test("at", () => {
+        expect(array.at(1)).toEqual(dehanced.at(1))
+        expect(array.at(-1)).toEqual(dehanced.at(-1))
     })
 
     test("flat/flatMap", () => {

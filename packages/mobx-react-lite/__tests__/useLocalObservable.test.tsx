@@ -10,7 +10,10 @@ import { useObserver } from "../src/useObserver"
 
 afterEach(cleanup)
 
-afterEach(cleanup)
+let consoleWarnMock: jest.SpyInstance | undefined
+afterEach(() => {
+    consoleWarnMock?.mockRestore()
+})
 
 test("base useLocalStore should work", () => {
     let counterRender = 0
@@ -427,7 +430,7 @@ describe("is used to keep observable within component body", () => {
                 ;(container.querySelector("#incmultiplier")! as any).click()
             })
             expect(container.querySelector("span")!.innerHTML).toBe("22")
-            expect(counterRender).toBe(4) // TODO: should be 3
+            expect(counterRender).toBe(4) // One from props, second from updating local observable with effect
         })
     })
 })
@@ -435,6 +438,8 @@ describe("is used to keep observable within component body", () => {
 describe("enforcing actions", () => {
     it("'never' should work", () => {
         mobx.configure({ enforceActions: "never" })
+        consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
+
         const { result } = renderHook(() => {
             const [multiplier, setMultiplier] = React.useState(2)
             const store = useLocalObservable(() => ({
@@ -452,10 +457,14 @@ describe("enforcing actions", () => {
             }, [multiplier])
             useEffect(() => setMultiplier(3), [])
         })
+
         expect(result.error).not.toBeDefined()
+        expect(consoleWarnMock).not.toBeCalled()
     })
     it("only when 'observed' should work", () => {
         mobx.configure({ enforceActions: "observed" })
+        consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
+
         const { result } = renderHook(() => {
             const [multiplier, setMultiplier] = React.useState(2)
             const store = useLocalObservable(() => ({
@@ -473,10 +482,14 @@ describe("enforcing actions", () => {
             }, [multiplier])
             useEffect(() => setMultiplier(3), [])
         })
+
         expect(result.error).not.toBeDefined()
+        expect(consoleWarnMock).not.toBeCalled()
     })
     it("'always' should work", () => {
         mobx.configure({ enforceActions: "always" })
+        consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
+
         const { result } = renderHook(() => {
             const [multiplier, setMultiplier] = React.useState(2)
             const store = useLocalObservable(() => ({
@@ -494,6 +507,8 @@ describe("enforcing actions", () => {
             }, [multiplier])
             useEffect(() => setMultiplier(3), [])
         })
+
         expect(result.error).not.toBeDefined()
+        expect(consoleWarnMock).toBeCalledTimes(2)
     })
 })

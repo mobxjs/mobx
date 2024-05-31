@@ -20,22 +20,23 @@ export function observe<T>(
     fireImmediately?: boolean
 ): Lambda
 export function observe<T>(
-    observableArray: IObservableArray<T>,
+    observableArray: IObservableArray<T> | Array<T>,
     listener: (change: IArrayDidChange<T>) => void,
     fireImmediately?: boolean
 ): Lambda
 export function observe<V>(
-    observableMap: ObservableSet<V>,
+    // ObservableSet/ObservableMap are required despite they implement Set/Map: https://github.com/mobxjs/mobx/pull/3180#discussion_r746542929
+    observableSet: ObservableSet<V> | Set<V>,
     listener: (change: ISetDidChange<V>) => void,
     fireImmediately?: boolean
 ): Lambda
 export function observe<K, V>(
-    observableMap: ObservableMap<K, V>,
+    observableMap: ObservableMap<K, V> | Map<K, V>,
     listener: (change: IMapDidChange<K, V>) => void,
     fireImmediately?: boolean
 ): Lambda
 export function observe<K, V>(
-    observableMap: ObservableMap<K, V>,
+    observableMap: ObservableMap<K, V> | Map<K, V>,
     property: K,
     listener: (change: IValueDidChange<V>) => void,
     fireImmediately?: boolean
@@ -52,9 +53,11 @@ export function observe<T, K extends keyof T>(
     fireImmediately?: boolean
 ): Lambda
 export function observe(thing, propOrCb?, cbOrFire?, fireImmediately?): Lambda {
-    if (isFunction(cbOrFire))
+    if (isFunction(cbOrFire)) {
         return observeObservableProperty(thing, propOrCb, cbOrFire, fireImmediately)
-    else return observeObservable(thing, propOrCb, cbOrFire)
+    } else {
+        return observeObservable(thing, propOrCb, cbOrFire)
+    }
 }
 
 function observeObservable(thing, listener, fireImmediately: boolean) {

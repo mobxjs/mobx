@@ -71,7 +71,7 @@ test("getDerivedStateFromProps works #447", () => {
         }
     }
 
-    const MainInjected = inject(({ store }) => ({ thing: store.thing }))(Main)
+    const MainInjected = inject(({ store }: { store: { thing: number } }) => ({ thing: store.thing }))(Main)
 
     const store = { thing: 3 }
 

@@ -104,6 +104,70 @@ test("spy error", () => {
 
 test("spy stop listen from handler, #1459", () => {
     const stop = mobx.spy(() => stop())
-    mobx.spy(() => {})
+    mobx.spy(() => { })
     doStuff()
+})
+
+test("bound actions report correct object (discussions/3140)", () => {
+    class AppState {
+        constructor() {
+            mobx.makeAutoObservable(this, {
+                actionBound: mobx.action.bound,
+            }, { autoBind: true });
+        }
+
+        actionBound() { }
+        autoActionBound() { }
+    }
+
+    const appState = new AppState();
+    const { actionBound, autoActionBound } = appState;
+
+    let events = [];
+    const disposeSpy = mobx.spy((event) => {
+        if (event.type !== 'action') return;
+        events.push(event);
+    });
+
+    try {
+        actionBound();
+        expect(events.pop().object).toBe(appState)
+        autoActionBound();
+        expect(events.pop().object).toBe(appState)
+    } finally {
+        disposeSpy();
+    }
+})
+
+test("computed shouldn't report update unless the value changed #3109", () => {
+    const number = mobx.observable({
+        value: 0,
+        get isEven() {
+            return (this.value % 2) === 0;
+        }
+    })
+
+    const events = [];
+    const disposeSpy = mobx.spy(event => {
+        if (event.observableKind === 'computed' && event.type === 'update') {
+            events.push(event);
+        };
+    });
+
+    const disposeAutorun = mobx.autorun(() => number.isEven);
+
+    try {
+        expect(events.pop()).toMatchObject({ oldValue: { cause: null }, newValue: true });
+        number.value++; // 1        
+        expect(events.pop()).toMatchObject({ oldValue: true, newValue: false });
+        number.value++; // 2   
+        expect(events.pop()).toMatchObject({ oldValue: false, newValue: true });
+        number.value += 2; // 4       
+        expect(events.pop()).toBe(undefined);
+        number.value += 2; // 6
+        expect(events.pop()).toBe(undefined);
+    } finally {
+        disposeSpy();
+        disposeAutorun();
+    }
 })

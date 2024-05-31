@@ -157,11 +157,16 @@ let isolateCalled = false
 
 export let globalState: MobXGlobals = (function () {
     let global = getGlobal()
-    if (global.__mobxInstanceCount > 0 && !global.__mobxGlobals) canMergeGlobalState = false
-    if (global.__mobxGlobals && global.__mobxGlobals.version !== new MobXGlobals().version)
+    if (global.__mobxInstanceCount > 0 && !global.__mobxGlobals) {
         canMergeGlobalState = false
+    }
+    if (global.__mobxGlobals && global.__mobxGlobals.version !== new MobXGlobals().version) {
+        canMergeGlobalState = false
+    }
 
     if (!canMergeGlobalState) {
+        // Because this is a IIFE we need to let isolateCalled a chance to change
+        // so we run it after the event loop completed at least 1 iteration
         setTimeout(() => {
             if (!isolateCalled) {
                 die(35)
@@ -170,7 +175,9 @@ export let globalState: MobXGlobals = (function () {
         return new MobXGlobals()
     } else if (global.__mobxGlobals) {
         global.__mobxInstanceCount += 1
-        if (!global.__mobxGlobals.UNCHANGED) global.__mobxGlobals.UNCHANGED = {} // make merge backward compatible
+        if (!global.__mobxGlobals.UNCHANGED) {
+            global.__mobxGlobals.UNCHANGED = {}
+        } // make merge backward compatible
         return global.__mobxGlobals
     } else {
         global.__mobxInstanceCount = 1
@@ -183,12 +190,15 @@ export function isolateGlobalState() {
         globalState.pendingReactions.length ||
         globalState.inBatch ||
         globalState.isRunningReactions
-    )
+    ) {
         die(36)
+    }
     isolateCalled = true
     if (canMergeGlobalState) {
         let global = getGlobal()
-        if (--global.__mobxInstanceCount === 0) global.__mobxGlobals = undefined
+        if (--global.__mobxInstanceCount === 0) {
+            global.__mobxGlobals = undefined
+        }
         globalState = new MobXGlobals()
     }
 }
@@ -203,7 +213,10 @@ export function getGlobalState(): any {
  */
 export function resetGlobalState() {
     const defaultGlobals = new MobXGlobals()
-    for (let key in defaultGlobals)
-        if (persistentKeys.indexOf(key as any) === -1) globalState[key] = defaultGlobals[key]
+    for (let key in defaultGlobals) {
+        if (persistentKeys.indexOf(key as any) === -1) {
+            globalState[key] = defaultGlobals[key]
+        }
+    }
     globalState.allowStateChanges = !globalState.enforceActions
 }

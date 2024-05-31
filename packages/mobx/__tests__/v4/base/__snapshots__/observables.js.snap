@@ -1,8 +1,8 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`delay autorun until end of transaction 1`] = `
-Array [
-  Object {
+[
+  {
     "debugObjectName": "ObservableObject@1",
     "name": "a",
     "newValue": 3,
@@ -11,11 +11,11 @@ Array [
     "spyReportStart": true,
     "type": "update",
   },
-  Object {
+  {
     "spyReportEnd": true,
     "type": "report-end",
   },
-  Object {
+  {
     "debugObjectName": "ObservableObject@1",
     "name": "a",
     "newValue": 4,
@@ -24,12 +24,12 @@ Array [
     "spyReportStart": true,
     "type": "update",
   },
-  Object {
+  {
     "spyReportEnd": true,
     "type": "report-end",
   },
   "end1",
-  Object {
+  {
     "debugObjectName": "ObservableObject@1",
     "name": "a",
     "newValue": 5,
@@ -38,19 +38,19 @@ Array [
     "spyReportStart": true,
     "type": "update",
   },
-  Object {
+  {
     "spyReportEnd": true,
     "type": "report-end",
   },
   "end2",
-  Object {
+  {
     "name": "test",
     "spyReportStart": true,
     "type": "reaction",
   },
   "auto",
   "calc y",
-  Object {
+  {
     "debugObjectName": "ObservableObject@1.b",
     "newValue": 5,
     "observableKind": "computed",
@@ -59,12 +59,12 @@ Array [
     },
     "type": "update",
   },
-  Object {
+  {
     "spyReportEnd": true,
     "type": "report-end",
   },
   "post trans1",
-  Object {
+  {
     "debugObjectName": "ObservableObject@1",
     "name": "a",
     "newValue": 6,
@@ -74,29 +74,29 @@ Array [
     "type": "update",
   },
   "calc y",
-  Object {
+  {
     "debugObjectName": "ObservableObject@1.b",
     "newValue": 6,
     "observableKind": "computed",
     "oldValue": 5,
     "type": "update",
   },
-  Object {
+  {
     "name": "test",
     "spyReportStart": true,
     "type": "reaction",
   },
   "auto",
-  Object {
+  {
     "spyReportEnd": true,
     "type": "report-end",
   },
-  Object {
+  {
     "spyReportEnd": true,
     "type": "report-end",
   },
   "post trans2",
-  Object {
+  {
     "debugObjectName": "ObservableObject@1",
     "name": "a",
     "newValue": 3,
@@ -105,7 +105,7 @@ Array [
     "spyReportStart": true,
     "type": "update",
   },
-  Object {
+  {
     "spyReportEnd": true,
     "type": "report-end",
   },
@@ -114,11 +114,11 @@ Array [
 `;
 
 exports[`issue 50 1`] = `
-Array [
+[
   "auto",
   "calc c",
   "transstart",
-  Object {
+  {
     "debugObjectName": "ObservableObject@1",
     "name": "a",
     "newValue": false,
@@ -127,11 +127,11 @@ Array [
     "spyReportStart": true,
     "type": "update",
   },
-  Object {
+  {
     "spyReportEnd": true,
     "type": "report-end",
   },
-  Object {
+  {
     "debugObjectName": "ObservableObject@1",
     "name": "b",
     "newValue": true,
@@ -140,26 +140,26 @@ Array [
     "spyReportStart": true,
     "type": "update",
   },
-  Object {
+  {
     "spyReportEnd": true,
     "type": "report-end",
   },
   "transpreend",
-  Object {
+  {
     "name": "ar",
     "spyReportStart": true,
     "type": "reaction",
   },
   "auto",
   "calc c",
-  Object {
+  {
     "debugObjectName": "ObservableObject@1.c",
     "newValue": true,
     "observableKind": "computed",
     "oldValue": false,
     "type": "update",
   },
-  Object {
+  {
     "spyReportEnd": true,
     "type": "report-end",
   },
@@ -168,11 +168,11 @@ Array [
 `;
 
 exports[`verify transaction events 1`] = `
-Array [
+[
   "auto",
   "calc c",
   "transstart",
-  Object {
+  {
     "debugObjectName": "ObservableObject@1",
     "name": "b",
     "newValue": 2,
@@ -181,26 +181,26 @@ Array [
     "spyReportStart": true,
     "type": "update",
   },
-  Object {
+  {
     "spyReportEnd": true,
     "type": "report-end",
   },
   "transpreend",
   "calc c",
-  Object {
+  {
     "debugObjectName": "ObservableObject@1.c",
     "newValue": 2,
     "observableKind": "computed",
     "oldValue": 1,
     "type": "update",
   },
-  Object {
+  {
     "name": "ar",
     "spyReportStart": true,
     "type": "reaction",
   },
   "auto",
-  Object {
+  {
     "spyReportEnd": true,
     "type": "report-end",
   },

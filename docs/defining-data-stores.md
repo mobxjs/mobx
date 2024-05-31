@@ -73,7 +73,7 @@ It is possible to express your domain objects as plain objects, but classes have
 ### Example domain store
 
 ```javascript
-import { makeAutoObservable, autorun, runInAction } from "mobx"
+import { makeAutoObservable, runInAction, reaction } from "mobx"
 import uuid from "node-uuid"
 
 export class TodoStore {
@@ -227,7 +227,7 @@ You might distribute the _ui-state-store_ through your application by passing it
 Example of a store (using ES6 syntax):
 
 ```javascript
-import { makeAutoObservable, observable, computed, asStructure } from "mobx"
+import { makeAutoObservable, observable, computed } from "mobx"
 
 export class UiState {
     language = "en_US"
@@ -289,7 +289,7 @@ class TodoStore {
     rootStore
 
     constructor(rootStore) {
-        makeAutoObservable(this, { rootStore: false })
+        makeAutoObservable(this)
         this.rootStore = rootStore
     }
 }

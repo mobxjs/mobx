@@ -12,7 +12,8 @@ import {
     isFunction,
     isPlainObject,
     die,
-    allowStateChanges
+    allowStateChanges,
+    GenericAbortSignal
 } from "../internal"
 
 export interface IAutorunOptions {
@@ -25,6 +26,7 @@ export interface IAutorunOptions {
     requiresObservable?: boolean
     scheduler?: (callback: () => void) => any
     onError?: (error: any) => void
+    signal?: GenericAbortSignal
 }
 
 /**
@@ -38,8 +40,12 @@ export function autorun(
     opts: IAutorunOptions = EMPTY_OBJECT
 ): IReactionDisposer {
     if (__DEV__) {
-        if (!isFunction(view)) die("Autorun expects a function as first argument")
-        if (isAction(view)) die("Autorun does not accept actions since actions are untrackable")
+        if (!isFunction(view)) {
+            die("Autorun expects a function as first argument")
+        }
+        if (isAction(view)) {
+            die("Autorun does not accept actions since actions are untrackable")
+        }
     }
 
     const name: string =
@@ -69,7 +75,9 @@ export function autorun(
                     isScheduled = true
                     scheduler(() => {
                         isScheduled = false
-                        if (!reaction.isDisposed_) reaction.track(reactionRunner)
+                        if (!reaction.isDisposed_) {
+                            reaction.track(reactionRunner)
+                        }
                     })
                 }
             },
@@ -82,18 +90,20 @@ export function autorun(
         view(reaction)
     }
 
-    reaction.schedule_()
-    return reaction.getDisposer_()
+    if(!opts?.signal?.aborted) {
+        reaction.schedule_()
+    }
+    return reaction.getDisposer_(opts?.signal)
 }
 
-export type IReactionOptions = IAutorunOptions & {
-    fireImmediately?: boolean
-    equals?: IEqualsComparer<any>
+export type IReactionOptions<T, FireImmediately extends boolean> = IAutorunOptions & {
+    fireImmediately?: FireImmediately
+    equals?: IEqualsComparer<T>
 }
 
 const run = (f: Lambda) => f()
 
-function createSchedulerFromOptions(opts: IReactionOptions) {
+function createSchedulerFromOptions(opts: IAutorunOptions) {
     return opts.scheduler
         ? opts.scheduler
         : opts.delay
@@ -101,15 +111,22 @@ function createSchedulerFromOptions(opts: IReactionOptions) {
         : run
 }
 
-export function reaction<T>(
+export function reaction<T, FireImmediately extends boolean = false>(
     expression: (r: IReactionPublic) => T,
-    effect: (arg: T, prev: T, r: IReactionPublic) => void,
-    opts: IReactionOptions = EMPTY_OBJECT
+    effect: (
+        arg: T,
+        prev: FireImmediately extends true ? T | undefined : T,
+        r: IReactionPublic
+    ) => void,
+    opts: IReactionOptions<T, FireImmediately> = EMPTY_OBJECT
 ): IReactionDisposer {
     if (__DEV__) {
-        if (!isFunction(expression) || !isFunction(effect))
+        if (!isFunction(expression) || !isFunction(effect)) {
             die("First and second argument to reaction should be functions")
-        if (!isPlainObject(opts)) die("Third argument of reactions should be an object")
+        }
+        if (!isPlainObject(opts)) {
+            die("Third argument of reactions should be an object")
+        }
     }
     const name = opts.name ?? (__DEV__ ? "Reaction@" + getNextId() : "Reaction")
     const effectAction = action(
@@ -122,9 +139,8 @@ export function reaction<T>(
     let firstTime = true
     let isScheduled = false
     let value: T
-    let oldValue: T = undefined as any // only an issue with fireImmediately
 
-    const equals = (opts as any).compareStructural
+    const equals: IEqualsComparer<T> = (opts as any).compareStructural
         ? comparer.structural
         : opts.equals || comparer.default
 
@@ -144,21 +160,31 @@ export function reaction<T>(
 
     function reactionRunner() {
         isScheduled = false
-        if (r.isDisposed_) return
+        if (r.isDisposed_) {
+            return
+        }
         let changed: boolean = false
+        const oldValue = value
         r.track(() => {
             const nextValue = allowStateChanges(false, () => expression(r))
             changed = firstTime || !equals(value, nextValue)
-            oldValue = value
             value = nextValue
         })
-        if (firstTime && opts.fireImmediately!) effectAction(value, oldValue, r)
-        else if (!firstTime && changed) effectAction(value, oldValue, r)
+
+        // This casting is nesessary as TS cannot infer proper type in current function implementation
+        type OldValue = FireImmediately extends true ? T | undefined : T
+        if (firstTime && opts.fireImmediately!) {
+            effectAction(value, oldValue as OldValue, r)
+        } else if (!firstTime && changed) {
+            effectAction(value, oldValue as OldValue, r)
+        }
         firstTime = false
     }
 
-    r.schedule_()
-    return r.getDisposer_()
+    if(!opts?.signal?.aborted) {
+        r.schedule_()
+    }
+    return r.getDisposer_(opts?.signal)
 }
 
 function wrapErrorHandler(errorHandler, baseFn) {

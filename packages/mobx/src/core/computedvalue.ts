@@ -35,7 +35,6 @@ import {
 export interface IComputedValue<T> {
     get(): T
     set(value: T): void
-    observe_(listener: (change: IComputedDidChange<T>) => void, fireImmediately?: boolean): Lambda
 }
 
 export interface IComputedValueOptions<T> {
@@ -98,7 +97,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     isTracing_: TraceMode = TraceMode.NONE
     scope_: Object | undefined
     private equals_: IEqualsComparer<any>
-    private requiresReaction_: boolean
+    private requiresReaction_: boolean | undefined
     keepAlive_: boolean
 
     /**
@@ -114,7 +113,9 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
      * This is useful for working with vectors, mouse coordinates etc.
      */
     constructor(options: IComputedValueOptions<T>) {
-        if (!options.get) die(31)
+        if (!options.get) {
+            die(31)
+        }
         this.derivation = options.get!
         this.name_ = options.name || (__DEV__ ? "ComputedValue@" + getNextId() : "ComputedValue")
         if (options.set) {
@@ -129,7 +130,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
                 ? comparer.structural
                 : comparer.default)
         this.scope_ = options.context
-        this.requiresReaction_ = !!options.requiresReaction
+        this.requiresReaction_ = options.requiresReaction
         this.keepAlive_ = !!options.keepAlive
     }
 
@@ -157,7 +158,9 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
      * Will evaluate its computation first if needed.
      */
     public get(): T {
-        if (this.isComputing_) die(32, this.name_, this.derivation)
+        if (this.isComputing_) {
+            die(32, this.name_, this.derivation)
+        }
         if (
             globalState.inBatch === 0 &&
             // !globalState.trackingDerivatpion &&
@@ -174,27 +177,37 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
             reportObserved(this)
             if (shouldCompute(this)) {
                 let prevTrackingContext = globalState.trackingContext
-                if (this.keepAlive_ && !prevTrackingContext) globalState.trackingContext = this
-                if (this.trackAndCompute()) propagateChangeConfirmed(this)
+                if (this.keepAlive_ && !prevTrackingContext) {
+                    globalState.trackingContext = this
+                }
+                if (this.trackAndCompute()) {
+                    propagateChangeConfirmed(this)
+                }
                 globalState.trackingContext = prevTrackingContext
             }
         }
         const result = this.value_!
 
-        if (isCaughtException(result)) throw result.cause
+        if (isCaughtException(result)) {
+            throw result.cause
+        }
         return result
     }
 
     public set(value: T) {
         if (this.setter_) {
-            if (this.isRunningSetter_) die(33, this.name_)
+            if (this.isRunningSetter_) {
+                die(33, this.name_)
+            }
             this.isRunningSetter_ = true
             try {
                 this.setter_.call(this.scope_, value)
             } finally {
                 this.isRunningSetter_ = false
             }
-        } else die(34, this.name_)
+        } else {
+            die(34, this.name_)
+        }
     }
 
     trackAndCompute(): boolean {
@@ -204,17 +217,6 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
             /* see #1208 */ this.dependenciesState_ === IDerivationState_.NOT_TRACKING_
         const newValue = this.computeValue_(true)
 
-        if (__DEV__ && isSpyEnabled()) {
-            spyReport({
-                observableKind: "computed",
-                debugObjectName: this.name_,
-                object: this.scope_,
-                type: "update",
-                oldValue: this.value_,
-                newValue
-            } as IComputedDidChange)
-        }
-
         const changed =
             wasSuspended ||
             isCaughtException(oldValue) ||
@@ -223,6 +225,17 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 
         if (changed) {
             this.value_ = newValue
+
+            if (__DEV__ && isSpyEnabled()) {
+                spyReport({
+                    observableKind: "computed",
+                    debugObjectName: this.name_,
+                    object: this.scope_,
+                    type: "update",
+                    oldValue,
+                    newValue
+                } as IComputedDidChange)
+            }
         }
 
         return changed
@@ -255,6 +268,11 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         if (!this.keepAlive_) {
             clearObserving(this)
             this.value_ = undefined // don't hold on to computed value!
+            if (__DEV__ && this.isTracing_ !== TraceMode.NONE) {
+                console.log(
+                    `[mobx.trace] Computed value '${this.name_}' was suspended and it will recompute on the next access.`
+                )
+            }
         }
     }
 
@@ -282,18 +300,21 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     }
 
     warnAboutUntrackedRead_() {
-        if (!__DEV__) return
-        if (this.requiresReaction_ === true) {
-            die(`[mobx] Computed value ${this.name_} is read outside a reactive context`)
+        if (!__DEV__) {
+            return
         }
         if (this.isTracing_ !== TraceMode.NONE) {
             console.log(
-                `[mobx.trace] '${this.name_}' is being read outside a reactive context. Doing a full recompute`
+                `[mobx.trace] Computed value '${this.name_}' is being read outside a reactive context. Doing a full recompute.`
             )
         }
-        if (globalState.computedRequiresReaction) {
+        if (
+            typeof this.requiresReaction_ === "boolean"
+                ? this.requiresReaction_
+                : globalState.computedRequiresReaction
+        ) {
             console.warn(
-                `[mobx] Computed value ${this.name_} is being read outside a reactive context. Doing a full recompute`
+                `[mobx] Computed value '${this.name_}' is being read outside a reactive context. Doing a full recompute.`
             )
         }
     }

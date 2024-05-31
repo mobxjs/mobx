@@ -23,7 +23,7 @@ const Item = observer(({ item, store }) => (
     <div className={store.isSelected(item.id) ? "selected" : ""}>
         {item.title}
     </div>
-)
+))
 ```
 
 There are four ways in which we can approach this. You can try the solutions below in [this CodeSandbox](https://codesandbox.io/s/multi-selection-odup1?file=/src/index.tsx).
@@ -57,7 +57,7 @@ const Item = observer(({ item, store }) => {
             {item.title}
         </div>
     )
-}
+})
 ```
 
 We create a fresh computed value in the middle of a reaction. This works fine and does introduce that additional caching point, avoiding all components having to directly respond to every selection change.

@@ -18,12 +18,39 @@ There are two types of React bindings, `mobx-react-lite` supports only functiona
 
 **CDN:** https://cdnjs.com/libraries/mobx / https://unpkg.com/mobx/dist/mobx.umd.production.min.js
 
+# Transpilation settings
+
+## MobX and Decorators
+
+Based on your preference, MobX can be used with or without decorators.
+Both the legacy implementation and the standardised TC-39 version of decorators are currently supported.
+See [enabling-decorators](enabling-decorators.md) for more details on how to enable them.
+Legacy decorator support will be removed in MobX 7, in favor of the standard.
+
 ## Use spec compliant transpilation for class properties
 
-⚠️ **Warning:** When using MobX with TypeScript and Babel, and you plan to use classes; make sure to update your configuration to use a TC-39 spec compliant transpilation for class fields, since this is not the default. Without this, class fields cannot be made observable before they are initialized.
+When using MobX with TypeScript or Babel, and you plan to use classes; make sure to update your configuration to use a TC-39 spec compliant transpilation for class fields, since this is not always the default. Without this, class fields cannot be made observable before they are initialized.
 
--   For Babel: Make sure to use at least version 7.12. Use the plugin `["@babel/plugin-proposal-class-properties", { "loose": false }]`
--   For TypeScript, set the compiler option `"useDefineForClassFields": true`
+-   **TypeScript**: Set the compiler option `"useDefineForClassFields": true`.
+-   **Babel**: Make sure to use at least version 7.12, with the following configuration:
+    ```json
+    {
+        // Babel < 7.13.0
+        "plugins": [["@babel/plugin-proposal-class-properties", { "loose": false }]],
+
+        // Babel >= 7.13.0 (https://babeljs.io/docs/en/assumptions)
+        "plugins": [["@babel/plugin-proposal-class-properties"]],
+        "assumptions": {
+            "setPublicClassFields": false
+        }
+    }
+    ```
+For verification insert this piece of code at the beginning of your sources (eg. `index.js`)
+```javascript
+if (!new class { x }().hasOwnProperty('x')) throw new Error('Transpiler is not configured correctly');
+```
+
+Note that for Next.js you must [customize Babel](https://nextjs.org/docs/advanced-features/customizing-babel-config) instead of TypeScript, even if your project is set up to use TypeScript. 
 
 ## MobX on older JavaScript environments
 
@@ -37,11 +64,7 @@ import { configure } from "mobx"
 configure({ useProxies: "never" }) // Or "ifavailable".
 ```
 
-## MobX and Decorators
-
-If you have used MobX before, or if you followed online tutorials, you probably saw MobX with decorators like `@observable`.
-In MobX 6, we have chosen to move away from decorators by default, for maximum compatibility with standard JavaScript.
-They can still be used if you [enable them](enabling-decorators.md) though.
+This option will be removed in MobX 7.
 
 ## MobX on other frameworks / platforms
 

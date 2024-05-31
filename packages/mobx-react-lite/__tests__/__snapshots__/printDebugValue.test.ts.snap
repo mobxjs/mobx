@@ -1,14 +1,14 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`printDebugValue 1`] = `
-Object {
-  "dependencies": Array [
-    Object {
+{
+  "dependencies": [
+    {
       "name": "ObservableObject@1.euro",
     },
-    Object {
-      "dependencies": Array [
-        Object {
+    {
+      "dependencies": [
+        {
           "name": "ObservableObject@1.euro",
         },
       ],
@@ -20,7 +20,7 @@ Object {
 `;
 
 exports[`printDebugValue 2`] = `
-Object {
+{
   "name": "Autorun@2",
 }
 `;

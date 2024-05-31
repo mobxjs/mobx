@@ -1,5 +1,134 @@
 # mobx-react
 
+## 9.1.1
+
+### Patch Changes
+
+-   [`61abc53f`](https://github.com/mobxjs/mobx/commit/61abc53ff10554d1d5ce3e85466f6beda4d63fa2) [#3852](https://github.com/mobxjs/mobx/pull/3852) Thanks [@mweststrate](https://github.com/mweststrate)! - Patched the release process, forcing release to get everything in pristine state.
+
+-   Updated dependencies [[`61abc53f`](https://github.com/mobxjs/mobx/commit/61abc53ff10554d1d5ce3e85466f6beda4d63fa2), [`7bbb523a`](https://github.com/mobxjs/mobx/commit/7bbb523a7b81229570e0e2a176b989bfc74c4634)]:
+    -   mobx-react-lite@4.0.7
+
+## 9.1.0
+
+### Minor Changes
+
+-   [`c9260974`](https://github.com/mobxjs/mobx/commit/c9260974f726f58de0fd4974ea024c644d9b7c6f) [#3790](https://github.com/mobxjs/mobx/pull/3790) Thanks [@mweststrate](https://github.com/mweststrate)! - Added support for modern 2022.3 Decorators. [#3790](https://github.com/mobxjs/mobx/pull/3790)
+    -   [Installation / usage instruction](https://mobx.js.org/enabling-decorators.html).
+    -   [Introduction announcement](https://michel.codes/blogs/mobx-decorators)
+    -   Original PR by [@Matchlighter](https://github.com/Matchlighter) in [#3638](https://github.com/mobxjs/mobx/pull/3638),
+
+## 9.0.2
+
+### Patch Changes
+
+-   [`5063c38e`](https://github.com/mobxjs/mobx/commit/5063c38ead557624321e2bbeb1aff905438564b0) [#3776](https://github.com/mobxjs/mobx/pull/3776) Thanks [@wbercx](https://github.com/wbercx)! - Fixed premature disposal of class component observers.
+
+## 9.0.1
+
+### Patch Changes
+
+-   [`d813746c`](https://github.com/mobxjs/mobx/commit/d813746cfaa18d80daddee3724562fed6b307c0a) [#3731](https://github.com/mobxjs/mobx/pull/3731) Thanks [@urugator](https://github.com/urugator)! - fix #3730: class component does not react to state changes performed before mount
+
+-   Updated dependencies [[`3ceeb865`](https://github.com/mobxjs/mobx/commit/3ceeb8651e328c4c7211c875696b3f5269fea834)]:
+    -   mobx-react-lite@4.0.4
+
+## 9.0.0
+
+### Major Changes
+
+-   [`473cb3f5`](https://github.com/mobxjs/mobx/commit/473cb3f5fc8bf43abdd1c9c7857fe2820d2291fe) [#3718](https://github.com/mobxjs/mobx/pull/3718) Thanks [@mweststrate](https://github.com/mweststrate)! - - Fixed `observer` in `StrictMode` #3671
+    -   **[BREAKING CHANGE]** Class component's `props`/`state`/`context` are no longer observable. Attempt to use these in any derivation other than component's `render` throws and error. For details see https://github.com/mobxjs/mobx/blob/main/packages/mobx-react/README.md#note-on-using-props-and-state-in-derivations
+    -   Extending or applying `observer` classes is now explicitly forbidden
+
+### Patch Changes
+
+-   Updated dependencies [[`58bb052c`](https://github.com/mobxjs/mobx/commit/58bb052ca41b8592e5bd5c3003b68ec52da53f33), [`473cb3f5`](https://github.com/mobxjs/mobx/commit/473cb3f5fc8bf43abdd1c9c7857fe2820d2291fe)]:
+    -   mobx-react-lite@4.0.3
+
+## 8.0.0
+
+### Major Changes
+
+-   [`44a2cf42`](https://github.com/mobxjs/mobx/commit/44a2cf42dec7635f639ddbfb19202ebc710bac54) [#3590](https://github.com/mobxjs/mobx/pull/3590) Thanks [@urugator](https://github.com/urugator)! - Functional components now use `useSyncExternalStore`, which should prevent tearing - you have to update mobx, otherwise it should behave as previously.<br>
+    Improved displayName/name handling of functional components as discussed in #3438.<br>
+    Reactions of uncommited class components are now correctly disposed, fixes #3492.<br>
+    Reactions don't notify uncommited class components, avoiding the warning, fixes #3492.<br>
+    Removed symbol "polyfill" and replaced with actual Symbols.<br>
+    Removed `this.render` replacement detection + warning. `this.render` is no longer configurable/writable (possibly BC).<br>
+    Class component instance is no longer exposed as `component[$mobx]["reactcomponent"]` (possibly BC).<br>
+    Deprecated `disposeOnUnmount`, it's not compatible with remounting.<br>
+
+### Patch Changes
+
+-   Updated dependencies [[`44a2cf42`](https://github.com/mobxjs/mobx/commit/44a2cf42dec7635f639ddbfb19202ebc710bac54)]:
+    -   mobx-react-lite@4.0.0
+
+## 7.6.0
+
+### Minor Changes
+
+-   [`7aab223e`](https://github.com/mobxjs/mobx/commit/7aab223e99bdd453365103782dba2047e77e41d0) [#3565](https://github.com/mobxjs/mobx/pull/3565) Thanks [@kubk](https://github.com/kubk)! - Make mobx-react compatible with TS 4.8+
+
+## 7.5.3
+
+### Patch Changes
+
+-   [`78d1aa23`](https://github.com/mobxjs/mobx/commit/78d1aa2362b4dc5d521518688d6ac7e2d4f7ad3a) [#3458](https://github.com/mobxjs/mobx/pull/3458) Thanks [@egilll](https://github.com/egilll)! - A slight revamp of the README, wording, and clearer links
+
+## 7.5.2
+
+### Patch Changes
+
+-   [`a23aaf3f`](https://github.com/mobxjs/mobx/commit/a23aaf3ff50217c40729e0d58c85767911323ebe) [#3452](https://github.com/mobxjs/mobx/pull/3452) Thanks [@urugator](https://github.com/urugator)! - fix #3448 regression: static rendering + class component
+
+## 7.5.1
+
+### Patch Changes
+
+-   [`bbcb12dc`](https://github.com/mobxjs/mobx/commit/bbcb12dc754524552181b177a52ffdbe80ecb953) [#3434](https://github.com/mobxjs/mobx/pull/3434) Thanks [@urugator](https://github.com/urugator)! - Support re-mounting of class components. Fixes #3395: observer not working with React@18 &lt;StrictMode&gt;.
+
+## 7.5.0
+
+### Minor Changes
+
+-   [`1470b8e4`](https://github.com/mobxjs/mobx/commit/1470b8e4273d6b4046f3107b7f6c30fcffc70eeb) [#3404](https://github.com/mobxjs/mobx/pull/3404) Thanks [@pixelkritzel](https://github.com/pixelkritzel)! - `this.context` is observable if static contextType is set
+
+## 7.4.0
+
+### Minor Changes
+
+-   [`4c5e75cd`](https://github.com/mobxjs/mobx/commit/4c5e75cdfec08c04ad774c70dca0629bd2c77016) [#3382](https://github.com/mobxjs/mobx/pull/3382) Thanks [@iChenLei](https://github.com/iChenLei)! - replace the deprecated react type definition with recommended type definition
+
+*   [`bd4b70d8`](https://github.com/mobxjs/mobx/commit/bd4b70d8ded29673af8161aa42fb88dc4ad4420e) [#3387](https://github.com/mobxjs/mobx/pull/3387) Thanks [@mweststrate](https://github.com/mweststrate)! - Added experimental / poor man's support for React 18. Fixes #3363, #2526. Supersedes #3005
+
+    -   Updated tests, test / build infra, peerDependencies to React 18
+    -   **[breaking icmw upgrading to React 18]** Already deprecated hooks like `useMutableSource` will trigger warnings in React 18, which is correct and those shouldn't be used anymore.
+    -   **[breaking icmw upgrading to React 18]** When using React 18, it is important that `act` is used in **unit tests** around every programmatic mutation. Without it, changes won't propagate!
+    -   The React 18 support is poor man's support; that is, we don't do anything yet to play nicely with Suspense features. Although e.g. [startTransition](https://github.com/mweststrate/platform-app/commit/bdd995773ddc6551235a4d2b0a4c9bd57d30510e) basically works, MobX as is doesn't respect the Suspense model and will always reflect the latest state that is being rendered with, so tearing might occur. I think this is in theoretically addressable by using `useSyncExternalStore` and capturing the current values together with the dependency tree of every component instance. However that isn't included in this pull request 1) it would be a breaking change, whereas the current change is still compatible with React 16 and 17. 2) I want to collect use cases where the tearing leads to problems first to build a better problem understanding. If you run into the problem, please submit an issue describing your scenario, and a PR with a unit tests demonstrating the problem in simplified form. For further discussion see #2526, #3005
+
+### Patch Changes
+
+-   Updated dependencies [[`4c5e75cd`](https://github.com/mobxjs/mobx/commit/4c5e75cdfec08c04ad774c70dca0629bd2c77016), [`bd4b70d8`](https://github.com/mobxjs/mobx/commit/bd4b70d8ded29673af8161aa42fb88dc4ad4420e)]:
+    -   mobx-react-lite@3.4.0
+
+## 7.3.0
+
+### Minor Changes
+
+-   [`59b42c28`](https://github.com/mobxjs/mobx/commit/59b42c2826208435353ce6bf154ae59077edcc05) [#3282](https://github.com/mobxjs/mobx/pull/3282) Thanks [@urugator](https://github.com/urugator)! - `observer(forwardRef(fn))` no longer generates extra `<Observer>` element and applies `memo` correctly
+
+### Patch Changes
+
+-   Updated dependencies [[`59b42c28`](https://github.com/mobxjs/mobx/commit/59b42c2826208435353ce6bf154ae59077edcc05)]:
+    -   mobx-react-lite@3.3.0
+
+## 7.2.1
+
+### Patch Changes
+
+-   [`8a1ff856`](https://github.com/mobxjs/mobx/commit/8a1ff856043d59396f623f8ca209822b1331d85f) [#3103](https://github.com/mobxjs/mobx/pull/3103) Thanks [@urugator](https://github.com/urugator)! - Missing `render` on component prototype throws.
+
 ## 7.2.0
 
 ### Minor Changes

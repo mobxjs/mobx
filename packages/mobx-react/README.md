@@ -2,10 +2,7 @@
 
 [![CircleCI](https://circleci.com/gh/mobxjs/mobx-react.svg?style=svg)](https://circleci.com/gh/mobxjs/mobx-react)
 [![CDNJS](https://img.shields.io/cdnjs/v/mobx-react.svg)](https://cdnjs.com/libraries/mobx-react)
-[![Minzipped size](https://img.shields.io/bundlephobia/minzip/mobx-react-lite.svg)](https://bundlephobia.com/result?p=mobx-react-lite)
-
-[![TypeScript](https://badges.frapsoft.com/typescript/code/typescript.svg?v=101)](https://github.com/ellerbrock/typescript-badges/)[![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
-
+[![Minzipped size](https://img.shields.io/bundlephobia/minzip/mobx-react.svg)](https://bundlephobia.com/result?p=mobx-react)
 [![Discuss on Github](https://img.shields.io/badge/discuss%20on-GitHub-orange)](https://github.com/mobxjs/mobx/discussions)
 [![View changelog](https://img.shields.io/badge/changelogs.xyz-Explore%20Changelog-brightgreen)](https://changelogs.xyz/mobx-react)
 
@@ -14,15 +11,16 @@ Exports the `observer` decorator and other utilities.
 For documentation, see the [MobX](https://mobx.js.org) project.
 This package supports both React and React Native.
 
-## Choosing your version
+## Compatibility matrix
 
-There are currently two actively maintained versions of mobx-react:
+Only the latest version is actively maintained. If you're missing a fix or a feature in older version, consider upgrading or using [patch-package](https://www.npmjs.com/package/patch-package)
 
-| NPM Version | Support MobX version | Supported React versions | Supports hook based components                                                   |
+| NPM Version | Support MobX version | Supported React versions | Added support for:                                                               |
 | ----------- | -------------------- | ------------------------ | -------------------------------------------------------------------------------- |
-| v7          | 6.\*                 | 16.8+                    | Yes                                                                              |
-| v6          | 4._ / 5._            | 16.8+                    | Yes                                                                              |
-| v5          | 4._ / 5._            | 0.13+                    | No, but it is possible to use `<Observer>` sections inside hook based components |
+| v9          | 6.\*                 | >16.8                    | Hooks, React 18.2 in strict mode                                                 |
+| v7          | 6.\*                 | >16.8 < 18.2             | Hooks                                                                            |
+| v6          | 4.\* / 5.\*          | >16.8 <17                | Hooks                                                                            |
+| v5          | 4.\* / 5.\*          | >0.13 <17                | No, but it is possible to use `<Observer>` sections inside hook based components |
 
 mobx-react 6 / 7 is a repackage of the smaller [mobx-react-lite](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react-lite) package + following features from the `mobx-react@5` package added:
 
@@ -60,9 +58,9 @@ Function (and decorator) that converts a React component definition, React compo
 
 #### Class Components
 
-When using component classes, `this.props` and `this.state` will be made observables, so the component will react to all changes in props and state that are used by `render`.
-
 `shouldComponentUpdate` is not supported. As such, it is recommended that class components extend `React.PureComponent`. The `observer` will automatically patch non-pure class components with an internal implementation of `React.PureComponent` if necessary.
+
+Extending `observer` class components is not supported. Always apply `observer` only on the last class in the inheritance chain.
 
 See the [MobX](https://mobx.js.org/react-integration.html#react-integration) documentation for more details.
 
@@ -88,6 +86,92 @@ class TodoView extends React.Component {
 
 // ---- or just use function components: ----
 const TodoView = observer(({ todo }) => <div>{todo.title}</div>)
+```
+
+##### Note on using props and state in derivations
+
+`mobx-react` version 6 and lower would automatically turn `this.state` and `this.props` into observables.
+This has the benefit that computed properties and reactions were able to observe those.
+However, since this pattern is fundamentally incompatible with `StrictMode` in React 18.2 and higher, this behavior has been removed in React 18.
+
+As a result, we recommend to no longer mark properties as `@computed` in observer components if they depend on `this.state` or `this.props`.
+
+```javascript
+@observer
+class Doubler extends React.Component<{ counter: number }> {
+    @computed // BROKEN! <-- @computed should be removed in mobx-react > 7
+    get doubleValue() {
+        // Changes to this.props will no longer be detected properly, to fix it,
+        // remove the @computed annotation.
+        return this.props * 2
+    }
+
+    render() {
+        return <div>{this.doubleValue}</div>
+    }
+}
+```
+
+Similarly, reactions will no longer respond to `this.state` / `this.props`. This can be overcome by creating an observable copy:
+
+```javascript
+@observer
+class Alerter extends React.Component<{ counter: number }> {
+    @observable observableCounter: number
+    reactionDisposer
+
+    constructor(props) {
+        this.observableCounter = counter
+    }
+
+    componentDidMount() {
+        // set up a reaction, by observing the observable,
+        // rather than the prop which is non-reactive:
+        this.reactionDisposer = autorun(() => {
+            if (this.observableCounter > 10) {
+                alert("Reached 10!")
+            }
+        })
+    }
+
+    componentDidUpdate() {
+        // sync the observable from props
+        this.observableCounter = this.props.counter
+    }
+
+    componentWillUnmount() {
+        this.reactionDisposer()
+    }
+
+    render() {
+        return <div>{this.props.counter}</div>
+    }
+}
+```
+
+MobX-react will try to detect cases where `this.props`, `this.state` or `this.context` are used by any other derivation than the `render` method of the owning component and throw.
+This is to make sure that neither computed properties, nor reactions, nor other components accidentally rely on those fields to be reactive.
+
+This includes cases where a render callback is passed to a child, that will read from the props or state of a parent component.
+As a result, passing a function that might later read a property of a parent in a reactive context will throw as well.
+Instead, when using a callback function that is being passed to an `observer` based child, the capture should be captured locally first:
+
+```javascript
+@observer
+class ChildWrapper extends React.Component<{ counter: number }> {
+    render() {
+        // Collapsible is an observer component that should respond to this.counter,
+        // if it is expanded
+
+        // BAD:
+        return <Collapsible onRenderContent={() => <h1>{this.props.counter}</h1>} />
+
+        // GOOD: (causes to pass down a fresh callback whenever counter changes,
+        // that doesn't depend on its parents props)
+        const counter = this.props.counter
+        return <Collapsible onRenderContent={() => <h1>{counter}</h1>} />
+    }
+}
 ```
 
 ### `Observer`
@@ -138,8 +222,6 @@ person.name = "Mike" // will cause the Observer region to re-render
 ```
 
 ### `useLocalObservable` hook
-
-[User guide](https://mobx-react.js.org/state-local)
 
 Local observable state can be introduced by using the `useLocalObservable` hook, that runs once to create an observable store. A quick example would be:
 
@@ -221,8 +303,6 @@ Use `import { PropTypes } from "mobx-react"` to import them, then use for exampl
 
 ### `Provider` and `inject`
 
-See also [the migration guide to React Hooks](https://mobx-react.js.org/recipes-migration).
-
 _Note: usually there is no need anymore to use `Provider` / `inject` in new code bases; most of its features are now covered by `React.createContext`._
 
 `Provider` is a component that can pass stores (or other stuff) using React's context mechanism to child components.
@@ -273,7 +353,7 @@ Notes:
 #### "The set of provided stores has changed" error
 
 Values provided through `Provider` should be final. Make sure that if you put things in `context` that might change over time, that they are `@observable` or provide some other means to listen to changes, like callbacks. However, if your stores will change over time, like an observable value of another store, MobX will throw an error.
-This restriction exists mainly for legacy reasons. If you have a scenario where you need to modify the set of stores, please leave a comment about it in this issue https://github.com/mobxjs/mobx-react/issues/745. Or a preferred way is to [use React Context](https://mobx-react.js.org/recipes-context) directly which does not have this restriction.
+This restriction exists mainly for legacy reasons. If you have a scenario where you need to modify the set of stores, please leave a comment about it in this issue https://github.com/mobxjs/mobx-react/issues/745. Or a preferred way is to [use React Context](https://reactjs.org/docs/context.html) directly which does not have this restriction.
 
 #### Inject as function
 
@@ -400,8 +480,6 @@ public render() {
    // ...
 }
 ```
-
-By [migrating to React Hooks](https://mobx-react.js.org/recipes-migration) you can avoid problems with TypeScript.
 
 #### Testing store injection
 

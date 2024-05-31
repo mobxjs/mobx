@@ -1,0 +1,12 @@
+{
+    "extends": ["../../tsconfig.json", "../../../../tsconfig.test.json"],
+    "compilerOptions": {
+        "target": "ES6",
+        "experimentalDecorators": false,
+        "useDefineForClassFields": true,
+
+        "rootDir": "../../"
+    },
+    "exclude": ["__tests__"],
+    "include": ["./", "../../src"] // ["../../src", "./"]
+}

@@ -27,7 +27,8 @@ import {
     DELETE,
     ADD,
     die,
-    isFunction
+    isFunction,
+    initObservable
 } from "../internal"
 
 const ObservableSetMarker = {}
@@ -65,7 +66,7 @@ export type ISetWillChange<T = any> =
 export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillChange>, IListenable {
     [$mobx] = ObservableSetMarker
     private data_: Set<any> = new Set()
-    private atom_: IAtom
+    atom_!: IAtom
     changeListeners_
     interceptors_
     dehancer: any
@@ -79,11 +80,13 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
         if (!isFunction(Set)) {
             die(22)
         }
-        this.atom_ = createAtom(this.name_)
         this.enhancer_ = (newV, oldV) => enhancer(newV, oldV, name_)
-        if (initialData) {
-            this.replace(initialData)
-        }
+        initObservable(() => {
+            this.atom_ = createAtom(this.name_)
+            if (initialData) {
+                this.replace(initialData)
+            }
+        })
     }
 
     private dehanceValue_<X extends T | undefined>(value: X): X {
@@ -96,7 +99,9 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
     clear() {
         transaction(() => {
             untracked(() => {
-                for (const value of this.data_.values()) this.delete(value)
+                for (const value of this.data_.values()) {
+                    this.delete(value)
+                }
             })
         })
     }
@@ -120,7 +125,9 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
                 object: this,
                 newValue: value
             })
-            if (!change) return this
+            if (!change) {
+                return this
+            }
             // ideally, value = change.value would be done here, so that values can be
             // changed by interceptor. Same applies for other Set and Map api's.
         }
@@ -141,22 +148,30 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
                           newValue: value
                       }
                     : null
-            if (notifySpy && __DEV__) spyReportStart(change!)
-            if (notify) notifyListeners(this, change)
-            if (notifySpy && __DEV__) spyReportEnd()
+            if (notifySpy && __DEV__) {
+                spyReportStart(change!)
+            }
+            if (notify) {
+                notifyListeners(this, change)
+            }
+            if (notifySpy && __DEV__) {
+                spyReportEnd()
+            }
         }
 
         return this
     }
 
-    delete(value: any) {
+    delete(value: T) {
         if (hasInterceptors(this)) {
             const change = interceptChange<ISetWillChange<T>>(this, {
                 type: DELETE,
                 object: this,
                 oldValue: value
             })
-            if (!change) return false
+            if (!change) {
+                return false
+            }
         }
         if (this.has(value)) {
             const notifySpy = __DEV__ && isSpyEnabled()
@@ -172,19 +187,25 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
                       }
                     : null
 
-            if (notifySpy && __DEV__) spyReportStart(change!)
+            if (notifySpy && __DEV__) {
+                spyReportStart(change!)
+            }
             transaction(() => {
                 this.atom_.reportChanged()
                 this.data_.delete(value)
             })
-            if (notify) notifyListeners(this, change)
-            if (notifySpy && __DEV__) spyReportEnd()
+            if (notify) {
+                notifyListeners(this, change)
+            }
+            if (notifySpy && __DEV__) {
+                spyReportEnd()
+            }
             return true
         }
         return false
     }
 
-    has(value: any) {
+    has(value: T) {
         this.atom_.reportObserved()
         return this.data_.has(this.dehanceValue_(value))
     }
@@ -243,8 +264,9 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
     }
     observe_(listener: (changes: ISetDidChange<T>) => void, fireImmediately?: boolean): Lambda {
         // ... 'fireImmediately' could also be true?
-        if (__DEV__ && fireImmediately === true)
+        if (__DEV__ && fireImmediately === true) {
             die("`observe` doesn't support fireImmediately=true in combination with sets.")
+        }
         return registerListener(this, listener)
     }
 

@@ -1,5 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`#3492 should not cause warning by calling forceUpdate on uncommited components 1`] = `[MockFunction]`;
+
+exports[`Redeclaring an existing observer component as an observer should throw 1`] = `"The provided component class (AlreadyObserver) has already been declared as an observer component."`;
+
+exports[`SSR works #3448 1`] = `[MockFunction]`;
+
 exports[`issue 12 1`] = `
 <div>
   <div>
@@ -9,7 +15,6 @@ exports[`issue 12 1`] = `
     </span>
     <span>
       tea
-      
     </span>
   </div>
 </div>
@@ -20,7 +25,6 @@ exports[`issue 12 2`] = `
   <div>
     <span>
       soup
-      
     </span>
   </div>
 </div>

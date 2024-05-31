@@ -6,13 +6,15 @@ import {
     createAction,
     getNextId,
     die,
-    allowStateChanges
+    allowStateChanges,
+    GenericAbortSignal
 } from "../internal"
 
 export interface IWhenOptions {
     name?: string
     timeout?: number
     onError?: (error: any) => void
+    signal?: GenericAbortSignal
 }
 
 export function when(
@@ -25,20 +27,24 @@ export function when(
     opts?: IWhenOptions
 ): IReactionDisposer
 export function when(predicate: any, arg1?: any, arg2?: any): any {
-    if (arguments.length === 1 || (arg1 && typeof arg1 === "object"))
+    if (arguments.length === 1 || (arg1 && typeof arg1 === "object")) {
         return whenPromise(predicate, arg1)
+    }
     return _when(predicate, arg1, arg2 || {})
 }
 
 function _when(predicate: () => boolean, effect: Lambda, opts: IWhenOptions): IReactionDisposer {
     let timeoutHandle: any
     if (typeof opts.timeout === "number") {
+        const error = new Error("WHEN_TIMEOUT")
         timeoutHandle = setTimeout(() => {
             if (!disposer[$mobx].isDisposed_) {
                 disposer()
-                const error = new Error("WHEN_TIMEOUT")
-                if (opts.onError) opts.onError(error)
-                else throw error
+                if (opts.onError) {
+                    opts.onError(error)
+                } else {
+                    throw error
+                }
             }
         }, opts.timeout)
     }
@@ -54,7 +60,9 @@ function _when(predicate: () => boolean, effect: Lambda, opts: IWhenOptions): IR
         let cond = allowStateChanges(false, predicate)
         if (cond) {
             r.dispose()
-            if (timeoutHandle) clearTimeout(timeoutHandle)
+            if (timeoutHandle) {
+                clearTimeout(timeoutHandle)
+            }
             effectAction()
         }
     }, opts)
@@ -65,16 +73,26 @@ function whenPromise(
     predicate: () => boolean,
     opts?: IWhenOptions
 ): Promise<void> & { cancel(): void } {
-    if (__DEV__ && opts && opts.onError)
+    if (__DEV__ && opts && opts.onError) {
         return die(`the options 'onError' and 'promise' cannot be combined`)
+    }
+    if (opts?.signal?.aborted) {
+        return Object.assign(Promise.reject(new Error("WHEN_ABORTED")), { cancel: () => null })
+    }
     let cancel
+    let abort
     const res = new Promise((resolve, reject) => {
-        let disposer = _when(predicate, resolve, { ...opts, onError: reject })
+        let disposer = _when(predicate, resolve as Lambda, { ...opts, onError: reject })
         cancel = () => {
             disposer()
-            reject("WHEN_CANCELLED")
+            reject(new Error("WHEN_CANCELLED"))
         }
-    })
+        abort = () => {
+            disposer()
+            reject(new Error("WHEN_ABORTED"))
+        }
+        opts?.signal?.addEventListener?.("abort", abort)
+    }).finally(() => opts?.signal?.removeEventListener?.("abort", abort))
     ;(res as any).cancel = cancel
     return res as any
 }

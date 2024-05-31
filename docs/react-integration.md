@@ -202,7 +202,6 @@ quite common. To make this pattern simpler the [`useLocalObservable`](https://gi
 
 ```javascript
 import { observer, useLocalObservable } from "mobx-react-lite"
-import { useState } from "react"
 
 const TimerView = observer(() => {
     const timer = useLocalObservable(() => ({
@@ -245,7 +244,7 @@ as follows, because the `.secondsPassed` is not read inside the `observer` compo
 ```javascript
 const TimerView = observer(({ secondsPassed }) => <span>Seconds passed: {secondsPassed}</span>)
 
-React.render(<TimerViewer secondPassed={myTimer.secondsPassed} />, document.body)
+React.render(<TimerView secondsPassed={myTimer.secondsPassed} />, document.body)
 ```
 
 Note that this is a different mindset from other libraries like `react-redux`, where it is a good practice to dereference early and pass primitives down, to better leverage memoization.
@@ -349,7 +348,7 @@ const TimerView = observer(
 )
 ```
 
-Check out [mobx-react docs](https://github.com/mobxjs/mobx-react#api-documentation) for more information.
+Check out [mobx-react docs](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react#class-components) for more information.
 
 </details>
 
@@ -421,7 +420,7 @@ However, the set of props that a React component receives is in itself not obser
 import { observer, useLocalObservable } from "mobx-react-lite"
 import { useEffect } from "react"
 
-const TimerView = observer(({ offset }) => {
+const TimerView = observer(({ offset = 0 }) => {
     const timer = useLocalObservable(() => ({
         offset, // The initial offset value
         secondsPassed: 0,
@@ -469,7 +468,7 @@ Combining `autorun` and coupling it to the life-cycle of the component using `us
 import { observer, useLocalObservable, useAsObservableSource } from "mobx-react-lite"
 import { useState } from "react"
 
-const TimerView = observer(({ offset }) => {
+const TimerView = observer(() => {
     const timer = useLocalObservable(() => ({
         secondsPassed: 0,
         increaseTimer() {
@@ -494,7 +493,7 @@ const TimerView = observer(({ offset }) => {
         }
     }, [])
 
-    return <span>Seconds passed: {timer.offsetTime}</span>
+    return <span>Seconds passed: {timer.secondsPassed}</span>
 })
 
 ReactDOM.render(<TimerView />, document.body)
@@ -525,4 +524,4 @@ Help! My component isn't re-rendering...
 1. Make sure you grok how tracking works in general. Check out the [Understanding reactivity](understanding-reactivity.md) section.
 1. Read the common pitfalls as described above.
 1. [Configure](configuration.md#linting-options) MobX to warn you of unsound usage of mechanisms and check the console logs.
-1. Use [trace](analyzing-reactivity.md) to verify that you are subscribing to the right things or check what MobX is doing in general using [spy](analyzing-reactivity.md#spy) / the [mobx-logger](https://github.com/winterbe/mobx-logger) package.
+1. Use [trace](analyzing-reactivity.md) to verify that you are subscribing to the right things or check what MobX is doing in general using [spy](analyzing-reactivity.md#spy) / the [mobx-log](https://github.com/kubk/mobx-log) package.

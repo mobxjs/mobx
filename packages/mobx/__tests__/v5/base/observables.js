@@ -15,6 +15,7 @@ const {
     isObservableProp
 } = mobx
 const utils = require("../../v5/utils/test-utils")
+const { MAX_SPLICE_SIZE, getGlobalState } = require("../../../src/internal")
 
 const voidObserver = function () {}
 
@@ -1074,7 +1075,7 @@ test("computed values believe deep NaN === deep NaN when using compareStructural
     )
 
     const buf = new buffer()
-    c.observe_(newValue => {
+    m.observe(c, newValue => {
         buf(newValue)
     })
 
@@ -1397,6 +1398,49 @@ test("atom events #427", () => {
 
     d()
     expect(stop).toBe(2)
+})
+
+test("#3563 reportObserved in batch", () => {
+    let start = 0
+    let stop = 0
+    let computed = 0
+    let observed = 0
+
+    const a = mobx.createAtom(
+        "test",
+        () => start++,
+        () => stop++
+    )
+    const c = mobx.computed(() => {
+        computed += 1
+        observed += a.reportObserved() ? 1 : 0
+    })
+    c.get()
+    expect(start).toBe(0)
+    expect(stop).toBe(0)
+    expect(computed).toBe(1)
+    expect(observed).toBe(0)
+
+    mobx.runInAction(() => {
+        c.get()
+        expect(start).toBe(0)
+        expect(stop).toBe(0)
+        expect(computed).toBe(2)
+        expect(observed).toBe(0)
+
+        c.get()
+        expect(computed).toBe(2)
+        expect(observed).toBe(0)
+    })
+
+    const c2 = mobx.computed(() => {
+        c.get()
+    })
+    c2.get()
+    expect(start).toBe(0)
+    expect(stop).toBe(0)
+    expect(computed).toBe(3)
+    expect(observed).toBe(0)
 })
 
 test("verify calculation count", () => {
@@ -2094,7 +2138,7 @@ test("extendObservable should not accept complex objects as second argument", ()
     expect(() => {
         extendObservable({}, new X())
     }).toThrowErrorMatchingInlineSnapshot(
-        `"[MobX] 'extendObservabe' only accepts plain objects as second argument"`
+        `"[MobX] 'extendObservable' only accepts plain objects as second argument"`
     )
 })
 
@@ -2189,4 +2233,249 @@ test("options can be provided only once", () => {
         o.y = 0
         makeObservable(o, { y: observable }, {})
     }).toThrow(error)
+})
+
+test("ObservableArray.replace", () => {
+    // both lists are small
+    let ar = observable([1])
+    let del = ar.replace([2])
+    expect(ar.toJSON()).toEqual([2])
+    expect(del).toEqual([1])
+
+    // the replacement is large
+    ar = observable([1])
+    del = ar.replace(new Array(MAX_SPLICE_SIZE))
+    expect(ar.length).toEqual(MAX_SPLICE_SIZE)
+    expect(del).toEqual([1])
+
+    // the original is large
+    ar = observable(new Array(MAX_SPLICE_SIZE))
+    del = ar.replace([2])
+    expect(ar).toEqual([2])
+    expect(del.length).toEqual(MAX_SPLICE_SIZE)
+
+    // both are large; original larger than replacement
+    ar = observable(new Array(MAX_SPLICE_SIZE + 1))
+    del = ar.replace(new Array(MAX_SPLICE_SIZE))
+    expect(ar.length).toEqual(MAX_SPLICE_SIZE)
+    expect(del.length).toEqual(MAX_SPLICE_SIZE + 1)
+
+    // both are large; replacement larger than original
+    ar = observable(new Array(MAX_SPLICE_SIZE))
+    del = ar.replace(new Array(MAX_SPLICE_SIZE + 1))
+    expect(ar.length).toEqual(MAX_SPLICE_SIZE + 1)
+    expect(del.length).toEqual(MAX_SPLICE_SIZE)
+})
+
+test("ObservableArray.splice", () => {
+    // Deleting 1 item from a large list
+    let ar = observable(new Array(MAX_SPLICE_SIZE + 1))
+    let del = ar.splice(1, 1)
+    expect(ar.length).toEqual(MAX_SPLICE_SIZE)
+    expect(del.length).toEqual(1)
+
+    // Deleting many items from a large list
+    ar = observable(new Array(MAX_SPLICE_SIZE + 2))
+    del = ar.splice(1, MAX_SPLICE_SIZE + 1)
+    expect(ar.length).toEqual(1)
+    expect(del.length).toEqual(MAX_SPLICE_SIZE + 1)
+
+    // Deleting 1 item from a large list and inserting many items
+    ar = observable(new Array(MAX_SPLICE_SIZE + 1))
+    del = ar.splice(1, 1, ...new Array(MAX_SPLICE_SIZE + 1))
+    expect(ar.length).toEqual(MAX_SPLICE_SIZE * 2 + 1)
+    expect(del.length).toEqual(1)
+
+    // Deleting many items from a large list and inserting many items
+    ar = observable(new Array(MAX_SPLICE_SIZE + 10))
+    del = ar.splice(1, MAX_SPLICE_SIZE + 1, ...new Array(MAX_SPLICE_SIZE + 1))
+    expect(ar.length).toEqual(MAX_SPLICE_SIZE + 10)
+    expect(del.length).toEqual(MAX_SPLICE_SIZE + 1)
+})
+
+describe("`requiresReaction` takes precedence over global `computedRequiresReaction`", () => {
+    const name = "TestComputed"
+    let warnMsg = `[mobx] Computed value '${name}' is being read outside a reactive context. Doing a full recompute.`
+    let consoleWarnSpy
+    beforeEach(() => {
+        consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation()
+    })
+    afterEach(() => {
+        consoleWarnSpy.mockRestore()
+        mobx._resetGlobalState()
+    })
+
+    test("`undefined`", () => {
+        mobx.configure({ computedRequiresReaction: true })
+        const c = mobx.computed(() => {}, { name })
+        c.get()
+        expect(consoleWarnSpy).toHaveBeenLastCalledWith(warnMsg)
+    })
+
+    test("`true` over `false`", () => {
+        mobx.configure({ computedRequiresReaction: false })
+        const c = mobx.computed(() => {}, { name, requiresReaction: true })
+        c.get()
+        expect(consoleWarnSpy).toHaveBeenLastCalledWith(warnMsg)
+    })
+
+    test("`false` over `true`", () => {
+        mobx.configure({ computedRequiresReaction: true })
+        const c = mobx.computed(() => {}, { name, requiresReaction: false })
+        c.get()
+        expect(consoleWarnSpy).not.toHaveBeenCalled()
+    })
+})
+
+describe("`requiresObservable` takes precedence over global `reactionRequiresObservable`", () => {
+    const name = "TestReaction"
+    let warnMsg = `[mobx] Derivation '${name}' is created/updated without reading any observable value.`
+    let consoleWarnSpy
+    beforeEach(() => {
+        consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation()
+    })
+    afterEach(() => {
+        consoleWarnSpy.mockRestore()
+        mobx._resetGlobalState()
+    })
+
+    test("`undefined`", () => {
+        mobx.configure({ reactionRequiresObservable: true })
+        const dispose = mobx.autorun(() => {}, { name })
+        dispose()
+        expect(consoleWarnSpy).toHaveBeenLastCalledWith(warnMsg)
+    })
+
+    test("`true` over `false`", () => {
+        mobx.configure({ reactionRequiresObservable: false })
+        const dispose = mobx.autorun(() => {}, { name, requiresObservable: true })
+        dispose()
+        expect(consoleWarnSpy).toHaveBeenLastCalledWith(warnMsg)
+    })
+
+    test("`false` over `true`", () => {
+        mobx.configure({ reactionRequiresObservable: true })
+        const dispose = mobx.autorun(() => {}, { name, requiresObservable: false })
+        dispose()
+        expect(consoleWarnSpy).not.toHaveBeenCalled()
+    })
+})
+
+test('Observables initialization does not violate `enforceActions: "always"`', () => {
+    const consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation(() => {})
+
+    const check = cb => {
+        cb()
+        expect(consoleWarnSpy).not.toBeCalled()
+    }
+
+    class MakeObservable {
+        x = 0
+        constructor() {
+            mobx.makeObservable(this, { x: true })
+        }
+    }
+    class MakeAutoObservable {
+        x = 0
+        constructor() {
+            mobx.makeAutoObservable(this)
+        }
+    }
+
+    try {
+        mobx.configure({ enforceActions: "always" })
+        check(() => mobx.observable(0))
+        check(() => new MakeObservable())
+        check(() => mobx.makeObservable({ x: 0 }, { x: true }))
+        check(() => new MakeAutoObservable())
+        check(() => mobx.makeAutoObservable({ x: 0 }))
+        check(() => mobx.extendObservable({}, { x: 0 }))
+        check(() => mobx.observable(new Set([0])))
+        check(() => mobx.observable(new Map([[0, 0]])))
+        check(() => mobx.observable({ x: 0 }, { proxy: false }))
+        check(() => mobx.observable({ x: 0 }, { proxy: true }))
+        check(() => mobx.observable([0], { proxy: false }))
+        check(() => mobx.observable([0], { proxy: true }))
+        check(() => mobx.computed(() => 0))
+    } finally {
+        consoleWarnSpy.mockRestore()
+        mobx._resetGlobalState()
+    }
+})
+
+test("enforceAction is respected when changing keys of observable object", () => {
+    const consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation(() => {})
+    try {
+        mobx.configure({ enforceActions: "always" })
+        const o = mobx.observable({ x: 0 })
+
+        o.y = 0
+        expect(consoleWarnSpy).toBeCalled()
+
+        consoleWarnSpy.mockClear()
+
+        delete o.x
+        expect(consoleWarnSpy).toBeCalled()
+    } finally {
+        consoleWarnSpy.mockRestore()
+        mobx._resetGlobalState()
+    }
+})
+
+test("state version does not update on observable creation", () => {
+    const globalState = getGlobalState()
+
+    const check = cb => {
+        const prevStateVersion = globalState.stateVersion
+        cb()
+        expect(prevStateVersion).toBe(globalState.stateVersion)
+    }
+
+    class MakeObservable {
+        x = 0
+        constructor() {
+            mobx.makeObservable(this, { x: true })
+        }
+    }
+    class MakeAutoObservable {
+        x = 0
+        constructor() {
+            mobx.makeAutoObservable(this)
+        }
+    }
+
+    class MakeObservableSubclass extends MakeObservable {
+        y = 0
+        constructor() {
+            super()
+            mobx.makeObservable(this, { y: true })
+        }
+    }
+
+    check(() => mobx.observable(0))
+    check(() => new MakeObservable())
+    // Batch is required by design - without batch reactions can be created/invoked inbetween individual constructors and they must see updated state version.
+    // https://github.com/mobxjs/mobx/pull/3732#discussion_r1285099080
+    check(mobx.action(() => new MakeObservableSubclass()))
+    check(() => mobx.makeObservable({ x: 0 }, { x: true }))
+    check(() => new MakeAutoObservable())
+    check(() => mobx.makeAutoObservable({ x: 0 }))
+    check(() => mobx.extendObservable({}, { x: 0 }))
+    check(() => mobx.observable(new Set([0])))
+    check(() => mobx.observable(new Map([[0, 0]])))
+    check(() => mobx.observable({ x: 0 }, { proxy: false }))
+    check(() => mobx.observable({ x: 0 }, { proxy: true }))
+    check(() => mobx.observable([0], { proxy: false }))
+    check(() => mobx.observable([0], { proxy: true }))
+    check(() => mobx.computed(() => 0))
+})
+
+test("#3747", () => {
+    mobx.runInAction(() => {
+        const o = observable.box(0)
+        const c = computed(() => o.get())
+        expect(c.get()).toBe(0)
+        o.set(1)
+        expect(c.get()).toBe(1) // would fail
+    })
 })
