@@ -3,6 +3,8 @@
     "compilerOptions": {
         // "module": "commonjs",
         "allowJs": true,
-        "noUnusedLocals": false
+        "noUnusedLocals": false,
+        // See: https://github.com/mobxjs/mobx/pull/3884
+        "useDefineForClassFields": true
     }
 }

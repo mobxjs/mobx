@@ -16,6 +16,7 @@
         "noImplicitThis": false,
         "noEmit": true,
         "experimentalDecorators": true,
+        // See: https://github.com/mobxjs/mobx/pull/3884
         "useDefineForClassFields": false,
         "jsx": "react",
         "esModuleInterop": true
