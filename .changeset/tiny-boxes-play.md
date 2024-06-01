@@ -6,4 +6,4 @@
 "mobx-undecorate": patch
 ---
 
-In TypeScript transpilation, disable useDefineForClassFields to reduce memory requirements of classes having optional members.
+Disable `useDefineForClassFields` in `tsconfig.json` to reduce memory footprint and improve performance of class instances with undefined and unused members.
