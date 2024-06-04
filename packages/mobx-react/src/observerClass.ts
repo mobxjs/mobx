@@ -33,6 +33,8 @@ type ObserverAdministration = {
     // forceUpdate sets this.props.
     // This flag is used to avoid the loop.
     isUpdating: boolean
+    changedVariables: WeakSet<any>
+    unchangedVariables: WeakSet<any>
 }
 
 function getAdministration(component: Component): ObserverAdministration {
@@ -51,7 +53,9 @@ function getAdministration(component: Component): ObserverAdministration {
         propsAtom: createAtom("props"),
         stateAtom: createAtom("state"),
         contextAtom: createAtom("context"),
-        isUpdating: false
+        isUpdating: false,
+        changedVariables: new WeakSet(),
+        unchangedVariables: new WeakSet()
     })
 }
 
@@ -259,15 +263,26 @@ function observerSCU(nextProps: ClassAttributes<any>, nextState: any): boolean {
             "[mobx-react] It seems that a re-rendering of a React component is triggered while in static (server-side) mode. Please make sure components are rendered only once server-side."
         )
     }
-    // update on any state changes (as is the default)
-    if (this.state !== nextState) {
-        return true
-    }
     // update if props are shallowly not equal, inspired by PureRenderMixin
     // we could return just 'false' here, and avoid the `skipRender` checks etc
     // however, it is nicer if lifecycle events are triggered like usually,
     // so we return true here if props are shallowly modified.
-    return !shallowEqual(this.props, nextProps)
+    const propsChanged = !shallowEqual(this.props, nextProps)
+    const stateChanged = !shallowEqual(this.state, nextState)
+    const admin = getAdministration(this)
+    const shouldUpdate = propsChanged || stateChanged
+
+    if (propsChanged) {
+        nextProps && admin.changedVariables.add(nextProps)
+    } else {
+        nextProps && admin.unchangedVariables.add(nextProps)
+    }
+    if (stateChanged) {
+        nextState && admin.changedVariables.add(nextState)
+    } else {
+        nextState && admin.unchangedVariables.add(nextState)
+    }
+    return shouldUpdate
 }
 
 function createObservablePropDescriptor(key: "props" | "state" | "context") {
@@ -290,7 +305,7 @@ function createObservablePropDescriptor(key: "props" | "state" | "context") {
             const admin = getAdministration(this)
             // forceUpdate issued by reaction sets new props.
             // It sets isUpdating to true to prevent loop.
-            if (!admin.isUpdating && !shallowEqual(admin[key], value)) {
+            if (!admin.isUpdating && shouldReportChanged(admin, key, value)) {
                 admin[key] = value
                 // This notifies all observers including our component,
                 // but we don't want to cause `forceUpdate`, because component is already updating,
@@ -302,6 +317,16 @@ function createObservablePropDescriptor(key: "props" | "state" | "context") {
                 admin[key] = value
             }
         }
+    }
+}
+
+function shouldReportChanged(admin: ObserverAdministration, key: string, value: any) {
+    if (admin.changedVariables.has(value)) {
+        return true
+    } else if (admin.unchangedVariables.has(value)) {
+        return false
+    } else {
+        return !shallowEqual(admin[key], value)
     }
 }
 

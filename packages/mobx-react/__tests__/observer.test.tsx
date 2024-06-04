@@ -9,7 +9,8 @@ import {
     computed,
     observable,
     transaction,
-    makeObservable
+    makeObservable,
+    runInAction
 } from "mobx"
 import { withConsole } from "./utils/withConsole"
 import { shallowEqual } from "../src/utils/utils"
@@ -502,14 +503,14 @@ describe("should render component even if setState called with exactly the same 
         expect(renderCount).toBe(2)
     })
 
-    test("after click twice renderCount === 3", () => {
+    test("after click twice renderCount === 2", () => {
         const { container } = render(<Comp />)
         const clickableDiv = container.querySelector("#clickableDiv") as HTMLElement
 
         act(() => clickableDiv.click())
         act(() => clickableDiv.click())
 
-        expect(renderCount).toBe(3)
+        expect(renderCount).toBe(2)
     })
 })
 
@@ -1129,6 +1130,7 @@ test("Class observer can react to changes made before mount #3730", () => {
 
     @observer
     class Child extends React.Component {
+        @action
         componentDidMount(): void {
             o.set(1)
         }
