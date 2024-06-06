@@ -68,7 +68,7 @@
         "tape": "^5.0.1",
         "ts-jest": "^29.0.5",
         "tsdx": "^0.14.1",
-        "typescript": "5.5.0-dev.20240517"
+        "typescript": "^5.5.0-beta"
     },
     "husky": {
         "hooks": {
