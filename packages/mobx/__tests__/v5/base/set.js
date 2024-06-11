@@ -289,3 +289,44 @@ test("set.forEach is reactive", () => {
     s.add(2)
     expect(c).toBe(3)
 })
+
+describe("The Set object methods do what they are supposed to do", () => {
+    const initialSet = new Set([1, 2, 3, 4, 5])
+    const reactiveSet = set(initialSet)
+
+    const observableResult1 = reactiveSet.intersection(new Set([1, 2, 6]))
+    const observableResult2 = reactiveSet.union(new Set([1, 2, 6]))
+    const observableResult3 = reactiveSet.difference(new Set([1, 2, 3, 4, 5, 6, 7]))
+    const observableResult4 = reactiveSet.symmetricDifference(new Set([3, 4]))
+    const observableResult5 = reactiveSet.isSubsetOf(new Set([1, 2, 3]))
+    const observableResult6 = reactiveSet.isSupersetOf(new Set([1, 2, 3, 4, 5, 6]))
+    const observableResult7 = reactiveSet.isDisjointFrom(new Set([6, 7]))
+
+    test("Observable Set methods returns correct result", () => {
+        expect(observableResult1).toEqual(new Set([1, 2]))
+        expect(observableResult2).toEqual(new Set([1, 2, 3, 4, 5, 6]))
+        expect(observableResult3).toEqual(new Set([6, 7]))
+        expect(observableResult4).toEqual(new Set([1, 2, 5]))
+        expect(observableResult5).toBeTruthy()
+        expect(observableResult6).toBeTruthy()
+        expect(observableResult7).toBeTruthy()
+    })
+
+    const nativeResult1 = initialSet.intersection(new Set([1, 2, 6]))
+    const nativeResult2 = initialSet.union(new Set([1, 2, 6]))
+    const nativeResult3 = initialSet.difference(new Set([1, 2, 3]))
+    const nativeResult4 = initialSet.symmetricDifference(new Set([3, 4]))
+    const nativeResult5 = initialSet.isSubsetOf(new Set([1, 2, 3]))
+    const nativeResult6 = initialSet.isSupersetOf(new Set([1, 2, 3, 4, 5, 6]))
+    const nativeResult7 = initialSet.isDisjointFrom(new Set([6, 7]))
+
+    test("Observable Set methods returns the same result as native Set", () => {
+        expect(observableResult1).toEqual(nativeResult1)
+        expect(observableResult2).toEqual(nativeResult2)
+        expect(observableResult3).toEqual(nativeResult3)
+        expect(observableResult4).toEqual(nativeResult4)
+        expect(observableResult5).toEqual(nativeResult5)
+        expect(observableResult6).toEqual(nativeResult6)
+        expect(observableResult7).toEqual(nativeResult7)
+    })
+})
