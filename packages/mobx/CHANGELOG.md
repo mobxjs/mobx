@@ -1,5 +1,11 @@
 # mobx
 
+## 6.12.4
+
+### Patch Changes
+
+-   [`e9e1955f`](https://github.com/mobxjs/mobx/commit/e9e1955f745545d796d906b6e0ba04a6cde3f1ee) [#3880](https://github.com/mobxjs/mobx/pull/3880) Thanks [@peterm-canva](https://github.com/peterm-canva)! - Shrink ComputedValue using a bitfield
+
 ## 6.12.2
 
 ### Patch Changes
