@@ -1,5 +1,11 @@
 # mobx
 
+## 6.12.4
+
+### Patch Changes
+
+-   [`e9e1955f`](https://github.com/mobxjs/mobx/commit/e9e1955f745545d796d906b6e0ba04a6cde3f1ee) [#3880](https://github.com/mobxjs/mobx/pull/3880) Thanks [@peterm-canva](https://github.com/peterm-canva)! - Shrink ComputedValue using a bitfield
+
 ## 6.12.2
 
 ### Patch Changes
@@ -1390,7 +1396,7 @@ A deprecation message will now be printed if creating computed properties while 
 
 ```javascript
 const x = observable({
-    computedProp: function() {
+    computedProp: function () {
         return someComputation
     }
 })
@@ -1415,7 +1421,7 @@ or alternatively:
 
 ```javascript
 observable({
-    computedProp: computed(function() {
+    computedProp: computed(function () {
         return someComputation
     })
 })
@@ -1433,7 +1439,7 @@ N.B. If you want to introduce actions on an observable that modify its state, us
 ```javascript
 observable({
     counter: 0,
-    increment: action(function() {
+    increment: action(function () {
         this.counter++
     })
 })
@@ -1559,10 +1565,10 @@ function Square() {
     extendObservable(this, {
         length: 2,
         squared: computed(
-            function() {
+            function () {
                 return this.squared * this.squared
             },
-            function(surfaceSize) {
+            function (surfaceSize) {
                 this.length = Math.sqrt(surfaceSize)
             }
         )

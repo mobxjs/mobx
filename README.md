@@ -23,11 +23,16 @@ Documentation can be found at **[mobx.js.org](https://mobx.js.org/)**.
 
 MobX is made possible by the generosity of the sponsors below, and many other [individual backers](https://github.com/mobxjs/mobx/blob/main/docs/backers-sponsors.md#backers). Sponsoring directly impacts the longevity of this project.
 
-**🥇 Gold sponsors (\$2500+ total contribution):**
+**🥇🥇 Platinum sponsors (\$5000+ total contribution): 🥇🥇**
 
 <br/>
 <a href="https://www.guilded.gg/"><img src="https://mobx.js.org/assets/guilded.jpg" align="center" width="100" title="Guilded" alt="Guilded" /></a>
+<a href="https://www.canva.com/"><img src="https://mobx.js.org/assets/canva.svg" align="center" width="100" title="Canva" alt="Canva" /></a>
 <a href="https://www.getparallax.com/"><img src="https://mobx.js.org/assets/parallax.png" align="center" width="100" title="Parallax" alt="Parallax" /></a>
+
+**🥇 Gold sponsors (\$2500+ total contribution):**
+
+<br/>
 <a href="https://www.one-beyond.com"><img src="https://mobx.js.org/assets/dcsl.png" align="center" width="100" title="One Beyond" alt="One Beyond"/></a>
 <a href="https://frontendmasters.com/"><img src="https://mobx.js.org/assets/frontendmasters.jpg" align="center" width="100" title="Frontend Masters" alt="Frontend Masters"></a>
 <a href="http://auctionfrontier.com/"><img src="https://mobx.js.org/assets/auctionfrontier.jpeg" align="center" width="100" title="Auction Frontier" alt="Auction Frontier"></a>
@@ -36,7 +41,6 @@ MobX is made possible by the generosity of the sponsors below, and many other [i
 <a href="https://coinbase.com/"><img src="https://mobx.js.org/assets/coinbase.jpeg" align="center" width="100" title="Coinbase" alt="Coinbase" /></a>
 <a href="https://curology.com/blog/tech"><img src="https://mobx.js.org/assets/curology.png" align="center" width="100" title="Curology" alt="Curology"/></a>
 <a href="https://mendix.com/"><img src="https://mobx.js.org/assets/mendix-logo.png" align="center" width="100" title="Mendix" alt="Mendix" /></a>
-<a href="https://www.canva.com/"><img src="https://mobx.js.org/assets/canva.svg" align="center" width="100" title="Canva" alt="Canva" /></a>
 <a href="https://opensource.facebook.com/"><img src="https://mobx.js.org/assets/fbos.jpeg" align="center" width="100" title="Facebook Open Source" alt="Facebook Open Source" /></a>
 <a href="https://casinosites.ltd.uk/?utm_source=sponsorship&utm_medium=mobx&utm_campaign=readme"><img src="https://mobx.js.org/assets/casino2.png" align="center" width="100" title="Casino Sites" alt="Casino Sites"/></a>
 <a href="https://www.bugsnag.com/platforms/react-error-reporting?utm_source=MobX&utm_medium=Website&utm_content=open-source&utm_campaign=2019-community&utm_term=20190913"><img src="https://mobx.js.org/assets/bugsnag.jpg" align="center" width="100" title="Bugsnag" alt="Bugsnag"/></a>

@@ -22,8 +22,8 @@ export interface IAtom extends IObservable {
 }
 
 export class Atom implements IAtom {
-    isPendingUnobservation_ = false // for effective unobserving. BaseAtom has true, for extra optimization, so its onBecomeUnobserved never gets called, because it's not needed
-    isBeingObserved_ = false
+    isPendingUnobservation = false // for effective unobserving. BaseAtom has true, for extra optimization, so its onBecomeUnobserved never gets called, because it's not needed
+    isBeingObserved = false
     observers_ = new Set<IDerivation>()
 
     diffValue_ = 0
