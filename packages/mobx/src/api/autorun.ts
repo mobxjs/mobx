@@ -90,7 +90,7 @@ export function autorun(
         view(reaction)
     }
 
-    if(!opts?.signal?.aborted) {
+    if (!opts?.signal?.aborted) {
         reaction.schedule_()
     }
     return reaction.getDisposer_(opts?.signal)
@@ -181,7 +181,7 @@ export function reaction<T, FireImmediately extends boolean = false>(
         firstTime = false
     }
 
-    if(!opts?.signal?.aborted) {
+    if (!opts?.signal?.aborted) {
         r.schedule_()
     }
     return r.getDisposer_(opts?.signal)
