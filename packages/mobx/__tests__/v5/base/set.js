@@ -342,4 +342,89 @@ describe("The Set object methods do what they are supposed to do", () => {
     })
 })
 
-describe("Observable Set methods are reactive", () => {})
+describe("Observable Set methods are reactive", () => {
+    let c = 0
+    let s = set()
+
+    beforeEach(() => {
+        c = 0
+        s = set()
+    })
+
+    test("Intersection method is reactive", () => {
+        autorun(() => {
+            s.intersection(new Set())
+            c++
+        })
+
+        s.add(1)
+        s.add(2)
+        expect(c).toBe(3)
+    })
+
+    test("Union method is reactive", () => {
+        autorun(() => {
+            s.union(new Set())
+            c++
+        })
+
+        s.add(1)
+        s.add(2)
+        expect(c).toBe(3)
+    })
+
+    test("Difference method is reactive", () => {
+        autorun(() => {
+            s.difference(new Set())
+            c++
+        })
+
+        s.add(1)
+        s.add(2)
+        expect(c).toBe(3)
+    })
+
+    test("symmetricDifference method is reactive", () => {
+        autorun(() => {
+            s.symmetricDifference(new Set())
+            c++
+        })
+
+        s.add(1)
+        s.add(2)
+        expect(c).toBe(3)
+    })
+
+    test("isSubsetOf method is reactive", () => {
+        autorun(() => {
+            s.isSubsetOf(new Set())
+            c++
+        })
+
+        s.add(1)
+        s.add(2)
+        expect(c).toBe(3)
+    })
+
+    test("isSupersetOf method is reactive", () => {
+        autorun(() => {
+            s.isSupersetOf(new Set())
+            c++
+        })
+
+        s.add(1)
+        s.add(2)
+        expect(c).toBe(3)
+    })
+
+    test("isDisjointFrom method is reactive", () => {
+        autorun(() => {
+            s.isDisjointFrom(new Set())
+            c++
+        })
+
+        s.add(1)
+        s.add(2)
+        expect(c).toBe(3)
+    })
+})
