@@ -291,18 +291,47 @@ test("set.forEach is reactive", () => {
 })
 
 describe("The Set object methods do what they are supposed to do", () => {
-    const initialSet = new Set([1, 2, 3, 4, 5])
-    const reactiveSet = set(initialSet)
-
-    const intersectionObservableResult = reactiveSet.intersection(new Set([1, 2, 6]))
-    const unionObservableResult = reactiveSet.union(new Set([1, 2, 6]))
-    const differenceObservableResult = reactiveSet.difference(new Set([1, 2, 3, 4, 5, 6, 7]))
-    const symmetricDifferenceObservableResult = reactiveSet.symmetricDifference(new Set([3, 4]))
-    const isSubsetOfObservableResult = reactiveSet.isSubsetOf(new Set([1, 2, 3]))
-    const isSupersetOfObservableResult = reactiveSet.isSupersetOf(new Set([1, 2, 3, 4, 5, 6]))
-    const isDisjointFromObservableResult = reactiveSet.isDisjointFrom(new Set([6, 7]))
+    const reactiveSet = set([1, 2, 3, 4, 5])
 
     test("Observable Set methods returns correct result", () => {
+        const intersectionObservableResult = reactiveSet.intersection(new Set([1, 2, 6]))
+        const unionObservableResult = reactiveSet.union(new Set([1, 2, 6]))
+        const differenceObservableResult = reactiveSet.difference(new Set([1, 2, 3, 4, 5, 6, 7]))
+        const symmetricDifferenceObservableResult = reactiveSet.symmetricDifference(new Set([3, 4]))
+        const isSubsetOfObservableResult = reactiveSet.isSubsetOf(new Set([1, 2, 3]))
+        const isSupersetOfObservableResult = reactiveSet.isSupersetOf(new Set([1, 2, 3, 4, 5, 6]))
+        const isDisjointFromObservableResult = reactiveSet.isDisjointFrom(new Set([6, 7]))
+
+        expect(intersectionObservableResult).toEqual(new Set([1, 2]))
+        expect(unionObservableResult).toEqual(new Set([1, 2, 3, 4, 5, 6]))
+        expect(differenceObservableResult).toEqual(new Set())
+        expect(symmetricDifferenceObservableResult).toEqual(new Set([1, 2, 5]))
+        expect(isSubsetOfObservableResult).toBeFalsy()
+        expect(isSupersetOfObservableResult).toBeFalsy()
+        expect(isDisjointFromObservableResult).toBeTruthy()
+    })
+
+    test("Observable Set proper works with Set-like objects", () => {
+        const intersectionObservableResult = reactiveSet.intersection(
+            new Map([1, 2, 6].map(i => [i, i]))
+        )
+        const unionObservableResult = reactiveSet.union(new Map([1, 2, 6].map(i => [i, i])))
+        const differenceObservableResult = reactiveSet.difference(
+            new Map([1, 2, 3, 4, 5, 6, 7].map(i => [i, i]))
+        )
+        const symmetricDifferenceObservableResult = reactiveSet.symmetricDifference(
+            new Map([3, 4].map(i => [i, i]))
+        )
+        const isSubsetOfObservableResult = reactiveSet.isSubsetOf(
+            new Map([1, 2, 3].map(i => [i, i]))
+        )
+        const isSupersetOfObservableResult = reactiveSet.isSupersetOf(
+            new Map([1, 2, 3, 4, 5, 6].map(i => [i, i]))
+        )
+        const isDisjointFromObservableResult = reactiveSet.isDisjointFrom(
+            new Map([6, 7].map(i => [i, i]))
+        )
+
         expect(intersectionObservableResult).toEqual(new Set([1, 2]))
         expect(unionObservableResult).toEqual(new Set([1, 2, 3, 4, 5, 6]))
         expect(differenceObservableResult).toEqual(new Set())
@@ -312,3 +341,5 @@ describe("The Set object methods do what they are supposed to do", () => {
         expect(isDisjointFromObservableResult).toBeTruthy()
     })
 })
+
+describe("Observable Set methods are reactive", () => {})
