@@ -6,7 +6,7 @@
     ],
     "resolutions": {
         "jest": "^29.5.0",
-        "typescript": "5.5.0-dev.20240603",
+        "typescript": "^5.5.2",
         "recast": "^0.23.1"
     },
     "repository": {
@@ -68,12 +68,11 @@
         "tape": "^5.0.1",
         "ts-jest": "^29.0.5",
         "tsdx": "^0.14.1",
-        "typescript": "5.5.0-dev.20240603"
+        "typescript": "^5.5.2"
     },
     "husky": {
         "hooks": {
             "pre-commit": "pretty-quick --staged"
         }
-    },
-    "packageManager": "yarn@1.22.19+sha256.732620bac8b1690d507274f025f3c6cfdc3627a84d9642e38a07452cc00e0f2e"
+    }
 }
