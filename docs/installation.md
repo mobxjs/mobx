@@ -35,26 +35,19 @@ When using MobX with TypeScript or Babel, and you plan to use classes; make sure
 -   **Babel**: Make sure to use at least version 7.12, with the following configuration:
     ```json
     {
-    // Babel < 7.13.0
-    "plugins": [["@babel/plugin-proposal-class-properties", { "loose": false }]],
+        // Babel < 7.13.0
+        "plugins": [["@babel/plugin-proposal-class-properties", { "loose": false }]],
 
-            // Babel >= 7.13.0 (https://babeljs.io/docs/en/assumptions)
-            "plugins": [["@babel/plugin-proposal-class-properties"]],
-            "assumptions": {
-                "setPublicClassFields": false
-            }
+        // Babel >= 7.13.0 (https://babeljs.io/docs/en/assumptions)
+        "plugins": [["@babel/plugin-proposal-class-properties"]],
+        "assumptions": {
+            "setPublicClassFields": false
         }
-        ```
-
-    For verification insert this piece of code at the beginning of your sources (eg. `index.js`)
-
+    }
+    ```
+For verification insert this piece of code at the beginning of your sources (eg. `index.js`)
 ```javascript
-if (
-    !new (class {
-        x
-    })().hasOwnProperty("x")
-)
-    throw new Error("Transpiler is not configured correctly")
+if (!new class { x }().hasOwnProperty('x')) throw new Error('Transpiler is not configured correctly');
 ```
 
 Note that for Next.js you must [customize Babel](https://nextjs.org/docs/advanced-features/customizing-babel-config) instead of TypeScript, even if your project is set up to use TypeScript.
