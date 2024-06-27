@@ -141,11 +141,11 @@ export function createInstanceofPredicate<T>(
 }
 
 export function isES6Map(thing: any): thing is Map<any, any> {
-    return thing instanceof Map
+    return thing != null && Object.prototype.toString.call(thing) === "[object Map]"
 }
 
 export function isES6Set(thing: any): thing is Set<any> {
-    return thing instanceof Set
+    return thing != null && Object.prototype.toString.call(thing) === "[object Set]"
 }
 
 const hasGetOwnPropertySymbols = typeof Object.getOwnPropertySymbols !== "undefined"

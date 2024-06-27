@@ -351,7 +351,7 @@ export class ObservableMap<K = any, V = any>
             } else if (Array.isArray(other)) {
                 other.forEach(([key, value]) => this.set(key, value))
             } else if (isES6Map(other)) {
-                if (other.constructor !== Map) {
+                if (other.constructor.name !== "Map") {
                     die(19, other)
                 }
                 other.forEach((value, key) => this.set(key, value))
