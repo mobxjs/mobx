@@ -16,6 +16,7 @@ import {
     hasListeners,
     interceptChange,
     isES6Map,
+    isPlainES6Map,
     isPlainObject,
     isSpyEnabled,
     makeIterable,
@@ -351,7 +352,7 @@ export class ObservableMap<K = any, V = any>
             } else if (Array.isArray(other)) {
                 other.forEach(([key, value]) => this.set(key, value))
             } else if (isES6Map(other)) {
-                if (other.constructor.name !== "Map") {
+                if (!isPlainES6Map(other)) {
                     die(19, other)
                 }
                 other.forEach((value, key) => this.set(key, value))
