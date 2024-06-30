@@ -1,5 +1,11 @@
 # mobx
 
+## 6.12.5
+
+### Patch Changes
+
+-   [`ba890343`](https://github.com/mobxjs/mobx/commit/ba8903430ce96746db5dcde6b78edeb195ea8018) [#3893](https://github.com/mobxjs/mobx/pull/3893) Thanks [@g6123](https://github.com/g6123)! - Fix ES6 Map/Set checks for cross-window scripts
+
 ## 6.12.4
 
 ### Patch Changes
