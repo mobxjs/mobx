@@ -334,9 +334,7 @@ function normalizeSpyEvents(events: any[]) {
 
 test("action decorator (2022.3)", () => {
     class Store {
-        constructor(private multiplier: number) {
-            makeObservable(this)
-        }
+        constructor(private multiplier: number) {}
 
         @action
         add(a: number, b: number): number {
@@ -366,9 +364,7 @@ test("action decorator (2022.3)", () => {
 
 test("custom action decorator (2022.3)", () => {
     class Store {
-        constructor(private multiplier: number) {
-            makeObservable(this)
-        }
+        constructor(private multiplier: number) {}
 
         @action("zoem zoem")
         add(a: number, b: number): number {
@@ -416,9 +412,7 @@ test("custom action decorator (2022.3)", () => {
 
 test("action decorator on field (2022.3)", () => {
     class Store {
-        constructor(private multiplier: number) {
-            makeObservable(this)
-        }
+        constructor(private multiplier: number) {}
 
         @action
         add = (a: number, b: number) => {
@@ -450,9 +444,7 @@ test("action decorator on field (2022.3)", () => {
 
 test("custom action decorator on field (2022.3)", () => {
     class Store {
-        constructor(private multiplier: number) {
-            makeObservable(this)
-        }
+        constructor(private multiplier: number) {}
 
         @action("zoem zoem")
         add = (a: number, b: number) => {
