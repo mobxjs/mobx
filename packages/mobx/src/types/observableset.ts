@@ -243,8 +243,8 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
         } as any)
     }
 
-    intersection<U>(otherSet: ReadonlySetLike<U> & Partial<Set<U>>): Set<T & U> {
-        if (typeof otherSet.intersection === "function") {
+    intersection<U>(otherSet: ReadonlySetLike<U> | Set<U>): Set<T & U> {
+        if (isES6Set(otherSet)) {
             this.atom_.reportObserved()
             return otherSet.intersection(this.data_)
         } else {
@@ -253,8 +253,8 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
         }
     }
 
-    union<U>(otherSet: ReadonlySetLike<U> & Partial<Set<U>>): Set<T | U> {
-        if (typeof otherSet.union === "function") {
+    union<U>(otherSet: ReadonlySetLike<U> & Set<U>): Set<T | U> {
+        if (isES6Set(otherSet)) {
             this.atom_.reportObserved()
             return otherSet.union(this.data_)
         } else {
@@ -263,12 +263,12 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
         }
     }
 
-    difference<U>(otherSet: ReadonlySetLike<U> & Partial<Set<T>>): Set<T> {
+    difference<U>(otherSet: ReadonlySetLike<U> & Set<T>): Set<T> {
         return new Set(this).difference(otherSet)
     }
 
-    symmetricDifference<U>(otherSet: ReadonlySetLike<U> & Partial<Set<U>>): Set<T | U> {
-        if (typeof otherSet.symmetricDifference === "function") {
+    symmetricDifference<U>(otherSet: ReadonlySetLike<U> & Set<U>): Set<T | U> {
+        if (isES6Set(otherSet)) {
             this.atom_.reportObserved()
             return otherSet.symmetricDifference(this.data_)
         } else {
@@ -277,16 +277,16 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
         }
     }
 
-    isSubsetOf(otherSet: ReadonlySetLike<unknown> & Partial<Set<unknown>>): boolean {
+    isSubsetOf(otherSet: ReadonlySetLike<unknown> & Set<unknown>): boolean {
         return new Set(this).isSubsetOf(otherSet)
     }
 
-    isSupersetOf(otherSet: ReadonlySetLike<unknown> & Partial<Set<unknown>>): boolean {
+    isSupersetOf(otherSet: ReadonlySetLike<unknown> & Set<unknown>): boolean {
         return new Set(this).isSupersetOf(otherSet)
     }
 
-    isDisjointFrom(otherSet: ReadonlySetLike<unknown> & Partial<Set<unknown>>): boolean {
-        if (typeof otherSet.isDisjointFrom === "function") {
+    isDisjointFrom(otherSet: ReadonlySetLike<unknown> & Set<unknown>): boolean {
+        if (isES6Set(otherSet)) {
             this.atom_.reportObserved()
             return otherSet.isDisjointFrom(this.data_)
         } else {
