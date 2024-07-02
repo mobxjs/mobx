@@ -1,5 +1,11 @@
 # mobx
 
+## 6.13.0
+
+### Minor Changes
+
+-   [`16f070e6aac60e9010c2591b1743276d700b23d5`](https://github.com/mobxjs/mobx/commit/16f070e6aac60e9010c2591b1743276d700b23d5) [#3898](https://github.com/mobxjs/mobx/pull/3898) Thanks [@inoyakaigor](https://github.com/inoyakaigor)! - Added new Set methods
+
 ## 6.12.5
 
 ### Patch Changes
