@@ -245,8 +245,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
 
     intersection<U>(otherSet: ReadonlySetLike<U> | Set<U>): Set<T & U> {
         if (isES6Set(otherSet)) {
-            this.atom_.reportObserved()
-            return otherSet.intersection(this.data_)
+            return otherSet.intersection(this)
         } else {
             const dehancedSet = new Set(this)
             return dehancedSet.intersection(otherSet)
@@ -255,8 +254,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
 
     union<U>(otherSet: ReadonlySetLike<U> | Set<U>): Set<T | U> {
         if (isES6Set(otherSet)) {
-            this.atom_.reportObserved()
-            return otherSet.union(this.data_)
+            return otherSet.union(this)
         } else {
             const dehancedSet = new Set(this)
             return dehancedSet.union(otherSet)
@@ -269,8 +267,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
 
     symmetricDifference<U>(otherSet: ReadonlySetLike<U> | Set<U>): Set<T | U> {
         if (isES6Set(otherSet)) {
-            this.atom_.reportObserved()
-            return otherSet.symmetricDifference(this.data_)
+            return otherSet.symmetricDifference(this)
         } else {
             const dehancedSet = new Set(this)
             return dehancedSet.symmetricDifference(otherSet)
@@ -287,8 +284,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
 
     isDisjointFrom(otherSet: ReadonlySetLike<unknown> | Set<unknown>): boolean {
         if (isES6Set(otherSet)) {
-            this.atom_.reportObserved()
-            return otherSet.isDisjointFrom(this.data_)
+            return otherSet.isDisjointFrom(this)
         } else {
             const dehancedSet = new Set(this)
             return dehancedSet.isDisjointFrom(otherSet)
