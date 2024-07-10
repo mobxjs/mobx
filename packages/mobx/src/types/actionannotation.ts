@@ -8,8 +8,7 @@ import {
     Annotation,
     globalState,
     MakeResult,
-    assert20223DecoratorType,
-    storeAnnotation
+    assert20223DecoratorType
 } from "../internal"
 
 export function createActionAnnotation(name: string, options?: object): Annotation {
