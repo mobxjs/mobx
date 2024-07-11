@@ -72,21 +72,17 @@ function decorate_20223_(this: Annotation, mthd, context: DecoratorContext) {
     const _createAction = m =>
         createAction(ann.options_?.name ?? name!.toString(), m, ann.options_?.autoAction ?? false)
 
-    if ((kind == "field" || kind == "method") && this.options_?.bound) {
-        addInitializer(function () {
-            const self = this as any
-            const bound = self[name].bind(self)
-            bound.isMobxAction = true
-            self[name] = bound
-        })
-    }
-
     if (kind == "field") {
-        return initMthd => {
-            if (!isAction(initMthd)) {
-                return _createAction(initMthd)
+        return function (initMthd) {
+            let mthd = initMthd
+            if (!isAction(mthd)) {
+                mthd = _createAction(initMthd)
             }
-            return initMthd
+            if (ann.options_?.bound) {
+                mthd = mthd.bind(this)
+                mthd.isMobxAction = true
+            }
+            return mthd
         }
     }
 
@@ -94,6 +90,16 @@ function decorate_20223_(this: Annotation, mthd, context: DecoratorContext) {
         if (!isAction(mthd)) {
             mthd = _createAction(mthd)
         }
+
+        if (this.options_?.bound) {
+            addInitializer(function () {
+                const self = this as any
+                const bound = self[name].bind(self)
+                bound.isMobxAction = true
+                self[name] = bound
+            })
+        }
+
         return mthd
     }
 
