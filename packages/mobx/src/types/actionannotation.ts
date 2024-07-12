@@ -76,7 +76,7 @@ function decorate_20223_(this: Annotation, mthd, context: DecoratorContext) {
         return function (initMthd) {
             let mthd = initMthd
             if (!isAction(mthd)) {
-                mthd = _createAction(initMthd)
+                mthd = _createAction(mthd)
             }
             if (ann.options_?.bound) {
                 mthd = mthd.bind(this)
