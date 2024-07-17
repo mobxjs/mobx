@@ -1,5 +1,11 @@
 # mobx
 
+## 6.13.1
+
+### Patch Changes
+
+-   [`5e711e0b4737fd6b5b3c6f9b32afd4f195bc5fc3`](https://github.com/mobxjs/mobx/commit/5e711e0b4737fd6b5b3c6f9b32afd4f195bc5fc3) [#3901](https://github.com/mobxjs/mobx/pull/3901) Thanks [@peterm-canva](https://github.com/peterm-canva)! - Shrink Atom and Reaction using a bitfield
+
 ## 6.13.0
 
 ### Minor Changes
