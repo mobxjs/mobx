@@ -32,6 +32,8 @@ import {
     allowStateChangesEnd
 } from "../internal"
 
+import { getFlag, setFlag } from "../utils/utils"
+
 export interface IComputedValue<T> {
     get(): T
     set(value: T): void
@@ -54,18 +56,6 @@ export type IComputedDidChange<T = any> = {
     debugObjectName: string
     newValue: T
     oldValue: T | undefined
-}
-
-function getFlag(flags: number, mask: number) {
-    return !!(flags & mask)
-}
-function setFlag(flags: number, mask: number, newValue: boolean): number {
-    if (newValue) {
-        flags |= mask
-    } else {
-        flags &= ~mask
-    }
-    return flags
 }
 
 /**
@@ -92,7 +82,6 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     observing_: IObservable[] = [] // nodes we are looking at. Our value depends on these nodes
     newObserving_ = null // during tracking it's an array with new observed observers
     observers_ = new Set<IDerivation>()
-    diffValue_ = 0
     runId_ = 0
     lastAccessedBy_ = 0
     lowestObserverState_ = IDerivationState_.UP_TO_DATE_
@@ -101,11 +90,12 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     name_: string
     triggeredBy_?: string
 
-    private static readonly isComputingMask_ = 0b0001
-    private static readonly isRunningSetterMask_ = 0b0010
-    private static readonly isBeingObservedMask_ = 0b0100
-    private static readonly isPendingUnobservationMask_ = 0b1000
-    private flags_ = 0b0000
+    private static readonly isComputingMask_ = 0b00001
+    private static readonly isRunningSetterMask_ = 0b00010
+    private static readonly isBeingObservedMask_ = 0b00100
+    private static readonly isPendingUnobservationMask_ = 0b01000
+    private static readonly diffValueMask_ = 0b10000
+    private flags_ = 0b00000
 
     derivation: () => T // N.B: unminified as it is used by MST
     setter_?: (value: T) => void
@@ -195,6 +185,17 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     }
     set isPendingUnobservation(newValue: boolean) {
         this.flags_ = setFlag(this.flags_, ComputedValue.isPendingUnobservationMask_, newValue)
+    }
+
+    get diffValue(): 0 | 1 {
+        return getFlag(this.flags_, ComputedValue.diffValueMask_) ? 1 : 0
+    }
+    set diffValue(newValue: 0 | 1) {
+        this.flags_ = setFlag(
+            this.flags_,
+            ComputedValue.diffValueMask_,
+            newValue === 1 ? true : false
+        )
     }
 
     /**

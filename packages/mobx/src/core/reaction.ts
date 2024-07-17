@@ -22,6 +22,8 @@ import {
     GenericAbortSignal
 } from "../internal"
 
+import { getFlag, setFlag } from "../utils/utils"
+
 /**
  * Reactions are a special kind of derivations. Several things distinguishes them from normal reactive computations
  *
@@ -55,13 +57,16 @@ export class Reaction implements IDerivation, IReactionPublic {
     observing_: IObservable[] = [] // nodes we are looking at. Our value depends on these nodes
     newObserving_: IObservable[] = []
     dependenciesState_ = IDerivationState_.NOT_TRACKING_
-    diffValue_ = 0
     runId_ = 0
     unboundDepsCount_ = 0
-    isDisposed_ = false
-    isScheduled_ = false
-    isTrackPending_ = false
-    isRunning_ = false
+
+    private static readonly isDisposedMask_ = 0b00001
+    private static readonly isScheduledMask_ = 0b00010
+    private static readonly isTrackPendingMask_ = 0b00100
+    private static readonly isRunningMask_ = 0b01000
+    private static readonly diffValueMask_ = 0b10000
+    private flags_ = 0b00000
+
     isTracing_: TraceMode = TraceMode.NONE
 
     constructor(
@@ -71,37 +76,68 @@ export class Reaction implements IDerivation, IReactionPublic {
         public requiresObservable_?
     ) {}
 
+    get isDisposed() {
+        return getFlag(this.flags_, Reaction.isDisposedMask_)
+    }
+    set isDisposed(newValue: boolean) {
+        this.flags_ = setFlag(this.flags_, Reaction.isDisposedMask_, newValue)
+    }
+
+    get isScheduled() {
+        return getFlag(this.flags_, Reaction.isScheduledMask_)
+    }
+    set isScheduled(newValue: boolean) {
+        this.flags_ = setFlag(this.flags_, Reaction.isScheduledMask_, newValue)
+    }
+
+    get isTrackPending() {
+        return getFlag(this.flags_, Reaction.isTrackPendingMask_)
+    }
+    set isTrackPending(newValue: boolean) {
+        this.flags_ = setFlag(this.flags_, Reaction.isTrackPendingMask_, newValue)
+    }
+
+    get isRunning() {
+        return getFlag(this.flags_, Reaction.isRunningMask_)
+    }
+    set isRunning(newValue: boolean) {
+        this.flags_ = setFlag(this.flags_, Reaction.isRunningMask_, newValue)
+    }
+
+    get diffValue(): 0 | 1 {
+        return getFlag(this.flags_, Reaction.diffValueMask_) ? 1 : 0
+    }
+    set diffValue(newValue: 0 | 1) {
+        this.flags_ = setFlag(this.flags_, Reaction.diffValueMask_, newValue === 1 ? true : false)
+    }
+
     onBecomeStale_() {
         this.schedule_()
     }
 
     schedule_() {
-        if (!this.isScheduled_) {
-            this.isScheduled_ = true
+        if (!this.isScheduled) {
+            this.isScheduled = true
             globalState.pendingReactions.push(this)
             runReactions()
         }
-    }
-
-    isScheduled() {
-        return this.isScheduled_
     }
 
     /**
      * internal, use schedule() if you intend to kick off a reaction
      */
     runReaction_() {
-        if (!this.isDisposed_) {
+        if (!this.isDisposed) {
             startBatch()
-            this.isScheduled_ = false
+            this.isScheduled = false
             const prev = globalState.trackingContext
             globalState.trackingContext = this
             if (shouldCompute(this)) {
-                this.isTrackPending_ = true
+                this.isTrackPending = true
 
                 try {
                     this.onInvalidate_()
-                    if (__DEV__ && this.isTrackPending_ && isSpyEnabled()) {
+                    if (__DEV__ && this.isTrackPending && isSpyEnabled()) {
                         // onInvalidate didn't trigger track right away..
                         spyReport({
                             name: this.name_,
@@ -118,7 +154,7 @@ export class Reaction implements IDerivation, IReactionPublic {
     }
 
     track(fn: () => void) {
-        if (this.isDisposed_) {
+        if (this.isDisposed) {
             return
             // console.warn("Reaction already disposed") // Note: Not a warning / error in mobx 4 either
         }
@@ -132,14 +168,14 @@ export class Reaction implements IDerivation, IReactionPublic {
                 type: "reaction"
             })
         }
-        this.isRunning_ = true
+        this.isRunning = true
         const prevReaction = globalState.trackingContext // reactions could create reactions...
         globalState.trackingContext = this
         const result = trackDerivedFunction(this, fn, undefined)
         globalState.trackingContext = prevReaction
-        this.isRunning_ = false
-        this.isTrackPending_ = false
-        if (this.isDisposed_) {
+        this.isRunning = false
+        this.isTrackPending = false
+        if (this.isDisposed) {
             // disposed during last run. Clean up everything that was bound after the dispose call.
             clearObserving(this)
         }
@@ -185,9 +221,9 @@ export class Reaction implements IDerivation, IReactionPublic {
     }
 
     dispose() {
-        if (!this.isDisposed_) {
-            this.isDisposed_ = true
-            if (!this.isRunning_) {
+        if (!this.isDisposed) {
+            this.isDisposed = true
+            if (!this.isRunning) {
                 // if disposed while running, clean up later. Maybe not optimal, but rare case
                 startBatch()
                 clearObserving(this)

@@ -75,7 +75,7 @@ export function autorun(
                     isScheduled = true
                     scheduler(() => {
                         isScheduled = false
-                        if (!reaction.isDisposed_) {
+                        if (!reaction.isDisposed) {
                             reaction.track(reactionRunner)
                         }
                     })
@@ -90,7 +90,7 @@ export function autorun(
         view(reaction)
     }
 
-    if(!opts?.signal?.aborted) {
+    if (!opts?.signal?.aborted) {
         reaction.schedule_()
     }
     return reaction.getDisposer_(opts?.signal)
@@ -160,7 +160,7 @@ export function reaction<T, FireImmediately extends boolean = false>(
 
     function reactionRunner() {
         isScheduled = false
-        if (r.isDisposed_) {
+        if (r.isDisposed) {
             return
         }
         let changed: boolean = false
@@ -181,7 +181,7 @@ export function reaction<T, FireImmediately extends boolean = false>(
         firstTime = false
     }
 
-    if(!opts?.signal?.aborted) {
+    if (!opts?.signal?.aborted) {
         r.schedule_()
     }
     return r.getDisposer_(opts?.signal)

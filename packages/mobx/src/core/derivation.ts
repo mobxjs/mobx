@@ -235,8 +235,8 @@ function bindDependencies(derivation: IDerivation) {
         l = derivation.unboundDepsCount_
     for (let i = 0; i < l; i++) {
         const dep = observing[i]
-        if (dep.diffValue_ === 0) {
-            dep.diffValue_ = 1
+        if (dep.diffValue === 0) {
+            dep.diffValue = 1
             if (i0 !== i) {
                 observing[i0] = dep
             }
@@ -259,10 +259,10 @@ function bindDependencies(derivation: IDerivation) {
     l = prevObserving.length
     while (l--) {
         const dep = prevObserving[l]
-        if (dep.diffValue_ === 0) {
+        if (dep.diffValue === 0) {
             removeObserver(dep, derivation)
         }
-        dep.diffValue_ = 0
+        dep.diffValue = 0
     }
 
     // Go through all new observables and check diffValue: (now it should be unique)
@@ -270,8 +270,8 @@ function bindDependencies(derivation: IDerivation) {
     //   1: it wasn't observed, let's observe it. set back to 0
     while (i0--) {
         const dep = observing[i0]
-        if (dep.diffValue_ === 1) {
-            dep.diffValue_ = 0
+        if (dep.diffValue === 1) {
+            dep.diffValue = 0
             addObserver(dep, derivation)
         }
     }

@@ -212,3 +212,16 @@ export const getOwnPropertyDescriptors =
         })
         return res
     }
+
+export function getFlag(flags: number, mask: number) {
+    return !!(flags & mask)
+}
+
+export function setFlag(flags: number, mask: number, newValue: boolean): number {
+    if (newValue) {
+        flags |= mask
+    } else {
+        flags &= ~mask
+    }
+    return flags
+}
