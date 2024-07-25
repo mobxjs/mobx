@@ -1,5 +1,11 @@
 # eslint-plugin-mobx
 
+## 0.0.11
+
+### Patch Changes
+
+-   [`638533e592f4fda7663fa351447380f9d0917d14`](https://github.com/mobxjs/mobx/commit/638533e592f4fda7663fa351447380f9d0917d14) [#3909](https://github.com/mobxjs/mobx/pull/3909) Thanks [@urugator](https://github.com/urugator)! - mobx/missing-observer rule false positive with forwardRef #3908
+
 ## 0.0.10
 
 ### Patch Changes
