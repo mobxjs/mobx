@@ -50,7 +50,7 @@ For verification insert this piece of code at the beginning of your sources (eg.
 if (!new class { x }().hasOwnProperty('x')) throw new Error('Transpiler is not configured correctly');
 ```
 
-Note that for Next.js you must [customize Babel](https://nextjs.org/docs/advanced-features/customizing-babel-config) instead of TypeScript, even if your project is set up to use TypeScript. 
+Note that for Next.js you must [customize Babel](https://nextjs.org/docs/advanced-features/customizing-babel-config) instead of TypeScript, even if your project is set up to use TypeScript.
 
 ## MobX on older JavaScript environments
 

@@ -1,5 +1,29 @@
 # mobx
 
+## 6.13.1
+
+### Patch Changes
+
+-   [`5e711e0b4737fd6b5b3c6f9b32afd4f195bc5fc3`](https://github.com/mobxjs/mobx/commit/5e711e0b4737fd6b5b3c6f9b32afd4f195bc5fc3) [#3901](https://github.com/mobxjs/mobx/pull/3901) Thanks [@peterm-canva](https://github.com/peterm-canva)! - Shrink Atom and Reaction using a bitfield
+
+## 6.13.0
+
+### Minor Changes
+
+-   [`16f070e6aac60e9010c2591b1743276d700b23d5`](https://github.com/mobxjs/mobx/commit/16f070e6aac60e9010c2591b1743276d700b23d5) [#3898](https://github.com/mobxjs/mobx/pull/3898) Thanks [@inoyakaigor](https://github.com/inoyakaigor)! - Added new Set methods
+
+## 6.12.5
+
+### Patch Changes
+
+-   [`ba890343`](https://github.com/mobxjs/mobx/commit/ba8903430ce96746db5dcde6b78edeb195ea8018) [#3893](https://github.com/mobxjs/mobx/pull/3893) Thanks [@g6123](https://github.com/g6123)! - Fix ES6 Map/Set checks for cross-window scripts
+
+## 6.12.4
+
+### Patch Changes
+
+-   [`e9e1955f`](https://github.com/mobxjs/mobx/commit/e9e1955f745545d796d906b6e0ba04a6cde3f1ee) [#3880](https://github.com/mobxjs/mobx/pull/3880) Thanks [@peterm-canva](https://github.com/peterm-canva)! - Shrink ComputedValue using a bitfield
+
 ## 6.12.2
 
 ### Patch Changes
@@ -1390,7 +1414,7 @@ A deprecation message will now be printed if creating computed properties while 
 
 ```javascript
 const x = observable({
-    computedProp: function() {
+    computedProp: function () {
         return someComputation
     }
 })
@@ -1415,7 +1439,7 @@ or alternatively:
 
 ```javascript
 observable({
-    computedProp: computed(function() {
+    computedProp: computed(function () {
         return someComputation
     })
 })
@@ -1433,7 +1457,7 @@ N.B. If you want to introduce actions on an observable that modify its state, us
 ```javascript
 observable({
     counter: 0,
-    increment: action(function() {
+    increment: action(function () {
         this.counter++
     })
 })
@@ -1559,10 +1583,10 @@ function Square() {
     extendObservable(this, {
         length: 2,
         squared: computed(
-            function() {
+            function () {
                 return this.squared * this.squared
             },
-            function(surfaceSize) {
+            function (surfaceSize) {
                 this.length = Math.sqrt(surfaceSize)
             }
         )
