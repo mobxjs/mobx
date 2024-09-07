@@ -293,7 +293,7 @@ test("set.forEach is reactive", () => {
 describe("The Set object methods do what they are supposed to do", () => {
     const reactiveSet = set([1, 2, 3, 4, 5])
 
-    test("Observable Set methods returns correct result", () => {
+    test("with native Set", () => {
         const intersectionObservableResult = reactiveSet.intersection(new Set([1, 2, 6]))
         const unionObservableResult = reactiveSet.union(new Set([1, 2, 6]))
         const differenceObservableResult = reactiveSet.difference(new Set([1, 2, 3, 4, 5, 6, 7]))
@@ -311,7 +311,25 @@ describe("The Set object methods do what they are supposed to do", () => {
         expect(isDisjointFromObservableResult).toBeTruthy()
     })
 
-    test("Observable Set proper works with Set-like objects", () => {
+    test("with ObservableSet #3919", () => {
+        const intersectionObservableResult = reactiveSet.intersection(set([1, 2, 6]))
+        const unionObservableResult = reactiveSet.union(set([1, 2, 6]))
+        const differenceObservableResult = reactiveSet.difference(set([1, 2, 3, 4, 5, 6, 7]))
+        const symmetricDifferenceObservableResult = reactiveSet.symmetricDifference(set([3, 4]))
+        const isSubsetOfObservableResult = reactiveSet.isSubsetOf(set([1, 2, 3]))
+        const isSupersetOfObservableResult = reactiveSet.isSupersetOf(set([1, 2, 3, 4, 5, 6]))
+        const isDisjointFromObservableResult = reactiveSet.isDisjointFrom(set([6, 7]))
+
+        expect(intersectionObservableResult).toEqual(new Set([1, 2]))
+        expect(unionObservableResult).toEqual(new Set([1, 2, 3, 4, 5, 6]))
+        expect(differenceObservableResult).toEqual(new Set())
+        expect(symmetricDifferenceObservableResult).toEqual(new Set([1, 2, 5]))
+        expect(isSubsetOfObservableResult).toBeFalsy()
+        expect(isSupersetOfObservableResult).toBeFalsy()
+        expect(isDisjointFromObservableResult).toBeTruthy()
+    })
+
+    test("with Set-like", () => {
         const intersectionObservableResult = reactiveSet.intersection(
             new Map([1, 2, 6].map(i => [i, i]))
         )

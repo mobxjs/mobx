@@ -140,18 +140,27 @@ export function createInstanceofPredicate<T>(
     } as any
 }
 
-export function isES6Map(thing: any): thing is Map<any, any> {
+/**
+ * Yields true for both native and observable Map, even across different windows.
+ */
+export function isES6Map(thing: unknown): thing is Map<any, any> {
     return thing != null && Object.prototype.toString.call(thing) === "[object Map]"
 }
 
-export function isPlainES6Map(thing: Map<any, any>): boolean {
+/**
+ * Makes sure a Map is an instance of non-inherited native or observable Map.
+ */
+export function isPlainES6Map(thing: Map<unknown, unknown>): boolean {
     const mapProto = Object.getPrototypeOf(thing)
     const objectProto = Object.getPrototypeOf(mapProto)
     const nullProto = Object.getPrototypeOf(objectProto)
     return nullProto === null
 }
 
-export function isES6Set(thing: any): thing is Set<any> {
+/**
+ * Yields true for both native and observable Set, even across different windows.
+ */
+export function isES6Set(thing: unknown): thing is Set<any> {
     return thing != null && Object.prototype.toString.call(thing) === "[object Set]"
 }
 
