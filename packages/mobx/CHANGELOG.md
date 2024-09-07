@@ -1,5 +1,11 @@
 # mobx
 
+## 6.13.2
+
+### Patch Changes
+
+-   [`f1f922152b45357a49ee6b310e9e0ecf38bd3955`](https://github.com/mobxjs/mobx/commit/f1f922152b45357a49ee6b310e9e0ecf38bd3955) [#3921](https://github.com/mobxjs/mobx/pull/3921) Thanks [@urugator](https://github.com/urugator)! - fix: #3919 new set methods not working with observable set
+
 ## 6.13.1
 
 ### Patch Changes
