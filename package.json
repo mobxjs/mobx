@@ -33,8 +33,9 @@
     "devDependencies": {
         "@changesets/changelog-github": "^0.2.7",
         "@changesets/cli": "^2.11.0",
+        "@testing-library/dom": "^10.4.0",
         "@testing-library/jest-dom": "^5.16.4",
-        "@testing-library/react": "^13.0.0",
+        "@testing-library/react": "^16.0.1",
         "@testing-library/react-hooks": "7.0.2",
         "@types/jest": "^26.0.15",
         "@types/node": "18",
