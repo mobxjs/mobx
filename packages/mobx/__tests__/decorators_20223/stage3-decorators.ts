@@ -1093,3 +1093,25 @@ test("#2159 - computed property keys", () => {
         "original string value" // original string
     ])
 })
+
+test(`decorated field can be inherited, but doesn't inherite the effect of decorator`, () => {
+    class Store {
+        @action
+        action = () => {
+            return
+        }
+    }
+
+    class SubStore extends Store {
+        action = () => {
+            // should not be a MobX action
+            return
+        }
+    }
+
+    const store = new Store()
+    expect(isAction(store.action)).toBe(true)
+
+    const subStore = new SubStore()
+    expect(isAction(subStore.action)).toBe(false)
+})

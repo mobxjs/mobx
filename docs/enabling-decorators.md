@@ -128,6 +128,9 @@ MobX' 2022.3 Decorators are very similar to the MobX 5 decorators, so usage is m
     The main cases for enumerability seem to have been around serialization and rest destructuring.
     -   Regarding serialization, implicitly serializing all properties probably isn't ideal in an OOP-world anyway, so this doesn't seem like a substantial issue (consider implementing `toJSON` or using `serializr` as possible alternatives)
     -   Addressing rest-destructuring, such is an anti-pattern in MobX - doing so would (likely unwantedly) touch all observables and make the observer overly-reactive).
+-   `@action some_field = () => {}` was and is valid usage. However, inheritance is different between legacy decorators and modern decorators.
+    -   In legacy decorators, if superclass has a field decorated by `@action`, and subclass tries to override the same field, it will throw a `TypeError: Cannot redefine property`.
+    -   In modern decorators, if superclass has a field decorated by `@action`, and subclass tries to override the same field, it's allowed to override the field. However, the field on subclass is not an action unless it's also decorated with `@action` in subclass declaration.
 
 </details>
 
