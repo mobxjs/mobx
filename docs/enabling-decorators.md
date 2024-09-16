@@ -14,8 +14,9 @@ After years of alterations, ES decorators have finally reached Stage 3 in the TC
 With modern decorators, it is no longer needed to call `makeObservable` / `makeAutoObservable`.
 
 2022.3 Decorators are supported in:
-* TypeScript (5.0 and higher, make sure that the `experimentalDecorators` flag is NOT enabled). [Example commit](https://github.com/mweststrate/currencies-demo/commit/acb9ac8c148e8beef88042c847bb395131e85d60).
-* For Babel make sure the plugin [`proposal-decorators`](https://babeljs.io/docs/babel-plugin-proposal-decorators) is enabled with the highest version (currently `2023-05`). [Example commit](https://github.com/mweststrate/currencies-demo/commit/4999d2228208f3e1e10bc00a272046eaefde8585).
+
+-   TypeScript (5.0 and higher, make sure that the `experimentalDecorators` flag is NOT enabled). [Example commit](https://github.com/mweststrate/currencies-demo/commit/acb9ac8c148e8beef88042c847bb395131e85d60).
+-   For Babel make sure the plugin [`proposal-decorators`](https://babeljs.io/docs/babel-plugin-proposal-decorators) is enabled with the highest version (currently `2023-05`). [Example commit](https://github.com/mweststrate/currencies-demo/commit/4999d2228208f3e1e10bc00a272046eaefde8585).
 
 ```js
 // tsconfig.json
@@ -106,6 +107,7 @@ class TodoList {
     }
 }
 ```
+
 </details>
 
 <details id="migrate-decorators"><summary>Migrating from legacy decorators</summary>
@@ -126,7 +128,9 @@ MobX' 2022.3 Decorators are very similar to the MobX 5 decorators, so usage is m
     The main cases for enumerability seem to have been around serialization and rest destructuring.
     -   Regarding serialization, implicitly serializing all properties probably isn't ideal in an OOP-world anyway, so this doesn't seem like a substantial issue (consider implementing `toJSON` or using `serializr` as possible alternatives)
     -   Addressing rest-destructuring, such is an anti-pattern in MobX - doing so would (likely unwantedly) touch all observables and make the observer overly-reactive).
--   `@action some_field = () => {}` was and is valid usage (_if_ `makeObservable()` is also used). However, `@action accessor some_field = () => {}` is never valid.
+-   `@action some_field = () => {}` was and is valid usage. However, inheritance is different between legacy decorators and modern decorators.
+    -   In legacy decorators, if superclass has a field decorated by `@action`, and subclass tries to override the same field, it will throw a `TypeError: Cannot redefine property`.
+    -   In modern decorators, if superclass has a field decorated by `@action`, and subclass tries to override the same field, it's allowed to override the field. However, the field on subclass is not an action unless it's also decorated with `@action` in subclass declaration.
 
 </details>
 
