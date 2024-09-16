@@ -1,5 +1,11 @@
 # mobx
 
+## 6.13.3
+
+### Patch Changes
+
+-   [`a1cf2c63ef92d3d42a5b42a23ff6c7a745664cfd`](https://github.com/mobxjs/mobx/commit/a1cf2c63ef92d3d42a5b42a23ff6c7a745664cfd) [#3902](https://github.com/mobxjs/mobx/pull/3902) Thanks [@jzhan-canva](https://github.com/jzhan-canva)! - Fix 2022.3 @action decorators on fields no longer require makeObservable
+
 ## 6.13.2
 
 ### Patch Changes
