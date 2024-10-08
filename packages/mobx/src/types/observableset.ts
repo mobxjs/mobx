@@ -13,6 +13,7 @@ import {
     notifyListeners,
     spyReportEnd,
     createInstanceofPredicate,
+    makeIterable,
     hasInterceptors,
     interceptChange,
     IInterceptable,
@@ -20,7 +21,6 @@ import {
     registerInterceptor,
     checkIfStateModificationsAreAllowed,
     untracked,
-    makeIterable,
     transaction,
     isES6Set,
     IAtom,
@@ -214,33 +214,33 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
         let nextIndex = 0
         const keys = Array.from(this.keys())
         const values = Array.from(this.values())
-        return makeIterable<[T, T]>({
+        return makeIterableForSet<[T, T]>({
             next() {
                 const index = nextIndex
                 nextIndex += 1
                 return index < values.length
                     ? { value: [keys[index], values[index]], done: false }
-                    : { done: true }
+                    : { value: undefined, done: true }
             }
-        } as any)
+        })
     }
 
-    keys(): IterableIterator<T> {
+    keys(): SetIterator<T> {
         return this.values()
     }
 
-    values(): IterableIterator<T> {
+    values(): SetIterator<T> {
         this.atom_.reportObserved()
         const self = this
         let nextIndex = 0
         const observableValues = Array.from(this.data_.values())
-        return makeIterable<T>({
+        return makeIterableForSet({
             next() {
                 return nextIndex < observableValues.length
                     ? { value: self.dehanceValue_(observableValues[nextIndex++]), done: false }
-                    : { done: true }
+                    : { value: undefined, done: true }
             }
-        } as any)
+        })
     }
 
     intersection<U>(otherSet: ReadonlySetLike<U> | Set<U>): Set<T & U> {
@@ -343,3 +343,8 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
 export var isObservableSet = createInstanceofPredicate("ObservableSet", ObservableSet) as (
     thing: any
 ) => thing is ObservableSet<any>
+
+function makeIterableForSet<T>(iterator: Iterator<T>): SetIterator<T> {
+    iterator[Symbol.toStringTag] = "SetIterator"
+    return makeIterable<T, BuiltinIteratorReturn>(iterator)
+}

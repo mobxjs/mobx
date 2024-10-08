@@ -915,6 +915,34 @@ test("maps.values, keys and maps.entries are iterables", () => {
     expect(Array.from(x.keys())).toEqual(["x", "y"])
 })
 
+// Test support for [iterator-helpers](https://github.com/tc39/proposal-iterator-helpers)
+test("esnext iterator helpers support", () => {
+    const map = mobx.observable(
+        new Map([
+            ["x", [1, 2]],
+            ["y", [3, 4]]
+        ])
+    )
+
+    expect(Array.from(map.keys().map(value => value))).toEqual(["x", "y"])
+    expect(Array.from(map.values().map(value => value))).toEqual([
+        [1, 2],
+        [3, 4]
+    ])
+    expect(Array.from(map.entries().map(([, value]) => value))).toEqual([
+        [1, 2],
+        [3, 4]
+    ])
+
+    expect(Array.from(map.entries().take(1))).toEqual([["x", [1, 2]]])
+    expect(Array.from(map.entries().drop(1))).toEqual([["y", [3, 4]]])
+    expect(Array.from(map.entries().filter(([key]) => key === "y"))).toEqual([["y", [3, 4]]])
+    expect(Array.from(map.entries().find(([key]) => key === "y"))).toEqual(["y", [3, 4]])
+    expect(map.entries().toArray()).toEqual(Array.from(map))
+
+    expect(map.entries().toString()).toEqual("[object MapIterator]")
+})
+
 test("toStringTag", () => {
     const x = mobx.observable.map({ x: 1, y: 2 })
     expect(x[Symbol.toStringTag]).toBe("Map")

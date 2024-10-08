@@ -1,8 +1,5 @@
-export function makeIterable<T>(iterator: Iterator<T>): IterableIterator<T> {
-    iterator[Symbol.iterator] = getSelf
-    return iterator as any
-}
-
-function getSelf() {
-    return this
+export function makeIterable<T, TReturn = unknown>(
+    iterator: Iterator<T>
+): IteratorObject<T, TReturn> {
+    return Object.assign(Object.create(Iterator.prototype), iterator)
 }

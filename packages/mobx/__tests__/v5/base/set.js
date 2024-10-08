@@ -201,6 +201,34 @@ test("set should support iterall / iterable ", () => {
     expect(leech(a.values())).toEqual([1, 2])
 })
 
+// Test support for [iterator-helpers](https://github.com/tc39/proposal-iterator-helpers)
+test("esnext iterator helpers support", () => {
+    const set = mobx.observable(
+        new Set([
+            [1, 2],
+            [3, 4]
+        ])
+    )
+
+    expect(Array.from(set.values().map(value => value))).toEqual([
+        [1, 2],
+        [3, 4]
+    ])
+
+    expect(Array.from(set.entries().map(([, value]) => value))).toEqual([
+        [1, 2],
+        [3, 4]
+    ])
+
+    expect(Array.from(set.values().take(1))).toEqual([[1, 2]])
+    expect(Array.from(set.values().drop(1))).toEqual([[3, 4]])
+    expect(Array.from(set.values().filter(value => value[0] === 3))).toEqual([[3, 4]])
+    expect(Array.from(set.values().find(value => value[0] === 3))).toEqual([3, 4])
+    expect(Array.from(set.values().flatMap(value => value))).toEqual([1, 2, 3, 4])
+
+    expect(set.entries().toString()).toEqual("[object SetIterator]")
+})
+
 test("support for ES6 Set", () => {
     const x = new Set()
     x.add(1)

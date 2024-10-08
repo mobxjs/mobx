@@ -9,6 +9,7 @@ import {
     checkIfStateModificationsAreAllowed,
     createAtom,
     createInstanceofPredicate,
+    makeIterable,
     deepEnhancer,
     getNextId,
     getPlainObjectKeys,
@@ -19,7 +20,6 @@ import {
     isPlainES6Map,
     isPlainObject,
     isSpyEnabled,
-    makeIterable,
     notifyListeners,
     referenceEnhancer,
     registerInterceptor,
@@ -296,15 +296,15 @@ export class ObservableMap<K = any, V = any>
         return value
     }
 
-    keys(): IterableIterator<K> {
+    keys(): MapIterator<K> {
         this.keysAtom_.reportObserved()
         return this.data_.keys()
     }
 
-    values(): IterableIterator<V> {
+    values(): MapIterator<V> {
         const self = this
         const keys = this.keys()
-        return makeIterable({
+        return makeIterableForMap({
             next() {
                 const { done, value } = keys.next()
                 return {
@@ -315,10 +315,10 @@ export class ObservableMap<K = any, V = any>
         })
     }
 
-    entries(): IterableIterator<IMapEntry<K, V>> {
+    entries(): MapIterator<IMapEntry<K, V>> {
         const self = this
         const keys = this.keys()
-        return makeIterable({
+        return makeIterableForMap({
             next() {
                 const { done, value } = keys.next()
                 return {
@@ -489,6 +489,11 @@ export class ObservableMap<K = any, V = any>
 export var isObservableMap = createInstanceofPredicate("ObservableMap", ObservableMap) as (
     thing: any
 ) => thing is ObservableMap<any, any>
+
+function makeIterableForMap<T>(iterator: Iterator<T>): MapIterator<T> {
+    iterator[Symbol.toStringTag] = "MapIterator"
+    return makeIterable<T, BuiltinIteratorReturn>(iterator)
+}
 
 function convertToMap(dataStructure: any): Map<any, any> {
     if (isES6Map(dataStructure) || isObservableMap(dataStructure)) {
