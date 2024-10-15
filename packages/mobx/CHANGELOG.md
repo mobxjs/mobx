@@ -1,5 +1,11 @@
 # mobx
 
+## 6.13.4
+
+### Patch Changes
+
+-   [`f91d2e1dc85a53b729c03bd28ab39ffcf0838403`](https://github.com/mobxjs/mobx/commit/f91d2e1dc85a53b729c03bd28ab39ffcf0838403) [#3935](https://github.com/mobxjs/mobx/pull/3935) Thanks [@tonyraoul](https://github.com/tonyraoul)! - Update typescript version to 5.6.2 and added support for esnext iterator helpers
+
 ## 6.13.3
 
 ### Patch Changes
