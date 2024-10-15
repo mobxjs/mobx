@@ -18,13 +18,27 @@ const ReactMemoSymbol = hasSymbol
     ? Symbol.for("react.memo")
     : typeof memo === "function" && memo((props: any) => null)["$$typeof"]
 
+/**
+ * @deprecated Observer options will be removed in the next major version of mobx-react-lite.
+ * Look at the individual properties for alternatives.
+ */
 export interface IObserverOptions {
+    /**
+     * @deprecated Pass a `React.forwardRef` component to observer instead of using the options object
+     * e.g. `observer(React.forwardRef(fn))`
+     */
     readonly forwardRef?: boolean
 }
 
 export function observer<P extends object, TRef = {}>(
     baseComponent: React.ForwardRefRenderFunction<TRef, P>,
-    options: IObserverOptions & { forwardRef: true }
+    options: IObserverOptions & {
+        /**
+         * @deprecated Pass a `React.forwardRef` component to observer instead of using the options object
+         * e.g. `observer(React.forwardRef(fn))`
+         */
+        forwardRef: true
+    }
 ): React.MemoExoticComponent<
     React.ForwardRefExoticComponent<React.PropsWithoutRef<P> & React.RefAttributes<TRef>>
 >
