@@ -10,6 +10,8 @@ npm install --save-dev eslint @typescript-eslint/parser eslint-plugin-mobx
 
 ## Configuration
 
+### Legacy Config
+
 ```javascript
 // .eslintrc.js
 module.exports = {
@@ -24,10 +26,35 @@ module.exports = {
         "mobx/exhaustive-make-observable": "warn",
         "mobx/unconditional-make-observable": "error",
         "mobx/missing-make-observable": "error",
-        "mobx/missing-observer": "warn",
-        "mobx/no-anonymous-observer": "warn"
+        "mobx/missing-observer": "warn"
     }
 }
+```
+
+### Flat Config
+
+```javascript
+// eslint.config.js
+import pluginMobx from "eslint-plugin-mobx";
+
+export default [
+    // ...
+
+    // Either extend our recommended configuration:
+    pluginMobx.flatConfigs.recommended,
+
+    // ...or specify and customize individual rules:
+    {
+        plugins: { "mobx": pluginMobx },
+        rules: {
+            // these values are the same as recommended
+            "mobx/exhaustive-make-observable": "warn",
+            "mobx/unconditional-make-observable": "error",
+            "mobx/missing-make-observable": "error",
+            "mobx/missing-observer": "warn"
+        }
+    },
+];
 ```
 
 ## Rules

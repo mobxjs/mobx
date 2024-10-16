@@ -1,11 +1,8 @@
-import { RuleTester } from "eslint";
+import { getRuleTester } from "./utils/getRuleTester";
 
 import rule from "../src/unconditional-make-observable.js";
 
-const tester = new RuleTester({
-  parser: require.resolve('@typescript-eslint/parser'),
-  parserOptions: {}
-});
+const tester = getRuleTester();
 
 const valid1 = {
   code: `
