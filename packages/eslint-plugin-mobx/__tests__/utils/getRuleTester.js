@@ -1,16 +1,16 @@
-const version = process.env.ESLINT_V;
+const version = global.ESLINT_V;
 
 const { RuleTester } = require(`eslint-${version}`);
 const typescriptEslintParser = require("@typescript-eslint/parser");
 
 function getRuleTesterConfig() {
     switch (version) {
-        case "7":
+        case 7:
             return {
                 parser: require.resolve("@typescript-eslint/parser"),
                 parserOptions: {},
             };
-        case "9":
+        case 9:
             return {
                 languageOptions: {
                     parser: typescriptEslintParser,

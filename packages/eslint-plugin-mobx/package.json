@@ -36,7 +36,6 @@
         "@rollup/plugin-node-resolve": "13.0.6",
         "@typescript-eslint/eslint-plugin": "^5.0.0",
         "@typescript-eslint/parser": "^5.0.0",
-        "cross-env": "^7.0.3",
         "eslint-7": "npm:eslint@^7.0.0",
         "eslint-9": "npm:eslint@^9.0.0",
         "rollup": "^2.60.2"
@@ -48,8 +47,8 @@
         "mobx"
     ],
     "scripts": {
-        "test:7": "cross-env ESLINT_V=7 jest",
-        "test:9": "cross-env ESLINT_V=9 jest",
+        "test:7": "jest --config jest.config-eslint-7.js",
+        "test:9": "jest --config jest.config-eslint-9.js",
         "test": "npm run test:7 && npm run test:9",
         "build": "yarn rollup --config",
         "prepublishOnly": "yarn build"
