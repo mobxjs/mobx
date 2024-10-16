@@ -1,5 +1,15 @@
+import { getGlobal } from "../internal"
+
+// safely get iterator prototype if available
+const maybeIteratorPrototype = getGlobal()["Iterator"]?.prototype
+
 export function makeIterable<T, TReturn = unknown>(
     iterator: Iterator<T>
 ): IteratorObject<T, TReturn> {
-    return Object.assign(Object.create(Iterator.prototype), iterator)
+    iterator[Symbol.iterator] = getSelf
+    return Object.assign(Object.create(maybeIteratorPrototype), iterator)
+}
+
+function getSelf() {
+    return this
 }
