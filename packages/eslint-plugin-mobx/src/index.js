@@ -1,6 +1,7 @@
 "use strict"
 
-const { name, version } = require("../package.json");
+const fs = require("fs");
+const path = require("path");
 
 const exhaustiveMakeObservable = require("./exhaustive-make-observable.js")
 const unconditionalMakeObservable = require("./unconditional-make-observable.js")
@@ -8,10 +9,12 @@ const missingMakeObservable = require("./missing-make-observable.js")
 const missingObserver = require("./missing-observer")
 const noAnonymousObserver = require("./no-anonymous-observer.js")
 
+const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "package.json"), "utf8"));
+
 const pluginMobx = {
     meta: {
-        name,
-        version
+        name: pkg.name,
+        version: pkg.version
     },
     rules: {
         "exhaustive-make-observable": exhaustiveMakeObservable,
