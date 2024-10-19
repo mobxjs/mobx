@@ -1,4 +1,4 @@
-import { getRuleTester } from "./utils/getRuleTester";
+import { getRuleTester } from "./utils/get-rule-tester";
 
 import rule from "../src/missing-observer.js"
 
