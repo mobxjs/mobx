@@ -1,11 +1,8 @@
-import { RuleTester } from "eslint"
+import { getRuleTester } from "./utils/get-rule-tester";
 
 import rule from "../src/no-anonymous-observer.js"
 
-const tester = new RuleTester({
-    parser: require.resolve("@typescript-eslint/parser"),
-    parserOptions: {}
-})
+const tester = getRuleTester();
 
 const valids = ["observer(function Name() {})", "observer(class Name {})"]
 
