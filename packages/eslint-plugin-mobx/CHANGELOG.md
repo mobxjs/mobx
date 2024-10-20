@@ -1,5 +1,11 @@
 # eslint-plugin-mobx
 
+## 0.0.12
+
+### Patch Changes
+
+-   [`218ebde877712775054e027cfda812210d2aa7d6`](https://github.com/mobxjs/mobx/commit/218ebde877712775054e027cfda812210d2aa7d6) [#3942](https://github.com/mobxjs/mobx/pull/3942) Thanks [@dartess](https://github.com/dartess)! - add eslint@9 support and flat config
+
 ## 0.0.11
 
 ### Patch Changes
