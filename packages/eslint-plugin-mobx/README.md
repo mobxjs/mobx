@@ -35,7 +35,7 @@ module.exports = {
 
 ```javascript
 // eslint.config.js
-import pluginMobx from "eslint-plugin-mobx";
+import pluginMobx from "eslint-plugin-mobx"
 
 export default [
     // ...
@@ -45,7 +45,7 @@ export default [
 
     // ...or specify and customize individual rules:
     {
-        plugins: { "mobx": pluginMobx },
+        plugins: { mobx: pluginMobx },
         rules: {
             // these values are the same as recommended
             "mobx/exhaustive-make-observable": "warn",
@@ -53,8 +53,8 @@ export default [
             "mobx/missing-make-observable": "error",
             "mobx/missing-observer": "warn"
         }
-    },
-];
+    }
+]
 ```
 
 ## Rules
