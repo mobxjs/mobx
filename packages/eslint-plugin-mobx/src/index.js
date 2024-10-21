@@ -1,7 +1,7 @@
 "use strict"
 
-const fs = require("fs");
-const path = require("path");
+const fs = require("fs")
+const path = require("path")
 
 const exhaustiveMakeObservable = require("./exhaustive-make-observable.js")
 const unconditionalMakeObservable = require("./unconditional-make-observable.js")
@@ -9,7 +9,7 @@ const missingMakeObservable = require("./missing-make-observable.js")
 const missingObserver = require("./missing-observer")
 const noAnonymousObserver = require("./no-anonymous-observer.js")
 
-const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "package.json"), "utf8"));
+const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "package.json"), "utf8"))
 
 const pluginMobx = {
     meta: {
@@ -23,7 +23,7 @@ const pluginMobx = {
         "missing-observer": missingObserver,
         "no-anonymous-observer": noAnonymousObserver
     }
-};
+}
 
 const recommendedRules = {
     "mobx/exhaustive-make-observable": "warn",
@@ -37,13 +37,13 @@ module.exports = {
     configs: {
         recommended: {
             plugins: ["mobx"],
-            rules: recommendedRules,
+            rules: recommendedRules
         }
     },
     flatConfigs: {
         recommended: {
-            name: "react-hooks/recommended",
-            plugins: { "mobx": pluginMobx },
+            name: "mobx/recommended",
+            plugins: { mobx: pluginMobx },
             rules: recommendedRules
         }
     }
