@@ -1,6 +1,6 @@
 {
     "name": "eslint-plugin-mobx",
-    "version": "0.0.12",
+    "version": "0.0.13",
     "description": "ESLint rules for MobX",
     "main": "dist/index.js",
     "repository": {

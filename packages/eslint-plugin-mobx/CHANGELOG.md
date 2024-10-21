@@ -1,5 +1,11 @@
 # eslint-plugin-mobx
 
+## 0.0.13
+
+### Patch Changes
+
+-   [`88aa10828eabdf9edf2d0e523e0388c854c79dea`](https://github.com/mobxjs/mobx/commit/88aa10828eabdf9edf2d0e523e0388c854c79dea) [#3947](https://github.com/mobxjs/mobx/pull/3947) Thanks [@dartess](https://github.com/dartess)! - fix config name for recommended flat config
+
 ## 0.0.12
 
 ### Patch Changes
