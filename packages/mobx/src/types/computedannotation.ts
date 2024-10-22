@@ -64,6 +64,7 @@ function decorate_20223_(this: Annotation, get, context: ClassGetterDecoratorCon
         options.name ||= __DEV__
             ? `${adm.name_}.${key.toString()}`
             : `ObservableObject.${key.toString()}`
+        adm.values_.set(key, new ComputedValue(options))
         adm.values_.set(get, new ComputedValue(options))
     })
 
