@@ -443,11 +443,18 @@ However, TypeScript isn't aware of that transformation, so `flowResult` will mak
 `flow`, like `action`, can be used to wrap functions directly. The above example could also have been written as follows:
 
 ```typescript
-import { flow } from "mobx"
+import { flow, makeObservable, observable } from "mobx"
 
 class Store {
     githubProjects = []
     state = "pending"
+
+    constructor() {
+        makeObservable(this, {
+            githubProjects: observable,
+            state: observable,
+        })
+    }
 
     fetchProjects = flow(function* (this: Store) {
         this.githubProjects = []

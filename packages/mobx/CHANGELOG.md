@@ -1,5 +1,17 @@
 # mobx
 
+## 6.13.5
+
+### Patch Changes
+
+-   [`4c077738776d5fc7ba0f108805a9ec816c2709b9`](https://github.com/mobxjs/mobx/commit/4c077738776d5fc7ba0f108805a9ec816c2709b9) [#3943](https://github.com/mobxjs/mobx/pull/3943) Thanks [@tonyraoul](https://github.com/tonyraoul)! - Fix browser compatability issue introduced in 6.13.4 release
+
+## 6.13.4
+
+### Patch Changes
+
+-   [`f91d2e1dc85a53b729c03bd28ab39ffcf0838403`](https://github.com/mobxjs/mobx/commit/f91d2e1dc85a53b729c03bd28ab39ffcf0838403) [#3935](https://github.com/mobxjs/mobx/pull/3935) Thanks [@tonyraoul](https://github.com/tonyraoul)! - Update typescript version to 5.6.2 and added support for esnext iterator helpers
+
 ## 6.13.3
 
 ### Patch Changes
