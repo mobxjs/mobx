@@ -1,7 +1,6 @@
 import * as mobx from "mobx"
 import * as React from "react"
-import { renderHook } from "@testing-library/react-hooks"
-import { act, cleanup, fireEvent, render } from "@testing-library/react"
+import { act, cleanup, fireEvent, render, renderHook } from "@testing-library/react"
 
 import { Observer, observer, useLocalObservable } from "../src"
 import { useEffect, useState } from "react"

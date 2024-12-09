@@ -1,5 +1,4 @@
-import { act, cleanup, render } from "@testing-library/react"
-import { renderHook } from "@testing-library/react-hooks"
+import { act, cleanup, render, renderHook } from "@testing-library/react"
 import { autorun, configure, observable } from "mobx"
 import * as React from "react"
 import { useEffect, useState } from "react"
