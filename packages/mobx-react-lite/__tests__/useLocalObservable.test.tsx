@@ -439,75 +439,108 @@ describe("enforcing actions", () => {
         mobx.configure({ enforceActions: "never" })
         consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
 
-        const { result } = renderHook(() => {
-            const [multiplier, setMultiplier] = React.useState(2)
-            const store = useLocalObservable(() => ({
-                multiplier,
-                count: 10,
-                get multiplied() {
-                    return this.multiplier * this.count
-                },
-                inc() {
-                    this.count += 1
+        const onError = jest.fn()
+        const { result } = renderHook(
+            () => {
+                const [multiplier, setMultiplier] = React.useState(2)
+                const store = useLocalObservable(() => ({
+                    multiplier,
+                    count: 10,
+                    get multiplied() {
+                        return this.multiplier * this.count
+                    },
+                    inc() {
+                        this.count += 1
+                    }
+                }))
+                useEffect(() => {
+                    store.multiplier = multiplier
+                }, [multiplier])
+                useEffect(() => setMultiplier(3), [])
+            },
+            {
+                wrapper: class extends React.Component<React.PropsWithChildren> {
+                    componentDidCatch = onError
+                    render() {
+                        return this.props.children
+                    }
                 }
-            }))
-            useEffect(() => {
-                store.multiplier = multiplier
-            }, [multiplier])
-            useEffect(() => setMultiplier(3), [])
-        })
+            }
+        )
 
-        expect(result.error).not.toBeDefined()
+        expect(onError).not.toBeCalled()
         expect(consoleWarnMock).not.toBeCalled()
     })
     it("only when 'observed' should work", () => {
         mobx.configure({ enforceActions: "observed" })
         consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
 
-        const { result } = renderHook(() => {
-            const [multiplier, setMultiplier] = React.useState(2)
-            const store = useLocalObservable(() => ({
-                multiplier,
-                count: 10,
-                get multiplied() {
-                    return this.multiplier * this.count
-                },
-                inc() {
-                    this.count += 1
+        const onError = jest.fn()
+        renderHook(
+            () => {
+                const [multiplier, setMultiplier] = React.useState(2)
+                const store = useLocalObservable(() => ({
+                    multiplier,
+                    count: 10,
+                    get multiplied() {
+                        return this.multiplier * this.count
+                    },
+                    inc() {
+                        this.count += 1
+                    }
+                }))
+                useEffect(() => {
+                    store.multiplier = multiplier
+                }, [multiplier])
+                useEffect(() => setMultiplier(3), [])
+            },
+            {
+                wrapper: class extends React.Component<React.PropsWithChildren> {
+                    componentDidCatch = onError
+                    render() {
+                        return this.props.children
+                    }
                 }
-            }))
-            useEffect(() => {
-                store.multiplier = multiplier
-            }, [multiplier])
-            useEffect(() => setMultiplier(3), [])
-        })
+            }
+        )
 
-        expect(result.error).not.toBeDefined()
+        expect(onError).not.toBeCalled()
         expect(consoleWarnMock).not.toBeCalled()
     })
     it("'always' should work", () => {
         mobx.configure({ enforceActions: "always" })
         consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
 
-        const { result } = renderHook(() => {
-            const [multiplier, setMultiplier] = React.useState(2)
-            const store = useLocalObservable(() => ({
-                multiplier,
-                count: 10,
-                get multiplied() {
-                    return this.multiplier * this.count
-                },
-                inc() {
-                    this.count += 1
+        const onError = jest.fn()
+        renderHook(
+            () => {
+                const [multiplier, setMultiplier] = React.useState(2)
+                const store = useLocalObservable(() => ({
+                    multiplier,
+                    count: 10,
+                    get multiplied() {
+                        return this.multiplier * this.count
+                    },
+                    inc() {
+                        this.count += 1
+                    }
+                }))
+                useEffect(() => {
+                    store.multiplier = multiplier
+                }, [multiplier])
+                useEffect(() => setMultiplier(3), [])
+            },
+            {
+                wrapper: class extends React.Component<React.PropsWithChildren> {
+                    componentDidCatch = onError
+                    render() {
+                        return this.props.children
+                    }
                 }
-            }))
-            useEffect(() => {
-                store.multiplier = multiplier
-            }, [multiplier])
-            useEffect(() => setMultiplier(3), [])
-        })
+            }
+        )
 
-        expect(result.error).not.toBeDefined()
+        expect(onError).not.toBeCalled()
         expect(consoleWarnMock).toBeCalledTimes(2)
     })
 })
