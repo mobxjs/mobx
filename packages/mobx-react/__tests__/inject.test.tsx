@@ -296,7 +296,8 @@ describe("inject based context", () => {
         expect(ref.current?.testField).toBe(1)
     })
 
-    test("propTypes and defaultProps are forwarded", () => {
+    // skipping because `propTypes` and `defaultProps` are dropped in React 19
+    test.skip("propTypes and defaultProps are forwarded", () => {
         const msg: Array<string> = []
         const baseError = console.error
         console.error = m => msg.push(m)

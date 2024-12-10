@@ -13,7 +13,8 @@ StatelessComp.defaultProps = {
     testProp: "default value for prop testProp"
 }
 
-describe("stateless component with propTypes", () => {
+// skipping because `propTypes` and `defaultProps` are dropped in React 19
+describe.skip("stateless component with propTypes", () => {
     const StatelessCompObserver: React.FunctionComponent<any> = observer(StatelessComp)
 
     test("default property value should be propagated", () => {
