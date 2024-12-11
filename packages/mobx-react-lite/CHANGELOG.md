@@ -1,5 +1,11 @@
 # mobx-react-lite
 
+## 4.1.0
+
+### Minor Changes
+
+-   [`2587df31a1a967a6b385b7ab2d9f0d42fc94e4b0`](https://github.com/mobxjs/mobx/commit/2587df31a1a967a6b385b7ab2d9f0d42fc94e4b0) [#3985](https://github.com/mobxjs/mobx/pull/3985) Thanks [@imjordanxd](https://github.com/imjordanxd)! - \* Added React 19 support, fixes #3986
+
 ## 4.0.7
 
 ### Patch Changes
