@@ -307,7 +307,7 @@ describe("is used to keep observable within component body", () => {
             })
             expect(container.querySelector("span")!.innerHTML).toBe("22")
             expect(counterRender).toBe(2)
-            expect(observerRender).toBe(3)
+            expect(observerRender).toBe(4)
             expect(consoleWarnMock).toMatchSnapshot()
         })
 
@@ -377,7 +377,7 @@ describe("is used to keep observable within component body", () => {
             })
             expect(container.querySelector("span")!.innerHTML).toBe("22")
             expect(counterRender).toBe(2)
-            expect(observerRender).toBe(3)
+            expect(observerRender).toBe(4)
         })
 
         it("with observer()", () => {

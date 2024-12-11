@@ -37,11 +37,11 @@
     },
     "homepage": "https://mobx.js.org",
     "dependencies": {
-        "use-sync-external-store": "^1.2.0"
+        "use-sync-external-store": "^1.4.0"
     },
     "peerDependencies": {
         "mobx": "^6.9.0",
-        "react": "^16.8.0 || ^17 || ^18"
+        "react": "^16.8.0 || ^17 || ^18 || ^19"
     },
     "peerDependenciesMeta": {
         "react-dom": {

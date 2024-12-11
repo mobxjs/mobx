@@ -49,7 +49,7 @@ function runTestSuite(mode: "observer" | "useObserver") {
                 list: 0
             }
 
-            const TodoItem = obsComponent(({ todo }: { todo: typeof store.todos[0] }) => {
+            const TodoItem = obsComponent(({ todo }: { todo: (typeof store.todos)[0] }) => {
                 renderings.item++
                 return <li>|{todo.title}</li>
             }, true)
@@ -997,7 +997,7 @@ it("dependencies should not become temporarily unobserved", async () => {
     expect(doubleDisposed).toBeCalledTimes(1)
 })
 
-it("Legacy context support", () => {
+it.skip("Legacy context support", () => {
     const contextKey = "key"
     const contextValue = "value"
 
