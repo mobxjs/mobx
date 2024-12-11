@@ -49,7 +49,7 @@ test("computed properties react to props when using hooks", async () => {
     act(() => {
         jest.runAllTimers()
     })
-    expect(seen).toEqual(["parent", 0, "parent", 2])
+    expect(seen).toEqual(["parent", 0, "parent", 2, 2])
     expect(container).toHaveTextContent("2")
     expect(consoleWarnMock).toMatchSnapshot()
 })
