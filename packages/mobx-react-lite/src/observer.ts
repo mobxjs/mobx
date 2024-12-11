@@ -4,6 +4,7 @@ import { isUsingStaticRendering } from "./staticRendering"
 import { useObserver } from "./useObserver"
 
 let warnObserverOptionsDeprecated = true
+let warnLegacyContextTypes = true
 
 const hasSymbol = typeof Symbol === "function" && Symbol.for
 const isFunctionNameConfigurable =
@@ -137,6 +138,13 @@ export function observer<P extends object, TRef = {}>(
         ;(observerComponent as React.FunctionComponent).contextTypes = (
             baseComponent as any
         ).contextTypes
+
+        if (process.env.NODE_ENV !== "production" && warnLegacyContextTypes) {
+            warnLegacyContextTypes = false
+            console.warn(
+                `[mobx-react-lite] Support for Legacy Context in function components will be removed in the next major release.`
+            )
+        }
     }
 
     if (useForwardRef) {
