@@ -1,5 +1,7 @@
 import { useObserver } from "./useObserver"
 
+// TODO: this type could be improved in the next major release:
+// type IObserverProps = { children: () => React.ReactNode, render?: never } | { children?: never, render: () => React.ReactNode }
 interface IObserverProps {
     children?(): React.ReactElement | null
     render?(): React.ReactElement | null
