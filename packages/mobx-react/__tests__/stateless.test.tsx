@@ -13,7 +13,8 @@ StatelessComp.defaultProps = {
     testProp: "default value for prop testProp"
 }
 
-describe("stateless component with propTypes", () => {
+// skipping because `propTypes` and `defaultProps` are dropped in React 19
+describe.skip("stateless component with propTypes", () => {
     const StatelessCompObserver: React.FunctionComponent<any> = observer(StatelessComp)
 
     test("default property value should be propagated", () => {
@@ -57,7 +58,8 @@ test("stateless component with context support", () => {
     expect(container.textContent).toBe("context: hello world")
 })
 
-test("component with observable propTypes", () => {
+// propTypes validation seems to have been removed from class components in React 19: https://react.dev/reference/react/Component
+test.skip("component with observable propTypes", () => {
     class Comp extends React.Component {
         render() {
             return null

@@ -469,8 +469,8 @@ test("should stop updating if error was thrown in render (#134)", () => {
         data.set(5)
     })
     // MWE: not sure if these numbers make sense. Nor whether it really matters
-    expect(lastOwnRenderCount).toBe(6)
-    expect(renderingsCount).toBe(6)
+    expect(lastOwnRenderCount).toBe(4)
+    expect(renderingsCount).toBe(4)
 })
 
 describe("should render component even if setState called with exactly the same props", () => {

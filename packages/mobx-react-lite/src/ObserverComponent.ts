@@ -1,11 +1,18 @@
 import { useObserver } from "./useObserver"
 
+// TODO: this type could be improved in the next major release:
+// type IObserverProps = { children: () => React.ReactNode, render?: never } | { children?: never, render: () => React.ReactNode }
 interface IObserverProps {
     children?(): React.ReactElement | null
     render?(): React.ReactElement | null
 }
 
 function ObserverComponent({ children, render }: IObserverProps) {
+    if (children && render) {
+        console.error(
+            "MobX Observer: Do not use children and render in the same time in `Observer`"
+        )
+    }
     const component = children || render
     if (typeof component !== "function") {
         return null
