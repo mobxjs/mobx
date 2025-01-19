@@ -211,15 +211,11 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
     }
 
     entries() {
-        const keys = this.keys()
         const values = this.values()
         return makeIterableForSet<[T, T]>({
             next() {
-                const key = keys.next()
-                const value = values.next()
-                return !key.done && !value.done
-                    ? { value: [key.value, value.value], done: false }
-                    : { value: undefined, done: true }
+                const { value, done } = values.next()
+                return !done ? { value: [value, value], done } : { value: undefined, done }
             }
         })
     }
