@@ -586,7 +586,7 @@ results of this test:
         log(
             "Setting and deleting " +
                 propertiesCount +
-                " map properties " +
+                " set properties " +
                 iterationsCount +
                 " times: " +
                 (end - start) +
@@ -618,7 +618,7 @@ results of this test:
         log(
             "Looking up " +
                 propertiesCount +
-                " map properties " +
+                " set properties " +
                 iterationsCount +
                 " times: " +
                 (end - start) +
@@ -646,9 +646,9 @@ results of this test:
         const end = Date.now()
 
         log(
-            "Looking up " +
+            "Single take out of" +
                 propertiesCount +
-                " map properties " +
+                " set properties " +
                 iterationsCount +
                 " times: " +
                 (end - start) +
@@ -679,9 +679,9 @@ results of this test:
         const end = Date.now()
 
         log(
-            "Looking up " +
+            "Converting " +
                 propertiesCount +
-                " map properties " +
+                " set properties into an array" +
                 iterationsCount +
                 " times: " +
                 (end - start) +
