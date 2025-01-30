@@ -39,6 +39,28 @@ With modern decorators, it is no longer needed to call `makeObservable` / `makeA
 }
 ```
 
+- Vite configuration
+
+```js
+// vite.config.js
+{
+    plugins: [
+      react({
+        babel: {
+          plugins: [
+            [
+              "@babel/plugin-proposal-decorators",
+              {
+                version: "2023-05",
+              },
+            ],
+          ],
+        },
+      }),
+    ]
+}
+```
+
 ## Using decorators
 
 ```javascript
