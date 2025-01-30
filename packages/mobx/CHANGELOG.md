@@ -1,5 +1,11 @@
 # mobx
 
+## 6.13.6
+
+### Patch Changes
+
+-   [`bca3841347f4fba50ad910e1c4176c56ba0173d1`](https://github.com/mobxjs/mobx/commit/bca3841347f4fba50ad910e1c4176c56ba0173d1) [#3993](https://github.com/mobxjs/mobx/pull/3993) Thanks [@tonyraoul](https://github.com/tonyraoul)! - Improve observableset memory footprint and performance
+
 ## 6.13.5
 
 ### Patch Changes
