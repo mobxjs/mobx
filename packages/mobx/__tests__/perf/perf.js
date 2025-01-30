@@ -203,11 +203,11 @@ results of this test:
         const ar = observable([0])
         const findLastIndexOfZero = computed(function () {
             aCalc++
-            return ar.findLastIndex(x => x === 0);
+            return ar.findLastIndex(x => x === 0)
         })
         const lastIndexOfZero = computed(function () {
             bCalc++
-            return ar.lastIndexOf(0);
+            return ar.lastIndexOf(0)
         })
         mobx.observe(findLastIndexOfZero, voidObserver, true)
         mobx.observe(lastIndexOfZero, voidObserver, true)
@@ -225,9 +225,7 @@ results of this test:
 
         const end = now()
 
-        log(
-            "Array findLastIndex loop -  Updated in " + (end - start) + " ms."
-        )
+        log("Array findLastIndex loop -  Updated in " + (end - start) + " ms.")
         t.end()
     })
 
@@ -549,6 +547,146 @@ results of this test:
         t.equal(computeds[27].get(), 134217728)
 
         log("computed memoization " + (now() - start) + "ms")
+        t.end()
+    })
+
+    test(`${version} - Set: initializing`, function (t) {
+        gc()
+        const iterationsCount = 100000
+        let i
+
+        const start = Date.now()
+        for (i = 0; i < iterationsCount; i++) {
+            mobx.observable.set()
+        }
+        const end = Date.now()
+        log("Initilizing " + iterationsCount + " maps: " + (end - start) + " ms.")
+        t.end()
+    })
+
+    test(`${version} - Set: setting and deleting properties`, function (t) {
+        gc()
+        const iterationsCount = 1000
+        const propertiesCount = 10000
+        const set = mobx.observable.set()
+        let i
+        let p
+
+        const start = Date.now()
+        for (i = 0; i < iterationsCount; i++) {
+            for (p = 0; p < propertiesCount; p++) {
+                set.add("" + p)
+            }
+            for (p = 0; p < propertiesCount; p++) {
+                set.delete("" + p)
+            }
+        }
+        const end = Date.now()
+
+        log(
+            "Setting and deleting " +
+                propertiesCount +
+                " set properties " +
+                iterationsCount +
+                " times: " +
+                (end - start) +
+                " ms."
+        )
+        t.end()
+    })
+
+    test(`${version} - Set: looking up properties`, function (t) {
+        gc()
+        const iterationsCount = 1000
+        const propertiesCount = 10000
+        const set = mobx.observable.set()
+        let i
+        let p
+
+        for (p = 0; p < propertiesCount; p++) {
+            set.add("" + p)
+        }
+
+        const start = Date.now()
+        for (i = 0; i < iterationsCount; i++) {
+            for (p = 0; p < propertiesCount; p++) {
+                set.has("" + p)
+            }
+        }
+        const end = Date.now()
+
+        log(
+            "Looking up " +
+                propertiesCount +
+                " set properties " +
+                iterationsCount +
+                " times: " +
+                (end - start) +
+                " ms."
+        )
+        t.end()
+    })
+
+    test(`${version} - Set: iterator helpers`, function (t) {
+        gc()
+        const iterationsCount = 1000
+        const propertiesCount = 10000
+        const set = mobx.observable.set()
+        let i
+        let p
+
+        for (p = 0; p < propertiesCount; p++) {
+            set.add("" + p)
+        }
+
+        const start = Date.now()
+        for (i = 0; i < iterationsCount; i++) {
+            set.entries().take(1)
+        }
+        const end = Date.now()
+
+        log(
+            "Single take out of" +
+                propertiesCount +
+                " set properties " +
+                iterationsCount +
+                " times: " +
+                (end - start) +
+                " ms."
+        )
+        t.end()
+    })
+
+    test(`${version} - Set: conversion to array`, function (t) {
+        gc()
+        const iterationsCount = 1000
+        const propertiesCount = 10000
+        const set = mobx.observable.set()
+        let i
+        let p
+
+        for (p = 0; p < propertiesCount; p++) {
+            set.add("" + p)
+        }
+
+        const start = Date.now()
+        for (i = 0; i < iterationsCount; i++) {
+            Array.from(set.keys())
+            Array.from(set.values())
+            Array.from(set.entries())
+            ;[...set]
+        }
+        const end = Date.now()
+
+        log(
+            "Converting " +
+                propertiesCount +
+                " set properties into an array" +
+                iterationsCount +
+                " times: " +
+                (end - start) +
+                " ms."
+        )
         t.end()
     })
 

@@ -211,16 +211,11 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
     }
 
     entries() {
-        let nextIndex = 0
-        const keys = Array.from(this.keys())
-        const values = Array.from(this.values())
+        const values = this.values()
         return makeIterableForSet<[T, T]>({
             next() {
-                const index = nextIndex
-                nextIndex += 1
-                return index < values.length
-                    ? { value: [keys[index], values[index]], done: false }
-                    : { value: undefined, done: true }
+                const { value, done } = values.next()
+                return !done ? { value: [value, value], done } : { value: undefined, done }
             }
         })
     }
@@ -232,13 +227,13 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
     values(): SetIterator<T> {
         this.atom_.reportObserved()
         const self = this
-        let nextIndex = 0
-        const observableValues = Array.from(this.data_.values())
+        const values = this.data_.values()
         return makeIterableForSet({
             next() {
-                return nextIndex < observableValues.length
-                    ? { value: self.dehanceValue_(observableValues[nextIndex++]), done: false }
-                    : { value: undefined, done: true }
+                const { value, done } = values.next()
+                return !done
+                    ? { value: self.dehanceValue_(value), done }
+                    : { value: undefined, done }
             }
         })
     }
