@@ -319,7 +319,7 @@ Note that it is possible to pass `{ proxy: false }` as an option to `observable`
 1. By default _TypeScript_ will not allow you to annotate **private** fields. This can be overcome by explicitly passing the relevant private fields as generic argument, like this: `makeObservable<MyStore, "privateField" | "privateField2">(this, { privateField: observable, privateField2: observable })`
 1. **Calling `make(Auto)Observable`** and providing annotations must be done **unconditionally**, as this makes it possible to cache the inference results.
 1. **Modifying prototypes** after **`make(Auto)Observable`** has been called is **not supported**.
-1. _EcmaScript_ **private** fields (**`#field`**) are **not supported**. When using _TypeScript_, it is recommended to use the `private` modifier instead.
+1. _EcmaScript_ **private** fields (**`#field`**) are **not supported** by `make(Auto)Observable`. Use auto-accessor + Stage-3 decorators (`@observable accessor #field`) syntax instead. Otherwise, when using _TypeScript_, it is recommended to use the `private` modifier.
 1. **Mixing annotations and decorators** within single inheritance chain is **not supported** - eg. you can't use decorators for superclass and annotations for subclass.
 1. `makeObservable`,`extendObservable` cannot be used on other builtin observable types (`ObservableMap`, `ObservableSet`, `ObservableArray`, etc)
 1. `makeObservable(Object.create(prototype))` copies properties from `prototype` to created object and makes them `observable`. This behavior is wrong, unexpected and therefore **deprecated** and will likely change in future versions. Don't rely on it.
