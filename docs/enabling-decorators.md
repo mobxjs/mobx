@@ -39,24 +39,24 @@ With modern decorators, it is no longer needed to call `makeObservable` / `makeA
 }
 ```
 
-- Vite configuration
+-   Vite configuration
 
 ```js
 // vite.config.js
 {
     plugins: [
-      react({
-        babel: {
-          plugins: [
-            [
-              "@babel/plugin-proposal-decorators",
-              {
-                version: "2023-05",
-              },
-            ],
-          ],
-        },
-      }),
+        react({
+            babel: {
+                plugins: [
+                    [
+                        "@babel/plugin-proposal-decorators",
+                        {
+                            version: "2023-05"
+                        }
+                    ]
+                ]
+            }
+        })
     ]
 }
 ```
@@ -139,6 +139,8 @@ To migrate from legacy decorators to modern decorators, perform the following st
 1. Disable / remove the `experimentalDecorators` flag from your TypeScript configuration (or Babel equivalent)
 2. Remove all `makeObservable(this)` calls from class constructors that use decorators.
 3. Replace all instances of `@observable` (and variations) with `@observable accessor`
+
+Please note that adding `accessor` to a class property will change it into `get` and `set` class methods. Unlike class properties, class methods are not enumerable. This may introduce new behavior with some APIs, such as `Object.keys`, `JSON.stringify`, etc.
 
 </details>
 
