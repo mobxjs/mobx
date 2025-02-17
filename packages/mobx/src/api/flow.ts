@@ -17,11 +17,11 @@ export const FLOW = "flow"
 
 let generatorId = 0
 
-class FlowCancellationError extends Error {
+export class FlowCancellationError extends Error {
     constructor() {
-        super("FLOW_CANCELLED");
-        Object.setPrototypeOf(this, new.target.prototype);
-        this.name = "FlowCancellationError";
+        super("FLOW_CANCELLED")
+        Object.setPrototypeOf(this, new.target.prototype)
+        this.name = "FlowCancellationError"
     }
 }
 
