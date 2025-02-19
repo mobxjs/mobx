@@ -51,17 +51,20 @@ export type ISetDidChange<T = any> =
           oldValue: T
       }
 
+export type ISetWillDeleteChange<T = any> = {
+    type: "delete"
+    object: ObservableSet<T>
+    oldValue: T
+};
+export type ISetWillAddChange<T = any> = {
+    type: "add"
+    object: ObservableSet<T>
+    newValue: T
+};
+
 export type ISetWillChange<T = any> =
-    | {
-          type: "delete"
-          object: ObservableSet<T>
-          oldValue: T
-      }
-    | {
-          type: "add"
-          object: ObservableSet<T>
-          newValue: T
-      }
+    | ISetWillDeleteChange<T>
+    | ISetWillAddChange<T>
 
 export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillChange>, IListenable {
     [$mobx] = ObservableSetMarker
@@ -120,7 +123,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
     add(value: T) {
         checkIfStateModificationsAreAllowed(this.atom_)
         if (hasInterceptors(this)) {
-            const change = interceptChange<ISetWillChange<T>>(this, {
+            const change = interceptChange<ISetWillAddChange<T>>(this, {
                 type: ADD,
                 object: this,
                 newValue: value
@@ -128,8 +131,10 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
             if (!change) {
                 return this
             }
-            // ideally, value = change.value would be done here, so that values can be
-            // changed by interceptor. Same applies for other Set and Map api's.
+
+            // implemented reassignment same as it's done for ObservableMap
+            value = change.newValue!;
+
         }
         if (!this.has(value)) {
             transaction(() => {
@@ -164,7 +169,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
 
     delete(value: T) {
         if (hasInterceptors(this)) {
-            const change = interceptChange<ISetWillChange<T>>(this, {
+            const change = interceptChange<ISetWillDeleteChange<T>>(this, {
                 type: DELETE,
                 object: this,
                 oldValue: value
