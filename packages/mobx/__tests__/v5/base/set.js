@@ -474,3 +474,48 @@ describe("Observable Set methods are reactive", () => {
         expect(c).toBe(3)
     })
 })
+
+
+describe("Observable Set interceptors", () => {
+
+    let s = set()
+
+    beforeEach(() => {
+        s = set()
+    })
+
+    test("Add does not add value if interceptor returned no change", () => {
+        mobx.intercept(s, (change) => {
+            if(change.type === 'add' && change.newValue === 2) {
+                return undefined;
+            }
+
+            return change;
+        })
+
+        s.add(1);
+        s.add(2);
+
+        expect([...s]).toStrictEqual([1]);
+
+
+    })
+
+    test("Add respects newValue from interceptor", () => {
+
+        mobx.intercept(s, (change) => {
+            if(change.type === 'add' && change.newValue === 2) {
+                change.newValue = 10;
+            }
+
+            return change;
+        })
+
+        s.add(1);
+        s.add(2);
+
+        expect([...s]).toStrictEqual([1, 10])
+    })
+
+
+})
