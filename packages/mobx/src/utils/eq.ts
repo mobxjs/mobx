@@ -17,6 +17,8 @@ export function deepEqual(a: any, b: any, depth: number = -1): boolean {
 }
 
 // Copied from https://github.com/jashkenas/underscore/blob/5c237a7c682fb68fd5378203f0bf22dce1624854/underscore.js#L1186-L1289
+// Modified: "Deep compare objects" part to iterate over keys in forward order instead of reverse order.
+//
 // Internal recursive comparison function for `isEqual`.
 function eq(a: any, b: any, depth: number, aStack?: any[], bStack?: any[]) {
     // Identical objects are equal. `0 === -0`, but they aren't identical.
@@ -149,15 +151,14 @@ function eq(a: any, b: any, depth: number, aStack?: any[], bStack?: any[]) {
     } else {
         // Deep compare objects.
         const keys = Object.keys(a)
-        let key
-        length = keys.length
+        const length = keys.length
         // Ensure that both objects contain the same number of properties before comparing deep equality.
         if (Object.keys(b).length !== length) {
             return false
         }
-        while (length--) {
+        for (let i = 0; i < length; i++) {
             // Deep compare each member
-            key = keys[length]
+            const key = keys[i]
             if (!(hasProp(b, key) && eq(a[key], b[key], depth - 1, aStack, bStack))) {
                 return false
             }
