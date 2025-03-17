@@ -1,5 +1,11 @@
 # mobx
 
+## 6.13.7
+
+### Patch Changes
+
+-   [`54e3f71ca02f09b3107290f18d8484b70a6e2f0b`](https://github.com/mobxjs/mobx/commit/54e3f71ca02f09b3107290f18d8484b70a6e2f0b) [#4528](https://github.com/mobxjs/mobx/pull/4528) Thanks [@k-g-a](https://github.com/k-g-a)! - Fix observable.set not respecting the new value from interceptors
+
 ## 6.13.6
 
 ### Patch Changes
