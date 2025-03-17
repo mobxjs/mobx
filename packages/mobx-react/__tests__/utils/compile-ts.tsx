@@ -1,15 +1,7 @@
 import React from "react"
 import ReactDOM from "react-dom"
 import PropTypes from "prop-types"
-import {
-    observer,
-    Provider,
-    inject,
-    Observer,
-    disposeOnUnmount,
-    PropTypes as MRPropTypes,
-    useLocalStore
-} from "../src"
+import { observer, Provider, inject, Observer, disposeOnUnmount, useLocalStore } from "../../src"
 
 @observer
 class T1 extends React.Component<{ pizza: number }, {}> {
@@ -27,9 +19,6 @@ const T2 = observer(
                     <T1 pizza={this.props.cake} />
                 </div>
             )
-        }
-        static propTypes = {
-            zoem: MRPropTypes.arrayOrObservableArray
         }
     }
 )
