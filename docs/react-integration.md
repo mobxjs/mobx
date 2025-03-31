@@ -202,7 +202,6 @@ quite common. To make this pattern simpler the [`useLocalObservable`](https://gi
 
 ```javascript
 import { observer, useLocalObservable } from "mobx-react-lite"
-import { useState } from "react"
 
 const TimerView = observer(() => {
     const timer = useLocalObservable(() => ({
@@ -349,7 +348,7 @@ const TimerView = observer(
 )
 ```
 
-Check out [mobx-react docs](https://github.com/mobxjs/mobx-react#api-documentation) for more information.
+Check out [mobx-react docs](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react#class-components) for more information.
 
 </details>
 

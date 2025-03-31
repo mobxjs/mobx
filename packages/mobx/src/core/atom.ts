@@ -16,6 +16,8 @@ import {
     queueForUnobservation
 } from "../internal"
 
+import { getFlag, setFlag } from "../utils/utils"
+
 export const $mobx = Symbol("mobx administration")
 
 export function createObserverStore(observee: IObservable): Set<IDerivation> {
@@ -39,15 +41,17 @@ export function createObserverStore(observee: IObservable): Set<IDerivation> {
 
 export interface IAtom extends IObservable {
     reportObserved(): boolean
-    reportChanged()
+    reportChanged(): void
 }
 
 export class Atom implements IAtom {
-    isPendingUnobservation_ = false // for effective unobserving. BaseAtom has true, for extra optimization, so its onBecomeUnobserved never gets called, because it's not needed
-    isBeingObserved_ = false
+    private static readonly isBeingObservedMask_ = 0b001
+    private static readonly isPendingUnobservationMask_ = 0b010
+    private static readonly diffValueMask_ = 0b100
+    private flags_ = 0b000
+
     observers_ = createObserverStore(this)
 
-    diffValue_ = 0
     lastAccessedBy_ = 0
     lowestObserverState_ = IDerivationState_.NOT_TRACKING_
     /**
@@ -55,6 +59,28 @@ export class Atom implements IAtom {
      * The onBecomeObserved and onBecomeUnobserved callbacks can be used for resource management.
      */
     constructor(public name_ = __DEV__ ? "Atom@" + getNextId() : "Atom") {}
+
+    // for effective unobserving. BaseAtom has true, for extra optimization, so its onBecomeUnobserved never gets called, because it's not needed
+    get isBeingObserved(): boolean {
+        return getFlag(this.flags_, Atom.isBeingObservedMask_)
+    }
+    set isBeingObserved(newValue: boolean) {
+        this.flags_ = setFlag(this.flags_, Atom.isBeingObservedMask_, newValue)
+    }
+
+    get isPendingUnobservation(): boolean {
+        return getFlag(this.flags_, Atom.isPendingUnobservationMask_)
+    }
+    set isPendingUnobservation(newValue: boolean) {
+        this.flags_ = setFlag(this.flags_, Atom.isPendingUnobservationMask_, newValue)
+    }
+
+    get diffValue(): 0 | 1 {
+        return getFlag(this.flags_, Atom.diffValueMask_) ? 1 : 0
+    }
+    set diffValue(newValue: 0 | 1) {
+        this.flags_ = setFlag(this.flags_, Atom.diffValueMask_, newValue === 1 ? true : false)
+    }
 
     // onBecomeObservedListeners
     public onBOL: Set<Lambda> | undefined

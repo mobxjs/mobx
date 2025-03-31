@@ -4,8 +4,12 @@ import { isUsingStaticRendering } from "./staticRendering"
 import { useObserver } from "./useObserver"
 
 let warnObserverOptionsDeprecated = true
+let warnLegacyContextTypes = true
 
 const hasSymbol = typeof Symbol === "function" && Symbol.for
+const isFunctionNameConfigurable =
+    Object.getOwnPropertyDescriptor(() => {}, "name")?.configurable ?? false
+
 // Using react-is had some issues (and operates on elements, not on types), see #608 / #609
 const ReactForwardRefSymbol = hasSymbol
     ? Symbol.for("react.forward_ref")
@@ -15,13 +19,27 @@ const ReactMemoSymbol = hasSymbol
     ? Symbol.for("react.memo")
     : typeof memo === "function" && memo((props: any) => null)["$$typeof"]
 
+/**
+ * @deprecated Observer options will be removed in the next major version of mobx-react-lite.
+ * Look at the individual properties for alternatives.
+ */
 export interface IObserverOptions {
+    /**
+     * @deprecated Pass a `React.forwardRef` component to observer instead of using the options object
+     * e.g. `observer(React.forwardRef(fn))`
+     */
     readonly forwardRef?: boolean
 }
 
 export function observer<P extends object, TRef = {}>(
     baseComponent: React.ForwardRefRenderFunction<TRef, P>,
-    options: IObserverOptions & { forwardRef: true }
+    options: IObserverOptions & {
+        /**
+         * @deprecated Pass a `React.forwardRef` component to observer instead of using the options object
+         * e.g. `observer(React.forwardRef(fn))`
+         */
+        forwardRef: true
+    }
 ): React.MemoExoticComponent<
     React.ForwardRefExoticComponent<React.PropsWithoutRef<P> & React.RefAttributes<TRef>>
 >
@@ -104,10 +122,15 @@ export function observer<P extends object, TRef = {}>(
         return useObserver(() => render(props, ref), baseComponentName)
     }
 
-    // Don't set `displayName` for anonymous components,
-    // so the `displayName` can be customized by user, see #3192.
-    if (baseComponentName !== "") {
-        ;(observerComponent as React.FunctionComponent).displayName = baseComponentName
+    // Inherit original name and displayName, see #3438
+    ;(observerComponent as React.FunctionComponent).displayName = baseComponent.displayName
+
+    if (isFunctionNameConfigurable) {
+        Object.defineProperty(observerComponent, "name", {
+            value: baseComponent.name,
+            writable: true,
+            configurable: true
+        })
     }
 
     // Support legacy context: `contextTypes` must be applied before `memo`
@@ -115,6 +138,13 @@ export function observer<P extends object, TRef = {}>(
         ;(observerComponent as React.FunctionComponent).contextTypes = (
             baseComponent as any
         ).contextTypes
+
+        if (process.env.NODE_ENV !== "production" && warnLegacyContextTypes) {
+            warnLegacyContextTypes = false
+            console.warn(
+                `[mobx-react-lite] Support for Legacy Context in function components will be removed in the next major release.`
+            )
+        }
     }
 
     if (useForwardRef) {
@@ -136,7 +166,7 @@ export function observer<P extends object, TRef = {}>(
             set() {
                 throw new Error(
                     `[mobx-react-lite] \`${
-                        this.displayName || this.type?.displayName || "Component"
+                        this.displayName || this.type?.displayName || this.type?.name || "Component"
                     }.contextTypes\` must be set before applying \`observer\`.`
                 )
             }

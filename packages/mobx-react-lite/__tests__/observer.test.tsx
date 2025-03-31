@@ -49,7 +49,7 @@ function runTestSuite(mode: "observer" | "useObserver") {
                 list: 0
             }
 
-            const TodoItem = obsComponent(({ todo }: { todo: typeof store.todos[0] }) => {
+            const TodoItem = obsComponent(({ todo }: { todo: (typeof store.todos)[0] }) => {
                 renderings.item++
                 return <li>|{todo.title}</li>
             }, true)
@@ -618,12 +618,15 @@ it("should hoist known statics only", () => {
     expect(wrapped.render).toBe(undefined)
 })
 
-it("should have the correct displayName", () => {
-    const TestComponent = observer(function MyComponent() {
+it("should inherit original name/displayName #3438", () => {
+    function Name() {
         return null
-    })
+    }
+    Name.displayName = "DisplayName"
+    const TestComponent = observer(Name)
 
-    expect((TestComponent as any).type.displayName).toBe("MyComponent")
+    expect((TestComponent as any).type.name).toBe("Name")
+    expect((TestComponent as any).type.displayName).toBe("DisplayName")
 })
 
 test("parent / childs render in the right order", done => {
@@ -994,7 +997,7 @@ it("dependencies should not become temporarily unobserved", async () => {
     expect(doubleDisposed).toBeCalledTimes(1)
 })
 
-it("Legacy context support", () => {
+it.skip("Legacy context support", () => {
     const contextKey = "key"
     const contextValue = "value"
 
@@ -1083,4 +1086,45 @@ test("Anonymous component displayName #3192", () => {
     expect(MemoCmp.displayName).toEqual(ObserverCmp.displayName)
     expect(observerError.message).toEqual(memoError.message)
     consoleErrorSpy.mockRestore()
+})
+
+test("StrictMode #3671", async () => {
+    const o = mobx.observable({ x: 0 })
+
+    const Cmp = observer(() => o.x as any)
+
+    const { container, unmount } = render(
+        <React.StrictMode>
+            <Cmp />
+        </React.StrictMode>
+    )
+
+    expect(container).toHaveTextContent("0")
+    act(
+        mobx.action(() => {
+            o.x++
+        })
+    )
+    expect(container).toHaveTextContent("1")
+})
+
+test("`isolateGlobalState` shouldn't break reactivity #3734", async () => {
+    mobx.configure({ isolateGlobalState: true })
+
+    const o = mobx.observable({ x: 0 })
+
+    const Cmp = observer(() => o.x as any)
+
+    const { container, unmount } = render(<Cmp />)
+
+    expect(container).toHaveTextContent("0")
+    act(
+        mobx.action(() => {
+            o.x++
+        })
+    )
+    expect(container).toHaveTextContent("1")
+    unmount()
+
+    mobx._resetGlobalState()
 })

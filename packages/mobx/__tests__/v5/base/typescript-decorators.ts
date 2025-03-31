@@ -22,7 +22,9 @@ import {
     IAtom,
     createAtom,
     runInAction,
-    makeObservable
+    makeObservable,
+    flow,
+    flowResult
 } from "../../../src/mobx"
 import * as mobx from "../../../src/mobx"
 
@@ -60,6 +62,16 @@ test("decorators", () => {
 
         constructor() {
             makeObservable(this)
+        }
+
+        @flow
+        *testDouble(n: number): Generator<number, number> {
+            yield 3
+            return n * 2
+        }
+
+        async run() {
+            const x: number = await flowResult(this.testDouble(2))
         }
     }
 

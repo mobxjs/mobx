@@ -7,7 +7,12 @@ import { IReactComponent } from "./types/IReactComponent"
 /**
  * Observer function / decorator
  */
-export function observer<T extends IReactComponent>(component: T): T {
+export function observer<T extends IReactComponent>(component: T, context: ClassDecoratorContext): void
+export function observer<T extends IReactComponent>(component: T): T
+export function observer<T extends IReactComponent>(component: T, context?: ClassDecoratorContext): T {
+    if (context && context.kind !== "class") {
+        throw new Error("The @observer decorator can be used on classes only")
+    }
     if (component["isMobxInjector"] === true) {
         console.warn(
             "Mobx observer: You are trying to use `observer` on a component that already has `inject`. Please apply `observer` before applying `inject`"

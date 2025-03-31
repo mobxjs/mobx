@@ -201,6 +201,34 @@ test("set should support iterall / iterable ", () => {
     expect(leech(a.values())).toEqual([1, 2])
 })
 
+// Test support for [iterator-helpers](https://github.com/tc39/proposal-iterator-helpers)
+test("esnext iterator helpers support", () => {
+    const set = mobx.observable(
+        new Set([
+            [1, 2],
+            [3, 4]
+        ])
+    )
+
+    expect(Array.from(set.values().map(value => value))).toEqual([
+        [1, 2],
+        [3, 4]
+    ])
+
+    expect(Array.from(set.entries().map(([, value]) => value))).toEqual([
+        [1, 2],
+        [3, 4]
+    ])
+
+    expect(Array.from(set.values().take(1))).toEqual([[1, 2]])
+    expect(Array.from(set.values().drop(1))).toEqual([[3, 4]])
+    expect(Array.from(set.values().filter(value => value[0] === 3))).toEqual([[3, 4]])
+    expect(Array.from(set.values().find(value => value[0] === 3))).toEqual([3, 4])
+    expect(Array.from(set.values().flatMap(value => value))).toEqual([1, 2, 3, 4])
+
+    expect(set.entries().toString()).toEqual("[object SetIterator]")
+})
+
 test("support for ES6 Set", () => {
     const x = new Set()
     x.add(1)
@@ -288,4 +316,206 @@ test("set.forEach is reactive", () => {
     s.add(1)
     s.add(2)
     expect(c).toBe(3)
+})
+
+describe("The Set object methods do what they are supposed to do", () => {
+    const reactiveSet = set([1, 2, 3, 4, 5])
+
+    test("with native Set", () => {
+        const intersectionObservableResult = reactiveSet.intersection(new Set([1, 2, 6]))
+        const unionObservableResult = reactiveSet.union(new Set([1, 2, 6]))
+        const differenceObservableResult = reactiveSet.difference(new Set([1, 2, 3, 4, 5, 6, 7]))
+        const symmetricDifferenceObservableResult = reactiveSet.symmetricDifference(new Set([3, 4]))
+        const isSubsetOfObservableResult = reactiveSet.isSubsetOf(new Set([1, 2, 3]))
+        const isSupersetOfObservableResult = reactiveSet.isSupersetOf(new Set([1, 2, 3, 4, 5, 6]))
+        const isDisjointFromObservableResult = reactiveSet.isDisjointFrom(new Set([6, 7]))
+
+        expect(intersectionObservableResult).toEqual(new Set([1, 2]))
+        expect(unionObservableResult).toEqual(new Set([1, 2, 3, 4, 5, 6]))
+        expect(differenceObservableResult).toEqual(new Set())
+        expect(symmetricDifferenceObservableResult).toEqual(new Set([1, 2, 5]))
+        expect(isSubsetOfObservableResult).toBeFalsy()
+        expect(isSupersetOfObservableResult).toBeFalsy()
+        expect(isDisjointFromObservableResult).toBeTruthy()
+    })
+
+    test("with ObservableSet #3919", () => {
+        const intersectionObservableResult = reactiveSet.intersection(set([1, 2, 6]))
+        const unionObservableResult = reactiveSet.union(set([1, 2, 6]))
+        const differenceObservableResult = reactiveSet.difference(set([1, 2, 3, 4, 5, 6, 7]))
+        const symmetricDifferenceObservableResult = reactiveSet.symmetricDifference(set([3, 4]))
+        const isSubsetOfObservableResult = reactiveSet.isSubsetOf(set([1, 2, 3]))
+        const isSupersetOfObservableResult = reactiveSet.isSupersetOf(set([1, 2, 3, 4, 5, 6]))
+        const isDisjointFromObservableResult = reactiveSet.isDisjointFrom(set([6, 7]))
+
+        expect(intersectionObservableResult).toEqual(new Set([1, 2]))
+        expect(unionObservableResult).toEqual(new Set([1, 2, 3, 4, 5, 6]))
+        expect(differenceObservableResult).toEqual(new Set())
+        expect(symmetricDifferenceObservableResult).toEqual(new Set([1, 2, 5]))
+        expect(isSubsetOfObservableResult).toBeFalsy()
+        expect(isSupersetOfObservableResult).toBeFalsy()
+        expect(isDisjointFromObservableResult).toBeTruthy()
+    })
+
+    test("with Set-like", () => {
+        const intersectionObservableResult = reactiveSet.intersection(
+            new Map([1, 2, 6].map(i => [i, i]))
+        )
+        const unionObservableResult = reactiveSet.union(new Map([1, 2, 6].map(i => [i, i])))
+        const differenceObservableResult = reactiveSet.difference(
+            new Map([1, 2, 3, 4, 5, 6, 7].map(i => [i, i]))
+        )
+        const symmetricDifferenceObservableResult = reactiveSet.symmetricDifference(
+            new Map([3, 4].map(i => [i, i]))
+        )
+        const isSubsetOfObservableResult = reactiveSet.isSubsetOf(
+            new Map([1, 2, 3].map(i => [i, i]))
+        )
+        const isSupersetOfObservableResult = reactiveSet.isSupersetOf(
+            new Map([1, 2, 3, 4, 5, 6].map(i => [i, i]))
+        )
+        const isDisjointFromObservableResult = reactiveSet.isDisjointFrom(
+            new Map([6, 7].map(i => [i, i]))
+        )
+
+        expect(intersectionObservableResult).toEqual(new Set([1, 2]))
+        expect(unionObservableResult).toEqual(new Set([1, 2, 3, 4, 5, 6]))
+        expect(differenceObservableResult).toEqual(new Set())
+        expect(symmetricDifferenceObservableResult).toEqual(new Set([1, 2, 5]))
+        expect(isSubsetOfObservableResult).toBeFalsy()
+        expect(isSupersetOfObservableResult).toBeFalsy()
+        expect(isDisjointFromObservableResult).toBeTruthy()
+    })
+})
+
+describe("Observable Set methods are reactive", () => {
+    let c = 0
+    let s = set()
+
+    beforeEach(() => {
+        c = 0
+        s = set()
+    })
+
+    test("Intersection method is reactive", () => {
+        autorun(() => {
+            s.intersection(new Set())
+            c++
+        })
+
+        s.add(1)
+        s.add(2)
+        expect(c).toBe(3)
+    })
+
+    test("Union method is reactive", () => {
+        autorun(() => {
+            s.union(new Set())
+            c++
+        })
+
+        s.add(1)
+        s.add(2)
+        expect(c).toBe(3)
+    })
+
+    test("Difference method is reactive", () => {
+        autorun(() => {
+            s.difference(new Set())
+            c++
+        })
+
+        s.add(1)
+        s.add(2)
+        expect(c).toBe(3)
+    })
+
+    test("symmetricDifference method is reactive", () => {
+        autorun(() => {
+            s.symmetricDifference(new Set())
+            c++
+        })
+
+        s.add(1)
+        s.add(2)
+        expect(c).toBe(3)
+    })
+
+    test("isSubsetOf method is reactive", () => {
+        autorun(() => {
+            s.isSubsetOf(new Set())
+            c++
+        })
+
+        s.add(1)
+        s.add(2)
+        expect(c).toBe(3)
+    })
+
+    test("isSupersetOf method is reactive", () => {
+        autorun(() => {
+            s.isSupersetOf(new Set())
+            c++
+        })
+
+        s.add(1)
+        s.add(2)
+        expect(c).toBe(3)
+    })
+
+    test("isDisjointFrom method is reactive", () => {
+        autorun(() => {
+            s.isDisjointFrom(new Set())
+            c++
+        })
+
+        s.add(1)
+        s.add(2)
+        expect(c).toBe(3)
+    })
+})
+
+
+describe("Observable Set interceptors", () => {
+
+    let s = set()
+
+    beforeEach(() => {
+        s = set()
+    })
+
+    test("Add does not add value if interceptor returned no change", () => {
+        mobx.intercept(s, (change) => {
+            if(change.type === 'add' && change.newValue === 2) {
+                return undefined;
+            }
+
+            return change;
+        })
+
+        s.add(1);
+        s.add(2);
+
+        expect([...s]).toStrictEqual([1]);
+
+
+    })
+
+    test("Add respects newValue from interceptor", () => {
+
+        mobx.intercept(s, (change) => {
+            if(change.type === 'add' && change.newValue === 2) {
+                change.newValue = 10;
+            }
+
+            return change;
+        })
+
+        s.add(1);
+        s.add(2);
+
+        expect([...s]).toStrictEqual([1, 10])
+    })
+
+
 })

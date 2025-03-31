@@ -18,6 +18,9 @@ MobX distinguishes between the following three concepts in your application:
 
 Let's take a closer look at these concepts below, or alternatively, in the [10 minute introduction to MobX and React](https://mobx.js.org/getting-started), where you can interactively dive deeper into these concepts step by step and build a simple Todo list app.
 
+Some might recognise the concept of "Signals" in the concepts described below.
+This is correct, MobX is a signal based state management library avant la lettre.
+
 ### 1. Define state and make it observable
 
 _State_ is the data that drives your application.
@@ -52,10 +55,15 @@ class Todo {
 }
 ```
 
-**Hint**: this example can be shortened using [`makeAutoObservable`](observable-state.md), but by being explicit we can showcase the different concepts in greater detail.
-
 Using `observable` is like turning a property of an object into a spreadsheet cell.
 But unlike spreadsheets, these values can not only be primitive values, but also references, objects and arrays.
+
+<details><summary>Tip: Prefer classes, plain objects or decorators? MobX supports many styles.</summary>
+
+This example can be shortened using [`makeAutoObservable`](observable-state.md), but by being explicit we can showcase the different concepts in greater detail.
+Note that MobX doesn't dictate an object style, plain objects instead can be used as well, as can decorators for even more concise classes. See the page for more details.
+
+</details>
 
 But what about `toggle`, which we marked as `action`?
 
@@ -188,6 +196,7 @@ To learn more about how MobX determines which observables need to be reacted to,
 ## Principles
 
 MobX uses a uni-directional data flow where _actions_ change the _state_, which in turn updates all affected _views_.
+
 
 ![Action, State, View](assets/action-state-view.png)
 

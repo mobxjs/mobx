@@ -46,7 +46,8 @@ import {
     getAdministration,
     getDebugName,
     objectPrototype,
-    MakeResult
+    MakeResult,
+    checkIfStateModificationsAreAllowed
 } from "../internal"
 
 const descriptorCache = Object.create(null)
@@ -314,6 +315,7 @@ export class ObservableObjectAdministration
         descriptor: PropertyDescriptor,
         proxyTrap: boolean = false
     ): boolean | null {
+        checkIfStateModificationsAreAllowed(this.keysAtom_)
         try {
             startBatch()
 
@@ -368,6 +370,7 @@ export class ObservableObjectAdministration
         enhancer: IEnhancer<any>,
         proxyTrap: boolean = false
     ): boolean | null {
+        checkIfStateModificationsAreAllowed(this.keysAtom_)
         try {
             startBatch()
 
@@ -432,6 +435,7 @@ export class ObservableObjectAdministration
         options: IComputedValueOptions<any>,
         proxyTrap: boolean = false
     ): boolean | null {
+        checkIfStateModificationsAreAllowed(this.keysAtom_)
         try {
             startBatch()
 
@@ -490,6 +494,7 @@ export class ObservableObjectAdministration
      * @returns {boolean|null} true on success, false on failure (proxyTrap + non-configurable), null when cancelled by interceptor
      */
     delete_(key: PropertyKey, proxyTrap: boolean = false): boolean | null {
+        checkIfStateModificationsAreAllowed(this.keysAtom_)
         // No such prop
         if (!hasProp(this.target_, key)) {
             return true
@@ -624,7 +629,7 @@ export class ObservableObjectAdministration
         this.keysAtom_.reportChanged()
     }
 
-    ownKeys_(): ArrayLike<string | symbol> {
+    ownKeys_(): Array<string | symbol> {
         this.keysAtom_.reportObserved()
         return ownKeys(this.target_)
     }
@@ -642,7 +647,7 @@ export class ObservableObjectAdministration
 }
 
 export interface IIsObservableObject {
-    $mobx: ObservableObjectAdministration
+    [$mobx]: ObservableObjectAdministration
 }
 
 export function asObservableObject(

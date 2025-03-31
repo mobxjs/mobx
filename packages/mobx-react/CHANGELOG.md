@@ -1,5 +1,80 @@
 # mobx-react
 
+## 9.2.0
+
+### Minor Changes
+
+-   [`2587df31a1a967a6b385b7ab2d9f0d42fc94e4b0`](https://github.com/mobxjs/mobx/commit/2587df31a1a967a6b385b7ab2d9f0d42fc94e4b0) [#3985](https://github.com/mobxjs/mobx/pull/3985) Thanks [@imjordanxd](https://github.com/imjordanxd)! - \* Added React 19 support, fixes #3986
+
+### Patch Changes
+
+-   Updated dependencies [[`2587df31a1a967a6b385b7ab2d9f0d42fc94e4b0`](https://github.com/mobxjs/mobx/commit/2587df31a1a967a6b385b7ab2d9f0d42fc94e4b0)]:
+    -   mobx-react-lite@4.1.0
+
+## 9.1.1
+
+### Patch Changes
+
+-   [`61abc53f`](https://github.com/mobxjs/mobx/commit/61abc53ff10554d1d5ce3e85466f6beda4d63fa2) [#3852](https://github.com/mobxjs/mobx/pull/3852) Thanks [@mweststrate](https://github.com/mweststrate)! - Patched the release process, forcing release to get everything in pristine state.
+
+-   Updated dependencies [[`61abc53f`](https://github.com/mobxjs/mobx/commit/61abc53ff10554d1d5ce3e85466f6beda4d63fa2), [`7bbb523a`](https://github.com/mobxjs/mobx/commit/7bbb523a7b81229570e0e2a176b989bfc74c4634)]:
+    -   mobx-react-lite@4.0.7
+
+## 9.1.0
+
+### Minor Changes
+
+-   [`c9260974`](https://github.com/mobxjs/mobx/commit/c9260974f726f58de0fd4974ea024c644d9b7c6f) [#3790](https://github.com/mobxjs/mobx/pull/3790) Thanks [@mweststrate](https://github.com/mweststrate)! - Added support for modern 2022.3 Decorators. [#3790](https://github.com/mobxjs/mobx/pull/3790)
+    -   [Installation / usage instruction](https://mobx.js.org/enabling-decorators.html).
+    -   [Introduction announcement](https://michel.codes/blogs/mobx-decorators)
+    -   Original PR by [@Matchlighter](https://github.com/Matchlighter) in [#3638](https://github.com/mobxjs/mobx/pull/3638),
+
+## 9.0.2
+
+### Patch Changes
+
+-   [`5063c38e`](https://github.com/mobxjs/mobx/commit/5063c38ead557624321e2bbeb1aff905438564b0) [#3776](https://github.com/mobxjs/mobx/pull/3776) Thanks [@wbercx](https://github.com/wbercx)! - Fixed premature disposal of class component observers.
+
+## 9.0.1
+
+### Patch Changes
+
+-   [`d813746c`](https://github.com/mobxjs/mobx/commit/d813746cfaa18d80daddee3724562fed6b307c0a) [#3731](https://github.com/mobxjs/mobx/pull/3731) Thanks [@urugator](https://github.com/urugator)! - fix #3730: class component does not react to state changes performed before mount
+
+-   Updated dependencies [[`3ceeb865`](https://github.com/mobxjs/mobx/commit/3ceeb8651e328c4c7211c875696b3f5269fea834)]:
+    -   mobx-react-lite@4.0.4
+
+## 9.0.0
+
+### Major Changes
+
+-   [`473cb3f5`](https://github.com/mobxjs/mobx/commit/473cb3f5fc8bf43abdd1c9c7857fe2820d2291fe) [#3718](https://github.com/mobxjs/mobx/pull/3718) Thanks [@mweststrate](https://github.com/mweststrate)! - - Fixed `observer` in `StrictMode` #3671
+    -   **[BREAKING CHANGE]** Class component's `props`/`state`/`context` are no longer observable. Attempt to use these in any derivation other than component's `render` throws and error. For details see https://github.com/mobxjs/mobx/blob/main/packages/mobx-react/README.md#note-on-using-props-and-state-in-derivations
+    -   Extending or applying `observer` classes is now explicitly forbidden
+
+### Patch Changes
+
+-   Updated dependencies [[`58bb052c`](https://github.com/mobxjs/mobx/commit/58bb052ca41b8592e5bd5c3003b68ec52da53f33), [`473cb3f5`](https://github.com/mobxjs/mobx/commit/473cb3f5fc8bf43abdd1c9c7857fe2820d2291fe)]:
+    -   mobx-react-lite@4.0.3
+
+## 8.0.0
+
+### Major Changes
+
+-   [`44a2cf42`](https://github.com/mobxjs/mobx/commit/44a2cf42dec7635f639ddbfb19202ebc710bac54) [#3590](https://github.com/mobxjs/mobx/pull/3590) Thanks [@urugator](https://github.com/urugator)! - Functional components now use `useSyncExternalStore`, which should prevent tearing - you have to update mobx, otherwise it should behave as previously.<br>
+    Improved displayName/name handling of functional components as discussed in #3438.<br>
+    Reactions of uncommited class components are now correctly disposed, fixes #3492.<br>
+    Reactions don't notify uncommited class components, avoiding the warning, fixes #3492.<br>
+    Removed symbol "polyfill" and replaced with actual Symbols.<br>
+    Removed `this.render` replacement detection + warning. `this.render` is no longer configurable/writable (possibly BC).<br>
+    Class component instance is no longer exposed as `component[$mobx]["reactcomponent"]` (possibly BC).<br>
+    Deprecated `disposeOnUnmount`, it's not compatible with remounting.<br>
+
+### Patch Changes
+
+-   Updated dependencies [[`44a2cf42`](https://github.com/mobxjs/mobx/commit/44a2cf42dec7635f639ddbfb19202ebc710bac54)]:
+    -   mobx-react-lite@4.0.0
+
 ## 7.6.0
 
 ### Minor Changes

@@ -119,7 +119,6 @@ describe("is used to keep observable within component body", () => {
         fireEvent.click(div)
         expect(div.textContent).toBe("3-2")
 
-        // though render 3 times, mobx.observable only called once
         expect(renderCount).toBe(3)
     })
 
@@ -308,7 +307,7 @@ describe("is used to keep observable within component body", () => {
             })
             expect(container.querySelector("span")!.innerHTML).toBe("22")
             expect(counterRender).toBe(2)
-            expect(observerRender).toBe(3)
+            expect(observerRender).toBe(4)
             expect(consoleWarnMock).toMatchSnapshot()
         })
 
@@ -378,7 +377,7 @@ describe("is used to keep observable within component body", () => {
             })
             expect(container.querySelector("span")!.innerHTML).toBe("22")
             expect(counterRender).toBe(2)
-            expect(observerRender).toBe(3)
+            expect(observerRender).toBe(4)
         })
 
         it("with observer()", () => {
@@ -436,7 +435,7 @@ describe("is used to keep observable within component body", () => {
                 ;(container.querySelector("#incmultiplier")! as any).click()
             })
             expect(container.querySelector("span")!.innerHTML).toBe("22")
-            expect(counterRender).toBe(4) // TODO: should be 3
+            expect(counterRender).toBe(4) // One from props, second from updating source (setState during render)
         })
     })
 })

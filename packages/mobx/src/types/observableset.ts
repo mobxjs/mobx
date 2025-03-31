@@ -13,6 +13,7 @@ import {
     notifyListeners,
     spyReportEnd,
     createInstanceofPredicate,
+    makeIterable,
     hasInterceptors,
     interceptChange,
     IInterceptable,
@@ -20,14 +21,14 @@ import {
     registerInterceptor,
     checkIfStateModificationsAreAllowed,
     untracked,
-    makeIterable,
     transaction,
     isES6Set,
     IAtom,
     DELETE,
     ADD,
     die,
-    isFunction
+    isFunction,
+    initObservable
 } from "../internal"
 
 const ObservableSetMarker = {}
@@ -50,22 +51,25 @@ export type ISetDidChange<T = any> =
           oldValue: T
       }
 
+export type ISetWillDeleteChange<T = any> = {
+    type: "delete"
+    object: ObservableSet<T>
+    oldValue: T
+};
+export type ISetWillAddChange<T = any> = {
+    type: "add"
+    object: ObservableSet<T>
+    newValue: T
+};
+
 export type ISetWillChange<T = any> =
-    | {
-          type: "delete"
-          object: ObservableSet<T>
-          oldValue: T
-      }
-    | {
-          type: "add"
-          object: ObservableSet<T>
-          newValue: T
-      }
+    | ISetWillDeleteChange<T>
+    | ISetWillAddChange<T>
 
 export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillChange>, IListenable {
     [$mobx] = ObservableSetMarker
     private data_: Set<any> = new Set()
-    atom_: IAtom
+    atom_!: IAtom
     changeListeners_
     interceptors_
     dehancer: any
@@ -79,11 +83,13 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
         if (!isFunction(Set)) {
             die(22)
         }
-        this.atom_ = createAtom(this.name_)
         this.enhancer_ = (newV, oldV) => enhancer(newV, oldV, name_)
-        if (initialData) {
-            this.replace(initialData)
-        }
+        initObservable(() => {
+            this.atom_ = createAtom(this.name_)
+            if (initialData) {
+                this.replace(initialData)
+            }
+        })
     }
 
     private dehanceValue_<X extends T | undefined>(value: X): X {
@@ -117,7 +123,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
     add(value: T) {
         checkIfStateModificationsAreAllowed(this.atom_)
         if (hasInterceptors(this)) {
-            const change = interceptChange<ISetWillChange<T>>(this, {
+            const change = interceptChange<ISetWillAddChange<T>>(this, {
                 type: ADD,
                 object: this,
                 newValue: value
@@ -125,8 +131,10 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
             if (!change) {
                 return this
             }
-            // ideally, value = change.value would be done here, so that values can be
-            // changed by interceptor. Same applies for other Set and Map api's.
+
+            // implemented reassignment same as it's done for ObservableMap
+            value = change.newValue!;
+
         }
         if (!this.has(value)) {
             transaction(() => {
@@ -161,7 +169,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
 
     delete(value: T) {
         if (hasInterceptors(this)) {
-            const change = interceptChange<ISetWillChange<T>>(this, {
+            const change = interceptChange<ISetWillDeleteChange<T>>(this, {
                 type: DELETE,
                 object: this,
                 oldValue: value
@@ -208,36 +216,79 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
     }
 
     entries() {
-        let nextIndex = 0
-        const keys = Array.from(this.keys())
-        const values = Array.from(this.values())
-        return makeIterable<[T, T]>({
+        const values = this.values()
+        return makeIterableForSet<[T, T]>({
             next() {
-                const index = nextIndex
-                nextIndex += 1
-                return index < values.length
-                    ? { value: [keys[index], values[index]], done: false }
-                    : { done: true }
+                const { value, done } = values.next()
+                return !done ? { value: [value, value], done } : { value: undefined, done }
             }
-        } as any)
+        })
     }
 
-    keys(): IterableIterator<T> {
+    keys(): SetIterator<T> {
         return this.values()
     }
 
-    values(): IterableIterator<T> {
+    values(): SetIterator<T> {
         this.atom_.reportObserved()
         const self = this
-        let nextIndex = 0
-        const observableValues = Array.from(this.data_.values())
-        return makeIterable<T>({
+        const values = this.data_.values()
+        return makeIterableForSet({
             next() {
-                return nextIndex < observableValues.length
-                    ? { value: self.dehanceValue_(observableValues[nextIndex++]), done: false }
-                    : { done: true }
+                const { value, done } = values.next()
+                return !done
+                    ? { value: self.dehanceValue_(value), done }
+                    : { value: undefined, done }
             }
-        } as any)
+        })
+    }
+
+    intersection<U>(otherSet: ReadonlySetLike<U> | Set<U>): Set<T & U> {
+        if (isES6Set(otherSet) && !isObservableSet(otherSet)) {
+            return otherSet.intersection(this)
+        } else {
+            const dehancedSet = new Set(this)
+            return dehancedSet.intersection(otherSet)
+        }
+    }
+
+    union<U>(otherSet: ReadonlySetLike<U> | Set<U>): Set<T | U> {
+        if (isES6Set(otherSet) && !isObservableSet(otherSet)) {
+            return otherSet.union(this)
+        } else {
+            const dehancedSet = new Set(this)
+            return dehancedSet.union(otherSet)
+        }
+    }
+
+    difference<U>(otherSet: ReadonlySetLike<U>): Set<T> {
+        return new Set(this).difference(otherSet)
+    }
+
+    symmetricDifference<U>(otherSet: ReadonlySetLike<U> | Set<U>): Set<T | U> {
+        if (isES6Set(otherSet) && !isObservableSet(otherSet)) {
+            return otherSet.symmetricDifference(this)
+        } else {
+            const dehancedSet = new Set(this)
+            return dehancedSet.symmetricDifference(otherSet)
+        }
+    }
+
+    isSubsetOf(otherSet: ReadonlySetLike<unknown>): boolean {
+        return new Set(this).isSubsetOf(otherSet)
+    }
+
+    isSupersetOf(otherSet: ReadonlySetLike<unknown>): boolean {
+        return new Set(this).isSupersetOf(otherSet)
+    }
+
+    isDisjointFrom(otherSet: ReadonlySetLike<unknown> | Set<unknown>): boolean {
+        if (isES6Set(otherSet) && !isObservableSet(otherSet)) {
+            return otherSet.isDisjointFrom(this)
+        } else {
+            const dehancedSet = new Set(this)
+            return dehancedSet.isDisjointFrom(otherSet)
+        }
     }
 
     replace(other: ObservableSet<T> | IObservableSetInitialValues<T>): ObservableSet<T> {
@@ -292,3 +343,8 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
 export var isObservableSet = createInstanceofPredicate("ObservableSet", ObservableSet) as (
     thing: any
 ) => thing is ObservableSet<any>
+
+function makeIterableForSet<T>(iterator: Iterator<T>): SetIterator<T> {
+    iterator[Symbol.toStringTag] = "SetIterator"
+    return makeIterable<T, BuiltinIteratorReturn>(iterator)
+}

@@ -24,7 +24,9 @@ Usage:
 
 This function can be used to make _existing_ object properties observable. Any JavaScript object (including class instances) can be passed into `target`.
 Typically `makeObservable` is used in the constructor of a class, and its first argument is `this`.
-The `annotations` argument maps [annotations](#available-annotations) to each member. Only annotated members are affected. Note that when using [decorators](enabling-decorators.md), the `annotations` argument can be omitted.
+The `annotations` argument maps [annotations](#available-annotations) to each member. Only annotated members are affected.
+
+Alternatively, decorators like `@observable` can be used on class members instead of calling `makeObservable` in the constructor.
 
 Methods that derive information and take arguments (for example `findUsersOlderThan(age: number): User[]`) can not be annotated as `computed` – their read operations will still be tracked when they are called from a reaction, but their output won't be memoized to avoid memory leaks. To memoize such methods you can use [MobX-utils computedFn {🚀}](https://github.com/mobxjs/mobx-utils#computedfn) instead.
 
@@ -66,6 +68,40 @@ class Doubler {
 
 **All annotated** fields are **non-configurable**.<br>
 **All non-observable** (stateless) fields (`action`, `flow`) are **non-writable**.
+
+
+<!--class + decorators-->
+
+When using modern decorators, there is no need to call `makeObservable`, below is what a decorator based class looks like.
+Note that the `@observable` annotation should always be used in combination with the `accessor` keyword.
+
+```javascript
+import { observable, computed, action, flow } from "mobx"
+
+class Doubler {
+    @observable accessor value
+
+    constructor(value) {
+        this.value = value
+    }
+
+    @computed
+    get double() {
+        return this.value * 2
+    }
+
+    @action
+    increment() {
+        this.value++
+    }
+
+    @flow
+    *fetch() {
+        const response = yield fetch("/api/value")
+        this.value = response.json()
+    }
+}
+```
 
 <!--factory function + makeAutoObservable-->
 
@@ -112,6 +148,40 @@ tags.push("prio: for fun")
 In contrast to the first example with `makeObservable`, `observable` supports adding (and removing) _fields_ to an object.
 This makes `observable` great for collections like dynamically keyed objects, arrays, Maps and Sets.
 
+
+<!--class + decorators (legacy)-->
+
+To use legacy decorators, `makeObservable(this)` should be called in the constructor to make sure decorators work.
+
+```javascript
+import { observable, computed, action, flow } from "mobx"
+
+class Doubler {
+    @observable value
+
+    constructor(value) {
+        makeObservable(this)
+        this.value = value
+    }
+
+    @computed
+    get double() {
+        return this.value * 2
+    }
+
+    @action
+    increment() {
+        this.value++
+    }
+
+    @flow
+    *fetch() {
+        const response = yield fetch("/api/value")
+        this.value = response.json()
+    }
+}
+```
+
 <!--END_DOCUSAURUS_CODE_TABS-->
 
 ## `makeAutoObservable`
@@ -130,8 +200,8 @@ However, `makeAutoObservable` cannot be used on classes that have super or are [
 Inference rules:
 
 -   All _own_ properties become `observable`.
--   All `get`ters become `computed`.
--   All `set`ters become `action`.
+-   All `getters` become `computed`.
+-   All `setters` become `action`.
 -   All _functions_ become [`autoAction`](#autoAction).
 -   All _generator_ functions become `flow`. (Note that generator functions are not detectable in some transpiler configurations, if flow doesn't work as expected, make sure to specify `flow` explicitly.)
 -   Members marked with `false` in the `overrides` argument will not be annotated. For example, using it for read only fields such as identifiers.
@@ -141,6 +211,7 @@ Inference rules:
 Usage:
 
 -   `observable(source, overrides?, options?)`
+-   `@observable accessor` _(field decorator)_
 
 The `observable` annotation can also be called as a function to make an entire object observable at once.
 The `source` object will be cloned and all members will be made observable, similar to how it would be done by `makeAutoObservable`.
@@ -248,7 +319,7 @@ Note that it is possible to pass `{ proxy: false }` as an option to `observable`
 1. By default _TypeScript_ will not allow you to annotate **private** fields. This can be overcome by explicitly passing the relevant private fields as generic argument, like this: `makeObservable<MyStore, "privateField" | "privateField2">(this, { privateField: observable, privateField2: observable })`
 1. **Calling `make(Auto)Observable`** and providing annotations must be done **unconditionally**, as this makes it possible to cache the inference results.
 1. **Modifying prototypes** after **`make(Auto)Observable`** has been called is **not supported**.
-1. _EcmaScript_ **private** fields (**`#field`**) are **not supported**. When using _TypeScript_, it is recommended to use the `private` modifier instead.
+1. _EcmaScript_ **private** fields (**`#field`**) are **not supported** by `make(Auto)Observable`. Use auto-accessor + Stage-3 decorators (`@observable accessor #field`) syntax instead. Otherwise, when using _TypeScript_, it is recommended to use the `private` modifier.
 1. **Mixing annotations and decorators** within single inheritance chain is **not supported** - eg. you can't use decorators for superclass and annotations for subclass.
 1. `makeObservable`,`extendObservable` cannot be used on other builtin observable types (`ObservableMap`, `ObservableSet`, `ObservableArray`, etc)
 1. `makeObservable(Object.create(prototype))` copies properties from `prototype` to created object and makes them `observable`. This behavior is wrong, unexpected and therefore **deprecated** and will likely change in future versions. Don't rely on it.
@@ -260,7 +331,7 @@ The above APIs take an optional `options` argument which is an object that suppo
 -   **`autoBind: true`** uses `action.bound`/`flow.bound` by default, rather than `action`/`flow`. Does not affect explicitely annotated members.
 -   **`deep: false`** uses `observable.ref` by default, rather than `observable`. Does not affect explicitely annotated members.
 -   **`name: <string>`** gives the object a debug name that is printed in error messages and reflection APIs.
--   **`proxy: false`** forces `observable(thing)` to use non-[**proxy**](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) implementation. This is a good option if the shape of the object will not change over time, as non-proxied objects are easier to debug and faster. See [avoiding proxies](#avoid-proxies).
+-   **`proxy: false`** forces `observable(thing)` to use non-[**proxy**](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) implementation. This is a good option if the shape of the object will not change over time, as non-proxied objects are easier to debug and faster. This option is **not** available for `make(Auto)Observable`, see [avoiding proxies](#avoid-proxies).
 
 <details id="one-options-per-target"><summary>**Note:** options are *sticky* and can be provided only once<a href="#one-options-per-target" class="tip-anchor"></a></summary>
 `options` argument can be provided only for `target` that is NOT observable yet.<br>
@@ -283,7 +354,7 @@ const plainMap = new Map(observableMap)
 ```
 
 To convert a data tree recursively to plain objects, the [`toJS`](api.md#tojs) utility can be used.
-For classes, it is recommend to implement a `toJSON()` method, as it will be picked up by `JSON.stringify`.
+For classes, it is recommended to implement a `toJSON()` method, as it will be picked up by `JSON.stringify`.
 
 ## A short note on classes
 

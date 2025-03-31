@@ -4,7 +4,7 @@ const utils = require("../../v5/utils/test-utils")
 
 const { observable, computed, $mobx, autorun } = mobx
 
-const voidObserver = function () { }
+const voidObserver = function () {}
 
 function checkGlobalState() {
     const gs = mobx._getGlobalState()
@@ -148,7 +148,7 @@ test("deny state changes in views", function () {
 
     m.reaction(
         () => z.get(),
-        () => { }
+        () => {}
     )
     expect(
         utils.grabConsole(() => {
@@ -194,7 +194,7 @@ test("deny array change in view", function (done) {
     }).not.toThrow()
     m.reaction(
         () => z.length,
-        () => { }
+        () => {}
     )
 
     expect(
@@ -483,9 +483,9 @@ test("peeking inside erroring computed value doesn't bork (global) state", () =>
         b.get()
     }).toThrowError(/chocolademelk/)
 
-    expect(a.isPendingUnobservation_).toBe(false)
+    expect(a.isPendingUnobservation).toBe(false)
     expect(a.observers_.size).toBe(0)
-    expect(a.diffValue_).toBe(0)
+    expect(a.diffValue).toBe(0)
     expect(a.lowestObserverState_).toBe(-1)
     expect(a.hasUnreportedChange_).toBe(false)
     expect(a.value_).toBe(1)
@@ -493,15 +493,15 @@ test("peeking inside erroring computed value doesn't bork (global) state", () =>
     expect(b.dependenciesState_).toBe(-1) // NOT_TRACKING
     expect(b.observing_.length).toBe(0)
     expect(b.newObserving_).toBe(null)
-    expect(b.isPendingUnobservation_).toBe(false)
+    expect(b.isPendingUnobservation).toBe(false)
     expect(b.observers_.size).toBe(0)
-    expect(b.diffValue_).toBe(0)
+    expect(b.diffValue).toBe(0)
     expect(b.lowestObserverState_).toBe(0)
     expect(b.unboundDepsCount_).toBe(0)
     expect(() => {
         b.get()
     }).toThrowError(/chocolademelk/)
-    expect(b.isComputing_).toBe(false)
+    expect(b.isComputing).toBe(false)
 
     checkGlobalState()
 })
@@ -521,9 +521,9 @@ describe("peeking inside autorun doesn't bork (global) state", () => {
     expect(r).toBe(1)
 
     test("it should update correctly initially", () => {
-        expect(a.isPendingUnobservation_).toBe(false)
+        expect(a.isPendingUnobservation).toBe(false)
         expect(a.observers_.size).toBe(1)
-        expect(a.diffValue_).toBe(0)
+        expect(a.diffValue).toBe(0)
         expect(a.lowestObserverState_).toBe(-1)
         expect(a.hasUnreportedChange_).toBe(false)
         expect(a.value_).toBe(1)
@@ -531,23 +531,23 @@ describe("peeking inside autorun doesn't bork (global) state", () => {
         expect(b.dependenciesState_).toBe(0)
         expect(b.observing_.length).toBe(1)
         expect(b.newObserving_).toBe(null)
-        expect(b.isPendingUnobservation_).toBe(false)
+        expect(b.isPendingUnobservation).toBe(false)
         expect(b.observers_.size).toBe(1)
-        expect(b.diffValue_).toBe(0)
+        expect(b.diffValue).toBe(0)
         expect(b.lowestObserverState_).toBe(0)
         expect(b.unboundDepsCount_).toBe(1) // value is always the last bound amount of observers
         expect(b.value_).toBe(1)
-        expect(b.isComputing_).toBe(false)
+        expect(b.isComputing).toBe(false)
 
         expect(c.dependenciesState_).toBe(0)
         expect(c.observing_.length).toBe(1)
         expect(c.newObserving_).toBe(null)
-        expect(c.diffValue_).toBe(0)
+        expect(c.diffValue).toBe(0)
         expect(c.unboundDepsCount_).toBe(1)
-        expect(c.isDisposed_).toBe(false)
-        expect(c.isScheduled_).toBe(false)
-        expect(c.isTrackPending_).toBe(false)
-        expect(c.isRunning_).toBe(false)
+        expect(c.isDisposed).toBe(false)
+        expect(c.isScheduled).toBe(false)
+        expect(c.isTrackPending).toBe(false)
+        expect(c.isRunning).toBe(false)
         checkGlobalState()
     })
 
@@ -558,9 +558,9 @@ describe("peeking inside autorun doesn't bork (global) state", () => {
         }, /chocolademelk/)
         expect(r).toBe(2)
 
-        expect(a.isPendingUnobservation_).toBe(false)
+        expect(a.isPendingUnobservation).toBe(false)
         expect(a.observers_.size).toBe(1)
-        expect(a.diffValue_).toBe(0)
+        expect(a.diffValue).toBe(0)
         expect(a.lowestObserverState_).toBe(0)
         expect(a.hasUnreportedChange_).toBe(false)
         expect(a.value_).toBe(2)
@@ -568,23 +568,23 @@ describe("peeking inside autorun doesn't bork (global) state", () => {
         expect(b.dependenciesState_).toBe(0) // up to date (for what it's worth)
         expect(b.observing_.length).toBe(1)
         expect(b.newObserving_).toBe(null)
-        expect(b.isPendingUnobservation_).toBe(false)
+        expect(b.isPendingUnobservation).toBe(false)
         expect(b.observers_.size).toBe(1)
-        expect(b.diffValue_).toBe(0)
+        expect(b.diffValue).toBe(0)
         expect(b.lowestObserverState_).toBe(0)
         expect(b.unboundDepsCount_).toBe(1)
-        expect(b.isComputing_).toBe(false)
+        expect(b.isComputing).toBe(false)
         expect(() => b.get()).toThrowError(/chocolademelk/)
 
         expect(c.dependenciesState_).toBe(0)
         expect(c.observing_.length).toBe(1)
         expect(c.newObserving_).toBe(null)
-        expect(c.diffValue_).toBe(0)
+        expect(c.diffValue).toBe(0)
         expect(c.unboundDepsCount_).toBe(1)
-        expect(c.isDisposed_).toBe(false)
-        expect(c.isScheduled_).toBe(false)
-        expect(c.isTrackPending_).toBe(false)
-        expect(c.isRunning_).toBe(false)
+        expect(c.isDisposed).toBe(false)
+        expect(c.isScheduled).toBe(false)
+        expect(c.isTrackPending).toBe(false)
+        expect(c.isRunning).toBe(false)
         checkGlobalState()
     })
 
@@ -594,9 +594,9 @@ describe("peeking inside autorun doesn't bork (global) state", () => {
         a.set(3)
         expect(r).toBe(3)
 
-        expect(a.isPendingUnobservation_).toBe(false)
+        expect(a.isPendingUnobservation).toBe(false)
         expect(a.observers_.size).toBe(1)
-        expect(a.diffValue_).toBe(0)
+        expect(a.diffValue).toBe(0)
         expect(a.lowestObserverState_).toBe(0)
         expect(a.hasUnreportedChange_).toBe(false)
         expect(a.value_).toBe(3)
@@ -604,23 +604,23 @@ describe("peeking inside autorun doesn't bork (global) state", () => {
         expect(b.dependenciesState_).toBe(0) // up to date
         expect(b.observing_.length).toBe(1)
         expect(b.newObserving_).toBe(null)
-        expect(b.isPendingUnobservation_).toBe(false)
+        expect(b.isPendingUnobservation).toBe(false)
         expect(b.observers_.size).toBe(1)
-        expect(b.diffValue_).toBe(0)
+        expect(b.diffValue).toBe(0)
         expect(b.lowestObserverState_).toBe(0)
         expect(b.unboundDepsCount_).toBe(1)
         expect(b.value_).toBe(3)
-        expect(b.isComputing_).toBe(false)
+        expect(b.isComputing).toBe(false)
 
         expect(c.dependenciesState_).toBe(0)
         expect(c.observing_.length).toBe(1)
         expect(c.newObserving_).toBe(null)
-        expect(c.diffValue_).toBe(0)
+        expect(c.diffValue).toBe(0)
         expect(c.unboundDepsCount_).toBe(1)
-        expect(c.isDisposed_).toBe(false)
-        expect(c.isScheduled_).toBe(false)
-        expect(c.isTrackPending_).toBe(false)
-        expect(c.isRunning_).toBe(false)
+        expect(c.isDisposed).toBe(false)
+        expect(c.isScheduled).toBe(false)
+        expect(c.isTrackPending).toBe(false)
+        expect(c.isRunning).toBe(false)
 
         checkGlobalState()
     })
@@ -628,9 +628,9 @@ describe("peeking inside autorun doesn't bork (global) state", () => {
     test("it should clean up correctly", () => {
         d()
 
-        expect(a.isPendingUnobservation_).toBe(false)
+        expect(a.isPendingUnobservation).toBe(false)
         expect(a.observers_.size).toBe(0)
-        expect(a.diffValue_).toBe(0)
+        expect(a.diffValue).toBe(0)
         expect(a.lowestObserverState_).toBe(0)
         expect(a.hasUnreportedChange_).toBe(false)
         expect(a.value_).toBe(3)
@@ -638,23 +638,23 @@ describe("peeking inside autorun doesn't bork (global) state", () => {
         expect(b.dependenciesState_).toBe(-1) // not tracking
         expect(b.observing_.length).toBe(0)
         expect(b.newObserving_).toBe(null)
-        expect(b.isPendingUnobservation_).toBe(false)
+        expect(b.isPendingUnobservation).toBe(false)
         expect(b.observers_.size).toBe(0)
-        expect(b.diffValue_).toBe(0)
+        expect(b.diffValue).toBe(0)
         expect(b.lowestObserverState_).toBe(0)
         expect(b.unboundDepsCount_).toBe(1)
         expect(b.value_).not.toBe(3)
-        expect(b.isComputing_).toBe(false)
+        expect(b.isComputing).toBe(false)
 
         expect(c.dependenciesState_).toBe(-1)
         expect(c.observing_.length).toBe(0)
         expect(c.newObserving_).toBe(null)
-        expect(c.diffValue_).toBe(0)
+        expect(c.diffValue).toBe(0)
         expect(c.unboundDepsCount_).toBe(1)
-        expect(c.isDisposed_).toBe(true)
-        expect(c.isScheduled_).toBe(false)
-        expect(c.isTrackPending_).toBe(false)
-        expect(c.isRunning_).toBe(false)
+        expect(c.isDisposed).toBe(true)
+        expect(c.isScheduled).toBe(false)
+        expect(c.isTrackPending).toBe(false)
+        expect(c.isRunning).toBe(false)
 
         expect(b.get()).toBe(3)
 
@@ -866,4 +866,4 @@ describe("es5 compat warnings", () => {
     })
 })
 
-test("should throw when adding properties in ES5 compat mode", () => { })
+test("should throw when adding properties in ES5 compat mode", () => {})

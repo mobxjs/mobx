@@ -1,5 +1,31 @@
 # eslint-plugin-mobx
 
+## 0.0.13
+
+### Patch Changes
+
+-   [`88aa10828eabdf9edf2d0e523e0388c854c79dea`](https://github.com/mobxjs/mobx/commit/88aa10828eabdf9edf2d0e523e0388c854c79dea) [#3947](https://github.com/mobxjs/mobx/pull/3947) Thanks [@dartess](https://github.com/dartess)! - fix config name for recommended flat config
+
+## 0.0.12
+
+### Patch Changes
+
+-   [`218ebde877712775054e027cfda812210d2aa7d6`](https://github.com/mobxjs/mobx/commit/218ebde877712775054e027cfda812210d2aa7d6) [#3942](https://github.com/mobxjs/mobx/pull/3942) Thanks [@dartess](https://github.com/dartess)! - add eslint@9 support and flat config
+
+## 0.0.11
+
+### Patch Changes
+
+-   [`638533e592f4fda7663fa351447380f9d0917d14`](https://github.com/mobxjs/mobx/commit/638533e592f4fda7663fa351447380f9d0917d14) [#3909](https://github.com/mobxjs/mobx/pull/3909) Thanks [@urugator](https://github.com/urugator)! - mobx/missing-observer rule false positive with forwardRef #3908
+
+## 0.0.10
+
+### Patch Changes
+
+-   [`44a5fe07`](https://github.com/mobxjs/mobx/commit/44a5fe07fb95c2ba24d8df19f18b57ee92abb1a9) [#3881](https://github.com/mobxjs/mobx/pull/3881) Thanks [@kade-robertson](https://github.com/kade-robertson)! - Adds an option for the `mobx/exhaustive-make-observable` eslint rule to configure whether fields are annotated with `true` or `false` with the autofixer.
+
+    This option defaults to `true` if not present or an invalid value is received to maintain existing behavior.
+
 ## 0.0.9
 
 ### Patch Changes

@@ -61,8 +61,8 @@
         "sidebar_label": "Defining data stores"
       },
       "enabling-decorators": {
-        "title": "Enabling decorators",
-        "sidebar_label": "Enabling decorators {🚀}"
+        "title": "Decorators",
+        "sidebar_label": "Decorators {🚀}"
       },
       "faq/migrate-to-6": {
         "title": "Migrating from MobX 4/5"

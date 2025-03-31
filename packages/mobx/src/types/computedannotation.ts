@@ -1,15 +1,26 @@
-import { ObservableObjectAdministration, die, Annotation, MakeResult } from "../internal"
+import {
+    ObservableObjectAdministration,
+    die,
+    Annotation,
+    MakeResult,
+    assert20223DecoratorType,
+    $mobx,
+    asObservableObject,
+    ComputedValue
+} from "../internal"
 
 export function createComputedAnnotation(name: string, options?: object): Annotation {
     return {
         annotationType_: name,
         options_: options,
         make_,
-        extend_
+        extend_,
+        decorate_20223_
     }
 }
 
 function make_(
+    this: Annotation,
     adm: ObservableObjectAdministration,
     key: PropertyKey,
     descriptor: PropertyDescriptor
@@ -18,6 +29,7 @@ function make_(
 }
 
 function extend_(
+    this: Annotation,
     adm: ObservableObjectAdministration,
     key: PropertyKey,
     descriptor: PropertyDescriptor,
@@ -33,6 +45,31 @@ function extend_(
         },
         proxyTrap
     )
+}
+
+function decorate_20223_(this: Annotation, get, context: ClassGetterDecoratorContext) {
+    if (__DEV__) {
+        assert20223DecoratorType(context, ["getter"])
+    }
+    const ann = this
+    const { name: key, addInitializer } = context
+
+    addInitializer(function () {
+        const adm: ObservableObjectAdministration = asObservableObject(this)[$mobx]
+        const options = {
+            ...ann.options_,
+            get,
+            context: this
+        }
+        options.name ||= __DEV__
+            ? `${adm.name_}.${key.toString()}`
+            : `ObservableObject.${key.toString()}`
+        adm.values_.set(key, new ComputedValue(options))
+    })
+
+    return function () {
+        return this[$mobx].getObservablePropValue_(key)
+    }
 }
 
 function assertComputedDescriptor(

@@ -3,7 +3,7 @@
         "target": "es6",
         "module": "esnext",
         "moduleResolution": "node",
-        "lib": ["es6"],
+        "lib": ["esnext"],
         "downlevelIteration": true,
         "alwaysStrict": true,
         "sourceMap": true,
@@ -18,7 +18,8 @@
         "experimentalDecorators": true,
         "useDefineForClassFields": true,
         "jsx": "react",
-        "esModuleInterop": true
+        "esModuleInterop": true,
+        "skipLibCheck": true
     },
     "exclude": ["__tests__"]
 }

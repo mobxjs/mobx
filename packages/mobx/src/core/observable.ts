@@ -17,17 +17,17 @@ export interface IDepTreeNode {
 }
 
 export interface IObservable extends IDepTreeNode {
-    diffValue_: number
+    diffValue: number
     /**
      * Id of the derivation *run* that last accessed this observable.
      * If this id equals the *run* id of the current derivation,
      * the dependency is already established
      */
     lastAccessedBy_: number
-    isBeingObserved_: boolean
+    isBeingObserved: boolean
 
     lowestObserverState_: IDerivationState_ // Used to avoid redundant propagations
-    isPendingUnobservation_: boolean // Used to push itself to global.pendingUnobservations at most once per batch.
+    isPendingUnobservation: boolean // Used to push itself to global.pendingUnobservations at most once per batch.
 
     observers_: Set<IDerivation>
 
@@ -91,9 +91,9 @@ export function removeObserver(observable: IObservable, node: IDerivation) {
 }
 
 export function queueForUnobservation(observable: IObservable) {
-    if (observable.isPendingUnobservation_ === false) {
+    if (observable.isPendingUnobservation === false) {
         // invariant(observable._observers.length === 0, "INTERNAL ERROR, should only queue for unobservation unobserved observables");
-        observable.isPendingUnobservation_ = true
+        observable.isPendingUnobservation = true
         globalState.pendingUnobservations.push(observable)
     }
 }
@@ -114,11 +114,11 @@ export function endBatch() {
         const list = globalState.pendingUnobservations
         for (let i = 0; i < list.length; i++) {
             const observable = list[i]
-            observable.isPendingUnobservation_ = false
+            observable.isPendingUnobservation = false
             if (observable.observers_.size === 0) {
-                if (observable.isBeingObserved_) {
+                if (observable.isBeingObserved) {
                     // if this observable had reactive observers, trigger the hooks
-                    observable.isBeingObserved_ = false
+                    observable.isBeingObserved = false
                     observable.onBUO()
                 }
                 if (observable instanceof ComputedValue) {
@@ -146,12 +146,12 @@ export function reportObserved(observable: IObservable): boolean {
             observable.lastAccessedBy_ = derivation.runId_
             // Tried storing newObserving, or observing, or both as Set, but performance didn't come close...
             derivation.newObserving_![derivation.unboundDepsCount_++] = observable
-            if (!observable.isBeingObserved_ && globalState.trackingContext) {
-                observable.isBeingObserved_ = true
+            if (!observable.isBeingObserved && globalState.trackingContext) {
+                observable.isBeingObserved = true
                 observable.onBO()
             }
         }
-        return observable.isBeingObserved_
+        return observable.isBeingObserved
     } else if (observable.observers_.size === 0 && globalState.inBatch > 0) {
         queueForUnobservation(observable)
     }

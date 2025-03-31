@@ -12,7 +12,8 @@ import {
     isFunction,
     isPlainObject,
     die,
-    allowStateChanges
+    allowStateChanges,
+    GenericAbortSignal
 } from "../internal"
 
 export interface IAutorunOptions {
@@ -31,6 +32,7 @@ export interface IAutorunOptions {
      * This is an advanced feature that, in 99.99% of cases you won't need.
      */
     weak?: boolean
+    signal?: GenericAbortSignal
 }
 
 /**
@@ -80,7 +82,7 @@ export function autorun(
                     isScheduled = true
                     scheduler(() => {
                         isScheduled = false
-                        if (!reaction.isDisposed_) {
+                        if (!reaction.isDisposed) {
                             reaction.track(reactionRunner)
                         }
                     })
@@ -96,8 +98,10 @@ export function autorun(
         view(reaction)
     }
 
-    reaction.schedule_()
-    return reaction.getDisposer_()
+    if (!opts?.signal?.aborted) {
+        reaction.schedule_()
+    }
+    return reaction.getDisposer_(opts?.signal)
 }
 
 export type IReactionOptions<T, FireImmediately extends boolean> = IAutorunOptions & {
@@ -143,7 +147,6 @@ export function reaction<T, FireImmediately extends boolean = false>(
     let firstTime = true
     let isScheduled = false
     let value: T
-    let oldValue: T | undefined
 
     const equals: IEqualsComparer<T> = (opts as any).compareStructural
         ? comparer.structural
@@ -166,18 +169,18 @@ export function reaction<T, FireImmediately extends boolean = false>(
 
     function reactionRunner() {
         isScheduled = false
-        if (r.isDisposed_) {
+        if (r.isDisposed) {
             return
         }
         let changed: boolean = false
+        const oldValue = value
         r.track(() => {
             const nextValue = allowStateChanges(false, () => expression(r))
             changed = firstTime || !equals(value, nextValue)
-            oldValue = value
             value = nextValue
         })
 
-        // This casting is nesessary as TS cannot infer proper type in current funciton implementation
+        // This casting is nesessary as TS cannot infer proper type in current function implementation
         type OldValue = FireImmediately extends true ? T | undefined : T
         if (firstTime && opts.fireImmediately!) {
             effectAction(value, oldValue as OldValue, r)
@@ -187,8 +190,10 @@ export function reaction<T, FireImmediately extends boolean = false>(
         firstTime = false
     }
 
-    r.schedule_()
-    return r.getDisposer_()
+    if (!opts?.signal?.aborted) {
+        r.schedule_()
+    }
+    return r.getDisposer_(opts?.signal)
 }
 
 function wrapErrorHandler(errorHandler, baseFn) {

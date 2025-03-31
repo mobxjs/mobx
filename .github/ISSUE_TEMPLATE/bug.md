@@ -29,7 +29,7 @@ A description of what happened, including a screenshot or copy-paste of any rela
 <!--
 Please create a reproduction and link to it here. You can use the following starters:
 - React: https://codesandbox.io/s/minimal-mobx-react-project-ppgml
-- React Native: https://snack.expo.dev/hu86FDcoU
+- React Native: https://snack.expo.dev/vEF39Ohnb
 
 If the issue is more complicated or not reproducible with React, feel free to create your CodeSandbox or your own GitHub repo with the code.
 

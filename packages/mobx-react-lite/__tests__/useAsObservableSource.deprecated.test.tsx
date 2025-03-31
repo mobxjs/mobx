@@ -1,5 +1,4 @@
-import { act, cleanup, render } from "@testing-library/react"
-import { renderHook } from "@testing-library/react-hooks"
+import { act, cleanup, render, renderHook } from "@testing-library/react"
 import { autorun, configure, observable } from "mobx"
 import * as React from "react"
 import { useEffect, useState } from "react"
@@ -81,7 +80,7 @@ describe("base useAsObservableSource should work", () => {
         })
         expect(container.querySelector("span")!.innerHTML).toBe("22")
         expect(counterRender).toBe(2)
-        expect(observerRender).toBe(3)
+        expect(observerRender).toBe(4)
         expect(consoleWarnMock).toMatchSnapshot()
     })
 
@@ -138,7 +137,7 @@ describe("base useAsObservableSource should work", () => {
             ;(container.querySelector("#incmultiplier")! as any).click()
         })
         expect(container.querySelector("span")!.innerHTML).toBe("22")
-        expect(counterRender).toBe(4) // TODO: should be 3
+        expect(counterRender).toBe(4) // One from props, second from updating local observable (setState during render)
     })
 })
 
@@ -271,7 +270,12 @@ describe("combining observer with props and stores", () => {
             store.x = 10
         })
 
-        expect(renderedValues).toEqual([10, 15, 15, 20]) // TODO: should have one 15 less
+        expect(renderedValues).toEqual([
+            10,
+            15, // props change
+            15, // local observable change (setState during render)
+            20
+        ])
 
         // TODO: re-enable this line. When debugging, the correct value is returned from render,
         // which is also visible with renderedValues, however, querying the dom doesn't show the correct result
@@ -283,29 +287,62 @@ describe("combining observer with props and stores", () => {
 describe("enforcing actions", () => {
     it("'never' should work", () => {
         configure({ enforceActions: "never" })
-        const { result } = renderHook(() => {
-            const [thing, setThing] = React.useState("world")
-            useAsObservableSource({ hello: thing })
-            useEffect(() => setThing("react"), [])
-        })
-        expect(result.error).not.toBeDefined()
+        const onError = jest.fn()
+        renderHook(
+            () => {
+                const [thing, setThing] = React.useState("world")
+                useAsObservableSource({ hello: thing })
+                useEffect(() => setThing("react"), [])
+            },
+            {
+                wrapper: class extends React.Component<React.PropsWithChildren> {
+                    componentDidCatch = onError
+                    render() {
+                        return this.props.children
+                    }
+                }
+            }
+        )
+        expect(onError).not.toBeCalled()
     })
     it("only when 'observed' should work", () => {
         configure({ enforceActions: "observed" })
-        const { result } = renderHook(() => {
-            const [thing, setThing] = React.useState("world")
-            useAsObservableSource({ hello: thing })
-            useEffect(() => setThing("react"), [])
-        })
-        expect(result.error).not.toBeDefined()
+        const onError = jest.fn()
+        renderHook(
+            () => {
+                const [thing, setThing] = React.useState("world")
+                useAsObservableSource({ hello: thing })
+                useEffect(() => setThing("react"), [])
+            },
+            {
+                wrapper: class extends React.Component<React.PropsWithChildren> {
+                    componentDidCatch = onError
+                    render() {
+                        return this.props.children
+                    }
+                }
+            }
+        )
+        expect(onError).not.toBeCalled()
     })
     it("'always' should work", () => {
         configure({ enforceActions: "always" })
-        const { result } = renderHook(() => {
-            const [thing, setThing] = React.useState("world")
-            useAsObservableSource({ hello: thing })
-            useEffect(() => setThing("react"), [])
-        })
-        expect(result.error).not.toBeDefined()
+        const onError = jest.fn()
+        renderHook(
+            () => {
+                const [thing, setThing] = React.useState("world")
+                useAsObservableSource({ hello: thing })
+                useEffect(() => setThing("react"), [])
+            },
+            {
+                wrapper: class extends React.Component<React.PropsWithChildren> {
+                    componentDidCatch = onError
+                    render() {
+                        return this.props.children
+                    }
+                }
+            }
+        )
+        expect(onError).not.toBeCalled()
     })
 })

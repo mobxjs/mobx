@@ -1,5 +1,136 @@
 # mobx
 
+## 6.13.7
+
+### Patch Changes
+
+-   [`54e3f71ca02f09b3107290f18d8484b70a6e2f0b`](https://github.com/mobxjs/mobx/commit/54e3f71ca02f09b3107290f18d8484b70a6e2f0b) [#4528](https://github.com/mobxjs/mobx/pull/4528) Thanks [@k-g-a](https://github.com/k-g-a)! - Fix observable.set not respecting the new value from interceptors
+
+## 6.13.6
+
+### Patch Changes
+
+-   [`bca3841347f4fba50ad910e1c4176c56ba0173d1`](https://github.com/mobxjs/mobx/commit/bca3841347f4fba50ad910e1c4176c56ba0173d1) [#3993](https://github.com/mobxjs/mobx/pull/3993) Thanks [@tonyraoul](https://github.com/tonyraoul)! - Improve observableset memory footprint and performance
+
+## 6.13.5
+
+### Patch Changes
+
+-   [`4c077738776d5fc7ba0f108805a9ec816c2709b9`](https://github.com/mobxjs/mobx/commit/4c077738776d5fc7ba0f108805a9ec816c2709b9) [#3943](https://github.com/mobxjs/mobx/pull/3943) Thanks [@tonyraoul](https://github.com/tonyraoul)! - Fix browser compatability issue introduced in 6.13.4 release
+
+## 6.13.4
+
+### Patch Changes
+
+-   [`f91d2e1dc85a53b729c03bd28ab39ffcf0838403`](https://github.com/mobxjs/mobx/commit/f91d2e1dc85a53b729c03bd28ab39ffcf0838403) [#3935](https://github.com/mobxjs/mobx/pull/3935) Thanks [@tonyraoul](https://github.com/tonyraoul)! - Update typescript version to 5.6.2 and added support for esnext iterator helpers
+
+## 6.13.3
+
+### Patch Changes
+
+-   [`a1cf2c63ef92d3d42a5b42a23ff6c7a745664cfd`](https://github.com/mobxjs/mobx/commit/a1cf2c63ef92d3d42a5b42a23ff6c7a745664cfd) [#3902](https://github.com/mobxjs/mobx/pull/3902) Thanks [@jzhan-canva](https://github.com/jzhan-canva)! - Fix 2022.3 @action decorators on fields no longer require makeObservable
+
+## 6.13.2
+
+### Patch Changes
+
+-   [`f1f922152b45357a49ee6b310e9e0ecf38bd3955`](https://github.com/mobxjs/mobx/commit/f1f922152b45357a49ee6b310e9e0ecf38bd3955) [#3921](https://github.com/mobxjs/mobx/pull/3921) Thanks [@urugator](https://github.com/urugator)! - fix: #3919 new set methods not working with observable set
+
+## 6.13.1
+
+### Patch Changes
+
+-   [`5e711e0b4737fd6b5b3c6f9b32afd4f195bc5fc3`](https://github.com/mobxjs/mobx/commit/5e711e0b4737fd6b5b3c6f9b32afd4f195bc5fc3) [#3901](https://github.com/mobxjs/mobx/pull/3901) Thanks [@peterm-canva](https://github.com/peterm-canva)! - Shrink Atom and Reaction using a bitfield
+
+## 6.13.0
+
+### Minor Changes
+
+-   [`16f070e6aac60e9010c2591b1743276d700b23d5`](https://github.com/mobxjs/mobx/commit/16f070e6aac60e9010c2591b1743276d700b23d5) [#3898](https://github.com/mobxjs/mobx/pull/3898) Thanks [@inoyakaigor](https://github.com/inoyakaigor)! - Added new Set methods
+
+## 6.12.5
+
+### Patch Changes
+
+-   [`ba890343`](https://github.com/mobxjs/mobx/commit/ba8903430ce96746db5dcde6b78edeb195ea8018) [#3893](https://github.com/mobxjs/mobx/pull/3893) Thanks [@g6123](https://github.com/g6123)! - Fix ES6 Map/Set checks for cross-window scripts
+
+## 6.12.4
+
+### Patch Changes
+
+-   [`e9e1955f`](https://github.com/mobxjs/mobx/commit/e9e1955f745545d796d906b6e0ba04a6cde3f1ee) [#3880](https://github.com/mobxjs/mobx/pull/3880) Thanks [@peterm-canva](https://github.com/peterm-canva)! - Shrink ComputedValue using a bitfield
+
+## 6.12.2
+
+### Patch Changes
+
+-   [`61abc53f`](https://github.com/mobxjs/mobx/commit/61abc53ff10554d1d5ce3e85466f6beda4d63fa2) [#3852](https://github.com/mobxjs/mobx/pull/3852) Thanks [@mweststrate](https://github.com/mweststrate)! - Patched the release process, forcing release to get everything in pristine state.
+
+*   [`b28e0ebb`](https://github.com/mobxjs/mobx/commit/b28e0ebbfc9aa11293bc185216da92997e497fd3) [#3816](https://github.com/mobxjs/mobx/pull/3816) Thanks [@barroij](https://github.com/barroij)! - Fix `IReactionDisposer` and `IIsObservableObject` interface definition so that Typescript knows the property key `$mobx` is a symbol and not a string
+
+## 6.12.1
+
+### Patch Changes
+
+-   [`620f78c7`](https://github.com/mobxjs/mobx/commit/620f78c74e66bc532a96e28b26fd2d0ed1b67d54) [#3812](https://github.com/mobxjs/mobx/pull/3812) Thanks [@barroij](https://github.com/barroij)! - Prevent `reaction` from heeping a Reference to the OldValue that would prevent GC.
+
+*   [`6111b093`](https://github.com/mobxjs/mobx/commit/6111b0939d0d3c0d46dc325ba6bbd5f740a161d3) [#3833](https://github.com/mobxjs/mobx/pull/3833) Thanks [@realyze](https://github.com/realyze)! - Reduce memory overhead of tracking dependencies
+
+## 6.12.0
+
+### Minor Changes
+
+-   [`ec5db592`](https://github.com/mobxjs/mobx/commit/ec5db592d7756826c31e710b1c759d7e9406b153) [#3792](https://github.com/mobxjs/mobx/pull/3792) Thanks [@tonyraoul](https://github.com/tonyraoul)! - Improve observablearray proxy pefromance for es2023.array and es2022.array methods
+
+### Patch Changes
+
+-   [`86616c11`](https://github.com/mobxjs/mobx/commit/86616c11c108a511331eb05e55c08fc2c5a23f4d) [#3654](https://github.com/mobxjs/mobx/pull/3654) Thanks [@ahoisl](https://github.com/ahoisl)! - fix: action transparently forwards toString of underlying function
+
+## 6.11.0
+
+### Minor Changes
+
+-   [`c9260974`](https://github.com/mobxjs/mobx/commit/c9260974f726f58de0fd4974ea024c644d9b7c6f) [#3790](https://github.com/mobxjs/mobx/pull/3790) Thanks [@mweststrate](https://github.com/mweststrate)! - Added support for modern 2022.3 Decorators. [#3790](https://github.com/mobxjs/mobx/pull/3790)
+    -   [Installation / usage instruction](https://mobx.js.org/enabling-decorators.html).
+    -   [Introduction announcement](https://michel.codes/blogs/mobx-decorators)
+    -   Original PR by [@Matchlighter](https://github.com/Matchlighter) in [#3638](https://github.com/mobxjs/mobx/pull/3638),
+
+## 6.10.2
+
+### Patch Changes
+
+-   [`c8d9374d`](https://github.com/mobxjs/mobx/commit/c8d9374d4f3b05cfec0d690e0eb3ada4f619ff0b) [#3748](https://github.com/mobxjs/mobx/pull/3748) Thanks [@mweststrate](https://github.com/mweststrate)! - Fixed: #3747, computed values becoming stale if the underlying observable was created and updated outside a reactive context
+
+## 6.10.1
+
+### Patch Changes
+
+-   [`3ceeb865`](https://github.com/mobxjs/mobx/commit/3ceeb8651e328c4c7211c875696b3f5269fea834) [#3732](https://github.com/mobxjs/mobx/pull/3732) Thanks [@urugator](https://github.com/urugator)! - - fix: #3728: Observable initialization updates state version.
+    -   fix: Observable set initialization violates `enforceActions: "always"`.
+    -   fix: Changing keys of observable object does not respect `enforceActions`.
+
+## 6.10.0
+
+### Minor Changes
+
+-   [`bebd5f05`](https://github.com/mobxjs/mobx/commit/bebd5f0507a109145f401c78630ed9d59e4a1101) [#3727](https://github.com/mobxjs/mobx/pull/3727) Thanks [@rluvaton](https://github.com/rluvaton)! - Added support for `signal` (AbortSignal) in `autorun`, `reaction` and sync `when` options to dispose them
+
+### Patch Changes
+
+-   [`55f78ddc`](https://github.com/mobxjs/mobx/commit/55f78ddc20e84f38a7aa88b99a51ad994e558241) [#3717](https://github.com/mobxjs/mobx/pull/3717) Thanks [@liucan233](https://github.com/liucan233)! - remove proxy option for makeObservable and makeAutoObservable
+
+## 6.9.1
+
+### Patch Changes
+
+-   [`4792303e`](https://github.com/mobxjs/mobx/commit/4792303ec9119c1ba54134fff7e845d21a1d9337) [#3709](https://github.com/mobxjs/mobx/pull/3709) Thanks [@kubk](https://github.com/kubk)! - Make trace() noop in production build
+
+## 6.9.0
+
+### Minor Changes
+
+-   [`44a2cf42`](https://github.com/mobxjs/mobx/commit/44a2cf42dec7635f639ddbfb19202ebc710bac54) [#3590](https://github.com/mobxjs/mobx/pull/3590) Thanks [@urugator](https://github.com/urugator)! - Better support for React 18: Mobx now keeps track of a global state version, which updates with each mutation.
+
 ## 6.8.0
 
 ### Minor Changes
@@ -1319,7 +1450,7 @@ A deprecation message will now be printed if creating computed properties while 
 
 ```javascript
 const x = observable({
-    computedProp: function() {
+    computedProp: function () {
         return someComputation
     }
 })
@@ -1344,7 +1475,7 @@ or alternatively:
 
 ```javascript
 observable({
-    computedProp: computed(function() {
+    computedProp: computed(function () {
         return someComputation
     })
 })
@@ -1362,7 +1493,7 @@ N.B. If you want to introduce actions on an observable that modify its state, us
 ```javascript
 observable({
     counter: 0,
-    increment: action(function() {
+    increment: action(function () {
         this.counter++
     })
 })
@@ -1488,10 +1619,10 @@ function Square() {
     extendObservable(this, {
         length: 2,
         squared: computed(
-            function() {
+            function () {
                 return this.squared * this.squared
             },
-            function(surfaceSize) {
+            function (surfaceSize) {
                 this.length = Math.sqrt(surfaceSize)
             }
         )

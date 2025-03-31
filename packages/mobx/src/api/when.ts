@@ -6,16 +6,9 @@ import {
     createAction,
     getNextId,
     die,
-    allowStateChanges
+    allowStateChanges,
+    GenericAbortSignal
 } from "../internal"
-
-// https://github.com/mobxjs/mobx/issues/3582
-interface GenericAbortSignal {
-    readonly aborted: boolean
-    onabort?: ((...args: any) => any) | null
-    addEventListener?: (...args: any) => any
-    removeEventListener?: (...args: any) => any
-}
 
 export interface IWhenOptions {
     name?: string
@@ -45,7 +38,7 @@ function _when(predicate: () => boolean, effect: Lambda, opts: IWhenOptions): IR
     if (typeof opts.timeout === "number") {
         const error = new Error("WHEN_TIMEOUT")
         timeoutHandle = setTimeout(() => {
-            if (!disposer[$mobx].isDisposed_) {
+            if (!disposer[$mobx].isDisposed) {
                 disposer()
                 if (opts.onError) {
                     opts.onError(error)

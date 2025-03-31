@@ -7,7 +7,9 @@ import {
     isObservableProp,
     isComputedProp,
     isAction,
-    extendObservable
+    extendObservable,
+    observable,
+    reaction
 } from "../../../src/mobx"
 
 test("extendObservable should work", function () {
@@ -159,4 +161,16 @@ test("extendObservable should apply specified decorators", function () {
 
     expect(isAction(box.someFunc)).toBe(true)
     expect(box.someFunc()).toEqual(2)
+})
+
+test("extendObservable notifies about added keys", () => {
+    let reactionCalled = false
+    const o = observable({})
+    const disposeReaction = reaction(
+        () => Object.keys(o),
+        () => (reactionCalled = true)
+    )
+    extendObservable(o, { x: 0 })
+    expect(reactionCalled).toBe(true)
+    disposeReaction()
 })

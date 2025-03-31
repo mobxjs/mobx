@@ -33,6 +33,8 @@ import {
     createObserverStore
 } from "../internal"
 
+import { getFlag, setFlag } from "../utils/utils"
+
 export interface IComputedValue<T> {
     get(): T
     set(value: T): void
@@ -86,10 +88,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     dependenciesState_ = IDerivationState_.NOT_TRACKING_
     observing_: IObservable[] = [] // nodes we are looking at. Our value depends on these nodes
     newObserving_ = null // during tracking it's an array with new observed observers
-    isBeingObserved_ = false
-    isPendingUnobservation_: boolean = false
     observers_ = createObserverStore(this)
-    diffValue_ = 0
     runId_ = 0
     lastAccessedBy_ = 0
     lowestObserverState_ = IDerivationState_.UP_TO_DATE_
@@ -97,8 +96,14 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     protected value_: T | undefined | CaughtException = new CaughtException(null)
     name_: string
     triggeredBy_?: string
-    isComputing_: boolean = false // to check for cycles
-    isRunningSetter_: boolean = false
+
+    private static readonly isComputingMask_ = 0b00001
+    private static readonly isRunningSetterMask_ = 0b00010
+    private static readonly isBeingObservedMask_ = 0b00100
+    private static readonly isPendingUnobservationMask_ = 0b01000
+    private static readonly diffValueMask_ = 0b10000
+    private flags_ = 0b00000
+
     derivation: () => T // N.B: unminified as it is used by MST
     setter_?: (value: T) => void
     isTracing_: TraceMode = TraceMode.NONE
@@ -162,12 +167,52 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         }
     }
 
+    // to check for cycles
+    private get isComputing(): boolean {
+        return getFlag(this.flags_, ComputedValue.isComputingMask_)
+    }
+    private set isComputing(newValue: boolean) {
+        this.flags_ = setFlag(this.flags_, ComputedValue.isComputingMask_, newValue)
+    }
+
+    private get isRunningSetter(): boolean {
+        return getFlag(this.flags_, ComputedValue.isRunningSetterMask_)
+    }
+    private set isRunningSetter(newValue: boolean) {
+        this.flags_ = setFlag(this.flags_, ComputedValue.isRunningSetterMask_, newValue)
+    }
+
+    get isBeingObserved(): boolean {
+        return getFlag(this.flags_, ComputedValue.isBeingObservedMask_)
+    }
+    set isBeingObserved(newValue: boolean) {
+        this.flags_ = setFlag(this.flags_, ComputedValue.isBeingObservedMask_, newValue)
+    }
+
+    get isPendingUnobservation(): boolean {
+        return getFlag(this.flags_, ComputedValue.isPendingUnobservationMask_)
+    }
+    set isPendingUnobservation(newValue: boolean) {
+        this.flags_ = setFlag(this.flags_, ComputedValue.isPendingUnobservationMask_, newValue)
+    }
+
+    get diffValue(): 0 | 1 {
+        return getFlag(this.flags_, ComputedValue.diffValueMask_) ? 1 : 0
+    }
+    set diffValue(newValue: 0 | 1) {
+        this.flags_ = setFlag(
+            this.flags_,
+            ComputedValue.diffValueMask_,
+            newValue === 1 ? true : false
+        )
+    }
+
     /**
      * Returns the current value of this computed value.
      * Will evaluate its computation first if needed.
      */
     public get(): T {
-        if (this.isComputing_) {
+        if (this.isComputing) {
             die(32, this.name_, this.derivation)
         }
         if (
@@ -205,14 +250,14 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 
     public set(value: T) {
         if (this.setter_) {
-            if (this.isRunningSetter_) {
+            if (this.isRunningSetter) {
                 die(33, this.name_)
             }
-            this.isRunningSetter_ = true
+            this.isRunningSetter = true
             try {
                 this.setter_.call(this.scope_, value)
             } finally {
-                this.isRunningSetter_ = false
+                this.isRunningSetter = false
             }
         } else {
             die(34, this.name_)
@@ -251,7 +296,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     }
 
     computeValue_(track: boolean) {
-        this.isComputing_ = true
+        this.isComputing = true
         // don't allow state changes during computation
         const prev = allowStateChangesStart(false)
         let res: T | CaughtException
@@ -269,7 +314,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
             }
         }
         allowStateChangesEnd(prev)
-        this.isComputing_ = false
+        this.isComputing = false
         return res
     }
 

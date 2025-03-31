@@ -9,6 +9,7 @@ import {
     checkIfStateModificationsAreAllowed,
     createAtom,
     createInstanceofPredicate,
+    makeIterable,
     deepEnhancer,
     getNextId,
     getPlainObjectKeys,
@@ -16,9 +17,9 @@ import {
     hasListeners,
     interceptChange,
     isES6Map,
+    isPlainES6Map,
     isPlainObject,
     isSpyEnabled,
-    makeIterable,
     notifyListeners,
     referenceEnhancer,
     registerInterceptor,
@@ -35,7 +36,7 @@ import {
     UPDATE,
     IAtom,
     PureSpyEvent,
-    allowStateChanges
+    initObservable
 } from "../internal"
 
 export interface IKeyValueMap<V = any> {
@@ -90,11 +91,12 @@ export type IObservableMapInitialValues<K = any, V = any> =
 // just extend Map? See also https://gist.github.com/nestharus/13b4d74f2ef4a2f4357dbd3fc23c1e54
 // But: https://github.com/mobxjs/mobx/issues/1556
 export class ObservableMap<K = any, V = any>
-    implements Map<K, V>, IInterceptable<IMapWillChange<K, V>>, IListenable {
+    implements Map<K, V>, IInterceptable<IMapWillChange<K, V>>, IListenable
+{
     [$mobx] = ObservableMapMarker
-    data_: Map<K, ObservableValue<V>>
-    hasMap_: Map<K, ObservableValue<boolean>> // hasMap, not hashMap >-).
-    keysAtom_: IAtom
+    data_!: Map<K, ObservableValue<V>>
+    hasMap_!: Map<K, ObservableValue<boolean>> // hasMap, not hashMap >-).
+    keysAtom_!: IAtom
     interceptors_
     changeListeners_
     dehancer: any
@@ -107,11 +109,13 @@ export class ObservableMap<K = any, V = any>
         if (!isFunction(Map)) {
             die(18)
         }
-        this.keysAtom_ = createAtom(__DEV__ ? `${this.name_}.keys()` : "ObservableMap.keys()")
-        this.data_ = new Map()
-        this.hasMap_ = new Map()
-        allowStateChanges(true, () => {
-            this.merge(initialData)
+        initObservable(() => {
+            this.keysAtom_ = createAtom(__DEV__ ? `${this.name_}.keys()` : "ObservableMap.keys()")
+            this.data_ = new Map()
+            this.hasMap_ = new Map()
+            if (initialData) {
+                this.merge(initialData)
+            }
         })
     }
 
@@ -292,15 +296,15 @@ export class ObservableMap<K = any, V = any>
         return value
     }
 
-    keys(): IterableIterator<K> {
+    keys(): MapIterator<K> {
         this.keysAtom_.reportObserved()
         return this.data_.keys()
     }
 
-    values(): IterableIterator<V> {
+    values(): MapIterator<V> {
         const self = this
         const keys = this.keys()
-        return makeIterable({
+        return makeIterableForMap({
             next() {
                 const { done, value } = keys.next()
                 return {
@@ -311,10 +315,10 @@ export class ObservableMap<K = any, V = any>
         })
     }
 
-    entries(): IterableIterator<IMapEntry<K, V>> {
+    entries(): MapIterator<IMapEntry<K, V>> {
         const self = this
         const keys = this.keys()
-        return makeIterable({
+        return makeIterableForMap({
             next() {
                 const { done, value } = keys.next()
                 return {
@@ -348,7 +352,7 @@ export class ObservableMap<K = any, V = any>
             } else if (Array.isArray(other)) {
                 other.forEach(([key, value]) => this.set(key, value))
             } else if (isES6Map(other)) {
-                if (other.constructor !== Map) {
+                if (!isPlainES6Map(other)) {
                     die(19, other)
                 }
                 other.forEach((value, key) => this.set(key, value))
@@ -485,6 +489,11 @@ export class ObservableMap<K = any, V = any>
 export var isObservableMap = createInstanceofPredicate("ObservableMap", ObservableMap) as (
     thing: any
 ) => thing is ObservableMap<any, any>
+
+function makeIterableForMap<T>(iterator: Iterator<T>): MapIterator<T> {
+    iterator[Symbol.toStringTag] = "MapIterator"
+    return makeIterable<T, BuiltinIteratorReturn>(iterator)
+}
 
 function convertToMap(dataStructure: any): Map<any, any> {
     if (isES6Map(dataStructure) || isObservableMap(dataStructure)) {

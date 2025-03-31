@@ -1,8 +1,6 @@
 import {
     getNextId,
     addHiddenFinalProp,
-    allowStateChangesStart,
-    allowStateChangesEnd,
     makeIterable,
     addHiddenProp,
     ObservableArrayAdministration,
@@ -11,7 +9,8 @@ import {
     IEnhancer,
     isObservableArray,
     IObservableArray,
-    defineProperty
+    defineProperty,
+    initObservable
 } from "../internal"
 
 // Bug in safari 9.* (or iOS 9 safari mobile). See #364
@@ -53,7 +52,7 @@ inherit(StubArray, Array.prototype)
 // but it is unclear why the hack is need as MobX never changed the prototype
 // anyway, so removed it in V6
 
-class LegacyObservableArray<T> extends StubArray {
+export class LegacyObservableArray<T> extends StubArray {
     constructor(
         initialValues: T[] | undefined,
         enhancer: IEnhancer<T>,
@@ -61,23 +60,22 @@ class LegacyObservableArray<T> extends StubArray {
         owned = false
     ) {
         super()
+        initObservable(() => {
+            const adm = new ObservableArrayAdministration(name, enhancer, owned, true)
+            adm.proxy_ = this as any
+            addHiddenFinalProp(this, $mobx, adm)
 
-        const adm = new ObservableArrayAdministration(name, enhancer, owned, true)
-        adm.proxy_ = this as any
-        addHiddenFinalProp(this, $mobx, adm)
+            if (initialValues && initialValues.length) {
+                // @ts-ignore
+                this.spliceWithArray(0, 0, initialValues)
+            }
 
-        if (initialValues && initialValues.length) {
-            const prev = allowStateChangesStart(true)
-            // @ts-ignore
-            this.spliceWithArray(0, 0, initialValues)
-            allowStateChangesEnd(prev)
-        }
-
-        if (safariPrototypeSetterInheritanceBug) {
-            // Seems that Safari won't use numeric prototype setter untill any * numeric property is
-            // defined on the instance. After that it works fine, even if this property is deleted.
-            Object.defineProperty(this, "0", ENTRY_0)
-        }
+            if (safariPrototypeSetterInheritanceBug) {
+                // Seems that Safari won't use numeric prototype setter until any * numeric property is
+                // defined on the instance. After that it works fine, even if this property is deleted.
+                Object.defineProperty(this, "0", ENTRY_0)
+            }
+        })
     }
 
     concat(...arrays: T[][]): T[] {

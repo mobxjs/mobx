@@ -1,8 +1,7 @@
-import { cleanup, render } from "@testing-library/react"
+import { cleanup, render, waitFor } from "@testing-library/react"
 import * as mobx from "mobx"
 import * as React from "react"
 import { useObserver } from "../src/useObserver"
-import { sleep } from "./utils"
 import gc from "expose-gc/function"
 import { observerFinalizationRegistry } from "../src/utils/observerFinalizationRegistry"
 
@@ -14,7 +13,18 @@ expect(observerFinalizationRegistry).toBeInstanceOf(globalThis.FinalizationRegis
 
 afterEach(cleanup)
 
+function nextFrame() {
+    return new Promise(accept => setTimeout(accept, 1))
+}
+
+async function gc_cycle() {
+    await nextFrame()
+    gc()
+    await nextFrame()
+}
+
 test("uncommitted components should not leak observations", async () => {
+    jest.setTimeout(30_000)
     const store = mobx.observable({ count1: 0, count2: 0 })
 
     // Track whether counts are observed
@@ -42,11 +52,19 @@ test("uncommitted components should not leak observations", async () => {
     )
 
     // Allow gc to kick in in case to let finalization registry cleanup
-    gc()
-    await sleep(50)
+    await gc_cycle()
 
-    // count1 should still be being observed by Component1,
-    // but count2 should have had its reaction cleaned up.
-    expect(count1IsObserved).toBeTruthy()
-    expect(count2IsObserved).toBeFalsy()
+    // Can take a while (especially on CI) before gc actually calls the registry
+    await waitFor(
+        () => {
+            // count1 should still be being observed by Component1,
+            // but count2 should have had its reaction cleaned up.
+            expect(count1IsObserved).toBeTruthy()
+            expect(count2IsObserved).toBeFalsy()
+        },
+        {
+            timeout: 15_000,
+            interval: 200
+        }
+    )
 })
