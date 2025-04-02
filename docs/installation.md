@@ -10,7 +10,12 @@ hide_title: true
 
 MobX works in any ES5 environment, which includes browsers and NodeJS.
 
-There are two types of React bindings, `mobx-react-lite` supports only functional components, whereas `mobx-react` also supports class based components. Append the appropriate bindings for your use case to the _Yarn_ or _NPM_ command below:
+There are three types of React bindings:
+- [mobx-react-lite](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react-lite). Utilities to manually apply observation
+- [mobx-react-observer](https://github.com/christianalfoni/mobx-react-observer). Babel/swc plugin to automatically apply observation to components
+- [mobx-react](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react). Support for class components
+
+Append the appropriate bindings for your use case to the _Yarn_ or _NPM_ command below:
 
 **Yarn:** `yarn add mobx`
 
