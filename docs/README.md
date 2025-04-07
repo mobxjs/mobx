@@ -54,6 +54,7 @@ MobX is made possible by the generosity of the sponsors below, and many other [i
 <a href="https://talentplot.com/"><img src="https://mobx.js.org/assets/talentplot.png" align="center" width="100" title="talentplot" alt="talentplot"></a>
 <a href="https://www.easeus.com/?utm_source=github_mobxjs_sponsorship&utm_medium=readme&utm_campaign=sponsorship"><img src="https://mobx.js.org/assets/easeus.png" align="center" width="100" title="EaseUS" alt="EaseUS"/></a>
 <a href="https://route4me.com/"><img src="https://mobx.js.org/assets/route4me.png" align="center" width="100" title="Route Planner and Route Optimizer" alt="Route Planner and Route Optimizer"/></a>
+<a href="https://handsontable.com/docs/react-data-grid/?utm_source=Mobx_homepage&utm_medium=sponsorship&utm_campaign=library_sponsorship"><img src="https://mobx.js.org/assets/handsontable.png" align="center" width="100" title="Handsontable" alt="Handsontable"/></a>
 
 ---
 
