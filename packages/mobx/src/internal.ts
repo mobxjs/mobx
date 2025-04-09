@@ -8,6 +8,7 @@ but at least in this file we can magically reorder the imports with trial and er
 export * from "./utils/global"
 export * from "./errors"
 export * from "./utils/utils"
+export * from "./utils/weakset"
 export * from "./api/decorators"
 export * from "./core/atom"
 export * from "./utils/comparer"

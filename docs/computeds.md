@@ -238,3 +238,7 @@ It is recommended to set this one to `true` on very expensive computed values. I
 ### `keepAlive`
 
 This avoids suspending computed values when they are not being observed by anything (see the above explanation). Can potentially create memory leaks, similar to the ones discussed for [reactions](reactions.md#always-dispose-of-reactions).
+
+### `weak`
+
+Intended for use with `keepAlive`. When `true`, MobX will use a `WeakRef` (_if_ you're not targeting something old that doesn't support `WeakRef`s) when add the `computed` to any `observables`. If your reference to the `computed` is garbage collected, the `computed` will be too (instead of `observable`s holding references and preventing garbage collection)
