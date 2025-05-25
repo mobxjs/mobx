@@ -26,6 +26,12 @@ export interface IAutorunOptions {
     requiresObservable?: boolean
     scheduler?: (callback: () => void) => any
     onError?: (error: any) => void
+    /**
+     * Observees will not prevent this Reaction from being garbage collected and disposed - you'll need to keep a reference to it somewhere
+     *
+     * This is an advanced feature that, in 99.99% of cases you won't need.
+     */
+    weak?: boolean
     signal?: GenericAbortSignal
 }
 
@@ -61,7 +67,8 @@ export function autorun(
                 this.track(reactionRunner)
             },
             opts.onError,
-            opts.requiresObservable
+            opts.requiresObservable,
+            opts.weak
         )
     } else {
         const scheduler = createSchedulerFromOptions(opts)
@@ -82,7 +89,8 @@ export function autorun(
                 }
             },
             opts.onError,
-            opts.requiresObservable
+            opts.requiresObservable,
+            opts.weak
         )
     }
 
@@ -155,7 +163,8 @@ export function reaction<T, FireImmediately extends boolean = false>(
             }
         },
         opts.onError,
-        opts.requiresObservable
+        opts.requiresObservable,
+        opts.weak
     )
 
     function reactionRunner() {
