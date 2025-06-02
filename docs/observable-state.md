@@ -69,7 +69,6 @@ class Doubler {
 **All annotated** fields are **non-configurable**.<br>
 **All non-observable** (stateless) fields (`action`, `flow`) are **non-writable**.
 
-
 <!--class + decorators-->
 
 When using modern decorators, there is no need to call `makeObservable`, below is what a decorator based class looks like.
@@ -148,7 +147,6 @@ tags.push("prio: for fun")
 In contrast to the first example with `makeObservable`, `observable` supports adding (and removing) _fields_ to an object.
 This makes `observable` great for collections like dynamically keyed objects, arrays, Maps and Sets.
 
-
 <!--class + decorators (legacy)-->
 
 To use legacy decorators, `makeObservable(this)` should be called in the constructor to make sure decorators work.
@@ -221,6 +219,8 @@ Check out the above code block for an example.
 The object returned by `observable` will be a Proxy, which means that properties that are added later to the object will be picked up and made observable as well (except when [proxy usage](configuration.md#proxy-support) is disabled).
 
 The `observable` method can also be called with collections types like [arrays](api.md#observablearray), [Maps](api.md#observablemap) and [Sets](api.md#observableset). Those will be cloned as well and converted into their observable counterparts.
+
+> Tip: as holds for JavaScript in general, don't use observable plain objects to create a keyed collection (for example to store a mapping from a user's UUID to user object), use maps instead. Object descriptors are aggressively cached by MobX, so if property names are unstable, this might result in memory leaks.
 
 <details id="observable-array"><summary>**Example:** observable array<a href="#observable-array" class="tip-anchor"></a></summary>
 
