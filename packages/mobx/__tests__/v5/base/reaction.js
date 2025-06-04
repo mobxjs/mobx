@@ -3,6 +3,7 @@
  */
 const mobx = require("../../../src/mobx.ts")
 const reaction = mobx.reaction
+const $mobx = mobx.$mobx
 const utils = require("../../v5/utils/test-utils")
 
 test("basic", () => {
@@ -702,5 +703,29 @@ describe("reaction opts requiresObservable", () => {
         })
 
         expect(messages.length).toBe(0)
+    })
+})
+
+describe("explicit resource management", () => {
+    Symbol.dispose ??= Symbol("Symbol.dispose")
+
+    test("reaction has [Symbol.dispose] and calling it disposes of reaction", () => {
+        const a = mobx.observable.box(1)
+        const values = []
+
+        const disposeReaction = reaction(
+            () => a.get(),
+            newValue => {
+                values.push(newValue)
+            }
+        )
+
+        expect(disposeReaction[Symbol.dispose]).toBeInstanceOf(Function)
+
+        disposeReaction[Symbol.dispose]()
+        a.set(2)
+
+        expect(values).toEqual([])
+        expect(disposeReaction[$mobx].isDisposed).toBe(true)
     })
 })

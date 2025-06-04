@@ -329,6 +329,54 @@ class OrderLine {
 
 </details>
 
+In environments that support [Explicit Resource Management](https://github.com/tc39/proposal-explicit-resource-management),
+the disposer function includes a `[Symbol.dispose]` method that can be used to
+dispose of the reaction. This can be useful when disposing of several reactions
+simultaneously or when disposing of reactions alongside other Disposables.
+
+<details id="disposable-stack"><summary>**Example:** using DisposableStack<a href="#disposable-stack" class="tip-anchor"></a></summary>
+
+```javascript
+function createSomeDisposableResource() {}
+
+class Vat {
+    value = 1.2
+
+    constructor() {
+        makeAutoObservable(this)
+    }
+}
+
+const vat = new Vat()
+
+class OrderLine {
+    price = 10
+    amount = 1
+    disposableStack = new DisposableStack()
+    someDisposableResource
+
+    constructor() {
+        makeAutoObservable(this)
+
+        this.disposableStack.use(autorun(() => {
+            doSomethingWith(this.price * this.amount)
+        }))
+
+        this.disposableStack.use(autorun(() => {
+            doSomethingWith(this.price * this.amount * vat.value)
+        }))
+
+        this.someDisposableResource = this.disposableStack.use(createSomeDisposableResource())
+    }
+
+    [Symbol.dispose]() {
+        this.disposableStack[Symbol.dispose]();
+    }
+}
+```
+
+</details>
+
 ## Use reactions sparingly!
 
 As it was already said, you won't create reactions very often.
