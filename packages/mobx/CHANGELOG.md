@@ -1,5 +1,11 @@
 # mobx
 
+## 6.14.0
+
+### Minor Changes
+
+-   [`fe1d3f45cfd0d21189e963579e5c9d764329fea9`](https://github.com/mobxjs/mobx/commit/fe1d3f45cfd0d21189e963579e5c9d764329fea9) [#4558](https://github.com/mobxjs/mobx/pull/4558) Thanks [@vkrol](https://github.com/vkrol)! - Add Explicit Resource Management support in reactions
+
 ## 6.13.7
 
 ### Patch Changes
