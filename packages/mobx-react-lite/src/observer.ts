@@ -44,6 +44,11 @@ export function observer<P extends object, TRef = {}>(
     React.ForwardRefExoticComponent<React.PropsWithoutRef<P> & React.RefAttributes<TRef>>
 >
 
+export function observer<P extends object>(
+    baseComponent: React.FunctionComponent<P>,
+    options?: IObserverOptions
+): React.FunctionComponent<P>
+
 export function observer<P extends object, TRef = {}>(
     baseComponent: React.ForwardRefExoticComponent<
         React.PropsWithoutRef<P> & React.RefAttributes<TRef>
@@ -51,12 +56,6 @@ export function observer<P extends object, TRef = {}>(
 ): React.MemoExoticComponent<
     React.ForwardRefExoticComponent<React.PropsWithoutRef<P> & React.RefAttributes<TRef>>
 >
-
-export function observer<P extends object>(
-    baseComponent: React.FunctionComponent<P>,
-    options?: IObserverOptions
-): React.FunctionComponent<P>
-
 export function observer<
     C extends React.FunctionComponent<any> | React.ForwardRefRenderFunction<any>,
     Options extends IObserverOptions
