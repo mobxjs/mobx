@@ -156,13 +156,16 @@ export interface IObservableValueFactory {
 
 export interface IObservableMapFactory {
     <K = any, V = any>(): ObservableMap<K, V>
-    <K, V>(initialValues: IMapEntries<K, V>, options?: CreateObservableOptions): ObservableMap<K, V>
+    <K, V>(initialValues?: IMapEntries<K, V>, options?: CreateObservableOptions): ObservableMap<
+        K,
+        V
+    >
     <K, V>(
-        initialValues: IReadonlyMapEntries<K, V>,
+        initialValues?: IReadonlyMapEntries<K, V>,
         options?: CreateObservableOptions
     ): ObservableMap<K, V>
-    <K, V>(initialValues: IKeyValueMap<V>, options?: CreateObservableOptions): ObservableMap<K, V>
-    <K, V>(initialValues: Map<K, V>, options?: CreateObservableOptions): ObservableMap<K, V>
+    <K, V>(initialValues?: IKeyValueMap<V>, options?: CreateObservableOptions): ObservableMap<K, V>
+    <K, V>(initialValues?: Map<K, V>, options?: CreateObservableOptions): ObservableMap<K, V>
     <K = any, V = any>(initialValues: undefined, options?: CreateObservableOptions): ObservableMap<
         K,
         V

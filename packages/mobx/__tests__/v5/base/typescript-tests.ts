@@ -1962,6 +1962,15 @@ test("observable.map() accepts an undefined value with or without options", () =
     mobx.observable.map(undefined)
 })
 
+test("observable.map() accepts optional initial values", () => {
+    interface Usage {}
+
+    ;(data?: [string, Usage][]) => observable.map(data, { name: "test" })
+    ;(data?: readonly (readonly [string, Usage])[]) => observable.map(data, { name: "test" })
+    ;(data?: Record<string, Usage>) => observable.map(data, { name: "test" })
+    ;(data?: Map<string, Usage>) => observable.map(data, { name: "test" })
+})
+
 test("toJS bug #1413 (TS)", () => {
     class X {
         test = {
