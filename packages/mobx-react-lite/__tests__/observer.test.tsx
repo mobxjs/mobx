@@ -594,6 +594,33 @@ test("useImperativeHandle and forwardRef should work with useObserver", () => {
     expect(consoleWarnMock).toMatchSnapshot()
 })
 
+test("observer should work with custom HOC and infer correct type", () => {
+    const validateChildrenWrapper = <T extends {}>(component: React.FC<T>): React.FC<T> => {
+        const wrapper: React.FC<T> = (...args) => {
+            const result = component(...args)
+            if (result && React.isValidElement(result) && result.type === "div") {
+                return result
+            }
+            throw new Error("Only <div> allowed as root element")
+        }
+        wrapper.displayName = component.displayName || component.name
+        return wrapper
+    }
+
+    interface IProps {
+        value: string
+    }
+
+    const TestComponent: React.FC<IProps> = observer(
+        validateChildrenWrapper(function TestComponent({ value }) {
+            return <div>{value}</div>
+        })
+    )
+
+    const rendered = render(<TestComponent value="1" />)
+    expect(rendered.container.querySelector("div")!.innerHTML).toBe("1")
+})
+
 it("should hoist known statics only", () => {
     function isNumber() {
         return null
