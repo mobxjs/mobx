@@ -46,7 +46,7 @@ export interface IKeyValueMap<V = any> {
 export type IMapEntry<K = any, V = any> = [K, V]
 export type IReadonlyMapEntry<K = any, V = any> = readonly [K, V]
 export type IMapEntries<K = any, V = any> = IMapEntry<K, V>[]
-export type IReadonlyMapEntries<K = any, V = any> = IReadonlyMapEntry<K, V>[]
+export type IReadonlyMapEntries<K = any, V = any> = readonly IReadonlyMapEntry<K, V>[]
 
 export type IMapDidChange<K = any, V = any> = { observableKind: "map"; debugObjectName: string } & (
     | {

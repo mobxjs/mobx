@@ -1933,6 +1933,44 @@ test("allow 'as const' for creating tuples for observable.map()", () => {
     mobx.observable.map(newValues)
 })
 
+test("infers tuple type for observable.map() when using array.map", () => {
+    interface Usage {
+        daily: number
+        monthly: number
+    }
+    const data: Array<{ id: string; usage: Usage }> = [
+        { id: "1", usage: { daily: 5, monthly: 100 } },
+        { id: "2", usage: { daily: 10, monthly: 200 } },
+        { id: "3", usage: { daily: 15, monthly: 300 } }
+    ]
+
+    const map = mobx.observable.map(
+        data.map(app => [app.id, app.usage]),
+        { name: "test" }
+    )
+
+    expect(map.get("2")).toEqual({ daily: 10, monthly: 200 })
+})
+
+test("observable.map() accepts an undefined value with or without options", () => {
+    const map = mobx.observable.map<string, number>(undefined, { name: "custom name" })
+    map.set("test", 1)
+    expect(map.get("test")).toBe(1)
+    expect(map.name_).toBe("custom name")
+
+    // without options
+    mobx.observable.map(undefined)
+})
+
+test("observable.map() accepts optional initial values", () => {
+    interface Usage {}
+
+    ;(data?: [string, Usage][]) => observable.map(data, { name: "test" })
+    ;(data?: readonly (readonly [string, Usage])[]) => observable.map(data, { name: "test" })
+    ;(data?: Record<string, Usage>) => observable.map(data, { name: "test" })
+    ;(data?: Map<string, Usage>) => observable.map(data, { name: "test" })
+})
+
 test("toJS bug #1413 (TS)", () => {
     class X {
         test = {
