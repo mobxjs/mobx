@@ -1,5 +1,11 @@
 # mobx
 
+## 6.14.1
+
+### Patch Changes
+
+-   [`61d6cf39764f28c6c2e0d2b3912364889739c619`](https://github.com/mobxjs/mobx/commit/61d6cf39764f28c6c2e0d2b3912364889739c619) [#4563](https://github.com/mobxjs/mobx/pull/4563) Thanks [@mweststrate](https://github.com/mweststrate)! - Fixed memory leak where makeAutoObservable would keep wrapping setters defined on the prototype. Fixes #4553
+
 ## 6.14.0
 
 ### Minor Changes
