@@ -3,6 +3,9 @@ import {
     IEqualsComparer,
     IObservableArray,
     IObservableMapInitialValues,
+    IMapEntries,
+    IReadonlyMapEntries,
+    IKeyValueMap,
     IObservableSetInitialValues,
     IObservableValue,
     ObservableMap,
@@ -151,6 +154,24 @@ export interface IObservableValueFactory {
     <T>(value?: T, options?: CreateObservableOptions): IObservableValue<T | undefined>
 }
 
+export interface IObservableMapFactory {
+    <K = any, V = any>(): ObservableMap<K, V>
+    <K, V>(initialValues?: IMapEntries<K, V>, options?: CreateObservableOptions): ObservableMap<
+        K,
+        V
+    >
+    <K, V>(
+        initialValues?: IReadonlyMapEntries<K, V>,
+        options?: CreateObservableOptions
+    ): ObservableMap<K, V>
+    <K, V>(initialValues?: IKeyValueMap<V>, options?: CreateObservableOptions): ObservableMap<K, V>
+    <K, V>(initialValues?: Map<K, V>, options?: CreateObservableOptions): ObservableMap<K, V>
+    <K = any, V = any>(initialValues: undefined, options?: CreateObservableOptions): ObservableMap<
+        K,
+        V
+    >
+}
+
 export interface IObservableFactory
     extends Annotation,
         PropertyDecorator,
@@ -172,10 +193,7 @@ export interface IObservableFactory
         initialValues?: IObservableSetInitialValues<T>,
         options?: CreateObservableOptions
     ) => ObservableSet<T>
-    map: <K = any, V = any>(
-        initialValues?: IObservableMapInitialValues<K, V>,
-        options?: CreateObservableOptions
-    ) => ObservableMap<K, V>
+    map: IObservableMapFactory
     object: <T = any>(
         props: T,
         decorators?: AnnotationsMap<T, never>,
