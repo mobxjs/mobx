@@ -58,6 +58,8 @@ export interface IDerivation extends IDepTreeNode {
      *  warn if the derivation has no dependencies after creation/update
      */
     requiresObservable_?: boolean
+
+    readonly weak_: boolean
 }
 
 export class CaughtException {
