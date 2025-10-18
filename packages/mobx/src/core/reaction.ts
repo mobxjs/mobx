@@ -48,7 +48,7 @@ export interface IReactionPublic {
     trace(enterBreakPoint?: boolean): void
 }
 
-export interface IReactionDisposer {
+export interface IReactionDisposer extends Disposable {
     (): void
     [$mobx]: Reaction
 }
