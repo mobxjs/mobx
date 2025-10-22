@@ -5,8 +5,8 @@
 _Simple, scalable state management._
 
 [![npm version](https://badge.fury.io/js/mobx.svg)](https://badge.fury.io/js/mobx)
-[![OpenCollective](https://opencollective.com/mobx/backers/badge.svg)](docs/backers-sponsors.md#backers)
-[![OpenCollective](https://opencollective.com/mobx/sponsors/badge.svg)](docs/backers-sponsors.md#sponsors)
+[![OpenCollective](https://img.shields.io/opencollective/backers/emotion)](docs/backers-sponsors.md#backers)
+[![OpenCollective](https://img.shields.io/opencollective/sponsors/emotion)](docs/backers-sponsors.md#sponsors)
 [![Discuss on Github](https://img.shields.io/badge/discuss%20on-GitHub-orange)](https://github.com/mobxjs/mobx/discussions)
 [![Coverage Status](https://coveralls.io/repos/github/mobxjs/mobx/badge.svg?branch=main)](https://coveralls.io/github/mobxjs/mobx?branch=main)
 [![View changelog](https://img.shields.io/badge/changelogs.xyz-Explore%20Changelog-brightgreen)](https://changelogs.xyz/mobx)
