@@ -57,7 +57,7 @@ if (!new class { x }().hasOwnProperty('x')) throw new Error('Transpiler is not c
 
 ## MobX on older JavaScript environments
 
-By default, MobX uses proxies for optimal performance and compatibility. However, on older JavaScript engines `Proxy` is not available (check out [Proxy support](https://compat-table.github.io/compat-table/es6/#test-Proxy)). Examples of such are Internet Explorer (before Edge), Node.js < 6, iOS < 10, Android before RN 0.59, or Android on iOS.
+By default, MobX uses proxies for optimal performance and compatibility. However, on older JavaScript engines `Proxy` is not available (check out [Proxy support](https://compat-table.github.io/compat-table/es6/#test-Proxy)). Examples of such are Internet Explorer (before Edge), Node.js < 6, iOS < 10, Android before RN 0.59.
 
 In such cases, MobX can fallback to an ES5 compatible implementation which works almost identically, although there are a few [limitations without Proxy support](configuration.md#limitations-without-proxy-support). You will have to explicitly enable the fallback implementation by configuring [`useProxies`](configuration.md#proxy-support):
 
