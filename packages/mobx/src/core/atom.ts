@@ -11,12 +11,33 @@ import {
     propagateChanged,
     reportObserved,
     startBatch,
-    Lambda
+    Lambda,
+    StrongWeakSet,
+    queueForUnobservation
 } from "../internal"
 
 import { getFlag, setFlag } from "../utils/utils"
 
 export const $mobx = Symbol("mobx administration")
+
+export function createObserverStore(observee: IObservable): Set<IDerivation> {
+    if (
+        typeof WeakRef != "undefined" &&
+        typeof FinalizationRegistry != "undefined" &&
+        typeof Symbol != "undefined"
+    ) {
+        const store = new StrongWeakSet<IDerivation>(() => {
+            if (store.size === 0) {
+                startBatch()
+                queueForUnobservation(observee)
+                endBatch()
+            }
+        })
+        return store
+    } else {
+        return new Set<IDerivation>()
+    }
+}
 
 export interface IAtom extends IObservable {
     reportObserved(): boolean
@@ -29,7 +50,7 @@ export class Atom implements IAtom {
     private static readonly diffValueMask_ = 0b100
     private flags_ = 0b000
 
-    observers_ = new Set<IDerivation>()
+    observers_ = createObserverStore(this)
 
     lastAccessedBy_ = 0
     lowestObserverState_ = IDerivationState_.NOT_TRACKING_

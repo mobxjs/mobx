@@ -44,7 +44,8 @@
         "@babel/preset-typescript": "^7.9.0",
         "@babel/runtime": "^7.9.2",
         "conditional-type-checks": "^1.0.5",
-        "flow-bin": "^0.123.0"
+        "flow-bin": "^0.123.0",
+        "expose-gc": "^1.0.0"
     },
     "keywords": [
         "mobx",

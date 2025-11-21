@@ -73,7 +73,8 @@ export class Reaction implements IDerivation, IReactionPublic {
         public name_: string = __DEV__ ? "Reaction@" + getNextId() : "Reaction",
         private onInvalidate_: () => void,
         private errorHandler_?: (error: any, derivation: IDerivation) => void,
-        public requiresObservable_?
+        public requiresObservable_?,
+        readonly weak_ = false
     ) {}
 
     get isDisposed() {
