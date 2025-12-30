@@ -312,7 +312,7 @@ If `observer` is used in server side rendering context; make sure to call `enabl
 
 <details id="react-vs-lite"><summary>**Note:** mobx-react vs. mobx-react-lite<a href="#react-vs-lite" class="tip-anchor"></a></summary>
 In this documentation we used `mobx-react-lite` as default.
-[mobx-react](https://github.com/mobxjs/mobx-react/) is it's big brother, which uses `mobx-react-lite` under the hood.
+[mobx-react](https://github.com/mobxjs/mobx-react/) is its big brother, which uses `mobx-react-lite` under the hood.
 It offers a few more features which are typically not needed anymore in greenfield projects. The additional things offered by mobx-react:
 
 1. Support for React class components.
@@ -336,7 +336,7 @@ Briefly, you can wrap class-based components in `observer` just like
 you can wrap function components:
 
 ```javascript
-import React from "React"
+import React from "react"
 
 const TimerView = observer(
     class TimerView extends React.Component {

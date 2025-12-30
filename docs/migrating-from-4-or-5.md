@@ -22,7 +22,7 @@ _⚠️ **Warning**: Depending on factors like the size and complexity of your c
 4. For babel users:
     - If you are using Babel and have class-properties enabled, disable the legacy loose field support: `["@babel/plugin-proposal-class-properties", { "loose": false }]`
     - (Optional) In MobX 6 decorators have become opt-in. If you no longer wish to use decorators, remove `plugin-proposal-decorators` from your babel configuration and dependencies. Check out the [Enabling decorators {🚀}](enabling-decorators.md) section for more details.
-5. For Typescript users:
+5. For TypeScript users:
     - Add the flag `"useDefineForClassFields": true` to your compiler config.
     - (Optional) In MobX 6 decorators have become opt-in. If you no longer wish to use decorators, remove / disable the `experimentalDecorators` configuration from your TypeScript config. Check out the [Enabling decorators {🚀}](enabling-decorators.md) section for more details.
 6. The MobX default configuration has become more strict. We recommend to adopt the new defaults after completing the upgrade, check out the [Configuration {🚀}](configuration.md) section. During migration, we recommend to configure MobX in the same way as it would be in v4/v5 out of the box: `import {configure} from "mobx"; configure({ enforceActions: "never" });`. After finishing the entire migration process and validating that your project works as expected, consider enabling the flags `computedRequiresReaction`, `reactionRequiresObservable` and `observableRequiresReaction` and `enforceActions: "observed"` to write more idiomatic MobX code.
@@ -75,6 +75,6 @@ pass along `props` to the superclass.
 
 ## Functions are auto-converted
 
-Functions that become part of a deep observable structure are automatically converted to [`autoAction`](observable-state.md#autoAction) or to [`flow`](actions.html#using-flow-instead-of-async--await-) if it's a generator function. See [inference rules](observable-state.html#makeautoobservable) for details.
+Functions that become part of a deep observable structure are automatically converted to [`autoAction`](observable-state.md#autoAction) or to [`flow`](actions.md#using-flow-instead-of-async--await-) if it's a generator function. See [inference rules](observable-state.md#makeautoobservable) for details.
 This means that the original function reference is not preserved - in the same spirit as the original array/object/set/map reference is lost when converted to observable. [This can be surprising in some situations](https://github.com/mobxjs/mobx/issues/3616).
-If this behavior is not desired use [`observable.shallow`](observable-state.html#available-annotations) / [`observable.ref`](observable-state.html#available-annotations) / [`false`](observable-state.html#available-annotations) / [`deep: flase`](observable-state.html#options-) to prevent the conversion process or make sure the function is already an `action` as shown in the issue.
+If this behavior is not desired use [`observable.shallow`](observable-state.md#available-annotations) / [`observable.ref`](observable-state.md#available-annotations) / [`false`](observable-state.md#available-annotations) / [`deep: false`](observable-state.md#options-) to prevent the conversion process or make sure the function is already an `action` as shown in the issue.
