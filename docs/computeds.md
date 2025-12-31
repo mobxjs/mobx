@@ -82,7 +82,7 @@ Even though we change the `amount`, and this will trigger the `total` to recompu
 it won't trigger the `autorun`, as `total` will detect its output hasn't been affected, so there is no need to update the `autorun`.
 
 In comparison, if `total` would not be annotated, the `autorun` would run its effect 3 times,
-as it would directly depend on `total` and `amount`. [Try it out yourself](https://codesandbox.io/s/computed-3cjo9?file=/src/index.tsx).
+as it would directly depend on `price` and `amount`. [Try it out yourself](https://codesandbox.io/s/computed-3cjo9?file=/src/index.tsx).
 
 ![computed graph](assets/computed-example.png)
 
