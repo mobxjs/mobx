@@ -1,4 +1,4 @@
-import React, { StrictMode, Suspense } from "react"
+import React, { createContext, StrictMode, Suspense } from "react"
 import { inject, observer, Observer, enableStaticRendering } from "../src"
 import { render, act, waitFor } from "@testing-library/react"
 import {
@@ -10,10 +10,7 @@ import {
     observable,
     transaction,
     makeObservable,
-    autorun,
-    IReactionDisposer,
-    reaction,
-    configure
+    runInAction
 } from "mobx"
 import { withConsole } from "./utils/withConsole"
 import { shallowEqual } from "../src/utils/utils"
@@ -506,14 +503,14 @@ describe("should render component even if setState called with exactly the same 
         expect(renderCount).toBe(2)
     })
 
-    test("after click twice renderCount === 3", () => {
+    test("after click twice renderCount === 2", () => {
         const { container } = render(<Comp />)
         const clickableDiv = container.querySelector("#clickableDiv") as HTMLElement
 
         act(() => clickableDiv.click())
         act(() => clickableDiv.click())
 
-        expect(renderCount).toBe(3)
+        expect(renderCount).toBe(2)
     })
 })
 
@@ -897,6 +894,74 @@ test("Missing render should throw", () => {
     expect(() => observer(Component)).toThrow()
 })
 
+test("this.context is observable if ComponentName.contextType is set", () => {
+    const Context = createContext({})
+
+    let renderCounter = 0
+
+    @observer
+    class Parent extends React.Component<any> {
+        constructor(props: any) {
+            super(props)
+            makeObservable(this)
+        }
+
+        @observable
+        counter = 0
+
+        @computed
+        get contextValue() {
+            return { counter: this.counter }
+        }
+
+        render() {
+            return (
+                <Context.Provider value={this.contextValue}>{this.props.children}</Context.Provider>
+            )
+        }
+    }
+
+    @observer
+    class Child extends React.Component {
+        static contextType = Context
+
+        constructor(props: any) {
+            super(props)
+            makeObservable(this)
+        }
+
+        @computed
+        get counterValue() {
+            return (this.context as any).counter
+        }
+
+        render() {
+            renderCounter++
+            return <div>{this.counterValue}</div>
+        }
+    }
+
+    const parentRef = React.createRef<Parent>()
+
+    const app = (
+        <Parent ref={parentRef}>
+            <Child />
+        </Parent>
+    )
+
+    const { unmount, container } = render(app)
+
+    act(() => {
+        if (parentRef.current) {
+            parentRef.current!.counter = 1
+        }
+    })
+
+    expect(renderCounter).toBe(2)
+    expect(container).toHaveTextContent("1")
+    unmount()
+})
+
 test("class observer supports re-mounting #3395", () => {
     const state = observable.box(1)
     let mountCounter = 0
@@ -1011,61 +1076,6 @@ test("#3492 should not cause warning by calling forceUpdate on uncommited compon
     unmount()
     expect(consoleWarnMock).toMatchSnapshot()
 })
-;["props", "state", "context"].forEach(key => {
-    test(`using ${key} in computed throws`, () => {
-        // React prints errors even if we catch em
-        const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {})
-
-        const TestCmp = observer(
-            class TestCmp extends React.Component {
-                render() {
-                    computed(() => this[key]).get()
-                    return ""
-                }
-            }
-        )
-
-        expect(() => render(<TestCmp />)).toThrowError(
-            new RegExp(`^\\[mobx-react\\] Cannot read "TestCmp.${key}" in a reactive context`)
-        )
-
-        consoleErrorSpy.mockRestore()
-    })
-
-    test(`using ${key} in autorun throws`, () => {
-        // React prints errors even if we catch em
-        const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {})
-
-        let caughtError
-
-        const TestCmp = observer(
-            class TestCmp extends React.Component {
-                disposeAutorun: IReactionDisposer | undefined
-
-                componentDidMount(): void {
-                    this.disposeAutorun = autorun(() => this[key], {
-                        onError: error => (caughtError = error)
-                    })
-                }
-
-                componentWillUnmount(): void {
-                    this.disposeAutorun?.()
-                }
-
-                render() {
-                    return ""
-                }
-            }
-        )
-
-        render(<TestCmp />)
-        expect(caughtError?.message).toMatch(
-            new RegExp(`^\\[mobx-react\\] Cannot read "TestCmp.${key}" in a reactive context`)
-        )
-
-        consoleErrorSpy.mockRestore()
-    })
-})
 
 test(`Component react's to observable changes in componenDidMount #3691`, () => {
     const o = observable.box(0)
@@ -1115,189 +1125,12 @@ test(`Observable changes in componenWillUnmount don't cause any warnings or erro
     consoleWarnSpy.mockRestore()
 })
 
-test(`Observable prop workaround`, () => {
-    configure({
-        enforceActions: "observed"
-    })
-
-    const propValues: Array<any> = []
-
-    const TestCmp = observer(
-        class TestCmp extends React.Component<{ prop: number }> {
-            disposeReaction: IReactionDisposer | undefined
-            observableProp: number
-
-            get computed() {
-                return this.observableProp + 100
-            }
-
-            constructor(props) {
-                super(props)
-                // Synchronize our observableProp with the actual prop on the first render.
-                this.observableProp = this.props.prop
-                makeObservable(this, {
-                    observableProp: observable,
-                    computed: computed,
-                    // Mutates observable therefore must be action
-                    componentDidUpdate: action
-                })
-            }
-
-            componentDidMount(): void {
-                // Reactions/autoruns must be created in componenDidMount (not in constructor).
-                this.disposeReaction = reaction(
-                    () => this.observableProp,
-                    prop => propValues.push(prop),
-                    {
-                        fireImmediately: true
-                    }
-                )
-            }
-
-            componentDidUpdate(): void {
-                // Synchronize our observableProp with the actual prop on every update.
-                this.observableProp = this.props.prop
-            }
-
-            componentWillUnmount(): void {
-                this.disposeReaction?.()
-            }
-
-            render() {
-                return this.computed
-            }
-        }
-    )
-
-    const { container, unmount, rerender } = render(<TestCmp prop={1} />)
-    expect(container).toHaveTextContent("101")
-    rerender(<TestCmp prop={2} />)
-    expect(container).toHaveTextContent("102")
-    rerender(<TestCmp prop={3} />)
-    expect(container).toHaveTextContent("103")
-    rerender(<TestCmp prop={4} />)
-    expect(container).toHaveTextContent("104")
-    expect(propValues).toEqual([1, 2, 3, 4])
-    unmount()
-})
-
-test(`Observable props/state/context workaround`, () => {
-    configure({
-        enforceActions: "observed"
-    })
-
-    const reactionResults: Array<string> = []
-
-    const ContextType = React.createContext(0)
-
-    const TestCmp = observer(
-        class TestCmp extends React.Component<any, any> {
-            static contextType = ContextType
-
-            disposeReaction: IReactionDisposer | undefined
-            observableProps: any
-            observableState: any
-            observableContext: any
-
-            constructor(props, context) {
-                super(props, context)
-                this.state = {
-                    x: 0
-                }
-                this.observableState = this.state
-                this.observableProps = this.props
-                this.observableContext = this.context
-                makeObservable(this, {
-                    observableProps: observable,
-                    observableState: observable,
-                    observableContext: observable,
-                    computed: computed,
-                    componentDidUpdate: action
-                })
-            }
-
-            get computed() {
-                return `${this.observableProps?.x}${this.observableState?.x}${this.observableContext}`
-            }
-
-            componentDidMount(): void {
-                this.disposeReaction = reaction(
-                    () => this.computed,
-                    prop => reactionResults.push(prop),
-                    {
-                        fireImmediately: true
-                    }
-                )
-            }
-
-            componentDidUpdate(): void {
-                // Props are different object with every update
-                if (!shallowEqual(this.observableProps, this.props)) {
-                    this.observableProps = this.props
-                }
-                if (!shallowEqual(this.observableState, this.state)) {
-                    this.observableState = this.state
-                }
-                if (!shallowEqual(this.observableContext, this.context)) {
-                    this.observableContext = this.context
-                }
-            }
-
-            componentWillUnmount(): void {
-                this.disposeReaction?.()
-            }
-
-            render() {
-                return (
-                    <span
-                        id="updateState"
-                        onClick={() => this.setState(state => ({ x: state.x + 1 }))}
-                    >
-                        {this.computed}
-                    </span>
-                )
-            }
-        }
-    )
-
-    const App = () => {
-        const [context, setContext] = React.useState(0)
-        const [prop, setProp] = React.useState(0)
-        return (
-            <ContextType.Provider value={context}>
-                <span id="updateContext" onClick={() => setContext(val => val + 1)}></span>
-                <span id="updateProp" onClick={() => setProp(val => val + 1)}></span>
-                <TestCmp x={prop}></TestCmp>
-            </ContextType.Provider>
-        )
-    }
-
-    const { container, unmount } = render(<App />)
-
-    const updateProp = () =>
-        act(() => (container.querySelector("#updateProp") as HTMLElement).click())
-    const updateState = () =>
-        act(() => (container.querySelector("#updateState") as HTMLElement).click())
-    const updateContext = () =>
-        act(() => (container.querySelector("#updateContext") as HTMLElement).click())
-
-    expect(container).toHaveTextContent("000")
-    updateProp()
-    expect(container).toHaveTextContent("100")
-    updateState()
-    expect(container).toHaveTextContent("110")
-    updateContext()
-    expect(container).toHaveTextContent("111")
-
-    expect(reactionResults).toEqual(["000", "100", "110", "111"])
-    unmount()
-})
-
 test("Class observer can react to changes made before mount #3730", () => {
     const o = observable.box(0)
 
     @observer
     class Child extends React.Component {
+        @action
         componentDidMount(): void {
             o.set(1)
         }

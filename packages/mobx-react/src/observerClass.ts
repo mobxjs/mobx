@@ -1,10 +1,12 @@
 import { PureComponent, Component, ComponentClass, ClassAttributes } from "react"
 import {
+    createAtom,
     _allowStateChanges,
     Reaction,
     _allowStateReadsStart,
     _allowStateReadsEnd,
-    _getGlobalState
+    _getGlobalState,
+    IAtom
 } from "mobx"
 import {
     isUsingStaticRendering,
@@ -15,25 +17,24 @@ import { shallowEqual, patch } from "./utils/utils"
 const administrationSymbol = Symbol("ObserverAdministration")
 const isMobXReactObserverSymbol = Symbol("isMobXReactObserver")
 
-let observablePropDescriptors: PropertyDescriptorMap
-if (__DEV__) {
-    observablePropDescriptors = {
-        props: createObservablePropDescriptor("props"),
-        state: createObservablePropDescriptor("state"),
-        context: createObservablePropDescriptor("context")
-    }
-}
-
 type ObserverAdministration = {
     reaction: Reaction | null // also serves as disposed flag
     forceUpdate: Function | null
     mounted: boolean // we could use forceUpdate as mounted flag
     reactionInvalidatedBeforeMount: boolean
     name: string
-    // Used only on __DEV__
+    propsAtom: IAtom
+    stateAtom: IAtom
+    contextAtom: IAtom
     props: any
     state: any
     context: any
+    // Setting this.props causes forceUpdate, because this.props is observable.
+    // forceUpdate sets this.props.
+    // This flag is used to avoid the loop.
+    isUpdating: boolean
+    changedVariables: WeakSet<any>
+    unchangedVariables: WeakSet<any>
 }
 
 function getAdministration(component: Component): ObserverAdministration {
@@ -48,7 +49,13 @@ function getAdministration(component: Component): ObserverAdministration {
         name: getDisplayName(component.constructor as ComponentClass),
         state: undefined,
         props: undefined,
-        context: undefined
+        context: undefined,
+        propsAtom: createAtom("props"),
+        stateAtom: createAtom("state"),
+        contextAtom: createAtom("context"),
+        isUpdating: false,
+        changedVariables: new WeakSet(),
+        unchangedVariables: new WeakSet()
     })
 }
 
@@ -80,9 +87,15 @@ export function makeClassComponentObserver(
         }
     }
 
-    if (__DEV__) {
-        Object.defineProperties(prototype, observablePropDescriptors)
-    }
+    // this.props and this.state are made observable, just to make sure @computed fields that
+    // are defined inside the component, and which rely on state or props, re-compute if state or props change
+    // (otherwise the computed wouldn't update and become stale on props change, since props are not observable)
+    // However, this solution is not without it's own problems: https://github.com/mobxjs/mobx-react/issues?utf8=%E2%9C%93&q=is%3Aissue+label%3Aobservable-props-or-not+
+    Object.defineProperties(prototype, {
+        props: observablePropsDescriptor,
+        state: observableStateDescriptor,
+        context: observableContextDescriptor
+    })
 
     const originalRender = prototype.render
     if (typeof originalRender !== "function") {
@@ -216,6 +229,12 @@ function createReactiveRender(originalRender: any) {
 
 function createReaction(admin: ObserverAdministration) {
     return new Reaction(`${admin.name}.render()`, () => {
+        if (admin.isUpdating) {
+            // Reaction is suppressed when setting new state/props/context,
+            // this is when component is already being updated.
+            return
+        }
+
         if (!admin.mounted) {
             // This is neccessary to avoid react warning about calling forceUpdate on component that isn't mounted yet.
             // This happens when component is abandoned after render - our reaction is already created and reacts to changes.
@@ -226,10 +245,14 @@ function createReaction(admin: ObserverAdministration) {
         }
 
         try {
+            // forceUpdate sets new `props`, since we made it observable, it would `reportChanged`, causing a loop.
+            admin.isUpdating = true
             admin.forceUpdate?.()
         } catch (error) {
             admin.reaction?.dispose()
             admin.reaction = null
+        } finally {
+            admin.isUpdating = false
         }
     })
 }
@@ -240,35 +263,73 @@ function observerSCU(nextProps: ClassAttributes<any>, nextState: any): boolean {
             "[mobx-react] It seems that a re-rendering of a React component is triggered while in static (server-side) mode. Please make sure components are rendered only once server-side."
         )
     }
-    // update on any state changes (as is the default)
-    if (this.state !== nextState) {
-        return true
-    }
     // update if props are shallowly not equal, inspired by PureRenderMixin
     // we could return just 'false' here, and avoid the `skipRender` checks etc
     // however, it is nicer if lifecycle events are triggered like usually,
     // so we return true here if props are shallowly modified.
-    return !shallowEqual(this.props, nextProps)
+    const propsChanged = !shallowEqual(this.props, nextProps)
+    const stateChanged = !shallowEqual(this.state, nextState)
+    const admin = getAdministration(this)
+    const shouldUpdate = propsChanged || stateChanged
+
+    if (propsChanged) {
+        nextProps && admin.changedVariables.add(nextProps)
+    } else {
+        nextProps && admin.unchangedVariables.add(nextProps)
+    }
+    if (stateChanged) {
+        nextState && admin.changedVariables.add(nextState)
+    } else {
+        nextState && admin.unchangedVariables.add(nextState)
+    }
+    return shouldUpdate
 }
 
 function createObservablePropDescriptor(key: "props" | "state" | "context") {
+    const atomKey = `${key}Atom`
     return {
         configurable: true,
         enumerable: true,
         get() {
             const admin = getAdministration(this)
-            const derivation = _getGlobalState().trackingDerivation
-            if (derivation && derivation !== admin.reaction) {
-                throw new Error(
-                    `[mobx-react] Cannot read "${admin.name}.${key}" in a reactive context, as it isn't observable.
-                    Please use component lifecycle method to copy the value into a local observable first.
-                    See https://github.com/mobxjs/mobx/blob/main/packages/mobx-react/README.md#note-on-using-props-and-state-in-derivations`
-                )
-            }
+
+            let prevReadState = _allowStateReadsStart(true)
+
+            admin[atomKey].reportObserved()
+
+            _allowStateReadsEnd(prevReadState)
+
             return admin[key]
         },
         set(value) {
-            getAdministration(this)[key] = value
+            const admin = getAdministration(this)
+            // forceUpdate issued by reaction sets new props.
+            // It sets isUpdating to true to prevent loop.
+            if (!admin.isUpdating && shouldReportChanged(admin, key, value)) {
+                admin[key] = value
+                // This notifies all observers including our component,
+                // but we don't want to cause `forceUpdate`, because component is already updating,
+                // therefore supress component reaction.
+                admin.isUpdating = true
+                admin[atomKey].reportChanged()
+                admin.isUpdating = false
+            } else {
+                admin[key] = value
+            }
         }
     }
 }
+
+function shouldReportChanged(admin: ObserverAdministration, key: string, value: any) {
+    if (admin.changedVariables.has(value)) {
+        return true
+    } else if (admin.unchangedVariables.has(value)) {
+        return false
+    } else {
+        return !shallowEqual(admin[key], value)
+    }
+}
+
+const observablePropsDescriptor = createObservablePropDescriptor("props")
+const observableStateDescriptor = createObservablePropDescriptor("state")
+const observableContextDescriptor = createObservablePropDescriptor("context")

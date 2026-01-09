@@ -212,6 +212,113 @@ test("verify prop changes are picked up", () => {
     expect(container.textContent).toMatchInlineSnapshot(`"1.2.test.0"`)
 })
 
+test("verify props is reactive", () => {
+    function createItem(subid, label) {
+        const res = observable(
+            {
+                subid,
+                id: 1,
+                label: label,
+                get text() {
+                    events.push(["compute", this.subid])
+                    return (
+                        this.id +
+                        "." +
+                        this.subid +
+                        "." +
+                        this.label +
+                        "." +
+                        data.items.indexOf(this as any)
+                    )
+                }
+            },
+            {},
+            { proxy: false }
+        )
+        res.subid = subid // non reactive
+        return res
+    }
+
+    const data = observable({
+        items: [createItem(1, "hi")]
+    })
+    const events: Array<any> = []
+
+    class Child extends React.Component<any, any> {
+        constructor(p) {
+            super(p)
+            makeObservable(this)
+        }
+
+        @computed
+        get computedLabel() {
+            events.push(["computed label", this.props.item.subid])
+            return this.props.item.label
+        }
+        componentDidMount() {
+            events.push(["mount"])
+        }
+        componentDidUpdate(prevProps) {
+            events.push(["update", prevProps.item.subid, this.props.item.subid])
+        }
+        render() {
+            events.push(["render", this.props.item.subid, this.props.item.text, this.computedLabel])
+            return (
+                <span>
+                    {this.props.item.text}
+                    {this.computedLabel}
+                </span>
+            )
+        }
+    }
+
+    const ChildAsObserver = observer(Child)
+
+    const Parent = observer(
+        class Parent extends React.Component<any, any> {
+            render() {
+                return (
+                    <div onClick={changeStuff.bind(this)} id="testDiv">
+                        {data.items.map(item => (
+                            <ChildAsObserver key="fixed" item={item} />
+                        ))}
+                    </div>
+                )
+            }
+        }
+    )
+
+    const Wrapper = () => <Parent />
+
+    function changeStuff() {
+        act(() => {
+            transaction(() => {
+                // components start rendeirng a new item, but computed is still based on old value
+                data.items = [createItem(2, "test")]
+            })
+        })
+    }
+
+    const { container } = render(<Wrapper />)
+    expect(events.sort()).toEqual(
+        [["mount"], ["compute", 1], ["computed label", 1], ["render", 1, "1.1.hi.0", "hi"]].sort()
+    )
+
+    events.splice(0)
+    let testDiv = container.querySelector("#testDiv") as HTMLElement
+    testDiv.click()
+
+    expect(events.sort()).toEqual(
+        [
+            ["compute", 1],
+            ["update", 1, 2],
+            ["compute", 2],
+            ["computed label", 2],
+            ["render", 2, "1.2.test.0", "test"]
+        ].sort()
+    )
+})
+
 test("no re-render for shallow equal props", async () => {
     function createItem(subid, label) {
         const res = observable({
@@ -307,4 +414,41 @@ test("lifecycle callbacks called with correct arguments", () => {
     const { container } = render(<Root />)
     let testButton = container.querySelector("#testButton") as HTMLElement
     testButton.click()
+})
+
+test("verify props are reactive in constructor", () => {
+    const propValues: Array<any> = []
+    let constructorCallsCount = 0
+
+    const Component = observer(
+        class Component extends React.Component<any, any> {
+            disposer: IReactionDisposer
+            constructor(props, context) {
+                super(props, context)
+                constructorCallsCount++
+                this.disposer = reaction(
+                    () => this.props.prop,
+                    prop => propValues.push(prop),
+                    {
+                        fireImmediately: true
+                    }
+                )
+            }
+
+            componentWillUnmount() {
+                this.disposer()
+            }
+
+            render() {
+                return <div />
+            }
+        }
+    )
+
+    const { rerender } = render(<Component prop="1" />)
+    rerender(<Component prop="2" />)
+    rerender(<Component prop="3" />)
+    rerender(<Component prop="4" />)
+    expect(constructorCallsCount).toEqual(1)
+    expect(propValues).toEqual(["1", "2", "3", "4"])
 })
