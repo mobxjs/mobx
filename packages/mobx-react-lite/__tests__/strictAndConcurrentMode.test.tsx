@@ -1,4 +1,4 @@
-import { act, cleanup, render } from "@testing-library/react"
+import { act, cleanup, render, RenderResult } from "@testing-library/react"
 import mockConsole from "jest-mock-console"
 import * as mobx from "mobx"
 import * as React from "react"
@@ -116,7 +116,7 @@ test("suspended components should not leak observations", async () => {
     await act(async () => {
         jest.runAllTimers()
     })
-    expect(container).toHaveTextContent(o.x + "")
+    expect(container).toHaveTextContent(`${o.x}`)
 
     // ensure that we using same reaction and component state
     expect(observed).toBeCalledTimes(1)
@@ -129,7 +129,7 @@ test("suspended components should not leak observations", async () => {
     await act(async () => {
         jest.runAllTimers()
     })
-    expect(container).toHaveTextContent(o.x + "")
+    expect(container).toHaveTextContent(`${o.x}`)
 
     unmount()
 
@@ -139,6 +139,141 @@ test("suspended components should not leak observations", async () => {
     expect(observed).toBeCalledTimes(1)
     expect(unobserved).toBeCalledTimes(1)
     jest.useRealTimers()
+})
+
+describe("suspended components should not leak observations when suspensions happen before observations", () => {
+    let x1: mobx.IObservableValue<number>
+    let o1: PromiseWithResolvers<mobx.IObservableValue<number>>
+    let x2: mobx.IObservableValue<number>
+    let o2: PromiseWithResolvers<mobx.IObservableValue<number>>
+    let Cmp: React.ComponentType<{}>
+    let x1Observed: jest.MockedFunction<VoidFunction>
+    let x2Observed: jest.MockedFunction<VoidFunction>
+    let x1Unobserved: jest.MockedFunction<VoidFunction>
+    let x2Unobserved: jest.MockedFunction<VoidFunction>
+
+    beforeEach(() => {
+        jest.useFakeTimers()
+        mobx.onBecomeObserved((x1 = mobx.observable.box(10)), (x1Observed = jest.fn()))
+        mobx.onBecomeUnobserved(x1, (x1Unobserved = jest.fn()))
+        mobx.onBecomeObserved((x2 = mobx.observable.box(11)), (x2Observed = jest.fn()))
+        mobx.onBecomeUnobserved(x2, (x2Unobserved = jest.fn()))
+        o1 = Promise.withResolvers()
+        o2 = Promise.withResolvers()
+        Cmp = observer(() => {
+            const x1 = simpleUse(o1.promise).get()
+            const x2 = simpleUse(o2.promise).get()
+
+            return (
+                <>
+                    {x1} {x2}
+                </>
+            )
+        })
+    })
+
+    afterEach(() => {
+        jest.useRealTimers()
+    })
+
+    describe("when rendered", () => {
+        let rendered: RenderResult
+
+        beforeEach(() => {
+            rendered = render(
+                <React.Suspense fallback={"loading..."}>
+                    <Cmp />
+                </React.Suspense>
+            )
+        })
+
+        it("renders the fallback (due to the first promise not being resolved)", () => {
+            expect(rendered.baseElement).toHaveTextContent("loading...")
+        })
+
+        it("does not start an observation for x1", () => {
+            expect(x1Observed).not.toHaveBeenCalled()
+        })
+
+        it("does not start an observation for x2", () => {
+            expect(x2Observed).not.toHaveBeenCalled()
+        })
+
+        describe("when the first promise resolves", () => {
+            beforeEach(async () => {
+                await act(async () => {
+                    o1.resolve(x1)
+                })
+            })
+
+            it("still renders the fallback (due to the second promise not being resolved)", () => {
+                expect(rendered.baseElement).toHaveTextContent("loading...")
+            })
+
+            it("starts an observation for x1", () => {
+                expect(x1Observed).toHaveBeenCalledTimes(1)
+            })
+
+            it("does not stop the observation of x1", () => {
+                expect(x1Unobserved).not.toHaveBeenCalled()
+            })
+
+            it("does not start an observation for x2", () => {
+                expect(x2Observed).not.toHaveBeenCalled()
+            })
+
+            describe("when the second promise resolves", () => {
+                beforeEach(async () => {
+                    x1Observed.mockClear()
+                    await act(async () => {
+                        o2.resolve(x2)
+                    })
+                })
+
+                it("now renders the expected contents", () => {
+                    expect(rendered.baseElement).toHaveTextContent("10 11")
+                })
+
+                it("does not start a new observation of x1", () => {
+                    expect(x1Observed).not.toHaveBeenCalled()
+                })
+
+                it("starts observing x2", () => {
+                    expect(x2Observed).toHaveBeenCalledTimes(1)
+                })
+
+                describe("when some observed observable changes", () => {
+                    beforeEach(async () => {
+                        await act(async () => {
+                            mobx.runInAction(() => {
+                                x1.set(14)
+                            })
+                        })
+                    })
+
+                    it("rendering updates immediately", () => {
+                        expect(rendered.baseElement).toHaveTextContent("14 11")
+                    })
+                })
+
+                describe("when the component unmounts", () => {
+                    beforeEach(async () => {
+                        await act(async () => {
+                            rendered.rerender(<div />)
+                        })
+                    })
+
+                    it("stops observing x1", () => {
+                        expect(x1Unobserved).toHaveBeenCalledTimes(1)
+                    })
+
+                    it("stops observing x2", () => {
+                        expect(x2Unobserved).toHaveBeenCalledTimes(1)
+                    })
+                })
+            })
+        })
+    })
 })
 
 test("uncommitted components should not leak observations", async () => {
@@ -212,3 +347,44 @@ test("abandoned components should not leak observations", async () => {
     jest.useRealTimers()
     consoleErrorSpy.mockRestore()
 })
+
+const status = Symbol.for("status-of-promise-for-use-hook")
+const result = Symbol.for("result-of-promise-for-use-hook")
+const rejection = Symbol.for("rejection-of-promise-for-use-hook")
+
+// Note: this is an approximated "use" for when real "use" of React 19 is not yet available.
+export const simpleUse = maybePromise => {
+    if (!(maybePromise instanceof Promise)) {
+        return maybePromise
+    }
+
+    const promise = maybePromise
+
+    switch (promise[status]) {
+        case "fulfilled":
+            return promise[result]
+
+        case "rejected":
+            throw promise[rejection]
+
+        case "pending":
+            throw promise
+
+        default:
+            promise[status] = "pending"
+
+            promise.then(
+                r => {
+                    promise[status] = "fulfilled"
+                    promise[result] = r
+                },
+
+                e => {
+                    promise[status] = "rejected"
+                    promise[rejection] = e
+                }
+            )
+
+            throw promise
+    }
+}
