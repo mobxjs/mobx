@@ -8,7 +8,7 @@ import { observer } from "../src/observer"
 
 afterEach(cleanup)
 
-test("uncommitted observing components should not attempt state changes", () => {
+test("uncommitted observing components should not attempt state changes", async () => {
     const store = mobx.observable({ count: 0 })
 
     const TestComponent = observer(() => <div>{store.count}</div>)
@@ -30,7 +30,7 @@ test("uncommitted observing components should not attempt state changes", () => 
     // trigger an update.
     const restoreConsole = mockConsole()
     try {
-        act(() => {
+        await act(async () => {
             store.count++
         })
 
@@ -90,52 +90,39 @@ test("suspended components should not leak observations", async () => {
         </React.Suspense>
     )
 
-    await act(async () => {
-        jest.runAllTimers()
-    })
     expect(container).toHaveTextContent("0")
     expect(observed).toBeCalledTimes(1)
 
     let resolve: () => void
-    act(() => {
+    await act(async () => {
         o.promise = new Promise(r => (resolve = r))
     })
 
-    await act(async () => {
-        jest.runAllTimers()
-    })
     expect(container).toHaveTextContent("loading...")
-    expect(observed).toBeCalledTimes(1)
-    expect(unobserved).toBeCalledTimes(0)
+    expect(observed).toBeCalledTimes(2)
+    expect(unobserved).toBeCalledTimes(2)
 
-    act(() => {
+    observed.mockClear()
+    unobserved.mockClear()
+    await act(async () => {
         o.promise = null
         resolve!()
     })
 
-    await act(async () => {
-        jest.runAllTimers()
-    })
     expect(container).toHaveTextContent(`${o.x}`)
 
     // ensure that we using same reaction and component state
     expect(observed).toBeCalledTimes(1)
     expect(unobserved).toBeCalledTimes(0)
 
-    act(() => {
+    await act(async () => {
         o.x++
     })
 
-    await act(async () => {
-        jest.runAllTimers()
-    })
     expect(container).toHaveTextContent(`${o.x}`)
 
     unmount()
 
-    await act(async () => {
-        jest.runAllTimers()
-    })
     expect(observed).toBeCalledTimes(1)
     expect(unobserved).toBeCalledTimes(1)
     jest.useRealTimers()
@@ -210,12 +197,12 @@ describe("suspended components should not leak observations when suspensions hap
                 expect(rendered.baseElement).toHaveTextContent("loading...")
             })
 
-            it("starts an observation for x1", () => {
-                expect(x1Observed).toHaveBeenCalledTimes(1)
+            it("starts observing x1 twice", () => {
+                expect(x1Observed).toHaveBeenCalledTimes(2)
             })
 
-            it("does not stop the observation of x1", () => {
-                expect(x1Unobserved).not.toHaveBeenCalled()
+            it("stops both observations of x1", () => {
+                expect(x1Unobserved).toHaveBeenCalledTimes(2)
             })
 
             it("does not start an observation for x2", () => {
@@ -225,6 +212,7 @@ describe("suspended components should not leak observations when suspensions hap
             describe("when the second promise resolves", () => {
                 beforeEach(async () => {
                     x1Observed.mockClear()
+                    x1Unobserved.mockClear()
                     await act(async () => {
                         o2.resolve(x2)
                     })
@@ -234,8 +222,8 @@ describe("suspended components should not leak observations when suspensions hap
                     expect(rendered.baseElement).toHaveTextContent("10 11")
                 })
 
-                it("does not start a new observation of x1", () => {
-                    expect(x1Observed).not.toHaveBeenCalled()
+                it("starts another observation of x1", () => {
+                    expect(x1Observed).toHaveBeenCalledTimes(1)
                 })
 
                 it("starts observing x2", () => {
@@ -304,9 +292,6 @@ test("uncommitted components should not leak observations", async () => {
         </React.StrictMode>
     )
 
-    await act(async () => {
-        jest.runAllTimers()
-    })
     // count1 should still be being observed by Component1,
     // but count2 should have had its reaction cleaned up.
     expect(count1IsObserved).toBeTruthy()
@@ -319,9 +304,10 @@ test("abandoned components should not leak observations", async () => {
     const store = mobx.observable({ count: 0 })
     const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {})
 
-    let countIsObserved = false
-    mobx.onBecomeObserved(store, "count", () => (countIsObserved = true))
-    mobx.onBecomeUnobserved(store, "count", () => (countIsObserved = false))
+    const observed = jest.fn()
+    const unobserved = jest.fn()
+    mobx.onBecomeObserved(store, "count", observed)
+    mobx.onBecomeUnobserved(store, "count", unobserved)
 
     const TestComponent = observer(() => {
         store.count // establish dependency
@@ -336,13 +322,8 @@ test("abandoned components should not leak observations", async () => {
         </ErrorBoundary>
     )
 
-    expect(countIsObserved).toBeTruthy()
-
-    await act(async () => {
-        jest.runAllTimers()
-    })
-
-    expect(countIsObserved).toBeFalsy()
+    expect(observed).toHaveBeenCalledTimes(2)
+    expect(unobserved).toHaveBeenCalledTimes(2)
 
     jest.useRealTimers()
     consoleErrorSpy.mockRestore()

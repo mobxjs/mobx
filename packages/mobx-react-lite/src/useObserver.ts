@@ -7,22 +7,17 @@ import { useSyncExternalStore } from "use-sync-external-store/shim"
 // Required by SSR when hydrating #3669
 const getServerSnapshot = () => {}
 
-// will prevent disposing reaction of delayed components
-const DISPOSE_TIMEOUT = 100
-
 type ObserverAdministration = {
     subscribe(onStoreChange: VoidFunction): VoidFunction
     readonly reaction: Reaction
     isLive(): boolean
     getSnapshot(): symbol
+    dispose(): void
 }
-
-type TimeoutId = Parameters<typeof clearTimeout>[0]
 
 const createObserverAdministration = (name: string): ObserverAdministration => {
     let onStoreChange: VoidFunction | undefined = undefined
     let stateVersion = Symbol()
-    let timeoutID: TimeoutId
     let reaction: Reaction | undefined = new Reaction(`observer${name}`, () => {
         stateVersion = Symbol()
         // onStoreChange won't be available until the component "mounts".
@@ -30,10 +25,6 @@ const createObserverAdministration = (name: string): ObserverAdministration => {
         // `useSyncExternalStore` should handle that by checking the state version and issuing update.
         onStoreChange?.()
     })
-    const cancelDispose = () => {
-        clearTimeout(timeoutID)
-        timeoutID = undefined
-    }
     const dispose = () => {
         // We've lost our reaction and therefore all subscriptions, occurs when:
         // 1. scheduleDispose disposed reaction before component mounted.
@@ -46,10 +37,7 @@ const createObserverAdministration = (name: string): ObserverAdministration => {
         reaction?.dispose()
         reaction = undefined
         onStoreChange = undefined
-        cancelDispose()
     }
-
-    timeoutID = setTimeout(dispose, DISPOSE_TIMEOUT)
 
     return {
         get reaction() {
@@ -62,14 +50,14 @@ const createObserverAdministration = (name: string): ObserverAdministration => {
         getSnapshot: () => stateVersion,
         isLive: () => !!reaction,
         subscribe: (cb: () => void) => {
-            cancelDispose()
             onStoreChange = cb
 
             return () => {
                 onStoreChange = undefined
                 dispose()
             }
-        }
+        },
+        dispose
     }
 }
 
@@ -85,7 +73,7 @@ export function useObserver<T>(render: () => T, baseComponentName: string = "obs
         admRef.current = createObserverAdministration(baseComponentName)
     }
 
-    const { reaction, subscribe, getSnapshot } = admRef.current
+    const { reaction, subscribe, getSnapshot, dispose } = admRef.current
 
     React.useDebugValue(reaction, printDebugValue)
 
@@ -111,6 +99,7 @@ export function useObserver<T>(render: () => T, baseComponentName: string = "obs
     })
 
     if (exception) {
+        dispose()
         throw exception // re-throw any exceptions caught during rendering
     }
 
