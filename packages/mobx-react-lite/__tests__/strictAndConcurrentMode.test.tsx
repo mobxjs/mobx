@@ -133,27 +133,44 @@ describe("suspended components should not leak observations when suspensions hap
     let o1: PromiseWithResolvers<mobx.IObservableValue<number>>
     let x2: mobx.IObservableValue<number>
     let o2: PromiseWithResolvers<mobx.IObservableValue<number>>
+    let value: PromiseWithResolvers<string>
     let Cmp: React.ComponentType<{}>
-    let x1Observed: jest.MockedFunction<VoidFunction>
-    let x2Observed: jest.MockedFunction<VoidFunction>
-    let x1Unobserved: jest.MockedFunction<VoidFunction>
-    let x2Unobserved: jest.MockedFunction<VoidFunction>
+    let observationOrdering: string[]
+
+    const trackObservationalGenerationsFor = (target: mobx.IObservableValue<any>, name: string) => {
+        let generation = 0
+
+        mobx.onBecomeObserved(target, () => {
+            const gen = (generation += 1)
+            observationOrdering.push(`observed(${name})[${gen}]`)
+            const stop = mobx.onBecomeUnobserved(target, () => {
+                observationOrdering.push(`unobserved(${name})[${gen}]`)
+                stop()
+            })
+        })
+    }
 
     beforeEach(() => {
         jest.useFakeTimers()
-        mobx.onBecomeObserved((x1 = mobx.observable.box(10)), (x1Observed = jest.fn()))
-        mobx.onBecomeUnobserved(x1, (x1Unobserved = jest.fn()))
-        mobx.onBecomeObserved((x2 = mobx.observable.box(11)), (x2Observed = jest.fn()))
-        mobx.onBecomeUnobserved(x2, (x2Unobserved = jest.fn()))
+        observationOrdering = []
+
+        x1 = mobx.observable.box(10)
+        trackObservationalGenerationsFor(x1, "x1")
+
+        x2 = mobx.observable.box(11)
+        trackObservationalGenerationsFor(x2, "x2")
+
         o1 = Promise.withResolvers()
         o2 = Promise.withResolvers()
+        value = Promise.withResolvers()
         Cmp = observer(() => {
             const x1 = simpleUse(o1.promise).get()
             const x2 = simpleUse(o2.promise).get()
+            const v = simpleUse(value.promise)
 
             return (
                 <>
-                    {x1} {x2}
+                    {x1} {x2} {v}
                 </>
             )
         })
@@ -169,7 +186,7 @@ describe("suspended components should not leak observations when suspensions hap
         beforeEach(() => {
             rendered = render(
                 <React.Suspense fallback={"loading..."}>
-                    <Cmp />
+                    <Cmp key="v1" />
                 </React.Suspense>
             )
         })
@@ -178,12 +195,8 @@ describe("suspended components should not leak observations when suspensions hap
             expect(rendered.baseElement).toHaveTextContent("loading...")
         })
 
-        it("does not start an observation for x1", () => {
-            expect(x1Observed).not.toHaveBeenCalled()
-        })
-
-        it("does not start an observation for x2", () => {
-            expect(x2Observed).not.toHaveBeenCalled()
+        it("does not observe anything", () => {
+            expect(observationOrdering).toEqual([])
         })
 
         describe("when the first promise resolves", () => {
@@ -197,66 +210,113 @@ describe("suspended components should not leak observations when suspensions hap
                 expect(rendered.baseElement).toHaveTextContent("loading...")
             })
 
-            it("starts observing x1 twice", () => {
-                expect(x1Observed).toHaveBeenCalledTimes(2)
+            it("starts and stops the expected observations", () => {
+                expect(observationOrdering).toEqual([
+                    "observed(x1)[1]",
+                    "unobserved(x1)[1]",
+                    "observed(x1)[2]",
+                    "unobserved(x1)[2]"
+                ])
             })
 
-            it("stops both observations of x1", () => {
-                expect(x1Unobserved).toHaveBeenCalledTimes(2)
-            })
+            describe("when rerendered as a different instance", () => {
+                beforeEach(() => {
+                    observationOrdering = []
+                    rendered.rerender(
+                        <React.Suspense fallback={"loading..."}>
+                            <Cmp key="v2" />
+                        </React.Suspense>
+                    )
+                })
 
-            it("does not start an observation for x2", () => {
-                expect(x2Observed).not.toHaveBeenCalled()
+                it("still renders the fallback (due to the second promise not being resolved)", () => {
+                    expect(rendered.baseElement).toHaveTextContent("loading...")
+                })
+
+                it("starts and stops the expected observations", () => {
+                    expect(observationOrdering).toEqual([
+                        "observed(x1)[3]",
+                        "unobserved(x1)[3]",
+                        "observed(x1)[4]",
+                        "unobserved(x1)[4]"
+                    ])
+                })
             })
 
             describe("when the second promise resolves", () => {
                 beforeEach(async () => {
-                    x1Observed.mockClear()
-                    x1Unobserved.mockClear()
+                    observationOrdering = []
                     await act(async () => {
                         o2.resolve(x2)
                     })
                 })
 
-                it("now renders the expected contents", () => {
-                    expect(rendered.baseElement).toHaveTextContent("10 11")
+                it("still renders the fallback (due to the second promise not being resolved)", () => {
+                    expect(rendered.baseElement).toHaveTextContent("loading...")
                 })
 
-                it("starts another observation of x1", () => {
-                    expect(x1Observed).toHaveBeenCalledTimes(1)
+                it("starts and stops the expected observations", () => {
+                    expect(observationOrdering).toEqual([
+                        "observed(x1)[3]",
+                        "observed(x2)[1]",
+                        "unobserved(x2)[1]",
+                        "unobserved(x1)[3]",
+                        "observed(x1)[4]",
+                        "observed(x2)[2]",
+                        "unobserved(x2)[2]",
+                        "unobserved(x1)[4]"
+                    ])
                 })
 
-                it("starts observing x2", () => {
-                    expect(x2Observed).toHaveBeenCalledTimes(1)
-                })
-
-                describe("when some observed observable changes", () => {
+                describe("when the third promise resolves", () => {
                     beforeEach(async () => {
+                        observationOrdering = []
                         await act(async () => {
-                            mobx.runInAction(() => {
-                                x1.set(14)
+                            value.resolve("some-string")
+                        })
+                    })
+
+                    it("now renders the expected contents", () => {
+                        expect(rendered.baseElement.textContent).toEqual("10 11 some-string")
+                    })
+
+                    it("starts the expected observations", () => {
+                        expect(observationOrdering).toEqual(["observed(x1)[5]", "observed(x2)[3]"])
+                    })
+
+                    describe("when some observed observable changes", () => {
+                        beforeEach(async () => {
+                            observationOrdering = []
+                            await act(async () => {
+                                mobx.runInAction(() => {
+                                    x1.set(14)
+                                })
                             })
                         })
-                    })
 
-                    it("rendering updates immediately", () => {
-                        expect(rendered.baseElement).toHaveTextContent("14 11")
-                    })
-                })
+                        it("rendering updates immediately", () => {
+                            expect(rendered.baseElement.textContent).toEqual("14 11 some-string")
+                        })
 
-                describe("when the component unmounts", () => {
-                    beforeEach(async () => {
-                        await act(async () => {
-                            rendered.rerender(<div />)
+                        it("does not change the observational status of any observables", () => {
+                            expect(observationOrdering).toEqual([])
                         })
                     })
 
-                    it("stops observing x1", () => {
-                        expect(x1Unobserved).toHaveBeenCalledTimes(1)
-                    })
+                    describe("when the component unmounts", () => {
+                        beforeEach(async () => {
+                            observationOrdering = []
+                            await act(async () => {
+                                rendered.rerender(<div />)
+                            })
+                        })
 
-                    it("stops observing x2", () => {
-                        expect(x2Unobserved).toHaveBeenCalledTimes(1)
+                        it("stops the expected observations", () => {
+                            expect(observationOrdering).toEqual([
+                                "unobserved(x2)[3]",
+                                "unobserved(x1)[5]"
+                            ])
+                        })
                     })
                 })
             })
