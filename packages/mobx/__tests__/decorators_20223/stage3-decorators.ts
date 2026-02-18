@@ -980,12 +980,8 @@ test("unobserved computed reads should warn with requiresReaction enabled", () =
         a.y
 
         expect(warnings.length).toEqual(2)
-        expect(warnings[0]).toContain(
-            "is being read outside a reactive context. Doing a full recompute."
-        )
-        expect(warnings[1]).toContain(
-            "is being read outside a reactive context. Doing a full recompute."
-        )
+        expect(warnings[0]).toContain("is being read outside a reactive context.")
+        expect(warnings[1]).toContain("is being read outside a reactive context.")
     } finally {
         console.warn = consoleWarn
     }

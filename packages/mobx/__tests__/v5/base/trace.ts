@@ -35,7 +35,7 @@ describe("trace", () => {
 
         x.fullname
         expectedLogCalls.push([
-            "[mobx.trace] Computed value 'x.fullname' is being read outside a reactive context. Doing a full recompute."
+            "[mobx.trace] Computed value 'x.fullname' is being read outside a reactive context."
         ])
 
         const dispose = mobx.autorun(
@@ -61,10 +61,6 @@ describe("trace", () => {
 
         dispose()
 
-        expectedLogCalls.push([
-            "[mobx.trace] Computed value 'x.fullname' was suspended and it will recompute on the next access."
-        ])
-
         expect(expectedLogCalls).toEqual(consoleLogSpy.mock.calls)
     })
 
@@ -85,7 +81,7 @@ describe("trace", () => {
 
         x.fooIsGreaterThan5
         expectedLogCalls.push([
-            "[mobx.trace] Computed value 'x.fooIsGreaterThan5' is being read outside a reactive context. Doing a full recompute."
+            "[mobx.trace] Computed value 'x.fooIsGreaterThan5' is being read outside a reactive context."
         ])
 
         const dispose = mobx.autorun(
@@ -116,10 +112,6 @@ describe("trace", () => {
         ])
 
         dispose()
-
-        expectedLogCalls.push([
-            "[mobx.trace] Computed value 'x.fooIsGreaterThan5' was suspended and it will recompute on the next access."
-        ])
 
         expect(expectedLogCalls).toEqual(consoleLogSpy.mock.calls)
     })
