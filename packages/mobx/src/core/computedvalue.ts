@@ -136,7 +136,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
                 : comparer.default)
         this.scope_ = options.context
         this.requiresReaction_ = options.requiresReaction
-        this.keepAlive_ = !!options.keepAlive
+        this.keepAlive_ = options.keepAlive !== false
     }
 
     onBecomeStale_() {
@@ -206,14 +206,14 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         if (this.isComputing) {
             die(32, this.name_, this.derivation)
         }
-        if (
-            globalState.inBatch === 0 &&
-            // !globalState.trackingDerivatpion &&
-            this.observers_.size === 0 &&
-            !this.keepAlive_
-        ) {
+        const isUntrackedRead = globalState.inBatch === 0 && this.observers_.size === 0
+
+        if (isUntrackedRead && !globalState.trackingDerivation) {
+            this.warnAboutUntrackedRead_()
+        }
+
+        if (isUntrackedRead && !this.keepAlive_) {
             if (shouldCompute(this)) {
-                this.warnAboutUntrackedRead_()
                 startBatch() // See perf test 'computed memoization'
                 this.value_ = this.computeValue_(false)
                 endBatch()
@@ -348,19 +348,20 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         if (!__DEV__) {
             return
         }
+        let untrackedReadWarning = `Computed value '${this.name_}' is being read outside a reactive context.`
+        if (!this.keepAlive_) {
+            untrackedReadWarning += " Doing a full recompute."
+        }
+
         if (this.isTracing_ !== TraceMode.NONE) {
-            console.log(
-                `[mobx.trace] Computed value '${this.name_}' is being read outside a reactive context. Doing a full recompute.`
-            )
+            console.log(`[mobx.trace] ${untrackedReadWarning}`)
         }
         if (
             typeof this.requiresReaction_ === "boolean"
                 ? this.requiresReaction_
                 : globalState.computedRequiresReaction
         ) {
-            console.warn(
-                `[mobx] Computed value '${this.name_}' is being read outside a reactive context. Doing a full recompute.`
-            )
+            console.warn(`[mobx] ${untrackedReadWarning}`)
         }
     }
 
