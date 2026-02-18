@@ -98,30 +98,24 @@ When using computed values there are a couple of best practices to follow:
 
 ## Tips
 
-<details id="computed-suspend"><summary>**Tip:** computed values will be suspended if they are _not_ observed<a href="#computed-suspend" class="tip-anchor"></a></summary>
+<details id="computed-cached"><summary>**Tip:** computed values will stay alive (cached) even when they're _not_ observed<a href="#computed-cached" class="tip-anchor"></a></summary>
 
-It sometimes confuses people new to MobX, perhaps used to a library like [Reselect](https://github.com/reduxjs/reselect), that if you create a computed property but don't use it anywhere in a reaction, it is not memoized and appears to be recomputed more often than necessary.
-For example, if we extended the above example with calling `console.log(order.total)` twice, after we called `stop()`, the value would be recomputed twice.
+Computed values are **memoized by default**, even outside reactions.
 
-This allows MobX to automatically suspend computations that are not actively in use
-to avoid unnecessary updates to computed values that are not being accessed. But if a computed property is _not_ in use by some reaction, then computed expressions are evaluated each time their value is requested, so they behave just like a normal property.
-
-If you only fiddle around computed properties might not seem efficient, but when applied in a project that uses `observer`, `autorun`, etc., they become very efficient.
-
-The following code demonstrates the issue:
+The following code demonstrates it:
 
 ```javascript
 // OrderLine has a computed property `total`.
 const line = new OrderLine(2.0)
 
-// If you access `line.total` outside of a reaction, it is recomputed every time.
+// If you access `line.total` outside of a reaction, it is still cached.
 setInterval(() => {
     console.log(line.total)
 }, 60)
 ```
 
-It can be overridden by setting the annotation with the `keepAlive` option ([try it out yourself](https://codesandbox.io/s/computed-3cjo9?file=/src/index.tsx)) or by creating a no-op `autorun(() => { someObject.someComputed })`, which can be nicely cleaned up later if needed.
-Note that both solutions have the risk of creating memory leaks. Changing the default behavior here is an anti-pattern.
+If you need the old suspension behavior (no caching when not observed), set `keepAlive: false`.
+It can reduce retained memory, but may trigger extra recomputation on untracked reads.
 
 MobX can also be configured with the [`computedRequiresReaction`](configuration.md#computedrequiresreaction-boolean) option, to report an error when computeds are accessed outside of a reactive context.
 
@@ -237,4 +231,6 @@ It is recommended to set this one to `true` on very expensive computed values. I
 
 ### `keepAlive`
 
-This avoids suspending computed values when they are not being observed by anything (see the above explanation). Can potentially create memory leaks, similar to the ones discussed for [reactions](reactions.md#always-dispose-of-reactions).
+`keepAlive` controls whether a computed gets suspended when it has no observers.
+By default, computeds are kept alive (`true`).
+Set `keepAlive: false` to opt into suspension behavior and lower retention at the cost of potential recomputation.
