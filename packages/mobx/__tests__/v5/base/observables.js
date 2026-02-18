@@ -279,16 +279,16 @@ test("transaction with inspection", function () {
         expect(calcs).toBe(1)
     })
     expect(b.get()).toBe(6)
-    expect(calcs).toBe(2)
+    expect(calcs).toBe(1)
 
     // if inspected, evaluate eagerly
     mobx.transaction(function () {
         a.set(4)
         expect(b.get()).toBe(8)
-        expect(calcs).toBe(3)
+        expect(calcs).toBe(2)
     })
     expect(b.get()).toBe(8)
-    expect(calcs).toBe(4)
+    expect(calcs).toBe(2)
 })
 
 test("transaction with inspection 2", function () {
@@ -660,16 +660,16 @@ test("lazy evaluation", function () {
     expect(cCalcs).toBe(1)
 
     expect(c.get()).toBe(3)
-    expect(bCalcs).toBe(2)
-    expect(cCalcs).toBe(2)
+    expect(bCalcs).toBe(1)
+    expect(cCalcs).toBe(1)
 
     a.set(2)
-    expect(bCalcs).toBe(2)
-    expect(cCalcs).toBe(2)
+    expect(bCalcs).toBe(1)
+    expect(cCalcs).toBe(1)
 
     expect(c.get()).toBe(4)
-    expect(bCalcs).toBe(3)
-    expect(cCalcs).toBe(3)
+    expect(bCalcs).toBe(2)
+    expect(cCalcs).toBe(2)
 
     const d = computed(function () {
         dCalcs += 1
@@ -683,31 +683,31 @@ test("lazy evaluation", function () {
         },
         false
     )
-    expect(bCalcs).toBe(4)
-    expect(cCalcs).toBe(3)
+    expect(bCalcs).toBe(2)
+    expect(cCalcs).toBe(2)
     expect(dCalcs).toBe(1) // d is evaluated, so that its dependencies are known
 
     a.set(3)
     expect(d.get()).toBe(8)
-    expect(bCalcs).toBe(5)
-    expect(cCalcs).toBe(3)
+    expect(bCalcs).toBe(3)
+    expect(cCalcs).toBe(2)
     expect(dCalcs).toBe(2)
 
     expect(c.get()).toBe(5)
-    expect(bCalcs).toBe(5)
-    expect(cCalcs).toBe(4)
+    expect(bCalcs).toBe(3)
+    expect(cCalcs).toBe(3)
     expect(dCalcs).toBe(2)
 
     expect(b.get()).toBe(4)
-    expect(bCalcs).toBe(5)
-    expect(cCalcs).toBe(4)
+    expect(bCalcs).toBe(3)
+    expect(cCalcs).toBe(3)
     expect(dCalcs).toBe(2)
 
     handle() // unlisten
     expect(d.get()).toBe(8)
-    expect(bCalcs).toBe(6) // gone to sleep
-    expect(cCalcs).toBe(4)
-    expect(dCalcs).toBe(3)
+    expect(bCalcs).toBe(3)
+    expect(cCalcs).toBe(3)
+    expect(dCalcs).toBe(2)
 
     expect(observerChanges).toBe(1)
 
@@ -1416,31 +1416,31 @@ test("#3563 reportObserved in batch", () => {
         observed += a.reportObserved() ? 1 : 0
     })
     c.get()
-    expect(start).toBe(0)
+    expect(start).toBe(1)
     expect(stop).toBe(0)
     expect(computed).toBe(1)
-    expect(observed).toBe(0)
+    expect(observed).toBe(1)
 
     mobx.runInAction(() => {
         c.get()
-        expect(start).toBe(0)
+        expect(start).toBe(1)
         expect(stop).toBe(0)
-        expect(computed).toBe(2)
-        expect(observed).toBe(0)
+        expect(computed).toBe(1)
+        expect(observed).toBe(1)
 
         c.get()
-        expect(computed).toBe(2)
-        expect(observed).toBe(0)
+        expect(computed).toBe(1)
+        expect(observed).toBe(1)
     })
 
     const c2 = mobx.computed(() => {
         c.get()
     })
     c2.get()
-    expect(start).toBe(0)
+    expect(start).toBe(1)
     expect(stop).toBe(0)
-    expect(computed).toBe(3)
-    expect(observed).toBe(0)
+    expect(computed).toBe(1)
+    expect(observed).toBe(1)
 })
 
 test("verify calculation count", () => {
@@ -1506,7 +1506,6 @@ test("verify calculation count", () => {
         "e",
         "f", // would have expected b c e d f, but alas
         "transaction",
-        "f",
         "change",
         "b",
         "try c",
@@ -1937,10 +1936,10 @@ test("computed comparer works with decorate (plain) - 3", () => {
 })
 
 test("can create computed with setter", () => {
-    let y = 1
-    let x = mobx.computed(() => y, {
+    const y = observable.box(1)
+    let x = mobx.computed(() => y.get(), {
         set: v => {
-            y = v * 2
+            y.set(v * 2)
         }
     })
     expect(x.get()).toBe(1)
@@ -1955,6 +1954,26 @@ test("can make non-extenible objects observable", () => {
     o.x = 4
     expect(o.x).toBe(4)
     expect(mobx.isObservableProp(o, "x")).toBeTruthy()
+})
+
+test("computed values are kept alive by default", () => {
+    let calcs = 0
+    const x = observable({
+        x: 1,
+        get y() {
+            calcs++
+            return this.x * 2
+        }
+    })
+
+    expect(x.y).toBe(2)
+    expect(x.y).toBe(2)
+    expect(calcs).toBe(1)
+
+    x.x = 3
+    expect(calcs).toBe(1)
+    expect(x.y).toBe(6)
+    expect(calcs).toBe(2)
 })
 
 test("keeping computed properties alive does not run before access", () => {
@@ -2295,7 +2314,7 @@ test("ObservableArray.splice", () => {
 
 describe("`requiresReaction` takes precedence over global `computedRequiresReaction`", () => {
     const name = "TestComputed"
-    let warnMsg = `[mobx] Computed value '${name}' is being read outside a reactive context. Doing a full recompute.`
+    let warnMsg = `[mobx] Computed value '${name}' is being read outside a reactive context.`
     let consoleWarnSpy
     beforeEach(() => {
         consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation()

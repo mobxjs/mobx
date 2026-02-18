@@ -60,7 +60,7 @@ test("#2309 don't trigger oBO for computeds that aren't subscribed to", () => {
     asd.actionProp()
     events.push("--")
     asd.actionComputed()
-    expect(events).toEqual(["--"])
+    expect(events).toEqual(["--", "onBecomeObserved"])
 })
 
 describe("#2309 onBecomeObserved inconsistencies", () => {
@@ -338,15 +338,14 @@ describe("nested computes don't trigger hooks #2686", () => {
     expect(lowerForComputed.isObserved).toBe(true)
 
     d()
-    expect(lowerForComputed.isObserved).toBe(false)
+    expect(lowerForComputed.isObserved).toBe(true)
 
     expect(events).toEqual([
         "upperValue$",
         "value read through computed: -Infinity",
         "upperValue$",
         "onBecomeObserved",
-        "value read through computed: -1",
-        "onBecomeUnobserved"
+        "value read through computed: -1"
     ])
 })
 
@@ -375,7 +374,7 @@ test("#2686 - 2", () => {
         selection.color = "blue"
     })
     d()
-    expect(events).toEqual(["unselected", "observing", "selected", "unobserving"])
+    expect(events).toEqual(["unselected", "observing", "selected"])
 })
 
 test("#2686 - 3", () => {
@@ -505,8 +504,7 @@ test("#2667", () => {
         "onBecomeObservednew",
         1,
         "new",
-        "onBecomeUnobservedinitial",
-        "onBecomeUnobservednew"
+        "onBecomeUnobservedinitial"
     ])
 })
 
