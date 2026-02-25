@@ -1,7 +1,7 @@
 "use strict"
 
 function create(context) {
-    const sourceCode = context.getSourceCode()
+    const sourceCode = context.sourceCode ?? context.getSourceCode()
 
     return {
         'CallExpression[callee.name="observer"]': observer => {
