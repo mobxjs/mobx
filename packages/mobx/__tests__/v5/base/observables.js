@@ -73,7 +73,7 @@ describe("computed keepAlive: migration flag", () => {
             mobx.computed(() => box.get() * 3)
 
             const migrationWarnings = consoleWarnSpy.mock.calls.filter(([msg]) =>
-                msg.includes("Default behavior for computed values without explicit `keepAlive`")
+                msg.includes("Computed created without explicit `keepAlive`")
             )
             expect(migrationWarnings).toHaveLength(1)
         } finally {
