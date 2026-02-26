@@ -55,6 +55,81 @@ test("basic", function () {
     expect(mobx._isComputingDerivation()).toBe(false)
 })
 
+describe("computed keepAlive: migration flag", () => {
+    beforeEach(() => {
+        mobx.configure({ globalKeepAliveState: false })
+    })
+
+    afterEach(() => {
+        mobx.configure({ globalKeepAliveState: false })
+        mobx._resetGlobalState()
+    })
+
+    test("warns once when implicit `keepAlive`", () => {
+        const consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation(() => {})
+        try {
+            const box = observable.box(1)
+            mobx.computed(() => box.get() * 2)
+            mobx.computed(() => box.get() * 3)
+
+            const migrationWarnings = consoleWarnSpy.mock.calls.filter(([msg]) =>
+                msg.includes("Default behavior for computed values without explicit `keepAlive`")
+            )
+            expect(migrationWarnings).toHaveLength(1)
+        } finally {
+            consoleWarnSpy.mockRestore()
+        }
+    })
+
+    test("implicit `keepAlive` defaults to global flag", () => {
+        const consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation(() => {})
+        try {
+            let computations = 0
+            const box = observable.box(1)
+            const computed = mobx.computed(() => {
+                computations++
+                return box.get() * 2
+            })
+
+            expect(computed.get()).toBe(2)
+            expect(computed.get()).toBe(2)
+            expect(computations).toBe(2)
+        } finally {
+            consoleWarnSpy.mockRestore()
+        }
+    })
+
+    test("explicit `keepAlive` overrides global flag", () => {
+        mobx.configure({ globalKeepAliveState: false })
+        let computationsWhenTrue = 0
+        const a = observable.box(1)
+        const keepAliveTrue = mobx.computed(
+            () => {
+                computationsWhenTrue++
+                return a.get() * 2
+            },
+            { keepAlive: true }
+        )
+        expect(keepAliveTrue.get()).toBe(2)
+        expect(keepAliveTrue.get()).toBe(2)
+        expect(computationsWhenTrue).toBe(1)
+
+        mobx.configure({ globalKeepAliveState: true })
+        let computationsWhenFalse = 0
+        const b = observable.box(1)
+        const keepAliveFalse = mobx.computed(
+            () => {
+                computationsWhenFalse++
+                return b.get() * 2
+            },
+            { keepAlive: false }
+        )
+        expect(keepAliveFalse.get()).toBe(2)
+        expect(keepAliveFalse.get()).toBe(2)
+        expect(computationsWhenFalse).toBe(2)
+    })
+})
+
 test("basic2", function () {
     const x = observable.box(3)
     const z = computed(function () {
@@ -279,16 +354,16 @@ test("transaction with inspection", function () {
         expect(calcs).toBe(1)
     })
     expect(b.get()).toBe(6)
-    expect(calcs).toBe(1)
+    expect(calcs).toBe(2)
 
     // if inspected, evaluate eagerly
     mobx.transaction(function () {
         a.set(4)
         expect(b.get()).toBe(8)
-        expect(calcs).toBe(2)
+        expect(calcs).toBe(3)
     })
     expect(b.get()).toBe(8)
-    expect(calcs).toBe(2)
+    expect(calcs).toBe(4)
 })
 
 test("transaction with inspection 2", function () {
@@ -660,16 +735,16 @@ test("lazy evaluation", function () {
     expect(cCalcs).toBe(1)
 
     expect(c.get()).toBe(3)
-    expect(bCalcs).toBe(1)
-    expect(cCalcs).toBe(1)
-
-    a.set(2)
-    expect(bCalcs).toBe(1)
-    expect(cCalcs).toBe(1)
-
-    expect(c.get()).toBe(4)
     expect(bCalcs).toBe(2)
     expect(cCalcs).toBe(2)
+
+    a.set(2)
+    expect(bCalcs).toBe(2)
+    expect(cCalcs).toBe(2)
+
+    expect(c.get()).toBe(4)
+    expect(bCalcs).toBe(3)
+    expect(cCalcs).toBe(3)
 
     const d = computed(function () {
         dCalcs += 1
@@ -683,31 +758,31 @@ test("lazy evaluation", function () {
         },
         false
     )
-    expect(bCalcs).toBe(2)
-    expect(cCalcs).toBe(2)
+    expect(bCalcs).toBe(4)
+    expect(cCalcs).toBe(3)
     expect(dCalcs).toBe(1) // d is evaluated, so that its dependencies are known
 
     a.set(3)
     expect(d.get()).toBe(8)
-    expect(bCalcs).toBe(3)
-    expect(cCalcs).toBe(2)
+    expect(bCalcs).toBe(5)
+    expect(cCalcs).toBe(3)
     expect(dCalcs).toBe(2)
 
     expect(c.get()).toBe(5)
-    expect(bCalcs).toBe(3)
-    expect(cCalcs).toBe(3)
+    expect(bCalcs).toBe(5)
+    expect(cCalcs).toBe(4)
     expect(dCalcs).toBe(2)
 
     expect(b.get()).toBe(4)
-    expect(bCalcs).toBe(3)
-    expect(cCalcs).toBe(3)
+    expect(bCalcs).toBe(5)
+    expect(cCalcs).toBe(4)
     expect(dCalcs).toBe(2)
 
     handle() // unlisten
     expect(d.get()).toBe(8)
-    expect(bCalcs).toBe(3)
-    expect(cCalcs).toBe(3)
-    expect(dCalcs).toBe(2)
+    expect(bCalcs).toBe(6) // gone to sleep
+    expect(cCalcs).toBe(4)
+    expect(dCalcs).toBe(3)
 
     expect(observerChanges).toBe(1)
 
@@ -1416,31 +1491,31 @@ test("#3563 reportObserved in batch", () => {
         observed += a.reportObserved() ? 1 : 0
     })
     c.get()
-    expect(start).toBe(1)
+    expect(start).toBe(0)
     expect(stop).toBe(0)
     expect(computed).toBe(1)
-    expect(observed).toBe(1)
+    expect(observed).toBe(0)
 
     mobx.runInAction(() => {
         c.get()
-        expect(start).toBe(1)
+        expect(start).toBe(0)
         expect(stop).toBe(0)
-        expect(computed).toBe(1)
-        expect(observed).toBe(1)
+        expect(computed).toBe(2)
+        expect(observed).toBe(0)
 
         c.get()
-        expect(computed).toBe(1)
-        expect(observed).toBe(1)
+        expect(computed).toBe(2)
+        expect(observed).toBe(0)
     })
 
     const c2 = mobx.computed(() => {
         c.get()
     })
     c2.get()
-    expect(start).toBe(1)
+    expect(start).toBe(0)
     expect(stop).toBe(0)
-    expect(computed).toBe(1)
-    expect(observed).toBe(1)
+    expect(computed).toBe(3)
+    expect(observed).toBe(0)
 })
 
 test("verify calculation count", () => {
@@ -1506,6 +1581,7 @@ test("verify calculation count", () => {
         "e",
         "f", // would have expected b c e d f, but alas
         "transaction",
+        "f",
         "change",
         "b",
         "try c",
@@ -1936,10 +2012,10 @@ test("computed comparer works with decorate (plain) - 3", () => {
 })
 
 test("can create computed with setter", () => {
-    const y = observable.box(1)
-    let x = mobx.computed(() => y.get(), {
+    let y = 1
+    let x = mobx.computed(() => y, {
         set: v => {
-            y.set(v * 2)
+            y = v * 2
         }
     })
     expect(x.get()).toBe(1)
@@ -1954,26 +2030,6 @@ test("can make non-extenible objects observable", () => {
     o.x = 4
     expect(o.x).toBe(4)
     expect(mobx.isObservableProp(o, "x")).toBeTruthy()
-})
-
-test("computed values are kept alive by default", () => {
-    let calcs = 0
-    const x = observable({
-        x: 1,
-        get y() {
-            calcs++
-            return this.x * 2
-        }
-    })
-
-    expect(x.y).toBe(2)
-    expect(x.y).toBe(2)
-    expect(calcs).toBe(1)
-
-    x.x = 3
-    expect(calcs).toBe(1)
-    expect(x.y).toBe(6)
-    expect(calcs).toBe(2)
 })
 
 test("keeping computed properties alive does not run before access", () => {
@@ -2314,7 +2370,7 @@ test("ObservableArray.splice", () => {
 
 describe("`requiresReaction` takes precedence over global `computedRequiresReaction`", () => {
     const name = "TestComputed"
-    let warnMsg = `[mobx] Computed value '${name}' is being read outside a reactive context.`
+    let warnMsg = `[mobx] Computed value '${name}' is being read outside a reactive context. Doing a full recompute.`
     let consoleWarnSpy
     beforeEach(() => {
         consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation()
@@ -2326,21 +2382,21 @@ describe("`requiresReaction` takes precedence over global `computedRequiresReact
 
     test("`undefined`", () => {
         mobx.configure({ computedRequiresReaction: true })
-        const c = mobx.computed(() => {}, { name })
+        const c = mobx.computed(() => {}, { name, keepAlive: false })
         c.get()
         expect(consoleWarnSpy).toHaveBeenLastCalledWith(warnMsg)
     })
 
     test("`true` over `false`", () => {
         mobx.configure({ computedRequiresReaction: false })
-        const c = mobx.computed(() => {}, { name, requiresReaction: true })
+        const c = mobx.computed(() => {}, { name, requiresReaction: true, keepAlive: false })
         c.get()
         expect(consoleWarnSpy).toHaveBeenLastCalledWith(warnMsg)
     })
 
     test("`false` over `true`", () => {
         mobx.configure({ computedRequiresReaction: true })
-        const c = mobx.computed(() => {}, { name, requiresReaction: false })
+        const c = mobx.computed(() => {}, { name, requiresReaction: false, keepAlive: false })
         c.get()
         expect(consoleWarnSpy).not.toHaveBeenCalled()
     })
@@ -2415,7 +2471,7 @@ test('Observables initialization does not violate `enforceActions: "always"`', (
         check(() => mobx.observable({ x: 0 }, { proxy: true }))
         check(() => mobx.observable([0], { proxy: false }))
         check(() => mobx.observable([0], { proxy: true }))
-        check(() => mobx.computed(() => 0))
+        check(() => mobx.computed(() => 0, { keepAlive: false }))
     } finally {
         consoleWarnSpy.mockRestore()
         mobx._resetGlobalState()
@@ -2486,7 +2542,7 @@ test("state version does not update on observable creation", () => {
     check(() => mobx.observable({ x: 0 }, { proxy: true }))
     check(() => mobx.observable([0], { proxy: false }))
     check(() => mobx.observable([0], { proxy: true }))
-    check(() => mobx.computed(() => 0))
+    check(() => mobx.computed(() => 0, { keepAlive: false }))
 })
 
 test("#3747", () => {
