@@ -1110,7 +1110,7 @@ test("unobserved computed reads should warn with requiresReaction enabled", () =
         class A {
             @observable x = 0
 
-            @computed({ requiresReaction: true })
+            @computed({ requiresReaction: true, keepAlive: false })
             get y() {
                 return this.x * 2
             }
@@ -1123,7 +1123,7 @@ test("unobserved computed reads should warn with requiresReaction enabled", () =
 
         a.y
         expectedWarnings.push(
-            `[mobx] Computed value 'a.y' is being read outside a reactive context.`
+            `[mobx] Computed value 'a.y' is being read outside a reactive context. Doing a full recompute.`
         )
 
         const d = mobx.reaction(
@@ -1137,7 +1137,7 @@ test("unobserved computed reads should warn with requiresReaction enabled", () =
 
         a.y
         expectedWarnings.push(
-            `[mobx] Computed value 'a.y' is being read outside a reactive context.`
+            `[mobx] Computed value 'a.y' is being read outside a reactive context. Doing a full recompute.`
         )
 
         expect(warnings).toEqual(expectedWarnings)
