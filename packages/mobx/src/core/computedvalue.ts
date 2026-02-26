@@ -37,7 +37,7 @@ import { getFlag, setFlag } from "../utils/utils"
 
 const implicitKeepAliveDefaultWarning = once(() =>
     console.warn(
-        "[mobx] Computed created without explicit `keepAlive`. The default is currently controlled by `configure({ globalKeepAliveState })` and will change from `false` to `true` in the next major version. Set `keepAlive` explicitly (`true`/`false`) to avoid relying on defaults."
+        "[mobx] Computed created without explicit `keepAlive`. It will use `configure({ globalKeepAliveState })` if set, otherwise the current default (`false`, changing to `true` in the next major version). Set `keepAlive` explicitly to avoid relying on global / default behavior."
     )
 )
 

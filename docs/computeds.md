@@ -98,9 +98,9 @@ When using computed values there are a couple of best practices to follow:
 
 ## Tips
 
-<details id="computed-cached"><summary>**Tip:** computed values will stay alive (cached) even when they're _not_ observed<a href="#computed-cached" class="tip-anchor"></a></summary>
+<details id="computed-suspend"><summary>**Tip:** computed values will be suspended if they are _not_ observed (by default)<a href="#computed-suspend" class="tip-anchor"></a></summary>
 
-Computed values are **memoized by default**, even outside reactions.
+By default, computeds that are read outside a reaction are not kept alive, so they can recompute on each untracked access. _This will be changed in next major release_
 
 The following code demonstrates it:
 
@@ -108,14 +108,14 @@ The following code demonstrates it:
 // OrderLine has a computed property `total`.
 const line = new OrderLine(2.0)
 
-// If you access `line.total` outside of a reaction, it is still cached.
+// If you access `line.total` outside of a reaction, it is recomputed every time.
 setInterval(() => {
     console.log(line.total)
 }, 60)
 ```
 
-If you need the old suspension behavior (no caching when not observed), set `keepAlive: false`.
-It can reduce retained memory, but may trigger extra recomputation on untracked reads.
+You can override this per computed with `keepAlive: true`, or globally with `configure({ globalKeepAliveState: true })`.
+Keeping computeds alive can increase memory retention, but avoids extra recomputation on untracked reads.
 
 MobX can also be configured with the [`computedRequiresReaction`](configuration.md#computedrequiresreaction-boolean) option, to report an error when computeds are accessed outside of a reactive context.
 
@@ -232,5 +232,6 @@ It is recommended to set this one to `true` on very expensive computed values. I
 ### `keepAlive`
 
 `keepAlive` controls whether a computed gets suspended when it has no observers.
-By default, computeds are kept alive (`true`).
-Set `keepAlive: false` to opt into suspension behavior and lower retention at the cost of potential recomputation.
+Explicit `keepAlive` takes precedence.
+If omitted, MobX uses `configure({ globalKeepAliveState })`, which currently defaults to `false` to preserve existing behavior.
+In the next major version, `globalKeepAliveState` will default to `true`

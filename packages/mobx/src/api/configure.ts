@@ -55,7 +55,7 @@ export function configure(options: {
         }
     })
     if (options.globalKeepAliveState !== undefined) {
-        globalState.globalKeepAliveState = options.globalKeepAliveState
+        globalState.globalKeepAliveState = !!options.globalKeepAliveState
     }
     globalState.allowStateReads = !globalState.observableRequiresReaction
     if (__DEV__ && globalState.disableErrorBoundaries === true) {

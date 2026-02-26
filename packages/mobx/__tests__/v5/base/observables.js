@@ -56,10 +56,6 @@ test("basic", function () {
 })
 
 describe("computed keepAlive: migration flag", () => {
-    beforeEach(() => {
-        mobx.configure({ globalKeepAliveState: false })
-    })
-
     afterEach(() => {
         mobx.configure({ globalKeepAliveState: false })
         mobx._resetGlobalState()
@@ -84,6 +80,7 @@ describe("computed keepAlive: migration flag", () => {
     test("implicit `keepAlive` defaults to global flag", () => {
         const consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation(() => {})
         try {
+            mobx.configure({ globalKeepAliveState: false })
             let computations = 0
             const box = observable.box(1)
             const computed = mobx.computed(() => {

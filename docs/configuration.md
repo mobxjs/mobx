@@ -136,6 +136,15 @@ const clock = new Clock()
 }
 ```
 
+#### `globalKeepAliveState: boolean`
+
+Overrides the default `keepAlive` behavior for computed's that do not set `keepAlive` explicitly.
+Explicit `keepAlive` takes precedence. `globalKeepAliveState` currently defaults to `false` to preserve existing behavior. In next major, the flag will default to `true`
+
+```javascript
+configure({ globalKeepAliveState: false })
+```
+
 #### `observableRequiresReaction: boolean`
 
 Warns about any unobserved observable access.
