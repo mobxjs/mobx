@@ -16,6 +16,7 @@ import {
     globalState,
     isCaughtException,
     isSpyEnabled,
+    once,
     propagateChangeConfirmed,
     propagateMaybeChanged,
     reportObserved,
@@ -33,6 +34,12 @@ import {
 } from "../internal"
 
 import { getFlag, setFlag } from "../utils/utils"
+
+const implicitKeepAliveDefaultWarning = once(() =>
+    console.warn(
+        "[mobx] Default behavior for computed values without explicit `keepAlive` will be `true` in the next major version. Set `keepAlive: false` explicitly, or set `globalKeepAliveState` to `false` to preserve the current behavior."
+    )
+)
 
 export interface IComputedValue<T> {
     get(): T
@@ -136,7 +143,10 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
                 : comparer.default)
         this.scope_ = options.context
         this.requiresReaction_ = options.requiresReaction
-        this.keepAlive_ = options.keepAlive !== false
+        if (__DEV__ && options.keepAlive === undefined) {
+            implicitKeepAliveDefaultWarning()
+        }
+        this.keepAlive_ = options.keepAlive ?? globalState.globalKeepAliveState
     }
 
     onBecomeStale_() {

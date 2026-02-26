@@ -9,6 +9,7 @@ const persistentKeys: (keyof MobXGlobals)[] = [
     "spyListeners",
     "enforceActions",
     "computedRequiresReaction",
+    "globalKeepAliveState",
     "reactionRequiresObservable",
     "observableRequiresReaction",
     "allowStateReads",
@@ -113,6 +114,12 @@ export class MobXGlobals {
      * Warn if computed values are accessed outside a reactive context
      */
     computedRequiresReaction = false
+
+    /**
+     * Global flag for computed keepAlive behavior.
+     * Defaults to `false` to preserve current behavior.
+     */
+    globalKeepAliveState = false
 
     /**
      * (Experimental)
