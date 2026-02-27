@@ -3,7 +3,7 @@
 const { findAncestor, isMobxDecorator } = require('./utils.js');
 
 function create(context) {
-  const sourceCode = context.getSourceCode();
+  const sourceCode = context.sourceCode ?? context.getSourceCode();
 
   return {
     'Decorator': decorator => {
