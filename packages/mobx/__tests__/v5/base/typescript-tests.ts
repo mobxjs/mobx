@@ -1672,7 +1672,7 @@ test("unobserved computed reads should warn with requiresReaction enabled", () =
                     this,
                     {
                         x: observable,
-                        y: computed({ requiresReaction: true })
+                        y: computed({ requiresReaction: true, keepAlive: false })
                     },
                     { name: "a" }
                 )

@@ -1110,7 +1110,7 @@ test("unobserved computed reads should warn with requiresReaction enabled", () =
         class A {
             @observable x = 0
 
-            @computed({ requiresReaction: true })
+            @computed({ requiresReaction: true, keepAlive: false })
             get y() {
                 return this.x * 2
             }

@@ -16,6 +16,7 @@ export function configure(options: {
      * Warn if observables are accessed outside a reactive context
      */
     observableRequiresReaction?: boolean
+    globalKeepAliveState?: boolean
     isolateGlobalState?: boolean
     disableErrorBoundaries?: boolean
     safeDescriptors?: boolean
@@ -53,6 +54,9 @@ export function configure(options: {
             globalState[key] = !!options[key]
         }
     })
+    if (options.globalKeepAliveState !== undefined) {
+        globalState.globalKeepAliveState = !!options.globalKeepAliveState
+    }
     globalState.allowStateReads = !globalState.observableRequiresReaction
     if (__DEV__ && globalState.disableErrorBoundaries === true) {
         console.warn(
