@@ -10,6 +10,7 @@ import {
     runReactions,
     checkIfStateReadsAreAllowed
 } from "../internal"
+import { createWeakRef } from "../utils/weakRef"
 
 export interface IDepTreeNode {
     name_: string
@@ -82,7 +83,7 @@ export function addObserver(observable: IObservable, node: IDerivation) {
     // invariant(observable._observers.indexOf(node) === -1, "INTERNAL ERROR add already added node");
     // invariantObservers(observable);
 
-    observable.observers_.add(new WeakRef(node))
+    observable.observers_.add(createWeakRef(node))
     if (observable.lowestObserverState_ > node.dependenciesState_) {
         observable.lowestObserverState_ = node.dependenciesState_
     }
