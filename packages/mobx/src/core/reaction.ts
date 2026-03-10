@@ -74,7 +74,9 @@ export class Reaction implements IDerivation, IReactionPublic {
         private onInvalidate_: () => void,
         private errorHandler_?: (error: any, derivation: IDerivation) => void,
         public requiresObservable_?
-    ) {}
+    ) {
+        globalState.activeReactions.add(this)
+    }
 
     get isDisposed() {
         return getFlag(this.flags_, Reaction.isDisposedMask_)
@@ -223,6 +225,7 @@ export class Reaction implements IDerivation, IReactionPublic {
     dispose() {
         if (!this.isDisposed) {
             this.isDisposed = true
+            globalState.activeReactions.delete(this)
             if (!this.isRunning) {
                 // if disposed while running, clean up later. Maybe not optimal, but rare case
                 startBatch()

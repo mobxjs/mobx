@@ -81,7 +81,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     dependenciesState_ = IDerivationState_.NOT_TRACKING_
     observing_: IObservable[] = [] // nodes we are looking at. Our value depends on these nodes
     newObserving_ = null // during tracking it's an array with new observed observers
-    observers_ = new Set<IDerivation>()
+    observers_ = new Set<WeakRef<IDerivation>>()
     runId_ = 0
     lastAccessedBy_ = 0
     lowestObserverState_ = IDerivationState_.UP_TO_DATE_
