@@ -29,7 +29,7 @@ export class Atom implements IAtom {
     private static readonly diffValueMask_ = 0b100
     private flags_ = 0b000
 
-    observers_ = new Set<IDerivation>()
+    observers_ = new Set<WeakRef<IDerivation>>()
 
     lastAccessedBy_ = 0
     lowestObserverState_ = IDerivationState_.NOT_TRACKING_
