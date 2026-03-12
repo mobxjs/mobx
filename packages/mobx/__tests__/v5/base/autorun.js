@@ -42,9 +42,12 @@ test("autorun can be disposed using AbortSignal", function () {
     const ac = new AbortController()
     const values = []
 
-    mobx.autorun(() => {
-        values.push(a.get())
-    }, { signal: ac.signal })
+    mobx.autorun(
+        () => {
+            values.push(a.get())
+        },
+        { signal: ac.signal }
+    )
 
     a.set(2)
     a.set(3)
@@ -61,9 +64,12 @@ test("autorun should not run first time when passing already aborted AbortSignal
 
     ac.abort()
 
-    mobx.autorun(() => {
-        values.push(a.get())
-    }, { signal: ac.signal })
+    mobx.autorun(
+        () => {
+            values.push(a.get())
+        },
+        { signal: ac.signal }
+    )
 
     expect(values).toEqual([])
 })
@@ -71,7 +77,7 @@ test("autorun should not run first time when passing already aborted AbortSignal
 test("autorun warns when passed an action", function () {
     const action = mobx.action(() => {})
     expect.assertions(1)
-    expect(() => mobx.autorun(action)).toThrowError(/Autorun does not accept actions/)
+    expect(() => mobx.autorun(action)).toThrow(/Autorun does not accept actions/)
 })
 
 test("autorun batches automatically", function () {

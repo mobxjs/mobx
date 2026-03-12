@@ -31,7 +31,7 @@ describe("enforcing actions", () => {
         })
 
         render(<Parent />)
-        expect(consoleWarnMock).not.toBeCalled()
+        expect(consoleWarnMock).not.toHaveBeenCalled()
     })
 
     it("'observed' should work", () => {
@@ -50,7 +50,7 @@ describe("enforcing actions", () => {
         })
 
         render(<Parent />)
-        expect(consoleWarnMock).toBeCalledTimes(1)
+        expect(consoleWarnMock).toHaveBeenCalledTimes(1)
     })
 
     it("'always' should work", () => {
@@ -69,6 +69,6 @@ describe("enforcing actions", () => {
         })
 
         render(<Parent />)
-        expect(consoleWarnMock).toBeCalledTimes(1)
+        expect(consoleWarnMock).toHaveBeenCalledTimes(1)
     })
 })

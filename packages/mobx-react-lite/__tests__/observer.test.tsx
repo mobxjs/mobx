@@ -996,32 +996,32 @@ it("dependencies should not become temporarily unobserved", async () => {
 
     expect(computed).toBe(1)
     expect(renders).toBe(1)
-    expect(doubleDisposed).toBeCalledTimes(0)
+    expect(doubleDisposed).toHaveBeenCalledTimes(0)
 
     store.inc()
     expect(computed).toBe(2) // change propagated
     expect(renders).toBe(1) // but not yet rendered
-    expect(doubleDisposed).toBeCalledTimes(0) // if we dispose to early, this fails!
+    expect(doubleDisposed).toHaveBeenCalledTimes(0) // if we dispose to early, this fails!
 
     // Bug: change the state, before the useEffect fires, can cause the reaction to be disposed
     mobx.reaction(() => store.x, reactionFired)
-    expect(reactionFired).toBeCalledTimes(0)
+    expect(reactionFired).toHaveBeenCalledTimes(0)
     expect(computed).toBe(2) // Not 3!
     expect(renders).toBe(1)
-    expect(doubleDisposed).toBeCalledTimes(0)
+    expect(doubleDisposed).toHaveBeenCalledTimes(0)
 
     await runEffects()
-    expect(reactionFired).toBeCalledTimes(0)
+    expect(reactionFired).toHaveBeenCalledTimes(0)
     expect(computed).toBe(2) // Not 3!
     expect(renders).toBe(2)
-    expect(doubleDisposed).toBeCalledTimes(0)
+    expect(doubleDisposed).toHaveBeenCalledTimes(0)
 
     r.unmount()
     cleanups.filter(Boolean).forEach(f => f())
-    expect(reactionFired).toBeCalledTimes(0)
+    expect(reactionFired).toHaveBeenCalledTimes(0)
     expect(computed).toBe(2)
     expect(renders).toBe(2)
-    expect(doubleDisposed).toBeCalledTimes(1)
+    expect(doubleDisposed).toHaveBeenCalledTimes(1)
 })
 
 it.skip("Legacy context support", () => {

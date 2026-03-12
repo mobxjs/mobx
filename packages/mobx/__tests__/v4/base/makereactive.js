@@ -450,7 +450,7 @@ test("as structure view", function () {
 })
 
 test("540 - extendobservable should not report cycles", function () {
-    expect(() => m.extendObservable(Object.freeze({}), {})).toThrowError(
+    expect(() => m.extendObservable(Object.freeze({}), {})).toThrow(
         /Cannot make the designated object observable/
     )
 
@@ -463,7 +463,7 @@ test("540 - extendobservable should not report cycles", function () {
     }
 
     objWrapper.value = obj
-    expect(() => mobx.extendObservable(objWrapper, objWrapper.value)).toThrowError(
+    expect(() => mobx.extendObservable(objWrapper, objWrapper.value)).toThrow(
         /Extending an object with another observable \(object\) is not supported/
     )
 })

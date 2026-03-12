@@ -1430,7 +1430,7 @@ test("support computed property getters / setters", () => {
     a.size = 3
     expect(a.volume).toBe(9)
 
-    expect(() => (a.volume = 9)).toThrowError(
+    expect(() => (a.volume = 9)).toThrow(
         /It is not possible to assign a new value to a computed value/
     )
 
@@ -1493,7 +1493,7 @@ test("helpful error for self referencing setter", function () {
         }
     })
 
-    expect(() => (a.y = 2)).toThrowError(/The setter of computed value/)
+    expect(() => (a.y = 2)).toThrow(/The setter of computed value/)
 })
 
 test("#558 boxed observables stay boxed observables", function () {

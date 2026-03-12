@@ -40,7 +40,7 @@ test("autorun can be disposed on first run", function () {
 test("autorun warns when passed an action", function () {
     const action = mobx.action(() => {})
     expect.assertions(1)
-    expect(() => mobx.autorun(action)).toThrowError(/Autorun does not accept actions/)
+    expect(() => mobx.autorun(action)).toThrow(/Autorun does not accept actions/)
 })
 
 test("autorun batches automatically", function () {

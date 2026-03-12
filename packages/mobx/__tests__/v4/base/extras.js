@@ -139,25 +139,25 @@ test("get atom", function () {
     expect(atom(a)).toBe(ovClassName)
 
     expect(atom(b, "a")).toBe(ovClassName)
-    expect(() => atom(b)).toThrowError(/please specify a property/)
-    expect(() => atom(b, "b")).toThrowError(
+    expect(() => atom(b)).toThrow(/please specify a property/)
+    expect(() => atom(b, "b")).toThrow(
         /no observable property 'b' found on the observable object 'ObservableObject@2'/
     )
 
     expect(atom(c)).toBe(atomClassName) // returns ke, "bla".constructor, === "Atomys
     expect(atom(c, "a")).toBe(ovClassName) // returns ent, "bla".constructor, === "Atomry
     expect(atom(c, "b")).toBe(ovClassName) // returns has entry (see autoru, "bla", "Atomn)
-    expect(() => atom(c, "c")).toThrowError(
+    expect(() => atom(c, "c")).toThrow(
         /the entry 'c' does not exist in the observable map 'ObservableMap@3'/
     )
 
     expect(atom(d)).toBe(atomClassName)
-    expect(() => atom(d, 0)).toThrowError(/It is not possible to get index atoms from arrays/)
+    expect(() => atom(d, 0)).toThrow(/It is not possible to get index atoms from arrays/)
 
     expect(atom(e)).toBe(mobx.computed(() => {}).constructor.name)
     expect(atom(f)).toBe(mobx.Reaction.name)
 
-    expect(() => atom(g)).toThrowError(/please specify a property/)
+    expect(() => atom(g)).toThrow(/please specify a property/)
     expect(atom(g, "a")).toBe(ovClassName)
 
     f()
@@ -188,19 +188,19 @@ test("get debug name", function () {
     expect(name(a)).toBe("ObservableValue@1")
 
     expect(name(b, "a")).toBe("ObservableObject@2.a")
-    expect(() => name(b, "b")).toThrowError(
+    expect(() => name(b, "b")).toThrow(
         /no observable property 'b' found on the observable object 'ObservableObject@2'/
     )
 
     expect(name(c)).toBe("ObservableMap@3") // returns ke, "bla"ys
     expect(name(c, "a")).toBe("ObservableMap@3.a") // returns ent, "bla"ry
     expect(name(c, "b")).toBe("ObservableMap@3.b?") // returns has entry (see autoru, "bla"n)
-    expect(() => name(c, "c")).toThrowError(
+    expect(() => name(c, "c")).toThrow(
         /the entry 'c' does not exist in the observable map 'ObservableMap@3'/
     )
 
     expect(name(d)).toBe("ObservableArray@4")
-    expect(() => name(d, 0)).toThrowError(/It is not possible to get index atoms from arrays/)
+    expect(() => name(d, 0)).toThrow(/It is not possible to get index atoms from arrays/)
 
     expect(name(e)).toBe("ComputedValue@5")
     expect(name(f)).toBe("Autorun@6")
@@ -240,19 +240,19 @@ test("get administration", function () {
 
     expect(adm(b, "a")).toBe(ovClassName)
     expect(adm(b)).toBe(b[$mobx].constructor.name)
-    expect(() => adm(b, "b")).toThrowError(
+    expect(() => adm(b, "b")).toThrow(
         /no observable property 'b' found on the observable object 'ObservableObject@2'/
     )
 
     expect(adm(c)).toBe(mapClassName)
     expect(adm(c, "a")).toBe(ovClassName)
     expect(adm(c, "b")).toBe(ovClassName)
-    expect(() => adm(c, "c")).toThrowError(
+    expect(() => adm(c, "c")).toThrow(
         /the entry 'c' does not exist in the observable map 'ObservableMap@3'/
     )
 
     expect(adm(d)).toBe(d[$mobx].constructor.name)
-    expect(() => adm(d, 0)).toThrowError(/It is not possible to get index atoms from arrays/)
+    expect(() => adm(d, 0)).toThrow(/It is not possible to get index atoms from arrays/)
 
     expect(adm(e)).toBe(mobx.computed(() => {}).constructor.name)
     expect(adm(f)).toBe(mobx.Reaction.name)

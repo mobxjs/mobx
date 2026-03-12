@@ -18,7 +18,7 @@ describe("become-observed", () => {
         const cb = jest.fn()
         onBecomeObserved(oMap, key, cb)
         autorun(() => oMap.get(key))
-        expect(cb).toBeCalled()
+        expect(cb).toHaveBeenCalled()
     })
 })
 
@@ -523,6 +523,6 @@ test("works with ObservableSet #3595", () => {
     disposeOBO()
     disposeOBU()
 
-    expect(onSetObserved).toBeCalledTimes(1)
-    expect(onSetUnobserved).toBeCalledTimes(1)
+    expect(onSetObserved).toHaveBeenCalledTimes(1)
+    expect(onSetUnobserved).toHaveBeenCalledTimes(1)
 })
