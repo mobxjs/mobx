@@ -1,5 +1,11 @@
 # eslint-plugin-mobx
 
+## 0.0.14
+
+### Patch Changes
+
+-   [`f65bc0700461846b05294f857beb211f45eead6f`](https://github.com/mobxjs/mobx/commit/f65bc0700461846b05294f857beb211f45eead6f) [#4613](https://github.com/mobxjs/mobx/pull/4613) Thanks [@roli-lpci](https://github.com/roli-lpci)! - Replace deprecated context.getSourceCode() with context.sourceCode for ESLint 10 compatibility
+
 ## 0.0.13
 
 ### Patch Changes

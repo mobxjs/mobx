@@ -35,7 +35,7 @@ test("exceptions in computed values can be recovered from", () => {
     expect(a.y).toBe(2)
     a.x = 2
 
-    expect(() => a.y).toThrowError(/Uhoh/)
+    expect(() => a.y).toThrow(/Uhoh/)
 
     checkGlobalState()
 
@@ -91,7 +91,7 @@ test("exception in autorun can be recovered from", () => {
     // exception is also rethrown to each consumer
     expect(() => {
         expect(a.y).toBe(2) // old cached value!
-    }).toThrowError(/Uhoh/)
+    }).toThrow(/Uhoh/)
     expect(mobx.getAtom(a, "y").observers_.size).toBe(1)
 
     expect(b).toBe(2)
@@ -481,7 +481,7 @@ test("peeking inside erroring computed value doesn't bork (global) state", () =>
 
     expect(() => {
         b.get()
-    }).toThrowError(/chocolademelk/)
+    }).toThrow(/chocolademelk/)
 
     expect(a.isPendingUnobservation).toBe(false)
     expect(a.observers_.size).toBe(0)
@@ -500,7 +500,7 @@ test("peeking inside erroring computed value doesn't bork (global) state", () =>
     expect(b.unboundDepsCount_).toBe(0)
     expect(() => {
         b.get()
-    }).toThrowError(/chocolademelk/)
+    }).toThrow(/chocolademelk/)
     expect(b.isComputing).toBe(false)
 
     checkGlobalState()
@@ -574,7 +574,7 @@ describe("peeking inside autorun doesn't bork (global) state", () => {
         expect(b.lowestObserverState_).toBe(0)
         expect(b.unboundDepsCount_).toBe(1)
         expect(b.isComputing).toBe(false)
-        expect(() => b.get()).toThrowError(/chocolademelk/)
+        expect(() => b.get()).toThrow(/chocolademelk/)
 
         expect(c.dependenciesState_).toBe(0)
         expect(c.observing_.length).toBe(1)
@@ -746,7 +746,7 @@ test("global error handling will be skipped when using disableErrorBoundaries - 
                 mobx.autorun(function () {
                     throw "OOPS"
                 })
-            }).toThrowError(/OOPS/)
+            }).toThrow(/OOPS/)
         } finally {
             mobx.configure({ disableErrorBoundaries: false })
             mobx._resetGlobalState()
@@ -768,7 +768,7 @@ test("global error handling will be skipped when using disableErrorBoundaries - 
             )
             expect(() => {
                 a.set(2)
-            }).toThrowError(/OOPS/)
+            }).toThrow(/OOPS/)
 
             d()
         } finally {
@@ -827,7 +827,7 @@ describe("es5 compat warnings", () => {
 
         expect(() => {
             "z" in x
-        }).not.toThrowError()
+        }).not.toThrow()
 
         let e
         autorun(() => {
@@ -845,7 +845,7 @@ describe("es5 compat warnings", () => {
 
         expect(() => {
             Object.getOwnPropertyNames(x)
-        }).not.toThrowError()
+        }).not.toThrow()
         autorun(() => {
             try {
                 Object.getOwnPropertyNames(x)

@@ -240,6 +240,10 @@ export class Reaction implements IDerivation, IReactionPublic {
         abortSignal?.addEventListener?.("abort", dispose)
         dispose[$mobx] = this
 
+        if ("dispose" in Symbol && typeof Symbol.dispose === "symbol") {
+            dispose[Symbol.dispose] = dispose
+        }
+
         return dispose
     }
 

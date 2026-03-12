@@ -227,7 +227,7 @@ test("reaction accepts a scheduling function", function (done) {
 test("autorunAsync warns when passed an action", function () {
     const action = mobx.action(() => {})
     expect.assertions(1)
-    expect(() => mobx.autorun(action)).toThrowError(/Autorun does not accept actions/)
+    expect(() => mobx.autorun(action)).toThrow(/Autorun does not accept actions/)
 })
 
 test("whenWithTimeout should operate normally", done => {

@@ -24,10 +24,10 @@ jobs:
       - name: Build packages
         run: yarn lerna run build:test
 
-      - name: Run Coverage
-        run: yarn coverage
+      # - name: Run Coverage
+      #   run: yarn coverage
 
-      - name: Upload to coveralls
-        uses: coverallsapp/github-action@v2.3.6 
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Upload to coveralls
+      #   uses: coverallsapp/github-action@v2.3.6
+      #   with:
+      #     github-token: ${{ secrets.GITHUB_TOKEN }}

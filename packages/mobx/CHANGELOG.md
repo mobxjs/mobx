@@ -1,5 +1,27 @@
 # mobx
 
+## 6.15.0
+
+### Minor Changes
+
+-   [`2e703388eda4ba3eefed2bf1f5ca3958980978c3`](https://github.com/mobxjs/mobx/commit/2e703388eda4ba3eefed2bf1f5ca3958980978c3) [#4584](https://github.com/mobxjs/mobx/pull/4584) Thanks [@mweststrate](https://github.com/mweststrate)! - Fix #4753: Wrong inferred type of observable.map in TS 5.9+, by @mbest in #578
+
+### Patch Changes
+
+-   [`61d6cf39764f28c6c2e0d2b3912364889739c619`](https://github.com/mobxjs/mobx/commit/61d6cf39764f28c6c2e0d2b3912364889739c619) [#4563](https://github.com/mobxjs/mobx/pull/4563) Thanks [@mweststrate](https://github.com/mweststrate)! - Fixed memory leak where makeAutoObservable would keep wrapping setters defined on the prototype. Fixes #4553
+
+## 6.14.0
+
+### Minor Changes
+
+-   [`fe1d3f45cfd0d21189e963579e5c9d764329fea9`](https://github.com/mobxjs/mobx/commit/fe1d3f45cfd0d21189e963579e5c9d764329fea9) [#4558](https://github.com/mobxjs/mobx/pull/4558) Thanks [@vkrol](https://github.com/vkrol)! - Add Explicit Resource Management support in reactions
+
+## 6.13.7
+
+### Patch Changes
+
+-   [`54e3f71ca02f09b3107290f18d8484b70a6e2f0b`](https://github.com/mobxjs/mobx/commit/54e3f71ca02f09b3107290f18d8484b70a6e2f0b) [#4528](https://github.com/mobxjs/mobx/pull/4528) Thanks [@k-g-a](https://github.com/k-g-a)! - Fix observable.set not respecting the new value from interceptors
+
 ## 6.13.6
 
 ### Patch Changes

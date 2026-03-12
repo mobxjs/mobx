@@ -67,7 +67,7 @@ class Child extends Parent {
             computed: override,
             // new
             childObservable: observable,
-            childArrowAction: action
+            childArrowAction: action,
             childAction: action,
             childActionBound: action.bound,
             childComputed: computed,
@@ -84,7 +84,7 @@ class Child extends Parent {
 1. Extending builtins (`ObservableMap`, `ObservableArray`, etc) is not supported.
 1. You can't provide different options to `makeObservable` in subclass.
 1. You can't mix annotations/decorators in single inheritance chain.
-1. [All other limitations apply as well](observable-state.html#limitations)
+1. [All other limitations apply as well](observable-state.md#limitations)
 
 ### `TypeError: Cannot redefine property`
 

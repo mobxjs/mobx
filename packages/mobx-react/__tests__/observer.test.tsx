@@ -1025,7 +1025,7 @@ test("#3492 should not cause warning by calling forceUpdate on uncommited compon
             }
         )
 
-        expect(() => render(<TestCmp />)).toThrowError(
+        expect(() => render(<TestCmp />)).toThrow(
             new RegExp(`^\\[mobx-react\\] Cannot read "TestCmp.${key}" in a reactive context`)
         )
 
@@ -1108,8 +1108,8 @@ test(`Observable changes in componenWillUnmount don't cause any warnings or erro
     expect(container).toHaveTextContent("0")
     unmount()
 
-    expect(consoleErrorSpy).not.toBeCalled()
-    expect(consoleWarnSpy).not.toBeCalled()
+    expect(consoleErrorSpy).not.toHaveBeenCalled()
+    expect(consoleWarnSpy).not.toHaveBeenCalled()
 
     consoleErrorSpy.mockRestore()
     consoleWarnSpy.mockRestore()

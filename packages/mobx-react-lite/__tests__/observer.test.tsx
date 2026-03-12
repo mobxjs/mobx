@@ -594,6 +594,33 @@ test("useImperativeHandle and forwardRef should work with useObserver", () => {
     expect(consoleWarnMock).toMatchSnapshot()
 })
 
+test("observer should work with custom HOC and infer correct type", () => {
+    const validateChildrenWrapper = <T extends {}>(component: React.FC<T>): React.FC<T> => {
+        const wrapper: React.FC<T> = (...args) => {
+            const result = component(...args)
+            if (result && React.isValidElement(result) && result.type === "div") {
+                return result
+            }
+            throw new Error("Only <div> allowed as root element")
+        }
+        wrapper.displayName = component.displayName || component.name
+        return wrapper
+    }
+
+    interface IProps {
+        value: string
+    }
+
+    const TestComponent: React.FC<IProps> = observer(
+        validateChildrenWrapper(function TestComponent({ value }) {
+            return <div>{value}</div>
+        })
+    )
+
+    const rendered = render(<TestComponent value="1" />)
+    expect(rendered.container.querySelector("div")!.innerHTML).toBe("1")
+})
+
 it("should hoist known statics only", () => {
     function isNumber() {
         return null
@@ -969,32 +996,32 @@ it("dependencies should not become temporarily unobserved", async () => {
 
     expect(computed).toBe(1)
     expect(renders).toBe(1)
-    expect(doubleDisposed).toBeCalledTimes(0)
+    expect(doubleDisposed).toHaveBeenCalledTimes(0)
 
     store.inc()
     expect(computed).toBe(2) // change propagated
     expect(renders).toBe(1) // but not yet rendered
-    expect(doubleDisposed).toBeCalledTimes(0) // if we dispose to early, this fails!
+    expect(doubleDisposed).toHaveBeenCalledTimes(0) // if we dispose to early, this fails!
 
     // Bug: change the state, before the useEffect fires, can cause the reaction to be disposed
     mobx.reaction(() => store.x, reactionFired)
-    expect(reactionFired).toBeCalledTimes(0)
+    expect(reactionFired).toHaveBeenCalledTimes(0)
     expect(computed).toBe(2) // Not 3!
     expect(renders).toBe(1)
-    expect(doubleDisposed).toBeCalledTimes(0)
+    expect(doubleDisposed).toHaveBeenCalledTimes(0)
 
     await runEffects()
-    expect(reactionFired).toBeCalledTimes(0)
+    expect(reactionFired).toHaveBeenCalledTimes(0)
     expect(computed).toBe(2) // Not 3!
     expect(renders).toBe(2)
-    expect(doubleDisposed).toBeCalledTimes(0)
+    expect(doubleDisposed).toHaveBeenCalledTimes(0)
 
     r.unmount()
     cleanups.filter(Boolean).forEach(f => f())
-    expect(reactionFired).toBeCalledTimes(0)
+    expect(reactionFired).toHaveBeenCalledTimes(0)
     expect(computed).toBe(2)
     expect(renders).toBe(2)
-    expect(doubleDisposed).toBeCalledTimes(1)
+    expect(doubleDisposed).toHaveBeenCalledTimes(1)
 })
 
 it.skip("Legacy context support", () => {

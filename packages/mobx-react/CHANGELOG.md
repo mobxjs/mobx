@@ -1,5 +1,14 @@
 # mobx-react
 
+## 9.2.1
+
+### Patch Changes
+
+-   [`2e703388eda4ba3eefed2bf1f5ca3958980978c3`](https://github.com/mobxjs/mobx/commit/2e703388eda4ba3eefed2bf1f5ca3958980978c3) [#4584](https://github.com/mobxjs/mobx/pull/4584) Thanks [@mweststrate](https://github.com/mweststrate)! - Fix type definition of `observer`, when used in combination with a Higher Order Component. By @mbest in #4576
+
+-   Updated dependencies [[`2e703388eda4ba3eefed2bf1f5ca3958980978c3`](https://github.com/mobxjs/mobx/commit/2e703388eda4ba3eefed2bf1f5ca3958980978c3)]:
+    -   mobx-react-lite@4.1.1
+
 ## 9.2.0
 
 ### Minor Changes

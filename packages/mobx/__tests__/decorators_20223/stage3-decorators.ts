@@ -196,7 +196,7 @@ test("ClassFieldDecorators should NOT work without accessor without legacy compi
         class Order {
             @observable price: number = 3
         }
-    }).toThrowError("[MobX] Please use `@observable accessor price` instead of `@observable price`")
+    }).toThrow("[MobX] Please use `@observable accessor price` instead of `@observable price`")
 })
 
 test("Reasonable error for decorator kind mismatch", () => {
@@ -205,7 +205,7 @@ test("Reasonable error for decorator kind mismatch", () => {
             // @ts-ignore
             @computed total = 3
         }
-    }).toThrowError("[MobX] The decorator applied to 'total' cannot be used on a field element")
+    }).toThrow("[MobX] The decorator applied to 'total' cannot be used on a field element")
 })
 
 test("typescript: parameterized computed decorator", () => {

@@ -1,6 +1,6 @@
 {
     "name": "mobx",
-    "version": "6.13.6",
+    "version": "6.15.0",
     "description": "Simple, scalable state management.",
     "source": "src/mobx.ts",
     "main": "dist/index.js",
@@ -61,7 +61,7 @@
         "data flow"
     ],
     "scripts": {
-        "test": "jest",
+        "test": "jest --config jest.projects.js",
         "lint": "eslint src/**/*",
         "build": "node ../../scripts/build.js mobx",
         "build:test": "yarn build --target test",

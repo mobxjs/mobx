@@ -5,7 +5,7 @@ const { findAncestor, isMobxDecorator } = require("./utils.js")
 // TODO support this.foo = 5; in constructor
 // TODO? report on field as well
 function create(context) {
-    const sourceCode = context.getSourceCode()
+    const sourceCode = context.sourceCode ?? context.getSourceCode()
     const autofixAnnotation = context.options[0]?.autofixAnnotation ?? true
 
     function fieldToKey(field) {

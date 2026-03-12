@@ -10,7 +10,8 @@ import {
     autoAction,
     isGenerator,
     MakeResult,
-    die
+    die,
+    isAction
 } from "../internal"
 
 const AUTO = "true"
@@ -40,7 +41,9 @@ function make_(
     // lone setter -> action setter
     if (descriptor.set) {
         // TODO make action applicable to setter and delegate to action.make_
-        const set = createAction(key.toString(), descriptor.set) as (v: any) => void
+        const set = isAction(descriptor.set)
+            ? descriptor.set // See #4553
+            : (createAction(key.toString(), descriptor.set) as (v: any) => void)
         // own
         if (source === adm.target_) {
             return adm.defineProperty_(key, {

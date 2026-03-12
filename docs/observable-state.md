@@ -69,7 +69,6 @@ class Doubler {
 **All annotated** fields are **non-configurable**.<br>
 **All non-observable** (stateless) fields (`action`, `flow`) are **non-writable**.
 
-
 <!--class + decorators-->
 
 When using modern decorators, there is no need to call `makeObservable`, below is what a decorator based class looks like.
@@ -122,7 +121,7 @@ function createDoubler(value) {
 ```
 
 Note that classes can leverage `makeAutoObservable` as well.
-The difference in the examples just demonstrate how MobX can be applied to different programming styles.
+The difference in the examples just demonstrates how MobX can be applied to different programming styles.
 
 <!--observable-->
 
@@ -147,7 +146,6 @@ tags.push("prio: for fun")
 
 In contrast to the first example with `makeObservable`, `observable` supports adding (and removing) _fields_ to an object.
 This makes `observable` great for collections like dynamically keyed objects, arrays, Maps and Sets.
-
 
 <!--class + decorators (legacy)-->
 
@@ -222,6 +220,8 @@ The object returned by `observable` will be a Proxy, which means that properties
 
 The `observable` method can also be called with collections types like [arrays](api.md#observablearray), [Maps](api.md#observablemap) and [Sets](api.md#observableset). Those will be cloned as well and converted into their observable counterparts.
 
+> Tip: as holds for JavaScript in general, don't use observable plain objects to create a keyed collection (for example to store a mapping from a user's UUID to user object), use maps instead. Object descriptors are aggressively cached by MobX, so if property names are unstable, this might result in memory leaks.
+
 <details id="observable-array"><summary>**Example:** observable array<a href="#observable-array" class="tip-anchor"></a></summary>
 
 The following example creates an observable and observes it using [`autorun`](reactions.md#autorun).
@@ -290,7 +290,7 @@ Note that it is possible to pass `{ proxy: false }` as an option to `observable`
 
 | Annotation                                 | Description                                                                                                                                                                                                                                                                                                                                       |
 | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `observable`<br/>`observable.deep`         | Defines a trackable field that stores state. If possible, any value assigned to `observable` is automatically converted to (deep) `observable`, [`autoAction`](#autoAction) or `flow` based on it's type. Only `plain object`, `array`, `Map`, `Set`, `function`, `generator function` are convertible. Class instances and others are untouched. |
+| `observable`<br/>`observable.deep`         | Defines a trackable field that stores state. If possible, any value assigned to `observable` is automatically converted to (deep) `observable`, [`autoAction`](#autoAction) or `flow` based on its type. Only `plain object`, `array`, `Map`, `Set`, `function`, `generator function` are convertible. Class instances and others are untouched. |
 | `observable.ref`                           | Like `observable`, but only reassignments will be tracked. The assigned values are completely ignored and will NOT be automatically converted to `observable`/[`autoAction`](#autoAction)/`flow`. For example, use this if you intend to store immutable data in an observable field.                                                             |
 | `observable.shallow`                       | Like `observable.ref` but for collections. Any collection assigned will be made observable, but the contents of the collection itself won't become observable.                                                                                                                                                                                    |
 | `observable.struct`                        | Like `observable`, except that any assigned value that is structurally equal to the current value will be ignored.                                                                                                                                                                                                                                |
@@ -328,8 +328,8 @@ Note that it is possible to pass `{ proxy: false }` as an option to `observable`
 
 The above APIs take an optional `options` argument which is an object that supports the following options:
 
--   **`autoBind: true`** uses `action.bound`/`flow.bound` by default, rather than `action`/`flow`. Does not affect explicitely annotated members.
--   **`deep: false`** uses `observable.ref` by default, rather than `observable`. Does not affect explicitely annotated members.
+-   **`autoBind: true`** uses `action.bound`/`flow.bound` by default, rather than `action`/`flow`. Does not affect explicitly annotated members.
+-   **`deep: false`** uses `observable.ref` by default, rather than `observable`. Does not affect explicitly annotated members.
 -   **`name: <string>`** gives the object a debug name that is printed in error messages and reflection APIs.
 -   **`proxy: false`** forces `observable(thing)` to use non-[**proxy**](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) implementation. This is a good option if the shape of the object will not change over time, as non-proxied objects are easier to debug and faster. This option is **not** available for `make(Auto)Observable`, see [avoiding proxies](#avoid-proxies).
 

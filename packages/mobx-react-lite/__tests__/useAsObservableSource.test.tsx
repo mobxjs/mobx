@@ -366,7 +366,7 @@ describe("enforcing actions", () => {
                 }
             }
         )
-        expect(onError).not.toBeCalled()
+        expect(onError).not.toHaveBeenCalled()
     })
     it("only when 'observed' should work", () => {
         configure({ enforceActions: "observed" })
@@ -386,7 +386,7 @@ describe("enforcing actions", () => {
                 }
             }
         )
-        expect(onError).not.toBeCalled()
+        expect(onError).not.toHaveBeenCalled()
     })
     it("'always' should work", () => {
         configure({ enforceActions: "always" })
@@ -406,7 +406,7 @@ describe("enforcing actions", () => {
                 }
             }
         )
-        expect(onError).not.toBeCalled()
+        expect(onError).not.toHaveBeenCalled()
     })
 })
 

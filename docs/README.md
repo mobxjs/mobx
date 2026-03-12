@@ -54,6 +54,7 @@ MobX is made possible by the generosity of the sponsors below, and many other [i
 <a href="https://talentplot.com/"><img src="https://mobx.js.org/assets/talentplot.png" align="center" width="100" title="talentplot" alt="talentplot"></a>
 <a href="https://www.easeus.com/?utm_source=github_mobxjs_sponsorship&utm_medium=readme&utm_campaign=sponsorship"><img src="https://mobx.js.org/assets/easeus.png" align="center" width="100" title="EaseUS" alt="EaseUS"/></a>
 <a href="https://route4me.com/"><img src="https://mobx.js.org/assets/route4me.png" align="center" width="100" title="Route Planner and Route Optimizer" alt="Route Planner and Route Optimizer"/></a>
+<a href="https://handsontable.com/docs/react-data-grid/?utm_source=Mobx_homepage&utm_medium=sponsorship&utm_campaign=library_sponsorship"><img src="https://mobx.js.org/assets/handsontable.png" align="center" width="100" title="Handsontable" alt="Handsontable"/></a>
 
 ---
 
@@ -151,7 +152,7 @@ This conceptual picture can be applied to the above example, or any other applic
 
 ## Getting started
 
-To learn about the core concepts of MobX using a larger example, check out **[The gist of MobX](https://mobx.js.org/the-gist-of-mobx.html)** page, or take the **[10 minute interactive introduction to MobX and React](https://mobx.js.org/getting-started)**.
+To learn about the core concepts of MobX using a larger example, check out **[The gist of MobX](the-gist-of-mobx.md)** page, or take the **[10 minute interactive introduction to MobX and React](https://mobx.js.org/getting-started)**.
 
 The philosophy and benefits of the mental model provided by MobX are also described in great detail in the blog posts [UI as an afterthought](https://michel.codes/blogs/ui-as-an-afterthought) and [How to decouple state and UI (a.k.a. you don’t need componentWillMount)](https://hackernoon.com/how-to-decouple-state-and-ui-a-k-a-you-dont-need-componentwillmount-cc90b787aa37).
 
