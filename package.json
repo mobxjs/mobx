@@ -14,8 +14,6 @@
         "url": "https://github.com/mobxjs/mobx.git"
     },
     "scripts": {
-        "build:test": "yarn workspace mobx build:test && yarn workspace mobx-react-lite build:test && yarn workspace mobx-react build:test",
-        "pretest": "yarn build:test",
         "test": "jest",
         "coverage": "jest --coverage",
         "lint": "eslint packages/*/src/**/* --ext .js,.ts,.tsx",
