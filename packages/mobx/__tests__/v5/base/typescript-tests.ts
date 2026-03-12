@@ -33,6 +33,7 @@ import {
     flowResult,
     IObjectWillChange
 } from "../../../src/mobx"
+import type { CancellablePromise } from "../../../src/mobx"
 import * as mobx from "../../../src/mobx"
 import { assert, IsExact } from "conditional-type-checks"
 
@@ -2328,6 +2329,14 @@ test("TS - it should support flow as function wrapper", done => {
             done()
         })
     }, 10)
+})
+
+test("TS - it should export CancellablePromise", () => {
+    const wrapped = flow(function* () {
+        return 5
+    })
+
+    assert<IsExact<ReturnType<typeof wrapped>, CancellablePromise<number>>>(true)
 })
 
 test("TS - it should support flow as annotation", done => {
