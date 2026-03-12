@@ -108,6 +108,7 @@ export {
     flow,
     isFlow,
     flowResult,
+    CancellablePromise,
     FlowCancellationError,
     isFlowCancellationError,
     toJS,
