@@ -42,6 +42,8 @@ const SetStaleContext = React.createContext<((stale: boolean) => void) | null>(n
  * expensive computed values.
  *
  * @param scheduler - A ReactionScheduler that controls when reactions run
+ * @param defaultStaleWrapper - Optional default StaleWrapper applied to all components
+ *   created by this factory. Can be overridden per-component.
  * @returns An observer HOC that uses the provided scheduler
  *
  * @example
@@ -62,6 +64,25 @@ const SetStaleContext = React.createContext<((stale: boolean) => void) | null>(n
  *     <div style={{ opacity: isStale ? 0.5 : 1 }}>{children}</div>
  *   )
  * )
+ *
+ * // Default stale wrapper for all components using this scheduler
+ * const deferredObserver = scheduledObserver(
+ *   createRAFScheduler(),
+ *   (children, isStale) => (
+ *     <div style={{ opacity: isStale ? 0.5 : 1 }}>{children}</div>
+ *   )
+ * )
+ * // All components get the default wrapper automatically
+ * const MyComponent = deferredObserver(function MyComponent() {
+ *   return <div>{store.expensiveComputedValue}</div>
+ * })
+ * // Per-component override
+ * const OtherComponent = deferredObserver(
+ *   function OtherComponent() { ... },
+ *   (children, isStale) => (
+ *     <div style={{ pointerEvents: isStale ? 'none' : 'auto' }}>{children}</div>
+ *   )
+ * )
  * ```
  *
  * **Important:** The `staleWrapper` must always render `children` in the
@@ -70,7 +91,10 @@ const SetStaleContext = React.createContext<((stale: boolean) => void) | null>(n
  * permanently. To show a skeleton or placeholder while stale, hide `children`
  * with CSS (e.g. `display: "none"`) rather than omitting them.
  */
-export function scheduledObserver(scheduler: ReactionScheduler) {
+export function scheduledObserver(
+    scheduler: ReactionScheduler,
+    defaultStaleWrapper?: StaleWrapper
+) {
     // Return an observer HOC factory
     function observerWithScheduler<P extends object>(
         baseComponent: React.FunctionComponent<P>,
@@ -120,7 +144,10 @@ export function scheduledObserver(scheduler: ReactionScheduler) {
             }
         }
 
-        if (staleWrapper) {
+        // Per-component staleWrapper overrides the default
+        const effectiveStaleWrapper = staleWrapper ?? defaultStaleWrapper
+
+        if (effectiveStaleWrapper) {
             // Two-layer structure: outer manages stale state, inner does tracked render.
             // This is necessary because re-rendering inside reaction.track() would consume
             // the pending reaction, preventing the scheduler's runReaction_() from working.
@@ -153,7 +180,7 @@ export function scheduledObserver(scheduler: ReactionScheduler) {
                 return React.createElement(
                     SetStaleContext.Provider,
                     { value: setIsStale },
-                    staleWrapper(children, isStale)
+                    effectiveStaleWrapper(children, isStale)
                 )
             }
 

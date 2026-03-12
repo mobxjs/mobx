@@ -842,6 +842,125 @@ describe("staleWrapper", () => {
     })
 })
 
+describe("defaultStaleWrapper", () => {
+    test("default staleWrapper is applied when no per-component wrapper given", () => {
+        const store = mobx.observable({ value: 1 })
+        const { scheduler, flush } = createManualScheduler()
+        const deferredObserver = scheduledObserver(scheduler, (children, isStale) => (
+            <div data-testid="wrapper" data-stale={String(isStale)}>
+                {children}
+            </div>
+        ))
+
+        const Component = deferredObserver(function Component() {
+            return <span data-testid="value">{store.value}</span>
+        })
+
+        const { getByTestId } = render(<Component />)
+        expect(getByTestId("wrapper").dataset.stale).toBe("false")
+        expect(getByTestId("value").textContent).toBe("1")
+
+        act(() => {
+            store.value = 2
+        })
+
+        expect(getByTestId("wrapper").dataset.stale).toBe("true")
+
+        act(() => {
+            flush()
+        })
+
+        expect(getByTestId("wrapper").dataset.stale).toBe("false")
+        expect(getByTestId("value").textContent).toBe("2")
+    })
+
+    test("per-component staleWrapper overrides default", () => {
+        const store = mobx.observable({ value: 1 })
+        const { scheduler, flush } = createManualScheduler()
+        const deferredObserver = scheduledObserver(scheduler, (children, isStale) => (
+            <div data-testid="default-wrapper" data-stale={String(isStale)}>
+                {children}
+            </div>
+        ))
+
+        const Component = deferredObserver(
+            function Component() {
+                return <span data-testid="value">{store.value}</span>
+            },
+            (children, isStale) => (
+                <div data-testid="custom-wrapper" data-stale={String(isStale)}>
+                    {children}
+                </div>
+            )
+        )
+
+        const { getByTestId, queryByTestId } = render(<Component />)
+        // Custom wrapper is used, not the default
+        expect(getByTestId("custom-wrapper")).toBeTruthy()
+        expect(queryByTestId("default-wrapper")).toBeNull()
+        expect(getByTestId("custom-wrapper").dataset.stale).toBe("false")
+
+        act(() => {
+            store.value = 2
+        })
+
+        expect(getByTestId("custom-wrapper").dataset.stale).toBe("true")
+
+        act(() => {
+            flush()
+        })
+
+        expect(getByTestId("custom-wrapper").dataset.stale).toBe("false")
+        expect(getByTestId("value").textContent).toBe("2")
+    })
+
+    test("multiple components share default staleWrapper", () => {
+        const storeA = mobx.observable({ value: "a1" })
+        const storeB = mobx.observable({ value: "b1" })
+        const { scheduler, flush } = createManualScheduler()
+        const deferredObserver = scheduledObserver(scheduler, (children, isStale) => (
+            <div style={{ opacity: isStale ? 0.5 : 1 }} data-stale={String(isStale)}>
+                {children}
+            </div>
+        ))
+
+        const ComponentA = deferredObserver(function ComponentA() {
+            return <span data-testid="valueA">{storeA.value}</span>
+        })
+
+        const ComponentB = deferredObserver(function ComponentB() {
+            return <span data-testid="valueB">{storeB.value}</span>
+        })
+
+        const { getByTestId } = render(
+            <>
+                <ComponentA />
+                <ComponentB />
+            </>
+        )
+
+        const wrapperA = getByTestId("valueA").parentElement!
+        const wrapperB = getByTestId("valueB").parentElement!
+        expect(wrapperA.dataset.stale).toBe("false")
+        expect(wrapperB.dataset.stale).toBe("false")
+
+        // Only change storeA
+        act(() => {
+            storeA.value = "a2"
+        })
+
+        expect(wrapperA.dataset.stale).toBe("true")
+        expect(wrapperB.dataset.stale).toBe("false")
+
+        act(() => {
+            flush()
+        })
+
+        expect(wrapperA.dataset.stale).toBe("false")
+        expect(getByTestId("valueA").textContent).toBe("a2")
+    })
+})
+
 describe("comparison: observer vs scheduledObserver", () => {
     test("observer updates synchronously, scheduledObserver defers", async () => {
         const store = mobx.observable({ value: 1 })
