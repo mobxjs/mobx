@@ -1,5 +1,13 @@
 # mobx
 
+## 6.15.1
+
+### Patch Changes
+
+-   [`df81c144fb148b64140d761aa61f032a7f429e12`](https://github.com/mobxjs/mobx/commit/df81c144fb148b64140d761aa61f032a7f429e12) [#4523](https://github.com/mobxjs/mobx/pull/4523) Thanks [@exzos28](https://github.com/exzos28)! - Make `FlowCancellationError` a proper `Error` instance while preserving its previous string representation.
+
+-   [`21fc4de6c09a77caf115aedd2fe6df972637412b`](https://github.com/mobxjs/mobx/commit/21fc4de6c09a77caf115aedd2fe6df972637412b) [#4626](https://github.com/mobxjs/mobx/pull/4626) Thanks [@kubk](https://github.com/kubk)! - Export `CancellablePromise` from the public `mobx` entrypoint.
+
 ## 6.15.0
 
 ### Minor Changes
