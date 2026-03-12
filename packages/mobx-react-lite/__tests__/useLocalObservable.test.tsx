@@ -468,8 +468,8 @@ describe("enforcing actions", () => {
             }
         )
 
-        expect(onError).not.toBeCalled()
-        expect(consoleWarnMock).not.toBeCalled()
+        expect(onError).not.toHaveBeenCalled()
+        expect(consoleWarnMock).not.toHaveBeenCalled()
     })
     it("only when 'observed' should work", () => {
         mobx.configure({ enforceActions: "observed" })
@@ -504,8 +504,8 @@ describe("enforcing actions", () => {
             }
         )
 
-        expect(onError).not.toBeCalled()
-        expect(consoleWarnMock).not.toBeCalled()
+        expect(onError).not.toHaveBeenCalled()
+        expect(consoleWarnMock).not.toHaveBeenCalled()
     })
     it("'always' should work", () => {
         mobx.configure({ enforceActions: "always" })
@@ -540,7 +540,7 @@ describe("enforcing actions", () => {
             }
         )
 
-        expect(onError).not.toBeCalled()
-        expect(consoleWarnMock).toBeCalledTimes(2)
+        expect(onError).not.toHaveBeenCalled()
+        expect(consoleWarnMock).toHaveBeenCalledTimes(2)
     })
 })

@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`#3492 should not cause warning by calling forceUpdate on uncommited components 1`] = `[MockFunction]`;
 
