@@ -75,7 +75,7 @@ export class Reaction implements IDerivation, IReactionPublic {
         private errorHandler_?: (error: any, derivation: IDerivation) => void,
         public requiresObservable_?
     ) {
-        globalState.activeReactions.add(this)
+        globalState.strongRefReactions.add(this)
     }
 
     get isDisposed() {
@@ -225,7 +225,7 @@ export class Reaction implements IDerivation, IReactionPublic {
     dispose() {
         if (!this.isDisposed) {
             this.isDisposed = true
-            globalState.activeReactions.delete(this)
+            globalState.strongRefReactions.delete(this)
             if (!this.isRunning) {
                 // if disposed while running, clean up later. Maybe not optimal, but rare case
                 startBatch()

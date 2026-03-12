@@ -73,9 +73,9 @@ export class MobXGlobals {
 
     /**
      * Set of reactions that have not yet been disposed.
-     * This prevents them from being garbage collected.
+     * Inclusion in this set prevents them from being garbage collected.
      */
-    activeReactions = new Set<Reaction>()
+    strongRefReactions = new Set<Reaction>()
 
     /**
      * List of scheduled, not yet executed, reactions.
