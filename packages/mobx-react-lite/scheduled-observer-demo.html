@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>scheduledObserver Demo</title>
+        <style>
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+
+            body {
+                font-family: system-ui, -apple-system, sans-serif;
+                background: #0a0a0f;
+                color: #e8e8f0;
+                min-height: 100vh;
+                padding: 32px;
+            }
+
+            h1 {
+                font-size: 1.3rem;
+                font-weight: 600;
+                margin-bottom: 8px;
+                text-align: center;
+            }
+
+            .subtitle {
+                font-size: 0.85rem;
+                color: #666;
+                margin-bottom: 12px;
+                text-align: center;
+                line-height: 1.5;
+            }
+
+            .controls {
+                display: flex;
+                gap: 16px;
+                justify-content: center;
+                margin-bottom: 32px;
+                flex-wrap: wrap;
+            }
+
+            .controls label {
+                font-size: 0.8rem;
+                color: #888;
+            }
+
+            .controls input,
+            .controls select {
+                font-family: inherit;
+                font-size: 0.85rem;
+                padding: 4px 8px;
+                border: 1px solid #333;
+                border-radius: 4px;
+                background: #1a1a24;
+                color: #e8e8f0;
+                margin-left: 4px;
+            }
+
+            .controls button {
+                font-family: inherit;
+                font-size: 0.85rem;
+                padding: 6px 16px;
+                border: 1px solid #444;
+                border-radius: 6px;
+                background: #2a2a3a;
+                color: #e8e8f0;
+                cursor: pointer;
+            }
+
+            .controls button:hover {
+                border-color: #666;
+                background: #3a3a4a;
+            }
+
+            .grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 32px;
+                max-width: 1100px;
+                margin: 0 auto;
+            }
+
+            .section {
+                background: #12121a;
+                border: 1px solid #222;
+                border-radius: 12px;
+                padding: 20px;
+            }
+
+            .section-title {
+                font-size: 0.9rem;
+                font-weight: 600;
+                margin-bottom: 4px;
+            }
+
+            .section-desc {
+                font-size: 0.75rem;
+                color: #555;
+                margin-bottom: 16px;
+                line-height: 1.4;
+            }
+
+            /* Toolbar styles */
+            .toolbar {
+                display: flex;
+                gap: 8px;
+                flex-wrap: wrap;
+                transition: opacity 0.15s ease;
+            }
+
+            .toolbar-item {
+                padding: 8px 14px;
+                font-family: inherit;
+                font-size: 0.8rem;
+                border: 1px solid #333;
+                border-radius: 6px;
+                background: #1e1e2e;
+                color: #ccc;
+                cursor: pointer;
+                transition: all 0.15s ease;
+                position: relative;
+            }
+
+            .toolbar-item:hover {
+                border-color: #555;
+                color: #fff;
+            }
+
+            .toolbar-item.active {
+                background: #00cc6a;
+                border-color: #00cc6a;
+                color: #000;
+                font-weight: 600;
+            }
+
+            /* Stale indicators */
+            .stale-opacity {
+                opacity: 0.35;
+            }
+
+            .stale-blocked {
+                position: relative;
+                cursor: not-allowed;
+            }
+
+            .stale-blocked::after {
+                content: "";
+                position: absolute;
+                inset: -4px;
+                border: 2px dashed #ff4444;
+                border-radius: 10px;
+                pointer-events: none;
+            }
+
+            .stale-skeleton .toolbar-item {
+                color: transparent;
+                background: linear-gradient(90deg, #1e1e2e 25%, #2a2a3a 50%, #1e1e2e 75%);
+                background-size: 200% 100%;
+                animation: shimmer 1.5s infinite;
+                border-color: #2a2a3a;
+            }
+
+            @keyframes shimmer {
+                0% {
+                    background-position: 200% 0;
+                }
+                100% {
+                    background-position: -200% 0;
+                }
+            }
+
+            .stale-badge {
+                display: inline-block;
+                font-size: 0.65rem;
+                padding: 2px 6px;
+                border-radius: 3px;
+                margin-left: 8px;
+                font-weight: 600;
+                vertical-align: middle;
+            }
+
+            .stale-badge.stale {
+                background: #ff4444;
+                color: #fff;
+            }
+
+            .stale-badge.fresh {
+                background: #00cc6a;
+                color: #000;
+            }
+
+            .log {
+                margin-top: 12px;
+                font-size: 0.7rem;
+                color: #555;
+                font-family: "SF Mono", Menlo, monospace;
+                max-height: 60px;
+                overflow-y: auto;
+                line-height: 1.4;
+            }
+
+            .log .stale-event {
+                color: #ff6666;
+            }
+
+            .log .fresh-event {
+                color: #66ff99;
+            }
+
+            .no-scheduler {
+                grid-column: 1 / -1;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>scheduledObserver Stale Wrapper Demo</h1>
+        <p class="subtitle">
+            Each section shows a toolbar with deferred MobX updates. Click "Change State" to modify
+            the observable — the scheduler delay makes staleness visible.
+        </p>
+
+        <div class="controls" id="controls"></div>
+        <div class="grid" id="root"></div>
+
+        <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+        <script
+            crossorigin
+            src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+        ></script>
+        <script
+            crossorigin
+            src="https://unpkg.com/use-sync-external-store@1/cjs/use-sync-external-store-shim.development.js"
+        ></script>
+        <script src="../mobx/dist/mobx.umd.development.js"></script>
+        <script>
+            // ============================================================
+            // Inline scheduledObserver implementation
+            // (Mirrors src/useScheduledObserver.ts + src/scheduledObserver.ts)
+            // ============================================================
+
+            const { observable, computed, runInAction, ScheduledReaction, action } = mobx
+            const {
+                createElement: h,
+                useState,
+                useRef,
+                useContext,
+                createContext,
+                memo,
+                forwardRef
+            } = React
+
+            // Shim: use-sync-external-store loaded as CJS, grab from global
+            const useSyncExternalStore =
+                React.useSyncExternalStore ||
+                window.__USE_SYNC_EXTERNAL_STORE_SHIM__?.useSyncExternalStore
+
+            // Fallback: try the module that was loaded
+            const useSES = (() => {
+                // The CJS shim attaches to exports, try to find it
+                if (useSyncExternalStore) return useSyncExternalStore
+                // React 18 has it built in
+                if (React.useSyncExternalStore) return React.useSyncExternalStore
+                // Manual fallback using useState + useEffect
+                return function useSyncExternalStoreFallback(subscribe, getSnapshot) {
+                    const [state, setState] = useState(getSnapshot)
+                    React.useEffect(() => {
+                        return subscribe(() => setState(getSnapshot()))
+                    }, [subscribe, getSnapshot])
+                    return state
+                }
+            })()
+
+            const SetStaleContext = createContext(null)
+
+            function createScheduledReaction(adm) {
+                adm.reaction = new ScheduledReaction(
+                    "scheduledObserver_" + adm.name,
+                    () => {
+                        adm.onFresh?.()
+                        adm.stateVersion = Symbol()
+                        adm.onStoreChange?.()
+                    },
+                    reaction => {
+                        adm.onStale?.()
+                        adm.scheduler(reaction)
+                    }
+                )
+            }
+
+            function useScheduledObserver(render, scheduler, name, options) {
+                name = name || "observed"
+                const admRef = useRef(null)
+
+                if (!admRef.current) {
+                    const adm = {
+                        reaction: null,
+                        onStoreChange: null,
+                        stateVersion: Symbol(),
+                        name: name,
+                        scheduler: scheduler,
+                        onStale: options?.onStale ?? null,
+                        onFresh: options?.onFresh ?? null,
+                        subscribe(onStoreChange) {
+                            adm.onStoreChange = onStoreChange
+                            if (!adm.reaction) {
+                                createScheduledReaction(adm)
+                                adm.stateVersion = Symbol()
+                            }
+                            return () => {
+                                adm.onStoreChange = null
+                                adm.reaction?.dispose()
+                                adm.reaction = null
+                            }
+                        },
+                        getSnapshot() {
+                            return adm.stateVersion
+                        }
+                    }
+                    admRef.current = adm
+                }
+
+                const adm = admRef.current
+                adm.scheduler = scheduler
+                adm.onStale = options?.onStale ?? null
+                adm.onFresh = options?.onFresh ?? null
+
+                if (!adm.reaction) {
+                    createScheduledReaction(adm)
+                }
+
+                useSES(adm.subscribe, adm.getSnapshot, adm.getSnapshot)
+
+                let renderResult
+                let exception
+                adm.reaction.track(() => {
+                    try {
+                        renderResult = render()
+                    } catch (e) {
+                        exception = e
+                    }
+                })
+
+                if (exception) throw exception
+                return renderResult
+            }
+
+            function scheduledObserver(scheduler) {
+                return function observerWithScheduler(baseComponent, staleWrapper) {
+                    const baseComponentName = baseComponent.displayName || baseComponent.name
+
+                    if (staleWrapper) {
+                        // Inner: memo'd, does tracked render
+                        const InnerMemo = memo(function Inner(props) {
+                            const setIsStale = useContext(SetStaleContext)
+                            return useScheduledObserver(
+                                () => baseComponent(props),
+                                scheduler,
+                                baseComponentName,
+                                {
+                                    onStale: () => setIsStale?.(true),
+                                    onFresh: () => setIsStale?.(false)
+                                }
+                            )
+                        })
+                        InnerMemo.displayName = baseComponentName + "_Inner"
+
+                        // Outer: manages stale state
+                        function Outer(props) {
+                            const [isStale, setIsStale] = useState(false)
+                            const children = h(InnerMemo, props)
+                            return h(
+                                SetStaleContext.Provider,
+                                { value: setIsStale },
+                                staleWrapper(children, isStale)
+                            )
+                        }
+                        Outer.displayName = baseComponentName
+                        return Outer
+                    }
+
+                    // No staleWrapper — single layer
+                    const Comp = memo(function (props) {
+                        return useScheduledObserver(
+                            () => baseComponent(props),
+                            scheduler,
+                            baseComponentName
+                        )
+                    })
+                    Comp.displayName = baseComponentName
+                    return Comp
+                }
+            }
+
+            // ============================================================
+            // Demo App
+            // ============================================================
+
+            // Read delay from query params (default 1500ms)
+            const params = new URLSearchParams(window.location.search)
+            const initialDelay = parseInt(params.get("delay") || "1500", 10)
+
+            // Shared state
+            const store = observable({
+                items: ["Bold", "Italic", "Underline", "Strike", "Code"],
+                activeIndex: 0,
+                counter: 0
+            })
+
+            // Create a scheduler with configurable delay
+            function createDelayScheduler(delayMs) {
+                const pending = new Set()
+                let timer = null
+                return {
+                    scheduler: reaction => {
+                        pending.add(reaction)
+                        if (!timer) {
+                            timer = setTimeout(() => {
+                                timer = null
+                                const toRun = Array.from(pending)
+                                pending.clear()
+                                for (const r of toRun) {
+                                    r.runReaction_()
+                                }
+                            }, delayMs)
+                        }
+                    },
+                    setDelay: ms => {
+                        delayMs = ms
+                    }
+                }
+            }
+
+            let currentDelay = initialDelay
+            const { scheduler: demoScheduler, setDelay } = createDelayScheduler(currentDelay)
+
+            const deferredObserver = scheduledObserver(demoScheduler)
+
+            // -- Toolbar Item (plain, no observer) --
+            function ToolbarItem({ label, active, onClick }) {
+                return h(
+                    "button",
+                    {
+                        className: "toolbar-item" + (active ? " active" : ""),
+                        onClick: onClick
+                    },
+                    label
+                )
+            }
+
+            // -- Toolbar contents (shared render logic) --
+            function renderToolbar() {
+                return h(
+                    "div",
+                    { className: "toolbar" },
+                    store.items.map((item, i) =>
+                        h(ToolbarItem, {
+                            key: item,
+                            label: item + " (" + store.counter + ")",
+                            active: i === store.activeIndex,
+                            onClick: () =>
+                                runInAction(() => {
+                                    store.activeIndex = i
+                                })
+                        })
+                    )
+                )
+            }
+
+            // ============================================================
+            // 1. Opacity Dim (staleWrapper)
+            // ============================================================
+            const OpacityToolbar = deferredObserver(
+                function OpacityToolbar() {
+                    return renderToolbar()
+                },
+                (children, isStale) =>
+                    h(
+                        "div",
+                        null,
+                        h("div", { className: isStale ? "stale-opacity" : "" }, children),
+                        h(
+                            "span",
+                            {
+                                className: "stale-badge " + (isStale ? "stale" : "fresh")
+                            },
+                            isStale ? "STALE" : "FRESH"
+                        )
+                    )
+            )
+
+            // ============================================================
+            // 2. Pointer Events Blocked (staleWrapper)
+            // ============================================================
+            const BlockedToolbar = deferredObserver(
+                function BlockedToolbar() {
+                    return renderToolbar()
+                },
+                (children, isStale) =>
+                    h(
+                        "div",
+                        null,
+                        h(
+                            "div",
+                            {
+                                className: isStale ? "stale-blocked" : "",
+                                // Capture clicks during stale and swallow them.
+                                // Buttons still show hover/active states but
+                                // onClick handlers never fire.
+                                onClickCapture: isStale
+                                    ? e => {
+                                          e.stopPropagation()
+                                          e.preventDefault()
+                                      }
+                                    : undefined
+                            },
+                            children
+                        ),
+                        h(
+                            "span",
+                            {
+                                className: "stale-badge " + (isStale ? "stale" : "fresh")
+                            },
+                            isStale ? "BLOCKED" : "FRESH"
+                        )
+                    )
+            )
+
+            // ============================================================
+            // 3. Skeleton Shimmer (staleWrapper — children always rendered)
+            // ============================================================
+            const SkeletonToolbar = deferredObserver(
+                function SkeletonToolbar() {
+                    return renderToolbar()
+                },
+                (children, isStale) =>
+                    h(
+                        "div",
+                        null,
+                        h(
+                            "div",
+                            {
+                                className: isStale ? "stale-skeleton" : ""
+                            },
+                            children
+                        ),
+                        h(
+                            "span",
+                            {
+                                className: "stale-badge " + (isStale ? "stale" : "fresh")
+                            },
+                            isStale ? "SKELETON" : "FRESH"
+                        )
+                    )
+            )
+
+            // ============================================================
+            // 4. No staleWrapper (plain scheduledObserver)
+            // ============================================================
+            const PlainToolbar = deferredObserver(function PlainToolbar() {
+                return h(
+                    "div",
+                    null,
+                    renderToolbar(),
+                    h("span", { className: "stale-badge fresh" }, "NO STALE WRAPPER")
+                )
+            })
+
+            // ============================================================
+            // Section wrapper
+            // ============================================================
+            function Section({ title, desc, children, wide }) {
+                return h(
+                    "div",
+                    {
+                        className: "section" + (wide ? " no-scheduler" : "")
+                    },
+                    h("div", { className: "section-title" }, title),
+                    h("div", { className: "section-desc" }, desc),
+                    children
+                )
+            }
+
+            // ============================================================
+            // Controls (vanilla DOM — not part of MobX)
+            // ============================================================
+            const controlsEl = document.getElementById("controls")
+
+            // Delay input
+            const delayLabel = document.createElement("label")
+            delayLabel.textContent = "Scheduler delay (ms):"
+            const delayInput = document.createElement("input")
+            delayInput.type = "number"
+            delayInput.value = currentDelay
+            delayInput.min = 0
+            delayInput.max = 10000
+            delayInput.style.width = "80px"
+            delayInput.addEventListener("input", () => {
+                const val = parseInt(delayInput.value, 10)
+                if (!isNaN(val) && val >= 0) {
+                    currentDelay = val
+                    setDelay(val)
+                    // Update URL without reload
+                    const url = new URL(window.location)
+                    url.searchParams.set("delay", val)
+                    window.history.replaceState({}, "", url)
+                }
+            })
+            delayLabel.appendChild(delayInput)
+            controlsEl.appendChild(delayLabel)
+
+            // Change State button
+            const changeBtn = document.createElement("button")
+            changeBtn.textContent = "Change State"
+            changeBtn.addEventListener("click", () => {
+                runInAction(() => {
+                    store.counter++
+                    store.activeIndex = (store.activeIndex + 1) % store.items.length
+                })
+            })
+            controlsEl.appendChild(changeBtn)
+
+            // Add Item button
+            const addBtn = document.createElement("button")
+            addBtn.textContent = "Add Item"
+            addBtn.addEventListener("click", () => {
+                const names = ["Quote", "Link", "Image", "Table", "List", "Heading", "Divider"]
+                runInAction(() => {
+                    store.counter++
+                    const name = names[store.items.length % names.length] + " " + store.items.length
+                    store.items.push(name)
+                })
+            })
+            controlsEl.appendChild(addBtn)
+
+            // Reset button
+            const resetBtn = document.createElement("button")
+            resetBtn.textContent = "Reset"
+            resetBtn.addEventListener("click", () => {
+                runInAction(() => {
+                    store.items.replace(["Bold", "Italic", "Underline", "Strike", "Code"])
+                    store.activeIndex = 0
+                    store.counter = 0
+                })
+            })
+            controlsEl.appendChild(resetBtn)
+
+            // ============================================================
+            // Render
+            // ============================================================
+            const root = ReactDOM.createRoot(document.getElementById("root"))
+            root.render(
+                h(
+                    React.Fragment,
+                    null,
+                    h(
+                        Section,
+                        {
+                            title: "1. Opacity Dim",
+                            desc: "staleWrapper dims the toolbar to 35% opacity while stale. User can still see the old content but knows it's outdated."
+                        },
+                        h(OpacityToolbar)
+                    ),
+                    h(
+                        Section,
+                        {
+                            title: "2. Pointer Events Blocked",
+                            desc: "staleWrapper disables pointer events and shows a dashed red border. Prevents clicking stale buttons."
+                        },
+                        h(BlockedToolbar)
+                    ),
+                    h(
+                        Section,
+                        {
+                            title: "3. Skeleton Shimmer",
+                            desc: "staleWrapper applies a skeleton shimmer animation over the toolbar items. Children are always rendered (hidden by CSS) to keep the reaction alive."
+                        },
+                        h(SkeletonToolbar)
+                    ),
+                    h(
+                        Section,
+                        {
+                            title: "4. No staleWrapper (plain scheduledObserver)",
+                            desc: "No staleWrapper provided. Updates are still deferred by the scheduler, but there is no visual indication of staleness. Single-layer component, no overhead.",
+                            wide: true
+                        },
+                        h(PlainToolbar)
+                    )
+                )
+            )
+        </script>
+    </body>
+</html>
