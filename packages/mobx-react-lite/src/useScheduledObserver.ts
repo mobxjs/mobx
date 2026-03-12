@@ -5,6 +5,11 @@ import { isUsingStaticRendering } from "./staticRendering"
 import { observerFinalizationRegistry } from "./utils/observerFinalizationRegistry"
 import { useSyncExternalStore } from "use-sync-external-store/shim"
 
+export type ScheduledObserverOptions = {
+    onStale?: () => void // fires when scheduler is invoked (stale begins)
+    onFresh?: () => void // fires when onInvalidate_ runs (stale ends)
+}
+
 // Do not store `admRef` (even as part of a closure!) on this object,
 // otherwise it will prevent GC and therefore reaction disposal via FinalizationRegistry.
 type ScheduledObserverAdministration = {
@@ -17,6 +22,8 @@ type ScheduledObserverAdministration = {
     stateVersion: any
     name: string
     scheduler: ReactionScheduler
+    onStale: (() => void) | null
+    onFresh: (() => void) | null
     // These don't depend on state/props, therefore we can keep them here instead of `useCallback`
     subscribe: Parameters<typeof React.useSyncExternalStore>[0]
     getSnapshot: Parameters<typeof React.useSyncExternalStore>[1]
@@ -26,13 +33,17 @@ function createScheduledReaction(adm: ScheduledObserverAdministration) {
     adm.reaction = new ScheduledReaction(
         `scheduledObserver${adm.name}`,
         () => {
+            adm.onFresh?.()
             adm.stateVersion = Symbol()
             // onStoreChange won't be available until the component "mounts".
             // If state changes in between initial render and mount,
             // `useSyncExternalStore` should handle that by checking the state version and issuing update.
             adm.onStoreChange?.()
         },
-        adm.scheduler
+        reaction => {
+            adm.onStale?.()
+            adm.scheduler(reaction)
+        }
     )
 }
 
@@ -60,7 +71,8 @@ function createScheduledReaction(adm: ScheduledObserverAdministration) {
 export function useScheduledObserver<T>(
     render: () => T,
     scheduler: ReactionScheduler,
-    baseComponentName: string = "observed"
+    baseComponentName: string = "observed",
+    options?: ScheduledObserverOptions
 ): T {
     if (isUsingStaticRendering()) {
         return render()
@@ -76,6 +88,8 @@ export function useScheduledObserver<T>(
             stateVersion: Symbol(),
             name: baseComponentName,
             scheduler,
+            onStale: options?.onStale ?? null,
+            onFresh: options?.onFresh ?? null,
             subscribe(onStoreChange: () => void) {
                 // Do NOT access admRef here!
                 observerFinalizationRegistry.unregister(adm)
@@ -110,8 +124,10 @@ export function useScheduledObserver<T>(
 
     const adm = admRef.current!
 
-    // Update scheduler if it changed (though typically it shouldn't)
+    // Update scheduler and callbacks if they changed (though typically they shouldn't)
     adm.scheduler = scheduler
+    adm.onStale = options?.onStale ?? null
+    adm.onFresh = options?.onFresh ?? null
 
     if (!adm.reaction) {
         // First render or reaction was disposed by registry before subscribe

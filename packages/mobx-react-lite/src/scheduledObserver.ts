@@ -1,5 +1,5 @@
 import { ReactionScheduler } from "mobx"
-import { forwardRef, memo } from "react"
+import React, { forwardRef, memo } from "react"
 
 import { isUsingStaticRendering } from "./staticRendering"
 import { useScheduledObserver } from "./useScheduledObserver"
@@ -18,6 +18,25 @@ const ReactMemoSymbol = hasSymbol
     : typeof memo === "function" && memo((props: any) => null)["$$typeof"]
 
 /**
+ * A function that wraps the tracked render output during stale windows.
+ * Called in the outer (non-tracked) layer, so it can freely use `isStale`
+ * without consuming the pending reaction.
+ *
+ * **Important:** The returned element must always include `children` in the
+ * React tree. Omitting `children` when stale will unmount the inner tracked
+ * component, disposing its MobX reaction and preventing recovery. To show a
+ * skeleton or placeholder, render `children` hidden (e.g. `display: "none"`)
+ * alongside the placeholder content.
+ *
+ * @param children - The last rendered output from the tracked component
+ * @param isStale - Whether dependencies have changed but the scheduler hasn't run yet
+ */
+export type StaleWrapper = (children: React.ReactNode, isStale: boolean) => React.ReactElement
+
+// Internal context to pass setIsStale from outer to inner component
+const SetStaleContext = React.createContext<((stale: boolean) => void) | null>(null)
+
+/**
  * Creates a scheduled observer HOC that uses ScheduledReaction to defer
  * reaction execution. This can improve UI responsiveness when observing
  * expensive computed values.
@@ -27,42 +46,42 @@ const ReactMemoSymbol = hasSymbol
  *
  * @example
  * ```tsx
- * // Create a scheduler that defers to next animation frame
- * function createRAFScheduler(): ReactionScheduler {
- *   const pending = new Set<ScheduledReaction>()
- *   let scheduled = false
- *
- *   return (reaction) => {
- *     pending.add(reaction)
- *     if (!scheduled) {
- *       scheduled = true
- *       requestAnimationFrame(() => {
- *         scheduled = false
- *         const toRun = Array.from(pending)
- *         pending.clear()
- *         toRun.forEach(r => r.runReaction_())
- *       })
- *     }
- *   }
- * }
- *
  * const deferredObserver = scheduledObserver(createRAFScheduler())
  *
+ * // Simple — no stale awareness
  * const MyComponent = deferredObserver(function MyComponent() {
  *   return <div>{store.expensiveComputedValue}</div>
  * })
+ *
+ * // With stale awareness — second arg wraps the output
+ * const MyComponent = deferredObserver(
+ *   function MyComponent() {
+ *     return <div>{store.expensiveComputedValue}</div>
+ *   },
+ *   (children, isStale) => (
+ *     <div style={{ opacity: isStale ? 0.5 : 1 }}>{children}</div>
+ *   )
+ * )
  * ```
+ *
+ * **Important:** The `staleWrapper` must always render `children` in the
+ * returned element tree. The inner tracked component is a child of the wrapper —
+ * removing `children` from the tree unmounts it, disposing the MobX reaction
+ * permanently. To show a skeleton or placeholder while stale, hide `children`
+ * with CSS (e.g. `display: "none"`) rather than omitting them.
  */
 export function scheduledObserver(scheduler: ReactionScheduler) {
     // Return an observer HOC factory
     function observerWithScheduler<P extends object>(
-        baseComponent: React.FunctionComponent<P>
+        baseComponent: React.FunctionComponent<P>,
+        staleWrapper?: StaleWrapper
     ): React.FunctionComponent<P>
 
     function observerWithScheduler<P extends object, TRef = {}>(
         baseComponent: React.ForwardRefExoticComponent<
             React.PropsWithoutRef<P> & React.RefAttributes<TRef>
-        >
+        >,
+        staleWrapper?: StaleWrapper
     ): React.MemoExoticComponent<
         React.ForwardRefExoticComponent<React.PropsWithoutRef<P> & React.RefAttributes<TRef>>
     >
@@ -71,7 +90,8 @@ export function scheduledObserver(scheduler: ReactionScheduler) {
         baseComponent:
             | React.ForwardRefRenderFunction<TRef, P>
             | React.FunctionComponent<P>
-            | React.ForwardRefExoticComponent<React.PropsWithoutRef<P> & React.RefAttributes<TRef>>
+            | React.ForwardRefExoticComponent<React.PropsWithoutRef<P> & React.RefAttributes<TRef>>,
+        staleWrapper?: StaleWrapper
     ) {
         if (ReactMemoSymbol && baseComponent["$$typeof"] === ReactMemoSymbol) {
             throw new Error(
@@ -98,6 +118,69 @@ export function scheduledObserver(scheduler: ReactionScheduler) {
                     `[mobx-react-lite] \`render\` property of ForwardRef was not a function`
                 )
             }
+        }
+
+        if (staleWrapper) {
+            // Two-layer structure: outer manages stale state, inner does tracked render.
+            // This is necessary because re-rendering inside reaction.track() would consume
+            // the pending reaction, preventing the scheduler's runReaction_() from working.
+
+            // Inner component: memo'd, does the actual tracked render
+            let innerComponent = (props: any, ref: React.Ref<TRef>) => {
+                const setIsStale = React.useContext(SetStaleContext)
+                return useScheduledObserver(
+                    () => render(props, ref),
+                    scheduler,
+                    baseComponentName,
+                    {
+                        onStale: () => setIsStale?.(true),
+                        onFresh: () => setIsStale?.(false)
+                    }
+                )
+            }
+
+            if (useForwardRef) {
+                innerComponent = forwardRef(innerComponent)
+            }
+
+            const InnerMemo = memo(innerComponent)
+
+            // Outer component: manages stale state, calls staleWrapper
+            let outerComponent: any = (props: any, ref: React.Ref<TRef>) => {
+                const [isStale, setIsStale] = React.useState(false)
+                const innerProps = useForwardRef ? { ...props, ref } : props
+                const children = React.createElement(InnerMemo, innerProps)
+                return React.createElement(
+                    SetStaleContext.Provider,
+                    { value: setIsStale },
+                    staleWrapper(children, isStale)
+                )
+            }
+
+            // Inherit original name and displayName
+            ;(outerComponent as React.FunctionComponent).displayName = baseComponent.displayName
+
+            if (isFunctionNameConfigurable) {
+                Object.defineProperty(outerComponent, "name", {
+                    value: baseComponent.name,
+                    writable: true,
+                    configurable: true
+                })
+            }
+
+            if ((baseComponent as any).contextTypes) {
+                ;(outerComponent as React.FunctionComponent).contextTypes = (
+                    baseComponent as any
+                ).contextTypes
+            }
+
+            if (useForwardRef) {
+                outerComponent = forwardRef(outerComponent)
+            }
+
+            copyStaticProperties(baseComponent, outerComponent)
+
+            return outerComponent
         }
 
         let observerComponent = (props: any, ref: React.Ref<TRef>) => {

@@ -16,7 +16,9 @@ export { useLocalObservable } from "./useLocalObservable"
 export { useLocalStore } from "./useLocalStore"
 export { useAsObservableSource } from "./useAsObservableSource"
 export { scheduledObserver } from "./scheduledObserver"
+export type { StaleWrapper } from "./scheduledObserver"
 export { useScheduledObserver } from "./useScheduledObserver"
+export type { ScheduledObserverOptions } from "./useScheduledObserver"
 export { createTimeoutScheduler, createRAFScheduler, createIdleScheduler } from "./schedulers"
 
 export { observerFinalizationRegistry as _observerFinalizationRegistry }
