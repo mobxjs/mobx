@@ -23,6 +23,10 @@ export class FlowCancellationError extends Error {
         Object.setPrototypeOf(this, new.target.prototype)
         this.name = "FlowCancellationError"
     }
+
+    toString() {
+        return `Error: ${this.message}`
+    }
 }
 
 export function isFlowCancellationError(error: Error) {
