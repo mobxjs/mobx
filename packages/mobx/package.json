@@ -61,7 +61,7 @@
         "data flow"
     ],
     "scripts": {
-        "test": "jest",
+        "test": "jest --config jest.projects.js",
         "lint": "eslint src/**/*",
         "build": "node ../../scripts/build.js mobx",
         "build:test": "yarn build --target test",
