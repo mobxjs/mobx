@@ -55,6 +55,78 @@ test("basic", function () {
     expect(mobx._isComputingDerivation()).toBe(false)
 })
 
+describe("computed keepAlive: migration flag", () => {
+    afterEach(() => {
+        mobx.configure({ globalKeepAliveState: false })
+        mobx._resetGlobalState()
+    })
+
+    test("warns once when implicit `keepAlive`", () => {
+        const consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation(() => {})
+        try {
+            const box = observable.box(1)
+            mobx.computed(() => box.get() * 2)
+            mobx.computed(() => box.get() * 3)
+
+            const migrationWarnings = consoleWarnSpy.mock.calls.filter(([msg]) =>
+                msg.includes("Computed created without explicit `keepAlive`")
+            )
+            expect(migrationWarnings).toHaveLength(1)
+        } finally {
+            consoleWarnSpy.mockRestore()
+        }
+    })
+
+    test("implicit `keepAlive` defaults to global flag", () => {
+        const consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation(() => {})
+        try {
+            mobx.configure({ globalKeepAliveState: false })
+            let computations = 0
+            const box = observable.box(1)
+            const computed = mobx.computed(() => {
+                computations++
+                return box.get() * 2
+            })
+
+            expect(computed.get()).toBe(2)
+            expect(computed.get()).toBe(2)
+            expect(computations).toBe(2)
+        } finally {
+            consoleWarnSpy.mockRestore()
+        }
+    })
+
+    test("explicit `keepAlive` overrides global flag", () => {
+        mobx.configure({ globalKeepAliveState: false })
+        let computationsWhenTrue = 0
+        const a = observable.box(1)
+        const keepAliveTrue = mobx.computed(
+            () => {
+                computationsWhenTrue++
+                return a.get() * 2
+            },
+            { keepAlive: true }
+        )
+        expect(keepAliveTrue.get()).toBe(2)
+        expect(keepAliveTrue.get()).toBe(2)
+        expect(computationsWhenTrue).toBe(1)
+
+        mobx.configure({ globalKeepAliveState: true })
+        let computationsWhenFalse = 0
+        const b = observable.box(1)
+        const keepAliveFalse = mobx.computed(
+            () => {
+                computationsWhenFalse++
+                return b.get() * 2
+            },
+            { keepAlive: false }
+        )
+        expect(keepAliveFalse.get()).toBe(2)
+        expect(keepAliveFalse.get()).toBe(2)
+        expect(computationsWhenFalse).toBe(2)
+    })
+})
+
 test("basic2", function () {
     const x = observable.box(3)
     const z = computed(function () {
@@ -2307,21 +2379,21 @@ describe("`requiresReaction` takes precedence over global `computedRequiresReact
 
     test("`undefined`", () => {
         mobx.configure({ computedRequiresReaction: true })
-        const c = mobx.computed(() => {}, { name })
+        const c = mobx.computed(() => {}, { name, keepAlive: false })
         c.get()
         expect(consoleWarnSpy).toHaveBeenLastCalledWith(warnMsg)
     })
 
     test("`true` over `false`", () => {
         mobx.configure({ computedRequiresReaction: false })
-        const c = mobx.computed(() => {}, { name, requiresReaction: true })
+        const c = mobx.computed(() => {}, { name, requiresReaction: true, keepAlive: false })
         c.get()
         expect(consoleWarnSpy).toHaveBeenLastCalledWith(warnMsg)
     })
 
     test("`false` over `true`", () => {
         mobx.configure({ computedRequiresReaction: true })
-        const c = mobx.computed(() => {}, { name, requiresReaction: false })
+        const c = mobx.computed(() => {}, { name, requiresReaction: false, keepAlive: false })
         c.get()
         expect(consoleWarnSpy).not.toHaveBeenCalled()
     })
@@ -2396,7 +2468,7 @@ test('Observables initialization does not violate `enforceActions: "always"`', (
         check(() => mobx.observable({ x: 0 }, { proxy: true }))
         check(() => mobx.observable([0], { proxy: false }))
         check(() => mobx.observable([0], { proxy: true }))
-        check(() => mobx.computed(() => 0))
+        check(() => mobx.computed(() => 0, { keepAlive: false }))
     } finally {
         consoleWarnSpy.mockRestore()
         mobx._resetGlobalState()
@@ -2467,7 +2539,7 @@ test("state version does not update on observable creation", () => {
     check(() => mobx.observable({ x: 0 }, { proxy: true }))
     check(() => mobx.observable([0], { proxy: false }))
     check(() => mobx.observable([0], { proxy: true }))
-    check(() => mobx.computed(() => 0))
+    check(() => mobx.computed(() => 0, { keepAlive: false }))
 })
 
 test("#3747", () => {

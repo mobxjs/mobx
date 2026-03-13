@@ -96,9 +96,9 @@ In the rare case where you create observables lazily, for example in a computed 
 #### `computedRequiresReaction: boolean`
 
 Forbids the direct access of any unobserved computed value from outside an action or reaction.
-This guarantees you aren't using computed values in a way where MobX won't cache them. **Default: `false`**.
+Use this to enforce that computeds are only read in a reactive context. **Default: `false`**.
 
-In the following example, MobX won't cache the computed value in the first code block, but will cache the result in the second and third block:
+In the following example, the first block will trigger a warning when this option is enabled:
 
 ```javascript
 class Clock {
@@ -116,7 +116,7 @@ class Clock {
 
 const clock = new Clock()
 {
-    // This would compute twice, but is warned against by this flag.
+    // This is warned against by this flag.
     console.log(clock.milliseconds)
     console.log(clock.milliseconds)
 }
@@ -134,6 +134,15 @@ const clock = new Clock()
         console.log(clock.milliseconds)
     })
 }
+```
+
+#### `globalKeepAliveState: boolean`
+
+Overrides the default `keepAlive` behavior for computed's that do not set `keepAlive` explicitly.
+Explicit `keepAlive` takes precedence. `globalKeepAliveState` currently defaults to `false` to preserve existing behavior. In next major, the flag will default to `true`
+
+```javascript
+configure({ globalKeepAliveState: false })
 ```
 
 #### `observableRequiresReaction: boolean`
