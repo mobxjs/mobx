@@ -2193,6 +2193,44 @@ test("configure({ safeDescriptors: false })", () => {
     expect(globalState.safeDescriptors).toBe(true)
 })
 
+test("configure({ useDescriptorCache: false }) disables and evicts cached object descriptors", () => {
+    const globalState = mobx._getGlobalState()
+    const getKeyGetter = () =>
+        Object.getOwnPropertyDescriptor(
+            mobx.observable.object(
+                {
+                    key: 1
+                },
+                {},
+                { proxy: false }
+            ),
+            "key"
+        ).get
+
+    try {
+        expect(globalState.useDescriptorCache).toBe(true)
+
+        const cachedGetter = getKeyGetter()
+        expect(getKeyGetter()).toBe(cachedGetter)
+
+        mobx.configure({ useDescriptorCache: false })
+        expect(globalState.useDescriptorCache).toBe(false)
+
+        const uncachedGetter = getKeyGetter()
+        expect(uncachedGetter).not.toBe(cachedGetter)
+        expect(getKeyGetter()).not.toBe(uncachedGetter)
+
+        mobx.configure({ useDescriptorCache: true })
+        expect(globalState.useDescriptorCache).toBe(true)
+
+        const recachedGetter = getKeyGetter()
+        expect(recachedGetter).not.toBe(cachedGetter)
+        expect(getKeyGetter()).toBe(recachedGetter)
+    } finally {
+        mobx.configure({ useDescriptorCache: true })
+    }
+})
+
 test("function props are observable auto actions", () => {
     const o = observable({
         observable: 0,

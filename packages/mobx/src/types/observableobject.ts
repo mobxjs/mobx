@@ -50,7 +50,11 @@ import {
     checkIfStateModificationsAreAllowed
 } from "../internal"
 
-const descriptorCache = Object.create(null)
+let descriptorCache = Object.create(null)
+
+export function clearObservablePropDescriptorCache() {
+    descriptorCache = Object.create(null)
+}
 
 export type IObjectDidChange<T = any> = {
     observableKind: "object"
@@ -698,18 +702,22 @@ const isObservableObjectAdministration = createInstanceofPredicate(
     ObservableObjectAdministration
 )
 
-function getCachedObservablePropDescriptor(key) {
-    return (
-        descriptorCache[key] ||
-        (descriptorCache[key] = {
-            get() {
-                return this[$mobx].getObservablePropValue_(key)
-            },
-            set(value) {
-                return this[$mobx].setObservablePropValue_(key, value)
-            }
-        })
-    )
+function createObservablePropDescriptor(key: PropertyKey) {
+    return {
+        get() {
+            return this[$mobx].getObservablePropValue_(key)
+        },
+        set(value) {
+            return this[$mobx].setObservablePropValue_(key, value)
+        }
+    }
+}
+
+function getCachedObservablePropDescriptor(key: PropertyKey) {
+    if (!globalState.useDescriptorCache) {
+        return createObservablePropDescriptor(key)
+    }
+    return descriptorCache[key] || (descriptorCache[key] = createObservablePropDescriptor(key))
 }
 
 export function isObservableObject(thing: any): boolean {

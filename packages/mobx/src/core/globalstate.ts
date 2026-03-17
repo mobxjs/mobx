@@ -144,6 +144,11 @@ export class MobXGlobals {
      */
     verifyProxies = false
 
+    /*
+     * Reuse property descriptors for observable plain-object keys.
+     */
+    useDescriptorCache = true
+
     /**
      * False forces all object's descriptors to
      * writable: true
@@ -178,6 +183,9 @@ export let globalState: MobXGlobals = (function () {
         if (!global.__mobxGlobals.UNCHANGED) {
             global.__mobxGlobals.UNCHANGED = {}
         } // make merge backward compatible
+        if (global.__mobxGlobals.useDescriptorCache === undefined) {
+            global.__mobxGlobals.useDescriptorCache = true
+        }
         return global.__mobxGlobals
     } else {
         global.__mobxInstanceCount = 1

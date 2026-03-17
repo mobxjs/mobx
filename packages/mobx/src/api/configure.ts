@@ -1,4 +1,9 @@
-import { globalState, isolateGlobalState, setReactionScheduler } from "../internal"
+import {
+    clearObservablePropDescriptorCache,
+    globalState,
+    isolateGlobalState,
+    setReactionScheduler
+} from "../internal"
 
 const NEVER = "never"
 const ALWAYS = "always"
@@ -19,6 +24,7 @@ export function configure(options: {
     isolateGlobalState?: boolean
     disableErrorBoundaries?: boolean
     safeDescriptors?: boolean
+    useDescriptorCache?: boolean
     reactionScheduler?: (f: () => void) => void
     useProxies?: "always" | "never" | "ifavailable"
 }): void {
@@ -41,6 +47,12 @@ export function configure(options: {
         const ea = enforceActions === ALWAYS ? ALWAYS : enforceActions === OBSERVED
         globalState.enforceActions = ea
         globalState.allowStateChanges = ea === true || ea === ALWAYS ? false : true
+    }
+    if ("useDescriptorCache" in options) {
+        globalState.useDescriptorCache = !!options.useDescriptorCache
+        if (!globalState.useDescriptorCache) {
+            clearObservablePropDescriptorCache()
+        }
     }
     ;[
         "computedRequiresReaction",

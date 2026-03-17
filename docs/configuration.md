@@ -196,6 +196,18 @@ Note it doesn't affect existing observables, only the ones created after it's be
 configure({ safeDescriptors: false })
 ```
 
+#### `useDescriptorCache: boolean`
+
+MobX caches property descriptors for observable plain-object keys so repeated keys can reuse the same getter and setter functions. This is usually a small performance optimization, but the cache can grow without bound when observables are created with a very large number of unique property names, such as UUIDs used as object keys during SSR.
+
+`configure({ useDescriptorCache: false })` disables descriptor reuse and clears any descriptors that were cached so far. Existing observable objects keep working; only future observable properties stop using the cache. **Default: `true`**
+
+```javascript
+configure({ useDescriptorCache: false })
+```
+
+Whenever possible, prefer `observable.map` for truly dynamic key-based collections.
+
 ## Further configuration options
 
 #### `isolateGlobalState: boolean`
