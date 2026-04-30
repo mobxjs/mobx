@@ -98,6 +98,7 @@ export class ObservableObjectAdministration
     isPlainObject_: boolean
     appliedAnnotations_?: object
     private pendingKeys_: undefined | Map<PropertyKey, ObservableValue<boolean>>
+    lazyComputedKeys_: undefined | Map<PropertyKey, () => ComputedValue<any>>
 
     constructor(
         public target_: any,
@@ -119,10 +120,22 @@ export class ObservableObjectAdministration
     }
 
     getObservablePropValue_(key: PropertyKey): any {
+        this.materializeLazyComputed_(key)
         return this.values_.get(key)!.get()
     }
 
+    materializeLazyComputed_(key: PropertyKey): boolean {
+        const factory = this.lazyComputedKeys_?.get(key)
+        if (!factory) {
+            return false
+        }
+        this.lazyComputedKeys_!.delete(key)
+        this.values_.set(key, factory())
+        return true
+    }
+
     setObservablePropValue_(key: PropertyKey, newValue): boolean | null {
+        this.materializeLazyComputed_(key)
         const observable = this.values_.get(key)
         if (observable instanceof ComputedValue) {
             observable.set(newValue)
