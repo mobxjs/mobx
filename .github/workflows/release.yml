@@ -29,7 +29,6 @@ jobs:
         with:
           node-version: 24
           registry-url: https://registry.npmjs.org
-          auth-type: oidc
 
       - name: Update npm
         run: npm install -g npm@11.13.0
@@ -61,16 +60,6 @@ jobs:
         id: changesets
         uses: changesets/action@v1.7.0
         with:
-          # We must explicitly clear `NODE_AUTH_TOKEN` here. `actions/setup-node`
-          # auto-writes `.npmrc` with `//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}`
-          # whenever `registry-url` is set, AND it exports the literal sentinel
-          # `NODE_AUTH_TOKEN=XXXXX-XXXXX-XXXXX-XXXXX` as a default. Without this
-          # override, npm CLI 11.x prefers the (bogus) token over OIDC, fails auth,
-          # and surfaces a misleading `404 Not Found - PUT` from the registry —
-          # see actions/setup-node#1445 and npm/cli#9088. Setting NODE_AUTH_TOKEN
-          # to an empty string forces npm to fall through to the OIDC trusted-
-          # publishing flow (provenance is still signed via Sigstore automatically).
-          #
           # This expects you to have a script called release which does a build for your packages and calls changeset publish
           publish: npm run release
         env:
