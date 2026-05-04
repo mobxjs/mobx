@@ -20,10 +20,13 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Node.js 22.x
-        uses: actions/setup-node@master
+        uses: actions/setup-node@v4
         with:
           node-version: 22.x
           registry-url: https://registry.npmjs.org
+
+      - name: Update npm
+        run: npm install -g npm@11.5.1
 
       - name: Install Dependencies
         run: yarn
