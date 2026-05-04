@@ -61,10 +61,6 @@ jobs:
         id: changesets
         uses: changesets/action@v1
         with:
-          # This expects you to have a script called release which does a build for your packages and calls changeset publish
-          publish: npm run release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # We must explicitly clear `NODE_AUTH_TOKEN` here. `actions/setup-node`
           # auto-writes `.npmrc` with `//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}`
           # whenever `registry-url` is set, AND it exports the literal sentinel
@@ -74,4 +70,9 @@ jobs:
           # see actions/setup-node#1445 and npm/cli#9088. Setting NODE_AUTH_TOKEN
           # to an empty string forces npm to fall through to the OIDC trusted-
           # publishing flow (provenance is still signed via Sigstore automatically).
-          NODE_AUTH_TOKEN: ''
+          #
+          # This expects you to have a script called release which does a build for your packages and calls changeset publish
+          publish: env -u NODE_AUTH_TOKEN npm run release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
