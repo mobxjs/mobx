@@ -22,7 +22,7 @@
     "sideEffects": false,
     "repository": {
         "type": "git",
-        "url": "https://github.com/mobxjs/mobx.git"
+        "url": "git+https://github.com/mobxjs/mobx.git"
     },
     "author": "Michel Weststrate",
     "license": "MIT",
