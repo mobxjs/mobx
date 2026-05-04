@@ -30,31 +30,11 @@ jobs:
           node-version: 24
           registry-url: https://registry.npmjs.org
 
-      - name: Update npm
-        run: npm install -g npm@11.13.0
-
       - name: Install Dependencies
         run: yarn
 
       - name: Build packages
         run: yarn lerna run build
-
-      - name: Debug npm auth and registry
-        run: |
-          echo "--- npm version ---"
-          npm --version
-          echo "--- npm config ---"
-          npm config list
-          echo "--- npm registry ---"
-          npm config get registry
-          echo "--- OIDC token check ---"
-          if [ -n "$ACTIONS_ID_TOKEN_REQUEST_TOKEN" ]; then
-            echo "OIDC token request token is set"
-          else
-            echo "OIDC token request token is NOT set"
-          fi
-          echo "--- npm whoami ---"
-          npm whoami || echo "npm whoami failed - this is expected if OIDC is not configured"
 
       - name: Create Release Pull Request or Publish to npm
         id: changesets
