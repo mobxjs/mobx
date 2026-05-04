@@ -72,7 +72,7 @@ jobs:
           # publishing flow (provenance is still signed via Sigstore automatically).
           #
           # This expects you to have a script called release which does a build for your packages and calls changeset publish
-          publish: env -u NODE_AUTH_TOKEN npm run release
+          publish: npm run release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
