@@ -405,6 +405,35 @@ Now you can see component names:
 
 </details>
 
+<details id="eslint-hooks"><summary>**Tip:** `eslint-plugin-react-hooks` compatibility with `observer`<a href="#eslint-hooks" class="tip-anchor"></a>
+</summary>
+
+By default, [`eslint-plugin-react-hooks`](https://www.npmjs.com/package/eslint-plugin-react-hooks) rules (such as `rules-of-hooks` and `exhaustive-deps`) only recognize components defined as named functions or arrow functions directly assigned to a variable. When you write:
+
+```javascript
+// Arrow function — ESLint react-hooks rules will NOT check this component
+const MyComponent = observer(props => { ... })
+```
+
+ESLint cannot tell that `observer`'s return value is a component, so the hooks rules are silently skipped.
+
+The fix is the same as the one for React DevTools display names: **use a named function inside `observer`**:
+
+```javascript
+// Named function — ESLint react-hooks rules WILL check this component ✓
+const MyComponent = observer(function MyComponent(props) {
+    // hooks are now validated by eslint-plugin-react-hooks
+    const [value, setValue] = React.useState(0)
+    return <div>{value}</div>
+})
+```
+
+This pattern also provides accurate names in React DevTools and stack traces. It is the recommended way to define observable components.
+
+If you prefer arrow functions, you can configure [`eslint-plugin-react`](https://github.com/jsx-eslint/eslint-plugin-react#configuration-legacy-eslintrc-) with the `componentWrapperFunctions` setting to teach ESLint about `observer`, but note that this only affects `eslint-plugin-react` rules, not `eslint-plugin-react-hooks`.
+
+</details>
+
 <details id="wrap-order"><summary>{🚀} **Tip:** when combining `observer` with other higher-order-components, apply `observer` first<a href="#wrap-order" class="tip-anchor"></a></summary>
 
 When `observer` needs to be combined with other decorators or higher-order-components, make sure that `observer` is the innermost (first applied) decorator;
