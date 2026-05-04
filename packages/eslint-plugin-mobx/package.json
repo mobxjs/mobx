@@ -50,7 +50,7 @@
         "test:7": "jest --config jest.config-eslint-7.js",
         "test:9": "jest --config jest.config-eslint-9.js",
         "test": "npm run test:7 && npm run test:9",
-        "build": "yarn rollup --config",
-        "prepublishOnly": "yarn build"
+        "build": "rollup --config",
+        "prepublishOnly": "npm run build"
     }
 }
