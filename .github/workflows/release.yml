@@ -24,12 +24,22 @@ jobs:
         with:
           node-version: 24
           registry-url: https://registry.npmjs.org
+          auth-type: oidc
 
       - name: Install Dependencies
         run: yarn
 
       - name: Build packages
         run: yarn lerna run build
+
+      - name: Debug npm auth and registry
+        run: |
+          echo "--- npm config ---"
+          npm config list
+          echo "--- npm registry ---"
+          npm config get registry
+          echo "--- npm whoami ---"
+          npm whoami || true
 
       - name: Create Release Pull Request or Publish to npm
         id: changesets
