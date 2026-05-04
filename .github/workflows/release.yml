@@ -59,7 +59,7 @@ jobs:
 
       - name: Create Release Pull Request or Publish to npm
         id: changesets
-        uses: changesets/action@v1
+        uses: changesets/action@v1.7.0
         with:
           # We must explicitly clear `NODE_AUTH_TOKEN` here. `actions/setup-node`
           # auto-writes `.npmrc` with `//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}`
@@ -73,7 +73,6 @@ jobs:
           #
           # This expects you to have a script called release which does a build for your packages and calls changeset publish
           publish: env -u NODE_AUTH_TOKEN npm run release
-          setupGitUser: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
