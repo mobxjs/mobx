@@ -9,6 +9,9 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
     steps:
       - name: Checkout Repo
         uses: actions/checkout@main
@@ -20,6 +23,7 @@ jobs:
         uses: actions/setup-node@master
         with:
           node-version: 22.x
+          registry-url: https://registry.npmjs.org
 
       - name: Install Dependencies
         run: yarn
@@ -37,4 +41,3 @@ jobs:
           title: Next release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
