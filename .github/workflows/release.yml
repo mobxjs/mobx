@@ -5,16 +5,21 @@ on:
     branches:
       - main
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+
+permissions:
+  contents: write
+  id-token: write
+  pull-requests: write
+
 jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      id-token: write
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@main
+        uses: actions/checkout@v4
         with:
           # This makes Actions fetch all Git history so that Changesets can generate changelogs with the correct commits
           fetch-depth: 0
@@ -38,16 +43,20 @@ jobs:
           npm config list
           echo "--- npm registry ---"
           npm config get registry
+          echo "--- OIDC token check ---"
+          if [ -n "$ACTIONS_ID_TOKEN_REQUEST_TOKEN" ]; then
+            echo "OIDC token request token is set"
+          else
+            echo "OIDC token request token is NOT set"
+          fi
           echo "--- npm whoami ---"
-          npm whoami || true
+          npm whoami || echo "npm whoami failed - this is expected if OIDC is not configured"
 
       - name: Create Release Pull Request or Publish to npm
         id: changesets
         uses: changesets/action@v1
         with:
           # This expects you to have a script called release which does a build for your packages and calls changeset publish
-          publish: yarn release
-          commit: Version release
-          title: Next release
+          publish: npm run release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
