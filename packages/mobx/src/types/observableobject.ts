@@ -120,23 +120,24 @@ export class ObservableObjectAdministration
     }
 
     getObservablePropValue_(key: PropertyKey): any {
-        this.materializeLazyComputed_(key)
-        return this.values_.get(key)!.get()
+        // Hot path: single map lookup. Lazy computeds (rare) take the materialise branch.
+        const observable = this.values_.get(key) ?? this.materializeLazyComputed_(key)
+        return observable!.get()
     }
 
-    materializeLazyComputed_(key: PropertyKey): boolean {
+    materializeLazyComputed_(key: PropertyKey): ComputedValue<any> | undefined {
         const factory = this.lazyComputedKeys_?.get(key)
         if (!factory) {
-            return false
+            return undefined
         }
         this.lazyComputedKeys_!.delete(key)
-        this.values_.set(key, factory())
-        return true
+        const computed = factory()
+        this.values_.set(key, computed)
+        return computed
     }
 
     setObservablePropValue_(key: PropertyKey, newValue): boolean | null {
-        this.materializeLazyComputed_(key)
-        const observable = this.values_.get(key)
+        const observable = this.values_.get(key) ?? this.materializeLazyComputed_(key)
         if (observable instanceof ComputedValue) {
             observable.set(newValue)
             return true
