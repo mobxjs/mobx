@@ -1,5 +1,11 @@
 # mobx
 
+## 6.15.2
+
+### Patch Changes
+
+-   [`52ddce0f179a461b85e578554e35e94bf76edf3c`](https://github.com/mobxjs/mobx/commit/52ddce0f179a461b85e578554e35e94bf76edf3c) [#4642](https://github.com/mobxjs/mobx/pull/4642) Thanks [@kubk](https://github.com/kubk)! - Restore npm release build target forwarding so published tarballs include the standalone ESM development and production bundles.
+
 ## 6.15.1
 
 ### Patch Changes

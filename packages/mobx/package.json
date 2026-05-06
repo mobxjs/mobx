@@ -1,6 +1,6 @@
 {
     "name": "mobx",
-    "version": "6.15.1",
+    "version": "6.15.2",
     "description": "Simple, scalable state management.",
     "source": "src/mobx.ts",
     "main": "dist/index.js",
@@ -22,7 +22,7 @@
     "sideEffects": false,
     "repository": {
         "type": "git",
-        "url": "https://github.com/mobxjs/mobx.git"
+        "url": "git+https://github.com/mobxjs/mobx.git"
     },
     "author": "Michel Weststrate",
     "license": "MIT",
@@ -64,7 +64,7 @@
         "test": "jest --config jest.projects.js",
         "lint": "eslint src/**/*",
         "build": "node ../../scripts/build.js mobx",
-        "build:test": "yarn build --target test",
+        "build:test": "npm run build -- --target test",
         "perf": "scripts/perf.sh",
         "perf-legacy": "node --expose-gc ./__tests__/perf/index.js legacy",
         "perf-proxy": "node --expose-gc ./__tests__/perf/index.js proxy",
@@ -75,6 +75,6 @@
         "test:coverage": "yarn test -i --coverage",
         "test:size": "yarn import-size --report . observable computed autorun action",
         "test:check": "yarn test:types",
-        "prepublishOnly": "node ./scripts/prepublish.js && yarn build --target publish"
+        "prepublishOnly": "node ./scripts/prepublish.js && npm run build -- --target publish"
     }
 }
