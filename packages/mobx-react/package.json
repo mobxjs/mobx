@@ -66,11 +66,11 @@
     "scripts": {
         "lint": "eslint src/**/* --ext .js,.ts,.tsx",
         "build": "node ../../scripts/build.js mobxReact",
-        "build:test": "npm run build --target test",
+        "build:test": "npm run build -- --target test",
         "test": "jest",
-        "test:size": "npm run import-size --report . observer",
+        "test:size": "import-size --report . observer",
         "test:types": "tsc --noEmit",
         "test:check": "npm run test:types",
-        "prepublishOnly": "npm run build --target publish"
+        "prepublishOnly": "npm run build -- --target publish"
     }
 }

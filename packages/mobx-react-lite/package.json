@@ -69,13 +69,13 @@
     "scripts": {
         "lint": "eslint src/**/* --ext .js,.ts,.tsx",
         "build": "node ../../scripts/build.js mobxReactLite",
-        "build:test": "npm run build --target test",
+        "build:test": "npm run build -- --target test",
         "build:cjs": "tsc --project tsconfig.build.cjs.json",
         "build:es": "tsc --project tsconfig.build.es.json",
         "test": "jest",
         "test:size": "import-size --report . observer useLocalObservable",
         "test:types": "tsc --noEmit",
         "test:check": "npm run test:types",
-        "prepublishOnly": "cd ../mobx && npm run build --target publish && cd ../mobx-react-lite && npm run build --target publish && npm run build:cjs && npm run build:es"
+        "prepublishOnly": "cd ../mobx && npm run build -- --target publish && cd ../mobx-react-lite && npm run build -- --target publish && npm run build:cjs && npm run build:es"
     }
 }

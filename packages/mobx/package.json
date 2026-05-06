@@ -64,7 +64,7 @@
         "test": "jest --config jest.projects.js",
         "lint": "eslint src/**/*",
         "build": "node ../../scripts/build.js mobx",
-        "build:test": "npm run build --target test",
+        "build:test": "npm run build -- --target test",
         "perf": "scripts/perf.sh",
         "perf-legacy": "node --expose-gc ./__tests__/perf/index.js legacy",
         "perf-proxy": "node --expose-gc ./__tests__/perf/index.js proxy",
@@ -75,6 +75,6 @@
         "test:coverage": "yarn test -i --coverage",
         "test:size": "yarn import-size --report . observable computed autorun action",
         "test:check": "yarn test:types",
-        "prepublishOnly": "node ./scripts/prepublish.js && npm run build --target publish"
+        "prepublishOnly": "node ./scripts/prepublish.js && npm run build -- --target publish"
     }
 }
