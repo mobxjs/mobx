@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "target": "ES2022",
+        "module": "CommonJS",
+        "moduleResolution": "Node",
+        "useDefineForClassFields": true,
+        "experimentalDecorators": false,
+        "esModuleInterop": true,
+        "strict": false,
+        "skipLibCheck": true,
+        "outDir": "./compiled",
+        "rootDir": "./"
+    },
+    "include": ["./lazy-computed-decorator.ts"]
+}

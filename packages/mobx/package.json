@@ -68,6 +68,7 @@
         "perf": "scripts/perf.sh",
         "perf-legacy": "node --expose-gc ./__tests__/perf/index.js legacy",
         "perf-proxy": "node --expose-gc ./__tests__/perf/index.js proxy",
+        "perf-decorator": "tsc -p ./__tests__/perf/tsconfig.decorator.json && node --expose-gc ./__tests__/perf/compiled/lazy-computed-decorator.js",
         "test:performance": "yarn perf proxy && yarn perf legacy",
         "test:mixed-versions": "yarn test --testRegex mixed-versions",
         "test:types": "tsc --noEmit",
