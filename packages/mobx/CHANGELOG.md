@@ -1,5 +1,11 @@
 # mobx
 
+## 6.15.3
+
+### Patch Changes
+
+-   [`25e859a3582bcdd3c5a71aa52510adfd924a1a60`](https://github.com/mobxjs/mobx/commit/25e859a3582bcdd3c5a71aa52510adfd924a1a60) [#4644](https://github.com/mobxjs/mobx/pull/4644) Thanks [@kubk](https://github.com/kubk)! - Fix TypeScript errors when using `flow` as a standard decorator.
+
 ## 6.15.2
 
 ### Patch Changes
