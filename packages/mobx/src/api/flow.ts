@@ -37,6 +37,7 @@ export type CancellablePromise<T> = Promise<T> & { cancel(): void }
 
 type FlowGenerator = (...args: any[]) => Generator<any, any, any> | AsyncGenerator<any, any, any>
 
+// PropertyDecorator is only for legacy decorators
 interface Flow extends Annotation, PropertyDecorator {
     <This, Value extends FlowGenerator>(
         value: Value,
