@@ -35,7 +35,13 @@ export function isFlowCancellationError(error: Error) {
 
 export type CancellablePromise<T> = Promise<T> & { cancel(): void }
 
-interface Flow extends Annotation, PropertyDecorator, ClassMethodDecorator {
+type FlowGenerator = (...args: any[]) => Generator<any, any, any> | AsyncGenerator<any, any, any>
+
+interface Flow extends Annotation, PropertyDecorator {
+    <This, Value extends FlowGenerator>(
+        value: Value,
+        context: ClassMethodDecoratorContext<This, Value>
+    ): Value | void
     <R, Args extends any[]>(
         generator: (...args: Args) => Generator<any, R, any> | AsyncGenerator<any, R, any>
     ): (...args: Args) => CancellablePromise<R>

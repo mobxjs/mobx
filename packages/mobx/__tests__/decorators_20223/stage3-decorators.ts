@@ -1052,6 +1052,62 @@ test("it should support asyncAction as decorator (2022.3)", async () => {
     expect(await x.f(3)).toBe(16)
 })
 
+test("it should support flow as decorator (2022.3)", async () => {
+    class DecoratorInferred {
+        @mobx.flow
+        *f() {
+            return true
+        }
+    }
+
+    class DecoratorExplicit {
+        @mobx.flow
+        *f(): Generator<never, boolean, unknown> {
+            return true
+        }
+    }
+
+    class AutoObservable {
+        constructor() {
+            mobx.makeAutoObservable(this)
+        }
+
+        *f() {
+            return true
+        }
+    }
+
+    class ExplicitObservable {
+        constructor() {
+            mobx.makeObservable(this, {
+                f: mobx.flow
+            })
+        }
+
+        *f() {
+            return true
+        }
+    }
+
+    class FlowField {
+        f = mobx.flow(function* () {
+            return true
+        })
+    }
+
+    const decoratorInferredResult: boolean = await mobx.flowResult(new DecoratorInferred().f())
+    const decoratorExplicitResult: boolean = await mobx.flowResult(new DecoratorExplicit().f())
+    const autoObservableResult: boolean = await mobx.flowResult(new AutoObservable().f())
+    const explicitObservableResult: boolean = await mobx.flowResult(new ExplicitObservable().f())
+    const flowFieldResult: boolean = await new FlowField().f()
+
+    expect(decoratorInferredResult).toBe(true)
+    expect(decoratorExplicitResult).toBe(true)
+    expect(autoObservableResult).toBe(true)
+    expect(explicitObservableResult).toBe(true)
+    expect(flowFieldResult).toBe(true)
+})
+
 test("toJS bug #1413 (2022.3)", () => {
     class X {
         @observable
