@@ -68,13 +68,13 @@
         "perf": "scripts/perf.sh",
         "perf-legacy": "node --expose-gc ./__tests__/perf/index.js legacy",
         "perf-proxy": "node --expose-gc ./__tests__/perf/index.js proxy",
-        "test:performance": "yarn perf proxy && yarn perf legacy",
-        "test:mixed-versions": "yarn test --testRegex mixed-versions",
+        "test:performance": "npm run perf -- proxy && npm run perf -- legacy",
+        "test:mixed-versions": "npm test -- --testRegex mixed-versions",
         "test:types": "tsc --noEmit",
         "test:flow": "flow check",
-        "test:coverage": "yarn test -i --coverage",
-        "test:size": "yarn import-size --report . observable computed autorun action",
-        "test:check": "yarn test:types",
+        "test:coverage": "npm test -- -i --coverage",
+        "test:size": "import-size --report . observable computed autorun action",
+        "test:check": "npm run test:types",
         "prepublishOnly": "node ./scripts/prepublish.js && npm run build -- --target publish"
     }
 }

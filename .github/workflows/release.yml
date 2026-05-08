@@ -31,7 +31,7 @@ jobs:
           registry-url: https://registry.npmjs.org
 
       - name: Install Dependencies
-        run: yarn
+        run: npm ci --ignore-scripts
 
       - name: Build packages
         run: npm run build
