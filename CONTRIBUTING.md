@@ -37,7 +37,6 @@ For a small bug fix change (less than 20 lines of code changed), feel free to op
 git clone git@github.com:mobxjs/mobx.git
 cd mobx
 yarn install
-yarn lerna run build
+npm run build
 yarn test
 ```
-

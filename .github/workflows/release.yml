@@ -34,7 +34,7 @@ jobs:
         run: yarn
 
       - name: Build packages
-        run: yarn lerna run build
+        run: npm run build
 
       - name: Create Release Pull Request or Publish to npm
         id: changesets
@@ -44,4 +44,3 @@ jobs:
           publish: npm run release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-

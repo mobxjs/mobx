@@ -27,16 +27,16 @@ jobs:
         run: yarn lint
 
       - name: Build check
-        run: yarn lerna run build:check
+        run: npm run build:check
 
       - name: Build packages
-        run: yarn lerna run build:test
+        run: npm run build:test
 
       - name: Test
         run: yarn test -i
 
       - name: Test size
-        run: yarn lerna run test:size
+        run: npm run test:size
 
       - name: Test flow
         run: yarn mobx test:flow
