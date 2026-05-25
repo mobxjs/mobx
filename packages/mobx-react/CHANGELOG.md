@@ -1,5 +1,11 @@
 # mobx-react
 
+## 9.2.2
+
+### Patch Changes
+
+-   [`82f1e426e8205348dd0954a4bd3f647b40109996`](https://github.com/mobxjs/mobx/commit/82f1e426e8205348dd0954a4bd3f647b40109996) [#4652](https://github.com/mobxjs/mobx/pull/4652) Thanks [@kubk](https://github.com/kubk)! - Avoid Rolldown invalid PURE annotation warnings from Babel-generated React version parsing output.
+
 ## 9.2.1
 
 ### Patch Changes
