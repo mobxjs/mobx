@@ -1,5 +1,11 @@
 # mobx
 
+## 6.15.4
+
+### Patch Changes
+
+-   [`105c985c71308e439bfeed118fb1ba1eac06824e`](https://github.com/mobxjs/mobx/commit/105c985c71308e439bfeed118fb1ba1eac06824e) [#4650](https://github.com/mobxjs/mobx/pull/4650) Thanks [@kubk](https://github.com/kubk)! - Avoid Rolldown invalid PURE annotation warnings from Babel-generated optional chaining output.
+
 ## 6.15.3
 
 ### Patch Changes
