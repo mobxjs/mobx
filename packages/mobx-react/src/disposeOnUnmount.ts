@@ -1,7 +1,7 @@
 import React from "react"
 import { patch } from "./utils/utils"
 
-const reactMajorVersion = Number.parseInt(React.version.split(".")[0])
+const reactMajorVersion = Number.parseInt(React.version, 10)
 let warnedAboutDisposeOnUnmountDeprecated = false
 
 type Disposer = () => void
