@@ -33,11 +33,12 @@ For a small bug fix change (less than 20 lines of code changed), feel free to op
 
 #### Getting things running
 
+Use Node.js 24, matching CI. The npm version bundled with Node is sufficient.
+
 ```
 git clone git@github.com:mobxjs/mobx.git
 cd mobx
-yarn install
-yarn lerna run build
-yarn test
+npm install
+npm run build
+npm test
 ```
-

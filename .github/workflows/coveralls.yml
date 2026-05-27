@@ -19,13 +19,13 @@ jobs:
           node-version: 24
 
       - name: Install Dependencies
-        run: yarn --frozen-lockfile --ignore-scripts
+        run: npm ci --ignore-scripts
 
       - name: Build packages
-        run: yarn lerna run build:test
+        run: npm run build:test
 
       # - name: Run Coverage
-      #   run: yarn coverage
+      #   run: npm run coverage
 
       # - name: Upload to coveralls
       #   uses: coverallsapp/github-action@v2.3.6
