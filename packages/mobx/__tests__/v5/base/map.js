@@ -700,6 +700,38 @@ test("issue 940, should not be possible to change maps outside strict mode", () 
     }
 })
 
+test("map getOrInsert", function () {
+    const names = map({ user1: "User 1" })
+
+    const values = []
+    const dispose = autorun(() => {
+        values.push(names.getOrInsert("user1", "User 2"))
+    })
+    names.set("user1", "Updated")
+    dispose()
+    expect(values).toEqual(["User 1", "Updated"])
+
+    expect(names.getOrInsert("user2", "User 2")).toBe("User 2")
+    expect(names.get("user2")).toBe("User 2")
+})
+
+test("map getOrInsertComputed", function () {
+    const names = map({ user1: "User 1" })
+    const getName = userId => "User " + userId.slice(4)
+
+    const values = []
+    const dispose = autorun(() => {
+        values.push(names.getOrInsertComputed("user1", getName))
+    })
+    names.set("user1", "Updated")
+    dispose()
+
+    expect(values).toEqual(["User 1", "Updated"])
+
+    expect(names.getOrInsertComputed("user2", getName)).toBe("User 2")
+    expect(names.get("user2")).toBe("User 2")
+})
+
 test("issue 1243, .replace should not trigger change on unchanged values", () => {
     const m = mobx.observable.map({ a: 1, b: 2, c: 3 })
 
