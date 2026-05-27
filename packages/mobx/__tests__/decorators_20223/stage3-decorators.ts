@@ -24,7 +24,7 @@ import {
     runInAction,
     makeObservable
 } from "../../src/mobx"
-import { type ObservableArrayAdministration } from "../../src/internal"
+import { $mobx, type ObservableArrayAdministration } from "../../src/internal"
 import * as mobx from "../../src/mobx"
 
 const testFunction = function (a: any) {}
@@ -1148,6 +1148,64 @@ test("#2159 - computed property keys", () => {
         "new string value", // new string
         "original string value" // original string
     ])
+})
+
+test("4616 - @computed decorator should be lazy", () => {
+    let computeCount = 0
+
+    class Order {
+        @observable accessor price: number = 3
+
+        @computed
+        get unused() {
+            computeCount++
+            return this.price * 2
+        }
+
+        @computed
+        get used() {
+            return this.price * 3
+        }
+    }
+
+    const o = new Order()
+    // Sanity check via public API: both should report as observable props
+    t.equal(isObservableProp(o, "unused"), true)
+    t.equal(isObservableProp(o, "used"), true)
+
+    // Internal check: ComputedValue is not yet allocated for either getter
+    const adm: any = (o as any)[$mobx]
+    expect(adm.values_.has("unused")).toBe(false)
+    expect(adm.values_.has("used")).toBe(false)
+    expect(adm.lazyComputedKeys_.has("unused")).toBe(true)
+    expect(adm.lazyComputedKeys_.has("used")).toBe(true)
+    expect(computeCount).toBe(0)
+
+    // First access materialises the ComputedValue
+    t.equal(o.used, 9)
+    expect(adm.values_.has("used")).toBe(true)
+    expect(adm.lazyComputedKeys_.has("used")).toBe(false)
+
+    // The unused computed remains lazy and never ran
+    expect(adm.values_.has("unused")).toBe(false)
+    expect(computeCount).toBe(0)
+})
+
+test("4616 - observe on @computed before first read materialises it", () => {
+    class Order {
+        @observable accessor price: number = 3
+
+        @computed
+        get total() {
+            return this.price * 2
+        }
+    }
+
+    const o = new Order()
+    const events: number[] = []
+    observe(o, "total", ev => events.push((ev as any).newValue))
+    o.price = 4
+    t.deepEqual(events, [8])
 })
 
 test(`decorated field can be inherited, but doesn't inherite the effect of decorator`, () => {

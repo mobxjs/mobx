@@ -54,17 +54,23 @@ function decorate_20223_(this: Annotation, get, context: ClassGetterDecoratorCon
     const ann = this
     const { name: key, addInitializer } = context
 
+    // Defer ComputedValue creation until first access — avoids allocating
+    // ComputedValues for getters that are never read on a given instance.
+    // The factory is materialised by ObservableObjectAdministration on demand.
     addInitializer(function () {
         const adm: ObservableObjectAdministration = asObservableObject(this)[$mobx]
-        const options = {
-            ...ann.options_,
-            get,
-            context: this
-        }
-        options.name ||= __DEV__
-            ? `${adm.name_}.${key.toString()}`
-            : `ObservableObject.${key.toString()}`
-        adm.values_.set(key, new ComputedValue(options))
+        const target = this
+        ;(adm.lazyComputedKeys_ ??= new Map()).set(key, () => {
+            const options = {
+                ...ann.options_,
+                get,
+                context: target
+            }
+            options.name ||= __DEV__
+                ? `${adm.name_}.${key.toString()}`
+                : `ObservableObject.${key.toString()}`
+            return new ComputedValue(options)
+        })
     })
 
     return function () {
