@@ -289,6 +289,20 @@ export class ObservableMap<K = any, V = any>
         return this.dehanceValue_(undefined)
     }
 
+    getOrInsert(key: K, value: V): V {
+        if (!this.has(key)) {
+            this.set(key, value)
+        }
+        return this.get(key)!
+    }
+
+    getOrInsertComputed(key: K, callback: (key: K) => V): V {
+        if (!this.has(key)) {
+            this.set(key, callback(key))
+        }
+        return this.get(key)!
+    }
+
     private dehanceValue_<X extends V | undefined>(value: X): X {
         if (this.dehancer !== undefined) {
             return this.dehancer(value)
