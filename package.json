@@ -2,9 +2,13 @@
     "name": "mobx-root",
     "private": true,
     "workspaces": [
-        "packages/*"
+        "packages/mobx",
+        "packages/mobx-react-lite",
+        "packages/mobx-react",
+        "packages/eslint-plugin-mobx",
+        "packages/mobx-undecorate"
     ],
-    "resolutions": {
+    "overrides": {
         "jest": "^30.3.0",
         "typescript": "^5.9.2",
         "recast": "^0.23.1"
@@ -14,21 +18,25 @@
         "url": "git+https://github.com/mobxjs/mobx.git"
     },
     "scripts": {
+        "build": "npm run build --workspaces --if-present",
+        "build:check": "npm run build:check --workspaces --if-present",
+        "build:test": "npm run build:test --workspaces --if-present",
         "test": "jest",
         "coverage": "jest --coverage",
         "lint": "eslint packages/*/src/**/* --ext .js,.ts,.tsx",
         "prettier": "prettier --write **/*.{js,ts,md}",
-        "release": "lerna run prepublishOnly && changeset publish",
-        "mobx": "yarn workspace mobx",
-        "mobx-react": "yarn workspace mobx-react",
-        "mobx-react-lite": "yarn workspace mobx-react-lite",
-        "mobx-undecorate": "yarn workspace mobx-undecorate",
-        "eslint-plugin-mobx": "yarn workspace eslint-plugin-mobx",
-        "docs:build": "yarn --cwd website build",
-        "docs:start": "yarn --cwd website start",
-        "docs:publish": "yarn --cwd website publish-gh-pages",
-        "prepare": "yarn dedup && yarn --cwd website install",
-        "dedup": "npx yarn-deduplicate --strategy fewer yarn.lock"
+        "release": "npm run prepublishOnly --workspaces --if-present && changeset publish",
+        "test:size": "npm run test:size --workspaces --if-present",
+        "mobx": "npm -w mobx run",
+        "mobx-react": "npm -w mobx-react run",
+        "mobx-react-lite": "npm -w mobx-react-lite run",
+        "mobx-undecorate": "npm -w mobx-undecorate run",
+        "eslint-plugin-mobx": "npm -w eslint-plugin-mobx run",
+        "docs:build": "npm --prefix website run build",
+        "docs:start": "npm --prefix website run start",
+        "docs:publish": "npm --prefix website run publish-gh-pages",
+        "prepare": "npm install --prefix website",
+        "dedup": "npm dedupe"
     },
     "devDependencies": {
         "@changesets/changelog-github": "^0.2.7",
@@ -53,7 +61,6 @@
         "jest": "^30.3.0",
         "jest-environment-jsdom": "^30.3.0",
         "jest-mock-console": "^1.0.1",
-        "lerna": "^3.22.1",
         "lint-staged": "^10.1.7",
         "lodash": "^4.17.4",
         "minimist": "^1.2.5",
@@ -61,9 +68,9 @@
         "prettier": "^2.8.4",
         "pretty-quick": "3.1.0",
         "prop-types": "15.6.2",
-        "react": "^19.0.0",
-        "react-dom": "^19.0.0",
-        "react-test-renderer": "^18.0.0",
+        "react": "19.0.0",
+        "react-dom": "19.0.0",
+        "react-test-renderer": "19.0.0",
         "serializr": "^2.0.3",
         "tape": "^5.0.1",
         "ts-jest": "^29.4.6",
@@ -74,6 +81,5 @@
         "hooks": {
             "pre-commit": "pretty-quick --staged"
         }
-    },
-    "packageManager": "yarn@1.22.21+sha1.1959a18351b811cdeedbd484a8f86c3cc3bbaf72"
+    }
 }
