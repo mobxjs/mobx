@@ -22,7 +22,11 @@ function _isObservable(value, property?: PropertyKey): boolean {
         }
         if (isObservableObject(value)) {
             const adm = value[$mobx]
-            return adm.values_.has(property) || !!adm.lazyComputedKeys_?.has(property)
+            return (
+                adm.values_.has(property) ||
+                !!adm.lazyComputedKeys_?.has(property) ||
+                !!adm.lazyObservableKeys_?.has(property)
+            )
         }
         return false
     }

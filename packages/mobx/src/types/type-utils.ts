@@ -48,7 +48,10 @@ export function getAtom(thing: any, property?: PropertyKey): IDepTreeNode {
                 return die(26)
             }
             const adm = (thing as any)[$mobx]
-            const observable = adm.values_.get(property) ?? adm.materializeLazyComputed_(property)
+            const observable =
+                adm.values_.get(property) ??
+                adm.materializeLazyComputed_(property) ??
+                adm.materializeLazyObservable_(property)
             if (!observable) {
                 die(27, property, getDebugName(thing))
             }
