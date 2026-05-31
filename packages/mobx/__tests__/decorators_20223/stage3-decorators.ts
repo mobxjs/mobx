@@ -22,7 +22,8 @@ import {
     IAtom,
     createAtom,
     runInAction,
-    makeObservable
+    makeObservable,
+    isComputedProp
 } from "../../src/mobx"
 import { $mobx, type ObservableArrayAdministration } from "../../src/internal"
 import * as mobx from "../../src/mobx"
@@ -1189,6 +1190,19 @@ test("4616 - @computed decorator should be lazy", () => {
     // The unused computed remains lazy and never ran
     expect(adm.values_.has("unused")).toBe(false)
     expect(computeCount).toBe(0)
+})
+
+test("4616 - isComputedProp reports lazy @computed before first read", () => {
+    class Order {
+        @computed
+        get total() {
+            return 3
+        }
+    }
+
+    const o = new Order()
+
+    t.equal(isComputedProp(o, "total"), true)
 })
 
 test("4616 - observe on @computed before first read materialises it", () => {
