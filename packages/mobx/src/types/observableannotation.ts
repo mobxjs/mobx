@@ -64,51 +64,45 @@ function decorate_20223_(
     const ann = this
     const { kind, name } = context
 
-    // The laziness here is not ideal... It's a workaround to how 2022.3 Decorators are implemented:
-    //   `addInitializer` callbacks are executed _before_ any accessors are defined (instead of the ideal-for-us right after each).
-    //   This means that, if we were to do our stuff in an `addInitializer`, we'd attempt to read a private slot
-    //   before it has been initialized. The runtime doesn't like that and throws a `Cannot read private member
-    //   from an object whose class did not declare it` error.
-    // TODO: it seems that this will not be required anymore in the final version of the spec
-    // See TODO: link
-    const initializedObjects = new WeakSet()
-
-    function initializeObservable(target, value) {
-        const adm: ObservableObjectAdministration = asObservableObject(target)[$mobx]
-        const observable = new ObservableValue(
-            value,
-            ann.options_?.enhancer ?? deepEnhancer,
-            __DEV__ ? `${adm.name_}.${name.toString()}` : `ObservableObject.${name.toString()}`,
-            false
-        )
-        adm.values_.set(name, observable)
-        initializedObjects.add(target)
+    if (kind !== "accessor") {
+        return
     }
 
-    if (kind == "accessor") {
-        return {
-            get() {
-                if (!initializedObjects.has(this)) {
-                    initializeObservable(this, desc.get.call(this))
-                }
-                return this[$mobx].getObservablePropValue_(name)
-            },
-            set(value) {
-                if (!initializedObjects.has(this)) {
-                    initializeObservable(this, value)
-                }
-                return this[$mobx].setObservablePropValue_(name, value)
-            },
-            init(value) {
-                if (!initializedObjects.has(this)) {
-                    initializeObservable(this, value)
-                }
-                return value
-            }
+    // Defer ObservableValue construction until first access. The factory is
+    // materialised by ObservableObjectAdministration on demand, so unused
+    // fields on wide classes never pay the per-instance allocation cost.
+    function registerLazy(target: any, value: any): ObservableObjectAdministration {
+        const adm: ObservableObjectAdministration = asObservableObject(target)[$mobx]
+        ;(adm.lazyObservableKeys_ ??= new Map()).set(
+            name,
+            () =>
+                new ObservableValue(
+                    value,
+                    ann.options_?.enhancer ?? deepEnhancer,
+                    __DEV__
+                        ? `${adm.name_}.${name.toString()}`
+                        : `ObservableObject.${name.toString()}`,
+                    false
+                )
+        )
+        return adm
+    }
+
+    return {
+        get() {
+            const adm: ObservableObjectAdministration =
+                this[$mobx] ?? registerLazy(this, desc.get.call(this))
+            return adm.getObservablePropValue_(name)
+        },
+        set(value) {
+            const adm: ObservableObjectAdministration = this[$mobx] ?? registerLazy(this, value)
+            return adm.setObservablePropValue_(name, value)
+        },
+        init(value) {
+            registerLazy(this, value)
+            return value
         }
     }
-
-    return
 }
 
 function assertObservableDescriptor(

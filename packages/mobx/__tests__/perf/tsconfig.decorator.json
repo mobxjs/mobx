@@ -11,5 +11,5 @@
         "outDir": "./compiled",
         "rootDir": "./"
     },
-    "include": ["./lazy-computed-decorator.ts"]
+    "include": ["./lazy-computed-decorator.ts", "./lazy-observable-decorator.ts"]
 }

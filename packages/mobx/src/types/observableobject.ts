@@ -99,6 +99,7 @@ export class ObservableObjectAdministration
     appliedAnnotations_?: object
     private pendingKeys_: undefined | Map<PropertyKey, ObservableValue<boolean>>
     lazyComputedKeys_: undefined | Map<PropertyKey, () => ComputedValue<any>>
+    lazyObservableKeys_: undefined | Map<PropertyKey, () => ObservableValue<any>>
 
     constructor(
         public target_: any,
@@ -120,8 +121,11 @@ export class ObservableObjectAdministration
     }
 
     getObservablePropValue_(key: PropertyKey): any {
-        // Hot path: single map lookup. Lazy computeds (rare) take the materialise branch.
-        const observable = this.values_.get(key) ?? this.materializeLazyComputed_(key)
+        // Hot path: single map lookup. Lazy entries (rare) take the materialise branch.
+        const observable =
+            this.values_.get(key) ??
+            this.materializeLazyComputed_(key) ??
+            this.materializeLazyObservable_(key)
         return observable!.get()
     }
 
@@ -131,13 +135,33 @@ export class ObservableObjectAdministration
             return undefined
         }
         this.lazyComputedKeys_!.delete(key)
+        if (this.lazyComputedKeys_!.size === 0) {
+            this.lazyComputedKeys_ = undefined
+        }
         const computed = factory()
         this.values_.set(key, computed)
         return computed
     }
 
+    materializeLazyObservable_(key: PropertyKey): ObservableValue<any> | undefined {
+        const factory = this.lazyObservableKeys_?.get(key)
+        if (!factory) {
+            return undefined
+        }
+        this.lazyObservableKeys_!.delete(key)
+        if (this.lazyObservableKeys_!.size === 0) {
+            this.lazyObservableKeys_ = undefined
+        }
+        const observable = factory()
+        this.values_.set(key, observable)
+        return observable
+    }
+
     setObservablePropValue_(key: PropertyKey, newValue): boolean | null {
-        const observable = this.values_.get(key) ?? this.materializeLazyComputed_(key)
+        const observable =
+            this.values_.get(key) ??
+            this.materializeLazyComputed_(key) ??
+            this.materializeLazyObservable_(key)
         if (observable instanceof ComputedValue) {
             observable.set(newValue)
             return true

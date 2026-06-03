@@ -1006,9 +1006,10 @@ test("multiple inheritance should work", () => {
         }
     }
 
-    const obsvKeys = [
-        ...(mobx._getAdministration(new B()) as ObservableArrayAdministration).values_.keys()
-    ]
+    const adm = mobx._getAdministration(new B()) as any
+    // @observable accessor is lazy (#4616 follow-up), so unread fields live in
+    // `lazyObservableKeys_` until first read. Union with `values_` to see them all.
+    const obsvKeys = [...adm.values_.keys(), ...(adm.lazyObservableKeys_?.keys() ?? [])].sort()
     expect(obsvKeys).toEqual(["x", "y"])
 })
 
@@ -1220,6 +1221,81 @@ test("4616 - observe on @computed before first read materialises it", () => {
     observe(o, "total", ev => events.push((ev as any).newValue))
     o.price = 4
     t.deepEqual(events, [8])
+})
+
+test("4616 - @observable accessor should be lazy", () => {
+    class Wide {
+        @observable accessor unused: number = 1
+        @observable accessor used: number = 2
+    }
+
+    const o = new Wide()
+    // Public API: both should report as observable props
+    t.equal(isObservableProp(o, "unused"), true)
+    t.equal(isObservableProp(o, "used"), true)
+
+    // Internal check: ObservableValue is not yet allocated for either field
+    const adm: any = (o as any)[$mobx]
+    expect(adm.values_.has("unused")).toBe(false)
+    expect(adm.values_.has("used")).toBe(false)
+    expect(adm.lazyObservableKeys_.has("unused")).toBe(true)
+    expect(adm.lazyObservableKeys_.has("used")).toBe(true)
+
+    // First access materialises the ObservableValue
+    t.equal(o.used, 2)
+    expect(adm.values_.has("used")).toBe(true)
+    expect(adm.lazyObservableKeys_.has("used")).toBe(false)
+
+    // The unused field remains lazy
+    expect(adm.values_.has("unused")).toBe(false)
+    expect(adm.lazyObservableKeys_.has("unused")).toBe(true)
+})
+
+test("4616 - observe on @observable accessor before first read materialises it", () => {
+    class Counter {
+        @observable accessor count: number = 0
+    }
+
+    const o = new Counter()
+    const adm: any = (o as any)[$mobx]
+    expect(adm.values_.has("count")).toBe(false)
+
+    const events: number[] = []
+    observe(o, "count", ev => events.push((ev as any).newValue))
+    // observe should have materialised the ObservableValue
+    expect(adm.values_.has("count")).toBe(true)
+
+    o.count = 5
+    o.count = 7
+    t.deepEqual(events, [5, 7])
+})
+
+test("4616 - set on @observable accessor before first read materialises it", () => {
+    class Counter {
+        @observable accessor count: number = 0
+    }
+
+    const o = new Counter()
+    const adm: any = (o as any)[$mobx]
+    expect(adm.values_.has("count")).toBe(false)
+
+    o.count = 42
+    expect(adm.values_.has("count")).toBe(true)
+    t.equal(o.count, 42)
+})
+
+test("4616 - autorun reacts to @observable accessor that is lazy on entry", () => {
+    class Counter {
+        @observable accessor count: number = 0
+    }
+
+    const o = new Counter()
+    const seen: number[] = []
+    const dispose = autorun(() => seen.push(o.count))
+    o.count = 1
+    o.count = 2
+    dispose()
+    t.deepEqual(seen, [0, 1, 2])
 })
 
 test(`decorated field can be inherited, but doesn't inherite the effect of decorator`, () => {
