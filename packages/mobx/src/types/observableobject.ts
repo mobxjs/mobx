@@ -135,6 +135,9 @@ export class ObservableObjectAdministration
             return undefined
         }
         this.lazyComputedKeys_!.delete(key)
+        if (this.lazyComputedKeys_!.size === 0) {
+            this.lazyComputedKeys_ = undefined
+        }
         const computed = factory()
         this.values_.set(key, computed)
         return computed
@@ -146,6 +149,9 @@ export class ObservableObjectAdministration
             return undefined
         }
         this.lazyObservableKeys_!.delete(key)
+        if (this.lazyObservableKeys_!.size === 0) {
+            this.lazyObservableKeys_ = undefined
+        }
         const observable = factory()
         this.values_.set(key, observable)
         return observable
