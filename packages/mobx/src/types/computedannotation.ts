@@ -60,6 +60,12 @@ function decorate_20223_(this: Annotation, get, context: ClassGetterDecoratorCon
     addInitializer(function () {
         const adm: ObservableObjectAdministration = asObservableObject(this)[$mobx]
         const target = this
+        // A base class `makeObservable(this, { [key]: computed })` running in super()
+        // may have already created a ComputedValue from *this* decorator's replacement
+        // getter (which just calls getObservablePropValue_(key)) — a self-referential
+        // cycle. Drop that stale entry so our lazy factory (built from the original
+        // getter) wins on first access. See #4660.
+        adm.values_.delete(key)
         ;(adm.lazyComputedKeys_ ??= new Map()).set(key, () => {
             const options = {
                 ...ann.options_,

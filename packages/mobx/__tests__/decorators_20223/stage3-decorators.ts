@@ -1319,3 +1319,59 @@ test(`decorated field can be inherited, but doesn't inherite the effect of decor
     const subStore = new SubStore()
     expect(isAction(subStore.action)).toBe(false)
 })
+
+test("issue 4660 - @computed override of a base makeObservable computed doesn't cycle", () => {
+    class Base {
+        _value = false
+        get value() {
+            return this._value
+        }
+        constructor() {
+            makeObservable(this, { _value: observable, value: computed })
+        }
+    }
+
+    class Child extends Base {
+        @computed
+        override get value() {
+            return super.value
+        }
+    }
+
+    const child = new Child()
+    // Used to throw "[MobX] Cycle detected in computation": base makeObservable
+    // built a ComputedValue from the child's @computed replacement getter.
+    expect(child.value).toBe(false)
+    child._value = true
+    expect(child.value).toBe(true)
+})
+
+test("issue 4660 - three-level inheritance with intermediate plain override", () => {
+    class ViewModelBase {
+        _mounted = false
+        get isMounted() {
+            return this._mounted
+        }
+        constructor() {
+            makeObservable(this, { _mounted: observable, isMounted: computed })
+        }
+    }
+
+    class RouteViewModel extends ViewModelBase {
+        override get isMounted() {
+            return super.isMounted
+        }
+    }
+
+    class ProductsPageVM extends RouteViewModel {
+        @computed
+        override get isMounted() {
+            return super.isMounted
+        }
+    }
+
+    const vm = new ProductsPageVM()
+    expect(vm.isMounted).toBe(false)
+    vm._mounted = true
+    expect(vm.isMounted).toBe(true)
+})
