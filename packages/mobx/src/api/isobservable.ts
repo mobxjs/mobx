@@ -24,6 +24,8 @@ function _isObservable(value, property?: PropertyKey): boolean {
             const adm = value[$mobx]
             return (
                 adm.values_.has(property) ||
+                !!adm.computedEntries_?.has(property) ||
+                !!adm.computedGetterEntries_?.size ||
                 !!adm.lazyComputedKeys_?.has(property) ||
                 !!adm.lazyObservableKeys_?.has(property)
             )

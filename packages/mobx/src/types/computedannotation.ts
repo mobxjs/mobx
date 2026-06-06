@@ -54,24 +54,81 @@ function decorate_20223_(this: Annotation, get, context: ClassGetterDecoratorCon
     const ann = this
     const { name: key, addInitializer } = context
 
-    // Defer ComputedValue creation until first access — avoids allocating
-    // ComputedValues for getters that are never read on a given instance.
-    // The factory is materialised by ObservableObjectAdministration on demand.
     addInitializer(function () {
         const adm: ObservableObjectAdministration = asObservableObject(this)[$mobx]
         const target = this
-        ;(adm.lazyComputedKeys_ ??= new Map()).set(key, () => {
+
+        const factory = (): ComputedValue<any> => {
             const options = {
                 ...ann.options_,
                 get,
                 context: target
             }
+
             options.name ||= __DEV__
                 ? `${adm.name_}.${key.toString()}`
                 : `ObservableObject.${key.toString()}`
-            return new ComputedValue(options)
-        })
+
+            const cv = new ComputedValue(options)
+
+            if (!adm.values_.has(key)) {
+                adm.values_.set(key, cv)
+            }
+            adm.computedEntries_?.set(key, cv)
+            if (adm.computedGetterEntries_) {
+                adm.computedGetterEntries_.set(get, cv)
+            }
+
+            return cv
+        }
+        // Check if a parent class already registered a computed for this key (inheritance)
+        const lazyMap = adm.lazyComputedKeys_
+        const existing = lazyMap
+            ? (lazyMap.get(key) as (() => ComputedValue<any>) | undefined) ??
+              (adm.computedEntries_?.get(key) as (() => ComputedValue<any>) | undefined)
+            : (adm.computedEntries_?.get(key) as (() => ComputedValue<any>) | undefined)
+        if (existing && typeof existing === "function") {
+            // Inheritance detected → find parent's getter from prototype chain
+            let parentGet: Function | undefined
+            let proto = Object.getPrototypeOf(target)
+            // Skip prototypes until we find our own replacement getter
+            while (proto && proto !== Object.prototype) {
+                const desc = Object.getOwnPropertyDescriptor(proto, key)
+                if (desc?.get && (desc.get as any).__mobx_get === get) {
+                    proto = Object.getPrototypeOf(proto)
+                    break
+                }
+                proto = Object.getPrototypeOf(proto)
+            }
+            // Now find the parent's replacement getter
+            while (proto && proto !== Object.prototype) {
+                const desc = Object.getOwnPropertyDescriptor(proto, key)
+                if (desc?.get && (desc.get as any).__mobx_get) {
+                    parentGet = (desc.get as any).__mobx_get
+                    break
+                }
+                proto = Object.getPrototypeOf(proto)
+            }
+            if (parentGet) {
+                ;(adm.computedGetterEntries_ ??= new Map()).set(parentGet, existing)
+            }
+            // Remove parent's entry from lazyComputedKeys_ (now in computedGetterEntries_)
+            adm.lazyComputedKeys_?.delete(key)
+            ;(adm.computedEntries_ ??= new Map()).set(key, factory)
+        } else {
+            // Common case (no inheritance) → use lazyComputedKeys_ (like main branch)
+            ;(adm.lazyComputedKeys_ ??= new Map()).set(key, factory)
+        }
     })
+
+    if (typeof get === "function") {
+        const replacementGetter = function () {
+            return this[$mobx].readComputed_(key, get)
+        }
+        // Store original getter for child class inheritance detection
+        ;(replacementGetter as any).__mobx_get = get
+        return replacementGetter
+    }
 
     return function () {
         return this[$mobx].getObservablePropValue_(key)
