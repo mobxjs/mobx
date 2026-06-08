@@ -1,5 +1,13 @@
 # mobx
 
+## 6.16.1
+
+### Patch Changes
+
+-   [`7fd93348e81f484c4ec2dcca8cde5fa6ed7412fe`](https://github.com/mobxjs/mobx/commit/7fd93348e81f484c4ec2dcca8cde5fa6ed7412fe) [#4661](https://github.com/mobxjs/mobx/pull/4661) Thanks [@js2me](https://github.com/js2me)! - Fix Stage 3 `@computed` overrides that delegate to a same-named parent getter via `super`.
+
+-   [`02afa5b6c33441737df81d344161a03bb9aea0c8`](https://github.com/mobxjs/mobx/commit/02afa5b6c33441737df81d344161a03bb9aea0c8) [#4666](https://github.com/mobxjs/mobx/pull/4666) Thanks [@kubk](https://github.com/kubk)! - Remove outdated Flow typechecker support artifacts from the package.
+
 ## 6.16.0
 
 ### Minor Changes
