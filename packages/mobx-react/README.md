@@ -17,7 +17,8 @@ Only the latest version is actively maintained. If you're missing a fix or a fea
 
 | NPM Version | Support MobX version | Supported React versions | Added support for:                                                               |
 | ----------- | -------------------- | ------------------------ | -------------------------------------------------------------------------------- |
-| v9          | 6.\*                 | >16.8                    | Hooks, React 18.2 in strict mode                                                 |
+| v10         | 6.\*                 | >19                      | React 19                                                                         |
+| v9          | 6.\*                 | >16.8 < 19               | Hooks, React 18.2 in strict mode                                                 |
 | v7          | 6.\*                 | >16.8 < 18.2             | Hooks                                                                            |
 | v6          | 4.\* / 5.\*          | >16.8 <17                | Hooks                                                                            |
 | v5          | 4.\* / 5.\*          | >0.13 <17                | No, but it is possible to use `<Observer>` sections inside hook based components |
@@ -26,7 +27,6 @@ mobx-react 6 / 7 is a repackage of the smaller [mobx-react-lite](https://github.
 
 -   Support for class based components for `observer` and `@observer`
 -   `Provider / inject` to pass stores around (but consider to use `React.createContext` instead)
--   `PropTypes` to describe observable based property checkers (but consider to use TypeScript instead)
 -   The `disposeOnUnmount` utility / decorator to easily clean up resources such as reactions created in your class based components.
 
 ## Installation
@@ -286,20 +286,6 @@ Decorators are currently a stage-2 ESNext feature. How to enable them is documen
 
 See this [thread](https://www.reddit.com/r/reactjs/comments/4vnxg5/free_eggheadio_course_learn_mobx_react_in_30/d61oh0l).
 TL;DR: the conceptual distinction makes a lot of sense when using MobX as well, but use `observer` on all components.
-
-### `PropTypes`
-
-MobX-react provides the following additional `PropTypes` which can be used to validate against MobX structures:
-
--   `observableArray`
--   `observableArrayOf(React.PropTypes.number)`
--   `observableMap`
--   `observableObject`
--   `arrayOrObservableArray`
--   `arrayOrObservableArrayOf(React.PropTypes.number)`
--   `objectOrObservableObject`
-
-Use `import { PropTypes } from "mobx-react"` to import them, then use for example `PropTypes.observableArray`
 
 ### `Provider` and `inject`
 
