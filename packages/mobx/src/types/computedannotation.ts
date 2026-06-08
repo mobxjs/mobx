@@ -53,28 +53,45 @@ function decorate_20223_(this: Annotation, get, context: ClassGetterDecoratorCon
     }
     const ann = this
     const { name: key, addInitializer } = context
+    let computedValues: WeakMap<object, ComputedValue<any>> | undefined
 
     // Defer ComputedValue creation until first access — avoids allocating
     // ComputedValues for getters that are never read on a given instance.
     // The factory is materialised by ObservableObjectAdministration on demand.
+    function createComputedValue(target: object, adm: ObservableObjectAdministration) {
+        const options = {
+            ...ann.options_,
+            get,
+            context: target
+        }
+        options.name ||= __DEV__
+            ? `${adm.name_}.${key.toString()}`
+            : `ObservableObject.${key.toString()}`
+        return new ComputedValue(options)
+    }
+
     addInitializer(function () {
         const adm: ObservableObjectAdministration = asObservableObject(this)[$mobx]
-        const target = this
-        ;(adm.lazyComputedKeys_ ??= new Map()).set(key, () => {
-            const options = {
-                ...ann.options_,
-                get,
-                context: target
-            }
-            options.name ||= __DEV__
-                ? `${adm.name_}.${key.toString()}`
-                : `ObservableObject.${key.toString()}`
-            return new ComputedValue(options)
-        })
+        const target = this as object
+        const observable = adm.values_.get(key)
+        if (observable instanceof ComputedValue && observable.derivation !== get) {
+            adm.values_.delete(key)
+        }
+        ;(adm.lazyComputedKeys_ ??= new Map()).set(key, () => createComputedValue(target, adm))
     })
 
     return function () {
-        return this[$mobx].getObservablePropValue_(key)
+        const adm: ObservableObjectAdministration = this[$mobx]
+        const observable = adm.values_.get(key)
+        if (observable instanceof ComputedValue && observable.derivation !== get) {
+            let computed = computedValues?.get(this)
+            if (!computed) {
+                computed = createComputedValue(this, adm)
+                ;(computedValues ??= new WeakMap()).set(this, computed)
+            }
+            return computed.get()
+        }
+        return adm.getObservablePropValue_(key)
     }
 }
 

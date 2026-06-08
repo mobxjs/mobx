@@ -8,10 +8,13 @@ hide_title: true
 
 # Subclassing
 
-Subclassing is supported with [limitations](#limitations). Most notably you can only **override actions/flows/computeds on prototype** - you cannot override _[field declarations](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes#field_declarations)_. Use the `override` annotation for methods/getters overridden in a subclass - see example below. Try to keep things simple and prefer composition over inheritance.
+Subclassing is supported with [limitations](#limitations). Most notably you can only **override actions/flows/computeds on prototype** - you cannot override _[field declarations](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes#field_declarations)_. When using `makeObservable`, use the `override` annotation for methods/getters overridden in a subclass. When using modern decorators, redecorate the overridden prototype method/getter in the subclass. Try to keep things simple and prefer composition over inheritance.
+
+<!--DOCUSAURUS_CODE_TABS-->
+<!--makeObservable-->
 
 ```javascript
-import { makeObservable, observable, computed, action, override } from "mobx"
+import { makeObservable, observable, computed, action, flow, override } from "mobx"
 
 class Parent {
     // Annotated instance fields are NOT overridable
@@ -25,14 +28,16 @@ class Parent {
     action() {}
     actionBound() {}
     get computed() {}
+    *flow() {}
 
     constructor(value) {
         makeObservable(this, {
             observable: observable,
-            arrowAction: action
+            arrowAction: action,
             action: action,
             actionBound: action.bound,
             computed: computed,
+            flow: flow
         })
     }
 }
@@ -50,13 +55,15 @@ class Child extends Parent {
     action() {}
     actionBound() {}
     get computed() {}
+    *flow() {}
 
     /* --- NEW --- */
-    childObservable = 0;
+    childObservable = 0
     childArrowAction = () => {}
     childAction() {}
     childActionBound() {}
     get childComputed() {}
+    *childFlow() {}
 
     constructor(value) {
         super()
@@ -65,16 +72,72 @@ class Child extends Parent {
             action: override,
             actionBound: override,
             computed: override,
+            flow: override,
             // new
             childObservable: observable,
             childArrowAction: action,
             childAction: action,
             childActionBound: action.bound,
             childComputed: computed,
+            childFlow: flow
         })
     }
 }
 ```
+
+<!--Modern decorators-->
+
+```javascript
+import { observable, computed, action, flow } from "mobx"
+
+class Parent {
+    // Observable state fields are inherited, but should not be re-annotated
+    // or overridden by subclasses.
+    @observable accessor observable = 0
+
+    // Decorated instance fields should not be re-annotated or overridden.
+    @action arrowAction = () => {}
+
+    // Non-decorated instance fields are overridable.
+    overridableArrowAction = action(() => {})
+
+    // Decorated prototype methods/getters are overridable.
+    @action action() {}
+    @action.bound actionBound() {}
+    @computed get computed() {}
+    @flow *flow() {}
+}
+
+class Child extends Parent {
+    /* --- INHERITED --- */
+    // Unsupported: do not re-annotate or override observable/accessor fields.
+    // @observable accessor observable = 5
+    // @action arrowAction = () => {}
+
+    // OK - not decorated
+    overridableArrowAction = action(() => {})
+
+    // OK - prototype
+    @action action() {}
+    @action.bound actionBound() {}
+    @computed get computed() {
+        return super.computed
+    }
+    @flow *flow() {
+        return yield super.flow()
+    }
+
+    /* --- NEW --- */
+    @observable accessor childObservable = 0
+    @action childArrowAction = () => {}
+    @action childAction() {}
+    @action.bound childActionBound() {}
+    @computed get childComputed() {}
+    @flow *childFlow() {}
+}
+```
+
+<!--END_DOCUSAURUS_CODE_TABS-->
 
 ## Limitations
 
