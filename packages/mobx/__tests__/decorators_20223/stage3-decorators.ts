@@ -1179,19 +1179,14 @@ test("4616 - @computed decorator should be lazy", () => {
     const adm: any = (o as any)[$mobx]
     expect(adm.values_.has("unused")).toBe(false)
     expect(adm.values_.has("used")).toBe(false)
-    expect(!!adm.computedEntries_?.has("unused") || !!adm.lazyComputedKeys_?.has("unused")).toBe(
-        true
-    )
-    expect(!!adm.computedEntries_?.has("used") || !!adm.lazyComputedKeys_?.has("used")).toBe(true)
+    expect(adm.lazyComputedKeys_.has("unused")).toBe(true)
+    expect(adm.lazyComputedKeys_.has("used")).toBe(true)
     expect(computeCount).toBe(0)
 
     // First access materialises the ComputedValue
     t.equal(o.used, 9)
     expect(adm.values_.has("used")).toBe(true)
-    // After materialization, factory is replaced with ComputedValue in computedEntries_
-    // or removed from lazyComputedKeys_ (depending on inheritance)
-    const usedEntry = adm.computedEntries_?.get("used") ?? adm.values_.get("used")
-    expect(typeof usedEntry === "function" ? false : true).toBe(true)
+    expect(adm.lazyComputedKeys_.has("used")).toBe(false)
 
     // The unused computed remains lazy and never ran
     expect(adm.values_.has("unused")).toBe(false)
@@ -1323,140 +1318,4 @@ test(`decorated field can be inherited, but doesn't inherite the effect of decor
 
     const subStore = new SubStore()
     expect(isAction(subStore.action)).toBe(false)
-})
-
-test("4639 - @computed override with makeObservable in parent does not create cycle", () => {
-    class Base {
-        _value = false
-
-        get value() {
-            return this._value
-        }
-
-        constructor() {
-            makeObservable(this, {
-                _value: observable,
-                value: computed
-            })
-        }
-    }
-
-    class Child extends Base {
-        @computed
-        override get value() {
-            return super.value
-        }
-    }
-
-    const child = new Child()
-    expect(child.value).toBe(false)
-
-    // Verify reactivity
-    child._value = true
-    expect(child.value).toBe(true)
-})
-
-test("4639 - @computed override with makeObservable and intermediate class", () => {
-    class Base {
-        _isMounted = false
-
-        get isMounted() {
-            return this._isMounted
-        }
-
-        constructor() {
-            makeObservable(this, {
-                _isMounted: observable,
-                isMounted: computed
-            })
-        }
-    }
-
-    class Middle extends Base {
-        override get isMounted() {
-            return super.isMounted && true
-        }
-    }
-
-    class Child extends Middle {
-        @computed
-        override get isMounted() {
-            return super.isMounted
-        }
-    }
-
-    const child = new Child()
-    expect(child.isMounted).toBe(false)
-
-    child._isMounted = true
-    expect(child.isMounted).toBe(true)
-})
-
-test("4639 - @computed override with @computed parent", () => {
-    class Parent {
-        @observable accessor _value = false
-
-        @computed
-        get value() {
-            return this._value
-        }
-    }
-
-    class Child extends Parent {
-        @computed
-        override get value() {
-            return super.value
-        }
-    }
-
-    const child = new Child()
-    expect(child.value).toBe(false)
-
-    child._value = true
-    expect(child.value).toBe(true)
-})
-
-test("4639 - @computed override with super.value + 1", () => {
-    class Parent {
-        @computed
-        get number() {
-            return 1
-        }
-    }
-
-    class Child extends Parent {
-        @computed
-        override get number() {
-            return super.number + 1
-        }
-    }
-
-    const child = new Child()
-    expect(child.number).toBe(2)
-})
-
-test("4639 - three levels of @computed inheritance", () => {
-    class GrandParent {
-        @computed
-        get number() {
-            return 1
-        }
-    }
-
-    class Parent extends GrandParent {
-        @computed
-        override get number() {
-            return super.number + 1
-        }
-    }
-
-    class Child extends Parent {
-        @computed
-        override get number() {
-            return super.number + 1
-        }
-    }
-
-    const child = new Child()
-    expect(child.number).toBe(3)
 })

@@ -83,7 +83,7 @@ class Child extends Parent {
 1. `makeAutoObservable` does not support subclassing.
 1. Extending builtins (`ObservableMap`, `ObservableArray`, etc) is not supported.
 1. You can't provide different options to `makeObservable` in subclass.
-1. Mixing annotations (`makeObservable`) and decorators (`@computed` etc.) in a single inheritance chain is not recommended.
+1. You can't mix annotations/decorators in single inheritance chain.
 1. [All other limitations apply as well](observable-state.md#limitations)
 
 ### `TypeError: Cannot redefine property`

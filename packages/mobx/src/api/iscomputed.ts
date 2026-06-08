@@ -8,19 +8,8 @@ export function _isComputed(value, property?: PropertyKey): boolean {
         return false
     }
     const adm = value[$mobx]
-    if (adm.computedEntries_?.has(property)) {
-        return true
-    }
     if (adm.lazyComputedKeys_?.has(property)) {
         return true
-    }
-    if (adm.computedGetterEntries_) {
-        for (const value of adm.computedGetterEntries_.values()) {
-            if (typeof value === "function") {
-                // Lazy parent factory — still counts as computed
-                return true
-            }
-        }
     }
     if (!adm.values_.has(property)) {
         return false

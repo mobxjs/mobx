@@ -98,8 +98,6 @@ export class ObservableObjectAdministration
     isPlainObject_: boolean
     appliedAnnotations_?: object
     private pendingKeys_: undefined | Map<PropertyKey, ObservableValue<boolean>>
-    computedEntries_: undefined | Map<PropertyKey, (() => ComputedValue<any>) | ComputedValue<any>>
-    computedGetterEntries_?: Map<Function, (() => ComputedValue<any>) | ComputedValue<any>>
     lazyComputedKeys_: undefined | Map<PropertyKey, () => ComputedValue<any>>
     lazyObservableKeys_: undefined | Map<PropertyKey, () => ObservableValue<any>>
 
@@ -123,6 +121,7 @@ export class ObservableObjectAdministration
     }
 
     getObservablePropValue_(key: PropertyKey): any {
+        // Hot path: single map lookup. Lazy entries (rare) take the materialise branch.
         const observable =
             this.values_.get(key) ??
             this.materializeLazyComputed_(key) ??
@@ -130,49 +129,18 @@ export class ObservableObjectAdministration
         return observable!.get()
     }
 
-    readComputed_(key: PropertyKey, expectedGet: Function): any {
-        const observable = this.values_.get(key)
-        if (observable) {
-            if ((observable as ComputedValue<any>).derivation === expectedGet) {
-                return observable.get()
-            }
-            // derivation mismatch → super call; look up by getter function
-            const entry = this.computedGetterEntries_?.get(expectedGet)
-            if (entry) {
-                const cv = typeof entry === "function" ? entry() : entry
-                if (typeof entry === "function") {
-                    this.computedGetterEntries_!.set(expectedGet, cv)
-                }
-                return cv.get()
-            }
-        }
-        const computed = this.materializeLazyComputed_(key) ?? this.materializeLazyObservable_(key)
-        return computed!.get()
-    }
-
-    materializeLazyComputed_(
-        key: PropertyKey
-    ): ComputedValue<any> | ObservableValue<any> | undefined {
-        // Check lazyComputedKeys_ first (common case, like main branch)
+    materializeLazyComputed_(key: PropertyKey): ComputedValue<any> | undefined {
         const factory = this.lazyComputedKeys_?.get(key)
-        if (factory) {
-            this.lazyComputedKeys_!.delete(key)
-            if (this.lazyComputedKeys_!.size === 0) {
-                this.lazyComputedKeys_ = undefined
-            }
-            const cv = factory()
-            this.values_.set(key, cv)
-            return cv
-        }
-        // Check computedEntries_ (inheritance case)
-        const entry = this.computedEntries_?.get(key)
-        if (!entry) {
+        if (!factory) {
             return undefined
         }
-        if (typeof entry === "function") {
-            return entry()
+        this.lazyComputedKeys_!.delete(key)
+        if (this.lazyComputedKeys_!.size === 0) {
+            this.lazyComputedKeys_ = undefined
         }
-        return entry
+        const computed = factory()
+        this.values_.set(key, computed)
+        return computed
     }
 
     materializeLazyObservable_(key: PropertyKey): ObservableValue<any> | undefined {
@@ -607,34 +575,9 @@ export class ObservableObjectAdministration
             if (__DEV__) {
                 delete this.appliedAnnotations_![key]
             }
-            // Clear lazy entries even if not materialized
-            if (this.lazyComputedKeys_) {
-                this.lazyComputedKeys_.delete(key)
-                if (this.lazyComputedKeys_.size === 0) {
-                    this.lazyComputedKeys_ = undefined
-                }
-            }
-            if (this.computedEntries_) {
-                this.computedEntries_.delete(key)
-                if (this.computedEntries_.size === 0) {
-                    this.computedEntries_ = undefined
-                }
-            }
             // Clear observable
             if (observable) {
                 this.values_.delete(key)
-                if (this.computedGetterEntries_) {
-                    const computedEntry = this.computedEntries_?.get(key)
-                    for (const [getter, value] of this.computedGetterEntries_) {
-                        if (value === computedEntry || value === observable) {
-                            this.computedGetterEntries_.delete(getter)
-                            break
-                        }
-                    }
-                    if (this.computedGetterEntries_.size === 0) {
-                        this.computedGetterEntries_ = undefined
-                    }
-                }
                 // for computed, value is undefined
                 if (observable instanceof ObservableValue) {
                     value = observable.value_
