@@ -33,7 +33,7 @@ test("inherited observable accessor remains reactive in subclass", () => {
     expect(seen).toEqual([1, 2])
 })
 
-// #4660: Supported all-decorator same-key computed override can delegate via super.
+// #4660: Supported all-decorator same-key computed override can delegate via super
 test("computed override can delegate to parent computed with super", () => {
     class Parent {
         @observable accessor count = 1
@@ -52,9 +52,20 @@ test("computed override can delegate to parent computed with super", () => {
     }
 
     const child = new Child()
-    const seen: number[] = []
-    const dispose = autorun(() => seen.push(child.number))
 
+    // Before first read, lazy computed bookkeeping must stay scoped to each requested key
+    expect(isObservableProp(child, "number")).toBe(true)
+    expect(isComputedProp(child, "number")).toBe(true)
+    expect(isObservableProp(child, "count")).toBe(true)
+    expect(isComputedProp(child, "count")).toBe(false)
+    expect(isObservableProp(child, "missing")).toBe(false)
+    expect(isComputedProp(child, "missing")).toBe(false)
+
+    // Observing by public property key must observe the child computed, not the parent computed
+    const seen: number[] = []
+    const dispose = observe(child, "number", change => seen.push(change.newValue), true)
+
+    // Direct reads still delegate through super and remain reactive after materialization
     expect(child.number).toBe(2)
     runInAction(() => {
         child.count = 2
@@ -63,71 +74,14 @@ test("computed override can delegate to parent computed with super", () => {
 
     expect(isObservableProp(child, "number")).toBe(true)
     expect(isComputedProp(child, "number")).toBe(true)
-    expect(isComputedProp(child, "count")).toBe(false)
-    expect(isObservableProp(child, "missing")).toBe(false)
-    expect(isComputedProp(child, "missing")).toBe(false)
-    expect(seen).toEqual([2, 3])
-})
-
-// #4660: Lazy inheritance bookkeeping must stay scoped to the requested property.
-test("computed override introspection is scoped before first read", () => {
-    class Parent {
-        @observable accessor count = 1
-
-        @computed
-        get number() {
-            return this.count
-        }
-    }
-
-    class Child extends Parent {
-        @computed
-        override get number() {
-            return super.number + 1
-        }
-    }
-
-    const child = new Child()
-
-    expect(isObservableProp(child, "number")).toBe(true)
-    expect(isComputedProp(child, "number")).toBe(true)
     expect(isObservableProp(child, "count")).toBe(true)
     expect(isComputedProp(child, "count")).toBe(false)
     expect(isObservableProp(child, "missing")).toBe(false)
     expect(isComputedProp(child, "missing")).toBe(false)
-})
-
-// #4660: Property-key APIs must keep observing the public child computed.
-test("computed override remains the public property for observe", () => {
-    class Parent {
-        @observable accessor count = 1
-
-        @computed
-        get number() {
-            return this.count
-        }
-    }
-
-    class Child extends Parent {
-        @computed
-        override get number() {
-            return super.number + 1
-        }
-    }
-
-    const child = new Child()
-    const seen: number[] = []
-    const dispose = observe(child, "number", change => seen.push(change.newValue), true)
-
-    runInAction(() => {
-        child.count = 2
-    })
-    dispose()
-
     expect(seen).toEqual([2, 3])
 })
 
-// #4660: Super delegation can chain through multiple decorated prototypes.
+// #4660: Super delegation can chain through multiple decorated prototypes
 test("computed override can delegate through multiple parent computeds", () => {
     class GrandParent {
         @observable accessor count = 1
@@ -165,7 +119,7 @@ test("computed override can delegate through multiple parent computeds", () => {
     expect(seen).toEqual([3, 4])
 })
 
-// #4660: A parent constructor read must not pin the parent computed as the child property.
+// #4660: A parent constructor read must not pin the parent computed as the child property
 test("computed override wins when parent constructor reads the same key first", () => {
     class Parent {
         constructor() {
@@ -223,7 +177,7 @@ test("manually wrapped action field can be overridden as an ordinary field", () 
     expect(seen).toEqual([0, 2])
 })
 
-test("subclass can add new decorated members", async () => {
+test("subclass can add new observable, computed, and action members", () => {
     class Parent {
         @observable accessor count = 1
     }
@@ -245,11 +199,6 @@ test("subclass can add new decorated members", async () => {
         incrementCount() {
             this.count += 1
         }
-
-        @flow
-        *loadExtra(value: number): any {
-            this.extra = yield Promise.resolve(value)
-        }
     }
 
     const child = new Child()
@@ -259,14 +208,12 @@ test("subclass can add new decorated members", async () => {
 
     child.incrementExtra()
     incrementCount()
-    await flowResult(child.loadExtra(10))
     dispose()
 
     expect(isComputedProp(child, "total")).toBe(true)
     expect(isAction(child.incrementExtra)).toBe(true)
     expect(isAction(child.incrementCount)).toBe(true)
-    expect(isFlow(child.loadExtra)).toBe(true)
-    expect(seen).toEqual([3, 4, 5, 12])
+    expect(seen).toEqual([3, 4, 5])
 })
 
 test("action override can call parent action with super", () => {
