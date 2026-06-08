@@ -1,12 +1,25 @@
-import { configure, _resetGlobalState } from "./src/mobx"
+import { configure, _getGlobalState, _resetGlobalState } from "./src/mobx"
 
 global.setImmediate = global.setImmediate || ((fn, ...args) => global.setTimeout(fn, 0, ...args))
+
+function resetMobxTestState() {
+    _resetGlobalState()
+    _getGlobalState().spyListeners = []
+    configure({
+        useProxies: "always",
+        enforceActions: "never",
+        computedRequiresReaction: false,
+        reactionRequiresObservable: false,
+        observableRequiresReaction: false,
+        disableErrorBoundaries: false,
+        safeDescriptors: true
+    })
+}
 
 beforeEach(() => {
     // @ts-ignore
     global.__DEV__ = true
-    _resetGlobalState()
-    configure({
-        enforceActions: "never"
-    })
+    resetMobxTestState()
 })
+
+afterEach(resetMobxTestState)

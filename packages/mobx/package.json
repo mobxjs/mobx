@@ -43,8 +43,7 @@
         "@babel/preset-env": "^7.9.5",
         "@babel/preset-typescript": "^7.9.0",
         "@babel/runtime": "^7.9.2",
-        "conditional-type-checks": "^1.0.5",
-        "flow-bin": "^0.123.0"
+        "conditional-type-checks": "^1.0.5"
     },
     "keywords": [
         "mobx",
@@ -72,7 +71,6 @@
         "test:performance": "npm run perf -- proxy && npm run perf -- legacy && npm run perf-decorator",
         "test:mixed-versions": "npm test -- --testRegex mixed-versions",
         "test:types": "tsc --noEmit",
-        "test:flow": "flow check",
         "test:coverage": "npm test -- -i --coverage",
         "test:size": "import-size --report . observable computed autorun action",
         "test:check": "npm run test:types",
