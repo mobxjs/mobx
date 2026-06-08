@@ -134,6 +134,32 @@ test("annotations", () => {
     expect(order1.aFunction()).toBe(1)
 })
 
+test("observable private accessors", () => {
+    class Store {
+        @observable accessor #value = 1
+
+        @computed
+        get double() {
+            return this.#value * 2
+        }
+
+        increment() {
+            this.#value++
+        }
+    }
+
+    const store = new Store()
+    const values: number[] = []
+    const dispose = autorun(() => values.push(store.double))
+
+    store.increment()
+    dispose()
+    store.increment()
+
+    expect(values).toEqual([2, 4])
+    expect(store.double).toBe(6)
+})
+
 test("box", () => {
     class Box {
         @observable accessor uninitialized: any
