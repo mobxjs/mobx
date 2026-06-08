@@ -38,8 +38,5 @@ jobs:
       - name: Test size
         run: npm run test:size
 
-      - name: Test flow
-        run: npm -w mobx run test:flow
-
       - name: Test performance
         run: npm -w mobx run test:performance

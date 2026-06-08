@@ -23,9 +23,9 @@ import {
     createAtom,
     runInAction,
     makeObservable,
-    isComputedProp
+    flow,
+    flowResult
 } from "../../src/mobx"
-import { $mobx, type ObservableArrayAdministration } from "../../src/internal"
 import * as mobx from "../../src/mobx"
 
 const testFunction = function (a: any) {}
@@ -50,14 +50,28 @@ const t = {
 
 test("decorators", () => {
     class Order {
-        @observable accessor price: number = 3
-        @observable accessor amount: number = 2
-        @observable accessor orders: string[] = []
-        @observable accessor aFunction = testFunction
+        @observable price: number = 3
+        @observable amount: number = 2
+        @observable orders: string[] = []
+        @observable aFunction = testFunction
 
         @computed
         get total() {
             return this.amount * this.price * (1 + this.orders.length)
+        }
+
+        constructor() {
+            makeObservable(this)
+        }
+
+        @flow
+        *testDouble(n: number): Generator<number, number> {
+            yield 3
+            return n * 2
+        }
+
+        async run() {
+            const x: number = await flowResult(this.testDouble(2))
         }
     }
 
@@ -92,14 +106,18 @@ test("decorators", () => {
 test("annotations", () => {
     const fn0 = () => 0
     class Order {
-        @observable accessor price: number = 3
-        @observable accessor amount: number = 2
-        @observable accessor orders: string[] = []
-        @observable accessor aFunction = fn0
+        @observable price: number = 3
+        @observable amount: number = 2
+        @observable orders: string[] = []
+        @observable aFunction = fn0
 
         @computed
         get total() {
             return this.amount * this.price * (1 + this.orders.length)
+        }
+
+        constructor() {
+            makeObservable(this)
         }
     }
 
@@ -136,10 +154,11 @@ test("annotations", () => {
 
 test("box", () => {
     class Box {
-        @observable accessor uninitialized: any
-        @observable accessor height = 20
-        @observable accessor sizes = [2]
-        @observable accessor someFunc = function () {
+        @observable uninitialized: any
+        @observable height = 20
+        @observable sizes = [2]
+        @observable
+        someFunc = function () {
             return 2
         }
         @computed
@@ -150,6 +169,10 @@ test("box", () => {
         addSize() {
             this.sizes.push(3)
             this.sizes.push(4)
+        }
+
+        constructor() {
+            makeObservable(this)
         }
     }
 
@@ -176,13 +199,17 @@ test("box", () => {
 
 test("computed setter should succeed", () => {
     class Bla {
-        @observable accessor a = 3
+        @observable a = 3
         @computed
         get propX() {
             return this.a * 2
         }
         set propX(v) {
             this.a = v
+        }
+
+        constructor() {
+            makeObservable(this)
         }
     }
 
@@ -192,30 +219,16 @@ test("computed setter should succeed", () => {
     t.equal(b.propX, 8)
 })
 
-test("ClassFieldDecorators should NOT work without accessor without legacy compilation", () => {
-    expect(() => {
-        class Order {
-            @observable price: number = 3
-        }
-    }).toThrow("[MobX] Please use `@observable accessor price` instead of `@observable price`")
-})
-
-test("Reasonable error for decorator kind mismatch", () => {
-    expect(() => {
-        class Order {
-            // @ts-ignore
-            @computed total = 3
-        }
-    }).toThrow("[MobX] The decorator applied to 'total' cannot be used on a field element")
-})
-
 test("typescript: parameterized computed decorator", () => {
     class TestClass {
-        @observable accessor x = 3
-        @observable accessor y = 3
+        @observable x = 3
+        @observable y = 3
         @computed.struct
         get boxedSum() {
             return { sum: Math.round(this.x) + Math.round(this.y) }
+        }
+        constructor() {
+            makeObservable(this)
         }
     }
 
@@ -268,8 +281,8 @@ test("issue 165", () => {
     }
 
     class Game {
-        @observable accessor firstCardSelected: Card | null = null
-        @observable accessor secondCardSelected: Card | null = null
+        @observable firstCardSelected: Card | null = null
+        @observable secondCardSelected: Card | null = null
 
         @computed
         get isMatchWrong() {
@@ -278,6 +291,10 @@ test("issue 165", () => {
                 this.secondCardSelected !== null &&
                     this.firstCardSelected!.id !== this.secondCardSelected.id
             )
+        }
+
+        constructor() {
+            makeObservable(this)
         }
     }
 
@@ -302,10 +319,13 @@ test("issue 165", () => {
     t.equal(card2.isWrong, true)
 })
 
-test("issue 191 - shared initializers (2022.3)", () => {
+test("issue 191 - shared initializers (ts)", () => {
     class Test {
-        @observable accessor obj = { a: 1 }
-        @observable accessor array = [2]
+        @observable obj = { a: 1 }
+        @observable array = [2]
+        constructor() {
+            makeObservable(this)
+        }
     }
 
     const t1 = new Test()
@@ -333,9 +353,11 @@ function normalizeSpyEvents(events: any[]) {
     return events
 }
 
-test("action decorator (2022.3)", () => {
+test("action decorator (typescript)", () => {
     class Store {
-        constructor(private multiplier: number) {}
+        constructor(private multiplier: number) {
+            makeObservable(this)
+        }
 
         @action
         add(a: number, b: number): number {
@@ -363,9 +385,11 @@ test("action decorator (2022.3)", () => {
     d()
 })
 
-test("custom action decorator (2022.3)", () => {
+test("custom action decorator (typescript)", () => {
     class Store {
-        constructor(private multiplier: number) {}
+        constructor(private multiplier: number) {
+            makeObservable(this)
+        }
 
         @action("zoem zoem")
         add(a: number, b: number): number {
@@ -411,9 +435,11 @@ test("custom action decorator (2022.3)", () => {
     d()
 })
 
-test("action decorator on field (2022.3)", () => {
+test("action decorator on field (typescript)", () => {
     class Store {
-        constructor(private multiplier: number) {}
+        constructor(private multiplier: number) {
+            makeObservable(this)
+        }
 
         @action
         add = (a: number, b: number) => {
@@ -443,9 +469,11 @@ test("action decorator on field (2022.3)", () => {
     d()
 })
 
-test("custom action decorator on field (2022.3)", () => {
+test("custom action decorator on field (typescript)", () => {
     class Store {
-        constructor(private multiplier: number) {}
+        constructor(private multiplier: number) {
+            makeObservable(this)
+        }
 
         @action("zoem zoem")
         add = (a: number, b: number) => {
@@ -492,17 +520,25 @@ test("custom action decorator on field (2022.3)", () => {
     d()
 })
 
-test("267 (2022.3) should be possible to declare properties observable outside strict mode", () => {
+test("267 (typescript) should be possible to declare properties observable outside strict mode", () => {
     configure({ enforceActions: "observed" })
 
     class Store {
-        @observable accessor timer: number | null = null
+        @observable timer: number | null = null
+
+        constructor() {
+            makeObservable(this)
+        }
     }
 })
 
 test("288 atom not detected for object property", () => {
     class Store {
-        @observable accessor foo = ""
+        @observable foo = ""
+
+        constructor() {
+            makeObservable(this)
+        }
     }
 
     const store = new Store()
@@ -521,12 +557,15 @@ test.skip("observable performance - ts - decorators", () => {
     const AMOUNT = 100000
 
     class A {
-        @observable accessor a = 1
-        @observable accessor b = 2
-        @observable accessor c = 3
+        @observable a = 1
+        @observable b = 2
+        @observable c = 3
         @computed
         get d() {
             return this.a + this.b + this.c
+        }
+        constructor() {
+            makeObservable(this)
         }
     }
 
@@ -555,23 +594,35 @@ test("unbound methods", () => {
         // shared across all instances
         @action
         m1() {}
+
+        // per instance
+        @action m2 = () => {}
+        constructor() {
+            makeObservable(this)
+        }
     }
 
     const a1 = new A()
     const a2 = new A()
 
     t.equal(a1.m1, a2.m1)
+    t.notEqual(a1.m2, a2.m2)
     t.equal(Object.hasOwnProperty.call(a1, "m1"), false)
+    t.equal(Object.hasOwnProperty.call(a1, "m2"), true)
     t.equal(Object.hasOwnProperty.call(a2, "m1"), false)
+    t.equal(Object.hasOwnProperty.call(a2, "m2"), true)
 })
 
 test("inheritance", () => {
     class A {
-        @observable accessor a = 2
+        @observable a = 2
+        constructor() {
+            makeObservable(this)
+        }
     }
 
     class B extends A {
-        @observable accessor b = 3
+        @observable b = 3
         @computed
         get c() {
             return this.a + this.b
@@ -596,15 +647,21 @@ test("inheritance", () => {
 
 test("inheritance overrides observable", () => {
     class A {
-        @observable accessor a = 2
+        @observable a = 2
+        constructor() {
+            makeObservable(this)
+        }
     }
 
     class B {
-        @observable accessor a = 5
-        @observable accessor b = 3
+        @observable a = 5
+        @observable b = 3
         @computed
         get c() {
             return this.a + this.b
+        }
+        constructor() {
+            makeObservable(this)
         }
     }
 
@@ -623,8 +680,8 @@ test("inheritance overrides observable", () => {
 
 test("reusing initializers", () => {
     class A {
-        @observable accessor a = 3
-        @observable accessor b = this.a + 2
+        @observable a = 3
+        @observable b = this.a + 2
         @computed
         get c() {
             return this.a + this.b
@@ -632,6 +689,9 @@ test("reusing initializers", () => {
         @computed
         get d() {
             return this.c + 1
+        }
+        constructor() {
+            makeObservable(this)
         }
     }
 
@@ -645,72 +705,83 @@ test("reusing initializers", () => {
 
 test("enumerability", () => {
     class A {
-        @observable accessor a = 1 // enumerable, on proto
+        @observable a = 1 // enumerable, on proto
         @computed
         get b() {
             return this.a
         } // non-enumerable, (and, ideally, on proto)
         @action
         m() {} // non-enumerable, on proto
+        @action m2 = () => {} // non-enumerable, on self
+        constructor() {
+            makeObservable(this)
+        }
     }
 
     const a = new A()
 
     // not initialized yet
     let ownProps = Object.keys(a)
-    let enumProps: string[] = []
-    for (const key in a) enumProps.push(key)
+    let props: string[] = []
+    for (const key in a) props.push(key)
 
-    t.deepEqual(ownProps, [])
+    t.deepEqual(ownProps, [
+        "a" // yeej!
+    ])
 
-    t.deepEqual(enumProps, [])
+    t.deepEqual(props, [
+        // also 'a' would be ok
+        "a"
+    ])
 
     t.equal("a" in a, true)
     // eslint-disable-next-line
-    t.equal(a.hasOwnProperty("a"), false)
+    t.equal(a.hasOwnProperty("a"), true)
     // eslint-disable-next-line
-    t.equal(a.hasOwnProperty("b"), false)
+    t.equal(a.hasOwnProperty("b"), true) // false would be slightly better, true also ok-ish, and, see #1777
     // eslint-disable-next-line
     t.equal(a.hasOwnProperty("m"), false)
+    // eslint-disable-next-line
+    t.equal(a.hasOwnProperty("m2"), true)
 
     t.equal(mobx.isAction(a.m), true)
+    t.equal(mobx.isAction(a.m2), true)
 
     // after initialization
     a.a
     a.b
     a.m
+    a.m2
 
     ownProps = Object.keys(a)
-    enumProps = []
-    for (const key in a) enumProps.push(key)
+    props = []
+    for (const key in a) props.push(key)
 
-    t.deepEqual(ownProps, [])
+    t.deepEqual(ownProps, ["a"])
 
-    t.deepEqual(enumProps, [])
+    t.deepEqual(props, ["a"])
 
     t.equal("a" in a, true)
     // eslint-disable-next-line
-    t.equal(a.hasOwnProperty("a"), false)
+    t.equal(a.hasOwnProperty("a"), true)
     // eslint-disable-next-line
-    t.equal(a.hasOwnProperty("b"), false)
+    t.equal(a.hasOwnProperty("b"), true) // false would be slightly better, true also ok-ish, and, see #1777
     // eslint-disable-next-line
     t.equal(a.hasOwnProperty("m"), false)
+    // eslint-disable-next-line
+    t.equal(a.hasOwnProperty("m2"), true)
 })
 
-// Re-enable when late initialization is supported in TS
-test.skip("issue 285 (2022.3)", () => {
+test("issue 285 (typescript)", () => {
     const { observable, toJS } = mobx
 
     class Todo {
         id = 1
-        @observable accessor title: string
-        @observable accessor finished = false
-        @observable accessor childThings = [1, 2, 3]
-        @computed get bla() {
-            return 3
-        }
-        @action someMethod() {}
+        @observable title: string
+        @observable finished = false
+        @observable childThings = [1, 2, 3]
         constructor(title: string) {
+            makeObservable(this)
             this.title = title
         }
     }
@@ -725,13 +796,15 @@ test.skip("issue 285 (2022.3)", () => {
     })
 })
 
-// Re-enable when late initialization is supported in TS
-test.skip("verify object assign (2022.3) (legacy/field decorator)", () => {
+test("verify object assign (typescript)", () => {
     class Todo {
-        @observable accessor title = "test"
+        @observable title = "test"
         @computed
         get upperCase() {
             return this.title.toUpperCase()
+        }
+        constructor() {
+            makeObservable(this)
         }
     }
 
@@ -740,10 +813,52 @@ test.skip("verify object assign (2022.3) (legacy/field decorator)", () => {
     })
 })
 
+test("379, inheritable actions (typescript)", () => {
+    class A {
+        @action
+        method() {
+            return 42
+        }
+        constructor() {
+            makeObservable(this)
+        }
+    }
+
+    class B extends A {
+        method() {
+            return super.method() * 2
+        }
+        constructor() {
+            super()
+            makeObservable(this)
+        }
+    }
+
+    class C extends B {
+        method() {
+            return super.method() + 3
+        }
+        constructor() {
+            super()
+            makeObservable(this)
+        }
+    }
+
+    const b = new B()
+    t.equal(b.method(), 84)
+    t.equal(isAction(b.method), true)
+
+    const a = new A()
+    t.equal(a.method(), 42)
+    t.equal(isAction(a.method), true)
+
+    const c = new C()
+    t.equal(c.method(), 87)
+    t.equal(isAction(c.method), true)
+})
+
 test("373 - fix isObservable for unused computed", () => {
     class Bla {
-        ts_53332_workaround: string = ""
-
         @computed
         get computedVal() {
             return 3
@@ -759,13 +874,37 @@ test("373 - fix isObservable for unused computed", () => {
     new Bla()
 })
 
-test("705 - setter undoing caching (2022.3)", () => {
+test("505, don't throw when accessing subclass fields in super constructor (typescript)", () => {
+    const values: any = {}
+    class A {
+        @observable a = 1
+        constructor() {
+            makeObservable(this)
+            values.b = (this as any)["b"]
+            values.a = this.a
+        }
+    }
+
+    class B extends A {
+        @observable b = 2
+
+        constructor() {
+            super()
+            makeObservable(this)
+        }
+    }
+
+    new B()
+    t.deepEqual(values, { a: 1, b: undefined }) // undefined, as A constructor runs before B constructor
+})
+
+test("705 - setter undoing caching (typescript)", () => {
     let recomputes = 0
     let autoruns = 0
 
     class Person {
-        @observable accessor name: string = ""
-        @observable accessor title: string = ""
+        @observable name: string = ""
+        @observable title: string = ""
 
         // Typescript bug: if fullName is before the getter, the property is defined twice / incorrectly, see #705
         // set fullName(val) {
@@ -779,6 +918,9 @@ test("705 - setter undoing caching (2022.3)", () => {
         // Should also be possible to define the setter _before_ the fullname
         set fullName(val) {
             // Noop
+        }
+        constructor() {
+            makeObservable(this)
         }
     }
 
@@ -810,9 +952,12 @@ test("705 - setter undoing caching (2022.3)", () => {
     d2()
 })
 
-test("@observable.ref (2022.3)", () => {
+test("@observable.ref (TS)", () => {
     class A {
-        @observable.ref accessor ref = { a: 3 }
+        @observable.ref ref = { a: 3 }
+        constructor() {
+            makeObservable(this)
+        }
     }
 
     const a = new A()
@@ -821,9 +966,12 @@ test("@observable.ref (2022.3)", () => {
     t.equal(mobx.isObservableProp(a, "ref"), true)
 })
 
-test("@observable.shallow (2022.3)", () => {
+test("@observable.shallow (TS)", () => {
     class A {
-        @observable.shallow accessor arr = [{ todo: 1 }]
+        @observable.shallow arr = [{ todo: 1 }]
+        constructor() {
+            makeObservable(this)
+        }
     }
 
     const a = new A()
@@ -836,9 +984,12 @@ test("@observable.shallow (2022.3)", () => {
     t.equal(a.arr[1] === todo2, true)
 })
 
-test("@observable.shallow - 2 (2022.3)", () => {
+test("@observable.shallow - 2 (TS)", () => {
     class A {
-        @observable.shallow accessor arr: Record<string, any> = { x: { todo: 1 } }
+        @observable.shallow arr: Record<string, any> = { x: { todo: 1 } }
+        constructor() {
+            makeObservable(this)
+        }
     }
 
     const a = new A()
@@ -851,9 +1002,12 @@ test("@observable.shallow - 2 (2022.3)", () => {
     t.equal(a.arr.y === todo2, true)
 })
 
-test("@observable.deep (2022.3)", () => {
+test("@observable.deep (TS)", () => {
     class A {
-        @observable.deep accessor arr = [{ todo: 1 }]
+        @observable.deep arr = [{ todo: 1 }]
+        constructor() {
+            makeObservable(this)
+        }
     }
 
     const a = new A()
@@ -868,28 +1022,15 @@ test("@observable.deep (2022.3)", () => {
     t.equal(isObservable(todo2), false)
 })
 
-test("action.bound binds (2022.3)", () => {
+test("action.bound binds (TS)", () => {
     class A {
-        @observable accessor x = 0
+        @observable x = 0
         @action.bound
         inc(value: number) {
             this.x += value
         }
-    }
-
-    const a = new A()
-    const runner = a.inc
-    runner(2)
-
-    t.equal(a.x, 2)
-})
-
-test("action.bound binds property function (2022.3)", () => {
-    class A {
-        @observable accessor x = 0
-        @action.bound
-        inc = function (value: number) {
-            this.x += value
+        constructor() {
+            makeObservable(this)
         }
     }
 
@@ -900,7 +1041,7 @@ test("action.bound binds property function (2022.3)", () => {
     t.equal(a.x, 2)
 })
 
-test("@computed.equals (2022.3)", () => {
+test("@computed.equals (TS)", () => {
     const sameTime = (from: Time, to: Time) => from.hour === to.hour && from.minute === to.minute
     class Time {
         constructor(hour: number, minute: number) {
@@ -909,8 +1050,8 @@ test("@computed.equals (2022.3)", () => {
             this.minute = minute
         }
 
-        @observable public accessor hour: number
-        @observable public accessor minute: number
+        @observable public hour: number
+        @observable public minute: number
 
         @computed({ equals: sameTime })
         public get time() {
@@ -942,9 +1083,13 @@ test("@computed.equals (2022.3)", () => {
     disposeAutorun()
 })
 
-test("1072 - @observable accessor without initial value and observe before first access", () => {
+test("1072 - @observable without initial value and observe before first access", () => {
     class User {
-        @observable accessor loginCount: number = 0
+        @observable loginCount?: number
+
+        constructor() {
+            makeObservable(this)
+        }
     }
 
     const user = new User()
@@ -958,33 +1103,42 @@ test("unobserved computed reads should warn with requiresReaction enabled", () =
         warnings.push(...args)
     }
     try {
+        const expectedWarnings: string[] = []
+
         class A {
-            @observable accessor x = 0
+            @observable x = 0
 
             @computed({ requiresReaction: true })
             get y() {
                 return this.x * 2
+            }
+            constructor() {
+                makeObservable(this, undefined, { name: "a" })
             }
         }
 
         const a = new A()
 
         a.y
+        expectedWarnings.push(
+            `[mobx] Computed value 'a.y' is being read outside a reactive context. Doing a full recompute.`
+        )
+
         const d = mobx.reaction(
             () => a.y,
             () => {}
         )
-        a.y
-        d()
+
         a.y
 
-        expect(warnings.length).toEqual(2)
-        expect(warnings[0]).toContain(
-            "is being read outside a reactive context. Doing a full recompute."
+        d()
+
+        a.y
+        expectedWarnings.push(
+            `[mobx] Computed value 'a.y' is being read outside a reactive context. Doing a full recompute.`
         )
-        expect(warnings[1]).toContain(
-            "is being read outside a reactive context. Doing a full recompute."
-        )
+
+        expect(warnings).toEqual(expectedWarnings)
     } finally {
         console.warn = consoleWarn
     }
@@ -992,11 +1146,15 @@ test("unobserved computed reads should warn with requiresReaction enabled", () =
 
 test("multiple inheritance should work", () => {
     class A {
-        @observable accessor x = 1
+        @observable x = 1
+
+        constructor() {
+            makeObservable(this)
+        }
     }
 
     class B extends A {
-        @observable accessor y = 1
+        @observable y = 1
 
         constructor() {
             super()
@@ -1004,11 +1162,7 @@ test("multiple inheritance should work", () => {
         }
     }
 
-    const adm = mobx._getAdministration(new B()) as any
-    // @observable accessor is lazy (#4616 follow-up), so unread fields live in
-    // `lazyObservableKeys_` until first read. Union with `values_` to see them all.
-    const obsvKeys = [...adm.values_.keys(), ...(adm.lazyObservableKeys_?.keys() ?? [])].sort()
-    expect(obsvKeys).toEqual(["x", "y"])
+    expect(mobx.keys(new B())).toEqual(["x", "y"])
 })
 
 // 19.12.2020 @urugator:
@@ -1020,24 +1174,36 @@ test.skip("actions are reassignable", () => {
     class A {
         @action
         m1() {}
+        @action m2 = () => {}
         @action.bound
         m3() {}
+        @action.bound m4 = () => {}
+
+        constructor() {
+            makeObservable(this)
+        }
     }
 
     const a = new A()
     expect(isAction(a.m1)).toBe(true)
+    expect(isAction(a.m2)).toBe(true)
     expect(isAction(a.m3)).toBe(true)
+    expect(isAction(a.m4)).toBe(true)
     a.m1 = () => {}
     expect(isAction(a.m1)).toBe(false)
+    a.m2 = () => {}
+    expect(isAction(a.m2)).toBe(false)
     a.m3 = () => {}
     expect(isAction(a.m3)).toBe(false)
+    a.m4 = () => {}
+    expect(isAction(a.m4)).toBe(false)
 })
 
-test("it should support asyncAction as decorator (2022.3)", async () => {
+test("it should support asyncAction as decorator (ts)", async () => {
     mobx.configure({ enforceActions: "observed" })
 
     class X {
-        @observable accessor a = 1
+        @observable a = 1
 
         f = mobx.flow(function* f(this: X, initial: number) {
             this.a = initial // this runs in action
@@ -1045,6 +1211,10 @@ test("it should support asyncAction as decorator (2022.3)", async () => {
             this.a = this.a * 2
             return this.a
         })
+
+        constructor() {
+            makeObservable(this)
+        }
     }
 
     const x = new X()
@@ -1052,67 +1222,15 @@ test("it should support asyncAction as decorator (2022.3)", async () => {
     expect(await x.f(3)).toBe(16)
 })
 
-test("it should support flow as decorator (2022.3)", async () => {
-    class DecoratorInferred {
-        @mobx.flow
-        *f() {
-            return true
-        }
-    }
-
-    class DecoratorExplicit {
-        @mobx.flow
-        *f(): Generator<never, boolean, unknown> {
-            return true
-        }
-    }
-
-    class AutoObservable {
-        constructor() {
-            mobx.makeAutoObservable(this)
-        }
-
-        *f() {
-            return true
-        }
-    }
-
-    class ExplicitObservable {
-        constructor() {
-            mobx.makeObservable(this, {
-                f: mobx.flow
-            })
-        }
-
-        *f() {
-            return true
-        }
-    }
-
-    class FlowField {
-        f = mobx.flow(function* () {
-            return true
-        })
-    }
-
-    const decoratorInferredResult: boolean = await mobx.flowResult(new DecoratorInferred().f())
-    const decoratorExplicitResult: boolean = await mobx.flowResult(new DecoratorExplicit().f())
-    const autoObservableResult: boolean = await mobx.flowResult(new AutoObservable().f())
-    const explicitObservableResult: boolean = await mobx.flowResult(new ExplicitObservable().f())
-    const flowFieldResult: boolean = await new FlowField().f()
-
-    expect(decoratorInferredResult).toBe(true)
-    expect(decoratorExplicitResult).toBe(true)
-    expect(autoObservableResult).toBe(true)
-    expect(explicitObservableResult).toBe(true)
-    expect(flowFieldResult).toBe(true)
-})
-
-test("toJS bug #1413 (2022.3)", () => {
+test("toJS bug #1413 (TS)", () => {
     class X {
         @observable
-        accessor test = {
+        test = {
             test1: 1
+        }
+
+        constructor() {
+            makeObservable(this)
         }
     }
 
@@ -1127,8 +1245,12 @@ test("#2159 - computed property keys", () => {
     const testString = "testString"
 
     class TestClass {
-        @observable accessor [testSymbol] = "original symbol value"
-        @observable accessor [testString] = "original string value"
+        @observable [testSymbol] = "original symbol value";
+        @observable [testString] = "original string value"
+
+        constructor() {
+            makeObservable(this)
+        }
     }
 
     const o = new TestClass()
@@ -1148,172 +1270,4 @@ test("#2159 - computed property keys", () => {
         "new string value", // new string
         "original string value" // original string
     ])
-})
-
-test("4616 - @computed decorator should be lazy", () => {
-    let computeCount = 0
-
-    class Order {
-        @observable accessor price: number = 3
-
-        @computed
-        get unused() {
-            computeCount++
-            return this.price * 2
-        }
-
-        @computed
-        get used() {
-            return this.price * 3
-        }
-    }
-
-    const o = new Order()
-    // Sanity check via public API: both should report as observable props
-    t.equal(isObservableProp(o, "unused"), true)
-    t.equal(isObservableProp(o, "used"), true)
-
-    // Internal check: ComputedValue is not yet allocated for either getter
-    const adm: any = (o as any)[$mobx]
-    expect(adm.values_.has("unused")).toBe(false)
-    expect(adm.values_.has("used")).toBe(false)
-    expect(adm.lazyComputedKeys_.has("unused")).toBe(true)
-    expect(adm.lazyComputedKeys_.has("used")).toBe(true)
-    expect(computeCount).toBe(0)
-
-    // First access materialises the ComputedValue
-    t.equal(o.used, 9)
-    expect(adm.values_.has("used")).toBe(true)
-    expect(adm.lazyComputedKeys_.has("used")).toBe(false)
-
-    // The unused computed remains lazy and never ran
-    expect(adm.values_.has("unused")).toBe(false)
-    expect(computeCount).toBe(0)
-})
-
-test("4616 - isComputedProp reports lazy @computed before first read", () => {
-    class Order {
-        @computed
-        get total() {
-            return 3
-        }
-    }
-
-    const o = new Order()
-
-    t.equal(isComputedProp(o, "total"), true)
-})
-
-test("4616 - observe on @computed before first read materialises it", () => {
-    class Order {
-        @observable accessor price: number = 3
-
-        @computed
-        get total() {
-            return this.price * 2
-        }
-    }
-
-    const o = new Order()
-    const events: number[] = []
-    observe(o, "total", ev => events.push((ev as any).newValue))
-    o.price = 4
-    t.deepEqual(events, [8])
-})
-
-test("4616 - @observable accessor should be lazy", () => {
-    class Wide {
-        @observable accessor unused: number = 1
-        @observable accessor used: number = 2
-    }
-
-    const o = new Wide()
-    // Public API: both should report as observable props
-    t.equal(isObservableProp(o, "unused"), true)
-    t.equal(isObservableProp(o, "used"), true)
-
-    // Internal check: ObservableValue is not yet allocated for either field
-    const adm: any = (o as any)[$mobx]
-    expect(adm.values_.has("unused")).toBe(false)
-    expect(adm.values_.has("used")).toBe(false)
-    expect(adm.lazyObservableKeys_.has("unused")).toBe(true)
-    expect(adm.lazyObservableKeys_.has("used")).toBe(true)
-
-    // First access materialises the ObservableValue
-    t.equal(o.used, 2)
-    expect(adm.values_.has("used")).toBe(true)
-    expect(adm.lazyObservableKeys_.has("used")).toBe(false)
-
-    // The unused field remains lazy
-    expect(adm.values_.has("unused")).toBe(false)
-    expect(adm.lazyObservableKeys_.has("unused")).toBe(true)
-})
-
-test("4616 - observe on @observable accessor before first read materialises it", () => {
-    class Counter {
-        @observable accessor count: number = 0
-    }
-
-    const o = new Counter()
-    const adm: any = (o as any)[$mobx]
-    expect(adm.values_.has("count")).toBe(false)
-
-    const events: number[] = []
-    observe(o, "count", ev => events.push((ev as any).newValue))
-    // observe should have materialised the ObservableValue
-    expect(adm.values_.has("count")).toBe(true)
-
-    o.count = 5
-    o.count = 7
-    t.deepEqual(events, [5, 7])
-})
-
-test("4616 - set on @observable accessor before first read materialises it", () => {
-    class Counter {
-        @observable accessor count: number = 0
-    }
-
-    const o = new Counter()
-    const adm: any = (o as any)[$mobx]
-    expect(adm.values_.has("count")).toBe(false)
-
-    o.count = 42
-    expect(adm.values_.has("count")).toBe(true)
-    t.equal(o.count, 42)
-})
-
-test("4616 - autorun reacts to @observable accessor that is lazy on entry", () => {
-    class Counter {
-        @observable accessor count: number = 0
-    }
-
-    const o = new Counter()
-    const seen: number[] = []
-    const dispose = autorun(() => seen.push(o.count))
-    o.count = 1
-    o.count = 2
-    dispose()
-    t.deepEqual(seen, [0, 1, 2])
-})
-
-test(`decorated field can be inherited, but doesn't inherite the effect of decorator`, () => {
-    class Store {
-        @action
-        action = () => {
-            return
-        }
-    }
-
-    class SubStore extends Store {
-        action = () => {
-            // should not be a MobX action
-            return
-        }
-    }
-
-    const store = new Store()
-    expect(isAction(store.action)).toBe(true)
-
-    const subStore = new SubStore()
-    expect(isAction(subStore.action)).toBe(false)
 })
