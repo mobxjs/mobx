@@ -1053,7 +1053,7 @@ describe("@observer", () => {
     test("class comp with export before", () => {
         expect(
             convert(`
-        import {observer} from 'mobx-react-lite'
+        import {observer} from 'mobx-react'
 
 
         /* 1 */
@@ -1063,7 +1063,7 @@ describe("@observer", () => {
 
         `)
         ).toMatchInlineSnapshot(`
-            "import {observer} from 'mobx-react-lite'
+            "import {observer} from 'mobx-react'
 
 
             /* 1 */
@@ -1077,7 +1077,7 @@ describe("@observer", () => {
         expect(
             convert(
                 `
-        import {observer} from 'mobx-react-lite'
+        import {observer} from 'mobx-react'
 
 
         /* 1 */
@@ -1089,7 +1089,7 @@ describe("@observer", () => {
                 { decoratorsAfterExport: true }
             )
         ).toMatchInlineSnapshot(`
-            "import {observer} from 'mobx-react-lite'
+            "import {observer} from 'mobx-react'
 
 
             /* 1 */
