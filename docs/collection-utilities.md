@@ -9,7 +9,7 @@ hide_title: true
 # Collection utilities {🚀}
 
 They enable manipulating observable arrays, objects and Maps with the same generic API.
-These APIs are fully reactive, which means that even [without `Proxy` support](configuration.md#limitations-without-proxy-support) new property declarations can be detected by MobX if `set` is used to add them, and `values` or `keys` are used to iterate over them.
+These APIs are fully reactive and can track keys, values and entries without depending on the concrete collection type.
 
 Another benefit of `values`, `keys` and `entries` is that they return arrays rather than iterators, which makes it possible to, for example, immediately call `.map(fn)` on the results.
 
@@ -28,7 +28,7 @@ Mutation:
 -   `has(collection, key)` returns _true_ if the collection has the specified _observable_ property.
 -   `get(collection, key)` returns the child under the specified key.
 
-If you use the access APIs in an environment without `Proxy` support, then also use the mutation APIs so they can detect the changes.
+If you use `get` to track properties that might not exist yet, `set` provides the matching generic mutation API.
 
 ```javascript
 import { autorun, get, set, observable, values } from "mobx"

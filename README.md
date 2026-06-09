@@ -111,7 +111,7 @@ So what does code that uses MobX look like?
 import React from "react"
 import ReactDOM from "react-dom"
 import { makeAutoObservable } from "mobx"
-import { observer } from "mobx-react-lite"
+import { observer } from "mobx-react"
 
 // Model the application state.
 function createTimer() {

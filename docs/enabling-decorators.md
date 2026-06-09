@@ -12,6 +12,7 @@ hide_title: true
 
 After years of alterations, ES decorators have finally reached Stage 3 in the TC39 process, meaning that they are quite stable and won't undergo breaking changes again like the previous decorator proposals have. MobX has implemented support for this new "2022.3/Stage 3" decorator syntax.
 With modern decorators, it is no longer needed to call `makeObservable` / `makeAutoObservable`.
+Decorator APIs should be imported from `mobx`.
 
 2022.3 Decorators are supported in:
 
@@ -90,55 +91,14 @@ class TodoList {
 Notice the usage of the new `accessor` keyword when using `@observable`.
 It is part of the 2022.3 spec and is required if you want to use modern decorators.
 
-<details id="legacy-decorators"><summary>Using legacy decorators</summary>
-
-We do not recommend codebases to use TypeScript / Babel legacy decorators since they well never become an official part of the language, but you can still use them. It does require a specific setup for transpilation:
-
-MobX before version 6 encouraged the use of legacy decorators and mark things as `observable`, `computed` and `action`.
-While MobX 6 recommends against using these decorators (and instead use either modern decorators or [`makeObservable` / `makeAutoObservable`](observable-state.md)), it is in the current major version still possible.
-Support for legacy decorators will be removed in MobX 7.
-
-```javascript
-import { makeObservable, observable, computed, action } from "mobx"
-
-class Todo {
-    id = Math.random()
-    @observable title = ""
-    @observable finished = false
-
-    constructor() {
-        makeObservable(this)
-    }
-
-    @action
-    toggle() {
-        this.finished = !this.finished
-    }
-}
-
-class TodoList {
-    @observable todos = []
-
-    @computed
-    get unfinishedTodoCount() {
-        return this.todos.filter(todo => !todo.finished).length
-    }
-
-    constructor() {
-        makeObservable(this)
-    }
-}
-```
-
-</details>
-
 <details id="migrate-decorators"><summary>Migrating from legacy decorators</summary>
 
 To migrate from legacy decorators to modern decorators, perform the following steps:
 
 1. Disable / remove the `experimentalDecorators` flag from your TypeScript configuration (or Babel equivalent)
-2. Remove all `makeObservable(this)` calls from class constructors that use decorators.
-3. Replace all instances of `@observable` (and variations) with `@observable accessor`
+2. Import decorators from `mobx`.
+3. Remove all `makeObservable(this)` calls from class constructors that use decorators.
+4. Replace all instances of `@observable` (and variations) with `@observable accessor`
 
 Please note that adding `accessor` to a class property will change it into `get` and `set` class methods. Unlike class properties, class methods are not enumerable. This may introduce new behavior with some APIs, such as `Object.keys`, `JSON.stringify`, etc.
 
@@ -146,15 +106,13 @@ Please note that adding `accessor` to a class property will change it into `get`
 
 <details id="gotchas"><summary>Decorator changes / gotchas</summary>
 
-MobX' 2022.3 Decorators are very similar to the MobX 5 decorators, so usage is mostly the same, but there are some gotchas:
+MobX' 2022.3 decorators have some gotchas:
 
 -   `@observable accessor` decorators are _not_ enumerable. `accessor`s do not have a direct equivalent in the past - they're a new concept in the language. We've chosen to make them non-enumerable, non-own properties in order to better follow the spirit of the ES language and what `accessor` means.
     The main cases for enumerability seem to have been around serialization and rest destructuring.
     -   Regarding serialization, implicitly serializing all properties probably isn't ideal in an OOP-world anyway, so this doesn't seem like a substantial issue (consider implementing `toJSON` or using `serializr` as possible alternatives)
     -   Addressing rest-destructuring, such is an anti-pattern in MobX - doing so would (likely unwantedly) touch all observables and make the observer overly-reactive).
--   `@action some_field = () => {}` was and is valid usage. However, inheritance is different between legacy decorators and modern decorators.
-    -   In legacy decorators, if superclass has a field decorated by `@action`, and subclass tries to override the same field, it will throw a `TypeError: Cannot redefine property`.
-    -   In modern decorators, if superclass has a field decorated by `@action`, and subclass tries to override the same field, it's allowed to override the field. However, the field on subclass is not an action unless it's also decorated with `@action` in subclass declaration.
+-   `@action some_field = () => {}` is valid usage. If a superclass has a field decorated by `@action`, a subclass can override the field. However, the field on the subclass is not an action unless it is also decorated with `@action` in the subclass declaration.
 
 </details>
 
