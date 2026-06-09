@@ -172,7 +172,7 @@ _An action is any piece of code that modifies the state._
 
 ### `action`
 
-Usage: `action(fn)`, `action` _(annotation)_ or `@action` _(method / field decorator from `mobx`)_
+Usage: `action(fn)`, `action` _(annotation)_ or `@action` _(method / field decorator)_
 <small>(<b>[further information](actions.md)</b>)</small>
 
 Use on functions that intend to modify the state.
@@ -186,7 +186,7 @@ Create a one-time action that is immediately invoked.
 
 ### `flow`
 
-Usage: `flow(fn)`, `flow` _(annotation)_ or `@flow` _(generator method decorator from `mobx`)_
+Usage: `flow(fn)`, `flow` _(annotation)_ or `@flow` _(generator method decorator)_
 <small>(<b>[further information](actions.md#using-flow-instead-of-async--await-)</b>)</small>
 
 MobX friendly replacement for `async` / `await` that supports cancellation.
@@ -207,7 +207,7 @@ _Computed values can be used to derive information from other observables._
 
 ### `computed`
 
-Usage: `computed(fn, options?)`, `computed(options?)` _(annotation)_ or `@computed` _(getter decorator from `mobx`)_
+Usage: `computed(fn, options?)`, `computed(options?)` _(annotation)_ or `@computed` _(getter decorator)_
 <small>(<b>[further information](computeds.md)</b>)</small>
 
 Creates an observable value that is derived from other observables, but won't be recomputed unless one of the underlying observables changes.

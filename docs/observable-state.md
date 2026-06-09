@@ -26,7 +26,7 @@ This function can be used to make _existing_ object properties observable. Any J
 Typically `makeObservable` is used in the constructor of a class, and its first argument is `this`.
 The `annotations` argument maps [annotations](#available-annotations) to each member. Only annotated members are affected.
 
-Alternatively, decorators imported from `mobx` can be used on class members instead of calling `makeObservable` in the constructor.
+Alternatively, decorators like `@observable` can be used on class members instead of calling `makeObservable` in the constructor.
 
 Methods that derive information and take arguments (for example `findUsersOlderThan(age: number): User[]`) can not be annotated as `computed` – their read operations will still be tracked when they are called from a reaction, but their output won't be memoized to avoid memory leaks. To memoize such methods you can use [MobX-utils computedFn {🚀}](https://github.com/mobxjs/mobx-utils#computedfn) instead.
 
@@ -176,7 +176,7 @@ Inference rules:
 Usage:
 
 -   `observable(source, overrides?, options?)`
--   `@observable accessor` _(field decorator from `mobx`)_
+-   `@observable accessor` _(field decorator)_
 
 The `observable` annotation can also be called as a function to make an entire object observable at once.
 The `source` object will be cloned and all members will be made observable, similar to how it would be done by `makeAutoObservable`.

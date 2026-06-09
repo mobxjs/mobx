@@ -19,7 +19,7 @@ _⚠️ **Warning**: Depending on factors like the size and complexity of your c
 2. Update `mobx` to version 7.
 3. If you use React, update `mobx-react` to the latest compatible version and remove `mobx-react-lite` from your dependencies.
 4. Make sure your runtime has native [`Proxy`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) support. If you need to support Internet Explorer or React Native runtimes without proxies, stay on MobX 6 or move to a runtime with native Proxy support.
-5. If you use decorators, make sure they are Stage 3 decorators imported from `mobx`. Legacy decorators are not supported in MobX 7. Check out the [Enabling decorators {🚀}](enabling-decorators.md) section for more details.
+5. If you use decorators, make sure they use Stage 3 syntax. Legacy decorators are not supported in MobX 7. Check out the [Enabling decorators {🚀}](enabling-decorators.md) section for more details.
 6. Remove `configure({ useProxies: ... })` and `{ proxy: false }` observable options. MobX 7 always uses Proxy-backed observable arrays and plain objects.
 
 ## Updating React bindings
@@ -188,7 +188,7 @@ console.log(getDependencyTree(disposer))
 
 ## Other cleanup
 
--   Decorator APIs should be imported from `mobx`.
+-   Decorators must use Stage 3 syntax.
 -   Separate decorator entry artifacts are no longer published.
 -   Observable arrays are always Proxy-backed observable arrays. Workarounds that existed only for MobX 6 non-proxy mode can usually be removed.
 -   Published MobX 7 bundles target modern JavaScript environments. Transpiling can change syntax support, but it cannot add the Proxy semantics MobX needs.

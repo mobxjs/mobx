@@ -28,8 +28,6 @@ Mutation:
 -   `has(collection, key)` returns _true_ if the collection has the specified _observable_ property.
 -   `get(collection, key)` returns the child under the specified key.
 
-If you use `get` to track properties that might not exist yet, `set` provides the matching generic mutation API.
-
 ```javascript
 import { autorun, get, set, observable, values } from "mobx"
 

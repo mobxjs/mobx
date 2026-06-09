@@ -35,7 +35,7 @@ Fields can be made observable with either explicit annotation maps or Stage 3 de
 
 1. Remove all decorators and call `makeObservable` in the `constructor`, explicitly defining which field should be made observable using which annotation. For example: `makeObservable(this, { count: observable, tick: action, elapsedTime: computed })`.
 2. Remove decorators and use `makeAutoObservable(this)` in class constructors where subclassing limitations are acceptable.
-3. Migrate legacy decorators to Stage 3 decorators, import them from `mobx`, use `@observable accessor`, and remove `makeObservable(this)` calls from decorated classes.
+3. Migrate legacy decorators to Stage 3 decorators, use `@observable accessor`, and remove `makeObservable(this)` calls from decorated classes.
 
 Check out [makeObservable / makeAutoObservable](observable-state.md) for more details.
 

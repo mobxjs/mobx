@@ -12,7 +12,6 @@ hide_title: true
 
 After years of alterations, ES decorators have finally reached Stage 3 in the TC39 process, meaning that they are quite stable and won't undergo breaking changes again like the previous decorator proposals have. MobX has implemented support for this new "2022.3/Stage 3" decorator syntax.
 With modern decorators, it is no longer needed to call `makeObservable` / `makeAutoObservable`.
-Decorator APIs should be imported from `mobx`.
 
 2022.3 Decorators are supported in:
 
@@ -96,9 +95,8 @@ It is part of the 2022.3 spec and is required if you want to use modern decorato
 To migrate from legacy decorators to modern decorators, perform the following steps:
 
 1. Disable / remove the `experimentalDecorators` flag from your TypeScript configuration (or Babel equivalent)
-2. Import decorators from `mobx`.
-3. Remove all `makeObservable(this)` calls from class constructors that use decorators.
-4. Replace all instances of `@observable` (and variations) with `@observable accessor`
+2. Remove all `makeObservable(this)` calls from class constructors that use decorators.
+3. Replace all instances of `@observable` (and variations) with `@observable accessor`
 
 Please note that adding `accessor` to a class property will change it into `get` and `set` class methods. Unlike class properties, class methods are not enumerable. This may introduce new behavior with some APIs, such as `Object.keys`, `JSON.stringify`, etc.
 
