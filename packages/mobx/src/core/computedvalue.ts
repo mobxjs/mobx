@@ -5,7 +5,6 @@ import {
     IEqualsComparer,
     IObservable,
     Lambda,
-    TraceMode,
     autorun,
     clearObserving,
     comparer,
@@ -99,7 +98,6 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 
     derivation: () => T // N.B: unminified as it is used by MST
     setter_?: (value: T) => void
-    isTracing_: TraceMode = TraceMode.NONE
     scope_: Object | undefined
     private equals_: IEqualsComparer<any>
     private requiresReaction_: boolean | undefined
@@ -313,11 +311,6 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         if (!this.keepAlive_) {
             clearObserving(this)
             this.value_ = undefined // don't hold on to computed value!
-            if (__DEV__ && this.isTracing_ !== TraceMode.NONE) {
-                console.log(
-                    `[mobx.trace] Computed value '${this.name_}' was suspended and it will recompute on the next access.`
-                )
-            }
         }
     }
 
@@ -347,11 +340,6 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     warnAboutUntrackedRead_() {
         if (!__DEV__) {
             return
-        }
-        if (this.isTracing_ !== TraceMode.NONE) {
-            console.log(
-                `[mobx.trace] Computed value '${this.name_}' is being read outside a reactive context. Doing a full recompute.`
-            )
         }
         if (
             typeof this.requiresReaction_ === "boolean"

@@ -66,7 +66,6 @@ test("correct api should be exposed", function () {
             "set",
             "spy",
             "toJS",
-            "trace",
             "transaction",
             "untracked",
             "values",

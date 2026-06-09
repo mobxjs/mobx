@@ -2,8 +2,8 @@ const start = Date.now()
 const mkdirp = require("mkdirp")
 
 const ver = process.argv[2]
-if (!ver || !ver.match(/legacy|proxy/)) {
-    throw new Error("specify version to perf test as (legacy|proxy)")
+if (ver !== "proxy") {
+    throw new Error("specify version to perf test as proxy")
 }
 
 if (process.env.PERSIST) {

@@ -6,7 +6,6 @@ function resetMobxTestState() {
     _resetGlobalState()
     _getGlobalState().spyListeners = []
     configure({
-        useProxies: "always",
         enforceActions: "never",
         computedRequiresReaction: false,
         reactionRequiresObservable: false,

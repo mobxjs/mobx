@@ -4,7 +4,6 @@ import {
     IDerivationState_,
     IObservable,
     Lambda,
-    TraceMode,
     clearObserving,
     createInstanceofPredicate,
     endBatch,
@@ -17,7 +16,6 @@ import {
     spyReportEnd,
     spyReportStart,
     startBatch,
-    trace,
     trackDerivedFunction,
     GenericAbortSignal
 } from "../internal"
@@ -45,7 +43,6 @@ import { getFlag, setFlag } from "../utils/utils"
 
 export interface IReactionPublic {
     dispose(): void
-    trace(enterBreakPoint?: boolean): void
 }
 
 export interface IReactionDisposer {
@@ -66,8 +63,6 @@ export class Reaction implements IDerivation, IReactionPublic {
     private static readonly isRunningMask_ = 0b01000
     private static readonly diffValueMask_ = 0b10000
     private flags_ = 0b00000
-
-    isTracing_: TraceMode = TraceMode.NONE
 
     constructor(
         public name_: string = __DEV__ ? "Reaction@" + getNextId() : "Reaction",
@@ -249,10 +244,6 @@ export class Reaction implements IDerivation, IReactionPublic {
 
     toString() {
         return `Reaction[${this.name_}]`
-    }
-
-    trace(enterBreakPoint: boolean = false) {
-        trace(this, enterBreakPoint)
     }
 }
 

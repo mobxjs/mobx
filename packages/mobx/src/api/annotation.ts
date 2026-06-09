@@ -20,7 +20,6 @@ export type Annotation = {
         descriptor: PropertyDescriptor,
         proxyTrap: boolean
     ): boolean | null
-    decorate_20223_(value: any, context: DecoratorContext)
     options_?: any
 }
 

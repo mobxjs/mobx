@@ -14,8 +14,7 @@ export function createComputedAnnotation(name: string, options?: object): Annota
         annotationType_: name,
         options_: options,
         make_,
-        extend_,
-        decorate_20223_
+        extend_
     }
 }
 
@@ -47,11 +46,15 @@ function extend_(
     )
 }
 
-function decorate_20223_(this: Annotation, get, context: ClassGetterDecoratorContext) {
+export function decorateComputed20223_(
+    annotation: Annotation,
+    get,
+    context: ClassGetterDecoratorContext
+) {
     if (__DEV__) {
         assert20223DecoratorType(context, ["getter"])
     }
-    const ann = this
+    const ann = annotation
     const { name: key, addInitializer } = context
     let computedValues: WeakMap<object, ComputedValue<any>> | undefined
 

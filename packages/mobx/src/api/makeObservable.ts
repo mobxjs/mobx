@@ -4,14 +4,12 @@ import {
     AnnotationsMap,
     CreateObservableOptions,
     ObservableObjectAdministration,
-    collectStoredAnnotations,
     isPlainObject,
     isObservableObject,
     die,
     ownKeys,
     extendObservable,
     addHiddenProp,
-    storedAnnotationsSymbol,
     initObservable
 } from "../internal"
 
@@ -22,25 +20,22 @@ import {
 // Fixes: https://github.com/mobxjs/mobx/issues/2325#issuecomment-691070022
 type NoInfer<T> = [T][T extends any ? 0 : never]
 
-type MakeObservableOptions = Omit<CreateObservableOptions, "proxy">
+type MakeObservableOptions = CreateObservableOptions
 
 export function makeObservable<T extends object, AdditionalKeys extends PropertyKey = never>(
     target: T,
-    annotations?: AnnotationsMap<T, NoInfer<AdditionalKeys>>,
+    annotations: AnnotationsMap<T, NoInfer<AdditionalKeys>>,
     options?: MakeObservableOptions
 ): T {
     initObservable(() => {
         const adm: ObservableObjectAdministration = asObservableObject(target, options)[$mobx]
-        if (__DEV__ && annotations && target[storedAnnotationsSymbol]) {
-            die(
-                `makeObservable second arg must be nullish when using decorators. Mixing @decorator syntax with annotations is not supported.`
-            )
+        if (__DEV__ && annotations == null) {
+            die(`'makeObservable' requires annotations in MobX 7`)
         }
-        // Default to decorators
-        annotations ??= collectStoredAnnotations(target)
+        const annotationsMap = annotations ?? {}
 
         // Annotate
-        ownKeys(annotations).forEach(key => adm.make_(key, annotations![key]))
+        ownKeys(annotationsMap).forEach(key => adm.make_(key, annotationsMap[key]))
     })
     return target
 }

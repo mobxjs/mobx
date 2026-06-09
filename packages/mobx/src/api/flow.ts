@@ -4,14 +4,10 @@ import {
     die,
     isFunction,
     Annotation,
-    isStringish,
-    storeAnnotation,
     createFlowAnnotation,
-    createDecoratorAnnotation,
-    is20223Decorator
+    decorateFlow20223_,
+    assign
 } from "../internal"
-
-import type { ClassMethodDecorator } from "../types/decorator_fills"
 
 export const FLOW = "flow"
 
@@ -35,18 +31,29 @@ export function isFlowCancellationError(error: Error) {
 
 export type CancellablePromise<T> = Promise<T> & { cancel(): void }
 
-type FlowGenerator = (...args: any[]) => Generator<any, any, any> | AsyncGenerator<any, any, any>
+interface FlowDecoratorAnnotation extends Annotation {
+    (value: any, context: ClassMethodDecoratorContext): any
+}
 
-// PropertyDecorator is only for legacy decorators
-interface Flow extends Annotation, PropertyDecorator {
-    <This, Value extends FlowGenerator>(
-        value: Value,
-        context: ClassMethodDecoratorContext<This, Value>
-    ): Value | void
+function createFlowDecoratorAnnotation(annotation: Annotation): FlowDecoratorAnnotation {
+    return assign(function flowDecorator(value, context) {
+        if (context && typeof context.kind === "string") {
+            return decorateFlow20223_(annotation, value, context)
+        }
+        if (__DEV__) {
+            die(`Invalid arguments for \`${annotation.annotationType_}\``)
+        }
+        return undefined
+    }, annotation) as any
+}
+
+interface Flow extends Annotation {
+    (value: any, context: ClassMethodDecoratorContext): any
     <R, Args extends any[]>(
-        generator: (...args: Args) => Generator<any, R, any> | AsyncGenerator<any, R, any>
+        generator: (...args: Args) => Generator<any, R, any> | AsyncGenerator<any, R, any>,
+        context?: never
     ): (...args: Args) => CancellablePromise<R>
-    bound: Annotation & PropertyDecorator & ClassMethodDecorator
+    bound: FlowDecoratorAnnotation
 }
 
 const flowAnnotation = createFlowAnnotation("flow")
@@ -54,14 +61,10 @@ const flowBoundAnnotation = createFlowAnnotation("flow.bound", { bound: true })
 
 export const flow: Flow = Object.assign(
     function flow(arg1, arg2?) {
-        // @flow (2022.3 Decorators)
-        if (is20223Decorator(arg2)) {
-            return flowAnnotation.decorate_20223_(arg1, arg2)
+        if (arg2 && typeof arg2.kind === "string") {
+            return decorateFlow20223_(flowAnnotation, arg1, arg2)
         }
-        // @flow
-        if (isStringish(arg2)) {
-            return storeAnnotation(arg1, arg2, flowAnnotation)
-        }
+
         // flow(fn)
         if (__DEV__ && arguments.length !== 1) {
             die(`Flow expects single argument with generator function`)
@@ -152,7 +155,7 @@ export const flow: Flow = Object.assign(
     flowAnnotation
 )
 
-flow.bound = createDecoratorAnnotation(flowBoundAnnotation)
+flow.bound = createFlowDecoratorAnnotation(flowBoundAnnotation)
 
 function cancelPromise(promise) {
     if (isFunction(promise.cancel)) {

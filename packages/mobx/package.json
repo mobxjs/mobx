@@ -12,6 +12,9 @@
     "react-native": "dist/mobx.esm.js",
     "types": "dist/mobx.d.ts",
     "typings": "dist/mobx.d.ts",
+    "browserslist": [
+        "supports es6-module"
+    ],
     "files": [
         "src",
         "dist",
@@ -65,10 +68,9 @@
         "build": "node ../../scripts/build.js mobx",
         "build:test": "npm run build -- --target test",
         "perf": "scripts/perf.sh",
-        "perf-legacy": "node --expose-gc ./__tests__/perf/index.js legacy",
         "perf-proxy": "node --expose-gc ./__tests__/perf/index.js proxy",
         "perf-decorator": "tsc -p ./__tests__/perf/tsconfig.decorator.json && node --expose-gc ./__tests__/perf/compiled/lazy-computed-decorator.js && node --expose-gc ./__tests__/perf/compiled/lazy-observable-decorator.js",
-        "test:performance": "npm run perf -- proxy && npm run perf -- legacy && npm run perf-decorator",
+        "test:performance": "npm run perf -- proxy && npm run perf-decorator",
         "test:mixed-versions": "npm test -- --testRegex mixed-versions",
         "test:types": "tsc --noEmit",
         "test:coverage": "npm test -- -i --coverage",

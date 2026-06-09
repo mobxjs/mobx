@@ -758,47 +758,6 @@ test.skip("observable performance - ts", () => {
     console.log("changed in ", Date.now() - start)
 })
 
-test.skip("observable performance - ts - decorators", () => {
-    const AMOUNT = 100000
-
-    class A {
-        @observable
-        a = 1
-        @observable
-        b = 2
-        @observable
-        c = 3
-
-        constructor() {
-            makeObservable(this)
-        }
-
-        @computed
-        get d() {
-            return this.a + this.b + this.c
-        }
-    }
-
-    const objs: any[] = []
-    const start = Date.now()
-
-    for (let i = 0; i < AMOUNT; i++) objs.push(new A())
-
-    console.log("created in ", Date.now() - start)
-
-    for (let j = 0; j < 4; j++) {
-        for (let i = 0; i < AMOUNT; i++) {
-            const obj = objs[i]
-            obj.a += 3
-            obj.b *= 4
-            obj.c = obj.b - obj.a
-            obj.d
-        }
-    }
-
-    console.log("changed in ", Date.now() - start)
-})
-
 test("unbound methods", () => {
     class A {
         constructor() {
@@ -2380,20 +2339,21 @@ test("TS - it should support flow as annotation", done => {
     }, 10)
 })
 
-test("TS - it should support flow as decorator", done => {
+test("TS - it should support flow as annotation", done => {
     const values: number[] = []
 
     mobx.configure({ enforceActions: "observed" })
 
     class X {
-        @observable
         a = 1
 
         constructor() {
-            makeObservable(this)
+            makeObservable(this, {
+                a: observable,
+                f: flow
+            })
         }
 
-        @flow
         *f(initial) {
             this.a = initial // this runs in action
             try {

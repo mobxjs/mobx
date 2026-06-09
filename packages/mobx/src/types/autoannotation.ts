@@ -10,7 +10,6 @@ import {
     autoAction,
     isGenerator,
     MakeResult,
-    die,
     isAction
 } from "../internal"
 
@@ -23,8 +22,7 @@ export function createAutoAnnotation(options?: object): Annotation {
         annotationType_: AUTO,
         options_: options,
         make_,
-        extend_,
-        decorate_20223_
+        extend_
     }
 }
 
@@ -109,8 +107,4 @@ function extend_(
     }
     let observableAnnotation = this.options_?.deep === false ? observable.ref : observable
     return observableAnnotation.extend_(adm, key, descriptor, proxyTrap)
-}
-
-function decorate_20223_(this: Annotation, desc, context: ClassGetterDecoratorContext) {
-    die(`'${this.annotationType_}' cannot be used as a decorator`)
 }
