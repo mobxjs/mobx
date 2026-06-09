@@ -6,9 +6,7 @@ module.exports = {
                 ...config.output,
                 globals: {
                     react: "React",
-                    mobx: "mobx",
-                    "react-dom": "ReactDOM",
-                    "mobx-react-lite": "mobxReactLite"
+                    mobx: "mobx"
                 }
             }
         }

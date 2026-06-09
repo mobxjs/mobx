@@ -18,7 +18,7 @@
         "LICENSE",
         "CHANGELOG.md",
         "README.md",
-        "batching*"
+        "batchingForReactNative.js"
     ],
     "sideEffects": false,
     "repository": {
@@ -35,24 +35,12 @@
         "url": "https://github.com/mobxjs/mobx/issues"
     },
     "homepage": "https://mobx.js.org",
-    "dependencies": {
-        "mobx-react-lite": "^4.1.1"
-    },
     "peerDependencies": {
         "mobx": "^6.9.0",
-        "react": "^16.8.0 || ^17 || ^18 || ^19"
-    },
-    "peerDependenciesMeta": {
-        "react-dom": {
-            "optional": true
-        },
-        "react-native": {
-            "optional": true
-        }
+        "react": "^18 || ^19"
     },
     "devDependencies": {
         "mobx": "^6.15.0",
-        "mobx-react-lite": "^4.1.1",
         "expose-gc": "^1.0.0"
     },
     "keywords": [

@@ -6,11 +6,9 @@ import {
     _allowStateReadsEnd,
     _getGlobalState
 } from "mobx"
-import {
-    isUsingStaticRendering,
-    _observerFinalizationRegistry as observerFinalizationRegistry
-} from "mobx-react-lite"
-import { shallowEqual, patch } from "./utils/utils"
+import { isUsingStaticRendering } from "./staticRendering"
+import { observerFinalizationRegistry } from "./utils/observerFinalizationRegistry"
+import { shallowEqual } from "./utils/utils"
 
 const administrationSymbol = Symbol("ObserverAdministration")
 const isMobXReactObserverSymbol = Symbol("isMobXReactObserver")
@@ -157,10 +155,10 @@ export function makeClassComponentObserver(
         return originalComponentDidMount?.apply(this, arguments)
     }
 
-    // TODO@major Overly complicated "patch" is only needed to support the deprecated @disposeOnUnmount
-    patch(prototype, "componentWillUnmount", function () {
+    const originalComponentWillUnmount = prototype.componentWillUnmount
+    prototype.componentWillUnmount = function () {
         if (isUsingStaticRendering()) {
-            return
+            return originalComponentWillUnmount?.apply(this, arguments)
         }
         const admin = getAdministration(this)
         admin.reaction?.dispose()
@@ -168,7 +166,8 @@ export function makeClassComponentObserver(
         admin.forceUpdate = null
         admin.mounted = false
         admin.reactionInvalidatedBeforeMount = false
-    })
+        return originalComponentWillUnmount?.apply(this, arguments)
+    }
 
     return componentClass
 }
@@ -198,8 +197,6 @@ function createReactiveRender(originalRender: any) {
         let renderResult = undefined
         admin.reaction.track(() => {
             try {
-                // TODO@major
-                // Optimization: replace with _allowStateChangesStart/End (not available in mobx@6.0.0)
                 renderResult = _allowStateChanges(false, boundOriginalRender)
             } catch (e) {
                 error = e

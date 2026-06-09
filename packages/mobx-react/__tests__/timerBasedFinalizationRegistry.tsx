@@ -2,8 +2,7 @@ import "./utils/killFinalizationRegistry"
 import { cleanup, render, act } from "@testing-library/react"
 import * as mobx from "mobx"
 import * as React from "react"
-import { observer } from "../src"
-import { clearTimers } from "mobx-react-lite"
+import { clearTimers, observer } from "../src"
 
 expect(globalThis.FinalizationRegistry).toBeUndefined()
 

@@ -1,5 +1,5 @@
 import React, { StrictMode, Suspense } from "react"
-import { inject, observer, Observer, enableStaticRendering } from "../src"
+import { observer, Observer, enableStaticRendering } from "../src"
 import { render, act, waitFor } from "@testing-library/react"
 import {
     getObserverTree,
@@ -316,36 +316,6 @@ test("changing state in render should fail", () => {
     _resetGlobalState()
 })
 
-test("observer component can be injected", () => {
-    const msg: Array<any> = []
-    const baseWarn = console.warn
-    console.warn = m => msg.push(m)
-
-    inject("foo")(
-        observer(
-            class T extends React.Component {
-                render() {
-                    return null
-                }
-            }
-        )
-    )
-
-    // N.B, the injected component will be observer since mobx-react 4.0!
-    inject(() => ({}))(
-        observer(
-            class T extends React.Component {
-                render() {
-                    return null
-                }
-            }
-        )
-    )
-
-    expect(msg.length).toBe(0)
-    console.warn = baseWarn
-})
-
 test("correctly wraps display name of child component", () => {
     const A = observer(
         class ObserverClass extends React.Component {
@@ -365,7 +335,6 @@ test("correctly wraps display name of child component", () => {
 
 describe("124 - react to changes in this.props via computed", () => {
     class T extends React.Component<any, any> {
-        @computed
         get computedProp() {
             return this.props.x
         }
@@ -406,8 +375,6 @@ describe("124 - react to changes in this.props via computed", () => {
     })
 })
 
-// Test on skip: since all reactions are now run in batched updates, the original issues can no longer be reproduced
-//this test case should be deprecated?
 test("should stop updating if error was thrown in render (#134)", () => {
     const data = observable.box(0)
     let renderingsCount = 0
@@ -523,7 +490,6 @@ test("it rerenders correctly if some props are non-observables - 1", () => {
 
     @observer
     class Comp extends React.Component<any, any> {
-        @computed
         get computed() {
             // n.b: data.y would not rerender! shallowly new equal props are not stored
             return this.props.odata.x
@@ -568,7 +534,6 @@ test("it rerenders correctly if some props are non-observables - 2", () => {
 
     @observer
     class Component extends React.PureComponent<any, any> {
-        @computed
         get computed() {
             return this.props.data.y // should recompute, since props.data is changed
         }
@@ -671,28 +636,34 @@ test("parent / childs render in the right order", () => {
     let events: Array<any> = []
 
     class User {
-        @observable
         name = "User's name"
+
+        constructor() {
+            makeObservable(this, {
+                name: observable
+            })
+        }
     }
 
     class Store {
-        @observable
         user: User | null = new User()
-        @action
+
         logout() {
             this.user = null
         }
+
         constructor() {
-            makeObservable(this)
+            makeObservable(this, {
+                user: observable,
+                logout: action
+            })
         }
     }
 
     function tryLogout() {
         try {
-            // ReactDOM.unstable_batchedUpdates(() => {
             store.logout()
             expect(true).toBeTruthy()
-            // });
         } catch (e) {
             // t.fail(e)
         }
@@ -722,8 +693,8 @@ test("parent / childs render in the right order", () => {
     expect(events).toEqual(["parent", "child", "parent"])
 })
 
-describe("use Observer inject and render sugar should work  ", () => {
-    test("use render without inject should be correct", () => {
+describe("Observer render sugar should work", () => {
+    test("use render should be correct", () => {
         const Comp = () => (
             <div>
                 <Observer render={() => <span>{123}</span>} />
@@ -733,7 +704,7 @@ describe("use Observer inject and render sugar should work  ", () => {
         expect(container).toHaveTextContent("123")
     })
 
-    test("use children without inject should be correct", () => {
+    test("use children should be correct", () => {
         const Comp = () => (
             <div>
                 <Observer>{() => <span>{123}</span>}</Observer>
@@ -795,7 +766,6 @@ test("computed properties react to props", () => {
     const seen: Array<any> = []
     @observer
     class Child extends React.Component<any, any> {
-        @computed
         get getPropX() {
             return this.props.x
         }
@@ -836,15 +806,16 @@ test("#692 - componentDidUpdate is triggered", () => {
 
     @observer
     class Test extends React.Component<any, any> {
-        @observable
         counter = 0
 
-        @action
         inc = () => this.counter++
 
         constructor(props) {
             super(props)
-            makeObservable(this)
+            makeObservable(this, {
+                counter: observable,
+                inc: action
+            })
             setTimeout(() => this.inc(), 300)
         }
 
