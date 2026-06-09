@@ -72,7 +72,10 @@
         "test:mixed-versions": "npm test -- --testRegex mixed-versions",
         "test:types": "tsc --noEmit",
         "test:coverage": "npm test -- -i --coverage",
-        "test:size": "import-size --report . observable computed autorun action",
+        "check-size": "npm run build -- --target publish && node ./scripts/size.js bundle minimal make-auto-observable",
+        "check-size:bundle": "npm run build -- --target publish && node ./scripts/size.js bundle",
+        "check-size:minimal": "npm run build -- --target publish && node ./scripts/size.js minimal",
+        "check-size:make-auto-observable": "npm run build -- --target publish && node ./scripts/size.js make-auto-observable",
         "test:check": "npm run test:types",
         "prepublishOnly": "node ./scripts/prepublish.js && npm run build -- --target publish"
     }

@@ -26,7 +26,6 @@
         "lint": "eslint packages/*/src/**/* --ext .js,.ts,.tsx",
         "prettier": "prettier --write **/*.{js,ts,md}",
         "release": "npm run prepublishOnly --workspaces --if-present && changeset publish",
-        "test:size": "npm run test:size --workspaces --if-present",
         "mobx": "npm -w mobx run",
         "mobx-react": "npm -w mobx-react run",
         "mobx-react-lite": "npm -w mobx-react-lite run",
