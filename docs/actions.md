@@ -13,7 +13,7 @@ Usage:
 -   `action` _(annotation)_
 -   `action(fn)`
 -   `action(name, fn)`
--   `@action` _(method / field decorator from `mobx`)_
+-   `@action` _(method / field decorator)_
 
 All applications have actions. An action is any piece of code that modifies the state. In principle, actions always happen in response to an event. For example, a button was clicked, some input changed, a websocket message arrived, etc.
 
@@ -237,7 +237,7 @@ class Parent {
         makeObservable(this, {
             arrowAction: action,
             action: action,
-            boundAction: action.bound
+            boundAction: action.bound,
         })
     }
 }
@@ -254,7 +254,7 @@ class Child extends Parent {
         makeObservable(this, {
             arrowAction: override,
             action: override,
-            boundAction: override
+            boundAction: override,
         })
     }
 }
@@ -417,7 +417,7 @@ Usage:
 
 -   `flow` _(annotation)_
 -   `flow(function* (args) { })`
--   `@flow` _(method decorator from `mobx`)_
+-   `@flow` _(method decorator)_
 
 The `flow` wrapper is an optional alternative to `async` / `await` that makes it easier to
 work with MobX actions.
@@ -452,7 +452,7 @@ class Store {
     constructor() {
         makeObservable(this, {
             githubProjects: observable,
-            state: observable
+            state: observable,
         })
     }
 
