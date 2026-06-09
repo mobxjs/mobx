@@ -18,7 +18,7 @@ _⚠️ **Warning**: Depending on factors like the size and complexity of your c
 1. Update `mobx` to the latest version of MobX 6 and solve any deprecation messages.
 2. Update `mobx` to version 7.
 3. If you use React, update `mobx-react` to the latest compatible version and remove `mobx-react-lite` from your dependencies.
-4. Make sure your runtime has native [`Proxy`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) support. If you need to support Internet Explorer or React Native runtimes without proxies, stay on MobX 6 or move to a runtime with native Proxy support.
+4. Make sure your runtime has native [`Proxy`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) support.
 5. If you use decorators, make sure they use Stage 3 syntax. Legacy decorators are not supported in MobX 7. Check out the [Enabling decorators {🚀}](enabling-decorators.md) section for more details.
 6. Remove `configure({ useProxies: ... })` and `{ proxy: false }` observable options. MobX 7 always uses Proxy-backed observable arrays and plain objects.
 

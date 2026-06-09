@@ -18,7 +18,7 @@ _⚠️ **Warning**: Depending on factors like the size and complexity of your c
 
 1. Update `mobx` to the latest version of MobX 4/5 and solve any deprecation messages.
 2. Update `mobx` to version 6.
-3. MobX 7 requires native Proxy support. If you need to support Internet Explorer or React Native runtimes without proxies, stay on MobX 6 or move to a runtime with native Proxy support. Check out the [Proxy Support](configuration.md#proxy-support) section for more details.
+3. MobX 7 requires native Proxy support. Check out the [Proxy Support](configuration.md#proxy-support) section for more details.
 4. For babel users:
     - If you are using Babel and have class-properties enabled, disable the legacy loose field support: `["@babel/plugin-proposal-class-properties", { "loose": false }]`
     - If you want to use decorators, configure the Stage 3 decorators transform. Legacy decorators are not supported in MobX 7. Check out the [Enabling decorators {🚀}](enabling-decorators.md) section for more details.

@@ -15,10 +15,8 @@ Most configuration options can be set by using the `configure` method.
 
 MobX requires [`Proxy` support](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) to make arrays and plain objects observable.
 Proxies provide the best performance and most consistent behavior across environments.
-Proxy support cannot be polyfilled for MobX because available polyfills do not support the full specification.
 
 MobX 7 does not include the older ES5 fallback implementation and no longer supports `configure({ useProxies })`.
-If you need to target environments without native Proxy support, use MobX 6 or an environment/runtime that provides native Proxy support.
 
 ## Decorator support
 
