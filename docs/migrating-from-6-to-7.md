@@ -191,7 +191,6 @@ console.log(getDependencyTree(disposer))
 -   Decorators must use Stage 3 syntax.
 -   Separate decorator entry artifacts are no longer published.
 -   Observable arrays are always Proxy-backed observable arrays. Workarounds that existed only for MobX 6 non-proxy mode can usually be removed.
--   Published MobX 7 bundles target modern JavaScript environments. Transpiling can change syntax support, but it cannot add the Proxy semantics MobX needs.
 
 ## Replacing `Provider` and `inject`
 

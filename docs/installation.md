@@ -8,8 +8,7 @@ hide_title: true
 
 # Installation
 
-MobX works in modern JavaScript environments with native `Proxy` support, including current browsers and Node.js versions.
-Published MobX 7 bundles target browsers with native ES module support.
+MobX works in browsers and Node.js environments that provide native `Proxy` support.
 
 React integration is available in two forms:
 
@@ -18,9 +17,9 @@ React integration is available in two forms:
 
 Append the appropriate bindings for your use case to the _Yarn_ or _NPM_ command below:
 
-**Yarn:** `yarn add mobx mobx-react`
+**Yarn:** `yarn add mobx`
 
-**NPM:** `npm install --save mobx mobx-react`
+**NPM:** `npm install --save mobx`
 
 **CDN:** https://cdnjs.com/libraries/mobx / https://unpkg.com/mobx/dist/mobx.umd.production.min.js
 
@@ -29,7 +28,6 @@ Append the appropriate bindings for your use case to the _Yarn_ or _NPM_ command
 ## MobX and Decorators
 
 Based on your preference, MobX can be used with or without decorators.
-Only the standardized TC-39 decorators are supported.
 See [enabling-decorators](enabling-decorators.md) for more details on how to enable them.
 
 ## Use spec compliant transpilation for class properties
@@ -40,32 +38,24 @@ When using MobX with TypeScript or Babel, and you plan to use classes; make sure
 -   **Babel**: Make sure to use at least version 7.12, with the following configuration:
     ```json
     {
-    // Babel < 7.13.0
-    "plugins": [["@babel/plugin-proposal-class-properties", { "loose": false }]],
+        // Babel < 7.13.0
+        "plugins": [["@babel/plugin-proposal-class-properties", { "loose": false }]],
 
-            // Babel >= 7.13.0 (https://babeljs.io/docs/en/assumptions)
-            "plugins": [["@babel/plugin-proposal-class-properties"]],
-            "assumptions": {
-                "setPublicClassFields": false
-            }
+        // Babel >= 7.13.0 (https://babeljs.io/docs/en/assumptions)
+        "plugins": [["@babel/plugin-proposal-class-properties"]],
+        "assumptions": {
+            "setPublicClassFields": false
         }
-        ```
-
-    For verification insert this piece of code at the beginning of your sources (eg. `index.js`)
-
+    }
+    ```
+For verification insert this piece of code at the beginning of your sources (eg. `index.js`)
 ```javascript
-if (
-    !new (class {
-        x
-    })().hasOwnProperty("x")
-)
-    throw new Error("Transpiler is not configured correctly")
+if (!new class { x }().hasOwnProperty('x')) throw new Error('Transpiler is not configured correctly');
 ```
 
 ## MobX on older JavaScript environments
 
 MobX requires native [`Proxy` support](https://compat-table.github.io/compat-table/es6/#test-Proxy) for observable arrays and plain objects.
-Older JavaScript engines without Proxy support, such as Internet Explorer, Node.js < 6, iOS < 10, and Android before RN 0.59, are not supported by MobX 7.
 
 ## MobX on other frameworks / platforms
 
