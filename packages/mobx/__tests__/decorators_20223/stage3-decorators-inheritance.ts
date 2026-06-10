@@ -1,6 +1,6 @@
 import {
     autorun,
-    action as createAction,
+    action as actionFn,
     flowResult,
     isAction,
     isComputedProp,
@@ -151,13 +151,13 @@ test("manually wrapped action field can be overridden as an ordinary field", () 
     class Parent {
         @observable accessor count = 0
 
-        increment = createAction(() => {
+        increment = actionFn(() => {
             this.count += 1
         })
     }
 
     class Child extends Parent {
-        increment = createAction(() => {
+        increment = actionFn(() => {
             this.count += 2
         })
     }

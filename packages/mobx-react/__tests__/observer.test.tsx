@@ -473,7 +473,7 @@ describe("should render component even if setState called with exactly the same 
     })
 })
 
-test("it rerenders correctly if some props are non-observables - 1", () => {
+test("class observer rerenders from observable prop and rereads plain prop", () => {
     let odata = observable({ x: 1 })
     let data = { y: 1 }
 
@@ -491,7 +491,6 @@ test("it rerenders correctly if some props are non-observables - 1", () => {
     const Parent = observer(
         class Parent extends React.Component<any, any> {
             render() {
-                // this.props.odata.x;
                 return <Comp data={this.props.data} odata={this.props.odata} />
             }
         }
@@ -513,7 +512,7 @@ test("it rerenders correctly if some props are non-observables - 1", () => {
     expect(container).toHaveTextContent("3-3-3")
 })
 
-test("it rerenders correctly if some props are non-observables - 2", () => {
+test("pure class observer receives new plain props after observable parent render", () => {
     let renderCount = 0
     let odata = observable({ x: 1 })
 
