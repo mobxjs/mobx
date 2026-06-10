@@ -8,10 +8,7 @@ hide_title: true
 
 # Migrating from MobX 6 {🚀}
 
-MobX 7 is mostly a cleanup release. Most applications that already use MobX 6 idiomatically can upgrade with only dependency and import changes.
-This page covers the migration guide from MobX 6 to MobX 7, and an extensive list of the changes that can affect existing projects.
-
-_⚠️ **Warning**: Depending on factors like the size and complexity of your code base, your MobX usage patterns, and the quality of your automated tests, this migration guide might take you anywhere between an hour and a couple of days. Please refrain from upgrading if you don't trust your Continuous Integration or QA / test procedures enough to pick up any unexpected breakages. Unexpected behavioral changes might be caused by changes in MobX itself or the changes needed to your Babel / TypeScript build configuration. ⚠️_
+MobX 7 is mostly a cleanup release. Most applications that already use MobX 6 idiomatically can upgrade with dependency, import and decorator configuration changes.
 
 ## Getting started
 
@@ -39,7 +36,7 @@ Update imports from `mobx-react-lite` to `mobx-react`:
 +import { observer, Observer, useLocalObservable } from "mobx-react"
 ```
 
-`mobx-react` requires React 18 or later. If your project still uses React 16 or 17, upgrade React first or stay on the MobX 6 compatible React bindings.
+`mobx-react` requires React 18 or later.
 
 The public `mobx-react` surface has been reduced to the APIs that are still recommended:
 
@@ -64,7 +61,7 @@ The following APIs have been removed:
 
 ## Migrating legacy decorators
 
-MobX 7 supports Stage 3 decorators only. If your MobX 6 project still uses TypeScript / Babel legacy decorators, migrate them before upgrading.
+MobX 7 supports Stage 3 decorators only.
 
 Legacy decorators looked like this:
 
@@ -143,8 +140,6 @@ class Todo {
 }
 ```
 
-`makeObservable(this)` without annotations no longer discovers decorator metadata and will throw in development builds.
-
 ## Proxy support is required
 
 MobX 7 requires native Proxy support and no longer includes the ES5 fallback implementation.
@@ -169,9 +164,6 @@ Also remove `{ proxy: false }` from `observable`, `observable.object` and `obser
 +const todos = observable.object({})
 ```
 
-If you used `{ proxy: false }` because the object shape is fixed, `makeObservable` or `makeAutoObservable` is often the clearer API because it keeps the original object identity.
-If you used non-proxy observable objects as dynamically keyed collections, consider using observable maps instead.
-
 ## Removed `trace`
 
 The `trace` API has been removed. For debugging reactivity, use [`getDependencyTree`](api.md#getdependencytree), [`getObserverTree`](api.md#getobservertree), [`spy`](analyzing-reactivity.md#spy), the MobX developer tools, or packages such as `mobx-log`.
@@ -186,21 +178,19 @@ const disposer = autorun(() => {
 console.log(getDependencyTree(disposer))
 ```
 
-## Other cleanup
-
--   Separate decorator entry artifacts are no longer published.
--   Observable arrays are always Proxy-backed observable arrays. Workarounds that existed only for MobX 6 non-proxy mode can usually be removed.
-
 ## Replacing `Provider` and `inject`
 
-`Provider` and `inject` predate React's modern context API. In MobX 7, use React context directly and keep the observable object itself stable. The observable can change internally; the context value usually shouldn't be replaced.
+`Provider` and `inject` were removed. Use React context directly. Keep the context value stable and mutate the observable store instead of replacing the provider value.
 
 Before:
 
 ```javascript
 import { Provider, inject, observer } from "mobx-react"
 
-const UserName = inject("userStore")(observer(({ userStore }) => <span>{userStore.name}</span>))
+// prettier-ignore
+const UserName = inject("userStore")(
+    observer(({ userStore }) => <span>{userStore.name}</span>)
+)
 
 const App = ({ userStore }) => (
     <Provider userStore={userStore}>
