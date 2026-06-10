@@ -5,7 +5,7 @@
 
 Release MobX 7 and mobx-react 10.
 
-MobX 7 and mobx-react 10 are coordinated major releases. Bundle sizes are down: ESM prod 17.02 KiB gzip -> 14.90 KiB gzip; a minimal tree-shaken example is 12.63 KiB gzip now.
+Bundle sizes are down: ESM prod 17.02 KiB gzip -> 14.90 KiB gzip; a minimal tree-shaken example is 12.63 KiB gzip now.
 
 They remove long-deprecated compatibility paths and make `mobx-react` the single React binding package for MobX 7.
 
@@ -23,8 +23,12 @@ MobX 7 is a cleanup release focused on the modern runtime and decorator model.
 
 mobx-react 10 requires MobX 7 and React 18 or later.
 
--   `mobx-react` is now the unified React binding package for function components, `forwardRef`, class components, and Stage 3 `@observer` class decorator usage.
--   Move `observer`, `Observer`, and `useLocalObservable` imports from `mobx-react-lite` to `mobx-react`.
+`mobx-react` and `mobx-react-lite` have been merged back into one package. `mobx-react-lite` is no longer available; import React bindings from `mobx-react` instead.
+
+This is possible because, after removing `Provider` / `inject` and the old observable `props` / `state` behavior, `mobx-react` had become a thin class-component wrapper around `mobx-react-lite`'s `observer`.
+
+-   Move `observer`, `Observer`, `useLocalObservable`, `enableStaticRendering`, and `isUsingStaticRendering` imports from `mobx-react-lite` to `mobx-react`.
+-   The merged `observer` supports function components, `forwardRef`, class components, and Stage 3 `@observer` class decorator usage.
 -   Remove React batching imports, including the stale React Native batching deep import. React 18+ renderers handle batching.
 
 The recommended public React binding surface is now:
