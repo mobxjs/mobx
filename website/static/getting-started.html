@@ -243,7 +243,7 @@ observableTodoStore.todos[0].task = "grok MobX tutorial";
                         <h3 id="reactive-reactjs-components">Making React reactive</h3>
                         <p>Ok, so far we made a silly report reactive. Time to build a reactive user interface around this very
                             same store. React components are (despite their name) not reactive out of the box.
-                            The <code>observer</code> HoC wrapper from the <code>mobx-react-lite</code> package fixes that by
+                            The <code>observer</code> HoC wrapper from the <code>mobx-react</code> package fixes that by
                             basically wrapping the React component in <code>autorun</code>. This
                             keeps the component in sync with the state. This is conceptually not different from what we did
                             with the <code>report</code> before.
@@ -396,7 +396,7 @@ setTimeout(action(() => {
                         <h3>Conclusion</h3>
                         <p>
                             That's all! No boilerplate. Just some simple, declarative components that form our complete UI. And which are derived completely,
-                            reactively from our state. You are now ready to start using the <code>mobx</code> and <code>mobx-react-lite</code> packages in your own applications.
+                            reactively from our state. You are now ready to start using the <code>mobx</code> and <code>mobx-react</code> packages in your own applications.
                             A short summary of the things you learned so far:
                         </p>
                         <ol>
@@ -411,7 +411,7 @@ setTimeout(action(() => {
                                 This is useful for logging, making network requests, etc.
                             </li>
                             <li>
-                                Use the <code>observer</code> wrapper from the <code>mobx-react-lite</code> package to make your React components truly reactive.
+                                Use the <code>observer</code> wrapper from the <code>mobx-react</code> package to make your React components truly reactive.
                                 They will update automatically and
                                 efficiently. Even when used in large complex applications with large amounts of data.
                             </li>
@@ -478,7 +478,7 @@ rather than being something that's required by default for anything more than a 
     <script src="https://unpkg.com/react-dom@16.13.1/umd/react-dom.development.js"></script>
     <script src="assets/getting-started-assets/babel.min.js"></script>
     <script src="https://unpkg.com/mobx@6.0.0-rc.8/dist/mobx.umd.development.js"></script>
-    <script src="https://unpkg.com/mobx-react-lite@3.0.0-beta.1/dist/mobxreactlite.umd.development.js"></script>
+    <script src="https://unpkg.com/mobx-react/dist/mobxreact.umd.development.js"></script>
     <script src="assets/getting-started-assets/script.js"></script>
     <script type="text/javascript">
         var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");

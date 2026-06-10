@@ -77,3 +77,47 @@ test("should not prevent GC of uncomitted components", async () => {
 
     unmount()
 })
+
+test("uncommitted function components should not leak observations", async () => {
+    expect(typeof globalThis.FinalizationRegistry).toBe("function")
+
+    const store = mobx.observable({ count1: 0, count2: 0 })
+    let count1IsObserved = false
+    let count2IsObserved = false
+
+    mobx.onBecomeObserved(store, "count1", () => (count1IsObserved = true))
+    mobx.onBecomeUnobserved(store, "count1", () => (count1IsObserved = false))
+    mobx.onBecomeObserved(store, "count2", () => (count2IsObserved = true))
+    mobx.onBecomeUnobserved(store, "count2", () => (count2IsObserved = false))
+
+    const TestComponent1 = observer(() => <div>{store.count1}</div>)
+    const TestComponent2 = observer(() => <div>{store.count2}</div>)
+
+    const rendering = render(
+        <React.StrictMode>
+            <TestComponent1 />
+            <TestComponent2 />
+        </React.StrictMode>
+    )
+    rendering.rerender(
+        <React.StrictMode>
+            <TestComponent1 />
+        </React.StrictMode>
+    )
+
+    await Promise.resolve()
+    gc()
+
+    await waitFor(
+        () => {
+            expect(count1IsObserved).toBe(true)
+            expect(count2IsObserved).toBe(false)
+        },
+        {
+            timeout: 15_000,
+            interval: 200
+        }
+    )
+
+    rendering.unmount()
+})

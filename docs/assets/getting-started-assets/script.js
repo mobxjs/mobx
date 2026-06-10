@@ -25,7 +25,7 @@ function runCodeHelper(code) {
     window.autorun = mobx.autorun
     window.computed = mobx.computed
     window.action = mobx.action
-    window.observer = mobxReactLite.observer
+    window.observer = mobxReact.observer
     window.makeObservable = mobx.makeObservable
     window.makeAutoObservable = mobx.makeAutoObservable
 
