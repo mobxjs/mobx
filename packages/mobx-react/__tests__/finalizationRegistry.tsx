@@ -1,12 +1,10 @@
-import { cleanup, render, waitFor } from "@testing-library/react"
+import { render, waitFor } from "@testing-library/react"
 import * as mobx from "mobx"
 import * as React from "react"
 
 // @ts-ignore
 import gc from "expose-gc/function"
 import { observer } from "../src"
-
-afterEach(cleanup)
 
 test("should not prevent GC of uncomitted components", async () => {
     expect(typeof globalThis.FinalizationRegistry).toBe("function")

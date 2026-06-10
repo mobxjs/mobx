@@ -1,4 +1,4 @@
-import { act, cleanup, fireEvent, render } from "@testing-library/react"
+import { act, fireEvent, render } from "@testing-library/react"
 import mockConsole from "jest-mock-console"
 import * as mobx from "mobx"
 import React from "react"
@@ -8,14 +8,7 @@ import { useObserver } from "../src/useObserver"
 
 const getDNode = (obj: any, prop?: string) => mobx.getObserverTree(obj, prop)
 
-afterEach(cleanup)
-
 let consoleWarnMock: jest.SpyInstance | undefined
-afterEach(() => {
-    consoleWarnMock?.mockRestore()
-    consoleWarnMock = undefined
-    mobx._resetGlobalState()
-})
 
 function runTestSuite(mode: "observer" | "useObserver") {
     function obsComponent<P extends object>(
@@ -298,7 +291,6 @@ function runTestSuite(mode: "observer" | "useObserver") {
             data.set(3)
         })
         expect(container).toMatchSnapshot()
-        mobx._resetGlobalState()
     })
 
     describe("should render component even if setState called with exactly the same props", () => {
@@ -1066,6 +1058,4 @@ test("`isolateGlobalState` shouldn't break reactivity #3734", async () => {
     )
     expect(container).toHaveTextContent("1")
     unmount()
-
-    mobx._resetGlobalState()
 })

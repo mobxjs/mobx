@@ -4,7 +4,6 @@ import { render, act, waitFor } from "@testing-library/react"
 import {
     getObserverTree,
     _getGlobalState,
-    _resetGlobalState,
     action,
     computed,
     observable,
@@ -21,14 +20,7 @@ import { shallowEqual } from "../src/utils/utils"
  *  some test suite is too tedious
  */
 
-afterEach(() => {
-    jest.useRealTimers()
-})
-
 let consoleWarnMock: jest.SpyInstance | undefined
-afterEach(() => {
-    consoleWarnMock?.mockRestore()
-})
 
 /*
  use TestUtils.renderIntoDocument will re-mounted the component with different props
@@ -313,7 +305,6 @@ test("changing state in render should fail", () => {
     render(<Comp />)
 
     act(() => data.set(3))
-    _resetGlobalState()
 })
 
 test("correctly wraps display name of child component", () => {

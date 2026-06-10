@@ -1,10 +1,8 @@
 import React from "react"
-import { act, cleanup, render } from "@testing-library/react"
+import { act, render } from "@testing-library/react"
 import { observable, runInAction } from "mobx"
 
 import { observer } from "../src"
-
-afterEach(cleanup)
 
 test("observer function component reacts to observable values from React context", () => {
     const store = observable({ count: 0 })

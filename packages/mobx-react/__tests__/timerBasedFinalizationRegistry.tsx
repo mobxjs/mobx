@@ -1,5 +1,5 @@
 import "./utils/killFinalizationRegistry"
-import { cleanup, render, act } from "@testing-library/react"
+import { render, act } from "@testing-library/react"
 import * as mobx from "mobx"
 import * as React from "react"
 import { clearTimers, observer } from "../src"
@@ -16,9 +16,6 @@ expect(observerFinalizationRegistry).toBeInstanceOf(TimerBasedFinalizationRegist
 const registry = observerFinalizationRegistry as TimerBasedFinalizationRegistry<unknown>
 
 afterEach(() => {
-    cleanup()
-    jest.useRealTimers()
-    jest.restoreAllMocks()
     registry.finalizeAllImmediately()
 })
 
