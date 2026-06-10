@@ -7,7 +7,7 @@ Release MobX 7 and mobx-react 10.
 
 Bundle sizes are down: ESM prod 17.02 KiB gzip -> 14.90 KiB gzip; a minimal tree-shaken example is 12.63 KiB gzip now.
 
-They remove long-deprecated compatibility paths and make `mobx-react` the single React binding package for MobX 7.
+It removes long-deprecated compatibility paths and makes `mobx-react` the single React binding package for MobX 7.
 
 ## MobX 7
 
@@ -27,7 +27,7 @@ mobx-react 10 requires MobX 7 and React 18 or later.
 
 This is possible because, after removing `Provider` / `inject` and the old observable `props` / `state` behavior, `mobx-react` had become a thin class-component wrapper around `mobx-react-lite`'s `observer`.
 
--   Move `observer`, `Observer`, `useLocalObservable`, `enableStaticRendering`, and `isUsingStaticRendering` imports from `mobx-react-lite` to `mobx-react`.
+-   Update imports from `mobx-react-lite` to `mobx-react`.
 -   The merged `observer` supports function components, `forwardRef`, class components, and Stage 3 `@observer` class decorator usage.
 -   Remove React batching imports, including the stale React Native batching deep import. React 18+ renderers handle batching.
 
