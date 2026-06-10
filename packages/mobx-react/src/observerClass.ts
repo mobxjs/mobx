@@ -197,6 +197,8 @@ function createReactiveRender(originalRender: any) {
         let renderResult = undefined
         admin.reaction.track(() => {
             try {
+                // TODO@major
+                // Optimization: replace with _allowStateChangesStart/End (not available in mobx@6.0.0)
                 renderResult = _allowStateChanges(false, boundOriginalRender)
             } catch (e) {
                 error = e

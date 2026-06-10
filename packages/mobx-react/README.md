@@ -17,6 +17,7 @@ Only the latest version is actively maintained. If you're missing a fix or a fea
 
 | NPM Version | Support MobX version | Supported React versions | Added support for:                                                               |
 | ----------- | -------------------- | ------------------------ | -------------------------------------------------------------------------------- |
+| v10         | 7.\*                 | >=18                     | MobX 7, Hooks, React 18 strict mode                                              |
 | v9          | 6.\*                 | >=18                     | Hooks, React 18 strict mode                                                      |
 | v7          | 6.\*                 | >16.8 < 18.2             | Hooks                                                                            |
 | v6          | 4.\* / 5.\*          | >16.8 <17                | Hooks                                                                            |

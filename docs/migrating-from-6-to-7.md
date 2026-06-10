@@ -15,28 +15,28 @@ _⚠️ **Warning**: Depending on factors like the size and complexity of your c
 
 ## Getting started
 
-1. Update `mobx` to the latest version of MobX 6 and solve any deprecation messages.
-2. Update `mobx` to version 7.
-3. If you use React, update `mobx-react` to the latest compatible version and remove `mobx-react-lite` from your dependencies.
-4. Make sure your runtime has native [`Proxy`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) support.
-5. If you use decorators, make sure they use Stage 3 syntax. Legacy decorators are not supported in MobX 7. Check out the [Enabling decorators {🚀}](enabling-decorators.md) section for more details.
-6. Remove `configure({ useProxies: ... })` and `{ proxy: false }` observable options. MobX 7 always uses Proxy-backed observable arrays and plain objects.
+1. Install the latest `mobx` and `mobx-react`.
+2. Uninstall `mobx-react-lite`.
+3. Make sure your runtime has native [`Proxy`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) support.
+4. If you use decorators, make sure they use Stage 3 syntax. Legacy decorators are not supported in MobX 7. Check out the [Enabling decorators {🚀}](enabling-decorators.md) section for more details.
+5. Remove `configure({ useProxies: ... })` and `{ proxy: false }` observable options. MobX 7 always uses Proxy-backed observable arrays and plain objects.
 
 ## Updating React bindings
 
 The only React bindings package in MobX 7 is `mobx-react`. It supports function components, `forwardRef`, class components, and the `@observer` class decorator.
 
-If your project imports from `mobx-react-lite`, update those imports to `mobx-react`:
+Install the MobX 7 packages and remove the old React bindings package:
+
+```shell
+npm install mobx@latest mobx-react@latest
+npm uninstall mobx-react-lite
+```
+
+Update imports from `mobx-react-lite` to `mobx-react`:
 
 ```diff
 -import { observer, Observer, useLocalObservable } from "mobx-react-lite"
 +import { observer, Observer, useLocalObservable } from "mobx-react"
-```
-
-Then remove the package from your dependencies:
-
-```shell
-npm uninstall mobx-react-lite
 ```
 
 `mobx-react` requires React 18 or later. If your project still uses React 16 or 17, upgrade React first or stay on the MobX 6 compatible React bindings.

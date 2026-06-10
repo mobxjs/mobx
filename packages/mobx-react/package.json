@@ -17,8 +17,7 @@
         "dist",
         "LICENSE",
         "CHANGELOG.md",
-        "README.md",
-        "batchingForReactNative.js"
+        "README.md"
     ],
     "sideEffects": false,
     "repository": {

@@ -13,6 +13,7 @@ type ObserverAdministration = {
     // tearing is still present,
     // because there is no cross component synchronization,
     // but we can use `useSyncExternalStore` API.
+    // TODO: optimize to use number?
     stateVersion: any
     name: string
     // These don't depend on state/props, therefore we can keep them here instead of `useCallback`
