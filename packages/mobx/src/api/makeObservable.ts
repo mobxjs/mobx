@@ -20,12 +20,10 @@ import {
 // Fixes: https://github.com/mobxjs/mobx/issues/2325#issuecomment-691070022
 type NoInfer<T> = [T][T extends any ? 0 : never]
 
-type MakeObservableOptions = CreateObservableOptions
-
 export function makeObservable<T extends object, AdditionalKeys extends PropertyKey = never>(
     target: T,
     annotations: AnnotationsMap<T, NoInfer<AdditionalKeys>>,
-    options?: MakeObservableOptions
+    options?: CreateObservableOptions
 ): T {
     initObservable(() => {
         const adm: ObservableObjectAdministration = asObservableObject(target, options)[$mobx]
@@ -46,7 +44,7 @@ const keysSymbol = Symbol("mobx-keys")
 export function makeAutoObservable<T extends object, AdditionalKeys extends PropertyKey = never>(
     target: T,
     overrides?: AnnotationsMap<T, NoInfer<AdditionalKeys>>,
-    options?: MakeObservableOptions
+    options?: CreateObservableOptions
 ): T {
     if (__DEV__) {
         if (!isPlainObject(target) && !isPlainObject(Object.getPrototypeOf(target))) {
