@@ -333,46 +333,35 @@ test("correctly wraps display name of child component", () => {
     expect((B as any).type.displayName).toEqual(undefined)
 })
 
-describe("124 - react to changes in this.props via computed", () => {
-    class T extends React.Component<any, any> {
-        get computedProp() {
-            return this.props.x
+test("MobX computed getters cannot read class props", () => {
+    const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {})
+
+    const Comp = observer(
+        class TestCmp extends React.Component<{ x: number }> {
+            constructor(props) {
+                super(props)
+                makeObservable(this, {
+                    computedProp: computed
+                })
+            }
+
+            get computedProp() {
+                return this.props.x
+            }
+
+            render() {
+                return <span>{this.computedProp}</span>
+            }
         }
-        render() {
-            return (
-                <span>
-                    x:
-                    {this.computedProp}
-                </span>
-            )
-        }
+    )
+
+    try {
+        expect(() => render(<Comp x={1} />)).toThrow(
+            /^\[mobx-react\] Cannot read "TestCmp.props" in a reactive context/
+        )
+    } finally {
+        consoleErrorSpy.mockRestore()
     }
-
-    const Comp = observer(T)
-
-    class Parent extends React.Component {
-        state = { v: 1 }
-        render() {
-            return (
-                <div onClick={() => this.setState({ v: 2 })}>
-                    <Comp x={this.state.v} />
-                </div>
-            )
-        }
-    }
-
-    test("init state is correct", () => {
-        const { container } = render(<Parent />)
-
-        expect(container).toHaveTextContent("x:1")
-    })
-
-    test("change after click", () => {
-        const { container } = render(<Parent />)
-
-        act(() => container.querySelector("div")!.click())
-        expect(container).toHaveTextContent("x:2")
-    })
 })
 
 test("should stop updating if error was thrown in render (#134)", () => {
@@ -490,14 +479,10 @@ test("it rerenders correctly if some props are non-observables - 1", () => {
 
     @observer
     class Comp extends React.Component<any, any> {
-        get computed() {
-            // n.b: data.y would not rerender! shallowly new equal props are not stored
-            return this.props.odata.x
-        }
         render() {
             return (
                 <span onClick={stuff}>
-                    {this.props.odata.x}-{this.props.data.y}-{this.computed}
+                    {this.props.odata.x}-{this.props.data.y}-{this.props.odata.x}
                 </span>
             )
         }
@@ -534,15 +519,11 @@ test("it rerenders correctly if some props are non-observables - 2", () => {
 
     @observer
     class Component extends React.PureComponent<any, any> {
-        get computed() {
-            return this.props.data.y // should recompute, since props.data is changed
-        }
-
         render() {
             renderCount++
             return (
                 <span onClick={stuff}>
-                    {this.props.data.y}-{this.computed}
+                    {this.props.data.y}-{this.props.data.y}
                 </span>
             )
         }
@@ -758,45 +739,6 @@ test("static on function components are hoisted", () => {
     const Comp2 = observer(Comp)
 
     expect(Comp2.foo).toBe(3)
-})
-
-test("computed properties react to props", () => {
-    jest.useFakeTimers()
-
-    const seen: Array<any> = []
-    @observer
-    class Child extends React.Component<any, any> {
-        get getPropX() {
-            return this.props.x
-        }
-
-        render() {
-            seen.push(this.getPropX)
-            return <div>{this.getPropX}</div>
-        }
-    }
-
-    class Parent extends React.Component {
-        state = { x: 0 }
-        render() {
-            seen.push("parent")
-            return <Child x={this.state.x} />
-        }
-
-        componentDidMount() {
-            setTimeout(() => this.setState({ x: 2 }), 100)
-        }
-    }
-
-    const { container } = render(<Parent />)
-    expect(container).toHaveTextContent("0")
-
-    act(() => {
-        jest.runAllTimers()
-    })
-    expect(container).toHaveTextContent("2")
-
-    expect(seen).toEqual(["parent", 0, "parent", 2])
 })
 
 test("#692 - componentDidUpdate is triggered", () => {

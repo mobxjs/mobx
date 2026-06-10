@@ -1,6 +1,5 @@
-import { Reaction } from "mobx"
+import { getDependencyTree, Reaction } from "mobx"
 import React from "react"
-import { printDebugValue } from "./utils/printDebugValue"
 import { isUsingStaticRendering } from "./staticRendering"
 import { observerFinalizationRegistry } from "./utils/observerFinalizationRegistry"
 
@@ -88,7 +87,7 @@ export function useObserver<T>(render: () => T, baseComponentName: string = "obs
         observerFinalizationRegistry.register(admRef, adm, adm)
     }
 
-    React.useDebugValue(adm.reaction!, printDebugValue)
+    React.useDebugValue(adm.reaction!, getDependencyTree)
 
     React.useSyncExternalStore(
         // Both of these must be stable, otherwise it would keep resubscribing every render.
