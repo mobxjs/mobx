@@ -1,14 +1,9 @@
 import "./utils/assertEnvironment"
 
-import { configure, observable } from "mobx"
+import { observable } from "mobx"
 import { Component } from "react"
 
-import { unstable_batchedUpdates as batch } from "./utils/reactBatchedUpdates"
 import { observerFinalizationRegistry } from "./utils/observerFinalizationRegistry"
-
-if (batch) {
-    configure({ reactionScheduler: batch })
-}
 
 if (!Component) {
     throw new Error("mobx-react requires React to be available")

@@ -48,16 +48,16 @@ The public `mobx-react` surface has been reduced to the APIs that are still reco
 
 The following APIs have been removed:
 
-| Removed API                                                                                                | Replacement                                                                                                                     |
-| ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `disposeOnUnmount`                                                                                         | Dispose reactions in `componentWillUnmount`, or return a cleanup function from `useEffect`.                                     |
-| `PropTypes`                                                                                                | Use TypeScript or the regular `prop-types` package.                                                                             |
-| `useLocalStore`                                                                                            | Use `useLocalObservable`.                                                                                                       |
-| `useAsObservableSource`                                                                                    | Store the values you need locally and synchronize them from props with `useEffect`.                                             |
-| `useObserver`                                                                                              | Wrap the component in `observer`, or use the `<Observer>` component.                                                            |
-| `useStaticRendering`                                                                                       | Use `enableStaticRendering`.                                                                                                    |
-| `observerBatching`, `isObserverBatched`, `batchingForReactDom`, `batchingOptOut`, `batchingForReactNative` | Remove these imports. React DOM batching is configured internally, and the React Native side-effect import is no longer needed. |
-| `Provider`, `inject`, `MobXProviderContext`                                                                | Use `React.createContext` directly.                                                                                             |
+| Removed API                                                                                                | Replacement                                                                                                                           |
+| ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `disposeOnUnmount`                                                                                         | Dispose reactions in `componentWillUnmount`, or return a cleanup function from `useEffect`.                                           |
+| `PropTypes`                                                                                                | Use TypeScript or the regular `prop-types` package.                                                                                   |
+| `useLocalStore`                                                                                            | Use `useLocalObservable`.                                                                                                             |
+| `useAsObservableSource`                                                                                    | Store the values you need locally and synchronize them from props with `useEffect`.                                                   |
+| `useObserver`                                                                                              | Wrap the component in `observer`, or use the `<Observer>` component.                                                                  |
+| `useStaticRendering`                                                                                       | Use `enableStaticRendering`.                                                                                                          |
+| `observerBatching`, `isObserverBatched`, `batchingForReactDom`, `batchingOptOut`, `batchingForReactNative` | Remove these imports. React 18+ renderers handle batching automatically, and the React Native side-effect import is no longer needed. |
+| `Provider`, `inject`, `MobXProviderContext`                                                                | Use `React.createContext` directly.                                                                                                   |
 
 ## Migrating legacy decorators
 
