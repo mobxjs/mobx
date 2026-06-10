@@ -18,7 +18,7 @@ Only the latest version is actively maintained. If you're missing a fix or a fea
 | NPM Version | Support MobX version | Supported React versions | Added support for:                                                               |
 | ----------- | -------------------- | ------------------------ | -------------------------------------------------------------------------------- |
 | v10         | 7.\*                 | >=18                     | MobX 7, Hooks, React 18 strict mode                                              |
-| v9          | 6.\*                 | >=18                     | Hooks, React 18 strict mode                                                      |
+| v9          | 6.\*                 | >16.8                    | Hooks, React 18.2 in strict mode                                                 |
 | v7          | 6.\*                 | >16.8 < 18.2             | Hooks                                                                            |
 | v6          | 4.\* / 5.\*          | >16.8 <17                | Hooks                                                                            |
 | v5          | 4.\* / 5.\*          | >0.13 <17                | No, but it is possible to use `<Observer>` sections inside hook based components |
@@ -30,7 +30,7 @@ Only the latest version is actively maintained. If you're missing a fix or a fea
 
 ## Installation
 
-`npm install mobx-react --save`
+`npm install mobx-react`
 
 Or CDN: https://unpkg.com/mobx-react (UMD namespace: `mobxReact`)
 

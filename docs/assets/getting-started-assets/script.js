@@ -28,6 +28,7 @@ function runCodeHelper(code) {
     window.observer = mobxReact.observer
     window.makeObservable = mobx.makeObservable
     window.makeAutoObservable = mobx.makeAutoObservable
+    window.renderReactApp = renderReactApp
 
     var globalEval = eval // global scope trick, See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval
 
@@ -39,6 +40,15 @@ function runCodeHelper(code) {
     } catch (e) {
         console.error(e)
     }
+}
+
+function renderReactApp(element) {
+    var container = document.getElementById("reactjs-app")
+    if (!window.__cachedReactRoot) {
+        // Reuse one React 18 root across repeated "Run code" clicks.
+        window.__cachedReactRoot = ReactDOM.createRoot(container)
+    }
+    window.__cachedReactRoot.render(element)
 }
 
 function runCode(ids) {

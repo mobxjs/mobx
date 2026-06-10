@@ -15,11 +15,13 @@ React integration is available in two forms:
 -   [mobx-react](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react). Utilities to manually apply observation to function and class components.
 -   [mobx-react-observer](https://github.com/christianalfoni/mobx-react-observer). Babel/swc plugin to automatically apply observation to components.
 
-Append the appropriate bindings for your use case to the _Yarn_ or _NPM_ command below:
+Append the appropriate bindings for your use case to one of the commands below:
 
-**Yarn:** `yarn add mobx`
+**npm:** `npm install mobx`
 
-**NPM:** `npm install --save mobx`
+**pnpm:** `pnpm add mobx`
+
+**yarn:** `yarn add mobx`
 
 **CDN:** https://cdnjs.com/libraries/mobx / https://unpkg.com/mobx/dist/mobx.umd.production.min.js
 
@@ -38,24 +40,27 @@ When using MobX with TypeScript or Babel, and you plan to use classes; make sure
 -   **Babel**: Make sure to use at least version 7.12, with the following configuration:
     ```json
     {
-        // Babel < 7.13.0
-        "plugins": [["@babel/plugin-proposal-class-properties", { "loose": false }]],
+    // Babel < 7.13.0
+    "plugins": [["@babel/plugin-proposal-class-properties", { "loose": false }]],
 
-        // Babel >= 7.13.0 (https://babeljs.io/docs/en/assumptions)
-        "plugins": [["@babel/plugin-proposal-class-properties"]],
-        "assumptions": {
-            "setPublicClassFields": false
+            // Babel >= 7.13.0 (https://babeljs.io/docs/en/assumptions)
+            "plugins": [["@babel/plugin-proposal-class-properties"]],
+            "assumptions": {
+                "setPublicClassFields": false
+            }
         }
-    }
-    ```
-For verification insert this piece of code at the beginning of your sources (eg. `index.js`)
+        ```
+
+    For verification insert this piece of code at the beginning of your sources (eg. `index.js`)
+
 ```javascript
-if (!new class { x }().hasOwnProperty('x')) throw new Error('Transpiler is not configured correctly');
+if (
+    !new (class {
+        x
+    })().hasOwnProperty("x")
+)
+    throw new Error("Transpiler is not configured correctly")
 ```
-
-## MobX on older JavaScript environments
-
-MobX requires native [`Proxy` support](https://compat-table.github.io/compat-table/es6/#test-Proxy) for observable arrays and plain objects.
 
 ## MobX on other frameworks / platforms
 

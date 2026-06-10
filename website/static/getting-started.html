@@ -163,7 +163,7 @@ console.log(todoStore.report());
                             list. By using the <code>observable</code> and <code>computed</code> annotations we can introduce observable properties on an
                             object.
                             In the example below we use <code>makeObservable</code> to show the annotations explicitly,
-                            but we could have used <code>makeAutoObservable(this)</code> instead to simplify this process.
+                            but we could use <code>makeAutoObservable(this)</code> instead to simplify this process.
                         </p>
                         <textarea spellcheck="false" class="prettyprint" id="code3" rows="8">
 class ObservableTodoStore {
@@ -208,7 +208,7 @@ const observableTodoStore = new ObservableTodoStore();
                         </textarea>
 
                         <p>That's it! We marked some properties as being <code>observable</code> to signal MobX that these values can change over time.
-                            The computations are decorated with <code>computed</code> to identify that these can be derived from the state and caches as long as no underlying state changed.
+                            The computations are marked with <code>computed</code> to identify that these can be derived from the state and caches as long as no underlying state changed.
                         </p>
                         <p>
                             The <code>pendingRequests</code> and <code>assignee</code> attributes are not used so far,
@@ -243,7 +243,7 @@ observableTodoStore.todos[0].task = "grok MobX tutorial";
                         <h3 id="reactive-reactjs-components">Making React reactive</h3>
                         <p>Ok, so far we made a silly report reactive. Time to build a reactive user interface around this very
                             same store. React components are (despite their name) not reactive out of the box.
-                            The <code>observer</code> HoC wrapper from the <code>mobx-react</code> package fixes that by
+                            The <code>observer</code> wrapper from the <code>mobx-react</code> package fixes that by
                             basically wrapping the React component in <code>autorun</code>. This
                             keeps the component in sync with the state. This is conceptually not different from what we did
                             with the <code>report</code> before.
@@ -311,9 +311,8 @@ const TodoView = observer(({todo}) => {
   );
 })
 
-ReactDOM.render(
-  <TodoList store={ observableTodoStore } />,
-  document.getElementById('reactjs-app')
+renderReactApp(
+  <TodoList store={ observableTodoStore } />
 );
                         </textarea>
                         <button onClick="runCode(['#code1', '#code3', '#code4', '#react1'])" class="btn-run">Run code</button>
@@ -401,10 +400,10 @@ setTimeout(action(() => {
                         </p>
                         <ol>
                             <li>
-                                Use the <code>observable</code> decorator or <code>observable(object or array)</code> functions to make objects trackable for MobX.
+                                Use <code>makeObservable</code>, <code>makeAutoObservable</code>, or <code>observable(object or array)</code> to make objects trackable for MobX.
                             </li>
                             <li>
-                                The <code>computed</code> decorator can be used to create functions that can automatically derive value from the state and cache them.
+                                The <code>computed</code> annotation can be used to create functions that can automatically derive value from the state and cache them.
                             </li>
                             <li>
                                 Use <code>autorun</code> to automatically run functions that depend on some observable state.
@@ -474,11 +473,11 @@ rather than being something that's required by default for anything more than a 
     <link rel="stylesheet" href="assets/getting-started-assets/javascripts/codemirror/theme/xq-light.css">
     <script src="assets/getting-started-assets/javascripts/codemirror/javascript/javascript.js"></script>
 
-    <script src="https://unpkg.com/react@16.13.1/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@16.13.1/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/react@18.2.0/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.development.js"></script>
     <script src="assets/getting-started-assets/babel.min.js"></script>
-    <script src="https://unpkg.com/mobx@6.0.0-rc.8/dist/mobx.umd.development.js"></script>
-    <script src="https://unpkg.com/mobx-react/dist/mobxreact.umd.development.js"></script>
+    <script src="https://unpkg.com/mobx@7/dist/mobx.umd.development.js"></script>
+    <script src="https://unpkg.com/mobx-react@10/dist/mobxreact.umd.development.js"></script>
     <script src="assets/getting-started-assets/script.js"></script>
     <script type="text/javascript">
         var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
