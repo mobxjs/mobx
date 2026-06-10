@@ -3,7 +3,7 @@ import mockConsole from "jest-mock-console"
 import * as mobx from "mobx"
 import * as React from "react"
 
-import { useObserverInternal as useObserver } from "../src/useObserverInternal"
+import { useObserver } from "../src/useObserver"
 
 afterEach(cleanup)
 

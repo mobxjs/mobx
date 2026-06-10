@@ -1,7 +1,7 @@
 import { forwardRef, memo } from "react"
 
 import { isUsingStaticRendering } from "./staticRendering"
-import { useObserverInternal } from "./useObserverInternal"
+import { useObserver } from "./useObserver"
 
 const hasSymbol = typeof Symbol === "function" && Symbol.for
 const isFunctionNameConfigurable =
@@ -66,7 +66,7 @@ export function observerFunction<P extends object, TRef = {}>(
     }
 
     let observerComponent = (props: any, ref: React.Ref<TRef>) => {
-        return useObserverInternal(() => render(props, ref), baseComponentName)
+        return useObserver(() => render(props, ref), baseComponentName)
     }
 
     // Inherit original name and displayName, see #3438

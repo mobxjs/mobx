@@ -5,7 +5,7 @@ import { act, cleanup, fireEvent, render, renderHook } from "@testing-library/re
 import { Observer, observer, useLocalObservable } from "../src"
 import { useEffect, useState } from "react"
 import { autorun, _resetGlobalState, configure } from "mobx"
-import { useObserverInternal as useObserver } from "../src/useObserverInternal"
+import { useObserver } from "../src/useObserver"
 
 let consoleWarnMock: jest.SpyInstance | undefined
 afterEach(() => {

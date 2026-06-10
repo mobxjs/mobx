@@ -31,7 +31,7 @@ function createReaction(adm: ObserverAdministration) {
     })
 }
 
-export function useObserverInternal<T>(render: () => T, baseComponentName: string = "observed"): T {
+export function useObserver<T>(render: () => T, baseComponentName: string = "observed"): T {
     if (isUsingStaticRendering()) {
         return render()
     }

@@ -1,4 +1,4 @@
-import { useObserverInternal } from "./useObserverInternal"
+import { useObserver } from "./useObserver"
 import type { ReactElement } from "react"
 
 interface IObserverProps {
@@ -16,7 +16,7 @@ function ObserverComponent({ children, render }: IObserverProps) {
     if (typeof component !== "function") {
         return null
     }
-    return useObserverInternal(component)
+    return useObserver(component)
 }
 ObserverComponent.displayName = "Observer"
 

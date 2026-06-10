@@ -4,7 +4,7 @@ import * as mobx from "mobx"
 import React from "react"
 
 import { observer, enableStaticRendering } from "../src"
-import { useObserverInternal as useObserver } from "../src/useObserverInternal"
+import { useObserver } from "../src/useObserver"
 
 const getDNode = (obj: any, prop?: string) => mobx.getObserverTree(obj, prop)
 

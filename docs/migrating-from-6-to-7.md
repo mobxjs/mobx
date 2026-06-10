@@ -1,12 +1,12 @@
 ---
-title: Migrating from MobX 6
-sidebar_label: Migrating from MobX 6 {🚀}
+title: Migrating to MobX 7
+sidebar_label: Migrating to MobX 7 {🚀}
 hide_title: true
 ---
 
 <script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
-# Migrating from MobX 6 {🚀}
+# Migrating to MobX 7 {🚀}
 
 MobX 7 is mostly a cleanup release. Most applications that already use MobX 6 idiomatically can upgrade with dependency, import and decorator configuration changes.
 
