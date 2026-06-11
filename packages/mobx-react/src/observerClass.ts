@@ -10,7 +10,7 @@ import {
     isUsingStaticRendering,
     _observerFinalizationRegistry as observerFinalizationRegistry
 } from "mobx-react-lite"
-import { patch, shallowEqual } from "./utils/utils"
+import { shallowEqual, patch } from "./utils/utils"
 
 const administrationSymbol = Symbol("ObserverAdministration")
 const isMobXReactObserverSymbol = Symbol("isMobXReactObserver")
