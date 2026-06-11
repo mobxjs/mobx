@@ -17,7 +17,7 @@ How can we implement a derivation like `store.isSelected(item.id)`?
 
 ```javascript
 import * as React from "react"
-import { observer } from "mobx-react"
+import { observer } from "mobx-react-lite"
 
 const Item = observer(({ item, store }) => (
     <div className={store.isSelected(item.id) ? "selected" : ""}>{item.title}</div>
@@ -46,7 +46,7 @@ This is a more efficient implementation compared to the original.
 ```javascript
 import * as React from "react"
 import { computed } from "mobx"
-import { observer } from "mobx-react"
+import { observer } from "mobx-react-lite"
 
 const Item = observer(({ item, store }) => {
     const isSelected = computed(() => store.isSelected(item.id)).get()

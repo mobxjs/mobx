@@ -136,12 +136,12 @@ as making a network request when submitting a form, should be triggered explicit
 
 #### 3.3. Reactive React components
 
-If you are using React, you can make your components reactive by wrapping them with the [`observer`](react-integration.md) function from the `mobx-react` package.
+If you are using React, you can make your function components reactive by wrapping them with the [`observer`](react-integration.md) function from the `mobx-react-lite` package.
 
 ```javascript
 import * as React from "react"
 import { render } from "react-dom"
-import { observer } from "mobx-react"
+import { observer } from "mobx-react-lite"
 
 const TodoListView = observer(({ todoList }) => (
     <div>

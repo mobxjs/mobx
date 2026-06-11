@@ -16,15 +16,15 @@ const ReactMemoSymbol = hasSymbol
     ? Symbol.for("react.memo")
     : typeof memo === "function" && memo((props: any) => null)["$$typeof"]
 
-export function observerFunction<C extends React.FunctionComponent<any>>(
+export function observer<C extends React.FunctionComponent<any>>(
     baseComponent: C
 ): C & React.MemoExoticComponent<C>
 
-export function observerFunction<P extends object>(
+export function observer<P extends object>(
     baseComponent: React.FunctionComponent<P>
 ): React.FunctionComponent<P> & React.MemoExoticComponent<React.FunctionComponent<P>>
 
-export function observerFunction<P extends object, TRef = {}>(
+export function observer<P extends object, TRef = {}>(
     baseComponent: React.ForwardRefExoticComponent<
         React.PropsWithoutRef<P> & React.RefAttributes<TRef>
     >
@@ -33,7 +33,7 @@ export function observerFunction<P extends object, TRef = {}>(
 >
 
 // n.b. base case is not used for actual typings or exported in the typing files
-export function observerFunction<P extends object, TRef = {}>(
+export function observer<P extends object, TRef = {}>(
     baseComponent:
         | React.ForwardRefRenderFunction<TRef, P>
         | React.FunctionComponent<P>
@@ -41,7 +41,7 @@ export function observerFunction<P extends object, TRef = {}>(
 ) {
     if (ReactMemoSymbol && baseComponent["$$typeof"] === ReactMemoSymbol) {
         throw new Error(
-            `[mobx-react] You are trying to use \`observer\` on a function component wrapped in either another \`observer\` or \`React.memo\`. The observer already applies 'React.memo' for you.`
+            `[mobx-react-lite] You are trying to use \`observer\` on a function component wrapped in either another \`observer\` or \`React.memo\`. The observer already applies 'React.memo' for you.`
         )
     }
 
@@ -61,7 +61,9 @@ export function observerFunction<P extends object, TRef = {}>(
         useForwardRef = true
         render = baseComponent["render"]
         if (typeof render !== "function") {
-            throw new Error(`[mobx-react] \`render\` property of ForwardRef was not a function`)
+            throw new Error(
+                `[mobx-react-lite] \`render\` property of ForwardRef was not a function`
+            )
         }
     }
 

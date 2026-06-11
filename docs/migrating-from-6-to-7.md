@@ -12,33 +12,34 @@ MobX 7 is mostly a cleanup release. Most applications that already use MobX 6 id
 
 ## Getting started
 
-1. Install the latest `mobx` and `mobx-react`.
-2. Uninstall `mobx-react-lite`.
+1. Install the latest `mobx` and the React binding package you use: `mobx-react-lite` for function components, or `mobx-react` if you need class component support.
+2. Make sure your React binding package is on its MobX 7-compatible major version.
 3. Make sure your runtime has native [`Proxy`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) support.
 4. If you use decorators, make sure they use Stage 3 syntax. Legacy decorators are not supported in MobX 7. Check out the [Enabling decorators {🚀}](enabling-decorators.md) section for more details.
 5. Remove `configure({ useProxies: ... })` and `{ proxy: false }` observable options. MobX 7 always uses Proxy-backed observable arrays and plain objects.
 
 ## Updating React bindings
 
-The only React bindings package in MobX 7 is `mobx-react`. It supports function components, `forwardRef`, class components, and the `@observer` class decorator.
+MobX 7 keeps the React bindings split:
 
-Install the MobX 7 packages and remove the old React bindings package:
+-   `mobx-react-lite` supports function components and `forwardRef`.
+-   `mobx-react` is a thin wrapper around `mobx-react-lite` that also supports class components and the `@observer` class decorator.
+
+Install the MobX 7 packages for your use case:
+
+```shell
+npm install mobx@latest mobx-react-lite@latest
+```
+
+Or, if you need class component support:
 
 ```shell
 npm install mobx@latest mobx-react@latest
-npm uninstall mobx-react-lite
 ```
 
-Update imports from `mobx-react-lite` to `mobx-react`:
+`mobx-react-lite` and `mobx-react` require React 18 or later.
 
-```diff
--import { observer, Observer, useLocalObservable } from "mobx-react-lite"
-+import { observer, Observer, useLocalObservable } from "mobx-react"
-```
-
-`mobx-react` requires React 18 or later.
-
-The public `mobx-react` surface has been reduced to the APIs that are still recommended:
+The public React binding surface has been reduced to the APIs that are still recommended:
 
 -   `observer`
 -   `Observer`
@@ -57,7 +58,7 @@ The following APIs have been removed:
 | `useObserver`                                                                                              | Wrap the component in `observer`, or use the `<Observer>` component.                                                                  |
 | `useStaticRendering`                                                                                       | Use `enableStaticRendering`.                                                                                                          |
 | `observerBatching`, `isObserverBatched`, `batchingForReactDom`, `batchingOptOut`, `batchingForReactNative` | Remove these imports. React 18+ renderers handle batching automatically, and the React Native side-effect import is no longer needed. |
-| `Provider`, `inject`, `MobXProviderContext`                                                                | Use `React.createContext` directly.                                                                                                   |
+| `Provider`, `inject`, `MobXProviderContext` from `mobx-react`                                              | Use `React.createContext` directly.                                                                                                   |
 
 ## Migrating legacy decorators
 

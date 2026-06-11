@@ -1,16 +1,16 @@
 {
-    "name": "mobx-react",
-    "version": "9.2.2",
-    "description": "React bindings for MobX. Create fully reactive components.",
+    "name": "mobx-react-lite",
+    "version": "4.1.1",
+    "description": "Lightweight React bindings for MobX based on function components and Hooks",
     "source": "src/index.ts",
     "type": "commonjs",
     "main": "dist/index.js",
-    "umd:main": "dist/mobxreact.umd.production.min.js",
-    "unpkg": "dist/mobxreact.umd.production.min.js",
-    "jsdelivr": "dist/mobxreact.umd.production.min.js",
-    "jsnext:main": "dist/mobxreact.esm.js",
-    "module": "dist/mobxreact.esm.js",
-    "react-native": "dist/mobxreact.esm.js",
+    "umd:main": "dist/mobxreactlite.umd.production.min.js",
+    "unpkg": "dist/mobxreactlite.umd.production.min.js",
+    "jsdelivr": "dist/mobxreactlite.umd.production.min.js",
+    "jsnext:main": "dist/mobxreactlite.esm.production.min.js",
+    "module": "dist/mobxreactlite.esm.js",
+    "react-native": "dist/mobxreactlite.esm.js",
     "types": "dist/index.d.ts",
     "typings": "dist/index.d.ts",
     "exports": {
@@ -18,11 +18,11 @@
         ".": {
             "react-native": {
                 "types": "./dist/index.d.ts",
-                "default": "./dist/mobxreact.esm.js"
+                "default": "./dist/mobxreactlite.esm.js"
             },
             "import": {
                 "types": "./dist/index.d.mts",
-                "default": "./dist/mobxreact.mjs"
+                "default": "./dist/mobxreactlite.mjs"
             },
             "default": {
                 "types": "./dist/index.d.ts",
@@ -39,12 +39,11 @@
         "CHANGELOG.md",
         "README.md"
     ],
-    "sideEffects": false,
     "repository": {
         "type": "git",
         "url": "https://github.com/mobxjs/mobx.git"
     },
-    "author": "Michel Weststrate",
+    "author": "Daniel K.",
     "license": "MIT",
     "funding": {
         "type": "opencollective",
@@ -54,9 +53,6 @@
         "url": "https://github.com/mobxjs/mobx/issues"
     },
     "homepage": "https://mobx.js.org",
-    "dependencies": {
-        "mobx-react-lite": "^4.1.1"
-    },
     "peerDependencies": {
         "mobx": "^6.9.0",
         "react": "^18 || ^19"
@@ -74,7 +70,6 @@
         "babel-plugin-dev-expression": "^0.2.3",
         "expose-gc": "^1.0.0",
         "mobx": "^6.15.0",
-        "mobx-react-lite": "^4.1.1",
         "rollup": "^2.60.2",
         "rollup-plugin-sourcemaps": "^0.6.3",
         "rollup-plugin-terser": "^5.3.1",
@@ -86,14 +81,17 @@
         "react-component",
         "react",
         "reactjs",
-        "reactive"
+        "reactive",
+        "hooks",
+        "observer",
+        "useLocalObservable"
     ],
     "scripts": {
         "lint": "eslint src/**/* --ext .js,.ts,.tsx",
-        "build": "node ../../scripts/build.js mobxReact",
+        "build": "node ../../scripts/build.js mobxReactLite",
         "build:test": "npm run build -- --target test",
         "test": "jest",
-        "test:size": "import-size --report . observer",
+        "test:size": "import-size --report . observer useLocalObservable",
         "test:types": "tsc --noEmit",
         "test:check": "npm run test:types",
         "prepublishOnly": "npm run build -- --target publish"

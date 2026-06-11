@@ -216,7 +216,7 @@ Creates an observable value that is derived from other observables, but won't be
 
 ## React integration
 
-_From the `mobx-react` package._
+_From `mobx-react-lite` for function components, or `mobx-react` for class component support._
 
 ### `observer`
 

@@ -6,8 +6,10 @@ import {
     _allowStateReadsEnd,
     _getGlobalState
 } from "mobx"
-import { isUsingStaticRendering } from "./staticRendering"
-import { observerFinalizationRegistry } from "./utils/observerFinalizationRegistry"
+import {
+    isUsingStaticRendering,
+    _observerFinalizationRegistry as observerFinalizationRegistry
+} from "mobx-react-lite"
 import { shallowEqual } from "./utils/utils"
 
 const administrationSymbol = Symbol("ObserverAdministration")

@@ -11,20 +11,20 @@ hide_title: true
 This documentation outlines how to manually apply observation to React components. However, by using the [mobx-react-observer](https://github.com/christianalfoni/mobx-react-observer) Babel/SWC plugin, you can automatically handle observation without manual intervention. Still, understanding how MobX observation integrates with React components remains valuable, even when leveraging automated solutions.
 
 ```javascript
-import { observer } from "mobx-react"
+import { observer } from "mobx-react-lite"
 
 const MyComponent = observer(props => ReactElement)
 ```
 
 While MobX works independently from React, they are most commonly used together. In [The gist of MobX](the-gist-of-mobx.md) you have already seen the most important part of this integration: the `observer` [HoC](https://reactjs.org/docs/higher-order-components.html) that you can wrap around a React component.
 
-`observer` is provided by the [`mobx-react` package](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react).
+`observer` is provided by the [`mobx-react-lite` package](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react-lite) for function components. Use [`mobx-react`](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react) if you also need class component support.
 
 ```javascript
 import React from "react"
 import ReactDOM from "react-dom"
 import { makeAutoObservable } from "mobx"
-import { observer } from "mobx-react"
+import { observer } from "mobx-react-lite"
 
 class Timer {
     secondsPassed = 0
@@ -77,7 +77,7 @@ The examples below demonstrate different patterns on how external and local obse
 Observables can be passed into components as props (as in the example above):
 
 ```javascript
-import { observer } from "mobx-react"
+import { observer } from "mobx-react-lite"
 
 const myTimer = new Timer() // See the Timer definition above.
 
@@ -145,7 +145,7 @@ The simplest way to use local observable state is to store a reference to an obs
 Note that, since we typically don't want to replace the reference, we totally ignore the updater function returned by `useState`:
 
 ```javascript
-import { observer } from "mobx-react"
+import { observer } from "mobx-react-lite"
 import { useState } from "react"
 
 const TimerView = observer(() => {
@@ -176,7 +176,7 @@ As stated before, instead of using classes, it is possible to directly create ob
 We can leverage [observable](observable-state.md#observable) for that:
 
 ```javascript
-import { observer } from "mobx-react"
+import { observer } from "mobx-react-lite"
 import { observable } from "mobx"
 import { useState } from "react"
 
@@ -198,10 +198,10 @@ ReactDOM.render(<TimerView />, document.body)
 <!--`useLocalObservable` hook-->
 
 The combination `const [store] = useState(() => observable({ /* something */}))` is
-quite common. To make this pattern simpler the [`useLocalObservable`](https://github.com/mobxjs/mobx-react#uselocalobservable-hook) hook is exposed from the `mobx-react` package, making it possible to simplify the earlier example to:
+quite common. To make this pattern simpler the [`useLocalObservable`](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react-lite#uselocalobservabletinitializer--t-annotations-annotationsmapt-t) hook is exposed from the `mobx-react-lite` package, making it possible to simplify the earlier example to:
 
 ```javascript
-import { observer, useLocalObservable } from "mobx-react"
+import { observer, useLocalObservable } from "mobx-react-lite"
 
 const TimerView = observer(() => {
     const timer = useLocalObservable(() => ({
@@ -291,7 +291,7 @@ const TodoView = observer(({ todo }: { todo: Todo }) =>
 
 Imagine the same example, where `GridRow` takes an `onRender` callback instead.
 Since `onRender` is part of the rendering cycle of `GridRow`, rather than `TodoView`'s render (even though that is where it syntactically appears), we have to make sure that the callback component uses an `observer` component.
-Or, we can create an in-line anonymous observer using [`<Observer />`](https://github.com/mobxjs/mobx-react#observer):
+Or, we can create an in-line anonymous observer using [`<Observer />`](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react-lite#observerrenderfn):
 
 ```javascript
 const TodoView = observer(({ todo }: { todo: Todo }) => {
@@ -322,6 +322,7 @@ you can wrap function components:
 
 ```javascript
 import React from "react"
+import { observer } from "mobx-react"
 
 const TimerView = observer(
     class TimerView extends React.Component {
@@ -353,7 +354,7 @@ then no display name will be visible in the DevTools.
 
 The following approaches can be used to fix this:
 
--   use `function` with a name instead of an arrow function. `mobx-react` infers component name from the function name:
+-   use `function` with a name instead of an arrow function. `observer` infers component name from the function name:
 
     ```javascript
     export const MyComponent = observer(function MyComponent(props) {
@@ -382,7 +383,7 @@ The following approaches can be used to fix this:
     MyComponent.displayName = "MyComponent"
     ```
 
-    This is broken in React 16 at the time of writing; mobx-react `observer` uses a React.memo and runs into this bug: https://github.com/facebook/react/issues/18026, but it will be fixed in React 17.
+    This was broken in React 16 because `observer` uses `React.memo`, but React 18 and later no longer have this issue.
 
 Now you can see component names:
 
@@ -431,7 +432,7 @@ In some cases the computed values of your local observables might depend on some
 However, the set of props that a React component receives is in itself not observable, so changes to the props won't be reflected in any computed values. You have to manually update local observable state in order to properly derive computed values from latest data.
 
 ```javascript
-import { observer, useLocalObservable } from "mobx-react"
+import { observer, useLocalObservable } from "mobx-react-lite"
 import { useEffect } from "react"
 
 const TimerView = observer(({ offset = 0 }) => {
@@ -479,7 +480,7 @@ With MobX that isn't really needed, since MobX has already a way to automaticall
 Combining `autorun` and coupling it to the life-cycle of the component using `useEffect` is luckily straightforward:
 
 ```javascript
-import { observer, useLocalObservable } from "mobx-react"
+import { observer, useLocalObservable } from "mobx-react-lite"
 import { useState } from "react"
 
 const TimerView = observer(() => {

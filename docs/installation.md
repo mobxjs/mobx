@@ -12,7 +12,8 @@ MobX works in browsers and Node.js environments that provide native `Proxy` supp
 
 React integration is available in two forms:
 
--   [mobx-react](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react). Utilities to manually apply observation to function and class components.
+-   [mobx-react-lite](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react-lite). Utilities to manually apply observation to function components.
+-   [mobx-react](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react). Wrapper around `mobx-react-lite` that also supports class components.
 -   [mobx-react-observer](https://github.com/christianalfoni/mobx-react-observer). Babel/swc plugin to automatically apply observation to components.
 
 Append the appropriate bindings for your use case to one of the commands below:

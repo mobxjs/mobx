@@ -23,9 +23,9 @@ Only the latest version is actively maintained. If you're missing a fix or a fea
 | v6          | 4.\* / 5.\*          | >16.8 <17                | Hooks                                                                            |
 | v5          | 4.\* / 5.\*          | >0.13 <17                | No, but it is possible to use `<Observer>` sections inside hook based components |
 
-`mobx-react` is the canonical React binding package for MobX:
+`mobx-react` is a wrapper around `mobx-react-lite` for applications that also need class component support:
 
--   Support for function components through `observer`
+-   Support for function components through `mobx-react-lite`
 -   Support for class based components for `observer` and `@observer`
 
 ## Installation

@@ -3,6 +3,7 @@
     "private": true,
     "workspaces": [
         "packages/mobx",
+        "packages/mobx-react-lite",
         "packages/mobx-react",
         "packages/eslint-plugin-mobx",
         "packages/mobx-undecorate"
@@ -26,6 +27,7 @@
         "prettier": "prettier --write **/*.{js,ts,md}",
         "release": "npm run prepublishOnly --workspaces --if-present && changeset publish",
         "mobx": "npm -w mobx run",
+        "mobx-react-lite": "npm -w mobx-react-lite run",
         "mobx-react": "npm -w mobx-react run",
         "mobx-undecorate": "npm -w mobx-undecorate run",
         "eslint-plugin-mobx": "npm -w eslint-plugin-mobx run",
