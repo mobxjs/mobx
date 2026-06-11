@@ -44,39 +44,21 @@ The following APIs have been removed:
 
 MobX 7 supports Stage 3 decorators only.
 
-Legacy decorators looked like this:
+To keep decorators, switch the class to Stage 3 decorator syntax: remove `makeObservable(this)` from decorated classes, drop its import when unused, and add `accessor` to observable fields.
 
-```javascript
-import { makeObservable, observable, computed, action } from "mobx"
-
-class Todo {
-    @observable title = ""
-    @observable finished = false
-
-    constructor() {
-        makeObservable(this)
-    }
-
-    @computed
-    get label() {
-        return `${this.finished ? "[DONE]" : "[OPEN]"} ${this.title}`
-    }
-
-    @action
-    toggle() {
-        this.finished = !this.finished
-    }
-}
-```
-
-To keep decorators add `accessor` to observable fields, and remove `makeObservable(this)` from decorated classes:
-
-```javascript
-import { observable, computed, action } from "mobx"
+```diff
+-import { makeObservable, observable, computed, action } from "mobx"
++import { observable, computed, action } from "mobx"
 
 class Todo {
-    @observable accessor title = ""
-    @observable accessor finished = false
+-    @observable title = ""
++    @observable accessor title = ""
+-    @observable finished = false
++    @observable accessor finished = false
+-
+-    constructor() {
+-        makeObservable(this)
+-    }
 
     @computed
     get label() {
