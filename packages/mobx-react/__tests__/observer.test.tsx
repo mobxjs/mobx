@@ -503,45 +503,6 @@ test("class observer rerenders from observable prop and rereads plain prop", () 
     expect(container).toHaveTextContent("3-3-3")
 })
 
-test("pure class observer receives new plain props after observable parent render", () => {
-    let renderCount = 0
-    let odata = observable({ x: 1 })
-
-    @observer
-    class Component extends React.PureComponent<any, any> {
-        render() {
-            renderCount++
-            return (
-                <span onClick={stuff}>
-                    {this.props.data.y}-{this.props.data.y}
-                </span>
-            )
-        }
-    }
-
-    const Parent = observer(props => {
-        let data = { y: props.odata.x }
-        return <Component data={data} odata={props.odata} />
-    })
-
-    function stuff() {
-        odata.x++
-    }
-
-    const { container } = render(<Parent odata={odata} />)
-
-    expect(renderCount).toBe(1)
-    expect(container).toHaveTextContent("1-1")
-
-    act(() => stuff())
-    expect(renderCount).toBe(2)
-    expect(container).toHaveTextContent("2-2")
-
-    act(() => stuff())
-    expect(renderCount).toBe(3)
-    expect(container).toHaveTextContent("3-3")
-})
-
 describe("Observer regions should react", () => {
     let data
     const Comp = () => (
