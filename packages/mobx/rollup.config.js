@@ -80,18 +80,6 @@ if (process.env.NODE_ENV === 'production') {
     fs.outputFileSync(path.join(dist, "index.js"), contents)
 }
 
-const copyMtsTypes = () => ({
-    name: "copy-mts-types",
-    closeBundle() {
-        const dts = path.join(dist, `${packageName}.d.ts`)
-        const dmts = path.join(dist, `${packageName}.d.mts`)
-
-        if (fs.existsSync(dts)) {
-            fs.copyFileSync(dts, dmts)
-        }
-    }
-})
-
 const stripShebang = () => ({
     name: "strip-shebang",
     transform(code) {
@@ -193,8 +181,7 @@ const createConfig = ({ format, env, declarations, extraOutputs = [] }) => {
                 }),
             sourcemaps(),
             shouldMinify && terser(defaultTerserOptions(format)),
-            shouldMinify && terser(mobxTerserOptions),
-            declarations && copyMtsTypes()
+            shouldMinify && terser(mobxTerserOptions)
         ].filter(Boolean)
     }
 }

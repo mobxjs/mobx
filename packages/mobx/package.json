@@ -21,7 +21,7 @@
                 "default": "./dist/mobx.esm.js"
             },
             "import": {
-                "types": "./dist/mobx.d.mts",
+                "types": "./dist/mobx.d.ts",
                 "default": "./dist/mobx.mjs"
             },
             "default": {
