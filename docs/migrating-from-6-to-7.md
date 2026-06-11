@@ -8,15 +8,7 @@ hide_title: true
 
 # Migrating to MobX 7 {🚀}
 
-MobX 7 is mostly a cleanup release. Most applications that already use MobX 6 idiomatically can upgrade with dependency, import and decorator configuration changes.
-
-## Getting started
-
-1. Install the latest `mobx` and the React binding package you use: `mobx-react-lite` for function components, or `mobx-react` if you need class component support.
-2. Make sure your React binding package is on its MobX 7-compatible major version.
-3. Make sure your runtime has native [`Proxy`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) support.
-4. If you use decorators, make sure they use Stage 3 syntax. Legacy decorators are not supported in MobX 7. Check out the [Enabling decorators {🚀}](enabling-decorators.md) section for more details.
-5. Remove `configure({ useProxies: ... })` and `{ proxy: false }` observable options. MobX 7 always uses Proxy-backed observable arrays and plain objects.
+MobX 7 is mostly a cleanup release. Most applications that already use MobX 6 idiomatically can upgrade with minimal changes.
 
 ## Updating React bindings
 
@@ -24,18 +16,6 @@ MobX 7 keeps the React bindings split:
 
 -   `mobx-react-lite` supports function components and `forwardRef`.
 -   `mobx-react` is a thin wrapper around `mobx-react-lite` that also supports class components and the `@observer` class decorator.
-
-Install the MobX 7 packages for your use case:
-
-```shell
-npm install mobx@latest mobx-react-lite@latest
-```
-
-Or, if you need class component support:
-
-```shell
-npm install mobx@latest mobx-react@latest
-```
 
 `mobx-react-lite` and `mobx-react` require React 18 or later.
 
@@ -89,7 +69,7 @@ class Todo {
 }
 ```
 
-To keep decorators, switch your compiler to Stage 3 decorators, add `accessor` to observable fields, and remove `makeObservable(this)` from decorated classes:
+To keep decorators add `accessor` to observable fields, and remove `makeObservable(this)` from decorated classes:
 
 ```javascript
 import { observable, computed, action } from "mobx"
@@ -110,8 +90,10 @@ class Todo {
 }
 ```
 
-For TypeScript users, use TypeScript 5 or later and disable or remove the `experimentalDecorators` flag.
-For Babel users, use `@babel/plugin-proposal-decorators` with the current Stage 3 configuration. See [Enabling decorators {🚀}](enabling-decorators.md) for the exact compiler setup.
+Switch your compiler to modern decorators:
+
+-   For TypeScript, use TypeScript 5 or later and disable or remove the `experimentalDecorators` flag.
+-   For Babel, use `@babel/plugin-proposal-decorators` with the current Stage 3 configuration. See [Enabling decorators {🚀}](enabling-decorators.md) for the exact compiler setup.
 
 If you don't want to keep decorators, remove them and pass an explicit annotation map to `makeObservable`:
 
@@ -155,8 +137,6 @@ Remove `useProxies` from `configure` calls:
 -    useProxies: "ifavailable"
  })
 ```
-
-This applies to all previous `useProxies` values: `"always"`, `"never"` and `"ifavailable"`.
 
 Also remove `{ proxy: false }` from `observable`, `observable.object` and `observable.array` options:
 
