@@ -3,6 +3,7 @@
     "version": "9.2.2",
     "description": "React bindings for MobX. Create fully reactive components.",
     "source": "src/index.ts",
+    "type": "commonjs",
     "main": "dist/index.js",
     "umd:main": "dist/mobxreact.umd.production.min.js",
     "unpkg": "dist/mobxreact.umd.production.min.js",
@@ -12,6 +13,25 @@
     "react-native": "dist/mobxreact.esm.js",
     "types": "dist/index.d.ts",
     "typings": "dist/index.d.ts",
+    "exports": {
+        "./package.json": "./package.json",
+        ".": {
+            "react-native": {
+                "types": "./dist/index.d.ts",
+                "default": "./dist/mobxreact.esm.js"
+            },
+            "import": {
+                "types": "./dist/index.d.mts",
+                "default": "./dist/mobxreact.mjs"
+            },
+            "default": {
+                "types": "./dist/index.d.ts",
+                "default": "./dist/index.js"
+            }
+        },
+        "./dist/*": "./dist/*",
+        "./src/*": "./src/*"
+    },
     "files": [
         "src",
         "dist",
@@ -39,8 +59,22 @@
         "react": "^18 || ^19"
     },
     "devDependencies": {
+        "@babel/core": "^7.9.0",
+        "@babel/plugin-proposal-class-properties": "^7.8.3",
+        "@babel/preset-env": "^7.9.5",
+        "@rollup/plugin-babel": "^5.3.0",
+        "@rollup/plugin-commonjs": "^21.0.1",
+        "@rollup/plugin-json": "^4.1.0",
+        "@rollup/plugin-node-resolve": "13.0.6",
+        "@rollup/plugin-replace": "^2.4.2",
+        "babel-plugin-annotate-pure-calls": "^0.4.0",
+        "babel-plugin-dev-expression": "^0.2.3",
+        "expose-gc": "^1.0.0",
         "mobx": "^6.15.0",
-        "expose-gc": "^1.0.0"
+        "rollup": "^2.60.2",
+        "rollup-plugin-sourcemaps": "^0.6.3",
+        "rollup-plugin-terser": "^5.3.1",
+        "rollup-plugin-typescript2": "^0.27.3"
     },
     "keywords": [
         "mobx",

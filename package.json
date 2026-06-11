@@ -69,7 +69,6 @@
         "serializr": "^2.0.3",
         "tape": "^5.0.1",
         "ts-jest": "^29.4.6",
-        "tsdx": "^0.14.1",
         "typescript": "^5.9.2"
     },
     "husky": {
