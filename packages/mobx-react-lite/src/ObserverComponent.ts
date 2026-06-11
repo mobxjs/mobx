@@ -1,10 +1,10 @@
 import { useObserver } from "./useObserver"
-import type { ReactElement } from "react"
+import type { ReactNode } from "react"
 
-interface IObserverProps {
-    children?(): ReactElement | null
-    render?(): ReactElement | null
-}
+type IObserverProps =
+    | { children: () => ReactNode; render?: never }
+    | { children?: never; render: () => ReactNode }
+    | { children?: never; render?: never }
 
 function ObserverComponent({ children, render }: IObserverProps) {
     if (children && render) {
