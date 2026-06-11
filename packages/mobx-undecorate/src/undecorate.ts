@@ -18,7 +18,7 @@ interface MobxUndecorateOptions {
     parseTsAsNonJsx?: boolean
 }
 
-const validPackages = ["mobx", "mobx-react"]
+const validPackages = ["mobx", "mobx-react", "mobx-react-lite"]
 const validDecorators = ["action", "observable", "computed", "observer", "inject"]
 
 const babylon = require("@babel/parser")

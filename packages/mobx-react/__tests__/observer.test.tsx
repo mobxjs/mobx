@@ -692,6 +692,7 @@ describe("Observer render sugar should work", () => {
 
         const Comp = () => (
             <div>
+                {/* @ts-expect-error render and children are mutually exclusive */}
                 <Observer render={() => <span>{123}</span>}>{() => <span>{123}</span>}</Observer>
             </div>
         )

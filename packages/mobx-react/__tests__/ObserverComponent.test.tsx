@@ -43,6 +43,7 @@ it("renders null if no children/render prop is supplied a function", () => {
 
 it.skip("prop types checks for children/render usage", () => {
     const Comp = () => (
+        // @ts-expect-error render and children are mutually exclusive
         <Observer render={() => <span>children</span>}>{() => <span>children</span>}</Observer>
     )
     const restoreConsole = mockConsole("error")
