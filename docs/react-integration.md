@@ -11,7 +11,7 @@ hide_title: true
 This documentation outlines how to manually apply observation to React components. However, by using the [mobx-react-observer](https://github.com/christianalfoni/mobx-react-observer) Babel/SWC plugin, you can automatically handle observation without manual intervention. Still, understanding how MobX observation integrates with React components remains valuable, even when leveraging automated solutions.
 
 ```javascript
-import { observer } from "mobx-react-lite"
+import { observer } from "mobx-react-lite" // Or "mobx-react".
 
 const MyComponent = observer(props => ReactElement)
 ```
@@ -108,7 +108,7 @@ Using observables directly works very well, but since this typically introduces 
 [React Context](https://reactjs.org/docs/context.html) is a great mechanism to share observables with an entire subtree:
 
 ```javascript
-import {observer} from 'mobx-react'
+import {observer} from 'mobx-react-lite'
 import {createContext, useContext} from "react"
 
 const TimerContext = createContext<Timer>()
@@ -376,14 +376,12 @@ The following approaches can be used to fix this:
     export default observer(MyComponent)
     ```
 
--   [**Broken**] Set `displayName` explicitly:
+-   Set `displayName` explicitly:
 
     ```javascript
     export const MyComponent = observer(props => <div>hi</div>)
     MyComponent.displayName = "MyComponent"
     ```
-
-    This was broken in React 16 because `observer` uses `React.memo`, but React 18 and later no longer have this issue.
 
 Now you can see component names:
 
