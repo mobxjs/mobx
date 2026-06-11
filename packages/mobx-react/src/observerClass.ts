@@ -10,7 +10,7 @@ import {
     isUsingStaticRendering,
     _observerFinalizationRegistry as observerFinalizationRegistry
 } from "mobx-react-lite"
-import { shallowEqual } from "./utils/utils"
+import { patch, shallowEqual } from "./utils/utils"
 
 const administrationSymbol = Symbol("ObserverAdministration")
 const isMobXReactObserverSymbol = Symbol("isMobXReactObserver")
@@ -157,10 +157,9 @@ export function makeClassComponentObserver(
         return originalComponentDidMount?.apply(this, arguments)
     }
 
-    const originalComponentWillUnmount = prototype.componentWillUnmount
-    prototype.componentWillUnmount = function () {
+    patch(prototype, "componentWillUnmount", function () {
         if (isUsingStaticRendering()) {
-            return originalComponentWillUnmount?.apply(this, arguments)
+            return
         }
         const admin = getAdministration(this)
         admin.reaction?.dispose()
@@ -168,8 +167,7 @@ export function makeClassComponentObserver(
         admin.forceUpdate = null
         admin.mounted = false
         admin.reactionInvalidatedBeforeMount = false
-        return originalComponentWillUnmount?.apply(this, arguments)
-    }
+    })
 
     return componentClass
 }

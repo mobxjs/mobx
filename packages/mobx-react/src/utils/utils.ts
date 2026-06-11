@@ -27,3 +27,98 @@ function is(x: any, y: any): boolean {
         return x !== x && y !== y
     }
 }
+
+const mobxMixins = Symbol("patchMixins")
+const mobxPatchedDefinition = Symbol("patchedDefinition")
+
+export interface Mixins extends Record<string, any> {
+    locks: number
+    methods: Array<Function>
+}
+
+function getMixins(target: object, methodName: string): Mixins {
+    const mixins = (target[mobxMixins] = target[mobxMixins] || {})
+    const methodMixins = (mixins[methodName] = mixins[methodName] || {})
+    methodMixins.locks = methodMixins.locks || 0
+    methodMixins.methods = methodMixins.methods || []
+    return methodMixins
+}
+
+function wrapper(realMethod: Function, mixins: Mixins, ...args: Array<any>) {
+    mixins.locks++
+
+    try {
+        let retVal
+        if (realMethod !== undefined && realMethod !== null) {
+            retVal = realMethod.apply(this, args)
+        }
+
+        return retVal
+    } finally {
+        mixins.locks--
+        if (mixins.locks === 0) {
+            mixins.methods.forEach(mx => {
+                mx.apply(this, args)
+            })
+        }
+    }
+}
+
+function wrapFunction(realMethod: Function, mixins: Mixins): (...args: Array<any>) => any {
+    const fn = function (...args: Array<any>) {
+        wrapper.call(this, realMethod, mixins, ...args)
+    }
+    return fn
+}
+
+export function patch(target: object, methodName: string, mixinMethod: Function): void {
+    const mixins = getMixins(target, methodName)
+
+    if (mixins.methods.indexOf(mixinMethod) < 0) {
+        mixins.methods.push(mixinMethod)
+    }
+
+    const oldDefinition = Object.getOwnPropertyDescriptor(target, methodName)
+    if (oldDefinition && oldDefinition[mobxPatchedDefinition]) {
+        return
+    }
+
+    const originalMethod = target[methodName]
+    const newDefinition = createDefinition(
+        target,
+        methodName,
+        oldDefinition ? oldDefinition.enumerable : undefined,
+        mixins,
+        originalMethod
+    )
+
+    Object.defineProperty(target, methodName, newDefinition)
+}
+
+function createDefinition(
+    target: object,
+    methodName: string,
+    enumerable: any,
+    mixins: Mixins,
+    originalMethod: Function
+): PropertyDescriptor {
+    let wrappedFunc = wrapFunction(originalMethod, mixins)
+
+    return {
+        // @ts-ignore
+        [mobxPatchedDefinition]: true,
+        get: function () {
+            return wrappedFunc
+        },
+        set: function (value) {
+            if (this === target) {
+                wrappedFunc = wrapFunction(value, mixins)
+            } else {
+                const newDefinition = createDefinition(this, methodName, enumerable, mixins, value)
+                Object.defineProperty(this, methodName, newDefinition)
+            }
+        },
+        configurable: true,
+        enumerable: enumerable
+    }
+}

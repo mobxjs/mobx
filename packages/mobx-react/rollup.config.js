@@ -147,7 +147,8 @@ const createConfig = ({ format, env, declarations, extraOutputs = [] }) => {
         sourcemap: true,
         globals: {
             react: "React",
-            mobx: "mobx"
+            mobx: "mobx",
+            "mobx-react-lite": "mobxReactLite"
         },
         exports: "named"
     }

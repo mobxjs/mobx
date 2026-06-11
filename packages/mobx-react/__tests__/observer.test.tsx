@@ -1019,6 +1019,35 @@ test(`Observable changes in componenWillUnmount don't cause any warnings or erro
     consoleWarnSpy.mockRestore()
 })
 
+test("Class observer cleans up when componentWillUnmount is assigned on the instance", () => {
+    const o = observable.box(0)
+    let unmounts = 0
+
+    const TestCmp = observer(
+        class TestCmp extends React.Component {
+            constructor(props) {
+                super(props)
+                ;(this as any).componentWillUnmount = () => {
+                    unmounts++
+                }
+            }
+
+            render() {
+                return o.get()
+            }
+        }
+    )
+
+    const { container, unmount } = render(<TestCmp />)
+    expect(container).toHaveTextContent("0")
+    expect(getObserverTree(o).observers!.length).toBe(1)
+
+    unmount()
+
+    expect(unmounts).toBe(1)
+    expect(getObserverTree(o).observers).toBe(undefined)
+})
+
 test(`Observable prop workaround`, () => {
     configure({
         enforceActions: "observed"
