@@ -28,6 +28,10 @@ function is(x: any, y: any): boolean {
     }
 }
 
+/**
+ * Utilities for patching componentWillUnmount, to make sure @disposeOnUnmount works correctly icm with user defined hooks
+ * and the handler provided by mobx-react
+ */
 const mobxMixins = Symbol("patchMixins")
 const mobxPatchedDefinition = Symbol("patchedDefinition")
 
@@ -45,6 +49,7 @@ function getMixins(target: object, methodName: string): Mixins {
 }
 
 function wrapper(realMethod: Function, mixins: Mixins, ...args: Array<any>) {
+    // locks are used to ensure that mixins are invoked only once per invocation, even on recursive calls
     mixins.locks++
 
     try {
@@ -80,6 +85,7 @@ export function patch(target: object, methodName: string, mixinMethod: Function)
 
     const oldDefinition = Object.getOwnPropertyDescriptor(target, methodName)
     if (oldDefinition && oldDefinition[mobxPatchedDefinition]) {
+        // already patched definition, do not repatch
         return
     }
 
@@ -114,6 +120,10 @@ function createDefinition(
             if (this === target) {
                 wrappedFunc = wrapFunction(value, mixins)
             } else {
+                // when it is an instance of the prototype/a child prototype patch that particular case again separately
+                // since we need to store separate values depending on wether it is the actual instance, the prototype, etc
+                // e.g. the method for super might not be the same as the method for the prototype which might be not the same
+                // as the method for the instance
                 const newDefinition = createDefinition(this, methodName, enumerable, mixins, value)
                 Object.defineProperty(this, methodName, newDefinition)
             }

@@ -157,6 +157,7 @@ export function makeClassComponentObserver(
         return originalComponentDidMount?.apply(this, arguments)
     }
 
+    // TODO@major Overly complicated "patch" is only needed to support the deprecated @disposeOnUnmount
     patch(prototype, "componentWillUnmount", function () {
         if (isUsingStaticRendering()) {
             return

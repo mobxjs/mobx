@@ -41,14 +41,13 @@ it("renders null if no children/render prop is supplied a function", () => {
     restoreConsole()
 })
 
-it.skip("prop types checks for children/render usage", () => {
+it("prop types checks for children/render usage", () => {
     const Comp = () => (
         // @ts-expect-error render and children are mutually exclusive
         <Observer render={() => <span>children</span>}>{() => <span>children</span>}</Observer>
     )
     const restoreConsole = mockConsole("error")
     render(<Comp />)
-    // tslint:disable-next-line:no-console
     expect(console.error).toHaveBeenCalledWith(
         expect.stringContaining("Do not use children and render in the same time")
     )
