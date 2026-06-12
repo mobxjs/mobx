@@ -1,7 +1,7 @@
 import * as mobx from "mobx"
 import * as React from "react"
 import { useEffect } from "react"
-import { observer, useLocalObservable } from "mobx-react"
+import { observer, useLocalObservable } from "../src"
 import { render } from "@testing-library/react"
 
 let consoleWarnMock: jest.SpyInstance | undefined
