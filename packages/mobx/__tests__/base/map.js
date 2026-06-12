@@ -1360,12 +1360,14 @@ test("2346 - subscribe to not yet existing map keys", async () => {
     class Compute {
         values = observable.map()
 
-        @computed get get42() {
+        get get42() {
             return this.get(42)
         }
 
         constructor() {
-            makeObservable(this)
+            makeObservable(this, {
+                get42: computed
+            })
         }
 
         get(k) {

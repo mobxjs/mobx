@@ -14,8 +14,7 @@ const persistentKeys: (keyof MobXGlobals)[] = [
     "allowStateReads",
     "disableErrorBoundaries",
     "runId",
-    "UNCHANGED",
-    "useProxies"
+    "UNCHANGED"
 ]
 
 export type IUNCHANGED = {}
@@ -29,7 +28,7 @@ export class MobXGlobals {
      * N.B: this version is unrelated to the package version of MobX, and is only the version of the
      * internal state storage of MobX, and can be the same across many different package versions
      */
-    version = 6
+    version = 7
 
     /**
      * globally unique token to signal unchanged
@@ -137,12 +136,6 @@ export class MobXGlobals {
      * they are not the cause, see: https://github.com/mobxjs/mobx/issues/1836
      */
     suppressReactionErrors = false
-
-    useProxies = true
-    /*
-     * print warnings about code that would fail if proxies weren't available
-     */
-    verifyProxies = false
 
     /**
      * False forces all object's descriptors to

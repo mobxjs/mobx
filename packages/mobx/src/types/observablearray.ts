@@ -22,8 +22,6 @@ import {
     registerListener,
     spyReportEnd,
     spyReportStart,
-    assertProxies,
-    reserveArrayBuffer,
     hasProp,
     die,
     globalState,
@@ -130,8 +128,7 @@ export class ObservableArrayAdministration
     constructor(
         name = __DEV__ ? "ObservableArray@" + getNextId() : "ObservableArray",
         enhancer: IEnhancer<any>,
-        public owned_: boolean,
-        public legacyMode_: boolean
+        public owned_: boolean
     ) {
         this.atom_ = new Atom(name)
         this.enhancer_ = (newV, oldV) =>
@@ -204,9 +201,6 @@ export class ObservableArrayAdministration
             die(16)
         }
         this.lastKnownLength_ += delta
-        if (this.legacyMode_ && delta > 0) {
-            reserveArrayBuffer(oldLength + delta + 1)
-        }
     }
 
     spliceWithArray_(index: number, deleteCount?: number, newItems?: any[]): any[] {
@@ -250,7 +244,7 @@ export class ObservableArrayAdministration
 
         newItems =
             newItems.length === 0 ? newItems : newItems.map(v => this.enhancer_(v, undefined))
-        if (this.legacyMode_ || __DEV__) {
+        if (__DEV__) {
             const lengthDelta = newItems.length - deleteCount
             this.updateArrayLength_(length, lengthDelta) // checks if internal array wasn't modified
         }
@@ -344,24 +338,12 @@ export class ObservableArrayAdministration
     }
 
     get_(index: number): any | undefined {
-        if (this.legacyMode_ && index >= this.values_.length) {
-            console.warn(
-                __DEV__
-                    ? `[mobx.array] Attempt to read an array index (${index}) that is out of bounds (${this.values_.length}). Please check length first. Out of bound indices will not be tracked by MobX`
-                    : `[mobx] Out of bounds read: ${index}`
-            )
-            return undefined
-        }
         this.atom_.reportObserved()
         return this.dehanceValue_(this.values_[index])
     }
 
     set_(index: number, newValue: any) {
         const values = this.values_
-        if (this.legacyMode_ && index > values.length) {
-            // out of bounds
-            die(17, index, values.length)
-        }
         if (index < values.length) {
             // update at index in range
             checkIfStateModificationsAreAllowed(this.atom_)
@@ -404,9 +386,8 @@ export function createObservableArray<T>(
     name = __DEV__ ? "ObservableArray@" + getNextId() : "ObservableArray",
     owned = false
 ): IObservableArray<T> {
-    assertProxies()
     return initObservable(() => {
-        const adm = new ObservableArrayAdministration(name, enhancer, owned, false)
+        const adm = new ObservableArrayAdministration(name, enhancer, owned)
         addHiddenFinalProp(adm.values_, $mobx, adm)
         const proxy = new Proxy(adm.values_, arrayTraps) as any
         adm.proxy_ = proxy

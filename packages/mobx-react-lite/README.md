@@ -6,18 +6,18 @@
 [![Discuss on Github](https://img.shields.io/badge/discuss%20on-GitHub-orange)](https://github.com/mobxjs/mobx/discussions)
 [![View changelog](https://img.shields.io/badge/changelogs.xyz-Explore%20Changelog-brightgreen)](https://changelogs.xyz/mobx-react-lite)
 
-This is a lighter version of [mobx-react](https://github.com/mobxjs/mobx-react) which supports React **functional components only** and as such makes the library slightly faster and smaller (_only 1.5kB gzipped_). Note however that it is possible to use `<Observer>` inside the render of class components.
-Unlike `mobx-react`, it doesn't `Provider`/`inject`, as `useContext` can be used instead.
+This package supports React **function components only**. Use [mobx-react](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react) if you also need class component support. It is still possible to use `<Observer>` inside the render of class components.
 
 ## Compatibility table (major versions)
 
 | mobx | mobx-react-lite | Browser                                        |
 | ---- | --------------- | ---------------------------------------------- |
+| 7    | 5               | Modern browsers with native Proxy support      |
 | 6    | 3               | Modern browsers (IE 11+ in compatibility mode) |
 | 5    | 2               | Modern browsers                                |
 | 4    | 2               | IE 11+, RN w/o Proxy support                   |
 
-`mobx-react-lite` requires React 16.8 or higher.
+`mobx-react-lite` version 5 requires React 18 or higher.
 
 ## User Guide 👉 https://mobx.js.org/react-integration.html
 
@@ -38,7 +38,7 @@ Is a React component, which applies observer to an anonymous region in your comp
 
 Creates an observable object with the given properties, methods and computed values.
 
-Note that computed values cannot directly depend on non-observable values, but only on observable values, so it might be needed to sync properties into the observable using `useEffect` (see the example below at `useAsObservableSource`).
+Note that computed values cannot directly depend on non-observable values, but only on observable values, so it might be needed to sync properties into the observable using `useEffect`.
 
 `useLocalObservable` is a short-hand for:
 
@@ -50,108 +50,9 @@ Call `enableStaticRendering(true)` when running in an SSR environment, in which 
 
 ---
 
-## Deprecated APIs
+## Removed APIs in version 5
 
-### **`useObserver<T>(fn: () => T, baseComponentName = "observed", options?: IUseObserverOptions): T`** (deprecated)
-
-_This API is deprecated in 3.\*. It is often used wrong (e.g. to select data rather than for rendering, and `<Observer>` better decouples the rendering from the component updates_
-
-```ts
-interface IUseObserverOptions {
-    // optional custom hook that should make a component re-render (or not) upon changes
-    // Supported in 2.x only
-    useForceUpdate: () => () => void
-}
-```
-
-It allows you to use an observer like behaviour, but still allowing you to optimize the component in any way you want (e.g. using memo with a custom areEqual, using forwardRef, etc.) and to declare exactly the part that is observed (the render phase).
-
-### **`useLocalStore<T, S>(initializer: () => T, source?: S): T`** (deprecated)
-
-_This API is deprecated in 3.\*. Use `useLocalObservable` instead. They do roughly the same, but `useLocalObservable` accepts an set of annotations as second argument, rather than a `source` object. Using `source` is not recommended, see the deprecation message at `useAsObservableSource` for details_
-
-Local observable state can be introduced by using the useLocalStore hook, that runs its initializer function once to create an observable store and keeps it around for a lifetime of a component.
-
-The annotations are similar to the annotations that are passed in to MobX's [`observable`](https://mobx.js.org/observable.html#available-annotations) API, and can be used to override the automatic member inference of specific fields.
-
-### **`useAsObservableSource<T>(source: T): T`** (deprecated)
-
-The useAsObservableSource hook can be used to turn any set of values into an observable object that has a stable reference (the same object is returned every time from the hook).
-
-_This API is deprecated in 3.\* as it relies on observables to be updated during rendering which is an anti-pattern. Instead, use `useEffect` to synchronize non-observable values with values. Example:_
-
-```javascript
-// Before:
-function Measurement({ unit }) {
-    const observableProps = useAsObservableSource({ unit })
-    const state = useLocalStore(() => ({
-        length: 0,
-        get lengthWithUnit() {
-            // lengthWithUnit can only depend on observables, hence the above conversion with `useAsObservableSource`
-            return observableProps.unit === "inch"
-                ? `${this.length / 2.54} inch`
-                : `${this.length} cm`
-        }
-    }))
-
-    return <h1>{state.lengthWithUnit}</h1>
-}
-
-// After:
-function Measurement({ unit }) {
-    const state = useLocalObservable(() => ({
-        unit, // the initial unit
-        length: 0,
-        get lengthWithUnit() {
-            // lengthWithUnit can only depend on observables, hence the above conversion with `useAsObservableSource`
-            return this.unit === "inch" ? `${this.length / 2.54} inch` : `${this.length} cm`
-        }
-    }))
-
-    useEffect(() => {
-        // sync the unit from 'props' into the observable 'state'
-        state.unit = unit
-    }, [unit])
-
-    return <h1>{state.lengthWithUnit}</h1>
-}
-```
-
-Note that, at your own risk, it is also possible to not use `useEffect`, but do `state.unit = unit` instead in the rendering.
-This is closer to the old behavior, but React will warn correctly about this if this would affect the rendering of other components.
-
-## Observer batching (deprecated)
-
-_Note: configuring observer batching is only needed when using `mobx-react-lite` 2.0.* or 2.1.*. From 2.2 onward it will be configured automatically based on the availability of react-dom / react-native packages_
-
-[Check out the elaborate explanation](https://github.com/mobxjs/mobx-react/pull/787#issuecomment-573599793).
-
-In short without observer batching the React doesn't guarantee the order component rendering in some cases. We highly recommend that you configure batching to avoid these random surprises.
-
-Import one of these before any React rendering is happening, typically `index.js/ts`. For Jest tests you can utilize [setupFilesAfterEnv](https://jestjs.io/docs/en/configuration#setupfilesafterenv-array).
-
-**React DOM:**
-
-> import 'mobx-react-lite/batchingForReactDom'
-
-**React Native:**
-
-> import 'mobx-react-lite/batchingForReactNative'
-
-### Opt-out
-
-To opt-out from batching in some specific cases, simply import the following to silence the warning.
-
-> import 'mobx-react-lite/batchingOptOut'
-
-### Custom batched updates
-
-Above imports are for a convenience to utilize standard versions of batching. If you for some reason have customized version of batched updates, you can do the following instead.
-
-```js
-import { observerBatching } from "mobx-react-lite"
-observerBatching(customBatchedUpdates)
-```
+`useObserver`, `useLocalStore`, `useAsObservableSource`, `useStaticRendering`, batching imports, `observerBatching`, and `isObserverBatched` have been removed. Use `observer`, `<Observer>`, `useLocalObservable`, and `enableStaticRendering`; React 18 renderers handle batching.
 
 ## Testing
 

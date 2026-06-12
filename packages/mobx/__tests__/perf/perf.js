@@ -19,9 +19,6 @@ results of this test:
 
 */
     const mobx = require(`../../dist/mobx.cjs.production.min.js`)
-    if (version === "legacy") {
-        mobx.configure({ useProxies: false })
-    }
     const observable = mobx.observable
     const computed = mobx.computed
 

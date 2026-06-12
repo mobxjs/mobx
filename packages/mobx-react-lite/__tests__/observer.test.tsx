@@ -1,18 +1,14 @@
-import { act, cleanup, fireEvent, render } from "@testing-library/react"
+import { act, fireEvent, render } from "@testing-library/react"
 import mockConsole from "jest-mock-console"
 import * as mobx from "mobx"
 import React from "react"
 
-import { observer, useObserver, isObserverBatched, enableStaticRendering } from "../src"
+import { observer, enableStaticRendering } from "../src"
+import { useObserver } from "../src/useObserver"
 
 const getDNode = (obj: any, prop?: string) => mobx.getObserverTree(obj, prop)
 
-afterEach(cleanup)
-
 let consoleWarnMock: jest.SpyInstance | undefined
-afterEach(() => {
-    consoleWarnMock?.mockRestore()
-})
 
 function runTestSuite(mode: "observer" | "useObserver") {
     function obsComponent<P extends object>(
@@ -274,14 +270,6 @@ function runTestSuite(mode: "observer" | "useObserver") {
         })
     })
 
-    describe("issue 309", () => {
-        test("isObserverBatched is still defined and yields true by default", () => {
-            consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
-            expect(isObserverBatched()).toBe(true)
-            expect(consoleWarnMock).toMatchSnapshot()
-        })
-    })
-
     test("changing state in render should fail", () => {
         // This test is most likely obsolete ... exception is not thrown
         const data = mobx.observable.box(2)
@@ -303,7 +291,6 @@ function runTestSuite(mode: "observer" | "useObserver") {
             data.set(3)
         })
         expect(container).toMatchSnapshot()
-        mobx._resetGlobalState()
     })
 
     describe("should render component even if setState called with exactly the same props", () => {
@@ -488,43 +475,6 @@ function runTestSuite(mode: "observer" | "useObserver") {
 
 runTestSuite("observer")
 runTestSuite("useObserver")
-
-test("observer(cmp, { forwardRef: true }) + useImperativeHandle", () => {
-    consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
-
-    interface IMethods {
-        focus(): void
-    }
-
-    interface IProps {
-        value: string
-        ref: React.Ref<IMethods>
-    }
-
-    const FancyInput = observer<IProps>(
-        (props: IProps, ref: React.Ref<IMethods>) => {
-            const inputRef = React.useRef<HTMLInputElement>(null)
-            React.useImperativeHandle(
-                ref,
-                () => ({
-                    focus: () => {
-                        inputRef.current!.focus()
-                    }
-                }),
-                []
-            )
-            return <input ref={inputRef} defaultValue={props.value} />
-        },
-        { forwardRef: true }
-    )
-
-    const cr = React.createRef<IMethods>()
-    render(<FancyInput ref={cr} value="" />)
-    expect(cr).toBeTruthy()
-    expect(cr.current).toBeTruthy()
-    expect(typeof cr.current!.focus).toBe("function")
-    expect(consoleWarnMock).toMatchSnapshot()
-})
 
 test("observer(forwardRef(cmp)) + useImperativeHandle", () => {
     interface IMethods {
@@ -734,23 +684,7 @@ it("should have overload for props with children", () => {
     // this test has no `expect` calls as it verifies whether such component compiles or not
 })
 
-it("should have overload for empty options", () => {
-    // empty options are not really making sense now, but we shouldn't rely on `forwardRef`
-    // being specified in case other options are added in the future
-
-    interface IProps {
-        value: string
-    }
-    const TestComponent = observer<IProps>(({ value }) => {
-        return null
-    }, {})
-
-    render(<TestComponent value="1" />)
-
-    // this test has no `expect` calls as it verifies whether such component compiles or not
-})
-
-it("should have overload for props with children when forwardRef", () => {
+it("should have overload for props with children when using forwardRef", () => {
     interface IMethods {
         focus(): void
     }
@@ -758,11 +692,10 @@ it("should have overload for props with children when forwardRef", () => {
     interface IProps {
         value: string
     }
-    const TestComponent = observer<IProps, IMethods>(
-        ({ value }, ref) => {
+    const TestComponent = observer(
+        React.forwardRef<IMethods, IProps>(({ value }, ref) => {
             return null
-        },
-        { forwardRef: true }
+        })
     )
 
     render(<TestComponent value="1" />)
@@ -799,38 +732,26 @@ it("should preserve generic parameters", () => {
     // this test has no `expect` calls as it verifies whether such component compiles or not
 })
 
-it("should preserve generic parameters when forwardRef", () => {
+it("should preserve concrete props when using forwardRef", () => {
     interface IMethods {
         focus(): void
     }
 
-    interface IColor {
-        name: string
-        css: string
-    }
-
-    interface ITestComponentProps<T> {
-        value: T
-        callback: (value: T) => void
+    interface ITestComponentProps {
+        value: string
+        callback: (value: string) => void
     }
     const TestComponent = observer(
-        <T extends unknown>(props: ITestComponentProps<T>, ref: React.Ref<IMethods>) => {
+        React.forwardRef<IMethods, ITestComponentProps>((props, ref) => {
             return null
-        },
-        { forwardRef: true }
+        })
     )
 
     function callbackString(value: string) {
         return
     }
-    function callbackColor(value: IColor) {
-        return
-    }
 
     render(<TestComponent value="1" callback={callbackString} />)
-    render(
-        <TestComponent value={{ name: "red", css: "rgb(255, 0, 0)" }} callback={callbackColor} />
-    )
 
     // this test has no `expect` calls as it verifies whether such component compiles or not
 })
@@ -1056,21 +977,6 @@ it.skip("Legacy context support", () => {
     render(<ContextProvider />)
 })
 
-it("Throw when trying to set contextType on observer", () => {
-    const NamedObserver = observer(function TestCmp() {
-        return null
-    })
-    const AnonymousObserver = observer(() => null)
-    expect(() => {
-        ;(NamedObserver as any).contextTypes = {}
-    }).toThrow(/\[mobx-react-lite\] `TestCmp.contextTypes` must be set before applying `observer`./)
-    expect(() => {
-        ;(AnonymousObserver as any).contextTypes = {}
-    }).toThrow(
-        /\[mobx-react-lite\] `Component.contextTypes` must be set before applying `observer`./
-    )
-})
-
 test("Anonymous component displayName #3192", () => {
     // React prints errors even if we catch em
     const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {})
@@ -1152,6 +1058,4 @@ test("`isolateGlobalState` shouldn't break reactivity #3734", async () => {
     )
     expect(container).toHaveTextContent("1")
     unmount()
-
-    mobx._resetGlobalState()
 })

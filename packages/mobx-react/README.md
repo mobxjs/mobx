@@ -17,21 +17,20 @@ Only the latest version is actively maintained. If you're missing a fix or a fea
 
 | NPM Version | Support MobX version | Supported React versions | Added support for:                                                               |
 | ----------- | -------------------- | ------------------------ | -------------------------------------------------------------------------------- |
+| v10         | 7.\*                 | >=18                     | MobX 7, Hooks, React 18 strict mode                                              |
 | v9          | 6.\*                 | >16.8                    | Hooks, React 18.2 in strict mode                                                 |
 | v7          | 6.\*                 | >16.8 < 18.2             | Hooks                                                                            |
 | v6          | 4.\* / 5.\*          | >16.8 <17                | Hooks                                                                            |
 | v5          | 4.\* / 5.\*          | >0.13 <17                | No, but it is possible to use `<Observer>` sections inside hook based components |
 
-mobx-react 6 / 7 is a repackage of the smaller [mobx-react-lite](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react-lite) package + following features from the `mobx-react@5` package added:
+`mobx-react` is a wrapper around `mobx-react-lite` for applications that also need class component support:
 
+-   Support for function components through `mobx-react-lite`
 -   Support for class based components for `observer` and `@observer`
--   `Provider / inject` to pass stores around (but consider to use `React.createContext` instead)
--   `PropTypes` to describe observable based property checkers (but consider to use TypeScript instead)
--   The `disposeOnUnmount` utility / decorator to easily clean up resources such as reactions created in your class based components.
 
 ## Installation
 
-`npm install mobx-react --save`
+`npm install mobx-react`
 
 Or CDN: https://unpkg.com/mobx-react (UMD namespace: `mobxReact`)
 
@@ -42,7 +41,7 @@ import { observer } from "mobx-react"
 This package provides the bindings for MobX and React.
 See the [official documentation](https://mobx.js.org/react-integration.html) for how to get started.
 
-For greenfield projects you might want to consider to use [mobx-react-lite](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react-lite), if you intend to only use function based components. `React.createContext` can be used to pass stores around.
+Use `React.createContext` to pass stores around.
 
 ## API documentation
 
@@ -226,7 +225,7 @@ person.name = "Mike" // will cause the Observer region to re-render
 Local observable state can be introduced by using the `useLocalObservable` hook, that runs once to create an observable store. A quick example would be:
 
 ```javascript
-import { useLocalObservable, Observer } from "mobx-react-lite"
+import { useLocalObservable, Observer } from "mobx-react"
 
 const Todo = () => {
     const todo = useLocalObservable(() => ({
@@ -241,7 +240,7 @@ const Todo = () => {
         <Observer>
             {() => (
                 <h1 onClick={todo.toggle}>
-                    {todo.title} {todo.done ? "[DONE]" : "[TODO]"}
+                    {todo.title} {todo.done ? "[DONE]" : "[OPEN]"}
                 </h1>
             )}
         </Observer>
@@ -253,7 +252,7 @@ When using `useLocalObservable`, all properties of the returned object will be m
 
 It is important to realize that the store is created only once! It is not possible to specify dependencies to force re-creation, _nor should you directly be referring to props for the initializer function_, as changes in those won't propagate.
 
-Instead, if your store needs to refer to props (or `useState` based local state), the `useLocalObservable` should be combined with the `useAsObservableSource` hook, see below.
+Instead, if your store needs to refer to props (or `useState` based local state), sync those values into the store with `useEffect`.
 
 Note that in many cases it is possible to extract the initializer function to a function outside the component definition. Which makes it possible to test the store itself in a more straight-forward manner, and avoids creating the initializer closure on each re-render.
 
@@ -286,261 +285,6 @@ Decorators are currently a stage-2 ESNext feature. How to enable them is documen
 
 See this [thread](https://www.reddit.com/r/reactjs/comments/4vnxg5/free_eggheadio_course_learn_mobx_react_in_30/d61oh0l).
 TL;DR: the conceptual distinction makes a lot of sense when using MobX as well, but use `observer` on all components.
-
-### `PropTypes`
-
-MobX-react provides the following additional `PropTypes` which can be used to validate against MobX structures:
-
--   `observableArray`
--   `observableArrayOf(React.PropTypes.number)`
--   `observableMap`
--   `observableObject`
--   `arrayOrObservableArray`
--   `arrayOrObservableArrayOf(React.PropTypes.number)`
--   `objectOrObservableObject`
-
-Use `import { PropTypes } from "mobx-react"` to import them, then use for example `PropTypes.observableArray`
-
-### `Provider` and `inject`
-
-_Note: usually there is no need anymore to use `Provider` / `inject` in new code bases; most of its features are now covered by `React.createContext`._
-
-`Provider` is a component that can pass stores (or other stuff) using React's context mechanism to child components.
-This is useful if you have things that you don't want to pass through multiple layers of components explicitly.
-
-`inject` can be used to pick up those stores. It is a higher order component that takes a list of strings and makes those stores available to the wrapped component.
-
-Example (based on the official [context docs](https://facebook.github.io/react/docs/context.html#passing-info-automatically-through-a-tree)):
-
-```javascript
-@inject("color")
-@observer
-class Button extends React.Component {
-    render() {
-        return <button style={{ background: this.props.color }}>{this.props.children}</button>
-    }
-}
-
-class Message extends React.Component {
-    render() {
-        return (
-            <div>
-                {this.props.text} <Button>Delete</Button>
-            </div>
-        )
-    }
-}
-
-class MessageList extends React.Component {
-    render() {
-        const children = this.props.messages.map(message => <Message text={message.text} />)
-        return (
-            <Provider color="red">
-                <div>{children}</div>
-            </Provider>
-        )
-    }
-}
-```
-
-Notes:
-
--   It is possible to read the stores provided by `Provider` using `React.useContext`, by using the `MobXProviderContext` context that can be imported from `mobx-react`.
--   If a component asks for a store and receives a store via a property with the same name, the property takes precedence. Use this to your advantage when testing!
--   When using both `@inject` and `@observer`, make sure to apply them in the correct order: `observer` should be the inner decorator, `inject` the outer. There might be additional decorators in between.
--   The original component wrapped by `inject` is available as the `wrappedComponent` property of the created higher order component.
-
-#### "The set of provided stores has changed" error
-
-Values provided through `Provider` should be final. Make sure that if you put things in `context` that might change over time, that they are `@observable` or provide some other means to listen to changes, like callbacks. However, if your stores will change over time, like an observable value of another store, MobX will throw an error.
-This restriction exists mainly for legacy reasons. If you have a scenario where you need to modify the set of stores, please leave a comment about it in this issue https://github.com/mobxjs/mobx-react/issues/745. Or a preferred way is to [use React Context](https://reactjs.org/docs/context.html) directly which does not have this restriction.
-
-#### Inject as function
-
-The above example in ES5 would start like:
-
-```javascript
-var Button = inject("color")(
-    observer(
-        class Button extends Component {
-            /* ... etc ... */
-        }
-    )
-)
-```
-
-A functional stateless component would look like:
-
-```javascript
-var Button = inject("color")(
-    observer(({ color }) => {
-        /* ... etc ... */
-    })
-)
-```
-
-#### Customizing inject
-
-Instead of passing a list of store names, it is also possible to create a custom mapper function and pass it to inject.
-The mapper function receives all stores as argument, the properties with which the components are invoked and the context, and should produce a new set of properties,
-that are mapped into the original:
-
-`mapperFunction: (allStores, props, context) => additionalProps`
-
-Since version 4.0 the `mapperFunction` itself is tracked as well, so it is possible to do things like:
-
-```javascript
-const NameDisplayer = ({ name }) => <h1>{name}</h1>
-
-const UserNameDisplayer = inject(stores => ({
-    name: stores.userStore.name
-}))(NameDisplayer)
-
-const user = mobx.observable({
-    name: "Noa"
-})
-
-const App = () => (
-    <Provider userStore={user}>
-        <UserNameDisplayer />
-    </Provider>
-)
-
-ReactDOM.render(<App />, document.body)
-```
-
-_N.B. note that in this *specific* case neither `NameDisplayer` nor `UserNameDisplayer` needs to be decorated with `observer`, since the observable dereferencing is done in the mapper function_
-
-#### Using `PropTypes` and `defaultProps` and other static properties in combination with `inject`
-
-Inject wraps a new component around the component you pass into it.
-This means that assigning a static property to the resulting component, will be applied to the HoC, and not to the original component.
-So if you take the following example:
-
-```javascript
-const UserName = inject("userStore")(({ userStore, bold }) => someRendering())
-
-UserName.propTypes = {
-    bold: PropTypes.boolean.isRequired,
-    userStore: PropTypes.object.isRequired // will always fail
-}
-```
-
-The above propTypes are incorrect, `bold` needs to be provided by the caller of the `UserName` component and is checked by React.
-However, `userStore` does not need to be required! Although it is required for the original stateless function component, it is not
-required for the resulting inject component. After all, the whole point of that component is to provide that `userStore` itself.
-
-So if you want to make assertions on the data that is being injected (either stores or data resulting from a mapper function), the propTypes
-should be defined on the _wrapped_ component. Which is available through the static property `wrappedComponent` on the inject component:
-
-```javascript
-const UserName = inject("userStore")(({ userStore, bold }) => someRendering())
-
-UserName.propTypes = {
-    bold: PropTypes.boolean.isRequired // could be defined either here ...
-}
-
-UserName.wrappedComponent.propTypes = {
-    // ... or here
-    userStore: PropTypes.object.isRequired // correct
-}
-```
-
-The same principle applies to `defaultProps` and other static React properties.
-Note that it is not allowed to redefine `contextTypes` on `inject` components (but is possible to define it on `wrappedComponent`)
-
-Finally, mobx-react will automatically move non React related static properties from wrappedComponent to the inject component so that all static fields are
-actually available to the outside world without needing `.wrappedComponent`.
-
-#### Strongly typing inject
-
-##### With TypeScript
-
-`inject` also accepts a function (`(allStores, nextProps, nextContext) => additionalProps`) that can be used to pick all the desired stores from the available stores like this.
-The `additionalProps` will be merged into the original `nextProps` before being provided to the next component.
-
-```typescript
-import { IUserStore } from "myStore"
-
-@inject(allStores => ({
-    userStore: allStores.userStore as IUserStore
-}))
-class MyComponent extends React.Component<{ userStore?: IUserStore; otherProp: number }, {}> {
-    /* etc */
-}
-```
-
-Make sure to mark `userStore` as an optional property. It should not (necessarily) be passed in by parent components at all!
-
-Note: If you have strict null checking enabled, you could muffle the nullable type by using the `!` operator:
-
-```
-public render() {
-   const {a, b} = this.store!
-   // ...
-}
-```
-
-#### Testing store injection
-
-It is allowed to pass any declared store in directly as a property as well. This makes it easy to set up individual component tests without a provider.
-
-So if you have in your app something like:
-
-```javascript
-<Provider profile={profile}>
-    <Person age={"30"} />
-</Provider>
-```
-
-In your test you can easily test the `Person` component by passing the necessary store as prop directly:
-
-```
-const profile = new Profile()
-const mountedComponent = mount(
-   <Person age={'30'} profile={profile} />
-)
-```
-
-Bear in mind that using shallow rendering won't provide any useful results when testing injected components; only the injector will be rendered.
-To test with shallow rendering, instantiate the `wrappedComponent` instead: `shallow(<Person.wrappedComponent />)`
-
-### disposeOnUnmount(componentInstance, propertyKey | function | function[])
-
-Function (and decorator) that makes sure a function (usually a disposer such as the ones returned by `reaction`, `autorun`, etc.) is automatically executed as part of the componentWillUnmount lifecycle event.
-
-```javascript
-import { disposeOnUnmount } from "mobx-react"
-
-class SomeComponent extends React.Component {
-    // decorator version
-    @disposeOnUnmount
-    someReactionDisposer = reaction(...)
-
-    // decorator version with arrays
-    @disposeOnUnmount
-    someReactionDisposers = [
-        reaction(...),
-        reaction(...)
-    ]
-
-
-    // function version over properties
-    someReactionDisposer = disposeOnUnmount(this, reaction(...))
-
-    // function version inside methods
-    componentDidMount() {
-        // single function
-        disposeOnUnmount(this, reaction(...))
-
-        // or function array
-        disposeOnUnmount(this, [
-            reaction(...),
-            reaction(...)
-        ])
-    }
-}
-```
 
 ## DevTools
 

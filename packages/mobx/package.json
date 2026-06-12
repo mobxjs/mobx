@@ -3,6 +3,7 @@
     "version": "6.16.1",
     "description": "Simple, scalable state management.",
     "source": "src/mobx.ts",
+    "type": "commonjs",
     "main": "dist/index.js",
     "umd:main": "dist/mobx.umd.production.min.js",
     "unpkg": "dist/mobx.umd.production.min.js",
@@ -12,6 +13,25 @@
     "react-native": "dist/mobx.esm.js",
     "types": "dist/mobx.d.ts",
     "typings": "dist/mobx.d.ts",
+    "exports": {
+        "./package.json": "./package.json",
+        ".": {
+            "react-native": {
+                "types": "./dist/mobx.d.ts",
+                "default": "./dist/mobx.esm.js"
+            },
+            "import": {
+                "types": "./dist/mobx.d.ts",
+                "default": "./dist/mobx.mjs"
+            },
+            "default": {
+                "types": "./dist/mobx.d.ts",
+                "default": "./dist/index.js"
+            }
+        },
+        "./dist/*": "./dist/*",
+        "./src/*": "./src/*"
+    },
     "files": [
         "src",
         "dist",
@@ -43,7 +63,18 @@
         "@babel/preset-env": "^7.9.5",
         "@babel/preset-typescript": "^7.9.0",
         "@babel/runtime": "^7.9.2",
-        "conditional-type-checks": "^1.0.5"
+        "@rollup/plugin-babel": "^5.3.0",
+        "@rollup/plugin-commonjs": "^21.0.1",
+        "@rollup/plugin-json": "^4.1.0",
+        "@rollup/plugin-node-resolve": "13.0.6",
+        "@rollup/plugin-replace": "^2.4.2",
+        "babel-plugin-annotate-pure-calls": "^0.4.0",
+        "babel-plugin-dev-expression": "^0.2.3",
+        "conditional-type-checks": "^1.0.5",
+        "rollup": "^2.60.2",
+        "rollup-plugin-sourcemaps": "^0.6.3",
+        "rollup-plugin-terser": "^5.3.1",
+        "rollup-plugin-typescript2": "^0.27.3"
     },
     "keywords": [
         "mobx",
@@ -65,14 +96,16 @@
         "build": "node ../../scripts/build.js mobx",
         "build:test": "npm run build -- --target test",
         "perf": "scripts/perf.sh",
-        "perf-legacy": "node --expose-gc ./__tests__/perf/index.js legacy",
         "perf-proxy": "node --expose-gc ./__tests__/perf/index.js proxy",
         "perf-decorator": "tsc -p ./__tests__/perf/tsconfig.decorator.json && node --expose-gc ./__tests__/perf/compiled/lazy-computed-decorator.js && node --expose-gc ./__tests__/perf/compiled/lazy-observable-decorator.js",
-        "test:performance": "npm run perf -- proxy && npm run perf -- legacy && npm run perf-decorator",
+        "test:performance": "npm run perf -- proxy && npm run perf-decorator",
         "test:mixed-versions": "npm test -- --testRegex mixed-versions",
         "test:types": "tsc --noEmit",
         "test:coverage": "npm test -- -i --coverage",
-        "test:size": "import-size --report . observable computed autorun action",
+        "check-size": "npm run build -- --target publish && node ./scripts/size.js bundle minimal make-auto-observable",
+        "check-size:bundle": "npm run build -- --target publish && node ./scripts/size.js bundle",
+        "check-size:minimal": "npm run build -- --target publish && node ./scripts/size.js minimal",
+        "check-size:make-auto-observable": "npm run build -- --target publish && node ./scripts/size.js make-auto-observable",
         "test:check": "npm run test:types",
         "prepublishOnly": "node ./scripts/prepublish.js && npm run build -- --target publish"
     }

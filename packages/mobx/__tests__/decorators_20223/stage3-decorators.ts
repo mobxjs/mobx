@@ -2,11 +2,8 @@
 
 import {
     observe,
-    computed,
-    observable,
     autorun,
     extendObservable,
-    action,
     IObservableArray,
     IArrayWillChange,
     IArrayWillSplice,
@@ -22,9 +19,9 @@ import {
     IAtom,
     createAtom,
     runInAction,
-    makeObservable,
     isComputedProp
 } from "../../src/mobx"
+import { action, computed, flow, observable } from "../../src/mobx"
 import { $mobx, type ObservableArrayAdministration } from "../../src/internal"
 import * as mobx from "../../src/mobx"
 
@@ -272,9 +269,7 @@ test("issue 165", () => {
     }
 
     class Card {
-        constructor(public game: Game, public id: number) {
-            makeObservable(this)
-        }
+        constructor(public game: Game, public id: number) {}
 
         @computed
         get isWrong() {
@@ -602,10 +597,6 @@ test("inheritance", () => {
         get c() {
             return this.a + this.b
         }
-        constructor() {
-            super()
-            makeObservable(this)
-        }
     }
     const b1 = new B()
     const b2 = new B()
@@ -775,7 +766,6 @@ test("373 - fix isObservable for unused computed", () => {
             return 3
         }
         constructor() {
-            makeObservable(this)
             t.equal(isObservableProp(this, "computedVal"), true)
             this.computedVal
             t.equal(isObservableProp(this, "computedVal"), true)
@@ -930,7 +920,6 @@ test("@computed.equals (2022.3)", () => {
     const sameTime = (from: Time, to: Time) => from.hour === to.hour && from.minute === to.minute
     class Time {
         constructor(hour: number, minute: number) {
-            makeObservable(this)
             this.hour = hour
             this.minute = minute
         }
@@ -1023,11 +1012,6 @@ test("multiple inheritance should work", () => {
 
     class B extends A {
         @observable accessor y = 1
-
-        constructor() {
-            super()
-            makeObservable(this)
-        }
     }
 
     const adm = mobx._getAdministration(new B()) as any
@@ -1080,14 +1064,14 @@ test("it should support asyncAction as decorator (2022.3)", async () => {
 
 test("it should support flow as decorator (2022.3)", async () => {
     class DecoratorInferred {
-        @mobx.flow
+        @flow
         *f() {
             return true
         }
     }
 
     class DecoratorExplicit {
-        @mobx.flow
+        @flow
         *f(): Generator<never, boolean, unknown> {
             return true
         }

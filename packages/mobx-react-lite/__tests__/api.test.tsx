@@ -12,13 +12,7 @@ test("correct api should be exposed", function () {
             "observer",
             "Observer",
             "useLocalObservable",
-            "useLocalStore",
-            "useAsObservableSource",
             "clearTimers",
-            "useObserver",
-            "isObserverBatched",
-            "observerBatching",
-            "useStaticRendering",
             "_observerFinalizationRegistry"
         ].sort()
     )

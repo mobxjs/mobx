@@ -1,4 +1,4 @@
-import { globalState, die } from "../internal"
+import { globalState } from "../internal"
 
 // We shorten anything used > 5 times
 export const assign = Object.assign
@@ -17,27 +17,7 @@ export interface Lambda {
     name?: string
 }
 
-const hasProxy = typeof Proxy !== "undefined"
 const plainObjectString = Object.toString()
-
-export function assertProxies() {
-    if (!hasProxy) {
-        die(
-            __DEV__
-                ? "`Proxy` objects are not available in the current environment. Please configure MobX to enable a fallback implementation.`"
-                : "Proxy not available"
-        )
-    }
-}
-
-export function warnAboutProxyRequirement(msg: string) {
-    if (__DEV__ && globalState.verifyProxies) {
-        die(
-            "MobX is currently configured to be able to run in ES5 mode, but in ES5 MobX won't be able to " +
-                msg
-        )
-    }
-}
 
 export function getNextId() {
     return ++globalState.mobxGuid

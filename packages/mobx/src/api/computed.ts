@@ -2,30 +2,41 @@ import {
     ComputedValue,
     IComputedValueOptions,
     Annotation,
-    storeAnnotation,
-    createDecoratorAnnotation,
-    isStringish,
     isPlainObject,
     isFunction,
     die,
     IComputedValue,
     createComputedAnnotation,
     comparer,
-    is20223Decorator
+    decorateComputed20223_,
+    assign
 } from "../internal"
-
 import type { ClassGetterDecorator } from "../types/decorator_fills"
 
 export const COMPUTED = "computed"
 export const COMPUTED_STRUCT = "computed.struct"
 
-export interface IComputedFactory extends Annotation, PropertyDecorator, ClassGetterDecorator {
-    // @computed(opts)
-    <T>(options: IComputedValueOptions<T>): Annotation & PropertyDecorator & ClassGetterDecorator
+interface IComputedDecoratorAnnotation extends Annotation, ClassGetterDecorator {}
+
+function createComputedDecoratorAnnotation(annotation: Annotation): IComputedDecoratorAnnotation {
+    return assign(function computedDecorator(get, context) {
+        if (context && typeof context.kind === "string") {
+            return decorateComputed20223_(annotation, get, context)
+        }
+        if (__DEV__) {
+            die(`Invalid arguments for \`${annotation.annotationType_}\``)
+        }
+        return undefined
+    }, annotation) as any
+}
+
+export interface IComputedFactory extends Annotation, ClassGetterDecorator {
+    // computed annotation with options
+    <T>(options: IComputedValueOptions<T>): IComputedDecoratorAnnotation
     // computed(fn, opts)
     <T>(func: () => T, options?: IComputedValueOptions<T>): IComputedValue<T>
 
-    struct: Annotation & PropertyDecorator & ClassGetterDecorator
+    struct: IComputedDecoratorAnnotation
 }
 
 const computedAnnotation = createComputedAnnotation(COMPUTED)
@@ -33,22 +44,14 @@ const computedStructAnnotation = createComputedAnnotation(COMPUTED_STRUCT, {
     equals: comparer.structural
 })
 
-/**
- * Decorator for class properties: @computed get value() { return expr; }.
- * For legacy purposes also invokable as ES5 observable created: `computed(() => expr)`;
- */
 export const computed: IComputedFactory = function computed(arg1, arg2) {
-    if (is20223Decorator(arg2)) {
-        // @computed (2022.3 Decorators)
-        return computedAnnotation.decorate_20223_(arg1, arg2)
+    if (arg2 && typeof arg2.kind === "string") {
+        return decorateComputed20223_(computedAnnotation, arg1, arg2)
     }
-    if (isStringish(arg2)) {
-        // @computed
-        return storeAnnotation(arg1, arg2, computedAnnotation)
-    }
+
     if (isPlainObject(arg1)) {
-        // @computed({ options })
-        return createDecoratorAnnotation(createComputedAnnotation(COMPUTED, arg1))
+        // computed annotation with options
+        return createComputedDecoratorAnnotation(createComputedAnnotation(COMPUTED, arg1))
     }
 
     // computed(expr, options?)
@@ -71,4 +74,4 @@ export const computed: IComputedFactory = function computed(arg1, arg2) {
 
 Object.assign(computed, computedAnnotation)
 
-computed.struct = createDecoratorAnnotation(computedStructAnnotation)
+computed.struct = createComputedDecoratorAnnotation(computedStructAnnotation)

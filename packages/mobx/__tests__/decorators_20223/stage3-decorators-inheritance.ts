@@ -1,17 +1,15 @@
 import {
-    action,
     autorun,
-    computed,
-    flow,
+    action as actionFn,
     flowResult,
     isAction,
     isComputedProp,
     isFlow,
     isObservableProp,
-    observable,
     observe,
     runInAction
 } from "../../src/mobx"
+import { action, computed, flow, observable } from "../../src/mobx"
 
 test("inherited observable accessor remains reactive in subclass", () => {
     class Parent {
@@ -153,13 +151,13 @@ test("manually wrapped action field can be overridden as an ordinary field", () 
     class Parent {
         @observable accessor count = 0
 
-        increment = action(() => {
+        increment = actionFn(() => {
             this.count += 1
         })
     }
 
     class Child extends Parent {
-        increment = action(() => {
+        increment = actionFn(() => {
             this.count += 2
         })
     }

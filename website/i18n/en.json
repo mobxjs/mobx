@@ -95,6 +95,10 @@
         "title": "Migrating from MobX 4/5",
         "sidebar_label": "Migrating from MobX 4/5 {🚀}"
       },
+      "migrating-from-6-to-7": {
+        "title": "Migrating to MobX 7",
+        "sidebar_label": "Migrating to MobX 7 {🚀}"
+      },
       "mobx-utils": {
         "title": "MobX-utils",
         "sidebar_label": "MobX-utils {🚀}"

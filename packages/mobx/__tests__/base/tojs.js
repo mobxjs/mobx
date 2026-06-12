@@ -384,15 +384,6 @@ describe("recurseEverything set to true", function () {
     })
 })
 
-test("Does not throw on object with configure({ useProxies: 'ifavailable'}) #2871", () => {
-    mobx.configure({ useProxies: "ifavailable" })
-    expect(() => {
-        const o = mobx.observable({ key: "value" })
-        const dispose = mobx.autorun(() => mobx.toJS(o))
-        dispose()
-    }).not.toThrow()
-})
-
 test("Correctly converts observable objects with computed values", () => {
     const a = observable({ key: "value" })
     const c = observable({ computedValue: mobx.computed(() => a.key) })

@@ -212,13 +212,6 @@ test("adding a different key doesn't trigger a pending key", () => {
     d()
 })
 
-test("proxy false reverts to original behavior", () => {
-    const x = observable({ x: 3 }, {}, { proxy: false })
-    x.y = 3
-    expect(isObservableProp(x, "x")).toBe(true)
-    expect(isObservableProp(x, "y")).toBe(false)
-})
-
 test("ownKeys invariant not broken - 1", () => {
     const a = observable({ x: 3, get y() {} })
     expect(() => {
@@ -231,33 +224,6 @@ test("ownKeys invariant not broken - 2", () => {
     expect(() => {
         Object.freeze(a)
     }).toThrow("cannot be frozen")
-})
-
-test("non-proxied object", () => {
-    const a = observable({ x: 3 }, {}, { proxy: false })
-    a.b = 4
-    extendObservable(
-        a,
-        {
-            double() {
-                this.x = this.x * 2
-            },
-            get y() {
-                return this.x * 2
-            }
-        },
-        {
-            double: action
-        }
-    )
-
-    expect(a.y).toBe(6)
-    a.double()
-    expect(a.y).toBe(12)
-    expect(isComputedProp(a, "y")).toBe(true)
-    expect(isAction(a.double)).toBe(true)
-    expect(stripAdminFromDescriptors(Object.getOwnPropertyDescriptors(a))).toMatchSnapshot()
-    expect(Object.keys(a)).toEqual(["x", "b"])
 })
 
 test("extend proxies", () => {
