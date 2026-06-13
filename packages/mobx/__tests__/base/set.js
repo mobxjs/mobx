@@ -512,3 +512,102 @@ describe("Observable Set interceptors", () => {
         expect([...s]).toStrictEqual([1, 10])
     })
 })
+
+describe("#3761 replace only fires events for actual changes", () => {
+    test("replace only emits delete/add for removed/added values", () => {
+        const s = set(["a", "b", "c"])
+        const events = []
+        mobx.observe(s, change => {
+            delete change.observableKind
+            delete change.debugObjectName
+            events.push(change)
+        })
+
+        s.replace(["b", "c", "d"])
+
+        expect(events).toEqual([
+            { object: s, oldValue: "a", type: "delete" },
+            { object: s, newValue: "d", type: "add" }
+        ])
+        expect(mobx.values(s)).toEqual(["b", "c", "d"])
+    })
+
+    test("replace with identical content emits no events", () => {
+        const s = set(["x", "y"])
+        const events = []
+        mobx.observe(s, change => events.push(change))
+
+        s.replace(["x", "y"])
+
+        expect(events).toEqual([])
+        expect(mobx.values(s)).toEqual(["x", "y"])
+    })
+
+    test("replace with an ES6 Set only emits events for actual changes", () => {
+        const s = set([1, 2, 3])
+        const events = []
+        mobx.observe(s, change => {
+            delete change.observableKind
+            delete change.debugObjectName
+            events.push(change)
+        })
+
+        s.replace(new Set([2, 3, 4]))
+
+        expect(events).toEqual([
+            { object: s, oldValue: 1, type: "delete" },
+            { object: s, newValue: 4, type: "add" }
+        ])
+        expect(mobx.values(s)).toEqual([2, 3, 4])
+    })
+
+    test("replace with an observable Set only emits events for actual changes", () => {
+        const s = set([1, 2, 3])
+        const other = set([2, 3, 4])
+        const events = []
+        mobx.observe(s, change => {
+            delete change.observableKind
+            delete change.debugObjectName
+            events.push(change)
+        })
+
+        s.replace(other)
+
+        expect(events).toEqual([
+            { object: s, oldValue: 1, type: "delete" },
+            { object: s, newValue: 4, type: "add" }
+        ])
+        expect(mobx.values(s)).toEqual([2, 3, 4])
+    })
+
+    test("replace with identical content does not report a change", () => {
+        const s = set([1, 2, 3])
+        let runCount = 0
+        const dispose = mobx.autorun(() => {
+            mobx.values(s)
+            runCount++
+        })
+        expect(runCount).toBe(1)
+
+        // Nothing actually changes, so observers must not be notified.
+        s.replace([1, 2, 3])
+
+        expect(runCount).toBe(1)
+        dispose()
+    })
+
+    test("replace still honors interceptors", () => {
+        const s = set([1, 2])
+        mobx.intercept(s, change => {
+            // Prevent adding 4.
+            if (change.type === "add" && change.newValue === 4) {
+                return undefined
+            }
+            return change
+        })
+
+        s.replace([2, 3, 4])
+
+        expect(mobx.values(s)).toEqual([2, 3])
+    })
+})
