@@ -55,16 +55,14 @@ export type ISetWillDeleteChange<T = any> = {
     type: "delete"
     object: ObservableSet<T>
     oldValue: T
-};
+}
 export type ISetWillAddChange<T = any> = {
     type: "add"
     object: ObservableSet<T>
     newValue: T
-};
+}
 
-export type ISetWillChange<T = any> =
-    | ISetWillDeleteChange<T>
-    | ISetWillAddChange<T>
+export type ISetWillChange<T = any> = ISetWillDeleteChange<T> | ISetWillAddChange<T>
 
 export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillChange>, IListenable {
     [$mobx] = ObservableSetMarker
@@ -133,8 +131,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
             }
 
             // implemented reassignment same as it's done for ObservableMap
-            value = change.newValue!;
-
+            value = change.newValue!
         }
         if (!this.has(value)) {
             transaction(() => {
@@ -296,17 +293,27 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
             other = new Set(other)
         }
 
-        transaction(() => {
-            if (Array.isArray(other)) {
-                this.clear()
-                other.forEach(value => this.add(value))
-            } else if (isES6Set(other)) {
-                this.clear()
-                other.forEach(value => this.add(value))
-            } else if (other !== null && other !== undefined) {
-                die("Cannot initialize set from " + other)
-            }
-        })
+        if (Array.isArray(other) || isES6Set(other)) {
+            // Only emit `delete`/`add` events (and `reportChanged`) for values that
+            // actually change, instead of clearing and re-adding everything. `add` and
+            // `delete` are already no-ops for values that are respectively already
+            // present or already absent, so we just need to avoid deleting values that
+            // are part of the replacement. See #3761.
+            transaction(() => {
+                // Collect the desired values for quick lookup (dedupes the source).
+                const replacementValues = new Set<T>(other as Iterable<T>)
+                // Delete values that are not part of the replacement.
+                for (const value of this.data_.values()) {
+                    if (!replacementValues.has(this.dehanceValue_(value))) {
+                        this.delete(value)
+                    }
+                }
+                // Add new values; values that are already present are a no-op.
+                replacementValues.forEach(value => this.add(value))
+            })
+        } else if (other !== null && other !== undefined) {
+            die("Cannot initialize set from " + other)
+        }
 
         return this
     }
