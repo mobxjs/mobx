@@ -18,4 +18,14 @@ it("throws if mobx is not installed", () => {
     )
 })
 
+it("throws if mobx is older than version 7", () => {
+    jest.mock("react", () => ({ useState: true, useSyncExternalStore: true }))
+    jest.mock("mobx", () => ({
+        _getGlobalState: () => ({ version: 6 })
+    }))
+    expect(() => require("../src/utils/assertEnvironment.ts")).toThrowErrorMatchingInlineSnapshot(
+        `"mobx-react-lite requires mobx at least version 7 to be available"`
+    )
+})
+
 export default "Cannot use import statement outside a module"
