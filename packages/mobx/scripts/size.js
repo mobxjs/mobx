@@ -95,6 +95,7 @@ const checkBundle = () => {
 
 const checkExample = async name => {
     const { rollup } = require("rollup")
+    const nodeResolve = require("@rollup/plugin-node-resolve")
     const replace = require("@rollup/plugin-replace")
     const { terser } = require("rollup-plugin-terser")
     const example = examples[name]
@@ -123,11 +124,11 @@ const checkExample = async name => {
                 values: {
                     "process.env.NODE_ENV": JSON.stringify("production")
                 }
+            }),
+            nodeResolve.default({
+                mainFields: ["module", "main"]
             })
-        ],
-        treeshake: {
-            moduleSideEffects: false
-        }
+        ]
     })
 
     try {

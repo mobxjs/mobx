@@ -1,4 +1,4 @@
-import { action, autorun, computed, observable } from "../dist/mobx.esm.js"
+import { action, autorun, computed, observable } from "mobx"
 
 const state = observable({ count: 1 })
 const doubled = computed(() => state.count * 2)

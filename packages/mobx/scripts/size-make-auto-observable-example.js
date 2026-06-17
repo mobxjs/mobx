@@ -1,4 +1,4 @@
-import { autorun, makeAutoObservable } from "../dist/mobx.esm.js"
+import { autorun, makeAutoObservable } from "mobx"
 
 class Store {
     count = 1
