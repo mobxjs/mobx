@@ -436,11 +436,11 @@ test("#2686 - 3", () => {
 test("#2667", () => {
     const events: any[] = []
     class LazyInitializedList {
-        public items: string[] | undefined = undefined
+        items: string[] | undefined = undefined
 
-        public listName: string
+        listName: string
 
-        public constructor(listName: string, lazyItems: string[]) {
+        constructor(listName: string, lazyItems: string[]) {
             this.listName = listName
             makeObservable(this, {
                 items: observable,
@@ -466,11 +466,11 @@ test("#2667", () => {
     }
 
     class ItemsStore {
-        private list: LazyInitializedList
+        list: LazyInitializedList
 
-        public constructor() {
+        constructor() {
             this.list = new LazyInitializedList("initial", ["a, b, c"])
-            makeObservable<this, "list">(this, {
+            makeObservable(this, {
                 list: observable,
                 changeList: action,
                 items: computed,
@@ -478,15 +478,15 @@ test("#2667", () => {
             })
         }
 
-        public changeList = () => {
+        changeList = () => {
             this.list = new LazyInitializedList("new", ["b, c, a"])
         }
 
-        public get items(): string[] | undefined {
+        get items(): string[] | undefined {
             return this.list.items
         }
 
-        public get activeListName(): string {
+        get activeListName(): string {
             return this.list.listName
         }
     }
