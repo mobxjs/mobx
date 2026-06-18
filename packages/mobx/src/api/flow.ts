@@ -5,9 +5,10 @@ import {
     isFunction,
     Annotation,
     createFlowAnnotation,
-    decorateFlow20223_,
-    assign
+    decorateFlow20223_
 } from "../internal"
+import { createDecoratorAnnotation, type DecoratorAnnotation } from "./decoratorannotation"
+import type { ClassMethodDecorator } from "../types/decorator_fills"
 
 export const FLOW = "flow"
 
@@ -31,29 +32,18 @@ export function isFlowCancellationError(error: Error) {
 
 export type CancellablePromise<T> = Promise<T> & { cancel(): void }
 
-interface FlowDecoratorAnnotation extends Annotation {
-    (value: any, context: ClassMethodDecoratorContext): any
+function createFlowDecoratorAnnotation(
+    annotation: Annotation
+): DecoratorAnnotation<ClassMethodDecorator> {
+    return createDecoratorAnnotation(annotation, decorateFlow20223_)
 }
 
-function createFlowDecoratorAnnotation(annotation: Annotation): FlowDecoratorAnnotation {
-    return assign(function flowDecorator(value, context) {
-        if (context && typeof context.kind === "string") {
-            return decorateFlow20223_(annotation, value, context)
-        }
-        if (__DEV__) {
-            die(`Invalid arguments for \`${annotation.annotationType_}\``)
-        }
-        return undefined
-    }, annotation) as any
-}
-
-interface Flow extends Annotation {
-    (value: any, context: ClassMethodDecoratorContext): any
+interface Flow extends Annotation, ClassMethodDecorator {
     <R, Args extends any[]>(
         generator: (...args: Args) => Generator<any, R, any> | AsyncGenerator<any, R, any>,
         context?: never
     ): (...args: Args) => CancellablePromise<R>
-    bound: FlowDecoratorAnnotation
+    bound: DecoratorAnnotation<ClassMethodDecorator>
 }
 
 const flowAnnotation = createFlowAnnotation("flow")

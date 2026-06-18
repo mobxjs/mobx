@@ -6,10 +6,10 @@ import {
     isFunction,
     isStringish,
     createActionAnnotation,
-    decorateAction20223_,
-    assign
+    decorateAction20223_
 } from "../internal"
-import type { ClassFieldDecorator, ClassMethodDecorator } from "../types/decorator_fills"
+import { createDecoratorAnnotation, type DecoratorAnnotation } from "./decoratorannotation"
+import type { ClassMethodAndFieldDecorator } from "../types/decorator_fills"
 
 export const ACTION = "action"
 export const ACTION_BOUND = "action.bound"
@@ -30,32 +30,22 @@ const autoActionBoundAnnotation = createActionAnnotation(AUTOACTION_BOUND, {
     bound: true
 })
 
-type ActionStage3Decorator = ClassMethodDecorator & ClassFieldDecorator
-
-interface IActionDecoratorAnnotation extends Annotation, ActionStage3Decorator {}
-
-function createActionDecoratorAnnotation(annotation: Annotation): IActionDecoratorAnnotation {
-    return assign(function actionDecorator(value, context) {
-        if (context && typeof context.kind === "string") {
-            return decorateAction20223_(annotation, value, context)
-        }
-        if (__DEV__) {
-            die(`Invalid arguments for \`${annotation.annotationType_}\``)
-        }
-        return undefined
-    }, annotation) as any
+function createActionDecoratorAnnotation(
+    annotation: Annotation
+): DecoratorAnnotation<ClassMethodAndFieldDecorator> {
+    return createDecoratorAnnotation(annotation, decorateAction20223_)
 }
 
-export interface IActionFactory extends Annotation, ActionStage3Decorator {
+export interface IActionFactory extends Annotation, ClassMethodAndFieldDecorator {
     // nameless actions
     <T extends Function | undefined | null>(fn: T): T
     // named actions
     <T extends Function | undefined | null>(name: string, fn: T): T
 
     // named annotation
-    (customName: string): IActionDecoratorAnnotation
+    (customName: string): DecoratorAnnotation<ClassMethodAndFieldDecorator>
 
-    bound: IActionDecoratorAnnotation
+    bound: DecoratorAnnotation<ClassMethodAndFieldDecorator>
 }
 
 function createActionFactory(autoAction: boolean): IActionFactory {

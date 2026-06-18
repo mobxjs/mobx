@@ -28,10 +28,10 @@ import {
     createObservableAnnotation,
     createAutoAnnotation,
     initObservable,
-    decorateObservable20223_,
-    die
+    decorateObservable20223_
 } from "../internal"
-import type { ClassAccessorDecorator, ClassFieldDecorator } from "../types/decorator_fills"
+import { createDecoratorAnnotation, type DecoratorAnnotation } from "./decoratorannotation"
+import type { ClassAccessorAndFieldDecorator } from "../types/decorator_fills"
 
 export const OBSERVABLE = "observable"
 export const OBSERVABLE_REF = "observable.ref"
@@ -70,22 +70,10 @@ const observableStructAnnotation = createObservableAnnotation(OBSERVABLE_STRUCT,
     enhancer: refStructEnhancer
 })
 
-type ObservableStage3Decorator = ClassAccessorDecorator & ClassFieldDecorator
-
-interface IObservableDecoratorAnnotation extends Annotation, ObservableStage3Decorator {}
-
 function createObservableDecoratorAnnotation(
     annotation: Annotation
-): IObservableDecoratorAnnotation {
-    return assign(function observableDecorator(value, context) {
-        if (context && typeof context.kind === "string") {
-            return decorateObservable20223_(annotation, value, context)
-        }
-        if (__DEV__) {
-            die(`Invalid arguments for \`${annotation.annotationType_}\``)
-        }
-        return undefined
-    }, annotation) as any
+): DecoratorAnnotation<ClassAccessorAndFieldDecorator> {
+    return createDecoratorAnnotation(annotation, decorateObservable20223_)
 }
 
 export function getEnhancerFromOptions(options: CreateObservableOptions): IEnhancer<any> {
@@ -172,7 +160,7 @@ export interface IObservableMapFactory {
     >
 }
 
-export interface IObservableFactory extends Annotation, ObservableStage3Decorator {
+export interface IObservableFactory extends Annotation, ClassAccessorAndFieldDecorator {
     <T = any>(value: T[], options?: CreateObservableOptions): IObservableArray<T>
     <T = any>(value: Set<T>, options?: CreateObservableOptions): ObservableSet<T>
     <K = any, V = any>(value: Map<K, V>, options?: CreateObservableOptions): ObservableMap<K, V>
@@ -198,13 +186,13 @@ export interface IObservableFactory extends Annotation, ObservableStage3Decorato
     /**
      * Annotation that creates an observable that only observes the references, but doesn't try to turn the assigned value into an observable.ts.
      */
-    ref: IObservableDecoratorAnnotation
+    ref: DecoratorAnnotation<ClassAccessorAndFieldDecorator>
     /**
      * Annotation that creates an observable converts its value (objects, maps or arrays) into a shallow observable structure
      */
-    shallow: IObservableDecoratorAnnotation
-    deep: IObservableDecoratorAnnotation
-    struct: IObservableDecoratorAnnotation
+    shallow: DecoratorAnnotation<ClassAccessorAndFieldDecorator>
+    deep: DecoratorAnnotation<ClassAccessorAndFieldDecorator>
+    struct: DecoratorAnnotation<ClassAccessorAndFieldDecorator>
 }
 
 const observableFactories: IObservableFactory = {

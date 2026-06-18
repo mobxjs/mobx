@@ -8,35 +8,27 @@ import {
     IComputedValue,
     createComputedAnnotation,
     comparer,
-    decorateComputed20223_,
-    assign
+    decorateComputed20223_
 } from "../internal"
+import { createDecoratorAnnotation, type DecoratorAnnotation } from "./decoratorannotation"
 import type { ClassGetterDecorator } from "../types/decorator_fills"
 
 export const COMPUTED = "computed"
 export const COMPUTED_STRUCT = "computed.struct"
 
-interface IComputedDecoratorAnnotation extends Annotation, ClassGetterDecorator {}
-
-function createComputedDecoratorAnnotation(annotation: Annotation): IComputedDecoratorAnnotation {
-    return assign(function computedDecorator(get, context) {
-        if (context && typeof context.kind === "string") {
-            return decorateComputed20223_(annotation, get, context)
-        }
-        if (__DEV__) {
-            die(`Invalid arguments for \`${annotation.annotationType_}\``)
-        }
-        return undefined
-    }, annotation) as any
+function createComputedDecoratorAnnotation(
+    annotation: Annotation
+): DecoratorAnnotation<ClassGetterDecorator> {
+    return createDecoratorAnnotation(annotation, decorateComputed20223_)
 }
 
 export interface IComputedFactory extends Annotation, ClassGetterDecorator {
     // computed annotation with options
-    <T>(options: IComputedValueOptions<T>): IComputedDecoratorAnnotation
+    <T>(options: IComputedValueOptions<T>): DecoratorAnnotation<ClassGetterDecorator>
     // computed(fn, opts)
     <T>(func: () => T, options?: IComputedValueOptions<T>): IComputedValue<T>
 
-    struct: IComputedDecoratorAnnotation
+    struct: DecoratorAnnotation<ClassGetterDecorator>
 }
 
 const computedAnnotation = createComputedAnnotation(COMPUTED)
