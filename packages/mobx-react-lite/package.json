@@ -54,7 +54,7 @@
     },
     "homepage": "https://mobx.js.org",
     "peerDependencies": {
-        "mobx": "^6.9.0",
+        "mobx": "^7.0.0",
         "react": "^18 || ^19"
     },
     "devDependencies": {
