@@ -17,6 +17,7 @@ MobX requires [`Proxy` support](https://developer.mozilla.org/en-US/docs/Web/Jav
 Proxies provide the best performance and most consistent behavior across environments.
 
 MobX 7 does not include the older ES5 fallback implementation and no longer supports `configure({ useProxies })`.
+Use MobX 6 if you need to support environments without Proxy support, such as Internet Explorer or older React Native versions.
 
 ## Decorator support
 

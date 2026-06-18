@@ -90,6 +90,9 @@ class TodoList {
 Notice the usage of the new `accessor` keyword when using `@observable`.
 It is part of the 2022.3 spec and is required if you want to use modern decorators.
 
+If you still need legacy TypeScript decorators, use MobX 6.
+MobX 7 requires migrating to modern decorators.
+
 <details id="migrate-decorators"><summary>Migrating from legacy decorators</summary>
 
 To migrate from legacy decorators to modern decorators, perform the following steps:
