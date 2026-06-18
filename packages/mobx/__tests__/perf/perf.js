@@ -9,7 +9,7 @@ function voidObserver() {
     // nothing, nada, noppes.
 }
 
-module.exports = function runForVersion(version) {
+module.exports = function runPerfSuite() {
     /*
 results of this test:
 300/40000 mseconds on netbook (AMD c60 processor, same test is on Intel i7 3770 ~10 times faster)
@@ -22,7 +22,7 @@ results of this test:
     const observable = mobx.observable
     const computed = mobx.computed
 
-    test(`${version} - one observes ten thousand that observe one`, function (t) {
+    test("one observes ten thousand that observe one", function (t) {
         gc()
         const a = observable.box(2)
 
@@ -68,7 +68,7 @@ results of this test:
         t.end()
     })
 
-    test(`${version} - five hundrend properties that observe their sibling`, function (t) {
+    test("five hundrend properties that observe their sibling", function (t) {
         gc()
         const observables = [observable.box(1)]
         for (let i = 0; i < 500; i++) {
@@ -102,7 +102,7 @@ results of this test:
         t.end()
     })
 
-    test(`${version} - late dependency change`, function (t) {
+    test("late dependency change", function (t) {
         gc()
         const values = []
         for (let i = 0; i < 100; i++) values.push(observable.box(0))
@@ -124,7 +124,7 @@ results of this test:
         t.end()
     })
 
-    test(`${version} - lots of unused computables`, function (t) {
+    test("lots of unused computables", function (t) {
         gc()
         const a = observable.box(1)
 
@@ -172,7 +172,7 @@ results of this test:
         t.end()
     })
 
-    test(`${version} - many unreferenced observables`, function (t) {
+    test("many unreferenced observables", function (t) {
         gc()
         const a = observable.box(3)
         const b = observable.box(6)
@@ -193,7 +193,7 @@ results of this test:
         t.end()
     })
 
-    test(`${version} - array.es2023 findLastIndex methods`, function (t) {
+    test("array.es2023 findLastIndex methods", function (t) {
         gc()
         let aCalc = 0
         let bCalc = 0
@@ -226,7 +226,7 @@ results of this test:
         t.end()
     })
 
-    test(`${version} - array reduce`, function (t) {
+    test("array reduce", function (t) {
         gc()
         let aCalc = 0
         const ar = observable([])
@@ -268,7 +268,7 @@ results of this test:
         t.end()
     })
 
-    test(`${version} - array classic loop`, function (t) {
+    test("array classic loop", function (t) {
         gc()
         const ar = observable([])
         let aCalc = 0
@@ -400,23 +400,23 @@ results of this test:
         t.end()
     }
 
-    test(`${version} - order system observed`, function (t) {
+    test("order system observed", function (t) {
         order_system_helper(t, false, true)
     })
 
-    test(`${version} - order system batched observed`, function (t) {
+    test("order system batched observed", function (t) {
         order_system_helper(t, true, true)
     })
 
-    test(`${version} - order system lazy`, function (t) {
+    test("order system lazy", function (t) {
         order_system_helper(t, false, false)
     })
 
-    test(`${version} - order system batched lazy`, function (t) {
+    test("order system batched lazy", function (t) {
         order_system_helper(t, true, false)
     })
 
-    test(`${version} - create array`, function (t) {
+    test("create array", function (t) {
         gc()
         const a = []
         for (let i = 0; i < 1000; i++) a.push(i)
@@ -426,7 +426,7 @@ results of this test:
         t.end()
     })
 
-    test(`${version} - create array (fast)`, function (t) {
+    test("create array (fast)", function (t) {
         gc()
         const a = []
         for (let i = 0; i < 1000; i++) a.push(i)
@@ -436,7 +436,7 @@ results of this test:
         t.end()
     })
 
-    test(`${version} - observe and dispose`, t => {
+    test("observe and dispose", t => {
         gc()
 
         const start = now()
@@ -457,7 +457,7 @@ results of this test:
         t.end()
     })
 
-    test(`${version} - sort`, t => {
+    test("sort", t => {
         gc()
 
         function Item(a, b, c) {
@@ -531,7 +531,7 @@ results of this test:
         t.end()
     })
 
-    test(`${version} - computed temporary memoization`, t => {
+    test("computed temporary memoization", t => {
         "use strict"
         gc()
         const computeds = []
@@ -547,7 +547,7 @@ results of this test:
         t.end()
     })
 
-    test(`${version} - Set: initializing`, function (t) {
+    test("Set: initializing", function (t) {
         gc()
         const iterationsCount = 100000
         let i
@@ -561,7 +561,7 @@ results of this test:
         t.end()
     })
 
-    test(`${version} - Set: setting and deleting properties`, function (t) {
+    test("Set: setting and deleting properties", function (t) {
         gc()
         const iterationsCount = 1000
         const propertiesCount = 10000
@@ -592,7 +592,7 @@ results of this test:
         t.end()
     })
 
-    test(`${version} - Set: looking up properties`, function (t) {
+    test("Set: looking up properties", function (t) {
         gc()
         const iterationsCount = 1000
         const propertiesCount = 10000
@@ -624,7 +624,7 @@ results of this test:
         t.end()
     })
 
-    test(`${version} - Set: iterator helpers`, function (t) {
+    test("Set: iterator helpers", function (t) {
         gc()
         const iterationsCount = 1000
         const propertiesCount = 10000
@@ -654,7 +654,7 @@ results of this test:
         t.end()
     })
 
-    test(`${version} - Set: conversion to array`, function (t) {
+    test("Set: conversion to array", function (t) {
         gc()
         const iterationsCount = 1000
         const propertiesCount = 10000
@@ -687,7 +687,7 @@ results of this test:
         t.end()
     })
 
-    test(`${version} - Map: initializing`, function (t) {
+    test("Map: initializing", function (t) {
         gc()
         const iterationsCount = 100000
         let i
@@ -701,7 +701,7 @@ results of this test:
         t.end()
     })
 
-    test(`${version} - Map: looking up properties`, function (t) {
+    test("Map: looking up properties", function (t) {
         gc()
         const iterationsCount = 1000
         const propertiesCount = 100
@@ -733,7 +733,7 @@ results of this test:
         t.end()
     })
 
-    test(`${version} - Map: setting and deleting properties`, function (t) {
+    test("Map: setting and deleting properties", function (t) {
         gc()
         const iterationsCount = 1000
         const propertiesCount = 100

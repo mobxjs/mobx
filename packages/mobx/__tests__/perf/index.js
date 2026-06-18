@@ -1,15 +1,10 @@
 const start = Date.now()
 const mkdirp = require("mkdirp")
 
-const ver = process.argv[2]
-if (ver !== "proxy") {
-    throw new Error("specify version to perf test as proxy")
-}
-
 if (process.env.PERSIST) {
     const fs = require("fs")
     const path = require("path")
-    const logFile = path.resolve(`${__dirname}/../../perf_report/${ver}.txt`)
+    const logFile = path.resolve(`${__dirname}/../../perf_report/perf.txt`)
     mkdirp.sync(path.dirname(logFile))
     // clear previous results
     if (fs.existsSync(logFile)) fs.unlinkSync(logFile)
@@ -25,7 +20,7 @@ if (process.env.PERSIST) {
 }
 
 const perf = require("./perf.js")
-perf(ver)
+perf()
 
 // This test runs last..
 require("tape")(t => {
