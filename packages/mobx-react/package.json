@@ -1,6 +1,6 @@
 {
     "name": "mobx-react",
-    "version": "9.2.2",
+    "version": "10.0.0",
     "description": "React bindings for MobX. Create fully reactive components.",
     "source": "src/index.ts",
     "type": "commonjs",
