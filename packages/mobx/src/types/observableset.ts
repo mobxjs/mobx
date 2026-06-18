@@ -27,7 +27,6 @@ import {
     DELETE,
     ADD,
     die,
-    isFunction,
     initObservable
 } from "../internal"
 
@@ -55,16 +54,14 @@ export type ISetWillDeleteChange<T = any> = {
     type: "delete"
     object: ObservableSet<T>
     oldValue: T
-};
+}
 export type ISetWillAddChange<T = any> = {
     type: "add"
     object: ObservableSet<T>
     newValue: T
-};
+}
 
-export type ISetWillChange<T = any> =
-    | ISetWillDeleteChange<T>
-    | ISetWillAddChange<T>
+export type ISetWillChange<T = any> = ISetWillDeleteChange<T> | ISetWillAddChange<T>
 
 export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillChange>, IListenable {
     [$mobx] = ObservableSetMarker
@@ -80,9 +77,6 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
         enhancer: IEnhancer<T> = deepEnhancer,
         public name_ = __DEV__ ? "ObservableSet@" + getNextId() : "ObservableSet"
     ) {
-        if (!isFunction(Set)) {
-            die(22)
-        }
         this.enhancer_ = (newV, oldV) => enhancer(newV, oldV, name_)
         initObservable(() => {
             this.atom_ = createAtom(this.name_)
@@ -133,8 +127,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
             }
 
             // implemented reassignment same as it's done for ObservableMap
-            value = change.newValue!;
-
+            value = change.newValue!
         }
         if (!this.has(value)) {
             transaction(() => {

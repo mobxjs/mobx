@@ -26,10 +26,6 @@ const niceErrors = {
     14: "Intercept handlers should return nothing or a change object",
     15: `Observable arrays cannot be frozen. If you're passing observables to 3rd party component/function that calls Object.freeze, pass copy instead: toJS(observable)`,
     16: `Modification exception: the internal structure of an observable array was changed.`,
-    17(index, length) {
-        return `[mobx.array] Index out of bounds, ${index} is larger than ${length}`
-    },
-    18: "mobx.map requires Map polyfill for the current browser. Check babel-polyfill or core-js/es6/map.js",
     19(other) {
         return "Cannot initialize from classes that inherit from Map: " + other.constructor.name
     },
@@ -39,7 +35,6 @@ const niceErrors = {
     21(dataStructure) {
         return `Cannot convert to map from '${dataStructure}'`
     },
-    22: "mobx.set requires Set polyfill for the current browser. Check babel-polyfill or core-js/es6/set.js",
     23: "It is not possible to get index atoms from arrays",
     24(thing) {
         return "Cannot obtain administration from " + thing

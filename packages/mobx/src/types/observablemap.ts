@@ -32,7 +32,6 @@ import {
     onBecomeUnobserved,
     globalState,
     die,
-    isFunction,
     UPDATE,
     IAtom,
     PureSpyEvent,
@@ -106,9 +105,6 @@ export class ObservableMap<K = any, V = any>
         public enhancer_: IEnhancer<V> = deepEnhancer,
         public name_ = __DEV__ ? "ObservableMap@" + getNextId() : "ObservableMap"
     ) {
-        if (!isFunction(Map)) {
-            die(18)
-        }
         initObservable(() => {
             this.keysAtom_ = createAtom(__DEV__ ? `${this.name_}.keys()` : "ObservableMap.keys()")
             this.data_ = new Map()
