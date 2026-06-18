@@ -22,17 +22,6 @@ import {
     ObservableMap
 } from "../../src/mobx"
 
-test("makeObservable requires annotations", () => {
-    class Test {
-        constructor() {
-            // @ts-expect-error makeObservable requires annotations in MobX 7
-            makeObservable(this)
-        }
-    }
-
-    expect(() => new Test()).toThrow(/requires annotations/)
-})
-
 test("makeObservable picks up annotations", () => {
     class Test {
         x = 3

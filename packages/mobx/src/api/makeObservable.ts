@@ -27,13 +27,9 @@ export function makeObservable<T extends object, AdditionalKeys extends Property
 ): T {
     initObservable(() => {
         const adm: ObservableObjectAdministration = asObservableObject(target, options)[$mobx]
-        if (__DEV__ && annotations == null) {
-            die(`'makeObservable' requires annotations in MobX 7`)
-        }
-        const annotationsMap = annotations ?? {}
 
         // Annotate
-        ownKeys(annotationsMap).forEach(key => adm.make_(key, annotationsMap[key]))
+        ownKeys(annotations).forEach(key => adm.make_(key, annotations[key]))
     })
     return target
 }
