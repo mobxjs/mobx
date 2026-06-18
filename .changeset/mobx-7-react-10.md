@@ -18,7 +18,7 @@ MobX 7 is a cleanup release focused on the modern runtime and decorator model.
 -   `configure({ useProxies: ... })` is no longer supported.
 -   `{ proxy: false }` options for `observable`, `observable.object`, and `observable.array` are no longer supported.
 -   Legacy decorators are no longer supported.
--   The public `trace` API and its related runtime support have been removed. Use `getDependencyTree`, `getObserverTree`, `spy`, MobX developer tools, or logging packages for reactivity debugging.
+-   The public `trace` API and its related runtime support have been removed. Use `toJS`, `getDependencyTree`, `getObserverTree`, `spy` or `mobx-log` package for debugging.
 
 ## mobx-react-lite 5 and mobx-react 10
 
