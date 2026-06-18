@@ -26,27 +26,21 @@ test("#2309 don't trigger oBO for computeds that aren't subscribed to", () => {
     const events: string[] = []
 
     class Asd {
-        prop = 42
+        @observable accessor prop = 42
 
+        @computed
         get computed() {
             return this.prop
         }
 
+        @action
         actionProp() {
             const foo = this.prop
         }
 
+        @action
         actionComputed() {
             const bar = this.computed
-        }
-
-        constructor() {
-            makeObservable(this, {
-                prop: observable,
-                computed: computed,
-                actionProp: action,
-                actionComputed: action
-            })
         }
     }
 
@@ -436,16 +430,12 @@ test("#2686 - 3", () => {
 test("#2667", () => {
     const events: any[] = []
     class LazyInitializedList {
-        items: string[] | undefined = undefined
+        @observable accessor items: string[] | undefined = undefined
 
-        listName: string
+        @observable accessor listName: string
 
         constructor(listName: string, lazyItems: string[]) {
             this.listName = listName
-            makeObservable(this, {
-                items: observable,
-                listName: observable
-            })
             onBecomeObserved(
                 this,
                 "items",
@@ -466,26 +456,23 @@ test("#2667", () => {
     }
 
     class ItemsStore {
-        list: LazyInitializedList
+        @observable accessor list: LazyInitializedList
 
         constructor() {
             this.list = new LazyInitializedList("initial", ["a, b, c"])
-            makeObservable(this, {
-                list: observable,
-                changeList: action,
-                items: computed,
-                activeListName: computed
-            })
         }
 
+        @action
         changeList = () => {
             this.list = new LazyInitializedList("new", ["b, c, a"])
         }
 
+        @computed
         get items(): string[] | undefined {
             return this.list.items
         }
 
+        @computed
         get activeListName(): string {
             return this.list.listName
         }
