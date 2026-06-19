@@ -75,19 +75,19 @@
     "scripts": {
         "test": "jest --config jest.projects.js",
         "lint": "eslint src/**/*",
-        "build": "node ../../scripts/build.mjs mobx",
-        "build:test": "npm run build -- --target test",
+        "build": "rollup --config rollup.config.mjs",
+        "build:test": "npm run build -- --environment TARGET:test",
         "perf": "scripts/perf.sh",
         "perf-decorator": "tsc -p ./__tests__/perf/tsconfig.decorator.json && node --expose-gc ./__tests__/perf/compiled/lazy-computed-decorator.js && node --expose-gc ./__tests__/perf/compiled/lazy-observable-decorator.js",
         "test:performance": "npm run perf && npm run perf-decorator",
         "test:mixed-versions": "npm test -- --testRegex mixed-versions",
         "test:types": "tsc --noEmit",
         "test:coverage": "npm test -- -i --coverage",
-        "check-size": "npm run build -- --target publish && node ./scripts/size.js bundle minimal make-auto-observable",
-        "check-size:bundle": "npm run build -- --target publish && node ./scripts/size.js bundle",
-        "check-size:minimal": "npm run build -- --target publish && node ./scripts/size.js minimal",
-        "check-size:make-auto-observable": "npm run build -- --target publish && node ./scripts/size.js make-auto-observable",
+        "check-size": "npm run build -- --environment TARGET:publish && node ./scripts/size.js bundle minimal make-auto-observable",
+        "check-size:bundle": "npm run build -- --environment TARGET:publish && node ./scripts/size.js bundle",
+        "check-size:minimal": "npm run build -- --environment TARGET:publish && node ./scripts/size.js minimal",
+        "check-size:make-auto-observable": "npm run build -- --environment TARGET:publish && node ./scripts/size.js make-auto-observable",
         "test:check": "npm run test:types",
-        "prepublishOnly": "node ./scripts/prepublish.js && npm run build -- --target publish"
+        "prepublishOnly": "node ./scripts/prepublish.js && npm run build -- --environment TARGET:publish"
     }
 }

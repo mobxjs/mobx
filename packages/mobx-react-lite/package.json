@@ -73,12 +73,12 @@
     ],
     "scripts": {
         "lint": "eslint src/**/* --ext .js,.ts,.tsx",
-        "build": "node ../../scripts/build.mjs mobxReactLite",
-        "build:test": "npm run build -- --target test",
+        "build": "rollup --config rollup.config.mjs",
+        "build:test": "npm run build -- --environment TARGET:test",
         "test": "jest",
         "test:size": "import-size --report . observer useLocalObservable",
         "test:types": "tsc --noEmit",
         "test:check": "npm run test:types",
-        "prepublishOnly": "npm run build -- --target publish"
+        "prepublishOnly": "npm run build -- --environment TARGET:publish"
     }
 }

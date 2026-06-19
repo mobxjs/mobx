@@ -72,7 +72,6 @@
         "jest-mock-console": "^1.0.1",
         "lint-staged": "^10.1.7",
         "lodash": "^4.17.4",
-        "minimist": "^1.2.5",
         "mkdirp": "1.0.4",
         "prettier": "^2.8.4",
         "pretty-quick": "3.1.0",
