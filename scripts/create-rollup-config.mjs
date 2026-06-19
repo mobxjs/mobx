@@ -1,40 +1,15 @@
 import { DEFAULT_EXTENSIONS } from "@babel/core"
-import babelModule from "@rollup/plugin-babel"
+import { babel } from "@rollup/plugin-babel"
 import commonjs from "@rollup/plugin-commonjs"
 import json from "@rollup/plugin-json"
-import * as nodeResolveModule from "@rollup/plugin-node-resolve"
+import { DEFAULTS as nodeResolveDefaults, nodeResolve } from "@rollup/plugin-node-resolve"
 import replace from "@rollup/plugin-replace"
 import fs from "fs-extra"
 import path from "node:path"
 import sourcemaps from "rollup-plugin-sourcemaps"
-import terserModule from "rollup-plugin-terser"
+import { terser } from "rollup-plugin-terser"
 import typescript from "typescript"
 import typescript2 from "rollup-plugin-typescript2"
-
-const firstFunction = (...values) => values.find(value => typeof value === "function")
-
-const babel = firstFunction(
-    babelModule.default,
-    babelModule.default?.default,
-    babelModule.babel,
-    babelModule.default?.babel,
-    babelModule
-)
-const nodeResolve = firstFunction(
-    nodeResolveModule.default,
-    nodeResolveModule.default?.default,
-    nodeResolveModule.nodeResolve,
-    nodeResolveModule
-)
-const terser = firstFunction(
-    terserModule.terser,
-    terserModule.default?.terser,
-    terserModule.default,
-    terserModule
-)
-const nodeResolveExtensions = nodeResolveModule.DEFAULTS?.extensions ??
-    nodeResolveModule.default?.DEFAULTS?.extensions ??
-    nodeResolveModule.default?.default?.DEFAULTS?.extensions ?? [".mjs", ".js", ".json", ".node"]
 
 const dist = "dist"
 
@@ -179,7 +154,7 @@ const createConfig = ({
         plugins: [
             nodeResolve({
                 mainFields: ["module", "main", "browser"],
-                extensions: [...nodeResolveExtensions, ".jsx"]
+                extensions: [...nodeResolveDefaults.extensions, ".jsx"]
             }),
             commonjs({
                 include: format === "umd" ? /\/node_modules\// : /\/regenerator-runtime\//
