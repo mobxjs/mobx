@@ -558,6 +558,41 @@ test.skip("observable performance - babel", () => {
     console.log("changed in ", Date.now() - start)
 })
 
+// Do not remove: slow manual stage-3 decorator benchmark
+test.skip("observable performance - babel - decorators", () => {
+    const AMOUNT = 100000
+
+    class A {
+        @observable accessor a = 1
+        @observable accessor b = 2
+        @observable accessor c = 3
+
+        @computed
+        get d() {
+            return this.a + this.b + this.c
+        }
+    }
+
+    const objs = []
+    const start = Date.now()
+
+    for (let i = 0; i < AMOUNT; i++) objs.push(new A())
+
+    console.log("created in ", Date.now() - start)
+
+    for (let j = 0; j < 4; j++) {
+        for (let i = 0; i < AMOUNT; i++) {
+            const obj = objs[i]
+            obj.a += 3
+            obj.b *= 4
+            obj.c = obj.b - obj.a
+            obj.d
+        }
+    }
+
+    console.log("changed in ", Date.now() - start)
+})
+
 test("unbound methods", () => {
     class A {
         constructor() {
