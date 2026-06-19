@@ -36,7 +36,7 @@ jobs:
         run: npm test -- -i
 
       - name: Check size
-        run: npm -w mobx run check-size
+        run: npm run check-size
 
       - name: Test performance
         run: npm -w mobx run test:performance
