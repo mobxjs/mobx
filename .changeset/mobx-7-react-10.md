@@ -6,7 +6,7 @@
 
 Release MobX 7, mobx-react-lite 5, and mobx-react 10.
 
-Bundle sizes are down: ESM prod 17.02 KiB gzip -> 14.90 KiB gzip; a minimal tree-shaken example is 12.63 KiB gzip now.
+Bundle sizes are down: ESM prod 17.02 KiB gzip -> 14.79 KiB gzip; a minimal tree-shaken example is 12.52 KiB gzip now.
 
 It removes long-deprecated compatibility paths and keeps the React bindings split between `mobx-react-lite` for function components and `mobx-react` for class-component support.
 
