@@ -75,7 +75,7 @@
     ],
     "scripts": {
         "lint": "eslint src/**/* --ext .js,.ts,.tsx",
-        "build": "node ../../scripts/build.js mobxReact",
+        "build": "node ../../scripts/build.mjs mobxReact",
         "build:test": "npm run build -- --target test",
         "test": "jest",
         "test:size": "import-size --report . observer",
