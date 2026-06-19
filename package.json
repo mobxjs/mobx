@@ -21,6 +21,7 @@
         "build": "npm run build --workspaces --if-present",
         "build:check": "npm run build:check --workspaces --if-present",
         "build:test": "npm run build:test --workspaces --if-present",
+        "check-size": "node scripts/size/index.js",
         "test": "jest",
         "coverage": "jest --coverage",
         "lint": "eslint packages/*/src/**/* --ext .js,.ts,.tsx",
