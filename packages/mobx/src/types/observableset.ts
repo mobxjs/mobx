@@ -300,8 +300,23 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
             // present or already absent, so we just need to avoid deleting values that
             // are part of the replacement. See #3761.
             transaction(() => {
-                // Collect the desired values for quick lookup (dedupes the source).
-                const replacementValues = new Set<T>(other as Iterable<T>)
+                // Collect the desired values for quick lookup. `other` is already a Set
+                // here when it was passed (or snapshotted from an observable set) as one,
+                // so reuse it rather than allocating another; arrays are wrapped (which
+                // also dedupes them).
+                const replacementValues: Set<T> = isES6Set(other)
+                    ? other
+                    : new Set<T>(other as Iterable<T>)
+                // Short-circuit the trivial cases: an empty replacement is just a clear,
+                // and replacing into an empty set only needs the adds.
+                if (replacementValues.size === 0) {
+                    this.clear()
+                    return
+                }
+                if (this.data_.size === 0) {
+                    replacementValues.forEach(value => this.add(value))
+                    return
+                }
                 // Delete values that are not part of the replacement.
                 for (const value of this.data_.values()) {
                     if (!replacementValues.has(this.dehanceValue_(value))) {

@@ -523,13 +523,18 @@ describe("#3761 replace only fires events for actual changes", () => {
             events.push(change)
         })
 
-        s.replace(["b", "c", "d"])
+        // The replacement is intentionally ordered differently from the original
+        // ("c", "a", "d" vs "a", "b", "c"): "b" is removed, "d" is added, "a"/"c" survive.
+        s.replace(["c", "a", "d"])
 
         expect(events).toEqual([
-            { object: s, oldValue: "a", type: "delete" },
+            { object: s, oldValue: "b", type: "delete" },
             { object: s, newValue: "d", type: "add" }
         ])
-        expect(mobx.values(s)).toEqual(["b", "c", "d"])
+        // Surviving values keep their original relative order ("a" before "c") and the
+        // added value is appended, so the result iterates as ["a", "c", "d"]. See the
+        // iteration-order note in the changeset / #3761 discussion.
+        expect(mobx.values(s)).toEqual(["a", "c", "d"])
     })
 
     test("replace with identical content emits no events", () => {
@@ -552,13 +557,15 @@ describe("#3761 replace only fires events for actual changes", () => {
             events.push(change)
         })
 
-        s.replace(new Set([2, 3, 4]))
+        // Reordered replacement (3, 1, 4 vs 1, 2, 3): 2 is removed, 4 is added, 1/3 survive.
+        s.replace(new Set([3, 1, 4]))
 
         expect(events).toEqual([
-            { object: s, oldValue: 1, type: "delete" },
+            { object: s, oldValue: 2, type: "delete" },
             { object: s, newValue: 4, type: "add" }
         ])
-        expect(mobx.values(s)).toEqual([2, 3, 4])
+        // Survivors keep their original relative order (1 before 3), 4 is appended.
+        expect(mobx.values(s)).toEqual([1, 3, 4])
     })
 
     test("replace with an observable Set only emits events for actual changes", () => {
