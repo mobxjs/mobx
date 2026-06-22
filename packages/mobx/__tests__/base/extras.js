@@ -511,6 +511,21 @@ test("deepEquals should yield correct results for complex objects #1118 - 2", ()
     expect(mobx.comparer.structural(a1, a4)).toBe(false)
 })
 
+test("deepEquals should correctly compare Symbol wrapper objects", () => {
+    const sym = Symbol("test")
+    const sameSym1 = Object(sym)
+    const sameSym2 = Object(sym)
+    const diffSym1 = Object(Symbol("test"))
+    const diffSym2 = Object(Symbol("test"))
+
+    // Two wrappers around the SAME symbol should be structurally equal
+    expect(mobx.comparer.structural(sameSym1, sameSym2)).toBe(true)
+    // Two wrappers around DIFFERENT symbols (same description) should not be equal
+    expect(mobx.comparer.structural(diffSym1, diffSym2)).toBe(false)
+    // A wrapper compared to itself is trivially equal
+    expect(mobx.comparer.structural(sameSym1, sameSym1)).toBe(true)
+})
+
 test("comparer.shallow should require types to be equal", () => {
     const sh = mobx.comparer.shallow
     const obs = mobx.observable

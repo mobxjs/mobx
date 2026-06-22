@@ -69,7 +69,7 @@ function eq(a: any, b: any, depth: number, aStack?: any[], bStack?: any[]) {
             return +a === +b
         case "[object Symbol]":
             return (
-                typeof Symbol !== "undefined" && Symbol.valueOf.call(a) === Symbol.valueOf.call(b)
+                typeof Symbol !== "undefined" && Symbol.prototype.valueOf.call(a) === Symbol.prototype.valueOf.call(b)
             )
         case "[object Map]":
         case "[object Set]":
