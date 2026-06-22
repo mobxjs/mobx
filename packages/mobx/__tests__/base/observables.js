@@ -1693,6 +1693,47 @@ test("#561 test toPrimitive() of observable objects", function () {
     }
 })
 
+test("#4673 Symbol.toPrimitive of a null observable does not throw in Babel's ES5 _toPrimitive helper", function () {
+    // Exactly what Babel inlines into ES5-transpiled consumer code. It uses
+    // `typeof x === "object"` to test for a primitive, so it misclassifies the
+    // spec-legal `null` result and throws.
+    function _toPrimitive(t, r) {
+        if ("object" != typeof t || !t) return t
+        var e = t[Symbol.toPrimitive]
+        if (void 0 !== e) {
+            var i = e.call(t, r || "default")
+            if ("object" != typeof i) return i
+            throw new TypeError("@@toPrimitive must return a primitive value.")
+        }
+        return ("string" === r ? String : Number)(t)
+    }
+    function _toPropertyKey(t) {
+        var i = _toPrimitive(t, "string")
+        return "symbol" == typeof i ? i : i + ""
+    }
+
+    const box = observable.box(null)
+
+    // The transpiled coercion path must not throw and must mirror native
+    // coercion of `null` (String(null) === "null", Number(null) === 0).
+    expect(() => _toPropertyKey(box)).not.toThrow()
+    expect(_toPropertyKey(box)).toBe("null")
+    expect(_toPrimitive(box, "number")).toBe(0)
+
+    // Native ToPrimitive is and stays unaffected.
+    expect(String(box)).toBe("null")
+
+    // Non-null values still coerce as before.
+    box.set(5)
+    expect(_toPropertyKey(box)).toBe("5")
+    expect(+box).toBe(5)
+
+    // computed values share the same coercion path.
+    const c = computed(() => null)
+    expect(() => _toPropertyKey(c)).not.toThrow()
+    expect(_toPropertyKey(c)).toBe("null")
+})
+
 test("computed equals function only invoked when necessary", () => {
     utils.supressConsole(() => {
         const comparisons = []

@@ -189,8 +189,18 @@ export class ObservableValue<T>
         return toPrimitive(this.get())
     }
 
-    [Symbol.toPrimitive]() {
-        return this.valueOf()
+    [Symbol.toPrimitive](hint: "default" | "string" | "number") {
+        const value = this.valueOf()
+        // `null` is a valid Symbol.toPrimitive result per spec, but Babel's
+        // inlined ES5 `_toPrimitive` helper rejects it — it checks
+        // `typeof x === "object"`, and `typeof null === "object"`, so it throws
+        // "@@toPrimitive must return a primitive value." Return a non-null
+        // primitive that mirrors native coercion of `null`
+        // (`Number(null) === 0`, `String(null) === "null"`). See #4673.
+        if (value === null) {
+            return hint === "number" ? 0 : "null"
+        }
+        return value
     }
 }
 
