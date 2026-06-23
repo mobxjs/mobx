@@ -154,7 +154,7 @@ export class Reaction implements IDerivation, IReactionPublic {
             // console.warn("Reaction already disposed") // Note: Not a warning / error in mobx 4 either
         }
         startBatch()
-        const notify = isSpyEnabled()
+        const notify = __DEV__ && isSpyEnabled()
         let startTime
         if (__DEV__ && notify) {
             startTime = Date.now()

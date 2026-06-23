@@ -297,7 +297,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
                 this.clear()
                 other.forEach(value => this.add(value))
             } else if (other !== null && other !== undefined) {
-                die("Cannot initialize set from " + other)
+                die(41, other)
             }
         })
 

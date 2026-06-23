@@ -105,7 +105,7 @@ export function set(obj: any, key: any, value?: any): void {
             key = parseInt(key, 10)
         }
         if (key < 0) {
-            die(`Invalid index: '${key}'`)
+            die(42, key)
         }
         startBatch()
         if (key >= obj.length) {

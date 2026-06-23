@@ -180,16 +180,13 @@ export class ObservableArrayAdministration
 
     setArrayLength_(newLength: number) {
         if (typeof newLength !== "number" || isNaN(newLength) || newLength < 0) {
-            die("Out of range: " + newLength)
+            die(40, newLength)
         }
         let currentLength = this.values_.length
         if (newLength === currentLength) {
             return
         } else if (newLength > currentLength) {
-            const newItems = new Array(newLength - currentLength)
-            for (let i = 0; i < newLength - currentLength; i++) {
-                newItems[i] = undefined
-            } // No Array.fill everywhere...
+            const newItems = new Array(newLength - currentLength).fill(undefined)
             this.spliceWithArray_(currentLength, 0, newItems)
         } else {
             this.spliceWithArray_(newLength, currentLength - newLength)
@@ -277,7 +274,7 @@ export class ObservableArrayAdministration
     }
 
     notifyArrayChildUpdate_(index: number, newValue: any, oldValue: any) {
-        const notifySpy = !this.owned_ && isSpyEnabled()
+        const notifySpy = __DEV__ && !this.owned_ && isSpyEnabled()
         const notify = hasListeners(this)
         const change: IArrayDidChange | null =
             notify || notifySpy
@@ -307,7 +304,7 @@ export class ObservableArrayAdministration
     }
 
     notifyArraySplice_(index: number, added: any[], removed: any[]) {
-        const notifySpy = !this.owned_ && isSpyEnabled()
+        const notifySpy = __DEV__ && !this.owned_ && isSpyEnabled()
         const notify = hasListeners(this)
         const change: IArraySplice | null =
             notify || notifySpy
@@ -370,10 +367,7 @@ export class ObservableArrayAdministration
             // For out of bound index, we don't create an actual sparse array,
             // but rather fill the holes with undefined (same as setArrayLength_).
             // This could be considered a bug.
-            const newItems = new Array(index + 1 - values.length)
-            for (let i = 0; i < newItems.length - 1; i++) {
-                newItems[i] = undefined
-            } // No Array.fill everywhere...
+            const newItems = new Array(index + 1 - values.length).fill(undefined)
             newItems[newItems.length - 1] = newValue
             this.spliceWithArray_(values.length, 0, newItems)
         }

@@ -70,7 +70,7 @@ export function isPlainObject(value: any) {
     if (proto == null) {
         return true
     }
-    const protoConstructor = Object.hasOwnProperty.call(proto, "constructor") && proto.constructor
+    const protoConstructor = hasProp(proto, "constructor") && proto.constructor
     return (
         typeof protoConstructor === "function" && protoConstructor.toString() === plainObjectString
     )
@@ -144,17 +144,11 @@ export function isES6Set(thing: unknown): thing is Set<any> {
     return thing != null && Object.prototype.toString.call(thing) === "[object Set]"
 }
 
-const hasGetOwnPropertySymbols = typeof Object.getOwnPropertySymbols !== "undefined"
-
 /**
  * Returns the following: own enumerable keys and symbols.
  */
 export function getPlainObjectKeys(object: any) {
     const keys = Object.keys(object)
-    // Not supported in IE, so there are not going to be symbol props anyway...
-    if (!hasGetOwnPropertySymbols) {
-        return keys
-    }
     const symbols = Object.getOwnPropertySymbols(object)
     if (!symbols.length) {
         return keys
@@ -164,12 +158,7 @@ export function getPlainObjectKeys(object: any) {
 
 // From Immer utils
 // Returns all own keys, including non-enumerable and symbolic
-export const ownKeys: (target: any) => Array<string | symbol> =
-    typeof Reflect !== "undefined" && Reflect.ownKeys
-        ? Reflect.ownKeys
-        : hasGetOwnPropertySymbols
-        ? obj => Object.getOwnPropertyNames(obj).concat(Object.getOwnPropertySymbols(obj) as any)
-        : /* istanbul ignore next */ Object.getOwnPropertyNames
+export const ownKeys: (target: any) => Array<string | symbol> = Reflect.ownKeys
 
 export function stringifyKey(key: any): string {
     if (typeof key === "string") {
@@ -189,18 +178,7 @@ export function hasProp(target: Object, prop: PropertyKey): boolean {
     return objectPrototype.hasOwnProperty.call(target, prop)
 }
 
-// From Immer utils
-export const getOwnPropertyDescriptors =
-    Object.getOwnPropertyDescriptors ||
-    function getOwnPropertyDescriptors(target: any) {
-        // Polyfill needed for Hermes and IE, see https://github.com/facebook/hermes/issues/274
-        const res: any = {}
-        // Note: without polyfill for ownKeys, symbols won't be picked up
-        ownKeys(target).forEach(key => {
-            res[key] = getDescriptor(target, key)
-        })
-        return res
-    }
+export const getOwnPropertyDescriptors = Object.getOwnPropertyDescriptors
 
 export function getFlag(flags: number, mask: number) {
     return !!(flags & mask)

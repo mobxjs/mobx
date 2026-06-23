@@ -67,7 +67,16 @@ const niceErrors = {
         return `[mobx] \`observableArray.${method}()\` mutates the array in-place, which is not allowed inside a derivation. Use \`array.slice().${method}()\` instead`
     },
     38: "'ownKeys()' can only be used on observable objects",
-    39: "'defineProperty()' can only be used on observable objects"
+    39: "'defineProperty()' can only be used on observable objects",
+    40(length) {
+        return "Out of range: " + length
+    },
+    41(other) {
+        return "Cannot initialize set from " + other
+    },
+    42(key) {
+        return `Invalid index: '${key}'`
+    }
 } as const
 
 const errors: typeof niceErrors = __DEV__ ? niceErrors : ({} as any)

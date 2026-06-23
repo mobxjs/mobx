@@ -174,7 +174,7 @@ export class ObservableMap<K = any, V = any>
             }
         }
         if (this.has_(key)) {
-            const notifySpy = isSpyEnabled()
+            const notifySpy = __DEV__ && isSpyEnabled()
             const notify = hasListeners(this)
             const change: IMapDidChange<K, V> | null =
                 notify || notifySpy
@@ -213,7 +213,7 @@ export class ObservableMap<K = any, V = any>
         const observable = this.data_.get(key)!
         newValue = (observable as any).prepareNewValue_(newValue) as V
         if (newValue !== globalState.UNCHANGED) {
-            const notifySpy = isSpyEnabled()
+            const notifySpy = __DEV__ && isSpyEnabled()
             const notify = hasListeners(this)
             const change: IMapDidChange<K, V> | null =
                 notify || notifySpy
@@ -254,7 +254,7 @@ export class ObservableMap<K = any, V = any>
             this.hasMap_.get(key)?.setNewValue_(true)
             this.keysAtom_.reportChanged()
         })
-        const notifySpy = isSpyEnabled()
+        const notifySpy = __DEV__ && isSpyEnabled()
         const notify = hasListeners(this)
         const change: IMapDidChange<K, V> | null =
             notify || notifySpy

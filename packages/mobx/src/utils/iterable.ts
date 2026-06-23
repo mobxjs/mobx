@@ -1,8 +1,5 @@
-import { getGlobal } from "../internal"
-
 // safely get iterator prototype if available
-const global = getGlobal()
-const maybeIteratorPrototype = global.Iterator?.prototype || {}
+const maybeIteratorPrototype = (globalThis as any).Iterator?.prototype || {}
 
 export function makeIterable<T, TReturn = unknown>(
     iterator: Iterator<T>

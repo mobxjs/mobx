@@ -69,13 +69,13 @@ export class ObservableValue<T>
 
     constructor(
         value: T,
-        public enhancer: IEnhancer<T>,
+        public enhancer_: IEnhancer<T>,
         public name_ = __DEV__ ? "ObservableValue@" + getNextId() : "ObservableValue",
         notifySpy = true,
-        private equals: IEqualsComparer<any> = comparer.default
+        private equals_: IEqualsComparer<any> = comparer.default
     ) {
         super(name_)
-        this.value_ = enhancer(value, undefined, name_)
+        this.value_ = enhancer_(value, undefined, name_)
         if (__DEV__ && notifySpy && isSpyEnabled()) {
             // only notify spy if this is a stand-alone observable
             spyReport({
@@ -99,7 +99,7 @@ export class ObservableValue<T>
         const oldValue = this.value_
         newValue = this.prepareNewValue_(newValue) as any
         if (newValue !== globalState.UNCHANGED) {
-            const notifySpy = isSpyEnabled()
+            const notifySpy = __DEV__ && isSpyEnabled()
             if (__DEV__ && notifySpy) {
                 spyReportStart({
                     type: UPDATE,
@@ -131,8 +131,8 @@ export class ObservableValue<T>
             newValue = change.newValue
         }
         // apply modifier
-        newValue = this.enhancer(newValue, this.value_, this.name_)
-        return this.equals(this.value_, newValue) ? globalState.UNCHANGED : newValue
+        newValue = this.enhancer_(newValue, this.value_, this.name_)
+        return this.equals_(this.value_, newValue) ? globalState.UNCHANGED : newValue
     }
 
     setNewValue_(newValue: T) {
