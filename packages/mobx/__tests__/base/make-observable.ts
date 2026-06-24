@@ -3,8 +3,11 @@ import { deepEnhancer } from "../../src/internal"
 import {
     makeObservable,
     action,
+    actionBound,
     computed,
     observable,
+    observableRef,
+    observableShallow,
     isObservable,
     isObservableObject,
     isObservableProp,
@@ -17,6 +20,7 @@ import {
     _getAdministration,
     configure,
     flow,
+    flowBound,
     override,
     ObservableSet,
     ObservableMap
@@ -44,7 +48,7 @@ test("makeObservable picks up annotations", () => {
                 x: observable,
                 double: computed,
                 unbound: action,
-                bound: action.bound
+                bound: actionBound
             })
         }
     }
@@ -83,7 +87,7 @@ test("makeObservable supports private fields", () => {
                 x: observable,
                 double: computed,
                 unbound: action,
-                bound: action.bound
+                bound: actionBound
             })
             if (3 - 1 === 4) {
                 makeObservable<this, "x" | "double" | "unbound" | "bound">(this, {
@@ -134,7 +138,7 @@ test("makeObservable has sane defaults", () => {
                 y: false,
                 double: true,
                 unbound: true,
-                bound: action.bound
+                bound: actionBound
             })
             if (3 - 1 === 4) {
                 makeObservable(this, {
@@ -318,7 +322,7 @@ test("makeAutoObservable allows overrides", () => {
         constructor() {
             makeAutoObservable(this, {
                 unbound: true,
-                bound: action.bound,
+                bound: actionBound,
                 y: false
             })
             if (3 - 1 === 4) {
@@ -595,13 +599,13 @@ test("class - annotations", async () => {
         constructor() {
             makeObservable(this, {
                 observable: observable,
-                "observable.ref": observable.ref,
-                "observable.shallow": observable.shallow,
+                "observable.ref": observableRef,
+                "observable.shallow": observableShallow,
                 computed: computed,
                 action: action,
-                "action.bound": action.bound,
+                "action.bound": actionBound,
                 flow: flow,
-                "flow.bound": flow.bound
+                "flow.bound": flowBound
             })
         }
 
@@ -671,11 +675,11 @@ test("subclass - annotation", () => {
         constructor() {
             makeObservable(this, {
                 observable: observable,
-                "observable.ref": observable.ref,
-                "observable.shallow": observable.shallow,
+                "observable.ref": observableRef,
+                "observable.shallow": observableShallow,
                 computed: computed,
                 action: action,
-                "action.bound": action.bound,
+                "action.bound": actionBound,
                 flow: flow
             })
         }
@@ -706,11 +710,11 @@ test("subclass - annotation", () => {
             super()
             makeObservable(this, {
                 observable2: observable,
-                "observable.ref2": observable.ref,
-                "observable.shallow2": observable.shallow,
+                "observable.ref2": observableRef,
+                "observable.shallow2": observableShallow,
                 computed2: computed,
                 action2: action,
-                "action.bound2": action.bound,
+                "action.bound2": actionBound,
                 flow2: flow
             })
         }
@@ -795,10 +799,10 @@ test("subclass - annotation - override", async () => {
         constructor() {
             makeObservable(this, {
                 action: action,
-                ["action.bound"]: action.bound,
+                ["action.bound"]: actionBound,
                 computed: computed,
                 flow: flow,
-                ["flow.bound"]: flow.bound
+                ["flow.bound"]: flowBound
             })
         }
         action() {
@@ -895,9 +899,9 @@ test("subclass - cannot re-annotate", () => {
             makeObservable(this, {
                 action: action,
                 observable: observable,
-                actionBound: action.bound,
+                actionBound: actionBound,
                 flow: flow,
-                flowBound: flow.bound,
+                flowBound: flowBound,
                 computed: computed
             })
         }
@@ -924,7 +928,7 @@ test("subclass - cannot re-annotate", () => {
         constructor() {
             super()
             makeObservable(this, {
-                actionBound: action.bound
+                actionBound: actionBound
             })
         }
         actionBound() {}
@@ -944,7 +948,7 @@ test("subclass - cannot re-annotate", () => {
         constructor() {
             super()
             makeObservable(this, {
-                flowBound: flow.bound
+                flowBound: flowBound
             })
         }
         *flowBound() {}
@@ -1142,7 +1146,7 @@ test("makeAutoObservable + override + annotation cache #2832", () => {
         override = []
         constructor() {
             makeAutoObservable(this, {
-                override: observable.ref
+                override: observableRef
             })
         }
     }
@@ -1159,7 +1163,7 @@ test("flow.bound #2941", async () => {
     class Clazz {
         constructor() {
             makeObservable(this, {
-                flowBound: flow.bound
+                flowBound: flowBound
             })
         }
         *flowBound() {
@@ -1192,7 +1196,7 @@ test("makeAutoObservable + Object.create #3197", () => {
 test("flow.bound #3271", async () => {
     class Test {
         constructor() {
-            makeObservable(this, { flowBound: flow.bound })
+            makeObservable(this, { flowBound: flowBound })
         }
         *flowBound() {
             return this

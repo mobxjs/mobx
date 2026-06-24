@@ -6,6 +6,7 @@ import {
     autorun,
     observable,
     action,
+    actionBound,
     reaction,
     extendObservable,
     keys,
@@ -298,7 +299,7 @@ test("predictable 'this' - 1", () => {
         },
         {
             a1: action,
-            a2: action.bound
+            a2: actionBound
         }
     )
 
@@ -313,7 +314,7 @@ test("predictable 'this' - 2", () => {
         constructor() {
             makeObservable(this, {
                 a1: action,
-                a2: action.bound,
+                a2: actionBound,
                 computed: computed
             })
         }

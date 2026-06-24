@@ -6,6 +6,7 @@ const {
     $mobx,
     observable,
     computed,
+    comparerStructural,
     transaction,
     autorun,
     extendObservable,
@@ -85,7 +86,7 @@ test("computed with asStructure modifier", function () {
                 sum: x1.get() + x2.get()
             }
         },
-        { compareStructural: true }
+        { equals: comparerStructural }
     )
     const b = buffer()
     m.observe(y, b, true)
@@ -1071,7 +1072,7 @@ test("computed values believe deep NaN === deep NaN when using compareStructural
         function () {
             return a.b
         },
-        { compareStructural: true }
+        { equals: comparerStructural }
     )
 
     const buf = new buffer()

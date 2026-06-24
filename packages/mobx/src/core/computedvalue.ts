@@ -7,7 +7,7 @@ import {
     Lambda,
     autorun,
     clearObserving,
-    comparer,
+    comparerDefault,
     createAction,
     createInstanceofPredicate,
     endBatch,
@@ -108,11 +108,9 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
      *
      * The `name` property is for debug purposes only.
      *
-     * The `equals` property specifies the comparer function to use to determine if a newly produced
-     * value differs from the previous value. Two comparers are provided in the library; `defaultComparer`
-     * compares based on identity comparison (===), and `structuralComparer` deeply compares the structure.
-     * Structural comparison can be convenient if you always produce a new aggregated object and
-     * don't want to notify observers if it is structurally the same.
+     * The `equals` property specifies the comparer function used to determine if a newly produced
+     * value differs from the previous value. Structural comparison can be convenient if you always
+     * produce a new aggregated object and don't want to notify observers if it is structurally the same.
      * This is useful for working with vectors, mouse coordinates etc.
      */
     constructor(options: IComputedValueOptions<T>) {
@@ -127,11 +125,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
                 options.set
             ) as any
         }
-        this.equals_ =
-            options.equals ||
-            ((options as any).compareStructural || (options as any).struct
-                ? comparer.structural
-                : comparer.default)
+        this.equals_ = options.equals || comparerDefault
         this.scope_ = options.context
         this.requiresReaction_ = options.requiresReaction
         this.keepAlive_ = !!options.keepAlive

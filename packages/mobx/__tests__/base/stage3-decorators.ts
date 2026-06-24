@@ -21,7 +21,17 @@ import {
     runInAction,
     isComputedProp
 } from "../../src/mobx"
-import { action, computed, flow, observable } from "../../src/mobx"
+import {
+    action,
+    actionBound,
+    computed,
+    computedStruct,
+    flow,
+    observable,
+    observableDeep,
+    observableRef,
+    observableShallow
+} from "../../src/mobx"
 import { $mobx, type ObservableArrayAdministration } from "../../src/internal"
 import * as mobx from "../../src/mobx"
 
@@ -236,7 +246,7 @@ test("typescript: parameterized computed decorator", () => {
     class TestClass {
         @observable accessor x = 3
         @observable accessor y = 3
-        @computed.struct
+        @computedStruct
         get boxedSum() {
             return { sum: Math.round(this.x) + Math.round(this.y) }
         }
@@ -826,9 +836,9 @@ test("705 - setter undoing caching (2022.3)", () => {
     d2()
 })
 
-test("@observable.ref (2022.3)", () => {
+test("@observableRef (2022.3)", () => {
     class A {
-        @observable.ref accessor ref = { a: 3 }
+        @observableRef accessor ref = { a: 3 }
     }
 
     const a = new A()
@@ -837,9 +847,9 @@ test("@observable.ref (2022.3)", () => {
     t.equal(mobx.isObservableProp(a, "ref"), true)
 })
 
-test("@observable.shallow (2022.3)", () => {
+test("@observableShallow (2022.3)", () => {
     class A {
-        @observable.shallow accessor arr = [{ todo: 1 }]
+        @observableShallow accessor arr = [{ todo: 1 }]
     }
 
     const a = new A()
@@ -852,9 +862,9 @@ test("@observable.shallow (2022.3)", () => {
     t.equal(a.arr[1] === todo2, true)
 })
 
-test("@observable.shallow - 2 (2022.3)", () => {
+test("@observableShallow - 2 (2022.3)", () => {
     class A {
-        @observable.shallow accessor arr: Record<string, any> = { x: { todo: 1 } }
+        @observableShallow accessor arr: Record<string, any> = { x: { todo: 1 } }
     }
 
     const a = new A()
@@ -867,9 +877,9 @@ test("@observable.shallow - 2 (2022.3)", () => {
     t.equal(a.arr.y === todo2, true)
 })
 
-test("@observable.deep (2022.3)", () => {
+test("@observableDeep (2022.3)", () => {
     class A {
-        @observable.deep accessor arr = [{ todo: 1 }]
+        @observableDeep accessor arr = [{ todo: 1 }]
     }
 
     const a = new A()
@@ -887,7 +897,7 @@ test("@observable.deep (2022.3)", () => {
 test("action.bound binds (2022.3)", () => {
     class A {
         @observable accessor x = 0
-        @action.bound
+        @actionBound
         inc(value: number) {
             this.x += value
         }
@@ -903,7 +913,7 @@ test("action.bound binds (2022.3)", () => {
 test("action.bound binds property function (2022.3)", () => {
     class A {
         @observable accessor x = 0
-        @action.bound
+        @actionBound
         inc = function (value: number) {
             this.x += value
         }
@@ -1030,7 +1040,7 @@ test.skip("actions are reassignable", () => {
     class A {
         @action
         m1() {}
-        @action.bound
+        @actionBound
         m3() {}
     }
 

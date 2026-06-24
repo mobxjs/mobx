@@ -7,7 +7,7 @@ import {
     die,
     IComputedValue,
     createComputedAnnotation,
-    comparer,
+    comparerStructural,
     decorateComputed20223_
 } from "../internal"
 import { createDecoratorAnnotation, type DecoratorAnnotation } from "./decoratorannotation"
@@ -27,14 +27,13 @@ export interface IComputedFactory extends Annotation, ClassGetterDecorator {
     <T>(options: IComputedValueOptions<T>): DecoratorAnnotation<ClassGetterDecorator>
     // computed(fn, opts)
     <T>(func: () => T, options?: IComputedValueOptions<T>): IComputedValue<T>
-
-    struct: DecoratorAnnotation<ClassGetterDecorator>
 }
 
 const computedAnnotation = createComputedAnnotation(COMPUTED)
 const computedStructAnnotation = createComputedAnnotation(COMPUTED_STRUCT, {
-    equals: comparer.structural
+    equals: comparerStructural
 })
+export const computedStruct = createComputedDecoratorAnnotation(computedStructAnnotation)
 
 export const computed: IComputedFactory = function computed(arg1, arg2) {
     if (arg2 && typeof arg2.kind === "string") {
@@ -65,5 +64,3 @@ export const computed: IComputedFactory = function computed(arg1, arg2) {
 } as any
 
 Object.assign(computed, computedAnnotation)
-
-computed.struct = createComputedDecoratorAnnotation(computedStructAnnotation)

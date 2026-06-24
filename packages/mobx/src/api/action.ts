@@ -44,8 +44,6 @@ export interface IActionFactory extends Annotation, ClassMethodAndFieldDecorator
 
     // named annotation
     (customName: string): DecoratorAnnotation<ClassMethodAndFieldDecorator>
-
-    bound: DecoratorAnnotation<ClassMethodAndFieldDecorator>
 }
 
 function createActionFactory(autoAction: boolean): IActionFactory {
@@ -88,8 +86,8 @@ Object.assign(action, actionAnnotation)
 export const autoAction: IActionFactory = createActionFactory(true)
 Object.assign(autoAction, autoActionAnnotation)
 
-action.bound = createActionDecoratorAnnotation(actionBoundAnnotation)
-autoAction.bound = createActionDecoratorAnnotation(autoActionBoundAnnotation)
+export const actionBound = createActionDecoratorAnnotation(actionBoundAnnotation)
+export const autoActionBound = createActionDecoratorAnnotation(autoActionBoundAnnotation)
 
 export function runInAction<T>(fn: () => T): T {
     return executeAction(fn.name || DEFAULT_ACTION_NAME, false, fn, this, undefined)

@@ -39,7 +39,7 @@ function extend_(
     return adm.defineObservableProperty_(
         key,
         descriptor.value,
-        this.options_?.enhancer ?? deepEnhancer,
+        this.options_?.enhancer_ ?? deepEnhancer,
         proxyTrap
     )
 }
@@ -77,7 +77,7 @@ export function decorateObservable20223_(
             () =>
                 new ObservableValue(
                     value,
-                    ann.options_?.enhancer ?? deepEnhancer,
+                    ann.options_?.enhancer_ ?? deepEnhancer,
                     __DEV__
                         ? `${adm.name_}.${name.toString()}`
                         : `ObservableObject.${name.toString()}`,

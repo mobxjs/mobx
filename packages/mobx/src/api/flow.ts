@@ -43,7 +43,6 @@ interface Flow extends Annotation, ClassMethodDecorator {
         generator: (...args: Args) => Generator<any, R, any> | AsyncGenerator<any, R, any>,
         context?: never
     ): (...args: Args) => CancellablePromise<R>
-    bound: DecoratorAnnotation<ClassMethodDecorator>
 }
 
 const flowAnnotation = createFlowAnnotation("flow")
@@ -145,7 +144,7 @@ export const flow: Flow = Object.assign(
     flowAnnotation
 )
 
-flow.bound = createFlowDecoratorAnnotation(flowBoundAnnotation)
+export const flowBound = createFlowDecoratorAnnotation(flowBoundAnnotation)
 
 function cancelPromise(promise) {
     if (isFunction(promise.cancel)) {

@@ -2,6 +2,7 @@ import {
     autorun,
     onBecomeObserved,
     observable,
+    observableRef,
     computed,
     action,
     makeObservable,
@@ -304,7 +305,7 @@ describe("nested computes don't trigger hooks #2686", () => {
         constructor() {
             makeObservable(this, {
                 upperValue$: computed,
-                lower$: observable.ref
+                lower$: observableRef
             })
         }
 

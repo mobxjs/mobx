@@ -3,6 +3,7 @@ import {
     computed,
     isObservable,
     observable,
+    observableRef,
     reaction,
     transaction,
     IReactionDisposer,
@@ -50,7 +51,7 @@ const wizardModel = observable(
         }
     } as any,
     {
-        activateNextStep: observable.ref
+        activateNextStep: observableRef
     }
 )
 

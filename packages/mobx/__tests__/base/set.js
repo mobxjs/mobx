@@ -248,9 +248,9 @@ test("deepEqual set", () => {
     x2.add(1)
     x2.add({ z: 2 })
 
-    expect(mobx.comparer.structural(x, x2)).toBe(false)
+    expect(mobx.comparerStructural(x, x2)).toBe(false)
     x2.replace([1, { z: 1 }])
-    expect(mobx.comparer.structural(x, x2)).toBe(true)
+    expect(mobx.comparerStructural(x, x2)).toBe(true)
 })
 
 test("set.clear should not be tracked", () => {

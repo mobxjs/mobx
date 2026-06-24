@@ -482,9 +482,9 @@ test("deepEquals should yield correct results for complex objects #1118 - 1", ()
 
     expect(d2016jan1).toEqual(d2016jan1_2)
     expect(d2016jan1).not.toEqual(d2017jan1)
-    expect(mobx.comparer.structural(d2016jan1, d2016jan1)).toBe(true)
-    expect(mobx.comparer.structural(d2016jan1, d2017jan1)).toBe(false)
-    expect(mobx.comparer.structural(d2016jan1, d2016jan1_2)).toBe(true)
+    expect(mobx.comparerStructural(d2016jan1, d2016jan1)).toBe(true)
+    expect(mobx.comparerStructural(d2016jan1, d2017jan1)).toBe(false)
+    expect(mobx.comparerStructural(d2016jan1, d2016jan1_2)).toBe(true)
 })
 
 test("deepEquals should yield correct results for complex objects #1118 - 2", () => {
@@ -505,14 +505,14 @@ test("deepEquals should yield correct results for complex objects #1118 - 2", ()
 
     expect(a1).toEqual(a2)
     expect(a1).not.toEqual(a3)
-    expect(mobx.comparer.structural(a1, a1)).toBe(true)
-    expect(mobx.comparer.structural(a1, a3)).toBe(false)
-    expect(mobx.comparer.structural(a1, a2)).toBe(true)
-    expect(mobx.comparer.structural(a1, a4)).toBe(false)
+    expect(mobx.comparerStructural(a1, a1)).toBe(true)
+    expect(mobx.comparerStructural(a1, a3)).toBe(false)
+    expect(mobx.comparerStructural(a1, a2)).toBe(true)
+    expect(mobx.comparerStructural(a1, a4)).toBe(false)
 })
 
 test("comparer.shallow should require types to be equal", () => {
-    const sh = mobx.comparer.shallow
+    const sh = mobx.comparerShallow
     const obs = mobx.observable
 
     expect(sh({}, {})).toBe(true)
@@ -588,7 +588,7 @@ test("comparer.shallow should require types to be equal", () => {
     expect(sh(obs(new Map()), obs(new Map()))).toBe(true)
 })
 test("comparer.shallow should work", () => {
-    const sh = mobx.comparer.shallow
+    const sh = mobx.comparerShallow
     const obs = mobx.observable
 
     expect(sh(1, 1)).toBe(true)

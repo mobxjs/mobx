@@ -1,13 +1,16 @@
 import {
     ObservableObjectAdministration,
     observable,
+    observableRef,
     Annotation,
     defineProperty,
     createAction,
     globalState,
     flow,
+    flowBound,
     computed,
     autoAction,
+    autoActionBound,
     isGenerator,
     MakeResult,
     isAction
@@ -61,16 +64,16 @@ function make_(
     // function on proto -> autoAction/flow
     if (source !== adm.target_ && typeof descriptor.value === "function") {
         if (isGenerator(descriptor.value)) {
-            const flowAnnotation = this.options_?.autoBind ? flow.bound : flow
+            const flowAnnotation = this.options_?.autoBind ? flowBound : flow
             return flowAnnotation.make_(adm, key, descriptor, source)
         }
-        const actionAnnotation = this.options_?.autoBind ? autoAction.bound : autoAction
+        const actionAnnotation = this.options_?.autoBind ? autoActionBound : autoAction
         return actionAnnotation.make_(adm, key, descriptor, source)
     }
     // other -> observable
     // Copy props from proto as well, see test:
     // "decorate should work with Object.create"
-    let observableAnnotation = this.options_?.deep === false ? observable.ref : observable
+    let observableAnnotation = this.options_?.deep === false ? observableRef : observable
     // if function respect autoBind option
     if (typeof descriptor.value === "function" && this.options_?.autoBind) {
         descriptor.value = descriptor.value.bind(adm.proxy_ ?? adm.target_)
@@ -105,6 +108,6 @@ function extend_(
     if (typeof descriptor.value === "function" && this.options_?.autoBind) {
         descriptor.value = descriptor.value.bind(adm.proxy_ ?? adm.target_)
     }
-    let observableAnnotation = this.options_?.deep === false ? observable.ref : observable
+    let observableAnnotation = this.options_?.deep === false ? observableRef : observable
     return observableAnnotation.extend_(adm, key, descriptor, proxyTrap)
 }

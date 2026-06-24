@@ -7,7 +7,7 @@ import {
     IListenable,
     Lambda,
     checkIfStateModificationsAreAllowed,
-    comparer,
+    comparerDefault,
     createInstanceofPredicate,
     getNextId,
     hasInterceptors,
@@ -72,7 +72,7 @@ export class ObservableValue<T>
         public enhancer_: IEnhancer<T>,
         public name_ = __DEV__ ? "ObservableValue@" + getNextId() : "ObservableValue",
         notifySpy = true,
-        private equals_: IEqualsComparer<any> = comparer.default
+        private equals_: IEqualsComparer<any> = comparerDefault
     ) {
         super(name_)
         this.value_ = enhancer_(value, undefined, name_)

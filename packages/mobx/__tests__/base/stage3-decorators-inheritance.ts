@@ -8,7 +8,7 @@ import {
     observe,
     runInAction
 } from "../../src/mobx"
-import { action, computed, flow, observable } from "../../src/mobx"
+import { action, actionBound, computed, flow, observable } from "../../src/mobx"
 
 test("inherited observable accessor remains reactive in subclass", () => {
     class Parent {
@@ -190,7 +190,7 @@ test("subclass can add new observable, computed, and action members", () => {
             this.extra += 1
         }
 
-        @action.bound
+        @actionBound
         incrementCount() {
             this.count += 1
         }
@@ -245,14 +245,14 @@ test("action.bound override can be called after extraction", () => {
     class Parent {
         @observable accessor count = 0
 
-        @action.bound
+        @actionBound
         increment(value: number) {
             this.count += value
         }
     }
 
     class Child extends Parent {
-        @action.bound
+        @actionBound
         override increment(value: number) {
             super.increment(value)
             this.count += 1

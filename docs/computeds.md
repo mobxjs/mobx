@@ -214,22 +214,22 @@ This string is used as a debug name in the [Spy event listeners](analyzing-react
 
 ### `equals`
 
-Set to `comparer.default` by default. It acts as a comparison function for comparing the previous value with the next value. If this function considers the values to be equal, then the observers will not be re-evaluated.
+Set to `comparerDefault` by default. It acts as a comparison function for comparing the previous value with the next value. If this function considers the values to be equal, then the observers will not be re-evaluated.
 
-This is useful when working with structural data and types from other libraries. For example, a computed [moment](https://momentjs.com/) instance could use `(a, b) => a.isSame(b)`. `comparer.structural` and `comparer.shallow` come in handy if you want to use structural / shallow comparison to determine whether the new value is different from the previous value, and as a result notify its observers.
+This is useful when working with structural data and types from other libraries. For example, a computed [moment](https://momentjs.com/) instance could use `(a, b) => a.isSame(b)`. `comparerStructural` and `comparerShallow` come in handy if you want to use structural / shallow comparison to determine whether the new value is different from the previous value, and as a result notify its observers.
 
 Check out the [`computed.struct`](#computed-struct) section above.
 
 #### Built-in comparers
 
-MobX provides four built-in `comparer` methods which should cover most needs of the `equals` option of `computed`:
+MobX provides four built-in comparer functions which should cover most needs of the `equals` option of `computed`:
 
--   `comparer.identity` uses the identity (`===`) operator to determine if two values are the same.
--   `comparer.default` is the same as `comparer.identity`, but also considers `NaN` to be equal to `NaN`.
--   `comparer.structural` performs deep structural comparison to determine if two values are the same.
--   `comparer.shallow` performs shallow structural comparison to determine if two values are the same.
+-   `comparerIdentity` uses the identity (`===`) operator to determine if two values are the same.
+-   `comparerDefault` is the same as `comparerIdentity`, but also considers `NaN` to be equal to `NaN`.
+-   `comparerStructural` performs deep structural comparison to determine if two values are the same.
+-   `comparerShallow` performs shallow structural comparison to determine if two values are the same.
 
-You can import `comparer` from `mobx` to access these methods. They can be used for `reaction` as well.
+You can import these functions from `mobx`. They can be used for `reaction` as well.
 
 ### `requiresReaction`
 

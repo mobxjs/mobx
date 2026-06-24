@@ -61,13 +61,13 @@ export function asCreateObservableOptions(thing: any): CreateObservableOptions {
 
 const observableAnnotation = createObservableAnnotation(OBSERVABLE)
 const observableRefAnnotation = createObservableAnnotation(OBSERVABLE_REF, {
-    enhancer: referenceEnhancer
+    enhancer_: referenceEnhancer
 })
 const observableShallowAnnotation = createObservableAnnotation(OBSERVABLE_SHALLOW, {
-    enhancer: shallowEnhancer
+    enhancer_: shallowEnhancer
 })
 const observableStructAnnotation = createObservableAnnotation(OBSERVABLE_STRUCT, {
-    enhancer: refStructEnhancer
+    enhancer_: refStructEnhancer
 })
 
 function createObservableDecoratorAnnotation(
@@ -91,7 +91,7 @@ export function getAnnotationFromOptions(
 }
 
 export function getEnhancerFromAnnotation(annotation?: Annotation): IEnhancer<any> {
-    return !annotation ? deepEnhancer : annotation.options_?.enhancer ?? deepEnhancer
+    return !annotation ? deepEnhancer : annotation.options_?.enhancer_ ?? deepEnhancer
 }
 
 /**
@@ -182,17 +182,6 @@ export interface IObservableFactory extends Annotation, ClassAccessorAndFieldDec
         annotations?: AnnotationsMap<T, never>,
         options?: CreateObservableOptions
     ) => T
-
-    /**
-     * Annotation that creates an observable that only observes the references, but doesn't try to turn the assigned value into an observable.ts.
-     */
-    ref: DecoratorAnnotation<ClassAccessorAndFieldDecorator>
-    /**
-     * Annotation that creates an observable converts its value (objects, maps or arrays) into a shallow observable structure
-     */
-    shallow: DecoratorAnnotation<ClassAccessorAndFieldDecorator>
-    deep: DecoratorAnnotation<ClassAccessorAndFieldDecorator>
-    struct: DecoratorAnnotation<ClassAccessorAndFieldDecorator>
 }
 
 const observableFactories: IObservableFactory = {
@@ -226,12 +215,13 @@ const observableFactories: IObservableFactory = {
         return initObservable(() =>
             extendObservable(asDynamicObservableObject({}, options), props, annotations)
         )
-    },
-    ref: createObservableDecoratorAnnotation(observableRefAnnotation),
-    shallow: createObservableDecoratorAnnotation(observableShallowAnnotation),
-    deep: createObservableDecoratorAnnotation(observableAnnotation),
-    struct: createObservableDecoratorAnnotation(observableStructAnnotation)
+    }
 } as any
+
+export const observableRef = createObservableDecoratorAnnotation(observableRefAnnotation)
+export const observableShallow = createObservableDecoratorAnnotation(observableShallowAnnotation)
+export const observableDeep = createObservableDecoratorAnnotation(observableAnnotation)
+export const observableStruct = createObservableDecoratorAnnotation(observableStructAnnotation)
 
 // eslint-disable-next-line
 export var observable: IObservableFactory = assign(

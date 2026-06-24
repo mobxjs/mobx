@@ -105,6 +105,83 @@ class Todo {
 }
 ```
 
+## Replacing namespaced APIs
+
+Namespaced annotation and comparer properties have been replaced by named exports for better tree-shaking:
+
+| Removed API           | Replacement          |
+| --------------------- | -------------------- |
+| `observable.ref`      | `observableRef`      |
+| `observable.shallow`  | `observableShallow`  |
+| `observable.deep`     | `observableDeep`     |
+| `observable.struct`   | `observableStruct`   |
+| `computed.struct`     | `computedStruct`     |
+| `action.bound`        | `actionBound`        |
+| `flow.bound`          | `flowBound`          |
+| `comparer.identity`   | `comparerIdentity`   |
+| `comparer.default`    | `comparerDefault`    |
+| `comparer.structural` | `comparerStructural` |
+| `comparer.shallow`    | `comparerShallow`    |
+
+Annotation map:
+
+```diff
+-import { action, comparer, computed, flow, makeObservable, observable } from "mobx"
++import { actionBound, comparerStructural, computed, computedStruct, flowBound, makeObservable, observableRef } from "mobx"
+
+ makeObservable(this, {
+-    value: observable.ref,
+-    total: computed.struct,
+-    rounded: computed({ equals: comparer.structural }),
+-    save: action.bound,
+-    load: flow.bound
++    value: observableRef,
++    total: computedStruct,
++    rounded: computed({ equals: comparerStructural }),
++    save: actionBound,
++    load: flowBound
+ })
+```
+
+Decorator:
+
+```diff
+-import { action, comparer, computed, flow, observable } from "mobx"
++import { actionBound, comparerStructural, computed, computedStruct, flowBound, observableRef } from "mobx"
+
+ class Store {
+-    @observable.ref accessor value = null
++    @observableRef accessor value = null
+
+-    @computed.struct
++    @computedStruct
+     get total() {
+         return { value: this.value }
+     }
+
+-    @computed({ equals: comparer.structural })
++    @computed({ equals: comparerStructural })
+     get rounded() {
+         return { value: Math.round(this.value) }
+     }
+
+-    @action.bound
++    @actionBound
+     save() {}
+
+-    @flow.bound
++    @flowBound
+     *load() {}
+ }
+```
+
+Old computed structural options should use `equals` explicitly:
+
+```diff
+-computed(() => value, { compareStructural: true })
++computed(() => value, { equals: comparerStructural })
+```
+
 ## Proxy support is required
 
 MobX 7 requires native Proxy support and no longer includes the ES5 fallback implementation.
