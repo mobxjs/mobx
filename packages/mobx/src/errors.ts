@@ -97,10 +97,8 @@ export function die(error: string | keyof typeof errors, ...args: any[]): never 
         throw new Error(`[MobX] ${e}`)
     }
     throw new Error(
-        typeof error === "number"
-            ? `[MobX] minified error nr: ${error}${
-                  args.length ? " " + args.map(String).join(",") : ""
-              }. See http://mobx.js.org/errors`
-            : `[MobX] ${error}`
+        `[MobX] minified error nr: ${error}${
+            args.length ? " " + args.map(String).join(",") : ""
+        }. See http://mobx.js.org/errors`
     )
 }
