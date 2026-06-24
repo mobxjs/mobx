@@ -46,7 +46,8 @@ import {
     getDebugName,
     objectPrototype,
     MakeResult,
-    checkIfStateModificationsAreAllowed
+    checkIfStateModificationsAreAllowed,
+    assign
 } from "../internal"
 
 const descriptorCache = Object.create(null)
@@ -367,10 +368,9 @@ export class ObservableObjectAdministration
                 }
                 const { newValue } = change as any
                 if (descriptor.value !== newValue) {
-                    descriptor = {
-                        ...descriptor,
+                    descriptor = assign({}, descriptor, {
                         value: newValue
-                    }
+                    })
                 }
             }
 

@@ -5,7 +5,8 @@ import {
     isFunction,
     Annotation,
     createFlowAnnotation,
-    decorateFlow20223_
+    decorateFlow20223_,
+    assign
 } from "../internal"
 import { createDecoratorAnnotation, type DecoratorAnnotation } from "./decoratorannotation"
 import type { ClassMethodDecorator } from "../types/decorator_fills"
@@ -48,7 +49,7 @@ interface Flow extends Annotation, ClassMethodDecorator {
 const flowAnnotation = createFlowAnnotation("flow")
 const flowBoundAnnotation = createFlowAnnotation("flow.bound", { bound: true })
 
-export const flow: Flow = Object.assign(
+export const flow: Flow = assign(
     function flow(arg1, arg2?) {
         if (arg2 && typeof arg2.kind === "string") {
             return decorateFlow20223_(flowAnnotation, arg1, arg2)

@@ -8,7 +8,8 @@ import {
     IComputedValue,
     createComputedAnnotation,
     compareStructural,
-    decorateComputed20223_
+    decorateComputed20223_,
+    assign
 } from "../internal"
 import { createDecoratorAnnotation, type DecoratorAnnotation } from "./decoratorannotation"
 import type { ClassGetterDecorator } from "../types/decorator_fills"
@@ -63,4 +64,4 @@ export const computed: IComputedFactory = function computed(arg1, arg2) {
     return new ComputedValue(opts)
 } as any
 
-Object.assign(computed, computedAnnotation)
+assign(computed, computedAnnotation)

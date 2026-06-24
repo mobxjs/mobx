@@ -6,7 +6,8 @@ import {
     isFunction,
     isStringish,
     createActionAnnotation,
-    decorateAction20223_
+    decorateAction20223_,
+    assign
 } from "../internal"
 import { createDecoratorAnnotation, type DecoratorAnnotation } from "./decoratorannotation"
 import type { ClassMethodAndFieldDecorator } from "../types/decorator_fills"
@@ -82,9 +83,9 @@ function createActionFactory(autoAction: boolean): IActionFactory {
 }
 
 export const action: IActionFactory = createActionFactory(false)
-Object.assign(action, actionAnnotation)
+assign(action, actionAnnotation)
 export const autoAction: IActionFactory = createActionFactory(true)
-Object.assign(autoAction, autoActionAnnotation)
+assign(autoAction, autoActionAnnotation)
 
 export const actionBound = createActionDecoratorAnnotation(actionBoundAnnotation)
 export const autoActionBound = createActionDecoratorAnnotation(autoActionBoundAnnotation)

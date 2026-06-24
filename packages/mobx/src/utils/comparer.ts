@@ -16,6 +16,4 @@ export function compareShallow(a: any, b: any): boolean {
     return deepEqual(a, b, 1)
 }
 
-export function compareDefault(a: any, b: any): boolean {
-    return Object.is(a, b)
-}
+export const compareDefault = Object.is

@@ -186,7 +186,7 @@ export class ObservableArrayAdministration
         if (newLength === currentLength) {
             return
         } else if (newLength > currentLength) {
-            const newItems = new Array(newLength - currentLength).fill(undefined)
+            const newItems = Array.from({ length: newLength - currentLength })
             this.spliceWithArray_(currentLength, 0, newItems)
         } else {
             this.spliceWithArray_(newLength, currentLength - newLength)
@@ -367,7 +367,7 @@ export class ObservableArrayAdministration
             // For out of bound index, we don't create an actual sparse array,
             // but rather fill the holes with undefined (same as setArrayLength_).
             // This could be considered a bug.
-            const newItems = new Array(index + 1 - values.length).fill(undefined)
+            const newItems = Array.from({ length: index + 1 - values.length })
             newItems[newItems.length - 1] = newValue
             this.spliceWithArray_(values.length, 0, newItems)
         }
