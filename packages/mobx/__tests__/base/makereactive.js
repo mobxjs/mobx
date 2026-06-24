@@ -429,7 +429,7 @@ test("as structure view", function () {
             }
         },
         {
-            c: m.computed({ equals: m.comparerStructural })
+            c: m.computed({ equals: m.compareStructural })
         }
     )
 

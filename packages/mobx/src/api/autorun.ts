@@ -6,8 +6,7 @@ import {
     Lambda,
     Reaction,
     action,
-    comparerDefault,
-    comparerStructural,
+    compareDefault,
     getNextId,
     isAction,
     isFunction,
@@ -141,9 +140,7 @@ export function reaction<T, FireImmediately extends boolean = false>(
     let isScheduled = false
     let value: T
 
-    const equals: IEqualsComparer<T> = (opts as any).compareStructural
-        ? comparerStructural
-        : opts.equals || comparerDefault
+    const equals: IEqualsComparer<T> = opts.equals || compareDefault
 
     const r = new Reaction(
         name,

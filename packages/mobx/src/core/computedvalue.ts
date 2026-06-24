@@ -7,7 +7,7 @@ import {
     Lambda,
     autorun,
     clearObserving,
-    comparerDefault,
+    compareDefault,
     createAction,
     createInstanceofPredicate,
     endBatch,
@@ -125,7 +125,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
                 options.set
             ) as any
         }
-        this.equals_ = options.equals || comparerDefault
+        this.equals_ = options.equals || compareDefault
         this.scope_ = options.context
         this.requiresReaction_ = options.requiresReaction
         this.keepAlive_ = !!options.keepAlive

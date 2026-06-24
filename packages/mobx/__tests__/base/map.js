@@ -507,16 +507,16 @@ test("deepEqual map", () => {
     x2.set("x", 3)
     x2.set("y", { z: 3 })
 
-    expect(mobx.comparerStructural(x, x2)).toBe(false)
+    expect(mobx.compareStructural(x, x2)).toBe(false)
     x2.get("y").z = 2
-    expect(mobx.comparerStructural(x, x2)).toBe(true)
+    expect(mobx.compareStructural(x, x2)).toBe(true)
 
     x2.set("z", 1)
-    expect(mobx.comparerStructural(x, x2)).toBe(false)
+    expect(mobx.compareStructural(x, x2)).toBe(false)
     x2.delete("z")
-    expect(mobx.comparerStructural(x, x2)).toBe(true)
+    expect(mobx.compareStructural(x, x2)).toBe(true)
     x2.delete("y")
-    expect(mobx.comparerStructural(x, x2)).toBe(false)
+    expect(mobx.compareStructural(x, x2)).toBe(false)
 })
 
 test("798, cannot return observable map from computed prop", () => {

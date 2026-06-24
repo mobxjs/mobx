@@ -431,6 +431,6 @@ Set a custom scheduler to determine how re-running the autorun function should b
 
 ### `equals`: (reaction)
 
-Set to `comparerDefault` by default. If specified, this comparer function is used to compare the previous and next values produced by the _data_ function. The _effect_ function is only invoked if this function returns false.
+Set to `compareDefault` by default. If specified, this comparison function is used to compare the previous and next values produced by the _data_ function. The _effect_ function is only invoked if this function returns false.
 
 Check out the [Built-in comparers](computeds.md#built-in-comparers) section.
