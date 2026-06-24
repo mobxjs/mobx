@@ -31,5 +31,5 @@ function make_(this: Annotation, adm: ObservableObjectAdministration, key): Make
 }
 
 function extend_(this: Annotation, adm, key, descriptor, proxyTrap): boolean {
-    die(`'${this.annotationType_}' can only be used with 'makeObservable'`)
+    die(44, this.annotationType_)
 }

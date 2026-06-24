@@ -76,6 +76,15 @@ export const niceErrors = {
     },
     42(key) {
         return `Invalid index: '${key}'`
+    },
+    43(annotationType, name, kind) {
+        return (
+            `Cannot apply '${annotationType}' to '${name}' (kind: ${kind}):` +
+            `\n'${annotationType}' can only be used on properties with a function value.`
+        )
+    },
+    44(annotationType) {
+        return `'${annotationType}' can only be used with 'makeObservable'`
     }
 } as const
 

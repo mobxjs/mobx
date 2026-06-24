@@ -102,10 +102,7 @@ export function decorateAction20223_(annotation: Annotation, mthd, context: Deco
         return mthd
     }
 
-    die(
-        `Cannot apply '${ann.annotationType_}' to '${String(name)}' (kind: ${kind}):` +
-            `\n'${ann.annotationType_}' can only be used on properties with a function value.`
-    )
+    die(43, ann.annotationType_, String(name), kind)
 }
 
 function assertActionDescriptor(

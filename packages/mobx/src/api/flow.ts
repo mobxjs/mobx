@@ -60,14 +60,17 @@ export const flow: Flow = assign(
             die(`Flow expects single argument with generator function`)
         }
         const generator = arg1
-        const name = generator.name || "<unnamed flow>"
+        const name = generator.name || (__DEV__ ? "<unnamed flow>" : "flow")
 
         // Implementation based on https://github.com/tj/co/blob/master/index.js
         const res = function () {
             const ctx = this
             const args = arguments
-            const runId = ++generatorId
-            const gen = action(`${name} - runid: ${runId} - init`, generator).apply(ctx, args)
+            const runId = __DEV__ ? ++generatorId : 0
+            const gen = action(
+                __DEV__ ? `${name} - runid: ${runId} - init` : name,
+                generator
+            ).apply(ctx, args)
             let rejector: (error: any) => void
             let pendingPromise: CancellablePromise<any> | undefined = undefined
 
@@ -80,7 +83,7 @@ export const flow: Flow = assign(
                     let ret
                     try {
                         ret = action(
-                            `${name} - runid: ${runId} - yield ${stepId++}`,
+                            __DEV__ ? `${name} - runid: ${runId} - yield ${stepId++}` : name,
                             gen.next
                         ).call(gen, res)
                     } catch (e) {
@@ -95,7 +98,7 @@ export const flow: Flow = assign(
                     let ret
                     try {
                         ret = action(
-                            `${name} - runid: ${runId} - yield ${stepId++}`,
+                            __DEV__ ? `${name} - runid: ${runId} - yield ${stepId++}` : name,
                             gen.throw!
                         ).call(gen, err)
                     } catch (e) {
@@ -120,23 +123,26 @@ export const flow: Flow = assign(
                 onFulfilled(undefined) // kick off the process
             }) as any
 
-            promise.cancel = action(`${name} - runid: ${runId} - cancel`, function () {
-                try {
-                    if (pendingPromise) {
-                        cancelPromise(pendingPromise)
+            promise.cancel = action(
+                __DEV__ ? `${name} - runid: ${runId} - cancel` : name,
+                function () {
+                    try {
+                        if (pendingPromise) {
+                            cancelPromise(pendingPromise)
+                        }
+                        // Finally block can return (or yield) stuff..
+                        const res = gen.return!(undefined as any)
+                        // eat anything that promise would do, it's cancelled!
+                        const yieldedPromise = Promise.resolve(res.value)
+                        yieldedPromise.then(noop, noop)
+                        cancelPromise(yieldedPromise) // maybe it can be cancelled :)
+                        // reject our original promise
+                        rejector(new FlowCancellationError())
+                    } catch (e) {
+                        rejector(e) // there could be a throwing finally block
                     }
-                    // Finally block can return (or yield) stuff..
-                    const res = gen.return!(undefined as any)
-                    // eat anything that promise would do, it's cancelled!
-                    const yieldedPromise = Promise.resolve(res.value)
-                    yieldedPromise.then(noop, noop)
-                    cancelPromise(yieldedPromise) // maybe it can be cancelled :)
-                    // reject our original promise
-                    rejector(new FlowCancellationError())
-                } catch (e) {
-                    rejector(e) // there could be a throwing finally block
                 }
-            })
+            )
             return promise
         }
         res.isMobXFlow = true
