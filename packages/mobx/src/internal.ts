@@ -6,7 +6,7 @@ With this file that will still happen,
 but at least in this file we can magically reorder the imports with trial and error until the build succeeds again.
 */
 export * from "./utils/global"
-export * from "./errors"
+export { die } from "./errors"
 export * from "./utils/utils"
 export * from "./api/decorators"
 export * from "./core/atom"
