@@ -1,7 +1,9 @@
 {
   "scripts": {
     "examples": "docusaurus-examples",
+    "prestart": "node scripts/generate-error-docs.mjs",
     "start": "docusaurus-start",
+    "prebuild": "node scripts/generate-error-docs.mjs",
     "build": "docusaurus-build",
     "publish-gh-pages": "docusaurus-publish",
     "write-translations": "docusaurus-write-translations",

@@ -87,7 +87,7 @@ export function die(error: string | keyof typeof errors, ...args: any[]): never 
         typeof error === "number"
             ? `[MobX] minified error nr: ${error}${
                   args.length ? " " + args.map(String).join(",") : ""
-              }. Find the full error at: https://github.com/mobxjs/mobx/blob/main/packages/mobx/src/errors.ts`
+              }. See http://mobx.js.org/errors`
             : `[MobX] ${error}`
     )
 }
