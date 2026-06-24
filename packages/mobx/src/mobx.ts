@@ -43,7 +43,6 @@ export {
     compareIdentity,
     compareStructural,
     compareShallow,
-    referenceEnhancer as _referenceEnhancer,
     IEnhancer,
     IInterceptable,
     IInterceptor,

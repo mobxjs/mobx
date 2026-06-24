@@ -73,7 +73,6 @@ test("correct api should be exposed", function () {
             "reaction",
             "remove",
             "_resetGlobalState",
-            "_referenceEnhancer",
             "runInAction",
             "set",
             "spy",

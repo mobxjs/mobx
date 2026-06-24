@@ -96,7 +96,7 @@ export function _startAction(
 ): IActionRunInfo {
     const notifySpy_ = __DEV__ && isSpyEnabled() && !!actionName
     let startTime_: number = 0
-    if (__DEV__ && notifySpy_) {
+    if (notifySpy_) {
         startTime_ = Date.now()
         const flattenedArgs = args ? Array.from(args) : EMPTY_ARRAY
         spyReportStart({
