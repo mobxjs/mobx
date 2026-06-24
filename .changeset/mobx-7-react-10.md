@@ -18,7 +18,7 @@ MobX 7 is a cleanup release focused on the modern runtime and decorator model.
 -   `configure({ useProxies: ... })` is no longer supported.
 -   `{ proxy: false }` options for `observable`, `observable.object`, and `observable.array` are no longer supported.
 -   Legacy decorators are no longer supported.
--   Namespaced annotation and comparer properties now use named exports:
+-   Namespaced annotation and comparer properties now use named exports to reduce bundle size:
 
 | Removed API           | Replacement         |
 | --------------------- | ------------------- |
