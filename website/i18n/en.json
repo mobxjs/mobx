@@ -64,6 +64,10 @@
         "title": "Decorators",
         "sidebar_label": "Decorators {🚀}"
       },
+      "errors": {
+        "title": "MobX error codes",
+        "sidebar_label": "Error codes"
+      },
       "faq/migrate-to-6": {
         "title": "Migrating from MobX 4/5"
       },
