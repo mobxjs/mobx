@@ -1,4 +1,4 @@
-const niceErrors = {
+export const niceErrors = {
     0: `Invalid value for configuration 'enforceActions', expected 'never', 'always' or 'observed'`,
     1(annotationType, key: PropertyKey) {
         return `Cannot apply '${annotationType}' to '${key.toString()}': Field not found.`

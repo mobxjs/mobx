@@ -1,24 +1,14 @@
 #!/usr/bin/env node
 
-import { readFileSync, writeFileSync } from "node:fs"
-import { relative } from "node:path"
-import { fileURLToPath } from "node:url"
+const { writeFileSync } = require("fs")
+const { relative, resolve } = require("path")
 
-const repoRoot = fileURLToPath(new URL("../..", import.meta.url))
-const errorsPath = fileURLToPath(new URL("../../packages/mobx/src/errors.ts", import.meta.url))
-const outputPath = fileURLToPath(new URL("../../docs/errors.md", import.meta.url))
+const repoRoot = resolve(__dirname, "../..")
+const errorsPath = resolve(repoRoot, "packages/mobx/src/errors.ts")
+const outputPath = resolve(repoRoot, "docs/errors.md")
 
-function readNiceErrors() {
-    const source = readFileSync(errorsPath, "utf8")
-    const match = source.match(/const niceErrors = ([\s\S]*?) as const/)
-
-    if (!match) {
-        throw new Error(`Could not find niceErrors in ${errorsPath}`)
-    }
-
-    const objectLiteral = match[1].replace(": PropertyKey", "")
-    return eval(`(${objectLiteral})`)
-}
+globalThis.__DEV__ = true
+const { niceErrors } = require(errorsPath)
 
 function getParamNames(fn) {
     const match = fn.toString().match(/^[^(]*\(([^)]*)\)/)
@@ -63,7 +53,7 @@ ${rows}
 `
 }
 
-const docs = renderDocs(readNiceErrors())
+const docs = renderDocs(niceErrors)
 writeFileSync(outputPath, docs)
 
 console.log(`Generated ${relative(repoRoot, outputPath)} from ${relative(repoRoot, errorsPath)}`)
