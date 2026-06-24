@@ -131,14 +131,14 @@ Annotation map:
 
  makeObservable(this, {
 -    value: observable.ref,
--    total: computed.struct,
--    rounded: computed({ equals: comparer.structural }),
--    save: action.bound,
--    load: flow.bound
 +    value: observableRef,
+-    total: computed.struct,
 +    total: computedStruct,
+-    rounded: computed({ equals: comparer.structural }),
 +    rounded: computed({ equals: compareStructural }),
+-    save: action.bound,
 +    save: actionBound,
+-    load: flow.bound
 +    load: flowBound
  })
 ```

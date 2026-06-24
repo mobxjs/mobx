@@ -18,6 +18,22 @@ MobX 7 is a cleanup release focused on the modern runtime and decorator model.
 -   `configure({ useProxies: ... })` is no longer supported.
 -   `{ proxy: false }` options for `observable`, `observable.object`, and `observable.array` are no longer supported.
 -   Legacy decorators are no longer supported.
+-   Namespaced annotation and comparer properties now use named exports:
+
+| Removed API           | Replacement         |
+| --------------------- | ------------------- |
+| `observable.ref`      | `observableRef`     |
+| `observable.shallow`  | `observableShallow` |
+| `observable.deep`     | `observableDeep`    |
+| `observable.struct`   | `observableStruct`  |
+| `computed.struct`     | `computedStruct`    |
+| `action.bound`        | `actionBound`       |
+| `flow.bound`          | `flowBound`         |
+| `comparer.identity`   | `compareIdentity`   |
+| `comparer.default`    | `compareDefault`    |
+| `comparer.structural` | `compareStructural` |
+| `comparer.shallow`    | `compareShallow`    |
+
 -   The public `trace` API and its related runtime support have been removed. Use `toJS`, `getDependencyTree`, `getObserverTree`, `spy` or `mobx-log` package for debugging.
 
 ## mobx-react-lite 5 and mobx-react 10
