@@ -43,7 +43,7 @@ custom_edit_url: https://github.com/mobxjs/mobx/edit/main/packages/mobx/src/erro
 
 # MobX error codes
 
-In development builds, MobX throws full error messages. Production builds replace known messages with short numeric codes to keep the published bundle small.
+In development builds, MobX throws full error messages. Production builds replace known messages with short numeric codes to keep the published bundle smaller.
 
 | Code | Message |
 | ---- | ------- |
