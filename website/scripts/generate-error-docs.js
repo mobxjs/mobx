@@ -10,28 +10,26 @@ const outputPath = resolve(repoRoot, "docs/errors.md")
 globalThis.__DEV__ = true
 const { niceErrors } = require(errorsPath)
 
-function getParamNames(fn) {
-    const match = fn.toString().match(/^[^(]*\(([^)]*)\)/)
-    return match ? match[1].split(",").map(name => name.trim()).filter(Boolean) : []
-}
+function formatMarkdownCell(message) {
+    let value = message
 
-function renderMessage(message) {
-    if (typeof message !== "function") {
-        return message
+    if (typeof message === "function") {
+        // Render dynamic errors with visible placeholders instead of real runtime values
+        const match = message.toString().match(/^[^(]*\(([^)]*)\)/)
+        const params = match ? match[1] : ""
+        const names = params.split(",").map(name => name.trim()).filter(Boolean)
+        const args = names.map(name => `{${name}}`)
+        value = message(...args).replace("String", args[0])
     }
 
-    const args = getParamNames(message).map(name => `{${name}}`)
-    return message(...args).replace("String", args[0])
-}
-
-function escapeMarkdownTableCell(value) {
+    // Keep the generated table valid Markdown
     return String(value).replace(/\r?\n/g, "<br />").replace(/\|/g, "\\|")
 }
 
 function renderDocs(errors) {
     const rows = Object.keys(errors)
         .sort((left, right) => Number(left) - Number(right))
-        .map(code => `| ${code} | ${escapeMarkdownTableCell(renderMessage(errors[code]))} |`)
+        .map(code => `| ${code} | ${formatMarkdownCell(errors[code])} |`)
         .join("\n")
 
     return `---
