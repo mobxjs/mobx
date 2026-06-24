@@ -123,26 +123,24 @@ export const flow: Flow = assign(
                 onFulfilled(undefined) // kick off the process
             }) as any
 
-            promise.cancel = action(
-                __DEV__ ? `${name} - runid: ${runId} - cancel` : name,
-                function () {
-                    try {
-                        if (pendingPromise) {
-                            cancelPromise(pendingPromise)
-                        }
-                        // Finally block can return (or yield) stuff..
-                        const res = gen.return!(undefined as any)
-                        // eat anything that promise would do, it's cancelled!
-                        const yieldedPromise = Promise.resolve(res.value)
-                        yieldedPromise.then(noop, noop)
-                        cancelPromise(yieldedPromise) // maybe it can be cancelled :)
-                        // reject our original promise
-                        rejector(new FlowCancellationError())
-                    } catch (e) {
-                        rejector(e) // there could be a throwing finally block
+            const cancelActionName = __DEV__ ? `${name} - runid: ${runId} - cancel` : name
+            promise.cancel = action(cancelActionName, function () {
+                try {
+                    if (pendingPromise) {
+                        cancelPromise(pendingPromise)
                     }
+                    // Finally block can return (or yield) stuff..
+                    const res = gen.return!(undefined as any)
+                    // eat anything that promise would do, it's cancelled!
+                    const yieldedPromise = Promise.resolve(res.value)
+                    yieldedPromise.then(noop, noop)
+                    cancelPromise(yieldedPromise) // maybe it can be cancelled :)
+                    // reject our original promise
+                    rejector(new FlowCancellationError())
+                } catch (e) {
+                    rejector(e) // there could be a throwing finally block
                 }
-            )
+            })
             return promise
         }
         res.isMobXFlow = true
