@@ -16,6 +16,7 @@ permissions:
 jobs:
   release:
     name: Release
+    if: github.repository == 'mobxjs/mobx'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
