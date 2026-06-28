@@ -23,17 +23,18 @@ const ReactMemoSymbol = hasSymbol
  * @deprecated Observer options will be removed in the next major version of mobx-react-lite.
  * Look at the individual properties for alternatives.
  */
-export interface IObserverOptions {
+export interface IObserverOptions<P extends object = object> {
     /**
      * @deprecated Pass a `React.forwardRef` component to observer instead of using the options object
      * e.g. `observer(React.forwardRef(fn))`
      */
     readonly forwardRef?: boolean
+    propsAreEqual?: (prevProps: Readonly<P>, nextProps: Readonly<P>) => boolean
 }
 
 export function observer<P extends object, TRef = {}>(
     baseComponent: React.ForwardRefRenderFunction<TRef, P>,
-    options: IObserverOptions & {
+    options: IObserverOptions<P> & {
         /**
          * @deprecated Pass a `React.forwardRef` component to observer instead of using the options object
          * e.g. `observer(React.forwardRef(fn))`
@@ -46,7 +47,7 @@ export function observer<P extends object, TRef = {}>(
 
 export function observer<P extends object>(
     baseComponent: React.FunctionComponent<P>,
-    options?: IObserverOptions
+    options?: IObserverOptions<P>
 ): React.FunctionComponent<P>
 
 export function observer<P extends object, TRef = {}>(
@@ -58,7 +59,7 @@ export function observer<P extends object, TRef = {}>(
 >
 export function observer<
     C extends React.FunctionComponent<any> | React.ForwardRefRenderFunction<any>,
-    Options extends IObserverOptions
+    Options extends IObserverOptions<React.ComponentProps<C>>
 >(
     baseComponent: C,
     options?: Options
@@ -80,7 +81,7 @@ export function observer<P extends object, TRef = {}>(
         | React.FunctionComponent<P>
         | React.ForwardRefExoticComponent<React.PropsWithoutRef<P> & React.RefAttributes<TRef>>,
     // TODO remove in next major
-    options?: IObserverOptions
+    options?: IObserverOptions<P>
 ) {
     if (process.env.NODE_ENV !== "production" && warnObserverOptionsDeprecated && options) {
         warnObserverOptionsDeprecated = false
@@ -156,7 +157,7 @@ export function observer<P extends object, TRef = {}>(
     // memo; we are not interested in deep updates
     // in props; we assume that if deep objects are changed,
     // this is in observables, which would have been tracked anyway
-    observerComponent = memo(observerComponent)
+    observerComponent = memo(observerComponent, options?.propsAreEqual)
 
     copyStaticProperties(baseComponent, observerComponent)
 
