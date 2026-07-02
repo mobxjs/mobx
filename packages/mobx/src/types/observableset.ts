@@ -55,16 +55,14 @@ export type ISetWillDeleteChange<T = any> = {
     type: "delete"
     object: ObservableSet<T>
     oldValue: T
-};
+}
 export type ISetWillAddChange<T = any> = {
     type: "add"
     object: ObservableSet<T>
     newValue: T
-};
+}
 
-export type ISetWillChange<T = any> =
-    | ISetWillDeleteChange<T>
-    | ISetWillAddChange<T>
+export type ISetWillChange<T = any> = ISetWillDeleteChange<T> | ISetWillAddChange<T>
 
 export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillChange>, IListenable {
     [$mobx] = ObservableSetMarker
@@ -133,8 +131,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
             }
 
             // implemented reassignment same as it's done for ObservableMap
-            value = change.newValue!;
-
+            value = change.newValue!
         }
         if (!this.has(value)) {
             transaction(() => {
@@ -244,21 +241,11 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
     }
 
     intersection<U>(otherSet: ReadonlySetLike<U> | Set<U>): Set<T & U> {
-        if (isES6Set(otherSet) && !isObservableSet(otherSet)) {
-            return otherSet.intersection(this)
-        } else {
-            const dehancedSet = new Set(this)
-            return dehancedSet.intersection(otherSet)
-        }
+        return new Set(this).intersection(otherSet)
     }
 
     union<U>(otherSet: ReadonlySetLike<U> | Set<U>): Set<T | U> {
-        if (isES6Set(otherSet) && !isObservableSet(otherSet)) {
-            return otherSet.union(this)
-        } else {
-            const dehancedSet = new Set(this)
-            return dehancedSet.union(otherSet)
-        }
+        return new Set(this).union(otherSet)
     }
 
     difference<U>(otherSet: ReadonlySetLike<U>): Set<T> {
@@ -266,12 +253,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
     }
 
     symmetricDifference<U>(otherSet: ReadonlySetLike<U> | Set<U>): Set<T | U> {
-        if (isES6Set(otherSet) && !isObservableSet(otherSet)) {
-            return otherSet.symmetricDifference(this)
-        } else {
-            const dehancedSet = new Set(this)
-            return dehancedSet.symmetricDifference(otherSet)
-        }
+        return new Set(this).symmetricDifference(otherSet)
     }
 
     isSubsetOf(otherSet: ReadonlySetLike<unknown>): boolean {
@@ -283,12 +265,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
     }
 
     isDisjointFrom(otherSet: ReadonlySetLike<unknown> | Set<unknown>): boolean {
-        if (isES6Set(otherSet) && !isObservableSet(otherSet)) {
-            return otherSet.isDisjointFrom(this)
-        } else {
-            const dehancedSet = new Set(this)
-            return dehancedSet.isDisjointFrom(otherSet)
-        }
+        return new Set(this).isDisjointFrom(otherSet)
     }
 
     replace(other: ObservableSet<T> | IObservableSetInitialValues<T>): ObservableSet<T> {

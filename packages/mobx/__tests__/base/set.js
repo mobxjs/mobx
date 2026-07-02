@@ -339,6 +339,17 @@ describe("The Set object methods do what they are supposed to do", () => {
         expect(isDisjointFromObservableResult).toBeTruthy()
     })
 
+    test("set methods preserve receiver order (matches native Set)", () => {
+        const nativeCopy = new Set(reactiveSet)
+        const other = new Set([6, 2, 1])
+
+        expect([...reactiveSet.union(other)]).toEqual([...nativeCopy.union(other)])
+        expect([...reactiveSet.intersection(other)]).toEqual([...nativeCopy.intersection(other)])
+        expect([...reactiveSet.symmetricDifference(other)]).toEqual([
+            ...nativeCopy.symmetricDifference(other)
+        ])
+    })
+
     test("with ObservableSet #3919", () => {
         const intersectionObservableResult = reactiveSet.intersection(set([1, 2, 6]))
         const unionObservableResult = reactiveSet.union(set([1, 2, 6]))
