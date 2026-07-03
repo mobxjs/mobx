@@ -22,6 +22,11 @@ export interface IEnhancer<T> {
 }
 
 export function deepEnhancer(v, _, name) {
+    // primitives can never be made observable; skip the type checks below
+    if (v === null || (typeof v !== "object" && typeof v !== "function")) {
+        return v
+    }
+
     // it is an observable already, done
     if (isObservable(v)) {
         return v
