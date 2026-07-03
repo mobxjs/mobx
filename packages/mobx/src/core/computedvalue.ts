@@ -81,7 +81,8 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     dependenciesState_ = IDerivationState_.NOT_TRACKING_
     observing_: IObservable[] = [] // nodes we are looking at. Our value depends on these nodes
     newObserving_ = null // during tracking it's an array with new observed observers
-    observers_ = new Set<IDerivation>()
+    // Lazily allocated on first observer - see Atom.observers_.
+    observers_: Set<IDerivation> | null = null
     runId_ = 0
     lastAccessedBy_ = 0
     lowestObserverState_ = IDerivationState_.UP_TO_DATE_
@@ -209,7 +210,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         if (
             globalState.inBatch === 0 &&
             // !globalState.trackingDerivatpion &&
-            this.observers_.size === 0 &&
+            (!this.observers_ || this.observers_.size === 0) &&
             !this.keepAlive_
         ) {
             if (shouldCompute(this)) {

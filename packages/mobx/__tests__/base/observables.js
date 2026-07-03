@@ -1030,7 +1030,7 @@ test("prematurely end autorun", function () {
             x.get()
         })
 
-        expect(x.observers_.size).toBe(0)
+        expect(x.observers_?.size ?? 0).toBe(0)
         expect(dis1[$mobx].observing_.length).toBe(0)
         expect(dis2[$mobx].observing_.length).toBe(0)
 
@@ -1281,7 +1281,7 @@ test("prematurely ended autoruns are cleaned up properly", () => {
 
     expect(called).toBe(1)
     expect(a.observers_.size).toBe(1)
-    expect(b.observers_.size).toBe(0)
+    expect(b.observers_?.size ?? 0).toBe(0)
     expect(c.observers_.size).toBe(1)
     expect(d[$mobx].observing_.length).toBe(2)
 
@@ -1289,7 +1289,7 @@ test("prematurely ended autoruns are cleaned up properly", () => {
 
     expect(called).toBe(2)
     expect(a.observers_.size).toBe(0)
-    expect(b.observers_.size).toBe(0)
+    expect(b.observers_?.size ?? 0).toBe(0)
     expect(c.observers_.size).toBe(0)
     expect(d[$mobx].observing_.length).toBe(0)
 })

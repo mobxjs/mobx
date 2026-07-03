@@ -484,7 +484,7 @@ test("peeking inside erroring computed value doesn't bork (global) state", () =>
     }).toThrow(/chocolademelk/)
 
     expect(a.isPendingUnobservation).toBe(false)
-    expect(a.observers_.size).toBe(0)
+    expect(a.observers_?.size ?? 0).toBe(0)
     expect(a.diffValue).toBe(0)
     expect(a.lowestObserverState_).toBe(-1)
     expect(a.hasUnreportedChange_).toBe(false)
@@ -494,7 +494,7 @@ test("peeking inside erroring computed value doesn't bork (global) state", () =>
     expect(b.observing_.length).toBe(0)
     expect(b.newObserving_).toBe(null)
     expect(b.isPendingUnobservation).toBe(false)
-    expect(b.observers_.size).toBe(0)
+    expect(b.observers_?.size ?? 0).toBe(0)
     expect(b.diffValue).toBe(0)
     expect(b.lowestObserverState_).toBe(0)
     expect(b.unboundDepsCount_).toBe(0)
