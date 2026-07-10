@@ -12,7 +12,6 @@ import {
     IEnhancer,
     IInterceptable,
     IListenable,
-    Lambda,
     ObservableValue,
     addHiddenProp,
     createInstanceofPredicate,
@@ -26,8 +25,6 @@ import {
     isSpyEnabled,
     notifyListeners,
     referenceEnhancer,
-    registerInterceptor,
-    registerListener,
     spyReportEnd,
     spyReportStart,
     startBatch,
@@ -44,8 +41,6 @@ import {
     autoAnnotation,
     getAdministration,
     getDebugName,
-    objectPrototype,
-    MakeResult,
     checkIfStateModificationsAreAllowed,
     assign
 } from "../internal"
@@ -272,38 +267,6 @@ export class ObservableObjectAdministration
             this.pendingKeys_.set(key, entry)
         }
         return entry.get()
-    }
-
-    /**
-     * @param {PropertyKey} key
-     * @param {Annotation|boolean} annotation true - use default annotation, false - ignore prop
-     */
-    make_(key: PropertyKey, annotation: Annotation | boolean): void {
-        if (annotation === true) {
-            annotation = this.defaultAnnotation_
-        }
-        if (annotation === false) {
-            return
-        }
-        assertAnnotable(this, annotation, key)
-        if (!(key in this.target_)) {
-            die(1, annotation.annotationType_, `${this.name_}.${key.toString()}`)
-        }
-        let source = this.target_
-        while (source && source !== objectPrototype) {
-            const descriptor = getDescriptor(source, key)
-            if (descriptor) {
-                const outcome = annotation.make_(this, key, descriptor, source)
-                if (outcome === MakeResult.Cancel) {
-                    return
-                }
-                if (outcome === MakeResult.Break) {
-                    break
-                }
-            }
-            source = Object.getPrototypeOf(source)
-        }
-        recordAnnotationApplied(this, annotation, key)
     }
 
     /**
@@ -608,22 +571,6 @@ export class ObservableObjectAdministration
         return true
     }
 
-    /**
-     * Observes this object. Triggers for the events 'add', 'update' and 'delete'.
-     * See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe
-     * for callback details
-     */
-    observe_(callback: (changes: IObjectDidChange) => void, fireImmediately?: boolean): Lambda {
-        if (__DEV__ && fireImmediately === true) {
-            die("`observe` doesn't support the fire immediately property for observable objects.")
-        }
-        return registerListener(this, callback)
-    }
-
-    intercept_(handler): Lambda {
-        return registerInterceptor(this, handler)
-    }
-
     notifyPropertyAddition_(key: PropertyKey, value: any) {
         const notify = hasListeners(this)
         const notifySpy = __DEV__ && isSpyEnabled()
@@ -757,7 +704,7 @@ export function recordAnnotationApplied(
     }
 }
 
-function assertAnnotable(
+export function assertAnnotable(
     adm: ObservableObjectAdministration,
     annotation: Annotation,
     key: PropertyKey

@@ -3,9 +3,7 @@ import {
     IEnhancer,
     IInterceptable,
     IEqualsComparer,
-    IInterceptor,
     IListenable,
-    Lambda,
     checkIfStateModificationsAreAllowed,
     compareDefault,
     createInstanceofPredicate,
@@ -15,8 +13,6 @@ import {
     interceptChange,
     isSpyEnabled,
     notifyListeners,
-    registerInterceptor,
-    registerListener,
     spyReport,
     spyReportEnd,
     spyReportStart,
@@ -152,24 +148,6 @@ export class ObservableValue<T>
     public get(): T {
         this.reportObserved()
         return this.dehanceValue(this.value_)
-    }
-
-    intercept_(handler: IInterceptor<IValueWillChange<T>>): Lambda {
-        return registerInterceptor(this, handler)
-    }
-
-    observe_(listener: (change: IValueDidChange<T>) => void, fireImmediately?: boolean): Lambda {
-        if (fireImmediately) {
-            listener({
-                observableKind: "value",
-                debugObjectName: this.name_,
-                object: this,
-                type: UPDATE,
-                newValue: this.value_,
-                oldValue: undefined
-            })
-        }
-        return registerListener(this, listener)
     }
 
     raw() {

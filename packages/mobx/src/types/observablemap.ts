@@ -2,9 +2,7 @@ import {
     $mobx,
     IEnhancer,
     IInterceptable,
-    IInterceptor,
     IListenable,
-    Lambda,
     ObservableValue,
     checkIfStateModificationsAreAllowed,
     createAtom,
@@ -22,14 +20,11 @@ import {
     isSpyEnabled,
     notifyListeners,
     referenceEnhancer,
-    registerInterceptor,
-    registerListener,
     spyReportEnd,
     spyReportStart,
     stringifyKey,
     transaction,
     untracked,
-    onBecomeUnobserved,
     globalState,
     die,
     UPDATE,
@@ -133,7 +128,7 @@ export class ObservableMap<K = any, V = any>
                 false
             ))
             this.hasMap_.set(key, newEntry)
-            onBecomeUnobserved(newEntry, () => this.hasMap_.delete(key))
+            newEntry.onBUOL = new Set([() => this.hasMap_.delete(key)])
         }
 
         return entry.get()
@@ -476,22 +471,6 @@ export class ObservableMap<K = any, V = any>
 
     get [Symbol.toStringTag]() {
         return "Map"
-    }
-
-    /**
-     * Observes this object. Triggers for the events 'add', 'update' and 'delete'.
-     * See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe
-     * for callback details
-     */
-    observe_(listener: (changes: IMapDidChange<K, V>) => void, fireImmediately?: boolean): Lambda {
-        if (__DEV__ && fireImmediately === true) {
-            die("`observe` doesn't support fireImmediately=true in combination with maps.")
-        }
-        return registerListener(this, listener)
-    }
-
-    intercept_(handler: IInterceptor<IMapWillChange<K, V>>): Lambda {
-        return registerInterceptor(this, handler)
     }
 }
 

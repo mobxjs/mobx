@@ -112,9 +112,14 @@ export function _startAction(
     let prevAllowStateChanges_ = globalState.allowStateChanges // by default preserve previous allow
     if (runAsAction) {
         untrackedStart()
-        prevAllowStateChanges_ = allowStateChangesStart(true)
+        if (__DEV__) {
+            prevAllowStateChanges_ = allowStateChangesStart(true)
+        }
     }
-    const prevAllowStateReads_ = allowStateReadsStart(true)
+    const prevAllowStateReads_ = globalState.allowStateReads
+    if (__DEV__) {
+        allowStateReadsStart(true)
+    }
     const runInfo = {
         runAsAction_: runAsAction,
         prevDerivation_,
@@ -138,8 +143,10 @@ export function _endAction(runInfo: IActionRunInfo) {
     if (runInfo.error_ !== undefined) {
         globalState.suppressReactionErrors = true
     }
-    allowStateChangesEnd(runInfo.prevAllowStateChanges_)
-    allowStateReadsEnd(runInfo.prevAllowStateReads_)
+    if (__DEV__) {
+        allowStateChangesEnd(runInfo.prevAllowStateChanges_)
+        allowStateReadsEnd(runInfo.prevAllowStateReads_)
+    }
     endBatch()
     if (runInfo.runAsAction_) {
         untrackedEnd(runInfo.prevDerivation_)

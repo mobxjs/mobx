@@ -96,7 +96,7 @@ const measureMinimalExample = async () => {
     const { rollup } = require("rollup")
     const nodeResolve = require("@rollup/plugin-node-resolve")
     const replace = require("@rollup/plugin-replace")
-    const { terser } = require("rollup-plugin-terser")
+    const terser = require("@rollup/plugin-terser")
     const input = path.join(__dirname, "minimal-example.js")
     const resolve = nodeResolve.default || nodeResolve.nodeResolve || nodeResolve
 

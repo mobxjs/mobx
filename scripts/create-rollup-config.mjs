@@ -4,10 +4,10 @@ import commonjs from "@rollup/plugin-commonjs"
 import json from "@rollup/plugin-json"
 import { DEFAULTS as nodeResolveDefaults, nodeResolve } from "@rollup/plugin-node-resolve"
 import replace from "@rollup/plugin-replace"
+import terser from "@rollup/plugin-terser"
 import fs from "fs-extra"
 import path from "node:path"
 import sourcemaps from "rollup-plugin-sourcemaps"
-import { terser } from "rollup-plugin-terser"
 import typescript from "typescript"
 import typescript2 from "rollup-plugin-typescript2"
 
@@ -32,7 +32,6 @@ const tsconfigDefaults = {
 }
 
 const defaultTerserOptions = format => ({
-    sourcemap: true,
     output: { comments: false },
     compress: {
         keep_infinity: true,
@@ -40,12 +39,10 @@ const defaultTerserOptions = format => ({
         passes: 10
     },
     ecma: 5,
-    toplevel: format === "cjs",
-    warnings: true
+    toplevel: format === "cjs"
 })
 
 const privatePropertyTerserOptions = {
-    sourcemap: true,
     module: true,
     compress: {
         hoist_funs: true,

@@ -5,9 +5,7 @@ import {
     IAtom,
     IEnhancer,
     IInterceptable,
-    IInterceptor,
     IListenable,
-    Lambda,
     addHiddenFinalProp,
     checkIfStateModificationsAreAllowed,
     createInstanceofPredicate,
@@ -18,8 +16,6 @@ import {
     isObject,
     isSpyEnabled,
     notifyListeners,
-    registerInterceptor,
-    registerListener,
     spyReportEnd,
     spyReportStart,
     hasProp,
@@ -147,30 +143,6 @@ export class ObservableArrayAdministration
             return values.map(this.dehancer) as any
         }
         return values
-    }
-
-    intercept_(handler: IInterceptor<IArrayWillChange<any> | IArrayWillSplice<any>>): Lambda {
-        return registerInterceptor<IArrayWillChange<any> | IArrayWillSplice<any>>(this, handler)
-    }
-
-    observe_(
-        listener: (changeData: IArrayDidChange<any>) => void,
-        fireImmediately = false
-    ): Lambda {
-        if (fireImmediately) {
-            listener(<IArraySplice<any>>{
-                observableKind: "array",
-                object: this.proxy_ as any,
-                debugObjectName: this.atom_.name_,
-                type: "splice",
-                index: 0,
-                added: this.values_.slice(),
-                addedCount: this.values_.length,
-                removed: [],
-                removedCount: 0
-            })
-        }
-        return registerListener(this, listener)
     }
 
     getArrayLength_(): number {

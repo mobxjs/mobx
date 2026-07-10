@@ -8,7 +8,7 @@ import {
     removeObserver
 } from "../internal"
 
-export enum IDerivationState_ {
+export const enum IDerivationState_ {
     // before being run or (outside batch and not being observed)
     // at this point derivation is not holding any data about dependency tree
     NOT_TRACKING_ = -1,
@@ -83,7 +83,7 @@ export function shouldCompute(derivation: IDerivation): boolean {
             return true
         case IDerivationState_.POSSIBLY_STALE_: {
             // state propagation can occur outside of action/reactive context #2195
-            const prevAllowStateReads = allowStateReadsStart(true)
+            const prevAllowStateReads = __DEV__ ? allowStateReadsStart(true) : true
             const prevUntracked = untrackedStart() // no need for those computeds to be reported, they will be picked up in trackDerivedFunction.
             const obs = derivation.observing_,
                 l = obs.length
@@ -98,7 +98,9 @@ export function shouldCompute(derivation: IDerivation): boolean {
                         } catch (e) {
                             // we are not interested in the value *or* exception at this moment, but if there is one, notify all
                             untrackedEnd(prevUntracked)
-                            allowStateReadsEnd(prevAllowStateReads)
+                            if (__DEV__) {
+                                allowStateReadsEnd(prevAllowStateReads)
+                            }
                             return true
                         }
                     }
@@ -107,14 +109,18 @@ export function shouldCompute(derivation: IDerivation): boolean {
                     // invariantShouldCompute(derivation)
                     if ((derivation.dependenciesState_ as any) === IDerivationState_.STALE_) {
                         untrackedEnd(prevUntracked)
-                        allowStateReadsEnd(prevAllowStateReads)
+                        if (__DEV__) {
+                            allowStateReadsEnd(prevAllowStateReads)
+                        }
                         return true
                     }
                 }
             }
             changeDependenciesStateTo0(derivation)
             untrackedEnd(prevUntracked)
-            allowStateReadsEnd(prevAllowStateReads)
+            if (__DEV__) {
+                allowStateReadsEnd(prevAllowStateReads)
+            }
             return false
         }
     }
@@ -158,7 +164,7 @@ export function checkIfStateReadsAreAllowed(observable: IObservable) {
  * as observer of any of the accessed observables.
  */
 export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T, context: any) {
-    const prevAllowStateReads = allowStateReadsStart(true)
+    const prevAllowStateReads = __DEV__ ? allowStateReadsStart(true) : true
     changeDependenciesStateTo0(derivation)
     // Preallocate array; will be trimmed by bindDependencies.
     derivation.newObserving_ = new Array(
@@ -186,7 +192,9 @@ export function trackDerivedFunction<T>(derivation: IDerivation, f: () => T, con
     bindDependencies(derivation)
 
     warnAboutDerivationWithoutDependencies(derivation)
-    allowStateReadsEnd(prevAllowStateReads)
+    if (__DEV__) {
+        allowStateReadsEnd(prevAllowStateReads)
+    }
     return result
 }
 

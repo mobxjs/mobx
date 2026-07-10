@@ -50,6 +50,14 @@ export interface IReactionDisposer {
     [$mobx]: Reaction
 }
 
+const enum ReactionFlags {
+    isDisposed = 0b00001,
+    isScheduled = 0b00010,
+    isTrackPending = 0b00100,
+    isRunning = 0b01000,
+    diffValue = 0b10000
+}
+
 export class Reaction implements IDerivation, IReactionPublic {
     observing_: IObservable[] = [] // nodes we are looking at. Our value depends on these nodes
     newObserving_: IObservable[] = []
@@ -57,11 +65,6 @@ export class Reaction implements IDerivation, IReactionPublic {
     runId_ = 0
     unboundDepsCount_ = 0
 
-    private static readonly isDisposedMask_ = 0b00001
-    private static readonly isScheduledMask_ = 0b00010
-    private static readonly isTrackPendingMask_ = 0b00100
-    private static readonly isRunningMask_ = 0b01000
-    private static readonly diffValueMask_ = 0b10000
     private flags_ = 0b00000
 
     constructor(
@@ -72,38 +75,38 @@ export class Reaction implements IDerivation, IReactionPublic {
     ) {}
 
     get isDisposed() {
-        return getFlag(this.flags_, Reaction.isDisposedMask_)
+        return getFlag(this.flags_, ReactionFlags.isDisposed)
     }
     set isDisposed(newValue: boolean) {
-        this.flags_ = setFlag(this.flags_, Reaction.isDisposedMask_, newValue)
+        this.flags_ = setFlag(this.flags_, ReactionFlags.isDisposed, newValue)
     }
 
     get isScheduled() {
-        return getFlag(this.flags_, Reaction.isScheduledMask_)
+        return getFlag(this.flags_, ReactionFlags.isScheduled)
     }
     set isScheduled(newValue: boolean) {
-        this.flags_ = setFlag(this.flags_, Reaction.isScheduledMask_, newValue)
+        this.flags_ = setFlag(this.flags_, ReactionFlags.isScheduled, newValue)
     }
 
     get isTrackPending() {
-        return getFlag(this.flags_, Reaction.isTrackPendingMask_)
+        return getFlag(this.flags_, ReactionFlags.isTrackPending)
     }
     set isTrackPending(newValue: boolean) {
-        this.flags_ = setFlag(this.flags_, Reaction.isTrackPendingMask_, newValue)
+        this.flags_ = setFlag(this.flags_, ReactionFlags.isTrackPending, newValue)
     }
 
     get isRunning() {
-        return getFlag(this.flags_, Reaction.isRunningMask_)
+        return getFlag(this.flags_, ReactionFlags.isRunning)
     }
     set isRunning(newValue: boolean) {
-        this.flags_ = setFlag(this.flags_, Reaction.isRunningMask_, newValue)
+        this.flags_ = setFlag(this.flags_, ReactionFlags.isRunning, newValue)
     }
 
     get diffValue(): 0 | 1 {
-        return getFlag(this.flags_, Reaction.diffValueMask_) ? 1 : 0
+        return getFlag(this.flags_, ReactionFlags.diffValue) ? 1 : 0
     }
     set diffValue(newValue: 0 | 1) {
-        this.flags_ = setFlag(this.flags_, Reaction.diffValueMask_, newValue === 1 ? true : false)
+        this.flags_ = setFlag(this.flags_, ReactionFlags.diffValue, newValue === 1 ? true : false)
     }
 
     onBecomeStale_() {

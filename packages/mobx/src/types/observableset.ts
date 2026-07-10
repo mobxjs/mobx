@@ -7,8 +7,6 @@ import {
     isSpyEnabled,
     hasListeners,
     IListenable,
-    registerListener,
-    Lambda,
     spyReportStart,
     notifyListeners,
     spyReportEnd,
@@ -17,8 +15,6 @@ import {
     hasInterceptors,
     interceptChange,
     IInterceptable,
-    IInterceptor,
-    registerInterceptor,
     checkIfStateModificationsAreAllowed,
     untracked,
     transaction,
@@ -303,18 +299,6 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
 
         return this
     }
-    observe_(listener: (changes: ISetDidChange<T>) => void, fireImmediately?: boolean): Lambda {
-        // ... 'fireImmediately' could also be true?
-        if (__DEV__ && fireImmediately === true) {
-            die("`observe` doesn't support fireImmediately=true in combination with sets.")
-        }
-        return registerListener(this, listener)
-    }
-
-    intercept_(handler: IInterceptor<ISetWillChange<T>>): Lambda {
-        return registerInterceptor(this, handler)
-    }
-
     toJSON(): T[] {
         return Array.from(this)
     }
