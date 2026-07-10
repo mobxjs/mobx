@@ -72,6 +72,12 @@ export class MobXGlobals {
     pendingUnobservations: IObservable[] = []
 
     /**
+     * Set of reactions that have not yet been disposed.
+     * Inclusion in this set prevents them from being garbage collected.
+     */
+    strongRefReactions = new Set<Reaction>()
+
+    /**
      * List of scheduled, not yet executed, reactions.
      */
     pendingReactions: Reaction[] = []
