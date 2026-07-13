@@ -1,6 +1,6 @@
 import React from "react"
 import PropTypes from "prop-types"
-import { observer, PropTypes as MRPropTypes } from "../src"
+import { observer } from "../src"
 import { render, act } from "@testing-library/react"
 import { observable } from "mobx"
 
@@ -56,29 +56,6 @@ test("stateless component with context support", () => {
 
     const { container } = render(<ContextProvider />)
     expect(container.textContent).toBe("context: hello world")
-})
-
-// propTypes validation seems to have been removed from class components in React 19: https://react.dev/reference/react/Component
-test.skip("component with observable propTypes", () => {
-    class Comp extends React.Component {
-        render() {
-            return null
-        }
-        static propTypes = {
-            a1: MRPropTypes.observableArray,
-            a2: MRPropTypes.arrayOrObservableArray
-        }
-    }
-    const originalConsoleError = console.error
-    const warnings: Array<any> = []
-    console.error = msg => warnings.push(msg)
-    // eslint-disable-next-line no-unused-vars
-    const firstWrapper = <Comp a1={[]} a2={[]} />
-    expect(warnings.length).toBe(1)
-    // eslint-disable-next-line no-unused-vars
-    const secondWrapper = <Comp a1={observable([])} a2={observable([])} />
-    expect(warnings.length).toBe(1)
-    console.error = originalConsoleError
 })
 
 describe("stateless component with forwardRef", () => {

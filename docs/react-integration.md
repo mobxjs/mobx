@@ -317,7 +317,6 @@ It offers a few more features which are typically not needed anymore in greenfie
 
 1. Support for React class components.
 1. `Provider` and `inject`. MobX's own React.createContext predecessor which is not needed anymore.
-1. Observable specific `propTypes`.
 
 Note that `mobx-react` fully repackages and re-exports `mobx-react-lite`, including functional component support.
 If you use `mobx-react`, there is no need to add `mobx-react-lite` as a dependency or import from it anywhere.
