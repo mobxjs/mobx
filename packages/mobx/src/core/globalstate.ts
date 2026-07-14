@@ -82,6 +82,14 @@ export class MobXGlobals {
     isRunningReactions = false
 
     /**
+     * Are we currently draining pendingUnobservations in endBatch?
+     * An onBecomeUnobserved handler can dispose a Reaction, which calls
+     * startBatch/endBatch again; this guards against re-entering the same
+     * drain loop recursively (see endBatch in observable.ts).
+     */
+    isRunningUnobservations = false
+
+    /**
      * Is it allowed to change observables at this point?
      * In general, MobX doesn't allow that when running computations and React.render.
      * To ensure that those functions stay pure.

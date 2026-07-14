@@ -111,24 +111,33 @@ export function endBatch() {
     if (--globalState.inBatch === 0) {
         runReactions()
         // the batch is actually about to finish, all unobserving should happen here.
-        const list = globalState.pendingUnobservations
-        for (let i = 0; i < list.length; i++) {
-            const observable = list[i]
-            observable.isPendingUnobservation = false
-            if (observable.observers_.size === 0) {
-                if (observable.isBeingObserved) {
-                    // if this observable had reactive observers, trigger the hooks
-                    observable.isBeingObserved = false
-                    observable.onBUO()
-                }
-                if (observable instanceof ComputedValue) {
-                    // computed values are automatically teared down when the last observer leaves
-                    // this process happens recursively, this computed might be the last observabe of another, etc..
-                    observable.suspend_()
+        // Guard against re-entering this loop: an onBUO handler can dispose a Reaction,
+        // which calls startBatch/endBatch again while we're still iterating. Bail out of
+        // the nested call instead of recursing; the outer loop re-reads list.length on
+        // every iteration, so it picks up anything the nested dispose() pushes onto the
+        // same pendingUnobservations array.
+        if (!globalState.isRunningUnobservations) {
+            globalState.isRunningUnobservations = true
+            const list = globalState.pendingUnobservations
+            for (let i = 0; i < list.length; i++) {
+                const observable = list[i]
+                observable.isPendingUnobservation = false
+                if (observable.observers_.size === 0) {
+                    if (observable.isBeingObserved) {
+                        // if this observable had reactive observers, trigger the hooks
+                        observable.isBeingObserved = false
+                        observable.onBUO()
+                    }
+                    if (observable instanceof ComputedValue) {
+                        // computed values are automatically teared down when the last observer leaves
+                        // this process happens recursively, this computed might be the last observabe of another, etc..
+                        observable.suspend_()
+                    }
                 }
             }
+            globalState.pendingUnobservations = []
+            globalState.isRunningUnobservations = false
         }
-        globalState.pendingUnobservations = []
     }
 }
 
