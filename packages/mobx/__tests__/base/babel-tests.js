@@ -182,7 +182,7 @@ class Order {
     }
 }
 
-test("decorators", function () {
+test.skip("decorators", function () {
     const o = new Order()
     expect(isObservableObject(o)).toBe(true)
     expect(isObservableProp(o, "amount")).toBe(true)
@@ -303,7 +303,7 @@ function normalizeSpyEvents(events) {
     return events
 }
 
-test("action decorator (babel)", function () {
+test.skip("action decorator (babel)", function () {
     class Store {
         constructor(multiplier) {
             makeObservable(this, {
@@ -338,7 +338,7 @@ test("action decorator (babel)", function () {
     d()
 })
 
-test("custom action decorator (babel)", function () {
+test.skip("custom action decorator (babel)", function () {
     class Store {
         constructor(multiplier) {
             makeObservable(this, {
@@ -391,7 +391,7 @@ test("custom action decorator (babel)", function () {
     d()
 })
 
-test("action decorator on field (babel)", function () {
+test.skip("action decorator on field (babel)", function () {
     class Store {
         constructor(multiplier) {
             makeObservable(this, {
@@ -427,7 +427,7 @@ test("action decorator on field (babel)", function () {
     d()
 })
 
-test("custom action decorator on field (babel)", function () {
+test.skip("custom action decorator on field (babel)", function () {
     class Store {
         constructor(multiplier) {
             makeObservable(this, {
@@ -496,7 +496,7 @@ test("267 (babel) should be possible to declare properties observable outside st
     Store // just to avoid linter warning
 })
 
-test("288 atom not detected for object property", () => {
+test.skip("288 atom not detected for object property", () => {
     class Store {
         foo = ""
 

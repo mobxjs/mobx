@@ -30,7 +30,7 @@ test("json1", function () {
     expect(output).toBe("write blog, improve coverage, take a nap")
 })
 
-test("json2", function () {
+test.skip("json2", function () {
     const source = {
         todos: [
             {

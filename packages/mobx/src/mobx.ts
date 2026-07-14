@@ -25,7 +25,7 @@ if (__DEV__) {
     })
 }
 
-import { spy, getDebugName, $mobx } from "./internal"
+import { getDebugName, $mobx } from "./internal"
 
 export {
     IObservable,
@@ -36,7 +36,6 @@ export {
     untracked,
     IAtom,
     createAtom,
-    spy,
     IComputedValue,
     IEqualsComparer,
     compareDefault,
@@ -44,19 +43,12 @@ export {
     compareStructural,
     compareShallow,
     IEnhancer,
-    IInterceptable,
-    IInterceptor,
-    IListenable,
-    IObjectWillChange,
     IObjectDidChange,
     isObservableObject,
     IValueDidChange,
-    IValueWillChange,
     IObservableValue,
     isObservableValue as isBoxedObservable,
     IObservableArray,
-    IArrayWillChange,
-    IArrayWillSplice,
     IArraySplice,
     IArrayUpdate,
     IArrayDidChange,
@@ -65,14 +57,12 @@ export {
     ObservableMap,
     IMapEntries,
     IMapEntry,
-    IMapWillChange,
     IMapDidChange,
     isObservableMap,
     IObservableMapInitialValues,
     ObservableSet,
     isObservableSet,
     ISetDidChange,
-    ISetWillChange,
     IObservableSetInitialValues,
     transaction,
     observable,
@@ -90,8 +80,6 @@ export {
     isComputed,
     isComputedProp,
     extendObservable,
-    observe,
-    intercept,
     autorun,
     IAutorunOptions,
     reaction,
@@ -138,7 +126,6 @@ export {
     $mobx,
     isComputingDerivation as _isComputingDerivation,
     onReactionError,
-    interceptReads as _interceptReads,
     IComputedValueOptions,
     IActionRunInfo,
     _startAction,
@@ -159,7 +146,6 @@ declare const __MOBX_DEVTOOLS_GLOBAL_HOOK__: { injectMobx: (any) => void }
 if (__DEV__ && typeof __MOBX_DEVTOOLS_GLOBAL_HOOK__ === "object") {
     // See: https://github.com/andykog/mobx-devtools/
     __MOBX_DEVTOOLS_GLOBAL_HOOK__.injectMobx({
-        spy,
         extras: {
             getDebugName
         },

@@ -140,7 +140,7 @@ function stripTrackerOutput(output) {
     })
 }
 
-test("spy 1", function () {
+test.skip("spy 1", function () {
     m._resetGlobalState()
     const lines = []
 

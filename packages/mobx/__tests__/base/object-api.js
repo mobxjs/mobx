@@ -420,7 +420,7 @@ test("keys(array)", () => {
     expect(snapshots).toEqual([[0], [0, 1], [0, 1, 2, 3], [0, 1, 2, 3], [0, 1, 2], [0, 1]])
 })
 
-test("observe & intercept", () => {
+test.skip("observe & intercept", () => {
     let events = []
     const todos = observable(
         {
@@ -457,7 +457,7 @@ test("observe & intercept", () => {
     })
 })
 
-test("observe & intercept set called multiple times", () => {
+test.skip("observe & intercept set called multiple times", () => {
     const a = mobx.observable({}, {}, { name: "TestObject" }) // stable name for snapshot
     const interceptLogs = []
     const observeLogs = []

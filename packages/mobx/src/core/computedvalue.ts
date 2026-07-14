@@ -13,12 +13,10 @@ import {
     getNextId,
     globalState,
     isCaughtException,
-    isSpyEnabled,
     propagateChangeConfirmed,
     propagateMaybeChanged,
     reportObserved,
     shouldCompute,
-    spyReport,
     startBatch,
     toPrimitive,
     trackDerivedFunction,
@@ -261,17 +259,6 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 
         if (changed) {
             this.value_ = newValue
-
-            if (__DEV__ && isSpyEnabled()) {
-                spyReport({
-                    observableKind: "computed",
-                    debugObjectName: this.name_,
-                    object: this.scope_,
-                    type: "update",
-                    oldValue,
-                    newValue
-                } as IComputedDidChange)
-            }
         }
 
         return changed

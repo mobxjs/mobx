@@ -2,17 +2,12 @@ import {
     IDerivation,
     endBatch,
     globalState,
-    isSpyEnabled,
-    spyReportEnd,
-    spyReportStart,
     startBatch,
     untrackedEnd,
     untrackedStart,
     isFunction,
     allowStateReadsStart,
     allowStateReadsEnd,
-    ACTION,
-    EMPTY_ARRAY,
     die,
     getDescriptor,
     defineProperty
@@ -80,8 +75,6 @@ export interface IActionRunInfo {
     prevDerivation_: IDerivation | null
     prevAllowStateChanges_: boolean
     prevAllowStateReads_: boolean
-    notifySpy_: boolean
-    startTime_: number
     error_?: any
     parentActionId_: number
     actionId_: number
@@ -94,18 +87,6 @@ export function _startAction(
     scope: any,
     args?: IArguments
 ): IActionRunInfo {
-    const notifySpy_ = __DEV__ && isSpyEnabled() && !!actionName
-    let startTime_: number = 0
-    if (notifySpy_) {
-        startTime_ = Date.now()
-        const flattenedArgs = args ? Array.from(args) : EMPTY_ARRAY
-        spyReportStart({
-            type: ACTION,
-            name: actionName,
-            object: scope,
-            arguments: flattenedArgs
-        })
-    }
     const prevDerivation_ = globalState.trackingDerivation
     const runAsAction = !canRunAsDerivation || !prevDerivation_
     startBatch()
@@ -125,8 +106,6 @@ export function _startAction(
         prevDerivation_,
         prevAllowStateChanges_,
         prevAllowStateReads_,
-        notifySpy_,
-        startTime_,
         actionId_: nextActionId++,
         parentActionId_: currentActionId
     }
@@ -150,9 +129,6 @@ export function _endAction(runInfo: IActionRunInfo) {
     endBatch()
     if (runInfo.runAsAction_) {
         untrackedEnd(runInfo.prevDerivation_)
-    }
-    if (__DEV__ && runInfo.notifySpy_) {
-        spyReportEnd({ time: Date.now() - runInfo.startTime_ })
     }
     globalState.suppressReactionErrors = false
 }

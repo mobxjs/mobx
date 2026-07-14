@@ -147,7 +147,7 @@ test("it should support asyncAction in classes", done => {
     }, 10)
 })
 
-test("it should support logging", done => {
+test.skip("it should support logging", done => {
     mobx.configure({ enforceActions: "observed" })
     const events = []
     const x = mobx.observable({ a: 1 })

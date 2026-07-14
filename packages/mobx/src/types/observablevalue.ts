@@ -1,32 +1,15 @@
 import {
     Atom,
     IEnhancer,
-    IInterceptable,
     IEqualsComparer,
-    IListenable,
     checkIfStateModificationsAreAllowed,
     compareDefault,
     createInstanceofPredicate,
     getNextId,
-    hasInterceptors,
-    hasListeners,
-    interceptChange,
-    isSpyEnabled,
-    notifyListeners,
-    spyReport,
-    spyReportEnd,
-    spyReportStart,
     toPrimitive,
     globalState,
-    IUNCHANGED,
-    UPDATE
+    IUNCHANGED
 } from "../internal"
-
-export interface IValueWillChange<T> {
-    object: IObservableValue<T>
-    type: "update"
-    newValue: T
-}
 
 export type IValueDidChange<T = any> = {
     type: "update"
@@ -51,107 +34,40 @@ export interface IObservableValue<T> {
     set(value: T): void
 }
 
-const CREATE = "create"
-
-export class ObservableValue<T>
-    extends Atom
-    implements IObservableValue<T>, IInterceptable<IValueWillChange<T>>, IListenable
-{
-    hasUnreportedChange_ = false
-    interceptors_
-    changeListeners_
+export class ObservableValue<T> extends Atom implements IObservableValue<T> {
     value_
-    dehancer: any
 
     constructor(
         value: T,
         public enhancer_: IEnhancer<T>,
         public name_ = __DEV__ ? "ObservableValue@" + getNextId() : "ObservableValue",
-        notifySpy = true,
         private equals_: IEqualsComparer<any> = compareDefault
     ) {
         super(name_)
         this.value_ = enhancer_(value, undefined, name_)
-        if (__DEV__ && notifySpy && isSpyEnabled()) {
-            // only notify spy if this is a stand-alone observable
-            spyReport({
-                type: CREATE,
-                object: this,
-                observableKind: "value",
-                debugObjectName: this.name_,
-                newValue: "" + this.value_?.toString()
-            })
-        }
-    }
-
-    private dehanceValue(value: T): T {
-        if (this.dehancer !== undefined) {
-            return this.dehancer(value)
-        }
-        return value
     }
 
     public set(newValue: T) {
-        const oldValue = this.value_
         newValue = this.prepareNewValue_(newValue) as any
         if (newValue !== globalState.UNCHANGED) {
-            const notifySpy = __DEV__ && isSpyEnabled()
-            if (__DEV__ && notifySpy) {
-                spyReportStart({
-                    type: UPDATE,
-                    object: this,
-                    observableKind: "value",
-                    debugObjectName: this.name_,
-                    newValue,
-                    oldValue
-                })
-            }
             this.setNewValue_(newValue)
-            if (__DEV__ && notifySpy) {
-                spyReportEnd()
-            }
         }
     }
 
     private prepareNewValue_(newValue): T | IUNCHANGED {
         checkIfStateModificationsAreAllowed(this)
-        if (hasInterceptors(this)) {
-            const change = interceptChange<IValueWillChange<T>>(this, {
-                object: this,
-                type: UPDATE,
-                newValue
-            })
-            if (!change) {
-                return globalState.UNCHANGED
-            }
-            newValue = change.newValue
-        }
         // apply modifier
         newValue = this.enhancer_(newValue, this.value_, this.name_)
         return this.equals_(this.value_, newValue) ? globalState.UNCHANGED : newValue
     }
 
     setNewValue_(newValue: T) {
-        const oldValue = this.value_
         this.value_ = newValue
         this.reportChanged()
-        if (hasListeners(this)) {
-            notifyListeners(this, {
-                type: UPDATE,
-                object: this,
-                newValue,
-                oldValue
-            })
-        }
     }
 
     public get(): T {
         this.reportObserved()
-        return this.dehanceValue(this.value_)
-    }
-
-    raw() {
-        // used by MST ot get undehanced value
         return this.value_
     }
 

@@ -8,7 +8,6 @@ const MOBX_GLOBALS_VERSION = 7
  */
 const persistentKeys: (keyof MobXGlobals)[] = [
     "mobxGuid",
-    "spyListeners",
     "enforceActions",
     "computedRequiresReaction",
     "reactionRequiresObservable",
@@ -99,11 +98,6 @@ export class MobXGlobals {
      * If strict mode is enabled, state changes are by default not allowed
      */
     enforceActions: boolean | "always" = true
-
-    /**
-     * Spy callbacks
-     */
-    spyListeners: { (change: any): void }[] = []
 
     /**
      * Globally attached error handlers that react specifically to errors in reactions

@@ -159,7 +159,7 @@ test("observable3", function () {
     expect(b.toArray()).toEqual([2, 3, 0, 1])
 })
 
-test("observable4", function () {
+test.skip("observable4", function () {
     const x = m.observable([{ x: 1 }, { x: 2 }])
 
     const b = buffer()

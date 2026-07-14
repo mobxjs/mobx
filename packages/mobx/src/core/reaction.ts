@@ -10,11 +10,7 @@ import {
     getNextId,
     globalState,
     isCaughtException,
-    isSpyEnabled,
     shouldCompute,
-    spyReport,
-    spyReportEnd,
-    spyReportStart,
     startBatch,
     trackDerivedFunction,
     GenericAbortSignal
@@ -135,13 +131,6 @@ export class Reaction implements IDerivation, IReactionPublic {
 
                 try {
                     this.onInvalidate_()
-                    if (__DEV__ && this.isTrackPending && isSpyEnabled()) {
-                        // onInvalidate didn't trigger track right away..
-                        spyReport({
-                            name: this.name_,
-                            type: "scheduled-reaction"
-                        })
-                    }
                 } catch (e) {
                     this.reportExceptionInDerivation_(e)
                 }
@@ -157,15 +146,6 @@ export class Reaction implements IDerivation, IReactionPublic {
             // console.warn("Reaction already disposed") // Note: Not a warning / error in mobx 4 either
         }
         startBatch()
-        const notify = __DEV__ && isSpyEnabled()
-        let startTime
-        if (__DEV__ && notify) {
-            startTime = Date.now()
-            spyReportStart({
-                name: this.name_,
-                type: "reaction"
-            })
-        }
         this.isRunning = true
         const prevReaction = globalState.trackingContext // reactions could create reactions...
         globalState.trackingContext = this
@@ -179,11 +159,6 @@ export class Reaction implements IDerivation, IReactionPublic {
         }
         if (isCaughtException(result)) {
             this.reportExceptionInDerivation_(result.cause)
-        }
-        if (__DEV__ && notify) {
-            spyReportEnd({
-                time: Date.now() - startTime
-            })
         }
         endBatch()
     }
@@ -205,15 +180,6 @@ export class Reaction implements IDerivation, IReactionPublic {
             console.error(message, error)
             /** If debugging brought you here, please, read the above message :-). Tnx! */
         } else if (__DEV__) { console.warn(`[mobx] (error in reaction '${this.name_}' suppressed, fix error of causing action below)`) } // prettier-ignore
-
-        if (__DEV__ && isSpyEnabled()) {
-            spyReport({
-                type: "error",
-                name: this.name_,
-                message,
-                error: "" + error
-            })
-        }
 
         globalState.globalReactionErrorHandlers.forEach(f => f(error, this))
     }

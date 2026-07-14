@@ -4,24 +4,13 @@ import {
     deepEnhancer,
     getNextId,
     IEnhancer,
-    isSpyEnabled,
-    hasListeners,
-    IListenable,
-    spyReportStart,
-    notifyListeners,
-    spyReportEnd,
     createInstanceofPredicate,
     makeIterable,
-    hasInterceptors,
-    interceptChange,
-    IInterceptable,
     checkIfStateModificationsAreAllowed,
     untracked,
     transaction,
     isES6Set,
     IAtom,
-    DELETE,
-    ADD,
     die,
     initObservable
 } from "../internal"
@@ -46,26 +35,10 @@ export type ISetDidChange<T = any> =
           oldValue: T
       }
 
-export type ISetWillDeleteChange<T = any> = {
-    type: "delete"
-    object: ObservableSet<T>
-    oldValue: T
-}
-export type ISetWillAddChange<T = any> = {
-    type: "add"
-    object: ObservableSet<T>
-    newValue: T
-}
-
-export type ISetWillChange<T = any> = ISetWillDeleteChange<T> | ISetWillAddChange<T>
-
-export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillChange>, IListenable {
+export class ObservableSet<T = any> implements Set<T> {
     [$mobx] = ObservableSetMarker
     private data_: Set<any> = new Set()
     atom_!: IAtom
-    changeListeners_
-    interceptors_
-    dehancer: any
     enhancer_: (newV: any, oldV: any | undefined) => any
 
     constructor(
@@ -80,13 +53,6 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
                 this.replace(initialData)
             }
         })
-    }
-
-    private dehanceValue_<X extends T | undefined>(value: X): X {
-        if (this.dehancer !== undefined) {
-            return this.dehancer(value)
-        }
-        return value
     }
 
     clear() {
@@ -112,88 +78,22 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
 
     add(value: T) {
         checkIfStateModificationsAreAllowed(this.atom_)
-        if (hasInterceptors(this)) {
-            const change = interceptChange<ISetWillAddChange<T>>(this, {
-                type: ADD,
-                object: this,
-                newValue: value
-            })
-            if (!change) {
-                return this
-            }
-
-            // implemented reassignment same as it's done for ObservableMap
-            value = change.newValue!
-        }
         if (!this.has(value)) {
             transaction(() => {
                 this.data_.add(this.enhancer_(value, undefined))
                 this.atom_.reportChanged()
             })
-            const notifySpy = __DEV__ && isSpyEnabled()
-            const notify = hasListeners(this)
-            const change =
-                notify || notifySpy
-                    ? <ISetDidChange<T>>{
-                          observableKind: "set",
-                          debugObjectName: this.name_,
-                          type: ADD,
-                          object: this,
-                          newValue: value
-                      }
-                    : null
-            if (notifySpy && __DEV__) {
-                spyReportStart(change!)
-            }
-            if (notify) {
-                notifyListeners(this, change)
-            }
-            if (notifySpy && __DEV__) {
-                spyReportEnd()
-            }
         }
 
         return this
     }
 
     delete(value: T) {
-        if (hasInterceptors(this)) {
-            const change = interceptChange<ISetWillDeleteChange<T>>(this, {
-                type: DELETE,
-                object: this,
-                oldValue: value
-            })
-            if (!change) {
-                return false
-            }
-        }
         if (this.has(value)) {
-            const notifySpy = __DEV__ && isSpyEnabled()
-            const notify = hasListeners(this)
-            const change =
-                notify || notifySpy
-                    ? <ISetDidChange<T>>{
-                          observableKind: "set",
-                          debugObjectName: this.name_,
-                          type: DELETE,
-                          object: this,
-                          oldValue: value
-                      }
-                    : null
-
-            if (notifySpy && __DEV__) {
-                spyReportStart(change!)
-            }
             transaction(() => {
                 this.atom_.reportChanged()
                 this.data_.delete(value)
             })
-            if (notify) {
-                notifyListeners(this, change)
-            }
-            if (notifySpy && __DEV__) {
-                spyReportEnd()
-            }
             return true
         }
         return false
@@ -201,7 +101,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
 
     has(value: T) {
         this.atom_.reportObserved()
-        return this.data_.has(this.dehanceValue_(value))
+        return this.data_.has(value)
     }
 
     entries() {
@@ -220,14 +120,11 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
 
     values(): SetIterator<T> {
         this.atom_.reportObserved()
-        const self = this
         const values = this.data_.values()
         return makeIterableForSet({
             next() {
                 const { value, done } = values.next()
-                return !done
-                    ? { value: self.dehanceValue_(value), done }
-                    : { value: undefined, done }
+                return !done ? { value, done } : { value: undefined, done }
             }
         })
     }
