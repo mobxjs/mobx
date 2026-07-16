@@ -537,6 +537,31 @@ test("#3954 - disposing a chain of reactions from onBecomeUnobserved doesn't ove
     expect(unobservedCount).toBe(N)
 })
 
+test("#3954 followup - isRunningUnobservations is released even if an onBecomeUnobserved handler throws", () => {
+    const boxA = observable.box(0)
+    const disposeA = autorun(() => boxA.get())
+    onBecomeUnobserved(boxA, () => {
+        throw new Error("boom")
+    })
+
+    // the handler's exception should still surface to the caller, not be swallowed
+    expect(() => disposeA()).toThrow("boom")
+
+    // if the internal guard were left stuck true after that exception, every
+    // future endBatch() would silently stop draining pendingUnobservations,
+    // so this completely unrelated disposal would never fire its own handler
+    const boxB = observable.box(0)
+    const disposeB = autorun(() => boxB.get())
+    let unobservedB = false
+    onBecomeUnobserved(boxB, () => {
+        unobservedB = true
+    })
+
+    disposeB()
+
+    expect(unobservedB).toBe(true)
+})
+
 test("works with ObservableSet #3595", () => {
     const onSetObserved = jest.fn()
     const onSetUnobserved = jest.fn()

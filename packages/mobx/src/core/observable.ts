@@ -118,25 +118,31 @@ export function endBatch() {
         // same pendingUnobservations array.
         if (!globalState.isRunningUnobservations) {
             globalState.isRunningUnobservations = true
-            const list = globalState.pendingUnobservations
-            for (let i = 0; i < list.length; i++) {
-                const observable = list[i]
-                observable.isPendingUnobservation = false
-                if (observable.observers_.size === 0) {
-                    if (observable.isBeingObserved) {
-                        // if this observable had reactive observers, trigger the hooks
-                        observable.isBeingObserved = false
-                        observable.onBUO()
-                    }
-                    if (observable instanceof ComputedValue) {
-                        // computed values are automatically teared down when the last observer leaves
-                        // this process happens recursively, this computed might be the last observabe of another, etc..
-                        observable.suspend_()
+            try {
+                const list = globalState.pendingUnobservations
+                for (let i = 0; i < list.length; i++) {
+                    const observable = list[i]
+                    observable.isPendingUnobservation = false
+                    if (observable.observers_.size === 0) {
+                        if (observable.isBeingObserved) {
+                            // if this observable had reactive observers, trigger the hooks
+                            observable.isBeingObserved = false
+                            observable.onBUO()
+                        }
+                        if (observable instanceof ComputedValue) {
+                            // computed values are automatically teared down when the last observer leaves
+                            // this process happens recursively, this computed might be the last observabe of another, etc..
+                            observable.suspend_()
+                        }
                     }
                 }
+                globalState.pendingUnobservations = []
+            } finally {
+                // Always release the guard, even if an onBUO handler (user code) threw,
+                // otherwise every future endBatch() would see isRunningUnobservations
+                // stuck true and silently stop draining pendingUnobservations forever.
+                globalState.isRunningUnobservations = false
             }
-            globalState.pendingUnobservations = []
-            globalState.isRunningUnobservations = false
         }
     }
 }
