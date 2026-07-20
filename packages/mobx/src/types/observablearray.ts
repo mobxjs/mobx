@@ -5,9 +5,7 @@ import {
     IAtom,
     IEnhancer,
     IInterceptable,
-    IInterceptor,
     IListenable,
-    Lambda,
     addHiddenFinalProp,
     checkIfStateModificationsAreAllowed,
     createInstanceofPredicate,
@@ -18,12 +16,8 @@ import {
     isObject,
     isSpyEnabled,
     notifyListeners,
-    registerInterceptor,
-    registerListener,
     spyReportEnd,
     spyReportStart,
-    assertProxies,
-    reserveArrayBuffer,
     hasProp,
     die,
     globalState,
@@ -130,8 +124,7 @@ export class ObservableArrayAdministration
     constructor(
         name = __DEV__ ? "ObservableArray@" + getNextId() : "ObservableArray",
         enhancer: IEnhancer<any>,
-        public owned_: boolean,
-        public legacyMode_: boolean
+        public owned_: boolean
     ) {
         this.atom_ = new Atom(name)
         this.enhancer_ = (newV, oldV) =>
@@ -152,30 +145,6 @@ export class ObservableArrayAdministration
         return values
     }
 
-    intercept_(handler: IInterceptor<IArrayWillChange<any> | IArrayWillSplice<any>>): Lambda {
-        return registerInterceptor<IArrayWillChange<any> | IArrayWillSplice<any>>(this, handler)
-    }
-
-    observe_(
-        listener: (changeData: IArrayDidChange<any>) => void,
-        fireImmediately = false
-    ): Lambda {
-        if (fireImmediately) {
-            listener(<IArraySplice<any>>{
-                observableKind: "array",
-                object: this.proxy_ as any,
-                debugObjectName: this.atom_.name_,
-                type: "splice",
-                index: 0,
-                added: this.values_.slice(),
-                addedCount: this.values_.length,
-                removed: [],
-                removedCount: 0
-            })
-        }
-        return registerListener(this, listener)
-    }
-
     getArrayLength_(): number {
         this.atom_.reportObserved()
         return this.values_.length
@@ -183,16 +152,13 @@ export class ObservableArrayAdministration
 
     setArrayLength_(newLength: number) {
         if (typeof newLength !== "number" || isNaN(newLength) || newLength < 0) {
-            die("Out of range: " + newLength)
+            die(40, newLength)
         }
         let currentLength = this.values_.length
         if (newLength === currentLength) {
             return
         } else if (newLength > currentLength) {
-            const newItems = new Array(newLength - currentLength)
-            for (let i = 0; i < newLength - currentLength; i++) {
-                newItems[i] = undefined
-            } // No Array.fill everywhere...
+            const newItems = Array.from({ length: newLength - currentLength })
             this.spliceWithArray_(currentLength, 0, newItems)
         } else {
             this.spliceWithArray_(newLength, currentLength - newLength)
@@ -204,9 +170,6 @@ export class ObservableArrayAdministration
             die(16)
         }
         this.lastKnownLength_ += delta
-        if (this.legacyMode_ && delta > 0) {
-            reserveArrayBuffer(oldLength + delta + 1)
-        }
     }
 
     spliceWithArray_(index: number, deleteCount?: number, newItems?: any[]): any[] {
@@ -250,7 +213,7 @@ export class ObservableArrayAdministration
 
         newItems =
             newItems.length === 0 ? newItems : newItems.map(v => this.enhancer_(v, undefined))
-        if (this.legacyMode_ || __DEV__) {
+        if (__DEV__) {
             const lengthDelta = newItems.length - deleteCount
             this.updateArrayLength_(length, lengthDelta) // checks if internal array wasn't modified
         }
@@ -283,7 +246,7 @@ export class ObservableArrayAdministration
     }
 
     notifyArrayChildUpdate_(index: number, newValue: any, oldValue: any) {
-        const notifySpy = !this.owned_ && isSpyEnabled()
+        const notifySpy = __DEV__ && !this.owned_ && isSpyEnabled()
         const notify = hasListeners(this)
         const change: IArrayDidChange | null =
             notify || notifySpy
@@ -313,7 +276,7 @@ export class ObservableArrayAdministration
     }
 
     notifyArraySplice_(index: number, added: any[], removed: any[]) {
-        const notifySpy = !this.owned_ && isSpyEnabled()
+        const notifySpy = __DEV__ && !this.owned_ && isSpyEnabled()
         const notify = hasListeners(this)
         const change: IArraySplice | null =
             notify || notifySpy
@@ -344,24 +307,12 @@ export class ObservableArrayAdministration
     }
 
     get_(index: number): any | undefined {
-        if (this.legacyMode_ && index >= this.values_.length) {
-            console.warn(
-                __DEV__
-                    ? `[mobx.array] Attempt to read an array index (${index}) that is out of bounds (${this.values_.length}). Please check length first. Out of bound indices will not be tracked by MobX`
-                    : `[mobx] Out of bounds read: ${index}`
-            )
-            return undefined
-        }
         this.atom_.reportObserved()
         return this.dehanceValue_(this.values_[index])
     }
 
     set_(index: number, newValue: any) {
         const values = this.values_
-        if (this.legacyMode_ && index > values.length) {
-            // out of bounds
-            die(17, index, values.length)
-        }
         if (index < values.length) {
             // update at index in range
             checkIfStateModificationsAreAllowed(this.atom_)
@@ -388,10 +339,7 @@ export class ObservableArrayAdministration
             // For out of bound index, we don't create an actual sparse array,
             // but rather fill the holes with undefined (same as setArrayLength_).
             // This could be considered a bug.
-            const newItems = new Array(index + 1 - values.length)
-            for (let i = 0; i < newItems.length - 1; i++) {
-                newItems[i] = undefined
-            } // No Array.fill everywhere...
+            const newItems = Array.from({ length: index + 1 - values.length })
             newItems[newItems.length - 1] = newValue
             this.spliceWithArray_(values.length, 0, newItems)
         }
@@ -404,9 +352,8 @@ export function createObservableArray<T>(
     name = __DEV__ ? "ObservableArray@" + getNextId() : "ObservableArray",
     owned = false
 ): IObservableArray<T> {
-    assertProxies()
     return initObservable(() => {
-        const adm = new ObservableArrayAdministration(name, enhancer, owned, false)
+        const adm = new ObservableArrayAdministration(name, enhancer, owned)
         addHiddenFinalProp(adm.values_, $mobx, adm)
         const proxy = new Proxy(adm.values_, arrayTraps) as any
         adm.proxy_ = proxy

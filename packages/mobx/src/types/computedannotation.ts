@@ -6,7 +6,8 @@ import {
     assert20223DecoratorType,
     $mobx,
     asObservableObject,
-    ComputedValue
+    ComputedValue,
+    assign
 } from "../internal"
 
 export function createComputedAnnotation(name: string, options?: object): Annotation {
@@ -14,8 +15,7 @@ export function createComputedAnnotation(name: string, options?: object): Annota
         annotationType_: name,
         options_: options,
         make_,
-        extend_,
-        decorate_20223_
+        extend_
     }
 }
 
@@ -38,20 +38,23 @@ function extend_(
     assertComputedDescriptor(adm, this, key, descriptor)
     return adm.defineComputedProperty_(
         key,
-        {
-            ...this.options_,
+        assign({}, this.options_, {
             get: descriptor.get,
             set: descriptor.set
-        },
+        }),
         proxyTrap
     )
 }
 
-function decorate_20223_(this: Annotation, get, context: ClassGetterDecoratorContext) {
+export function decorateComputed20223_(
+    annotation: Annotation,
+    get,
+    context: ClassGetterDecoratorContext
+) {
     if (__DEV__) {
         assert20223DecoratorType(context, ["getter"])
     }
-    const ann = this
+    const ann = annotation
     const { name: key, addInitializer } = context
     let computedValues: WeakMap<object, ComputedValue<any>> | undefined
 
@@ -59,11 +62,10 @@ function decorate_20223_(this: Annotation, get, context: ClassGetterDecoratorCon
     // ComputedValues for getters that are never read on a given instance.
     // The factory is materialised by ObservableObjectAdministration on demand.
     function createComputedValue(target: object, adm: ObservableObjectAdministration) {
-        const options = {
-            ...ann.options_,
+        const options = assign({}, ann.options_, {
             get,
             context: target
-        }
+        })
         options.name ||= __DEV__
             ? `${adm.name_}.${key.toString()}`
             : `ObservableObject.${key.toString()}`

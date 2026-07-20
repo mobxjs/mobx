@@ -418,7 +418,7 @@ test("extendObservable respects action decorators", () => {
         },
         {
             a1: mobx.action,
-            a2: mobx.action.bound,
+            a2: mobx.actionBound,
             a3: false
         }
     )
@@ -460,7 +460,7 @@ test("bound actions bind", () => {
             }
         },
         {
-            z: mobx.action.bound
+            z: mobx.actionBound
         }
     )
 

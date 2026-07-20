@@ -12,7 +12,8 @@ import {
     getAdministration,
     ObservableSet,
     ISetWillChange,
-    isFunction
+    isFunction,
+    registerInterceptor
 } from "../internal"
 
 export function intercept<T>(
@@ -51,9 +52,9 @@ export function intercept(thing, propOrHandler?, handler?): Lambda {
 }
 
 function interceptInterceptable(thing, handler) {
-    return getAdministration(thing).intercept_(handler)
+    return registerInterceptor(getAdministration(thing), handler)
 }
 
 function interceptProperty(thing, property, handler) {
-    return getAdministration(thing, property).intercept_(handler)
+    return registerInterceptor(getAdministration(thing, property), handler)
 }

@@ -2,6 +2,7 @@ import {
     autorun,
     onBecomeObserved,
     observable,
+    observableRef,
     computed,
     action,
     makeObservable,
@@ -26,7 +27,7 @@ test("#2309 don't trigger oBO for computeds that aren't subscribed to", () => {
     const events: string[] = []
 
     class Asd {
-        @observable prop = 42
+        @observable accessor prop = 42
 
         @computed
         get computed() {
@@ -41,10 +42,6 @@ test("#2309 don't trigger oBO for computeds that aren't subscribed to", () => {
         @action
         actionComputed() {
             const bar = this.computed
-        }
-
-        constructor() {
-            makeObservable(this)
         }
     }
 
@@ -308,7 +305,7 @@ describe("nested computes don't trigger hooks #2686", () => {
         constructor() {
             makeObservable(this, {
                 upperValue$: computed,
-                lower$: observable.ref
+                lower$: observableRef
             })
         }
 
@@ -434,14 +431,11 @@ test("#2686 - 3", () => {
 test("#2667", () => {
     const events: any[] = []
     class LazyInitializedList {
-        @observable
-        public items: string[] | undefined
+        @observable accessor items: string[] | undefined = undefined
 
-        @observable
-        public listName
+        @observable accessor listName: string
 
-        public constructor(listName: string, lazyItems: string[]) {
-            makeObservable(this)
+        constructor(listName: string, lazyItems: string[]) {
             this.listName = listName
             onBecomeObserved(
                 this,
@@ -463,26 +457,24 @@ test("#2667", () => {
     }
 
     class ItemsStore {
-        @observable
-        private list: LazyInitializedList
+        @observable accessor list: LazyInitializedList
 
-        public constructor() {
+        constructor() {
             this.list = new LazyInitializedList("initial", ["a, b, c"])
-            makeObservable(this)
         }
 
         @action
-        public changeList = () => {
+        changeList = () => {
             this.list = new LazyInitializedList("new", ["b, c, a"])
         }
 
         @computed
-        public get items(): string[] | undefined {
+        get items(): string[] | undefined {
             return this.list.items
         }
 
         @computed
-        public get activeListName(): string {
+        get activeListName(): string {
             return this.list.listName
         }
     }

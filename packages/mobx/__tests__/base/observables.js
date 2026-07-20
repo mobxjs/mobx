@@ -6,6 +6,7 @@ const {
     $mobx,
     observable,
     computed,
+    compareStructural,
     transaction,
     autorun,
     extendObservable,
@@ -85,7 +86,7 @@ test("computed with asStructure modifier", function () {
                 sum: x1.get() + x2.get()
             }
         },
-        { compareStructural: true }
+        { equals: compareStructural }
     )
     const b = buffer()
     m.observe(y, b, true)
@@ -1071,7 +1072,7 @@ test("computed values believe deep NaN === deep NaN when using compareStructural
         function () {
             return a.b
         },
-        { compareStructural: true }
+        { equals: compareStructural }
     )
 
     const buf = new buffer()
@@ -2390,10 +2391,8 @@ test('Observables initialization does not violate `enforceActions: "always"`', (
         check(() => mobx.extendObservable({}, { x: 0 }))
         check(() => mobx.observable(new Set([0])))
         check(() => mobx.observable(new Map([[0, 0]])))
-        check(() => mobx.observable({ x: 0 }, { proxy: false }))
-        check(() => mobx.observable({ x: 0 }, { proxy: true }))
-        check(() => mobx.observable([0], { proxy: false }))
-        check(() => mobx.observable([0], { proxy: true }))
+        check(() => mobx.observable({ x: 0 }))
+        check(() => mobx.observable([0]))
         check(() => mobx.computed(() => 0))
     } finally {
         consoleWarnSpy.mockRestore()
@@ -2459,10 +2458,8 @@ test("state version does not update on observable creation", () => {
     check(() => mobx.extendObservable({}, { x: 0 }))
     check(() => mobx.observable(new Set([0])))
     check(() => mobx.observable(new Map([[0, 0]])))
-    check(() => mobx.observable({ x: 0 }, { proxy: false }))
-    check(() => mobx.observable({ x: 0 }, { proxy: true }))
-    check(() => mobx.observable([0], { proxy: false }))
-    check(() => mobx.observable([0], { proxy: true }))
+    check(() => mobx.observable({ x: 0 }))
+    check(() => mobx.observable([0]))
     check(() => mobx.computed(() => 0))
 })
 

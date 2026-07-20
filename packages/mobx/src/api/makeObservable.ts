@@ -4,15 +4,19 @@ import {
     AnnotationsMap,
     CreateObservableOptions,
     ObservableObjectAdministration,
-    collectStoredAnnotations,
     isPlainObject,
     isObservableObject,
     die,
     ownKeys,
     extendObservable,
     addHiddenProp,
-    storedAnnotationsSymbol,
-    initObservable
+    initObservable,
+    Annotation,
+    assertAnnotable,
+    getDescriptor,
+    MakeResult,
+    objectPrototype,
+    recordAnnotationApplied
 } from "../internal"
 
 // Hack based on https://github.com/Microsoft/TypeScript/issues/14829#issuecomment-322267089
@@ -22,25 +26,16 @@ import {
 // Fixes: https://github.com/mobxjs/mobx/issues/2325#issuecomment-691070022
 type NoInfer<T> = [T][T extends any ? 0 : never]
 
-type MakeObservableOptions = Omit<CreateObservableOptions, "proxy">
-
 export function makeObservable<T extends object, AdditionalKeys extends PropertyKey = never>(
     target: T,
-    annotations?: AnnotationsMap<T, NoInfer<AdditionalKeys>>,
-    options?: MakeObservableOptions
+    annotations: AnnotationsMap<T, NoInfer<AdditionalKeys>>,
+    options?: CreateObservableOptions
 ): T {
     initObservable(() => {
         const adm: ObservableObjectAdministration = asObservableObject(target, options)[$mobx]
-        if (__DEV__ && annotations && target[storedAnnotationsSymbol]) {
-            die(
-                `makeObservable second arg must be nullish when using decorators. Mixing @decorator syntax with annotations is not supported.`
-            )
-        }
-        // Default to decorators
-        annotations ??= collectStoredAnnotations(target)
 
         // Annotate
-        ownKeys(annotations).forEach(key => adm.make_(key, annotations![key]))
+        ownKeys(annotations).forEach(key => make_(adm, key, annotations[key]))
     })
     return target
 }
@@ -51,7 +46,7 @@ const keysSymbol = Symbol("mobx-keys")
 export function makeAutoObservable<T extends object, AdditionalKeys extends PropertyKey = never>(
     target: T,
     overrides?: AnnotationsMap<T, NoInfer<AdditionalKeys>>,
-    options?: MakeObservableOptions
+    options?: CreateObservableOptions
 ): T {
     if (__DEV__) {
         if (!isPlainObject(target) && !isPlainObject(Object.getPrototypeOf(target))) {
@@ -82,7 +77,8 @@ export function makeAutoObservable<T extends object, AdditionalKeys extends Prop
         }
 
         target[keysSymbol].forEach(key =>
-            adm.make_(
+            make_(
+                adm,
                 key,
                 // must pass "undefined" for { key: undefined }
                 !overrides ? true : key in overrides ? overrides[key] : true
@@ -91,4 +87,36 @@ export function makeAutoObservable<T extends object, AdditionalKeys extends Prop
     })
 
     return target
+}
+
+function make_(
+    adm: ObservableObjectAdministration,
+    key: PropertyKey,
+    annotation: Annotation | boolean
+) {
+    if (annotation === true) {
+        annotation = adm.defaultAnnotation_
+    }
+    if (annotation === false) {
+        return
+    }
+    assertAnnotable(adm, annotation, key)
+    if (!(key in adm.target_)) {
+        die(1, annotation.annotationType_, `${adm.name_}.${key.toString()}`)
+    }
+    let source = adm.target_
+    while (source && source !== objectPrototype) {
+        const descriptor = getDescriptor(source, key)
+        if (descriptor) {
+            const outcome = annotation.make_(adm, key, descriptor, source)
+            if (outcome === MakeResult.Cancel) {
+                return
+            }
+            if (outcome === MakeResult.Break) {
+                break
+            }
+        }
+        source = Object.getPrototypeOf(source)
+    }
+    recordAnnotationApplied(adm, annotation, key)
 }

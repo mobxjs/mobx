@@ -1,10 +1,15 @@
 import {
     observable,
+    observableRef,
+    observableShallow,
+    observableDeep,
     computed,
+    computedStruct,
     transaction,
     autorun,
     extendObservable,
     action,
+    actionBound,
     isObservableObject,
     observe,
     isObservable,
@@ -97,7 +102,7 @@ test("babel: parameterized computed decorator", () => {
             makeObservable(this, {
                 x: observable,
                 y: observable,
-                boxedSum: computed.struct
+                boxedSum: computedStruct
             })
         }
 
@@ -134,7 +139,7 @@ test("computed value should be the same around changing which was considered equ
         constructor() {
             makeObservable(this, {
                 c: observable,
-                collection: computed.struct
+                collection: computedStruct
             })
         }
 
@@ -558,20 +563,14 @@ test.skip("observable performance - babel", () => {
     console.log("changed in ", Date.now() - start)
 })
 
+// Do not remove: slow manual stage-3 decorator benchmark
 test.skip("observable performance - babel - decorators", () => {
     const AMOUNT = 100000
 
     class A {
-        @observable
-        a = 1
-        @observable
-        b = 2
-        @observable
-        c = 3
-
-        constructor() {
-            makeObservable(this)
-        }
+        @observable accessor a = 1
+        @observable accessor b = 2
+        @observable accessor c = 3
 
         @computed
         get d() {
@@ -598,6 +597,7 @@ test.skip("observable performance - babel - decorators", () => {
 
     console.log("changed in ", Date.now() - start)
 })
+
 test("unbound methods", () => {
     class A {
         constructor() {
@@ -1029,13 +1029,13 @@ test("issue #701", () => {
     expect(mobx.isObservableObject(model)).toBe(true)
 })
 
-test("@observable.ref (Babel)", () => {
+test("@observableRef (Babel)", () => {
     class A {
         ref = { a: 3 }
 
         constructor() {
             makeObservable(this, {
-                ref: observable.ref
+                ref: observableRef
             })
         }
     }
@@ -1046,13 +1046,13 @@ test("@observable.ref (Babel)", () => {
     expect(mobx.isObservableProp(a, "ref")).toBe(true)
 })
 
-test("@observable.shallow (Babel)", () => {
+test("@observableShallow (Babel)", () => {
     class A {
         arr = [{ todo: 1 }]
 
         constructor() {
             makeObservable(this, {
-                arr: observable.shallow
+                arr: observableShallow
             })
         }
     }
@@ -1067,13 +1067,13 @@ test("@observable.shallow (Babel)", () => {
     expect(a.arr[1] === todo2).toBeTruthy()
 })
 
-test("@observable.deep (Babel)", () => {
+test("@observableDeep (Babel)", () => {
     class A {
         arr = [{ todo: 1 }]
 
         constructor() {
             makeObservable(this, {
-                arr: observable.deep
+                arr: observableDeep
             })
         }
     }
@@ -1097,7 +1097,7 @@ test("action.bound binds (Babel)", () => {
         constructor() {
             makeObservable(this, {
                 x: observable,
-                inc: action.bound
+                inc: actionBound
             })
         }
 
@@ -1298,8 +1298,8 @@ test.skip("actions are reassignable", () => {
             makeObservable(this, {
                 m1: action,
                 m2: action,
-                m3: action.bound,
-                m4: action.bound
+                m3: actionBound,
+                m4: actionBound
             })
         }
 

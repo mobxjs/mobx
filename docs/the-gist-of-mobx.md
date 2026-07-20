@@ -136,7 +136,7 @@ as making a network request when submitting a form, should be triggered explicit
 
 #### 3.3. Reactive React components
 
-If you are using React, you can make your components reactive by wrapping them with the [`observer`](react-integration.md) function from the bindings package you've [chosen during installation](installation.md#installation). In this example, we're going to use the more lightweight `mobx-react-lite` package.
+If you are using React, you can make your function components reactive by wrapping them with the [`observer`](react-integration.md) function from the `mobx-react-lite` package.
 
 ```javascript
 import * as React from "react"
@@ -196,7 +196,6 @@ To learn more about how MobX determines which observables need to be reacted to,
 ## Principles
 
 MobX uses a uni-directional data flow where _actions_ change the _state_, which in turn updates all affected _views_.
-
 
 ![Action, State, View](assets/action-state-view.png)
 

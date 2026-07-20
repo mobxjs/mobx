@@ -4,13 +4,11 @@ import {
     die,
     isFunction,
     Annotation,
-    isStringish,
-    storeAnnotation,
     createFlowAnnotation,
-    createDecoratorAnnotation,
-    is20223Decorator
+    decorateFlow20223_,
+    assign
 } from "../internal"
-
+import { createDecoratorAnnotation, type DecoratorAnnotation } from "./decoratorannotation"
 import type { ClassMethodDecorator } from "../types/decorator_fills"
 
 export const FLOW = "flow"
@@ -35,46 +33,44 @@ export function isFlowCancellationError(error: Error) {
 
 export type CancellablePromise<T> = Promise<T> & { cancel(): void }
 
-type FlowGenerator = (...args: any[]) => Generator<any, any, any> | AsyncGenerator<any, any, any>
+function createFlowDecoratorAnnotation(
+    annotation: Annotation
+): DecoratorAnnotation<ClassMethodDecorator> {
+    return createDecoratorAnnotation(annotation, decorateFlow20223_)
+}
 
-// PropertyDecorator is only for legacy decorators
-interface Flow extends Annotation, PropertyDecorator {
-    <This, Value extends FlowGenerator>(
-        value: Value,
-        context: ClassMethodDecoratorContext<This, Value>
-    ): Value | void
+interface Flow extends Annotation, ClassMethodDecorator {
     <R, Args extends any[]>(
-        generator: (...args: Args) => Generator<any, R, any> | AsyncGenerator<any, R, any>
+        generator: (...args: Args) => Generator<any, R, any> | AsyncGenerator<any, R, any>,
+        context?: never
     ): (...args: Args) => CancellablePromise<R>
-    bound: Annotation & PropertyDecorator & ClassMethodDecorator
 }
 
 const flowAnnotation = createFlowAnnotation("flow")
 const flowBoundAnnotation = createFlowAnnotation("flow.bound", { bound: true })
 
-export const flow: Flow = Object.assign(
+export const flow: Flow = assign(
     function flow(arg1, arg2?) {
-        // @flow (2022.3 Decorators)
-        if (is20223Decorator(arg2)) {
-            return flowAnnotation.decorate_20223_(arg1, arg2)
+        if (arg2 && typeof arg2.kind === "string") {
+            return decorateFlow20223_(flowAnnotation, arg1, arg2)
         }
-        // @flow
-        if (isStringish(arg2)) {
-            return storeAnnotation(arg1, arg2, flowAnnotation)
-        }
+
         // flow(fn)
         if (__DEV__ && arguments.length !== 1) {
             die(`Flow expects single argument with generator function`)
         }
         const generator = arg1
-        const name = generator.name || "<unnamed flow>"
+        const name = generator.name || (__DEV__ ? "<unnamed flow>" : "flow")
 
         // Implementation based on https://github.com/tj/co/blob/master/index.js
         const res = function () {
             const ctx = this
             const args = arguments
-            const runId = ++generatorId
-            const gen = action(`${name} - runid: ${runId} - init`, generator).apply(ctx, args)
+            const runId = __DEV__ ? ++generatorId : 0
+            const gen = action(
+                __DEV__ ? `${name} - runid: ${runId} - init` : name,
+                generator
+            ).apply(ctx, args)
             let rejector: (error: any) => void
             let pendingPromise: CancellablePromise<any> | undefined = undefined
 
@@ -87,7 +83,7 @@ export const flow: Flow = Object.assign(
                     let ret
                     try {
                         ret = action(
-                            `${name} - runid: ${runId} - yield ${stepId++}`,
+                            __DEV__ ? `${name} - runid: ${runId} - yield ${stepId++}` : name,
                             gen.next
                         ).call(gen, res)
                     } catch (e) {
@@ -102,7 +98,7 @@ export const flow: Flow = Object.assign(
                     let ret
                     try {
                         ret = action(
-                            `${name} - runid: ${runId} - yield ${stepId++}`,
+                            __DEV__ ? `${name} - runid: ${runId} - yield ${stepId++}` : name,
                             gen.throw!
                         ).call(gen, err)
                     } catch (e) {
@@ -127,7 +123,8 @@ export const flow: Flow = Object.assign(
                 onFulfilled(undefined) // kick off the process
             }) as any
 
-            promise.cancel = action(`${name} - runid: ${runId} - cancel`, function () {
+            const cancelActionName = __DEV__ ? `${name} - runid: ${runId} - cancel` : name
+            promise.cancel = action(cancelActionName, function () {
                 try {
                     if (pendingPromise) {
                         cancelPromise(pendingPromise)
@@ -152,7 +149,7 @@ export const flow: Flow = Object.assign(
     flowAnnotation
 )
 
-flow.bound = createDecoratorAnnotation(flowBoundAnnotation)
+export const flowBound = createFlowDecoratorAnnotation(flowBoundAnnotation)
 
 function cancelPromise(promise) {
     if (isFunction(promise.cancel)) {

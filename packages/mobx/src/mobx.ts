@@ -16,13 +16,14 @@
  *
  */
 import { die } from "./errors"
-import { getGlobal } from "./utils/global"
-;["Symbol", "Map", "Set"].forEach(m => {
-    let g = getGlobal()
-    if (typeof g[m] === "undefined") {
-        die(`MobX requires global '${m}' to be available or polyfilled`)
-    }
-})
+if (__DEV__) {
+    const g = globalThis as any
+    ;["Symbol", "Map", "Set", "Proxy"].forEach(m => {
+        if (typeof g[m] === "undefined") {
+            die(`MobX requires global '${m}' to be available or polyfilled`)
+        }
+    })
+}
 
 import { spy, getDebugName, $mobx } from "./internal"
 
@@ -38,7 +39,10 @@ export {
     spy,
     IComputedValue,
     IEqualsComparer,
-    comparer,
+    compareDefault,
+    compareIdentity,
+    compareStructural,
+    compareShallow,
     IEnhancer,
     IInterceptable,
     IInterceptor,
@@ -72,9 +76,14 @@ export {
     IObservableSetInitialValues,
     transaction,
     observable,
+    observableRef,
+    observableShallow,
+    observableDeep,
+    observableStruct,
     IObservableFactory,
     CreateObservableOptions,
     computed,
+    computedStruct,
     IComputedFactory,
     isObservable,
     isObservableProp,
@@ -90,6 +99,7 @@ export {
     when,
     IWhenOptions,
     action,
+    actionBound,
     isAction,
     runInAction,
     IActionFactory,
@@ -106,13 +116,13 @@ export {
     onBecomeObserved,
     onBecomeUnobserved,
     flow,
+    flowBound,
     isFlow,
     flowResult,
     CancellablePromise,
     FlowCancellationError,
     isFlowCancellationError,
     toJS,
-    trace,
     IObserverTree,
     IDependencyTree,
     getDependencyTree,
@@ -138,6 +148,7 @@ export {
     makeObservable,
     makeAutoObservable,
     autoAction as _autoAction,
+    autoActionBound as _autoActionBound,
     AnnotationsMap,
     AnnotationMapEntry,
     override
@@ -145,7 +156,7 @@ export {
 
 // Devtools support
 declare const __MOBX_DEVTOOLS_GLOBAL_HOOK__: { injectMobx: (any) => void }
-if (typeof __MOBX_DEVTOOLS_GLOBAL_HOOK__ === "object") {
+if (__DEV__ && typeof __MOBX_DEVTOOLS_GLOBAL_HOOK__ === "object") {
     // See: https://github.com/andykog/mobx-devtools/
     __MOBX_DEVTOOLS_GLOBAL_HOOK__.injectMobx({
         spy,

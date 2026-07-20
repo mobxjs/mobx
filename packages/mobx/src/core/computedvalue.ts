@@ -5,10 +5,8 @@ import {
     IEqualsComparer,
     IObservable,
     Lambda,
-    TraceMode,
-    autorun,
     clearObserving,
-    comparer,
+    compareDefault,
     createAction,
     createInstanceofPredicate,
     endBatch,
@@ -24,9 +22,6 @@ import {
     startBatch,
     toPrimitive,
     trackDerivedFunction,
-    untrackedEnd,
-    untrackedStart,
-    UPDATE,
     die,
     allowStateChangesStart,
     allowStateChangesEnd
@@ -77,6 +72,14 @@ export type IComputedDidChange<T = any> = {
  *
  * If at any point it's outside batch and it isn't observed: reset everything and go to 1.
  */
+const enum ComputedValueFlags {
+    isComputing = 0b00001,
+    isRunningSetter = 0b00010,
+    isBeingObserved = 0b00100,
+    isPendingUnobservation = 0b01000,
+    diffValue = 0b10000
+}
+
 export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDerivation {
     dependenciesState_ = IDerivationState_.NOT_TRACKING_
     observing_: IObservable[] = [] // nodes we are looking at. Our value depends on these nodes
@@ -90,16 +93,10 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     name_: string
     triggeredBy_?: string
 
-    private static readonly isComputingMask_ = 0b00001
-    private static readonly isRunningSetterMask_ = 0b00010
-    private static readonly isBeingObservedMask_ = 0b00100
-    private static readonly isPendingUnobservationMask_ = 0b01000
-    private static readonly diffValueMask_ = 0b10000
     private flags_ = 0b00000
 
     derivation: () => T // N.B: unminified as it is used by MST
     setter_?: (value: T) => void
-    isTracing_: TraceMode = TraceMode.NONE
     scope_: Object | undefined
     private equals_: IEqualsComparer<any>
     private requiresReaction_: boolean | undefined
@@ -110,11 +107,9 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
      *
      * The `name` property is for debug purposes only.
      *
-     * The `equals` property specifies the comparer function to use to determine if a newly produced
-     * value differs from the previous value. Two comparers are provided in the library; `defaultComparer`
-     * compares based on identity comparison (===), and `structuralComparer` deeply compares the structure.
-     * Structural comparison can be convenient if you always produce a new aggregated object and
-     * don't want to notify observers if it is structurally the same.
+     * The `equals` property specifies the comparer function used to determine if a newly produced
+     * value differs from the previous value. Structural comparison can be convenient if you always
+     * produce a new aggregated object and don't want to notify observers if it is structurally the same.
      * This is useful for working with vectors, mouse coordinates etc.
      */
     constructor(options: IComputedValueOptions<T>) {
@@ -129,11 +124,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
                 options.set
             ) as any
         }
-        this.equals_ =
-            options.equals ||
-            ((options as any).compareStructural || (options as any).struct
-                ? comparer.structural
-                : comparer.default)
+        this.equals_ = options.equals || compareDefault
         this.scope_ = options.context
         this.requiresReaction_ = options.requiresReaction
         this.keepAlive_ = !!options.keepAlive
@@ -160,40 +151,40 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
 
     // to check for cycles
     private get isComputing(): boolean {
-        return getFlag(this.flags_, ComputedValue.isComputingMask_)
+        return getFlag(this.flags_, ComputedValueFlags.isComputing)
     }
     private set isComputing(newValue: boolean) {
-        this.flags_ = setFlag(this.flags_, ComputedValue.isComputingMask_, newValue)
+        this.flags_ = setFlag(this.flags_, ComputedValueFlags.isComputing, newValue)
     }
 
     private get isRunningSetter(): boolean {
-        return getFlag(this.flags_, ComputedValue.isRunningSetterMask_)
+        return getFlag(this.flags_, ComputedValueFlags.isRunningSetter)
     }
     private set isRunningSetter(newValue: boolean) {
-        this.flags_ = setFlag(this.flags_, ComputedValue.isRunningSetterMask_, newValue)
+        this.flags_ = setFlag(this.flags_, ComputedValueFlags.isRunningSetter, newValue)
     }
 
     get isBeingObserved(): boolean {
-        return getFlag(this.flags_, ComputedValue.isBeingObservedMask_)
+        return getFlag(this.flags_, ComputedValueFlags.isBeingObserved)
     }
     set isBeingObserved(newValue: boolean) {
-        this.flags_ = setFlag(this.flags_, ComputedValue.isBeingObservedMask_, newValue)
+        this.flags_ = setFlag(this.flags_, ComputedValueFlags.isBeingObserved, newValue)
     }
 
     get isPendingUnobservation(): boolean {
-        return getFlag(this.flags_, ComputedValue.isPendingUnobservationMask_)
+        return getFlag(this.flags_, ComputedValueFlags.isPendingUnobservation)
     }
     set isPendingUnobservation(newValue: boolean) {
-        this.flags_ = setFlag(this.flags_, ComputedValue.isPendingUnobservationMask_, newValue)
+        this.flags_ = setFlag(this.flags_, ComputedValueFlags.isPendingUnobservation, newValue)
     }
 
     get diffValue(): 0 | 1 {
-        return getFlag(this.flags_, ComputedValue.diffValueMask_) ? 1 : 0
+        return getFlag(this.flags_, ComputedValueFlags.diffValue) ? 1 : 0
     }
     set diffValue(newValue: 0 | 1) {
         this.flags_ = setFlag(
             this.flags_,
-            ComputedValue.diffValueMask_,
+            ComputedValueFlags.diffValue,
             newValue === 1 ? true : false
         )
     }
@@ -289,7 +280,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
     computeValue_(track: boolean) {
         this.isComputing = true
         // don't allow state changes during computation
-        const prev = allowStateChangesStart(false)
+        const prev = __DEV__ ? allowStateChangesStart(false) : false
         let res: T | CaughtException
         if (track) {
             res = trackDerivedFunction(this, this.derivation, this.scope_)
@@ -304,7 +295,9 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
                 }
             }
         }
-        allowStateChangesEnd(prev)
+        if (__DEV__) {
+            allowStateChangesEnd(prev)
+        }
         this.isComputing = false
         return res
     }
@@ -313,45 +306,12 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
         if (!this.keepAlive_) {
             clearObserving(this)
             this.value_ = undefined // don't hold on to computed value!
-            if (__DEV__ && this.isTracing_ !== TraceMode.NONE) {
-                console.log(
-                    `[mobx.trace] Computed value '${this.name_}' was suspended and it will recompute on the next access.`
-                )
-            }
         }
-    }
-
-    observe_(listener: (change: IComputedDidChange<T>) => void, fireImmediately?: boolean): Lambda {
-        let firstTime = true
-        let prevValue: T | undefined = undefined
-        return autorun(() => {
-            // TODO: why is this in a different place than the spyReport() function? in all other observables it's called in the same place
-            let newValue = this.get()
-            if (!firstTime || fireImmediately) {
-                const prevU = untrackedStart()
-                listener({
-                    observableKind: "computed",
-                    debugObjectName: this.name_,
-                    type: UPDATE,
-                    object: this,
-                    newValue,
-                    oldValue: prevValue
-                })
-                untrackedEnd(prevU)
-            }
-            firstTime = false
-            prevValue = newValue
-        })
     }
 
     warnAboutUntrackedRead_() {
         if (!__DEV__) {
             return
-        }
-        if (this.isTracing_ !== TraceMode.NONE) {
-            console.log(
-                `[mobx.trace] Computed value '${this.name_}' is being read outside a reactive context. Doing a full recompute.`
-            )
         }
         if (
             typeof this.requiresReaction_ === "boolean"

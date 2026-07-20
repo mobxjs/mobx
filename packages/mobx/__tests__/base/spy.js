@@ -114,7 +114,7 @@ test("bound actions report correct object (discussions/3140)", () => {
             mobx.makeAutoObservable(
                 this,
                 {
-                    actionBound: mobx.action.bound
+                    actionBound: mobx.actionBound
                 },
                 { autoBind: true }
             )

@@ -3,9 +3,6 @@ import { forwardRef, memo } from "react"
 import { isUsingStaticRendering } from "./staticRendering"
 import { useObserver } from "./useObserver"
 
-let warnObserverOptionsDeprecated = true
-let warnLegacyContextTypes = true
-
 const hasSymbol = typeof Symbol === "function" && Symbol.for
 const isFunctionNameConfigurable =
     Object.getOwnPropertyDescriptor(() => {}, "name")?.configurable ?? false
@@ -19,35 +16,13 @@ const ReactMemoSymbol = hasSymbol
     ? Symbol.for("react.memo")
     : typeof memo === "function" && memo((props: any) => null)["$$typeof"]
 
-/**
- * @deprecated Observer options will be removed in the next major version of mobx-react-lite.
- * Look at the individual properties for alternatives.
- */
-export interface IObserverOptions {
-    /**
-     * @deprecated Pass a `React.forwardRef` component to observer instead of using the options object
-     * e.g. `observer(React.forwardRef(fn))`
-     */
-    readonly forwardRef?: boolean
-}
-
-export function observer<P extends object, TRef = {}>(
-    baseComponent: React.ForwardRefRenderFunction<TRef, P>,
-    options: IObserverOptions & {
-        /**
-         * @deprecated Pass a `React.forwardRef` component to observer instead of using the options object
-         * e.g. `observer(React.forwardRef(fn))`
-         */
-        forwardRef: true
-    }
-): React.MemoExoticComponent<
-    React.ForwardRefExoticComponent<React.PropsWithoutRef<P> & React.RefAttributes<TRef>>
->
+export function observer<C extends React.FunctionComponent<any>>(
+    baseComponent: C
+): C & React.MemoExoticComponent<C>
 
 export function observer<P extends object>(
-    baseComponent: React.FunctionComponent<P>,
-    options?: IObserverOptions
-): React.FunctionComponent<P>
+    baseComponent: React.FunctionComponent<P>
+): React.FunctionComponent<P> & React.MemoExoticComponent<React.FunctionComponent<P>>
 
 export function observer<P extends object, TRef = {}>(
     baseComponent: React.ForwardRefExoticComponent<
@@ -56,39 +31,14 @@ export function observer<P extends object, TRef = {}>(
 ): React.MemoExoticComponent<
     React.ForwardRefExoticComponent<React.PropsWithoutRef<P> & React.RefAttributes<TRef>>
 >
-export function observer<
-    C extends React.FunctionComponent<any> | React.ForwardRefRenderFunction<any>,
-    Options extends IObserverOptions
->(
-    baseComponent: C,
-    options?: Options
-): Options extends { forwardRef: true }
-    ? C extends React.ForwardRefRenderFunction<infer TRef, infer P>
-        ? C &
-              React.MemoExoticComponent<
-                  React.ForwardRefExoticComponent<
-                      React.PropsWithoutRef<P> & React.RefAttributes<TRef>
-                  >
-              >
-        : never /* forwardRef set for a non forwarding component */
-    : C & { displayName: string }
 
 // n.b. base case is not used for actual typings or exported in the typing files
 export function observer<P extends object, TRef = {}>(
     baseComponent:
         | React.ForwardRefRenderFunction<TRef, P>
         | React.FunctionComponent<P>
-        | React.ForwardRefExoticComponent<React.PropsWithoutRef<P> & React.RefAttributes<TRef>>,
-    // TODO remove in next major
-    options?: IObserverOptions
+        | React.ForwardRefExoticComponent<React.PropsWithoutRef<P> & React.RefAttributes<TRef>>
 ) {
-    if (process.env.NODE_ENV !== "production" && warnObserverOptionsDeprecated && options) {
-        warnObserverOptionsDeprecated = false
-        console.warn(
-            `[mobx-react-lite] \`observer(fn, { forwardRef: true })\` is deprecated, use \`observer(React.forwardRef(fn))\``
-        )
-    }
-
     if (ReactMemoSymbol && baseComponent["$$typeof"] === ReactMemoSymbol) {
         throw new Error(
             `[mobx-react-lite] You are trying to use \`observer\` on a function component wrapped in either another \`observer\` or \`React.memo\`. The observer already applies 'React.memo' for you.`
@@ -100,7 +50,7 @@ export function observer<P extends object, TRef = {}>(
         return baseComponent
     }
 
-    let useForwardRef = options?.forwardRef ?? false
+    let useForwardRef = false
     let render = baseComponent
 
     const baseComponentName = baseComponent.displayName || baseComponent.name
@@ -132,20 +82,6 @@ export function observer<P extends object, TRef = {}>(
         })
     }
 
-    // Support legacy context: `contextTypes` must be applied before `memo`
-    if ((baseComponent as any).contextTypes) {
-        ;(observerComponent as React.FunctionComponent).contextTypes = (
-            baseComponent as any
-        ).contextTypes
-
-        if (process.env.NODE_ENV !== "production" && warnLegacyContextTypes) {
-            warnLegacyContextTypes = false
-            console.warn(
-                `[mobx-react-lite] Support for Legacy Context in function components will be removed in the next major release.`
-            )
-        }
-    }
-
     if (useForwardRef) {
         // `forwardRef` must be applied prior `memo`
         // `forwardRef(observer(cmp))` throws:
@@ -159,18 +95,6 @@ export function observer<P extends object, TRef = {}>(
     observerComponent = memo(observerComponent)
 
     copyStaticProperties(baseComponent, observerComponent)
-
-    if ("production" !== process.env.NODE_ENV) {
-        Object.defineProperty(observerComponent, "contextTypes", {
-            set() {
-                throw new Error(
-                    `[mobx-react-lite] \`${
-                        this.displayName || this.type?.displayName || this.type?.name || "Component"
-                    }.contextTypes\` must be set before applying \`observer\`.`
-                )
-            }
-        })
-    }
 
     return observerComponent
 }

@@ -507,16 +507,16 @@ test("deepEqual map", () => {
     x2.set("x", 3)
     x2.set("y", { z: 3 })
 
-    expect(mobx.comparer.structural(x, x2)).toBe(false)
+    expect(mobx.compareStructural(x, x2)).toBe(false)
     x2.get("y").z = 2
-    expect(mobx.comparer.structural(x, x2)).toBe(true)
+    expect(mobx.compareStructural(x, x2)).toBe(true)
 
     x2.set("z", 1)
-    expect(mobx.comparer.structural(x, x2)).toBe(false)
+    expect(mobx.compareStructural(x, x2)).toBe(false)
     x2.delete("z")
-    expect(mobx.comparer.structural(x, x2)).toBe(true)
+    expect(mobx.compareStructural(x, x2)).toBe(true)
     x2.delete("y")
-    expect(mobx.comparer.structural(x, x2)).toBe(false)
+    expect(mobx.compareStructural(x, x2)).toBe(false)
 })
 
 test("798, cannot return observable map from computed prop", () => {
@@ -1360,12 +1360,14 @@ test("2346 - subscribe to not yet existing map keys", async () => {
     class Compute {
         values = observable.map()
 
-        @computed get get42() {
+        get get42() {
             return this.get(42)
         }
 
         constructor() {
-            makeObservable(this)
+            makeObservable(this, {
+                get42: computed
+            })
         }
 
         get(k) {

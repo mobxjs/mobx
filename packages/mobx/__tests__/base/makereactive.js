@@ -99,7 +99,7 @@ test("observable1", function () {
             }
         },
         {
-            a: m.observable.ref
+            a: m.observableRef
         }
     )
 
@@ -256,7 +256,7 @@ test("flat array", function () {
                 }
             ]
         },
-        { x: m.observable.shallow }
+        { x: m.observableShallow }
     )
 
     let result
@@ -324,7 +324,7 @@ test("as structure", function () {
             x: null
         },
         {
-            x: m.observable.struct
+            x: m.observableStruct
         }
     )
 
@@ -429,7 +429,7 @@ test("as structure view", function () {
             }
         },
         {
-            c: m.computed({ compareStructural: true })
+            c: m.computed({ equals: m.compareStructural })
         }
     )
 
@@ -543,7 +543,7 @@ test("761 - deeply nested modifiers work", () => {
                 someNestedKey: []
             },
             {
-                someNestedKey: mobx.observable.ref
+                someNestedKey: mobx.observableRef
             }
         )
     })
@@ -570,7 +570,7 @@ test("compare structurally, ref", () => {
             x: undefined
         },
         {
-            x: mobx.observable.struct
+            x: mobx.observableStruct
         }
     )
 
@@ -608,7 +608,7 @@ test("double declare property", () => {
             o,
             { a: 2 },
             {
-                a: mobx.observable.ref
+                a: mobx.observableRef
             }
         )
     }).toThrow(/The field is already annotated/)
@@ -620,7 +620,7 @@ test("structural collections", () => {
             x: [1, 2, 3]
         },
         {
-            x: mobx.observable.struct
+            x: mobx.observableStruct
         }
     )
 

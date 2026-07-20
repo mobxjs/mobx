@@ -1,5 +1,7 @@
-import { IDerivation, IObservable, Reaction, die, getGlobal } from "../internal"
+import { IDerivation, IObservable, Reaction, die } from "../internal"
 import { ComputedValue } from "./computedvalue"
+
+const MOBX_GLOBALS_VERSION = 7
 
 /**
  * These values will persist if global state is reset
@@ -14,8 +16,7 @@ const persistentKeys: (keyof MobXGlobals)[] = [
     "allowStateReads",
     "disableErrorBoundaries",
     "runId",
-    "UNCHANGED",
-    "useProxies"
+    "UNCHANGED"
 ]
 
 export type IUNCHANGED = {}
@@ -29,7 +30,7 @@ export class MobXGlobals {
      * N.B: this version is unrelated to the package version of MobX, and is only the version of the
      * internal state storage of MobX, and can be the same across many different package versions
      */
-    version = 6
+    version = MOBX_GLOBALS_VERSION
 
     /**
      * globally unique token to signal unchanged
@@ -138,12 +139,6 @@ export class MobXGlobals {
      */
     suppressReactionErrors = false
 
-    useProxies = true
-    /*
-     * print warnings about code that would fail if proxies weren't available
-     */
-    verifyProxies = false
-
     /**
      * False forces all object's descriptors to
      * writable: true
@@ -156,11 +151,11 @@ let canMergeGlobalState = true
 let isolateCalled = false
 
 export let globalState: MobXGlobals = (function () {
-    let global = getGlobal()
+    let global = globalThis as any
     if (global.__mobxInstanceCount > 0 && !global.__mobxGlobals) {
         canMergeGlobalState = false
     }
-    if (global.__mobxGlobals && global.__mobxGlobals.version !== new MobXGlobals().version) {
+    if (global.__mobxGlobals && global.__mobxGlobals.version !== MOBX_GLOBALS_VERSION) {
         canMergeGlobalState = false
     }
 
@@ -195,7 +190,7 @@ export function isolateGlobalState() {
     }
     isolateCalled = true
     if (canMergeGlobalState) {
-        let global = getGlobal()
+        let global = globalThis as any
         if (--global.__mobxInstanceCount === 0) {
             global.__mobxGlobals = undefined
         }

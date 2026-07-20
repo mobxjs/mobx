@@ -3,6 +3,7 @@
 
 import {
     observable,
+    observableRef,
     computed,
     autorun,
     action,
@@ -58,7 +59,7 @@ test("decorate should work", function () {
         }
         constructor() {
             makeObservable(this, {
-                uninitialized: observable.ref,
+                uninitialized: observableRef,
                 height: observable,
                 sizes: observable,
                 someFunc: observable,

@@ -6,8 +6,6 @@ import {
     endBatch,
     getNextId,
     noop,
-    onBecomeObserved,
-    onBecomeUnobserved,
     propagateChanged,
     reportObserved,
     startBatch,
@@ -23,10 +21,13 @@ export interface IAtom extends IObservable {
     reportChanged(): void
 }
 
+const enum AtomFlags {
+    isBeingObserved = 0b001,
+    isPendingUnobservation = 0b010,
+    diffValue = 0b100
+}
+
 export class Atom implements IAtom {
-    private static readonly isBeingObservedMask_ = 0b001
-    private static readonly isPendingUnobservationMask_ = 0b010
-    private static readonly diffValueMask_ = 0b100
     private flags_ = 0b000
 
     observers_ = new Set<IDerivation>()
@@ -41,24 +42,24 @@ export class Atom implements IAtom {
 
     // for effective unobserving. BaseAtom has true, for extra optimization, so its onBecomeUnobserved never gets called, because it's not needed
     get isBeingObserved(): boolean {
-        return getFlag(this.flags_, Atom.isBeingObservedMask_)
+        return getFlag(this.flags_, AtomFlags.isBeingObserved)
     }
     set isBeingObserved(newValue: boolean) {
-        this.flags_ = setFlag(this.flags_, Atom.isBeingObservedMask_, newValue)
+        this.flags_ = setFlag(this.flags_, AtomFlags.isBeingObserved, newValue)
     }
 
     get isPendingUnobservation(): boolean {
-        return getFlag(this.flags_, Atom.isPendingUnobservationMask_)
+        return getFlag(this.flags_, AtomFlags.isPendingUnobservation)
     }
     set isPendingUnobservation(newValue: boolean) {
-        this.flags_ = setFlag(this.flags_, Atom.isPendingUnobservationMask_, newValue)
+        this.flags_ = setFlag(this.flags_, AtomFlags.isPendingUnobservation, newValue)
     }
 
     get diffValue(): 0 | 1 {
-        return getFlag(this.flags_, Atom.diffValueMask_) ? 1 : 0
+        return getFlag(this.flags_, AtomFlags.diffValue) ? 1 : 0
     }
     set diffValue(newValue: 0 | 1) {
-        this.flags_ = setFlag(this.flags_, Atom.diffValueMask_, newValue === 1 ? true : false)
+        this.flags_ = setFlag(this.flags_, AtomFlags.diffValue, newValue === 1 ? true : false)
     }
 
     // onBecomeObservedListeners
@@ -110,11 +111,11 @@ export function createAtom(
     const atom = new Atom(name)
     // default `noop` listener will not initialize the hook Set
     if (onBecomeObservedHandler !== noop) {
-        onBecomeObserved(atom, onBecomeObservedHandler)
+        atom.onBOL = new Set([onBecomeObservedHandler])
     }
 
     if (onBecomeUnobservedHandler !== noop) {
-        onBecomeUnobserved(atom, onBecomeUnobservedHandler)
+        atom.onBUOL = new Set([onBecomeUnobservedHandler])
     }
     return atom
 }

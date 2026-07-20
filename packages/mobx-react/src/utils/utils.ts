@@ -28,52 +28,6 @@ function is(x: any, y: any): boolean {
     }
 }
 
-// based on https://github.com/mridgway/hoist-non-react-statics/blob/master/src/index.js
-const hoistBlackList = {
-    $$typeof: 1,
-    render: 1,
-    compare: 1,
-    type: 1,
-    childContextTypes: 1,
-    contextType: 1,
-    contextTypes: 1,
-    defaultProps: 1,
-    getDefaultProps: 1,
-    getDerivedStateFromError: 1,
-    getDerivedStateFromProps: 1,
-    mixins: 1,
-    displayName: 1,
-    propTypes: 1
-}
-
-export function copyStaticProperties(base: object, target: object): void {
-    const protoProps = Object.getOwnPropertyNames(Object.getPrototypeOf(base))
-    Object.getOwnPropertyNames(base).forEach(key => {
-        if (!hoistBlackList[key] && protoProps.indexOf(key) === -1) {
-            Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(base, key)!)
-        }
-    })
-}
-
-/**
- * Helper to set `prop` to `this` as non-enumerable (hidden prop)
- * @param target
- * @param prop
- * @param value
- */
-export function setHiddenProp(target: object, prop: any, value: any): void {
-    if (!Object.hasOwnProperty.call(target, prop)) {
-        Object.defineProperty(target, prop, {
-            enumerable: false,
-            configurable: true,
-            writable: true,
-            value
-        })
-    } else {
-        target[prop] = value
-    }
-}
-
 /**
  * Utilities for patching componentWillUnmount, to make sure @disposeOnUnmount works correctly icm with user defined hooks
  * and the handler provided by mobx-react
