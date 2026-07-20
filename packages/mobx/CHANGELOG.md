@@ -1,5 +1,11 @@
 # mobx
 
+## 6.16.2
+
+### Patch Changes
+
+-   [`979d267d569734dc3cb969ed1880ed68bb79f1b5`](https://github.com/mobxjs/mobx/commit/979d267d569734dc3cb969ed1880ed68bb79f1b5) [#4677](https://github.com/mobxjs/mobx/pull/4677) Thanks [@kubk](https://github.com/kubk)! - Shorten minified error URL to reduce production bundle size.
+
 ## 6.16.1
 
 ### Patch Changes
