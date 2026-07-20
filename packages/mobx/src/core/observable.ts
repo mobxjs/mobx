@@ -29,7 +29,7 @@ export interface IObservable extends IDepTreeNode {
     lowestObserverState_: IDerivationState_ // Used to avoid redundant propagations
     isPendingUnobservation: boolean // Used to push itself to global.pendingUnobservations at most once per batch.
 
-    observers_: Set<IDerivation>
+    observers_: Set<IDerivation> | null
 
     onBUO(): void
     onBO(): void
@@ -39,11 +39,11 @@ export interface IObservable extends IDepTreeNode {
 }
 
 export function hasObservers(observable: IObservable): boolean {
-    return observable.observers_ && observable.observers_.size > 0
+    return !!observable.observers_ && observable.observers_.size > 0
 }
 
 export function getObservers(observable: IObservable): Set<IDerivation> {
-    return observable.observers_
+    return observable.observers_ ?? new Set()
 }
 
 // function invariantObservers(observable: IObservable) {
@@ -68,7 +68,7 @@ export function addObserver(observable: IObservable, node: IDerivation) {
     // invariant(observable._observers.indexOf(node) === -1, "INTERNAL ERROR add already added node");
     // invariantObservers(observable);
 
-    observable.observers_.add(node)
+    ;(observable.observers_ ??= new Set()).add(node)
     if (observable.lowestObserverState_ > node.dependenciesState_) {
         observable.lowestObserverState_ = node.dependenciesState_
     }
@@ -81,8 +81,12 @@ export function removeObserver(observable: IObservable, node: IDerivation) {
     // invariant(globalState.inBatch > 0, "INTERNAL ERROR, remove should be called only inside batch");
     // invariant(observable._observers.indexOf(node) !== -1, "INTERNAL ERROR remove already removed node");
     // invariantObservers(observable);
-    observable.observers_.delete(node)
-    if (observable.observers_.size === 0) {
+    const observers = observable.observers_
+    if (!observers) {
+        return
+    }
+    observers.delete(node)
+    if (observers.size === 0) {
         // deleting last observer
         queueForUnobservation(observable)
     }
@@ -115,7 +119,7 @@ export function endBatch() {
         for (let i = 0; i < list.length; i++) {
             const observable = list[i]
             observable.isPendingUnobservation = false
-            if (observable.observers_.size === 0) {
+            if (!observable.observers_ || observable.observers_.size === 0) {
                 if (observable.isBeingObserved) {
                     // if this observable had reactive observers, trigger the hooks
                     observable.isBeingObserved = false
@@ -152,7 +156,10 @@ export function reportObserved(observable: IObservable): boolean {
             }
         }
         return observable.isBeingObserved
-    } else if (observable.observers_.size === 0 && globalState.inBatch > 0) {
+    } else if (
+        (!observable.observers_ || observable.observers_.size === 0) &&
+        globalState.inBatch > 0
+    ) {
         queueForUnobservation(observable)
     }
 
@@ -190,7 +197,7 @@ export function propagateChanged(observable: IObservable) {
     observable.lowestObserverState_ = IDerivationState_.STALE_
 
     // Ideally we use for..of here, but the downcompiled version is really slow...
-    observable.observers_.forEach(d => {
+    observable.observers_?.forEach(d => {
         if (d.dependenciesState_ === IDerivationState_.UP_TO_DATE_) {
             if (__DEV__ && d.isTracing_ !== TraceMode.NONE) {
                 logTraceInfo(d, observable)
@@ -210,7 +217,7 @@ export function propagateChangeConfirmed(observable: IObservable) {
     }
     observable.lowestObserverState_ = IDerivationState_.STALE_
 
-    observable.observers_.forEach(d => {
+    observable.observers_?.forEach(d => {
         if (d.dependenciesState_ === IDerivationState_.POSSIBLY_STALE_) {
             d.dependenciesState_ = IDerivationState_.STALE_
             if (__DEV__ && d.isTracing_ !== TraceMode.NONE) {
@@ -233,7 +240,7 @@ export function propagateMaybeChanged(observable: IObservable) {
     }
     observable.lowestObserverState_ = IDerivationState_.POSSIBLY_STALE_
 
-    observable.observers_.forEach(d => {
+    observable.observers_?.forEach(d => {
         if (d.dependenciesState_ === IDerivationState_.UP_TO_DATE_) {
             d.dependenciesState_ = IDerivationState_.POSSIBLY_STALE_
             d.onBecomeStale_()

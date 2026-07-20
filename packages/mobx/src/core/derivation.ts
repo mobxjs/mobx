@@ -135,7 +135,7 @@ export function checkIfStateModificationsAreAllowed(atom: IAtom) {
     if (!__DEV__) {
         return
     }
-    const hasObservers = atom.observers_.size > 0
+    const hasObservers = !!atom.observers_ && atom.observers_.size > 0
     // Should not be possible to change observed state outside strict mode, except during initialization, see #563
     if (
         !globalState.allowStateChanges &&
