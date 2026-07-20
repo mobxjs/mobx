@@ -510,6 +510,58 @@ test("#2667", () => {
     ])
 })
 
+test("#3954 - disposing a chain of reactions from onBecomeUnobserved doesn't overflow the stack", () => {
+    // Each box's onBecomeUnobserved handler disposes the next reaction in the
+    // chain. Disposing reaction[0] unobserves box[0], whose handler disposes
+    // reaction[1], which unobserves box[1], and so on. Each of those disposals
+    // re-enters endBatch() while the previous one is still draining
+    // pendingUnobservations, so this used to recurse N deep instead of
+    // looping, overflowing the stack for a large enough chain.
+    const N = 10000
+    const boxes = Array.from({ length: N }, () => observable.box(0))
+    const disposers = boxes.map(box => autorun(() => box.get()))
+    let unobservedCount = 0
+
+    boxes.forEach((box, i) => {
+        onBecomeUnobserved(box, () => {
+            unobservedCount++
+            if (i + 1 < N) {
+                disposers[i + 1]()
+            }
+        })
+    })
+
+    expect(() => disposers[0]()).not.toThrow()
+
+    // the whole chain should have unwound, not just the first link
+    expect(unobservedCount).toBe(N)
+})
+
+test("#3954 followup - isRunningUnobservations is released even if an onBecomeUnobserved handler throws", () => {
+    const boxA = observable.box(0)
+    const disposeA = autorun(() => boxA.get())
+    onBecomeUnobserved(boxA, () => {
+        throw new Error("boom")
+    })
+
+    // the handler's exception should still surface to the caller, not be swallowed
+    expect(() => disposeA()).toThrow("boom")
+
+    // if the internal guard were left stuck true after that exception, every
+    // future endBatch() would silently stop draining pendingUnobservations,
+    // so this completely unrelated disposal would never fire its own handler
+    const boxB = observable.box(0)
+    const disposeB = autorun(() => boxB.get())
+    let unobservedB = false
+    onBecomeUnobserved(boxB, () => {
+        unobservedB = true
+    })
+
+    disposeB()
+
+    expect(unobservedB).toBe(true)
+})
+
 test("works with ObservableSet #3595", () => {
     const onSetObserved = jest.fn()
     const onSetUnobserved = jest.fn()
