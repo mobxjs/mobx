@@ -462,13 +462,6 @@ Is this a boxed computed value, created using `computed(() => expr)`?
 
 Is this a computed property?
 
-### `spy`
-
-{🚀} Usage: `spy(eventListener)`
-<small>(<b>[further information](analyzing-reactivity.md#spy)</b>)</small>
-
-Registers a global spy listener that listens to all events that happen in MobX.
-
 ### `getDebugName`
 
 {🚀} Usage: `getDebugName(reaction|array|Set|Map)` or `getDebugName(object|Map, propertyName)`

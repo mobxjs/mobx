@@ -14,10 +14,7 @@ import {
     hasListeners,
     interceptChange,
     isObject,
-    isSpyEnabled,
     notifyListeners,
-    spyReportEnd,
-    spyReportStart,
     hasProp,
     die,
     globalState,
@@ -246,63 +243,45 @@ export class ObservableArrayAdministration
     }
 
     notifyArrayChildUpdate_(index: number, newValue: any, oldValue: any) {
-        const notifySpy = __DEV__ && !this.owned_ && isSpyEnabled()
         const notify = hasListeners(this)
-        const change: IArrayDidChange | null =
-            notify || notifySpy
-                ? ({
-                      observableKind: "array",
-                      object: this.proxy_,
-                      type: UPDATE,
-                      debugObjectName: this.atom_.name_,
-                      index,
-                      newValue,
-                      oldValue
-                  } as const)
-                : null
+        const change: IArrayDidChange | null = notify
+            ? ({
+                  observableKind: "array",
+                  object: this.proxy_,
+                  type: UPDATE,
+                  debugObjectName: this.atom_.name_,
+                  index,
+                  newValue,
+                  oldValue
+              } as const)
+            : null
 
-        // The reason why this is on right hand side here (and not above), is this way the uglifier will drop it, but it won't
-        // cause any runtime overhead in development mode without NODE_ENV set, unless spying is enabled
-        if (__DEV__ && notifySpy) {
-            spyReportStart(change!)
-        }
         this.atom_.reportChanged()
         if (notify) {
             notifyListeners(this, change)
-        }
-        if (__DEV__ && notifySpy) {
-            spyReportEnd()
         }
     }
 
     notifyArraySplice_(index: number, added: any[], removed: any[]) {
-        const notifySpy = __DEV__ && !this.owned_ && isSpyEnabled()
         const notify = hasListeners(this)
-        const change: IArraySplice | null =
-            notify || notifySpy
-                ? ({
-                      observableKind: "array",
-                      object: this.proxy_,
-                      debugObjectName: this.atom_.name_,
-                      type: SPLICE,
-                      index,
-                      removed,
-                      added,
-                      removedCount: removed.length,
-                      addedCount: added.length
-                  } as const)
-                : null
+        const change: IArraySplice | null = notify
+            ? ({
+                  observableKind: "array",
+                  object: this.proxy_,
+                  debugObjectName: this.atom_.name_,
+                  type: SPLICE,
+                  index,
+                  removed,
+                  added,
+                  removedCount: removed.length,
+                  addedCount: added.length
+              } as const)
+            : null
 
-        if (__DEV__ && notifySpy) {
-            spyReportStart(change!)
-        }
         this.atom_.reportChanged()
         // conform: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
         if (notify) {
             notifyListeners(this, change)
-        }
-        if (__DEV__ && notifySpy) {
-            spyReportEnd()
         }
     }
 

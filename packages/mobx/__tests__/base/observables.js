@@ -862,15 +862,6 @@ test("when 2", function () {
     expect(d[$mobx].name_).toBe("when x is 3")
 })
 
-function stripSpyOutput(events) {
-    events.forEach(ev => {
-        delete ev.time
-        delete ev.fn
-        delete ev.object
-    })
-    return events
-}
-
 test("issue 50", function (done) {
     m._resetGlobalState()
     mobx._getGlobalState().mobxGuid = 0
@@ -890,10 +881,6 @@ test("issue 50", function (done) {
         result = [x.a, x.b, x.c].join(",")
     })
 
-    const disposer2 = mobx.spy(function (info) {
-        events.push(info)
-    })
-
     setTimeout(function () {
         mobx.transaction(function () {
             events.push("transstart")
@@ -905,48 +892,9 @@ test("issue 50", function (done) {
         expect(result).toBe("false,true,true")
         expect(x.c).toBe(x.b)
 
-        expect(stripSpyOutput(events)).toMatchSnapshot()
-
         disposer1()
-        disposer2()
         done()
     }, 500)
-})
-
-test("verify transaction events", function () {
-    m._resetGlobalState()
-    mobx._getGlobalState().mobxGuid = 0
-
-    const x = observable({
-        b: 1,
-        get c() {
-            events.push("calc c")
-            return this.b
-        }
-    })
-
-    const events = []
-    const disposer1 = mobx.autorun(function ar() {
-        events.push("auto")
-        x.c
-    })
-
-    const disposer2 = mobx.spy(function (info) {
-        events.push(info)
-    })
-
-    mobx.transaction(function () {
-        events.push("transstart")
-        x.b = 1
-        x.b = 2
-        events.push("transpreend")
-    })
-    events.push("transpostend")
-
-    expect(stripSpyOutput(events)).toMatchSnapshot()
-
-    disposer1()
-    disposer2()
 })
 
 test("verify array in transaction", function () {
@@ -982,9 +930,6 @@ test("delay autorun until end of transaction", function () {
         }
     })
     let disposer1
-    const disposer2 = mobx.spy(function (info) {
-        events.push(info)
-    })
     let didRun = false
 
     mobx.transaction(function () {
@@ -1014,10 +959,6 @@ test("delay autorun until end of transaction", function () {
     disposer1()
     x.a = 3
     events.push("post trans3")
-
-    expect(stripSpyOutput(events)).toMatchSnapshot()
-
-    disposer2()
 })
 
 test("prematurely end autorun", function () {

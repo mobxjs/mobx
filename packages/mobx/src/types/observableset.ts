@@ -4,12 +4,9 @@ import {
     deepEnhancer,
     getNextId,
     IEnhancer,
-    isSpyEnabled,
     hasListeners,
     IListenable,
-    spyReportStart,
     notifyListeners,
-    spyReportEnd,
     createInstanceofPredicate,
     makeIterable,
     hasInterceptors,
@@ -130,26 +127,18 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
                 this.data_.add(this.enhancer_(value, undefined))
                 this.atom_.reportChanged()
             })
-            const notifySpy = __DEV__ && isSpyEnabled()
             const notify = hasListeners(this)
-            const change =
-                notify || notifySpy
-                    ? <ISetDidChange<T>>{
-                          observableKind: "set",
-                          debugObjectName: this.name_,
-                          type: ADD,
-                          object: this,
-                          newValue: value
-                      }
-                    : null
-            if (notifySpy && __DEV__) {
-                spyReportStart(change!)
-            }
+            const change = notify
+                ? <ISetDidChange<T>>{
+                      observableKind: "set",
+                      debugObjectName: this.name_,
+                      type: ADD,
+                      object: this,
+                      newValue: value
+                  }
+                : null
             if (notify) {
                 notifyListeners(this, change)
-            }
-            if (notifySpy && __DEV__) {
-                spyReportEnd()
             }
         }
 
@@ -168,31 +157,23 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
             }
         }
         if (this.has(value)) {
-            const notifySpy = __DEV__ && isSpyEnabled()
             const notify = hasListeners(this)
-            const change =
-                notify || notifySpy
-                    ? <ISetDidChange<T>>{
-                          observableKind: "set",
-                          debugObjectName: this.name_,
-                          type: DELETE,
-                          object: this,
-                          oldValue: value
-                      }
-                    : null
+            const change = notify
+                ? <ISetDidChange<T>>{
+                      observableKind: "set",
+                      debugObjectName: this.name_,
+                      type: DELETE,
+                      object: this,
+                      oldValue: value
+                  }
+                : null
 
-            if (notifySpy && __DEV__) {
-                spyReportStart(change!)
-            }
             transaction(() => {
                 this.atom_.reportChanged()
                 this.data_.delete(value)
             })
             if (notify) {
                 notifyListeners(this, change)
-            }
-            if (notifySpy && __DEV__) {
-                spyReportEnd()
             }
             return true
         }

@@ -15,7 +15,6 @@ import {
     isObservable,
     isObservableProp,
     isComputedProp,
-    spy,
     isAction,
     configure,
     makeObservable
@@ -295,14 +294,6 @@ test("705 - setter undoing caching (babel)", () => {
     d2()
 })
 
-function normalizeSpyEvents(events) {
-    events.forEach(ev => {
-        delete ev.fn
-        delete ev.time
-    })
-    return events
-}
-
 test("action decorator (babel)", function () {
     class Store {
         constructor(multiplier) {
@@ -320,22 +311,9 @@ test("action decorator (babel)", function () {
 
     const store1 = new Store(2)
     const store2 = new Store(3)
-    const events = []
-    const d = spy(events.push.bind(events))
     expect(store1.add(3, 4)).toBe(14)
     expect(store2.add(3, 4)).toBe(21)
     expect(store1.add(1, 1)).toBe(4)
-
-    expect(normalizeSpyEvents(events)).toEqual([
-        { arguments: [3, 4], name: "add", spyReportStart: true, object: store1, type: "action" },
-        { type: "report-end", spyReportEnd: true },
-        { arguments: [3, 4], name: "add", spyReportStart: true, object: store2, type: "action" },
-        { type: "report-end", spyReportEnd: true },
-        { arguments: [1, 1], name: "add", spyReportStart: true, object: store1, type: "action" },
-        { type: "report-end", spyReportEnd: true }
-    ])
-
-    d()
 })
 
 test("custom action decorator (babel)", function () {
@@ -355,40 +333,9 @@ test("custom action decorator (babel)", function () {
 
     const store1 = new Store(2)
     const store2 = new Store(3)
-    const events = []
-    const d = spy(events.push.bind(events))
     expect(store1.add(3, 4)).toBe(14)
     expect(store2.add(3, 4)).toBe(21)
     expect(store1.add(1, 1)).toBe(4)
-
-    expect(normalizeSpyEvents(events)).toEqual([
-        {
-            arguments: [3, 4],
-            name: "zoem zoem",
-            spyReportStart: true,
-            object: store1,
-            type: "action"
-        },
-        { type: "report-end", spyReportEnd: true },
-        {
-            arguments: [3, 4],
-            name: "zoem zoem",
-            spyReportStart: true,
-            object: store2,
-            type: "action"
-        },
-        { type: "report-end", spyReportEnd: true },
-        {
-            arguments: [1, 1],
-            name: "zoem zoem",
-            spyReportStart: true,
-            object: store1,
-            type: "action"
-        },
-        { type: "report-end", spyReportEnd: true }
-    ])
-
-    d()
 })
 
 test("action decorator on field (babel)", function () {
@@ -409,22 +356,9 @@ test("action decorator on field (babel)", function () {
     const store1 = new Store(2)
     const store2 = new Store(7)
 
-    const events = []
-    const d = spy(events.push.bind(events))
     expect(store1.add(3, 4)).toBe(14)
     expect(store2.add(5, 4)).toBe(63)
     expect(store1.add(2, 2)).toBe(8)
-
-    expect(normalizeSpyEvents(events)).toEqual([
-        { arguments: [3, 4], name: "add", spyReportStart: true, object: store1, type: "action" },
-        { type: "report-end", spyReportEnd: true },
-        { arguments: [5, 4], name: "add", spyReportStart: true, object: store2, type: "action" },
-        { type: "report-end", spyReportEnd: true },
-        { arguments: [2, 2], name: "add", spyReportStart: true, object: store1, type: "action" },
-        { type: "report-end", spyReportEnd: true }
-    ])
-
-    d()
 })
 
 test("custom action decorator on field (babel)", function () {
@@ -445,40 +379,9 @@ test("custom action decorator on field (babel)", function () {
     const store1 = new Store(2)
     const store2 = new Store(7)
 
-    const events = []
-    const d = spy(events.push.bind(events))
     expect(store1.add(3, 4)).toBe(14)
     expect(store2.add(5, 4)).toBe(63)
     expect(store1.add(2, 2)).toBe(8)
-
-    expect(normalizeSpyEvents(events)).toEqual([
-        {
-            arguments: [3, 4],
-            name: "zoem zoem",
-            spyReportStart: true,
-            object: store1,
-            type: "action"
-        },
-        { type: "report-end", spyReportEnd: true },
-        {
-            arguments: [5, 4],
-            name: "zoem zoem",
-            spyReportStart: true,
-            object: store2,
-            type: "action"
-        },
-        { type: "report-end", spyReportEnd: true },
-        {
-            arguments: [2, 2],
-            name: "zoem zoem",
-            spyReportStart: true,
-            object: store1,
-            type: "action"
-        },
-        { type: "report-end", spyReportEnd: true }
-    ])
-
-    d()
 })
 
 test("267 (babel) should be possible to declare properties observable outside strict mode", () => {

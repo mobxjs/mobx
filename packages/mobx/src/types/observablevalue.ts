@@ -11,11 +11,7 @@ import {
     hasInterceptors,
     hasListeners,
     interceptChange,
-    isSpyEnabled,
     notifyListeners,
-    spyReport,
-    spyReportEnd,
-    spyReportStart,
     toPrimitive,
     globalState,
     IUNCHANGED,
@@ -36,22 +32,10 @@ export type IValueDidChange<T = any> = {
     newValue: T
     oldValue: T | undefined
 }
-export type IBoxDidChange<T = any> =
-    | {
-          type: "create"
-          observableKind: "value"
-          object: IObservableValue<T>
-          debugObjectName: string
-          newValue: T
-      }
-    | IValueDidChange<T>
-
 export interface IObservableValue<T> {
     get(): T
     set(value: T): void
 }
-
-const CREATE = "create"
 
 export class ObservableValue<T>
     extends Atom
@@ -67,21 +51,10 @@ export class ObservableValue<T>
         value: T,
         public enhancer_: IEnhancer<T>,
         public name_ = __DEV__ ? "ObservableValue@" + getNextId() : "ObservableValue",
-        notifySpy = true,
         private equals_: IEqualsComparer<any> = compareDefault
     ) {
         super(name_)
         this.value_ = enhancer_(value, undefined, name_)
-        if (__DEV__ && notifySpy && isSpyEnabled()) {
-            // only notify spy if this is a stand-alone observable
-            spyReport({
-                type: CREATE,
-                object: this,
-                observableKind: "value",
-                debugObjectName: this.name_,
-                newValue: "" + this.value_?.toString()
-            })
-        }
     }
 
     private dehanceValue(value: T): T {
@@ -92,24 +65,9 @@ export class ObservableValue<T>
     }
 
     public set(newValue: T) {
-        const oldValue = this.value_
         newValue = this.prepareNewValue_(newValue) as any
         if (newValue !== globalState.UNCHANGED) {
-            const notifySpy = __DEV__ && isSpyEnabled()
-            if (__DEV__ && notifySpy) {
-                spyReportStart({
-                    type: UPDATE,
-                    object: this,
-                    observableKind: "value",
-                    debugObjectName: this.name_,
-                    newValue,
-                    oldValue
-                })
-            }
             this.setNewValue_(newValue)
-            if (__DEV__ && notifySpy) {
-                spyReportEnd()
-            }
         }
     }
 

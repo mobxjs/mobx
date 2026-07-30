@@ -13,7 +13,6 @@ import {
     isObservableObject,
     transaction,
     IObjectDidChange,
-    spy,
     configure,
     isAction,
     IAtom,
@@ -356,14 +355,6 @@ test("issue 191 - shared initializers (2022.3)", () => {
     t.deepEqual(t2.array.slice(), [2, 4])
 })
 
-function normalizeSpyEvents(events: any[]) {
-    events.forEach(ev => {
-        delete ev.fn
-        delete ev.time
-    })
-    return events
-}
-
 test("action decorator (2022.3)", () => {
     class Store {
         constructor(private multiplier: number) {}
@@ -376,22 +367,9 @@ test("action decorator (2022.3)", () => {
 
     const store1 = new Store(2)
     const store2 = new Store(3)
-    const events: any[] = []
-    const d = spy(events.push.bind(events))
     t.equal(store1.add(3, 4), 14)
     t.equal(store2.add(2, 2), 12)
     t.equal(store1.add(1, 1), 4)
-
-    t.deepEqual(normalizeSpyEvents(events), [
-        { arguments: [3, 4], name: "add", spyReportStart: true, object: store1, type: "action" },
-        { type: "report-end", spyReportEnd: true },
-        { arguments: [2, 2], name: "add", spyReportStart: true, object: store2, type: "action" },
-        { type: "report-end", spyReportEnd: true },
-        { arguments: [1, 1], name: "add", spyReportStart: true, object: store1, type: "action" },
-        { type: "report-end", spyReportEnd: true }
-    ])
-
-    d()
 })
 
 test("custom action decorator (2022.3)", () => {
@@ -406,40 +384,9 @@ test("custom action decorator (2022.3)", () => {
 
     const store1 = new Store(2)
     const store2 = new Store(3)
-    const events: any[] = []
-    const d = spy(events.push.bind(events))
     t.equal(store1.add(3, 4), 14)
     t.equal(store2.add(2, 2), 12)
     t.equal(store1.add(1, 1), 4)
-
-    t.deepEqual(normalizeSpyEvents(events), [
-        {
-            arguments: [3, 4],
-            name: "zoem zoem",
-            spyReportStart: true,
-            object: store1,
-            type: "action"
-        },
-        { type: "report-end", spyReportEnd: true },
-        {
-            arguments: [2, 2],
-            name: "zoem zoem",
-            spyReportStart: true,
-            object: store2,
-            type: "action"
-        },
-        { type: "report-end", spyReportEnd: true },
-        {
-            arguments: [1, 1],
-            name: "zoem zoem",
-            spyReportStart: true,
-            object: store1,
-            type: "action"
-        },
-        { type: "report-end", spyReportEnd: true }
-    ])
-
-    d()
 })
 
 test("action decorator on field (2022.3)", () => {
@@ -456,22 +403,9 @@ test("action decorator on field (2022.3)", () => {
     const store2 = new Store(7)
     expect(store1.add).not.toEqual(store2.add)
 
-    const events: any[] = []
-    const d = spy(events.push.bind(events))
     t.equal(store1.add(3, 4), 14)
     t.equal(store2.add(4, 5), 63)
     t.equal(store1.add(2, 2), 8)
-
-    t.deepEqual(normalizeSpyEvents(events), [
-        { arguments: [3, 4], name: "add", spyReportStart: true, object: store1, type: "action" },
-        { type: "report-end", spyReportEnd: true },
-        { arguments: [4, 5], name: "add", spyReportStart: true, object: store2, type: "action" },
-        { type: "report-end", spyReportEnd: true },
-        { arguments: [2, 2], name: "add", spyReportStart: true, object: store1, type: "action" },
-        { type: "report-end", spyReportEnd: true }
-    ])
-
-    d()
 })
 
 test("custom action decorator on field (2022.3)", () => {
@@ -487,40 +421,9 @@ test("custom action decorator on field (2022.3)", () => {
     const store1 = new Store(2)
     const store2 = new Store(7)
 
-    const events: any[] = []
-    const d = spy(events.push.bind(events))
     t.equal(store1.add(3, 4), 14)
     t.equal(store2.add(4, 5), 63)
     t.equal(store1.add(2, 2), 8)
-
-    t.deepEqual(normalizeSpyEvents(events), [
-        {
-            arguments: [3, 4],
-            name: "zoem zoem",
-            spyReportStart: true,
-            object: store1,
-            type: "action"
-        },
-        { type: "report-end", spyReportEnd: true },
-        {
-            arguments: [4, 5],
-            name: "zoem zoem",
-            spyReportStart: true,
-            object: store2,
-            type: "action"
-        },
-        { type: "report-end", spyReportEnd: true },
-        {
-            arguments: [2, 2],
-            name: "zoem zoem",
-            spyReportStart: true,
-            object: store1,
-            type: "action"
-        },
-        { type: "report-end", spyReportEnd: true }
-    ])
-
-    d()
 })
 
 test("267 (2022.3) should be possible to declare properties observable outside strict mode", () => {

@@ -75,7 +75,6 @@ test("correct api should be exposed", function () {
             "_resetGlobalState",
             "runInAction",
             "set",
-            "spy",
             "toJS",
             "transaction",
             "untracked",

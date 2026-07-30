@@ -17,11 +17,8 @@ import {
     isES6Map,
     isPlainES6Map,
     isPlainObject,
-    isSpyEnabled,
     notifyListeners,
     referenceEnhancer,
-    spyReportEnd,
-    spyReportStart,
     stringifyKey,
     transaction,
     untracked,
@@ -29,7 +26,6 @@ import {
     die,
     UPDATE,
     IAtom,
-    PureSpyEvent,
     initObservable
 } from "../internal"
 
@@ -124,8 +120,7 @@ export class ObservableMap<K = any, V = any>
             const newEntry = (entry = new ObservableValue(
                 this.has_(key),
                 referenceEnhancer,
-                __DEV__ ? `${this.name_}.${stringifyKey(key)}?` : "ObservableMap.key?",
-                false
+                __DEV__ ? `${this.name_}.${stringifyKey(key)}?` : "ObservableMap.key?"
             ))
             this.hasMap_.set(key, newEntry)
             newEntry.onBUOL = new Set([() => this.hasMap_.delete(key)])
@@ -169,23 +164,18 @@ export class ObservableMap<K = any, V = any>
             }
         }
         if (this.has_(key)) {
-            const notifySpy = __DEV__ && isSpyEnabled()
             const notify = hasListeners(this)
-            const change: IMapDidChange<K, V> | null =
-                notify || notifySpy
-                    ? {
-                          observableKind: "map",
-                          debugObjectName: this.name_,
-                          type: DELETE,
-                          object: this,
-                          oldValue: (<any>this.data_.get(key)).value_,
-                          name: key
-                      }
-                    : null
+            const change: IMapDidChange<K, V> | null = notify
+                ? {
+                      observableKind: "map",
+                      debugObjectName: this.name_,
+                      type: DELETE,
+                      object: this,
+                      oldValue: (<any>this.data_.get(key)).value_,
+                      name: key
+                  }
+                : null
 
-            if (__DEV__ && notifySpy) {
-                spyReportStart(change! as PureSpyEvent)
-            } // TODO fix type
             transaction(() => {
                 this.keysAtom_.reportChanged()
                 this.hasMap_.get(key)?.setNewValue_(false)
@@ -196,9 +186,6 @@ export class ObservableMap<K = any, V = any>
             if (notify) {
                 notifyListeners(this, change)
             }
-            if (__DEV__ && notifySpy) {
-                spyReportEnd()
-            }
             return true
         }
         return false
@@ -208,29 +195,21 @@ export class ObservableMap<K = any, V = any>
         const observable = this.data_.get(key)!
         newValue = (observable as any).prepareNewValue_(newValue) as V
         if (newValue !== globalState.UNCHANGED) {
-            const notifySpy = __DEV__ && isSpyEnabled()
             const notify = hasListeners(this)
-            const change: IMapDidChange<K, V> | null =
-                notify || notifySpy
-                    ? {
-                          observableKind: "map",
-                          debugObjectName: this.name_,
-                          type: UPDATE,
-                          object: this,
-                          oldValue: (observable as any).value_,
-                          name: key,
-                          newValue
-                      }
-                    : null
-            if (__DEV__ && notifySpy) {
-                spyReportStart(change! as PureSpyEvent)
-            } // TODO fix type
+            const change: IMapDidChange<K, V> | null = notify
+                ? {
+                      observableKind: "map",
+                      debugObjectName: this.name_,
+                      type: UPDATE,
+                      object: this,
+                      oldValue: (observable as any).value_,
+                      name: key,
+                      newValue
+                  }
+                : null
             observable.setNewValue_(newValue as V)
             if (notify) {
                 notifyListeners(this, change)
-            }
-            if (__DEV__ && notifySpy) {
-                spyReportEnd()
             }
         }
     }
@@ -241,35 +220,26 @@ export class ObservableMap<K = any, V = any>
             const observable = new ObservableValue(
                 newValue,
                 this.enhancer_,
-                __DEV__ ? `${this.name_}.${stringifyKey(key)}` : "ObservableMap.key",
-                false
+                __DEV__ ? `${this.name_}.${stringifyKey(key)}` : "ObservableMap.key"
             )
             this.data_.set(key, observable)
             newValue = (observable as any).value_ // value might have been changed
             this.hasMap_.get(key)?.setNewValue_(true)
             this.keysAtom_.reportChanged()
         })
-        const notifySpy = __DEV__ && isSpyEnabled()
         const notify = hasListeners(this)
-        const change: IMapDidChange<K, V> | null =
-            notify || notifySpy
-                ? {
-                      observableKind: "map",
-                      debugObjectName: this.name_,
-                      type: ADD,
-                      object: this,
-                      name: key,
-                      newValue
-                  }
-                : null
-        if (__DEV__ && notifySpy) {
-            spyReportStart(change! as PureSpyEvent)
-        } // TODO fix type
+        const change: IMapDidChange<K, V> | null = notify
+            ? {
+                  observableKind: "map",
+                  debugObjectName: this.name_,
+                  type: ADD,
+                  object: this,
+                  name: key,
+                  newValue
+              }
+            : null
         if (notify) {
             notifyListeners(this, change)
-        }
-        if (__DEV__ && notifySpy) {
-            spyReportEnd()
         }
     }
 

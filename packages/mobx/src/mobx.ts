@@ -25,8 +25,6 @@ if (__DEV__) {
     })
 }
 
-import { spy, getDebugName, $mobx } from "./internal"
-
 export {
     IObservable,
     IDepTreeNode,
@@ -36,7 +34,6 @@ export {
     untracked,
     IAtom,
     createAtom,
-    spy,
     IComputedValue,
     IEqualsComparer,
     compareDefault,
@@ -153,16 +150,3 @@ export {
     AnnotationMapEntry,
     override
 } from "./internal"
-
-// Devtools support
-declare const __MOBX_DEVTOOLS_GLOBAL_HOOK__: { injectMobx: (any) => void }
-if (__DEV__ && typeof __MOBX_DEVTOOLS_GLOBAL_HOOK__ === "object") {
-    // See: https://github.com/andykog/mobx-devtools/
-    __MOBX_DEVTOOLS_GLOBAL_HOOK__.injectMobx({
-        spy,
-        extras: {
-            getDebugName
-        },
-        $mobx
-    })
-}

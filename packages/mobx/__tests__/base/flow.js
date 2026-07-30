@@ -147,38 +147,6 @@ test("it should support asyncAction in classes", done => {
     }, 10)
 })
 
-test("it should support logging", done => {
-    mobx.configure({ enforceActions: "observed" })
-    const events = []
-    const x = mobx.observable({ a: 1 })
-
-    const f = mobx.flow(function* myaction(initial) {
-        x.a = initial
-        x.a = yield delay(100, 5)
-        x.a = 4
-        x.a = yield delay(100, 3)
-        return x.a
-    })
-    const d = mobx.spy(ev => events.push(ev))
-
-    setTimeout(() => {
-        f(2).then(() => {
-            expect(stripEvents(events)).toMatchSnapshot()
-            d()
-            done()
-        })
-    }, 10)
-})
-
-function stripEvents(events) {
-    return events.map(e => {
-        delete e.object
-        delete e.fn
-        delete e.time
-        return e
-    })
-}
-
 test("flows are cancelled with an instance of FlowCancellationError", async () => {
     const start = flow(function* () {
         yield Promise.resolve()

@@ -22,11 +22,8 @@ import {
     interceptChange,
     isObject,
     isPlainObject,
-    isSpyEnabled,
     notifyListeners,
     referenceEnhancer,
-    spyReportEnd,
-    spyReportStart,
     startBatch,
     stringifyKey,
     globalState,
@@ -180,29 +177,21 @@ export class ObservableObjectAdministration
         // notify spy & observers
         if (newValue !== globalState.UNCHANGED) {
             const notify = hasListeners(this)
-            const notifySpy = __DEV__ && isSpyEnabled()
-            const change: IObjectDidChange | null =
-                notify || notifySpy
-                    ? {
-                          type: UPDATE,
-                          observableKind: "object",
-                          debugObjectName: this.name_,
-                          object: this.proxy_ || this.target_,
-                          oldValue: (observable as any).value_,
-                          name: key,
-                          newValue
-                      }
-                    : null
+            const change: IObjectDidChange | null = notify
+                ? {
+                      type: UPDATE,
+                      observableKind: "object",
+                      debugObjectName: this.name_,
+                      object: this.proxy_ || this.target_,
+                      oldValue: (observable as any).value_,
+                      name: key,
+                      newValue
+                  }
+                : null
 
-            if (__DEV__ && notifySpy) {
-                spyReportStart(change!)
-            }
             ;(observable as ObservableValue<any>).setNewValue_(newValue)
             if (notify) {
                 notifyListeners(this, change)
-            }
-            if (__DEV__ && notifySpy) {
-                spyReportEnd()
             }
         }
         return true
@@ -261,8 +250,7 @@ export class ObservableObjectAdministration
             entry = new ObservableValue(
                 key in this.target_,
                 referenceEnhancer,
-                __DEV__ ? `${this.name_}.${stringifyKey(key)}?` : "ObservableObject.key?",
-                false
+                __DEV__ ? `${this.name_}.${stringifyKey(key)}?` : "ObservableObject.key?"
             )
             this.pendingKeys_.set(key, entry)
         }
@@ -406,8 +394,7 @@ export class ObservableObjectAdministration
             const observable = new ObservableValue(
                 value,
                 enhancer,
-                __DEV__ ? `${this.name_}.${key.toString()}` : "ObservableObject.key",
-                false
+                __DEV__ ? `${this.name_}.${key.toString()}` : "ObservableObject.key"
             )
 
             this.values_.set(key, observable)
@@ -508,12 +495,11 @@ export class ObservableObjectAdministration
         try {
             startBatch()
             const notify = hasListeners(this)
-            const notifySpy = __DEV__ && isSpyEnabled()
             const observable = this.values_.get(key)
-            // Value needed for spies/listeners
+            // Value needed for listeners
             let value = undefined
             // Optimization: don't pull the value unless we will need it
-            if (!observable && (notify || notifySpy)) {
+            if (!observable && notify) {
                 value = getDescriptor(this.target_, key)?.value
             }
             // delete prop (do first, may fail)
@@ -545,8 +531,8 @@ export class ObservableObjectAdministration
             // "in" as it may still exist in proto
             this.pendingKeys_?.get(key)?.set(key in this.target_)
 
-            // Notify spies/listeners
-            if (notify || notifySpy) {
+            // Notify listeners
+            if (notify) {
                 const change: IObjectDidChange = {
                     type: REMOVE,
                     observableKind: "object",
@@ -555,15 +541,7 @@ export class ObservableObjectAdministration
                     oldValue: value,
                     name: key
                 }
-                if (__DEV__ && notifySpy) {
-                    spyReportStart(change!)
-                }
-                if (notify) {
-                    notifyListeners(this, change)
-                }
-                if (__DEV__ && notifySpy) {
-                    spyReportEnd()
-                }
+                notifyListeners(this, change)
             }
         } finally {
             endBatch()
@@ -573,29 +551,16 @@ export class ObservableObjectAdministration
 
     notifyPropertyAddition_(key: PropertyKey, value: any) {
         const notify = hasListeners(this)
-        const notifySpy = __DEV__ && isSpyEnabled()
-        if (notify || notifySpy) {
-            const change: IObjectDidChange | null =
-                notify || notifySpy
-                    ? ({
-                          type: ADD,
-                          observableKind: "object",
-                          debugObjectName: this.name_,
-                          object: this.proxy_ || this.target_,
-                          name: key,
-                          newValue: value
-                      } as const)
-                    : null
-
-            if (__DEV__ && notifySpy) {
-                spyReportStart(change!)
+        if (notify) {
+            const change: IObjectDidChange = {
+                type: ADD,
+                observableKind: "object",
+                debugObjectName: this.name_,
+                object: this.proxy_ || this.target_,
+                name: key,
+                newValue: value
             }
-            if (notify) {
-                notifyListeners(this, change)
-            }
-            if (__DEV__ && notifySpy) {
-                spyReportEnd()
-            }
+            notifyListeners(this, change)
         }
 
         this.pendingKeys_?.get(key)?.set(true)

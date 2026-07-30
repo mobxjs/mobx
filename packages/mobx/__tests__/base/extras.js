@@ -130,37 +130,6 @@ test("names", function () {
     expect(task[$mobx].values_.get("title").name_).toBe("Task@4.title")
 })
 
-function stripTrackerOutput(output) {
-    return output.map(function (i) {
-        if (Array.isArray(i)) return stripTrackerOutput(i)
-        delete i.object
-        delete i.time
-        delete i.fn
-        return i
-    })
-}
-
-test("spy 1", function () {
-    m._resetGlobalState()
-    const lines = []
-
-    const a = m.observable.box(3)
-    const b = m.computed(function () {
-        return a.get() * 2
-    })
-    m.autorun(function () {
-        b.get()
-    })
-    const stop = m.spy(function (line) {
-        lines.push(line)
-    })
-
-    a.set(4)
-    stop()
-    a.set(5)
-    expect(stripTrackerOutput(lines)).toMatchSnapshot()
-})
-
 test("get atom", function () {
     mobx._resetGlobalState()
     mobx._getGlobalState().mobxGuid = 0 // hmm dangerous reset?
