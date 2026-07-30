@@ -393,27 +393,6 @@ Is this a boxed computed value, created using `computed(() => expr)`?
 
 Is this a computed property?
 
-### `getDebugName`
-
-{🚀} Usage: `getDebugName(reaction|array|Set|Map)` or `getDebugName(object|Map, propertyName)`
-<small>(<b>[further information](analyzing-reactivity.md#getdebugname)</b>)</small>
-
-Returns the (generated) friendly debug name for an observable or reaction.
-
-### `getDependencyTree`
-
-{🚀} Usage: `getDependencyTree(object, computedPropertyName)`
-<small>(<b>[further information](analyzing-reactivity.md#getdependencytree)</b>)</small>
-
-Returns a tree structure with all observables the given reaction / computation currently depends upon.
-
-### `getObserverTree`
-
-{🚀} Usage: `getObserverTree(array|Set|Map)` or `getObserverTree(object|Map, propertyName)`
-<small>(<b>[further information](analyzing-reactivity.md#getobservertree)</b>)</small>
-
-Returns a tree structure with all reactions / computations that are observing the given observable.
-
 ---
 
 ## Extending MobX {🚀}

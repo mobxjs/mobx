@@ -68,20 +68,6 @@ message.updateTitle("Bar")
 
 This will react as expected. The `.title` property was dereferenced by the autorun, and changed afterwards, so this change is detected.
 
-You can inspect what MobX tracks by calling [`getDependencyTree`](api.md#getdependencytree) with the disposer returned by `autorun`:
-
-```javascript
-import { getDependencyTree } from "mobx"
-
-const disposer = autorun(() => {
-    console.log(message.title)
-})
-
-// Outputs:
-console.log(getDependencyTree(disposer))
-// { name: 'Autorun@2', dependencies: [ { name: 'Message@1.title' } ] }
-```
-
 #### Incorrect: changing a non-observable reference
 
 ```javascript

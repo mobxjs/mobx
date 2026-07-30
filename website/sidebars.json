@@ -21,7 +21,6 @@
       "defining-data-stores",
       "understanding-reactivity",
       "subclassing",
-      "analyzing-reactivity",
       "errors",
       "computeds-with-args",
       "mobx-utils",

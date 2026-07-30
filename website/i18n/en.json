@@ -13,10 +13,6 @@
         "title": "Updating state using actions",
         "sidebar_label": "Actions"
       },
-      "analyzing-reactivity": {
-        "title": "Analyzing reactivity",
-        "sidebar_label": "Analyzing reactivity {🚀}"
-      },
       "api": {
         "title": "MobX API Reference",
         "sidebar_label": "API"
