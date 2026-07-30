@@ -93,7 +93,6 @@ export class ObservableArrayAdministration implements IListenable {
     readonly values_: any[] = [] // this is the prop that gets proxied, so can't replace it!
     changeListeners_
     enhancer_: (newV: any, oldV: any | undefined) => any
-    dehancer: any
     proxy_!: IObservableArray<any>
     lastKnownLength_ = 0
 
@@ -105,20 +104,6 @@ export class ObservableArrayAdministration implements IListenable {
         this.atom_ = new Atom(name)
         this.enhancer_ = (newV, oldV) =>
             enhancer(newV, oldV, __DEV__ ? name + "[..]" : "ObservableArray[..]")
-    }
-
-    dehanceValue_(value: any): any {
-        if (this.dehancer !== undefined) {
-            return this.dehancer(value)
-        }
-        return value
-    }
-
-    dehanceValues_(values: any[]): any[] {
-        if (this.dehancer !== undefined && values.length > 0) {
-            return values.map(this.dehancer) as any
-        }
-        return values
     }
 
     getArrayLength_(): number {
@@ -183,7 +168,7 @@ export class ObservableArrayAdministration implements IListenable {
         if (deleteCount !== 0 || newItems.length !== 0) {
             this.notifyArraySplice_(index, newItems, res)
         }
-        return this.dehanceValues_(res)
+        return res
     }
 
     spliceItemsIntoValues_(index: number, deleteCount: number, newItems: any[]): any[] {
@@ -251,7 +236,7 @@ export class ObservableArrayAdministration implements IListenable {
 
     get_(index: number): any | undefined {
         this.atom_.reportObserved()
-        return this.dehanceValue_(this.values_[index])
+        return this.values_[index]
     }
 
     set_(index: number, newValue: any) {
@@ -382,7 +367,7 @@ export var arrayExtensions = {
 
     remove(value: any): boolean {
         const adm: ObservableArrayAdministration = this[$mobx]
-        const idx = adm.dehanceValues_(adm.values_).indexOf(value)
+        const idx = adm.values_.indexOf(value)
         if (idx > -1) {
             this.splice(idx, 1)
             return true
@@ -431,13 +416,13 @@ function addArrayExtension(funcName, funcFactory) {
     }
 }
 
-// Report and delegate to dehanced array
+// Report and delegate to the backing array
 function simpleFunc(funcName) {
     return function () {
         const adm: ObservableArrayAdministration = this[$mobx]
         adm.atom_.reportObserved()
-        const dehancedValues = adm.dehanceValues_(adm.values_)
-        return dehancedValues[funcName].apply(dehancedValues, arguments)
+        const values = adm.values_
+        return values[funcName].apply(values, arguments)
     }
 }
 
@@ -446,8 +431,8 @@ function mapLikeFunc(funcName) {
     return function (callback, thisArg) {
         const adm: ObservableArrayAdministration = this[$mobx]
         adm.atom_.reportObserved()
-        const dehancedValues = adm.dehanceValues_(adm.values_)
-        return dehancedValues[funcName]((element, index) => {
+        const values = adm.values_
+        return values[funcName]((element, index) => {
             return callback.call(thisArg, element, index, this)
         })
     }
@@ -458,13 +443,13 @@ function reduceLikeFunc(funcName) {
     return function () {
         const adm: ObservableArrayAdministration = this[$mobx]
         adm.atom_.reportObserved()
-        const dehancedValues = adm.dehanceValues_(adm.values_)
+        const values = adm.values_
         // #2432 - reduce behavior depends on arguments.length
         const callback = arguments[0]
         arguments[0] = (accumulator, currentValue, index) => {
             return callback(accumulator, currentValue, index, this)
         }
-        return dehancedValues[funcName].apply(dehancedValues, arguments)
+        return values[funcName].apply(values, arguments)
     }
 }
 

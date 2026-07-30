@@ -76,7 +76,6 @@ export class ObservableMap<K = any, V = any> implements Map<K, V>, IListenable {
     hasMap_!: Map<K, ObservableValue<boolean>> // hasMap, not hashMap >-).
     keysAtom_!: IAtom
     changeListeners_
-    dehancer: any
 
     constructor(
         initialData?: IObservableMapInitialValues<K, V>,
@@ -210,9 +209,9 @@ export class ObservableMap<K = any, V = any> implements Map<K, V>, IListenable {
 
     get(key: K): V | undefined {
         if (this.has(key)) {
-            return this.dehanceValue_(this.data_.get(key)!.get())
+            return this.data_.get(key)!.get()
         }
-        return this.dehanceValue_(undefined)
+        return undefined
     }
 
     getOrInsert(key: K, value: V): V {
@@ -227,13 +226,6 @@ export class ObservableMap<K = any, V = any> implements Map<K, V>, IListenable {
             this.set(key, callback(key))
         }
         return this.get(key)!
-    }
-
-    private dehanceValue_<X extends V | undefined>(value: X): X {
-        if (this.dehancer !== undefined) {
-            return this.dehancer(value)
-        }
-        return value
     }
 
     keys(): MapIterator<K> {

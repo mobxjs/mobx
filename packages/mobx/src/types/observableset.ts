@@ -45,7 +45,6 @@ export class ObservableSet<T = any> implements Set<T>, IListenable {
     private data_: Set<any> = new Set()
     atom_!: IAtom
     changeListeners_
-    dehancer: any
     enhancer_: (newV: any, oldV: any | undefined) => any
 
     constructor(
@@ -60,13 +59,6 @@ export class ObservableSet<T = any> implements Set<T>, IListenable {
                 this.replace(initialData)
             }
         })
-    }
-
-    private dehanceValue_<X extends T | undefined>(value: X): X {
-        if (this.dehancer !== undefined) {
-            return this.dehancer(value)
-        }
-        return value
     }
 
     clear() {
@@ -142,7 +134,7 @@ export class ObservableSet<T = any> implements Set<T>, IListenable {
 
     has(value: T) {
         this.atom_.reportObserved()
-        return this.data_.has(this.dehanceValue_(value))
+        return this.data_.has(value)
     }
 
     entries() {
@@ -161,14 +153,11 @@ export class ObservableSet<T = any> implements Set<T>, IListenable {
 
     values(): SetIterator<T> {
         this.atom_.reportObserved()
-        const self = this
         const values = this.data_.values()
         return makeIterableForSet({
             next() {
                 const { value, done } = values.next()
-                return !done
-                    ? { value: self.dehanceValue_(value), done }
-                    : { value: undefined, done }
+                return !done ? { value, done } : { value: undefined, done }
             }
         })
     }

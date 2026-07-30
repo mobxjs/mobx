@@ -126,7 +126,6 @@ export {
     $mobx,
     isComputingDerivation as _isComputingDerivation,
     onReactionError,
-    interceptReads as _interceptReads,
     IComputedValueOptions,
     IActionRunInfo,
     _startAction,

@@ -41,7 +41,6 @@ test("correct api should be exposed", function () {
             "has",
             "_getGlobalState",
             "getObserverTree",
-            "_interceptReads",
             "isAction",
             "isBoxedObservable",
             "isComputed",

@@ -32,7 +32,6 @@ export class ObservableValue<T> extends Atom implements IObservableValue<T>, ILi
     hasUnreportedChange_ = false
     changeListeners_
     value_
-    dehancer: any
 
     constructor(
         value: T,
@@ -42,13 +41,6 @@ export class ObservableValue<T> extends Atom implements IObservableValue<T>, ILi
     ) {
         super(name_)
         this.value_ = enhancer_(value, undefined, name_)
-    }
-
-    private dehanceValue(value: T): T {
-        if (this.dehancer !== undefined) {
-            return this.dehancer(value)
-        }
-        return value
     }
 
     public set(newValue: T) {
@@ -81,11 +73,6 @@ export class ObservableValue<T> extends Atom implements IObservableValue<T>, ILi
 
     public get(): T {
         this.reportObserved()
-        return this.dehanceValue(this.value_)
-    }
-
-    raw() {
-        // used by MST ot get undehanced value
         return this.value_
     }
 
