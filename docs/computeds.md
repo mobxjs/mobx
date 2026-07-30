@@ -210,7 +210,7 @@ This form of `computed` is not used very often, but in some cases where you need
 
 ### `name`
 
-This string is used as a debug name in the [Spy event listeners](analyzing-reactivity.md#spy) and [MobX developer tools](https://github.com/mobxjs/mobx-devtools).
+This string is used as a debug name in error messages and third-party developer tooling such as [mobx-log](https://github.com/kubk/mobx-log).
 
 ### `equals`
 

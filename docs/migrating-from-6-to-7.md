@@ -209,7 +209,7 @@ Also remove `{ proxy: false }` from `observable`, `observable.object` and `obser
 
 ## Removed `trace`
 
-The `trace` API has been removed. For debugging reactivity, use [`getDependencyTree`](api.md#getdependencytree), [`getObserverTree`](api.md#getobservertree), [`spy`](analyzing-reactivity.md#spy), the MobX developer tools, or packages such as `mobx-log`.
+The `trace` API has been removed. For debugging reactivity, use packages such as `mobx-log`.
 
 ```javascript
 import { autorun, getDependencyTree } from "mobx"

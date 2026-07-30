@@ -20,9 +20,6 @@
       "backers-sponsors": {
         "title": "MobX Backers and Sponsors"
       },
-      "best/debugging-mobx": {
-        "title": "Analyzing reactivity"
-      },
       "best/decorators": {
         "title": "Enabling decorators"
       },
@@ -148,17 +145,11 @@
       "refguide/modifiers": {
         "title": "Observable modifiers"
       },
-      "refguide/object-api": {
-        "title": "Collection utilities"
-      },
       "refguide/object": {
         "title": "Observable Objects"
       },
       "refguide/observable": {
         "title": "Creating observable state"
-      },
-      "refguide/observe": {
-        "title": "Intercept & Observe"
       },
       "refguide/on-become-observed": {
         "title": "Creating lazy observables"

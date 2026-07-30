@@ -412,7 +412,6 @@ Creates your own observable data structure and hooks it up to MobX. Used interna
 ### `getAtom`
 
 {🚀} Usage: `getAtom(thing, property?)`
-<small>(<b>[further information](analyzing-reactivity.md#getatom)</b>)</small>
 
 Returns the backing atom.
 
