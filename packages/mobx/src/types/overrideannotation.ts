@@ -1,23 +1,12 @@
-import {
-    die,
-    Annotation,
-    hasProp,
-    createDecoratorAnnotation,
-    ObservableObjectAdministration,
-    MakeResult
-} from "../internal"
-
-import type { ClassMethodDecorator } from "./decorator_fills"
+import { die, Annotation, hasProp, ObservableObjectAdministration, MakeResult } from "../internal"
 
 const OVERRIDE = "override"
 
-export const override: Annotation & PropertyDecorator & ClassMethodDecorator =
-    createDecoratorAnnotation({
-        annotationType_: OVERRIDE,
-        make_,
-        extend_,
-        decorate_20223_
-    })
+export const override: Annotation = {
+    annotationType_: OVERRIDE,
+    make_,
+    extend_
+}
 
 export function isOverride(annotation: Annotation): boolean {
     return annotation.annotationType_ === OVERRIDE
@@ -42,9 +31,5 @@ function make_(this: Annotation, adm: ObservableObjectAdministration, key): Make
 }
 
 function extend_(this: Annotation, adm, key, descriptor, proxyTrap): boolean {
-    die(`'${this.annotationType_}' can only be used with 'makeObservable'`)
-}
-
-function decorate_20223_(this: Annotation, desc, context: DecoratorContext) {
-    console.warn(`'${this.annotationType_}' cannot be used with decorators - this is a no-op`)
+    die(44, this.annotationType_)
 }

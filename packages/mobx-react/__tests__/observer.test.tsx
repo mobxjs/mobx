@@ -1,10 +1,9 @@
 import React, { StrictMode, Suspense } from "react"
-import { inject, observer, Observer, enableStaticRendering } from "../src"
+import { observer, Observer, enableStaticRendering } from "../src"
 import { render, act, waitFor } from "@testing-library/react"
 import {
     getObserverTree,
     _getGlobalState,
-    _resetGlobalState,
     action,
     computed,
     observable,
@@ -21,14 +20,7 @@ import { shallowEqual } from "../src/utils/utils"
  *  some test suite is too tedious
  */
 
-afterEach(() => {
-    jest.useRealTimers()
-})
-
 let consoleWarnMock: jest.SpyInstance | undefined
-afterEach(() => {
-    consoleWarnMock?.mockRestore()
-})
 
 /*
  use TestUtils.renderIntoDocument will re-mounted the component with different props
@@ -313,37 +305,6 @@ test("changing state in render should fail", () => {
     render(<Comp />)
 
     act(() => data.set(3))
-    _resetGlobalState()
-})
-
-test("observer component can be injected", () => {
-    const msg: Array<any> = []
-    const baseWarn = console.warn
-    console.warn = m => msg.push(m)
-
-    inject("foo")(
-        observer(
-            class T extends React.Component {
-                render() {
-                    return null
-                }
-            }
-        )
-    )
-
-    // N.B, the injected component will be observer since mobx-react 4.0!
-    inject(() => ({}))(
-        observer(
-            class T extends React.Component {
-                render() {
-                    return null
-                }
-            }
-        )
-    )
-
-    expect(msg.length).toBe(0)
-    console.warn = baseWarn
 })
 
 test("correctly wraps display name of child component", () => {
@@ -363,51 +324,37 @@ test("correctly wraps display name of child component", () => {
     expect((B as any).type.displayName).toEqual(undefined)
 })
 
-describe("124 - react to changes in this.props via computed", () => {
-    class T extends React.Component<any, any> {
-        @computed
-        get computedProp() {
-            return this.props.x
+test("MobX computed getters cannot read class props", () => {
+    const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {})
+
+    const Comp = observer(
+        class TestCmp extends React.Component<{ x: number }> {
+            constructor(props) {
+                super(props)
+                makeObservable(this, {
+                    computedProp: computed
+                })
+            }
+
+            get computedProp() {
+                return this.props.x
+            }
+
+            render() {
+                return <span>{this.computedProp}</span>
+            }
         }
-        render() {
-            return (
-                <span>
-                    x:
-                    {this.computedProp}
-                </span>
-            )
-        }
+    )
+
+    try {
+        expect(() => render(<Comp x={1} />)).toThrow(
+            /^\[mobx-react\] Cannot read "TestCmp.props" in a reactive context/
+        )
+    } finally {
+        consoleErrorSpy.mockRestore()
     }
-
-    const Comp = observer(T)
-
-    class Parent extends React.Component {
-        state = { v: 1 }
-        render() {
-            return (
-                <div onClick={() => this.setState({ v: 2 })}>
-                    <Comp x={this.state.v} />
-                </div>
-            )
-        }
-    }
-
-    test("init state is correct", () => {
-        const { container } = render(<Parent />)
-
-        expect(container).toHaveTextContent("x:1")
-    })
-
-    test("change after click", () => {
-        const { container } = render(<Parent />)
-
-        act(() => container.querySelector("div")!.click())
-        expect(container).toHaveTextContent("x:2")
-    })
 })
 
-// Test on skip: since all reactions are now run in batched updates, the original issues can no longer be reproduced
-//this test case should be deprecated?
 test("should stop updating if error was thrown in render (#134)", () => {
     const data = observable.box(0)
     let renderingsCount = 0
@@ -517,21 +464,16 @@ describe("should render component even if setState called with exactly the same 
     })
 })
 
-test("it rerenders correctly if some props are non-observables - 1", () => {
+test("class observer rerenders from observable prop and rereads plain prop", () => {
     let odata = observable({ x: 1 })
     let data = { y: 1 }
 
     @observer
     class Comp extends React.Component<any, any> {
-        @computed
-        get computed() {
-            // n.b: data.y would not rerender! shallowly new equal props are not stored
-            return this.props.odata.x
-        }
         render() {
             return (
                 <span onClick={stuff}>
-                    {this.props.odata.x}-{this.props.data.y}-{this.computed}
+                    {this.props.odata.x}-{this.props.data.y}-{this.props.odata.x}
                 </span>
             )
         }
@@ -540,7 +482,6 @@ test("it rerenders correctly if some props are non-observables - 1", () => {
     const Parent = observer(
         class Parent extends React.Component<any, any> {
             render() {
-                // this.props.odata.x;
                 return <Comp data={this.props.data} odata={this.props.odata} />
             }
         }
@@ -560,50 +501,6 @@ test("it rerenders correctly if some props are non-observables - 1", () => {
     expect(container).toHaveTextContent("2-2-2")
     stuff()
     expect(container).toHaveTextContent("3-3-3")
-})
-
-test("it rerenders correctly if some props are non-observables - 2", () => {
-    let renderCount = 0
-    let odata = observable({ x: 1 })
-
-    @observer
-    class Component extends React.PureComponent<any, any> {
-        @computed
-        get computed() {
-            return this.props.data.y // should recompute, since props.data is changed
-        }
-
-        render() {
-            renderCount++
-            return (
-                <span onClick={stuff}>
-                    {this.props.data.y}-{this.computed}
-                </span>
-            )
-        }
-    }
-
-    const Parent = observer(props => {
-        let data = { y: props.odata.x }
-        return <Component data={data} odata={props.odata} />
-    })
-
-    function stuff() {
-        odata.x++
-    }
-
-    const { container } = render(<Parent odata={odata} />)
-
-    expect(renderCount).toBe(1)
-    expect(container).toHaveTextContent("1-1")
-
-    act(() => stuff())
-    expect(renderCount).toBe(2)
-    expect(container).toHaveTextContent("2-2")
-
-    act(() => stuff())
-    expect(renderCount).toBe(3)
-    expect(container).toHaveTextContent("3-3")
 })
 
 describe("Observer regions should react", () => {
@@ -671,28 +568,34 @@ test("parent / childs render in the right order", () => {
     let events: Array<any> = []
 
     class User {
-        @observable
         name = "User's name"
+
+        constructor() {
+            makeObservable(this, {
+                name: observable
+            })
+        }
     }
 
     class Store {
-        @observable
         user: User | null = new User()
-        @action
+
         logout() {
             this.user = null
         }
+
         constructor() {
-            makeObservable(this)
+            makeObservable(this, {
+                user: observable,
+                logout: action
+            })
         }
     }
 
     function tryLogout() {
         try {
-            // ReactDOM.unstable_batchedUpdates(() => {
             store.logout()
             expect(true).toBeTruthy()
-            // });
         } catch (e) {
             // t.fail(e)
         }
@@ -722,8 +625,8 @@ test("parent / childs render in the right order", () => {
     expect(events).toEqual(["parent", "child", "parent"])
 })
 
-describe("use Observer inject and render sugar should work  ", () => {
-    test("use render without inject should be correct", () => {
+describe("Observer render sugar should work", () => {
+    test("use render should be correct", () => {
         const Comp = () => (
             <div>
                 <Observer render={() => <span>{123}</span>} />
@@ -733,7 +636,7 @@ describe("use Observer inject and render sugar should work  ", () => {
         expect(container).toHaveTextContent("123")
     })
 
-    test("use children without inject should be correct", () => {
+    test("use children should be correct", () => {
         const Comp = () => (
             <div>
                 <Observer>{() => <span>{123}</span>}</Observer>
@@ -750,6 +653,7 @@ describe("use Observer inject and render sugar should work  ", () => {
 
         const Comp = () => (
             <div>
+                {/* @ts-expect-error render and children are mutually exclusive */}
                 <Observer render={() => <span>{123}</span>}>{() => <span>{123}</span>}</Observer>
             </div>
         )
@@ -789,46 +693,6 @@ test("static on function components are hoisted", () => {
     expect(Comp2.foo).toBe(3)
 })
 
-test("computed properties react to props", () => {
-    jest.useFakeTimers()
-
-    const seen: Array<any> = []
-    @observer
-    class Child extends React.Component<any, any> {
-        @computed
-        get getPropX() {
-            return this.props.x
-        }
-
-        render() {
-            seen.push(this.getPropX)
-            return <div>{this.getPropX}</div>
-        }
-    }
-
-    class Parent extends React.Component {
-        state = { x: 0 }
-        render() {
-            seen.push("parent")
-            return <Child x={this.state.x} />
-        }
-
-        componentDidMount() {
-            setTimeout(() => this.setState({ x: 2 }), 100)
-        }
-    }
-
-    const { container } = render(<Parent />)
-    expect(container).toHaveTextContent("0")
-
-    act(() => {
-        jest.runAllTimers()
-    })
-    expect(container).toHaveTextContent("2")
-
-    expect(seen).toEqual(["parent", 0, "parent", 2])
-})
-
 test("#692 - componentDidUpdate is triggered", () => {
     jest.useFakeTimers()
 
@@ -836,15 +700,16 @@ test("#692 - componentDidUpdate is triggered", () => {
 
     @observer
     class Test extends React.Component<any, any> {
-        @observable
         counter = 0
 
-        @action
         inc = () => this.counter++
 
         constructor(props) {
             super(props)
-            makeObservable(this)
+            makeObservable(this, {
+                counter: observable,
+                inc: action
+            })
             setTimeout(() => this.inc(), 300)
         }
 
@@ -1113,6 +978,35 @@ test(`Observable changes in componenWillUnmount don't cause any warnings or erro
 
     consoleErrorSpy.mockRestore()
     consoleWarnSpy.mockRestore()
+})
+
+test("Class observer cleans up when componentWillUnmount is assigned on the instance", () => {
+    const o = observable.box(0)
+    let unmounts = 0
+
+    const TestCmp = observer(
+        class TestCmp extends React.Component {
+            constructor(props) {
+                super(props)
+                ;(this as any).componentWillUnmount = () => {
+                    unmounts++
+                }
+            }
+
+            render() {
+                return o.get()
+            }
+        }
+    )
+
+    const { container, unmount } = render(<TestCmp />)
+    expect(container).toHaveTextContent("0")
+    expect(getObserverTree(o).observers!.length).toBe(1)
+
+    unmount()
+
+    expect(unmounts).toBe(1)
+    expect(getObserverTree(o).observers).toBe(undefined)
 })
 
 test(`Observable prop workaround`, () => {

@@ -1,26 +1,43 @@
 {
     "name": "mobx-react-lite",
     "version": "4.1.1",
-    "description": "Lightweight React bindings for MobX based on React 16.8+ and Hooks",
+    "description": "Lightweight React bindings for MobX based on function components and Hooks",
     "source": "src/index.ts",
+    "type": "commonjs",
     "main": "dist/index.js",
-    "umd:main": "dist/mobxreact.umd.production.min.js",
+    "umd:main": "dist/mobxreactlite.umd.production.min.js",
     "unpkg": "dist/mobxreactlite.umd.production.min.js",
     "jsdelivr": "dist/mobxreactlite.umd.production.min.js",
     "jsnext:main": "dist/mobxreactlite.esm.production.min.js",
-    "module": "es/index.js",
-    "react-native": "es/index.js",
+    "module": "dist/mobxreactlite.esm.js",
+    "react-native": "dist/mobxreactlite.esm.js",
     "types": "dist/index.d.ts",
     "typings": "dist/index.d.ts",
+    "exports": {
+        "./package.json": "./package.json",
+        ".": {
+            "react-native": {
+                "types": "./dist/index.d.ts",
+                "default": "./dist/mobxreactlite.esm.js"
+            },
+            "import": {
+                "types": "./dist/index.d.ts",
+                "default": "./dist/mobxreactlite.mjs"
+            },
+            "default": {
+                "types": "./dist/index.d.ts",
+                "default": "./dist/index.js"
+            }
+        },
+        "./dist/*": "./dist/*",
+        "./src/*": "./src/*"
+    },
     "files": [
         "src",
-        "dist/",
-        "lib/",
-        "es/",
+        "dist",
         "LICENSE",
         "CHANGELOG.md",
-        "README.md",
-        "batching*"
+        "README.md"
     ],
     "repository": {
         "type": "git",
@@ -36,24 +53,12 @@
         "url": "https://github.com/mobxjs/mobx/issues"
     },
     "homepage": "https://mobx.js.org",
-    "dependencies": {
-        "use-sync-external-store": "^1.4.0"
-    },
     "peerDependencies": {
-        "mobx": "^6.9.0",
-        "react": "^16.8.0 || ^17 || ^18 || ^19"
-    },
-    "peerDependenciesMeta": {
-        "react-dom": {
-            "optional": true
-        },
-        "react-native": {
-            "optional": true
-        }
+        "mobx": "^7.0.0",
+        "react": "^18 || ^19"
     },
     "devDependencies": {
-        "mobx": "^6.15.0",
-        "expose-gc": "^1.0.0"
+        "mobx": "^6.15.0"
     },
     "keywords": [
         "mobx",
@@ -68,14 +73,12 @@
     ],
     "scripts": {
         "lint": "eslint src/**/* --ext .js,.ts,.tsx",
-        "build": "node ../../scripts/build.js mobxReactLite",
-        "build:test": "npm run build -- --target test",
-        "build:cjs": "tsc --project tsconfig.build.cjs.json",
-        "build:es": "tsc --project tsconfig.build.es.json",
+        "build": "rollup --config rollup.config.mjs",
+        "build:test": "npm run build -- --environment TARGET:test",
         "test": "jest",
         "test:size": "import-size --report . observer useLocalObservable",
         "test:types": "tsc --noEmit",
         "test:check": "npm run test:types",
-        "prepublishOnly": "cd ../mobx && npm run build -- --target publish && cd ../mobx-react-lite && npm run build -- --target publish && npm run build:cjs && npm run build:es"
+        "prepublishOnly": "npm run build -- --environment TARGET:publish"
     }
 }

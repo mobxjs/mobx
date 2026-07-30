@@ -18,7 +18,7 @@ const MyComponent = observer(props => ReactElement)
 
 While MobX works independently from React, they are most commonly used together. In [The gist of MobX](the-gist-of-mobx.md) you have already seen the most important part of this integration: the `observer` [HoC](https://reactjs.org/docs/higher-order-components.html) that you can wrap around a React component.
 
-`observer` is provided by a separate React bindings package you choose [during installation](installation.md#installation). In this example, we're going to use the more lightweight [`mobx-react-lite` package](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react-lite).
+`observer` is provided by the [`mobx-react-lite` package](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react-lite) for function components. Use [`mobx-react`](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react) if you also need class component support.
 
 ```javascript
 import React from "react"
@@ -198,7 +198,7 @@ ReactDOM.render(<TimerView />, document.body)
 <!--`useLocalObservable` hook-->
 
 The combination `const [store] = useState(() => observable({ /* something */}))` is
-quite common. To make this pattern simpler the [`useLocalObservable`](https://github.com/mobxjs/mobx-react#uselocalobservable-hook) hook is exposed from `mobx-react-lite` package, making it possible to simplify the earlier example to:
+quite common. To make this pattern simpler the [`useLocalObservable`](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react-lite#uselocalobservabletinitializer--t-annotations-annotationsmapt-t) hook is exposed from the `mobx-react-lite` package, making it possible to simplify the earlier example to:
 
 ```javascript
 import { observer, useLocalObservable } from "mobx-react-lite"
@@ -291,7 +291,7 @@ const TodoView = observer(({ todo }: { todo: Todo }) =>
 
 Imagine the same example, where `GridRow` takes an `onRender` callback instead.
 Since `onRender` is part of the rendering cycle of `GridRow`, rather than `TodoView`'s render (even though that is where it syntactically appears), we have to make sure that the callback component uses an `observer` component.
-Or, we can create an in-line anonymous observer using [`<Observer />`](https://github.com/mobxjs/mobx-react#observer):
+Or, we can create an in-line anonymous observer using [`<Observer />`](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react-lite#observerrenderfn):
 
 ```javascript
 const TodoView = observer(({ todo }: { todo: Todo }) => {
@@ -310,20 +310,6 @@ const TodoView = observer(({ todo }: { todo: Todo }) => {
 If `observer` is used in server side rendering context; make sure to call `enableStaticRendering(true)`, so that `observer` won't subscribe to any observables used, and no GC problems are introduced.
 </details>
 
-<details id="react-vs-lite"><summary>**Note:** mobx-react vs. mobx-react-lite<a href="#react-vs-lite" class="tip-anchor"></a></summary>
-In this documentation we used `mobx-react-lite` as default.
-[mobx-react](https://github.com/mobxjs/mobx-react/) is its big brother, which uses `mobx-react-lite` under the hood.
-It offers a few more features which are typically not needed anymore in greenfield projects. The additional things offered by mobx-react:
-
-1. Support for React class components.
-1. `Provider` and `inject`. MobX's own React.createContext predecessor which is not needed anymore.
-1. Observable specific `propTypes`.
-
-Note that `mobx-react` fully repackages and re-exports `mobx-react-lite`, including functional component support.
-If you use `mobx-react`, there is no need to add `mobx-react-lite` as a dependency or import from it anywhere.
-
-</details>
-
 <details id="observer-vs-memo"><summary>**Note:** `observer` or `React.memo`?<a href="#observer-vs-memo" class="tip-anchor"></a></summary>
 `observer` automatically applies `memo`, so `observer` components never need to be wrapped in `memo`.
 `memo` can be applied safely to observer components because mutations (deeply) inside the props will be picked up by `observer` anyway if relevant.
@@ -331,12 +317,12 @@ If you use `mobx-react`, there is no need to add `mobx-react-lite` as a dependen
 
 <details id="class-comp"><summary>**Tip:** `observer` for class based React components<a href="#class-comp" class="tip-anchor"></a>
 </summary>
-As stated above, class based components are only supported through `mobx-react`, and not `mobx-react-lite`.
 Briefly, you can wrap class-based components in `observer` just like
 you can wrap function components:
 
 ```javascript
 import React from "react"
+import { observer } from "mobx-react"
 
 const TimerView = observer(
     class TimerView extends React.Component {
@@ -368,7 +354,7 @@ then no display name will be visible in the DevTools.
 
 The following approaches can be used to fix this:
 
--   use `function` with a name instead of an arrow function. `mobx-react` infers component name from the function name:
+-   use `function` with a name instead of an arrow function. `observer` infers component name from the function name:
 
     ```javascript
     export const MyComponent = observer(function MyComponent(props) {
@@ -390,14 +376,12 @@ The following approaches can be used to fix this:
     export default observer(MyComponent)
     ```
 
--   [**Broken**] Set `displayName` explicitly:
+-   Set `displayName` explicitly:
 
     ```javascript
     export const MyComponent = observer(props => <div>hi</div>)
     MyComponent.displayName = "MyComponent"
     ```
-
-    This is broken in React 16 at the time of writing; mobx-react `observer` uses a React.memo and runs into this bug: https://github.com/facebook/react/issues/18026, but it will be fixed in React 17.
 
 Now you can see component names:
 
@@ -494,7 +478,7 @@ With MobX that isn't really needed, since MobX has already a way to automaticall
 Combining `autorun` and coupling it to the life-cycle of the component using `useEffect` is luckily straightforward:
 
 ```javascript
-import { observer, useLocalObservable, useAsObservableSource } from "mobx-react-lite"
+import { observer, useLocalObservable } from "mobx-react-lite"
 import { useState } from "react"
 
 const TimerView = observer(() => {
@@ -553,4 +537,4 @@ Help! My component isn't re-rendering...
 1. Make sure you grok how tracking works in general. Check out the [Understanding reactivity](understanding-reactivity.md) section.
 1. Read the common pitfalls as described above.
 1. [Configure](configuration.md#linting-options) MobX to warn you of unsound usage of mechanisms and check the console logs.
-1. Use [trace](analyzing-reactivity.md) to verify that you are subscribing to the right things or check what MobX is doing in general using [spy](analyzing-reactivity.md#spy) / the [mobx-log](https://github.com/kubk/mobx-log) package.
+1. Use [spy](analyzing-reactivity.md#spy), [`getDependencyTree`](api.md#getdependencytree), or the [mobx-log](https://github.com/kubk/mobx-log) package to inspect what MobX is doing.

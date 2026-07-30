@@ -24,20 +24,14 @@ import {
     shallowEnhancer,
     refStructEnhancer,
     AnnotationsMap,
-    asObservableObject,
-    storeAnnotation,
-    createDecoratorAnnotation,
-    createLegacyArray,
-    globalState,
     assign,
-    isStringish,
     createObservableAnnotation,
     createAutoAnnotation,
-    is20223Decorator,
-    initObservable
+    initObservable,
+    decorateObservable20223_
 } from "../internal"
-
-import type { ClassAccessorDecorator, ClassFieldDecorator } from "../types/decorator_fills"
+import { createDecoratorAnnotation, type DecoratorAnnotation } from "./decoratorannotation"
+import type { ClassAccessorAndFieldDecorator } from "../types/decorator_fills"
 
 export const OBSERVABLE = "observable"
 export const OBSERVABLE_REF = "observable.ref"
@@ -49,7 +43,6 @@ export type CreateObservableOptions = {
     equals?: IEqualsComparer<any>
     deep?: boolean
     defaultDecorator?: Annotation
-    proxy?: boolean
     autoBind?: boolean
 }
 
@@ -58,8 +51,7 @@ export type CreateObservableOptions = {
 export const defaultCreateObservableOptions: CreateObservableOptions = {
     deep: true,
     name: undefined,
-    defaultDecorator: undefined,
-    proxy: true
+    defaultDecorator: undefined
 }
 Object.freeze(defaultCreateObservableOptions)
 
@@ -69,16 +61,20 @@ export function asCreateObservableOptions(thing: any): CreateObservableOptions {
 
 const observableAnnotation = createObservableAnnotation(OBSERVABLE)
 const observableRefAnnotation = createObservableAnnotation(OBSERVABLE_REF, {
-    enhancer: referenceEnhancer
+    enhancer_: referenceEnhancer
 })
 const observableShallowAnnotation = createObservableAnnotation(OBSERVABLE_SHALLOW, {
-    enhancer: shallowEnhancer
+    enhancer_: shallowEnhancer
 })
 const observableStructAnnotation = createObservableAnnotation(OBSERVABLE_STRUCT, {
-    enhancer: refStructEnhancer
+    enhancer_: refStructEnhancer
 })
-const observableDecoratorAnnotation =
-    createDecoratorAnnotation<ClassAccessorDecorator>(observableAnnotation)
+
+function createObservableDecoratorAnnotation(
+    annotation: Annotation
+): DecoratorAnnotation<ClassAccessorAndFieldDecorator> {
+    return createDecoratorAnnotation(annotation, decorateObservable20223_)
+}
 
 export function getEnhancerFromOptions(options: CreateObservableOptions): IEnhancer<any> {
     return options.deep === true
@@ -95,7 +91,7 @@ export function getAnnotationFromOptions(
 }
 
 export function getEnhancerFromAnnotation(annotation?: Annotation): IEnhancer<any> {
-    return !annotation ? deepEnhancer : annotation.options_?.enhancer ?? deepEnhancer
+    return !annotation ? deepEnhancer : annotation.options_?.enhancer_ ?? deepEnhancer
 }
 
 /**
@@ -103,15 +99,8 @@ export function getEnhancerFromAnnotation(annotation?: Annotation): IEnhancer<an
  * @param v the value which should become observable.
  */
 function createObservable(v: any, arg2?: any, arg3?: any) {
-    // @observable someProp; (2022.3 Decorators)
-    if (is20223Decorator(arg2)) {
-        return observableAnnotation.decorate_20223_(v, arg2)
-    }
-
-    // @observable someProp;
-    if (isStringish(arg2)) {
-        storeAnnotation(v, arg2, observableAnnotation)
-        return
+    if (arg2 && typeof arg2.kind === "string") {
+        return decorateObservable20223_(observableAnnotation, v, arg2)
     }
 
     // already observable - ignore
@@ -147,7 +136,6 @@ function createObservable(v: any, arg2?: any, arg3?: any) {
     // anything else
     return observable.box(v, arg2)
 }
-assign(createObservable, observableDecoratorAnnotation)
 
 export interface IObservableValueFactory {
     <T>(value: T, options?: CreateObservableOptions): IObservableValue<T>
@@ -172,18 +160,13 @@ export interface IObservableMapFactory {
     >
 }
 
-export interface IObservableFactory
-    extends Annotation,
-        PropertyDecorator,
-        ClassAccessorDecorator,
-        ClassFieldDecorator {
-    // TODO: remove ClassFieldDecorator, this is only temporarily support for legacy decorators
+export interface IObservableFactory extends Annotation, ClassAccessorAndFieldDecorator {
     <T = any>(value: T[], options?: CreateObservableOptions): IObservableArray<T>
     <T = any>(value: Set<T>, options?: CreateObservableOptions): ObservableSet<T>
     <K = any, V = any>(value: Map<K, V>, options?: CreateObservableOptions): ObservableMap<K, V>
     <T extends object>(
         value: T,
-        decorators?: AnnotationsMap<T, never>,
+        annotations?: AnnotationsMap<T, never>,
         options?: CreateObservableOptions
     ): T
 
@@ -196,20 +179,9 @@ export interface IObservableFactory
     map: IObservableMapFactory
     object: <T = any>(
         props: T,
-        decorators?: AnnotationsMap<T, never>,
+        annotations?: AnnotationsMap<T, never>,
         options?: CreateObservableOptions
     ) => T
-
-    /**
-     * Decorator that creates an observable that only observes the references, but doesn't try to turn the assigned value into an observable.ts.
-     */
-    ref: Annotation & PropertyDecorator & ClassAccessorDecorator & ClassFieldDecorator
-    /**
-     * Decorator that creates an observable converts its value (objects, maps or arrays) into a shallow observable structure
-     */
-    shallow: Annotation & PropertyDecorator & ClassAccessorDecorator & ClassFieldDecorator
-    deep: Annotation & PropertyDecorator & ClassAccessorDecorator & ClassFieldDecorator
-    struct: Annotation & PropertyDecorator & ClassAccessorDecorator & ClassFieldDecorator
 }
 
 const observableFactories: IObservableFactory = {
@@ -219,11 +191,7 @@ const observableFactories: IObservableFactory = {
     },
     array<T = any>(initialValues?: T[], options?: CreateObservableOptions): IObservableArray<T> {
         const o = asCreateObservableOptions(options)
-        return (
-            globalState.useProxies === false || o.proxy === false
-                ? createLegacyArray
-                : createObservableArray
-        )(initialValues, getEnhancerFromOptions(o), o.name)
+        return createObservableArray(initialValues, getEnhancerFromOptions(o), o.name)
     },
     map<K = any, V = any>(
         initialValues?: IObservableMapInitialValues<K, V>,
@@ -241,24 +209,23 @@ const observableFactories: IObservableFactory = {
     },
     object<T extends object = any>(
         props: T,
-        decorators?: AnnotationsMap<T, never>,
+        annotations?: AnnotationsMap<T, never>,
         options?: CreateObservableOptions
     ): T {
         return initObservable(() =>
-            extendObservable(
-                globalState.useProxies === false || options?.proxy === false
-                    ? asObservableObject({}, options)
-                    : asDynamicObservableObject({}, options),
-                props,
-                decorators
-            )
+            extendObservable(asDynamicObservableObject({}, options), props, annotations)
         )
-    },
-    ref: createDecoratorAnnotation(observableRefAnnotation),
-    shallow: createDecoratorAnnotation(observableShallowAnnotation),
-    deep: observableDecoratorAnnotation,
-    struct: createDecoratorAnnotation(observableStructAnnotation)
+    }
 } as any
 
+export const observableRef = createObservableDecoratorAnnotation(observableRefAnnotation)
+export const observableShallow = createObservableDecoratorAnnotation(observableShallowAnnotation)
+export const observableDeep = createObservableDecoratorAnnotation(observableAnnotation)
+export const observableStruct = createObservableDecoratorAnnotation(observableStructAnnotation)
+
 // eslint-disable-next-line
-export var observable: IObservableFactory = assign(createObservable, observableFactories)
+export var observable: IObservableFactory = assign(
+    createObservable,
+    observableAnnotation,
+    observableFactories
+)

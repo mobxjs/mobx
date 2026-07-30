@@ -2,16 +2,15 @@ import {
     createAction,
     executeAction,
     Annotation,
-    storeAnnotation,
     die,
     isFunction,
     isStringish,
-    createDecoratorAnnotation,
     createActionAnnotation,
-    is20223Decorator
+    decorateAction20223_,
+    assign
 } from "../internal"
-
-import type { ClassFieldDecorator, ClassMethodDecorator } from "../types/decorator_fills"
+import { createDecoratorAnnotation, type DecoratorAnnotation } from "./decoratorannotation"
+import type { ClassMethodAndFieldDecorator } from "../types/decorator_fills"
 
 export const ACTION = "action"
 export const ACTION_BOUND = "action.bound"
@@ -32,28 +31,32 @@ const autoActionBoundAnnotation = createActionAnnotation(AUTOACTION_BOUND, {
     bound: true
 })
 
-export interface IActionFactory
-    extends Annotation,
-        PropertyDecorator,
-        ClassMethodDecorator,
-        ClassFieldDecorator {
+function createActionDecoratorAnnotation(
+    annotation: Annotation
+): DecoratorAnnotation<ClassMethodAndFieldDecorator> {
+    return createDecoratorAnnotation(annotation, decorateAction20223_)
+}
+
+export interface IActionFactory extends Annotation, ClassMethodAndFieldDecorator {
     // nameless actions
     <T extends Function | undefined | null>(fn: T): T
     // named actions
     <T extends Function | undefined | null>(name: string, fn: T): T
 
-    // named decorator
-    (customName: string): PropertyDecorator &
-        Annotation &
-        ClassMethodDecorator &
-        ClassFieldDecorator
-
-    // decorator (name no longer supported)
-    bound: Annotation & PropertyDecorator & ClassMethodDecorator & ClassFieldDecorator
+    // named annotation
+    (customName: string): DecoratorAnnotation<ClassMethodAndFieldDecorator>
 }
 
 function createActionFactory(autoAction: boolean): IActionFactory {
     const res: IActionFactory = function action(arg1, arg2?): any {
+        if (arg2 && typeof arg2.kind === "string") {
+            return decorateAction20223_(
+                autoAction ? autoActionAnnotation : actionAnnotation,
+                arg1,
+                arg2
+            )
+        }
+
         // action(fn() {})
         if (isFunction(arg1)) {
             return createAction(arg1.name || DEFAULT_ACTION_NAME, arg1, autoAction)
@@ -62,20 +65,9 @@ function createActionFactory(autoAction: boolean): IActionFactory {
         if (isFunction(arg2)) {
             return createAction(arg1, arg2, autoAction)
         }
-        // @action (2022.3 Decorators)
-        if (is20223Decorator(arg2)) {
-            return (autoAction ? autoActionAnnotation : actionAnnotation).decorate_20223_(
-                arg1,
-                arg2
-            )
-        }
-        // @action
-        if (isStringish(arg2)) {
-            return storeAnnotation(arg1, arg2, autoAction ? autoActionAnnotation : actionAnnotation)
-        }
-        // action("name") & @action("name")
+        // action("name") annotation
         if (isStringish(arg1)) {
-            return createDecoratorAnnotation(
+            return createActionDecoratorAnnotation(
                 createActionAnnotation(autoAction ? AUTOACTION : ACTION, {
                     name: arg1,
                     autoAction
@@ -91,12 +83,12 @@ function createActionFactory(autoAction: boolean): IActionFactory {
 }
 
 export const action: IActionFactory = createActionFactory(false)
-Object.assign(action, actionAnnotation)
+assign(action, actionAnnotation)
 export const autoAction: IActionFactory = createActionFactory(true)
-Object.assign(autoAction, autoActionAnnotation)
+assign(autoAction, autoActionAnnotation)
 
-action.bound = createDecoratorAnnotation(actionBoundAnnotation)
-autoAction.bound = createDecoratorAnnotation(autoActionBoundAnnotation)
+export const actionBound = createActionDecoratorAnnotation(actionBoundAnnotation)
+export const autoActionBound = createActionDecoratorAnnotation(autoActionBoundAnnotation)
 
 export function runInAction<T>(fn: () => T): T {
     return executeAction(fn.name || DEFAULT_ACTION_NAME, false, fn, this, undefined)

@@ -5,7 +5,6 @@ it will cause undefined errors (for example because super classes or local varia
 With this file that will still happen,
 but at least in this file we can magically reorder the imports with trial and error until the build succeeds again.
 */
-export * from "./utils/global"
 export { die } from "./errors"
 export * from "./utils/utils"
 export * from "./api/decorators"
@@ -43,7 +42,6 @@ export * from "./api/isobservable"
 export * from "./api/object-api"
 export * from "./api/observe"
 export * from "./api/tojs"
-export * from "./api/trace"
 export * from "./api/transaction"
 export * from "./api/when"
 export * from "./types/dynamicobject"
@@ -54,7 +52,6 @@ export * from "./types/observablearray"
 export * from "./types/observablemap"
 export * from "./types/observableset"
 export * from "./types/observableobject"
-export * from "./types/legacyobservablearray"
 export * from "./types/type-utils"
 export * from "./utils/eq"
 export * from "./utils/iterable"

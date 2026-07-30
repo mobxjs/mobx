@@ -1,20 +1,15 @@
 import * as mobx from "mobx"
 import * as React from "react"
-import { act, cleanup, fireEvent, render, renderHook } from "@testing-library/react"
+import { act, fireEvent, render, renderHook } from "@testing-library/react"
 
 import { Observer, observer, useLocalObservable } from "../src"
 import { useEffect, useState } from "react"
 import { autorun } from "mobx"
 import { useObserver } from "../src/useObserver"
 
-afterEach(cleanup)
-
 let consoleWarnMock: jest.SpyInstance | undefined
-afterEach(() => {
-    consoleWarnMock?.mockRestore()
-})
 
-test("base useLocalStore should work", () => {
+test("base useLocalObservable should work", () => {
     let counterRender = 0
     let observerRender = 0
     let outerStoreRef: any

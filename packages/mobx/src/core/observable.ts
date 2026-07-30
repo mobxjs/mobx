@@ -1,11 +1,8 @@
 import {
     Lambda,
     ComputedValue,
-    IDependencyTree,
     IDerivation,
     IDerivationState_,
-    TraceMode,
-    getDependencyTree,
     globalState,
     runReactions,
     checkIfStateReadsAreAllowed
@@ -192,9 +189,6 @@ export function propagateChanged(observable: IObservable) {
     // Ideally we use for..of here, but the downcompiled version is really slow...
     observable.observers_.forEach(d => {
         if (d.dependenciesState_ === IDerivationState_.UP_TO_DATE_) {
-            if (__DEV__ && d.isTracing_ !== TraceMode.NONE) {
-                logTraceInfo(d, observable)
-            }
             d.onBecomeStale_()
         }
         d.dependenciesState_ = IDerivationState_.STALE_
@@ -213,9 +207,6 @@ export function propagateChangeConfirmed(observable: IObservable) {
     observable.observers_.forEach(d => {
         if (d.dependenciesState_ === IDerivationState_.POSSIBLY_STALE_) {
             d.dependenciesState_ = IDerivationState_.STALE_
-            if (__DEV__ && d.isTracing_ !== TraceMode.NONE) {
-                logTraceInfo(d, observable)
-            }
         } else if (
             d.dependenciesState_ === IDerivationState_.UP_TO_DATE_ // this happens during computing of `d`, just keep lowestObserverState up to date.
         ) {
@@ -240,43 +231,4 @@ export function propagateMaybeChanged(observable: IObservable) {
         }
     })
     // invariantLOS(observable, "maybe end");
-}
-
-function logTraceInfo(derivation: IDerivation, observable: IObservable) {
-    console.log(
-        `[mobx.trace] '${derivation.name_}' is invalidated due to a change in: '${observable.name_}'`
-    )
-    if (derivation.isTracing_ === TraceMode.BREAK) {
-        const lines = []
-        printDepTree(getDependencyTree(derivation), lines, 1)
-
-        // prettier-ignore
-        new Function(
-`debugger;
-/*
-Tracing '${derivation.name_}'
-
-You are entering this break point because derivation '${derivation.name_}' is being traced and '${observable.name_}' is now forcing it to update.
-Just follow the stacktrace you should now see in the devtools to see precisely what piece of your code is causing this update
-The stackframe you are looking for is at least ~6-8 stack-frames up.
-
-${derivation instanceof ComputedValue ? derivation.derivation.toString().replace(/[*]\//g, "/") : ""}
-
-The dependencies for this derivation are:
-
-${lines.join("\n")}
-*/
-    `)()
-    }
-}
-
-function printDepTree(tree: IDependencyTree, lines: string[], depth: number) {
-    if (lines.length >= 1000) {
-        lines.push("(and many more)")
-        return
-    }
-    lines.push(`${"\t".repeat(depth - 1)}${tree.name}`)
-    if (tree.dependencies) {
-        tree.dependencies.forEach(child => printDepTree(child, lines, depth + 1))
-    }
 }

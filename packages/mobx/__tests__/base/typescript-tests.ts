@@ -3,10 +3,15 @@
 import {
     observe,
     computed,
+    computedStruct,
     observable,
+    observableRef,
+    observableShallow,
+    observableDeep,
     autorun,
     extendObservable,
     action,
+    actionBound,
     IArrayDidChange,
     IArrayWillChange,
     IArrayWillSplice,
@@ -370,7 +375,7 @@ test("typescript: parameterized computed decorator", () => {
             makeObservable(this, {
                 x: observable,
                 y: observable,
-                boxedSum: computed.struct
+                boxedSum: computedStruct
             })
         }
 
@@ -758,20 +763,14 @@ test.skip("observable performance - ts", () => {
     console.log("changed in ", Date.now() - start)
 })
 
+// Do not remove: slow manual stage-3 decorator benchmark
 test.skip("observable performance - ts - decorators", () => {
     const AMOUNT = 100000
 
     class A {
-        @observable
-        a = 1
-        @observable
-        b = 2
-        @observable
-        c = 3
-
-        constructor() {
-            makeObservable(this)
-        }
+        @observable accessor a = 1
+        @observable accessor b = 2
+        @observable accessor c = 3
 
         @computed
         get d() {
@@ -1244,13 +1243,13 @@ test("705 - setter undoing caching (typescript)", () => {
     d2()
 })
 
-test("@observable.ref (TS)", () => {
+test("@observableRef (TS)", () => {
     class A {
         ref = { a: 3 }
 
         constructor() {
             makeObservable(this, {
-                ref: observable.ref
+                ref: observableRef
             })
         }
     }
@@ -1261,13 +1260,13 @@ test("@observable.ref (TS)", () => {
     t.equal(mobx.isObservableProp(a, "ref"), true)
 })
 
-test("@observable.shallow (TS)", () => {
+test("@observableShallow (TS)", () => {
     class A {
         arr = [{ todo: 1 }]
 
         constructor() {
             makeObservable(this, {
-                arr: observable.shallow
+                arr: observableShallow
             })
         }
     }
@@ -1282,13 +1281,13 @@ test("@observable.shallow (TS)", () => {
     t.equal(a.arr[1] === todo2, true)
 })
 
-test("@observable.deep (TS)", () => {
+test("@observableDeep (TS)", () => {
     class A {
         arr = [{ todo: 1 }]
 
         constructor() {
             makeObservable(this, {
-                arr: observable.deep
+                arr: observableDeep
             })
         }
     }
@@ -1312,7 +1311,7 @@ test("action.bound binds (TS)", () => {
         constructor() {
             makeObservable(this, {
                 x: observable,
-                inc: action.bound
+                inc: actionBound
             })
         }
 
@@ -1328,7 +1327,7 @@ test("action.bound binds (TS)", () => {
     t.equal(a.x, 2)
 })
 
-test("803 - action.bound and action preserve type info", () => {
+test("803 - actionBound and action preserve type info", () => {
     function thingThatAcceptsCallback(cb: (elem: { x: boolean }) => void) {}
 
     thingThatAcceptsCallback(elem => {
@@ -1741,8 +1740,8 @@ test.skip("actions are reassignable", () => {
             makeObservable(this, {
                 m1: action,
                 m2: action,
-                m3: action.bound,
-                m4: action.bound
+                m3: actionBound,
+                m4: actionBound
             })
         }
 
@@ -2380,20 +2379,21 @@ test("TS - it should support flow as annotation", done => {
     }, 10)
 })
 
-test("TS - it should support flow as decorator", done => {
+test("TS - it should support flow as annotation", done => {
     const values: number[] = []
 
     mobx.configure({ enforceActions: "observed" })
 
     class X {
-        @observable
         a = 1
 
         constructor() {
-            makeObservable(this)
+            makeObservable(this, {
+                a: observable,
+                f: flow
+            })
         }
 
-        @flow
         *f(initial) {
             this.a = initial // this runs in action
             try {
