@@ -27,8 +27,7 @@
       "mobx-utils",
       "custom-observables",
       "lazy-observables",
-      "collection-utilities",
-      "intercept-and-observe"
+      "collection-utilities"
     ],
     "Fine-tuning": [
       "configuration",

@@ -69,13 +69,9 @@ test("action modifications should be picked up 3", () => {
 
     const doubler = mobx.computed(() => a.get() * 2)
 
-    mobx.observe(
-        doubler,
-        () => {
-            b = doubler.get()
-        },
-        true
-    )
+    mobx.autorun(() => {
+        b = doubler.get()
+    })
 
     expect(b).toBe(2)
 

@@ -1,7 +1,6 @@
 import {
     $mobx,
     IEnhancer,
-    IListenable,
     ObservableValue,
     checkIfStateModificationsAreAllowed,
     createAtom,
@@ -10,18 +9,15 @@ import {
     deepEnhancer,
     getNextId,
     getPlainObjectKeys,
-    hasListeners,
     isES6Map,
     isPlainES6Map,
     isPlainObject,
-    notifyListeners,
     referenceEnhancer,
     stringifyKey,
     transaction,
     untracked,
     globalState,
     die,
-    UPDATE,
     IAtom,
     initObservable
 } from "../internal"
@@ -35,32 +31,7 @@ export type IReadonlyMapEntry<K = any, V = any> = readonly [K, V]
 export type IMapEntries<K = any, V = any> = IMapEntry<K, V>[]
 export type IReadonlyMapEntries<K = any, V = any> = readonly IReadonlyMapEntry<K, V>[]
 
-export type IMapDidChange<K = any, V = any> = { observableKind: "map"; debugObjectName: string } & (
-    | {
-          object: ObservableMap<K, V>
-          name: K // actual the key or index, but this is based on the ancient .observe proposal for consistency
-          type: "update"
-          newValue: V
-          oldValue: V
-      }
-    | {
-          object: ObservableMap<K, V>
-          name: K
-          type: "add"
-          newValue: V
-      }
-    | {
-          object: ObservableMap<K, V>
-          name: K
-          type: "delete"
-          oldValue: V
-      }
-)
-
 const ObservableMapMarker = {}
-
-export const ADD = "add"
-export const DELETE = "delete"
 
 export type IObservableMapInitialValues<K = any, V = any> =
     | IMapEntries<K, V>
@@ -70,12 +41,11 @@ export type IObservableMapInitialValues<K = any, V = any> =
 
 // just extend Map? See also https://gist.github.com/nestharus/13b4d74f2ef4a2f4357dbd3fc23c1e54
 // But: https://github.com/mobxjs/mobx/issues/1556
-export class ObservableMap<K = any, V = any> implements Map<K, V>, IListenable {
+export class ObservableMap<K = any, V = any> implements Map<K, V> {
     [$mobx] = ObservableMapMarker
     data_!: Map<K, ObservableValue<V>>
     hasMap_!: Map<K, ObservableValue<boolean>> // hasMap, not hashMap >-).
     keysAtom_!: IAtom
-    changeListeners_
 
     constructor(
         initialData?: IObservableMapInitialValues<K, V>,
@@ -128,18 +98,6 @@ export class ObservableMap<K = any, V = any> implements Map<K, V>, IListenable {
     delete(key: K): boolean {
         checkIfStateModificationsAreAllowed(this.keysAtom_)
         if (this.has_(key)) {
-            const notify = hasListeners(this)
-            const change: IMapDidChange<K, V> | null = notify
-                ? {
-                      observableKind: "map",
-                      debugObjectName: this.name_,
-                      type: DELETE,
-                      object: this,
-                      oldValue: (<any>this.data_.get(key)).value_,
-                      name: key
-                  }
-                : null
-
             transaction(() => {
                 this.keysAtom_.reportChanged()
                 this.hasMap_.get(key)?.setNewValue_(false)
@@ -147,9 +105,6 @@ export class ObservableMap<K = any, V = any> implements Map<K, V>, IListenable {
                 observable.setNewValue_(undefined as any)
                 this.data_.delete(key)
             })
-            if (notify) {
-                notifyListeners(this, change)
-            }
             return true
         }
         return false
@@ -159,22 +114,7 @@ export class ObservableMap<K = any, V = any> implements Map<K, V>, IListenable {
         const observable = this.data_.get(key)!
         newValue = (observable as any).prepareNewValue_(newValue) as V
         if (newValue !== globalState.UNCHANGED) {
-            const notify = hasListeners(this)
-            const change: IMapDidChange<K, V> | null = notify
-                ? {
-                      observableKind: "map",
-                      debugObjectName: this.name_,
-                      type: UPDATE,
-                      object: this,
-                      oldValue: (observable as any).value_,
-                      name: key,
-                      newValue
-                  }
-                : null
             observable.setNewValue_(newValue as V)
-            if (notify) {
-                notifyListeners(this, change)
-            }
         }
     }
 
@@ -187,24 +127,9 @@ export class ObservableMap<K = any, V = any> implements Map<K, V>, IListenable {
                 __DEV__ ? `${this.name_}.${stringifyKey(key)}` : "ObservableMap.key"
             )
             this.data_.set(key, observable)
-            newValue = (observable as any).value_ // value might have been changed
             this.hasMap_.get(key)?.setNewValue_(true)
             this.keysAtom_.reportChanged()
         })
-        const notify = hasListeners(this)
-        const change: IMapDidChange<K, V> | null = notify
-            ? {
-                  observableKind: "map",
-                  debugObjectName: this.name_,
-                  type: ADD,
-                  object: this,
-                  name: key,
-                  newValue
-              }
-            : null
-        if (notify) {
-            notifyListeners(this, change)
-        }
     }
 
     get(key: K): V | undefined {

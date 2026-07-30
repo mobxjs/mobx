@@ -10,25 +10,19 @@ import {
     IAtom,
     IComputedValueOptions,
     IEnhancer,
-    IListenable,
     ObservableValue,
     addHiddenProp,
     createInstanceofPredicate,
     endBatch,
     getNextId,
-    hasListeners,
     isObject,
     isPlainObject,
-    notifyListeners,
     referenceEnhancer,
     startBatch,
     stringifyKey,
     globalState,
-    ADD,
-    UPDATE,
     die,
     hasProp,
-    getDescriptor,
     ownKeys,
     isOverride,
     defineProperty,
@@ -40,32 +34,8 @@ import {
 
 const descriptorCache = Object.create(null)
 
-export type IObjectDidChange<T = any> = {
-    observableKind: "object"
-    name: PropertyKey
-    object: T
-    debugObjectName: string
-} & (
-    | {
-          type: "add"
-          newValue: any
-      }
-    | {
-          type: "update"
-          oldValue: any
-          newValue: any
-      }
-    | {
-          type: "remove"
-          oldValue: any
-      }
-)
-
-const REMOVE = "remove"
-
-export class ObservableObjectAdministration implements IListenable {
+export class ObservableObjectAdministration {
     keysAtom_: IAtom
-    changeListeners_
     proxy_: any
     isPlainObject_: boolean
     appliedAnnotations_?: object
@@ -143,23 +113,7 @@ export class ObservableObjectAdministration implements IListenable {
 
         // notify observers
         if (newValue !== globalState.UNCHANGED) {
-            const notify = hasListeners(this)
-            const change: IObjectDidChange | null = notify
-                ? {
-                      type: UPDATE,
-                      observableKind: "object",
-                      debugObjectName: this.name_,
-                      object: this.proxy_ || this.target_,
-                      oldValue: (observable as any).value_,
-                      name: key,
-                      newValue
-                  }
-                : null
-
             ;(observable as ObservableValue<any>).setNewValue_(newValue)
-            if (notify) {
-                notifyListeners(this, change)
-            }
         }
         return true
     }
@@ -283,7 +237,7 @@ export class ObservableObjectAdministration implements IListenable {
             }
 
             // Notify
-            this.notifyPropertyAddition_(key, descriptor.value)
+            this.notifyPropertyAddition_(key)
         } finally {
             endBatch()
         }
@@ -334,7 +288,7 @@ export class ObservableObjectAdministration implements IListenable {
             this.values_.set(key, observable)
 
             // Notify (value possibly changed by ObservableValue)
-            this.notifyPropertyAddition_(key, observable.value_)
+            this.notifyPropertyAddition_(key)
         } finally {
             endBatch()
         }
@@ -380,7 +334,7 @@ export class ObservableObjectAdministration implements IListenable {
             this.values_.set(key, new ComputedValue(options))
 
             // Notify
-            this.notifyPropertyAddition_(key, undefined)
+            this.notifyPropertyAddition_(key)
         } finally {
             endBatch()
         }
@@ -403,14 +357,7 @@ export class ObservableObjectAdministration implements IListenable {
         // Delete
         try {
             startBatch()
-            const notify = hasListeners(this)
             const observable = this.values_.get(key)
-            // Value needed for listeners
-            let value = undefined
-            // Optimization: don't pull the value unless we will need it
-            if (!observable && notify) {
-                value = getDescriptor(this.target_, key)?.value
-            }
             // delete prop (do first, may fail)
             if (proxyTrap) {
                 if (!Reflect.deleteProperty(this.target_, key)) {
@@ -426,10 +373,6 @@ export class ObservableObjectAdministration implements IListenable {
             // Clear observable
             if (observable) {
                 this.values_.delete(key)
-                // for computed, value is undefined
-                if (observable instanceof ObservableValue) {
-                    value = observable.value_
-                }
                 // Notify: autorun(() => obj[key]), see #1796
                 propagateChanged(observable)
             }
@@ -439,39 +382,13 @@ export class ObservableObjectAdministration implements IListenable {
             // Notify "has" observers
             // "in" as it may still exist in proto
             this.pendingKeys_?.get(key)?.set(key in this.target_)
-
-            // Notify listeners
-            if (notify) {
-                const change: IObjectDidChange = {
-                    type: REMOVE,
-                    observableKind: "object",
-                    object: this.proxy_ || this.target_,
-                    debugObjectName: this.name_,
-                    oldValue: value,
-                    name: key
-                }
-                notifyListeners(this, change)
-            }
         } finally {
             endBatch()
         }
         return true
     }
 
-    notifyPropertyAddition_(key: PropertyKey, value: any) {
-        const notify = hasListeners(this)
-        if (notify) {
-            const change: IObjectDidChange = {
-                type: ADD,
-                observableKind: "object",
-                debugObjectName: this.name_,
-                object: this.proxy_ || this.target_,
-                name: key,
-                newValue: value
-            }
-            notifyListeners(this, change)
-        }
-
+    notifyPropertyAddition_(key: PropertyKey) {
         this.pendingKeys_?.get(key)?.set(true)
 
         // Notify "keys/entries/values" observers

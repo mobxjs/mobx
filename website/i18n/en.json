@@ -75,10 +75,6 @@
         "title": "Installation",
         "sidebar_label": "Installation"
       },
-      "intercept-and-observe": {
-        "title": "Intercept & Observe",
-        "sidebar_label": "Intercept & Observe {🚀}"
-      },
       "intro/concepts": {
         "title": "The gist of MobX"
       },

@@ -5,7 +5,6 @@ import {
     isComputedProp,
     isFlow,
     isObservableProp,
-    observe,
     runInAction
 } from "../../src/mobx"
 import { action, actionBound, computed, flow, observable } from "../../src/mobx"
@@ -57,16 +56,11 @@ test("computed override can delegate to parent computed with super", () => {
     expect(isObservableProp(child, "missing")).toBe(false)
     expect(isComputedProp(child, "missing")).toBe(false)
 
-    // Observing by public property key must observe the child computed, not the parent computed
-    const seen: number[] = []
-    const dispose = observe(child, "number", change => seen.push(change.newValue), true)
-
     // Direct reads still delegate through super and remain reactive after materialization
     expect(child.number).toBe(2)
     runInAction(() => {
         child.count = 2
     })
-    dispose()
 
     expect(isObservableProp(child, "number")).toBe(true)
     expect(isComputedProp(child, "number")).toBe(true)
@@ -74,7 +68,6 @@ test("computed override can delegate to parent computed with super", () => {
     expect(isComputedProp(child, "count")).toBe(false)
     expect(isObservableProp(child, "missing")).toBe(false)
     expect(isComputedProp(child, "missing")).toBe(false)
-    expect(seen).toEqual([2, 3])
 })
 
 test("computed override can delegate through multiple parent computeds", () => {
@@ -102,16 +95,12 @@ test("computed override can delegate through multiple parent computeds", () => {
     }
 
     const child = new Child()
-    const seen: number[] = []
-    const dispose = observe(child, "number", change => seen.push(change.newValue), true)
 
     runInAction(() => {
         child.count = 2
     })
-    dispose()
 
     expect(child.number).toBe(4)
-    expect(seen).toEqual([3, 4])
 })
 
 // #4660: A parent constructor read must not pin the parent computed as the child property
@@ -137,13 +126,9 @@ test("computed override wins when parent constructor reads the same key first", 
     }
 
     const child = new Child()
-    const seen: number[] = []
-    const dispose = observe(child, "number", change => seen.push(change.newValue), true)
-    dispose()
 
     expect(child.number).toBe(0)
     expect(isComputedProp(child, "number")).toBe(true)
-    expect(seen).toEqual([0])
 })
 
 test("manually wrapped action field can be overridden as an ordinary field", () => {

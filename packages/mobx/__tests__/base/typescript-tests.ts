@@ -1,7 +1,6 @@
 "use strict"
 
 import {
-    observe,
     computed,
     computedStruct,
     observable,
@@ -12,13 +11,11 @@ import {
     extendObservable,
     action,
     actionBound,
-    IArrayDidChange,
     IObservableValue,
     isObservable,
     isObservableProp,
     isObservableObject,
     transaction,
-    IObjectDidChange,
     configure,
     isAction,
     makeObservable,
@@ -26,16 +23,10 @@ import {
     createAtom,
     runInAction,
     flow,
-    IMapDidChange,
-    IValueDidChange,
-    ISetDidChange,
     flowResult
 } from "../../src/mobx"
 import * as mobx from "../../src/mobx"
 import { assert, IsExact } from "conditional-type-checks"
-
-const v = observable.box(3)
-observe(v, () => {})
 
 const a = observable([1, 2, 3])
 
@@ -89,28 +80,6 @@ test("decorators", () => {
     t.equal(isObservableObject(o), true)
     t.equal(isObservableProp(o, "amount"), true)
     t.equal(isObservableProp(o, "total"), true)
-
-    const events: any[] = []
-    const d1 = observe(o, (ev: IObjectDidChange) => events.push(ev.name, (ev as any).oldValue))
-    const d2 = observe(o, "price", ev => events.push(ev.newValue, ev.oldValue))
-    const d3 = observe(o, "total", ev => events.push(ev.newValue, ev.oldValue))
-
-    o.price = 4
-
-    d1()
-    d2()
-    d3()
-
-    o.price = 5
-
-    t.deepEqual(events, [
-        8, // new total
-        6, // old total
-        4, // new price
-        3, // old price
-        "price", // event name
-        3 // event oldValue
-    ])
 })
 
 test("observable", () => {
@@ -593,29 +562,6 @@ test("267 (typescript) should be possible to declare properties observable outsi
             })
         }
     }
-})
-
-test("288 atom not detected for object property", () => {
-    class Store {
-        foo = ""
-
-        constructor() {
-            makeObservable(this, {
-                foo: observable
-            })
-        }
-    }
-
-    const store = new Store()
-
-    mobx.observe(
-        store,
-        "foo",
-        () => {
-            // console.log("Change observed")
-        },
-        true
-    )
 })
 
 test.skip("observable performance - ts", () => {
@@ -1457,21 +1403,6 @@ test("computed comparer works with decorate (TS) - 3", () => {
     disposeAutorun()
 })
 
-test("1072 - @observable without initial value and observe before first access", () => {
-    class User {
-        loginCount?: number
-
-        constructor() {
-            makeObservable(this, {
-                loginCount: observable
-            })
-        }
-    }
-
-    const user = new User()
-    observe(user, "loginCount", () => {})
-})
-
 test("typescript - decorate works with classes", () => {
     class Box {
         height: number = 2
@@ -1901,41 +1832,6 @@ test("type of flows that return promises", async () => {
 
     const n: number = await f()
     expect(n).toBe(5)
-})
-
-test("#2159 - computed property keys", () => {
-    const testSymbol = Symbol("test symbol")
-    const testString = "testString"
-
-    class TestClass {
-        [testSymbol] = "original symbol value";
-        [testString] = "original string value"
-
-        constructor() {
-            makeObservable(this, {
-                [testSymbol]: observable,
-                [testString]: observable
-            })
-        }
-    }
-
-    const o = new TestClass()
-
-    const events: any[] = []
-    observe(o, testSymbol, ev => events.push(ev.newValue, ev.oldValue))
-    observe(o, testString, ev => events.push(ev.newValue, ev.oldValue))
-
-    runInAction(() => {
-        o[testSymbol] = "new symbol value"
-        o[testString] = "new string value"
-    })
-
-    t.deepEqual(events, [
-        "new symbol value", // new symbol
-        "original symbol value", // original symbol
-        "new string value", // new string
-        "original string value" // original string
-    ])
 })
 
 test("type inference of the action callback", () => {

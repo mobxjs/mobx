@@ -4,22 +4,17 @@ import {
     EMPTY_ARRAY,
     IAtom,
     IEnhancer,
-    IListenable,
     addHiddenFinalProp,
     checkIfStateModificationsAreAllowed,
     createInstanceofPredicate,
     getNextId,
-    hasListeners,
     isObject,
-    notifyListeners,
     hasProp,
     die,
     globalState,
     initObservable
 } from "../internal"
 
-const SPLICE = "splice"
-export const UPDATE = "update"
 export const MAX_SPLICE_SIZE = 10000 // See e.g. https://github.com/mobxjs/mobx/issues/859
 
 export interface IObservableArray<T = any> extends Array<T> {
@@ -28,29 +23,6 @@ export interface IObservableArray<T = any> extends Array<T> {
     replace(newItems: T[]): T[]
     remove(value: T): boolean
     toJSON(): T[]
-}
-
-interface IArrayBaseChange<T> {
-    object: IObservableArray<T>
-    observableKind: "array"
-    debugObjectName: string
-    index: number
-}
-
-export type IArrayDidChange<T = any> = IArrayUpdate<T> | IArraySplice<T>
-
-export interface IArrayUpdate<T = any> extends IArrayBaseChange<T> {
-    type: "update"
-    newValue: T
-    oldValue: T
-}
-
-export interface IArraySplice<T = any> extends IArrayBaseChange<T> {
-    type: "splice"
-    added: T[]
-    addedCount: number
-    removed: T[]
-    removedCount: number
 }
 
 const arrayTraps = {
@@ -88,10 +60,9 @@ const arrayTraps = {
     }
 }
 
-export class ObservableArrayAdministration implements IListenable {
+export class ObservableArrayAdministration {
     atom_: IAtom
     readonly values_: any[] = [] // this is the prop that gets proxied, so can't replace it!
-    changeListeners_
     enhancer_: (newV: any, oldV: any | undefined) => any
     proxy_!: IObservableArray<any>
     lastKnownLength_ = 0
@@ -166,7 +137,7 @@ export class ObservableArrayAdministration implements IListenable {
         const res = this.spliceItemsIntoValues_(index, deleteCount, newItems)
 
         if (deleteCount !== 0 || newItems.length !== 0) {
-            this.notifyArraySplice_(index, newItems, res)
+            this.atom_.reportChanged()
         }
         return res
     }
@@ -191,49 +162,6 @@ export class ObservableArrayAdministration implements IListenable {
         }
     }
 
-    notifyArrayChildUpdate_(index: number, newValue: any, oldValue: any) {
-        const notify = hasListeners(this)
-        const change: IArrayDidChange | null = notify
-            ? ({
-                  observableKind: "array",
-                  object: this.proxy_,
-                  type: UPDATE,
-                  debugObjectName: this.atom_.name_,
-                  index,
-                  newValue,
-                  oldValue
-              } as const)
-            : null
-
-        this.atom_.reportChanged()
-        if (notify) {
-            notifyListeners(this, change)
-        }
-    }
-
-    notifyArraySplice_(index: number, added: any[], removed: any[]) {
-        const notify = hasListeners(this)
-        const change: IArraySplice | null = notify
-            ? ({
-                  observableKind: "array",
-                  object: this.proxy_,
-                  debugObjectName: this.atom_.name_,
-                  type: SPLICE,
-                  index,
-                  removed,
-                  added,
-                  removedCount: removed.length,
-                  addedCount: added.length
-              } as const)
-            : null
-
-        this.atom_.reportChanged()
-        // conform: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
-        if (notify) {
-            notifyListeners(this, change)
-        }
-    }
-
     get_(index: number): any | undefined {
         this.atom_.reportObserved()
         return this.values_[index]
@@ -249,7 +177,7 @@ export class ObservableArrayAdministration implements IListenable {
             const changed = newValue !== oldValue
             if (changed) {
                 values[index] = newValue
-                this.notifyArrayChildUpdate_(index, newValue, oldValue)
+                this.atom_.reportChanged()
             }
         } else {
             // For out of bound index, we don't create an actual sparse array,

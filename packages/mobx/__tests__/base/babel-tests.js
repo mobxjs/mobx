@@ -11,7 +11,6 @@ import {
     action,
     actionBound,
     isObservableObject,
-    observe,
     isObservable,
     isObservableProp,
     isComputedProp,
@@ -187,28 +186,6 @@ test("decorators", function () {
     expect(isObservableProp(o, "amount")).toBe(true)
     expect(o.total).toBe(6) // .... this is required to initialize the props which are made reactive lazily...
     expect(isObservableProp(o, "total")).toBe(true)
-
-    const events = []
-    const d1 = observe(o, ev => events.push(ev.name, ev.oldValue))
-    const d2 = observe(o, "price", ev => events.push(ev.newValue, ev.oldValue))
-    const d3 = observe(o, "total", ev => events.push(ev.newValue, ev.oldValue))
-
-    o.price = 4
-
-    d1()
-    d2()
-    d3()
-
-    o.price = 5
-
-    expect(events).toEqual([
-        8, // new total
-        6, // old total
-        4, // new price
-        3, // old price
-        "price", // event name
-        3 // event oldValue
-    ])
 })
 
 test("issue 191 - shared initializers (babel)", function () {
@@ -397,31 +374,6 @@ test("267 (babel) should be possible to declare properties observable outside st
         }
     }
     Store // just to avoid linter warning
-})
-
-test("288 atom not detected for object property", () => {
-    class Store {
-        foo = ""
-
-        constructor() {
-            makeObservable(this, {
-                foo: mobx.observable
-            })
-        }
-    }
-
-    const store = new Store()
-    let changed = false
-
-    mobx.observe(
-        store,
-        "foo",
-        () => {
-            changed = true
-        },
-        true
-    )
-    expect(changed).toBe(true)
 })
 
 test.skip("observable performance - babel", () => {

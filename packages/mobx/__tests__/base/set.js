@@ -6,15 +6,7 @@ const autorun = mobx.autorun
 const iterall = require("iterall")
 
 test("set crud", function () {
-    const events = []
     const s = set([1])
-
-    mobx.observe(s, change => {
-        expect(change.observableKind).toEqual("set")
-        delete change.observableKind
-        delete change.debugObjectName
-        events.push(change)
-    })
 
     expect(s.has(1)).toBe(true)
     expect(s.has("1")).toBe(false)
@@ -66,16 +58,6 @@ test("set crud", function () {
     expect(s.has("2")).toBe(false)
     expect(s.has(3)).toBe(false)
     expect(s.has(4)).toBe(false)
-
-    expect(events).toEqual([
-        { object: s, newValue: "2", type: "add" },
-        { object: s, oldValue: 1, type: "delete" },
-        { object: s, oldValue: "2", type: "delete" },
-        { object: s, newValue: 3, type: "add" },
-        { object: s, oldValue: 3, type: "delete" },
-        { object: s, newValue: 4, type: "add" },
-        { object: s, oldValue: 4, type: "delete" }
-    ])
 })
 
 test("observe value", function () {
@@ -280,18 +262,6 @@ test("getAtom", () => {
 
     expect(mobx.isObservableSet(x)).toBeTruthy()
     expect(mobx.isObservable(x)).toBeTruthy()
-})
-
-test("observe", () => {
-    const vals = []
-    const x = set([1])
-    mobx.observe(x, change => {
-        delete change.debugObjectName
-        vals.push(change)
-    })
-    x.add(2)
-    x.add(1)
-    expect(vals).toEqual([{ newValue: 2, object: x, type: "add", observableKind: "set" }])
 })
 
 test("toJS", () => {

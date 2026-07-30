@@ -212,70 +212,6 @@ test("concat should automatically slice observable arrays, #260", () => {
     expect(a1.concat(a2)).toEqual([1, 2, 3, 4])
 })
 
-test("observe", function () {
-    const ar = mobx.observable([1, 4])
-    const buf = []
-    const disposer = mobx.observe(
-        ar,
-        function (changes) {
-            buf.push(changes)
-        },
-        true
-    )
-
-    ar[1] = 3 // 1,3
-    ar[2] = 0 // 1, 3, 0
-    ar.shift() // 3, 0
-    ar.push(1, 2) // 3, 0, 1, 2
-    ar.splice(1, 2, 3, 4) // 3, 3, 4, 2
-    expect(ar.slice()).toEqual([3, 3, 4, 2])
-    ar.splice(6)
-    ar.splice(6, 2)
-    ar.replace(["a"])
-    ar.pop()
-    ar.pop() // does not fire anything
-
-    // check the object param
-    buf.forEach(function (change) {
-        expect(change.object).toBe(ar)
-        delete change.object
-        expect(change.observableKind).toBe("array")
-        delete change.observableKind
-        delete change.debugObjectName
-    })
-
-    const result = [
-        { type: "splice", index: 0, addedCount: 2, removed: [], added: [1, 4], removedCount: 0 },
-        { type: "update", index: 1, oldValue: 4, newValue: 3 },
-        { type: "splice", index: 2, addedCount: 1, removed: [], added: [0], removedCount: 0 },
-        { type: "splice", index: 0, addedCount: 0, removed: [1], added: [], removedCount: 1 },
-        { type: "splice", index: 2, addedCount: 2, removed: [], added: [1, 2], removedCount: 0 },
-        {
-            type: "splice",
-            index: 1,
-            addedCount: 2,
-            removed: [0, 1],
-            added: [3, 4],
-            removedCount: 2
-        },
-        {
-            type: "splice",
-            index: 0,
-            addedCount: 1,
-            removed: [3, 3, 4, 2],
-            added: ["a"],
-            removedCount: 4
-        },
-        { type: "splice", index: 0, addedCount: 0, removed: ["a"], added: [], removedCount: 1 }
-    ]
-
-    expect(buf).toEqual(result)
-
-    disposer()
-    ar[0] = 5
-    expect(buf).toEqual(result)
-})
-
 test("array modification1", function () {
     const a = mobx.observable([1, 2, 3])
     const r = a.splice(-10, 5, 4, 5, 6)
@@ -414,12 +350,16 @@ test("react to sort changes", function () {
 test("autoextend buffer length", function () {
     const ar = observable(new Array(1000))
     let changesCount = 0
-    mobx.observe(ar, () => ++changesCount)
+    const d = mobx.reaction(
+        () => ar.length,
+        () => ++changesCount
+    )
 
     ar[ar.length] = 0
     ar.push(0)
 
     expect(changesCount).toBe(2)
+    d()
 })
 
 test("array exposes correct keys", () => {

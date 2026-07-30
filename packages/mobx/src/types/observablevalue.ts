@@ -2,35 +2,22 @@ import {
     Atom,
     IEnhancer,
     IEqualsComparer,
-    IListenable,
     checkIfStateModificationsAreAllowed,
     compareDefault,
     createInstanceofPredicate,
     getNextId,
-    hasListeners,
-    notifyListeners,
     toPrimitive,
     globalState,
-    IUNCHANGED,
-    UPDATE
+    IUNCHANGED
 } from "../internal"
 
-export type IValueDidChange<T = any> = {
-    type: "update"
-    observableKind: "value"
-    object: IObservableValue<T>
-    debugObjectName: string
-    newValue: T
-    oldValue: T | undefined
-}
 export interface IObservableValue<T> {
     get(): T
     set(value: T): void
 }
 
-export class ObservableValue<T> extends Atom implements IObservableValue<T>, IListenable {
+export class ObservableValue<T> extends Atom implements IObservableValue<T> {
     hasUnreportedChange_ = false
-    changeListeners_
     value_
 
     constructor(
@@ -58,17 +45,8 @@ export class ObservableValue<T> extends Atom implements IObservableValue<T>, ILi
     }
 
     setNewValue_(newValue: T) {
-        const oldValue = this.value_
         this.value_ = newValue
         this.reportChanged()
-        if (hasListeners(this)) {
-            notifyListeners(this, {
-                type: UPDATE,
-                object: this,
-                newValue,
-                oldValue
-            })
-        }
     }
 
     public get(): T {

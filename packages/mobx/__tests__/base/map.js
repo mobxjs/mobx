@@ -20,14 +20,7 @@ import { grabConsole } from "../utils/test-utils"
 test("map crud", function () {
     mobx._getGlobalState().mobxGuid = 0 // hmm dangerous reset?
 
-    const events = []
     const m = map({ 1: "a" })
-    mobx.observe(m, function (change) {
-        events.push(change)
-        expect(change.observableKind).toBe("map")
-        delete change.observableKind
-        delete change.debugObjectName
-    })
 
     expect(m.has("1")).toBe(true)
     expect(m.has(1)).toBe(false)
@@ -85,17 +78,6 @@ test("map crud", function () {
     expect(m.has("b")).toBe(false)
     expect(m.get("a")).toBe(undefined)
     expect(m.get("b")).toBe(undefined)
-
-    expect(events).toEqual([
-        { object: m, name: "1", newValue: "aa", oldValue: "a", type: "update" },
-        { object: m, name: 1, newValue: "b", type: "add" },
-        { object: m, name: ["arr"], newValue: "arrVal", type: "add" },
-        { object: m, name: s, newValue: "symbol-value", type: "add" },
-        { object: m, name: "1", oldValue: "aa", type: "delete" },
-        { object: m, name: 1, oldValue: "b", type: "delete" },
-        { object: m, name: ["arr"], oldValue: "arrVal", type: "delete" },
-        { object: m, name: s, oldValue: "symbol-value", type: "delete" }
-    ])
 
     expect(JSON.stringify(m)).toBe("[]")
 })

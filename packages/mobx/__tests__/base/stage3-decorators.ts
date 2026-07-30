@@ -1,7 +1,6 @@
 "use strict"
 
 import {
-    observe,
     autorun,
     extendObservable,
     IObservableArray,
@@ -10,7 +9,6 @@ import {
     isObservableProp,
     isObservableObject,
     transaction,
-    IObjectDidChange,
     configure,
     isAction,
     IAtom,
@@ -69,28 +67,6 @@ test("decorators", () => {
     t.equal(isObservableObject(o), true)
     t.equal(isObservableProp(o, "amount"), true)
     t.equal(isObservableProp(o, "total"), true)
-
-    const events: any[] = []
-    const d1 = observe(o, (ev: IObjectDidChange) => events.push(ev.name, (ev as any).oldValue))
-    const d2 = observe(o, "price", ev => events.push(ev.newValue, ev.oldValue))
-    const d3 = observe(o, "total", ev => events.push(ev.newValue, ev.oldValue))
-
-    o.price = 4
-
-    d1()
-    d2()
-    d3()
-
-    o.price = 5
-
-    t.deepEqual(events, [
-        8, // new total
-        6, // old total
-        4, // new price
-        3, // old price
-        "price", // event name
-        3 // event oldValue
-    ])
 })
 
 test("annotations", () => {
@@ -430,23 +406,6 @@ test("267 (2022.3) should be possible to declare properties observable outside s
     class Store {
         @observable accessor timer: number | null = null
     }
-})
-
-test("288 atom not detected for object property", () => {
-    class Store {
-        @observable accessor foo = ""
-    }
-
-    const store = new Store()
-
-    mobx.observe(
-        store,
-        "foo",
-        () => {
-            // console.log("Change observed")
-        },
-        true
-    )
 })
 
 test.skip("observable performance - ts - decorators", () => {
@@ -868,15 +827,6 @@ test("@computed.equals (2022.3)", () => {
     disposeAutorun()
 })
 
-test("1072 - @observable accessor without initial value and observe before first access", () => {
-    class User {
-        @observable accessor loginCount: number = 0
-    }
-
-    const user = new User()
-    observe(user, "loginCount", () => {})
-})
-
 test("unobserved computed reads should warn with requiresReaction enabled", () => {
     const consoleWarn = console.warn
     const warnings: string[] = []
@@ -1043,34 +993,6 @@ test("toJS bug #1413 (2022.3)", () => {
     expect(res.__mobxDidRunLazyInitializers).toBe(undefined)
 })
 
-test("#2159 - computed property keys", () => {
-    const testSymbol = Symbol("test symbol")
-    const testString = "testString"
-
-    class TestClass {
-        @observable accessor [testSymbol] = "original symbol value"
-        @observable accessor [testString] = "original string value"
-    }
-
-    const o = new TestClass()
-
-    const events: any[] = []
-    observe(o, testSymbol, ev => events.push(ev.newValue, ev.oldValue))
-    observe(o, testString, ev => events.push(ev.newValue, ev.oldValue))
-
-    runInAction(() => {
-        o[testSymbol] = "new symbol value"
-        o[testString] = "new string value"
-    })
-
-    t.deepEqual(events, [
-        "new symbol value", // new symbol
-        "original symbol value", // original symbol
-        "new string value", // new string
-        "original string value" // original string
-    ])
-})
-
 test("4616 - @computed decorator should be lazy", () => {
     let computeCount = 0
 
@@ -1125,23 +1047,6 @@ test("4616 - isComputedProp reports lazy @computed before first read", () => {
     t.equal(isComputedProp(o, "total"), true)
 })
 
-test("4616 - observe on @computed before first read materialises it", () => {
-    class Order {
-        @observable accessor price: number = 3
-
-        @computed
-        get total() {
-            return this.price * 2
-        }
-    }
-
-    const o = new Order()
-    const events: number[] = []
-    observe(o, "total", ev => events.push((ev as any).newValue))
-    o.price = 4
-    t.deepEqual(events, [8])
-})
-
 test("4616 - @observable accessor should be lazy", () => {
     class Wide {
         @observable accessor unused: number = 1
@@ -1168,25 +1073,6 @@ test("4616 - @observable accessor should be lazy", () => {
     // The unused field remains lazy
     expect(adm.values_.has("unused")).toBe(false)
     expect(adm.lazyObservableKeys_.has("unused")).toBe(true)
-})
-
-test("4616 - observe on @observable accessor before first read materialises it", () => {
-    class Counter {
-        @observable accessor count: number = 0
-    }
-
-    const o = new Counter()
-    const adm: any = (o as any)[$mobx]
-    expect(adm.values_.has("count")).toBe(false)
-
-    const events: number[] = []
-    observe(o, "count", ev => events.push((ev as any).newValue))
-    // observe should have materialised the ObservableValue
-    expect(adm.values_.has("count")).toBe(true)
-
-    o.count = 5
-    o.count = 7
-    t.deepEqual(events, [5, 7])
 })
 
 test("4616 - set on @observable accessor before first read materialises it", () => {

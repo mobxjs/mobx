@@ -22,13 +22,13 @@ const voidObserver = function () {}
 
 function buffer() {
     const b = []
-    const res = function (x) {
-        if (typeof x.newValue === "object") {
-            const copy = { ...x.newValue }
+    const res = function (v) {
+        if (v !== null && typeof v === "object") {
+            const copy = { ...v }
             delete copy[$mobx]
             b.push(copy)
         } else {
-            b.push(x.newValue)
+            b.push(v)
         }
     }
     res.toArray = function () {
@@ -47,7 +47,7 @@ test("argumentless observable", () => {
 test("basic", function () {
     const x = observable.box(3)
     const b = buffer()
-    m.observe(x, b)
+    m.reaction(() => x.get(), b)
     expect(3).toBe(x.get())
 
     x.set(5)
@@ -65,7 +65,7 @@ test("basic2", function () {
         return x.get() * 3
     })
 
-    m.observe(z, voidObserver)
+    m.autorun(() => z.get())
 
     expect(z.get()).toBe(6)
     expect(y.get()).toBe(9)
@@ -89,7 +89,7 @@ test("computed with asStructure modifier", function () {
         { equals: compareStructural }
     )
     const b = buffer()
-    m.observe(y, b, true)
+    m.reaction(() => y.get(), b, { fireImmediately: true })
 
     expect(8).toBe(y.get().sum)
 
@@ -113,7 +113,7 @@ test("dynamic", function (done) {
             return x.get()
         })
         const b = buffer()
-        m.observe(y, b, true)
+        m.reaction(() => y.get(), b, { fireImmediately: true })
 
         expect(3).toBe(y.get()) // First evaluation here..
 
@@ -138,7 +138,7 @@ test("dynamic2", function (done) {
 
         expect(9).toBe(y.get())
         const b = buffer()
-        m.observe(y, b)
+        m.reaction(() => y.get(), b)
 
         x.set(5)
         expect(25).toBe(y.get())
@@ -162,7 +162,7 @@ test("box uses equals", function (done) {
         })
 
         const b = buffer()
-        m.observe(x, b)
+        m.reaction(() => x.get(), b)
 
         x.set("A")
         x.set("b")
@@ -191,7 +191,7 @@ test("box uses equals2", function (done) {
         })
 
         const b = buffer()
-        m.observe(y, b)
+        m.reaction(() => y.get(), b)
 
         x.set("2")
         x.set("02")
@@ -220,7 +220,7 @@ test("readme1", function (done) {
             return order.price.get() * (1 + vat.get())
         })
 
-        m.observe(order.priceWithVat, b)
+        m.reaction(() => order.priceWithVat.get(), b)
 
         order.price.set(20)
         expect([24]).toEqual(b.toArray())
@@ -245,7 +245,7 @@ test("batch", function () {
         return c.get() * b.get()
     })
     const buf = buffer()
-    m.observe(d, buf)
+    m.reaction(() => d.get(), buf)
 
     a.set(4)
     b.set(5)
@@ -334,7 +334,7 @@ test("scope", function () {
     }
 
     const order = new Order()
-    m.observe(order.total, voidObserver)
+    m.autorun(() => order.total.get())
     order.price.set(10)
     order.amount.set(3)
     expect(36).toBe(order.total.get())
@@ -467,117 +467,6 @@ test("observe property", function () {
     expect(mb).toEqual([undefined, 15])
 })
 
-test("observe object", function () {
-    let events = []
-    const a = observable({
-        a: 1,
-        get da() {
-            return this.a * 2
-        }
-    })
-    const stop = m.observe(a, function (change) {
-        expect(change.observableKind).toEqual("object")
-        delete change.observableKind
-        delete change.debugObjectName
-        events.push(change)
-    })
-
-    a.a = 2
-    mobx.extendObservable(a, {
-        b: 3
-    })
-    a.a = 4
-    a.b = 5
-    expect(events).toEqual([
-        {
-            type: "update",
-            object: a,
-            name: "a",
-            newValue: 2,
-            oldValue: 1
-        },
-        {
-            type: "add",
-            object: a,
-            newValue: 3,
-            name: "b"
-        },
-        {
-            type: "update",
-            object: a,
-            name: "a",
-            newValue: 4,
-            oldValue: 2
-        },
-        {
-            type: "update",
-            object: a,
-            name: "b",
-            newValue: 5,
-            oldValue: 3
-        }
-    ])
-
-    stop()
-    events = []
-    a.a = 6
-    expect(events.length).toBe(0)
-})
-
-test("mobx.observe", function () {
-    const events = []
-    const o = observable({ b: 2 })
-    const ar = observable([3])
-    const map = mobx.observable.map({})
-
-    const push = function (event) {
-        delete event.debugObjectName
-        events.push(event)
-    }
-
-    const stop2 = mobx.observe(o, push)
-    const stop3 = mobx.observe(ar, push)
-    const stop4 = mobx.observe(map, push)
-
-    o.b = 5
-    ar[0] = 6
-    map.set("d", 7)
-
-    stop2()
-    stop3()
-    stop4()
-
-    o.b = 9
-    ar[0] = 10
-    map.set("d", 11)
-
-    expect(events).toEqual([
-        {
-            type: "update",
-            observableKind: "object",
-            object: o,
-            name: "b",
-            newValue: 5,
-            oldValue: 2
-        },
-        {
-            object: ar,
-            type: "update",
-            observableKind: "array",
-            index: 0,
-            newValue: 6,
-            oldValue: 3
-        },
-        {
-            type: "add",
-            observableKind: "map",
-            object: map,
-            newValue: 7,
-            name: "d"
-        }
-    ])
-})
-
 test("change count optimization", function () {
     let bCalcs = 0
     let cCalcs = 0
@@ -591,7 +480,7 @@ test("change count optimization", function () {
         return b.get()
     })
 
-    m.observe(c, voidObserver)
+    m.autorun(() => c.get())
 
     expect(b.get()).toBe(4)
     expect(c.get()).toBe(4)
@@ -619,7 +508,7 @@ test("observables removed", function () {
     })
 
     expect(calcs).toBe(0)
-    m.observe(c, voidObserver)
+    m.autorun(() => c.get())
     expect(c.get()).toBe(4)
     expect(calcs).toBe(1)
     a.set(2)
@@ -677,12 +566,11 @@ test("lazy evaluation", function () {
         return b.get() * 2
     })
 
-    const handle = m.observe(
-        d,
+    const handle = m.reaction(
+        () => d.get(),
         function () {
             observerChanges += 1
-        },
-        false
+        }
     )
     expect(bCalcs).toBe(4)
     expect(cCalcs).toBe(3)
@@ -777,12 +665,12 @@ test("nested observable2", function () {
     })
 
     const b = []
-    m.observe(
-        total,
-        function (x) {
-            b.push(x.newValue)
+    m.reaction(
+        () => total.get(),
+        function (v) {
+            b.push(v)
         },
-        true
+        { fireImmediately: true }
     )
 
     price.set(150)
@@ -996,7 +884,7 @@ test("computed values believe NaN === NaN", function () {
         return String(a.get() * b.get())
     })
     const buf = buffer()
-    m.observe(c, buf)
+    m.reaction(() => c.get(), buf)
 
     a.set(NaN)
     b.set(NaN)
@@ -1017,9 +905,12 @@ test("computed values believe deep NaN === deep NaN when using compareStructural
     )
 
     const buf = new buffer()
-    m.observe(c, newValue => {
-        buf(newValue)
-    })
+    m.reaction(
+        () => c.get(),
+        newValue => {
+            buf(newValue)
+        }
+    )
 
     a.b = { a: NaN }
     a.b = { a: NaN }

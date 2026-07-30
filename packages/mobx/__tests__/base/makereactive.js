@@ -163,15 +163,12 @@ test("observable4", function () {
     const x = m.observable([{ x: 1 }, { x: 2 }])
 
     const b = buffer()
-    m.observe(
-        m.computed(function () {
-            return x.map(function (d) {
-                return d.x
-            })
-        }),
-        x => b(x.newValue),
-        true
-    )
+    const c = m.computed(function () {
+        return x.map(function (d) {
+            return d.x
+        })
+    })
+    m.autorun(() => b(c.get()))
 
     x[0].x = 3
     x.shift()
@@ -182,15 +179,12 @@ test("observable4", function () {
     const x2 = o.array([{ x: 1 }, { x: 2 }], { deep: false })
 
     const b2 = buffer()
-    m.observe(
-        m.computed(function () {
-            return x2.map(function (d) {
-                return d.x
-            })
-        }),
-        x => b2(x.newValue),
-        true
-    )
+    const c2 = m.computed(function () {
+        return x2.map(function (d) {
+            return d.x
+        })
+    })
+    m.autorun(() => b2(c2.get()))
 
     x2[0].x = 3
     x2.shift()

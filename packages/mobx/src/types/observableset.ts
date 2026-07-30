@@ -4,9 +4,6 @@ import {
     deepEnhancer,
     getNextId,
     IEnhancer,
-    hasListeners,
-    IListenable,
-    notifyListeners,
     createInstanceofPredicate,
     makeIterable,
     checkIfStateModificationsAreAllowed,
@@ -14,8 +11,6 @@ import {
     transaction,
     isES6Set,
     IAtom,
-    DELETE,
-    ADD,
     die,
     initObservable
 } from "../internal"
@@ -24,27 +19,10 @@ const ObservableSetMarker = {}
 
 export type IObservableSetInitialValues<T> = Set<T> | readonly T[]
 
-export type ISetDidChange<T = any> =
-    | {
-          object: ObservableSet<T>
-          observableKind: "set"
-          debugObjectName: string
-          type: "add"
-          newValue: T
-      }
-    | {
-          object: ObservableSet<T>
-          observableKind: "set"
-          debugObjectName: string
-          type: "delete"
-          oldValue: T
-      }
-
-export class ObservableSet<T = any> implements Set<T>, IListenable {
+export class ObservableSet<T = any> implements Set<T> {
     [$mobx] = ObservableSetMarker
     private data_: Set<any> = new Set()
     atom_!: IAtom
-    changeListeners_
     enhancer_: (newV: any, oldV: any | undefined) => any
 
     constructor(
@@ -89,19 +67,6 @@ export class ObservableSet<T = any> implements Set<T>, IListenable {
                 this.data_.add(this.enhancer_(value, undefined))
                 this.atom_.reportChanged()
             })
-            const notify = hasListeners(this)
-            const change = notify
-                ? <ISetDidChange<T>>{
-                      observableKind: "set",
-                      debugObjectName: this.name_,
-                      type: ADD,
-                      object: this,
-                      newValue: value
-                  }
-                : null
-            if (notify) {
-                notifyListeners(this, change)
-            }
         }
 
         return this
@@ -109,24 +74,10 @@ export class ObservableSet<T = any> implements Set<T>, IListenable {
 
     delete(value: T) {
         if (this.has(value)) {
-            const notify = hasListeners(this)
-            const change = notify
-                ? <ISetDidChange<T>>{
-                      observableKind: "set",
-                      debugObjectName: this.name_,
-                      type: DELETE,
-                      object: this,
-                      oldValue: value
-                  }
-                : null
-
             transaction(() => {
                 this.atom_.reportChanged()
                 this.data_.delete(value)
             })
-            if (notify) {
-                notifyListeners(this, change)
-            }
             return true
         }
         return false

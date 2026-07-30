@@ -278,13 +278,6 @@ _Utilities that might make working with observable objects or computed values mo
 
 Attaches a global error listener, which is invoked for every error that is thrown from a _reaction_. This can be used for monitoring or test purposes.
 
-### `observe`
-
-{🚀} Usage: `observe(propertyName|array|object|Set|Map, listener)`
-<small>(<b>[further information](intercept-and-observe.md#observe)</b>)</small>
-
-Low-level API that can be used to observe a single observable value. Returns a disposer function that stops the interception.
-
 ### `onBecomeObserved`
 
 {🚀} Usage: `onBecomeObserved(observable, property?, listener: () => void)`
