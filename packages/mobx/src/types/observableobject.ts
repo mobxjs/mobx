@@ -10,16 +10,13 @@ import {
     IAtom,
     IComputedValueOptions,
     IEnhancer,
-    IInterceptable,
     IListenable,
     ObservableValue,
     addHiddenProp,
     createInstanceofPredicate,
     endBatch,
     getNextId,
-    hasInterceptors,
     hasListeners,
-    interceptChange,
     isObject,
     isPlainObject,
     notifyListeners,
@@ -38,8 +35,7 @@ import {
     autoAnnotation,
     getAdministration,
     getDebugName,
-    checkIfStateModificationsAreAllowed,
-    assign
+    checkIfStateModificationsAreAllowed
 } from "../internal"
 
 const descriptorCache = Object.create(null)
@@ -65,27 +61,11 @@ export type IObjectDidChange<T = any> = {
       }
 )
 
-export type IObjectWillChange<T = any> =
-    | {
-          object: T
-          type: "update" | "add"
-          name: PropertyKey
-          newValue: any
-      }
-    | {
-          object: T
-          type: "remove"
-          name: PropertyKey
-      }
-
 const REMOVE = "remove"
 
-export class ObservableObjectAdministration
-    implements IInterceptable<IObjectWillChange>, IListenable
-{
+export class ObservableObjectAdministration implements IListenable {
     keysAtom_: IAtom
     changeListeners_
-    interceptors_
     proxy_: any
     isPlainObject_: boolean
     appliedAnnotations_?: object
@@ -159,22 +139,9 @@ export class ObservableObjectAdministration
             return true
         }
 
-        // intercept
-        if (hasInterceptors(this)) {
-            const change = interceptChange<IObjectWillChange>(this, {
-                type: UPDATE,
-                object: this.proxy_ || this.target_,
-                name: key,
-                newValue
-            })
-            if (!change) {
-                return null
-            }
-            newValue = (change as any).newValue
-        }
         newValue = (observable as any).prepareNewValue_(newValue)
 
-        // notify spy & observers
+        // notify observers
         if (newValue !== globalState.UNCHANGED) {
             const notify = hasListeners(this)
             const change: IObjectDidChange | null = notify
@@ -306,25 +273,6 @@ export class ObservableObjectAdministration
                 return deleteOutcome
             }
 
-            // ADD interceptor
-            if (hasInterceptors(this)) {
-                const change = interceptChange<IObjectWillChange>(this, {
-                    object: this.proxy_ || this.target_,
-                    name: key,
-                    type: ADD,
-                    newValue: descriptor.value
-                })
-                if (!change) {
-                    return null
-                }
-                const { newValue } = change as any
-                if (descriptor.value !== newValue) {
-                    descriptor = assign({}, descriptor, {
-                        value: newValue
-                    })
-                }
-            }
-
             // Define
             if (proxyTrap) {
                 if (!Reflect.defineProperty(this.target_, key, descriptor)) {
@@ -358,20 +306,6 @@ export class ObservableObjectAdministration
             if (!deleteOutcome) {
                 // Failure or intercepted
                 return deleteOutcome
-            }
-
-            // ADD interceptor
-            if (hasInterceptors(this)) {
-                const change = interceptChange<IObjectWillChange>(this, {
-                    object: this.proxy_ || this.target_,
-                    name: key,
-                    type: ADD,
-                    newValue: value
-                })
-                if (!change) {
-                    return null
-                }
-                value = (change as any).newValue
             }
 
             const cachedDescriptor = getCachedObservablePropDescriptor(key)
@@ -424,18 +358,6 @@ export class ObservableObjectAdministration
                 return deleteOutcome
             }
 
-            // ADD interceptor
-            if (hasInterceptors(this)) {
-                const change = interceptChange<IObjectWillChange>(this, {
-                    object: this.proxy_ || this.target_,
-                    name: key,
-                    type: ADD,
-                    newValue: undefined
-                })
-                if (!change) {
-                    return null
-                }
-            }
             options.name ||= __DEV__ ? `${this.name_}.${key.toString()}` : "ObservableObject.key"
             options.context = this.proxy_ || this.target_
             const cachedDescriptor = getCachedObservablePropDescriptor(key)
@@ -476,19 +398,6 @@ export class ObservableObjectAdministration
         // No such prop
         if (!hasProp(this.target_, key)) {
             return true
-        }
-
-        // Intercept
-        if (hasInterceptors(this)) {
-            const change = interceptChange<IObjectWillChange>(this, {
-                object: this.proxy_ || this.target_,
-                name: key,
-                type: REMOVE
-            })
-            // Cancelled
-            if (!change) {
-                return null
-            }
         }
 
         // Delete

@@ -278,13 +278,6 @@ _Utilities that might make working with observable objects or computed values mo
 
 Attaches a global error listener, which is invoked for every error that is thrown from a _reaction_. This can be used for monitoring or test purposes.
 
-### `intercept`
-
-{🚀} Usage: `intercept(propertyName|array|object|Set|Map, listener)`
-<small>(<b>[further information](intercept-and-observe.md#intercept)</b>)</small>
-
-Intercepts changes before they are applied to an observable API. Returns a disposer function that stops the interception.
-
 ### `observe`
 
 {🚀} Usage: `observe(propertyName|array|object|Set|Map, listener)`

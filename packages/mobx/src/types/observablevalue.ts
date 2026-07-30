@@ -1,28 +1,19 @@
 import {
     Atom,
     IEnhancer,
-    IInterceptable,
     IEqualsComparer,
     IListenable,
     checkIfStateModificationsAreAllowed,
     compareDefault,
     createInstanceofPredicate,
     getNextId,
-    hasInterceptors,
     hasListeners,
-    interceptChange,
     notifyListeners,
     toPrimitive,
     globalState,
     IUNCHANGED,
     UPDATE
 } from "../internal"
-
-export interface IValueWillChange<T> {
-    object: IObservableValue<T>
-    type: "update"
-    newValue: T
-}
 
 export type IValueDidChange<T = any> = {
     type: "update"
@@ -37,12 +28,8 @@ export interface IObservableValue<T> {
     set(value: T): void
 }
 
-export class ObservableValue<T>
-    extends Atom
-    implements IObservableValue<T>, IInterceptable<IValueWillChange<T>>, IListenable
-{
+export class ObservableValue<T> extends Atom implements IObservableValue<T>, IListenable {
     hasUnreportedChange_ = false
-    interceptors_
     changeListeners_
     value_
     dehancer: any
@@ -73,17 +60,6 @@ export class ObservableValue<T>
 
     private prepareNewValue_(newValue): T | IUNCHANGED {
         checkIfStateModificationsAreAllowed(this)
-        if (hasInterceptors(this)) {
-            const change = interceptChange<IValueWillChange<T>>(this, {
-                object: this,
-                type: UPDATE,
-                newValue
-            })
-            if (!change) {
-                return globalState.UNCHANGED
-            }
-            newValue = change.newValue
-        }
         // apply modifier
         newValue = this.enhancer_(newValue, this.value_, this.name_)
         return this.equals_(this.value_, newValue) ? globalState.UNCHANGED : newValue

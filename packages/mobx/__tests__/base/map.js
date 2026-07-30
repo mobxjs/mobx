@@ -1246,47 +1246,6 @@ test("noop mutations do NOT reportChanges", () => {
     expect(autorunInvocationCount).toBe(1)
 })
 
-test(".replace() calls and respects interceptors", () => {
-    const map = mobx.observable.map([
-        [0, 0],
-        [1, 1],
-        [2, 2],
-        [3, 3]
-    ])
-    const replacementMap = [
-        [3, 33],
-        [4, 44],
-        [5, 55],
-        [0, 0]
-    ]
-    const expectedMap = [
-        [2, 2],
-        [3, 3],
-        [5, 55],
-        [0, 0]
-    ]
-
-    mobx.intercept(map, change => {
-        // cancel delete 2
-        if (change.type === "delete" && change.name === 2) {
-            return null
-        }
-        // cancel update 3
-        if (change.type === "update" && change.name === 3) {
-            return null
-        }
-        // cancel add 4
-        if (change.type === "add" && change.name === 4) {
-            return null
-        }
-        return change
-    })
-
-    map.replace(replacementMap)
-
-    expect(Array.from(map)).toEqual(expectedMap)
-})
-
 test(".replace() should reportChanged on key order change", () => {
     const map = mobx.observable.map([
         [1, 1],
@@ -1299,23 +1258,11 @@ test(".replace() should reportChanged on key order change", () => {
         [2, 22]
     ]
     const expectedMap = [
-        [1, 1],
+        [4, 44],
         [3, 33],
         [2, 22]
     ]
     let autorunInvocationCount = 0
-
-    mobx.intercept(map, change => {
-        // cancel delete 1
-        if (change.type === "delete" && change.name === 1) {
-            return null
-        }
-        // cancel add 4
-        if (change.type === "add" && change.name === 4) {
-            return null
-        }
-        return change
-    })
 
     autorun(() => {
         autorunInvocationCount++

@@ -420,62 +420,6 @@ test("keys(array)", () => {
     expect(snapshots).toEqual([[0], [0, 1], [0, 1, 2, 3], [0, 1, 2, 3], [0, 1, 2], [0, 1]])
 })
 
-test("observe & intercept", () => {
-    let events = []
-    const todos = observable(
-        {
-            a: { title: "get coffee" }
-        },
-        {},
-        {
-            deep: false,
-            name: "TestObject" // stable name for snapshot
-        }
-    )
-    mobx.observe(todos, c => {
-        events.push({ observe: { ...c, object: "skip" } })
-    })
-    const d = mobx.intercept(todos, c => {
-        events.push({ intercept: { ...c, object: "skip" } })
-        return null // no addition!
-    })
-
-    set(todos, { b: { title: "get tea" } })
-    remove(todos, "a")
-    expect(events).toMatchSnapshot()
-    expect(mobx.toJS(todos)).toEqual({
-        a: { title: "get coffee" }
-    })
-
-    events.splice(0)
-    d()
-    set(todos, { b: { title: "get tea" } })
-    remove(todos, "a")
-    expect(events).toMatchSnapshot()
-    expect(mobx.toJS(todos)).toEqual({
-        b: { title: "get tea" }
-    })
-})
-
-test("observe & intercept set called multiple times", () => {
-    const a = mobx.observable({}, {}, { name: "TestObject" }) // stable name for snapshot
-    const interceptLogs = []
-    const observeLogs = []
-
-    mobx.intercept(a, change => {
-        interceptLogs.push(`${change.name}: ${change.newValue}`)
-        return change
-    })
-    mobx.observe(a, change => observeLogs.push(`${change.name}: ${change.newValue}`))
-
-    mobx.set(a, "x", 0)
-    a.x = 1
-    mobx.set(a, "x", 2)
-
-    expect(interceptLogs).toEqual(["x: 0", "x: 1", "x: 2"])
-    expect(observeLogs).toEqual(["x: 0", "x: 1", "x: 2"])
-})
-
 test("dynamically adding properties should preserve the original modifiers of an object", () => {
     const todos = observable.object(
         {

@@ -4,15 +4,12 @@ import {
     EMPTY_ARRAY,
     IAtom,
     IEnhancer,
-    IInterceptable,
     IListenable,
     addHiddenFinalProp,
     checkIfStateModificationsAreAllowed,
     createInstanceofPredicate,
     getNextId,
-    hasInterceptors,
     hasListeners,
-    interceptChange,
     isObject,
     notifyListeners,
     hasProp,
@@ -56,21 +53,6 @@ export interface IArraySplice<T = any> extends IArrayBaseChange<T> {
     removedCount: number
 }
 
-export interface IArrayWillChange<T = any> {
-    object: IObservableArray<T>
-    index: number
-    type: "update"
-    newValue: T
-}
-
-export interface IArrayWillSplice<T = any> {
-    object: IObservableArray<T>
-    index: number
-    type: "splice"
-    added: T[]
-    removedCount: number
-}
-
 const arrayTraps = {
     get(target, name) {
         const adm: ObservableArrayAdministration = target[$mobx]
@@ -106,12 +88,9 @@ const arrayTraps = {
     }
 }
 
-export class ObservableArrayAdministration
-    implements IInterceptable<IArrayWillChange<any> | IArrayWillSplice<any>>, IListenable
-{
+export class ObservableArrayAdministration implements IListenable {
     atom_: IAtom
     readonly values_: any[] = [] // this is the prop that gets proxied, so can't replace it!
-    interceptors_
     changeListeners_
     enhancer_: (newV: any, oldV: any | undefined) => any
     dehancer: any
@@ -191,21 +170,6 @@ export class ObservableArrayAdministration
 
         if (newItems === undefined) {
             newItems = EMPTY_ARRAY
-        }
-
-        if (hasInterceptors(this)) {
-            const change = interceptChange<IArrayWillSplice<any>>(this as any, {
-                object: this.proxy_ as any,
-                type: SPLICE,
-                index,
-                removedCount: deleteCount,
-                added: newItems
-            })
-            if (!change) {
-                return EMPTY_ARRAY
-            }
-            deleteCount = change.removedCount
-            newItems = change.added
         }
 
         newItems =
@@ -296,18 +260,6 @@ export class ObservableArrayAdministration
             // update at index in range
             checkIfStateModificationsAreAllowed(this.atom_)
             const oldValue = values[index]
-            if (hasInterceptors(this)) {
-                const change = interceptChange<IArrayWillChange<any>>(this as any, {
-                    type: UPDATE,
-                    object: this.proxy_ as any, // since "this" is the real array we need to pass its proxy
-                    index,
-                    newValue
-                })
-                if (!change) {
-                    return
-                }
-                newValue = change.newValue
-            }
             newValue = this.enhancer_(newValue, oldValue)
             const changed = newValue !== oldValue
             if (changed) {

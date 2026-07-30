@@ -5,8 +5,6 @@ import {
     autorun,
     extendObservable,
     IObservableArray,
-    IArrayWillChange,
-    IArrayWillSplice,
     IObservableValue,
     isObservable,
     isObservableProp,

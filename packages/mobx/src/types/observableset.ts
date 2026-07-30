@@ -9,9 +9,6 @@ import {
     notifyListeners,
     createInstanceofPredicate,
     makeIterable,
-    hasInterceptors,
-    interceptChange,
-    IInterceptable,
     checkIfStateModificationsAreAllowed,
     untracked,
     transaction,
@@ -43,25 +40,11 @@ export type ISetDidChange<T = any> =
           oldValue: T
       }
 
-export type ISetWillDeleteChange<T = any> = {
-    type: "delete"
-    object: ObservableSet<T>
-    oldValue: T
-}
-export type ISetWillAddChange<T = any> = {
-    type: "add"
-    object: ObservableSet<T>
-    newValue: T
-}
-
-export type ISetWillChange<T = any> = ISetWillDeleteChange<T> | ISetWillAddChange<T>
-
-export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillChange>, IListenable {
+export class ObservableSet<T = any> implements Set<T>, IListenable {
     [$mobx] = ObservableSetMarker
     private data_: Set<any> = new Set()
     atom_!: IAtom
     changeListeners_
-    interceptors_
     dehancer: any
     enhancer_: (newV: any, oldV: any | undefined) => any
 
@@ -109,19 +92,6 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
 
     add(value: T) {
         checkIfStateModificationsAreAllowed(this.atom_)
-        if (hasInterceptors(this)) {
-            const change = interceptChange<ISetWillAddChange<T>>(this, {
-                type: ADD,
-                object: this,
-                newValue: value
-            })
-            if (!change) {
-                return this
-            }
-
-            // implemented reassignment same as it's done for ObservableMap
-            value = change.newValue!
-        }
         if (!this.has(value)) {
             transaction(() => {
                 this.data_.add(this.enhancer_(value, undefined))
@@ -146,16 +116,6 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
     }
 
     delete(value: T) {
-        if (hasInterceptors(this)) {
-            const change = interceptChange<ISetWillDeleteChange<T>>(this, {
-                type: DELETE,
-                object: this,
-                oldValue: value
-            })
-            if (!change) {
-                return false
-            }
-        }
         if (this.has(value)) {
             const notify = hasListeners(this)
             const change = notify

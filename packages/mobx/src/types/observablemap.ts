@@ -1,7 +1,6 @@
 import {
     $mobx,
     IEnhancer,
-    IInterceptable,
     IListenable,
     ObservableValue,
     checkIfStateModificationsAreAllowed,
@@ -11,9 +10,7 @@ import {
     deepEnhancer,
     getNextId,
     getPlainObjectKeys,
-    hasInterceptors,
     hasListeners,
-    interceptChange,
     isES6Map,
     isPlainES6Map,
     isPlainObject,
@@ -60,13 +57,6 @@ export type IMapDidChange<K = any, V = any> = { observableKind: "map"; debugObje
       }
 )
 
-export interface IMapWillChange<K = any, V = any> {
-    object: ObservableMap<K, V>
-    type: "update" | "add" | "delete"
-    name: K
-    newValue?: V
-}
-
 const ObservableMapMarker = {}
 
 export const ADD = "add"
@@ -80,14 +70,11 @@ export type IObservableMapInitialValues<K = any, V = any> =
 
 // just extend Map? See also https://gist.github.com/nestharus/13b4d74f2ef4a2f4357dbd3fc23c1e54
 // But: https://github.com/mobxjs/mobx/issues/1556
-export class ObservableMap<K = any, V = any>
-    implements Map<K, V>, IInterceptable<IMapWillChange<K, V>>, IListenable
-{
+export class ObservableMap<K = any, V = any> implements Map<K, V>, IListenable {
     [$mobx] = ObservableMapMarker
     data_!: Map<K, ObservableValue<V>>
     hasMap_!: Map<K, ObservableValue<boolean>> // hasMap, not hashMap >-).
     keysAtom_!: IAtom
-    interceptors_
     changeListeners_
     dehancer: any
 
@@ -131,18 +118,6 @@ export class ObservableMap<K = any, V = any>
 
     set(key: K, value: V) {
         const hasKey = this.has_(key)
-        if (hasInterceptors(this)) {
-            const change = interceptChange<IMapWillChange<K, V>>(this, {
-                type: hasKey ? UPDATE : ADD,
-                object: this,
-                newValue: value,
-                name: key
-            })
-            if (!change) {
-                return this
-            }
-            value = change.newValue!
-        }
         if (hasKey) {
             this.updateValue_(key, value)
         } else {
@@ -153,16 +128,6 @@ export class ObservableMap<K = any, V = any>
 
     delete(key: K): boolean {
         checkIfStateModificationsAreAllowed(this.keysAtom_)
-        if (hasInterceptors(this)) {
-            const change = interceptChange<IMapWillChange<K, V>>(this, {
-                type: DELETE,
-                object: this,
-                name: key
-            })
-            if (!change) {
-                return false
-            }
-        }
         if (this.has_(key)) {
             const notify = hasListeners(this)
             const change: IMapDidChange<K, V> | null = notify
