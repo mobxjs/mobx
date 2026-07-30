@@ -42,9 +42,11 @@ npx eslint src/**/*                             # lint (catches unused imports)
 
 For commit 6 also build the whole monorepo / mobx-react-lite so the downstream fix is validated.
 
-When removing an error code, first confirm no other caller: `grep -rn "die(<N>)" packages/mobx/src`.
+**Error codes**: error codes that are no longer thrown after a removal are cleaned up (deleted from `errors.ts`) in the same commit. Before deleting a code, confirm no remaining caller: `grep -rn "die(<N>)" packages/mobx/src`. Codes are a sparse map, so removing keys needs no renumbering.
 
-`base/api.js` (`__tests__/base/api.js`) asserts the exact set of `Object.keys(mobx)`. Every export removed below must also be deleted from its expected array — do this in the same commit or the whole suite fails.
+**globalState cleanup**: `globalState` (`core/globalstate.ts`) is a public object, but fields that no longer make sense after a removal ARE cleaned up. Any commit that changes the shape of `MobXGlobals` (add/remove a field, or change `persistentKeys`) MUST bump `MOBX_GLOBALS_VERSION` (`core/globalstate.ts:4`) so the multi-version-in-memory guard (`globalstate.ts:158`) stays correct. In this plan only commit 1 (removing `spyListeners`) touches globalState, so bump `7` → `8` there.
+
+**`base/api.js`** (`__tests__/base/api.js`) asserts the exact set of `Object.keys(mobx)`. It is updated **per commit** to reflect the export surface after that commit — this incremental change is intended. Every export removed in a commit must be deleted from its expected array in that same commit, or the whole suite fails.
 
 ---
 
@@ -70,7 +72,7 @@ Each commit is independently green. Commits 1–5 are largely independent; do th
 -   `src/core/spy.ts` entirely (`isSpyEnabled`, `spyReport`, `spyReportStart`, `spyReportEnd`, `END_EVENT`, `PureSpyEvent`, `SpyEvent`, `spy`).
 -   `internal.ts:30` (`export * from "./core/spy"`).
 -   `mobx.ts:39` (`spy` export) and the whole **Devtools hook** block (`mobx.ts:158-167`) — it is spy-centric; this also drops its `getDebugName` reference (removed in commit 6) and the `spy` import at `mobx.ts:28`.
--   `globalState.spyListeners` field (`core/globalstate.ts:106`) and its entry in `persistentKeys` (`core/globalstate.ts:11`).
+-   `globalState.spyListeners` field (`core/globalstate.ts:106`) and its entry in `persistentKeys` (`core/globalstate.ts:11`). Then **bump `MOBX_GLOBALS_VERSION`** (`core/globalstate.ts:4`) from `7` → `8`, since the internal state shape changed (see "globalState cleanup" note below).
 -   Spy-only change type `IComputedDidChange` (`core/computedvalue.ts:47-54`) — verify no remaining use (`observe` builds its computed-change object inline, so it does not need the type; confirm before deleting).
 -   `IBoxDidChange<T>` (`observablevalue.ts:39-47`) — spy-only, not exported.
 
@@ -283,7 +285,7 @@ Let `tsc --noEmit` confirm each type is truly unused before deleting.
 4. **Instance-method vs top-level name collision**: many tests call `.get()/.set()/.has()/.keys()` on Observable Map/Set as _methods_; only `mobx.get(...)` etc. are being removed. Grep carefully to avoid touching valid instance-method calls. Likewise `array.remove(...)` stays.
 5. **`observe` in error-handling/cycle tests** (`base/errorhandling.js`) may be load-bearing for triggering reactions, not just probing. Replace with `autorun`/`reaction` rather than deleting the test outright.
 6. **Change-event type deletion timing**: `*WillChange` are safe to delete with `intercept` (commit 2); `*DidChange` must wait until BOTH `spy` and `observe` are gone (commit 4). Rely on `tsc --noEmit` to confirm zero references before each type deletion.
-7. **Error-code renumbering**: codes are a sparse map (2–4 already commented out), so removing keys is safe without renumbering. But verify `die(42)` (used by object-api `set` AND array internals) stays — grep before removing any code.
-8. **`raw()` removal** (commit 3): `ObservableValue.raw()` existed for mobx-state-tree to read the un-dehanced value. Removing the dehancer removes its reason to exist; external MST versions relying on it would break — acceptable for this major cleanup, but worth flagging in the changelog.
+7. **Error codes**: codes are a sparse map (2–4 already commented out), so removing keys needs no renumbering. Delete the no-longer-thrown codes in the same commit as the feature. Verify `die(42)` (used by object-api `set` AND array internals) stays — grep before removing any code.
+8. **`dehancer` / `raw()` removal** (commit 3): the dehancer and `ObservableValue.raw()` existed for mobx-state-tree to read un-dehanced values. MST is **no longer supported**, so removing them wholesale is intended (not just acceptable). Note it in the changeset.
 9. **Devtools hook** (`__MOBX_DEVTOOLS_GLOBAL_HOOK__`) depends on `spy` + `getDebugName`; it is removed wholesale in commit 1. `mobx-devtools` will no longer receive data — intended given `spy` is gone.
 10. **Changesets**: this repo uses Changesets (`.changeset/`). Add a `major` changeset describing the removals so the release notes are correct.
