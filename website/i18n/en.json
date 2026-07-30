@@ -36,10 +36,6 @@
       "best/what-does-mobx-react-to": {
         "title": "Understanding reactivity"
       },
-      "collection-utilities": {
-        "title": "Collection utilities",
-        "sidebar_label": "Collection utilities {🚀}"
-      },
       "computeds-with-args": {
         "title": "Computeds with arguments",
         "sidebar_label": "Computeds with arguments {🚀}"

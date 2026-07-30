@@ -1,5 +1,5 @@
 const mobx = require("../../src/mobx")
-const { has, autorun, when, runInAction, reaction, observable } = mobx
+const { autorun, when, runInAction, reaction, observable } = mobx
 
 test("keys should be observable when extending", () => {
     const todos = observable({})
@@ -215,8 +215,7 @@ test("#1739 - delete and undelete should work", () => {
 
     const events = []
     autorun(() => {
-        // events.push("a" in x)
-        events.push(has(x, "a"))
+        events.push("a" in x)
     })
 
     x.a = 1

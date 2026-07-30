@@ -16,9 +16,9 @@ test("set crud", function () {
 
     expect(s.has("2")).toBe(true)
     expect(s.size).toBe(2)
-    expect(mobx.keys(s)).toEqual([1, "2"])
-    expect(mobx.values(s)).toEqual([1, "2"])
-    expect(mobx.entries(s)).toEqual([
+    expect([...s.keys()]).toEqual([1, "2"])
+    expect([...s.values()]).toEqual([1, "2"])
+    expect([...s.entries()]).toEqual([
         [1, 1],
         ["2", "2"]
     ])
@@ -29,8 +29,8 @@ test("set crud", function () {
 
     s.replace(new Set([3]))
 
-    expect(mobx.keys(s)).toEqual([3])
-    expect(mobx.values(s)).toEqual([3])
+    expect([...s.keys()]).toEqual([3])
+    expect([...s.values()]).toEqual([3])
     expect(s.size).toBe(1)
     expect(s.has(1)).toBe(false)
     expect(s.has("2")).toBe(false)
@@ -38,8 +38,8 @@ test("set crud", function () {
 
     s.replace(set([4]))
 
-    expect(mobx.keys(s)).toEqual([4])
-    expect(mobx.values(s)).toEqual([4])
+    expect([...s.keys()]).toEqual([4])
+    expect([...s.values()]).toEqual([4])
     expect(s.size).toBe(1)
     expect(s.has(1)).toBe(false)
     expect(s.has("2")).toBe(false)
@@ -51,8 +51,8 @@ test("set crud", function () {
     }).toThrow(/Cannot initialize set from/)
 
     s.clear()
-    expect(mobx.keys(s)).toEqual([])
-    expect(mobx.values(s)).toEqual([])
+    expect([...s.keys()]).toEqual([])
+    expect([...s.values()]).toEqual([])
     expect(s.size).toBe(0)
     expect(s.has(1)).toBe(false)
     expect(s.has("2")).toBe(false)
@@ -83,7 +83,7 @@ test("observe value", function () {
     s.replace(["y"])
     expect(hasX).toBe(false)
     expect(hasY).toBe(true)
-    expect(mobx.values(s)).toEqual(["y"])
+    expect([...s.values()]).toEqual(["y"])
 })
 
 test("observe collections", function () {
@@ -91,7 +91,7 @@ test("observe collections", function () {
     let keys, values, entries
 
     autorun(function () {
-        keys = mobx.keys(x)
+        keys = [...x.keys()]
     })
     autorun(function () {
         values = Array.from(x.values())

@@ -9,7 +9,6 @@ import {
     actionBound,
     reaction,
     extendObservable,
-    keys,
     makeObservable
 } from "../../src/mobx"
 
@@ -129,12 +128,10 @@ test("correct keys are reported", () => {
     ])
 
     expect(Object.getOwnPropertyNames(x)).toEqual(["x", "y", "z", "a", "b"])
-    expect(keys(x)).toEqual(["x", "z", "a"])
 
     delete x.x
     expect(Object.keys(x)).toEqual(["z", "a"])
     expect(Object.getOwnPropertyNames(x)).toEqual(["y", "z", "a", "b"])
-    expect(keys(x)).toEqual(["z", "a"])
 })
 
 test("in operator", () => {

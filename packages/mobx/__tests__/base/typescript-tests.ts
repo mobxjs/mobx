@@ -1554,7 +1554,7 @@ test("multiple inheritance should work", () => {
         }
     }
 
-    expect(mobx.keys(new B())).toEqual(["x", "y"])
+    expect(Object.keys(new B())).toEqual(["x", "y"])
 })
 
 // 19.12.2020 @urugator:
