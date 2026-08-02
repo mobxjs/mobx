@@ -1,8 +1,6 @@
 import {
     $mobx,
     IEnhancer,
-    IInterceptable,
-    IListenable,
     ObservableValue,
     checkIfStateModificationsAreAllowed,
     createAtom,
@@ -11,25 +9,16 @@ import {
     deepEnhancer,
     getNextId,
     getPlainObjectKeys,
-    hasInterceptors,
-    hasListeners,
-    interceptChange,
     isES6Map,
     isPlainES6Map,
     isPlainObject,
-    isSpyEnabled,
-    notifyListeners,
     referenceEnhancer,
-    spyReportEnd,
-    spyReportStart,
     stringifyKey,
     transaction,
     untracked,
     globalState,
     die,
-    UPDATE,
     IAtom,
-    PureSpyEvent,
     initObservable
 } from "../internal"
 
@@ -42,39 +31,7 @@ export type IReadonlyMapEntry<K = any, V = any> = readonly [K, V]
 export type IMapEntries<K = any, V = any> = IMapEntry<K, V>[]
 export type IReadonlyMapEntries<K = any, V = any> = readonly IReadonlyMapEntry<K, V>[]
 
-export type IMapDidChange<K = any, V = any> = { observableKind: "map"; debugObjectName: string } & (
-    | {
-          object: ObservableMap<K, V>
-          name: K // actual the key or index, but this is based on the ancient .observe proposal for consistency
-          type: "update"
-          newValue: V
-          oldValue: V
-      }
-    | {
-          object: ObservableMap<K, V>
-          name: K
-          type: "add"
-          newValue: V
-      }
-    | {
-          object: ObservableMap<K, V>
-          name: K
-          type: "delete"
-          oldValue: V
-      }
-)
-
-export interface IMapWillChange<K = any, V = any> {
-    object: ObservableMap<K, V>
-    type: "update" | "add" | "delete"
-    name: K
-    newValue?: V
-}
-
 const ObservableMapMarker = {}
-
-export const ADD = "add"
-export const DELETE = "delete"
 
 export type IObservableMapInitialValues<K = any, V = any> =
     | IMapEntries<K, V>
@@ -84,16 +41,11 @@ export type IObservableMapInitialValues<K = any, V = any> =
 
 // just extend Map? See also https://gist.github.com/nestharus/13b4d74f2ef4a2f4357dbd3fc23c1e54
 // But: https://github.com/mobxjs/mobx/issues/1556
-export class ObservableMap<K = any, V = any>
-    implements Map<K, V>, IInterceptable<IMapWillChange<K, V>>, IListenable
-{
+export class ObservableMap<K = any, V = any> implements Map<K, V> {
     [$mobx] = ObservableMapMarker
     data_!: Map<K, ObservableValue<V>>
     hasMap_!: Map<K, ObservableValue<boolean>> // hasMap, not hashMap >-).
     keysAtom_!: IAtom
-    interceptors_
-    changeListeners_
-    dehancer: any
 
     constructor(
         initialData?: IObservableMapInitialValues<K, V>,
@@ -124,8 +76,7 @@ export class ObservableMap<K = any, V = any>
             const newEntry = (entry = new ObservableValue(
                 this.has_(key),
                 referenceEnhancer,
-                __DEV__ ? `${this.name_}.${stringifyKey(key)}?` : "ObservableMap.key?",
-                false
+                __DEV__ ? `${this.name_}.${stringifyKey(key)}?` : "ObservableMap.key?"
             ))
             this.hasMap_.set(key, newEntry)
             newEntry.onBUOL = new Set([() => this.hasMap_.delete(key)])
@@ -136,18 +87,6 @@ export class ObservableMap<K = any, V = any>
 
     set(key: K, value: V) {
         const hasKey = this.has_(key)
-        if (hasInterceptors(this)) {
-            const change = interceptChange<IMapWillChange<K, V>>(this, {
-                type: hasKey ? UPDATE : ADD,
-                object: this,
-                newValue: value,
-                name: key
-            })
-            if (!change) {
-                return this
-            }
-            value = change.newValue!
-        }
         if (hasKey) {
             this.updateValue_(key, value)
         } else {
@@ -158,34 +97,7 @@ export class ObservableMap<K = any, V = any>
 
     delete(key: K): boolean {
         checkIfStateModificationsAreAllowed(this.keysAtom_)
-        if (hasInterceptors(this)) {
-            const change = interceptChange<IMapWillChange<K, V>>(this, {
-                type: DELETE,
-                object: this,
-                name: key
-            })
-            if (!change) {
-                return false
-            }
-        }
         if (this.has_(key)) {
-            const notifySpy = __DEV__ && isSpyEnabled()
-            const notify = hasListeners(this)
-            const change: IMapDidChange<K, V> | null =
-                notify || notifySpy
-                    ? {
-                          observableKind: "map",
-                          debugObjectName: this.name_,
-                          type: DELETE,
-                          object: this,
-                          oldValue: (<any>this.data_.get(key)).value_,
-                          name: key
-                      }
-                    : null
-
-            if (__DEV__ && notifySpy) {
-                spyReportStart(change! as PureSpyEvent)
-            } // TODO fix type
             transaction(() => {
                 this.keysAtom_.reportChanged()
                 this.hasMap_.get(key)?.setNewValue_(false)
@@ -193,12 +105,6 @@ export class ObservableMap<K = any, V = any>
                 observable.setNewValue_(undefined as any)
                 this.data_.delete(key)
             })
-            if (notify) {
-                notifyListeners(this, change)
-            }
-            if (__DEV__ && notifySpy) {
-                spyReportEnd()
-            }
             return true
         }
         return false
@@ -208,30 +114,7 @@ export class ObservableMap<K = any, V = any>
         const observable = this.data_.get(key)!
         newValue = (observable as any).prepareNewValue_(newValue) as V
         if (newValue !== globalState.UNCHANGED) {
-            const notifySpy = __DEV__ && isSpyEnabled()
-            const notify = hasListeners(this)
-            const change: IMapDidChange<K, V> | null =
-                notify || notifySpy
-                    ? {
-                          observableKind: "map",
-                          debugObjectName: this.name_,
-                          type: UPDATE,
-                          object: this,
-                          oldValue: (observable as any).value_,
-                          name: key,
-                          newValue
-                      }
-                    : null
-            if (__DEV__ && notifySpy) {
-                spyReportStart(change! as PureSpyEvent)
-            } // TODO fix type
             observable.setNewValue_(newValue as V)
-            if (notify) {
-                notifyListeners(this, change)
-            }
-            if (__DEV__ && notifySpy) {
-                spyReportEnd()
-            }
         }
     }
 
@@ -241,43 +124,19 @@ export class ObservableMap<K = any, V = any>
             const observable = new ObservableValue(
                 newValue,
                 this.enhancer_,
-                __DEV__ ? `${this.name_}.${stringifyKey(key)}` : "ObservableMap.key",
-                false
+                __DEV__ ? `${this.name_}.${stringifyKey(key)}` : "ObservableMap.key"
             )
             this.data_.set(key, observable)
-            newValue = (observable as any).value_ // value might have been changed
             this.hasMap_.get(key)?.setNewValue_(true)
             this.keysAtom_.reportChanged()
         })
-        const notifySpy = __DEV__ && isSpyEnabled()
-        const notify = hasListeners(this)
-        const change: IMapDidChange<K, V> | null =
-            notify || notifySpy
-                ? {
-                      observableKind: "map",
-                      debugObjectName: this.name_,
-                      type: ADD,
-                      object: this,
-                      name: key,
-                      newValue
-                  }
-                : null
-        if (__DEV__ && notifySpy) {
-            spyReportStart(change! as PureSpyEvent)
-        } // TODO fix type
-        if (notify) {
-            notifyListeners(this, change)
-        }
-        if (__DEV__ && notifySpy) {
-            spyReportEnd()
-        }
     }
 
     get(key: K): V | undefined {
         if (this.has(key)) {
-            return this.dehanceValue_(this.data_.get(key)!.get())
+            return this.data_.get(key)!.get()
         }
-        return this.dehanceValue_(undefined)
+        return undefined
     }
 
     getOrInsert(key: K, value: V): V {
@@ -292,13 +151,6 @@ export class ObservableMap<K = any, V = any>
             this.set(key, callback(key))
         }
         return this.get(key)!
-    }
-
-    private dehanceValue_<X extends V | undefined>(value: X): X {
-        if (this.dehancer !== undefined) {
-            return this.dehancer(value)
-        }
-        return value
     }
 
     keys(): MapIterator<K> {

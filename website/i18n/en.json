@@ -13,19 +13,12 @@
         "title": "Updating state using actions",
         "sidebar_label": "Actions"
       },
-      "analyzing-reactivity": {
-        "title": "Analyzing reactivity",
-        "sidebar_label": "Analyzing reactivity {🚀}"
-      },
       "api": {
         "title": "MobX API Reference",
         "sidebar_label": "API"
       },
       "backers-sponsors": {
         "title": "MobX Backers and Sponsors"
-      },
-      "best/debugging-mobx": {
-        "title": "Analyzing reactivity"
       },
       "best/decorators": {
         "title": "Enabling decorators"
@@ -35,10 +28,6 @@
       },
       "best/what-does-mobx-react-to": {
         "title": "Understanding reactivity"
-      },
-      "collection-utilities": {
-        "title": "Collection utilities",
-        "sidebar_label": "Collection utilities {🚀}"
       },
       "computeds-with-args": {
         "title": "Computeds with arguments",
@@ -74,10 +63,6 @@
       "installation": {
         "title": "Installation",
         "sidebar_label": "Installation"
-      },
-      "intercept-and-observe": {
-        "title": "Intercept & Observe",
-        "sidebar_label": "Intercept & Observe {🚀}"
       },
       "intro/concepts": {
         "title": "The gist of MobX"
@@ -160,17 +145,11 @@
       "refguide/modifiers": {
         "title": "Observable modifiers"
       },
-      "refguide/object-api": {
-        "title": "Collection utilities"
-      },
       "refguide/object": {
         "title": "Observable Objects"
       },
       "refguide/observable": {
         "title": "Creating observable state"
-      },
-      "refguide/observe": {
-        "title": "Intercept & Observe"
       },
       "refguide/on-become-observed": {
         "title": "Creating lazy observables"

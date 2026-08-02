@@ -2,7 +2,7 @@ import React, { StrictMode, Suspense } from "react"
 import { observer, Observer, enableStaticRendering } from "../src"
 import { render, act, waitFor } from "@testing-library/react"
 import {
-    getObserverTree,
+    getAtom,
     _getGlobalState,
     action,
     computed,
@@ -16,6 +16,14 @@ import {
 } from "mobx"
 import { withConsole } from "./utils/withConsole"
 import { shallowEqual } from "../src/utils/utils"
+
+// Local helper mirroring the (removed) `getObserverTree` shape, so we can assert
+// how many observers are attached to a given observable/property.
+function getObserverTree(obj: any, prop?: string): { observers?: any[] } {
+    const atom = getAtom(obj, prop) as any
+    const observers = atom.observers_
+    return { observers: observers && observers.size > 0 ? Array.from(observers) : undefined }
+}
 /**
  *  some test suite is too tedious
  */

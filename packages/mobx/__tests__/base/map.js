@@ -20,14 +20,7 @@ import { grabConsole } from "../utils/test-utils"
 test("map crud", function () {
     mobx._getGlobalState().mobxGuid = 0 // hmm dangerous reset?
 
-    const events = []
     const m = map({ 1: "a" })
-    mobx.observe(m, function (change) {
-        events.push(change)
-        expect(change.observableKind).toBe("map")
-        delete change.observableKind
-        delete change.debugObjectName
-    })
 
     expect(m.has("1")).toBe(true)
     expect(m.has(1)).toBe(false)
@@ -53,8 +46,8 @@ test("map crud", function () {
     expect(m.get(s)).toBe("symbol-value")
     expect(m.get(s.toString())).toBe(undefined)
 
-    expect(mobx.keys(m)).toEqual(["1", 1, k, s])
-    expect(mobx.values(m)).toEqual(["aa", "b", "arrVal", "symbol-value"])
+    expect([...m.keys()]).toEqual(["1", 1, k, s])
+    expect([...m.values()]).toEqual(["aa", "b", "arrVal", "symbol-value"])
     expect(Array.from(m)).toEqual([
         ["1", "aa"],
         [1, "b"],
@@ -76,8 +69,8 @@ test("map crud", function () {
     expect(m.size).toBe(4)
 
     m.clear()
-    expect(mobx.keys(m)).toEqual([])
-    expect(mobx.values(m)).toEqual([])
+    expect([...m.keys()]).toEqual([])
+    expect([...m.values()]).toEqual([])
     expect(m.toJSON()).toEqual([])
     expect(m.size).toBe(0)
 
@@ -85,17 +78,6 @@ test("map crud", function () {
     expect(m.has("b")).toBe(false)
     expect(m.get("a")).toBe(undefined)
     expect(m.get("b")).toBe(undefined)
-
-    expect(events).toEqual([
-        { object: m, name: "1", newValue: "aa", oldValue: "a", type: "update" },
-        { object: m, name: 1, newValue: "b", type: "add" },
-        { object: m, name: ["arr"], newValue: "arrVal", type: "add" },
-        { object: m, name: s, newValue: "symbol-value", type: "add" },
-        { object: m, name: "1", oldValue: "aa", type: "delete" },
-        { object: m, name: 1, oldValue: "b", type: "delete" },
-        { object: m, name: ["arr"], oldValue: "arrVal", type: "delete" },
-        { object: m, name: s, oldValue: "symbol-value", type: "delete" }
-    ])
 
     expect(JSON.stringify(m)).toBe("[]")
 })
@@ -157,7 +139,7 @@ test("observe value", function () {
 
     a.replace({ y: "stuff", z: "zoef" })
     expect(valueY).toBe("stuff")
-    expect(mobx.keys(a)).toEqual(["y", "z"])
+    expect([...a.keys()]).toEqual(["y", "z"])
 })
 
 test("initialize with entries", function () {
@@ -191,7 +173,7 @@ test("observe collections", function () {
     let keys, values, entries
 
     autorun(function () {
-        keys = mobx.keys(x)
+        keys = [...x.keys()]
     })
     autorun(function () {
         values = iteratorToArray(x.values())
@@ -325,7 +307,7 @@ test("issue 119 - unobserve before delete", function () {
     })
     // the error only happens if the value is observed
     mobx.autorun(function () {
-        mobx.values(myObservable.myMap).forEach(function (value) {
+        ;[...myObservable.myMap.values()].forEach(function (value) {
             propValues.push(value.myCalculatedProp)
         })
     })
@@ -353,7 +335,7 @@ test("map modifier", () => {
     expect(x.get("a")).toBe(1)
 
     x = mobx.observable.map()
-    expect(mobx.keys(x)).toEqual([])
+    expect([...x.keys()]).toEqual([])
 
     x = mobx.observable({ a: mobx.observable.map({ b: { c: 3 } }) })
     expect(mobx.isObservableObject(x)).toBe(true)
@@ -407,15 +389,15 @@ test("256, map.merge should be not be tracked for target", () => {
     })
 
     expect(c).toBe(1)
-    expect(mobx.keys(x)).toEqual(["a", "b"])
+    expect([...x.keys()]).toEqual(["a", "b"])
 
     y.set("c", 4)
     expect(c).toBe(2)
-    expect(mobx.keys(x)).toEqual(["a", "b", "c"])
+    expect([...x.keys()]).toEqual(["a", "b", "c"])
 
     x.set("d", 5)
     expect(c).toBe(2)
-    expect(mobx.keys(x)).toEqual(["a", "b", "c", "d"])
+    expect([...x.keys()]).toEqual(["a", "b", "c", "d"])
 
     d()
 })
@@ -424,27 +406,27 @@ test("308, map keys should be coerced to strings correctly", () => {
     const m = mobx.observable.map()
     m.set(1, true)
     m.delete(1)
-    expect(mobx.keys(m)).toEqual([])
+    expect([...m.keys()]).toEqual([])
 
     m.set(1, true)
     m.set("1", false)
     m.set(0, true)
     m.set(-0, false)
-    expect(Array.from(mobx.keys(m))).toEqual([1, "1", 0])
+    expect(Array.from([...m.keys()])).toEqual([1, "1", 0])
     expect(m.get(-0)).toBe(false)
     expect(m.get(1)).toBe(true)
 
     m.delete("1")
-    expect(Array.from(mobx.keys(m))).toEqual([1, 0])
+    expect(Array.from([...m.keys()])).toEqual([1, 0])
 
     m.delete(1)
-    expect(mobx.keys(m)).toEqual([0])
+    expect([...m.keys()]).toEqual([0])
 
     m.set(true, true)
     expect(m.get("true")).toBe(undefined)
     expect(m.get(true)).toBe(true)
     m.delete(true)
-    expect(mobx.keys(m)).toEqual([0])
+    expect([...m.keys()]).toEqual([0])
 })
 
 test("map should support iterall / iterable ", () => {
@@ -667,7 +649,7 @@ test("issue 940, should not be possible to change maps outside strict mode", () 
     mobx.configure({ enforceActions: "observed" })
 
     const m = mobx.observable.map()
-    const d = mobx.autorun(() => mobx.values(m))
+    const d = mobx.autorun(() => [...m.values()])
 
     expect(
         grabConsole(() => {
@@ -1246,47 +1228,6 @@ test("noop mutations do NOT reportChanges", () => {
     expect(autorunInvocationCount).toBe(1)
 })
 
-test(".replace() calls and respects interceptors", () => {
-    const map = mobx.observable.map([
-        [0, 0],
-        [1, 1],
-        [2, 2],
-        [3, 3]
-    ])
-    const replacementMap = [
-        [3, 33],
-        [4, 44],
-        [5, 55],
-        [0, 0]
-    ]
-    const expectedMap = [
-        [2, 2],
-        [3, 3],
-        [5, 55],
-        [0, 0]
-    ]
-
-    mobx.intercept(map, change => {
-        // cancel delete 2
-        if (change.type === "delete" && change.name === 2) {
-            return null
-        }
-        // cancel update 3
-        if (change.type === "update" && change.name === 3) {
-            return null
-        }
-        // cancel add 4
-        if (change.type === "add" && change.name === 4) {
-            return null
-        }
-        return change
-    })
-
-    map.replace(replacementMap)
-
-    expect(Array.from(map)).toEqual(expectedMap)
-})
-
 test(".replace() should reportChanged on key order change", () => {
     const map = mobx.observable.map([
         [1, 1],
@@ -1299,23 +1240,11 @@ test(".replace() should reportChanged on key order change", () => {
         [2, 22]
     ]
     const expectedMap = [
-        [1, 1],
+        [4, 44],
         [3, 33],
         [2, 22]
     ]
     let autorunInvocationCount = 0
-
-    mobx.intercept(map, change => {
-        // cancel delete 1
-        if (change.type === "delete" && change.name === 1) {
-            return null
-        }
-        // cancel add 4
-        if (change.type === "add" && change.name === 4) {
-            return null
-        }
-        return change
-    })
 
     autorun(() => {
         autorunInvocationCount++

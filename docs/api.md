@@ -278,20 +278,6 @@ _Utilities that might make working with observable objects or computed values mo
 
 Attaches a global error listener, which is invoked for every error that is thrown from a _reaction_. This can be used for monitoring or test purposes.
 
-### `intercept`
-
-{🚀} Usage: `intercept(propertyName|array|object|Set|Map, listener)`
-<small>(<b>[further information](intercept-and-observe.md#intercept)</b>)</small>
-
-Intercepts changes before they are applied to an observable API. Returns a disposer function that stops the interception.
-
-### `observe`
-
-{🚀} Usage: `observe(propertyName|array|object|Set|Map, listener)`
-<small>(<b>[further information](intercept-and-observe.md#observe)</b>)</small>
-
-Low-level API that can be used to observe a single observable value. Returns a disposer function that stops the interception.
-
 ### `onBecomeObserved`
 
 {🚀} Usage: `onBecomeObserved(observable, property?, listener: () => void)`
@@ -340,61 +326,6 @@ _Fine-tuning your MobX instance._
 Usage: sets global behavior settings on the active MobX instance.
 <small>(<b>[further information](configuration.md)</b>)</small>
 Use it to change how MobX behaves as a whole.
-
----
-
-## Collection utilities {🚀}
-
-_They enable manipulating observable arrays, objects and Maps with the same generic API._
-
-### `values`
-
-{🚀} Usage: `values(array|object|Set|Map)`
-<small>(<b>[further information](collection-utilities.md)</b>)</small>
-
-Returns all values in the collection as an array.
-
-### `keys`
-
-{🚀} Usage: `keys(array|object|Set|Map)`
-<small>(<b>[further information](collection-utilities.md)</b>)</small>
-
-Returns all keys / indices in the collection as an array.
-
-### `entries`
-
-{🚀} Usage: `entries(array|object|Set|Map)`
-<small>(<b>[further information](collection-utilities.md)</b>)</small>
-
-Returns a `[key, value]` pair of every entry in the collection as an array.
-
-### `set`
-
-{🚀} Usage: `set(array|object|Map, key, value)`
-<small>(<b>[further information](collection-utilities.md)</b>)</small>
-
-Updates the collection.
-
-### `remove`
-
-{🚀} Usage: `remove(array|object|Map, key)`
-<small>(<b>[further information](collection-utilities.md)</b>)</small>
-
-Removes item from the collection.
-
-### `has`
-
-{🚀} Usage: `has(array|object|Map, key)`
-<small>(<b>[further information](collection-utilities.md)</b>)</small>
-
-Checks for membership in the collection.
-
-### `get`
-
-{🚀} Usage: `get(array|object|Map, key)`
-<small>(<b>[further information](collection-utilities.md)</b>)</small>
-
-Gets value from the collection with key.
 
 ---
 
@@ -462,34 +393,6 @@ Is this a boxed computed value, created using `computed(() => expr)`?
 
 Is this a computed property?
 
-### `spy`
-
-{🚀} Usage: `spy(eventListener)`
-<small>(<b>[further information](analyzing-reactivity.md#spy)</b>)</small>
-
-Registers a global spy listener that listens to all events that happen in MobX.
-
-### `getDebugName`
-
-{🚀} Usage: `getDebugName(reaction|array|Set|Map)` or `getDebugName(object|Map, propertyName)`
-<small>(<b>[further information](analyzing-reactivity.md#getdebugname)</b>)</small>
-
-Returns the (generated) friendly debug name for an observable or reaction.
-
-### `getDependencyTree`
-
-{🚀} Usage: `getDependencyTree(object, computedPropertyName)`
-<small>(<b>[further information](analyzing-reactivity.md#getdependencytree)</b>)</small>
-
-Returns a tree structure with all observables the given reaction / computation currently depends upon.
-
-### `getObserverTree`
-
-{🚀} Usage: `getObserverTree(array|Set|Map)` or `getObserverTree(object|Map, propertyName)`
-<small>(<b>[further information](analyzing-reactivity.md#getobservertree)</b>)</small>
-
-Returns a tree structure with all reactions / computations that are observing the given observable.
-
 ---
 
 ## Extending MobX {🚀}
@@ -509,7 +412,6 @@ Creates your own observable data structure and hooks it up to MobX. Used interna
 ### `getAtom`
 
 {🚀} Usage: `getAtom(thing, property?)`
-<small>(<b>[further information](analyzing-reactivity.md#getatom)</b>)</small>
 
 Returns the backing atom.
 

@@ -69,20 +69,12 @@ test("json2", function () {
     let ab = []
     let tb = []
 
-    m.observe(
-        analyze,
-        function (d) {
-            ab.push(d.newValue)
-        },
-        true
-    )
-    m.observe(
-        alltags,
-        function (d) {
-            tb.push(d.newValue)
-        },
-        true
-    )
+    m.autorun(function () {
+        ab.push(analyze.get())
+    })
+    m.autorun(function () {
+        tb.push(alltags.get())
+    })
 
     o.todos[0].details.url = "boe"
     o.todos[1].details.url = "ba"

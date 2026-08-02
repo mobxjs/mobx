@@ -16,7 +16,6 @@ import {
     makeAutoObservable,
     autorun,
     extendObservable,
-    getDebugName,
     _getAdministration,
     configure,
     flow,
@@ -585,8 +584,8 @@ test("makeObservable respects options.name #2614'", () => {
     const instance = new Clazz()
     const plain = makeObservable({ timer: 0 }, { timer: observable }, { name })
 
-    expect(getDebugName(instance)).toBe(name)
-    expect(getDebugName(plain)).toBe(name)
+    expect(_getAdministration(instance).name_).toBe(name)
+    expect(_getAdministration(plain).name_).toBe(name)
 })
 // "makeObservable + action + arrow function + subclass override #2614"
 

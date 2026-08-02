@@ -6,15 +6,7 @@ const autorun = mobx.autorun
 const iterall = require("iterall")
 
 test("set crud", function () {
-    const events = []
     const s = set([1])
-
-    mobx.observe(s, change => {
-        expect(change.observableKind).toEqual("set")
-        delete change.observableKind
-        delete change.debugObjectName
-        events.push(change)
-    })
 
     expect(s.has(1)).toBe(true)
     expect(s.has("1")).toBe(false)
@@ -24,9 +16,9 @@ test("set crud", function () {
 
     expect(s.has("2")).toBe(true)
     expect(s.size).toBe(2)
-    expect(mobx.keys(s)).toEqual([1, "2"])
-    expect(mobx.values(s)).toEqual([1, "2"])
-    expect(mobx.entries(s)).toEqual([
+    expect([...s.keys()]).toEqual([1, "2"])
+    expect([...s.values()]).toEqual([1, "2"])
+    expect([...s.entries()]).toEqual([
         [1, 1],
         ["2", "2"]
     ])
@@ -37,8 +29,8 @@ test("set crud", function () {
 
     s.replace(new Set([3]))
 
-    expect(mobx.keys(s)).toEqual([3])
-    expect(mobx.values(s)).toEqual([3])
+    expect([...s.keys()]).toEqual([3])
+    expect([...s.values()]).toEqual([3])
     expect(s.size).toBe(1)
     expect(s.has(1)).toBe(false)
     expect(s.has("2")).toBe(false)
@@ -46,8 +38,8 @@ test("set crud", function () {
 
     s.replace(set([4]))
 
-    expect(mobx.keys(s)).toEqual([4])
-    expect(mobx.values(s)).toEqual([4])
+    expect([...s.keys()]).toEqual([4])
+    expect([...s.values()]).toEqual([4])
     expect(s.size).toBe(1)
     expect(s.has(1)).toBe(false)
     expect(s.has("2")).toBe(false)
@@ -59,23 +51,13 @@ test("set crud", function () {
     }).toThrow(/Cannot initialize set from/)
 
     s.clear()
-    expect(mobx.keys(s)).toEqual([])
-    expect(mobx.values(s)).toEqual([])
+    expect([...s.keys()]).toEqual([])
+    expect([...s.values()]).toEqual([])
     expect(s.size).toBe(0)
     expect(s.has(1)).toBe(false)
     expect(s.has("2")).toBe(false)
     expect(s.has(3)).toBe(false)
     expect(s.has(4)).toBe(false)
-
-    expect(events).toEqual([
-        { object: s, newValue: "2", type: "add" },
-        { object: s, oldValue: 1, type: "delete" },
-        { object: s, oldValue: "2", type: "delete" },
-        { object: s, newValue: 3, type: "add" },
-        { object: s, oldValue: 3, type: "delete" },
-        { object: s, newValue: 4, type: "add" },
-        { object: s, oldValue: 4, type: "delete" }
-    ])
 })
 
 test("observe value", function () {
@@ -101,7 +83,7 @@ test("observe value", function () {
     s.replace(["y"])
     expect(hasX).toBe(false)
     expect(hasY).toBe(true)
-    expect(mobx.values(s)).toEqual(["y"])
+    expect([...s.values()]).toEqual(["y"])
 })
 
 test("observe collections", function () {
@@ -109,7 +91,7 @@ test("observe collections", function () {
     let keys, values, entries
 
     autorun(function () {
-        keys = mobx.keys(x)
+        keys = [...x.keys()]
     })
     autorun(function () {
         values = Array.from(x.values())
@@ -280,18 +262,6 @@ test("getAtom", () => {
 
     expect(mobx.isObservableSet(x)).toBeTruthy()
     expect(mobx.isObservable(x)).toBeTruthy()
-})
-
-test("observe", () => {
-    const vals = []
-    const x = set([1])
-    mobx.observe(x, change => {
-        delete change.debugObjectName
-        vals.push(change)
-    })
-    x.add(2)
-    x.add(1)
-    expect(vals).toEqual([{ newValue: 2, object: x, type: "add", observableKind: "set" }])
 })
 
 test("toJS", () => {
@@ -472,43 +442,5 @@ describe("Observable Set methods are reactive", () => {
         s.add(1)
         s.add(2)
         expect(c).toBe(3)
-    })
-})
-
-describe("Observable Set interceptors", () => {
-    let s = set()
-
-    beforeEach(() => {
-        s = set()
-    })
-
-    test("Add does not add value if interceptor returned no change", () => {
-        mobx.intercept(s, change => {
-            if (change.type === "add" && change.newValue === 2) {
-                return undefined
-            }
-
-            return change
-        })
-
-        s.add(1)
-        s.add(2)
-
-        expect([...s]).toStrictEqual([1])
-    })
-
-    test("Add respects newValue from interceptor", () => {
-        mobx.intercept(s, change => {
-            if (change.type === "add" && change.newValue === 2) {
-                change.newValue = 10
-            }
-
-            return change
-        })
-
-        s.add(1)
-        s.add(2)
-
-        expect([...s]).toStrictEqual([1, 10])
     })
 })

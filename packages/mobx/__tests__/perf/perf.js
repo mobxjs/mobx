@@ -5,10 +5,6 @@ function gc() {
     if (typeof global.gc === "function") global.gc()
 }
 
-function voidObserver() {
-    // nothing, nada, noppes.
-}
-
 module.exports = function runPerfSuite() {
     /*
 results of this test:
@@ -49,7 +45,7 @@ results of this test:
 
         const start = now()
 
-        mobx.observe(b, voidObserver, true) // start observers
+        mobx.autorun(() => b.get()) // start observers
         t.equal(99990000, b.get())
         const initial = now()
 
@@ -84,7 +80,7 @@ results of this test:
         const start = now()
 
         const last = observables[observables.length - 1]
-        mobx.observe(last, voidObserver)
+        mobx.autorun(() => last.get())
         t.equal(501, last.get())
         const initial = now()
 
@@ -113,7 +109,7 @@ results of this test:
             return sum
         })
 
-        mobx.observe(sum, voidObserver, true)
+        mobx.autorun(() => sum.get())
 
         const start = new Date()
 
@@ -148,13 +144,9 @@ results of this test:
         })
 
         let sum = 0
-        const subscription = mobx.observe(
-            b,
-            function (e) {
-                sum = e.newValue
-            },
-            true
-        )
+        const subscription = mobx.autorun(() => {
+            sum = b.get()
+        })
 
         t.equal(sum, 49995000)
 
@@ -206,8 +198,8 @@ results of this test:
             bCalc++
             return ar.lastIndexOf(0)
         })
-        mobx.observe(findLastIndexOfZero, voidObserver, true)
-        mobx.observe(lastIndexOfZero, voidObserver, true)
+        mobx.autorun(() => findLastIndexOfZero.get())
+        mobx.autorun(() => lastIndexOfZero.get())
 
         const start = now()
 
@@ -238,7 +230,7 @@ results of this test:
                 return a + c * b.get()
             }, 0)
         })
-        mobx.observe(sum, voidObserver)
+        mobx.autorun(() => sum.get())
 
         const start = now()
 
@@ -279,7 +271,7 @@ results of this test:
             for (let i = 0; i < ar.length; i++) s += ar[i] * b.get()
             return s
         })
-        mobx.observe(sum, voidObserver, true) // calculate
+        mobx.autorun(() => sum.get()) // calculate
 
         const start = now()
 
@@ -353,7 +345,7 @@ results of this test:
         }
 
         let disp
-        if (keepObserving) disp = mobx.observe(totalAmount, voidObserver)
+        if (keepObserving) disp = mobx.autorun(() => totalAmount.get())
 
         const start = now()
 

@@ -1,7 +1,7 @@
 "use strict"
 
 const mobx = require("../../src/mobx.ts")
-const { observable, when, _getAdministration, reaction, computed, makeObservable, autorun } = mobx
+const { observable, when, reaction, computed, makeObservable, autorun } = mobx
 const iterall = require("iterall")
 
 let consoleWarnSpy
@@ -212,70 +212,6 @@ test("concat should automatically slice observable arrays, #260", () => {
     expect(a1.concat(a2)).toEqual([1, 2, 3, 4])
 })
 
-test("observe", function () {
-    const ar = mobx.observable([1, 4])
-    const buf = []
-    const disposer = mobx.observe(
-        ar,
-        function (changes) {
-            buf.push(changes)
-        },
-        true
-    )
-
-    ar[1] = 3 // 1,3
-    ar[2] = 0 // 1, 3, 0
-    ar.shift() // 3, 0
-    ar.push(1, 2) // 3, 0, 1, 2
-    ar.splice(1, 2, 3, 4) // 3, 3, 4, 2
-    expect(ar.slice()).toEqual([3, 3, 4, 2])
-    ar.splice(6)
-    ar.splice(6, 2)
-    ar.replace(["a"])
-    ar.pop()
-    ar.pop() // does not fire anything
-
-    // check the object param
-    buf.forEach(function (change) {
-        expect(change.object).toBe(ar)
-        delete change.object
-        expect(change.observableKind).toBe("array")
-        delete change.observableKind
-        delete change.debugObjectName
-    })
-
-    const result = [
-        { type: "splice", index: 0, addedCount: 2, removed: [], added: [1, 4], removedCount: 0 },
-        { type: "update", index: 1, oldValue: 4, newValue: 3 },
-        { type: "splice", index: 2, addedCount: 1, removed: [], added: [0], removedCount: 0 },
-        { type: "splice", index: 0, addedCount: 0, removed: [1], added: [], removedCount: 1 },
-        { type: "splice", index: 2, addedCount: 2, removed: [], added: [1, 2], removedCount: 0 },
-        {
-            type: "splice",
-            index: 1,
-            addedCount: 2,
-            removed: [0, 1],
-            added: [3, 4],
-            removedCount: 2
-        },
-        {
-            type: "splice",
-            index: 0,
-            addedCount: 1,
-            removed: [3, 3, 4, 2],
-            added: ["a"],
-            removedCount: 4
-        },
-        { type: "splice", index: 0, addedCount: 0, removed: ["a"], added: [], removedCount: 1 }
-    ]
-
-    expect(buf).toEqual(result)
-
-    disposer()
-    ar[0] = 5
-    expect(buf).toEqual(result)
-})
-
 test("array modification1", function () {
     const a = mobx.observable([1, 2, 3])
     const r = a.splice(-10, 5, 4, 5, 6)
@@ -414,12 +350,16 @@ test("react to sort changes", function () {
 test("autoextend buffer length", function () {
     const ar = observable(new Array(1000))
     let changesCount = 0
-    mobx.observe(ar, () => ++changesCount)
+    const d = mobx.reaction(
+        () => ar.length,
+        () => ++changesCount
+    )
 
     ar[ar.length] = 0
     ar.push(0)
 
     expect(changesCount).toBe(2)
+    d()
 })
 
 test("array exposes correct keys", () => {
@@ -533,22 +473,6 @@ test("concats correctly #1667", () => {
     expect(Array.isArray(x.data)).toBe(true)
     expect(x.data[0]).toBe(first)
     expect(x.data.length).toBe(11000)
-})
-
-test("dehances last value on shift/pop", () => {
-    const x1 = observable([3, 5])
-    _getAdministration(x1).dehancer = value => {
-        return value * 2
-    }
-    expect(x1.shift()).toBe(6)
-    expect(x1.shift()).toBe(10)
-
-    const x2 = observable([3, 5])
-    _getAdministration(x2).dehancer = value => {
-        return value * 2
-    }
-    expect(x2.pop()).toBe(10)
-    expect(x2.pop()).toBe(6)
 })
 
 test("#2044 symbol key on array", () => {
@@ -693,190 +617,6 @@ test("very long arrays can be safely passed to nativeArray.concat #2379", () => 
     const r2 = observableArray.splice(2, 2, ...longNativeArray)
     expect(r2).toEqual(r1)
     expect(observableArray).toEqual(anotherArray)
-})
-
-describe("dehances", () => {
-    function supressConsoleWarn(fn) {
-        const { warn } = console
-        console.warn = () => {}
-        const result = fn()
-        console.warn = warn
-        return result
-    }
-
-    const dehancer = thing => {
-        // Dehance only objects of a proper type
-        if (thing && typeof thing === "object" && thing.hasOwnProperty("value")) {
-            return thing.value
-        }
-        // Support nested arrays
-        if (Array.isArray(thing)) {
-            // If array has own dehancer it's still applied prior to ours.
-            // It doesn't matter how many dehancers we apply,
-            // if they ignore unknown types.
-            return thing.map(dehancer)
-        }
-        // Ignore unknown types
-        return thing
-    }
-
-    let enhanced, dehanced, array
-
-    beforeEach(() => {
-        enhanced = [{ value: 1 }, { value: 2 }, { value: 3 }]
-        dehanced = enhanced.map(dehancer)
-        array = observable(enhanced)
-        mobx._getAdministration(array).dehancer = dehancer
-    })
-
-    test("slice", () => {
-        expect(array.slice()).toEqual(dehanced.slice())
-    })
-
-    test("filter", () => {
-        const predicate = value => value === 2
-        expect(array.filter(predicate)).toEqual(dehanced.filter(predicate))
-    })
-
-    test("concat", () => {
-        expect(array.concat(4)).toEqual(dehanced.concat(4))
-    })
-
-    test("entries", () => {
-        expect([...array.entries()]).toEqual([...dehanced.entries()])
-    })
-
-    test("every", () => {
-        array.every((value, index) => {
-            expect(value).toEqual(dehanced[index])
-            return true
-        })
-    })
-
-    test("find", () => {
-        const predicate = value => value === 2
-        expect(array.find(predicate)).toEqual(dehanced.find(predicate))
-    })
-
-    test("forEach", () => {
-        array.forEach((value, index) => {
-            expect(value).toEqual(dehanced[index])
-        })
-    })
-
-    test("includes", () => {
-        expect(array.includes(2)).toEqual(dehanced.includes(2))
-    })
-
-    test("indexOf", () => {
-        expect(array.indexOf(2)).toEqual(dehanced.indexOf(2))
-    })
-
-    test("join", () => {
-        expect(array.join()).toEqual(dehanced.join())
-    })
-
-    test("lastIndexOf", () => {
-        expect(array.lastIndexOf(2)).toEqual(dehanced.lastIndexOf(2))
-    })
-
-    test("map", () => {
-        array.map((value, index) => {
-            expect(value).toEqual(dehanced[index])
-            return value
-        })
-    })
-
-    test("pop", () => {
-        expect(array.pop()).toEqual(dehanced.pop())
-    })
-
-    test("reduce", () => {
-        array.reduce((_, value, index) => {
-            expect(value).toEqual(dehanced[index])
-        })
-    })
-
-    test("reduceRight", () => {
-        array.reduceRight((_, value, index) => {
-            expect(value).toEqual(dehanced[index])
-        })
-    })
-
-    test("reverse", () => {
-        const reversedArray = supressConsoleWarn(() => array.reverse())
-        expect(reversedArray).toEqual(dehanced.reverse())
-    })
-
-    test("shift", () => {
-        expect(array.shift()).toEqual(dehanced.shift())
-    })
-
-    test("some", () => {
-        array.some((value, index) => {
-            expect(value).toEqual(dehanced[index])
-            return false
-        })
-    })
-
-    test("splice", () => {
-        expect(array.splice(1, 2)).toEqual(dehanced.splice(1, 2))
-    })
-
-    test("sort", () => {
-        const comparator = (a, b) => {
-            expect(typeof a).toEqual("number")
-            expect(typeof b).toEqual("number")
-            return b > a
-        }
-        const sortedArray = supressConsoleWarn(() => array.sort(comparator))
-        expect(sortedArray).toEqual(dehanced.sort(comparator))
-    })
-
-    test("values", () => {
-        expect([...array.values()]).toEqual([...dehanced.values()])
-    })
-
-    test("toReversed", () => {
-        expect(array.toReversed()).toEqual(dehanced.toReversed())
-    })
-
-    test("toSorted", () => {
-        expect(array.toSorted()).toEqual(dehanced.toSorted())
-    })
-
-    test("toSorted with args", () => {
-        expect(array.toSorted((a, b) => a - b)).toEqual(dehanced.toSorted((a, b) => a - b))
-    })
-
-    test("toSpliced", () => {
-        expect(array.toSpliced(1, 2)).toEqual(dehanced.toSpliced(1, 2))
-    })
-
-    test("with", () => {
-        expect(array.with(1, 5)).toEqual(dehanced.with(1, 5))
-    })
-
-    test("at", () => {
-        expect(array.at(1)).toEqual(dehanced.at(1))
-        expect(array.at(-1)).toEqual(dehanced.at(-1))
-    })
-
-    test("flat/flatMap", () => {
-        const nestedArray = [{ value: 1 }, [{ value: 2 }, [{ value: 3 }]]]
-        const dehancedNestedArray = nestedArray.map(dehancer)
-
-        // flat
-        array.replace(nestedArray)
-        expect(array.flat(Infinity)).toEqual(dehancedNestedArray.flat(Infinity))
-
-        // flatMap
-        const flattenedArray = array.flatMap((value, index) => {
-            expect(value).toEqual(dehancedNestedArray[index])
-            return value
-        })
-        expect(flattenedArray).toEqual(dehancedNestedArray.flat(1))
-    })
 })
 
 test("reduce without initial value #2432", () => {

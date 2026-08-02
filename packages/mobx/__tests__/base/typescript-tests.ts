@@ -1,7 +1,6 @@
 "use strict"
 
 import {
-    observe,
     computed,
     computedStruct,
     observable,
@@ -12,18 +11,11 @@ import {
     extendObservable,
     action,
     actionBound,
-    IArrayDidChange,
-    IArrayWillChange,
-    IArrayWillSplice,
-    IMapWillChange,
-    ISetWillChange,
     IObservableValue,
     isObservable,
     isObservableProp,
     isObservableObject,
     transaction,
-    IObjectDidChange,
-    spy,
     configure,
     isAction,
     makeObservable,
@@ -31,18 +23,10 @@ import {
     createAtom,
     runInAction,
     flow,
-    IMapDidChange,
-    IValueDidChange,
-    ISetDidChange,
-    IValueWillChange,
-    flowResult,
-    IObjectWillChange
+    flowResult
 } from "../../src/mobx"
 import * as mobx from "../../src/mobx"
 import { assert, IsExact } from "conditional-type-checks"
-
-const v = observable.box(3)
-observe(v, () => {})
 
 const a = observable([1, 2, 3])
 
@@ -96,28 +80,6 @@ test("decorators", () => {
     t.equal(isObservableObject(o), true)
     t.equal(isObservableProp(o, "amount"), true)
     t.equal(isObservableProp(o, "total"), true)
-
-    const events: any[] = []
-    const d1 = observe(o, (ev: IObjectDidChange) => events.push(ev.name, (ev as any).oldValue))
-    const d2 = observe(o, "price", ev => events.push(ev.newValue, ev.oldValue))
-    const d3 = observe(o, "total", ev => events.push(ev.newValue, ev.oldValue))
-
-    o.price = 4
-
-    d1()
-    d2()
-    d3()
-
-    o.price = 5
-
-    t.deepEqual(events, [
-        8, // new total
-        6, // old total
-        4, // new price
-        3, // old price
-        "price", // event name
-        3 // event oldValue
-    ])
 })
 
 test("observable", () => {
@@ -505,14 +467,6 @@ test("issue 191 - shared initializers (ts)", () => {
     t.deepEqual(t2.array.slice(), [2, 4])
 })
 
-function normalizeSpyEvents(events: any[]) {
-    events.forEach(ev => {
-        delete ev.fn
-        delete ev.time
-    })
-    return events
-}
-
 test("action decorator (typescript)", () => {
     class Store {
         constructor(private multiplier: number) {
@@ -528,22 +482,9 @@ test("action decorator (typescript)", () => {
 
     const store1 = new Store(2)
     const store2 = new Store(3)
-    const events: any[] = []
-    const d = spy(events.push.bind(events))
     t.equal(store1.add(3, 4), 14)
     t.equal(store2.add(2, 2), 12)
     t.equal(store1.add(1, 1), 4)
-
-    t.deepEqual(normalizeSpyEvents(events), [
-        { arguments: [3, 4], name: "add", spyReportStart: true, object: store1, type: "action" },
-        { type: "report-end", spyReportEnd: true },
-        { arguments: [2, 2], name: "add", spyReportStart: true, object: store2, type: "action" },
-        { type: "report-end", spyReportEnd: true },
-        { arguments: [1, 1], name: "add", spyReportStart: true, object: store1, type: "action" },
-        { type: "report-end", spyReportEnd: true }
-    ])
-
-    d()
 })
 
 test("custom action decorator (typescript)", () => {
@@ -561,40 +502,9 @@ test("custom action decorator (typescript)", () => {
 
     const store1 = new Store(2)
     const store2 = new Store(3)
-    const events: any[] = []
-    const d = spy(events.push.bind(events))
     t.equal(store1.add(3, 4), 14)
     t.equal(store2.add(2, 2), 12)
     t.equal(store1.add(1, 1), 4)
-
-    t.deepEqual(normalizeSpyEvents(events), [
-        {
-            arguments: [3, 4],
-            name: "zoem zoem",
-            spyReportStart: true,
-            object: store1,
-            type: "action"
-        },
-        { type: "report-end", spyReportEnd: true },
-        {
-            arguments: [2, 2],
-            name: "zoem zoem",
-            spyReportStart: true,
-            object: store2,
-            type: "action"
-        },
-        { type: "report-end", spyReportEnd: true },
-        {
-            arguments: [1, 1],
-            name: "zoem zoem",
-            spyReportStart: true,
-            object: store1,
-            type: "action"
-        },
-        { type: "report-end", spyReportEnd: true }
-    ])
-
-    d()
 })
 
 test("action decorator on field (typescript)", () => {
@@ -614,22 +524,9 @@ test("action decorator on field (typescript)", () => {
     const store2 = new Store(7)
     expect(store1.add).not.toEqual(store2.add)
 
-    const events: any[] = []
-    const d = spy(events.push.bind(events))
     t.equal(store1.add(3, 4), 14)
     t.equal(store2.add(4, 5), 63)
     t.equal(store1.add(2, 2), 8)
-
-    t.deepEqual(normalizeSpyEvents(events), [
-        { arguments: [3, 4], name: "add", spyReportStart: true, object: store1, type: "action" },
-        { type: "report-end", spyReportEnd: true },
-        { arguments: [4, 5], name: "add", spyReportStart: true, object: store2, type: "action" },
-        { type: "report-end", spyReportEnd: true },
-        { arguments: [2, 2], name: "add", spyReportStart: true, object: store1, type: "action" },
-        { type: "report-end", spyReportEnd: true }
-    ])
-
-    d()
 })
 
 test("custom action decorator on field (typescript)", () => {
@@ -648,40 +545,9 @@ test("custom action decorator on field (typescript)", () => {
     const store1 = new Store(2)
     const store2 = new Store(7)
 
-    const events: any[] = []
-    const d = spy(events.push.bind(events))
     t.equal(store1.add(3, 4), 14)
     t.equal(store2.add(4, 5), 63)
     t.equal(store1.add(2, 2), 8)
-
-    t.deepEqual(normalizeSpyEvents(events), [
-        {
-            arguments: [3, 4],
-            name: "zoem zoem",
-            spyReportStart: true,
-            object: store1,
-            type: "action"
-        },
-        { type: "report-end", spyReportEnd: true },
-        {
-            arguments: [4, 5],
-            name: "zoem zoem",
-            spyReportStart: true,
-            object: store2,
-            type: "action"
-        },
-        { type: "report-end", spyReportEnd: true },
-        {
-            arguments: [2, 2],
-            name: "zoem zoem",
-            spyReportStart: true,
-            object: store1,
-            type: "action"
-        },
-        { type: "report-end", spyReportEnd: true }
-    ])
-
-    d()
 })
 
 test("267 (typescript) should be possible to declare properties observable outside strict mode", () => {
@@ -696,29 +562,6 @@ test("267 (typescript) should be possible to declare properties observable outsi
             })
         }
     }
-})
-
-test("288 atom not detected for object property", () => {
-    class Store {
-        foo = ""
-
-        constructor() {
-            makeObservable(this, {
-                foo: observable
-            })
-        }
-    }
-
-    const store = new Store()
-
-    mobx.observe(
-        store,
-        "foo",
-        () => {
-            // console.log("Change observed")
-        },
-        true
-    )
 })
 
 test.skip("observable performance - ts", () => {
@@ -1560,21 +1403,6 @@ test("computed comparer works with decorate (TS) - 3", () => {
     disposeAutorun()
 })
 
-test("1072 - @observable without initial value and observe before first access", () => {
-    class User {
-        loginCount?: number
-
-        constructor() {
-            makeObservable(this, {
-                loginCount: observable
-            })
-        }
-    }
-
-    const user = new User()
-    observe(user, "loginCount", () => {})
-})
-
 test("typescript - decorate works with classes", () => {
     class Box {
         height: number = 2
@@ -1726,7 +1554,7 @@ test("multiple inheritance should work", () => {
         }
     }
 
-    expect(mobx.keys(new B())).toEqual(["x", "y"])
+    expect(Object.keys(new B())).toEqual(["x", "y"])
 })
 
 // 19.12.2020 @urugator:
@@ -2006,41 +1834,6 @@ test("type of flows that return promises", async () => {
     expect(n).toBe(5)
 })
 
-test("#2159 - computed property keys", () => {
-    const testSymbol = Symbol("test symbol")
-    const testString = "testString"
-
-    class TestClass {
-        [testSymbol] = "original symbol value";
-        [testString] = "original string value"
-
-        constructor() {
-            makeObservable(this, {
-                [testSymbol]: observable,
-                [testString]: observable
-            })
-        }
-    }
-
-    const o = new TestClass()
-
-    const events: any[] = []
-    observe(o, testSymbol, ev => events.push(ev.newValue, ev.oldValue))
-    observe(o, testString, ev => events.push(ev.newValue, ev.oldValue))
-
-    runInAction(() => {
-        o[testSymbol] = "new symbol value"
-        o[testString] = "new string value"
-    })
-
-    t.deepEqual(events, [
-        "new symbol value", // new symbol
-        "original symbol value", // original symbol
-        "new string value", // new string
-        "original string value" // original string
-    ])
-})
-
 test("type inference of the action callback", () => {
     function test1arg(fn: (a: number) => any) {}
 
@@ -2146,118 +1939,6 @@ test("TS - type inference of Set", () => {
     set.has("1")
     // @ts-expect-error
     set.delete("1")
-})
-
-test("TS - type inference of observe & intercept functions", () => {
-    const array = [1, 2]
-    const object = { numberKey: 1, stringKey: "string" }
-    const map = new Map([["testKey", 1]])
-    const set = new Set([1])
-
-    const { regularArray, regularObject, regularMap, regularSet } = observable({
-        regularArray: array,
-        regularObject: object,
-        regularMap: map,
-        regularSet: set
-    })
-
-    const observableArray = observable(array)
-    const observableObject = observable(object)
-    const observableMap = observable(map)
-    const observableSet = observable(set)
-
-    // Array
-    mobx.observe(regularArray, argument => {
-        assert<IsExact<typeof argument, IArrayDidChange<number>>>(true)
-    })
-    mobx.intercept(regularArray, argument => {
-        assert<IsExact<typeof argument, IArrayWillChange<number> | IArrayWillSplice<number>>>(true)
-        return argument
-    })
-    // ObservableArray
-    mobx.observe(observableArray, argument => {
-        assert<IsExact<typeof argument, IArrayDidChange<number>>>(true)
-    })
-    mobx.intercept(observableArray, argument => {
-        assert<IsExact<typeof argument, IArrayWillChange<number> | IArrayWillSplice<number>>>(true)
-        return argument
-    })
-    // Object
-    mobx.observe(regularObject, argument => {
-        assert<IsExact<typeof argument, IObjectDidChange>>(true)
-    })
-    mobx.intercept(regularObject, argument => {
-        assert<IsExact<typeof argument, IObjectWillChange>>(true)
-        return argument
-    })
-    mobx.observe(regularObject, "numberKey", argument => {
-        assert<IsExact<typeof argument, IValueDidChange<number>>>(true)
-    })
-    mobx.intercept(regularObject, "numberKey", argument => {
-        assert<IsExact<typeof argument, IValueWillChange<number>>>(true)
-        return argument
-    })
-    // ObservableObject
-    mobx.observe(observableObject, argument => {
-        assert<IsExact<typeof argument, IObjectDidChange>>(true)
-    })
-    mobx.intercept(observableObject, argument => {
-        assert<IsExact<typeof argument, IObjectWillChange>>(true)
-        return argument
-    })
-    mobx.observe(observableObject, "numberKey", argument => {
-        assert<IsExact<typeof argument, IValueDidChange<number>>>(true)
-    })
-    mobx.intercept(observableObject, "numberKey", argument => {
-        assert<IsExact<typeof argument, IValueWillChange<number>>>(true)
-        return argument
-    })
-    // Map
-    mobx.observe(regularMap, argument => {
-        assert<IsExact<typeof argument, IMapDidChange<string, number>>>(true)
-    })
-    mobx.intercept(regularMap, argument => {
-        assert<IsExact<typeof argument, IMapWillChange<string, number>>>(true)
-        return argument
-    })
-    mobx.observe(regularMap, "testKey", argument => {
-        assert<IsExact<typeof argument, IValueDidChange<number>>>(true)
-    })
-    mobx.intercept(regularMap, "testKey", argument => {
-        assert<IsExact<typeof argument, IValueWillChange<number>>>(true)
-        return argument
-    })
-    // ObservableMap
-    mobx.observe(observableMap, argument => {
-        assert<IsExact<typeof argument, IMapDidChange<string, number>>>(true)
-    })
-    mobx.intercept(observableMap, argument => {
-        assert<IsExact<typeof argument, IMapWillChange<string, number>>>(true)
-        return argument
-    })
-    mobx.observe(observableMap, "testKey", argument => {
-        assert<IsExact<typeof argument, IValueDidChange<number>>>(true)
-    })
-    mobx.intercept(observableMap, "testKey", argument => {
-        assert<IsExact<typeof argument, IValueWillChange<number>>>(true)
-        return argument
-    })
-    // Set
-    mobx.observe(regularSet, argument => {
-        assert<IsExact<typeof argument, ISetDidChange<number>>>(true)
-    })
-    mobx.intercept(regularSet, argument => {
-        assert<IsExact<typeof argument, ISetWillChange<number>>>(true)
-        return argument
-    })
-    // ObservableSet
-    mobx.observe(observableSet, argument => {
-        assert<IsExact<typeof argument, ISetDidChange<number>>>(true)
-    })
-    mobx.intercept(observableSet, argument => {
-        assert<IsExact<typeof argument, ISetWillChange<number>>>(true)
-        return argument
-    })
 })
 
 test("TS - type inference of reaction opts.equals", () => {

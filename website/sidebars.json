@@ -21,14 +21,11 @@
       "defining-data-stores",
       "understanding-reactivity",
       "subclassing",
-      "analyzing-reactivity",
       "errors",
       "computeds-with-args",
       "mobx-utils",
       "custom-observables",
-      "lazy-observables",
-      "collection-utilities",
-      "intercept-and-observe"
+      "lazy-observables"
     ],
     "Fine-tuning": [
       "configuration",

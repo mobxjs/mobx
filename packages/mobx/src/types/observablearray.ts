@@ -4,28 +4,17 @@ import {
     EMPTY_ARRAY,
     IAtom,
     IEnhancer,
-    IInterceptable,
-    IListenable,
     addHiddenFinalProp,
     checkIfStateModificationsAreAllowed,
     createInstanceofPredicate,
     getNextId,
-    hasInterceptors,
-    hasListeners,
-    interceptChange,
     isObject,
-    isSpyEnabled,
-    notifyListeners,
-    spyReportEnd,
-    spyReportStart,
     hasProp,
     die,
     globalState,
     initObservable
 } from "../internal"
 
-const SPLICE = "splice"
-export const UPDATE = "update"
 export const MAX_SPLICE_SIZE = 10000 // See e.g. https://github.com/mobxjs/mobx/issues/859
 
 export interface IObservableArray<T = any> extends Array<T> {
@@ -34,44 +23,6 @@ export interface IObservableArray<T = any> extends Array<T> {
     replace(newItems: T[]): T[]
     remove(value: T): boolean
     toJSON(): T[]
-}
-
-interface IArrayBaseChange<T> {
-    object: IObservableArray<T>
-    observableKind: "array"
-    debugObjectName: string
-    index: number
-}
-
-export type IArrayDidChange<T = any> = IArrayUpdate<T> | IArraySplice<T>
-
-export interface IArrayUpdate<T = any> extends IArrayBaseChange<T> {
-    type: "update"
-    newValue: T
-    oldValue: T
-}
-
-export interface IArraySplice<T = any> extends IArrayBaseChange<T> {
-    type: "splice"
-    added: T[]
-    addedCount: number
-    removed: T[]
-    removedCount: number
-}
-
-export interface IArrayWillChange<T = any> {
-    object: IObservableArray<T>
-    index: number
-    type: "update"
-    newValue: T
-}
-
-export interface IArrayWillSplice<T = any> {
-    object: IObservableArray<T>
-    index: number
-    type: "splice"
-    added: T[]
-    removedCount: number
 }
 
 const arrayTraps = {
@@ -109,15 +60,10 @@ const arrayTraps = {
     }
 }
 
-export class ObservableArrayAdministration
-    implements IInterceptable<IArrayWillChange<any> | IArrayWillSplice<any>>, IListenable
-{
+export class ObservableArrayAdministration {
     atom_: IAtom
     readonly values_: any[] = [] // this is the prop that gets proxied, so can't replace it!
-    interceptors_
-    changeListeners_
     enhancer_: (newV: any, oldV: any | undefined) => any
-    dehancer: any
     proxy_!: IObservableArray<any>
     lastKnownLength_ = 0
 
@@ -129,20 +75,6 @@ export class ObservableArrayAdministration
         this.atom_ = new Atom(name)
         this.enhancer_ = (newV, oldV) =>
             enhancer(newV, oldV, __DEV__ ? name + "[..]" : "ObservableArray[..]")
-    }
-
-    dehanceValue_(value: any): any {
-        if (this.dehancer !== undefined) {
-            return this.dehancer(value)
-        }
-        return value
-    }
-
-    dehanceValues_(values: any[]): any[] {
-        if (this.dehancer !== undefined && values.length > 0) {
-            return values.map(this.dehancer) as any
-        }
-        return values
     }
 
     getArrayLength_(): number {
@@ -196,21 +128,6 @@ export class ObservableArrayAdministration
             newItems = EMPTY_ARRAY
         }
 
-        if (hasInterceptors(this)) {
-            const change = interceptChange<IArrayWillSplice<any>>(this as any, {
-                object: this.proxy_ as any,
-                type: SPLICE,
-                index,
-                removedCount: deleteCount,
-                added: newItems
-            })
-            if (!change) {
-                return EMPTY_ARRAY
-            }
-            deleteCount = change.removedCount
-            newItems = change.added
-        }
-
         newItems =
             newItems.length === 0 ? newItems : newItems.map(v => this.enhancer_(v, undefined))
         if (__DEV__) {
@@ -220,9 +137,9 @@ export class ObservableArrayAdministration
         const res = this.spliceItemsIntoValues_(index, deleteCount, newItems)
 
         if (deleteCount !== 0 || newItems.length !== 0) {
-            this.notifyArraySplice_(index, newItems, res)
+            this.atom_.reportChanged()
         }
-        return this.dehanceValues_(res)
+        return res
     }
 
     spliceItemsIntoValues_(index: number, deleteCount: number, newItems: any[]): any[] {
@@ -245,70 +162,9 @@ export class ObservableArrayAdministration
         }
     }
 
-    notifyArrayChildUpdate_(index: number, newValue: any, oldValue: any) {
-        const notifySpy = __DEV__ && !this.owned_ && isSpyEnabled()
-        const notify = hasListeners(this)
-        const change: IArrayDidChange | null =
-            notify || notifySpy
-                ? ({
-                      observableKind: "array",
-                      object: this.proxy_,
-                      type: UPDATE,
-                      debugObjectName: this.atom_.name_,
-                      index,
-                      newValue,
-                      oldValue
-                  } as const)
-                : null
-
-        // The reason why this is on right hand side here (and not above), is this way the uglifier will drop it, but it won't
-        // cause any runtime overhead in development mode without NODE_ENV set, unless spying is enabled
-        if (__DEV__ && notifySpy) {
-            spyReportStart(change!)
-        }
-        this.atom_.reportChanged()
-        if (notify) {
-            notifyListeners(this, change)
-        }
-        if (__DEV__ && notifySpy) {
-            spyReportEnd()
-        }
-    }
-
-    notifyArraySplice_(index: number, added: any[], removed: any[]) {
-        const notifySpy = __DEV__ && !this.owned_ && isSpyEnabled()
-        const notify = hasListeners(this)
-        const change: IArraySplice | null =
-            notify || notifySpy
-                ? ({
-                      observableKind: "array",
-                      object: this.proxy_,
-                      debugObjectName: this.atom_.name_,
-                      type: SPLICE,
-                      index,
-                      removed,
-                      added,
-                      removedCount: removed.length,
-                      addedCount: added.length
-                  } as const)
-                : null
-
-        if (__DEV__ && notifySpy) {
-            spyReportStart(change!)
-        }
-        this.atom_.reportChanged()
-        // conform: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
-        if (notify) {
-            notifyListeners(this, change)
-        }
-        if (__DEV__ && notifySpy) {
-            spyReportEnd()
-        }
-    }
-
     get_(index: number): any | undefined {
         this.atom_.reportObserved()
-        return this.dehanceValue_(this.values_[index])
+        return this.values_[index]
     }
 
     set_(index: number, newValue: any) {
@@ -317,23 +173,11 @@ export class ObservableArrayAdministration
             // update at index in range
             checkIfStateModificationsAreAllowed(this.atom_)
             const oldValue = values[index]
-            if (hasInterceptors(this)) {
-                const change = interceptChange<IArrayWillChange<any>>(this as any, {
-                    type: UPDATE,
-                    object: this.proxy_ as any, // since "this" is the real array we need to pass its proxy
-                    index,
-                    newValue
-                })
-                if (!change) {
-                    return
-                }
-                newValue = change.newValue
-            }
             newValue = this.enhancer_(newValue, oldValue)
             const changed = newValue !== oldValue
             if (changed) {
                 values[index] = newValue
-                this.notifyArrayChildUpdate_(index, newValue, oldValue)
+                this.atom_.reportChanged()
             }
         } else {
             // For out of bound index, we don't create an actual sparse array,
@@ -451,7 +295,7 @@ export var arrayExtensions = {
 
     remove(value: any): boolean {
         const adm: ObservableArrayAdministration = this[$mobx]
-        const idx = adm.dehanceValues_(adm.values_).indexOf(value)
+        const idx = adm.values_.indexOf(value)
         if (idx > -1) {
             this.splice(idx, 1)
             return true
@@ -500,13 +344,13 @@ function addArrayExtension(funcName, funcFactory) {
     }
 }
 
-// Report and delegate to dehanced array
+// Report and delegate to the backing array
 function simpleFunc(funcName) {
     return function () {
         const adm: ObservableArrayAdministration = this[$mobx]
         adm.atom_.reportObserved()
-        const dehancedValues = adm.dehanceValues_(adm.values_)
-        return dehancedValues[funcName].apply(dehancedValues, arguments)
+        const values = adm.values_
+        return values[funcName].apply(values, arguments)
     }
 }
 
@@ -515,8 +359,8 @@ function mapLikeFunc(funcName) {
     return function (callback, thisArg) {
         const adm: ObservableArrayAdministration = this[$mobx]
         adm.atom_.reportObserved()
-        const dehancedValues = adm.dehanceValues_(adm.values_)
-        return dehancedValues[funcName]((element, index) => {
+        const values = adm.values_
+        return values[funcName]((element, index) => {
             return callback.call(thisArg, element, index, this)
         })
     }
@@ -527,13 +371,13 @@ function reduceLikeFunc(funcName) {
     return function () {
         const adm: ObservableArrayAdministration = this[$mobx]
         adm.atom_.reportObserved()
-        const dehancedValues = adm.dehanceValues_(adm.values_)
+        const values = adm.values_
         // #2432 - reduce behavior depends on arguments.length
         const callback = arguments[0]
         arguments[0] = (accumulator, currentValue, index) => {
             return callback(accumulator, currentValue, index, this)
         }
-        return dehancedValues[funcName].apply(dehancedValues, arguments)
+        return values[funcName].apply(values, arguments)
     }
 }
 
