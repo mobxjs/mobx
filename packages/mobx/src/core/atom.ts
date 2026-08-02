@@ -30,7 +30,8 @@ const enum AtomFlags {
 export class Atom implements IAtom {
     private flags_ = 0b000
 
-    observers_ = new Set<IDerivation>()
+    // Allocated lazily on first observer to save memory.
+    observers_: Set<IDerivation> | null = null
 
     lastAccessedBy_ = 0
     lowestObserverState_ = IDerivationState_.NOT_TRACKING_
