@@ -715,3 +715,18 @@ test("#1650, toString is not treated correctly", () => {
     const oo = mobx.observable(o)
     expect(oo.toString).toBe("toString")
 })
+
+test("deep enhancer passes primitives through unchanged", () => {
+    const x = mobx.observable({ v: undefined })
+    const primitives = [1, "a", true, null, undefined, Symbol("test"), BigInt(42)]
+    primitives.forEach(value => {
+        x.v = value
+        expect(x.v).toBe(value)
+    })
+})
+
+test("deep enhancer still wraps functions assigned after creation into autoActions", () => {
+    const x = mobx.observable({ fn: undefined })
+    x.fn = function () {}
+    expect(mobx.isAction(x.fn)).toBe(true)
+})
