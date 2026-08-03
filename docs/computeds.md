@@ -121,7 +121,6 @@ setInterval(() => {
 ```
 
 It can be overridden by setting the annotation with the `keepAlive` option ([try it out yourself](https://codesandbox.io/s/computed-3cjo9?file=/src/index.tsx)) or by creating a no-op `autorun(() => { someObject.someComputed })`, which can be nicely cleaned up later if needed.
-Note that both solutions have the risk of creating memory leaks. Changing the default behavior here is an anti-pattern.
 
 MobX can also be configured with the [`computedRequiresReaction`](configuration.md#computedrequiresreaction-boolean) option, to report an error when computeds are accessed outside of a reactive context.
 
@@ -237,4 +236,4 @@ It is recommended to set this one to `true` on very expensive computed values. I
 
 ### `keepAlive`
 
-This avoids suspending computed values when they are not being observed by anything (see the above explanation). Can potentially create memory leaks, similar to the ones discussed for [reactions](reactions.md#always-dispose-of-reactions).
+This avoids suspending computed values when they are not being observed by anything (see the above explanation).

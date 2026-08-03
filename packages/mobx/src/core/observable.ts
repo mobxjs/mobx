@@ -7,6 +7,7 @@ import {
     runReactions,
     checkIfStateReadsAreAllowed
 } from "../internal"
+import { createWeakRef } from "../utils/weakRef"
 
 export interface IDepTreeNode {
     name_: string
@@ -26,7 +27,7 @@ export interface IObservable extends IDepTreeNode {
     lowestObserverState_: IDerivationState_ // Used to avoid redundant propagations
     isPendingUnobservation: boolean // Used to push itself to global.pendingUnobservations at most once per batch.
 
-    observers_: Set<IDerivation>
+    observers_: Set<WeakRef<IDerivation>>
 
     onBUO(): void
     onBO(): void
@@ -39,8 +40,22 @@ export function hasObservers(observable: IObservable): boolean {
     return observable.observers_ && observable.observers_.size > 0
 }
 
-export function getObservers(observable: IObservable): Set<IDerivation> {
+export function getObservers(observable: IObservable): IteratorObject<IDerivation> {
     return observable.observers_
+        .keys()
+        .map(ref => ref.deref())
+        .filter(observer => observer !== undefined)
+}
+
+export function forEachObserver(observable: IObservable, callback: (d: IDerivation) => void) {
+    observable.observers_.forEach(ref => {
+        const d = ref.deref()
+        if (d === undefined) {
+            observable.observers_.delete(ref)
+            return
+        }
+        callback(d)
+    })
 }
 
 // function invariantObservers(observable: IObservable) {
@@ -65,7 +80,7 @@ export function addObserver(observable: IObservable, node: IDerivation) {
     // invariant(observable._observers.indexOf(node) === -1, "INTERNAL ERROR add already added node");
     // invariantObservers(observable);
 
-    observable.observers_.add(node)
+    observable.observers_.add(createWeakRef(node))
     if (observable.lowestObserverState_ > node.dependenciesState_) {
         observable.lowestObserverState_ = node.dependenciesState_
     }
@@ -78,7 +93,12 @@ export function removeObserver(observable: IObservable, node: IDerivation) {
     // invariant(globalState.inBatch > 0, "INTERNAL ERROR, remove should be called only inside batch");
     // invariant(observable._observers.indexOf(node) !== -1, "INTERNAL ERROR remove already removed node");
     // invariantObservers(observable);
-    observable.observers_.delete(node)
+    observable.observers_.forEach(ref => {
+        const observer = ref.deref()
+        if (observer === undefined || observer === node) {
+            observable.observers_.delete(ref)
+        }
+    })
     if (observable.observers_.size === 0) {
         // deleting last observer
         queueForUnobservation(observable)
@@ -187,7 +207,7 @@ export function propagateChanged(observable: IObservable) {
     observable.lowestObserverState_ = IDerivationState_.STALE_
 
     // Ideally we use for..of here, but the downcompiled version is really slow...
-    observable.observers_.forEach(d => {
+    forEachObserver(observable, d => {
         if (d.dependenciesState_ === IDerivationState_.UP_TO_DATE_) {
             d.onBecomeStale_()
         }
@@ -204,7 +224,7 @@ export function propagateChangeConfirmed(observable: IObservable) {
     }
     observable.lowestObserverState_ = IDerivationState_.STALE_
 
-    observable.observers_.forEach(d => {
+    forEachObserver(observable, d => {
         if (d.dependenciesState_ === IDerivationState_.POSSIBLY_STALE_) {
             d.dependenciesState_ = IDerivationState_.STALE_
         } else if (
@@ -224,7 +244,7 @@ export function propagateMaybeChanged(observable: IObservable) {
     }
     observable.lowestObserverState_ = IDerivationState_.POSSIBLY_STALE_
 
-    observable.observers_.forEach(d => {
+    forEachObserver(observable, d => {
         if (d.dependenciesState_ === IDerivationState_.UP_TO_DATE_) {
             d.dependenciesState_ = IDerivationState_.POSSIBLY_STALE_
             d.onBecomeStale_()

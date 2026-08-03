@@ -72,7 +72,9 @@ export class Reaction implements IDerivation, IReactionPublic {
         private onInvalidate_: () => void,
         private errorHandler_?: (error: any, derivation: IDerivation) => void,
         public requiresObservable_?
-    ) {}
+    ) {
+        globalState.strongRefReactions.add(this)
+    }
 
     get isDisposed() {
         return getFlag(this.flags_, ReactionFlags.isDisposed)
@@ -221,6 +223,7 @@ export class Reaction implements IDerivation, IReactionPublic {
     dispose() {
         if (!this.isDisposed) {
             this.isDisposed = true
+            globalState.strongRefReactions.delete(this)
             if (!this.isRunning) {
                 // if disposed while running, clean up later. Maybe not optimal, but rare case
                 startBatch()
