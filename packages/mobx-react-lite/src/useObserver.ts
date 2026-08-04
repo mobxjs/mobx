@@ -30,6 +30,49 @@ function createReaction(adm: ObserverAdministration) {
     })
 }
 
+// This must stay a module-level factory and must NOT be inlined into `useObserver`:
+// all closures created during the same function invocation share one context object.
+// If `subscribe`/`getSnapshot` were created inside `useObserver`, that shared context
+// would also hold the `reaction.track` callback's captures (`render`, `renderResult`),
+// and since `useSyncExternalStore` holds `subscribe` for as long as the component is
+// mounted, every observer would retain its first render's element tree, fibers and DOM.
+// Module scope also makes it impossible for these closures to capture `admRef`,
+// which would prevent its collection and break leaked-reaction disposal via the
+// FinalizationRegistry (see the comment on `ObserverAdministration`).
+function createObserverAdministration(baseComponentName: string): ObserverAdministration {
+    const adm: ObserverAdministration = {
+        reaction: null,
+        onStoreChange: null,
+        stateVersion: Symbol(),
+        name: baseComponentName,
+        subscribe(onStoreChange: () => void) {
+            observerFinalizationRegistry.unregister(adm)
+            adm.onStoreChange = onStoreChange
+            if (!adm.reaction) {
+                // We've lost our reaction and therefore all subscriptions, occurs when:
+                // 1. Timer based finalization registry disposed reaction before component mounted.
+                // 2. React "re-mounts" same component without calling render in between (typically <StrictMode>).
+                // We have to recreate reaction and schedule re-render to recreate subscriptions,
+                // even if state did not change.
+                createReaction(adm)
+                // `onStoreChange` won't force update if subsequent `getSnapshot` returns same value.
+                // So we make sure that is not the case
+                adm.stateVersion = Symbol()
+            }
+
+            return () => {
+                adm.onStoreChange = null
+                adm.reaction?.dispose()
+                adm.reaction = null
+            }
+        },
+        getSnapshot() {
+            return adm.stateVersion
+        }
+    }
+    return adm
+}
+
 export function useObserver<T>(render: () => T, baseComponentName: string = "observed"): T {
     if (isUsingStaticRendering()) {
         return render()
@@ -39,41 +82,7 @@ export function useObserver<T>(render: () => T, baseComponentName: string = "obs
 
     if (!admRef.current) {
         // First render
-        const adm: ObserverAdministration = {
-            reaction: null,
-            onStoreChange: null,
-            stateVersion: Symbol(),
-            name: baseComponentName,
-            subscribe(onStoreChange: () => void) {
-                // Do NOT access admRef here!
-                observerFinalizationRegistry.unregister(adm)
-                adm.onStoreChange = onStoreChange
-                if (!adm.reaction) {
-                    // We've lost our reaction and therefore all subscriptions, occurs when:
-                    // 1. Timer based finalization registry disposed reaction before component mounted.
-                    // 2. React "re-mounts" same component without calling render in between (typically <StrictMode>).
-                    // We have to recreate reaction and schedule re-render to recreate subscriptions,
-                    // even if state did not change.
-                    createReaction(adm)
-                    // `onStoreChange` won't force update if subsequent `getSnapshot` returns same value.
-                    // So we make sure that is not the case
-                    adm.stateVersion = Symbol()
-                }
-
-                return () => {
-                    // Do NOT access admRef here!
-                    adm.onStoreChange = null
-                    adm.reaction?.dispose()
-                    adm.reaction = null
-                }
-            },
-            getSnapshot() {
-                // Do NOT access admRef here!
-                return adm.stateVersion
-            }
-        }
-
-        admRef.current = adm
+        admRef.current = createObserverAdministration(baseComponentName)
     }
 
     const adm = admRef.current!
