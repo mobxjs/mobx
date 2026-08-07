@@ -20,6 +20,10 @@
                 "types": "./dist/mobx.d.ts",
                 "default": "./dist/mobx.esm.js"
             },
+            "node": {
+                "types": "./dist/mobx.d.ts",
+                "default": "./dist/index.js"
+            },
             "import": {
                 "types": "./dist/mobx.d.ts",
                 "default": "./dist/mobx.mjs"
