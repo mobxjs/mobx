@@ -81,7 +81,16 @@ const stripShebang = () => ({
     }
 })
 
-const babelPlugin = () =>
+// The env-agnostic esm outputs (`dist/<pkg>.esm.js` and `dist/<pkg>.mjs`) keep a
+// runtime `NODE_ENV` check, but evaluate it once at module scope instead of at
+// every `__DEV__` call site: `process.env` is an exotic object in Node, so every
+// read performs a real environment lookup, and unbundled consumers pay that on hot paths.
+// The identifier is scoped (`__MOBX_DEV__`) so consumer-side replacers that blindly define
+// `__DEV__` (e.g. `DefinePlugin({ __DEV__: ... })`) cannot collide with the declaration.
+const DEV_IDENTIFIER = "__MOBX_DEV__"
+const DEV_DECLARATION = `const ${DEV_IDENTIFIER} = process.env.NODE_ENV !== "production";`
+
+const babelPlugin = ({ devExpression = true } = {}) =>
     babel({
         babelHelpers: "bundled",
         exclude: "node_modules/**",
@@ -105,7 +114,10 @@ const babelPlugin = () =>
         ],
         plugins: [
             "babel-plugin-annotate-pure-calls",
-            "babel-plugin-dev-expression",
+            // For env-agnostic builds `__DEV__` stays a free identifier; it is
+            // renamed to `__MOBX_DEV__` and defined once by the `DEV_DECLARATION`
+            // intro instead of being inlined at every call site.
+            devExpression && "babel-plugin-dev-expression",
             ["@babel/plugin-proposal-class-properties", { loose: true }]
         ].filter(Boolean)
     })
@@ -121,6 +133,7 @@ const createConfig = ({
     globals
 }) => {
     const shouldMinify = env === "production"
+    const isEnvAgnostic = env === undefined
     const outputName = [`${dist}/${packageBase}`, format, env, shouldMinify ? "min" : "", "js"]
         .filter(Boolean)
         .join(".")
@@ -136,6 +149,10 @@ const createConfig = ({
         exports: "named"
     }
 
+    const outputs = [output, ...extraOutputs].map(o =>
+        isEnvAgnostic ? { ...o, intro: DEV_DECLARATION } : o
+    )
+
     return {
         input,
         external(id) {
@@ -147,7 +164,7 @@ const createConfig = ({
         treeshake: {
             propertyReadSideEffects: false
         },
-        output: [output, ...extraOutputs],
+        output: outputs,
         plugins: [
             nodeResolve({
                 mainFields: ["module", "main", "browser"],
@@ -171,7 +188,14 @@ const createConfig = ({
                 check: declarations,
                 useTsconfigDeclarationDir: false
             }),
-            babelPlugin(),
+            babelPlugin({ devExpression: !isEnvAgnostic }),
+            isEnvAgnostic &&
+                replace({
+                    preventAssignment: true,
+                    values: {
+                        __DEV__: DEV_IDENTIFIER
+                    }
+                }),
             env !== undefined &&
                 replace({
                     preventAssignment: true,
