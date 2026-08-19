@@ -11,11 +11,9 @@ import {
     action,
     actionBound,
     isObservableObject,
-    observe,
     isObservable,
     isObservableProp,
     isComputedProp,
-    spy,
     isAction,
     configure,
     makeObservable
@@ -188,28 +186,6 @@ test("decorators", function () {
     expect(isObservableProp(o, "amount")).toBe(true)
     expect(o.total).toBe(6) // .... this is required to initialize the props which are made reactive lazily...
     expect(isObservableProp(o, "total")).toBe(true)
-
-    const events = []
-    const d1 = observe(o, ev => events.push(ev.name, ev.oldValue))
-    const d2 = observe(o, "price", ev => events.push(ev.newValue, ev.oldValue))
-    const d3 = observe(o, "total", ev => events.push(ev.newValue, ev.oldValue))
-
-    o.price = 4
-
-    d1()
-    d2()
-    d3()
-
-    o.price = 5
-
-    expect(events).toEqual([
-        8, // new total
-        6, // old total
-        4, // new price
-        3, // old price
-        "price", // event name
-        3 // event oldValue
-    ])
 })
 
 test("issue 191 - shared initializers (babel)", function () {
@@ -295,14 +271,6 @@ test("705 - setter undoing caching (babel)", () => {
     d2()
 })
 
-function normalizeSpyEvents(events) {
-    events.forEach(ev => {
-        delete ev.fn
-        delete ev.time
-    })
-    return events
-}
-
 test("action decorator (babel)", function () {
     class Store {
         constructor(multiplier) {
@@ -320,22 +288,9 @@ test("action decorator (babel)", function () {
 
     const store1 = new Store(2)
     const store2 = new Store(3)
-    const events = []
-    const d = spy(events.push.bind(events))
     expect(store1.add(3, 4)).toBe(14)
     expect(store2.add(3, 4)).toBe(21)
     expect(store1.add(1, 1)).toBe(4)
-
-    expect(normalizeSpyEvents(events)).toEqual([
-        { arguments: [3, 4], name: "add", spyReportStart: true, object: store1, type: "action" },
-        { type: "report-end", spyReportEnd: true },
-        { arguments: [3, 4], name: "add", spyReportStart: true, object: store2, type: "action" },
-        { type: "report-end", spyReportEnd: true },
-        { arguments: [1, 1], name: "add", spyReportStart: true, object: store1, type: "action" },
-        { type: "report-end", spyReportEnd: true }
-    ])
-
-    d()
 })
 
 test("custom action decorator (babel)", function () {
@@ -355,40 +310,9 @@ test("custom action decorator (babel)", function () {
 
     const store1 = new Store(2)
     const store2 = new Store(3)
-    const events = []
-    const d = spy(events.push.bind(events))
     expect(store1.add(3, 4)).toBe(14)
     expect(store2.add(3, 4)).toBe(21)
     expect(store1.add(1, 1)).toBe(4)
-
-    expect(normalizeSpyEvents(events)).toEqual([
-        {
-            arguments: [3, 4],
-            name: "zoem zoem",
-            spyReportStart: true,
-            object: store1,
-            type: "action"
-        },
-        { type: "report-end", spyReportEnd: true },
-        {
-            arguments: [3, 4],
-            name: "zoem zoem",
-            spyReportStart: true,
-            object: store2,
-            type: "action"
-        },
-        { type: "report-end", spyReportEnd: true },
-        {
-            arguments: [1, 1],
-            name: "zoem zoem",
-            spyReportStart: true,
-            object: store1,
-            type: "action"
-        },
-        { type: "report-end", spyReportEnd: true }
-    ])
-
-    d()
 })
 
 test("action decorator on field (babel)", function () {
@@ -409,22 +333,9 @@ test("action decorator on field (babel)", function () {
     const store1 = new Store(2)
     const store2 = new Store(7)
 
-    const events = []
-    const d = spy(events.push.bind(events))
     expect(store1.add(3, 4)).toBe(14)
     expect(store2.add(5, 4)).toBe(63)
     expect(store1.add(2, 2)).toBe(8)
-
-    expect(normalizeSpyEvents(events)).toEqual([
-        { arguments: [3, 4], name: "add", spyReportStart: true, object: store1, type: "action" },
-        { type: "report-end", spyReportEnd: true },
-        { arguments: [5, 4], name: "add", spyReportStart: true, object: store2, type: "action" },
-        { type: "report-end", spyReportEnd: true },
-        { arguments: [2, 2], name: "add", spyReportStart: true, object: store1, type: "action" },
-        { type: "report-end", spyReportEnd: true }
-    ])
-
-    d()
 })
 
 test("custom action decorator on field (babel)", function () {
@@ -445,40 +356,9 @@ test("custom action decorator on field (babel)", function () {
     const store1 = new Store(2)
     const store2 = new Store(7)
 
-    const events = []
-    const d = spy(events.push.bind(events))
     expect(store1.add(3, 4)).toBe(14)
     expect(store2.add(5, 4)).toBe(63)
     expect(store1.add(2, 2)).toBe(8)
-
-    expect(normalizeSpyEvents(events)).toEqual([
-        {
-            arguments: [3, 4],
-            name: "zoem zoem",
-            spyReportStart: true,
-            object: store1,
-            type: "action"
-        },
-        { type: "report-end", spyReportEnd: true },
-        {
-            arguments: [5, 4],
-            name: "zoem zoem",
-            spyReportStart: true,
-            object: store2,
-            type: "action"
-        },
-        { type: "report-end", spyReportEnd: true },
-        {
-            arguments: [2, 2],
-            name: "zoem zoem",
-            spyReportStart: true,
-            object: store1,
-            type: "action"
-        },
-        { type: "report-end", spyReportEnd: true }
-    ])
-
-    d()
 })
 
 test("267 (babel) should be possible to declare properties observable outside strict mode", () => {
@@ -494,31 +374,6 @@ test("267 (babel) should be possible to declare properties observable outside st
         }
     }
     Store // just to avoid linter warning
-})
-
-test("288 atom not detected for object property", () => {
-    class Store {
-        foo = ""
-
-        constructor() {
-            makeObservable(this, {
-                foo: mobx.observable
-            })
-        }
-    }
-
-    const store = new Store()
-    let changed = false
-
-    mobx.observe(
-        store,
-        "foo",
-        () => {
-            changed = true
-        },
-        true
-    )
-    expect(changed).toBe(true)
 })
 
 test.skip("observable performance - babel", () => {

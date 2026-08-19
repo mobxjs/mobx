@@ -6,7 +6,11 @@ import React from "react"
 import { observer, enableStaticRendering } from "../src"
 import { useObserver } from "../src/useObserver"
 
-const getDNode = (obj: any, prop?: string) => mobx.getObserverTree(obj, prop)
+const getDNode = (obj: any, prop?: string) => {
+    const atom = mobx.getAtom(obj, prop) as any
+    const observers = atom.observers_
+    return { observers: observers && observers.size > 0 ? Array.from(observers) : undefined }
+}
 
 let consoleWarnMock: jest.SpyInstance | undefined
 

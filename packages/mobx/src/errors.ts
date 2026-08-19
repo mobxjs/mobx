@@ -14,16 +14,8 @@ export const niceErrors = {
         return `Cannot decorate '${prop.toString()}': computed can only be used on getter properties.`
     },
     */
-    5: "'keys()' can only be used on observable objects, arrays, sets and maps",
-    6: "'values()' can only be used on observable objects, arrays, sets and maps",
-    7: "'entries()' can only be used on observable objects, arrays and maps",
-    8: "'set()' can only be used on observable objects, arrays and maps",
-    9: "'remove()' can only be used on observable objects, arrays and maps",
-    10: "'has()' can only be used on observable objects, arrays and maps",
-    11: "'get()' can only be used on observable objects, arrays and maps",
     12: `Invalid annotation`,
     13: `Dynamic observable objects cannot be frozen. If you're passing observables to 3rd party component/function that calls Object.freeze, pass copy instead: toJS(observable)`,
-    14: "Intercept handlers should return nothing or a change object",
     15: `Observable arrays cannot be frozen. If you're passing observables to 3rd party component/function that calls Object.freeze, pass copy instead: toJS(observable)`,
     16: `Modification exception: the internal structure of an observable array was changed.`,
     19(other) {
@@ -66,16 +58,12 @@ export const niceErrors = {
     37(method) {
         return `[mobx] \`observableArray.${method}()\` mutates the array in-place, which is not allowed inside a derivation. Use \`array.slice().${method}()\` instead`
     },
-    38: "'ownKeys()' can only be used on observable objects",
     39: "'defineProperty()' can only be used on observable objects",
     40(length) {
         return "Out of range: " + length
     },
     41(other) {
         return "Cannot initialize set from " + other
-    },
-    42(key) {
-        return `Invalid index: '${key}'`
     },
     43(annotationType, name, kind) {
         return (

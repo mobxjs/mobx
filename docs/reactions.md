@@ -402,7 +402,7 @@ The behavior of `autorun`, `reaction` and `when` can be further fine-tuned by pa
 
 ### `name`
 
-This string is used as a debug name for this reaction in the [Spy event listeners](analyzing-reactivity.md#spy) and [MobX developer tools](https://github.com/mobxjs/mobx-devtools).
+This string is used as a debug name for this reaction in error messages and third-party developer tooling such as [mobx-log](https://github.com/kubk/mobx-log).
 
 ### `fireImmediately` _(reaction)_
 

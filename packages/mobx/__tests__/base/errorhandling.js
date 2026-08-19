@@ -245,7 +245,7 @@ test("cycle1", function () {
         return p.get() * 2
     }) // thats a cycle!
     utils.consoleError(() => {
-        mobx.observe(p, voidObserver, true)
+        mobx.autorun(() => p.get())
     }, /Cycle detected/)
     checkGlobalState()
 })
@@ -282,7 +282,7 @@ test("cycle4", function () {
         return a.get() * 2
     })
 
-    m.observe(b, voidObserver)
+    m.autorun(() => b.get())
     expect(1).toBe(a.get())
 
     utils.consoleError(() => {

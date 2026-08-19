@@ -69,13 +69,9 @@ test("action modifications should be picked up 3", () => {
 
     const doubler = mobx.computed(() => a.get() * 2)
 
-    mobx.observe(
-        doubler,
-        () => {
-            b = doubler.get()
-        },
-        true
-    )
+    mobx.autorun(() => {
+        b = doubler.get()
+    })
 
     expect(b).toBe(2)
 
@@ -307,14 +303,6 @@ test("#286 exceptions in actions should not affect global state", () => {
 test("runInAction", () => {
     mobx.configure({ enforceActions: "observed" })
     const values = []
-    const events = []
-    const spyDisposer = mobx.spy(ev => {
-        if (ev.type === "action")
-            events.push({
-                name: ev.name,
-                arguments: ev.arguments
-            })
-    })
 
     const observable = mobx.observable.box(0)
     const d = mobx.autorun(() => values.push(observable.get()))
@@ -336,12 +324,6 @@ test("runInAction", () => {
 
     expect(res).toBe(3)
     expect(values).toEqual([0, 9, 15])
-    expect(events).toEqual([
-        { arguments: [], name: "<unnamed action>" },
-        { arguments: [], name: "<unnamed action>" }
-    ])
-
-    spyDisposer()
 
     d()
 })
@@ -467,19 +449,15 @@ test("bound actions bind", () => {
     const d = mobx.autorun(() => {
         x.yValue
     })
-    const events = []
-    const d2 = mobx.spy(e => events.push(e))
 
     const runner = x.z
     runner(3)
     expect(x.yValue).toBe(6)
     expect(called).toBe(2)
 
-    expect(events.filter(e => e.type === "action").map(e => e.name)).toEqual(["z"])
     expect(Object.keys(x)).toEqual(["y"])
 
     d()
-    d2()
 })
 
 test("Fix #1367", () => {

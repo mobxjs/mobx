@@ -25,8 +25,6 @@ if (__DEV__) {
     })
 }
 
-import { spy, getDebugName, $mobx } from "./internal"
-
 export {
     IObservable,
     IDepTreeNode,
@@ -36,7 +34,6 @@ export {
     untracked,
     IAtom,
     createAtom,
-    spy,
     IComputedValue,
     IEqualsComparer,
     compareDefault,
@@ -44,35 +41,19 @@ export {
     compareStructural,
     compareShallow,
     IEnhancer,
-    IInterceptable,
-    IInterceptor,
-    IListenable,
-    IObjectWillChange,
-    IObjectDidChange,
     isObservableObject,
-    IValueDidChange,
-    IValueWillChange,
     IObservableValue,
     isObservableValue as isBoxedObservable,
     IObservableArray,
-    IArrayWillChange,
-    IArrayWillSplice,
-    IArraySplice,
-    IArrayUpdate,
-    IArrayDidChange,
     isObservableArray,
     IKeyValueMap,
     ObservableMap,
     IMapEntries,
     IMapEntry,
-    IMapWillChange,
-    IMapDidChange,
     isObservableMap,
     IObservableMapInitialValues,
     ObservableSet,
     isObservableSet,
-    ISetDidChange,
-    ISetWillChange,
     IObservableSetInitialValues,
     transaction,
     observable,
@@ -90,8 +71,6 @@ export {
     isComputed,
     isComputedProp,
     extendObservable,
-    observe,
-    intercept,
     autorun,
     IAutorunOptions,
     reaction,
@@ -103,14 +82,6 @@ export {
     isAction,
     runInAction,
     IActionFactory,
-    keys,
-    values,
-    entries,
-    set,
-    remove,
-    has,
-    get,
-    apiOwnKeys as ownKeys,
     apiDefineProperty as defineProperty,
     configure,
     onBecomeObserved,
@@ -123,13 +94,8 @@ export {
     FlowCancellationError,
     isFlowCancellationError,
     toJS,
-    IObserverTree,
-    IDependencyTree,
-    getDependencyTree,
-    getObserverTree,
     resetGlobalState as _resetGlobalState,
     getGlobalState as _getGlobalState,
-    getDebugName,
     getAtom,
     getAdministration as _getAdministration,
     allowStateChanges as _allowStateChanges,
@@ -138,7 +104,6 @@ export {
     $mobx,
     isComputingDerivation as _isComputingDerivation,
     onReactionError,
-    interceptReads as _interceptReads,
     IComputedValueOptions,
     IActionRunInfo,
     _startAction,
@@ -153,16 +118,3 @@ export {
     AnnotationMapEntry,
     override
 } from "./internal"
-
-// Devtools support
-declare const __MOBX_DEVTOOLS_GLOBAL_HOOK__: { injectMobx: (any) => void }
-if (__DEV__ && typeof __MOBX_DEVTOOLS_GLOBAL_HOOK__ === "object") {
-    // See: https://github.com/andykog/mobx-devtools/
-    __MOBX_DEVTOOLS_GLOBAL_HOOK__.injectMobx({
-        spy,
-        extras: {
-            getDebugName
-        },
-        $mobx
-    })
-}

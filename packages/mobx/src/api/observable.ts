@@ -187,7 +187,7 @@ export interface IObservableFactory extends Annotation, ClassAccessorAndFieldDec
 const observableFactories: IObservableFactory = {
     box<T = any>(value: T, options?: CreateObservableOptions): IObservableValue<T> {
         const o = asCreateObservableOptions(options)
-        return new ObservableValue(value, getEnhancerFromOptions(o), o.name, true, o.equals)
+        return new ObservableValue(value, getEnhancerFromOptions(o), o.name, o.equals)
     },
     array<T = any>(initialValues?: T[], options?: CreateObservableOptions): IObservableArray<T> {
         const o = asCreateObservableOptions(options)

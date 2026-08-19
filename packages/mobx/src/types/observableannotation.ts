@@ -80,8 +80,7 @@ export function decorateObservable20223_(
                     ann.options_?.enhancer_ ?? deepEnhancer,
                     __DEV__
                         ? `${adm.name_}.${name.toString()}`
-                        : `ObservableObject.${name.toString()}`,
-                    false
+                        : `ObservableObject.${name.toString()}`
                 )
         )
         return adm
