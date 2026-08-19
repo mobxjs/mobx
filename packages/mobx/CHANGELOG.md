@@ -1,5 +1,19 @@
 # mobx
 
+## 7.0.1
+
+### Patch Changes
+
+-   [`9444c624b957b489875e1c6b45deb290034ce4e9`](https://github.com/mobxjs/mobx/commit/9444c624b957b489875e1c6b45deb290034ce4e9) [#4694](https://github.com/mobxjs/mobx/pull/4694) Thanks [@mrpmohiburrahman](https://github.com/mrpmohiburrahman)! - fix: `onBecomeObserved` is now called for the dependencies of a computed that becomes observed while serving a cached value. Previously, observation only cascaded when the newly observed computed also happened to recompute, so an observable with a live observer chain up to a running reaction could still report itself as unobserved and never fire its hook.
+
+-   [`53bb83fdf455a4e606bb721ea10040ded7c57796`](https://github.com/mobxjs/mobx/commit/53bb83fdf455a4e606bb721ea10040ded7c57796) [#4683](https://github.com/mobxjs/mobx/pull/4683) Thanks [@gesposito](https://github.com/gesposito)! - perf: fast-path primitives in `deepEnhancer`. Writing a primitive into a deep observable no longer runs the observable/array/plain-object/Map/Set/function type checks; primitives can never be made observable, so they are returned immediately. Creating an observable array of primitives is ~4x faster, and observable Set/Map writes are ~20-25% faster in the perf suite.
+
+-   [`030498d6b2bfe4cc27340fed8c706177cb3b28e1`](https://github.com/mobxjs/mobx/commit/030498d6b2bfe4cc27340fed8c706177cb3b28e1) [#4684](https://github.com/mobxjs/mobx/pull/4684) Thanks [@a-y-ibrahim](https://github.com/a-y-ibrahim)! - Fix a stack overflow ("Maximum call stack size exceeded") that could occur when an `onBecomeUnobserved` handler disposes a `Reaction`. Disposing a `Reaction` re-enters `endBatch()`, which used to recurse into the same `pendingUnobservations` drain loop instead of letting the already-running outer loop pick up the newly queued items, causing unbounded stack depth for long enough chains.
+
+-   [`a9086076b9ead1a9c933215bffaa9b57d44f6829`](https://github.com/mobxjs/mobx/commit/a9086076b9ead1a9c933215bffaa9b57d44f6829) [#4681](https://github.com/mobxjs/mobx/pull/4681) Thanks [@spokodev](https://github.com/spokodev)! - Fix ObservableSet union, intersection and symmetricDifference to return results in receiver order, matching native Set, when the argument is a plain Set.
+
+-   [`c65a4e14cf48b42cb792dc4c64edbcf56234b32d`](https://github.com/mobxjs/mobx/commit/c65a4e14cf48b42cb792dc4c64edbcf56234b32d) [#4682](https://github.com/mobxjs/mobx/pull/4682) Thanks [@gesposito](https://github.com/gesposito)! - perf: lazily allocate the internal `observers_` Set. Atoms and computed values no longer allocate an empty `Set` upfront; it is created on first observer instead. Most atoms in large stores are never observed, so this saves roughly 160 bytes per unobserved atom (e.g. ~35% lower heap usage when hydrating 50k instances with 10 observable fields each).
+
 ## 7.0.0
 
 ### Major Changes
