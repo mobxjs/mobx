@@ -20,6 +20,10 @@
                 "types": "./dist/index.d.ts",
                 "default": "./dist/mobxreactlite.esm.js"
             },
+            "node": {
+                "types": "./dist/index.d.ts",
+                "default": "./dist/index.js"
+            },
             "import": {
                 "types": "./dist/index.d.ts",
                 "default": "./dist/mobxreactlite.mjs"
