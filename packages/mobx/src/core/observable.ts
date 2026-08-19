@@ -129,6 +129,24 @@ export function endBatch() {
     }
 }
 
+/**
+ * Marks an observable as observed, cascading into the dependencies of a ComputedValue.
+ * Unobservation already cascades (`suspend_` -> `clearObserving`), observation normally
+ * only does so by accident: a newly observed computed usually recomputes and re-reports
+ * its dependencies. When it serves a cached value instead nothing re-reports them, so the
+ * transition has to be propagated by hand. See #4547.
+ */
+export function markObserved(observable: IObservable) {
+    if (observable.isBeingObserved) {
+        return
+    }
+    observable.isBeingObserved = true
+    observable.onBO()
+    // No queueForUnobservation here: the observer links already exist, so the regular
+    // suspend_ -> clearObserving -> removeObserver teardown still delivers the onBUO.
+    observable.observing_?.forEach(markObserved)
+}
+
 export function reportObserved(observable: IObservable): boolean {
     checkIfStateReadsAreAllowed(observable)
 

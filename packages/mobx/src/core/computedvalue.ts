@@ -14,6 +14,7 @@ import {
     globalState,
     isCaughtException,
     isSpyEnabled,
+    markObserved,
     propagateChangeConfirmed,
     propagateMaybeChanged,
     reportObserved,
@@ -210,6 +211,7 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
                 endBatch()
             }
         } else {
+            const wasBeingObserved = this.isBeingObserved
             reportObserved(this)
             if (shouldCompute(this)) {
                 let prevTrackingContext = globalState.trackingContext
@@ -220,6 +222,10 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
                     propagateChangeConfirmed(this)
                 }
                 globalState.trackingContext = prevTrackingContext
+            } else if (!wasBeingObserved && this.isBeingObserved) {
+                // We just became observed while serving a cached value, so the getter
+                // won't run and won't re-report our dependencies. Cascade to them. #4547
+                this.observing_.forEach(markObserved)
             }
         }
         const result = this.value_!
