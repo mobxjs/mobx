@@ -1,5 +1,14 @@
 # mobx-react
 
+## 10.0.2
+
+### Patch Changes
+
+-   [`6f002b8e543ca39d3ee23681e28848d7f1724fae`](https://github.com/mobxjs/mobx/commit/6f002b8e543ca39d3ee23681e28848d7f1724fae) [#4696](https://github.com/mobxjs/mobx/pull/4696) Thanks [@gesposito](https://github.com/gesposito)! - perf: add a `node` export condition that routes Node and Bun to the existing `dist/index.js` entry, which picks the prebaked development or production CJS build once at require time. `import`ing mobx in Node no longer executes the env-agnostic `dist/mobx.mjs` with per-call `NODE_ENV` checks, and mixing `import` and `require` in one Node app now yields a single mobx instance.
+
+-   Updated dependencies [[`6f002b8e543ca39d3ee23681e28848d7f1724fae`](https://github.com/mobxjs/mobx/commit/6f002b8e543ca39d3ee23681e28848d7f1724fae)]:
+    -   mobx-react-lite@5.0.3
+
 ## 10.0.1
 
 ### Patch Changes
