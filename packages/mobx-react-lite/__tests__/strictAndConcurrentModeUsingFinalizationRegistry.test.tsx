@@ -1,4 +1,4 @@
-import { cleanup, render, waitFor } from "@testing-library/react"
+import { render, waitFor } from "@testing-library/react"
 import * as mobx from "mobx"
 import * as React from "react"
 import { useObserver } from "../src/useObserver"
@@ -10,8 +10,6 @@ if (typeof globalThis.FinalizationRegistry !== "function") {
 }
 
 expect(observerFinalizationRegistry).toBeInstanceOf(globalThis.FinalizationRegistry)
-
-afterEach(cleanup)
 
 function nextFrame() {
     return new Promise(accept => setTimeout(accept, 1))

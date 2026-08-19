@@ -2,9 +2,7 @@ import {
     $mobx,
     IEnhancer,
     IInterceptable,
-    IInterceptor,
     IListenable,
-    Lambda,
     ObservableValue,
     checkIfStateModificationsAreAllowed,
     createAtom,
@@ -22,17 +20,13 @@ import {
     isSpyEnabled,
     notifyListeners,
     referenceEnhancer,
-    registerInterceptor,
-    registerListener,
     spyReportEnd,
     spyReportStart,
     stringifyKey,
     transaction,
     untracked,
-    onBecomeUnobserved,
     globalState,
     die,
-    isFunction,
     UPDATE,
     IAtom,
     PureSpyEvent,
@@ -106,9 +100,6 @@ export class ObservableMap<K = any, V = any>
         public enhancer_: IEnhancer<V> = deepEnhancer,
         public name_ = __DEV__ ? "ObservableMap@" + getNextId() : "ObservableMap"
     ) {
-        if (!isFunction(Map)) {
-            die(18)
-        }
         initObservable(() => {
             this.keysAtom_ = createAtom(__DEV__ ? `${this.name_}.keys()` : "ObservableMap.keys()")
             this.data_ = new Map()
@@ -137,7 +128,7 @@ export class ObservableMap<K = any, V = any>
                 false
             ))
             this.hasMap_.set(key, newEntry)
-            onBecomeUnobserved(newEntry, () => this.hasMap_.delete(key))
+            newEntry.onBUOL = new Set([() => this.hasMap_.delete(key)])
         }
 
         return entry.get()
@@ -178,7 +169,7 @@ export class ObservableMap<K = any, V = any>
             }
         }
         if (this.has_(key)) {
-            const notifySpy = isSpyEnabled()
+            const notifySpy = __DEV__ && isSpyEnabled()
             const notify = hasListeners(this)
             const change: IMapDidChange<K, V> | null =
                 notify || notifySpy
@@ -217,7 +208,7 @@ export class ObservableMap<K = any, V = any>
         const observable = this.data_.get(key)!
         newValue = (observable as any).prepareNewValue_(newValue) as V
         if (newValue !== globalState.UNCHANGED) {
-            const notifySpy = isSpyEnabled()
+            const notifySpy = __DEV__ && isSpyEnabled()
             const notify = hasListeners(this)
             const change: IMapDidChange<K, V> | null =
                 notify || notifySpy
@@ -258,7 +249,7 @@ export class ObservableMap<K = any, V = any>
             this.hasMap_.get(key)?.setNewValue_(true)
             this.keysAtom_.reportChanged()
         })
-        const notifySpy = isSpyEnabled()
+        const notifySpy = __DEV__ && isSpyEnabled()
         const notify = hasListeners(this)
         const change: IMapDidChange<K, V> | null =
             notify || notifySpy
@@ -480,22 +471,6 @@ export class ObservableMap<K = any, V = any>
 
     get [Symbol.toStringTag]() {
         return "Map"
-    }
-
-    /**
-     * Observes this object. Triggers for the events 'add', 'update' and 'delete'.
-     * See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe
-     * for callback details
-     */
-    observe_(listener: (changes: IMapDidChange<K, V>) => void, fireImmediately?: boolean): Lambda {
-        if (__DEV__ && fireImmediately === true) {
-            die("`observe` doesn't support fireImmediately=true in combination with maps.")
-        }
-        return registerListener(this, listener)
-    }
-
-    intercept_(handler: IInterceptor<IMapWillChange<K, V>>): Lambda {
-        return registerInterceptor(this, handler)
     }
 }
 

@@ -1,11 +1,9 @@
-import { act, cleanup, render } from "@testing-library/react"
+import { act, render } from "@testing-library/react"
 import mockConsole from "jest-mock-console"
 import * as mobx from "mobx"
 import * as React from "react"
 
 import { useObserver } from "../src/useObserver"
-
-afterEach(cleanup)
 
 test("uncommitted observing components should not attempt state changes", () => {
     const store = mobx.observable({ count: 0 })
@@ -34,7 +32,6 @@ test("uncommitted observing components should not attempt state changes", () => 
         })
 
         // Check to see if any console errors were reported.
-        // tslint:disable-next-line: no-console
         expect(console.error).not.toHaveBeenCalled()
     } finally {
         restoreConsole()

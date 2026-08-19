@@ -111,13 +111,15 @@ export function getDebugName(thing: any, property?: string): string {
  */
 export function initObservable<T>(cb: () => T): T {
     const derivation = untrackedStart()
-    const allowStateChanges = allowStateChangesStart(true)
+    const allowStateChanges = __DEV__ ? allowStateChangesStart(true) : true
     startBatch()
     try {
         return cb()
     } finally {
         endBatch()
-        allowStateChangesEnd(allowStateChanges)
+        if (__DEV__) {
+            allowStateChangesEnd(allowStateChanges)
+        }
         untrackedEnd(derivation)
     }
 }

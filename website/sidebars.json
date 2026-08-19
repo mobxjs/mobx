@@ -33,6 +33,7 @@
     "Fine-tuning": [
       "configuration",
       "enabling-decorators",
+      "migrating-from-6-to-7",
       "migrating-from-4-or-5"
     ]
   }

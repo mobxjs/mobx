@@ -1,14 +1,31 @@
 #!/usr/bin/env node
 
-const { writeFileSync } = require("fs")
-const { relative, resolve } = require("path")
+const { readFileSync, writeFileSync } = require("fs")
+const { dirname, relative, resolve } = require("path")
+const Module = require("module")
+const ts = require("typescript")
 
 const repoRoot = resolve(__dirname, "../..")
 const errorsPath = resolve(repoRoot, "packages/mobx/src/errors.ts")
 const outputPath = resolve(repoRoot, "docs/errors.md")
 
 globalThis.__DEV__ = true
-const { niceErrors } = require(errorsPath)
+
+// errors.ts is TypeScript source, so strip the types and evaluate it as CommonJS
+// instead of relying on Node's require, which can't parse `export`/type syntax.
+function loadErrorsModule(tsPath) {
+    const { outputText } = ts.transpileModule(readFileSync(tsPath, "utf8"), {
+        compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2019 },
+        fileName: tsPath
+    })
+    const compiled = new Module(tsPath, module)
+    compiled.filename = tsPath
+    compiled.paths = Module._nodeModulePaths(dirname(tsPath))
+    compiled._compile(outputText, tsPath)
+    return compiled.exports
+}
+
+const { niceErrors } = loadErrorsModule(errorsPath)
 
 function formatMarkdownCell(message) {
     let value = message

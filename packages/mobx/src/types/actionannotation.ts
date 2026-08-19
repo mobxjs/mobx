@@ -16,8 +16,7 @@ export function createActionAnnotation(name: string, options?: object): Annotati
         annotationType_: name,
         options_: options,
         make_,
-        extend_,
-        decorate_20223_
+        extend_
     }
 }
 
@@ -62,12 +61,12 @@ function extend_(
     return adm.defineProperty_(key, actionDescriptor, proxyTrap)
 }
 
-function decorate_20223_(this: Annotation, mthd, context: DecoratorContext) {
+export function decorateAction20223_(annotation: Annotation, mthd, context: DecoratorContext) {
     if (__DEV__) {
         assert20223DecoratorType(context, ["method", "field"])
     }
     const { kind, name, addInitializer } = context
-    const ann = this
+    const ann = annotation
 
     const _createAction = m =>
         createAction(ann.options_?.name ?? name!.toString(), m, ann.options_?.autoAction ?? false)
@@ -91,7 +90,7 @@ function decorate_20223_(this: Annotation, mthd, context: DecoratorContext) {
             mthd = _createAction(mthd)
         }
 
-        if (this.options_?.bound) {
+        if (ann.options_?.bound) {
             addInitializer(function () {
                 const self = this as any
                 const bound = self[name].bind(self)
@@ -103,10 +102,7 @@ function decorate_20223_(this: Annotation, mthd, context: DecoratorContext) {
         return mthd
     }
 
-    die(
-        `Cannot apply '${ann.annotationType_}' to '${String(name)}' (kind: ${kind}):` +
-            `\n'${ann.annotationType_}' can only be used on properties with a function value.`
-    )
+    die(43, ann.annotationType_, String(name), kind)
 }
 
 function assertActionDescriptor(

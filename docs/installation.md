@@ -8,18 +8,21 @@ hide_title: true
 
 # Installation
 
-MobX works in any ES5 environment, which includes browsers and NodeJS.
+MobX works in browsers and Node.js environments that provide native `Proxy` support.
 
 There are three types of React bindings:
-- [mobx-react-lite](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react-lite). Utilities to manually apply observation
-- [mobx-react-observer](https://github.com/christianalfoni/mobx-react-observer). Babel/swc plugin to automatically apply observation to components
-- [mobx-react](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react). Support for class components
 
-Append the appropriate bindings for your use case to the _Yarn_ or _NPM_ command below:
+-   [mobx-react-lite](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react-lite). Utilities to manually apply observation
+-   [mobx-react-observer](https://github.com/christianalfoni/mobx-react-observer). Babel/swc plugin to automatically apply observation to components
+-   [mobx-react](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react). Support for class components
 
-**Yarn:** `yarn add mobx`
+Append the appropriate bindings for your use case to one of the commands below:
 
-**NPM:** `npm install --save mobx`
+**npm:** `npm install mobx`
+
+**pnpm:** `pnpm add mobx`
+
+**yarn:** `yarn add mobx`
 
 **CDN:** https://cdnjs.com/libraries/mobx / https://unpkg.com/mobx/dist/mobx.umd.production.min.js
 
@@ -28,9 +31,7 @@ Append the appropriate bindings for your use case to the _Yarn_ or _NPM_ command
 ## MobX and Decorators
 
 Based on your preference, MobX can be used with or without decorators.
-Both the legacy implementation and the standardised TC-39 version of decorators are currently supported.
 See [enabling-decorators](enabling-decorators.md) for more details on how to enable them.
-Legacy decorator support will be removed in MobX 7, in favor of the standard.
 
 ## Use spec compliant transpilation for class properties
 
@@ -38,6 +39,7 @@ When using MobX with TypeScript or Babel, and you plan to use classes; make sure
 
 -   **TypeScript**: Set the compiler option `"useDefineForClassFields": true`.
 -   **Babel**: Make sure to use at least version 7.12, with the following configuration:
+
     ```json
     {
         // Babel < 7.13.0
@@ -50,24 +52,13 @@ When using MobX with TypeScript or Babel, and you plan to use classes; make sure
         }
     }
     ```
+
 For verification insert this piece of code at the beginning of your sources (eg. `index.js`)
+
+<!-- prettier-ignore -->
 ```javascript
-if (!new class { x }().hasOwnProperty('x')) throw new Error('Transpiler is not configured correctly');
+if (!new (class { x })().hasOwnProperty("x")) throw new Error("Transpiler is not configured correctly")
 ```
-
-## MobX on older JavaScript environments
-
-By default, MobX uses proxies for optimal performance and compatibility. However, on older JavaScript engines `Proxy` is not available (check out [Proxy support](https://compat-table.github.io/compat-table/es6/#test-Proxy)). Examples of such are Internet Explorer (before Edge), Node.js < 6, iOS < 10, Android before RN 0.59.
-
-In such cases, MobX can fallback to an ES5 compatible implementation which works almost identically, although there are a few [limitations without Proxy support](configuration.md#limitations-without-proxy-support). You will have to explicitly enable the fallback implementation by configuring [`useProxies`](configuration.md#proxy-support):
-
-```javascript
-import { configure } from "mobx"
-
-configure({ useProxies: "never" }) // Or "ifavailable".
-```
-
-This option will be removed in MobX 7.
 
 ## MobX on other frameworks / platforms
 
