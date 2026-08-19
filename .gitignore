@@ -6,6 +6,7 @@ coverage
 test/babel-tests.js
 test/typescript/typescript-tests.js
 dist/
+/docs/errors.md
 **/.idea/*
 !/.idea/icon.png
 !/.idea/vcs.xml

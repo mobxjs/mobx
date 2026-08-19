@@ -25,6 +25,10 @@ export type ClassFieldDecorator<This = any, Value extends (...p: any[]) => any =
     context: ClassFieldDecoratorContext<This, Value>
 ) => Value | void
 
+export type ClassMethodAndFieldDecorator = ClassMethodDecorator & ClassFieldDecorator
+
+export type ClassAccessorAndFieldDecorator = ClassAccessorDecorator & ClassFieldDecorator
+
 export type Decorator =
     | ClassAccessorDecorator
     | ClassGetterDecorator

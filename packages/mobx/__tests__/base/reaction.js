@@ -353,7 +353,7 @@ test("#278 do not rerun if expr output doesn't change structurally", () => {
         },
         {
             fireImmediately: true,
-            compareStructural: true
+            equals: mobx.compareStructural
         }
     )
 
@@ -389,7 +389,7 @@ test("do not rerun if prev & next expr output is NaN", () => {
         newValue => {
             valuesS.push(String(newValue))
         },
-        { fireImmediately: true, compareStructural: true }
+        { fireImmediately: true, equals: mobx.compareStructural }
     )
 
     v.set(NaN)

@@ -17,8 +17,7 @@ export function createFlowAnnotation(name: string, options?: object): Annotation
         annotationType_: name,
         options_: options,
         make_,
-        extend_,
-        decorate_20223_
+        extend_
     }
 }
 
@@ -63,7 +62,11 @@ function extend_(
     return adm.defineProperty_(key, flowDescriptor, proxyTrap)
 }
 
-function decorate_20223_(this: Annotation, mthd, context: ClassMethodDecoratorContext) {
+export function decorateFlow20223_(
+    annotation: Annotation,
+    mthd,
+    context: ClassMethodDecoratorContext
+) {
     if (__DEV__) {
         assert20223DecoratorType(context, ["method"])
     }
@@ -73,7 +76,7 @@ function decorate_20223_(this: Annotation, mthd, context: ClassMethodDecoratorCo
         mthd = flow(mthd)
     }
 
-    if (this.options_?.bound) {
+    if (annotation.options_?.bound) {
         addInitializer(function () {
             const self = this as any
             const bound = self[name].bind(self)

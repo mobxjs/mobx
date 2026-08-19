@@ -10,10 +10,9 @@ import * as path from "path"
 const distPath = path.resolve(__dirname, "..", "..", "..", "dist", "mobx.cjs.development.js")
 const mobx = require(distPath) as {
     computed: any
-    makeObservable: any
     observable: any
 }
-const { computed, makeObservable, observable } = mobx
+const { computed, observable } = mobx
 
 const INSTANCES = 50_000
 const GETTERS_PER_INSTANCE = 10
@@ -52,10 +51,6 @@ class Wide {
     }
     @computed get c9() {
         return this.v + 9
-    }
-
-    constructor() {
-        makeObservable(this)
     }
 }
 

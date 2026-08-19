@@ -248,9 +248,9 @@ test("deepEqual set", () => {
     x2.add(1)
     x2.add({ z: 2 })
 
-    expect(mobx.comparer.structural(x, x2)).toBe(false)
+    expect(mobx.compareStructural(x, x2)).toBe(false)
     x2.replace([1, { z: 1 }])
-    expect(mobx.comparer.structural(x, x2)).toBe(true)
+    expect(mobx.compareStructural(x, x2)).toBe(true)
 })
 
 test("set.clear should not be tracked", () => {
@@ -337,6 +337,17 @@ describe("The Set object methods do what they are supposed to do", () => {
         expect(isSubsetOfObservableResult).toBeFalsy()
         expect(isSupersetOfObservableResult).toBeFalsy()
         expect(isDisjointFromObservableResult).toBeTruthy()
+    })
+
+    test("set methods preserve receiver order (matches native Set)", () => {
+        const nativeCopy = new Set(reactiveSet)
+        const other = new Set([6, 2, 1])
+
+        expect([...reactiveSet.union(other)]).toEqual([...nativeCopy.union(other)])
+        expect([...reactiveSet.intersection(other)]).toEqual([...nativeCopy.intersection(other)])
+        expect([...reactiveSet.symmetricDifference(other)]).toEqual([
+            ...nativeCopy.symmetricDifference(other)
+        ])
     })
 
     test("with ObservableSet #3919", () => {

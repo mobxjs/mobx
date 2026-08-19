@@ -15,7 +15,6 @@
         "noImplicitAny": false,
         "noImplicitThis": false,
         "noEmit": true,
-        "experimentalDecorators": true,
         "useDefineForClassFields": true,
         "jsx": "react",
         "esModuleInterop": true,

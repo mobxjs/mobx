@@ -114,19 +114,15 @@ import { makeAutoObservable } from "mobx"
 import { observer } from "mobx-react-lite"
 
 // Model the application state.
-function createTimer() {
-    return makeAutoObservable({
-        secondsPassed: 0,
-        increase() {
-            this.secondsPassed += 1
-        },
-        reset() {
-            this.secondsPassed = 0
-        }
-    })
-}
-
-const myTimer = createTimer()
+const myTimer = makeAutoObservable({
+    secondsPassed: 0,
+    increase() {
+        this.secondsPassed += 1
+    },
+    reset() {
+        this.secondsPassed = 0
+    }
+})
 
 // Build a "user interface" that uses the observable state.
 const TimerView = observer(({ timer }) => (

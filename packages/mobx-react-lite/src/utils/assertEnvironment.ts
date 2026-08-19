@@ -1,9 +1,9 @@
-import { makeObservable } from "mobx"
-import { useState } from "react"
+import { _getGlobalState } from "mobx"
+import { useState, useSyncExternalStore } from "react"
 
-if (!useState) {
-    throw new Error("mobx-react-lite requires React with Hooks support")
+if (!useState || !useSyncExternalStore) {
+    throw new Error("mobx-react-lite requires React 18 or later")
 }
-if (!makeObservable) {
-    throw new Error("mobx-react-lite@3 requires mobx at least version 6 to be available")
+if (!(_getGlobalState?.()?.version >= 7)) {
+    throw new Error("mobx-react-lite requires mobx at least version 7 to be available")
 }

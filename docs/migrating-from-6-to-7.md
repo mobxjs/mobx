@@ -1,0 +1,295 @@
+---
+title: Migrating to MobX 7
+sidebar_label: Migrating to MobX 7 {🚀}
+hide_title: true
+---
+
+<script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
+
+# Migrating to MobX 7 {🚀}
+
+MobX 7 is mostly a cleanup release. Most applications that already use MobX 6 idiomatically can upgrade with minimal changes.
+
+## Updating React bindings
+
+MobX 7 keeps the React bindings split:
+
+-   `mobx-react-lite` supports function components and `forwardRef`.
+-   `mobx-react` is a thin wrapper around `mobx-react-lite` that also supports class components and the `@observer` class decorator.
+
+`mobx-react-lite` and `mobx-react` require React 18 or later.
+
+The public React binding surface has been reduced to the APIs that are still recommended:
+
+-   `observer`
+-   `Observer`
+-   `useLocalObservable`
+-   `enableStaticRendering`
+-   `isUsingStaticRendering`
+
+The following APIs have been removed:
+
+| Removed API                                                                                                | Replacement                                                                                                                           |
+| ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `disposeOnUnmount`                                                                                         | Dispose reactions in `componentWillUnmount`, or return a cleanup function from `useEffect`.                                           |
+| `PropTypes`                                                                                                | Use TypeScript or the regular `prop-types` package.                                                                                   |
+| `useLocalStore`                                                                                            | Use `useLocalObservable`.                                                                                                             |
+| `useAsObservableSource`                                                                                    | Store the values you need locally and synchronize them from props with `useEffect`.                                                   |
+| `useObserver`                                                                                              | Wrap the component in `observer`, or use the `<Observer>` component.                                                                  |
+| `useStaticRendering`                                                                                       | Use `enableStaticRendering`.                                                                                                          |
+| `observerBatching`, `isObserverBatched`, `batchingForReactDom`, `batchingOptOut`, `batchingForReactNative` | Remove these imports. React 18+ renderers handle batching automatically, and the React Native side-effect import is no longer needed. |
+| `Provider`, `inject`, `MobXProviderContext` from `mobx-react`                                              | Use `React.createContext` directly.                                                                                                   |
+
+## Migrating legacy decorators
+
+MobX 7 supports Stage 3 decorators only.
+
+To keep decorators, switch the class to Stage 3 decorator syntax: remove `makeObservable(this)` from decorated classes, drop its import when unused, and add `accessor` to observable fields.
+
+```diff
+-import { makeObservable, observable, computed, action } from "mobx"
++import { observable, computed, action } from "mobx"
+
+class Todo {
+-    @observable title = ""
++    @observable accessor title = ""
+-    @observable finished = false
++    @observable accessor finished = false
+-
+-    constructor() {
+-        makeObservable(this)
+-    }
+
+    @computed
+    get label() {
+        return `${this.finished ? "[DONE]" : "[OPEN]"} ${this.title}`
+    }
+
+    @action
+    toggle() {
+        this.finished = !this.finished
+    }
+}
+```
+
+Switch your compiler to modern decorators:
+
+-   For TypeScript, use TypeScript 5 or later and disable or remove the `experimentalDecorators` flag.
+-   For Babel, use `@babel/plugin-proposal-decorators` with the current Stage 3 configuration. See [Enabling decorators {🚀}](enabling-decorators.md) for the exact compiler setup.
+
+If you don't want to keep decorators, remove them and pass an explicit annotation map to `makeObservable`:
+
+```javascript
+import { makeObservable, observable, computed, action } from "mobx"
+
+class Todo {
+    title = ""
+    finished = false
+
+    constructor() {
+        makeObservable(this, {
+            title: observable,
+            finished: observable,
+            label: computed,
+            toggle: action
+        })
+    }
+
+    get label() {
+        return `${this.finished ? "[DONE]" : "[OPEN]"} ${this.title}`
+    }
+
+    toggle() {
+        this.finished = !this.finished
+    }
+}
+```
+
+## Replacing namespaced APIs
+
+Namespaced annotation and comparer properties have been replaced by named exports for better tree-shaking:
+
+| Removed API           | Replacement         |
+| --------------------- | ------------------- |
+| `observable.ref`      | `observableRef`     |
+| `observable.shallow`  | `observableShallow` |
+| `observable.deep`     | `observableDeep`    |
+| `observable.struct`   | `observableStruct`  |
+| `computed.struct`     | `computedStruct`    |
+| `action.bound`        | `actionBound`       |
+| `flow.bound`          | `flowBound`         |
+| `comparer.identity`   | `compareIdentity`   |
+| `comparer.default`    | `compareDefault`    |
+| `comparer.structural` | `compareStructural` |
+| `comparer.shallow`    | `compareShallow`    |
+
+Annotation map:
+
+```diff
+-import { action, comparer, computed, flow, makeObservable, observable } from "mobx"
++import { actionBound, compareStructural, computed, computedStruct, flowBound, makeObservable, observableRef } from "mobx"
+
+ makeObservable(this, {
+-    value: observable.ref,
++    value: observableRef,
+-    total: computed.struct,
++    total: computedStruct,
+-    rounded: computed({ equals: comparer.structural }),
++    rounded: computed({ equals: compareStructural }),
+-    save: action.bound,
++    save: actionBound,
+-    load: flow.bound
++    load: flowBound
+ })
+```
+
+Decorator:
+
+```diff
+-import { action, comparer, computed, flow, observable } from "mobx"
++import { actionBound, compareStructural, computed, computedStruct, flowBound, observableRef } from "mobx"
+
+ class Store {
+-    @observable.ref accessor value = null
++    @observableRef accessor value = null
+
+-    @computed.struct
++    @computedStruct
+     get total() {
+         return { value: this.value }
+     }
+
+-    @computed({ equals: comparer.structural })
++    @computed({ equals: compareStructural })
+     get rounded() {
+         return { value: Math.round(this.value) }
+     }
+
+-    @action.bound
++    @actionBound
+     save() {}
+
+-    @flow.bound
++    @flowBound
+     *load() {}
+ }
+```
+
+Old structural boolean options should use `equals` explicitly:
+
+```diff
+-computed(() => value, { compareStructural: true })
++computed(() => value, { equals: compareStructural })
+
+-reaction(() => value, effect, { compareStructural: true })
++reaction(() => value, effect, { equals: compareStructural })
+```
+
+## Proxy support is required
+
+MobX 7 requires native Proxy support and no longer includes the ES5 fallback implementation.
+
+Remove `useProxies` from `configure` calls:
+
+```diff
+ import { configure } from "mobx"
+
+ configure({
+     enforceActions: "observed",
+-    useProxies: "ifavailable"
+ })
+```
+
+Also remove `{ proxy: false }` from `observable`, `observable.object` and `observable.array` options:
+
+```diff
+-const todos = observable.object({}, {}, { proxy: false })
++const todos = observable.object({})
+```
+
+## Removed `trace`
+
+The `trace` API has been removed. For debugging reactivity, use [`getDependencyTree`](api.md#getdependencytree), [`getObserverTree`](api.md#getobservertree), [`spy`](analyzing-reactivity.md#spy), the MobX developer tools, or packages such as `mobx-log`.
+
+```javascript
+import { autorun, getDependencyTree } from "mobx"
+
+const disposer = autorun(() => {
+    console.log(message.title)
+})
+
+console.log(getDependencyTree(disposer))
+```
+
+## Replacing `Provider` and `inject`
+
+`Provider` and `inject` were removed. Use React context directly. Keep the context value stable and mutate the observable store instead of replacing the provider value.
+
+Before:
+
+```javascript
+import { Provider, inject, observer } from "mobx-react"
+
+// prettier-ignore
+const UserName = inject("userStore")(
+    observer(({ userStore }) => <span>{userStore.name}</span>)
+)
+
+const App = ({ userStore }) => (
+    <Provider userStore={userStore}>
+        <UserName />
+    </Provider>
+)
+```
+
+After, using a function component:
+
+```javascript
+import React, { createContext, useContext } from "react"
+import { observer } from "mobx-react"
+
+const RootStoreContext = createContext(null)
+
+export const RootStoreProvider = ({ rootStore, children }) => (
+    <RootStoreContext.Provider value={rootStore}>{children}</RootStoreContext.Provider>
+)
+
+export const useRootStore = () => {
+    const store = useContext(RootStoreContext)
+    if (!store) {
+        throw new Error("RootStoreProvider is missing")
+    }
+    return store
+}
+
+const UserName = observer(() => {
+    const { userStore } = useRootStore()
+    return <span>{userStore.name}</span>
+})
+
+const App = () => (
+    <RootStoreProvider rootStore={{ userStore: new UserStore() }}>
+        <UserName />
+    </RootStoreProvider>
+)
+```
+
+After, using a class component:
+
+```javascript
+import React from "react"
+import { observer } from "mobx-react"
+
+const RootStoreContext = React.createContext(null)
+
+class UserName extends React.Component {
+    static contextType = RootStoreContext
+
+    render() {
+        const { userStore } = this.context
+        return <span>{userStore.name}</span>
+    }
+}
+
+const ObservedUserName = observer(UserName)
+```

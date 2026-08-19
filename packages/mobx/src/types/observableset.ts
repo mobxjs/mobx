@@ -7,8 +7,6 @@ import {
     isSpyEnabled,
     hasListeners,
     IListenable,
-    registerListener,
-    Lambda,
     spyReportStart,
     notifyListeners,
     spyReportEnd,
@@ -17,8 +15,6 @@ import {
     hasInterceptors,
     interceptChange,
     IInterceptable,
-    IInterceptor,
-    registerInterceptor,
     checkIfStateModificationsAreAllowed,
     untracked,
     transaction,
@@ -27,7 +23,6 @@ import {
     DELETE,
     ADD,
     die,
-    isFunction,
     initObservable
 } from "../internal"
 
@@ -78,9 +73,6 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
         enhancer: IEnhancer<T> = deepEnhancer,
         public name_ = __DEV__ ? "ObservableSet@" + getNextId() : "ObservableSet"
     ) {
-        if (!isFunction(Set)) {
-            die(22)
-        }
         this.enhancer_ = (newV, oldV) => enhancer(newV, oldV, name_)
         initObservable(() => {
             this.atom_ = createAtom(this.name_)
@@ -241,21 +233,11 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
     }
 
     intersection<U>(otherSet: ReadonlySetLike<U> | Set<U>): Set<T & U> {
-        if (isES6Set(otherSet) && !isObservableSet(otherSet)) {
-            return otherSet.intersection(this)
-        } else {
-            const dehancedSet = new Set(this)
-            return dehancedSet.intersection(otherSet)
-        }
+        return new Set(this).intersection(otherSet)
     }
 
     union<U>(otherSet: ReadonlySetLike<U> | Set<U>): Set<T | U> {
-        if (isES6Set(otherSet) && !isObservableSet(otherSet)) {
-            return otherSet.union(this)
-        } else {
-            const dehancedSet = new Set(this)
-            return dehancedSet.union(otherSet)
-        }
+        return new Set(this).union(otherSet)
     }
 
     difference<U>(otherSet: ReadonlySetLike<U>): Set<T> {
@@ -263,12 +245,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
     }
 
     symmetricDifference<U>(otherSet: ReadonlySetLike<U> | Set<U>): Set<T | U> {
-        if (isES6Set(otherSet) && !isObservableSet(otherSet)) {
-            return otherSet.symmetricDifference(this)
-        } else {
-            const dehancedSet = new Set(this)
-            return dehancedSet.symmetricDifference(otherSet)
-        }
+        return new Set(this).symmetricDifference(otherSet)
     }
 
     isSubsetOf(otherSet: ReadonlySetLike<unknown>): boolean {
@@ -280,12 +257,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
     }
 
     isDisjointFrom(otherSet: ReadonlySetLike<unknown> | Set<unknown>): boolean {
-        if (isES6Set(otherSet) && !isObservableSet(otherSet)) {
-            return otherSet.isDisjointFrom(this)
-        } else {
-            const dehancedSet = new Set(this)
-            return dehancedSet.isDisjointFrom(otherSet)
-        }
+        return new Set(this).isDisjointFrom(otherSet)
     }
 
     replace(other: ObservableSet<T> | IObservableSetInitialValues<T>): ObservableSet<T> {
@@ -327,23 +299,11 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
                 replacementValues.forEach(value => this.add(value))
             })
         } else if (other !== null && other !== undefined) {
-            die("Cannot initialize set from " + other)
+            die(41, other)
         }
 
         return this
     }
-    observe_(listener: (changes: ISetDidChange<T>) => void, fireImmediately?: boolean): Lambda {
-        // ... 'fireImmediately' could also be true?
-        if (__DEV__ && fireImmediately === true) {
-            die("`observe` doesn't support fireImmediately=true in combination with sets.")
-        }
-        return registerListener(this, listener)
-    }
-
-    intercept_(handler: IInterceptor<ISetWillChange<T>>): Lambda {
-        return registerInterceptor(this, handler)
-    }
-
     toJSON(): T[] {
         return Array.from(this)
     }

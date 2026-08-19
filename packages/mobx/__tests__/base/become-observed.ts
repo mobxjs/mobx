@@ -2,6 +2,7 @@ import {
     autorun,
     onBecomeObserved,
     observable,
+    observableRef,
     computed,
     action,
     makeObservable,
@@ -26,7 +27,7 @@ test("#2309 don't trigger oBO for computeds that aren't subscribed to", () => {
     const events: string[] = []
 
     class Asd {
-        @observable prop = 42
+        @observable accessor prop = 42
 
         @computed
         get computed() {
@@ -41,10 +42,6 @@ test("#2309 don't trigger oBO for computeds that aren't subscribed to", () => {
         @action
         actionComputed() {
             const bar = this.computed
-        }
-
-        constructor() {
-            makeObservable(this)
         }
     }
 
@@ -308,7 +305,7 @@ describe("nested computes don't trigger hooks #2686", () => {
         constructor() {
             makeObservable(this, {
                 upperValue$: computed,
-                lower$: observable.ref
+                lower$: observableRef
             })
         }
 
@@ -434,14 +431,11 @@ test("#2686 - 3", () => {
 test("#2667", () => {
     const events: any[] = []
     class LazyInitializedList {
-        @observable
-        public items: string[] | undefined
+        @observable accessor items: string[] | undefined = undefined
 
-        @observable
-        public listName
+        @observable accessor listName: string
 
-        public constructor(listName: string, lazyItems: string[]) {
-            makeObservable(this)
+        constructor(listName: string, lazyItems: string[]) {
             this.listName = listName
             onBecomeObserved(
                 this,
@@ -463,26 +457,24 @@ test("#2667", () => {
     }
 
     class ItemsStore {
-        @observable
-        private list: LazyInitializedList
+        @observable accessor list: LazyInitializedList
 
-        public constructor() {
+        constructor() {
             this.list = new LazyInitializedList("initial", ["a, b, c"])
-            makeObservable(this)
         }
 
         @action
-        public changeList = () => {
+        changeList = () => {
             this.list = new LazyInitializedList("new", ["b, c, a"])
         }
 
         @computed
-        public get items(): string[] | undefined {
+        get items(): string[] | undefined {
             return this.list.items
         }
 
         @computed
-        public get activeListName(): string {
+        get activeListName(): string {
             return this.list.listName
         }
     }
@@ -508,6 +500,58 @@ test("#2667", () => {
         "onBecomeUnobservedinitial",
         "onBecomeUnobservednew"
     ])
+})
+
+test("#3954 - disposing a chain of reactions from onBecomeUnobserved doesn't overflow the stack", () => {
+    // Each box's onBecomeUnobserved handler disposes the next reaction in the
+    // chain. Disposing reaction[0] unobserves box[0], whose handler disposes
+    // reaction[1], which unobserves box[1], and so on. Each of those disposals
+    // re-enters endBatch() while the previous one is still draining
+    // pendingUnobservations, so this used to recurse N deep instead of
+    // looping, overflowing the stack for a large enough chain.
+    const N = 10000
+    const boxes = Array.from({ length: N }, () => observable.box(0))
+    const disposers = boxes.map(box => autorun(() => box.get()))
+    let unobservedCount = 0
+
+    boxes.forEach((box, i) => {
+        onBecomeUnobserved(box, () => {
+            unobservedCount++
+            if (i + 1 < N) {
+                disposers[i + 1]()
+            }
+        })
+    })
+
+    expect(() => disposers[0]()).not.toThrow()
+
+    // the whole chain should have unwound, not just the first link
+    expect(unobservedCount).toBe(N)
+})
+
+test("#3954 followup - isRunningUnobservations is released even if an onBecomeUnobserved handler throws", () => {
+    const boxA = observable.box(0)
+    const disposeA = autorun(() => boxA.get())
+    onBecomeUnobserved(boxA, () => {
+        throw new Error("boom")
+    })
+
+    // the handler's exception should still surface to the caller, not be swallowed
+    expect(() => disposeA()).toThrow("boom")
+
+    // if the internal guard were left stuck true after that exception, every
+    // future endBatch() would silently stop draining pendingUnobservations,
+    // so this completely unrelated disposal would never fire its own handler
+    const boxB = observable.box(0)
+    const disposeB = autorun(() => boxB.get())
+    let unobservedB = false
+    onBecomeUnobserved(boxB, () => {
+        unobservedB = true
+    })
+
+    disposeB()
+
+    expect(unobservedB).toBe(true)
 })
 
 test("works with ObservableSet #3595", () => {

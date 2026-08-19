@@ -20,7 +20,7 @@ The most important annotations are:
 
 Usage:
 
--   `makeObservable(target, annotations?, options?)`
+-   `makeObservable(target, annotations, options?)`
 
 This function can be used to make _existing_ object properties observable. Any JavaScript object (including class instances) can be passed into `target`.
 Typically `makeObservable` is used in the constructor of a class, and its first argument is `this`.
@@ -72,7 +72,7 @@ class Doubler {
 <!--class + decorators-->
 
 When using modern decorators, there is no need to call `makeObservable`, below is what a decorator based class looks like.
-Note that the `@observable` annotation should always be used in combination with the `accessor` keyword.
+Note that the `@observable` decorator should always be used in combination with the `accessor` keyword.
 
 ```javascript
 import { observable, computed, action, flow } from "mobx"
@@ -147,39 +147,6 @@ tags.push("prio: for fun")
 In contrast to the first example with `makeObservable`, `observable` supports adding (and removing) _fields_ to an object.
 This makes `observable` great for collections like dynamically keyed objects, arrays, Maps and Sets.
 
-<!--class + decorators (legacy)-->
-
-To use legacy decorators, `makeObservable(this)` should be called in the constructor to make sure decorators work.
-
-```javascript
-import { observable, computed, action, flow } from "mobx"
-
-class Doubler {
-    @observable value
-
-    constructor(value) {
-        makeObservable(this)
-        this.value = value
-    }
-
-    @computed
-    get double() {
-        return this.value * 2
-    }
-
-    @action
-    increment() {
-        this.value++
-    }
-
-    @flow
-    *fetch() {
-        const response = yield fetch("/api/value")
-        this.value = response.json()
-    }
-}
-```
-
 <!--END_DOCUSAURUS_CODE_TABS-->
 
 ## `makeAutoObservable`
@@ -216,7 +183,7 @@ The `source` object will be cloned and all members will be made observable, simi
 Likewise, an `overrides` map can be provided to specify the annotations of specific members.
 Check out the above code block for an example.
 
-The object returned by `observable` will be a Proxy, which means that properties that are added later to the object will be picked up and made observable as well (except when [proxy usage](configuration.md#proxy-support) is disabled).
+The object returned by `observable` will be a Proxy, which means that properties that are added later to the object will be picked up and made observable as well.
 
 The `observable` method can also be called with collections types like [arrays](api.md#observablearray), [Maps](api.md#observablemap) and [Sets](api.md#observableset). Those will be cloned as well and converted into their observable counterparts.
 
@@ -274,36 +241,35 @@ Making class members observable is considered the responsibility of the class co
 
 </details>
 
-<details id="avoid-proxies"><summary>{🚀} **Tip:** observable (proxied) versus makeObservable (unproxied)<a href="#avoid-proxies" class="tip-anchor"></a></summary>
+<details id="avoid-proxies"><summary>{🚀} **Tip:** observable clones versus makeObservable in-place updates<a href="#avoid-proxies" class="tip-anchor"></a></summary>
 
 The primary difference between `make(Auto)Observable` and `observable` is that the first one modifies the object you are passing in as first argument, while `observable` creates a _clone_ that is made observable.
 
-The second difference is that `observable` creates a [`Proxy`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) object, to be able to trap future property additions in case you use the object as a dynamic lookup map.
-If the object you want to make observable has a regular structure where all members are known up-front, we recommend to use `makeObservable` as non proxied objects are a little faster, and they are easier to inspect in the debugger and `console.log`.
+`observable` creates a [`Proxy`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) object, to be able to trap future property additions in case you use the object as a dynamic lookup map.
+If the object you want to make observable has a regular structure where all members are known up-front, `makeObservable` is often the clearer API because it keeps the original object identity.
 
 Because of that, `make(Auto)Observable` is the recommended API to use in factory functions.
-Note that it is possible to pass `{ proxy: false }` as an option to `observable` to get a non proxied clone.
 
 </details>
 
 ## Available annotations
 
-| Annotation                                 | Description                                                                                                                                                                                                                                                                                                                                       |
-| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Annotation                                 | Description                                                                                                                                                                                                                                                                                                                                      |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `observable`<br/>`observable.deep`         | Defines a trackable field that stores state. If possible, any value assigned to `observable` is automatically converted to (deep) `observable`, [`autoAction`](#autoAction) or `flow` based on its type. Only `plain object`, `array`, `Map`, `Set`, `function`, `generator function` are convertible. Class instances and others are untouched. |
-| `observable.ref`                           | Like `observable`, but only reassignments will be tracked. The assigned values are completely ignored and will NOT be automatically converted to `observable`/[`autoAction`](#autoAction)/`flow`. For example, use this if you intend to store immutable data in an observable field.                                                             |
-| `observable.shallow`                       | Like `observable.ref` but for collections. Any collection assigned will be made observable, but the contents of the collection itself won't become observable.                                                                                                                                                                                    |
-| `observable.struct`                        | Like `observable`, except that any assigned value that is structurally equal to the current value will be ignored.                                                                                                                                                                                                                                |
-| `action`                                   | Mark a method as an action that will modify the state. Check out [actions](actions.md) for more details. Non-writable.                                                                                                                                                                                                                            |
-| `action.bound`                             | Like action, but will also bind the action to the instance so that `this` will always be set. Non-writable.                                                                                                                                                                                                                                       |
-| `computed`                                 | Can be used on a [getter](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get) to declare it as a derived value that can be cached. Check out [computeds](computeds.md) for more details.                                                                                                                             |
-| `computed.struct`                          | Like `computed`, except that if after recomputing the result is structurally equal to the previous result, no observers will be notified.                                                                                                                                                                                                         |
-| `true`                                     | Infer the best annotation. Check out [makeAutoObservable](#makeautoobservable) for more details.                                                                                                                                                                                                                                                  |
-| `false`                                    | Explicitly do not annotate this property.                                                                                                                                                                                                                                                                                                         |
-| `flow`                                     | Creates a `flow` to manage asynchronous processes. Check out [flow](actions.md#using-flow-instead-of-async--await-) for more details. Note that the inferred return type in TypeScript might be off. Non-writable.                                                                                                                                |
-| `flow.bound`                               | Like flow, but will also bind the flow to the instance so that `this` will always be set. Non-writable.                                                                                                                                                                                                                                           |
-| `override`                                 | [Applicable to inherited `action`, `flow`, `computed`, `action.bound` overridden by subclass](subclassing.md).                                                                                                                                                                                                                                    |
-| <span id="autoAction"></span> `autoAction` | Should not be used explicitly, but is used under the hood by `makeAutoObservable` to mark methods that can act as action or derivation, based on their calling context. It will be determined at runtime if the function is a derivation or action.                                                                                               |
+| `observable.ref`                           | Like `observable`, but only reassignments will be tracked. The assigned values are completely ignored and will NOT be automatically converted to `observable`/[`autoAction`](#autoAction)/`flow`. For example, use this if you intend to store immutable data in an observable field.                                                            |
+| `observable.shallow`                       | Like `observable.ref` but for collections. Any collection assigned will be made observable, but the contents of the collection itself won't become observable.                                                                                                                                                                                   |
+| `observable.struct`                        | Like `observable`, except that any assigned value that is structurally equal to the current value will be ignored.                                                                                                                                                                                                                               |
+| `action`                                   | Mark a method as an action that will modify the state. Check out [actions](actions.md) for more details. Non-writable.                                                                                                                                                                                                                           |
+| `action.bound`                             | Like action, but will also bind the action to the instance so that `this` will always be set. Non-writable.                                                                                                                                                                                                                                      |
+| `computed`                                 | Can be used on a [getter](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get) to declare it as a derived value that can be cached. Check out [computeds](computeds.md) for more details.                                                                                                                            |
+| `computed.struct`                          | Like `computed`, except that if after recomputing the result is structurally equal to the previous result, no observers will be notified.                                                                                                                                                                                                        |
+| `true`                                     | Infer the best annotation. Check out [makeAutoObservable](#makeautoobservable) for more details.                                                                                                                                                                                                                                                 |
+| `false`                                    | Explicitly do not annotate this property.                                                                                                                                                                                                                                                                                                        |
+| `flow`                                     | Creates a `flow` to manage asynchronous processes. Check out [flow](actions.md#using-flow-instead-of-async--await-) for more details. Note that the inferred return type in TypeScript might be off. Non-writable.                                                                                                                               |
+| `flow.bound`                               | Like flow, but will also bind the flow to the instance so that `this` will always be set. Non-writable.                                                                                                                                                                                                                                          |
+| `override`                                 | [Applicable to inherited `action`, `flow`, `computed`, `action.bound` overridden by subclass](subclassing.md).                                                                                                                                                                                                                                   |
+| <span id="autoAction"></span> `autoAction` | Should not be used explicitly, but is used under the hood by `makeAutoObservable` to mark methods that can act as action or derivation, based on their calling context. It will be determined at runtime if the function is a derivation or action.                                                                                              |
 
 ## Limitations
 
@@ -331,7 +297,6 @@ The above APIs take an optional `options` argument which is an object that suppo
 -   **`autoBind: true`** uses `action.bound`/`flow.bound` by default, rather than `action`/`flow`. Does not affect explicitly annotated members.
 -   **`deep: false`** uses `observable.ref` by default, rather than `observable`. Does not affect explicitly annotated members.
 -   **`name: <string>`** gives the object a debug name that is printed in error messages and reflection APIs.
--   **`proxy: false`** forces `observable(thing)` to use non-[**proxy**](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) implementation. This is a good option if the shape of the object will not change over time, as non-proxied objects are easier to debug and faster. This option is **not** available for `make(Auto)Observable`, see [avoiding proxies](#avoid-proxies).
 
 <details id="one-options-per-target"><summary>**Note:** options are *sticky* and can be provided only once<a href="#one-options-per-target" class="tip-anchor"></a></summary>
 `options` argument can be provided only for `target` that is NOT observable yet.<br>

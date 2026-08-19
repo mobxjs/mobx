@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@master
 
       - name: Setup Node.js 24
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version: 24
 
@@ -35,8 +35,8 @@ jobs:
       - name: Test
         run: npm test -- -i
 
-      - name: Test size
-        run: npm run test:size
+      - name: Check size
+        run: npm run check-size
 
       - name: Test performance
         run: npm -w mobx run test:performance

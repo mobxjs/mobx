@@ -15,8 +15,7 @@ export function createObservableAnnotation(name: string, options?: object): Anno
         annotationType_: name,
         options_: options,
         make_,
-        extend_,
-        decorate_20223_
+        extend_
     }
 }
 
@@ -40,13 +39,13 @@ function extend_(
     return adm.defineObservableProperty_(
         key,
         descriptor.value,
-        this.options_?.enhancer ?? deepEnhancer,
+        this.options_?.enhancer_ ?? deepEnhancer,
         proxyTrap
     )
 }
 
-function decorate_20223_(
-    this: Annotation,
+export function decorateObservable20223_(
+    annotation: Annotation,
     desc,
     context: ClassAccessorDecoratorContext | ClassFieldDecoratorContext
 ) {
@@ -61,7 +60,7 @@ function decorate_20223_(
         assert20223DecoratorType(context, ["accessor"])
     }
 
-    const ann = this
+    const ann = annotation
     const { kind, name } = context
 
     if (kind !== "accessor") {
@@ -78,7 +77,7 @@ function decorate_20223_(
             () =>
                 new ObservableValue(
                     value,
-                    ann.options_?.enhancer ?? deepEnhancer,
+                    ann.options_?.enhancer_ ?? deepEnhancer,
                     __DEV__
                         ? `${adm.name_}.${name.toString()}`
                         : `ObservableObject.${name.toString()}`,

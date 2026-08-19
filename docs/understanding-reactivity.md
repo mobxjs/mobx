@@ -12,7 +12,7 @@ MobX usually reacts to exactly the things you expect it to, which means that in 
 However, at some point you will encounter a case where it does not do what you expected.
 At that point it is invaluable to understand how MobX determines what to react to.
 
-> MobX reacts to any _existing_ **observable** _property_ that is read during the execution of a tracked function.
+> MobX reacts to any **observable** property that is read during the execution of a tracked function.
 
 -   _"reading"_ is dereferencing an object's property, which can be done through "dotting into" it (eg. `user.name`) or using the bracket notation (eg. `user['name']`, `todos[3]`) or destructuring (eg. `const {name} = user`).
 -   _"tracked functions"_ are the expression of `computed`, the _rendering_ of an `observer` React function component, the `render()` method of an `observer` based React class component, and the functions that are passed as the first param to `autorun`, `reaction` and `when`.
@@ -68,32 +68,17 @@ message.updateTitle("Bar")
 
 This will react as expected. The `.title` property was dereferenced by the autorun, and changed afterwards, so this change is detected.
 
-You can verify what MobX will track by calling [`trace()`](analyzing-reactivity.md) inside the tracked function. In the case of the above function it outputs the following:
-
-```javascript
-import { trace } from "mobx"
-
-const disposer = autorun(() => {
-    console.log(message.title)
-    trace()
-})
-// Outputs:
-// [mobx.trace] 'Autorun@2' tracing enabled
-
-message.updateTitle("Hello")
-// Outputs:
-// [mobx.trace] 'Autorun@2' is invalidated due to a change in: 'Message@1.title'
-Hello
-```
-
-It is also possible to get the internal dependency (or observer) tree by using `getDependencyTree`:
+You can inspect what MobX tracks by calling [`getDependencyTree`](api.md#getdependencytree) with the disposer returned by `autorun`:
 
 ```javascript
 import { getDependencyTree } from "mobx"
 
-// Prints the dependency tree of the reaction coupled to the disposer.
-console.log(getDependencyTree(disposer))
+const disposer = autorun(() => {
+    console.log(message.title)
+})
+
 // Outputs:
+console.log(getDependencyTree(disposer))
 // { name: 'Autorun@2', dependencies: [ { name: 'Message@1.title' } ] }
 ```
 
@@ -275,8 +260,7 @@ runInAction(() => {
 This **will** react. Observable maps support observing entries that may not exist.
 Note that this will initially print `undefined`.
 You can check for the existence of an entry first by using `twitterUrls.has("Sara")`.
-So in an environment without Proxy support for dynamically keyed collections always use observable maps. If you do have Proxy support you can use observable maps as well,
-but you also have the option to use plain objects.
+Observable maps are a good fit for dynamically keyed collections, although plain observable objects can track added properties as well.
 
 #### MobX does not track asynchronously accessed data
 
@@ -324,64 +308,9 @@ runInAction(() => {
 })
 ```
 
-This **will** react if you run React in an environment that supports Proxy.
+This **will** react for objects created with `observable` or `observable.object`.
 Note that this is only done for objects created with `observable` or `observable.object`. New properties on class instances will not be made observable automatically.
-
-_Environments without Proxy support_
-
-This will **not** react. MobX can only track observable properties, and 'age' has not been defined as observable property above.
-
-However, it is possible to use the `get` and `set` methods as exposed by MobX to work around this:
-
-```javascript
-import { get, set } from "mobx"
-
-autorun(() => {
-    console.log(get(message.author, "age"))
-})
-set(message.author, "age", 10)
-```
-
-#### [Without Proxy support] Incorrect: using not yet existing observable object properties
-
-```javascript
-autorun(() => {
-    console.log(message.author.age)
-})
-extendObservable(message.author, {
-    age: 10
-})
-```
-
-This will **not** react. MobX will not react to observable properties that did not exist when tracking started.
-If the two statements are swapped, or if any other observable causes the `autorun` to re-run, the `autorun` will start tracking the `age` as well.
-
-#### [Without Proxy support] Correct: using MobX utilities to read / write to objects
-
-If you are in an environment without proxy support and still want to use observable
-objects as a dynamic collection, you can handle them using the MobX `get` and `set`
-API.
-
-The following will react as well:
-
-```javascript
-import { get, set, observable } from "mobx"
-
-const twitterUrls = observable.object({
-    Joe: "twitter.com/joey"
-})
-
-autorun(() => {
-    console.log(get(twitterUrls, "Sara")) // `get` can track not yet existing properties.
-})
-
-runInAction(() => {
-    set(twitterUrls, { Sara: "twitter.com/horsejs" })
-})
-```
-
-Check out the [Collection utilities API](api.md#collection-utilities-) for more details.
 
 #### TL;DR
 
-> MobX reacts to any _existing_ **observable** _property_ that is read during the execution of a tracked function.
+> MobX reacts to any **observable** property that is read during the execution of a tracked function.
