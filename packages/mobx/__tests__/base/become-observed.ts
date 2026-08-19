@@ -570,3 +570,48 @@ test("works with ObservableSet #3595", () => {
     expect(onSetObserved).toHaveBeenCalledTimes(1)
     expect(onSetUnobserved).toHaveBeenCalledTimes(1)
 })
+
+test("onBecomeObserved fires when a computed becomes observed while serving a cached value #4547", () => {
+    const events: string[] = []
+
+    const o = observable.box(1)
+    onBecomeObserved(o, () => events.push("BO"))
+    onBecomeUnobserved(o, () => events.push("BUO"))
+    const c = computed(() => o.get())
+
+    let disposeAutorun: () => void
+    runInAction(() => {
+        // non-reactive read inside the batch leaves `c` up-to-date but unobserved
+        void c.get()
+        // `c` becomes observed during endBatch() without recomputing, so it never
+        // re-reports `o` — the hook has to cascade instead
+        disposeAutorun = autorun(() => void c.get())
+    })
+
+    expect(events).toEqual(["BO"])
+
+    disposeAutorun!()
+    expect(events).toEqual(["BO", "BUO"])
+})
+
+test("onBecomeObserved cascades through a chain of cached computeds #4547", () => {
+    const events: string[] = []
+
+    const o = observable.box(1)
+    onBecomeObserved(o, () => events.push("BO"))
+    onBecomeUnobserved(o, () => events.push("BUO"))
+    // two levels, as in the reported issue: the cascade has to recurse
+    const inner = computed(() => o.get())
+    const outer = computed(() => inner.get())
+
+    let disposeAutorun: () => void
+    runInAction(() => {
+        void outer.get()
+        disposeAutorun = autorun(() => void outer.get())
+    })
+
+    expect(events).toEqual(["BO"])
+
+    disposeAutorun!()
+    expect(events).toEqual(["BO", "BUO"])
+})
