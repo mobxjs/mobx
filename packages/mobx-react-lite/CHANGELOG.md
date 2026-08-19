@@ -1,5 +1,11 @@
 # mobx-react-lite
 
+## 5.0.2
+
+### Patch Changes
+
+-   [`ec1b708026c1578e1c1f6c7bd90be18b26f7ce85`](https://github.com/mobxjs/mobx/commit/ec1b708026c1578e1c1f6c7bd90be18b26f7ce85) [#4695](https://github.com/mobxjs/mobx/pull/4695) Thanks [@gesposito](https://github.com/gesposito)! - perf: evaluate `NODE_ENV` once at module scope in the env-agnostic esm bundles (`dist/<pkg>.esm.js` and `dist/<pkg>.mjs`) instead of at every `__DEV__` call site. `process.env` is an exotic object in Node, so each check performed a real environment lookup on hot paths; consumers that execute these files as-is (Node ESM, vitest, SSR) see roughly 10x faster observable writes in dev mode. All env-set artifacts and bundler output are unchanged.
+
 ## 5.0.1
 
 ### Patch Changes

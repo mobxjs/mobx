@@ -1,5 +1,15 @@
 # mobx
 
+## 7.0.2
+
+### Patch Changes
+
+-   [`ec1b708026c1578e1c1f6c7bd90be18b26f7ce85`](https://github.com/mobxjs/mobx/commit/ec1b708026c1578e1c1f6c7bd90be18b26f7ce85) [#4695](https://github.com/mobxjs/mobx/pull/4695) Thanks [@gesposito](https://github.com/gesposito)! - perf: evaluate `NODE_ENV` once at module scope in the env-agnostic esm bundles (`dist/<pkg>.esm.js` and `dist/<pkg>.mjs`) instead of at every `__DEV__` call site. `process.env` is an exotic object in Node, so each check performed a real environment lookup on hot paths; consumers that execute these files as-is (Node ESM, vitest, SSR) see roughly 10x faster observable writes in dev mode. All env-set artifacts and bundler output are unchanged.
+
+-   [`6d8b5fa6c7596d7e5b16e55e3121d81c0c5bb21a`](https://github.com/mobxjs/mobx/commit/6d8b5fa6c7596d7e5b16e55e3121d81c0c5bb21a) [#4672](https://github.com/mobxjs/mobx/pull/4672) Thanks [@chatman-media](https://github.com/chatman-media)! - Fix `ObservableSet.replace` emitting spurious `delete`/`add` events (and triggering reactions) for values that are unchanged. It now only fires `delete` for removed values and `add` for newly added ones, mirroring `ObservableMap.replace`.
+
+    Note: because `replace` no longer clears and re-adds every value, the iteration order after `replace` changes in a (subtle but observable) way. Surviving values now keep their original relative position and newly added values are appended, instead of the whole set being reordered to match the argument. For example, `set(["a", "b", "c"]).replace(["d", "b", "a"])` previously iterated as `d, b, a`, and now iterates as `a, b, d`. This is arguably the more correct behavior (unchanged values are genuinely unchanged), but if you relied on `replace` reordering the set to match its argument, you may need to adjust.
+
 ## 7.0.1
 
 ### Patch Changes
