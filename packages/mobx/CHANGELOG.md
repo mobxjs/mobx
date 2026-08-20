@@ -1,5 +1,11 @@
 # mobx
 
+## 7.0.4
+
+### Patch Changes
+
+-   [`01211a698b64ea94de8e5f276ff8235fcf8ddf96`](https://github.com/mobxjs/mobx/commit/01211a698b64ea94de8e5f276ff8235fcf8ddf96) [#4700](https://github.com/mobxjs/mobx/pull/4700) Thanks [@kubk](https://github.com/kubk)! - Fix `onBecomeObserved` not firing for dependencies gained when an observed computed is recomputed inside an action.
+
 ## 7.0.3
 
 ### Patch Changes
