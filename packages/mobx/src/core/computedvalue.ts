@@ -216,7 +216,13 @@ export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDeriva
             reportObserved(this)
             if (shouldCompute(this)) {
                 let prevTrackingContext = globalState.trackingContext
-                if (this.keepAlive_ && !prevTrackingContext) {
+                if (
+                    !prevTrackingContext &&
+                    (this.keepAlive_ || (this.observers_ && this.observers_.size > 0))
+                ) {
+                    // An observed computed can be recomputed by an untracked read, for
+                    // example from inside an action. Its dependencies are still
+                    // transitively observed and must fire their lifecycle hooks
                     globalState.trackingContext = this
                 }
                 if (this.trackAndCompute()) {

@@ -615,3 +615,24 @@ test("onBecomeObserved cascades through a chain of cached computeds #4547", () =
     disposeAutorun!()
     expect(events).toEqual(["BO", "BUO"])
 })
+
+test("onBecomeObserved fires for a dependency gained by an observed computed in an action #3674", () => {
+    const events: string[] = []
+    const enabled = observable.box(false)
+    const resource = observable.box(1)
+    onBecomeObserved(resource, () => events.push("BO"))
+    onBecomeUnobserved(resource, () => events.push("BUO"))
+    const derived = computed(() => (enabled.get() ? resource.get() : null))
+    const disposeAutorun = autorun(() => void derived.get())
+
+    runInAction(() => {
+        enabled.set(true)
+        // Recompute the already-observed computed without an outer tracking context
+        void derived.get()
+    })
+
+    expect(events).toEqual(["BO"])
+
+    disposeAutorun()
+    expect(events).toEqual(["BO", "BUO"])
+})
