@@ -623,12 +623,13 @@ test("onBecomeObserved fires for a dependency gained by an observed computed in 
     onBecomeObserved(resource, () => events.push("BO"))
     onBecomeUnobserved(resource, () => events.push("BUO"))
     const derived = computed(() => (enabled.get() ? resource.get() : null))
-    const disposeAutorun = autorun(() => void derived.get())
+    const disposeAutorun = autorun(() => {
+        derived.get()
+    })
 
     runInAction(() => {
         enabled.set(true)
-        // Recompute the already-observed computed without an outer tracking context
-        void derived.get()
+        derived.get()
     })
 
     expect(events).toEqual(["BO"])
