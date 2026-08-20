@@ -636,3 +636,21 @@ test("onBecomeObserved fires for a dependency gained by an observed computed in 
     disposeAutorun()
     expect(events).toEqual(["BO", "BUO"])
 })
+
+test("temporary computed observers do not activate lifecycle hooks", () => {
+    const events: string[] = []
+    const enabled = observable.box(false)
+    const resource = observable.box(1)
+    onBecomeObserved(resource, () => events.push("BO"))
+    onBecomeUnobserved(resource, () => events.push("BUO"))
+    const inner = computed(() => (enabled.get() ? resource.get() : null))
+    const outer = computed(() => inner.get())
+
+    runInAction(() => {
+        outer.get()
+        enabled.set(true)
+        inner.get()
+    })
+
+    expect(events).toEqual([])
+})
