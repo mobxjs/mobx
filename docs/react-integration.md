@@ -304,6 +304,10 @@ const TodoView = observer(({ todo }: { todo: Todo }) => {
 })
 ```
 
+Use `observer` when a component reads observables during its own render. Use `<Observer>` when another component invokes a render callback that contains the observable read. They create tracked render regions at different boundaries. When combining `observer` with another higher-order-component, keep `observer` innermost as described in the [wrap-order tip](#wrap-order).
+
+**Optional background:** The contributor maintains a [render props and higher-order components exercise](https://frontendatlas.com/react/trivia/react-render-props-vs-hocs) on FrontendAtlas.
+
 ## Tips
 
 <details id="static-rendering"><summary>Server Side Rendering (SSR)<a href="#static-rendering" class="tip-anchor"></a></summary>
