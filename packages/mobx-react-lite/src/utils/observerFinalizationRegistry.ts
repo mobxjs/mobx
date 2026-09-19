@@ -3,7 +3,8 @@ import { UniversalFinalizationRegistry } from "./UniversalFinalizationRegistry"
 
 export const observerFinalizationRegistry = new UniversalFinalizationRegistry(
     (adm: { reaction: Reaction | null }) => {
-        adm.reaction?.dispose()
+        const reaction = adm.reaction
         adm.reaction = null
+        reaction?.dispose()
     }
 )

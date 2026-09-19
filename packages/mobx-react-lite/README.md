@@ -59,9 +59,11 @@ Call `enableStaticRendering(true)` when running in an SSR environment, in which 
 Running the full test suite now requires node 14+
 But the library itself does not have this limitation
 
-In order to avoid memory leaks due to aborted renders from React
-fiber handling or React `StrictMode`, on environments that does not support [FinalizationRegistry](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/FinalizationRegistry), this library needs to
-run timers to tidy up the remains of the aborted renders.
+To avoid memory leaks from abandoned or suspended renders, this library uses timers
+to dispose reactions that never subscribe. When
+[FinalizationRegistry](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/FinalizationRegistry)
+is available, it can dispose these reactions earlier. Timers remain active for pending
+reactions because native finalization cannot clean up targets that are still reachable.
 
 This can cause issues with test frameworks such as Jest
 which require that timers be cleaned up before the tests

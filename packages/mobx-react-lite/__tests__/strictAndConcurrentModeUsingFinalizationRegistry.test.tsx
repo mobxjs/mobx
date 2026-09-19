@@ -4,12 +4,13 @@ import * as React from "react"
 import { useObserver } from "../src/useObserver"
 import gc from "expose-gc/function"
 import { observerFinalizationRegistry } from "../src/utils/observerFinalizationRegistry"
+import { FinalizationRegistryWithTimer } from "../src/utils/UniversalFinalizationRegistry"
 
 if (typeof globalThis.FinalizationRegistry !== "function") {
     throw new Error("This test must run with node >= 14")
 }
 
-expect(observerFinalizationRegistry).toBeInstanceOf(globalThis.FinalizationRegistry)
+expect(observerFinalizationRegistry).toBeInstanceOf(FinalizationRegistryWithTimer)
 
 function nextFrame() {
     return new Promise(accept => setTimeout(accept, 1))
