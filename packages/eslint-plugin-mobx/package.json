@@ -48,7 +48,7 @@
         "test": "npm run test:7 && npm run test:9",
         "test:types": "tsc --noEmit",
         "test:check": "npm run test:types",
-        "prebuild": "node -e \"require('fs').rmSync('dist', { recursive: true, force: true })\"",
+        "prebuild": "rm -rf dist",
         "build": "tsc",
         "prepublishOnly": "npm run build"
     }
