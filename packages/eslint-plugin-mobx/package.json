@@ -48,7 +48,8 @@
         "test": "npm run test:7 && npm run test:9",
         "test:types": "tsc --noEmit",
         "test:check": "npm run test:types",
-        "build": "rollup --config",
+        "prebuild": "node -e \"require('fs').rmSync('dist', { recursive: true, force: true })\"",
+        "build": "tsc",
         "prepublishOnly": "npm run build"
     }
 }

@@ -52,4 +52,4 @@ const plugin: typeof pluginMobx & {
     }
 }
 
-export default plugin
+export = plugin
