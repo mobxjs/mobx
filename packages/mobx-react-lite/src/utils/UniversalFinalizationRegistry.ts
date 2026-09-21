@@ -77,6 +77,8 @@ export class FinalizationRegistryWithTimer<T> implements FinalizationRegistryTyp
     }
 
     private tokens = new WeakMap<object, object>()
+    private staged = new Map<object, { target: object; value: T }>()
+    private flushScheduled = false
     private native =
         typeof FinalizationRegistry !== "undefined"
             ? new FinalizationRegistry<Registration<T>>(this.finalizeRegistration)
@@ -87,15 +89,20 @@ export class FinalizationRegistryWithTimer<T> implements FinalizationRegistryTyp
 
     register(target: object, value: T, token: object = target) {
         this.unregister(token)
-        // The unregister token can be the target itself (mobx-react classes).
-        // Never retain it in the timer's Map, or native finalization cannot run.
-        const registration = { value, token: {} }
-        this.tokens.set(token, registration.token)
-        this.native?.register(target, registration, registration.token)
-        this.timer.register(target, registration, registration.token)
+        // Most renders subscribe in this task. Only those still pending at the
+        // microtask checkpoint need native registration and a cleanup timer.
+        // Holding the target until then is intentional; flushing releases it.
+        this.staged.set(token, { target, value })
+        if (!this.flushScheduled) {
+            this.flushScheduled = true
+            Promise.resolve().then(this.flushRegistrations)
+        }
     }
 
     unregister(token: object) {
+        if (this.staged.delete(token)) {
+            return
+        }
         const internalToken = this.tokens.get(token)
         if (internalToken) {
             this.tokens.delete(token)
@@ -106,7 +113,21 @@ export class FinalizationRegistryWithTimer<T> implements FinalizationRegistryTyp
 
     // Bound so it can be exported directly as clearTimers.
     finalizeAllImmediately = () => {
+        this.flushRegistrations()
         this.timer.finalizeAllImmediately()
+    }
+
+    private flushRegistrations = () => {
+        this.flushScheduled = false
+        this.staged.forEach(({ target, value }, token) => {
+            // The unregister token can be the target itself (mobx-react classes).
+            // Never retain it in the timer's Map, or native finalization cannot run.
+            const registration = { value, token: {} }
+            this.tokens.set(token, registration.token)
+            this.native?.register(target, registration, registration.token)
+            this.timer.register(target, registration, registration.token)
+        })
+        this.staged.clear()
     }
 }
 

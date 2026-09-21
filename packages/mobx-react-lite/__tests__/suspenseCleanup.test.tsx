@@ -62,6 +62,7 @@ test.each([false, true])(
             expect(getObserverTree(source).observers?.length).toBeGreaterThan(0)
 
             // Native finalization cannot be relied on while React/derivations retain the target.
+            await Promise.resolve()
             act(() => jest.advanceTimersByTime(cleanupDelay))
             expect(getObserverTree(source).observers).toBeUndefined()
             const previousCalculations = calculations
@@ -84,7 +85,7 @@ test.each([false, true])(
     }
 )
 
-test("an abandoned suspended tree releases its observations", () => {
+test("an abandoned suspended tree releases its observations", async () => {
     const source = observable.box(1)
     const pending = new Promise<void>(() => {})
     const View = observer(() => {
@@ -98,6 +99,7 @@ test("an abandoned suspended tree releases its observations", () => {
     )
     expect(rendering.container.textContent).toBe("Loading")
     rendering.unmount()
+    await Promise.resolve()
     act(() => jest.advanceTimersByTime(cleanupDelay))
     expect(getObserverTree(source).observers).toBeUndefined()
 })
