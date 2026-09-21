@@ -19,13 +19,6 @@ import {
     recordAnnotationApplied
 } from "../internal"
 
-// Hack based on https://github.com/Microsoft/TypeScript/issues/14829#issuecomment-322267089
-// We need this, because otherwise, AdditionalKeys is going to be inferred to be any
-// set of superfluous keys. But, we rather want to get a compile error unless AdditionalKeys is
-// _explicity_ passed as generic argument
-// Fixes: https://github.com/mobxjs/mobx/issues/2325#issuecomment-691070022
-type NoInfer<T> = [T][T extends any ? 0 : never]
-
 export function makeObservable<T extends object, AdditionalKeys extends PropertyKey = never>(
     target: T,
     annotations: AnnotationsMap<T, NoInfer<AdditionalKeys>>,
