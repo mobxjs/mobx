@@ -1,4 +1,4 @@
-"use strict"
+import type { Rule } from "eslint"
 
 function create(context) {
     const sourceCode = context.sourceCode ?? context.getSourceCode()
@@ -49,7 +49,7 @@ function create(context) {
     }
 }
 
-module.exports = {
+const rule: Rule.RuleModule = {
     meta: {
         type: "problem",
         fixable: "code",
@@ -63,3 +63,5 @@ module.exports = {
     },
     create
 }
+
+export default rule

@@ -1,6 +1,6 @@
 import { getRuleTester } from "./utils/get-rule-tester";
 
-import rule from "../src/exhaustive-make-observable.js";
+import rule from "../src/exhaustive-make-observable";
 
 const tester = getRuleTester();
 

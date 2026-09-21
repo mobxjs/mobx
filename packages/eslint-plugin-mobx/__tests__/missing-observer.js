@@ -1,6 +1,6 @@
 import { getRuleTester } from "./utils/get-rule-tester";
 
-import rule from "../src/missing-observer.js"
+import rule from "../src/missing-observer"
 
 const tester = getRuleTester();
 

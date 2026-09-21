@@ -1,6 +1,6 @@
-'use strict';
+import type { Rule } from 'eslint';
 
-const { findAncestor, isMobxDecorator } = require('./utils.js');
+import { findAncestor, isMobxDecorator } from './utils';
 
 function create(context) {
   const sourceCode = context.sourceCode ?? context.getSourceCode();
@@ -53,14 +53,13 @@ function create(context) {
   };
 }
 
-module.exports = {
+const rule: Rule.RuleModule = {
   meta: {
     type: 'problem',
     fixable: 'code',
     docs: {
       description: 'prevents missing `makeObservable(this)` when using decorators',
       recommended: true,
-      suggestion: false,
     },
     messages: {
       missingMakeObservable: "Constructor is missing `makeObservable(this)`.",
@@ -69,3 +68,5 @@ module.exports = {
   },
   create,
 };
+
+export default rule;
