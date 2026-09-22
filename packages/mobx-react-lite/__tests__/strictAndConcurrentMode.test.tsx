@@ -134,7 +134,6 @@ test("suspended components should not leak observations", async () => {
     act(() => jest.runAllTimers())
     expect(container).toHaveTextContent(String(o.x))
 
-    // Ensure that we are using the same reaction and component state.
     expect(observed).toHaveBeenCalledTimes(1)
     expect(unobserved).toHaveBeenCalledTimes(0)
 

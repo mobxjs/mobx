@@ -32,7 +32,6 @@ export class TimerBasedFinalizationRegistry<T> implements FinalizationRegistryTy
         }
     }
 
-    // Bound so it can be used directly as setTimeout callback.
     sweep = (maxAge = REGISTRY_FINALIZE_AFTER) => {
         // cancel timeout so we can force sweep anytime
         clearTimeout(this.sweepTimeout)
@@ -51,7 +50,6 @@ export class TimerBasedFinalizationRegistry<T> implements FinalizationRegistryTy
         }
     }
 
-    // Bound so it can be exported directly as clearTimers test utility.
     finalizeAllImmediately = () => {
         this.sweep(0)
     }
@@ -89,9 +87,7 @@ export class FinalizationRegistryWithTimer<T> implements FinalizationRegistryTyp
 
     register(target: object, value: T, token: object = target) {
         this.unregister(token)
-        // Most renders subscribe in this task. Only those still pending at the
-        // microtask checkpoint need native registration and a cleanup timer.
-        // Holding the target until then is intentional; flushing releases it.
+        // Stage registrations so synchronous subscriptions avoid native and timer work.
         this.staged.set(token, { target, value })
         if (!this.flushScheduled) {
             this.flushScheduled = true
@@ -111,7 +107,6 @@ export class FinalizationRegistryWithTimer<T> implements FinalizationRegistryTyp
         }
     }
 
-    // Bound so it can be exported directly as clearTimers.
     finalizeAllImmediately = () => {
         this.flushRegistrations()
         this.timer.finalizeAllImmediately()
@@ -120,8 +115,7 @@ export class FinalizationRegistryWithTimer<T> implements FinalizationRegistryTyp
     private flushRegistrations = () => {
         this.flushScheduled = false
         this.staged.forEach(({ target, value }, token) => {
-            // The unregister token can be the target itself (mobx-react classes).
-            // Never retain it in the timer's Map, or native finalization cannot run.
+            // Use a separate token so a target used as its unregister token is not retained by the timer.
             const registration = { value, token: {} }
             this.tokens.set(token, registration.token)
             this.native?.register(target, registration, registration.token)
