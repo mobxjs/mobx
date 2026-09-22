@@ -1,11 +1,11 @@
-'use strict';
+import type { Rule } from 'eslint';
 
-const { findAncestor } = require('./utils.js');
+import { findAncestor } from './utils';
 
 function create(context) {
   return {
     'CallExpression[callee.name=/(makeObservable|makeAutoObservable)/]': makeObservable => {
-      // Only iterested about makeObservable(this, ...) inside constructor and not inside nested bindable function
+      // Only interested about makeObservable(this, ...) inside constructor and not inside nested bindable function
       const [firstArg] = makeObservable.arguments;
       if (!firstArg) return;
       if (firstArg.type !== 'ThisExpression') return;
@@ -29,7 +29,7 @@ function create(context) {
   };
 }
 
-module.exports = {
+const rule: Rule.RuleModule = {
   meta: {
     type: 'problem',
     docs: {
@@ -41,4 +41,6 @@ module.exports = {
     }
   },
   create,
-}
+};
+
+export default rule;

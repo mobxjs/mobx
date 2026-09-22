@@ -1,17 +1,17 @@
-"use strict"
+import fs from "fs"
+import path from "path"
 
-const fs = require("fs")
-const path = require("path")
+import type { ESLint, Linter } from "eslint"
 
-const exhaustiveMakeObservable = require("./exhaustive-make-observable.js")
-const unconditionalMakeObservable = require("./unconditional-make-observable.js")
-const missingMakeObservable = require("./missing-make-observable.js")
-const missingObserver = require("./missing-observer")
-const noAnonymousObserver = require("./no-anonymous-observer.js")
+import exhaustiveMakeObservable from "./exhaustive-make-observable"
+import unconditionalMakeObservable from "./unconditional-make-observable"
+import missingMakeObservable from "./missing-make-observable"
+import missingObserver from "./missing-observer"
+import noAnonymousObserver from "./no-anonymous-observer"
 
 const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "package.json"), "utf8"))
 
-const pluginMobx = {
+const pluginMobx: ESLint.Plugin = {
     meta: {
         name: pkg.name,
         version: pkg.version
@@ -25,14 +25,17 @@ const pluginMobx = {
     }
 }
 
-const recommendedRules = {
+const recommendedRules: Linter.RulesRecord = {
     "mobx/exhaustive-make-observable": "warn",
     "mobx/unconditional-make-observable": "error",
     "mobx/missing-make-observable": "error",
     "mobx/missing-observer": "warn"
 }
 
-module.exports = {
+const plugin: typeof pluginMobx & {
+    configs: { recommended: Linter.LegacyConfig }
+    flatConfigs: { recommended: Linter.Config }
+} = {
     ...pluginMobx,
     configs: {
         recommended: {
@@ -48,3 +51,5 @@ module.exports = {
         }
     }
 }
+
+export = plugin

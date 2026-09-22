@@ -1,6 +1,6 @@
-"use strict"
+import type { Rule } from "eslint"
 
-const { findAncestor, isMobxDecorator } = require("./utils.js")
+import { findAncestor, isMobxDecorator } from "./utils"
 
 // TODO support this.foo = 5; in constructor
 // TODO? report on field as well
@@ -42,7 +42,7 @@ function create(context) {
             }
 
             const annotationProps = secondArg?.properties || []
-            const nonAnnotatedMembers = []
+            const nonAnnotatedMembers: any[] = []
             let hasAnyDecorator = false
 
             members.forEach(member => {
@@ -102,7 +102,7 @@ function create(context) {
     }
 }
 
-module.exports = {
+const rule: Rule.RuleModule = {
     meta: {
         type: "suggestion",
         fixable: "code",
@@ -119,8 +119,7 @@ module.exports = {
         ],
         docs: {
             description: "enforce all fields being listen in `makeObservable`",
-            recommended: true,
-            suggestion: false
+            recommended: true
         },
         messages: {
             missingAnnotation:
@@ -129,3 +128,5 @@ module.exports = {
     },
     create
 }
+
+export default rule
