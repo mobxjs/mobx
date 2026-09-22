@@ -166,11 +166,12 @@ describe.each([TimerBasedFinalizationRegistry, FinalizationRegistryWithTimer])("
     test("a sweep preserves recent registrations", async () => {
         const finalize = jest.fn()
         const registry = new Registry(finalize)
-        registry.register({}, "older", {})
+        const olderTarget = {}
+        const recentTarget = {}
+        registry.register(olderTarget, "older", {})
         await Promise.resolve()
         jest.advanceTimersByTime(REGISTRY_SWEEP_INTERVAL / 2)
-        registry.register({}, "recent", {})
-        await Promise.resolve()
+        registry.register(recentTarget, "recent", {})
         jest.advanceTimersByTime(REGISTRY_SWEEP_INTERVAL / 2)
         expect(finalize.mock.calls).toEqual([["older"]])
         jest.advanceTimersByTime(REGISTRY_SWEEP_INTERVAL)
