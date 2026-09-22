@@ -1,5 +1,5 @@
 ---
-"mobx": minor
+"mobx": patch
 ---
 
 Extend IReactionDisposer with Disposable
