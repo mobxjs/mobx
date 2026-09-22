@@ -45,7 +45,7 @@ export interface IReactionPublic {
     dispose(): void
 }
 
-export interface IReactionDisposer {
+export interface IReactionDisposer extends Disposable {
     (): void
     [$mobx]: Reaction
 }
