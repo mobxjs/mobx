@@ -172,6 +172,7 @@ describe.each([TimerBasedFinalizationRegistry, FinalizationRegistryWithTimer])("
         await Promise.resolve()
         jest.advanceTimersByTime(REGISTRY_SWEEP_INTERVAL / 2)
         registry.register(recentTarget, "recent", {})
+        await Promise.resolve()
         jest.advanceTimersByTime(REGISTRY_SWEEP_INTERVAL / 2)
         expect(finalize.mock.calls).toEqual([["older"]])
         jest.advanceTimersByTime(REGISTRY_SWEEP_INTERVAL)
