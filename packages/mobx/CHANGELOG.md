@@ -1,5 +1,15 @@
 # mobx
 
+## 7.0.4
+
+### Patch Changes
+
+-   [`7d85a68fb7e449650535aba22e47ce4d21bfbc10`](https://github.com/mobxjs/mobx/commit/7d85a68fb7e449650535aba22e47ce4d21bfbc10) [#4592](https://github.com/mobxjs/mobx/pull/4592) Thanks [@VimHax](https://github.com/VimHax)! - Extend IReactionDisposer with Disposable
+
+-   [`01211a698b64ea94de8e5f276ff8235fcf8ddf96`](https://github.com/mobxjs/mobx/commit/01211a698b64ea94de8e5f276ff8235fcf8ddf96) [#4700](https://github.com/mobxjs/mobx/pull/4700) Thanks [@kubk](https://github.com/kubk)! - Fix `onBecomeObserved` not firing for dependencies gained when an observed computed is recomputed inside an action.
+
+-   [`6e0a03ef74750b3040c76d3ecc14c4adf202b95a`](https://github.com/mobxjs/mobx/commit/6e0a03ef74750b3040c76d3ecc14c4adf202b95a) [#4710](https://github.com/mobxjs/mobx/pull/4710) Thanks [@kubk](https://github.com/kubk)! - Use TypeScript's built-in `NoInfer` utility instead of a local compatibility alias.
+
 ## 7.0.3
 
 ### Patch Changes

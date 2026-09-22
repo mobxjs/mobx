@@ -1,5 +1,11 @@
 # eslint-plugin-mobx
 
+## 0.1.0
+
+### Minor Changes
+
+-   [`f7af259df425280aebeb0ccdb13350ba6d24270a`](https://github.com/mobxjs/mobx/commit/f7af259df425280aebeb0ccdb13350ba6d24270a) [#4699](https://github.com/mobxjs/mobx/pull/4699) Thanks [@rakleed](https://github.com/rakleed)! - Add TypeScript types for `configs.recommended` and `flatConfigs.recommended`, so they're typed when used from a TypeScript `eslint.config.ts`.
+
 ## 0.0.14
 
 ### Patch Changes
