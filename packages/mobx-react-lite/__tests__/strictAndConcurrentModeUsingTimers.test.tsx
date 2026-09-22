@@ -1,5 +1,5 @@
 import "./utils/killFinalizationRegistry"
-import { act, cleanup, render } from "@testing-library/react"
+import { act, render } from "@testing-library/react"
 import * as mobx from "mobx"
 import * as React from "react"
 import { useObserver } from "../src/useObserver"
@@ -13,8 +13,6 @@ import { TimerBasedFinalizationRegistry } from "../src/utils/UniversalFinalizati
 expect(observerFinalizationRegistry).toBeInstanceOf(TimerBasedFinalizationRegistry)
 
 const registry = observerFinalizationRegistry as TimerBasedFinalizationRegistry<unknown>
-
-afterEach(cleanup)
 
 test("uncommitted components should not leak observations", async () => {
     registry.finalizeAllImmediately()

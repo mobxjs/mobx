@@ -1,6 +1,6 @@
 import { getRuleTester } from "./utils/get-rule-tester";
 
-import rule from "../src/unconditional-make-observable.js";
+import rule from "../src/unconditional-make-observable";
 
 const tester = getRuleTester();
 

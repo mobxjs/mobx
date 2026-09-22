@@ -1,3 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`computed value 1`] = `"ComputedValue@1[() => 3]"`;

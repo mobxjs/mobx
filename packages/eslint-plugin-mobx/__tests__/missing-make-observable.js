@@ -1,6 +1,6 @@
 import { getRuleTester } from "./utils/get-rule-tester";
 
-import rule from "../src/missing-make-observable.js";
+import rule from "../src/missing-make-observable";
 
 const tester = getRuleTester();
 

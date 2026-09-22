@@ -358,19 +358,23 @@ class OrderLine {
     constructor() {
         makeAutoObservable(this)
 
-        this.disposableStack.use(autorun(() => {
-            doSomethingWith(this.price * this.amount)
-        }))
+        this.disposableStack.use(
+            autorun(() => {
+                doSomethingWith(this.price * this.amount)
+            })
+        )
 
-        this.disposableStack.use(autorun(() => {
-            doSomethingWith(this.price * this.amount * vat.value)
-        }))
+        this.disposableStack.use(
+            autorun(() => {
+                doSomethingWith(this.price * this.amount * vat.value)
+            })
+        )
 
         this.someDisposableResource = this.disposableStack.use(createSomeDisposableResource())
     }
 
     [Symbol.dispose]() {
-        this.disposableStack[Symbol.dispose]();
+        this.disposableStack[Symbol.dispose]()
     }
 }
 ```
@@ -427,6 +431,6 @@ Set a custom scheduler to determine how re-running the autorun function should b
 
 ### `equals`: (reaction)
 
-Set to `comparer.default` by default. If specified, this comparer function is used to compare the previous and next values produced by the _data_ function. The _effect_ function is only invoked if this function returns false.
+Set to `compareDefault` by default. If specified, this comparison function is used to compare the previous and next values produced by the _data_ function. The _effect_ function is only invoked if this function returns false.
 
 Check out the [Built-in comparers](computeds.md#built-in-comparers) section.

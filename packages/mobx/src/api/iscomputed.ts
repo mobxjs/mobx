@@ -7,7 +7,11 @@ export function _isComputed(value, property?: PropertyKey): boolean {
     if (isObservableObject(value) === false) {
         return false
     }
-    if (!value[$mobx].values_.has(property)) {
+    const adm = value[$mobx]
+    if (adm.lazyComputedKeys_?.has(property)) {
+        return true
+    }
+    if (!adm.values_.has(property)) {
         return false
     }
     const atom = getAtom(value, property)

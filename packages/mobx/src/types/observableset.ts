@@ -7,8 +7,6 @@ import {
     isSpyEnabled,
     hasListeners,
     IListenable,
-    registerListener,
-    Lambda,
     spyReportStart,
     notifyListeners,
     spyReportEnd,
@@ -17,8 +15,6 @@ import {
     hasInterceptors,
     interceptChange,
     IInterceptable,
-    IInterceptor,
-    registerInterceptor,
     checkIfStateModificationsAreAllowed,
     untracked,
     transaction,
@@ -27,7 +23,6 @@ import {
     DELETE,
     ADD,
     die,
-    isFunction,
     initObservable
 } from "../internal"
 
@@ -55,16 +50,14 @@ export type ISetWillDeleteChange<T = any> = {
     type: "delete"
     object: ObservableSet<T>
     oldValue: T
-};
+}
 export type ISetWillAddChange<T = any> = {
     type: "add"
     object: ObservableSet<T>
     newValue: T
-};
+}
 
-export type ISetWillChange<T = any> =
-    | ISetWillDeleteChange<T>
-    | ISetWillAddChange<T>
+export type ISetWillChange<T = any> = ISetWillDeleteChange<T> | ISetWillAddChange<T>
 
 export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillChange>, IListenable {
     [$mobx] = ObservableSetMarker
@@ -80,9 +73,6 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
         enhancer: IEnhancer<T> = deepEnhancer,
         public name_ = __DEV__ ? "ObservableSet@" + getNextId() : "ObservableSet"
     ) {
-        if (!isFunction(Set)) {
-            die(22)
-        }
         this.enhancer_ = (newV, oldV) => enhancer(newV, oldV, name_)
         initObservable(() => {
             this.atom_ = createAtom(this.name_)
@@ -133,8 +123,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
             }
 
             // implemented reassignment same as it's done for ObservableMap
-            value = change.newValue!;
-
+            value = change.newValue!
         }
         if (!this.has(value)) {
             transaction(() => {
@@ -244,21 +233,11 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
     }
 
     intersection<U>(otherSet: ReadonlySetLike<U> | Set<U>): Set<T & U> {
-        if (isES6Set(otherSet) && !isObservableSet(otherSet)) {
-            return otherSet.intersection(this)
-        } else {
-            const dehancedSet = new Set(this)
-            return dehancedSet.intersection(otherSet)
-        }
+        return new Set(this).intersection(otherSet)
     }
 
     union<U>(otherSet: ReadonlySetLike<U> | Set<U>): Set<T | U> {
-        if (isES6Set(otherSet) && !isObservableSet(otherSet)) {
-            return otherSet.union(this)
-        } else {
-            const dehancedSet = new Set(this)
-            return dehancedSet.union(otherSet)
-        }
+        return new Set(this).union(otherSet)
     }
 
     difference<U>(otherSet: ReadonlySetLike<U>): Set<T> {
@@ -266,12 +245,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
     }
 
     symmetricDifference<U>(otherSet: ReadonlySetLike<U> | Set<U>): Set<T | U> {
-        if (isES6Set(otherSet) && !isObservableSet(otherSet)) {
-            return otherSet.symmetricDifference(this)
-        } else {
-            const dehancedSet = new Set(this)
-            return dehancedSet.symmetricDifference(otherSet)
-        }
+        return new Set(this).symmetricDifference(otherSet)
     }
 
     isSubsetOf(otherSet: ReadonlySetLike<unknown>): boolean {
@@ -283,12 +257,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
     }
 
     isDisjointFrom(otherSet: ReadonlySetLike<unknown> | Set<unknown>): boolean {
-        if (isES6Set(otherSet) && !isObservableSet(otherSet)) {
-            return otherSet.isDisjointFrom(this)
-        } else {
-            const dehancedSet = new Set(this)
-            return dehancedSet.isDisjointFrom(otherSet)
-        }
+        return new Set(this).isDisjointFrom(otherSet)
     }
 
     replace(other: ObservableSet<T> | IObservableSetInitialValues<T>): ObservableSet<T> {
@@ -296,32 +265,45 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
             other = new Set(other)
         }
 
-        transaction(() => {
-            if (Array.isArray(other)) {
-                this.clear()
-                other.forEach(value => this.add(value))
-            } else if (isES6Set(other)) {
-                this.clear()
-                other.forEach(value => this.add(value))
-            } else if (other !== null && other !== undefined) {
-                die("Cannot initialize set from " + other)
-            }
-        })
+        if (Array.isArray(other) || isES6Set(other)) {
+            // Only emit `delete`/`add` events (and `reportChanged`) for values that
+            // actually change, instead of clearing and re-adding everything. `add` and
+            // `delete` are already no-ops for values that are respectively already
+            // present or already absent, so we just need to avoid deleting values that
+            // are part of the replacement. See #3761.
+            transaction(() => {
+                // Collect the desired values for quick lookup. `other` is already a Set
+                // here when it was passed (or snapshotted from an observable set) as one,
+                // so reuse it rather than allocating another; arrays are wrapped (which
+                // also dedupes them).
+                const replacementValues: Set<T> = isES6Set(other)
+                    ? other
+                    : new Set<T>(other as Iterable<T>)
+                // Short-circuit the trivial cases: an empty replacement is just a clear,
+                // and replacing into an empty set only needs the adds.
+                if (replacementValues.size === 0) {
+                    this.clear()
+                    return
+                }
+                if (this.data_.size === 0) {
+                    replacementValues.forEach(value => this.add(value))
+                    return
+                }
+                // Delete values that are not part of the replacement.
+                for (const value of this.data_.values()) {
+                    if (!replacementValues.has(this.dehanceValue_(value))) {
+                        this.delete(value)
+                    }
+                }
+                // Add new values; values that are already present are a no-op.
+                replacementValues.forEach(value => this.add(value))
+            })
+        } else if (other !== null && other !== undefined) {
+            die(41, other)
+        }
 
         return this
     }
-    observe_(listener: (changes: ISetDidChange<T>) => void, fireImmediately?: boolean): Lambda {
-        // ... 'fireImmediately' could also be true?
-        if (__DEV__ && fireImmediately === true) {
-            die("`observe` doesn't support fireImmediately=true in combination with sets.")
-        }
-        return registerListener(this, listener)
-    }
-
-    intercept_(handler: IInterceptor<ISetWillChange<T>>): Lambda {
-        return registerInterceptor(this, handler)
-    }
-
     toJSON(): T[] {
         return Array.from(this)
     }

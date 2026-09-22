@@ -2,7 +2,7 @@ import { IComputedDidChange } from "./computedvalue"
 import { IValueDidChange, IBoxDidChange } from "./../types/observablevalue"
 import { IObjectDidChange } from "./../types/observableobject"
 import { IArrayDidChange } from "./../types/observablearray"
-import { Lambda, globalState, once, ISetDidChange, IMapDidChange } from "../internal"
+import { Lambda, globalState, once, ISetDidChange, IMapDidChange, assign } from "../internal"
 
 export function isSpyEnabled() {
     return __DEV__ && !!globalState.spyListeners.length
@@ -41,7 +41,7 @@ export function spyReportStart(event: PureSpyEvent) {
     if (!__DEV__) {
         return
     }
-    const change = { ...event, spyReportStart: true as const }
+    const change = assign({}, event, { spyReportStart: true as const })
     spyReport(change)
 }
 
@@ -52,7 +52,7 @@ export function spyReportEnd(change?: { time?: number }) {
         return
     }
     if (change) {
-        spyReport({ ...change, type: "report-end", spyReportEnd: true })
+        spyReport(assign({}, change, { type: "report-end" as const, spyReportEnd: true as const }))
     } else {
         spyReport(END_EVENT)
     }

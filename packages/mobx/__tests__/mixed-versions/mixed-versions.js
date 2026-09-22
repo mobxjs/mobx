@@ -3,7 +3,7 @@ const child_process = require("child_process")
 
 if (!fs.existsSync(__dirname + "/../../dist/mobx.umd.development.js")) {
     // make sure the minified build exists
-    child_process.execSync("yarn build", { stdio: "inherit" })
+    child_process.execSync("npm run build", { stdio: "inherit" })
 }
 
 const mobx1 = require("../../dist")

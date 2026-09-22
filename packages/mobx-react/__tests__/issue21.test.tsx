@@ -3,6 +3,7 @@ import {
     computed,
     isObservable,
     observable,
+    observableRef,
     reaction,
     transaction,
     IReactionDisposer,
@@ -50,7 +51,7 @@ const wizardModel = observable(
         }
     } as any,
     {
-        activateNextStep: observable.ref
+        activateNextStep: observableRef
     }
 )
 
@@ -123,27 +124,23 @@ test("verify issue 21", () => {
 
 test("verify prop changes are picked up", () => {
     function createItem(subid, label) {
-        const res = observable(
-            {
-                subid,
-                id: 1,
-                label: label,
-                get text() {
-                    events.push(["compute", this.subid])
-                    return (
-                        this.id +
-                        "." +
-                        this.subid +
-                        "." +
-                        this.label +
-                        "." +
-                        data.items.indexOf(this as any)
-                    )
-                }
-            },
-            {},
-            { proxy: false }
-        )
+        const res = observable({
+            subid,
+            id: 1,
+            label: label,
+            get text() {
+                events.push(["compute", this.subid])
+                return (
+                    this.id +
+                    "." +
+                    this.subid +
+                    "." +
+                    this.label +
+                    "." +
+                    data.items.indexOf(this as any)
+                )
+            }
+        })
         res.subid = subid // non reactive
         return res
     }

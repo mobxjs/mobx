@@ -1,5 +1,11 @@
 # mobx-undecorate
 
+## 1.3.1
+
+### Patch Changes
+
+-   [`0e8fbd6947350e4318d3cf83b69ee58b4b839c25`](https://github.com/mobxjs/mobx/commit/0e8fbd6947350e4318d3cf83b69ee58b4b839c25) [#4646](https://github.com/mobxjs/mobx/pull/4646) Thanks [@kubk](https://github.com/kubk)! - Fix CLI resolution of the bundled jscodeshift binary when dependencies are hoisted by npm workspaces.
+
 ## 1.3.0
 
 ### Minor Changes

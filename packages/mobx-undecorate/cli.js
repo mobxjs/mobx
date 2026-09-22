@@ -31,8 +31,11 @@ const getCommandPath = binCommand => {
     COMMAND_PATH = COMMAND_PATH_SIBLING
   }
   else {
-    throw new Error("cannot find jscodeshift path")
-    process.exit(0)
+    // npm workspaces can hoist dependency bins outside both local paths above.
+    const pkgPath = require.resolve(`${binCommand}/package.json`, { paths: [__dirname] })
+    const pkg = require(pkgPath)
+    const binPath = typeof pkg.bin === "string" ? pkg.bin : pkg.bin[binCommand]
+    COMMAND_PATH = path.resolve(path.dirname(pkgPath), binPath)
   }
   return COMMAND_PATH
 
@@ -114,5 +117,4 @@ spawnBin("jscodeshift", [
   `"${path.join(process.cwd(), interpret_cli_args())}"`
 
 ]);
-
 

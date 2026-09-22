@@ -1,5 +1,102 @@
 # mobx-react
 
+## 10.0.2
+
+### Patch Changes
+
+-   [`6f002b8e543ca39d3ee23681e28848d7f1724fae`](https://github.com/mobxjs/mobx/commit/6f002b8e543ca39d3ee23681e28848d7f1724fae) [#4696](https://github.com/mobxjs/mobx/pull/4696) Thanks [@gesposito](https://github.com/gesposito)! - perf: add a `node` export condition that routes Node and Bun to the existing `dist/index.js` entry, which picks the prebaked development or production CJS build once at require time. `import`ing mobx in Node no longer executes the env-agnostic `dist/mobx.mjs` with per-call `NODE_ENV` checks, and mixing `import` and `require` in one Node app now yields a single mobx instance.
+
+-   Updated dependencies [[`6f002b8e543ca39d3ee23681e28848d7f1724fae`](https://github.com/mobxjs/mobx/commit/6f002b8e543ca39d3ee23681e28848d7f1724fae)]:
+    -   mobx-react-lite@5.0.3
+
+## 10.0.1
+
+### Patch Changes
+
+-   [`ec1b708026c1578e1c1f6c7bd90be18b26f7ce85`](https://github.com/mobxjs/mobx/commit/ec1b708026c1578e1c1f6c7bd90be18b26f7ce85) [#4695](https://github.com/mobxjs/mobx/pull/4695) Thanks [@gesposito](https://github.com/gesposito)! - perf: evaluate `NODE_ENV` once at module scope in the env-agnostic esm bundles (`dist/<pkg>.esm.js` and `dist/<pkg>.mjs`) instead of at every `__DEV__` call site. `process.env` is an exotic object in Node, so each check performed a real environment lookup on hot paths; consumers that execute these files as-is (Node ESM, vitest, SSR) see roughly 10x faster observable writes in dev mode. All env-set artifacts and bundler output are unchanged.
+
+-   Updated dependencies [[`ec1b708026c1578e1c1f6c7bd90be18b26f7ce85`](https://github.com/mobxjs/mobx/commit/ec1b708026c1578e1c1f6c7bd90be18b26f7ce85)]:
+    -   mobx-react-lite@5.0.2
+
+## 10.0.0
+
+### Major Changes
+
+-   [`1926c69f53168619d688f348aa587e8f3ae579ae`](https://github.com/mobxjs/mobx/commit/1926c69f53168619d688f348aa587e8f3ae579ae) [#4671](https://github.com/mobxjs/mobx/pull/4671) Thanks [@kubk](https://github.com/kubk)! - Release MobX 7, mobx-react-lite 5, and mobx-react 10.
+
+    Bundle sizes are down: ESM prod 17.02 KiB gzip -> 13.96 KiB gzip; a minimal tree-shaken example is 10.32 KiB gzip now.
+
+    It removes long-deprecated compatibility paths and keeps the React bindings split between `mobx-react-lite` for function components and `mobx-react` for class-component support.
+
+    ## MobX 7
+
+    MobX 7 is a cleanup release focused on the modern runtime and decorator model.
+
+    -   MobX now always uses Proxy-backed observable objects and arrays. The ES5/non-proxy fallback has been removed.
+    -   `configure({ useProxies: ... })` is no longer supported.
+    -   `{ proxy: false }` options for `observable`, `observable.object`, and `observable.array` are no longer supported.
+    -   Legacy decorators are no longer supported.
+    -   Namespaced annotation and comparer properties now use named exports to reduce bundle size:
+
+    | Removed API           | Replacement         |
+    | --------------------- | ------------------- |
+    | `observable.ref`      | `observableRef`     |
+    | `observable.shallow`  | `observableShallow` |
+    | `observable.deep`     | `observableDeep`    |
+    | `observable.struct`   | `observableStruct`  |
+    | `computed.struct`     | `computedStruct`    |
+    | `action.bound`        | `actionBound`       |
+    | `flow.bound`          | `flowBound`         |
+    | `comparer.identity`   | `compareIdentity`   |
+    | `comparer.default`    | `compareDefault`    |
+    | `comparer.structural` | `compareStructural` |
+    | `comparer.shallow`    | `compareShallow`    |
+
+    -   The public `trace` API and its related runtime support have been removed. Use `toJS`, `getDependencyTree`, `getObserverTree`, `spy` or `mobx-log` package for debugging.
+
+    ## mobx-react-lite 5 and mobx-react 10
+
+    mobx-react-lite 5 and mobx-react 10 require MobX 7 and React 18 or later.
+
+    `mobx-react-lite` remains the function-component package. `mobx-react` remains a thin wrapper around `mobx-react-lite` that adds class component and Stage 3 `@observer` class decorator support.
+
+    -   Keep function-component imports on `mobx-react-lite` if you do not need class component support.
+    -   Use `mobx-react` when you need class components or `@observer` class decorators.
+    -   `mobx-react-lite` supports function components and `forwardRef`; `mobx-react` delegates function components to `mobx-react-lite` and handles classes itself.
+    -   Remove React batching imports, including the stale React Native batching deep import. React 18+ renderers handle batching.
+
+    The recommended public React binding surface for both packages is:
+
+    -   `observer`
+    -   `Observer`
+    -   `useLocalObservable`
+    -   `enableStaticRendering`
+    -   `isUsingStaticRendering`
+
+    The following APIs have been removed from the React binding packages:
+
+    -   `Provider`, `inject`, and `MobXProviderContext`; use `React.createContext` directly.
+    -   `disposeOnUnmount`; dispose reactions in `componentWillUnmount` or return cleanup functions from `useEffect`.
+    -   `PropTypes`; use TypeScript or the regular `prop-types` package.
+    -   `useObserver`; wrap components with `observer` or use `<Observer>`.
+    -   `useLocalStore`; use `useLocalObservable`.
+    -   `useAsObservableSource`; synchronize values from props into local observable state explicitly.
+    -   `useStaticRendering`; use `enableStaticRendering`.
+    -   `observerBatching`, `isObserverBatched`, `batchingForReactDom`, `batchingOptOut`, and `batchingForReactNative`; remove these imports because React 18+ renderers handle batching.
+    -   Deprecated `observer(fn, { forwardRef: true })`; pass an already-created `React.forwardRef(...)` component to `observer` instead.
+    -   Legacy function-component `contextTypes` handling.
+
+### Patch Changes
+
+-   Updated dependencies [[`1926c69f53168619d688f348aa587e8f3ae579ae`](https://github.com/mobxjs/mobx/commit/1926c69f53168619d688f348aa587e8f3ae579ae)]:
+    -   mobx-react-lite@5.0.0
+
+## 9.2.2
+
+### Patch Changes
+
+-   [`82f1e426e8205348dd0954a4bd3f647b40109996`](https://github.com/mobxjs/mobx/commit/82f1e426e8205348dd0954a4bd3f647b40109996) [#4652](https://github.com/mobxjs/mobx/pull/4652) Thanks [@kubk](https://github.com/kubk)! - Avoid Rolldown invalid PURE annotation warnings from Babel-generated React version parsing output.
+
 ## 9.2.1
 
 ### Patch Changes

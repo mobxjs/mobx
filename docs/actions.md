@@ -170,7 +170,7 @@ For debugging purposes, we recommend to either name the wrapped function, or pas
 
 <details id="actions-are-untracked"><summary>**Note:** actions are untracked<a href="#actions-are-untracked" class="tip-anchor"></a></summary>
 
-Another feature of actions is that they are [untracked](api.md#untracked). When an action is called from inside a side effect or a computed value (very rare!), observables read by the action won't be counted towards the dependencies of the derivation
+Another feature of actions is that they are [untracked](api.md#untracked). When an action is called from inside a side effect or a computed value (very rare!), observables read by the action won't be counted towards the dependencies of the derivation.
 
 `makeAutoObservable`, `extendObservable` and `observable` use a special flavour of `action` called [`autoAction`](observable-state.md#autoAction),
 that will determine at runtime if the function is a derivation or action.
@@ -235,7 +235,7 @@ class Parent {
 
     constructor() {
         makeObservable(this, {
-            arrowAction: action
+            arrowAction: action,
             action: action,
             boundAction: action.bound,
         })
@@ -486,7 +486,7 @@ Usage:
 -   `flow.bound` _(annotation)_
 
 The `flow.bound` annotation can be used to automatically bind a method to the correct instance, so that `this` is always correctly bound inside the function.
-Similary to actions, flows can be bound by default using [`autoBind` option](#auto-bind).
+Similarly to actions, flows can be bound by default using [`autoBind` option](#auto-bind).
 
 ## Cancelling flows {🚀}
 

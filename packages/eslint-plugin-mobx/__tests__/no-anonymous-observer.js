@@ -1,6 +1,6 @@
 import { getRuleTester } from "./utils/get-rule-tester";
 
-import rule from "../src/no-anonymous-observer.js"
+import rule from "../src/no-anonymous-observer"
 
 const tester = getRuleTester();
 

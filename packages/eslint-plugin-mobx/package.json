@@ -1,8 +1,9 @@
 {
     "name": "eslint-plugin-mobx",
-    "version": "0.0.13",
+    "version": "0.0.14",
     "description": "ESLint rules for MobX",
     "main": "dist/index.js",
+    "types": "dist/index.d.ts",
     "repository": {
         "type": "git",
         "url": "https://github.com/mobxjs/mobx.git",
@@ -25,20 +26,15 @@
     ],
     "homepage": "https://mobx.js.org/",
     "peerDependencies": {
-        "eslint": "^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0 || ^9.0.0"
+        "eslint": "^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0 || ^9.0.0 || ^10.0.0"
+    },
+    "dependencies": {
+        "@types/eslint": "^9.6.1",
+        "@types/estree": "^1.0.0"
     },
     "devDependencies": {
-        "@babel/core": "^7.16.0",
-        "@babel/preset-env": "^7.16.4",
-        "@rollup/plugin-babel": "^5.3.0",
-        "@rollup/plugin-commonjs": "^21.0.1",
-        "@rollup/plugin-node-resolve": "13.0.6",
-        "@typescript-eslint/eslint-plugin": "^5.0.0",
-        "@typescript-eslint/parser": "^5.0.0",
-        "eslint": "^7.0.0",
         "eslint-7": "npm:eslint@^7.0.0",
-        "eslint-9": "npm:eslint@^9.0.0",
-        "rollup": "^2.60.2"
+        "eslint-9": "npm:eslint@^9.0.0"
     },
     "keywords": [
         "eslint",
@@ -50,7 +46,10 @@
         "test:7": "jest --config jest.config-eslint-7.js",
         "test:9": "jest --config jest.config-eslint-9.js",
         "test": "npm run test:7 && npm run test:9",
-        "build": "yarn rollup --config",
-        "prepublishOnly": "yarn build"
+        "test:types": "tsc --noEmit",
+        "test:check": "npm run test:types",
+        "prebuild": "rm -rf dist",
+        "build": "tsc",
+        "prepublishOnly": "npm run build"
     }
 }

@@ -4,3 +4,4 @@ LICENSE
 
 temp
 perf_report
+__tests__/perf/compiled

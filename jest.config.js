@@ -1,6 +1,5 @@
-const buildConfig = require("./jest.base.config")
-
-module.exports = buildConfig(__dirname, {
+module.exports = {
+    coverageDirectory: "<rootDir>/coverage/",
+    coverageReporters: ["lcov", "text"],
     projects: ["<rootDir>/packages/*/jest.config.js", "<rootDir>/packages/*/jest.config-*.js"]
-    // collectCoverageFrom: ["<rootDir>/packages/*/src/**/*.{ts,tsx}"]
-})
+}

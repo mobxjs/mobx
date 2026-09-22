@@ -11,7 +11,18 @@ import {
     getAdministration,
     ObservableSet,
     ISetDidChange,
-    isFunction
+    isFunction,
+    isComputedValue,
+    isObservableArray,
+    isObservableMap,
+    isObservableObject,
+    isObservableSet,
+    autorun,
+    registerListener,
+    untrackedEnd,
+    untrackedStart,
+    UPDATE,
+    die
 } from "../internal"
 
 export function observe<T>(
@@ -61,9 +72,77 @@ export function observe(thing, propOrCb?, cbOrFire?, fireImmediately?): Lambda {
 }
 
 function observeObservable(thing, listener, fireImmediately: boolean) {
-    return getAdministration(thing).observe_(listener, fireImmediately)
+    const adm = getAdministration(thing)
+
+    if (isObservableArray(thing)) {
+        if (fireImmediately) {
+            listener({
+                observableKind: "array",
+                object: adm.proxy_,
+                debugObjectName: adm.atom_.name_,
+                type: "splice",
+                index: 0,
+                added: adm.values_.slice(),
+                addedCount: adm.values_.length,
+                removed: [],
+                removedCount: 0
+            })
+        }
+    } else if (isObservableMap(thing)) {
+        if (__DEV__ && fireImmediately === true) {
+            die("`observe` doesn't support fireImmediately=true in combination with maps.")
+        }
+    } else if (isObservableSet(thing)) {
+        if (__DEV__ && fireImmediately === true) {
+            die("`observe` doesn't support fireImmediately=true in combination with sets.")
+        }
+    } else if (isObservableObject(thing)) {
+        if (__DEV__ && fireImmediately === true) {
+            die("`observe` doesn't support the fire immediately property for observable objects.")
+        }
+    } else {
+        return observeValue(adm, listener, fireImmediately)
+    }
+
+    return registerListener(adm, listener)
 }
 
 function observeObservableProperty(thing, property, listener, fireImmediately: boolean) {
-    return getAdministration(thing, property).observe_(listener, fireImmediately)
+    return observeValue(getAdministration(thing, property), listener, fireImmediately)
+}
+
+function observeValue(adm, listener, fireImmediately: boolean) {
+    if (isComputedValue(adm)) {
+        let firstTime = true
+        let prevValue: any = undefined
+        return autorun(() => {
+            const newValue = adm.get()
+            if (!firstTime || fireImmediately) {
+                const prevU = untrackedStart()
+                listener({
+                    observableKind: "computed",
+                    debugObjectName: adm.name_,
+                    type: UPDATE,
+                    object: adm,
+                    newValue,
+                    oldValue: prevValue
+                })
+                untrackedEnd(prevU)
+            }
+            firstTime = false
+            prevValue = newValue
+        })
+    }
+
+    if (fireImmediately) {
+        listener({
+            observableKind: "value",
+            debugObjectName: adm.name_,
+            object: adm,
+            type: UPDATE,
+            newValue: adm.value_,
+            oldValue: undefined
+        })
+    }
+    return registerListener(adm, listener)
 }

@@ -44,7 +44,7 @@ test("verify issue 806", () => {
     // make sure observableRequiresReaction is still working outside component
     withConsole(["warn"], () => {
         x.a.toString()
-        expect(console.warn).toBeCalledTimes(1)
+        expect(console.warn).toHaveBeenCalledTimes(1)
         expect(console.warn).toHaveBeenCalledWith(
             "[mobx] Observable 'ObservableObject@1.a' being read outside a reactive context."
         )

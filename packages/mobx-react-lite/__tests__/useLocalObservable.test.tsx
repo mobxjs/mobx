@@ -1,20 +1,15 @@
 import * as mobx from "mobx"
 import * as React from "react"
-import { act, cleanup, fireEvent, render, renderHook } from "@testing-library/react"
+import { act, fireEvent, render, renderHook } from "@testing-library/react"
 
 import { Observer, observer, useLocalObservable } from "../src"
 import { useEffect, useState } from "react"
 import { autorun } from "mobx"
 import { useObserver } from "../src/useObserver"
 
-afterEach(cleanup)
-
 let consoleWarnMock: jest.SpyInstance | undefined
-afterEach(() => {
-    consoleWarnMock?.mockRestore()
-})
 
-test("base useLocalStore should work", () => {
+test("base useLocalObservable should work", () => {
     let counterRender = 0
     let observerRender = 0
     let outerStoreRef: any
@@ -468,8 +463,8 @@ describe("enforcing actions", () => {
             }
         )
 
-        expect(onError).not.toBeCalled()
-        expect(consoleWarnMock).not.toBeCalled()
+        expect(onError).not.toHaveBeenCalled()
+        expect(consoleWarnMock).not.toHaveBeenCalled()
     })
     it("only when 'observed' should work", () => {
         mobx.configure({ enforceActions: "observed" })
@@ -504,8 +499,8 @@ describe("enforcing actions", () => {
             }
         )
 
-        expect(onError).not.toBeCalled()
-        expect(consoleWarnMock).not.toBeCalled()
+        expect(onError).not.toHaveBeenCalled()
+        expect(consoleWarnMock).not.toHaveBeenCalled()
     })
     it("'always' should work", () => {
         mobx.configure({ enforceActions: "always" })
@@ -540,7 +535,7 @@ describe("enforcing actions", () => {
             }
         )
 
-        expect(onError).not.toBeCalled()
-        expect(consoleWarnMock).toBeCalledTimes(2)
+        expect(onError).not.toHaveBeenCalled()
+        expect(consoleWarnMock).toHaveBeenCalledTimes(2)
     })
 })

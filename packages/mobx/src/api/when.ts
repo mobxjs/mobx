@@ -7,7 +7,8 @@ import {
     getNextId,
     die,
     allowStateChanges,
-    GenericAbortSignal
+    GenericAbortSignal,
+    assign
 } from "../internal"
 
 export interface IWhenOptions {
@@ -77,12 +78,12 @@ function whenPromise(
         return die(`the options 'onError' and 'promise' cannot be combined`)
     }
     if (opts?.signal?.aborted) {
-        return Object.assign(Promise.reject(new Error("WHEN_ABORTED")), { cancel: () => null })
+        return assign(Promise.reject(new Error("WHEN_ABORTED")), { cancel: () => null })
     }
     let cancel
     let abort
     const res = new Promise((resolve, reject) => {
-        let disposer = _when(predicate, resolve as Lambda, { ...opts, onError: reject })
+        let disposer = _when(predicate, resolve as Lambda, assign({}, opts, { onError: reject }))
         cancel = () => {
             disposer()
             reject(new Error("WHEN_CANCELLED"))

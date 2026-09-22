@@ -1,0 +1,95 @@
+const mobx = require("../../src/mobx.ts")
+
+test("correct api should be exposed", function () {
+    expect(
+        Object.keys(mobx)
+            .filter(key => mobx[key] !== undefined)
+            .sort()
+    ).toEqual(
+        [
+            "$mobx", // adminstration symbol
+            "action",
+            "actionBound",
+            "_allowStateChanges",
+            "_allowStateChangesInsideComputed",
+            "_allowStateReadsEnd",
+            "_allowStateReadsStart",
+            "_autoAction",
+            "_autoActionBound",
+            "autorun",
+            "compareDefault",
+            "compareIdentity",
+            "compareShallow",
+            "compareStructural",
+            "computed",
+            "computedStruct",
+            "configure",
+            "createAtom",
+            "defineProperty",
+            "extendObservable",
+            "flow",
+            "flowBound",
+            "isFlow",
+            "flowResult",
+            "FlowCancellationError",
+            "isFlowCancellationError",
+            "get",
+            "_getAdministration",
+            "getAtom",
+            "getDebugName",
+            "getDependencyTree",
+            "has",
+            "_getGlobalState",
+            "getObserverTree",
+            "intercept",
+            "_interceptReads",
+            "isAction",
+            "isBoxedObservable",
+            "isComputed",
+            "isComputedProp",
+            "_isComputingDerivation",
+            "isObservable",
+            "isObservableArray",
+            "isObservableMap",
+            "isObservableSet",
+            "isObservableObject",
+            "isObservableProp",
+            "keys",
+            "makeAutoObservable",
+            "makeObservable",
+            "ObservableMap",
+            "ObservableSet",
+            "observable",
+            "observableDeep",
+            "observableRef",
+            "observableShallow",
+            "observableStruct",
+            "observe",
+            "onReactionError",
+            "onBecomeObserved",
+            "onBecomeUnobserved",
+            "ownKeys",
+            "Reaction",
+            "reaction",
+            "remove",
+            "_resetGlobalState",
+            "runInAction",
+            "set",
+            "spy",
+            "toJS",
+            "transaction",
+            "untracked",
+            "values",
+            "entries",
+            "when",
+            "_startAction",
+            "_endAction",
+            "override"
+        ].sort()
+    )
+})
+
+test("mobx has no dependencies", () => {
+    const pkg = require("../../package.json")
+    expect(pkg.dependencies).toEqual({})
+})

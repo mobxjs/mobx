@@ -1,0 +1,71 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`decorate proxies 1`] = `
+{
+  "b": {
+    "configurable": true,
+    "enumerable": true,
+    "get": [Function],
+    "set": [Function],
+  },
+  "double": {
+    "configurable": true,
+    "enumerable": false,
+    "value": [Function],
+    "writable": false,
+  },
+  "x": {
+    "configurable": true,
+    "enumerable": true,
+    "get": [Function],
+    "set": [Function],
+  },
+  "y": {
+    "configurable": true,
+    "enumerable": false,
+    "get": [Function],
+    "set": [Function],
+  },
+  Symbol(mobx administration): {
+    "configurable": true,
+    "enumerable": false,
+    "value": "(omitted)",
+    "writable": true,
+  },
+}
+`;
+
+exports[`extend proxies 1`] = `
+{
+  "b": {
+    "configurable": true,
+    "enumerable": true,
+    "get": [Function],
+    "set": [Function],
+  },
+  "double": {
+    "configurable": true,
+    "enumerable": false,
+    "value": [Function],
+    "writable": false,
+  },
+  "x": {
+    "configurable": true,
+    "enumerable": true,
+    "get": [Function],
+    "set": [Function],
+  },
+  "y": {
+    "configurable": true,
+    "enumerable": false,
+    "get": [Function],
+    "set": [Function],
+  },
+  Symbol(mobx administration): {
+    "configurable": true,
+    "enumerable": false,
+    "value": "(omitted)",
+    "writable": true,
+  },
+}
+`;

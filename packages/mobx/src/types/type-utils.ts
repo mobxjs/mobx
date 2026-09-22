@@ -47,7 +47,11 @@ export function getAtom(thing: any, property?: PropertyKey): IDepTreeNode {
             if (!property) {
                 return die(26)
             }
-            const observable = (thing as any)[$mobx].values_.get(property)
+            const adm = (thing as any)[$mobx]
+            const observable =
+                adm.values_.get(property) ??
+                adm.materializeLazyComputed_(property) ??
+                adm.materializeLazyObservable_(property)
             if (!observable) {
                 die(27, property, getDebugName(thing))
             }
@@ -107,13 +111,15 @@ export function getDebugName(thing: any, property?: string): string {
  */
 export function initObservable<T>(cb: () => T): T {
     const derivation = untrackedStart()
-    const allowStateChanges = allowStateChangesStart(true)
+    const allowStateChanges = __DEV__ ? allowStateChangesStart(true) : true
     startBatch()
     try {
         return cb()
     } finally {
         endBatch()
-        allowStateChangesEnd(allowStateChanges)
+        if (__DEV__) {
+            allowStateChangesEnd(allowStateChanges)
+        }
         untrackedEnd(derivation)
     }
 }

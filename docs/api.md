@@ -25,7 +25,7 @@ _Making things observable._
 
 ### `makeObservable`
 
-Usage: `makeObservable(target, annotations?, options?)`
+Usage: `makeObservable(target, annotations, options?)`
 <small>(<b>[further information](observable-state.md#makeobservable)</b>)</small>
 
 Properties, entire objects, arrays, Maps and Sets can all be made observable.
@@ -89,7 +89,7 @@ If the values in the array should not be turned into observables automatically, 
 
 Creates a new observable [ES6 Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map) based on the provided `initialMap`.
 They are very useful if you don't want to react just to the change of a specific entry, but also to their addition and removal.
-Creating observable Maps is the recommended approach for creating dynamically keyed collections if you don't have [enabled Proxies](configuration.md#proxy-support).
+Creating observable Maps is the recommended approach for creating dynamically keyed collections.
 
 Besides all the language built-in Map functions, the following goodies are available on observable Maps as well:
 
@@ -216,7 +216,7 @@ Creates an observable value that is derived from other observables, but won't be
 
 ## React integration
 
-_From the `mobx-react` / `mobx-react-lite` packages._
+_From `mobx-react-lite` for function components, or `mobx-react` for class component support._
 
 ### `observer`
 
@@ -345,7 +345,7 @@ Use it to change how MobX behaves as a whole.
 
 ## Collection utilities {🚀}
 
-_They enable manipulating observable arrays, objects and Maps with the same generic API. This can be useful in [environments without `Proxy` support](configuration.md#limitations-without-proxy-support), but is otherwise typically not needed._
+_They enable manipulating observable arrays, objects and Maps with the same generic API._
 
 ### `values`
 
@@ -461,13 +461,6 @@ Is this a boxed computed value, created using `computed(() => expr)`?
 {🚀} Usage: `isComputedProp(object, propertyName)`
 
 Is this a computed property?
-
-### `trace`
-
-{🚀} Usage: `trace()`, `trace(true)` _(enter debugger)_ or `trace(object, propertyName, enterDebugger?)`
-<small>(<b>[further information](analyzing-reactivity.md)</b>)</small>
-
-Should be used inside an observer, reaction or computed value. Logs when the value is invalidated, or sets the debugger breakpoint if called with _true_.
 
 ### `spy`
 
