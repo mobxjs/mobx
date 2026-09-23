@@ -209,7 +209,6 @@ test("abandoned components should not leak observations", async () => {
 
     expect(countIsObserved).toBeTruthy()
 
-    // PR #4709 stages finalization registration in a microtask.
     await Promise.resolve()
     act(() => jest.runAllTimers())
 
