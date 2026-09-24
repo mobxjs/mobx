@@ -26,9 +26,12 @@ export class TimerBasedFinalizationRegistry<T> implements FinalizationRegistryTy
 
     unregister(token: unknown) {
         this.registrations.delete(token)
+        if (this.registrations.size === 0) {
+            clearTimeout(this.sweepTimeout)
+            this.sweepTimeout = undefined
+        }
     }
 
-    // Bound so it can be used directly as setTimeout callback.
     sweep = (maxAge = REGISTRY_FINALIZE_AFTER) => {
         // cancel timeout so we can force sweep anytime
         clearTimeout(this.sweepTimeout)
@@ -37,8 +40,8 @@ export class TimerBasedFinalizationRegistry<T> implements FinalizationRegistryTy
         const now = Date.now()
         this.registrations.forEach((registration, token) => {
             if (now - registration.registeredAt >= maxAge) {
-                this.finalize(registration.value)
                 this.registrations.delete(token)
+                this.finalize(registration.value)
             }
         })
 
@@ -47,7 +50,6 @@ export class TimerBasedFinalizationRegistry<T> implements FinalizationRegistryTy
         }
     }
 
-    // Bound so it can be exported directly as clearTimers test utility.
     finalizeAllImmediately = () => {
         this.sweep(0)
     }
@@ -59,7 +61,71 @@ export class TimerBasedFinalizationRegistry<T> implements FinalizationRegistryTy
     }
 }
 
+type Registration<T> = { value: T; token: object }
+
+// Native finalization can run early, but cannot collect a target retained by its
+// reaction's dependencies (for example, a computed capturing a React state setter).
+// Keep the timer as a backstop even when native finalization is available.
+export class FinalizationRegistryWithTimer<T> implements FinalizationRegistryType<T> {
+    private finalizeRegistration = (registration: Registration<T>) => {
+        // Remove both registrations before disposal, which can invoke user callbacks.
+        this.native?.unregister(registration.token)
+        this.timer.unregister(registration.token)
+        this.finalize(registration.value)
+    }
+
+    private tokens = new WeakMap<object, object>()
+    private staged = new Map<object, { target: object; value: T }>()
+    private flushScheduled = false
+    private native =
+        typeof FinalizationRegistry !== "undefined"
+            ? new FinalizationRegistry<Registration<T>>(this.finalizeRegistration)
+            : undefined
+    private timer = new TimerBasedFinalizationRegistry<Registration<T>>(this.finalizeRegistration)
+
+    constructor(private readonly finalize: (value: T) => void) {}
+
+    register(target: object, value: T, token: object = target) {
+        this.unregister(token)
+        // Stage registrations so synchronous subscriptions avoid native and timer work.
+        this.staged.set(token, { target, value })
+        if (!this.flushScheduled) {
+            this.flushScheduled = true
+            Promise.resolve().then(this.flushRegistrations)
+        }
+    }
+
+    unregister(token: object) {
+        if (this.staged.delete(token)) {
+            return
+        }
+        const internalToken = this.tokens.get(token)
+        if (internalToken) {
+            this.tokens.delete(token)
+            this.native?.unregister(internalToken)
+            this.timer.unregister(internalToken)
+        }
+    }
+
+    finalizeAllImmediately = () => {
+        this.flushRegistrations()
+        this.timer.finalizeAllImmediately()
+    }
+
+    private flushRegistrations = () => {
+        this.flushScheduled = false
+        this.staged.forEach(({ target, value }, token) => {
+            // Use a separate token so a target used as its unregister token is not retained by the timer.
+            const registration = { value, token: {} }
+            this.tokens.set(token, registration.token)
+            this.native?.register(target, registration, registration.token)
+            this.timer.register(target, registration, registration.token)
+        })
+        this.staged.clear()
+    }
+}
+
 export const UniversalFinalizationRegistry =
     typeof FinalizationRegistry !== "undefined"
-        ? FinalizationRegistry
+        ? FinalizationRegistryWithTimer
         : TimerBasedFinalizationRegistry
