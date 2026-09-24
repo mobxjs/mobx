@@ -13,7 +13,8 @@ import {
     autoActionBound,
     isGenerator,
     MakeResult,
-    isAction
+    isAction,
+    CreateObservableOptions
 } from "../internal"
 
 const AUTO = "true"
@@ -27,6 +28,17 @@ export function createAutoAnnotation(options?: object): Annotation {
         make_,
         extend_
     }
+}
+
+// The auto annotation only depends on `deep` and `autoBind`, so share one instance per combination
+// instead of allocating one for every object created with options
+const autoAnnotations: Annotation[] = [autoAnnotation]
+
+export function getAutoAnnotation(options: CreateObservableOptions): Annotation {
+    const deep = options.deep !== false
+    const autoBind = !!options.autoBind
+    const idx = (deep ? 0 : 1) | (autoBind ? 2 : 0)
+    return (autoAnnotations[idx] ??= createAutoAnnotation({ deep, autoBind }))
 }
 
 function make_(

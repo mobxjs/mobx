@@ -14,8 +14,13 @@ export function registerInterceptor<T>(
     interceptable: IInterceptable<T>,
     handler: IInterceptor<T>
 ): Lambda {
-    const interceptors = interceptable.interceptors_ || (interceptable.interceptors_ = [])
-    interceptors.push(handler)
+    let interceptors = interceptable.interceptors_
+    if (interceptors) {
+        interceptors.push(handler)
+    } else {
+        // Allocate at the exact size: pushing onto an empty array over-allocates its backing store
+        interceptors = interceptable.interceptors_ = [handler]
+    }
     return once(() => {
         const idx = interceptors.indexOf(handler)
         if (idx !== -1) {

@@ -225,3 +225,50 @@ test("intercept prevent dispose from breaking current execution", () => {
 
     expect(a.get()).toBe(4)
 })
+
+test("intercept disposers unregister the right handler, in any order", () => {
+    const a = m.observable.box(0)
+    const calls = []
+    const d1 = intercept(a, c => (calls.push(1), c))
+    const d2 = intercept(a, c => (calls.push(2), c))
+    const d3 = intercept(a, c => (calls.push(3), c))
+
+    a.set(1)
+    expect(calls).toEqual([1, 2, 3])
+
+    calls.length = 0
+    d2()
+    d2() // disposing twice is a no-op
+    a.set(2)
+    expect(calls).toEqual([1, 3])
+
+    calls.length = 0
+    d1()
+    d3()
+    a.set(3)
+    expect(calls).toEqual([])
+    expect(a.get()).toBe(3)
+
+    // registering again after all were disposed works, and old disposers don't affect it
+    const d4 = intercept(a, c => (calls.push(4), c))
+    d1()
+    a.set(4)
+    expect(calls).toEqual([4])
+    d4()
+    calls.length = 0
+    a.set(5)
+    expect(calls).toEqual([])
+})
+
+test("intercept disposer only removes one registration of the same handler", () => {
+    const o = m.observable({ x: 0 })
+    let count = 0
+    const handler = c => (count++, c)
+    const d1 = intercept(o, handler)
+    intercept(o, handler)
+    o.x = 1
+    expect(count).toBe(2)
+    d1()
+    o.x = 2
+    expect(count).toBe(3)
+})

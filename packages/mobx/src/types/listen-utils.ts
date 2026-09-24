@@ -9,8 +9,13 @@ export function hasListeners(listenable: IListenable) {
 }
 
 export function registerListener(listenable: IListenable, handler: Function): Lambda {
-    const listeners = listenable.changeListeners_ || (listenable.changeListeners_ = [])
-    listeners.push(handler)
+    let listeners = listenable.changeListeners_
+    if (listeners) {
+        listeners.push(handler)
+    } else {
+        // Allocate at the exact size: pushing onto an empty array over-allocates its backing store
+        listeners = listenable.changeListeners_ = [handler]
+    }
     return once(() => {
         const idx = listeners.indexOf(handler)
         if (idx !== -1) {

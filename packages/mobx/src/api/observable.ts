@@ -26,7 +26,7 @@ import {
     AnnotationsMap,
     assign,
     createObservableAnnotation,
-    createAutoAnnotation,
+    getAutoAnnotation,
     initObservable,
     decorateObservable20223_
 } from "../internal"
@@ -87,7 +87,7 @@ export function getEnhancerFromOptions(options: CreateObservableOptions): IEnhan
 export function getAnnotationFromOptions(
     options?: CreateObservableOptions
 ): Annotation | undefined {
-    return options ? options.defaultDecorator ?? createAutoAnnotation(options) : undefined
+    return options ? options.defaultDecorator ?? getAutoAnnotation(options) : undefined
 }
 
 export function getEnhancerFromAnnotation(annotation?: Annotation): IEnhancer<any> {
