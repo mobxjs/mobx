@@ -1,5 +1,13 @@
 # mobx-react-lite
 
+## 5.1.0
+
+### Minor Changes
+
+-   [`f78cb1607283e26ddae508b457eabcde295212a2`](https://github.com/mobxjs/mobx/commit/f78cb1607283e26ddae508b457eabcde295212a2) [#4709](https://github.com/mobxjs/mobx/pull/4709) Thanks [@kubk](https://github.com/kubk)! - Clean up reactions from uncommitted observer renders using the existing timed fallback even when native finalization is available. This releases subscriptions retained by suspended renders while preserving reactivity on retry.
+
+    In environments with native finalization, defer cleanup registration to a shared microtask so synchronous subscriptions avoid native registrations and timers.
+
 ## 5.0.3
 
 ### Patch Changes
