@@ -1,5 +1,11 @@
 # mobx
 
+## 7.0.5
+
+### Patch Changes
+
+-   [`105d66d73529812a8eddc0847891e7f0c574e129`](https://github.com/mobxjs/mobx/commit/105d66d73529812a8eddc0847891e7f0c574e129) [#4713](https://github.com/mobxjs/mobx/pull/4713) Thanks [@xaviergonz](https://github.com/xaviergonz)! - perf: reduce memory used by large, mostly unobserved state. `intercept` / `observe` handler arrays are allocated at their exact size, an observable's internal observers `Set` is released once its last observer leaves, observable objects created with the same `deep` / `autoBind` options share one default annotation instead of allocating their own, and `endBatch()` skips the unobservation pass when nothing is pending.
+
 ## 7.0.4
 
 ### Patch Changes
