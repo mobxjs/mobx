@@ -1221,3 +1221,92 @@ test("flow.bound #3271", async () => {
     expect(await t1.flowBound.call(null)).toBe(t1)
     expect(await t2.flowBound.call(null)).toBe(t2)
 })
+
+describe("default annotation from options", () => {
+    const defaultAnnotationOf = (o: object) => _getAdministration(o).defaultAnnotation_
+
+    test("is shared between objects created with equivalent options", () => {
+        const a = observable({ x: {} }, undefined, { deep: false })
+        const b = observable({ x: {} }, undefined, { deep: false, name: "b" })
+        const c = observable({ x: {} }, undefined, { autoBind: true })
+        const d = observable({ x: {} }, undefined, { autoBind: true, deep: false })
+        const e = observable({ x: {} }, undefined, { deep: true, autoBind: false })
+        const plain = observable({ x: {} })
+
+        expect(defaultAnnotationOf(a)).toBe(defaultAnnotationOf(b))
+        expect(defaultAnnotationOf(e)).toBe(defaultAnnotationOf(plain))
+        const distinct = new Set([a, c, d, e].map(defaultAnnotationOf))
+        expect(distinct.size).toBe(4)
+    })
+
+    test("deep: false keeps values as refs, also for later extensions", () => {
+        const o = observable({ x: { y: 1 } }, undefined, { deep: false })
+        expect(isObservable(o.x)).toBe(false)
+        expect(isObservableProp(o, "x")).toBe(true)
+        extendObservable(o, { z: { w: 1 } })
+        expect(isObservable((o as any).z)).toBe(false)
+        expect(isObservableProp(o, "z")).toBe(true)
+        ;(o as any).q = { r: 1 }
+        expect(isObservable((o as any).q)).toBe(false)
+
+        const deep = observable({ x: { y: 1 } }, undefined, { name: "deep" })
+        expect(isObservable(deep.x)).toBe(true)
+    })
+
+    test("autoBind binds functions, with and without deep", () => {
+        for (const deep of [true, false]) {
+            const o = observable(
+                {
+                    v: 1,
+                    inc() {
+                        this.v++
+                    }
+                },
+                undefined,
+                { autoBind: true, deep }
+            )
+            const inc = o.inc
+            inc()
+            expect(o.v).toBe(2)
+        }
+
+        class Store {
+            v = 1
+            constructor() {
+                makeAutoObservable(this, undefined, { autoBind: true })
+            }
+            inc() {
+                this.v++
+            }
+        }
+        const s1 = new Store()
+        const s2 = new Store()
+        const inc = s1.inc
+        inc()
+        expect(s1.v).toBe(2)
+        expect(defaultAnnotationOf(s1)).toBe(defaultAnnotationOf(s2))
+    })
+
+    test("defaultDecorator still takes precedence", () => {
+        const o = observable({ x: { y: 1 } }, undefined, {
+            deep: true,
+            defaultDecorator: observableRef
+        })
+        expect(isObservable(o.x)).toBe(false)
+        expect(defaultAnnotationOf(o)).toBe(observableRef)
+    })
+
+    test("makeObservable with explicit annotations and options", () => {
+        class Store {
+            a = { n: 1 }
+            b = { n: 1 }
+            constructor() {
+                makeObservable(this, { a: observable, b: true }, { deep: false })
+            }
+        }
+        const s = new Store()
+        expect(isObservable(s.a)).toBe(true)
+        expect(isObservable(s.b)).toBe(false)
+        expect(isObservableProp(s, "b")).toBe(true)
+    })
+})

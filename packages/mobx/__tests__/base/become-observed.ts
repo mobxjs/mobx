@@ -8,7 +8,8 @@ import {
     makeObservable,
     onBecomeUnobserved,
     runInAction,
-    makeAutoObservable
+    makeAutoObservable,
+    getObserverTree
 } from "../../src/mobx"
 
 describe("become-observed", () => {
@@ -654,4 +655,83 @@ test("temporary computed observers do not activate lifecycle hooks", () => {
     })
 
     expect(events).toEqual([])
+})
+
+test("observers can be removed and re-added repeatedly (lazy observers_ Set)", () => {
+    const events: string[] = []
+    const box = observable.box(1)
+    const double = computed(() => box.get() * 2)
+    onBecomeObserved(box, () => events.push("box observed"))
+    onBecomeUnobserved(box, () => events.push("box unobserved"))
+    onBecomeObserved(double, () => events.push("double observed"))
+    onBecomeUnobserved(double, () => events.push("double unobserved"))
+
+    for (let round = 0; round < 3; round++) {
+        const seen: number[] = []
+        const d1 = autorun(() => seen.push(double.get()))
+        const d2 = autorun(() => seen.push(box.get()))
+        runInAction(() => box.set(box.get() + 1))
+        d1()
+        // still observed by d2
+        runInAction(() => box.set(box.get() + 1))
+        d2()
+        // no observers left, changes go nowhere
+        runInAction(() => box.set(box.get() + 1))
+        const b = 1 + round * 3
+        expect(seen).toEqual([2 * b, b, 2 * (b + 1), b + 1, b + 2])
+    }
+    const cycle = ["double observed", "box observed", "double unobserved", "box unobserved"]
+    expect(events).toEqual([...cycle, ...cycle, ...cycle])
+})
+
+test("conditional dependencies that come and go keep tracking correctly", () => {
+    const events: string[] = []
+    const cond = observable.box(true)
+    const a = observable.box("a1")
+    const b = observable.box("b1")
+    onBecomeObserved(a, () => events.push("a observed"))
+    onBecomeUnobserved(a, () => events.push("a unobserved"))
+    const seen: string[] = []
+    const d = autorun(() => seen.push(cond.get() ? a.get() : b.get()))
+
+    runInAction(() => cond.set(false)) // drops a
+    runInAction(() => a.set("a2")) // not observed anymore
+    runInAction(() => cond.set(true)) // picks a up again
+    runInAction(() => a.set("a3"))
+    d()
+    expect(seen).toEqual(["a1", "b1", "a2", "a3"])
+    expect(events).toEqual(["a observed", "a unobserved", "a observed", "a unobserved"])
+})
+
+test("the observers_ Set is released once the last observer leaves", () => {
+    const observersOf = (o: object) => (o as any).observers_ as Set<unknown> | null
+    const box = observable.box(1)
+    const double = computed(() => box.get() * 2)
+    expect(observersOf(box)).toBe(null)
+
+    const d1 = autorun(() => double.get())
+    const d2 = autorun(() => box.get())
+    expect(observersOf(box)!.size).toBe(2)
+    expect(observersOf(double)!.size).toBe(1)
+
+    d1()
+    expect(observersOf(double)).toBe(null)
+    expect(observersOf(box)!.size).toBe(1)
+
+    d2()
+    expect(observersOf(box)).toBe(null)
+    expect(getObserverTree(box).observers).toBeUndefined()
+
+    // an observer that leaves and another that joins within the same batch reuse the Set
+    const d3 = autorun(() => box.get())
+    const set = observersOf(box)
+    let d4!: () => void
+    runInAction(() => {
+        d3()
+        d4 = autorun(() => box.get())
+    })
+    expect(observersOf(box)).toBe(set)
+    expect(set!.size).toBe(1)
+    d4()
+    expect(observersOf(box)).toBe(null)
 })

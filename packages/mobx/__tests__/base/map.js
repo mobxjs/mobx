@@ -251,26 +251,26 @@ test("cleanup", function () {
     let observable = x.data_.get("a")
 
     expect(aValue).toBe(1)
-    expect(observable.observers_.size).toBe(1)
-    expect(x.hasMap_.get("a").observers_.size).toBe(1)
+    expect(observable.observers_?.size ?? 0).toBe(1)
+    expect(x.hasMap_.get("a").observers_?.size ?? 0).toBe(1)
 
     expect(x.delete("a")).toBe(true)
     expect(x.delete("not-existing")).toBe(false)
 
     expect(aValue).toBe(undefined)
-    expect(observable.observers_.size).toBe(0)
-    expect(x.hasMap_.get("a").observers_.size).toBe(1)
+    expect(observable.observers_?.size ?? 0).toBe(0)
+    expect(x.hasMap_.get("a").observers_?.size ?? 0).toBe(1)
 
     x.set("a", 2)
     observable = x.data_.get("a")
 
     expect(aValue).toBe(2)
-    expect(observable.observers_.size).toBe(1)
-    expect(x.hasMap_.get("a").observers_.size).toBe(1)
+    expect(observable.observers_?.size ?? 0).toBe(1)
+    expect(x.hasMap_.get("a").observers_?.size ?? 0).toBe(1)
 
     disposer()
     expect(aValue).toBe(2)
-    expect(observable.observers_.size).toBe(0)
+    expect(observable.observers_?.size ?? 0).toBe(0)
     expect(x.hasMap_.has("a")).toBe(false)
 })
 

@@ -53,3 +53,49 @@ test("observe computed values", () => {
 
     expect(events).toEqual([[6, 0]])
 })
+
+test("observe disposers unregister the right listener, in any order", () => {
+    const arr = observable.array<number>([])
+    const calls: number[] = []
+    const d1 = observe(arr, () => calls.push(1))
+    const d2 = observe(arr, () => calls.push(2))
+    const d3 = observe(arr, () => calls.push(3))
+
+    arr.push(1)
+    expect(calls).toEqual([1, 2, 3])
+
+    calls.length = 0
+    d2()
+    d2() // disposing twice is a no-op
+    arr.push(2)
+    expect(calls).toEqual([1, 3])
+
+    calls.length = 0
+    d3()
+    d1()
+    arr.push(3)
+    expect(calls).toEqual([])
+
+    // registering again after all were disposed works, and old disposers don't affect it
+    const d4 = observe(arr, () => calls.push(4))
+    d1()
+    arr.push(4)
+    expect(calls).toEqual([4])
+    d4()
+    calls.length = 0
+    arr.push(5)
+    expect(calls).toEqual([])
+})
+
+test("observe disposer can be called from within a listener", () => {
+    const o = observable({ x: 0 })
+    const calls: string[] = []
+    const d = observe(o, () => {
+        calls.push("a")
+        d()
+    })
+    observe(o, () => calls.push("b"))
+    o.x = 1
+    o.x = 2
+    expect(calls).toEqual(["a", "b", "b"])
+})
