@@ -107,7 +107,7 @@ exports[`spy output 1`] = `
 [
   {
     "debugObjectName": "ObservableValue@1",
-    "newValue": "2",
+    "newValue": 2,
     "observableKind": "value",
     "type": "create",
   },

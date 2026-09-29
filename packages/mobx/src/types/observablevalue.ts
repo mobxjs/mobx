@@ -79,7 +79,7 @@ export class ObservableValue<T>
                 object: this,
                 observableKind: "value",
                 debugObjectName: this.name_,
-                newValue: "" + this.value_?.toString()
+                newValue: this.value_
             })
         }
     }
