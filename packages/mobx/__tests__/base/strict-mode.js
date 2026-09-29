@@ -266,6 +266,20 @@ describe("observableRequiresReaction", function () {
         dispose()
     })
 
+    test("don't warn when creating a boxed array while a spy is active - #3835", function () {
+        mobx.configure({ observableRequiresReaction: true })
+
+        const disposeSpy = mobx.spy(() => {})
+        try {
+            const messages = utils.supressConsole(() => {
+                mobx.observable.box([1])
+            })
+            expect(messages.length).toBe(0)
+        } finally {
+            disposeSpy()
+        }
+    })
+
     test("warn on unsafe reads of observable array", function () {
         mobx.configure({ observableRequiresReaction: true })
         const x = mobx.observable({
