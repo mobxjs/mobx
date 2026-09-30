@@ -127,7 +127,8 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
         }
         if (!this.has(value)) {
             transaction(() => {
-                this.data_.add(this.enhancer_(value, undefined))
+                value = this.enhancer_(value, undefined) // report the stored value, like map and array
+                this.data_.add(value)
                 this.atom_.reportChanged()
             })
             const notifySpy = __DEV__ && isSpyEnabled()
