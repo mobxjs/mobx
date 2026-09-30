@@ -303,6 +303,36 @@ test("fireImmediately should not be honored when passed already aborted AbortSig
     expect(values).toEqual([])
 })
 
+test("abort listener is removed when a reaction disposes itself", async () => {
+    const listeners = new Set()
+    const signal = {
+        aborted: false,
+        addEventListener: (type, fn) => listeners.add(fn),
+        removeEventListener: (type, fn) => listeners.delete(fn)
+    }
+    const a = mobx.observable.box(1)
+
+    reaction(
+        () => a.get(),
+        (v, prev, r) => r.dispose(),
+        { signal }
+    )
+    a.set(2)
+    expect(listeners.size).toBe(0)
+
+    mobx.when(
+        () => a.get() > 0,
+        () => {},
+        { signal }
+    )
+    expect(listeners.size).toBe(0)
+
+    const promise = mobx.when(() => a.get() > 2, { signal })
+    a.set(3)
+    await promise
+    expect(listeners.size).toBe(0)
+})
+
 test("#278 do not rerun if expr output doesn't change", () => {
     const a = mobx.observable.box(1)
     const values = []
