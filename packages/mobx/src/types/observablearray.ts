@@ -95,8 +95,7 @@ const arrayTraps = {
         const adm: ObservableArrayAdministration = target[$mobx]
         if (name === "length") {
             adm.setArrayLength_(value)
-        }
-        if (typeof name === "symbol" || isNaN(name)) {
+        } else if (typeof name === "symbol" || isNaN(name)) {
             target[name] = value
         } else {
             // numeric string
@@ -151,7 +150,7 @@ export class ObservableArrayAdministration
     }
 
     setArrayLength_(newLength: number) {
-        if (typeof newLength !== "number" || isNaN(newLength) || newLength < 0) {
+        if (!Number.isInteger(newLength) || newLength < 0) {
             die(40, newLength)
         }
         let currentLength = this.values_.length

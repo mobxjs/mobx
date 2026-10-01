@@ -85,6 +85,30 @@ test("intercept array", () => {
     expect(a.slice()).toEqual([3, 4, 15, 2])
 })
 
+test("intercept array length assignment", () => {
+    const a = m.observable([1, 2, 3])
+    const lengths = []
+    m.autorun(() => lengths.push(a.length))
+
+    const d = intercept(a, () => null)
+    a.length = 0
+    expect(a.slice()).toEqual([1, 2, 3])
+    expect(lengths).toEqual([3])
+    d()
+
+    // the interceptor can also shrink the splice
+    intercept(a, c => {
+        c.removedCount = Math.min(c.removedCount, 1)
+        return c
+    })
+    a.length = 0
+    expect(a.slice()).toEqual([2, 3])
+    expect(lengths).toEqual([3, 2])
+
+    a.push(4)
+    expect(a.slice()).toEqual([2, 3, 4])
+})
+
 test("intercept object", () => {
     const a = m.observable({
         b: 3
