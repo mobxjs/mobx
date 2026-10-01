@@ -203,6 +203,13 @@ export function isolateGlobalState() {
             global.__mobxGlobals = undefined
         }
         globalState = new MobXGlobals()
+        // Set runId and mobxGuid to large numbers to avoid collisions with existing
+        // values from before isolation. Date.now() provides a large enough number
+        // (milliseconds since 1970) that won't collide with typical runId_ values
+        // (which are usually in the thousands or millions).
+        const initialId = Date.now()
+        globalState.runId = initialId
+        globalState.mobxGuid = initialId
     }
 }
 
