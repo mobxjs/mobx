@@ -74,6 +74,9 @@ test("test1", function () {
     expect(sum.get()).toBe(3)
     expect(a.slice()).toEqual([1, 2])
 
+    expect(() => (a.length = 1.5)).toThrow("Out of range: 1.5")
+    expect(a.slice()).toEqual([1, 2])
+
     expect(a.reverse()).toEqual([2, 1])
     expect(a).toEqual([2, 1])
     expect(a.slice()).toEqual([2, 1])
