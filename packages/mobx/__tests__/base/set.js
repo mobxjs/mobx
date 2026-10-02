@@ -294,6 +294,17 @@ test("observe", () => {
     expect(vals).toEqual([{ newValue: 2, object: x, type: "add", observableKind: "set" }])
 })
 
+test("observe add reports the value that was stored in the set", () => {
+    const x = set()
+    const added = []
+    mobx.observe(x, change => added.push(change.newValue))
+    x.add({ title: "a" })
+
+    expect(mobx.isObservable(added[0])).toBe(true)
+    expect(x.has(added[0])).toBe(true)
+    expect(added[0]).toBe(Array.from(x)[0])
+})
+
 test("toJS", () => {
     const x = mobx.observable({ x: 1 })
     const y = set([x, 1])
