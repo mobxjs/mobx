@@ -1,5 +1,17 @@
 # mobx
 
+## 7.0.6
+
+### Patch Changes
+
+-   [`4b1c8d3ea2b3de1a2ae852fd5631e33d28a82b15`](https://github.com/mobxjs/mobx/commit/4b1c8d3ea2b3de1a2ae852fd5631e33d28a82b15) [#4721](https://github.com/mobxjs/mobx/pull/4721) Thanks [@giaBaoJS](https://github.com/giaBaoJS)! - fix: assigning `length` on an observable array now respects `intercept`. A cancelled or modified splice used to be overridden by a direct write to the backing array, which truncated it without notifying observers and made the next mutation throw "Modification exception". A non-integer `length` now throws "Out of range" before touching the array.
+
+-   [`60be47cab0926d12f22449ec6c809fb5ec6601c4`](https://github.com/mobxjs/mobx/commit/60be47cab0926d12f22449ec6c809fb5ec6601c4) [#4716](https://github.com/mobxjs/mobx/pull/4716) Thanks [@AcEKaycgR](https://github.com/AcEKaycgR)! - fix: `observable.box(array)` no longer warns under `observableRequiresReaction` when a spy is active. The `create` spy event now reports `newValue` as the value itself rather than a string, matching the declared `IBoxDidChange` type. Previously the constructor stringified the value, and stringifying an observable array reads its `length`, which counted as an observable read outside a reactive context. Spy listeners that relied on `newValue` being a string for `create` events will now receive the raw value.
+
+-   [`3551aeb051ff922717b03c4fbc04a6b98f7f3b3e`](https://github.com/mobxjs/mobx/commit/3551aeb051ff922717b03c4fbc04a6b98f7f3b3e) [#4717](https://github.com/mobxjs/mobx/pull/4717) Thanks [@breken-ai](https://github.com/breken-ai)! - Remove the `signal` abort listener when a reaction disposes itself (`r.dispose()` or a resolved `when`), so long-lived `AbortSignal`s no longer accumulate listeners that keep disposed reactions in memory
+
+-   [`7e4e27dbfbf0b56770a11e9cba913e5d49c0c6f8`](https://github.com/mobxjs/mobx/commit/7e4e27dbfbf0b56770a11e9cba913e5d49c0c6f8) [#4718](https://github.com/mobxjs/mobx/pull/4718) Thanks [@breken-ai](https://github.com/breken-ai)! - `observe`/`spy` `add` events of an observable Set now report the value that was actually stored (e.g. the observable copy of a plain object), matching ObservableMap and observable arrays, so `set.has(change.newValue)` holds
+
 ## 7.0.5
 
 ### Patch Changes
