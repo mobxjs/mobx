@@ -66,6 +66,7 @@ export class Reaction implements IDerivation, IReactionPublic {
     unboundDepsCount_ = 0
 
     private flags_ = 0b00000
+    private removeAbortListener_: Lambda | undefined = undefined
 
     constructor(
         public name_: string = __DEV__ ? "Reaction@" + getNextId() : "Reaction",
@@ -221,6 +222,8 @@ export class Reaction implements IDerivation, IReactionPublic {
     dispose() {
         if (!this.isDisposed) {
             this.isDisposed = true
+            // also covers self-disposal (`r.dispose()`, `when`), which bypasses the disposer
+            this.removeAbortListener_?.()
             if (!this.isRunning) {
                 // if disposed while running, clean up later. Maybe not optimal, but rare case
                 startBatch()
@@ -231,11 +234,11 @@ export class Reaction implements IDerivation, IReactionPublic {
     }
 
     getDisposer_(abortSignal?: GenericAbortSignal): IReactionDisposer {
-        const dispose = (() => {
-            this.dispose()
-            abortSignal?.removeEventListener?.("abort", dispose)
-        }) as IReactionDisposer
-        abortSignal?.addEventListener?.("abort", dispose)
+        const dispose = (() => this.dispose()) as IReactionDisposer
+        if (abortSignal?.addEventListener && !this.isDisposed) {
+            abortSignal.addEventListener("abort", dispose)
+            this.removeAbortListener_ = () => abortSignal.removeEventListener?.("abort", dispose)
+        }
         dispose[$mobx] = this
 
         if ("dispose" in Symbol && typeof Symbol.dispose === "symbol") {
