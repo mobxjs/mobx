@@ -202,14 +202,13 @@ export function isolateGlobalState() {
         if (--global.__mobxInstanceCount === 0) {
             global.__mobxGlobals = undefined
         }
+        // Observables created before isolation still hold runIds from the old counter
+        // in lastAccessedBy_, so restarting at 0 would let a new derivation collide
+        // with one of them. Continue from where the previous counters left off.
+        const { runId, mobxGuid } = globalState
         globalState = new MobXGlobals()
-        // Set runId and mobxGuid to large numbers to avoid collisions with existing
-        // values from before isolation. Date.now() provides a large enough number
-        // (milliseconds since 1970) that won't collide with typical runId_ values
-        // (which are usually in the thousands or millions).
-        const initialId = Date.now()
-        globalState.runId = initialId
-        globalState.mobxGuid = initialId
+        globalState.runId = runId
+        globalState.mobxGuid = mobxGuid
     }
 }
 
