@@ -28,6 +28,13 @@ const SPLICE = "splice"
 export const UPDATE = "update"
 export const MAX_SPLICE_SIZE = 10000 // See e.g. https://github.com/mobxjs/mobx/issues/859
 
+// Converts splice arguments the same way as Array.prototype.splice does
+function toIntegerOrInfinity(value: any): number {
+    const number = +value
+    // Adding 0 turns -0 into 0
+    return (number !== number ? 0 : number < 0 ? Math.ceil(number) : Math.floor(number)) + 0
+}
+
 export interface IObservableArray<T = any> extends Array<T> {
     spliceWithArray(index: number, deleteCount?: number, newItems?: T[]): T[]
     clear(): T[]
@@ -177,10 +184,13 @@ export class ObservableArrayAdministration
 
         if (index === undefined) {
             index = 0
-        } else if (index > length) {
-            index = length
-        } else if (index < 0) {
-            index = Math.max(0, length + index)
+        } else {
+            index = toIntegerOrInfinity(index)
+            if (index > length) {
+                index = length
+            } else if (index < 0) {
+                index = Math.max(0, length + index)
+            }
         }
 
         if (arguments.length === 1) {
@@ -188,7 +198,7 @@ export class ObservableArrayAdministration
         } else if (deleteCount === undefined || deleteCount === null) {
             deleteCount = 0
         } else {
-            deleteCount = Math.max(0, Math.min(deleteCount, length - index))
+            deleteCount = Math.max(0, Math.min(toIntegerOrInfinity(deleteCount), length - index))
         }
 
         if (newItems === undefined) {

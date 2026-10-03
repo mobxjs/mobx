@@ -917,3 +917,57 @@ test("accessing out of bound indices is supported", () => {
     expect(array.length).toBe(1002)
     expect(array[1001]).toBe("foo")
 })
+
+test("splice converts its arguments like Array.prototype.splice", () => {
+    const argumentLists = [
+        [null],
+        ["a"],
+        [0.5],
+        [1.5],
+        [-1.5],
+        ["-1"],
+        ["1"],
+        [NaN],
+        [undefined],
+        [Infinity],
+        [-Infinity],
+        [true],
+        [1, null],
+        [1, "a"],
+        [0, 1.5],
+        [0, "2"],
+        [1, NaN],
+        [1, -1],
+        [1, Infinity],
+        [1, 1.9, "x", "y"],
+        ["1", "1", "z"],
+        [null, undefined, "w"]
+    ]
+    argumentLists.forEach(args => {
+        const expected = [1, 2, 3, 4]
+        const actual = observable.array([1, 2, 3, 4])
+        const label = JSON.stringify(args.map(String))
+
+        expect([label, actual.splice(...args)]).toEqual([label, expected.splice(...args)])
+        expect([label, actual.slice()]).toEqual([label, expected])
+
+        // the array stays consistent and can be modified afterwards
+        actual.push(5)
+        expected.push(5)
+        expect([label, actual.slice()]).toEqual([label, expected])
+    })
+})
+
+test("splice reports integer indices and counts to observers", () => {
+    const array = observable.array([1, 2, 3, 4])
+    const changes = []
+    mobx.observe(array, change => changes.push([change.index, change.removedCount, change.added]))
+
+    array.splice(0.5, 1.5, "a")
+    array.splice("-1", 1)
+    expect(changes).toEqual([
+        [0, 1, ["a"]],
+        [3, 1, []]
+    ])
+    expect(array.slice()).toEqual(["a", 2, 3])
+})
