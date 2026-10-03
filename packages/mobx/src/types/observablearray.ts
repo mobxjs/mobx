@@ -30,9 +30,8 @@ export const MAX_SPLICE_SIZE = 10000 // See e.g. https://github.com/mobxjs/mobx/
 
 // Converts splice arguments the same way as Array.prototype.splice does
 function toIntegerOrInfinity(value: any): number {
-    const number = +value
-    // Adding 0 turns -0 into 0
-    return (number !== number ? 0 : number < 0 ? Math.ceil(number) : Math.floor(number)) + 0
+    // NaN and -0 become 0
+    return Math.trunc(+value) || 0
 }
 
 export interface IObservableArray<T = any> extends Array<T> {
