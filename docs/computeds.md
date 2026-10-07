@@ -130,7 +130,7 @@ MobX can also be configured with the [`computedRequiresReaction`](configuration.
 <details id="computed-setter"><summary>**Tip:** computed values can have setters<a href="#computed-setter" class="tip-anchor"></a></summary>
 
 It is possible to define a [setter](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/set) for computed values as well. Note that these setters cannot be used to alter the value of the computed property directly,
-but they can be used as an "inverse" of the derivation. Setters are automatically marked as actions. For example:
+but they can be used as an "inverse" of the derivation. When using `makeAutoObservable`, `makeObservable`, or `observable`, computed setters are automatically marked as actions. For example:
 
 ```javascript
 class Dimension {
@@ -147,6 +147,30 @@ class Dimension {
         this.length = Math.sqrt(value)
     }
 }
+```
+
+With [modern decorators](enabling-decorators.md), `@computed` applies only to the getter. The setter is **not** automatically marked as an action. Wrap the code that calls the setter in an [action](actions.md), so all changes made by that event are part of the same transaction:
+
+```javascript
+import { action, computed, observable } from "mobx"
+
+class Dimension {
+    @observable accessor length = 2
+
+    @computed
+    get squared() {
+        return this.length * this.length
+    }
+    set squared(value) {
+        this.length = Math.sqrt(value)
+    }
+}
+
+const dimension = new Dimension()
+const resize = action(value => {
+    dimension.squared = value
+})
+resize(9)
 ```
 
 </details>
