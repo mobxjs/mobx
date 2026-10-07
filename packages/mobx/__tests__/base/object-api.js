@@ -535,6 +535,40 @@ test("#1739 - delete and undelete should work", () => {
     expect(events).toEqual([false, true, false, true, false, true])
 })
 
+test("pending keys are cleaned up once they become unobserved", () => {
+    const x = observable({})
+    const pendingKeys = () => Array.from(x[mobx.$mobx].pendingKeys_?.keys() ?? [])
+
+    const events = []
+    const disposer1 = autorun(() => {
+        events.push(has(x, "a"))
+    })
+    const disposer2 = autorun(() => {
+        x.b
+        "c" in x
+    })
+    expect(pendingKeys()).toEqual(["a", "b", "c"])
+
+    disposer2()
+    expect(pendingKeys()).toEqual(["a"])
+
+    set(x, "a", 1)
+    remove(x, "a")
+    expect(events).toEqual([false, true, false])
+
+    disposer1()
+    expect(pendingKeys()).toEqual([])
+
+    // a new subscription for the same key still works
+    const disposer3 = autorun(() => {
+        events.push(has(x, "a"))
+    })
+    set(x, "a", 2)
+    expect(events).toEqual([false, true, false, false, true])
+    disposer3()
+    expect(pendingKeys()).toEqual([])
+})
+
 test("keys(set)", () => {
     const todos = observable.set([1])
     const snapshots = []
