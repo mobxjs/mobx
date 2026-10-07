@@ -265,6 +265,7 @@ export class ObservableObjectAdministration
                 false
             )
             this.pendingKeys_.set(key, entry)
+            entry.onBUOL = new Set([() => this.pendingKeys_?.delete(key)])
         }
         return entry.get()
     }
