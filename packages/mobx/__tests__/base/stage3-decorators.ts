@@ -225,6 +225,43 @@ test("computed setter should succeed", () => {
     t.equal(b.propX, 8)
 })
 
+test("modern computed setters require an enclosing action", () => {
+    configure({ enforceActions: "always" })
+    class Dimension {
+        @observable accessor length = 2
+
+        @computed
+        get squared() {
+            return this.length * this.length
+        }
+        set squared(value: number) {
+            this.length = Math.sqrt(value)
+        }
+    }
+
+    const dimension = new Dimension()
+    const values: number[] = []
+    const dispose = autorun(() => values.push(dimension.squared))
+    const warn = jest.spyOn(console, "warn").mockImplementation(() => {})
+    try {
+        dimension.squared = 9
+        expect(warn).toHaveBeenCalledTimes(1)
+        expect(warn.mock.calls[0][0]).toContain("without using an action")
+        warn.mockClear()
+
+        const resize = action(() => {
+            dimension.squared = 16
+            dimension.squared = 25
+        })
+        resize()
+        expect(warn).not.toHaveBeenCalled()
+        expect(values).toEqual([4, 9, 25])
+    } finally {
+        dispose()
+        warn.mockRestore()
+    }
+})
+
 test("ClassFieldDecorators should NOT work without accessor without legacy compilation", () => {
     expect(() => {
         class Order {
