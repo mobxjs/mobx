@@ -365,19 +365,10 @@ test("slow converging cycle", function () {
 })
 
 test("error handling assistence ", function (done) {
-    const baseError = console.error
-    const baseWarn = console.warn
-    const errors = [] // logged errors
-    const warns = [] // logged warns
+    const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {})
+    const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {})
     const values = [] // produced errors
     const thrown = [] // list of actually thrown exceptons
-
-    console.error = function (msg) {
-        errors.push(msg)
-    }
-    console.warn = function (msg) {
-        warns.push(msg)
-    }
 
     const a = observable.box(3)
     const b = computed(function () {
@@ -407,12 +398,9 @@ test("error handling assistence ", function (done) {
         }
 
         expect(values).toEqual([6, 4, 14, 8])
-        expect(errors.length).toBe(2)
-        expect(warns.length).toBe(0)
+        expect(errorSpy).toHaveBeenCalledTimes(2)
+        expect(warnSpy).not.toHaveBeenCalled()
         expect(thrown.length).toBe(0) // Mobx doesn't propagate throws from reactions
-
-        console.error = baseError
-        console.warn = baseWarn
 
         checkGlobalState()
         done()
