@@ -1014,42 +1014,38 @@ test("1072 - @observable accessor without initial value and observe before first
 })
 
 test("unobserved computed reads should warn with requiresReaction enabled", () => {
-    const consoleWarn = console.warn
     const warnings: string[] = []
-    console.warn = function (...args) {
+    jest.spyOn(console, "warn").mockImplementation((...args) => {
         warnings.push(...args)
-    }
-    try {
-        class A {
-            @observable accessor x = 0
+    })
 
-            @computed({ requiresReaction: true })
-            get y() {
-                return this.x * 2
-            }
+    class A {
+        @observable accessor x = 0
+
+        @computed({ requiresReaction: true })
+        get y() {
+            return this.x * 2
         }
-
-        const a = new A()
-
-        a.y
-        const d = mobx.reaction(
-            () => a.y,
-            () => {}
-        )
-        a.y
-        d()
-        a.y
-
-        expect(warnings.length).toEqual(2)
-        expect(warnings[0]).toContain(
-            "is being read outside a reactive context. Doing a full recompute."
-        )
-        expect(warnings[1]).toContain(
-            "is being read outside a reactive context. Doing a full recompute."
-        )
-    } finally {
-        console.warn = consoleWarn
     }
+
+    const a = new A()
+
+    a.y
+    const d = mobx.reaction(
+        () => a.y,
+        () => {}
+    )
+    a.y
+    d()
+    a.y
+
+    expect(warnings.length).toEqual(2)
+    expect(warnings[0]).toContain(
+        "is being read outside a reactive context. Doing a full recompute."
+    )
+    expect(warnings[1]).toContain(
+        "is being read outside a reactive context. Doing a full recompute."
+    )
 })
 
 test("multiple inheritance should work", () => {

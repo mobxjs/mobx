@@ -21,4 +21,7 @@ beforeEach(() => {
     resetMobxTestState()
 })
 
-afterEach(resetMobxTestState)
+afterEach(() => {
+    jest.restoreAllMocks()
+    resetMobxTestState()
+})

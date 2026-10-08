@@ -1397,13 +1397,9 @@ test("2346 - subscribe to not yet existing map keys", async () => {
 })
 
 test('initialization should not violate `enforceActions: "always"` - discussion #3255', async () => {
-    const consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation(() => {
+    jest.spyOn(console, "warn").mockImplementation(() => {
         throw new Error("console.warn called")
     })
-    try {
-        configure({ enforceActions: "always" })
-        observable(new Map([["x", "x"]]))
-    } finally {
-        consoleWarnSpy.mockRestore()
-    }
+    configure({ enforceActions: "always" })
+    observable(new Map([["x", "x"]]))
 })

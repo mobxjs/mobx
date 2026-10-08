@@ -133,14 +133,12 @@ test("bound actions report correct object (discussions/3140)", () => {
         events.push(event)
     })
 
-    try {
-        actionBound()
-        expect(events.pop().object).toBe(appState)
-        autoActionBound()
-        expect(events.pop().object).toBe(appState)
-    } finally {
-        disposeSpy()
-    }
+    actionBound()
+    expect(events.pop().object).toBe(appState)
+    autoActionBound()
+    expect(events.pop().object).toBe(appState)
+
+    disposeSpy()
 })
 
 test("computed shouldn't report update unless the value changed #3109", () => {
@@ -160,18 +158,16 @@ test("computed shouldn't report update unless the value changed #3109", () => {
 
     const disposeAutorun = mobx.autorun(() => number.isEven)
 
-    try {
-        expect(events.pop()).toMatchObject({ oldValue: { cause: null }, newValue: true })
-        number.value++ // 1
-        expect(events.pop()).toMatchObject({ oldValue: true, newValue: false })
-        number.value++ // 2
-        expect(events.pop()).toMatchObject({ oldValue: false, newValue: true })
-        number.value += 2 // 4
-        expect(events.pop()).toBe(undefined)
-        number.value += 2 // 6
-        expect(events.pop()).toBe(undefined)
-    } finally {
-        disposeSpy()
-        disposeAutorun()
-    }
+    expect(events.pop()).toMatchObject({ oldValue: { cause: null }, newValue: true })
+    number.value++ // 1
+    expect(events.pop()).toMatchObject({ oldValue: true, newValue: false })
+    number.value++ // 2
+    expect(events.pop()).toMatchObject({ oldValue: false, newValue: true })
+    number.value += 2 // 4
+    expect(events.pop()).toBe(undefined)
+    number.value += 2 // 6
+    expect(events.pop()).toBe(undefined)
+
+    disposeSpy()
+    disposeAutorun()
 })

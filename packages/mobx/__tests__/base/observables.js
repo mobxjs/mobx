@@ -2301,9 +2301,6 @@ describe("`requiresReaction` takes precedence over global `computedRequiresReact
     beforeEach(() => {
         consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation()
     })
-    afterEach(() => {
-        consoleWarnSpy.mockRestore()
-    })
 
     test("`undefined`", () => {
         mobx.configure({ computedRequiresReaction: true })
@@ -2334,9 +2331,6 @@ describe("`requiresObservable` takes precedence over global `reactionRequiresObs
     beforeEach(() => {
         consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation()
     })
-    afterEach(() => {
-        consoleWarnSpy.mockRestore()
-    })
 
     test("`undefined`", () => {
         mobx.configure({ reactionRequiresObservable: true })
@@ -2361,11 +2355,11 @@ describe("`requiresObservable` takes precedence over global `reactionRequiresObs
 })
 
 test('Observables initialization does not violate `enforceActions: "always"`', () => {
-    const consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation(() => {})
+    jest.spyOn(console, "warn").mockImplementation(() => {})
 
     const check = cb => {
         cb()
-        expect(consoleWarnSpy).not.toHaveBeenCalled()
+        expect(console.warn).not.toHaveBeenCalled()
     }
 
     class MakeObservable {
@@ -2381,40 +2375,32 @@ test('Observables initialization does not violate `enforceActions: "always"`', (
         }
     }
 
-    try {
-        mobx.configure({ enforceActions: "always" })
-        check(() => mobx.observable(0))
-        check(() => new MakeObservable())
-        check(() => mobx.makeObservable({ x: 0 }, { x: true }))
-        check(() => new MakeAutoObservable())
-        check(() => mobx.makeAutoObservable({ x: 0 }))
-        check(() => mobx.extendObservable({}, { x: 0 }))
-        check(() => mobx.observable(new Set([0])))
-        check(() => mobx.observable(new Map([[0, 0]])))
-        check(() => mobx.observable({ x: 0 }))
-        check(() => mobx.observable([0]))
-        check(() => mobx.computed(() => 0))
-    } finally {
-        consoleWarnSpy.mockRestore()
-    }
+    mobx.configure({ enforceActions: "always" })
+    check(() => mobx.observable(0))
+    check(() => new MakeObservable())
+    check(() => mobx.makeObservable({ x: 0 }, { x: true }))
+    check(() => new MakeAutoObservable())
+    check(() => mobx.makeAutoObservable({ x: 0 }))
+    check(() => mobx.extendObservable({}, { x: 0 }))
+    check(() => mobx.observable(new Set([0])))
+    check(() => mobx.observable(new Map([[0, 0]])))
+    check(() => mobx.observable({ x: 0 }))
+    check(() => mobx.observable([0]))
+    check(() => mobx.computed(() => 0))
 })
 
 test("enforceAction is respected when changing keys of observable object", () => {
     const consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation(() => {})
-    try {
-        mobx.configure({ enforceActions: "always" })
-        const o = mobx.observable({ x: 0 })
+    mobx.configure({ enforceActions: "always" })
+    const o = mobx.observable({ x: 0 })
 
-        o.y = 0
-        expect(consoleWarnSpy).toHaveBeenCalled()
+    o.y = 0
+    expect(consoleWarnSpy).toHaveBeenCalled()
 
-        consoleWarnSpy.mockClear()
+    consoleWarnSpy.mockClear()
 
-        delete o.x
-        expect(consoleWarnSpy).toHaveBeenCalled()
-    } finally {
-        consoleWarnSpy.mockRestore()
-    }
+    delete o.x
+    expect(consoleWarnSpy).toHaveBeenCalled()
 })
 
 test("state version does not update on observable creation", () => {

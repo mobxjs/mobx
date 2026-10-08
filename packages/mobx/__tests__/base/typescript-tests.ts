@@ -1651,56 +1651,52 @@ test("issue #1122", done => {
 })
 
 test("unobserved computed reads should warn with requiresReaction enabled", () => {
-    const consoleWarn = console.warn
     const warnings: string[] = []
-    console.warn = function (...args) {
+    jest.spyOn(console, "warn").mockImplementation((...args) => {
         warnings.push(...args)
-    }
-    try {
-        const expectedWarnings: string[] = []
+    })
 
-        class A {
-            x = 0
-            get y() {
-                return this.x * 2
-            }
-            constructor() {
-                makeObservable(
-                    this,
-                    {
-                        x: observable,
-                        y: computed({ requiresReaction: true })
-                    },
-                    { name: "a" }
-                )
-            }
+    const expectedWarnings: string[] = []
+
+    class A {
+        x = 0
+        get y() {
+            return this.x * 2
         }
-
-        const a = new A()
-
-        a.y
-        expectedWarnings.push(
-            `[mobx] Computed value 'a.y' is being read outside a reactive context. Doing a full recompute.`
-        )
-
-        const d = mobx.reaction(
-            () => a.y,
-            () => {}
-        )
-
-        a.y
-
-        d()
-
-        a.y
-        expectedWarnings.push(
-            `[mobx] Computed value 'a.y' is being read outside a reactive context. Doing a full recompute.`
-        )
-
-        expect(warnings).toEqual(expectedWarnings)
-    } finally {
-        console.warn = consoleWarn
+        constructor() {
+            makeObservable(
+                this,
+                {
+                    x: observable,
+                    y: computed({ requiresReaction: true })
+                },
+                { name: "a" }
+            )
+        }
     }
+
+    const a = new A()
+
+    a.y
+    expectedWarnings.push(
+        `[mobx] Computed value 'a.y' is being read outside a reactive context. Doing a full recompute.`
+    )
+
+    const d = mobx.reaction(
+        () => a.y,
+        () => {}
+    )
+
+    a.y
+
+    d()
+
+    a.y
+    expectedWarnings.push(
+        `[mobx] Computed value 'a.y' is being read outside a reactive context. Doing a full recompute.`
+    )
+
+    expect(warnings).toEqual(expectedWarnings)
 })
 
 test("multiple inheritance should work", () => {

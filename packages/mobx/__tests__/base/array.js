@@ -4,11 +4,6 @@ const mobx = require("../../src/mobx.ts")
 const { observable, when, _getAdministration, reaction, computed, makeObservable, autorun } = mobx
 const iterall = require("iterall")
 
-let consoleWarnSpy
-afterEach(() => {
-    consoleWarnSpy?.mockRestore()
-})
-
 test("test1", function () {
     const a = observable.array([])
     expect(a.length).toBe(0)
@@ -699,14 +694,6 @@ test("very long arrays can be safely passed to nativeArray.concat #2379", () => 
 })
 
 describe("dehances", () => {
-    function supressConsoleWarn(fn) {
-        const { warn } = console
-        console.warn = () => {}
-        const result = fn()
-        console.warn = warn
-        return result
-    }
-
     const dehancer = thing => {
         // Dehance only objects of a proper type
         if (thing && typeof thing === "object" && thing.hasOwnProperty("value")) {
@@ -807,8 +794,8 @@ describe("dehances", () => {
     })
 
     test("reverse", () => {
-        const reversedArray = supressConsoleWarn(() => array.reverse())
-        expect(reversedArray).toEqual(dehanced.reverse())
+        jest.spyOn(console, "warn").mockImplementation(() => {})
+        expect(array.reverse()).toEqual(dehanced.reverse())
     })
 
     test("shift", () => {
@@ -832,8 +819,8 @@ describe("dehances", () => {
             expect(typeof b).toEqual("number")
             return b > a
         }
-        const sortedArray = supressConsoleWarn(() => array.sort(comparator))
-        expect(sortedArray).toEqual(dehanced.sort(comparator))
+        jest.spyOn(console, "warn").mockImplementation(() => {})
+        expect(array.sort(comparator)).toEqual(dehanced.sort(comparator))
     })
 
     test("values", () => {
@@ -905,7 +892,7 @@ test("reduce without initial value #2432", () => {
 })
 
 test("accessing out of bound indices is supported", () => {
-    consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation(() => {
+    const consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation(() => {
         throw new Error(`Unexpected console.warn call`)
     })
 
