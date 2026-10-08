@@ -4,11 +4,6 @@ const mobx = require("../../src/mobx.ts")
 const { observable, when, _getAdministration, reaction, computed, makeObservable, autorun } = mobx
 const iterall = require("iterall")
 
-let consoleWarnSpy
-afterEach(() => {
-    consoleWarnSpy?.mockRestore()
-})
-
 test("test1", function () {
     const a = observable.array([])
     expect(a.length).toBe(0)
@@ -905,7 +900,7 @@ test("reduce without initial value #2432", () => {
 })
 
 test("accessing out of bound indices is supported", () => {
-    consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation(() => {
+    const consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation(() => {
         throw new Error(`Unexpected console.warn call`)
     })
 

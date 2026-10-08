@@ -278,14 +278,11 @@ describe("observableRequiresReaction", function () {
         mobx.configure({ observableRequiresReaction: true })
 
         const disposeSpy = mobx.spy(() => {})
-        try {
-            const messages = utils.supressConsole(() => {
-                mobx.observable.box([1])
-            })
-            expect(messages.length).toBe(0)
-        } finally {
-            disposeSpy()
-        }
+        const messages = utils.supressConsole(() => {
+            mobx.observable.box([1])
+        })
+        disposeSpy()
+        expect(messages.length).toBe(0)
     })
 
     test("warn on unsafe reads of observable array", function () {
