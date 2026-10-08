@@ -227,6 +227,14 @@ test("enforceActions 'strict' should not throw exception while observable array 
     }).not.toThrow(/Since strict-mode is enabled/)
 })
 
+test("deleting observable set entries outside an action warns in strict mode", () => {
+    mobx.configure({ enforceActions: "always" })
+
+    const s = mobx.observable.set([1, 2])
+    expect(utils.grabConsole(() => s.delete(1))).toMatch(/Since strict-mode is enabled/)
+    expect(s.has(1)).toBe(false)
+})
+
 test("warn on unsafe reads of computed", function () {
     mobx.configure({ computedRequiresReaction: true })
     const x = mobx.observable({

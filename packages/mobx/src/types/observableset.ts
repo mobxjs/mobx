@@ -158,6 +158,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
     }
 
     delete(value: T) {
+        checkIfStateModificationsAreAllowed(this.atom_)
         if (hasInterceptors(this)) {
             const change = interceptChange<ISetWillDeleteChange<T>>(this, {
                 type: DELETE,
