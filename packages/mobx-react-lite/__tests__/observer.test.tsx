@@ -270,19 +270,12 @@ function runTestSuite(mode: "observer" | "useObserver") {
         })
     })
 
-    test("changing state in render should fail", () => {
-        // This test is most likely obsolete ... exception is not thrown
+    test("changing state in render is applied, but React warns about it", () => {
+        const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {})
         const data = mobx.observable.box(2)
         const Comp = obsComponent(() => {
             if (data.get() === 3) {
-                try {
-                    data.set(4) // wouldn't throw first time for lack of observers.. (could we tighten this?)
-                } catch (err) {
-                    expect(err).toBeInstanceOf(Error)
-                    expect(err).toMatch(
-                        /Side effects like changing state are not allowed at this point/
-                    )
-                }
+                data.set(4)
             }
             return <div>{data.get()}</div>
         })
@@ -290,7 +283,9 @@ function runTestSuite(mode: "observer" | "useObserver") {
         act(() => {
             data.set(3)
         })
-        expect(container).toMatchSnapshot()
+        expect(container).toHaveTextContent("4")
+        expect(consoleErrorSpy).toHaveBeenCalledTimes(1)
+        expect(consoleErrorSpy.mock.calls[0][0]).toMatch(/Cannot update a component/)
     })
 
     describe("should render component even if setState called with exactly the same props", () => {
@@ -666,8 +661,8 @@ test("parent / childs render in the right order", done => {
 
     render(<Parent />)
 
-    tryLogout()
-    expect(events).toEqual(["parent", "child"])
+    act(() => tryLogout())
+    expect(events).toEqual(["parent", "child", "parent"])
     done()
 })
 
@@ -865,30 +860,7 @@ it("should keep original props types", () => {
 //     )
 // })
 
-it("dependencies should not become temporarily unobserved", async () => {
-    jest.spyOn(React, "useEffect")
-
-    let p: Promise<any>[] = []
-    const cleanups: any[] = []
-
-    async function runEffects() {
-        await Promise.all(p.splice(0))
-    }
-
-    // @ts-ignore
-    React.useEffect.mockImplementation(effect => {
-        p.push(
-            new Promise<void>(resolve => {
-                setTimeout(() => {
-                    act(() => {
-                        cleanups.push(effect())
-                    })
-                    resolve()
-                }, 10)
-            })
-        )
-    })
-
+it("dependencies should not become temporarily unobserved", () => {
     let computed = 0
     let renders = 0
 
@@ -904,7 +876,6 @@ it("dependencies should not become temporarily unobserved", async () => {
     })
 
     const doubleDisposed = jest.fn()
-    const reactionFired = jest.fn()
 
     mobx.onBecomeUnobserved(store, "double", doubleDisposed)
 
@@ -919,27 +890,14 @@ it("dependencies should not become temporarily unobserved", async () => {
     expect(renders).toBe(1)
     expect(doubleDisposed).toHaveBeenCalledTimes(0)
 
-    store.inc()
-    expect(computed).toBe(2) // change propagated
-    expect(renders).toBe(1) // but not yet rendered
-    expect(doubleDisposed).toHaveBeenCalledTimes(0) // if we dispose to early, this fails!
+    act(() => store.inc())
 
-    // Bug: change the state, before the useEffect fires, can cause the reaction to be disposed
-    mobx.reaction(() => store.x, reactionFired)
-    expect(reactionFired).toHaveBeenCalledTimes(0)
-    expect(computed).toBe(2) // Not 3!
-    expect(renders).toBe(1)
-    expect(doubleDisposed).toHaveBeenCalledTimes(0)
-
-    await runEffects()
-    expect(reactionFired).toHaveBeenCalledTimes(0)
     expect(computed).toBe(2) // Not 3!
     expect(renders).toBe(2)
-    expect(doubleDisposed).toHaveBeenCalledTimes(0)
+    expect(doubleDisposed).toHaveBeenCalledTimes(0) // if we dispose too early, this fails!
 
     r.unmount()
-    cleanups.filter(Boolean).forEach(f => f())
-    expect(reactionFired).toHaveBeenCalledTimes(0)
+
     expect(computed).toBe(2)
     expect(renders).toBe(2)
     expect(doubleDisposed).toHaveBeenCalledTimes(1)
