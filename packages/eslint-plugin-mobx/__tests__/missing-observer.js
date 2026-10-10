@@ -5,6 +5,10 @@ import rule from "../src/missing-observer"
 const tester = getRuleTester();
 
 const valids = [
+    "const Cmp = () => { }; export default observer(Cmp)",
+    "function Cmp() { }; export default observer(Cmp)",
+    "export default observer(Cmp); function Cmp() { }",
+    "class Cmp extends React.Component { }; export default observer(Cmp)",
     "observer(function Named() { });",
     "const foo = observer(function Named() { })",
     "const Anonym = observer(function () { });",
