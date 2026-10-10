@@ -1,6 +1,5 @@
 import type { Rule } from "eslint"
 
-// Whether `observer(name)` is called anywhere in the scopes enclosing the component
 function isWrappedElsewhere(context, sourceCode, cmp, name) {
     let scope = sourceCode.getScope ? sourceCode.getScope(cmp) : context.getScope()
     while (scope) {
