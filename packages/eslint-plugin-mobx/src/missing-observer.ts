@@ -78,7 +78,6 @@ function create(context) {
                 }
 
                 if (name && isWrappedElsewhere(context, sourceCode, cmp, name)) {
-                    // const Cmp = () => {}; export default observer(Cmp)
                     return
                 }
 
