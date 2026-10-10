@@ -18,7 +18,7 @@ the [`onBecomeObserved`](lazy-observables.md) utility to be notified when MobX s
 The following example demonstrates how you can create an observable `Clock` that returns the current date-time, which can then be used in reactive functions.
 This clock will only actually tick if it is being observed by someone.
 
-The complete API of the `Atom` class is demonstrated by this example. For further information, see [`createAtom`](api.md#createAtom).
+The complete API of the `Atom` class is demonstrated by this example. For further information, see [`createAtom`](api.md#createatom).
 
 ```javascript
 import { createAtom, autorun } from "mobx"
