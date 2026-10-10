@@ -32,6 +32,9 @@ import { getFlag, setFlag } from "../utils/utils"
 
 export interface IComputedValue<T> {
     get(): T
+}
+
+export interface IWritableComputedValue<T> extends IComputedValue<T> {
     set(value: T): void
 }
 
@@ -81,7 +84,7 @@ const enum ComputedValueFlags {
     diffValue = 0b10000
 }
 
-export class ComputedValue<T> implements IObservable, IComputedValue<T>, IDerivation {
+export class ComputedValue<T> implements IObservable, IWritableComputedValue<T>, IDerivation {
     dependenciesState_ = IDerivationState_.NOT_TRACKING_
     observing_: IObservable[] = [] // nodes we are looking at. Our value depends on these nodes
     newObserving_ = null // during tracking it's an array with new observed observers

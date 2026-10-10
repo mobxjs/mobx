@@ -38,6 +38,7 @@ export {
     createAtom,
     spy,
     IComputedValue,
+    IWritableComputedValue,
     IEqualsComparer,
     compareDefault,
     compareIdentity,

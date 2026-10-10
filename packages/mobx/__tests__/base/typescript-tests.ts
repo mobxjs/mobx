@@ -2506,3 +2506,14 @@ test("observable.box should keep track of undefined and null in type", () => {
     const a = observable.box<string | undefined>()
     assert<IsExact<typeof a, IObservableValue<string | undefined>>>(true)
 })
+
+test("computed .set is only typed when a setter is provided", () => {
+    const a = mobx.observable.box(1)
+    const readonly = mobx.computed(() => a.get() * 2)
+    // @ts-expect-error computed without a setter has no `set`
+    expect(() => readonly.set(4)).toThrow()
+
+    const writable = mobx.computed(() => a.get() * 2, { set: v => a.set(v / 2) })
+    writable.set(4)
+    expect(a.get()).toBe(2)
+})

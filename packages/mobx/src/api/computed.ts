@@ -6,6 +6,7 @@ import {
     isFunction,
     die,
     IComputedValue,
+    IWritableComputedValue,
     createComputedAnnotation,
     compareStructural,
     decorateComputed20223_,
@@ -26,6 +27,11 @@ function createComputedDecoratorAnnotation(
 export interface IComputedFactory extends Annotation, ClassGetterDecorator {
     // computed annotation with options
     <T>(options: IComputedValueOptions<T>): DecoratorAnnotation<ClassGetterDecorator>
+    // computed(fn, { set }) -> writable
+    <T>(
+        func: () => T,
+        options: IComputedValueOptions<T> & { set: (value: T) => void }
+    ): IWritableComputedValue<T>
     // computed(fn, opts)
     <T>(func: () => T, options?: IComputedValueOptions<T>): IComputedValue<T>
 }
