@@ -1,6 +1,5 @@
 import React from "react"
-import { createRoot } from "react-dom/client"
-import { flushSync } from "react-dom"
+import { act, render } from "@testing-library/react"
 import { action, observable } from "mobx"
 import { observer } from "../src"
 
@@ -24,30 +23,24 @@ test("React batches independent observer updates without a custom reaction sched
         </React.Profiler>
     )
 
-    const rootNode = document.createElement("div")
-    document.body.appendChild(rootNode)
-    const root = createRoot(rootNode)
-
-    flushSync(() => {
-        root.render(<App />)
-    })
+    render(<App />)
 
     const commitsBeforeUpdate = commits
     const rendersBeforeUpdate = renders.length
 
-    setTimeout(
-        action(() => {
-            store.a++
-            store.b++
-        }),
-        0
-    )
-
-    await new Promise(resolve => setTimeout(resolve, 0))
+    await act(async () => {
+        await new Promise<void>(resolve =>
+            setTimeout(
+                action(() => {
+                    store.a++
+                    store.b++
+                    resolve()
+                }),
+                0
+            )
+        )
+    })
 
     expect(commits - commitsBeforeUpdate).toBe(1)
     expect(renders.slice(rendersBeforeUpdate)).toEqual(["A:1", "B:1"])
-
-    root.unmount()
-    rootNode.remove()
 })
