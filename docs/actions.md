@@ -185,7 +185,7 @@ Usage:
 
 The `action.bound` annotation can be used to automatically bind a method to the correct instance, so that `this` is always correctly bound inside the function.
 
-<details id="auto-bind"><summary>**Tip:** use `makeAutoObservable(o, {}, { autoBind: true })` to bind all actions and flows automatically<a href="#avoid-bound" class="tip-anchor"></a></summary>
+<details id="auto-bind"><summary>**Tip:** use `makeAutoObservable(o, {}, { autoBind: true })` to bind all actions and flows automatically<a href="#auto-bind" class="tip-anchor"></a></summary>
 
 ```javascript
 import { makeAutoObservable } from "mobx"
