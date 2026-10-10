@@ -1,24 +1,25 @@
 import type { Rule } from "eslint"
 
-function isWrappedElsewhere(context, sourceCode, cmp, name) {
-    let scope = sourceCode.getScope ? sourceCode.getScope(cmp) : context.getScope()
-    while (scope) {
-        const variable = scope.set.get(name)
-        if (
-            variable?.references.some(ref => {
-                const parent = ref.identifier.parent
-                return (
-                    parent?.type === "CallExpression" &&
-                    parent.callee.name === "observer" &&
-                    parent.arguments[0] === ref.identifier
-                )
-            })
-        ) {
-            return true
-        }
-        scope = scope.upper
+function isWrappedElsewhere(context, sourceCode, cmp, cmpOrForwardRef) {
+    const declarator =
+        cmpOrForwardRef.parent?.type === "VariableDeclarator" ? cmpOrForwardRef.parent : undefined
+    const owner = declarator ?? (cmp.type.endsWith("Declaration") ? cmp : undefined)
+    const bindingName = (declarator ? declarator.id : owner?.id)?.name
+    if (!owner || !bindingName) {
+        return false
     }
-    return false
+    const declared = sourceCode.getDeclaredVariables
+        ? sourceCode.getDeclaredVariables(owner)
+        : context.getDeclaredVariables(owner)
+    const variable = declared.find(v => v.name === bindingName)
+    return !!variable?.references.some(ref => {
+        const parent = ref.identifier.parent
+        return (
+            parent?.type === "CallExpression" &&
+            parent.callee.name === "observer" &&
+            parent.arguments[0] === ref.identifier
+        )
+    })
 }
 
 function create(context) {
@@ -77,7 +78,7 @@ function create(context) {
                     }
                 }
 
-                if (name && isWrappedElsewhere(context, sourceCode, cmp, name)) {
+                if (isWrappedElsewhere(context, sourceCode, cmp, cmpOrForwardRef)) {
                     return
                 }
 
