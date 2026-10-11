@@ -120,7 +120,7 @@ This is a great way to find any missing `observer` wrappers, for example in Reac
 configure({ observableRequiresReaction: true })
 ```
 
-**Note:** using propTypes on components that are wrapped with `observer` might trigger false positives for this rule.
+**Warning:** with React 19.2+ in dev mode, this setting will log a lot of warnings, because React reads all props outside of any reaction for its [performance tracks](https://react.dev/reference/dev-tools/react-performance-tracks#changed-props). See [mobx#4607](https://github.com/mobxjs/mobx/issues/4607) and [react#35126](https://github.com/facebook/react/issues/35126).
 
 #### `reactionRequiresObservable: boolean`
 
