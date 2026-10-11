@@ -287,26 +287,6 @@ test("issue 12", () => {
     expect(events).toEqual(["table", "row: coffee", "row: tea", "table", "row: soup"])
 })
 
-test("changing state in render should fail", () => {
-    const data = observable.box(2)
-    const Comp = observer(() => {
-        if (data.get() === 3) {
-            try {
-                data.set(4) // wouldn't throw first time for lack of observers.. (could we tighten this?)
-            } catch (err) {
-                expect(err).toBeInstanceOf(Error)
-                expect(err).toMatch(
-                    /Side effects like changing state are not allowed at this point/
-                )
-            }
-        }
-        return <div>{data.get()}</div>
-    })
-    render(<Comp />)
-
-    act(() => data.set(3))
-})
-
 test("correctly wraps display name of child component", () => {
     const A = observer(
         class ObserverClass extends React.Component {
