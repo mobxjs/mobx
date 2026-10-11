@@ -903,6 +903,56 @@ it("dependencies should not become temporarily unobserved", () => {
     expect(doubleDisposed).toHaveBeenCalledTimes(1)
 })
 
+it("state changed between render and subscription is not lost and doesn't drop dependencies", () => {
+    let computed = 0
+    let renders = 0
+
+    const store = mobx.makeAutoObservable({
+        x: 1,
+        get double() {
+            computed++
+            return this.x * 2
+        },
+        inc() {
+            this.x++
+        }
+    })
+
+    const doubleDisposed = jest.fn()
+
+    mobx.onBecomeUnobserved(store, "double", doubleDisposed)
+
+    const TestComponent = observer(() => {
+        renders++
+        return <div>{store.double}</div>
+    })
+
+    // Layout effects run after render, but before passive effects, which is where
+    // `useSyncExternalStore` subscribes. So the observer is rendered but not subscribed yet.
+    const Mutator = () => {
+        React.useLayoutEffect(() => {
+            store.inc()
+        }, [])
+        return null
+    }
+
+    const { container, unmount } = render(
+        <>
+            <TestComponent />
+            <Mutator />
+        </>
+    )
+
+    expect(container).toHaveTextContent("4")
+    expect(computed).toBe(2) // Not 3!
+    expect(renders).toBe(2)
+    expect(doubleDisposed).toHaveBeenCalledTimes(0)
+
+    unmount()
+
+    expect(doubleDisposed).toHaveBeenCalledTimes(1)
+})
+
 it.skip("Legacy context support", () => {
     const contextKey = "key"
     const contextValue = "value"
