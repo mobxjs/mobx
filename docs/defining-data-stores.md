@@ -141,10 +141,7 @@ export class Todo {
     store = null
 
     constructor(store, id = uuid.v4()) {
-        makeAutoObservable(this, {
-            id: false,
-            store: false
-        })
+        makeAutoObservable(this)
         this.store = store
         this.id = id
     }
