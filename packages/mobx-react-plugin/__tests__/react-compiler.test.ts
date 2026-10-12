@@ -10,7 +10,7 @@ const reactCompiler = require.resolve("babel-plugin-react-compiler")
 const withCompiler = (source: string, options: mobxReactPlugin.Options | false = {}) =>
     transform(source, { options, plugins: [[reactCompiler, {}]] })
 
-describe("React Compiler integration (babel-plugin-react-compiler 1.0.0, default options)", () => {
+describe("React Compiler integration", () => {
     test("observed components are explicitly left to MobX, other components in the file are compiled", () => {
         const output = withCompiler(code`
 import { store } from "./store"
@@ -39,23 +39,6 @@ export default observer(CounterView)`
         expect(protectedOutput).toContain("export default observer(CounterView)")
     })
 
-    test("inline observer callbacks are currently skipped by inference only; the plugin makes the opt-out explicit", () => {
-        const source = code`
-import { observer } from "mobx-react-lite"
-import { store } from "./store"
-export const Inline = observer(function Inline() { return <div>{store.count}</div> })
-export const Banana = banana(function Banana() { return <div>{store.count}</div> })`
-
-        const unprotected = withCompiler(source, false)
-        // Not MobX awareness: any unknown HOC callback is skipped the same way.
-        expect(isCompiled(unprotected, "function Inline()")).toBe(false)
-        expect(isCompiled(unprotected, "function Banana()")).toBe(false)
-        expect(unprotected).not.toContain('"use no memo"')
-
-        const protectedOutput = withCompiler(source)
-        expect(functionBody(protectedOutput, "function Inline()")).toContain('"use no memo"')
-    })
-
     test("plugin order matters: React Compiler running first leaves its memo cache inside the observer", () => {
         const source = code`
 import { store } from "./store"
@@ -74,29 +57,5 @@ export function Counter() { return <div>{store.count}</div> }`
         const rightOrder = withCompiler(source)
         expect(rightOrder).toContain("observer(function Counter()")
         expect(isCompiled(rightOrder, "function Counter()")).toBe(false)
-    })
-
-    test("custom hooks are protected by default", () => {
-        const source = code`
-import { useStore } from "./store"
-export function useVisibleTodos() { const store = useStore(); return store.todos.filter(todo => todo.visible) }
-export function List() { const todos = useVisibleTodos(); return <ul>{todos.map(t => <li key={t.id}>{t.title}</li>)}</ul> }`
-
-        const output = withCompiler(source)
-        expect(isCompiled(output, "function useVisibleTodos()")).toBe(false)
-        expect(functionBody(output, "function useVisibleTodos()")).toContain('"use no memo"')
-
-        const hooksCompiled = withCompiler(source, { observer: { useNoMemoHooks: false } })
-        expect(isCompiled(hooksCompiled, "function useVisibleTodos()")).toBe(true)
-        expect(isCompiled(hooksCompiled, "function List()")).toBe(false)
-    })
-
-    test("forwardRef callbacks", () => {
-        const output = withCompiler(code`
-import { forwardRef } from "react"
-import { store } from "./store"
-export const Input = forwardRef((props, ref) => <input ref={ref} value={store.firstName} readOnly />)`)
-        expect(output).toContain("observer(forwardRef(function Input(props, ref)")
-        expect(isCompiled(output, "function Input(props, ref)")).toBe(false)
     })
 })

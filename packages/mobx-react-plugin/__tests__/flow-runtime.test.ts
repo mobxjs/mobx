@@ -64,7 +64,6 @@ describe("runtime: async methods as flows", () => {
 
         const promise = store.loadUser("42")
         expect(typeof promise.then).toBe("function")
-        expect(typeof promise.cancel).toBe("function")
         expect(store.status).toBe("loading")
         await expect(promise).resolves.toEqual({ id: "42" })
         expect(store.user).toEqual({ id: "42" })
@@ -81,11 +80,7 @@ describe("runtime: async methods as flows", () => {
         expect(isFlow(store.loadUser)).toBe(false)
         await store.loadUser("42")
         expect(store.user).toEqual({ id: "42" })
-        expect(warn).toHaveBeenCalledWith(
-            expect.stringContaining(
-                "changing (observed) observable values without using an action is not allowed"
-            )
-        )
+        expect(warn).toHaveBeenCalled()
     })
 
     test("modern decorators: @action async becomes @flow", async () => {

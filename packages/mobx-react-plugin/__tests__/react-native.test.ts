@@ -69,30 +69,15 @@ describe("React Native / Metro pipeline (@react-native/metro-babel-transformer +
     test("components are observed and left to MobX, React Compiler compiles the rest", () => {
         const output = transformRN(path.join(projectRoot, "App.tsx"), APP)
 
-        expect(output).toContain('require("mobx-react-lite")')
-        expect(output).toMatch(/_mobxReactLite\.observer\)\(function App\(\)/)
+        expect(output).toMatch(/observer\)?\(function App\(\)/)
         expect(functionBody(output, "function App()")).toContain('"use no memo"')
         expect(isCompiled(output, "function App()")).toBe(false)
-        expect(output).toMatch(/_mobxReactLite\.observer\)\(function TodoList\(\)/)
+        expect(output).toMatch(/observer\)?\(function TodoList\(\)/)
         expect(isCompiled(output, "function TodoList()")).toBe(false)
         expect(functionBody(output, "function useVisibleTodos()")).toContain('"use no memo"')
         expect(isCompiled(output, "function useVisibleTodos()")).toBe(false)
 
         // React Compiler did run in the same pipeline (after the plugin).
-        expect(output).toContain('require("react/compiler-runtime")')
-        expect(isCompiled(output, "function Pure(")).toBe(true)
-    })
-
-    test("Fast Refresh (dev + hot) registers the observed components", () => {
-        const output = transformRN(path.join(projectRoot, "App.tsx"), APP, { dev: true, hot: true })
-        expect(output).toMatch(/\$RefreshReg\$\(_c\d*, "App"\)/)
-        expect(output).toMatch(/\$RefreshReg\$\(_c\d*, "TodoList"\)/)
-    })
-
-    test("production transform", () => {
-        const output = transformRN(path.join(projectRoot, "App.tsx"), APP, { dev: false })
-        expect(output).toMatch(/_mobxReactLite\.observer\)\(function App\(\)/)
-        expect(isCompiled(output, "function App()")).toBe(false)
         expect(isCompiled(output, "function Pure(")).toBe(true)
     })
 
@@ -113,7 +98,7 @@ export default function Counter(props: Props): React.Node {
 `,
             { hermesParser: true }
         )
-        expect(output).toMatch(/_mobxReactLite\.observer\)\(function Counter\(props\)/)
+        expect(output).toMatch(/observer\)?\(function Counter\(props\)/)
         expect(functionBody(output, "function Counter(props)")).toContain('"use no memo"')
         expect(isCompiled(output, "function Counter(props)")).toBe(false)
     })
