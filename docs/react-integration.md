@@ -8,7 +8,7 @@ hide_title: true
 
 # React integration
 
-This documentation outlines how to manually apply observation to React components. However, by using the [mobx-react-observer](https://github.com/christianalfoni/mobx-react-observer) Babel/SWC plugin, you can automatically handle observation without manual intervention. Still, understanding how MobX observation integrates with React components remains valuable, even when leveraging automated solutions.
+This documentation outlines how to manually apply observation to React components. However, by using the [mobx-react-plugin](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react-plugin) Babel / Vite plugin, you can automatically handle observation without manual intervention (it also keeps [React Compiler](react-compiler.md) from memoizing observed components). Still, understanding how MobX observation integrates with React components remains valuable, even when leveraging automated solutions.
 
 ```javascript
 import { observer } from "mobx-react-lite" // Or "mobx-react".
@@ -532,6 +532,7 @@ Check out the [React optimizations {🚀}](react-optimizations.md) section.
 Help! My component isn't re-rendering...
 
 1. Make sure you didn't forget `observer` (yes, this is the most common mistake).
+1. If you use React Compiler, make sure it does not compile your `observer` components. See [MobX and React Compiler](react-compiler.md).
 1. Verify that the thing you intend to react to is indeed observable. Use utilities like [`isObservable`](api.md#isobservable), [`isObservableProp`](api.md#isobservableprop) if needed to verify this at runtime.
 1. Check the console logs in the browsers for any warnings or errors.
 1. Make sure you grok how tracking works in general. Check out the [Understanding reactivity](understanding-reactivity.md) section.

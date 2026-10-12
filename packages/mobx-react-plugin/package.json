@@ -1,0 +1,77 @@
+{
+    "name": "mobx-react-plugin",
+    "version": "0.0.0",
+    "description": "The MobX plugin for React projects, as a Babel plugin (Vite, webpack, Rspack, Metro / React Native, Expo, Next.js, Jest) and a Vite plugin: wraps components in `observer`, marks them \"use no memo\" so React Compiler leaves MobX-driven rendering to MobX, and turns async methods of observable classes into flows.",
+    "main": "dist/babel.js",
+    "types": "dist/babel.d.ts",
+    "exports": {
+        "./package.json": "./package.json",
+        ".": {
+            "types": "./dist/babel.d.ts",
+            "default": "./dist/babel.js"
+        },
+        "./babel": {
+            "types": "./dist/babel.d.ts",
+            "default": "./dist/babel.js"
+        },
+        "./vite": {
+            "types": "./dist/vite.d.ts",
+            "default": "./dist/vite.js"
+        }
+    },
+    "files": [
+        "src",
+        "dist",
+        "LICENSE",
+        "CHANGELOG.md",
+        "README.md"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/mobxjs/mobx.git",
+        "directory": "packages/mobx-react-plugin"
+    },
+    "license": "MIT",
+    "funding": {
+        "type": "opencollective",
+        "url": "https://opencollective.com/mobx"
+    },
+    "bugs": {
+        "url": "https://github.com/mobxjs/mobx/issues"
+    },
+    "homepage": "https://mobx.js.org/",
+    "keywords": [
+        "mobx",
+        "babel-plugin",
+        "vite-plugin",
+        "observer",
+        "react-compiler",
+        "flow",
+        "react-native",
+        "metro"
+    ],
+    "dependencies": {
+        "@babel/core": "^7.26.0",
+        "picomatch": "^4.0.2"
+    },
+    "devDependencies": {
+        "@babel/preset-react": "^7.27.1",
+        "@babel/preset-typescript": "^7.27.1",
+        "@react-native/babel-preset": "^0.87.1",
+        "@react-native/metro-babel-transformer": "^0.87.1",
+        "@types/babel__core": "^7.20.5",
+        "@types/picomatch": "^4.0.0",
+        "babel-plugin-react-compiler": "1.0.0",
+        "mobx": "^7.0.3",
+        "mobx-react-lite": "^5.1.0",
+        "react-refresh": "^0.19.0"
+    },
+    "scripts": {
+        "prebuild": "rm -rf dist",
+        "build": "tsc",
+        "test": "jest",
+        "test:types": "tsc --noEmit",
+        "test:check": "npm run test:types",
+        "prepublishOnly": "npm run build"
+    }
+}

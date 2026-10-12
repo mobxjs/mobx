@@ -1,0 +1,17 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "rootDir": "src",
+        "outDir": "dist",
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "target": "es2019",
+        "lib": ["es2020"],
+        "types": ["node"],
+        "sourceMap": false,
+        "noEmit": false,
+        "declaration": true,
+        "esModuleInterop": true
+    },
+    "include": ["src"]
+}

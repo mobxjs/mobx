@@ -13,7 +13,7 @@ MobX works in browsers and Node.js environments that provide native `Proxy` supp
 There are three types of React bindings:
 
 -   [mobx-react-lite](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react-lite). Utilities to manually apply observation
--   [mobx-react-observer](https://github.com/christianalfoni/mobx-react-observer). Babel/swc plugin to automatically apply observation to components
+-   [mobx-react-plugin](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react-plugin). Babel / Vite plugin to automatically apply observation to components, and to keep [React Compiler](react-compiler.md) out of them
 -   [mobx-react](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react). Support for class components
 
 Append the appropriate bindings for your use case to one of the commands below:

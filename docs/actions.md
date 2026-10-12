@@ -237,7 +237,7 @@ class Parent {
         makeObservable(this, {
             arrowAction: action,
             action: action,
-            boundAction: action.bound,
+            boundAction: action.bound
         })
     }
 }
@@ -254,7 +254,7 @@ class Child extends Parent {
         makeObservable(this, {
             arrowAction: override,
             action: override,
-            boundAction: override,
+            boundAction: override
         })
     }
 }
@@ -439,6 +439,12 @@ However, TypeScript isn't aware of that transformation, so `flowResult` will mak
 
 `makeAutoObservable` and friends will automatically infer generators to be `flow`s. `flow` annotated members will be non-enumerable.
 
+<details id="flow-plugin"><summary>**Tip:** write `async` / `await` and let a build plugin produce the flows<a href="#flow-plugin" class="tip-anchor"></a></summary>
+
+The [mobx-react-plugin](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react-plugin) Babel plugin turns the `async` methods of observable classes and objects into generator methods at build time, so `makeAutoObservable` and `flow` annotations treat them as flows. You keep writing (and type-checking) ordinary `async` / `await` code, without `runInAction` after every `await`.
+
+</details>
+
 <details id="flow-wrap"><summary>{🚀} **Note:** using flow on object fields<a href="#flow-wrap" class="tip-anchor"></a></summary>
 `flow`, like `action`, can be used to wrap functions directly. The above example could also have been written as follows:
 
@@ -452,7 +458,7 @@ class Store {
     constructor() {
         makeObservable(this, {
             githubProjects: observable,
-            state: observable,
+            state: observable
         })
     }
 
