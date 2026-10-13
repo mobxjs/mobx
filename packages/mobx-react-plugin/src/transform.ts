@@ -122,9 +122,6 @@ export function transformProgram(
     return ctx.result
 }
 
-// ---------------------------------------------------------------------------
-// Collecting
-
 function getWrapperKind(ctx: Context, callee: NodePath): WrapperKind | null {
     const { t } = ctx
     const node = callee.node
@@ -314,7 +311,6 @@ function inferNameFromFilename(ctx: Context): string | null {
     return name
 }
 
-// ---------------------------------------------------------------------------
 // Classification (mirrors React Compiler's inference, see Program.ts in
 // babel-plugin-react-compiler: getComponentOrHookLike & friends)
 
@@ -604,9 +600,6 @@ function functionDisplayName(ctx: Context, fn: FunctionPath): string | null {
     return null
 }
 
-// ---------------------------------------------------------------------------
-// Directives
-
 function findDirective(ctx: Context, fn: FunctionPath, set: Set<string>): string | null {
     const body = fn.node.body
     if (!ctx.t.isBlockStatement(body)) {
@@ -671,9 +664,6 @@ function addDirectivesToRemainingFunctions(ctx: Context): void {
         }
     })
 }
-
-// ---------------------------------------------------------------------------
-// Processing module scope candidates
 
 function describeCandidate(candidate: Candidate): string {
     return candidate.name ? `Component \`${candidate.name}\`` : "An anonymous component"
@@ -1100,9 +1090,6 @@ function wrapForwardRefCallSites(ctx: Context, name: string): void {
     }
 }
 
-// ---------------------------------------------------------------------------
-// Import handling
-
 function ensureObserverImport(ctx: Context): string {
     if (ctx.observerLocal !== null) {
         return ctx.observerLocal
@@ -1167,7 +1154,6 @@ function ensureObserverImport(ctx: Context): string {
             }
         }
     } else {
-        // CommonJS / script
         const declaration = t.variableDeclaration("const", [
             t.variableDeclarator(
                 t.objectPattern([

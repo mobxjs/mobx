@@ -92,9 +92,6 @@ export function transformFlows(types: Types, program: NodePath<t.Program>): Flow
     return ctx.result
 }
 
-// ---------------------------------------------------------------------------
-// Annotations
-
 function classifyAnnotation(
     ctx: Context,
     node: t.Node | null | undefined
@@ -215,9 +212,6 @@ function applyRewrites(ctx: Context, decision: Decision): void {
     }
 }
 
-// ---------------------------------------------------------------------------
-// Converting async functions
-
 type AsyncFunctionPath = NodePath<t.ClassMethod | t.ObjectMethod | t.FunctionExpression>
 
 /**
@@ -252,9 +246,6 @@ function convertToGenerator(ctx: Context, fn: AsyncFunctionPath): boolean {
     fn.node.generator = true
     return true
 }
-
-// ---------------------------------------------------------------------------
-// Classes
 
 /** Finds `makeAutoObservable(this, ...)` / `makeObservable(this, ...)` in the constructor. */
 function findClassTarget(ctx: Context, cls: NodePath<t.Class>): Target | null {
@@ -310,9 +301,6 @@ function transformClass(ctx: Context, cls: NodePath<t.Class>): void {
         ctx.result.flows.push(`${className}.${name}`)
     }
 }
-
-// ---------------------------------------------------------------------------
-// Object literals
 
 function objectLiteralOf(ctx: Context, node: t.Node | undefined): t.ObjectExpression | null {
     return ctx.t.isObjectExpression(node) ? node : null
@@ -392,7 +380,6 @@ function transformObjectCall(ctx: Context, call: NodePath<t.CallExpression>): vo
     }
 }
 
-// ---------------------------------------------------------------------------
 // `flow` import (needed when `action` annotations are rewritten)
 
 function ensureFlowImport(ctx: Context): string {

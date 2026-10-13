@@ -62,7 +62,6 @@ function mobxReactPlugin(options: mobxReactPlugin.Options = {}): mobxReactPlugin
                 result.metadata as { mobxReactPlugin?: babelPlugin.TransformResult } | undefined
             )?.mobxReactPlugin
             if (!meta || Object.values(meta).every(list => list.length === 0)) {
-                // Nothing changed: keep the original code (and its formatting/source map) untouched.
                 return null
             }
             return { code: result.code, map: result.map }
@@ -93,7 +92,6 @@ function resolveParserPlugins(
     return plugins
 }
 
-// eslint-disable-next-line @typescript-eslint/no-namespace
 namespace mobxReactPlugin {
     /**
      * The returned plugin object. Structurally compatible with Vite's `Plugin`

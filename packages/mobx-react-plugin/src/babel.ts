@@ -74,7 +74,6 @@ function mobxReactPlugin(
     }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-namespace
 namespace mobxReactPlugin {
     export type Options = import("./options").Options
     export type ObserverOptions = import("./options").ObserverOptions
