@@ -54,6 +54,10 @@ npm install --save-dev mobx-react-plugin
 
 The generated code imports `observer` from `mobx-react-lite` (configurable through [`importSource`](#options)), so `mobx-react-lite` (or `mobx-react`) must be a dependency of your app.
 
+## Requirements
+
+The latest MobX and, for the Vite plugin, the latest Vite. Older versions are not supported.
+
 ## Setup
 
 The plugin only needs to run **before React Compiler**, when the compiler is used. It does all its work in Babel's `Program:enter`, before any other plugin sees the file, so listing it first in the Babel `plugins` array is enough. The Vite plugin is a pre-transform (`enforce: "pre"`) and runs before any other Vite plugin.
@@ -73,7 +77,7 @@ export default defineConfig({
 
 This works with `@vitejs/plugin-react`, `@vitejs/plugin-react-swc` and `@vitejs/plugin-react-oxc`, with or without React Compiler, because the transform runs before the React plugin.
 
-With React Compiler through `@vitejs/plugin-react` 6 and `@rolldown/plugin-babel`:
+With React Compiler through `@vitejs/plugin-react` and `@rolldown/plugin-babel`:
 
 ```ts
 import { defineConfig } from "vite"
@@ -83,16 +87,6 @@ import mobxReactPlugin from "mobx-react-plugin/vite"
 
 export default defineConfig({
     plugins: [mobxReactPlugin(), react(), babel({ presets: [reactCompilerPreset()] })]
-})
-```
-
-With `@vitejs/plugin-react` 5 and earlier you can also add the Babel plugin to the plugin's Babel options instead; keep it before the compiler:
-
-```ts
-react({
-    babel: {
-        plugins: [["mobx-react-plugin/babel", {}], "babel-plugin-react-compiler"]
-    }
 })
 ```
 

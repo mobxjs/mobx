@@ -54,6 +54,9 @@
         "@babel/core": "^7.26.0",
         "picomatch": "^4.0.2"
     },
+    "peerDependencies": {
+        "mobx": "^7.0.0"
+    },
     "devDependencies": {
         "@babel/preset-react": "^7.27.1",
         "@babel/preset-typescript": "^7.27.1",

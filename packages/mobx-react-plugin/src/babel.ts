@@ -5,7 +5,7 @@ import { transformProgram } from "./transform"
 
 interface BabelApi {
     types: typeof t
-    assertVersion?(range: string | number): void
+    assertVersion(range: string | number): void
 }
 
 /**
@@ -32,9 +32,7 @@ function mobxReactPlugin(
     api: BabelApi,
     rawOptions?: mobxReactPlugin.Options
 ): PluginObj<PluginPass> {
-    if (typeof api.assertVersion === "function") {
-        api.assertVersion("^7.0.0 || ^8.0.0-0")
-    }
+    api.assertVersion("^7.0.0 || ^8.0.0-0")
     const options = normalizeOptions(rawOptions)
     return {
         name: "mobx-react-plugin",
