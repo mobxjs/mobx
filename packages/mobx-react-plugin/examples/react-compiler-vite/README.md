@@ -65,29 +65,6 @@ pure clicks:     0 -> 3
 no React errors
 ```
 
-The same behavior was verified manually in Chrome against `vite dev` and `vite preview`.
-
-## Versions
-
-Pinned in [package-lock.json](./package-lock.json):
-
-| Package                     | Version |
-| --------------------------- | ------- |
-| vite                        | 8.3.4   |
-| @vitejs/plugin-react        | 6.1.2   |
-| @rolldown/plugin-babel      | 0.2.4   |
-| babel-plugin-react-compiler | 1.0.0   |
-| react / react-dom           | 19.3.0  |
-| mobx                        | 7.0.6   |
-| mobx-react-lite             | 5.1.0   |
-| vitest                      | 4.1.11  |
-
-## Upstream status
-
--   Bare `mobx` is no longer on React Compiler's incompatible-library list ([facebook/react#32570](https://github.com/facebook/react/pull/32570)); the concern is `observer` from `mobx-react` / `mobx-react-lite`.
--   [facebook/react#37000](https://github.com/facebook/react/issues/37000) is the stale-observer reproduction this demo's control reproduces.
--   [facebook/react#37019](https://github.com/facebook/react/pull/37019) proposes a React-side skip of `observer` components. It was still open when this demo was written; the demo does not rely on it.
-
 ## Known limitation: custom hooks
 
 A function-level `"use no memo"` protects that function only. A separately defined hook that reads observables would be compiled on its own and cache derived values against the stable identity of the store. `mobx-react-plugin` therefore also adds the directive to custom hooks in the files it transforms (`observer.useNoMemoHooks`, enabled by default). Hooks in excluded files must opt out themselves.

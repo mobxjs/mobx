@@ -88,4 +88,4 @@ function useVisibleTodos() {
 
 ## Without the plugin
 
-If you prefer to apply `observer` manually, add `"use no memo"` to every observer component and to every hook that reads observables, and prefer the inline form `observer(function View() { ... })`. Components declared separately and then passed to `observer` (`observer(View)`) are compiled by the compiler's default inference and go stale. The inline form happens to be skipped by the compiler today, but only because callbacks of unknown higher-order functions are skipped in general, so the explicit directive is still required.
+If you prefer to apply `observer` manually, add `"use no memo"` to every observer component and to every hook that reads observables, and prefer the inline form `observer(function View() { ... })`. Components declared separately and then passed to `observer` (`observer(View)`) are compiled and go stale.

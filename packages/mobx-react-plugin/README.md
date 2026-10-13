@@ -46,8 +46,6 @@ Benefits:
 -   MobX and React Compiler coexist: see [React Compiler](#react-compiler) below.
 -   `async`/`await` in stores just works under `enforceActions`: see [Async methods become flows](#async-methods-become-flows).
 
-This package continues the work of [Christian Alfoni](https://github.com/christianalfoni) on [observing-components](https://github.com/christianalfoni/observing-components) and [mobx-react-plugin](https://github.com/christianalfoni/mobx-react-observer).
-
 ## Installation
 
 ```sh
@@ -269,24 +267,24 @@ class UserStore {
 }
 ```
 
-`makeAutoObservable` infers generator methods as `flow`s, so `loadUser` runs every step inside an action, still returns a promise (with an extra `cancel()` method) and keeps its TypeScript signature in your source. You write ordinary `async`/`await`, type-check it as such, and get flows at runtime.
+`makeAutoObservable` infers generator methods as `flow`s, so `loadUser` runs every step inside an action, still returns a promise (with an extra `cancel()` method) and keeps its TypeScript signature in your source.
 
 Only methods MobX will actually turn into flows are converted:
 
 -   `async` methods of classes that call `makeAutoObservable(this)` in their constructor, unless the method is overridden with another annotation (`{ load: false }`, `{ load: action }`);
--   `async` methods annotated with `flow` or `flow.bound` in `makeObservable(this, { ... })`, or decorated with `@flow` / `@flow.bound`;
--   `async` methods annotated with `action` / `action.bound` (`makeObservable(this, { load: action })`, `makeAutoObservable` overrides) or decorated with `@action` / `@action.bound`: `action` only covers the synchronous part of an `async` method, so these become flows and the annotation is rewritten to `flow` / `flow.bound` (importing `flow` from `mobx` when needed);
--   `async` methods of object literals passed to `observable()`, `observable.object()`, `makeAutoObservable()`, `makeObservable()` (with a `flow` annotation), `extendObservable()` or returned from `useLocalObservable(() => ({ ... }))`.
+-   `async` methods annotated with `flow` or `flow.bound` in `makeObservable(this, { ... })`, or decorated with `@flow` / `@flow.bound` (2023-11 decorators);
+-   `async` methods annotated with `action` / `action.bound` (`makeObservable(this, { load: action })`, `makeAutoObservable` overrides) or decorated with `@action` / `@action.bound` (2023-11 decorators): `action` only covers the synchronous part of an `async` method, so these become flows and the annotation is rewritten to `flow` / `flow.bound` (importing `flow` from `mobx` when needed);
+-   `async` methods of object literals passed to `makeAutoObservable()` or `makeObservable()` (with a `flow` annotation).
 
 Not converted: methods without `await`, methods using `for await`, static and private methods, arrow function properties (a generator would rebind `this`), and classes whose MobX call cannot be analyzed statically (for example `makeAutoObservable(this, overrides)` with a variable). Only the method's own `await`s are replaced; `async` callbacks inside it are untouched.
 
-This works with `makeAutoObservable`, `makeObservable`, `observable()` objects, legacy decorators (with `makeObservable(this)`) and modern 2023-11 decorators. Existing `runInAction` calls inside a converted method are left alone: a nested action is harmless, and removing them is a source cleanup (a codemod), not a build-time concern. `async` callbacks inside the method (for example in `.then()` or `setTimeout`) still need their own action.
+This works with `makeAutoObservable`, `makeObservable` and 2023-11 decorators; legacy decorators, `observable()`, `extendObservable` and `useLocalObservable` are not supported. Existing `runInAction` calls inside a converted method are left alone.
 
 Set `flow: false` to disable this.
 
 ## React Compiler
 
-MobX and React Compiler are both render optimizers, built on incompatible models. MobX tracks which observable objects a component reads during render and re-renders it when they change; the objects keep their identity and their contents change. React Compiler memoizes render expressions based on statically inferred dependencies and assumes values with a stable identity have not changed. Compiling an `observer` component is therefore unsafe:
+MobX tracks which observables a component reads during render and re-renders it when they change. React Compiler memoizes render output based on statically inferred dependencies and assumes values with a stable identity have not changed. Compiling an `observer` component is therefore unsafe:
 
 ```tsx
 function CounterView() {
@@ -297,18 +295,11 @@ function CounterView() {
 export default observer(CounterView)
 ```
 
-React Compiler caches the JSX of `CounterView`. When `counterStore.count` changes, MobX correctly re-renders the component, but the cached JSX is returned and the DOM stays stale, silently. See [facebook/react#37000](https://github.com/facebook/react/issues/37000) and [mobxjs/mobx#3874](https://github.com/mobxjs/mobx/issues/3874).
+React Compiler caches the JSX of `CounterView`. When `counterStore.count` changes, MobX re-renders the component, but the cached JSX is returned and the DOM stays stale, silently. See [facebook/react#37000](https://github.com/facebook/react/issues/37000) and [mobxjs/mobx#3874](https://github.com/mobxjs/mobx/issues/3874).
 
-React provides the [`"use no memo"` directive](https://react.dev/reference/react-compiler/directives/use-no-memo) to exclude a function from compilation. This plugin inserts it into every observed component (and every custom hook), which makes the division of responsibilities explicit:
+The plugin inserts React's [`"use no memo"` directive](https://react.dev/reference/react-compiler/directives/use-no-memo) into every observed component and custom hook, so MobX owns memoization and invalidation inside them and React Compiler optimizes everything else: components you exclude from the transform, and components with `"use memo"`.
 
--   MobX owns memoization and invalidation inside observed components. That is what `observer` does: it tracks the exact observables read during render, re-renders when they change and applies `React.memo`.
--   React Compiler optimizes everything else: components you exclude from the transform, hooks and components with `"use memo"`.
-
-Components written as `observer(function View() {})` are currently skipped by the compiler's inference as a side effect of how unknown higher-order-function callbacks are treated, not because the compiler knows MobX. The explicit directive makes the behavior independent of that heuristic.
-
-The precise claim is: **enabling React Compiler does not break MobX rendering, because observed components are explicitly left to MobX.** React Compiler does not optimize the inside of observer components; MobX already does that. Automatic observation can leave relatively little application code for React Compiler to optimize, which is an accepted tradeoff.
-
-React's documentation says the compiler must run first in the Babel pipeline. That rule exists so the compiler sees original source rather than transpiled output. This plugin only wraps components and adds the directive and leaves the code the compiler compiles untouched, so it must run before the compiler.
+The plugin must run before React Compiler: it adds the directive to the original source the compiler is going to see. See [MobX and React Compiler](https://mobx.js.org/react-compiler.html) for more background.
 
 ### Custom hooks
 
@@ -323,24 +314,12 @@ function useVisibleTodos() {
 
 Therefore the plugin also inserts `"use no memo"` into custom hooks by default (`useNoMemoHooks`). Turn it off only if your hooks never read observables.
 
-### Verifying your setup
+## Migrating from `mobx-react-observer`
 
-Inspect the transformed output of one file (for example through the "Sources" panel in dev tools, or Metro's `--verbose` output). An observed component must contain `"use no memo"` and must not contain the compiler's `_c(...)` memo cache. The test suite of this package contains the same checks, including a negative test that shows what happens when the plugin runs after the compiler.
-
-## Why a Babel plugin
-
-Babel is the one transform pipeline every React toolchain can run: Metro (React Native, Expo) and Jest are Babel-only, webpack and Rspack use `babel-loader`, Next.js switches to Babel when a Babel config is present, and React Compiler itself ships as a Babel plugin, so projects that enable it already run Babel. The Vite plugin runs the same transform as a pre-transform, so SWC- and oxc-based React plugins work as well. The transform is small (three AST rewrites) and keeps the original code otherwise intact; a Rust port (`swc-plugin-mobx`, or oxc once it supports third-party transforms) would expose the same options.
-
-## Migrating from `mobx-react-observer` 2.x
-
--   `import plugin from "mobx-react-plugin/vite-plugin"` becomes `import mobxReactPlugin from "mobx-react-plugin/vite"`.
--   `observer` is now imported from `mobx-react-lite` directly instead of from the plugin package; set `importSource` if needed. The runtime re-export is gone.
--   `exclude` works the same way and now also accepts RegExps and predicates. `include` is new.
+-   `import plugin from "mobx-react-observer/vite-plugin"` becomes `import mobxReactPlugin from "mobx-react-plugin/vite"`.
+-   `observer` is imported from `mobx-react-lite` directly instead of from the plugin package; set `importSource` if needed.
 -   `importPath` is now `importSource`.
--   Arrow function components are turned into named function expressions so they keep their name in React DevTools.
--   `forwardRef` components are wrapped correctly (`observer(forwardRef(...))`), `memo` is replaced by `observer`, and components that are passed to `observer(...)` elsewhere in the file are no longer wrapped twice.
--   The Babel plugin is available for every bundler through `mobx-react-plugin/babel`.
--   New: `async` methods of observable classes become flows (`flow` option).
+-   `exclude` also accepts RegExps and predicates. `include` is new.
 
 ## ESLint
 

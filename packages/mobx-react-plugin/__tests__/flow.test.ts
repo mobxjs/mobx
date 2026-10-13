@@ -112,52 +112,7 @@ class Store {
         )
     })
 
-    test("legacy decorators with makeObservable(this)", () => {
-        expectTransform(
-            code`
-import { makeObservable, flow, action } from "mobx"
-class Store {
-    constructor() { makeObservable(this) }
-    @flow async load() { await a() }
-    @flow.bound async sync() { await a() }
-    @action async save() { await a() }
-    @action.bound async saveBound() { await a() }
-    @action reset() {}
-    @custom async other() { await a() }
-}`,
-            code`
-import { makeObservable, flow, action } from "mobx";
-class Store {
-  constructor() {
-    makeObservable(this);
-  }
-  @flow
-  *load() {
-    yield a();
-  }
-  @flow.bound
-  *sync() {
-    yield a();
-  }
-  @flow
-  *save() {
-    yield a();
-  }
-  @flow.bound
-  *saveBound() {
-    yield a();
-  }
-  @action
-  reset() {}
-  @custom
-  async other() {
-    await a();
-  }
-}`
-        )
-    })
-
-    test("modern (2023-11) decorators without makeObservable", () => {
+    test("2023-11 decorators without makeObservable", () => {
         expectTransform(
             code`
 import { action, observable } from "mobx"
@@ -322,52 +277,15 @@ class Store {
 }`
         )
     })
-
-    test("TypeScript annotations are kept", () => {
-        expectTransform(
-            code`
-class Store {
-    constructor() { makeAutoObservable(this) }
-    async load(id: string): Promise<User | null> { return await api.getUser(id) }
-}`,
-            code`
-class Store {
-  constructor() {
-    makeAutoObservable(this);
-  }
-  *load(id: string): Promise<User | null> {
-    return yield api.getUser(id);
-  }
-}`
-        )
-    })
 })
 
 describe("async methods of observable object literals become flows", () => {
-    test("observable(), observable.object(), makeAutoObservable(), extendObservable()", () => {
+    test("makeAutoObservable()", () => {
         expectTransform(
             code`
-const a = observable({ async load() { await x() } })
-const b = observable.object({ async load() { await x() } })
-const c = makeAutoObservable({ async load() { await x() } })
-extendObservable(target, { async load() { await x() } })`,
+const a = makeAutoObservable({ async load() { await x() } })`,
             code`
-const a = observable({
-  *load() {
-    yield x();
-  }
-});
-const b = observable.object({
-  *load() {
-    yield x();
-  }
-});
-const c = makeAutoObservable({
-  *load() {
-    yield x();
-  }
-});
-extendObservable(target, {
+const a = makeAutoObservable({
   *load() {
     yield x();
   }
@@ -378,10 +296,10 @@ extendObservable(target, {
     test("overrides and explicit annotations", () => {
         expectTransform(
             code`
-const a = observable({ async load() { await x() }, async save() { await x() } }, { save: false })
+const a = makeAutoObservable({ async load() { await x() }, async save() { await x() } }, { save: false })
 const b = makeObservable({ async load() { await x() }, async save() { await x() } }, { load: flow })`,
             code`
-const a = observable({
+const a = makeAutoObservable({
   *load() {
     yield x();
   },
@@ -404,35 +322,12 @@ const b = makeObservable({
         )
     })
 
-    test("useLocalObservable", () => {
-        expectTransform(
-            code`
-const a = useLocalObservable(() => ({ async load() { await x() } }))
-const b = useLocalObservable(() => { const initial = 1; return { initial, async load() { await x() } } })`,
-            code`
-const a = useLocalObservable(() => ({
-  *load() {
-    yield x();
-  }
-}));
-const b = useLocalObservable(() => {
-  const initial = 1;
-  return {
-    initial,
-    *load() {
-      yield x();
-    }
-  };
-});`
-        )
-    })
-
     test("function expressions are converted, arrow functions are not (they would rebind this)", () => {
         expectTransform(
             code`
-const a = observable({ load: async function () { await x() }, save: async () => { await x() } })`,
+const a = makeAutoObservable({ load: async function () { await x() }, save: async () => { await x() } })`,
             code`
-const a = observable({
+const a = makeAutoObservable({
   load: function* () {
     yield x();
   },

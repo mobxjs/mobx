@@ -22,7 +22,7 @@ type Annotations = Map<string, AnnotationEntry> | null
 interface Target {
     /**
      * `auto`: generator methods are inferred as flows unless overridden
-     * (`makeAutoObservable`, `observable`, `extendObservable`, `useLocalObservable`).
+     * (`makeAutoObservable`).
      * `explicit`: only members annotated with `flow` become flows (`makeObservable`).
      */
     mode: "auto" | "explicit"
@@ -46,13 +46,6 @@ interface Context {
     importAdded: boolean
 }
 
-const AUTO_CALLEES = new Set([
-    "makeAutoObservable",
-    "observable",
-    "extendObservable",
-    "useLocalObservable"
-])
-
 /**
  * Turns `async` methods of observable classes and objects into generator
  * methods, so that MobX treats them as `flow`s: every step after an `await`
@@ -75,8 +68,7 @@ const AUTO_CALLEES = new Set([
  * method is overridden with another annotation), members annotated with `flow`
  * or `action` (which is rewritten to `flow`) in `makeObservable`, methods
  * decorated with `@flow` or `@action` (rewritten to `@flow`), and object literals
- * passed to `observable()`, `makeAutoObservable()`, `makeObservable()`,
- * `extendObservable()` or returned from `useLocalObservable(() => ...)`.
+ * passed to `makeAutoObservable()` or `makeObservable()`.
  */
 export function transformFlows(types: Types, program: NodePath<t.Program>): FlowResult {
     const ctx: Context = {
@@ -326,26 +318,6 @@ function objectLiteralOf(ctx: Context, node: t.Node | undefined): t.ObjectExpres
     return ctx.t.isObjectExpression(node) ? node : null
 }
 
-/** `useLocalObservable(() => ({ ... }))` – the object literal the initializer returns. */
-function returnedObjectLiteral(ctx: Context, node: t.Node | undefined): t.ObjectExpression | null {
-    const { t } = ctx
-    if (!t.isArrowFunctionExpression(node) && !t.isFunctionExpression(node)) {
-        return null
-    }
-    if (t.isObjectExpression(node.body)) {
-        return node.body
-    }
-    if (t.isBlockStatement(node.body)) {
-        const statements = node.body.body
-        const last = statements[statements.length - 1]
-        const returns = statements.filter(statement => t.isReturnStatement(statement))
-        if (returns.length === 1 && returns[0] === last && t.isReturnStatement(last)) {
-            return objectLiteralOf(ctx, last.argument ?? undefined)
-        }
-    }
-    return null
-}
-
 function findObjectTarget(
     ctx: Context,
     call: NodePath<t.CallExpression>
@@ -353,43 +325,21 @@ function findObjectTarget(
     const { t } = ctx
     const callee = call.node.callee
     const args = call.node.arguments
-    let name: string | null = null
-    if (t.isIdentifier(callee)) {
-        name = callee.name
-    } else if (
-        t.isMemberExpression(callee) &&
-        !callee.computed &&
-        t.isIdentifier(callee.object, { name: "observable" }) &&
-        t.isIdentifier(callee.property, { name: "object" })
-    ) {
-        name = "observable"
-    }
-    if (name === null) {
+    if (!t.isIdentifier(callee)) {
         return null
     }
-    if (name === "makeObservable") {
+    if (callee.name === "makeObservable") {
         const object = objectLiteralOf(ctx, args[0])
         return object
             ? { object, target: { mode: "explicit", annotations: parseAnnotations(ctx, args[1]) } }
             : null
     }
-    if (!AUTO_CALLEES.has(name)) {
+    if (callee.name !== "makeAutoObservable") {
         return null
     }
-    let object: t.ObjectExpression | null
-    let overrides: t.Node | undefined
-    if (name === "extendObservable") {
-        object = objectLiteralOf(ctx, args[1])
-        overrides = args[2]
-    } else if (name === "useLocalObservable") {
-        object = returnedObjectLiteral(ctx, args[0])
-        overrides = args[1]
-    } else {
-        object = objectLiteralOf(ctx, args[0])
-        overrides = args[1]
-    }
+    const object = objectLiteralOf(ctx, args[0])
     return object
-        ? { object, target: { mode: "auto", annotations: parseAnnotations(ctx, overrides) } }
+        ? { object, target: { mode: "auto", annotations: parseAnnotations(ctx, args[1]) } }
         : null
 }
 

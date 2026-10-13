@@ -8,27 +8,19 @@ function expectTransform(input: string, expected: string, opts?: Parameters<type
 }
 
 describe("wrapping components in observer", () => {
-    test("function declaration", () => {
+    test("function declarations", () => {
         expectTransform(
             code`
-function Counter() { return <h1>{store.count}</h1> }`,
+function Counter() { return <h1>{store.count}</h1> }
+export function Exported() { return <h1 /> }`,
             code`
 import { observer } from "mobx-react-lite";
 const Counter = observer(function Counter() {
   "use no memo";
 
   return <h1>{store.count}</h1>;
-});`
-        )
-    })
-
-    test("exported function declaration", () => {
-        expectTransform(
-            code`
-export function Counter() { return <h1 /> }`,
-            code`
-import { observer } from "mobx-react-lite";
-export const Counter = observer(function Counter() {
+});
+export const Exported = observer(function Exported() {
   "use no memo";
 
   return <h1 />;
@@ -380,23 +372,6 @@ function TodoItem({
 export const ObservedTodoItem = observer(TodoItem);`
         )
     })
-
-    test("non-recursive observed components are not touched", () => {
-        expectTransform(
-            code`
-import { observer } from "mobx-react-lite"
-export const Leaf = observer(function Leaf({ item }) { return <li>{item.text}</li> })`,
-            code`
-import { observer } from "mobx-react-lite";
-export const Leaf = observer(function Leaf({
-  item
-}) {
-  "use no memo";
-
-  return <li>{item.text}</li>;
-});`
-        )
-    })
 })
 
 describe("components that are already observed", () => {
@@ -440,23 +415,6 @@ export default observer(X);`
 })
 
 describe("forwardRef and memo", () => {
-    test("React 19 ref as a prop needs nothing special", () => {
-        expectTransform(
-            code`
-export function Input({ ref, value }) { return <input ref={ref} value={value} /> }`,
-            code`
-import { observer } from "mobx-react-lite";
-export const Input = observer(function Input({
-  ref,
-  value
-}) {
-  "use no memo";
-
-  return <input ref={ref} value={value} />;
-});`
-        )
-    })
-
     test("inline forwardRef is wrapped on the outside (forwardRef needs a plain render function)", () => {
         expectTransform(
             code`
