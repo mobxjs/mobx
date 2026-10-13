@@ -220,49 +220,6 @@ Usage:
 Use this utility to create a temporary action that is immediately invoked. Can be useful in asynchronous processes.
 Check out the [above code block](#examples) for an example.
 
-## Actions and inheritance
-
-Only actions defined **on prototype** can be **overridden** by subclass:
-
-```javascript
-class Parent {
-    // on instance
-    arrowAction = () => {}
-
-    // on prototype
-    action() {}
-    boundAction() {}
-
-    constructor() {
-        makeObservable(this, {
-            arrowAction: action,
-            action: action,
-            boundAction: action.bound
-        })
-    }
-}
-class Child extends Parent {
-    // THROWS: TypeError: Cannot redefine property: arrowAction
-    arrowAction = () => {}
-
-    // OK
-    action() {}
-    boundAction() {}
-
-    constructor() {
-        super()
-        makeObservable(this, {
-            arrowAction: override,
-            action: override,
-            boundAction: override
-        })
-    }
-}
-```
-
-To **bind** a single _action_ to `this`, `action.bound` can be used instead of _arrow functions_.<br>
-See [**subclassing**](subclassing.md) for more information.
-
 ## Asynchronous actions
 
 In essence, asynchronous processes don't need any special treatment in MobX, as all reactions will update automatically regardless of the moment in time they are caused.

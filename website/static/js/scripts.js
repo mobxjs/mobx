@@ -83,7 +83,7 @@ function addHashToTabClicks() {
     for (var tab of tabs) {
         tab.addEventListener('click', function(e) {
             if (e.currentTarget.id) {
-                location.hash = e.currentTarget.id;
+                history.replaceState(null, '', '#' + e.currentTarget.id);
             }
         });
     }
