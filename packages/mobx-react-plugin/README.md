@@ -325,4 +325,4 @@ With this plugin the [`mobx/missing-observer`](../eslint-plugin-mobx/README.md) 
 
 ## Credits
 
-The automatic observer transform was created by [Christian Alfoni](https://github.com/christianalfoni) in [observing-components](https://github.com/christianalfoni/observing-components) and packaged for MobX as [mobx-react-plugin](https://github.com/christianalfoni/mobx-react-observer). This package carries that idea forward as an official MobX package.
+The idea of automatically wrapping components in `observer` at build time comes from [Christian Alfoni](https://github.com/christianalfoni) and his [mobx-react-observer](https://github.com/christianalfoni/mobx-react-observer) package.
