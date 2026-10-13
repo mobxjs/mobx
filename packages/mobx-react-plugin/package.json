@@ -1,7 +1,7 @@
 {
     "name": "mobx-react-plugin",
     "version": "0.0.0",
-    "description": "Wraps React components in `observer` at build time, marks them \"use no memo\" so React Compiler leaves them to MobX, and turns async methods of observable classes into flows. Babel and Vite plugin.",
+    "description": "Wraps React components in `observer` at build time, marks them \"use no memo\" so React Compiler leaves them to MobX, and turns async methods of observable classes into flows. A Babel plugin, plus a Vite adapter.",
     "main": "dist/babel.js",
     "types": "dist/babel.d.ts",
     "exports": {
