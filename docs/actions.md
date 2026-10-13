@@ -398,7 +398,7 @@ However, TypeScript isn't aware of that transformation, so `flowResult` will mak
 
 <details id="flow-plugin"><summary>**Tip:** write `async` / `await` and let a build plugin produce the flows<a href="#flow-plugin" class="tip-anchor"></a></summary>
 
-The [mobx-react-plugin](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react-plugin) Babel plugin turns the `async` methods of observable classes and objects into generator methods at build time, so `makeAutoObservable` and `flow` annotations treat them as flows. You keep writing (and type-checking) ordinary `async` / `await` code, without `runInAction` after every `await`.
+The [mobx-react-plugin](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react-plugin) build plugin turns the `async` methods of observable classes and objects into generator methods at build time, so `makeAutoObservable` and `flow` annotations treat them as flows. You keep writing (and type-checking) ordinary `async` / `await` code, without `runInAction` after every `await`.
 
 </details>
 

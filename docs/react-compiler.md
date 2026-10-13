@@ -41,8 +41,6 @@ export function TodoList() {
 }
 ```
 
-It is a Babel plugin, so it works wherever Babel runs: Vite, webpack, Rspack, Metro (React Native and Expo), Next.js and Jest. There is also a Vite plugin that works with any React plugin.
-
 ```javascript
 // vite.config.ts
 import { defineConfig } from "vite"
@@ -63,7 +61,7 @@ module.exports = {
 }
 ```
 
-The plugin must run before React Compiler. See the [package documentation](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react-plugin) for all bundlers and options.
+The plugin must run before React Compiler. See the [package documentation](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react-plugin) for other bundlers and options.
 
 ## What this does and does not mean
 

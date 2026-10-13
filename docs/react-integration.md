@@ -8,7 +8,7 @@ hide_title: true
 
 # React integration
 
-This documentation outlines how to manually apply observation to React components. However, by using the [mobx-react-plugin](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react-plugin) Babel / Vite plugin, you can automatically handle observation without manual intervention (it also keeps [React Compiler](react-compiler.md) from memoizing observed components). Still, understanding how MobX observation integrates with React components remains valuable, even when leveraging automated solutions.
+This documentation outlines how to manually apply observation to React components. However, by using the [mobx-react-plugin](https://github.com/mobxjs/mobx/tree/main/packages/mobx-react-plugin) build plugin, you can automatically handle observation without manual intervention (it also keeps [React Compiler](react-compiler.md) from memoizing observed components). Still, understanding how MobX observation integrates with React components remains valuable, even when leveraging automated solutions.
 
 ```javascript
 import { observer } from "mobx-react-lite" // Or "mobx-react".

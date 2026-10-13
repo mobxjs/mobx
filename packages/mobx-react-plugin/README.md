@@ -1,8 +1,6 @@
 # mobx-react-plugin
 
-The MobX plugin for React projects: a Babel plugin that works with every bundler that runs Babel (Vite, webpack, Rspack, Metro / React Native, Expo, Next.js, Jest) plus a ready-made Vite plugin.
-
-It does three things, each of which can be switched off:
+Write plain React components and plain `async` store methods; the plugin adds the MobX wiring at build time. It does three things, each of which can be switched off:
 
 1. wraps every React component in your source files in [`observer`](https://mobx.js.org/react-integration.html), so you can never forget it;
 2. inserts the `"use no memo"` directive into components and hooks, so [React Compiler](https://react.dev/learn/react-compiler) leaves memoization and invalidation of observed components to MobX instead of caching their output;
@@ -59,6 +57,8 @@ The generated code imports `observer` from `mobx-react-lite` (configurable throu
 The latest MobX and, for the Vite plugin, the latest Vite. Older versions are not supported.
 
 ## Setup
+
+The package ships a Babel plugin (`mobx-react-plugin/babel`), which works with any bundler that runs Babel, and a Vite plugin (`mobx-react-plugin/vite`).
 
 The plugin only needs to run **before React Compiler**, when the compiler is used. It does all its work in Babel's `Program:enter`, before any other plugin sees the file, so listing it first in the Babel `plugins` array is enough. The Vite plugin is a pre-transform (`enforce: "pre"`) and runs before any other Vite plugin.
 
