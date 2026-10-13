@@ -105,7 +105,7 @@ function assertKnownKeys(object: object, known: Set<string>, context: string): v
     }
 }
 
-export function normalizeObserverOptions(
+function normalizeObserverOptions(
     raw: boolean | ObserverOptions | undefined
 ): NormalizedObserverOptions | null {
     if (raw === false) {

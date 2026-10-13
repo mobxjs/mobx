@@ -2,7 +2,7 @@
  * Every function compiled by React Compiler starts with `const $ = _c(n)`
  * (`(0, _compilerRuntime.c)(n)` after the CommonJS transform).
  */
-export const MEMO_CACHE_CALL = /(?:\b_c|\.c\))\(\d+\)/
+const MEMO_CACHE_CALL = /(?:\b_c|\.c\))\(\d+\)/
 
 /**
  * Returns the source text of the function whose header contains `header`

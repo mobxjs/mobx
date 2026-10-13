@@ -2,7 +2,7 @@ import { transformSync } from "@babel/core"
 import type { ParserOptions, PluginItem } from "@babel/core"
 import mobxReactPlugin = require("../../src/babel")
 
-export interface TransformOptions {
+interface TransformOptions {
     options?: mobxReactPlugin.Options | false
     filename?: string
     cwd?: string
@@ -12,7 +12,7 @@ export interface TransformOptions {
     parserPlugins?: ParserOptions["plugins"]
 }
 
-export const DEFAULT_PARSER_PLUGINS: NonNullable<ParserOptions["plugins"]> = [
+const DEFAULT_PARSER_PLUGINS: NonNullable<ParserOptions["plugins"]> = [
     "jsx",
     "typescript",
     "decorators",

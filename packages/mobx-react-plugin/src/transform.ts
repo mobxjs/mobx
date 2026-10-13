@@ -5,7 +5,7 @@ import type { NormalizedObserverOptions } from "./options"
 
 type Types = typeof t
 
-export type FunctionPath = NodePath<
+type FunctionPath = NodePath<
     t.FunctionDeclaration | t.FunctionExpression | t.ArrowFunctionExpression
 >
 type CallPath = NodePath<t.CallExpression>
@@ -17,9 +17,9 @@ interface Wrapper {
 }
 
 /** Directives understood by React Compiler (see `babel-plugin-react-compiler`, Program.ts). */
-export const OPT_IN_DIRECTIVES = new Set(["use memo", "use forget"])
-export const OPT_OUT_DIRECTIVES = new Set(["use no memo", "use no forget"])
-export const NO_MEMO_DIRECTIVE = "use no memo"
+const OPT_IN_DIRECTIVES = new Set(["use memo", "use forget"])
+const OPT_OUT_DIRECTIVES = new Set(["use no memo", "use no forget"])
+const NO_MEMO_DIRECTIVE = "use no memo"
 
 const HOOK_NAME_RE = /^use[A-Z0-9]/
 const COMPONENT_NAME_RE = /^[A-Z]/

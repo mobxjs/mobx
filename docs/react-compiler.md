@@ -13,12 +13,10 @@ hide_title: true
 Compiling an `observer` component is therefore not safe:
 
 ```javascript
-function CounterView() {
+export const CounterView = observer(() => {
     const count = counterStore.count
     return <div>{count}</div>
-}
-
-export default observer(CounterView)
+})
 ```
 
 React Compiler caches the JSX of `CounterView`. When `counterStore.count` changes, MobX correctly schedules a re-render, the component runs again, but the compiler returns the JSX it cached during the first render. The DOM stays stale and nothing warns you. The reproduction is tracked in [facebook/react#37000](https://github.com/facebook/react/issues/37000); the background discussion is [mobxjs/mobx#3874](https://github.com/mobxjs/mobx/issues/3874).

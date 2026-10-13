@@ -287,12 +287,10 @@ Set `flow: false` to disable this.
 MobX tracks which observables a component reads during render and re-renders it when they change. React Compiler memoizes render output based on statically inferred dependencies and assumes values with a stable identity have not changed. Compiling an `observer` component is therefore unsafe:
 
 ```tsx
-function CounterView() {
+export const CounterView = observer(() => {
     const count = counterStore.count
     return <div>{count}</div>
-}
-
-export default observer(CounterView)
+})
 ```
 
 React Compiler caches the JSX of `CounterView`. When `counterStore.count` changes, MobX re-renders the component, but the cached JSX is returned and the DOM stays stale, silently. See [facebook/react#37000](https://github.com/facebook/react/issues/37000) and [mobxjs/mobx#3874](https://github.com/mobxjs/mobx/issues/3874).
