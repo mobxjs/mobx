@@ -1,12 +1,12 @@
 ---
-title: Subclassing
-sidebar_label: Subclassing
+title: Inheritance
+sidebar_label: Inheritance
 hide_title: true
 ---
 
 <script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CEBD4KQ7&placement=mobxjsorg" id="_carbonads_js"></script>
 
-# Subclassing
+# Inheritance
 
 Subclassing is supported with [limitations](#limitations). Most notably you can only **override actions/flows/computeds on prototype** - you cannot override _[field declarations](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes#field_declarations)_. When using `makeObservable`, use the `override` annotation for methods/getters overridden in a subclass. When using modern decorators, redecorate the overridden prototype method/getter in the subclass. Try to keep things simple and prefer composition over inheritance.
 

@@ -179,8 +179,8 @@
         "title": "Observable Sets"
       },
       "subclassing": {
-        "title": "Subclassing",
-        "sidebar_label": "Subclassing"
+        "title": "Inheritance",
+        "sidebar_label": "Inheritance"
       },
       "the-gist-of-mobx": {
         "title": "The gist of MobX",
