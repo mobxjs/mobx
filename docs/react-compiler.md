@@ -19,7 +19,7 @@ export const CounterView = observer(() => {
 })
 ```
 
-React Compiler caches the JSX of `CounterView`. When `counterStore.count` changes, MobX correctly schedules a re-render, the component runs again, but the compiler returns the JSX it cached during the first render. The DOM stays stale and nothing warns you.
+React Compiler caches the JSX of `CounterView`. When `counterStore.count` changes, MobX correctly schedules a re-render, but the compiler returns the JSX it cached during the first render. The DOM stays stale and nothing warns you.
 
 ## The solution: leave observed components to MobX
 
