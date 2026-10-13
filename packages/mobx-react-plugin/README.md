@@ -54,13 +54,13 @@ The generated code imports `observer` from `mobx-react-lite` (configurable throu
 
 ## Requirements
 
-The latest MobX and, for the Vite adapter, the latest Vite. Older versions are not supported.
+The latest MobX and, for the Vite plugin, the latest Vite. Older versions are not supported.
 
 ## Setup
 
-`mobx-react-plugin` is a Babel plugin (`mobx-react-plugin/babel`), so it works with any bundler that runs Babel. For Vite there is also an adapter (`mobx-react-plugin/vite`) that runs the same Babel plugin before any React plugin, including the ones that do not use Babel.
+`mobx-react-plugin` is a Babel plugin (`mobx-react-plugin/babel`), so it works with any bundler that runs Babel. For Vite there is also a Vite plugin (`mobx-react-plugin/vite`) that runs the same Babel plugin before any React plugin, including the ones that do not use Babel.
 
-The plugin only needs to run **before React Compiler**, when the compiler is used. It does all its work in Babel's `Program:enter`, before any other plugin sees the file, so listing it first in the Babel `plugins` array is enough. The Vite adapter is a pre-transform (`enforce: "pre"`) and runs before any other Vite plugin.
+The plugin only needs to run **before React Compiler**, when the compiler is used. It does all its work in Babel's `Program:enter`, before any other plugin sees the file, so listing it first in the Babel `plugins` array is enough. The Vite plugin is a pre-transform (`enforce: "pre"`) and runs before any other Vite plugin.
 
 ### Vite
 
@@ -90,7 +90,7 @@ export default defineConfig({
 })
 ```
 
-The Vite adapter runs its own Babel pass with only this plugin, so it has to enable parser syntax itself. It enables `jsx`, `typescript` (for `.ts`/`.tsx`), `decorators` and `decoratorAutoAccessors`. If you use other syntax, pass [`parserPlugins`](#vite-adapter-options), for example `parserPlugins: ["decorators-legacy"]`.
+The Vite plugin runs its own Babel pass with only this plugin, so it has to enable parser syntax itself. It enables `jsx`, `typescript` (for `.ts`/`.tsx`), `decorators` and `decoratorAutoAccessors`. If you use other syntax, pass [`parserPlugins`](#vite-plugin-options), for example `parserPlugins: ["decorators-legacy"]`.
 
 ### React Native and Expo
 
@@ -146,7 +146,7 @@ If your tests render components and rely on the automatic wrapping, add the plug
 
 ## Options
 
-The Babel plugin and the Vite adapter accept the same options. Every feature is enabled by default; pick the ones you want:
+The Babel plugin and the Vite plugin accept the same options. Every feature is enabled by default; pick the ones you want:
 
 ```ts
 // just the automatic observer (and the React Compiler directive)
@@ -181,14 +181,14 @@ mobxReactPlugin({
 })
 ```
 
-### Vite adapter options
+### Vite plugin options
 
 | Option          | Default                                    | Description                                                                                       |
 | --------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------- |
 | `parserPlugins` | `["decorators", "decoratorAutoAccessors"]` | Babel parser plugins enabled in addition to `jsx` and `typescript`, e.g. `["decorators-legacy"]`. |
 | `babel`         |                                            | Extra Babel options merged into the transform (advanced).                                         |
 
-The Vite adapter's `include` defaults to `.js`, `.jsx`, `.ts`, `.tsx` (and their `.mjs`/`.cjs`/`.mts`/`.cts` variants).
+The Vite plugin's `include` defaults to `.js`, `.jsx`, `.ts`, `.tsx` (and their `.mjs`/`.cjs`/`.mts`/`.cts` variants).
 
 ## What gets transformed
 
