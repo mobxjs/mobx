@@ -19,11 +19,11 @@ export const CounterView = observer(() => {
 })
 ```
 
-React Compiler caches the JSX of `CounterView`. When `counterStore.count` changes, MobX correctly schedules a re-render, the component runs again, but the compiler returns the JSX it cached during the first render. The DOM stays stale and nothing warns you. The reproduction is tracked in [facebook/react#37000](https://github.com/facebook/react/issues/37000); the background discussion is [mobxjs/mobx#3874](https://github.com/mobxjs/mobx/issues/3874).
+React Compiler caches the JSX of `CounterView`. When `counterStore.count` changes, MobX correctly schedules a re-render, the component runs again, but the compiler returns the JSX it cached during the first render. The DOM stays stale and nothing warns you.
 
 ## The solution: leave observed components to MobX
 
-React offers the [`"use no memo"` directive](https://react.dev/reference/react-compiler/directives/use-no-memo) to exclude a function from compilation. Inside an `observer` component MobX already owns memoization and invalidation (it tracks the exact observables read during render, re-renders on change and applies `React.memo`), so every observed component should carry the directive:
+React offers the [`"use no memo"` directive](https://react.dev/reference/react-compiler/directives/use-no-memo) to exclude a function from compilation. Inside an `observer` component MobX already owns memoization and invalidation, so every observed component should carry the directive:
 
 ```javascript
 export const TodoList = observer(function TodoList() {
@@ -65,13 +65,13 @@ The plugin must run before React Compiler. See the [package documentation](https
 
 ## What this does and does not mean
 
-Enabling React Compiler does not break MobX rendering, because observed components are explicitly left to MobX. React Compiler optimizes everything else: components you exclude from the transform and components that opt in with `"use memo"`.
+You can enable React Compiler alongside MobX so observed components are explicitly left to MobX. React Compiler optimizes everything else: components you exclude from the transform and components that opt in with `"use memo"`.
 
 React Compiler does not optimize the inside of observer components. MobX already does that work, and asking a second memoization system to reinterpret the same render with incompatible assumptions has little value. In an application where most components are observed, React Compiler will have relatively little left to optimize. That is an accepted tradeoff.
 
 ## Custom hooks
 
-A directive protects one function. A custom hook that reads observables and is compiled on its own caches derived values against the stable identity of the store:
+React Compiler also memoizes all the custom hooks you write. That is why `mobx-react-plugin` inserts `"use no memo"` into them by default: a hook that uses a MobX store would otherwise return stale values, because the compiler caches them against the stable identity of the store.
 
 ```javascript
 function useVisibleTodos() {
@@ -80,8 +80,4 @@ function useVisibleTodos() {
 }
 ```
 
-`mobx-react-plugin` therefore also inserts `"use no memo"` into custom hooks by default. If you apply the directive manually, do the same for every hook that reads observables.
-
-## Without the plugin
-
-If you prefer to apply `observer` manually, add `"use no memo"` to every observer component and to every hook that reads observables, and prefer the inline form `observer(function View() { ... })`. Components declared separately and then passed to `observer` (`observer(View)`) are compiled and go stale.
+If none of your custom hooks use MobX stores, you can let React Compiler keep optimizing them by passing `mobxReactPlugin({ observer: { useNoMemoHooks: false } })` in your bundler config.
