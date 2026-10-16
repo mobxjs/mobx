@@ -5,8 +5,10 @@ import {
     isComputedProp,
     isFlow,
     isObservableProp,
+    makeObservable,
     observe,
-    runInAction
+    runInAction,
+    toJS
 } from "../../src/mobx"
 import { action, actionBound, computed, flow, observable } from "../../src/mobx"
 
@@ -209,6 +211,50 @@ test("subclass can add new observable, computed, and action members", () => {
     expect(isAction(child.incrementExtra)).toBe(true)
     expect(isAction(child.incrementCount)).toBe(true)
     expect(seen).toEqual([3, 4, 5])
+})
+
+test("toJS includes observable accessors of parent and subclass #4248", () => {
+    class Parent {
+        id = "p"
+        @observable accessor count = 1
+
+        @computed
+        get double() {
+            return this.count * 2
+        }
+    }
+
+    class Child extends Parent {
+        @observable accessor extra = 2
+
+        @computed
+        override get double() {
+            return super.double + this.extra
+        }
+    }
+
+    const child = new Child()
+    child.extra = 3
+
+    expect(toJS(child)).toEqual({ id: "p", count: 1, extra: 3 })
+    expect(toJS(new Parent())).toEqual({ id: "p", count: 1 })
+})
+
+test("toJS includes observable accessors of a subclass of a makeObservable class #4248", () => {
+    class Parent {
+        name = "parent"
+
+        constructor() {
+            makeObservable(this, { name: observable })
+        }
+    }
+
+    class Child extends Parent {
+        @observable accessor count = 1
+    }
+
+    expect(toJS(new Child())).toEqual({ name: "parent", count: 1 })
+    expect(toJS(new Parent())).toEqual({ name: "parent" })
 })
 
 test("action override can call parent action with super", () => {

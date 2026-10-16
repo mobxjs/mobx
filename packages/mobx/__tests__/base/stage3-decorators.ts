@@ -761,8 +761,7 @@ test("enumerability", () => {
     t.equal(a.hasOwnProperty("m"), false)
 })
 
-// Re-enable when late initialization is supported in TS
-test.skip("issue 285 (2022.3)", () => {
+test("issue 285 (2022.3)", () => {
     const { observable, toJS } = mobx
 
     class Todo {
@@ -787,6 +786,81 @@ test.skip("issue 285 (2022.3)", () => {
         finished: false,
         childThings: [1, 2, 3]
     })
+})
+
+test("#4248 toJS includes @observable accessor fields", () => {
+    const sym = Symbol("sym")
+
+    class Store {
+        id = 1
+        @observable accessor read = "read"
+        @observable accessor unread = "unread"
+        @observable accessor items = [{ x: 1 }]
+        @observableRef accessor ref = { y: 2 }
+        @observable accessor [sym] = "symbol"
+        @observable accessor #secret = "secret"
+        @computed get upper() {
+            return this.read.toUpperCase() + this.#secret
+        }
+        @action setRead(value: string) {
+            this.read = value
+        }
+    }
+
+    const store = new Store()
+    store.read
+    const adm = (store as any)[$mobx]
+    expect(adm.values_.has("read")).toBe(true)
+    expect(adm.lazyObservableKeys_?.has("unread")).toBe(true)
+    expect(adm.lazyObservableKeys_?.has("#secret")).toBe(true)
+
+    const res = mobx.toJS(store) as any
+    expect(res).toEqual({
+        id: 1,
+        read: "read",
+        unread: "unread",
+        items: [{ x: 1 }],
+        ref: { y: 2 },
+        [sym]: "symbol"
+    })
+    expect(Object.keys(res)).not.toContain("#secret")
+    expect(Object.keys(res)).not.toContain("upper")
+    expect(isObservable(res.items)).toBe(false)
+    expect(isObservable(res.items[0])).toBe(false)
+    expect(res.ref).toBe(store.ref)
+    // Only toJS changes, the accessors are still not own enumerable properties
+    expect(Object.keys(store)).toEqual(["id"])
+})
+
+test("#4248 toJS tracks @observable accessor fields", () => {
+    class Store {
+        @observable accessor value = 1
+    }
+
+    const store = new Store()
+    const seen: any[] = []
+    const dispose = autorun(() => seen.push(mobx.toJS(store)))
+    store.value = 2
+    dispose()
+
+    expect(seen).toEqual([{ value: 1 }, { value: 2 }])
+})
+
+test("#4248 toJS handles cycles through @observable accessor fields", () => {
+    class Node {
+        @observable accessor parent: Node | undefined = undefined
+        @observable accessor children: Node[] = []
+    }
+
+    const root = new Node()
+    const child = new Node()
+    child.parent = root
+    root.children.push(child)
+
+    const res = mobx.toJS(root) as any
+    expect(res.parent).toBe(undefined)
+    expect(res.children[0].parent).toBe(res)
+    expect(isObservableObject(res.children[0])).toBe(false)
 })
 
 // Re-enable when late initialization is supported in TS
