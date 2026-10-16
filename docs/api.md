@@ -314,7 +314,7 @@ Usage: `toJS(value)`
 Recursively converts an observable object to a JavaScript _object_. Supports observable arrays, objects, Maps and primitives.
 
 It does NOT recurse into non-observables, these are left as they are, even if they contain observables.
-Computed and other non-enumerable properties are completely ignored and won't be returned.
+Computed and other non-enumerable properties are completely ignored and won't be returned. `@observable accessor` fields are the exception: they are not enumerable, but they are returned.
 
 For more complex (de)serialization scenarios, it is recommended to give classes a (computed) `toJSON` method, or use a serialization library like [serializr](https://github.com/mobxjs/serializr).
 

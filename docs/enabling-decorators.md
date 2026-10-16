@@ -112,7 +112,7 @@ MobX' 2022.3 decorators have some gotchas:
 
 -   `@observable accessor` decorators are _not_ enumerable. `accessor`s do not have a direct equivalent in the past - they're a new concept in the language. We've chosen to make them non-enumerable, non-own properties in order to better follow the spirit of the ES language and what `accessor` means.
     The main cases for enumerability seem to have been around serialization and rest destructuring.
-    -   Regarding serialization, implicitly serializing all properties probably isn't ideal in an OOP-world anyway, so this doesn't seem like a substantial issue (consider implementing `toJSON` or using `serializr` as possible alternatives)
+    -   Regarding serialization, implicitly serializing all properties probably isn't ideal in an OOP-world anyway, so this doesn't seem like a substantial issue (consider implementing `toJSON` or using `serializr` as possible alternatives). [`toJS`](api.md#tojs) does include `@observable accessor` fields.
     -   Addressing rest-destructuring, such is an anti-pattern in MobX - doing so would (likely unwantedly) touch all observables and make the observer overly-reactive).
 -   `@action some_field = () => {}` is valid usage. If a superclass has a field decorated by `@action`, a subclass can override the field. However, the field on the subclass is not an action unless it is also decorated with `@action` in the subclass declaration.
 

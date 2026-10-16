@@ -1,4 +1,5 @@
 import {
+    $mobx,
     isObservable,
     isObservableArray,
     isObservableValue,
@@ -59,6 +60,10 @@ function toJSHelper(source, __alreadySeen: Map<any, any>) {
                 res[key] = toJSHelper(source[key], __alreadySeen)
             }
         })
+        // `@observable accessor` fields are defined on the prototype, so they are neither own nor enumerable
+        source[$mobx].accessorObservableKeys_().forEach((key: any) => {
+            res[key] = toJSHelper(source[key], __alreadySeen)
+        })
         return res
     }
 }
@@ -66,7 +71,7 @@ function toJSHelper(source, __alreadySeen: Map<any, any>) {
 /**
  * Recursively converts an observable to it's non-observable native counterpart.
  * It does NOT recurse into non-observables, these are left as they are, even if they contain observables.
- * Computed and other non-enumerable properties are completely ignored.
+ * Computed and other non-enumerable properties are completely ignored, except for `@observable accessor` fields.
  * Complex scenarios require custom solution, eg implementing `toJSON` or using `serializr` lib.
  */
 export function toJS<T>(source: T, options?: any): T {
