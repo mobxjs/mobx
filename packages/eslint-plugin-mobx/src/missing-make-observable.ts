@@ -27,7 +27,8 @@ function create(context) {
           })
         }
       } else {
-        const fix = fixer => {
+        // A derived constructor must call super with the base class's expected arguments.
+        const fix = !constructor && clazz.superClass ? undefined : fixer => {
           if (constructor?.value.type === 'TSEmptyBodyFunctionExpression') {
             // constructor() - yes this a thing
             const closingBracket = sourceCode.getLastToken(constructor.value);

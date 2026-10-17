@@ -156,6 +156,18 @@ class C {
 }))
 
 
+const invalid6 = {
+  code: `
+class C extends Base {
+  @observable o = 5
+}
+`,
+  errors: [
+    { messageId: 'missingMakeObservable' },
+  ],
+  output: null,
+}
+
 tester.run("missing-make-observable", rule, {
   valid: [
     ...valid1,
@@ -169,5 +181,6 @@ tester.run("missing-make-observable", rule, {
     ...invalid3,
     ...invalid4,
     ...invalid5,
+    invalid6,
   ],
 });
