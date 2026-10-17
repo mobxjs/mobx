@@ -5,6 +5,7 @@ import {
     IListenable,
     ObservableValue,
     checkIfStateModificationsAreAllowed,
+    reportChanged_,
     createAtom,
     createInstanceofPredicate,
     makeIterable,
@@ -187,7 +188,7 @@ export class ObservableMap<K = any, V = any>
                 spyReportStart(change! as PureSpyEvent)
             } // TODO fix type
             transaction(() => {
-                this.keysAtom_.reportChanged()
+                reportChanged_(this.keysAtom_)
                 this.hasMap_.get(key)?.setNewValue_(false)
                 const observable = this.data_.get(key)!
                 observable.setNewValue_(undefined as any)
@@ -247,7 +248,7 @@ export class ObservableMap<K = any, V = any>
             this.data_.set(key, observable)
             newValue = (observable as any).value_ // value might have been changed
             this.hasMap_.get(key)?.setNewValue_(true)
-            this.keysAtom_.reportChanged()
+            reportChanged_(this.keysAtom_)
         })
         const notifySpy = __DEV__ && isSpyEnabled()
         const notify = hasListeners(this)

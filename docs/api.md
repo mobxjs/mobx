@@ -504,7 +504,7 @@ _In the rare case you want to extend MobX itself._
 Creates your own observable data structure and hooks it up to MobX. Used internally by all observable data types. Atom exposes two _report_ methods to notify MobX with when:
 
 -   `reportObserved()`: the atom has become observed, and should be considered part of the dependency tree of the current derivation.
--   `reportChanged()`: the atom has changed, and all derivations depending on it should be invalidated.
+-   `reportChanged()`: the atom has changed, and all derivations depending on it should be invalidated. This is a state change: with [`enforceActions`](configuration.md#enforceactions) enabled it warns when called outside an [action](actions.md), the same way other observable mutations do.
 
 ### `getAtom`
 

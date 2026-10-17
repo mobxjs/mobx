@@ -42,6 +42,7 @@ import {
     getAdministration,
     getDebugName,
     checkIfStateModificationsAreAllowed,
+    reportChanged_,
     assign
 } from "../internal"
 
@@ -540,7 +541,7 @@ export class ObservableObjectAdministration
                 propagateChanged(observable)
             }
             // Notify "keys/entries/values" observers
-            this.keysAtom_.reportChanged()
+            reportChanged_(this.keysAtom_)
 
             // Notify "has" observers
             // "in" as it may still exist in proto
@@ -602,7 +603,7 @@ export class ObservableObjectAdministration
         this.pendingKeys_?.get(key)?.set(true)
 
         // Notify "keys/entries/values" observers
-        this.keysAtom_.reportChanged()
+        reportChanged_(this.keysAtom_)
     }
 
     ownKeys_(): Array<string | symbol> {

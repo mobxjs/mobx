@@ -21,7 +21,7 @@ This clock will only actually tick if it is being observed by someone.
 The complete API of the `Atom` class is demonstrated by this example. For further information, see [`createAtom`](api.md#createatom).
 
 ```javascript
-import { createAtom, autorun } from "mobx"
+import { action, autorun, createAtom } from "mobx"
 
 class Clock {
     atom
@@ -64,10 +64,11 @@ class Clock {
         }
     }
 
-    tick() {
+    // `reportChanged` is a state change, so it runs inside an action when `enforceActions` is enabled.
+    tick = action(() => {
         this.currentDateTime = new Date()
         this.atom.reportChanged() // Let MobX know that this data source has changed.
-    }
+    })
 
     startTicking() {
         this.tick() // Initial tick.

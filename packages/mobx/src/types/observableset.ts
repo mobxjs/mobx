@@ -16,6 +16,7 @@ import {
     interceptChange,
     IInterceptable,
     checkIfStateModificationsAreAllowed,
+    reportChanged_,
     untracked,
     transaction,
     isES6Set,
@@ -129,7 +130,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
             transaction(() => {
                 value = this.enhancer_(value, undefined) // report the stored value, like map and array
                 this.data_.add(value)
-                this.atom_.reportChanged()
+                reportChanged_(this.atom_)
             })
             const notifySpy = __DEV__ && isSpyEnabled()
             const notify = hasListeners(this)
@@ -187,7 +188,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
                 spyReportStart(change!)
             }
             transaction(() => {
-                this.atom_.reportChanged()
+                reportChanged_(this.atom_)
                 this.data_.delete(value)
             })
             if (notify) {

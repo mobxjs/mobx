@@ -235,6 +235,115 @@ test("deleting observable set entries outside an action warns in strict mode", (
     expect(s.has(1)).toBe(false)
 })
 
+test("createAtom().reportChanged() warns outside an action in strict mode", () => {
+    const atom = mobx.createAtom("custom")
+    let seen = 0
+    const dispose = mobx.autorun(() => {
+        atom.reportObserved()
+        seen++
+    })
+
+    mobx.configure({ enforceActions: "always" })
+    const alwaysWarnings = utils.supressConsole(() => atom.reportChanged())
+    expect(alwaysWarnings).toHaveLength(1)
+    expect(alwaysWarnings[0]).toMatch(strictError)
+    expect(alwaysWarnings[0]).toMatch(/custom/)
+    expect(seen).toBe(2)
+    expect(
+        utils.grabConsole(() => {
+            mobx.action(() => atom.reportChanged())()
+        })
+    ).toBe("")
+
+    dispose()
+    mobx.configure({ enforceActions: "observed" })
+    // Unobserved atoms may change outside an action.
+    expect(utils.grabConsole(() => atom.reportChanged())).toBe("")
+
+    const disposeObserved = mobx.autorun(() => {
+        atom.reportObserved()
+    })
+    const observedWarnings = utils.supressConsole(() => atom.reportChanged())
+    expect(observedWarnings).toHaveLength(1)
+    expect(observedWarnings[0]).toMatch(strictError)
+    expect(
+        utils.grabConsole(() => {
+            mobx.action(() => atom.reportChanged())()
+        })
+    ).toBe("")
+    disposeObserved()
+})
+
+test("built-in observables warn once for a change outside an action", () => {
+    mobx.configure({ enforceActions: "always" })
+
+    const box = mobx.observable.box(1)
+    expect(utils.supressConsole(() => box.set(2))).toHaveLength(1)
+
+    const obj = mobx.observable({ a: 1 })
+    expect(
+        utils.supressConsole(() => {
+            obj.a = 2
+        })
+    ).toHaveLength(1)
+
+    const arr = mobx.observable([1])
+    expect(
+        utils.supressConsole(() => {
+            arr.push(2)
+        })
+    ).toHaveLength(1)
+    expect(
+        utils.supressConsole(() => {
+            arr[0] = 3
+        })
+    ).toHaveLength(1)
+
+    const set = mobx.observable.set([1])
+    expect(utils.supressConsole(() => set.add(2))).toHaveLength(1)
+    expect(utils.supressConsole(() => set.delete(1))).toHaveLength(1)
+
+    const map = mobx.observable.map({ a: 1 })
+    expect(utils.supressConsole(() => map.set("b", 2))).toHaveLength(1)
+    expect(utils.supressConsole(() => map.set("a", 3))).toHaveLength(1)
+    expect(utils.supressConsole(() => map.delete("b"))).toHaveLength(1)
+
+    // Value, has() and keys atoms are all observed. Still a single warning.
+    mobx.configure({ enforceActions: "observed" })
+    const observed = mobx.observable.map({ a: 1 })
+    const dispose = mobx.autorun(() => {
+        observed.has("b")
+        observed.get("a")
+        Array.from(observed.keys())
+    })
+    const warnings = utils.supressConsole(() => {
+        observed.set("b", 2)
+    })
+    expect(warnings).toHaveLength(1)
+    expect(warnings[0]).toMatch(strictError)
+    expect(utils.supressConsole(() => observed.set("a", 3))).toHaveLength(1)
+    expect(utils.supressConsole(() => observed.delete("a"))).toHaveLength(1)
+    dispose()
+
+    // Key order is its own change and was not checked by add/delete.
+    const ordered = mobx.observable.map([
+        [1, 1],
+        [2, 2]
+    ])
+    const disposeOrder = mobx.autorun(() => {
+        Array.from(ordered.keys())
+    })
+    const orderWarnings = utils.supressConsole(() => {
+        ordered.replace([
+            [2, 2],
+            [1, 1]
+        ])
+    })
+    expect(orderWarnings).toHaveLength(1)
+    expect(orderWarnings[0]).toMatch(strictError)
+    disposeOrder()
+})
+
 test("warn on unsafe reads of computed", function () {
     mobx.configure({ computedRequiresReaction: true })
     const x = mobx.observable({

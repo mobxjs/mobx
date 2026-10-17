@@ -5,6 +5,7 @@ import {
     IEqualsComparer,
     IListenable,
     checkIfStateModificationsAreAllowed,
+    reportChanged_,
     compareDefault,
     createInstanceofPredicate,
     getNextId,
@@ -134,7 +135,7 @@ export class ObservableValue<T>
     setNewValue_(newValue: T) {
         const oldValue = this.value_
         this.value_ = newValue
-        this.reportChanged()
+        reportChanged_(this)
         if (hasListeners(this)) {
             notifyListeners(this, {
                 type: UPDATE,
