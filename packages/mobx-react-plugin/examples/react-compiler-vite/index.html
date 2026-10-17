@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>MobX + React Compiler</title>
+        <link rel="icon" href="data:," />
+        <style>
+            body {
+                font-family: system-ui, sans-serif;
+                max-width: 48rem;
+                margin: 2rem auto;
+                padding: 0 1rem;
+            }
+            section {
+                border: 1px solid #ccc;
+                border-radius: 8px;
+                padding: 1rem;
+                margin: 1rem 0;
+            }
+            section.broken {
+                border-color: #c33;
+            }
+            dt {
+                font-weight: 600;
+            }
+            dd {
+                margin: 0 0 0.5rem 0;
+                font-family: ui-monospace, monospace;
+            }
+            button {
+                font-size: 1rem;
+                padding: 0.5rem 1rem;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="root"></div>
+        <script type="module" src="/src/main.tsx"></script>
+    </body>
+</html>
