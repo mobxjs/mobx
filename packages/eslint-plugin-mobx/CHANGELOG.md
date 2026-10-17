@@ -1,5 +1,13 @@
 # eslint-plugin-mobx
 
+## 0.1.1
+
+### Patch Changes
+
+-   [`c7038b905f3d41a5de41b88dc82432b7b0796059`](https://github.com/mobxjs/mobx/commit/c7038b905f3d41a5de41b88dc82432b7b0796059) [#4740](https://github.com/mobxjs/mobx/pull/4740) Thanks [@sviat-barbutsa](https://github.com/sviat-barbutsa)! - Prevent `missing-make-observable` from generating an invalid constructor for derived classes that do not already define one.
+
+-   [`29ef68a5acbeeb8cec776b082cb47bf2b0a8610e`](https://github.com/mobxjs/mobx/commit/29ef68a5acbeeb8cec776b082cb47bf2b0a8610e) [#4729](https://github.com/mobxjs/mobx/pull/4729) Thanks [@kubk](https://github.com/kubk)! - `missing-observer` no longer reports components that are wrapped with `observer` elsewhere in the file, e.g. `export default observer(Cmp)`
+
 ## 0.1.0
 
 ### Minor Changes

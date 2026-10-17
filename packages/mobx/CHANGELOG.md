@@ -1,5 +1,17 @@
 # mobx
 
+## 7.1.0
+
+### Minor Changes
+
+-   [`457ea8f952f0d37681dbe4033670eea7f25a7c4d`](https://github.com/mobxjs/mobx/commit/457ea8f952f0d37681dbe4033670eea7f25a7c4d) [#4728](https://github.com/mobxjs/mobx/pull/4728) Thanks [@kubk](https://github.com/kubk)! - `computed(fn)` without a `set` option now returns `IComputedValue<T>` with only `get()`, so calling `.set()` on it is a type error instead of a runtime throw. `computed(fn, { set })` returns the new `IWritableComputedValue<T>`, which also has `set()`.
+
+### Patch Changes
+
+-   [`51c51658ce63895d40dc60a5e0eb0d5b7ac5ec2c`](https://github.com/mobxjs/mobx/commit/51c51658ce63895d40dc60a5e0eb0d5b7ac5ec2c) [#4723](https://github.com/mobxjs/mobx/pull/4723) Thanks [@giaBaoJS](https://github.com/giaBaoJS)! - Release the internal key subscriptions of observable objects once they are no longer observed. Reading a missing property or checking `key in obj` inside a reaction created an entry that was kept for the lifetime of the object, so objects used as dynamic dictionaries grew with every key ever looked up. `ObservableMap` already cleaned up its equivalent `has` entries.
+
+-   [`ef270d16ff49e19ebd34fac5724efbaf5c4bb18d`](https://github.com/mobxjs/mobx/commit/ef270d16ff49e19ebd34fac5724efbaf5c4bb18d) [#4726](https://github.com/mobxjs/mobx/pull/4726) Thanks [@sergioperezcheco](https://github.com/sergioperezcheco)! - Fix `ObservableSet.delete` (and therefore `clear`/`replace`) bypassing the `enforceActions` action diagnostics. Deleting observed values outside an action now warns/throws just like insertion already does, instead of silently allowing the mutation.
+
 ## 7.0.6
 
 ### Patch Changes
