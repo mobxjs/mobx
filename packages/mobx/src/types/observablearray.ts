@@ -8,6 +8,7 @@ import {
     IListenable,
     addHiddenFinalProp,
     checkIfStateModificationsAreAllowed,
+    reportChanged_,
     createInstanceofPredicate,
     getNextId,
     hasInterceptors,
@@ -265,7 +266,7 @@ export class ObservableArrayAdministration
         if (__DEV__ && notifySpy) {
             spyReportStart(change!)
         }
-        this.atom_.reportChanged()
+        reportChanged_(this.atom_)
         if (notify) {
             notifyListeners(this, change)
         }
@@ -295,7 +296,7 @@ export class ObservableArrayAdministration
         if (__DEV__ && notifySpy) {
             spyReportStart(change!)
         }
-        this.atom_.reportChanged()
+        reportChanged_(this.atom_)
         // conform: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe
         if (notify) {
             notifyListeners(this, change)

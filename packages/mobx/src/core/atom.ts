@@ -9,7 +9,8 @@ import {
     propagateChanged,
     reportObserved,
     startBatch,
-    Lambda
+    Lambda,
+    checkIfStateModificationsAreAllowed
 } from "../internal"
 
 import { getFlag, setFlag } from "../utils/utils"
@@ -92,14 +93,24 @@ export class Atom implements IAtom {
      * Invoke this method _after_ this method has changed to signal mobx that all its observers should invalidate.
      */
     public reportChanged() {
-        startBatch()
-        propagateChanged(this)
-        endBatch()
+        checkIfStateModificationsAreAllowed(this)
+        reportChanged_(this)
     }
 
     toString() {
         return this.name_
     }
+}
+
+/**
+ * Propagate an atom change without the `enforceActions` check.
+ * Built-in observables already checked once for the operation; checking again
+ * would warn once per atom for structures such as Map.
+ */
+export function reportChanged_(atom: IAtom) {
+    startBatch()
+    propagateChanged(atom)
+    endBatch()
 }
 
 export const isAtom = createInstanceofPredicate("Atom", Atom)
