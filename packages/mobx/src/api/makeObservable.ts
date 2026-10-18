@@ -16,7 +16,8 @@ import {
     getDescriptor,
     MakeResult,
     objectPrototype,
-    recordAnnotationApplied
+    recordAnnotationApplied,
+    hasProp
 } from "../internal"
 
 export function makeObservable<T extends object, AdditionalKeys extends PropertyKey = never>(
@@ -74,7 +75,7 @@ export function makeAutoObservable<T extends object, AdditionalKeys extends Prop
                 adm,
                 key,
                 // must pass "undefined" for { key: undefined }
-                !overrides ? true : key in overrides ? overrides[key] : true
+                !overrides ? true : hasProp(overrides, key) ? overrides[key] : true
             )
         )
     })

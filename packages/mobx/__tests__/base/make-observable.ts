@@ -1140,6 +1140,31 @@ test("makeAutoObservable + symbolic keys", () => {
     })
 })
 
+test("makeAutoObservable + overrides + toString", () => {
+    class Money {
+        amount = 1
+        currency = "EUR"
+
+        constructor() {
+            makeAutoObservable(this, { currency: false })
+        }
+
+        toString() {
+            return `${this.amount} ${this.currency}`
+        }
+    }
+
+    const money = new Money()
+    expect(isObservableProp(money, "amount")).toBe(true)
+    expect(isObservableProp(money, "currency")).toBe(false)
+    expect(isAction(money.toString)).toBe(true)
+    expect(String(money)).toBe("1 EUR")
+
+    const o = observable({ value: 1, toString: () => "o" }, {})
+    expect(isObservableProp(o, "value")).toBe(true)
+    expect(String(o)).toBe("o")
+})
+
 test("makeAutoObservable + override + annotation cache #2832", () => {
     class Clazz {
         auto = []

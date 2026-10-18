@@ -10,7 +10,8 @@ import {
     getOwnPropertyDescriptors,
     $mobx,
     ownKeys,
-    initObservable
+    initObservable,
+    hasProp
 } from "../internal"
 
 export function extendObservable<A extends Object, B extends Object>(
@@ -46,7 +47,7 @@ export function extendObservable<A extends Object, B extends Object>(
                 key,
                 descriptors[key as any],
                 // must pass "undefined" for { key: undefined }
-                !annotations ? true : key in annotations ? annotations[key] : true
+                !annotations ? true : hasProp(annotations, key) ? annotations[key] : true
             )
         })
     })
