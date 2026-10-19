@@ -42,8 +42,7 @@ import {
     getAdministration,
     getDebugName,
     checkIfStateModificationsAreAllowed,
-    assign,
-    EMPTY_ARRAY
+    assign
 } from "../internal"
 
 const descriptorCache = Object.create(null)
@@ -95,9 +94,8 @@ export class ObservableObjectAdministration
     appliedAnnotations_?: object
     private pendingKeys_: undefined | Map<PropertyKey, ObservableValue<boolean>>
     lazyComputedKeys_: undefined | Map<PropertyKey, () => ComputedValue<any>>
-    lazyObservableKeys_: undefined | Map<PropertyKey, () => ObservableValue<any>>
-    // Set once an `@observable accessor` field registers, so toJS can skip other objects cheaply
-    hasObservableAccessors_: undefined | boolean
+    // `null` once all fields were read, so `toJS` can tell objects with `@observable accessor` fields apart
+    lazyObservableKeys_: undefined | null | Map<PropertyKey, () => ObservableValue<any>>
 
     constructor(
         public target_: any,
@@ -148,7 +146,7 @@ export class ObservableObjectAdministration
         }
         this.lazyObservableKeys_!.delete(key)
         if (this.lazyObservableKeys_!.size === 0) {
-            this.lazyObservableKeys_ = undefined
+            this.lazyObservableKeys_ = null
         }
         const observable = factory()
         this.values_.set(key, observable)
@@ -622,36 +620,6 @@ export class ObservableObjectAdministration
         // - when symbolic/non-enumerable keys are relevant Reflect.ownKeys works as expected
         this.keysAtom_.reportObserved()
         return Object.keys(this.target_)
-    }
-
-    /**
-     * Keys of observable (non computed) values that are reachable on the target, but are not own properties.
-     * These are `@observable accessor` fields, which are defined on the prototype.
-     * Private accessors (`#field`) are not reachable by key and are left out.
-     */
-    accessorObservableKeys_(): PropertyKey[] {
-        if (!this.hasObservableAccessors_) {
-            // Plain objects and `makeObservable` instances have no accessor fields, so skip the scan
-            return EMPTY_ARRAY
-        }
-        const keys: PropertyKey[] = []
-        const collect = (key: PropertyKey) => {
-            if (!hasProp(this.target_, key) && key in this.target_) {
-                keys.push(key)
-            }
-        }
-        this.values_.forEach((value, key) => {
-            if (!(value instanceof ComputedValue)) {
-                collect(key)
-            }
-        })
-        // Fields that were never read yet have no ObservableValue in `values_`
-        this.lazyObservableKeys_?.forEach((_, key) => {
-            if (!this.values_.has(key)) {
-                collect(key)
-            }
-        })
-        return keys
     }
 }
 

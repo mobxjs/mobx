@@ -72,7 +72,6 @@ export function decorateObservable20223_(
     // fields on wide classes never pay the per-instance allocation cost.
     function registerLazy(target: any, value: any): ObservableObjectAdministration {
         const adm: ObservableObjectAdministration = asObservableObject(target)[$mobx]
-        adm.hasObservableAccessors_ = true
         ;(adm.lazyObservableKeys_ ??= new Map()).set(
             name,
             () =>

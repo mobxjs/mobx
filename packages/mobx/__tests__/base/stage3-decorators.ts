@@ -846,6 +846,20 @@ test("#4248 toJS tracks @observable accessor fields", () => {
     expect(seen).toEqual([{ value: 1 }, { value: 2 }])
 })
 
+test("#4248 toJS includes @observable accessor fields after all of them were read", () => {
+    class Store {
+        @observable accessor a = 1
+        @observable accessor b = 2
+    }
+
+    const store = new Store()
+    store.a
+    store.b
+    // Every field is materialized, toJS relies on `null` here to still find them
+    expect((store as any)[$mobx].lazyObservableKeys_).toBe(null)
+    expect(mobx.toJS(store)).toEqual({ a: 1, b: 2 })
+})
+
 test("#4248 toJS handles cycles through @observable accessor fields", () => {
     class Node {
         @observable accessor parent: Node | undefined = undefined
