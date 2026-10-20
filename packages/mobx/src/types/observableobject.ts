@@ -94,7 +94,8 @@ export class ObservableObjectAdministration
     appliedAnnotations_?: object
     private pendingKeys_: undefined | Map<PropertyKey, ObservableValue<boolean>>
     lazyComputedKeys_: undefined | Map<PropertyKey, () => ComputedValue<any>>
-    lazyObservableKeys_: undefined | Map<PropertyKey, () => ObservableValue<any>>
+    // `null` once all fields were read, so `toJS` can tell objects with `@observable accessor` fields apart
+    lazyObservableKeys_: undefined | null | Map<PropertyKey, () => ObservableValue<any>>
 
     constructor(
         public target_: any,
@@ -145,7 +146,7 @@ export class ObservableObjectAdministration
         }
         this.lazyObservableKeys_!.delete(key)
         if (this.lazyObservableKeys_!.size === 0) {
-            this.lazyObservableKeys_ = undefined
+            this.lazyObservableKeys_ = null
         }
         const observable = factory()
         this.values_.set(key, observable)
