@@ -214,6 +214,15 @@ test("get atom", function () {
     f()
 })
 
+test("get atom of an observable object does not subscribe the running derivation", function () {
+    const x = mobx.observable({ a: 1 })
+    const d = mobx.autorun(() => {
+        mobx.getAtom(x, "a")
+    })
+    expect(mobx.getDependencyTree(d[$mobx]).dependencies).toBeUndefined()
+    d()
+})
+
 test("get debug name", function () {
     mobx._resetGlobalState()
     mobx._getGlobalState().mobxGuid = 0 // hmm dangerous reset?

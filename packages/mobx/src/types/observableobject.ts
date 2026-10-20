@@ -669,7 +669,7 @@ export function asObservableObject(
     return target
 }
 
-const isObservableObjectAdministration = createInstanceofPredicate(
+export const isObservableObjectAdministration = createInstanceofPredicate(
     "ObservableObjectAdministration",
     ObservableObjectAdministration
 )

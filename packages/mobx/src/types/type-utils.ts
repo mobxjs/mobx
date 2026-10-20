@@ -4,9 +4,10 @@ import {
     IDepTreeNode,
     isAtom,
     isComputedValue,
-    isObservableArray,
+    isObservableArrayAdministration,
     isObservableMap,
     isObservableObject,
+    isObservableObjectAdministration,
     isReaction,
     isObservableSet,
     die,
@@ -21,11 +22,26 @@ import {
 
 export function getAtom(thing: any, property?: PropertyKey): IDepTreeNode {
     if (typeof thing === "object" && thing !== null) {
-        if (isObservableArray(thing)) {
+        // objects first: on a proxied object, the set/map checks would subscribe to missing keys
+        const adm = thing[$mobx]
+        if (isObservableObjectAdministration(adm)) {
+            if (!property) {
+                return die(26)
+            }
+            const observable =
+                adm.values_.get(property) ??
+                adm.materializeLazyComputed_(property) ??
+                adm.materializeLazyObservable_(property)
+            if (!observable) {
+                die(27, property, getDebugName(thing))
+            }
+            return observable
+        }
+        if (isObservableArrayAdministration(adm)) {
             if (property !== undefined) {
                 die(23)
             }
-            return (thing as any)[$mobx].atom_
+            return adm.atom_
         }
         if (isObservableSet(thing)) {
             return thing.atom_
@@ -44,18 +60,7 @@ export function getAtom(thing: any, property?: PropertyKey): IDepTreeNode {
             thing[property]
         } // See #1072
         if (isObservableObject(thing)) {
-            if (!property) {
-                return die(26)
-            }
-            const adm = (thing as any)[$mobx]
-            const observable =
-                adm.values_.get(property) ??
-                adm.materializeLazyComputed_(property) ??
-                adm.materializeLazyObservable_(property)
-            if (!observable) {
-                die(27, property, getDebugName(thing))
-            }
-            return observable
+            return getAtom(thing, property)
         }
         if (isAtom(thing) || isComputedValue(thing) || isReaction(thing)) {
             return thing
