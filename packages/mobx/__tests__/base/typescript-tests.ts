@@ -1830,6 +1830,29 @@ test("sync when can be aborted", async () => {
     x.set(3)
 })
 
+test("when accepts the requiresObservable option", async () => {
+    const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {})
+    try {
+        const disposer = mobx.when(
+            () => false,
+            () => {},
+            { name: "SyncWhen", requiresObservable: true }
+        )
+        disposer()
+        expect(warnSpy).toHaveBeenCalledWith(
+            "[mobx] Derivation 'SyncWhen' is created/updated without reading any observable value."
+        )
+
+        const x = mobx.observable.box(1)
+        const p = mobx.when(() => x.get() === 2, { requiresObservable: true })
+        x.set(2)
+        await p
+        expect(warnSpy).toHaveBeenCalledTimes(1)
+    } finally {
+        warnSpy.mockRestore()
+    }
+})
+
 test("it should support asyncAction as decorator (ts)", async () => {
     mobx.configure({ enforceActions: "observed" })
 
