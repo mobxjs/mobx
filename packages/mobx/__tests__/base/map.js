@@ -689,9 +689,10 @@ test("issue 940, should not be possible to change maps outside strict mode", () 
         grabConsole(() => {
             m.delete("x")
         })
-    ).toMatchInlineSnapshot(
-        `"<STDOUT> [MobX] Since strict-mode is enabled, changing (observed) observable values without using an action is not allowed. Tried to modify: ObservableMap@56.keys()"`
-    )
+    ).toMatchInlineSnapshot(`
+        "<STDOUT> [MobX] Since strict-mode is enabled, changing (observed) observable values without using an action is not allowed. Tried to modify: ObservableMap@56.keys()
+        <STDOUT> [MobX] Since strict-mode is enabled, changing (observed) observable values without using an action is not allowed. Tried to modify: ObservableMap@56.x?"
+    `)
 
     d()
 })
