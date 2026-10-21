@@ -168,8 +168,72 @@ Inference rules:
 -   All `getters` become `computed`.
 -   All `setters` become `action`.
 -   All _functions_ become [`autoAction`](#autoAction).
--   All _generator_ functions become `flow`. (Note that generator functions are not detectable in some transpiler configurations, if flow doesn't work as expected, make sure to specify `flow` explicitly.)
+-   All _generator_ functions become `flow`. (Note that generator functions are not detectable in some transpiler configurations, if flow doesn't work as expected, make sure to specify `flow` explicitly. See [below](#generator-detection) for details.)
 -   Members marked with `false` in the `overrides` argument will not be annotated. For example, using it for read only fields such as identifiers.
+
+<details id="generator-detection"><summary>**Note:** generators with default parameters may not be detected<a href="#generator-detection" class="tip-anchor"></a></summary>
+
+MobX can only infer `flow` if the function it receives is still a generator function at runtime.
+Some transpiler setups compile generators with default parameter values into a regular function that returns a generator.
+For example, Babel's `@babel/plugin-transform-parameters` (which some React Native presets enable) turns this:
+
+```javascript
+const store = makeAutoObservable({
+    *fetchPage(page = 0) {
+        // ...
+    }
+})
+```
+
+into roughly this:
+
+```javascript
+const store = makeAutoObservable({
+    fetchPage() {
+        var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0
+        return (function* () {
+            // ...
+        })()
+    }
+})
+```
+
+`makeAutoObservable` then sees a plain function and annotates it as `autoAction` instead of `flow`.
+Calling `store.fetchPage()` returns a generator object that nobody iterates, so the body silently never runs.
+The same function without the default parameter value works as expected, which makes this easy to miss.
+
+To avoid this, annotate such members with `flow` explicitly:
+
+```javascript
+const store = makeAutoObservable(
+    {
+        *fetchPage(page = 0) {
+            // ...
+        }
+    },
+    { fetchPage: flow }
+)
+```
+
+MobX can't detect this for you, because it depends on how _your_ code is compiled, not on how MobX itself was built.
+If you want to verify your build setup, you can add a check like this to your own code, so that it is compiled by the same toolchain:
+
+```javascript
+import { makeAutoObservable, isFlow } from "mobx"
+
+const probe = makeAutoObservable({
+    *generator(arg = 0) {}
+})
+
+if (!isFlow(probe.generator)) {
+    console.warn(
+        "[mobx] This build doesn't preserve generators with default parameters. " +
+            "Annotate them with `flow` explicitly."
+    )
+}
+```
+
+</details>
 
 ## `observable`
 
