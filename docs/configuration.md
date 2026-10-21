@@ -131,6 +131,8 @@ Use this to check whether you are unnecessarily wrapping React components with `
 configure({ reactionRequiresObservable: true })
 ```
 
+This setting can be overridden for individual reactions with the [`requiresObservable`](reactions.md#requiresobservable-autorun-reaction) option.
+
 #### `disableErrorBoundaries: boolean`
 
 By default, MobX will catch and re-throw exceptions happening in your code to make sure that a reaction in one exception does not prevent the scheduled execution of other, possibly unrelated, reactions. This means exceptions are not propagated back to the original causing code and therefore you won't be able to catch them using try/catch.
