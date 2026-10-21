@@ -19,10 +19,6 @@ import {
 export interface IAutorunOptions {
     delay?: number
     name?: string
-    /**
-     * Experimental.
-     * Warns if the view doesn't track observables
-     */
     requiresObservable?: boolean
     scheduler?: (callback: () => void) => any
     onError?: (error: any) => void
