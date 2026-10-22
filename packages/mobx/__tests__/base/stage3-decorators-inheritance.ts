@@ -358,14 +358,8 @@ test("flow override can wait for parent flow before child updates", async () => 
     expect(seen[seen.length - 1]).toBe("ready|User 2|User 2 profile")
 })
 
-// #4660: If a subclass has a same-named @computed override that is still lazy,
-// and another subclass member calls super.foo before foo itself has been read,
-// this call materializes the child lazy entry and returns the overridden value
-// instead of the parent value. For example, with override get number() {
-// return super.number + 1 } and get parentNumber() { return super.number },
-// the first child.parentNumber reads as 2 instead of the parent 1, making super
-// behavior order-dependent
-test.skip("computed sibling can read parent computed with super before child computed is read", () => {
+// #4660: super.number must read the parent computed even before the child override was read
+test("computed sibling can read parent computed with super before child computed is read", () => {
     class Parent {
         @observable accessor count = 1
 
