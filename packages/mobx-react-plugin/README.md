@@ -265,7 +265,7 @@ class UserStore {
 
 Only methods MobX will actually turn into flows are converted:
 
--   `async` methods of classes that call `makeAutoObservable(this)` in their constructor, unless the method is overridden with another annotation (`{ load: false }`, `{ load: action }`);
+-   `async` methods of classes that call `makeAutoObservable(this)` in their constructor, unless the method is overridden with an annotation other than `flow` or `action` (for example `{ load: false }`);
 -   `async` methods annotated with `flow` or `flow.bound` in `makeObservable(this, { ... })`, or decorated with `@flow` / `@flow.bound` (2023-11 decorators);
 -   `async` methods annotated with `action` / `action.bound` (`makeObservable(this, { load: action })`, `makeAutoObservable` overrides) or decorated with `@action` / `@action.bound` (2023-11 decorators): `action` only covers the synchronous part of an `async` method, so these become flows and the annotation is rewritten to `flow` / `flow.bound` (importing `flow` from `mobx` when needed);
 -   `async` methods of object literals passed to `makeAutoObservable()` or `makeObservable()` (with a `flow` annotation).
