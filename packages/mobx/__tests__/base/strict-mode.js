@@ -235,6 +235,17 @@ test("deleting observable set entries outside an action warns in strict mode", (
     expect(s.has(1)).toBe(false)
 })
 
+test("adding or deleting an observed observable map key outside an action warns in strict mode", () => {
+    const m = mobx.observable.map()
+    const d = mobx.autorun(() => m.get("x"))
+
+    expect(utils.grabConsole(() => m.set("x", 1))).toMatch(strictError)
+    expect(utils.grabConsole(() => m.delete("x"))).toMatch(strictError)
+    expect(m.has("x")).toBe(false)
+
+    d()
+})
+
 test("warn on unsafe reads of computed", function () {
     mobx.configure({ computedRequiresReaction: true })
     const x = mobx.observable({
