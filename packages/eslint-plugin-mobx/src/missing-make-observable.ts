@@ -10,6 +10,8 @@ function create(context) {
       if (!isMobxDecorator(decorator)) return;
       const clazz = findAncestor(decorator, node => node.type === 'ClassDeclaration' || node.type === 'ClassExpression');
       if (!clazz) return;
+      // Decorated `accessor` fields mean 2022.3 decorators, which don't need makeObservable(this)
+      if (clazz.body.body.some(node => node.type === 'AccessorProperty' && node.decorators?.length)) return;
       // ClassDeclaration > ClassBody > []
       const constructor = clazz.body.body.find(node => node.kind === 'constructor' && node.value.type === 'FunctionExpression') ??
         clazz.body.body.find(node => node.kind === 'constructor');

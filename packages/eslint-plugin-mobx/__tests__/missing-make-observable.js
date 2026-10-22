@@ -65,6 +65,17 @@ class C {
 }
 `).map(code => ({ code }))
 
+const valid5 = [
+  '@observable accessor o = 5',
+  '@observableRef accessor or = []',
+].map(field => `
+class C {
+  ${field}
+  @computed get c() {}
+  @action a() {}
+}
+`).map(code => ({ code }))
+
 const invalid1 = fields.map(field => ({
   code: `
 class C {
@@ -174,6 +185,7 @@ tester.run("missing-make-observable", rule, {
     valid2,
     ...valid3,
     ...valid4,
+    ...valid5,
   ],
   invalid: [
     ...invalid1,
