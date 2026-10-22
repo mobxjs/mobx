@@ -434,3 +434,7 @@ Set a custom scheduler to determine how re-running the autorun function should b
 Set to `compareDefault` by default. If specified, this comparison function is used to compare the previous and next values produced by the _data_ function. The _effect_ function is only invoked if this function returns false.
 
 Check out the [Built-in comparers](computeds.md#built-in-comparers) section.
+
+### `requiresObservable` _(autorun, reaction)_
+
+Overrides the global [`reactionRequiresObservable`](configuration.md#reactionrequiresobservable-boolean) setting for this reaction.
