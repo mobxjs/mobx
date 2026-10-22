@@ -437,12 +437,4 @@ Check out the [Built-in comparers](computeds.md#built-in-comparers) section.
 
 ### `requiresObservable` _(autorun, reaction)_
 
-Overrides the global [`reactionRequiresObservable`](configuration.md#reactionrequiresobservable-boolean) setting for this reaction only. In development builds, `true` makes MobX warn when the reaction runs without reading any observable value, and `false` suppresses that warning, even if `reactionRequiresObservable` is enabled globally. If not specified, the global setting applies.
-
-```javascript
-configure({ reactionRequiresObservable: true })
-
-// This reaction may legitimately run without reading any observables,
-// so opt it out of the global check.
-autorun(() => console.log("Started"), { requiresObservable: false })
-```
+Overrides the global [`reactionRequiresObservable`](configuration.md#reactionrequiresobservable-boolean) setting for this reaction.
