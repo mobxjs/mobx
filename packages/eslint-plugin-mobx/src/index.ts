@@ -5,7 +5,6 @@ import type { ESLint, Linter } from "eslint"
 
 import exhaustiveMakeObservable from "./exhaustive-make-observable"
 import unconditionalMakeObservable from "./unconditional-make-observable"
-import missingMakeObservable from "./missing-make-observable"
 import missingObserver from "./missing-observer"
 import noAnonymousObserver from "./no-anonymous-observer"
 
@@ -19,7 +18,6 @@ const pluginMobx: ESLint.Plugin = {
     rules: {
         "exhaustive-make-observable": exhaustiveMakeObservable,
         "unconditional-make-observable": unconditionalMakeObservable,
-        "missing-make-observable": missingMakeObservable,
         "missing-observer": missingObserver,
         "no-anonymous-observer": noAnonymousObserver
     }
@@ -28,7 +26,6 @@ const pluginMobx: ESLint.Plugin = {
 const recommendedRules: Linter.RulesRecord = {
     "mobx/exhaustive-make-observable": "warn",
     "mobx/unconditional-make-observable": "error",
-    "mobx/missing-make-observable": "error",
     "mobx/missing-observer": "warn"
 }
 
