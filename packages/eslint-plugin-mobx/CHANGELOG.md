@@ -1,5 +1,11 @@
 # eslint-plugin-mobx
 
+## 0.2.0
+
+### Minor Changes
+
+-   [`d33f8db15b1f16d2e3a92df0750c9ee2f7cd36f1`](https://github.com/mobxjs/mobx/commit/d33f8db15b1f16d2e3a92df0750c9ee2f7cd36f1) [#4750](https://github.com/mobxjs/mobx/pull/4750) Thanks [@APX403](https://github.com/APX403)! - Remove the `missing-make-observable` rule and add `mobx@^7.0.0` as a peer dependency. MobX 7 only supports 2022.3 decorators, which don't need `makeObservable(this)`, and `makeObservable` requires the annotations argument, so the rule no longer applies. MobX 6 users with legacy decorators should stay on `eslint-plugin-mobx` 0.1.x.
+
 ## 0.1.1
 
 ### Patch Changes

@@ -1,5 +1,13 @@
 # mobx
 
+## 7.1.1
+
+### Patch Changes
+
+-   [`b06078408dba2eb7504f0799f9ad66befdcbe4fc`](https://github.com/mobxjs/mobx/commit/b06078408dba2eb7504f0799f9ad66befdcbe4fc) [#4748](https://github.com/mobxjs/mobx/pull/4748) Thanks [@nk-batman21](https://github.com/nk-batman21)! - Warn under `enforceActions` when an `ObservableMap` key that a reaction reads through `get(key)` or `has(key)` is added or deleted outside an action. Before, only updates of existing keys and changes seen through `keys()`, `size` or iteration were checked, so the case from #940 stayed silent.
+
+-   [`20c221529d01b0e2d69535e27b3522c6c31c2e4f`](https://github.com/mobxjs/mobx/commit/20c221529d01b0e2d69535e27b3522c6c31c2e4f) [#4746](https://github.com/mobxjs/mobx/pull/4746) Thanks [@elyor-sh](https://github.com/elyor-sh)! - Add `requiresObservable` to `IWhenOptions`. `when` already forwarded this option to its underlying reaction at runtime, but TypeScript rejected it.
+
 ## 7.1.0
 
 ### Minor Changes
