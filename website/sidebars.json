@@ -15,7 +15,8 @@
     ],
     "MobX and React": [
       "react-integration",
-      "react-optimizations"
+      "react-optimizations",
+      "react-compiler"
     ],
     "Tips & Tricks": [
       "defining-data-stores",

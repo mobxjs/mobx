@@ -6,7 +6,8 @@
         "packages/mobx-react-lite",
         "packages/mobx-react",
         "packages/eslint-plugin-mobx",
-        "packages/mobx-undecorate"
+        "packages/mobx-undecorate",
+        "packages/mobx-react-plugin"
     ],
     "overrides": {
         "jest": "^30.3.0",
@@ -36,7 +37,8 @@
         "docs:start": "npm --prefix website run start",
         "docs:publish": "npm --prefix website run publish-gh-pages",
         "prepare": "npm install --prefix website",
-        "dedup": "npm dedupe"
+        "dedup": "npm dedupe",
+        "mobx-react-plugin": "npm -w mobx-react-plugin run"
     },
     "devDependencies": {
         "@babel/core": "^7.16.0",
