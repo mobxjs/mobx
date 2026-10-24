@@ -84,7 +84,8 @@ export function decorateComputed20223_(
 
     return function () {
         const adm: ObservableObjectAdministration = this[$mobx]
-        const observable = adm.values_.get(key)
+        // Materialize first, so a still lazy override is not evaluated in place of this getter
+        const observable = adm.values_.get(key) ?? adm.materializeLazyComputed_(key)
         if (observable instanceof ComputedValue && observable.derivation !== get) {
             let computed = computedValues?.get(this)
             if (!computed) {
