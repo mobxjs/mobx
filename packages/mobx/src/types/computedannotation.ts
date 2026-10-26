@@ -7,7 +7,8 @@ import {
     $mobx,
     asObservableObject,
     ComputedValue,
-    assign
+    assign,
+    getDescriptor
 } from "../internal"
 
 export function createComputedAnnotation(name: string, options?: object): Annotation {
@@ -82,10 +83,14 @@ export function decorateComputed20223_(
         ;(adm.lazyComputedKeys_ ??= new Map()).set(key, () => createComputedValue(target, adm))
     })
 
-    return function () {
+    return function computedGetter() {
         const adm: ObservableObjectAdministration = this[$mobx]
-        // Materialize first, so a still lazy override is not evaluated in place of this getter
-        const observable = adm.values_.get(key) ?? adm.materializeLazyComputed_(key)
+        let observable = adm.values_.get(key)
+        // A super read, while the override is still lazy: materialize the override first,
+        // so that it is not evaluated in place of this getter
+        if (!observable && lookupGetter(this, key) !== computedGetter) {
+            observable = adm.materializeLazyComputed_(key)
+        }
         if (observable instanceof ComputedValue && observable.derivation !== get) {
             let computed = computedValues?.get(this)
             if (!computed) {
@@ -96,6 +101,17 @@ export function decorateComputed20223_(
         }
         return adm.getObservablePropValue_(key)
     }
+}
+
+// The getter that `target[key]` runs
+function lookupGetter(target: object, key: PropertyKey) {
+    for (let proto = target; proto; proto = Object.getPrototypeOf(proto)) {
+        const descriptor = getDescriptor(proto, key)
+        if (descriptor) {
+            return descriptor.get
+        }
+    }
+    return undefined
 }
 
 function assertComputedDescriptor(

@@ -386,3 +386,66 @@ test("computed sibling can read parent computed with super before child computed
     expect(child.parentNumber).toBe(1)
     expect(child.number).toBe(2)
 })
+
+// A parent constructor that reads the key before the override is registered gets the parent value
+test("parent constructor reads the parent computed before the override is registered", () => {
+    class Parent {
+        @observable accessor price = 100
+        initialTotal: number
+
+        constructor() {
+            this.initialTotal = this.total
+        }
+
+        @computed
+        get total() {
+            return this.price
+        }
+    }
+
+    class Child extends Parent {
+        @observable accessor discount = 0.5
+
+        @computed
+        override get total() {
+            return super.total * this.discount
+        }
+    }
+
+    const child = new Child()
+
+    expect(child.initialTotal).toBe(100)
+    expect(child.total).toBe(50)
+})
+
+test("parent constructor reaction follows the override once it is registered", () => {
+    const log: number[] = []
+
+    class Parent {
+        @observable accessor price = 100
+
+        constructor() {
+            autorun(() => log.push(this.total))
+        }
+
+        @computed
+        get total() {
+            return this.price
+        }
+    }
+
+    class Child extends Parent {
+        @observable accessor discount = 0.5
+
+        @computed
+        override get total() {
+            return super.total * this.discount
+        }
+    }
+
+    const child = new Child()
+    runInAction(() => (child.price = 2))
+    runInAction(() => (child.discount = 1))
+
+    expect(log).toEqual([100, 1, 2])
+})
