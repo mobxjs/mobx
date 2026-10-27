@@ -1,5 +1,14 @@
 # mobx-react
 
+## 10.0.3
+
+### Patch Changes
+
+-   [`1442c8bbb04c8aa8073acd6aeb8b7ecb001b44a8`](https://github.com/mobxjs/mobx/commit/1442c8bbb04c8aa8073acd6aeb8b7ecb001b44a8) [#4754](https://github.com/mobxjs/mobx/pull/4754) Thanks [@jzhan-canva](https://github.com/jzhan-canva)! - Remove `"type": "commonjs"` from the package manifests. The `react-native` and `module` entries point at the ESM `dist/*.esm.js` builds, and the field made bundlers that honour it, such as webpack, Rspack and Re.Pack, parse those files as CommonJS and fail on their `import`/`export` statements.
+
+-   Updated dependencies [[`1442c8bbb04c8aa8073acd6aeb8b7ecb001b44a8`](https://github.com/mobxjs/mobx/commit/1442c8bbb04c8aa8073acd6aeb8b7ecb001b44a8)]:
+    -   mobx-react-lite@5.1.2
+
 ## 10.0.2
 
 ### Patch Changes
