@@ -95,4 +95,15 @@ export function Pure({ value }) { "use memo"; return <div>{value}</div> }`,
         expect(isCompiled(result!.code, "function App()")).toBe(false)
         expect(isCompiled(result!.code, "function Pure(")).toBe(true)
     })
+
+    test("extra babel plugins run even when the MobX transform changes nothing", async () => {
+        const plugin = createPlugin({
+            babel: { plugins: [[require.resolve("babel-plugin-react-compiler"), {}]] }
+        })
+        const result = await plugin.transform(
+            `export function Pure({ value }) { "use memo"; return <div>{value}</div> }`,
+            "/project/src/Pure.tsx"
+        )
+        expect(isCompiled(result!.code, "function Pure(")).toBe(true)
+    })
 })

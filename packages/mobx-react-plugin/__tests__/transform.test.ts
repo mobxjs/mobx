@@ -412,6 +412,29 @@ function X() {
 export default observer(X);`
         )
     })
+
+    test("aliased observer import", () => {
+        expectTransform(
+            code`
+import { observer as obs } from "mobx-react-lite"
+const X = obs(() => <div />)
+function Y() { return <div /> }
+export default obs(Y)`,
+            code`
+import { observer as obs } from "mobx-react-lite";
+const X = obs(() => {
+  "use no memo";
+
+  return <div />;
+});
+function Y() {
+  "use no memo";
+
+  return <div />;
+}
+export default obs(Y);`
+        )
+    })
 })
 
 describe("forwardRef and memo", () => {

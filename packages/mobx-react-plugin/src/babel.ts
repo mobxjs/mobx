@@ -9,24 +9,9 @@ interface BabelApi {
 }
 
 /**
- * Babel plugin: automatically wraps React components in MobX `observer` and
- * marks them (and custom hooks) with `"use no memo"` so React Compiler leaves
- * them to MobX.
- *
- * All work happens in `Program:enter`. Babel merges the visitors of all plugins
- * into one traversal, so a plugin that used per-function visitors could never
- * reliably run before React Compiler (which also does everything in
- * `Program:enter`). List this plugin *before* `babel-plugin-react-compiler`.
- *
- * It also turns `async` methods of observable classes into MobX flows
- * (the `flow` option).
- *
- * ```js
- * // babel.config.js (Metro / React Native, webpack, Next.js, ...)
- * module.exports = {
- *     plugins: [["mobx-react-plugin/babel", { observer: true, flow: true }], "babel-plugin-react-compiler"]
- * }
- * ```
+ * Babel merges the visitors of all plugins into one traversal, so all work happens in
+ * `Program:enter`: that is the only way to reliably run before React Compiler, which
+ * also works there. List this plugin before `babel-plugin-react-compiler`.
  */
 function mobxReactPlugin(
     api: BabelApi,
@@ -77,13 +62,10 @@ namespace mobxReactPlugin {
     export type ObserverOptions = import("./options").ObserverOptions
     export type FilterPattern = import("./options").FilterPattern
     export interface TransformResult {
-        /** Names of the components that were wrapped in `observer`. */
         wrapped: string[]
-        /** Names of the components and hooks that received the `"use no memo"` directive. */
         directives: string[]
         /** Already observed components whose recursive self references were redirected (mobxjs/mobx#3836). */
         aliased: string[]
-        /** `Class.method` names of the async functions that were turned into flows. */
         flows: string[]
     }
 }

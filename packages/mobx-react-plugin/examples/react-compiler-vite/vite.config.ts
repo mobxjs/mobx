@@ -13,9 +13,8 @@ export default defineConfig({
         //      src/controls/**  -> deliberately excluded: the manual observer stays broken
         //      src/pure/**      -> excluded: React Compiler optimizes it normally
         mobxReactPlugin({ include: ["src/protected/**"] }),
-        // 2. React (Fast Refresh in dev).
         react(),
-        // 3. React Compiler with its default configuration (babel-plugin-react-compiler 1.0.0).
+        // 3. React Compiler with its default configuration.
         babel({ presets: [reactCompilerPreset()] })
     ],
     test: {

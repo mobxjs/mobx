@@ -3,7 +3,6 @@ import type { NodePath, types as t } from "@babel/core"
 type Types = typeof t
 
 export interface FlowResult {
-    /** `Class.method` / `<object>.method` names of the async functions turned into flows. */
     flows: string[]
 }
 
@@ -12,7 +11,6 @@ type AnnotationKind = "flow" | "action" | "other"
 interface AnnotationEntry {
     kind: AnnotationKind
     bound: boolean
-    /** The `{ method: action }` property, so `action` can be rewritten to `flow`. */
     property: t.ObjectProperty
 }
 
@@ -20,11 +18,7 @@ interface AnnotationEntry {
 type Annotations = Map<string, AnnotationEntry> | null
 
 interface Target {
-    /**
-     * `auto`: generator methods are inferred as flows unless overridden
-     * (`makeAutoObservable`).
-     * `explicit`: only members annotated with `flow` become flows (`makeObservable`).
-     */
+    /** `auto`: `makeAutoObservable`, `explicit`: `makeObservable` (only `flow` members). */
     mode: "auto" | "explicit"
     annotations: Annotations
 }
@@ -41,28 +35,12 @@ interface Context {
     t: Types
     program: NodePath<t.Program>
     result: FlowResult
-    /** Local name of the `flow` import once it is known/inserted. */
     flowLocal: string | null
     importAdded: boolean
 }
 
 /**
- * Turns `async` methods of observable classes and objects into generator
- * methods, so that MobX treats them as `flow`s: every step after an `await`
- * (now `yield`) runs inside an action, without `runInAction` boilerplate.
- *
- *     class Store {
- *         constructor() { makeAutoObservable(this) }
- *         async load() { this.user = await api.getUser() }
- *     }
- *
- * becomes
- *
- *     class Store {
- *         constructor() { makeAutoObservable(this) }
- *         *load() { this.user = yield api.getUser() }
- *     }
- *
+ * Turns `async` methods into generator methods, i.e. MobX flows.
  * Only methods MobX will actually turn into flows are converted:
  * classes calling `makeAutoObservable(this)` in their constructor (unless the
  * method is overridden with another annotation), members annotated with `flow`
@@ -247,7 +225,6 @@ function convertToGenerator(ctx: Context, fn: AsyncFunctionPath): boolean {
     return true
 }
 
-/** Finds `makeAutoObservable(this, ...)` / `makeObservable(this, ...)` in the constructor. */
 function findClassTarget(ctx: Context, cls: NodePath<t.Class>): Target | null {
     const { t } = ctx
     const constructor = cls
@@ -337,7 +314,6 @@ function transformObjectCall(ctx: Context, call: NodePath<t.CallExpression>): vo
         return
     }
     const { object, target } = found
-    // Locate the NodePath of the object literal to get paths for its members.
     let objectPath: NodePath<t.ObjectExpression> | null = null
     call.traverse({
         ObjectExpression(p) {
@@ -379,8 +355,6 @@ function transformObjectCall(ctx: Context, call: NodePath<t.CallExpression>): vo
         ctx.result.flows.push(`<object>.${name}`)
     }
 }
-
-// `flow` import (needed when `action` annotations are rewritten)
 
 function ensureFlowImport(ctx: Context): string {
     if (ctx.flowLocal !== null) {

@@ -16,7 +16,6 @@ interface Wrapper {
     call: CallPath
 }
 
-/** Directives understood by React Compiler (see `babel-plugin-react-compiler`, Program.ts). */
 const OPT_IN_DIRECTIVES = new Set(["use memo", "use forget"])
 const OPT_OUT_DIRECTIVES = new Set(["use no memo", "use no forget"])
 const NO_MEMO_DIRECTIVE = "use no memo"
@@ -26,11 +25,8 @@ const COMPONENT_NAME_RE = /^[A-Z]/
 const KNOWN_OBSERVER_SOURCES = new Set(["mobx-react", "mobx-react-lite"])
 
 export interface TransformResult {
-    /** Names of the components that were wrapped in `observer`. */
     wrapped: string[]
-    /** Names of the components and hooks that received the `"use no memo"` directive. */
     directives: string[]
-    /** Names of already observed components whose recursive self references were redirected (mobxjs/mobx#3836). */
     aliased: string[]
 }
 
@@ -43,7 +39,6 @@ interface Candidate {
     fn: FunctionPath
     /** Binding name (or the name inferred from the filename for anonymous default exports). */
     name: string | null
-    /** Module scope binding of the component, if it has one. */
     binding: Binding | null
     /** Known HOC calls between the binding and the function, outermost first. */
     wrappers: Wrapper[]
@@ -58,7 +53,6 @@ interface Context {
     result: TransformResult
     /** Functions already classified by the module scope pass. */
     handled: Set<t.Node>
-    /** Local name of the `observer` import once it is known/inserted. */
     observerLocal: string | null
     /** Module scope bindings passed to `observer(X)` / `forwardRef(X)` somewhere in the file. */
     observedNames: Set<string>
@@ -67,15 +61,6 @@ interface Context {
     changed: boolean
 }
 
-/**
- * Transforms a module so that
- *   1. every module-scope React component is wrapped in `observer(...)`, and
- *   2. every component and hook that React Compiler would compile carries a
- *      `"use no memo"` directive, so the compiler leaves it to MobX.
- *
- * Runs entirely inside `Program:enter`, before any other plugin (including React
- * Compiler, which also works in `Program:enter`) sees the file.
- */
 export function transformProgram(
     types: Types,
     program: NodePath<t.Program>,
@@ -98,7 +83,6 @@ export function transformProgram(
 
     const programDirectives = program.node.directives.map(d => d.value.value)
     if (programDirectives.includes("use server")) {
-        // React Server Components module: nothing to observe here.
         return ctx.result
     }
     if (opts.clientOnly && !programDirectives.includes("use client")) {
@@ -107,6 +91,7 @@ export function transformProgram(
     const moduleOptOut = programDirectives.some(d => OPT_OUT_DIRECTIVES.has(d))
     const addDirectives = opts.useNoMemo && !moduleOptOut
 
+    ctx.observerLocal = findObserverImport(ctx)
     collectWrapperReferences(ctx)
     for (const candidate of collectCandidates(ctx)) {
         processCandidate(ctx, candidate, addDirectives)
@@ -126,7 +111,11 @@ function getWrapperKind(ctx: Context, callee: NodePath): WrapperKind | null {
     const { t } = ctx
     const node = callee.node
     if (t.isIdentifier(node)) {
-        if (node.name === "observer" || node.name === ctx.opts.importName) {
+        if (
+            node.name === "observer" ||
+            node.name === ctx.opts.importName ||
+            node.name === ctx.observerLocal
+        ) {
             return "observer"
         }
         if (node.name === "forwardRef" || node.name === "memo") {
@@ -281,11 +270,7 @@ function fromDeclarator(
     }
 }
 
-/**
- * `export default () => <div />` has no name. Derive one from the file name
- * (`TodoList.tsx` -> `TodoList`, `todo-list/index.tsx` -> `TodoList`) so the
- * component keeps a readable name in React DevTools.
- */
+/** `export default () => <div />` in `todo-list/index.tsx` -> `TodoList`, for React DevTools. */
 function inferNameFromFilename(ctx: Context): string | null {
     const { filename } = ctx
     if (!filename) {
@@ -613,7 +598,6 @@ function addNoMemoDirective(ctx: Context, fn: FunctionPath, name: string | null)
     const { t } = ctx
     const node = fn.node
     if (!t.isBlockStatement(node.body)) {
-        // `() => <div />` – a directive needs a block body.
         node.body = t.blockStatement([t.returnStatement(node.body)])
         ctx.changed = true
     }
@@ -717,7 +701,6 @@ function processCandidate(ctx: Context, candidate: Candidate, addDirectives: boo
 }
 
 interface WrapPlan {
-    /** What to wrap: the function itself or the surrounding `forwardRef(...)` call. */
     target: "fn" | CallPath
     /** A surrounding `memo(...)` call that becomes `observer(...)` when it has a single argument. */
     memoCall: CallPath | null
@@ -739,7 +722,6 @@ function resolveWrapPlan(wrappers: Wrapper[]): WrapPlan | null {
     return null
 }
 
-/** Can this arrow function become a `function` expression without changing semantics? */
 function canConvertArrow(ctx: Context, fn: NodePath<t.ArrowFunctionExpression>): boolean {
     let safe = true
     fn.traverse({
@@ -1011,7 +993,6 @@ function redirectObservedSelfReferences(ctx: Context, candidate: Candidate): voi
             t.isIdentifier(owner.node.id) &&
             owner.scope === ctx.program.scope
         ) {
-            // `const Observed = observer(X)`
             observedName = owner.node.id.name
         } else if (owner.isExportDefaultDeclaration() && owner.node.declaration === call.node) {
             // `export default observer(X)` -> give the observed component a binding.
@@ -1090,6 +1071,36 @@ function wrapForwardRefCallSites(ctx: Context, name: string): void {
     }
 }
 
+function findObserverImport(ctx: Context): string | null {
+    const { t, program } = ctx
+    const { importSource, importName } = ctx.opts
+    for (const node of program.node.body) {
+        if (
+            !t.isImportDeclaration(node) ||
+            node.importKind === "type" ||
+            node.importKind === "typeof"
+        ) {
+            continue
+        }
+        const source = node.source.value
+        if (source !== importSource && !KNOWN_OBSERVER_SOURCES.has(source)) {
+            continue
+        }
+        for (const spec of node.specifiers) {
+            if (!t.isImportSpecifier(spec) || spec.importKind === "type") {
+                continue
+            }
+            const imported = t.isIdentifier(spec.imported)
+                ? spec.imported.name
+                : spec.imported.value
+            if (imported === importName) {
+                return spec.local.name
+            }
+        }
+    }
+    return null
+}
+
 function ensureObserverImport(ctx: Context): string {
     if (ctx.observerLocal !== null) {
         return ctx.observerLocal
@@ -1105,28 +1116,11 @@ function ensureObserverImport(ctx: Context): string {
         }
         lastImport = stmt
         const node = stmt.node
-        if (node.importKind === "type" || node.importKind === "typeof") {
-            continue
-        }
-        const source = node.source.value
-        if (source !== importSource && !KNOWN_OBSERVER_SOURCES.has(source)) {
-            continue
-        }
-        for (const spec of node.specifiers) {
-            if (!t.isImportSpecifier(spec) || spec.importKind === "type") {
-                continue
-            }
-            const imported = t.isIdentifier(spec.imported)
-                ? spec.imported.name
-                : spec.imported.value
-            if (imported === importName) {
-                ctx.observerLocal = spec.local.name
-                return spec.local.name
-            }
-        }
         if (
-            source === importSource &&
             sameSourceImport === null &&
+            node.importKind !== "type" &&
+            node.importKind !== "typeof" &&
+            node.source.value === importSource &&
             !node.specifiers.some(spec => t.isImportNamespaceSpecifier(spec))
         ) {
             sameSourceImport = stmt

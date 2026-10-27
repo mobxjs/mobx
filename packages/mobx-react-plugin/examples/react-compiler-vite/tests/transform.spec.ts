@@ -8,8 +8,6 @@ const configFile = path.resolve(process.cwd(), "vite.config.ts")
 // the cache of a `vite dev` server running for the same project.
 const cacheDir = path.resolve(process.cwd(), "node_modules/.vite-tests")
 
-// Static proof: per-file output of the complete Vite pipeline, in dev and in production.
-
 // Every function compiled by React Compiler starts with `const $ = _c(n)`.
 const MEMO_CACHE = /\b_c\(\d+\)/
 const PROTECTED_COUNTER = "src/protected/AutoObservedCounter.tsx"

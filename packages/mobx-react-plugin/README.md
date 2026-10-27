@@ -134,11 +134,11 @@ Next.js only runs Babel plugins when the project has its own Babel configuration
 // .babelrc
 {
     "presets": ["next/babel"],
-    "plugins": [["mobx-react-plugin/babel", { "clientOnly": true }]]
+    "plugins": [["mobx-react-plugin/babel", { "observer": { "clientOnly": true } }]]
 }
 ```
 
-With the app router, `clientOnly: true` limits the transform to modules that start with `"use client"`. Server components cannot be wrapped in `observer`.
+With the app router, `observer.clientOnly: true` limits the transform to modules that start with `"use client"`. Server components cannot be wrapped in `observer`.
 
 ### Jest
 

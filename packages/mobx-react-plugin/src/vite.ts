@@ -5,18 +5,7 @@ import { normalizeOptions, shouldProcessFile } from "./options"
 
 const DEFAULT_INCLUDE = /\.[cm]?[jt]sx?$/
 
-/**
- * Vite plugin: runs the `mobx-react-plugin` Babel transform as a
- * pre-transform (`enforce: "pre"`), i.e. before `@vitejs/plugin-react`,
- * `@vitejs/plugin-react-swc`, `@rolldown/plugin-babel` and therefore before
- * React Compiler, whichever way it is enabled.
- *
- * ```ts
- * // vite.config.ts
- * import mobxReactPlugin from "mobx-react-plugin/vite"
- * export default defineConfig({ plugins: [mobxReactPlugin(), react()] })
- * ```
- */
+/** `enforce: "pre"`, so it runs before React Compiler whichever Vite plugin enables it. */
 function mobxReactPlugin(options: mobxReactPlugin.Options = {}): mobxReactPlugin.VitePlugin {
     const { parserPlugins, babel: babelOptions, include, exclude, ...pluginOptions } = options
     const filter = normalizeOptions({ include: include ?? DEFAULT_INCLUDE, exclude })
@@ -61,7 +50,13 @@ function mobxReactPlugin(options: mobxReactPlugin.Options = {}): mobxReactPlugin
             const meta = (
                 result.metadata as { mobxReactPlugin?: babelPlugin.TransformResult } | undefined
             )?.mobxReactPlugin
-            if (!meta || Object.values(meta).every(list => list.length === 0)) {
+            const extraTransforms = Boolean(
+                babelOptions?.plugins?.length || babelOptions?.presets?.length
+            )
+            if (
+                !extraTransforms &&
+                (!meta || Object.values(meta).every(list => list.length === 0))
+            ) {
                 return null
             }
             return { code: result.code, map: result.map }
