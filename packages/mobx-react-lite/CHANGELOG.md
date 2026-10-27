@@ -1,5 +1,11 @@
 # mobx-react-lite
 
+## 5.1.1
+
+### Patch Changes
+
+-   [`2d7d9b60acb4d6912683fcbb2739cb4b4884d27c`](https://github.com/mobxjs/mobx/commit/2d7d9b60acb4d6912683fcbb2739cb4b4884d27c) [#4752](https://github.com/mobxjs/mobx/pull/4752) Thanks [@jzhan-canva](https://github.com/jzhan-canva)! - Fix `observer` leaving props untyped when its result is assigned to a variable typed `React.ComponentType<P>`.
+
 ## 5.1.0
 
 ### Minor Changes
