@@ -6,34 +6,64 @@ Write plain React components and plain `async` store methods; the plugin adds th
 2. inserts the `"use no memo"` directive into components and hooks, so [React Compiler](https://react.dev/learn/react-compiler) leaves memoization and invalidation of observed components to MobX instead of caching their output;
 3. turns `async` methods of observable classes and objects into MobX [flows](https://mobx.js.org/actions.html#using-flow-instead-of-async--await-), so state changes after `await` are actions without `runInAction` boilerplate.
 
-**Before**
+So this code:
 
 ```tsx
-import { observer } from "mobx-react-lite"
+export function Dice() {
+    return (
+        <button disabled={dice.isRolling} onClick={() => dice.roll()}>
+            {dice.isRolling ? "Rolling..." : `You rolled ${dice.value}`}
+        </button>
+    )
+}
 
-export const TodoList = observer(function TodoList() {
-    return store.todos.map(todo => <Todo key={todo.id} todo={todo} />)
-})
-```
+class DiceStore {
+    value = 1
+    isRolling = false
 
-**After**
+    constructor() {
+        makeAutoObservable(this)
+    }
 
-```tsx
-export function TodoList() {
-    return store.todos.map(todo => <Todo key={todo.id} todo={todo} />)
+    async roll() {
+        this.isRolling = true
+        await sleep(1000)
+        this.value = Math.ceil(Math.random() * 6)
+        this.isRolling = false
+    }
 }
 ```
 
-The plugin turns the second form into the first one at build time:
+is compiled into:
 
 ```tsx
 import { observer } from "mobx-react-lite"
 
-export const TodoList = observer(function TodoList() {
+export const Dice = observer(function Dice() {
     "use no memo"
 
-    return store.todos.map(todo => <Todo key={todo.id} todo={todo} />)
+    return (
+        <button disabled={dice.isRolling} onClick={() => dice.roll()}>
+            {dice.isRolling ? "Rolling..." : `You rolled ${dice.value}`}
+        </button>
+    )
 })
+
+class DiceStore {
+    value = 1
+    isRolling = false
+
+    constructor() {
+        makeAutoObservable(this)
+    }
+
+    *roll() {
+        this.isRolling = true
+        yield sleep(1000)
+        this.value = Math.ceil(Math.random() * 6)
+        this.isRolling = false
+    }
+}
 ```
 
 Benefits:
