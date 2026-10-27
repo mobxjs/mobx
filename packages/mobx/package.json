@@ -3,7 +3,6 @@
     "version": "7.1.1",
     "description": "Simple, scalable state management.",
     "source": "src/mobx.ts",
-    "type": "commonjs",
     "main": "dist/index.js",
     "umd:main": "dist/mobx.umd.production.min.js",
     "unpkg": "dist/mobx.umd.production.min.js",
