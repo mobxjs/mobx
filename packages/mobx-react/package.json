@@ -3,7 +3,6 @@
     "version": "10.0.2",
     "description": "React bindings for MobX. Create fully reactive components.",
     "source": "src/index.ts",
-    "type": "commonjs",
     "main": "dist/index.js",
     "umd:main": "dist/mobxreact.umd.production.min.js",
     "unpkg": "dist/mobxreact.umd.production.min.js",
