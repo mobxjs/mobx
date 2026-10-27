@@ -75,11 +75,12 @@ export function decorateComputed20223_(
     addInitializer(function () {
         const adm: ObservableObjectAdministration = asObservableObject(this)[$mobx]
         const target = this as object
-        const observable = adm.values_.get(key)
-        if (observable instanceof ComputedValue && observable.derivation !== get) {
-            adm.values_.delete(key)
+        // An override is not lazy: a super read would materialize it in place of the parent (#4660)
+        if (adm.values_.has(key) || adm.lazyComputedKeys_?.delete(key)) {
+            adm.values_.set(key, createComputedValue(target, adm))
+        } else {
+            ;(adm.lazyComputedKeys_ ??= new Map()).set(key, () => createComputedValue(target, adm))
         }
-        ;(adm.lazyComputedKeys_ ??= new Map()).set(key, () => createComputedValue(target, adm))
     })
 
     return function () {

@@ -566,6 +566,22 @@ test("observer should work with custom HOC and infer correct type", () => {
     expect(rendered.container.querySelector("div")!.innerHTML).toBe("1")
 })
 
+test("observer infers props from a ComponentType variable", () => {
+    interface IProps {
+        value: string
+    }
+
+    const expectNumber = (_: number) => {}
+    const TestComponent: React.ComponentType<IProps> = observer(({ value }) => {
+        // @ts-expect-error `value` is a string, not `any`
+        expectNumber(value)
+        return <div>{value.toUpperCase()}</div>
+    })
+
+    const rendered = render(<TestComponent value="a" />)
+    expect(rendered.container.querySelector("div")!.innerHTML).toBe("A")
+})
+
 it("should hoist known statics only", () => {
     function isNumber() {
         return null

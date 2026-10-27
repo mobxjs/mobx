@@ -25,7 +25,6 @@ module.exports = {
         // these values are the same as recommended
         "mobx/exhaustive-make-observable": "warn",
         "mobx/unconditional-make-observable": "error",
-        "mobx/missing-make-observable": "error",
         "mobx/missing-observer": "warn"
     }
 }
@@ -50,7 +49,6 @@ export default [
             // these values are the same as recommended
             "mobx/exhaustive-make-observable": "warn",
             "mobx/unconditional-make-observable": "error",
-            "mobx/missing-make-observable": "error",
             "mobx/missing-observer": "warn"
         }
     }
@@ -78,11 +76,6 @@ Does not warn about annotated non-existing fields (there is a runtime check, but
 This is a boolean value that controls if the field is annotated with `true` or `false`.
 If you are migrating an existing project using `makeObservable` and do not want this rule to override
 your current usage (even if it may be wrong), you should run the autofix with the annotation set to `false` to maintain existing behaviour: `eslint --no-eslintrc --fix --rule='mobx/exhaustive-make-observable: [2, { "autofixAnnotation": false }]' .`
-
-### mobx/missing-make-observable
-
-_When using decorators (eg `@observable foo = 5`)_, makes sure that `makeObservable(this)` is called in a constructor.<br>
-**Autofix** creates a constructor if necessary and adds `makeObservable(this)` at it's end.
 
 ### mobx/unconditional-make-observable
 

@@ -1,9 +1,8 @@
 {
     "name": "mobx",
-    "version": "7.0.6",
+    "version": "7.1.3",
     "description": "Simple, scalable state management.",
     "source": "src/mobx.ts",
-    "type": "commonjs",
     "main": "dist/index.js",
     "umd:main": "dist/mobx.umd.production.min.js",
     "unpkg": "dist/mobx.umd.production.min.js",

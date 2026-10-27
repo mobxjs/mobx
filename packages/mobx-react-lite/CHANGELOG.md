@@ -1,5 +1,17 @@
 # mobx-react-lite
 
+## 5.1.2
+
+### Patch Changes
+
+-   [`1442c8bbb04c8aa8073acd6aeb8b7ecb001b44a8`](https://github.com/mobxjs/mobx/commit/1442c8bbb04c8aa8073acd6aeb8b7ecb001b44a8) [#4754](https://github.com/mobxjs/mobx/pull/4754) Thanks [@jzhan-canva](https://github.com/jzhan-canva)! - Remove `"type": "commonjs"` from the package manifests. The `react-native` and `module` entries point at the ESM `dist/*.esm.js` builds, and the field made bundlers that honour it, such as webpack, Rspack and Re.Pack, parse those files as CommonJS and fail on their `import`/`export` statements.
+
+## 5.1.1
+
+### Patch Changes
+
+-   [`2d7d9b60acb4d6912683fcbb2739cb4b4884d27c`](https://github.com/mobxjs/mobx/commit/2d7d9b60acb4d6912683fcbb2739cb4b4884d27c) [#4752](https://github.com/mobxjs/mobx/pull/4752) Thanks [@jzhan-canva](https://github.com/jzhan-canva)! - Fix `observer` leaving props untyped when its result is assigned to a variable typed `React.ComponentType<P>`.
+
 ## 5.1.0
 
 ### Minor Changes

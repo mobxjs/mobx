@@ -1,5 +1,19 @@
 # eslint-plugin-mobx
 
+## 0.2.0
+
+### Minor Changes
+
+-   [`d33f8db15b1f16d2e3a92df0750c9ee2f7cd36f1`](https://github.com/mobxjs/mobx/commit/d33f8db15b1f16d2e3a92df0750c9ee2f7cd36f1) [#4750](https://github.com/mobxjs/mobx/pull/4750) Thanks [@APX403](https://github.com/APX403)! - Remove the `missing-make-observable` rule and add `mobx@^7.0.0` as a peer dependency. MobX 7 only supports 2022.3 decorators, which don't need `makeObservable(this)`, and `makeObservable` requires the annotations argument, so the rule no longer applies. MobX 6 users with legacy decorators should stay on `eslint-plugin-mobx` 0.1.x.
+
+## 0.1.1
+
+### Patch Changes
+
+-   [`c7038b905f3d41a5de41b88dc82432b7b0796059`](https://github.com/mobxjs/mobx/commit/c7038b905f3d41a5de41b88dc82432b7b0796059) [#4740](https://github.com/mobxjs/mobx/pull/4740) Thanks [@sviat-barbutsa](https://github.com/sviat-barbutsa)! - Prevent `missing-make-observable` from generating an invalid constructor for derived classes that do not already define one.
+
+-   [`29ef68a5acbeeb8cec776b082cb47bf2b0a8610e`](https://github.com/mobxjs/mobx/commit/29ef68a5acbeeb8cec776b082cb47bf2b0a8610e) [#4729](https://github.com/mobxjs/mobx/pull/4729) Thanks [@kubk](https://github.com/kubk)! - `missing-observer` no longer reports components that are wrapped with `observer` elsewhere in the file, e.g. `export default observer(Cmp)`
+
 ## 0.1.0
 
 ### Minor Changes

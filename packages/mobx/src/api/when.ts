@@ -16,6 +16,7 @@ export interface IWhenOptions {
     timeout?: number
     onError?: (error: any) => void
     signal?: GenericAbortSignal
+    requiresObservable?: boolean
 }
 
 export function when(

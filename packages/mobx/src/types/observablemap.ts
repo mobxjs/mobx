@@ -188,7 +188,7 @@ export class ObservableMap<K = any, V = any>
             } // TODO fix type
             transaction(() => {
                 this.keysAtom_.reportChanged()
-                this.hasMap_.get(key)?.setNewValue_(false)
+                this.hasMap_.get(key)?.set(false)
                 const observable = this.data_.get(key)!
                 observable.setNewValue_(undefined as any)
                 this.data_.delete(key)
@@ -246,7 +246,7 @@ export class ObservableMap<K = any, V = any>
             )
             this.data_.set(key, observable)
             newValue = (observable as any).value_ // value might have been changed
-            this.hasMap_.get(key)?.setNewValue_(true)
+            this.hasMap_.get(key)?.set(true)
             this.keysAtom_.reportChanged()
         })
         const notifySpy = __DEV__ && isSpyEnabled()

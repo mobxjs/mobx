@@ -536,7 +536,7 @@ function reduceLikeFunc(funcName) {
     }
 }
 
-const isObservableArrayAdministration = createInstanceofPredicate(
+export const isObservableArrayAdministration = createInstanceofPredicate(
     "ObservableArrayAdministration",
     ObservableArrayAdministration
 )

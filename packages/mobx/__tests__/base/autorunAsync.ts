@@ -1,19 +1,15 @@
-/**
- * @type {typeof import("../../src/mobx")}
- */
-const mobx = require("../../src/mobx.ts")
-
-const utils = require("../utils/test-utils")
+import * as mobx from "../../src/mobx"
+import * as utils from "../utils/test-utils"
 
 const { $mobx } = mobx
 
 test("autorun 1", function (done) {
     let _fired = 0
-    let _result = null
+    let _result: number | null = null
     let _cCalcs = 0
     const to = setTimeout
 
-    function check(fired, cCalcs, result) {
+    function check(fired: number, cCalcs: number, result: number | null) {
         expect(_fired).toBe(fired)
         expect(_cCalcs).toBe(cCalcs)
         if (fired) expect(_result).toBe(result)
@@ -113,7 +109,7 @@ test("autorun should not result in loop", function (done) {
 })
 
 test("autorunAsync passes Reaction as an argument to view function", function (done) {
-    const a = mobx.observable.box(1)
+    const a = mobx.observable.box<number | string>(1)
 
     let autoRunsCalled = 0
 
@@ -186,7 +182,7 @@ test("reaction accepts a scheduling function", function (done) {
     let schedulingsCalled = 0
     let exprCalled = 0
 
-    const values = []
+    const values: number[] = []
 
     mobx.reaction(
         () => {
@@ -283,7 +279,7 @@ test("whenWithTimeout should dispose", done => {
 
     const d2 = mobx.when(
         () => a.get() === 2,
-        () => t.fail("2 should not finsih"),
+        () => done.fail("2 should not finsih"),
         {
             timeout: 200,
             onError: () => done.fail("2 should not timeout")
@@ -305,7 +301,7 @@ test("whenWithTimeout should dispose", done => {
 describe("when opts requiresObservable", () => {
     test("warn when no observable", () => {
         utils.consoleWarn(() => {
-            const disposer = mobx.when(() => 2, {
+            const disposer = mobx.when(() => true, {
                 requiresObservable: true
             })
 
@@ -319,7 +315,7 @@ describe("when opts requiresObservable", () => {
         })
 
         const messages = utils.supressConsole(() => {
-            const disposer = mobx.when(() => obsr.x, {
+            const disposer = mobx.when(() => obsr.x === 1, {
                 requiresObservable: true
             })
 

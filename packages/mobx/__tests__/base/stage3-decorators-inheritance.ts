@@ -5,8 +5,10 @@ import {
     isComputedProp,
     isFlow,
     isObservableProp,
+    makeObservable,
     observe,
-    runInAction
+    runInAction,
+    toJS
 } from "../../src/mobx"
 import { action, actionBound, computed, flow, observable } from "../../src/mobx"
 
@@ -211,6 +213,50 @@ test("subclass can add new observable, computed, and action members", () => {
     expect(seen).toEqual([3, 4, 5])
 })
 
+test("toJS includes observable accessors of parent and subclass #4248", () => {
+    class Parent {
+        id = "p"
+        @observable accessor count = 1
+
+        @computed
+        get double() {
+            return this.count * 2
+        }
+    }
+
+    class Child extends Parent {
+        @observable accessor extra = 2
+
+        @computed
+        override get double() {
+            return super.double + this.extra
+        }
+    }
+
+    const child = new Child()
+    child.extra = 3
+
+    expect(toJS(child)).toEqual({ id: "p", count: 1, extra: 3 })
+    expect(toJS(new Parent())).toEqual({ id: "p", count: 1 })
+})
+
+test("toJS includes observable accessors of a subclass of a makeObservable class #4248", () => {
+    class Parent {
+        name = "parent"
+
+        constructor() {
+            makeObservable(this, { name: observable })
+        }
+    }
+
+    class Child extends Parent {
+        @observable accessor count = 1
+    }
+
+    expect(toJS(new Child())).toEqual({ name: "parent", count: 1 })
+    expect(toJS(new Parent())).toEqual({ name: "parent" })
+})
+
 test("action override can call parent action with super", () => {
     class Parent {
         @observable accessor count = 0
@@ -312,14 +358,8 @@ test("flow override can wait for parent flow before child updates", async () => 
     expect(seen[seen.length - 1]).toBe("ready|User 2|User 2 profile")
 })
 
-// #4660: If a subclass has a same-named @computed override that is still lazy,
-// and another subclass member calls super.foo before foo itself has been read,
-// this call materializes the child lazy entry and returns the overridden value
-// instead of the parent value. For example, with override get number() {
-// return super.number + 1 } and get parentNumber() { return super.number },
-// the first child.parentNumber reads as 2 instead of the parent 1, making super
-// behavior order-dependent
-test.skip("computed sibling can read parent computed with super before child computed is read", () => {
+// #4660
+test("computed sibling can read parent computed with super before child computed is read", () => {
     class Parent {
         @observable accessor count = 1
 

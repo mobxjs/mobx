@@ -16,10 +16,6 @@ const ReactMemoSymbol = hasSymbol
     ? Symbol.for("react.memo")
     : typeof memo === "function" && memo((props: any) => null)["$$typeof"]
 
-export function observer<C extends React.FunctionComponent<any>>(
-    baseComponent: C
-): C & React.MemoExoticComponent<C>
-
 export function observer<P extends object>(
     baseComponent: React.FunctionComponent<P>
 ): React.FunctionComponent<P> & React.MemoExoticComponent<React.FunctionComponent<P>>
@@ -31,6 +27,10 @@ export function observer<P extends object, TRef = {}>(
 ): React.MemoExoticComponent<
     React.ForwardRefExoticComponent<React.PropsWithoutRef<P> & React.RefAttributes<TRef>>
 >
+
+export function observer<C extends React.FunctionComponent<any>>(
+    baseComponent: C
+): C & React.MemoExoticComponent<C>
 
 // n.b. base case is not used for actual typings or exported in the typing files
 export function observer<P extends object, TRef = {}>(

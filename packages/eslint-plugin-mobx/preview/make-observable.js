@@ -1,5 +1,4 @@
 /* eslint mobx/exhaustive-make-observable: "error" */
-/* eslint mobx/missing-make-observable: "error" */
 /* eslint mobx/unconditional-make-observable: "error" */
 
 makeObservable();
@@ -131,34 +130,5 @@ class Unconditional2 {
     const ff = function () {
       makeObservable(this, {}); // ok - `this` doesn't refer to class instance    
     }
-  }
-}
-
-class MissingMakeObservable1 {
-  @observable o = 5;
-}
-
-class MissingMakeObservable2 {
-  @observable o = 5;
-  constructor() { }
-}
-
-class MissingMakeObservable3 {
-  @observable o = 5;
-  constructor() {
-    makeObservable({})
-  }
-}
-
-class MissingMakeObservable4 {
-  @observable o = 5;
-  constructor()
-}
-
-// ok
-class MissingMakeObservable5 {
-  @observable o = 5;
-  constructor() {
-    makeObservable(this)
   }
 }

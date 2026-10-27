@@ -1,9 +1,8 @@
 {
     "name": "mobx-react-lite",
-    "version": "5.1.0",
+    "version": "5.1.2",
     "description": "Lightweight React bindings for MobX based on function components and Hooks",
     "source": "src/index.ts",
-    "type": "commonjs",
     "main": "dist/index.js",
     "umd:main": "dist/mobxreactlite.umd.production.min.js",
     "unpkg": "dist/mobxreactlite.umd.production.min.js",
@@ -62,7 +61,7 @@
         "react": "^18 || ^19"
     },
     "devDependencies": {
-        "mobx": "^7.0.3"
+        "mobx": "^7.1.2"
     },
     "keywords": [
         "mobx",

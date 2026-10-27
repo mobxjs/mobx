@@ -1,5 +1,43 @@
 # mobx
 
+## 7.1.3
+
+### Patch Changes
+
+-   [`78f3fa555a9481247c6f463d77ed3e59766599e2`](https://github.com/mobxjs/mobx/commit/78f3fa555a9481247c6f463d77ed3e59766599e2) [#4756](https://github.com/mobxjs/mobx/pull/4756) Thanks [@kubk](https://github.com/kubk)! - Fix `super` reads of a 2022.3 `@computed` getter returning the subclass override when that override had not been read yet on the instance.
+
+## 7.1.2
+
+### Patch Changes
+
+-   [`1442c8bbb04c8aa8073acd6aeb8b7ecb001b44a8`](https://github.com/mobxjs/mobx/commit/1442c8bbb04c8aa8073acd6aeb8b7ecb001b44a8) [#4754](https://github.com/mobxjs/mobx/pull/4754) Thanks [@jzhan-canva](https://github.com/jzhan-canva)! - Remove `"type": "commonjs"` from the package manifests. The `react-native` and `module` entries point at the ESM `dist/*.esm.js` builds, and the field made bundlers that honour it, such as webpack, Rspack and Re.Pack, parse those files as CommonJS and fail on their `import`/`export` statements.
+
+## 7.1.1
+
+### Patch Changes
+
+-   [`b06078408dba2eb7504f0799f9ad66befdcbe4fc`](https://github.com/mobxjs/mobx/commit/b06078408dba2eb7504f0799f9ad66befdcbe4fc) [#4748](https://github.com/mobxjs/mobx/pull/4748) Thanks [@nk-batman21](https://github.com/nk-batman21)! - Warn under `enforceActions` when an `ObservableMap` key that a reaction reads through `get(key)` or `has(key)` is added or deleted outside an action. Before, only updates of existing keys and changes seen through `keys()`, `size` or iteration were checked, so the case from #940 stayed silent.
+
+-   [`20c221529d01b0e2d69535e27b3522c6c31c2e4f`](https://github.com/mobxjs/mobx/commit/20c221529d01b0e2d69535e27b3522c6c31c2e4f) [#4746](https://github.com/mobxjs/mobx/pull/4746) Thanks [@elyor-sh](https://github.com/elyor-sh)! - Add `requiresObservable` to `IWhenOptions`. `when` already forwarded this option to its underlying reaction at runtime, but TypeScript rejected it.
+
+## 7.1.0
+
+### Minor Changes
+
+-   [`457ea8f952f0d37681dbe4033670eea7f25a7c4d`](https://github.com/mobxjs/mobx/commit/457ea8f952f0d37681dbe4033670eea7f25a7c4d) [#4728](https://github.com/mobxjs/mobx/pull/4728) Thanks [@kubk](https://github.com/kubk)! - `computed(fn)` without a `set` option now returns `IComputedValue<T>` with only `get()`, so calling `.set()` on it is a type error instead of a runtime throw. `computed(fn, { set })` returns the new `IWritableComputedValue<T>`, which also has `set()`.
+
+### Patch Changes
+
+-   [`129a01f8581d3b30d5722e7685a639541b7b929f`](https://github.com/mobxjs/mobx/commit/129a01f8581d3b30d5722e7685a639541b7b929f) [#4743](https://github.com/mobxjs/mobx/pull/4743) Thanks [@APX403](https://github.com/APX403)! - Fix `makeAutoObservable(this, overrides)`, `observable(object, annotations)` and `extendObservable` throwing "Invalid annotation" when the object has a member that also exists on `Object.prototype`, such as a `toString()` method. Only own keys of the overrides or annotations object are used as annotations now, as `makeObservable` already does.
+
+-   [`01e299b9f811de46df78ddcd6f044b396ba9bd09`](https://github.com/mobxjs/mobx/commit/01e299b9f811de46df78ddcd6f044b396ba9bd09) [#4738](https://github.com/mobxjs/mobx/pull/4738) Thanks [@lavrton](https://github.com/lavrton)! - `getAtom` checks for observable objects first: it is faster on them and no longer subscribes the running derivation to the internal set/map marker keys.
+
+-   [`51c51658ce63895d40dc60a5e0eb0d5b7ac5ec2c`](https://github.com/mobxjs/mobx/commit/51c51658ce63895d40dc60a5e0eb0d5b7ac5ec2c) [#4723](https://github.com/mobxjs/mobx/pull/4723) Thanks [@giaBaoJS](https://github.com/giaBaoJS)! - Release the internal key subscriptions of observable objects once they are no longer observed. Reading a missing property or checking `key in obj` inside a reaction created an entry that was kept for the lifetime of the object, so objects used as dynamic dictionaries grew with every key ever looked up. `ObservableMap` already cleaned up its equivalent `has` entries.
+
+-   [`ef270d16ff49e19ebd34fac5724efbaf5c4bb18d`](https://github.com/mobxjs/mobx/commit/ef270d16ff49e19ebd34fac5724efbaf5c4bb18d) [#4726](https://github.com/mobxjs/mobx/pull/4726) Thanks [@sergioperezcheco](https://github.com/sergioperezcheco)! - Fix `ObservableSet.delete` (and therefore `clear`/`replace`) bypassing the `enforceActions` action diagnostics. Deleting observed values outside an action now warns/throws just like insertion already does, instead of silently allowing the mutation.
+
+-   [`c71198629959cacbfa3582a72a43dc51294360cb`](https://github.com/mobxjs/mobx/commit/c71198629959cacbfa3582a72a43dc51294360cb) [#4741](https://github.com/mobxjs/mobx/pull/4741) Thanks [@Om-singhaI](https://github.com/Om-singhaI)! - `toJS` now includes fields declared with `@observable accessor`. These fields live on the prototype, so they are neither own nor enumerable properties, and `toJS` returned an object without them (often just `{}`). Computed values are still left out. Spread, `Object.keys` and `JSON.stringify` are unchanged.
+
 ## 7.0.6
 
 ### Patch Changes
