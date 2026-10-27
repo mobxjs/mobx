@@ -5,7 +5,6 @@ import { normalizeOptions, shouldProcessFile } from "./options"
 
 const DEFAULT_INCLUDE = /\.[cm]?[jt]sx?$/
 
-/** `enforce: "pre"`, so it runs before React Compiler whichever Vite plugin enables it. */
 function mobxReactPlugin(options: mobxReactPlugin.Options = {}): mobxReactPlugin.VitePlugin {
     const { parserPlugins, babel: babelOptions, include, exclude, ...pluginOptions } = options
     const filter = normalizeOptions({ include: include ?? DEFAULT_INCLUDE, exclude })
@@ -88,10 +87,6 @@ function resolveParserPlugins(
 }
 
 namespace mobxReactPlugin {
-    /**
-     * The returned plugin object. Structurally compatible with Vite's `Plugin`
-     * type (declared locally so this package does not depend on `vite`).
-     */
     export interface VitePlugin {
         name: string
         enforce: "pre"

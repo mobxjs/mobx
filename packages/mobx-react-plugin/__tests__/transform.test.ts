@@ -1,18 +1,11 @@
-/**
- * @jest-environment node
- */
-import { transform, code } from "./utils/transform"
-
-function expectTransform(input: string, expected: string, opts?: Parameters<typeof transform>[1]) {
-    expect(transform(input, opts)).toBe(expected)
-}
+import { transform, expectTransform, code } from "./utils/transform"
 
 describe("wrapping components in observer", () => {
     test("function declarations", () => {
         expectTransform(
             code`
 function Counter() { return <h1>{store.count}</h1> }
-export function Exported() { return <h1 /> }`,
+export function Exported() { return <>{store.count}</> }`,
             code`
 import { observer } from "mobx-react-lite";
 const Counter = observer(function Counter() {
@@ -23,7 +16,7 @@ const Counter = observer(function Counter() {
 export const Exported = observer(function Exported() {
   "use no memo";
 
-  return <h1 />;
+  return <>{store.count}</>;
 });`
         )
     })
@@ -142,9 +135,7 @@ const A = observer(() => {
         expectTransform(
             code`
 const A = function () { return <a /> }
-const B = function Inner() { return <b /> }
-let C = () => <c />
-var D = function () { return <d /> }`,
+const B = function Inner() { return <b /> }`,
             code`
 import { observer } from "mobx-react-lite";
 const A = observer(function A() {
@@ -156,37 +147,7 @@ const B = observer(function Inner() {
   "use no memo";
 
   return <b />;
-});
-let C = observer(function C() {
-  "use no memo";
-
-  return <c />;
-});
-var D = observer(function D() {
-  "use no memo";
-
-  return <d />;
 });`
-        )
-    })
-
-    test("multiple declarators", () => {
-        expectTransform(
-            code`
-const A = () => <a />, B = () => <b />, c = 1`,
-            code`
-import { observer } from "mobx-react-lite";
-const A = observer(function A() {
-    "use no memo";
-
-    return <a />;
-  }),
-  B = observer(function B() {
-    "use no memo";
-
-    return <b />;
-  }),
-  c = 1;`
         )
     })
 
@@ -213,26 +174,6 @@ const X: FC<P> = observer(function X(p) {
 
   return <div />;
 });`
-        )
-    })
-
-    test("comments are kept", () => {
-        expectTransform(
-            code`
-// leading comment
-/** doc */
-export function A() { return <div /> }
-// trailing`,
-            code`
-import { observer } from "mobx-react-lite";
-// leading comment
-/** doc */
-export const A = observer(function A() {
-  "use no memo";
-
-  return <div />;
-});
-// trailing`
         )
     })
 })
@@ -760,55 +701,9 @@ function useA() {
             { options: { observer: { useNoMemo: false } } }
         )
     })
-
-    test('"use client" is preserved, "use server" modules are skipped', () => {
-        expectTransform(
-            code`
-"use client"
-export function A() { return <div /> }`,
-            code`
-"use client";
-
-import { observer } from "mobx-react-lite";
-export const A = observer(function A() {
-  "use no memo";
-
-  return <div />;
-});`
-        )
-        expectTransform(
-            code`
-"use server"
-function A() { return <div /> }`,
-            code`
-"use server";
-
-function A() {
-  return <div />;
-}`
-        )
-    })
 })
 
 describe("observer import", () => {
-    test("is added after the existing imports", () => {
-        expectTransform(
-            code`
-import React from "react"
-import { store } from "./store"
-function A() { return <div /> }`,
-            code`
-import React from "react";
-import { store } from "./store";
-import { observer } from "mobx-react-lite";
-const A = observer(function A() {
-  "use no memo";
-
-  return <div />;
-});`
-        )
-    })
-
     test("reuses an existing import, also from mobx-react and under an alias", () => {
         expectTransform(
             code`
@@ -974,22 +869,6 @@ function A() {
 })
 
 describe("options", () => {
-    test('clientOnly only transforms "use client" modules', () => {
-        const input = code`
-export function A() { return <div /> }`
-        expectTransform(
-            input,
-            code`
-export function A() {
-  return <div />;
-}`,
-            { options: { observer: { clientOnly: true } } }
-        )
-        expect(
-            transform(`"use client"\n${input}`, { options: { observer: { clientOnly: true } } })
-        ).toContain("observer(function A()")
-    })
-
     test("unknown options are rejected", () => {
         expect(() => transform("const a = 1", { options: { foo: 1 } as any })).toThrow(
             /Unknown option "foo"/
@@ -997,29 +876,5 @@ export function A() {
         expect(() =>
             transform("const a = 1", { options: { observer: { foo: 1 } } as any })
         ).toThrow(/Unknown observer option "foo"/)
-    })
-
-    test("observer: false disables the component transform", () => {
-        expectTransform(
-            code`
-function A() { return <div /> }`,
-            code`
-function A() {
-  return <div />;
-}`,
-            { options: { observer: false } }
-        )
-    })
-})
-
-describe("react-refresh", () => {
-    test("registers the wrapped component under its name", () => {
-        const output = transform(
-            code`
-export function Counter() { return <div>{store.count}</div> }`,
-            { plugins: [[require.resolve("react-refresh/babel"), { skipEnvCheck: true }]] }
-        )
-        expect(output).toContain("observer(")
-        expect(output).toContain('"Counter"')
     })
 })

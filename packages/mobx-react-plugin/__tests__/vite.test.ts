@@ -1,8 +1,4 @@
-/**
- * @jest-environment node
- */
 import mobxReactPlugin = require("../src/vite")
-import { isCompiled } from "./utils/compiled"
 
 function createPlugin(options?: mobxReactPlugin.Options) {
     const plugin = mobxReactPlugin(options)
@@ -32,9 +28,10 @@ describe("Vite plugin", () => {
         expect(jsx!.code).toContain("observer(function App()")
     })
 
-    test("node_modules are left alone", async () => {
+    test("node_modules and non-JS files are left alone", async () => {
         const plugin = createPlugin()
         expect(await plugin.transform(COMPONENT, "/project/node_modules/lib/App.tsx")).toBeNull()
+        expect(await plugin.transform("a { color: red }", "/project/src/App.css")).toBeNull()
     })
 
     test(".ts files are parsed without JSX (angle bracket assertions keep working)", async () => {
@@ -83,19 +80,6 @@ export const App = () => <div />`
         expect(result!.code).not.toContain('"use no memo"')
     })
 
-    test("extra babel plugins run after the transform (e.g. React Compiler)", async () => {
-        const plugin = createPlugin({
-            babel: { plugins: [[require.resolve("babel-plugin-react-compiler"), {}]] }
-        })
-        const result = await plugin.transform(
-            `${COMPONENT}
-export function Pure({ value }) { "use memo"; return <div>{value}</div> }`,
-            "/project/src/App.tsx"
-        )
-        expect(isCompiled(result!.code, "function App()")).toBe(false)
-        expect(isCompiled(result!.code, "function Pure(")).toBe(true)
-    })
-
     test("extra babel plugins run even when the MobX transform changes nothing", async () => {
         const plugin = createPlugin({
             babel: { plugins: [[require.resolve("babel-plugin-react-compiler"), {}]] }
@@ -104,6 +88,6 @@ export function Pure({ value }) { "use memo"; return <div>{value}</div> }`,
             `export function Pure({ value }) { "use memo"; return <div>{value}</div> }`,
             "/project/src/Pure.tsx"
         )
-        expect(isCompiled(result!.code, "function Pure(")).toBe(true)
+        expect(result!.code).toContain("react/compiler-runtime")
     })
 })

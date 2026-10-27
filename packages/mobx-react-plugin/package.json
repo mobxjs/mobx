@@ -58,16 +58,10 @@
         "mobx": "^7.0.0"
     },
     "devDependencies": {
-        "@babel/preset-react": "^7.27.1",
-        "@babel/preset-typescript": "^7.27.1",
-        "@react-native/babel-preset": "^0.87.1",
-        "@react-native/metro-babel-transformer": "^0.87.1",
+        "@babel/preset-typescript": "^7.24.7",
         "@types/babel__core": "^7.20.5",
         "@types/picomatch": "^4.0.0",
-        "babel-plugin-react-compiler": "1.0.0",
-        "mobx": "^7.0.3",
-        "mobx-react-lite": "^5.1.0",
-        "react-refresh": "^0.19.0"
+        "babel-plugin-react-compiler": "1.0.0"
     },
     "scripts": {
         "prebuild": "rm -rf dist",

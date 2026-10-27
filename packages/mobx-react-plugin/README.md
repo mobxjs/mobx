@@ -126,20 +126,6 @@ Add the plugin to `babel-loader`'s options (or to `babel.config.js`):
 }
 ```
 
-### Next.js
-
-Next.js only runs Babel plugins when the project has its own Babel configuration (which replaces SWC):
-
-```json
-// .babelrc
-{
-    "presets": ["next/babel"],
-    "plugins": [["mobx-react-plugin/babel", { "observer": { "clientOnly": true } }]]
-}
-```
-
-With the app router, `observer.clientOnly: true` limits the transform to modules that start with `"use client"`. Server components cannot be wrapped in `observer`.
-
 ### Jest
 
 If your tests render components and rely on the automatic wrapping, add the plugin to the Babel configuration `babel-jest` uses (usually the same `babel.config.js`).
@@ -169,10 +155,8 @@ mobxReactPlugin({ observer: { importSource: "mobx-react", useNoMemoHooks: false 
 | Option           | Default             | Description                                                                                                                                        |
 | ---------------- | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `importSource`   | `"mobx-react-lite"` | Module that provides `observer`. Use `"mobx-react"` if your app only depends on `mobx-react` (relevant with strict package managers such as pnpm). |
-| `importName`     | `"observer"`        | Name of the export to import from `importSource`.                                                                                                  |
 | `useNoMemo`      | `true`              | Insert `"use no memo"` into components so React Compiler leaves them to MobX. The directive is inert when React Compiler is not used.              |
 | `useNoMemoHooks` | `true`              | Also insert `"use no memo"` into custom hooks (`useXxx`), see [custom hooks](#custom-hooks). Set to `false` if your hooks never read observables.  |
-| `clientOnly`     | `false`             | Only transform modules that start with `"use client"` (React Server Components).                                                                   |
 
 ```ts
 mobxReactPlugin({

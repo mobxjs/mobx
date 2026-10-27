@@ -8,11 +8,6 @@ interface BabelApi {
     assertVersion(range: string | number): void
 }
 
-/**
- * Babel merges the visitors of all plugins into one traversal, so all work happens in
- * `Program:enter`: that is the only way to reliably run before React Compiler, which
- * also works there. List this plugin before `babel-plugin-react-compiler`.
- */
 function mobxReactPlugin(
     api: BabelApi,
     rawOptions?: mobxReactPlugin.Options
@@ -64,7 +59,6 @@ namespace mobxReactPlugin {
     export interface TransformResult {
         wrapped: string[]
         directives: string[]
-        /** Already observed components whose recursive self references were redirected (mobxjs/mobx#3836). */
         aliased: string[]
         flows: string[]
     }

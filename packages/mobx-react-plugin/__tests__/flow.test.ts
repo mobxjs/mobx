@@ -1,11 +1,4 @@
-/**
- * @jest-environment node
- */
-import { transform, code } from "./utils/transform"
-
-function expectTransform(input: string, expected: string, opts?: Parameters<typeof transform>[1]) {
-    expect(transform(input, opts)).toBe(expected)
-}
+import { expectTransform, code } from "./utils/transform"
 
 describe("async methods of observable classes become flows", () => {
     test("makeAutoObservable", () => {
@@ -115,20 +108,25 @@ class Store {
     test("2023-11 decorators without makeObservable", () => {
         expectTransform(
             code`
-import { action, observable } from "mobx"
+import { action, flow, observable } from "mobx"
 class Store {
     @observable accessor user = null
     @action async load() { this.user = await a() }
+    @flow async save() { await a() }
     @action sync() { this.user = null }
 }`,
             code`
-import { action, observable, flow } from "mobx";
+import { action, flow, observable } from "mobx";
 class Store {
   @observable
   accessor user = null;
   @flow
   *load() {
     this.user = yield a();
+  }
+  @flow
+  *save() {
+    yield a();
   }
   @action
   sync() {

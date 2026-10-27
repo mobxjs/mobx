@@ -1,53 +1,40 @@
 import { transformSync } from "@babel/core"
-import type { ParserOptions, PluginItem } from "@babel/core"
+import type { PluginItem } from "@babel/core"
 import mobxReactPlugin = require("../../src/babel")
 
 interface TransformOptions {
-    options?: mobxReactPlugin.Options | false
+    options?: mobxReactPlugin.Options
     filename?: string
-    cwd?: string
-    sourceType?: "module" | "script" | "unambiguous"
+    sourceType?: "module" | "script"
     plugins?: PluginItem[]
     presets?: PluginItem[]
-    parserPlugins?: ParserOptions["plugins"]
 }
-
-const DEFAULT_PARSER_PLUGINS: NonNullable<ParserOptions["plugins"]> = [
-    "jsx",
-    "typescript",
-    "decorators",
-    "decoratorAutoAccessors"
-]
 
 export function transform(code: string, opts: TransformOptions = {}): string {
     const {
         options = {},
         filename = "/project/src/Component.tsx",
-        cwd = "/project",
         sourceType = "module",
         plugins = [],
-        presets = [],
-        parserPlugins = DEFAULT_PARSER_PLUGINS
+        presets = []
     } = opts
-    const result = transformSync(code, {
+    return transformSync(code, {
         filename,
-        cwd,
+        cwd: "/project",
         sourceType,
         babelrc: false,
         configFile: false,
         browserslistConfigFile: false,
-        parserOpts: { plugins: parserPlugins },
-        plugins: [...(options === false ? [] : [[mobxReactPlugin, options]]), ...plugins],
+        parserOpts: { plugins: ["jsx", "typescript", "decorators", "decoratorAutoAccessors"] },
+        plugins: [[mobxReactPlugin, options], ...plugins],
         presets
-    })
-    return result!.code!
+    })!.code!
 }
 
-/** Strips a leading newline so expected outputs can be written as template literals. */
-export function code(strings: TemplateStringsArray, ...values: unknown[]): string {
-    const raw = strings.reduce(
-        (acc, str, i) => acc + str + (i < values.length ? String(values[i]) : ""),
-        ""
-    )
-    return raw.replace(/^\n/, "").replace(/\n[ \t]*$/, "")
+export function expectTransform(input: string, expected: string, opts?: TransformOptions) {
+    expect(transform(input, opts)).toBe(expected)
+}
+
+export function code(strings: TemplateStringsArray): string {
+    return strings[0].replace(/^\n/, "").replace(/\n[ \t]*$/, "")
 }

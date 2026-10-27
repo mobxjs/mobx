@@ -1,6 +1,5 @@
 global.setImmediate = global.setImmediate || ((fn, ...args) => global.setTimeout(fn, 0, ...args))
 
-// Takes the mobx module from the caller so the reset hits the same mobx copy the tests use
 export function setupMobxTestState(
     { configure, _getGlobalState, _resetGlobalState },
     afterEachExtra = () => {}

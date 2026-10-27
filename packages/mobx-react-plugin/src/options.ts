@@ -16,11 +16,6 @@ export interface ObserverOptions {
      */
     importSource?: string
     /**
-     * Name of the `observer` export in `importSource`.
-     * @default "observer"
-     */
-    importName?: string
-    /**
      * Insert the `"use no memo"` directive into every component so that React Compiler
      * leaves memoization and invalidation of observed components to MobX.
      * The directive is inert when React Compiler is not used.
@@ -34,13 +29,6 @@ export interface ObserverOptions {
      * @default true
      */
     useNoMemoHooks?: boolean
-    /**
-     * Only transform modules that start with the `"use client"` directive. Useful with
-     * React Server Components (e.g. the Next.js app router), where server components must
-     * not be wrapped in `observer`.
-     * @default false
-     */
-    clientOnly?: boolean
 }
 
 export interface Options {
@@ -71,10 +59,8 @@ type Matcher = (absolute: string, relative: string | null) => boolean
 
 export interface NormalizedObserverOptions {
     importSource: string
-    importName: string
     useNoMemo: boolean
     useNoMemoHooks: boolean
-    clientOnly: boolean
 }
 
 export interface NormalizedOptions {
@@ -87,10 +73,8 @@ export interface NormalizedOptions {
 const KNOWN_OPTIONS = new Set<keyof Options>(["observer", "flow", "include", "exclude"])
 const KNOWN_OBSERVER_OPTIONS = new Set<keyof ObserverOptions>([
     "importSource",
-    "importName",
     "useNoMemo",
-    "useNoMemoHooks",
-    "clientOnly"
+    "useNoMemoHooks"
 ])
 
 function assertKnownKeys(object: object, known: Set<string>, context: string): void {
@@ -116,10 +100,8 @@ function normalizeObserverOptions(
     const useNoMemo = options.useNoMemo ?? true
     return {
         importSource: options.importSource ?? "mobx-react-lite",
-        importName: options.importName ?? "observer",
         useNoMemo,
-        useNoMemoHooks: useNoMemo && (options.useNoMemoHooks ?? true),
-        clientOnly: options.clientOnly ?? false
+        useNoMemoHooks: useNoMemo && (options.useNoMemoHooks ?? true)
     }
 }
 
@@ -165,18 +147,12 @@ function toPosix(filename: string): string {
     return filename.split(path.sep).join("/").replace(/\\/g, "/")
 }
 
-/**
- * Decides whether a file should be transformed at all.
- * `node_modules` is never transformed; `include`/`exclude` apply on top.
- */
 export function shouldProcessFile(
     filename: string | undefined | null,
     cwd: string | undefined | null,
     options: NormalizedOptions
 ): boolean {
     if (!filename) {
-        // No filename (e.g. transformSync without `filename`): only process when
-        // the user did not restrict the transform to specific files.
         return options.include === null
     }
     const absolute = toPosix(filename)

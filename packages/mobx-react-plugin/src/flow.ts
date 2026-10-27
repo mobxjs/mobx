@@ -1,6 +1,9 @@
 import type { NodePath, types as t } from "@babel/core"
+import { addImport, findImport } from "./imports"
 
 type Types = typeof t
+
+const FLOW_NAME = "flow"
 
 export interface FlowResult {
     flows: string[]
@@ -14,20 +17,16 @@ interface AnnotationEntry {
     property: t.ObjectProperty
 }
 
-/** `null`: the overrides object could not be analyzed statically. */
 type Annotations = Map<string, AnnotationEntry> | null
 
 interface Target {
-    /** `auto`: `makeAutoObservable`, `explicit`: `makeObservable` (only `flow` members). */
     mode: "auto" | "explicit"
     annotations: Annotations
 }
 
 interface Decision {
     convert: boolean
-    /** `{ method: action }` to rewrite to `flow` once the method is converted. */
     rewriteAnnotation?: AnnotationEntry
-    /** `@action` decorator to rewrite to `@flow` once the method is converted. */
     rewriteDecorator?: { decorator: t.Decorator; bound: boolean }
 }
 
@@ -39,21 +38,12 @@ interface Context {
     importAdded: boolean
 }
 
-/**
- * Turns `async` methods into generator methods, i.e. MobX flows.
- * Only methods MobX will actually turn into flows are converted:
- * classes calling `makeAutoObservable(this)` in their constructor (unless the
- * method is overridden with another annotation), members annotated with `flow`
- * or `action` (which is rewritten to `flow`) in `makeObservable`, methods
- * decorated with `@flow` or `@action` (rewritten to `@flow`), and object literals
- * passed to `makeAutoObservable()` or `makeObservable()`.
- */
 export function transformFlows(types: Types, program: NodePath<t.Program>): FlowResult {
     const ctx: Context = {
         t: types,
         program,
         result: { flows: [] },
-        flowLocal: null,
+        flowLocal: findImport(types, program, FLOW_NAME, ["mobx"]),
         importAdded: false
     }
     program.traverse({
@@ -104,7 +94,6 @@ function memberName(ctx: Context, key: t.Node, computed: boolean): string | null
     return null
 }
 
-/** Reads `{ method: flow, other: false, ... }`; `null` when it cannot be analyzed. */
 function parseAnnotations(ctx: Context, node: t.Node | null | undefined): Annotations {
     const { t } = ctx
     if (node == null || t.isNullLiteral(node) || t.isIdentifier(node, { name: "undefined" })) {
@@ -134,7 +123,6 @@ function decide(
     decorators: t.Decorator[] | null | undefined
 ): Decision {
     if (decorators && decorators.length > 0) {
-        // `@flow async method() {}` / `@action async method() {}`: the decorator decides.
         if (
             decorators.every(
                 decorator => classifyAnnotation(ctx, decorator.expression).kind === "flow"
@@ -192,17 +180,12 @@ function applyRewrites(ctx: Context, decision: Decision): void {
 
 type AsyncFunctionPath = NodePath<t.ClassMethod | t.ObjectMethod | t.FunctionExpression>
 
-/**
- * Replaces the function's own `await`s with `yield`s and makes it a generator.
- * Returns false when the function cannot be converted (no `await`, or `for await`).
- */
 function convertToGenerator(ctx: Context, fn: AsyncFunctionPath): boolean {
     const { t } = ctx
     const awaits: NodePath<t.AwaitExpression>[] = []
     let convertible = true
     fn.get("body").traverse({
         Function(inner) {
-            // `await` inside nested functions belongs to them.
             inner.skip()
         },
         ForOfStatement(loop) {
@@ -337,7 +320,6 @@ function transformObjectCall(ctx: Context, call: NodePath<t.CallExpression>): vo
             fn = property
         } else if (property.isObjectProperty()) {
             const value = property.get("value")
-            // Arrow functions are left alone: turning them into generators would rebind `this`.
             if (!value.isFunctionExpression()) {
                 continue
             }
@@ -357,80 +339,9 @@ function transformObjectCall(ctx: Context, call: NodePath<t.CallExpression>): vo
 }
 
 function ensureFlowImport(ctx: Context): string {
-    if (ctx.flowLocal !== null) {
-        return ctx.flowLocal
+    if (ctx.flowLocal === null) {
+        ctx.flowLocal = addImport(ctx.t, ctx.program, FLOW_NAME, "mobx")
+        ctx.importAdded = true
     }
-    const { t, program } = ctx
-    let lastImport: NodePath<t.ImportDeclaration> | null = null
-    let mobxImport: NodePath<t.ImportDeclaration> | null = null
-    for (const stmt of program.get("body")) {
-        if (!stmt.isImportDeclaration()) {
-            continue
-        }
-        lastImport = stmt
-        const node = stmt.node
-        if (
-            node.importKind === "type" ||
-            node.importKind === "typeof" ||
-            node.source.value !== "mobx"
-        ) {
-            continue
-        }
-        for (const spec of node.specifiers) {
-            if (!t.isImportSpecifier(spec) || spec.importKind === "type") {
-                continue
-            }
-            const imported = t.isIdentifier(spec.imported)
-                ? spec.imported.name
-                : spec.imported.value
-            if (imported === "flow") {
-                ctx.flowLocal = spec.local.name
-                return spec.local.name
-            }
-        }
-        if (
-            mobxImport === null &&
-            !node.specifiers.some(spec => t.isImportNamespaceSpecifier(spec))
-        ) {
-            mobxImport = stmt
-        }
-    }
-    const scope = program.scope
-    const local =
-        scope.hasBinding("flow") || scope.hasGlobal("flow") || scope.hasReference("flow")
-            ? scope.generateUidIdentifier("flow").name
-            : "flow"
-    if (program.node.sourceType === "module") {
-        const specifier = t.importSpecifier(t.identifier(local), t.identifier("flow"))
-        if (mobxImport) {
-            mobxImport.node.specifiers.push(specifier)
-        } else {
-            const declaration = t.importDeclaration([specifier], t.stringLiteral("mobx"))
-            if (lastImport) {
-                lastImport.insertAfter(declaration)
-            } else {
-                program.unshiftContainer("body", declaration)
-            }
-        }
-    } else {
-        program.unshiftContainer(
-            "body",
-            t.variableDeclaration("const", [
-                t.variableDeclarator(
-                    t.objectPattern([
-                        t.objectProperty(
-                            t.identifier("flow"),
-                            t.identifier(local),
-                            false,
-                            local === "flow"
-                        )
-                    ]),
-                    t.callExpression(t.identifier("require"), [t.stringLiteral("mobx")])
-                )
-            ])
-        )
-    }
-    ctx.flowLocal = local
-    ctx.importAdded = true
-    return local
+    return ctx.flowLocal
 }
