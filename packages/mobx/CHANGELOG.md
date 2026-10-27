@@ -1,5 +1,11 @@
 # mobx
 
+## 7.1.3
+
+### Patch Changes
+
+-   [`78f3fa555a9481247c6f463d77ed3e59766599e2`](https://github.com/mobxjs/mobx/commit/78f3fa555a9481247c6f463d77ed3e59766599e2) [#4756](https://github.com/mobxjs/mobx/pull/4756) Thanks [@kubk](https://github.com/kubk)! - Fix `super` reads of a 2022.3 `@computed` getter returning the subclass override when that override had not been read yet on the instance.
+
 ## 7.1.2
 
 ### Patch Changes
