@@ -2,9 +2,9 @@
 
 Write plain React components and plain `async` store methods; the plugin adds the MobX wiring at build time. It does three things, each of which can be switched off:
 
-1. wraps every React component in your source files in [`observer`](https://mobx.js.org/react-integration.html), so you can never forget it;
-2. inserts the `"use no memo"` directive into components and hooks, so [React Compiler](https://react.dev/learn/react-compiler) leaves memoization and invalidation of observed components to MobX instead of caching their output;
-3. turns `async` methods of observable classes and objects into MobX [flows](https://mobx.js.org/actions.html#using-flow-instead-of-async--await-), so state changes after `await` are actions without `runInAction` boilerplate.
+1. wraps every React component in [`observer`](https://mobx.js.org/react-integration.html), so you can never forget it;
+2. adds the `"use no memo"` directive to components and hooks, so [React Compiler](https://react.dev/learn/react-compiler) leaves them to MobX;
+3. turns `async` methods of observable classes and objects into [flows](https://mobx.js.org/actions.html#using-flow-instead-of-async--await-), so state changes after `await` need no `runInAction`.
 
 So this code:
 
@@ -66,13 +66,7 @@ class DiceStore {
 }
 ```
 
-Benefits:
-
--   No more "I forgot `observer`" bugs, the most common MobX + React mistake.
--   Components keep their names in React DevTools (arrow functions are turned into named function expressions).
--   Plain `function Component() {}` declarations: one definition per component, so "go to definition" in your editor keeps working.
--   MobX and React Compiler coexist: see [React Compiler](#react-compiler) below.
--   `async`/`await` in stores just works under `enforceActions`: see [Async methods become flows](#async-methods-become-flows).
+Components also keep their names in React DevTools (arrow functions become named function expressions), and "go to definition" in your editor lands on a plain `function` declaration.
 
 ## Installation
 
@@ -88,9 +82,9 @@ The latest MobX and, for the Vite plugin, the latest Vite. Older versions are no
 
 ## Setup
 
-`mobx-react-plugin` is a Babel plugin (`mobx-react-plugin/babel`), so it works with any bundler that runs Babel. For Vite there is also a Vite plugin (`mobx-react-plugin/vite`) that runs the same Babel plugin before any React plugin, including the ones that do not use Babel.
+`mobx-react-plugin` is a Babel plugin (`mobx-react-plugin/babel`), so it works with any bundler that runs Babel. For Vite there is also a Vite plugin (`mobx-react-plugin/vite`) that runs the same Babel plugin before any other plugin, including React plugins that do not use Babel.
 
-The plugin only needs to run **before React Compiler**, when the compiler is used. It does all its work in Babel's `Program:enter`, before any other plugin sees the file, so listing it first in the Babel `plugins` array is enough. The Vite plugin is a pre-transform (`enforce: "pre"`) and runs before any other Vite plugin.
+With Babel and React Compiler, list this plugin **before** the compiler in the `plugins` array.
 
 ### Vite
 
@@ -105,7 +99,7 @@ export default defineConfig({
 })
 ```
 
-This works with `@vitejs/plugin-react`, `@vitejs/plugin-react-swc` and `@vitejs/plugin-react-oxc`, with or without React Compiler, because the transform runs before the React plugin.
+This works with `@vitejs/plugin-react`, `@vitejs/plugin-react-swc` and `@vitejs/plugin-react-oxc`, with or without React Compiler.
 
 With React Compiler through `@vitejs/plugin-react` and `@rolldown/plugin-babel`:
 
@@ -132,7 +126,7 @@ module.exports = {
     presets: ["module:@react-native/babel-preset"], // or "babel-preset-expo"
     plugins: [
         ["mobx-react-plugin/babel", {}],
-        // Optional. React Compiler must be listed after mobx-react-plugin.
+        // optional, must come after mobx-react-plugin
         "babel-plugin-react-compiler"
     ]
 }
@@ -162,16 +156,7 @@ If your tests render components and rely on the automatic wrapping, add the plug
 
 ## Options
 
-The Babel plugin and the Vite plugin accept the same options. Every feature is enabled by default; pick the ones you want:
-
-```ts
-// just the automatic observer (and the React Compiler directive)
-mobxReactPlugin({ flow: false })
-// observer + async methods as flows (the default)
-mobxReactPlugin({ observer: true, flow: true })
-// configure a feature
-mobxReactPlugin({ observer: { importSource: "mobx-react", useNoMemoHooks: false }, flow: true })
-```
+The Babel plugin and the Vite plugin accept the same options. Every feature is enabled by default.
 
 | Option     | Default   | Description                                                                                                                                                                      |
 | ---------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -191,6 +176,7 @@ mobxReactPlugin({ observer: { importSource: "mobx-react", useNoMemoHooks: false 
 ```ts
 mobxReactPlugin({
     observer: { importSource: "mobx-react" },
+    flow: false,
     exclude: ["src/design-system/**", /\.stories\.tsx$/]
 })
 ```
@@ -235,12 +221,6 @@ Details worth knowing:
 -   A component that renders itself (tree views) keeps working: the recursive reference is redirected to the observed component.
 -   If the file already imports `observer` (from `mobx-react-lite`, `mobx-react` or `importSource`) that import is reused.
 
-### Opting out
-
--   Exclude files with `exclude` (or restrict the transform with `include`).
--   Start a component with `"use memo"` to say that React Compiler owns it: it is not wrapped in `observer` and gets no `"use no memo"`. Such a component must not read observables. A `"use memo"` component that is also wrapped in `observer` is a build error.
--   A module-level `"use no memo"` keeps the automatic `observer`, but no function-level directives are inserted since the compiler skips the whole file anyway.
-
 ## Async methods become flows
 
 Every step of an asynchronous process that changes observables must be an [action](https://mobx.js.org/actions.html#asynchronous-actions). With `async`/`await` that means wrapping the code after each `await` in `runInAction`, or rewriting the method as a generator and using `flow`. The plugin does the rewrite for you:
@@ -284,9 +264,7 @@ Only methods MobX will actually turn into flows are converted:
 -   `async` methods annotated with `action` / `action.bound` (`makeObservable(this, { load: action })`, `makeAutoObservable` overrides) or decorated with `@action` / `@action.bound` (2023-11 decorators): `action` only covers the synchronous part of an `async` method, so these become flows and the annotation is rewritten to `flow` / `flow.bound` (importing `flow` from `mobx` when needed);
 -   `async` methods of object literals passed to `makeAutoObservable()` or `makeObservable()` (with a `flow` annotation).
 
-Not converted: methods without `await`, methods using `for await`, static and private methods, arrow function properties (a generator would rebind `this`), and classes whose MobX call cannot be analyzed statically (for example `makeAutoObservable(this, overrides)` with a variable). Only the method's own `await`s are replaced; `async` callbacks inside it are untouched.
-
-This works with `makeAutoObservable`, `makeObservable` and 2023-11 decorators; legacy decorators, `observable()`, `extendObservable` and `useLocalObservable` are not supported. Existing `runInAction` calls inside a converted method are left alone.
+Not converted: methods without `await`, methods using `for await`, static and private methods, arrow function properties (a generator would rebind `this`), classes whose MobX call cannot be analyzed statically (for example `makeAutoObservable(this, overrides)` with a variable), legacy decorators, `observable()`, `extendObservable` and `useLocalObservable`. Only the method's own `await`s are replaced; `async` callbacks and existing `runInAction` calls inside it are untouched.
 
 Set `flow: false` to disable this.
 
@@ -303,13 +281,11 @@ export const CounterView = observer(() => {
 
 React Compiler caches the JSX of `CounterView`. When `counterStore.count` changes, MobX re-renders the component, but the cached JSX is returned and the DOM stays stale, silently. See [facebook/react#37000](https://github.com/facebook/react/issues/37000) and [mobxjs/mobx#3874](https://github.com/mobxjs/mobx/issues/3874).
 
-The plugin inserts React's [`"use no memo"` directive](https://react.dev/reference/react-compiler/directives/use-no-memo) into every observed component and custom hook, so MobX owns memoization and invalidation inside them and React Compiler optimizes everything else: components you exclude from the transform, and components with `"use memo"`.
-
-The plugin must run before React Compiler: it adds the directive to the original source the compiler is going to see. See [MobX and React Compiler](https://mobx.js.org/react-compiler.html) for more background.
+The plugin adds React's [`"use no memo"` directive](https://react.dev/reference/react-compiler/directives/use-no-memo) to every observed component, so React Compiler leaves it to MobX. See [MobX and React Compiler](https://mobx.js.org/react-compiler.html) for more background.
 
 ### Custom hooks
 
-A function-level directive only protects that function. A hook that reads observables and is compiled separately would cache derived values against the stable identity of the store:
+React Compiler memoizes custom hooks too, so a hook that reads a MobX store goes stale the same way:
 
 ```tsx
 function useVisibleTodos() {
@@ -318,7 +294,17 @@ function useVisibleTodos() {
 }
 ```
 
-Therefore the plugin also inserts `"use no memo"` into custom hooks by default (`useNoMemoHooks`). Turn it off only if your hooks never read observables.
+The plugin adds `"use no memo"` to hooks as well.
+
+### Opting out
+
+MobX already memoizes observed components, so in an application where most components are observed, React Compiler has little left to optimize. That is an accepted tradeoff. To hand code that does not read observables back to React Compiler:
+
+-   Exclude a folder or a UI library: `exclude: ["src/ui/**"]` (or restrict the transform with `include`).
+-   Start a component or hook with `"use memo"`. The plugin then neither wraps it in `observer` nor adds `"use no memo"`. A `"use memo"` component that is also wrapped in `observer` is a build error.
+-   If none of your hooks read observables, pass `observer: { useNoMemoHooks: false }`.
+
+A module-level `"use no memo"` keeps the automatic `observer` but skips the function-level directives, since the compiler skips the whole file anyway.
 
 ## Migrating from `mobx-react-observer`
 
