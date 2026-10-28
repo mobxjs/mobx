@@ -6,7 +6,7 @@ import { normalizeOptions, shouldProcessFile } from "./options"
 const DEFAULT_INCLUDE = /\.[cm]?[jt]sx?$/
 
 function mobxReactPlugin(options: mobxReactPlugin.Options = {}): mobxReactPlugin.VitePlugin {
-    const { parserPlugins, babel: babelOptions, include, exclude, ...pluginOptions } = options
+    const { babel: babelOptions, include, exclude, ...pluginOptions } = options
     const filter = normalizeOptions({ include: include ?? DEFAULT_INCLUDE, exclude })
     let root = process.cwd()
 
@@ -35,11 +35,7 @@ function mobxReactPlugin(options: mobxReactPlugin.Options = {}): mobxReactPlugin
                 sourceType: "module",
                 parserOpts: {
                     ...babelOptions?.parserOpts,
-                    plugins: resolveParserPlugins(
-                        filename,
-                        parserPlugins,
-                        babelOptions?.parserOpts?.plugins
-                    )
+                    plugins: resolveParserPlugins(filename, babelOptions?.parserOpts?.plugins)
                 },
                 plugins: [[babelPlugin, pluginOptions], ...(babelOptions?.plugins ?? [])]
             })
@@ -65,7 +61,6 @@ function mobxReactPlugin(options: mobxReactPlugin.Options = {}): mobxReactPlugin
 
 function resolveParserPlugins(
     filename: string,
-    userPlugins: ParserOptions["plugins"] | undefined,
     babelOptionPlugins: ParserOptions["plugins"] | undefined
 ): NonNullable<ParserOptions["plugins"]> {
     const plugins: NonNullable<ParserOptions["plugins"]> = []
@@ -75,11 +70,7 @@ function resolveParserPlugins(
     if (/\.[cm]?tsx?$/.test(filename)) {
         plugins.push("typescript")
     }
-    if (userPlugins) {
-        plugins.push(...userPlugins)
-    } else {
-        plugins.push("decorators", "decoratorAutoAccessors")
-    }
+    plugins.push("decorators", "decoratorAutoAccessors")
     if (babelOptionPlugins) {
         plugins.push(...babelOptionPlugins)
     }
@@ -106,13 +97,6 @@ namespace mobxReactPlugin {
         file: string
     }
     export interface Options extends babelPlugin.Options {
-        /**
-         * Babel parser plugins enabled when parsing your sources, in addition to `jsx`
-         * and (for `.ts`/`.tsx` files) `typescript`.
-         * @default ["decorators", "decoratorAutoAccessors"]
-         * @example ["decorators-legacy"]
-         */
-        parserPlugins?: ParserOptions["plugins"]
         /**
          * Extra Babel options merged into the transform call (advanced).
          */

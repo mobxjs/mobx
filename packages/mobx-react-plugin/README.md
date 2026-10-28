@@ -114,7 +114,7 @@ export default defineConfig({
 })
 ```
 
-The Vite plugin runs its own Babel pass with only this plugin, so it has to enable parser syntax itself. It enables `jsx`, `typescript` (for `.ts`/`.tsx`), `decorators` and `decoratorAutoAccessors`. If you use other syntax, pass [`parserPlugins`](#vite-plugin-options), for example `parserPlugins: ["decorators-legacy"]`.
+The Vite plugin runs its own Babel pass with only this plugin, so it has to enable parser syntax itself. It enables `jsx`, `typescript` (for `.ts`/`.tsx`), `decorators` and `decoratorAutoAccessors`. Other syntax can be enabled with `babel: { parserOpts: { plugins: [...] } }`.
 
 ### React Native and Expo
 
@@ -150,6 +150,10 @@ Add the plugin to `babel-loader`'s options (or to `babel.config.js`):
 }
 ```
 
+### Vitest
+
+Vitest uses the plugins from `vite.config.ts`, so nothing extra is needed.
+
 ### Jest
 
 If your tests render components and rely on the automatic wrapping, add the plugin to the Babel configuration `babel-jest` uses (usually the same `babel.config.js`).
@@ -183,10 +187,9 @@ mobxReactPlugin({
 
 ### Vite plugin options
 
-| Option          | Default                                    | Description                                                                                       |
-| --------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------- |
-| `parserPlugins` | `["decorators", "decoratorAutoAccessors"]` | Babel parser plugins enabled in addition to `jsx` and `typescript`, e.g. `["decorators-legacy"]`. |
-| `babel`         |                                            | Extra Babel options merged into the transform (advanced).                                         |
+| Option  | Description                                               |
+| ------- | --------------------------------------------------------- |
+| `babel` | Extra Babel options merged into the transform (advanced). |
 
 The Vite plugin's `include` defaults to `.js`, `.jsx`, `.ts`, `.tsx` (and their `.mjs`/`.cjs`/`.mts`/`.cts` variants).
 
@@ -260,11 +263,11 @@ class UserStore {
 Only methods MobX will actually turn into flows are converted:
 
 -   `async` methods of classes that call `makeAutoObservable(this)` in their constructor, unless the method is overridden with an annotation other than `flow` or `action` (for example `{ load: false }`);
--   `async` methods annotated with `flow` or `flow.bound` in `makeObservable(this, { ... })`, or decorated with `@flow` / `@flow.bound` (2023-11 decorators);
--   `async` methods annotated with `action` / `action.bound` (`makeObservable(this, { load: action })`, `makeAutoObservable` overrides) or decorated with `@action` / `@action.bound` (2023-11 decorators): `action` only covers the synchronous part of an `async` method, so these become flows and the annotation is rewritten to `flow` / `flow.bound` (importing `flow` from `mobx` when needed);
+-   `async` methods annotated with `flow` or `flow.bound` in `makeObservable(this, { ... })`, or decorated with `@flow` / `@flow.bound`;
+-   `async` methods annotated with `action` / `action.bound` (`makeObservable(this, { load: action })`, `makeAutoObservable` overrides) or decorated with `@action` / `@action.bound`: `action` only covers the synchronous part of an `async` method, so these become flows and the annotation is rewritten to `flow` / `flow.bound` (importing `flow` from `mobx` when needed);
 -   `async` methods of object literals passed to `makeAutoObservable()` or `makeObservable()` (with a `flow` annotation).
 
-Not converted: methods without `await`, methods using `for await`, static and private methods, arrow function properties (a generator would rebind `this`), classes whose MobX call cannot be analyzed statically (for example `makeAutoObservable(this, overrides)` with a variable), legacy decorators, `observable()`, `extendObservable` and `useLocalObservable`. Only the method's own `await`s are replaced; `async` callbacks and existing `runInAction` calls inside it are untouched.
+Not converted: methods without `await`, methods using `for await`, static and private methods, arrow function properties (a generator would rebind `this`), classes whose MobX call cannot be analyzed statically (for example `makeAutoObservable(this, overrides)` with a variable), `observable()`, `extendObservable` and `useLocalObservable`. Only the method's own `await`s are replaced; `async` callbacks and existing `runInAction` calls inside it are untouched.
 
 Set `flow: false` to disable this.
 

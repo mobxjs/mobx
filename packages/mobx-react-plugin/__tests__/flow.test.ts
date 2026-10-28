@@ -105,7 +105,7 @@ class Store {
         )
     })
 
-    test("2023-11 decorators without makeObservable", () => {
+    test("decorators without makeObservable", () => {
         expectTransform(
             code`
 import { action, flow, observable } from "mobx"

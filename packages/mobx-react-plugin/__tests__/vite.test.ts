@@ -43,19 +43,11 @@ describe("Vite plugin", () => {
         expect(result!.code).toContain('"use no memo"')
     })
 
-    test("modern decorators parse by default, legacy decorators via parserPlugins", async () => {
+    test("decorators parse", async () => {
         const source = `
 class Store { @observable accessor count = 0 }
 export const App = () => <div />`
         expect((await createPlugin().transform(source, "/project/src/App.tsx"))!.code).toContain(
-            "observer(function App()"
-        )
-
-        const legacy = createPlugin({ parserPlugins: ["decorators-legacy"] })
-        const legacySource = `
-class Store { @observable count = 0 }
-export const App = () => <div />`
-        expect((await legacy.transform(legacySource, "/project/src/App.tsx"))!.code).toContain(
             "observer(function App()"
         )
     })
