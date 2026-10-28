@@ -14,7 +14,7 @@ Subclassing is supported with [limitations](#limitations). Most notably you can 
 <!--makeObservable-->
 
 ```javascript
-import { makeObservable, observable, computed, action, flow, override } from "mobx"
+import { makeObservable, observable, computed, action, actionBound, flow, override } from "mobx"
 
 class Parent {
     // Annotated instance fields are NOT overridable
@@ -35,7 +35,7 @@ class Parent {
             observable: observable,
             arrowAction: action,
             action: action,
-            actionBound: action.bound,
+            actionBound: actionBound,
             computed: computed,
             flow: flow
         })
@@ -77,7 +77,7 @@ class Child extends Parent {
             childObservable: observable,
             childArrowAction: action,
             childAction: action,
-            childActionBound: action.bound,
+            childActionBound: actionBound,
             childComputed: computed,
             childFlow: flow
         })
@@ -88,7 +88,7 @@ class Child extends Parent {
 <!--Modern decorators-->
 
 ```javascript
-import { observable, computed, action, flow } from "mobx"
+import { observable, computed, action, actionBound, flow } from "mobx"
 
 class Parent {
     // Observable state fields are inherited, but should not be re-annotated
@@ -103,7 +103,7 @@ class Parent {
 
     // Decorated prototype methods/getters are overridable.
     @action action() {}
-    @action.bound actionBound() {}
+    @actionBound actionBound() {}
     @computed get computed() {}
     @flow *flow() {}
 }
@@ -119,7 +119,7 @@ class Child extends Parent {
 
     // OK - prototype
     @action action() {}
-    @action.bound actionBound() {}
+    @actionBound actionBound() {}
     @computed get computed() {
         return super.computed
     }
@@ -131,7 +131,7 @@ class Child extends Parent {
     @observable accessor childObservable = 0
     @action childArrowAction = () => {}
     @action childAction() {}
-    @action.bound childActionBound() {}
+    @actionBound childActionBound() {}
     @computed get childComputed() {}
     @flow *childFlow() {}
 }
@@ -141,7 +141,7 @@ class Child extends Parent {
 
 ## Limitations
 
-1. Only `action`, `computed`, `flow`, `action.bound` defined **on prototype** can be **overridden** by subclass.
+1. Only `action`, `computed`, `flow`, `actionBound` defined **on prototype** can be **overridden** by subclass.
 1. Field can't be re-annotated in subclass, except with `override`.
 1. `makeAutoObservable` does not support subclassing.
 1. Extending builtins (`ObservableMap`, `ObservableArray`, etc) is not supported.
@@ -153,7 +153,7 @@ class Child extends Parent {
 
 If you see this, you're probably trying to **override arrow function** in subclass `x = () => {}`. That's not possible because **all annotated** fields of classes are **non-configurable** ([see limitations](observable-state.md#limitations)). You have two options:
 
-<details><summary>1. Move function to prototype and use `action.bound` annotation instead</summary>
+<details><summary>1. Move function to prototype and use `actionBound` annotation instead</summary>
 
 ```javascript
 class Parent {
@@ -163,7 +163,7 @@ class Parent {
 
     constructor() {
         makeObservable(this, {
-            action: action.bound
+            action: actionBound
         })
     }
 }

@@ -175,9 +175,9 @@ resize(9)
 
 </details>
 
-<details id="computed-struct"><summary>{🚀} **Tip:** `computed.struct` for comparing output structurally <a href="#computed-struct" class="tip-anchor"></a></summary>
+<details id="computed-struct"><summary>{🚀} **Tip:** `computedStruct` for comparing output structurally <a href="#computed-struct" class="tip-anchor"></a></summary>
 
-If the output of a computed value that is structurally equivalent to the previous computation doesn't need to notify observers, `computed.struct` can be used. It will make a structural comparison first, rather than a reference equality check, before notifying observers. For example:
+If the output of a computed value that is structurally equivalent to the previous computation doesn't need to notify observers, `computedStruct` can be used. It will make a structural comparison first, rather than a reference equality check, before notifying observers. For example:
 
 ```javascript
 class Box {
@@ -188,7 +188,7 @@ class Box {
         makeObservable(this, {
             width: observable,
             height: observable,
-            topRight: computed.struct
+            topRight: computedStruct
         })
     }
 
@@ -201,14 +201,14 @@ class Box {
 }
 ```
 
-By default, the output of a `computed` is compared by reference. Since `topRight` in the above example will always produce a new result object, it is never going to be considered equal to a previous output. Unless `computed.struct` is used.
+By default, the output of a `computed` is compared by reference. Since `topRight` in the above example will always produce a new result object, it is never going to be considered equal to a previous output. Unless `computedStruct` is used.
 
-However, in the above example _we actually don't need `computed.struct`_!
+However, in the above example _we actually don't need `computedStruct`_!
 Computed values normally only re-evaluate if the backing values change.
 That's why `topRight` will only react to changes in `width` or `height`.
-Since if any of those change, we would get a different `topRight` coordinate anyway. `computed.struct` would never have a cache hit and be a waste of effort, so we don't need it.
+Since if any of those change, we would get a different `topRight` coordinate anyway. `computedStruct` would never have a cache hit and be a waste of effort, so we don't need it.
 
-In practice, `computed.struct` is less useful than it sounds. Only use it if changes in the underlying observables can still lead to the same output. For example, if we were rounding the coordinates first, the rounded coordinates might be equal to the previously rounded coordinates even though the underlying values aren't.
+In practice, `computedStruct` is less useful than it sounds. Only use it if changes in the underlying observables can still lead to the same output. For example, if we were rounding the coordinates first, the rounded coordinates might be equal to the previously rounded coordinates even though the underlying values aren't.
 
 Check out the [`equals`](#equals) option for further customizations on determining whether the output has changed.
 
@@ -242,7 +242,7 @@ Set to `compareDefault` by default. It acts as a comparison function for compari
 
 This is useful when working with structural data and types from other libraries. For example, a computed [moment](https://momentjs.com/) instance could use `(a, b) => a.isSame(b)`. `compareStructural` and `compareShallow` come in handy if you want to use structural / shallow comparison to determine whether the new value is different from the previous value, and as a result notify its observers.
 
-Check out the [`computed.struct`](#computed-struct) section above.
+Check out the [`computedStruct`](#computed-struct) section above.
 
 #### Built-in comparers
 
