@@ -87,10 +87,10 @@ class Doubler {
 }
 ```
 
-<!--action.bound-->
+<!--actionBound-->
 
 ```javascript
-import { makeObservable, observable, action } from "mobx"
+import { makeObservable, observable, actionBound } from "mobx"
 
 class Doubler {
     value = 0
@@ -98,7 +98,7 @@ class Doubler {
     constructor() {
         makeObservable(this, {
             value: observable,
-            increment: action.bound
+            increment: actionBound
         })
     }
 
@@ -177,13 +177,13 @@ that will determine at runtime if the function is a derivation or action.
 
 </details>
 
-## `action.bound`
+## `actionBound`
 
 Usage:
 
--   `action.bound` _(annotation)_
+-   `actionBound` _(annotation)_
 
-The `action.bound` annotation can be used to automatically bind a method to the correct instance, so that `this` is always correctly bound inside the function.
+The `actionBound` annotation can be used to automatically bind a method to the correct instance, so that `this` is always correctly bound inside the function.
 
 <details id="auto-bind"><summary>**Tip:** use `makeAutoObservable(o, {}, { autoBind: true })` to bind all actions and flows automatically<a href="#auto-bind" class="tip-anchor"></a></summary>
 
@@ -442,13 +442,13 @@ The upside is that we don't need `flowResult` anymore, the downside is that `thi
 
 </details>
 
-## `flow.bound`
+## `flowBound`
 
 Usage:
 
--   `flow.bound` _(annotation)_
+-   `flowBound` _(annotation)_
 
-The `flow.bound` annotation can be used to automatically bind a method to the correct instance, so that `this` is always correctly bound inside the function.
+The `flowBound` annotation can be used to automatically bind a method to the correct instance, so that `this` is always correctly bound inside the function.
 Similarly to actions, flows can be bound by default using [`autoBind` option](#auto-bind).
 
 ## Cancelling flows {🚀}

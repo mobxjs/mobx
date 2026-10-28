@@ -109,30 +109,30 @@ If the values in the Set should not be turned into observables automatically, us
 
 Unlike Map keys, Set values are [not tracked individually](https://github.com/mobxjs/mobx/issues/2336#issuecomment-616128089).
 
-### `observable.ref`
+### `observableRef`
 
-Usage: `observable.ref` _(annotation)_
+Usage: `observableRef` _(annotation)_
 <small>(<b>[further information](observable-state.md#available-annotations)</b>)</small>
 
 Like the `observable` annotation, but only reassignments will be tracked. The assigned values themselves won't be made observable automatically. For example, use this if you intend to store immutable data in an observable field.
 
-### `observable.shallow`
+### `observableShallow`
 
-Usage: `observable.shallow` _(annotation)_
+Usage: `observableShallow` _(annotation)_
 <small>(<b>[further information](observable-state.md#available-annotations)</b>)</small>
 
-Like the `observable.ref` annotation, but for collections. Any collection assigned will be made observable, but the contents of the collection itself won't become observable.
+Like the `observableRef` annotation, but for collections. Any collection assigned will be made observable, but the contents of the collection itself won't become observable.
 
-### `observable.struct`
+### `observableStruct`
 
-{🚀} Usage: `observable.struct` _(annotation)_
+{🚀} Usage: `observableStruct` _(annotation)_
 <small>(<b>[further information](observable-state.md#available-annotations)</b>)</small>
 
 Like the `observable` annotation, except that any assigned value that is structurally equal to the current value will be ignored.
 
-### `observable.deep`
+### `observableDeep`
 
-{🚀} Usage: `observable.deep` _(annotation)_
+{🚀} Usage: `observableDeep` _(annotation)_
 <small>(<b>[further information](observable-state.md#available-annotations)</b>)</small>
 
 Alias for the [`observable`](#observable) annotation.

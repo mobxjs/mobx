@@ -215,13 +215,13 @@ You might distribute the _ui-state-store_ through your application by passing it
 Example of a store (using ES6 syntax):
 
 ```javascript
-import { makeAutoObservable, observable, computed } from "mobx"
+import { makeAutoObservable, observableStruct } from "mobx"
 
 export class UiState {
     language = "en_US"
     pendingRequestCount = 0
 
-    // .struct makes sure observer won't be signaled unless the
+    // observableStruct makes sure observer won't be signaled unless the
     // dimensions object changed in a deepEqual manner.
     windowDimensions = {
         width: window.innerWidth,
@@ -229,7 +229,7 @@ export class UiState {
     }
 
     constructor() {
-        makeAutoObservable(this, { windowDimensions: observable.struct })
+        makeAutoObservable(this, { windowDimensions: observableStruct })
         window.onresize = () => {
             this.windowDimensions = getWindowDimensions()
         }
