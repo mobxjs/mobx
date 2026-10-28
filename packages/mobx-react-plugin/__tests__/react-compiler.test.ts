@@ -12,7 +12,7 @@ export function Counter() { return <div>{store.count}</div> }
 export function Pure({ value }) { "use memo"; return <div>{value}</div> }`,
         code`
 import { c as _c } from "react/compiler-runtime";
-import { observer } from "mobx-react-lite";
+import { observer } from "mobx-react-plugin/observer";
 export const Counter = observer(function Counter() {
   "use no memo";
 

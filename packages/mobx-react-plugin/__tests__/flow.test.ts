@@ -349,7 +349,7 @@ export function View() { return <div /> }`
         expectTransform(
             store,
             code`
-import { observer } from "mobx-react-lite";
+import { observer } from "mobx-react-plugin/observer";
 class Store {
   constructor() {
     makeAutoObservable(this);

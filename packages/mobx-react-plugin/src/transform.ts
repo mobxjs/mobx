@@ -24,7 +24,8 @@ const NO_MEMO_DIRECTIVE = "use no memo"
 const HOOK_NAME_RE = /^use[A-Z0-9]/
 const COMPONENT_NAME_RE = /^[A-Z]/
 const OBSERVER_NAME = "observer"
-const KNOWN_OBSERVER_SOURCES = ["mobx-react", "mobx-react-lite"]
+const OBSERVER_SOURCE = "mobx-react-plugin/observer"
+const KNOWN_OBSERVER_SOURCES = [OBSERVER_SOURCE, "mobx-react", "mobx-react-lite"]
 
 export interface TransformResult {
     wrapped: string[]
@@ -72,10 +73,7 @@ export function transformProgram(
         filename,
         result: { wrapped: [], directives: [], aliased: [] },
         handled: new Set(),
-        observerLocal: findImport(types, program, OBSERVER_NAME, [
-            opts.importSource,
-            ...KNOWN_OBSERVER_SOURCES
-        ]),
+        observerLocal: findImport(types, program, OBSERVER_NAME, KNOWN_OBSERVER_SOURCES),
         observedNames: new Set(),
         forwardRefNames: new Set(),
         forwardRefCalls: [],
@@ -1011,7 +1009,7 @@ function wrapForwardRefCallSites(ctx: Context, name: string): void {
 
 function ensureObserverImport(ctx: Context): string {
     if (ctx.observerLocal === null) {
-        ctx.observerLocal = addImport(ctx.t, ctx.program, OBSERVER_NAME, ctx.opts.importSource)
+        ctx.observerLocal = addImport(ctx.t, ctx.program, OBSERVER_NAME, OBSERVER_SOURCE)
         ctx.changed = true
     }
     return ctx.observerLocal

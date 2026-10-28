@@ -10,12 +10,6 @@ export type FilterPattern = string | RegExp | ((filename: string) => boolean)
 
 export interface ObserverOptions {
     /**
-     * Module that exports `observer`. Use `"mobx-react"` if your project only
-     * depends on `mobx-react` (relevant with strict package managers such as pnpm).
-     * @default "mobx-react-lite"
-     */
-    importSource?: string
-    /**
      * Insert the `"use no memo"` directive into every component so that React Compiler
      * leaves memoization and invalidation of observed components to MobX.
      * The directive is inert when React Compiler is not used.
@@ -58,7 +52,6 @@ export interface Options {
 type Matcher = (absolute: string, relative: string | null) => boolean
 
 export interface NormalizedObserverOptions {
-    importSource: string
     useNoMemo: boolean
     useNoMemoHooks: boolean
 }
@@ -71,11 +64,7 @@ export interface NormalizedOptions {
 }
 
 const KNOWN_OPTIONS = new Set<keyof Options>(["observer", "flow", "include", "exclude"])
-const KNOWN_OBSERVER_OPTIONS = new Set<keyof ObserverOptions>([
-    "importSource",
-    "useNoMemo",
-    "useNoMemoHooks"
-])
+const KNOWN_OBSERVER_OPTIONS = new Set<keyof ObserverOptions>(["useNoMemo", "useNoMemoHooks"])
 
 function assertKnownKeys(object: object, known: Set<string>, context: string): void {
     for (const key of Object.keys(object)) {
@@ -99,7 +88,6 @@ function normalizeObserverOptions(
     assertKnownKeys(options, KNOWN_OBSERVER_OPTIONS as Set<string>, "observer")
     const useNoMemo = options.useNoMemo ?? true
     return {
-        importSource: options.importSource ?? "mobx-react-lite",
         useNoMemo,
         useNoMemoHooks: useNoMemo && (options.useNoMemoHooks ?? true)
     }

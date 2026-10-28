@@ -37,7 +37,7 @@ class DiceStore {
 is compiled into:
 
 ```tsx
-import { observer } from "mobx-react-lite"
+import { observer } from "mobx-react-plugin/observer"
 
 export const Dice = observer(function Dice() {
     "use no memo"
@@ -71,10 +71,10 @@ Components also keep their names in React DevTools (arrow functions become named
 ## Installation
 
 ```sh
-npm install --save-dev mobx-react-plugin
+npm install mobx-react-plugin
 ```
 
-The generated code imports `observer` from `mobx-react-lite` (configurable through [`importSource`](#options)), so `mobx-react-lite` (or `mobx-react`) must be a dependency of your app.
+It is a regular dependency, not a dev dependency: the generated code imports `observer` from `mobx-react-plugin/observer`, which re-exports it from `mobx-react-lite`. Your app only needs `mobx`, `react` and `mobx-react-plugin`. Add `mobx-react-lite` only if you import from it yourself.
 
 ## Requirements
 
@@ -171,15 +171,14 @@ The Babel plugin and the Vite plugin accept the same options. Every feature is e
 
 ### `observer` options
 
-| Option           | Default             | Description                                                                                                                                        |
-| ---------------- | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `importSource`   | `"mobx-react-lite"` | Module that provides `observer`. Use `"mobx-react"` if your app only depends on `mobx-react` (relevant with strict package managers such as pnpm). |
-| `useNoMemo`      | `true`              | Insert `"use no memo"` into components so React Compiler leaves them to MobX. The directive is inert when React Compiler is not used.              |
-| `useNoMemoHooks` | `true`              | Also insert `"use no memo"` into custom hooks (`useXxx`), see [custom hooks](#custom-hooks). Set to `false` if your hooks never read observables.  |
+| Option           | Default | Description                                                                                                                                       |
+| ---------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `useNoMemo`      | `true`  | Insert `"use no memo"` into components so React Compiler leaves them to MobX. The directive is inert when React Compiler is not used.             |
+| `useNoMemoHooks` | `true`  | Also insert `"use no memo"` into custom hooks (`useXxx`), see [custom hooks](#custom-hooks). Set to `false` if your hooks never read observables. |
 
 ```ts
 mobxReactPlugin({
-    observer: { importSource: "mobx-react" },
+    observer: { useNoMemoHooks: false },
     flow: false,
     exclude: ["src/design-system/**", /\.stories\.tsx$/]
 })
@@ -222,7 +221,7 @@ Details worth knowing:
 
 -   A function declaration becomes a `const`. Code that referenced the component **before** its declaration at module evaluation time (for example a routes table above the component) now throws a "cannot access before initialization" error instead of relying on hoisting. Move the declaration up.
 -   A component that renders itself (tree views) keeps working: the recursive reference is redirected to the observed component.
--   If the file already imports `observer` (from `mobx-react-lite`, `mobx-react` or `importSource`) that import is reused.
+-   If the file already imports `observer` (from `mobx-react-plugin/observer`, `mobx-react-lite` or `mobx-react`) that import is reused.
 
 ## Async methods become flows
 
@@ -312,8 +311,7 @@ A module-level `"use no memo"` keeps the automatic `observer` but skips the func
 ## Migrating from `mobx-react-observer`
 
 -   `import plugin from "mobx-react-observer/vite-plugin"` becomes `import mobxReactPlugin from "mobx-react-plugin/vite"`.
--   `observer` is imported from `mobx-react-lite` directly instead of from the plugin package; set `importSource` if needed.
--   `importPath` is now `importSource`.
+-   `importPath` is removed: `observer` always comes from `mobx-react-plugin/observer`.
 -   `exclude` also accepts RegExps and predicates. `include` is new.
 
 ## ESLint

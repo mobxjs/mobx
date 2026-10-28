@@ -34,7 +34,7 @@ export function TodoList() {
 is compiled into:
 
 ```javascript
-import { observer } from "mobx-react-lite"
+import { observer } from "mobx-react-plugin/observer"
 
 export const TodoList = observer(function TodoList() {
     "use no memo"
