@@ -85,6 +85,9 @@ export const niceErrors = {
     },
     44(annotationType) {
         return `'${annotationType}' can only be used with 'makeObservable'`
+    },
+    45(name) {
+        return `Computed value '${name}' is being read outside a reactive context. This is not allowed because it was created with 'requiresReaction: true'.`
     }
 } as const
 

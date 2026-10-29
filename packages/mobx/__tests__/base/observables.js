@@ -2312,8 +2312,10 @@ describe("`requiresReaction` takes precedence over global `computedRequiresReact
     test("`true` over `false`", () => {
         mobx.configure({ computedRequiresReaction: false })
         const c = mobx.computed(() => {}, { name, requiresReaction: true })
-        c.get()
-        expect(consoleWarnSpy).toHaveBeenLastCalledWith(warnMsg)
+        expect(() => c.get()).toThrow(
+            `[MobX] Computed value '${name}' is being read outside a reactive context. This is not allowed because it was created with 'requiresReaction: true'.`
+        )
+        expect(consoleWarnSpy).not.toHaveBeenCalled()
     })
 
     test("`false` over `true`", () => {
@@ -2322,6 +2324,23 @@ describe("`requiresReaction` takes precedence over global `computedRequiresReact
         c.get()
         expect(consoleWarnSpy).not.toHaveBeenCalled()
     })
+})
+
+test("#3618 computed with `requiresReaction` throws instead of evaluating outside a reactive context", () => {
+    const x = mobx.observable.box(1)
+    const derivation = jest.fn(() => x.get() * 2)
+    const c = mobx.computed(derivation, { requiresReaction: true })
+
+    expect(() => c.get()).toThrow("is being read outside a reactive context")
+    expect(derivation).not.toHaveBeenCalled()
+
+    const values = []
+    const d = mobx.autorun(() => values.push(c.get()))
+    x.set(2)
+    d()
+
+    expect(values).toEqual([2, 4])
+    expect(() => c.get()).toThrow("is being read outside a reactive context")
 })
 
 describe("`requiresObservable` takes precedence over global `reactionRequiresObservable`", () => {
