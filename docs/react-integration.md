@@ -362,6 +362,23 @@ The following approaches can be used to fix this:
     })
     ```
 
+    Watch out with components that render themselves recursively. Inside the function, `MyComponent` refers to the function itself, not to the `observer` component, because the name of a function expression shadows the outer variable. The nested elements are then rendered without `observer` and silently stop reacting to changes. Give the inner function a different name in that case:
+
+    ```javascript
+    export const TodoItem = observer(function TodoItemView({ item }) {
+        return (
+            <li>
+                {item.text}
+                <ul>
+                    {item.children.map(child => (
+                        <TodoItem key={child.id} item={child} />
+                    ))}
+                </ul>
+            </li>
+        )
+    })
+    ```
+
 -   Transpilers (like Babel or TypeScript) infer component name from the variable name:
 
     ```javascript
@@ -412,7 +429,7 @@ const MyComponent = observer(function MyComponent(props) {
 })
 ```
 
-This pattern also provides accurate names in React DevTools and stack traces. It is the recommended way to define observable components.
+This pattern also provides accurate names in React DevTools and stack traces. It is the recommended way to define observable components. For components that render themselves recursively, see the caveat in [nice component names in React DevTools](#displayname).
 
 If you prefer arrow functions, you can configure [`eslint-plugin-react`](https://github.com/jsx-eslint/eslint-plugin-react#configuration-legacy-eslintrc-) with the `componentWrapperFunctions` setting to teach ESLint about `observer`, but note that this only affects `eslint-plugin-react` rules, not `eslint-plugin-react-hooks`.
 
