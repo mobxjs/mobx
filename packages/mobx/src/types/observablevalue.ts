@@ -137,6 +137,8 @@ export class ObservableValue<T>
         this.reportChanged()
         if (hasListeners(this)) {
             notifyListeners(this, {
+                observableKind: "value",
+                debugObjectName: this.name_,
                 type: UPDATE,
                 object: this,
                 newValue,
