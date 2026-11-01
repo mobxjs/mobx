@@ -3,7 +3,9 @@ import { addImport, findImport } from "./imports"
 
 type Types = typeof t
 
+const MOBX_SOURCE = "mobx"
 const FLOW_NAME = "flow"
+const FLOW_BOUND_NAME = "flowBound"
 
 export interface FlowResult {
     flows: string[]
@@ -11,9 +13,21 @@ export interface FlowResult {
 
 type AnnotationKind = "flow" | "action" | "other"
 
-interface AnnotationEntry {
+interface Classification {
     kind: AnnotationKind
     bound: boolean
+}
+
+const KNOWN_ANNOTATIONS = new Map<string, Classification>([
+    [FLOW_NAME, { kind: "flow", bound: false }],
+    [FLOW_BOUND_NAME, { kind: "flow", bound: true }],
+    ["action", { kind: "action", bound: false }],
+    ["actionBound", { kind: "action", bound: true }]
+])
+
+const OTHER_ANNOTATION: Classification = { kind: "other", bound: false }
+
+interface AnnotationEntry extends Classification {
     property: t.ObjectProperty
 }
 
@@ -34,7 +48,7 @@ interface Context {
     t: Types
     program: NodePath<t.Program>
     result: FlowResult
-    flowLocal: string | null
+    imports: Map<string, string>
     importAdded: boolean
 }
 
@@ -43,7 +57,7 @@ export function transformFlows(types: Types, program: NodePath<t.Program>): Flow
         t: types,
         program,
         result: { flows: [] },
-        flowLocal: findImport(types, program, FLOW_NAME, ["mobx"]),
+        imports: new Map(),
         importAdded: false
     }
     program.traverse({
@@ -60,27 +74,9 @@ export function transformFlows(types: Types, program: NodePath<t.Program>): Flow
     return ctx.result
 }
 
-function classifyAnnotation(
-    ctx: Context,
-    node: t.Node | null | undefined
-): { kind: AnnotationKind; bound: boolean } {
-    const { t } = ctx
-    if (t.isIdentifier(node)) {
-        if (node.name === "flow" || node.name === "action") {
-            return { kind: node.name, bound: false }
-        }
-        return { kind: "other", bound: false }
-    }
-    if (
-        t.isMemberExpression(node) &&
-        !node.computed &&
-        t.isIdentifier(node.object) &&
-        (node.object.name === "flow" || node.object.name === "action") &&
-        t.isIdentifier(node.property, { name: "bound" })
-    ) {
-        return { kind: node.object.name, bound: true }
-    }
-    return { kind: "other", bound: false }
+function classifyAnnotation(ctx: Context, node: t.Node | null | undefined): Classification {
+    const known = ctx.t.isIdentifier(node) ? KNOWN_ANNOTATIONS.get(node.name) : undefined
+    return known ?? OTHER_ANNOTATION
 }
 
 function memberName(ctx: Context, key: t.Node, computed: boolean): string | null {
@@ -158,9 +154,7 @@ function decide(
 }
 
 function flowExpression(ctx: Context, bound: boolean): t.Expression {
-    const { t } = ctx
-    const flow = t.identifier(ensureFlowImport(ctx))
-    return bound ? t.memberExpression(flow, t.identifier("bound")) : flow
+    return ctx.t.identifier(ensureMobxImport(ctx, bound ? FLOW_BOUND_NAME : FLOW_NAME))
 }
 
 function applyRewrites(ctx: Context, decision: Decision): void {
@@ -338,10 +332,12 @@ function transformObjectCall(ctx: Context, call: NodePath<t.CallExpression>): vo
     }
 }
 
-function ensureFlowImport(ctx: Context): string {
-    if (ctx.flowLocal === null) {
-        ctx.flowLocal = addImport(ctx.t, ctx.program, FLOW_NAME, "mobx")
+function ensureMobxImport(ctx: Context, name: string): string {
+    let local = ctx.imports.get(name) ?? findImport(ctx.t, ctx.program, name, [MOBX_SOURCE])
+    if (local === null) {
+        local = addImport(ctx.t, ctx.program, name, MOBX_SOURCE)
         ctx.importAdded = true
     }
-    return ctx.flowLocal
+    ctx.imports.set(name, local)
+    return local
 }

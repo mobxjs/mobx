@@ -313,6 +313,44 @@ function TodoItem({
 export const ObservedTodoItem = observer(TodoItem);`
         )
     })
+
+    test("arrow function and function expression observed by reference", () => {
+        expectTransform(
+            code`
+import { observer } from "mobx-react-lite"
+const TodoItem = ({ item }) => <ul>{item.children.map(child => <TodoItem key={child.id} item={child} />)}</ul>
+export default observer(TodoItem)`,
+            code`
+import { observer } from "mobx-react-lite";
+const TodoItem = ({
+  item
+}) => {
+  "use no memo";
+
+  return <ul>{item.children.map(child => <TodoItemObserver key={child.id} item={child} />)}</ul>;
+};
+const TodoItemObserver = observer(TodoItem);
+export default TodoItemObserver;`
+        )
+        expectTransform(
+            code`
+import { observer } from "mobx-react-lite"
+const TodoItem = function TodoItem({ item }) {
+    return <ul>{item.children.map(child => <TodoItem key={child.id} item={child} />)}</ul>
+}
+export const ObservedTodoItem = observer(TodoItem)`,
+            code`
+import { observer } from "mobx-react-lite";
+const TodoItem = function TodoItem({
+  item
+}) {
+  "use no memo";
+
+  return <ul>{item.children.map(child => <ObservedTodoItem key={child.id} item={child} />)}</ul>;
+};
+export const ObservedTodoItem = observer(TodoItem);`
+        )
+    })
 })
 
 describe("components that are already observed", () => {

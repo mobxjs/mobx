@@ -67,9 +67,9 @@ class Store {
     test("makeObservable: members annotated with flow or action (rewritten to flow)", () => {
         expectTransform(
             code`
-import { makeObservable, action, flow, observable } from "mobx"
+import { makeObservable, action, actionBound, flow, observable } from "mobx"
 class Store {
-    constructor() { makeObservable(this, { load: flow, save: action, sync: action.bound, reset: action, value: observable }) }
+    constructor() { makeObservable(this, { load: flow, save: action, sync: actionBound, reset: action, value: observable }) }
     async load() { await a() }
     async save() { await a() }
     async sync() { await a() }
@@ -77,13 +77,13 @@ class Store {
     async value() { await a() }
 }`,
             code`
-import { makeObservable, action, flow, observable } from "mobx";
+import { makeObservable, action, actionBound, flow, observable, flowBound } from "mobx";
 class Store {
   constructor() {
     makeObservable(this, {
       load: flow,
       save: flow,
-      sync: flow.bound,
+      sync: flowBound,
       reset: action,
       value: observable
     });
@@ -108,15 +108,16 @@ class Store {
     test("decorators without makeObservable", () => {
         expectTransform(
             code`
-import { action, flow, observable } from "mobx"
+import { action, flow, flowBound, observable } from "mobx"
 class Store {
     @observable accessor user = null
     @action async load() { this.user = await a() }
     @flow async save() { await a() }
+    @flowBound async refresh() { await a() }
     @action sync() { this.user = null }
 }`,
             code`
-import { action, flow, observable } from "mobx";
+import { action, flow, flowBound, observable } from "mobx";
 class Store {
   @observable
   accessor user = null;
@@ -126,6 +127,10 @@ class Store {
   }
   @flow
   *save() {
+    yield a();
+  }
+  @flowBound
+  *refresh() {
     yield a();
   }
   @action

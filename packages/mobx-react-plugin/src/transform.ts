@@ -631,8 +631,9 @@ function processCandidate(ctx: Context, candidate: Candidate, addDirectives: boo
     }
     ctx.handled.add(fn.node)
 
+    const inlineObserver = candidate.wrappers.some(w => w.kind === "observer")
     const observed =
-        candidate.wrappers.some(w => w.kind === "observer") ||
+        inlineObserver ||
         (candidate.binding !== null && name !== null && ctx.observedNames.has(name))
 
     const optIn = findDirective(ctx, fn, OPT_IN_DIRECTIVES)
@@ -658,7 +659,7 @@ function processCandidate(ctx: Context, candidate: Candidate, addDirectives: boo
         addNoMemoDirective(ctx, fn, name)
     }
     if (observed) {
-        redirectObservedSelfReferences(ctx, candidate)
+        redirectObservedSelfReferences(ctx, candidate, inlineObserver)
         return
     }
     wrapComponent(ctx, candidate)
@@ -742,13 +743,16 @@ function collectSelfReferences(ctx: Context, candidate: Candidate, fnName: strin
             }
         }
     }
-    if (binding && fn.isFunctionExpression() && fn.node.id && fn.node.id.name === fnName) {
-        const local = fn.scope.getBinding(fnName)
-        if (local && local.kind === "local") {
-            refs.push(...local.referencePaths)
-        }
+    if (binding) {
+        refs.push(...ownNameReferences(fn))
     }
     return refs
+}
+
+function ownNameReferences(fn: FunctionPath): NodePath[] {
+    const id = fn.isFunctionExpression() ? fn.node.id : null
+    const local = id ? fn.scope.getBinding(id.name) : undefined
+    return local && local.kind === "local" ? local.referencePaths : []
 }
 
 function copyFunctionMeta(from: t.Function, to: t.FunctionExpression): void {
@@ -899,15 +903,22 @@ function renameReferences(refs: NodePath[], name: string): void {
     }
 }
 
-function redirectObservedSelfReferences(ctx: Context, candidate: Candidate): void {
+function redirectObservedSelfReferences(
+    ctx: Context,
+    candidate: Candidate,
+    inlineObserver: boolean
+): void {
     const { t } = ctx
     const { fn, name, binding, site } = candidate
 
-    if (fn.isFunctionDeclaration()) {
+    if (!inlineObserver) {
         if (binding === null || name === null) {
             return
         }
-        const selfRefs = binding.referencePaths.filter(ref => ref.isDescendant(fn))
+        const selfRefs = [
+            ...binding.referencePaths.filter(ref => ref.isDescendant(fn)),
+            ...ownNameReferences(fn)
+        ]
         if (selfRefs.length === 0) {
             return
         }
@@ -952,8 +963,8 @@ function redirectObservedSelfReferences(ctx: Context, candidate: Candidate): voi
         return
     }
     const fnName = fn.node.id.name
-    const local = fn.scope.getBinding(fnName)
-    if (!local || local.kind !== "local" || local.referencePaths.length === 0) {
+    const selfRefs = ownNameReferences(fn)
+    if (selfRefs.length === 0) {
         return
     }
     if (site.kind === "declarator") {
@@ -961,7 +972,7 @@ function redirectObservedSelfReferences(ctx: Context, candidate: Candidate): voi
             return
         }
         const aliasId = ctx.program.scope.generateUidIdentifier(fnName)
-        renameReferences(local.referencePaths, aliasId.name)
+        renameReferences(selfRefs, aliasId.name)
         let stmt: NodePath = site.declarator.parentPath
         if (stmt.parentPath && stmt.parentPath.isExportNamedDeclaration()) {
             stmt = stmt.parentPath
@@ -972,7 +983,7 @@ function redirectObservedSelfReferences(ctx: Context, candidate: Candidate): voi
             return
         }
         const aliasId = ctx.program.scope.generateUidIdentifier(fnName)
-        renameReferences(local.referencePaths, aliasId.name)
+        renameReferences(selfRefs, aliasId.name)
         const declaration = site.exportDecl.node.declaration as t.Expression
         site.exportDecl.replaceWithMultiple([
             constDeclaration(t, fnName, declaration),

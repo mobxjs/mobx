@@ -262,8 +262,8 @@ class UserStore {
 Only methods MobX will actually turn into flows are converted:
 
 -   `async` methods of classes that call `makeAutoObservable(this)` in their constructor, unless the method is overridden with an annotation other than `flow` or `action` (for example `{ load: false }`);
--   `async` methods annotated with `flow` or `flow.bound` in `makeObservable(this, { ... })`, or decorated with `@flow` / `@flow.bound`;
--   `async` methods annotated with `action` / `action.bound` (`makeObservable(this, { load: action })`, `makeAutoObservable` overrides) or decorated with `@action` / `@action.bound`: `action` only covers the synchronous part of an `async` method, so these become flows and the annotation is rewritten to `flow` / `flow.bound` (importing `flow` from `mobx` when needed);
+-   `async` methods annotated with `flow` or `flowBound` in `makeObservable(this, { ... })`, or decorated with `@flow` / `@flowBound`;
+-   `async` methods annotated with `action` / `actionBound` (`makeObservable(this, { load: action })`, `makeAutoObservable` overrides) or decorated with `@action` / `@actionBound`: `action` only covers the synchronous part of an `async` method, so these become flows and the annotation is rewritten to `flow` / `flowBound` (imported from `mobx` when needed);
 -   `async` methods of object literals passed to `makeAutoObservable()` or `makeObservable()` (with a `flow` annotation).
 
 Not converted: methods without `await`, methods using `for await`, static and private methods, arrow function properties (a generator would rebind `this`), classes whose MobX call cannot be analyzed statically (for example `makeAutoObservable(this, overrides)` with a variable), `observable()`, `extendObservable` and `useLocalObservable`. Only the method's own `await`s are replaced; `async` callbacks and existing `runInAction` calls inside it are untouched.
