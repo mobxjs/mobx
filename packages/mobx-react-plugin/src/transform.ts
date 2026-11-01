@@ -936,14 +936,10 @@ function redirectObservedSelfReferences(
         }
         const call = observerCalls[0].parentPath as CallPath
         const owner = call.parentPath
+        const variableName = moduleVariableName(ctx, call)
         let observedName: string
-        if (
-            owner.isVariableDeclarator() &&
-            owner.node.init === call.node &&
-            t.isIdentifier(owner.node.id) &&
-            owner.scope === ctx.program.scope
-        ) {
-            observedName = owner.node.id.name
+        if (variableName !== null) {
+            observedName = variableName
         } else if (owner.isExportDefaultDeclaration() && owner.node.declaration === call.node) {
             observedName = uniqueComponentName(ctx, `${name}Observer`)
             owner.replaceWithMultiple([
@@ -1009,6 +1005,10 @@ function wrapForwardRefCallSites(ctx: Context, name: string): void {
         if (parent.isCallExpression() && getWrapperKind(ctx, parent.get("callee")) === "observer") {
             continue
         }
+        const variableName = moduleVariableName(ctx, call)
+        if (variableName !== null && ctx.observedNames.has(variableName)) {
+            continue
+        }
         call.replaceWith(t.callExpression(t.identifier(ensureObserverImport(ctx)), [call.node]))
         wrapped = true
     }
@@ -1016,6 +1016,19 @@ function wrapForwardRefCallSites(ctx: Context, name: string): void {
         ctx.result.wrapped.push(name)
         ctx.changed = true
     }
+}
+
+function moduleVariableName(ctx: Context, call: CallPath): string | null {
+    const declarator = call.parentPath
+    if (
+        declarator.isVariableDeclarator() &&
+        declarator.node.init === call.node &&
+        ctx.t.isIdentifier(declarator.node.id) &&
+        declarator.scope === ctx.program.scope
+    ) {
+        return declarator.node.id.name
+    }
+    return null
 }
 
 function ensureObserverImport(ctx: Context): string {

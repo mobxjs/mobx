@@ -457,6 +457,27 @@ export default observer(forwardRef(Input));`
         )
     })
 
+    test("forwardRef result that is observed by reference is not wrapped again", () => {
+        expectTransform(
+            code`
+import { forwardRef } from "react"
+import { observer } from "mobx-react-lite"
+function Input(props, ref) { return <input ref={ref} /> }
+const ForwardedInput = forwardRef(Input)
+export default observer(ForwardedInput)`,
+            code`
+import { forwardRef } from "react";
+import { observer } from "mobx-react-lite";
+function Input(props, ref) {
+  "use no memo";
+
+  return <input ref={ref} />;
+}
+const ForwardedInput = forwardRef(Input);
+export default observer(ForwardedInput);`
+        )
+    })
+
     test("memo(Component) becomes observer(Component), which already memoizes", () => {
         expectTransform(
             code`
