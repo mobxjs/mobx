@@ -16,7 +16,7 @@ import { createDecoratorAnnotation, type DecoratorAnnotation } from "./decorator
 import type { ClassGetterDecorator } from "../types/decorator_fills"
 
 export const COMPUTED = "computed"
-export const COMPUTED_STRUCT = "computed.struct"
+export const COMPUTED_STRUCT = "computedStruct"
 
 function createComputedDecoratorAnnotation(
     annotation: Annotation

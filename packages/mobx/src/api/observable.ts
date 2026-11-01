@@ -34,9 +34,9 @@ import { createDecoratorAnnotation, type DecoratorAnnotation } from "./decorator
 import type { ClassAccessorAndFieldDecorator } from "../types/decorator_fills"
 
 export const OBSERVABLE = "observable"
-export const OBSERVABLE_REF = "observable.ref"
-export const OBSERVABLE_SHALLOW = "observable.shallow"
-export const OBSERVABLE_STRUCT = "observable.struct"
+export const OBSERVABLE_REF = "observableRef"
+export const OBSERVABLE_SHALLOW = "observableShallow"
+export const OBSERVABLE_STRUCT = "observableStruct"
 
 export type CreateObservableOptions = {
     name?: string

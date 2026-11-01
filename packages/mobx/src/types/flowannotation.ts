@@ -113,7 +113,7 @@ function createFlowDescriptor(
 ): PropertyDescriptor {
     assertFlowDescriptor(adm, annotation, key, descriptor)
     let { value } = descriptor
-    // In case of flow.bound, the descriptor can be from already annotated prototype
+    // In case of flowBound, the descriptor can be from already annotated prototype
     if (!isFlow(value)) {
         value = flow(value)
     }

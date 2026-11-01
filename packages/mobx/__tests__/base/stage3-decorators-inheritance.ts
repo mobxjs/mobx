@@ -287,7 +287,7 @@ test("action override can call parent action with super", () => {
     expect(seen).toEqual([0, 3])
 })
 
-test("action.bound override can be called after extraction", () => {
+test("actionBound override can be called after extraction", () => {
     class Parent {
         @observable accessor count = 0
 
