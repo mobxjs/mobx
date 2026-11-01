@@ -1,5 +1,13 @@
 # mobx
 
+## 7.1.4
+
+### Patch Changes
+
+-   [`850b7123cb987d5d9d6c06b65f0494a11768bbb1`](https://github.com/mobxjs/mobx/commit/850b7123cb987d5d9d6c06b65f0494a11768bbb1) [#4761](https://github.com/mobxjs/mobx/pull/4761) Thanks [@Enesuygurs](https://github.com/Enesuygurs)! - Include `observableKind` and `debugObjectName` in the change events that `observe` reports for boxed observables, observable object properties and observable map entries, as the `IValueDidChange` type and the docs describe.
+
+-   [`95d5a28adfac4e8851c85a388b1c4a39695627c6`](https://github.com/mobxjs/mobx/commit/95d5a28adfac4e8851c85a388b1c4a39695627c6) [#4762](https://github.com/mobxjs/mobx/pull/4762) Thanks [@kubk](https://github.com/kubk)! - Error messages now name annotations by their MobX 7 exports (`actionBound`, `autoActionBound`, `flowBound`, `observableRef`, `observableShallow`, `observableStruct`, `computedStruct`) instead of the removed `action.bound`-style names.
+
 ## 7.1.3
 
 ### Patch Changes

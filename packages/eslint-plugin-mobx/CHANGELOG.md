@@ -1,5 +1,13 @@
 # eslint-plugin-mobx
 
+## 0.2.1
+
+### Patch Changes
+
+-   [`95d5a28adfac4e8851c85a388b1c4a39695627c6`](https://github.com/mobxjs/mobx/commit/95d5a28adfac4e8851c85a388b1c4a39695627c6) [#4762](https://github.com/mobxjs/mobx/pull/4762) Thanks [@kubk](https://github.com/kubk)! - `exhaustive-make-observable` recognizes the MobX 7 decorators `@observableRef`, `@observableShallow`, `@observableDeep`, `@observableStruct`, `@computedStruct`, `@actionBound` and `@flowBound`. Before, a class decorated only with them was reported as missing annotations.
+
+-   [`91f2bb288e40c135d4c3ddd90f676abbf516717b`](https://github.com/mobxjs/mobx/commit/91f2bb288e40c135d4c3ddd90f676abbf516717b) [#4764](https://github.com/mobxjs/mobx/pull/4764) Thanks [@kubk](https://github.com/kubk)! - `exhaustive-make-observable` checks undecorated members even when the class has decorated ones, and reports `makeObservable` called without annotations, which throws in MobX 7.
+
 ## 0.2.0
 
 ### Minor Changes
