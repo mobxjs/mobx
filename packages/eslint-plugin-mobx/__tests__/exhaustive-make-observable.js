@@ -1,24 +1,26 @@
-import { getRuleTester } from "./utils/get-rule-tester";
+import { getRuleTester } from "./utils/get-rule-tester"
 
-import rule from "../src/exhaustive-make-observable";
+import rule from "../src/exhaustive-make-observable"
 
-const tester = getRuleTester();
+const tester = getRuleTester()
 
 const decoratedFields = [
-  '@observable o = 5',
-  '@observable.ref or = []',
-  '@observable.shallow os = []',
-  '@observable.deep od = {}',
-  '@computed get c() {}',
-  '@computed.struct get cs() {}',
-  '@computed({ equals }) get co() {}',
-  '@action a() {}',
-  '@action.bound ab() {}',
-  '@flow *f() {}',
-  '@flow.bound *fb() {}',
-];
+    "@observable o = 5",
+    "@observableRef or = []",
+    "@observableShallow os = []",
+    "@observableDeep od = {}",
+    "@computed get c() {}",
+    "@computedStruct get cs() {}",
+    "@computed({ equals }) get co() {}",
+    "@action a() {}",
+    "@actionBound ab() {}",
+    "@flow *f() {}",
+    "@flowBound *fb() {}"
+]
 
-const valid1 = decoratedFields.map(field => `
+const valid1 = decoratedFields
+    .map(
+        field => `
 class C {     
   ${field}
 
@@ -26,10 +28,12 @@ class C {
     makeObservable(this) 
   }      
 }
-`).map(code => ({ code }))
+`
+    )
+    .map(code => ({ code }))
 
 const valid2 = {
-  code: `
+    code: `
 class C {     
   o = 5
   get c() {}
@@ -49,7 +53,7 @@ class C {
 }
 
 const valid3 = {
-  code: `
+    code: `
 class C {     
   o = 5
   get c() {}
@@ -64,7 +68,7 @@ class C {
 }
 
 const invalid1 = {
-  code: `
+    code: `
 class C {
   o = 5
   get c() {}
@@ -80,8 +84,8 @@ class C {
   }
 }
 `,
-  errors: [{ messageId: 'missingAnnotation' }],
-  output: `
+    errors: [{ messageId: "missingAnnotation" }],
+    output: `
 class C {
   o = 5
   get c() {}
@@ -100,7 +104,7 @@ class C {
 }
 
 const invalid2 = {
-  code: `
+    code: `
 class C {
   o = 5
   get c() {}
@@ -116,8 +120,8 @@ class C {
   }
 }
 `,
-  errors: [{ messageId: 'missingAnnotation' }],
-  output: `
+    errors: [{ messageId: "missingAnnotation" }],
+    output: `
 class C {
   o = 5
   get c() {}
@@ -136,7 +140,7 @@ class C {
 }
 
 const invalid3 = {
-  code: `
+    code: `
 class C {
   o = 5
   get c() {}
@@ -152,8 +156,8 @@ class C {
   }
 }
 `,
-  errors: [{ messageId: 'missingAnnotation' }],
-  output: `
+    errors: [{ messageId: "missingAnnotation" }],
+    output: `
 class C {
   o = 5
   get c() {}
@@ -172,7 +176,7 @@ class C {
 }
 
 const invalid4 = {
-  code: `
+    code: `
 class C {
   o = 5
   get c() {}
@@ -188,8 +192,8 @@ class C {
   }
 }
 `,
-  errors: [{ messageId: 'missingAnnotation' }],
-  output: `
+    errors: [{ messageId: "missingAnnotation" }],
+    output: `
 class C {
   o = 5
   get c() {}
@@ -208,7 +212,7 @@ class C {
 }
 
 const invalid5 = {
-  code: `
+    code: `
 class C {
   o = 5
   get c() {}
@@ -220,8 +224,8 @@ class C {
   }
 }
 `,
-  errors: [{ messageId: 'missingAnnotation' }],
-  output: `
+    errors: [{ messageId: "missingAnnotation" }],
+    output: `
 class C {
   o = 5
   get c() {}
@@ -236,16 +240,6 @@ class C {
 }
 
 tester.run("exhaustive-make-observable", rule, {
-  valid: [
-    ...valid1,
-    valid2,
-    valid3,
-  ],
-  invalid: [
-    invalid1,
-    invalid2,
-    invalid3,
-    invalid4,
-    invalid5,
-  ],
-});
+    valid: [...valid1, valid2, valid3],
+    invalid: [invalid1, invalid2, invalid3, invalid4, invalid5]
+})

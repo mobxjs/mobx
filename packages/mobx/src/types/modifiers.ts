@@ -89,7 +89,7 @@ export function referenceEnhancer(newValue?) {
 
 export function refStructEnhancer(v, oldValue): any {
     if (__DEV__ && isObservable(v)) {
-        die(`observable.struct should not be used with observable values`)
+        die(`observableStruct should not be used with observable values`)
     }
     if (deepEqual(v, oldValue)) {
         return oldValue

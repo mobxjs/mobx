@@ -13,9 +13,9 @@ import { createDecoratorAnnotation, type DecoratorAnnotation } from "./decorator
 import type { ClassMethodAndFieldDecorator } from "../types/decorator_fills"
 
 export const ACTION = "action"
-export const ACTION_BOUND = "action.bound"
+export const ACTION_BOUND = "actionBound"
 export const AUTOACTION = "autoAction"
-export const AUTOACTION_BOUND = "autoAction.bound"
+export const AUTOACTION_BOUND = "autoActionBound"
 
 const DEFAULT_ACTION_NAME = "<unnamed action>"
 
