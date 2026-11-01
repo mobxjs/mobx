@@ -593,19 +593,19 @@ test("makeObservable respects options.name #2614'", () => {
 test("class - annotations", async () => {
     class Foo {
         ["observable"] = { nested: {} };
-        ["observable.ref"] = { nested: {} };
-        ["observable.shallow"] = { nested: {} }
+        ["observableRef"] = { nested: {} };
+        ["observableShallow"] = { nested: {} }
 
         constructor() {
             makeObservable(this, {
                 observable: observable,
-                "observable.ref": observableRef,
-                "observable.shallow": observableShallow,
+                observableRef: observableRef,
+                observableShallow: observableShallow,
                 computed: computed,
                 action: action,
-                "action.bound": actionBound,
+                actionBound: actionBound,
                 flow: flow,
-                "flow.bound": flowBound
+                flowBound: flowBound
             })
         }
 
@@ -617,7 +617,7 @@ test("class - annotations", async () => {
             return this
         }
 
-        ["action.bound"]() {
+        ["actionBound"]() {
             return this
         }
 
@@ -625,7 +625,7 @@ test("class - annotations", async () => {
             return this
         }
 
-        *["flow.bound"]() {
+        *["flowBound"]() {
             return this
         }
     }
@@ -636,13 +636,13 @@ test("class - annotations", async () => {
     expect(isObservableProp(foo, "observable")).toBe(true)
     expect(isObservableObject(foo["observable"])).toBe(true)
 
-    expect(isObservableProp(foo, "observable.ref")).toBe(true)
-    expect(isObservableObject(foo["observable.ref"])).toBe(false)
-    expect(isObservableObject(foo["observable.ref"].nested)).toBe(false)
+    expect(isObservableProp(foo, "observableRef")).toBe(true)
+    expect(isObservableObject(foo["observableRef"])).toBe(false)
+    expect(isObservableObject(foo["observableRef"].nested)).toBe(false)
 
-    expect(isObservableProp(foo, "observable.shallow")).toBe(true)
-    expect(isObservableObject(foo["observable.shallow"])).toBe(true)
-    expect(isObservableObject(foo["observable.shallow"].nested)).toBe(false)
+    expect(isObservableProp(foo, "observableShallow")).toBe(true)
+    expect(isObservableObject(foo["observableShallow"])).toBe(true)
+    expect(isObservableObject(foo["observableShallow"].nested)).toBe(false)
 
     expect(isComputedProp(foo, "computed")).toBe(true)
 
@@ -651,35 +651,35 @@ test("class - annotations", async () => {
     expect(foo.hasOwnProperty("action")).toBe(false)
     expect(foo["action"].call(null)).toBe(null)
 
-    expect(isAction(foo["action.bound"])).toBe(true)
-    expect(Object.getPrototypeOf(foo).hasOwnProperty("action.bound")).toBe(true)
-    expect(foo.hasOwnProperty("action.bound")).toBe(true)
-    expect(foo["action.bound"].call(null)).toBe(foo)
+    expect(isAction(foo["actionBound"])).toBe(true)
+    expect(Object.getPrototypeOf(foo).hasOwnProperty("actionBound")).toBe(true)
+    expect(foo.hasOwnProperty("actionBound")).toBe(true)
+    expect(foo["actionBound"].call(null)).toBe(foo)
 
     expect(isFlow(foo["flow"])).toBe(true)
     expect(Object.getPrototypeOf(foo).hasOwnProperty("flow")).toBe(true)
     expect(foo.hasOwnProperty("flow")).toBe(false)
 
-    expect(isFlow(foo["flow.bound"])).toBe(true)
-    expect(Object.getPrototypeOf(foo).hasOwnProperty("flow.bound")).toBe(true)
-    expect(foo.hasOwnProperty("flow.bound")).toBe(true)
-    expect(await foo["flow.bound"].call(null)).toBe(foo)
+    expect(isFlow(foo["flowBound"])).toBe(true)
+    expect(Object.getPrototypeOf(foo).hasOwnProperty("flowBound")).toBe(true)
+    expect(foo.hasOwnProperty("flowBound")).toBe(true)
+    expect(await foo["flowBound"].call(null)).toBe(foo)
 })
 
 test("subclass - annotation", () => {
     class Parent {
         ["observable"] = { nested: {} };
-        ["observable.ref"] = { nested: {} };
-        ["observable.shallow"] = { nested: {} }
+        ["observableRef"] = { nested: {} };
+        ["observableShallow"] = { nested: {} }
 
         constructor() {
             makeObservable(this, {
                 observable: observable,
-                "observable.ref": observableRef,
-                "observable.shallow": observableShallow,
+                observableRef: observableRef,
+                observableShallow: observableShallow,
                 computed: computed,
                 action: action,
-                "action.bound": actionBound,
+                actionBound: actionBound,
                 flow: flow
             })
         }
@@ -692,7 +692,7 @@ test("subclass - annotation", () => {
             return this
         }
 
-        ["action.bound"]() {
+        ["actionBound"]() {
             return this
         }
 
@@ -703,18 +703,18 @@ test("subclass - annotation", () => {
 
     class Child extends Parent {
         ["observable2"] = { nested: {} };
-        ["observable.ref2"] = { nested: {} };
-        ["observable.shallow2"] = { nested: {} }
+        ["observableRef2"] = { nested: {} };
+        ["observableShallow2"] = { nested: {} }
 
         constructor() {
             super()
             makeObservable(this, {
                 observable2: observable,
-                "observable.ref2": observableRef,
-                "observable.shallow2": observableShallow,
+                observableRef2: observableRef,
+                observableShallow2: observableShallow,
                 computed2: computed,
                 action2: action,
-                "action.bound2": actionBound,
+                actionBound2: actionBound,
                 flow2: flow
             })
         }
@@ -727,7 +727,7 @@ test("subclass - annotation", () => {
             return this
         }
 
-        ["action.bound2"]() {
+        ["actionBound2"]() {
             return this
         }
 
@@ -742,13 +742,13 @@ test("subclass - annotation", () => {
     expect(isObservableProp(child, "observable")).toBe(true)
     expect(isObservableObject(child["observable"])).toBe(true)
 
-    expect(isObservableProp(child, "observable.ref")).toBe(true)
-    expect(isObservableObject(child["observable.ref"])).toBe(false)
-    expect(isObservableObject(child["observable.ref"].nested)).toBe(false)
+    expect(isObservableProp(child, "observableRef")).toBe(true)
+    expect(isObservableObject(child["observableRef"])).toBe(false)
+    expect(isObservableObject(child["observableRef"].nested)).toBe(false)
 
-    expect(isObservableProp(child, "observable.shallow")).toBe(true)
-    expect(isObservableObject(child["observable.shallow"])).toBe(true)
-    expect(isObservableObject(child["observable.shallow"].nested)).toBe(false)
+    expect(isObservableProp(child, "observableShallow")).toBe(true)
+    expect(isObservableObject(child["observableShallow"])).toBe(true)
+    expect(isObservableObject(child["observableShallow"].nested)).toBe(false)
 
     expect(isComputedProp(child, "computed")).toBe(true)
 
@@ -757,10 +757,10 @@ test("subclass - annotation", () => {
     expect(child.hasOwnProperty("action")).toBe(false)
     expect(child["action"].call(null)).toBe(null)
 
-    expect(isAction(child["action.bound"])).toBe(true)
-    expect(Object.getPrototypeOf(child).hasOwnProperty("action.bound")).toBe(false)
-    expect(child.hasOwnProperty("action.bound")).toBe(true)
-    expect(child["action.bound"].call(null)).toBe(child)
+    expect(isAction(child["actionBound"])).toBe(true)
+    expect(Object.getPrototypeOf(child).hasOwnProperty("actionBound")).toBe(false)
+    expect(child.hasOwnProperty("actionBound")).toBe(true)
+    expect(child["actionBound"].call(null)).toBe(child)
 
     expect(isFlow(child["flow"])).toBe(true)
     expect(Object.getPrototypeOf(child).hasOwnProperty("flow")).toBe(false)
@@ -769,13 +769,13 @@ test("subclass - annotation", () => {
     expect(isObservableProp(child, "observable2")).toBe(true)
     expect(isObservableObject(child["observable2"])).toBe(true)
 
-    expect(isObservableProp(child, "observable.ref2")).toBe(true)
-    expect(isObservableObject(child["observable.ref2"])).toBe(false)
-    expect(isObservableObject(child["observable.ref2"].nested)).toBe(false)
+    expect(isObservableProp(child, "observableRef2")).toBe(true)
+    expect(isObservableObject(child["observableRef2"])).toBe(false)
+    expect(isObservableObject(child["observableRef2"].nested)).toBe(false)
 
-    expect(isObservableProp(child, "observable.shallow2")).toBe(true)
-    expect(isObservableObject(child["observable.shallow2"])).toBe(true)
-    expect(isObservableObject(child["observable.shallow2"].nested)).toBe(false)
+    expect(isObservableProp(child, "observableShallow2")).toBe(true)
+    expect(isObservableObject(child["observableShallow2"])).toBe(true)
+    expect(isObservableObject(child["observableShallow2"].nested)).toBe(false)
 
     expect(isComputedProp(child, "computed2")).toBe(true)
 
@@ -784,10 +784,10 @@ test("subclass - annotation", () => {
     expect(child.hasOwnProperty("action2")).toBe(false)
     expect(child["action2"].call(null)).toBe(null)
 
-    expect(isAction(child["action.bound2"])).toBe(true)
-    expect(Object.getPrototypeOf(child).hasOwnProperty("action.bound2")).toBe(true)
-    expect(child.hasOwnProperty("action.bound2")).toBe(true)
-    expect(child["action.bound2"].call(null)).toBe(child)
+    expect(isAction(child["actionBound2"])).toBe(true)
+    expect(Object.getPrototypeOf(child).hasOwnProperty("actionBound2")).toBe(true)
+    expect(child.hasOwnProperty("actionBound2")).toBe(true)
+    expect(child["actionBound2"].call(null)).toBe(child)
 
     expect(isFlow(child["flow2"])).toBe(true)
     expect(Object.getPrototypeOf(child).hasOwnProperty("flow2")).toBe(true)
@@ -799,22 +799,22 @@ test("subclass - annotation - override", async () => {
         constructor() {
             makeObservable(this, {
                 action: action,
-                ["action.bound"]: actionBound,
+                ["actionBound"]: actionBound,
                 computed: computed,
                 flow: flow,
-                ["flow.bound"]: flowBound
+                ["flowBound"]: flowBound
             })
         }
         action() {
             return "parent"
         }
-        ["action.bound"]() {
+        ["actionBound"]() {
             return "parent"
         }
         *flow() {
             return "parent"
         }
-        *["flow.bound"]() {
+        *["flowBound"]() {
             return "parent"
         }
         get computed() {
@@ -826,8 +826,8 @@ test("subclass - annotation - override", async () => {
         action() {
             return "child of " + super.action()
         }
-        ["action.bound"]() {
-            return "child of " + super["action.bound"]()
+        ["actionBound"]() {
+            return "child of " + super["actionBound"]()
         }
         get computed() {
             return "child"
@@ -836,8 +836,8 @@ test("subclass - annotation - override", async () => {
             const parent = yield super.flow()
             return "child of " + parent
         }
-        *["flow.bound"](): any {
-            const parent = yield super["flow.bound"]()
+        *["flowBound"](): any {
+            const parent = yield super["flowBound"]()
             return "child of " + parent
         }
     }
@@ -855,15 +855,15 @@ test("subclass - annotation - override", async () => {
     expect(child.action()).toBe("child of parent")
 
     // Action bound
-    expect(isAction(Parent.prototype["action.bound"])).toBe(false)
-    expect(isAction(Child.prototype["action.bound"])).toBe(false)
-    expect(isAction(child["action.bound"])).toBe(true)
+    expect(isAction(Parent.prototype["actionBound"])).toBe(false)
+    expect(isAction(Child.prototype["actionBound"])).toBe(false)
+    expect(isAction(child["actionBound"])).toBe(true)
 
-    expect(child.hasOwnProperty("action.bound")).toBe(true)
+    expect(child.hasOwnProperty("actionBound")).toBe(true)
 
-    expect(Parent.prototype["action.bound"]()).toBe("parent")
-    expect(Child.prototype["action.bound"]()).toBe("child of parent")
-    expect(child["action.bound"]()).toBe("child of parent")
+    expect(Parent.prototype["actionBound"]()).toBe("parent")
+    expect(Child.prototype["actionBound"]()).toBe("child of parent")
+    expect(child["actionBound"]()).toBe("child of parent")
 
     // Computed
     expect(isComputedProp(child, "computed")).toBe(true)
@@ -881,15 +881,15 @@ test("subclass - annotation - override", async () => {
     expect(await child.flow()).toBe("child of parent")
 
     // Flow bound
-    expect(isFlow(Parent.prototype["flow.bound"])).toBe(true)
-    expect(isFlow(Child.prototype["flow.bound"])).toBe(true)
-    expect(isFlow(child["flow.bound"])).toBe(true)
+    expect(isFlow(Parent.prototype["flowBound"])).toBe(true)
+    expect(isFlow(Child.prototype["flowBound"])).toBe(true)
+    expect(isFlow(child["flowBound"])).toBe(true)
 
-    expect(child.hasOwnProperty("flow.bound")).toBe(true)
+    expect(child.hasOwnProperty("flowBound")).toBe(true)
 
-    expect(await Parent.prototype["flow.bound"]()).toBe("parent")
-    expect(await Child.prototype["flow.bound"]()).toBe("child of parent")
-    expect(await child["flow.bound"]()).toBe("child of parent")
+    expect(await Parent.prototype["flowBound"]()).toBe("parent")
+    expect(await Child.prototype["flowBound"]()).toBe("child of parent")
+    expect(await child["flowBound"]()).toBe("child of parent")
 })
 
 test("subclass - cannot re-annotate", () => {
@@ -1184,7 +1184,7 @@ test("makeAutoObservable + override + annotation cache #2832", () => {
     })
 })
 
-test("flow.bound #2941", async () => {
+test("flowBound #2941", async () => {
     class Clazz {
         constructor() {
             makeObservable(this, {
@@ -1218,7 +1218,7 @@ test("makeAutoObservable + Object.create #3197", () => {
     expect(isObservableProp(o, "observable")).toBe(true)
 })
 
-test("flow.bound #3271", async () => {
+test("flowBound #3271", async () => {
     class Test {
         constructor() {
             makeObservable(this, { flowBound: flowBound })

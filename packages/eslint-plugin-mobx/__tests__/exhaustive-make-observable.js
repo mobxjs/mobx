@@ -1,35 +1,41 @@
-import { getRuleTester } from "./utils/get-rule-tester";
+import { getRuleTester } from "./utils/get-rule-tester"
 
-import rule from "../src/exhaustive-make-observable";
+import rule from "../src/exhaustive-make-observable"
 
-const tester = getRuleTester();
+const tester = getRuleTester()
 
 const decoratedFields = [
-  '@observable o = 5',
-  '@observable.ref or = []',
-  '@observable.shallow os = []',
-  '@observable.deep od = {}',
-  '@computed get c() {}',
-  '@computed.struct get cs() {}',
-  '@computed({ equals }) get co() {}',
-  '@action a() {}',
-  '@action.bound ab() {}',
-  '@flow *f() {}',
-  '@flow.bound *fb() {}',
-];
+    "@observable accessor o = 5",
+    "@observableRef accessor or = []",
+    "@observableShallow accessor os = []",
+    "@observableDeep accessor od = {}",
+    "@observableStruct accessor ost = {}",
+    "@computed get c() {}",
+    "@computedStruct get cs() {}",
+    "@computed({ equals }) get co() {}",
+    "@action a() {}",
+    "@actionBound ab() {}",
+    "@flow *f() {}",
+    "@flowBound *fb() {}"
+]
 
-const valid1 = decoratedFields.map(field => `
-class C {     
+const valid1 = decoratedFields
+    .map(
+        field => `
+class C {
   ${field}
+  plain = 1
 
   constructor() {
-    makeObservable(this) 
-  }      
+    makeObservable(this, { plain: true })
+  }
 }
-`).map(code => ({ code }))
+`
+    )
+    .map(code => ({ code }))
 
 const valid2 = {
-  code: `
+    code: `
 class C {     
   o = 5
   get c() {}
@@ -49,7 +55,7 @@ class C {
 }
 
 const valid3 = {
-  code: `
+    code: `
 class C {     
   o = 5
   get c() {}
@@ -57,14 +63,14 @@ class C {
   *f() {}
   
   constructor() {
-    makeObservable({})
+    makeObservable({}, {})
   }  
 }
 `
 }
 
 const invalid1 = {
-  code: `
+    code: `
 class C {
   o = 5
   get c() {}
@@ -80,8 +86,8 @@ class C {
   }
 }
 `,
-  errors: [{ messageId: 'missingAnnotation' }],
-  output: `
+    errors: [{ messageId: "missingAnnotation" }],
+    output: `
 class C {
   o = 5
   get c() {}
@@ -100,7 +106,7 @@ class C {
 }
 
 const invalid2 = {
-  code: `
+    code: `
 class C {
   o = 5
   get c() {}
@@ -116,8 +122,8 @@ class C {
   }
 }
 `,
-  errors: [{ messageId: 'missingAnnotation' }],
-  output: `
+    errors: [{ messageId: "missingAnnotation" }],
+    output: `
 class C {
   o = 5
   get c() {}
@@ -136,7 +142,7 @@ class C {
 }
 
 const invalid3 = {
-  code: `
+    code: `
 class C {
   o = 5
   get c() {}
@@ -152,8 +158,8 @@ class C {
   }
 }
 `,
-  errors: [{ messageId: 'missingAnnotation' }],
-  output: `
+    errors: [{ messageId: "missingAnnotation" }],
+    output: `
 class C {
   o = 5
   get c() {}
@@ -172,7 +178,7 @@ class C {
 }
 
 const invalid4 = {
-  code: `
+    code: `
 class C {
   o = 5
   get c() {}
@@ -188,8 +194,8 @@ class C {
   }
 }
 `,
-  errors: [{ messageId: 'missingAnnotation' }],
-  output: `
+    errors: [{ messageId: "missingAnnotation" }],
+    output: `
 class C {
   o = 5
   get c() {}
@@ -208,7 +214,7 @@ class C {
 }
 
 const invalid5 = {
-  code: `
+    code: `
 class C {
   o = 5
   get c() {}
@@ -220,8 +226,8 @@ class C {
   }
 }
 `,
-  errors: [{ messageId: 'missingAnnotation' }],
-  output: `
+    errors: [{ messageId: "missingAnnotation" }],
+    output: `
 class C {
   o = 5
   get c() {}
@@ -235,17 +241,51 @@ class C {
 `
 }
 
+const invalid6 = {
+    code: `
+class C {
+  @observableRef accessor ref = []
+  count = 0
+
+  constructor() {
+    makeObservable(this, {})
+  }
+}
+`,
+    errors: [{ messageId: "missingAnnotation" }],
+    output: `
+class C {
+  @observableRef accessor ref = []
+  count = 0
+
+  constructor() {
+    makeObservable(this, { count: true, })
+  }
+}
+`
+}
+
+const invalid7 = {
+    code: `
+class C {
+  @observable accessor o = 5
+
+  constructor() {
+    makeObservable(this)
+  }
+}
+`,
+    errors: [{ messageId: "missingAnnotationsArg" }],
+    output: null
+}
+
+const invalid8 = {
+    code: `makeObservable({})`,
+    errors: [{ messageId: "missingAnnotationsArg" }],
+    output: null
+}
+
 tester.run("exhaustive-make-observable", rule, {
-  valid: [
-    ...valid1,
-    valid2,
-    valid3,
-  ],
-  invalid: [
-    invalid1,
-    invalid2,
-    invalid3,
-    invalid4,
-    invalid5,
-  ],
-});
+    valid: [...valid1, valid2, valid3],
+    invalid: [invalid1, invalid2, invalid3, invalid4, invalid5, invalid6, invalid7, invalid8]
+})

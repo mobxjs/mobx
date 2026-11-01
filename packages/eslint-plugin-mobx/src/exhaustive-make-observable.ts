@@ -43,37 +43,18 @@ function create(context) {
 
             const annotationProps = secondArg?.properties || []
             const nonAnnotatedMembers: any[] = []
-            let hasAnyDecorator = false
-
             members.forEach(member => {
                 if (member.static) return
                 if (member.kind === "constructor") return
-                //if (member.type !== 'MethodDefinition' && member.type !== 'ClassProperty') return;
-                hasAnyDecorator =
-                    hasAnyDecorator || member.decorators?.some(isMobxDecorator) || false
+                if (member.decorators?.some(isMobxDecorator)) return
                 if (!annotationProps.some(prop => fieldToKey(prop) === fieldToKey(member))) {
-                    // TODO optimize?
                     nonAnnotatedMembers.push(member)
                 }
             })
-            /*
-      // With decorators, second arg must be null/undefined or not provided
-      if (hasAnyDecorator && secondArg && secondArg.name !== "undefined" && secondArg.value !== null) {
-        context.report({
-          node: makeObservable,
-          message: 'When using decorators, second arg must be `null`, `undefined` or not provided.',
-        })
-      }
-      // Without decorators, in constructor, second arg must be object literal
-      if (!hasAnyDecorator && firstArg.type === 'ThisExpression' && (!secondArg || secondArg.type !== 'ObjectExpression')) {
-        context.report({
-          node: makeObservable,
-          message: 'Second argument must be object in form of `{ key: annotation }`.',
-        })
-      }
-      */
 
-            if (!hasAnyDecorator && nonAnnotatedMembers.length) {
+            if (!secondArg && !nonAnnotatedMembers.length) {
+                context.report({ node: makeObservable, messageId: "missingAnnotationsArg" })
+            } else if (nonAnnotatedMembers.length) {
                 // Set avoids reporting twice for setter+getter pair or actual duplicates
                 const keys = [...new Set(nonAnnotatedMembers.map(fieldToKey))]
                 const keyList = keys.map(key => `\`${key}\``).join(", ")
@@ -123,7 +104,9 @@ const rule: Rule.RuleModule = {
         },
         messages: {
             missingAnnotation:
-                "Missing annotation for {{ keyList }}. To exclude a field, use `false` as annotation."
+                "Missing annotation for {{ keyList }}. To exclude a field, use `false` as annotation.",
+            missingAnnotationsArg:
+                "`makeObservable` requires annotations. Decorated members don't need it, so the call can be removed."
         }
     },
     create

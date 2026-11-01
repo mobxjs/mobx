@@ -1090,7 +1090,7 @@ test("@observableDeep (Babel)", () => {
     expect(isObservable(todo2)).toBe(false)
 })
 
-test("action.bound binds (Babel)", () => {
+test("actionBound binds (Babel)", () => {
     class A {
         x = 0
 

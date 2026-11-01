@@ -47,7 +47,7 @@ interface Flow extends Annotation, ClassMethodDecorator {
 }
 
 const flowAnnotation = createFlowAnnotation("flow")
-const flowBoundAnnotation = createFlowAnnotation("flow.bound", { bound: true })
+const flowBoundAnnotation = createFlowAnnotation("flowBound", { bound: true })
 
 export const flow: Flow = assign(
     function flow(arg1, arg2?) {

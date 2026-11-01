@@ -99,3 +99,20 @@ test("observe disposer can be called from within a listener", () => {
     o.x = 2
     expect(calls).toEqual(["a", "b", "b"])
 })
+
+test("observe value changes report observableKind and debugObjectName", () => {
+    const box = observable.box(1, { name: "box" })
+    const o = observable({ a: 1 }, {}, { name: "o" })
+    const events: any[] = []
+    observe(box, e => events.push(e), true)
+    observe(o, "a", e => events.push(e))
+
+    box.set(2)
+    o.a = 2
+
+    expect(events.map(e => [e.observableKind, e.debugObjectName, e.newValue])).toEqual([
+        ["value", "box", 1],
+        ["value", "box", 2],
+        ["value", "o.a", 2]
+    ])
+})

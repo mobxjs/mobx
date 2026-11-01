@@ -1019,7 +1019,7 @@ test("@observableDeep (2022.3)", () => {
     t.equal(isObservable(todo2), false)
 })
 
-test("action.bound binds (2022.3)", () => {
+test("actionBound binds (2022.3)", () => {
     class A {
         @observable accessor x = 0
         @actionBound
@@ -1035,7 +1035,7 @@ test("action.bound binds (2022.3)", () => {
     t.equal(a.x, 2)
 })
 
-test("action.bound binds property function (2022.3)", () => {
+test("actionBound binds property function (2022.3)", () => {
     class A {
         @observable accessor x = 0
         @actionBound

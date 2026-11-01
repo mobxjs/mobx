@@ -630,7 +630,7 @@ test("structural collections", () => {
     expect(o.x).toBe(x)
     expect(() => {
         o.x = mobx.observable([1, 2, 3])
-    }).toThrow("observable.struct should not be used with observable values")
+    }).toThrow("observableStruct should not be used with observable values")
 })
 
 test("jest is behaving correctly", () => {
