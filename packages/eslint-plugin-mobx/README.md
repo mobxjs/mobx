@@ -61,6 +61,8 @@ export default [
 
 Makes sure that `makeObservable` annotates all fields defined on class or object literal.<br>
 To exclude a field, annotate it using `field: false`.<br>
+Members with MobX decorators are skipped, they are already annotated.<br>
+Also reports `makeObservable` called without annotations, which throws in MobX 7.<br>
 Does not support fields introduced by constructor (`this.foo = 5`).<br>
 Does not warn about annotated non-existing fields (there is a runtime check, but the autofix removing the field could be handy...).<br>
 **Autofix** adds `field: true` for each missing field by default. You can change this behaviour by specifying options in your eslint config:

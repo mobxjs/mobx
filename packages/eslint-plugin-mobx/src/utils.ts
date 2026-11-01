@@ -14,10 +14,8 @@ const mobxDecorators = new Set([
 ])
 
 export function isMobxDecorator(decorator) {
-    return (
-        mobxDecorators.has(decorator.expression.name) || // @foo
-        mobxDecorators.has(decorator.expression.callee?.name)
-    ) // @foo()
+    const { expression } = decorator
+    return mobxDecorators.has(expression.name) || mobxDecorators.has(expression.callee?.name)
 }
 
 export function findAncestor(node, match) {

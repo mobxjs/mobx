@@ -5,10 +5,11 @@ import rule from "../src/exhaustive-make-observable"
 const tester = getRuleTester()
 
 const decoratedFields = [
-    "@observable o = 5",
-    "@observableRef or = []",
-    "@observableShallow os = []",
-    "@observableDeep od = {}",
+    "@observable accessor o = 5",
+    "@observableRef accessor or = []",
+    "@observableShallow accessor os = []",
+    "@observableDeep accessor od = {}",
+    "@observableStruct accessor ost = {}",
     "@computed get c() {}",
     "@computedStruct get cs() {}",
     "@computed({ equals }) get co() {}",
@@ -21,12 +22,13 @@ const decoratedFields = [
 const valid1 = decoratedFields
     .map(
         field => `
-class C {     
+class C {
   ${field}
+  plain = 1
 
   constructor() {
-    makeObservable(this) 
-  }      
+    makeObservable(this, { plain: true })
+  }
 }
 `
     )
@@ -61,7 +63,7 @@ class C {
   *f() {}
   
   constructor() {
-    makeObservable({})
+    makeObservable({}, {})
   }  
 }
 `
@@ -239,7 +241,51 @@ class C {
 `
 }
 
+const invalid6 = {
+    code: `
+class C {
+  @observableRef accessor ref = []
+  count = 0
+
+  constructor() {
+    makeObservable(this, {})
+  }
+}
+`,
+    errors: [{ messageId: "missingAnnotation" }],
+    output: `
+class C {
+  @observableRef accessor ref = []
+  count = 0
+
+  constructor() {
+    makeObservable(this, { count: true, })
+  }
+}
+`
+}
+
+const invalid7 = {
+    code: `
+class C {
+  @observable accessor o = 5
+
+  constructor() {
+    makeObservable(this)
+  }
+}
+`,
+    errors: [{ messageId: "missingAnnotationsArg" }],
+    output: null
+}
+
+const invalid8 = {
+    code: `makeObservable({})`,
+    errors: [{ messageId: "missingAnnotationsArg" }],
+    output: null
+}
+
 tester.run("exhaustive-make-observable", rule, {
     valid: [...valid1, valid2, valid3],
-    invalid: [invalid1, invalid2, invalid3, invalid4, invalid5]
+    invalid: [invalid1, invalid2, invalid3, invalid4, invalid5, invalid6, invalid7, invalid8]
 })
