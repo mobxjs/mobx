@@ -77,7 +77,7 @@ npm install --save-dev mobx-react-plugin
 
 The generated code imports `observer` from `mobx-react-lite`, so it must be a dependency of your app. The plugin itself only runs at build time.
 
-`react-compiler-healthcheck` reports `mobx-react-lite` as incompatible with React Compiler. That does not apply here: the plugin marks every observed component with `"use no memo"`, so the compiler leaves it to MobX.
+`react-compiler-healthcheck` lists `mobx-react-lite` as incompatible because your `package.json` depends on it. You can ignore that: the plugin adds `"use no memo"` to every `observer` component in the files it transforms, so React Compiler skips them.
 
 ## Requirements
 
