@@ -74,10 +74,6 @@ Components also keep their names in React DevTools (arrow functions become named
 npm install mobx-react-lite mobx-react-plugin
 ```
 
-The generated code imports `observer` from `mobx-react-lite`, so it must be a dependency of your app.
-
-`react-compiler-healthcheck` lists `mobx-react-lite` as incompatible because your `package.json` depends on it. You can ignore that: the plugin adds `"use no memo"` to every `observer` component in the files it transforms, so React Compiler skips them.
-
 ## Requirements
 
 MobX 7+, `mobx-react-lite` 5+, React 18+, and, for the Vite plugin, Vite 8+.
@@ -309,6 +305,10 @@ MobX already memoizes observed components, so in an application where most compo
 -   If none of your hooks read observables, pass `observer: { useNoMemoHooks: false }`.
 
 A module-level `"use no memo"` keeps the automatic `observer` but skips the function-level directives, since the compiler skips the whole file anyway.
+
+### `react-compiler-healthcheck`
+
+`react-compiler-healthcheck` lists `mobx-react-lite` as incompatible because your `package.json` depends on it. You can ignore that: the plugin adds `"use no memo"` to every `observer` component in the files it transforms, so React Compiler skips them.
 
 ## ESLint
 
