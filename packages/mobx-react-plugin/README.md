@@ -78,7 +78,7 @@ It is a regular dependency, not a dev dependency: the generated code imports `ob
 
 ## Requirements
 
-The latest MobX and, for the Vite plugin, the latest Vite. Older versions are not supported.
+MobX 7+, `mobx-react-lite` 5+, React 18+, and, for the Vite plugin, Vite 8+.
 
 ## Setup
 
