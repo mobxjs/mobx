@@ -640,3 +640,40 @@ describe("#3761 replace only fires events for actual changes", () => {
         expect(mobx.values(s)).toEqual([2, 3])
     })
 })
+
+describe("mutations are not tracked", () => {
+    test.each([
+        ["add", s => s.add(2)],
+        ["delete", s => s.delete(1)],
+        ["replace", s => s.replace([1, 2])],
+        ["clear", s => s.clear()]
+    ])("%s", (_, mutate) => {
+        const s = set([1])
+        let runCount = 0
+        const dispose = autorun(() => {
+            runCount++
+            mutate(s)
+        })
+        expect(runCount).toBe(1)
+
+        s.add(3)
+
+        expect(runCount).toBe(1)
+        expect(s.has(3)).toBe(true)
+        dispose()
+    })
+
+    test("has is still tracked", () => {
+        const s = set([1])
+        let runCount = 0
+        const dispose = autorun(() => {
+            runCount++
+            s.has(1)
+        })
+
+        s.add(3)
+
+        expect(runCount).toBe(2)
+        dispose()
+    })
+})

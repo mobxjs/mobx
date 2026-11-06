@@ -125,7 +125,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
             // implemented reassignment same as it's done for ObservableMap
             value = change.newValue!
         }
-        if (!this.has(value)) {
+        if (!this.has_(value)) {
             transaction(() => {
                 value = this.enhancer_(value, undefined) // report the stored value, like map and array
                 this.data_.add(value)
@@ -169,7 +169,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
                 return false
             }
         }
-        if (this.has(value)) {
+        if (this.has_(value)) {
             const notifySpy = __DEV__ && isSpyEnabled()
             const notify = hasListeners(this)
             const change =
@@ -201,9 +201,13 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
         return false
     }
 
+    private has_(value: T): boolean {
+        return this.data_.has(this.dehanceValue_(value))
+    }
+
     has(value: T) {
         this.atom_.reportObserved()
-        return this.data_.has(this.dehanceValue_(value))
+        return this.has_(value)
     }
 
     entries() {
