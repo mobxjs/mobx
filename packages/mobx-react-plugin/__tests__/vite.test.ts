@@ -15,6 +15,12 @@ describe("Vite plugin", () => {
         expect(plugin.enforce).toBe("pre")
     })
 
+    test("pre-bundles mobx-react-lite unless observer is off or the user excludes it", () => {
+        expect(createPlugin().config()).toEqual({ optimizeDeps: { include: ["mobx-react-lite"] } })
+        expect(createPlugin({ observer: false }).config()).toBeNull()
+        expect(createPlugin().config({ optimizeDeps: { exclude: ["mobx-react-lite"] } })).toBeNull()
+    })
+
     test("transforms tsx and jsx files and provides a source map", async () => {
         const plugin = createPlugin()
         const result = await plugin.transform(COMPONENT, "/project/src/App.tsx?v=123")
