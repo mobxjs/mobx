@@ -7,7 +7,7 @@ describe("wrapping components in observer", () => {
 function Counter() { return <h1>{store.count}</h1> }
 export function Exported() { return <>{store.count}</> }`,
             code`
-import { observer } from "mobx-react-plugin/observer";
+import { observer } from "mobx-react-lite";
 const Counter = observer(function Counter() {
   "use no memo";
 
@@ -26,7 +26,7 @@ export const Exported = observer(function Exported() {
             code`
 export default function Page() { return <h1 /> }`,
             code`
-import { observer } from "mobx-react-plugin/observer";
+import { observer } from "mobx-react-lite";
 export default observer(function Page() {
   "use no memo";
 
@@ -41,7 +41,7 @@ export default observer(function Page() {
 export default function Page() { return <h1 /> }
 Page.displayName = "P"`,
             code`
-import { observer } from "mobx-react-plugin/observer";
+import { observer } from "mobx-react-lite";
 const Page = observer(function Page() {
   "use no memo";
 
@@ -57,7 +57,7 @@ Page.displayName = "P";`
             code`
 export default function () { return <h1 /> }`,
             code`
-import { observer } from "mobx-react-plugin/observer";
+import { observer } from "mobx-react-lite";
 export default observer(function TodoList() {
   "use no memo";
 
@@ -69,7 +69,7 @@ export default observer(function TodoList() {
             code`
 export default () => <h1 />`,
             code`
-import { observer } from "mobx-react-plugin/observer";
+import { observer } from "mobx-react-lite";
 export default observer(function TodoList() {
   "use no memo";
 
@@ -86,7 +86,7 @@ import Page from "./Page"
 export default () => <Page />`,
             code`
 import Page from "./Page";
-import { observer } from "mobx-react-plugin/observer";
+import { observer } from "mobx-react-lite";
 export default observer(() => {
   "use no memo";
 
@@ -102,7 +102,7 @@ export default observer(() => {
 const Counter = () => <h1>{store.count}</h1>
 export const Hooked = () => { const s = useStore(); return s.count }`,
             code`
-import { observer } from "mobx-react-plugin/observer";
+import { observer } from "mobx-react-lite";
 const Counter = observer(function Counter() {
   "use no memo";
 
@@ -122,7 +122,7 @@ export const Hooked = observer(function Hooked() {
             code`
 const A = () => { return <a onClick={() => this.x} /> }`,
             code`
-import { observer } from "mobx-react-plugin/observer";
+import { observer } from "mobx-react-lite";
 const A = observer(() => {
   "use no memo";
 
@@ -137,7 +137,7 @@ const A = observer(() => {
 const A = function () { return <a /> }
 const B = function Inner() { return <b /> }`,
             code`
-import { observer } from "mobx-react-plugin/observer";
+import { observer } from "mobx-react-lite";
 const A = observer(function A() {
   "use no memo";
 
@@ -158,7 +158,7 @@ function List<T>(props: Props<T>): JSX.Element { return <ul /> }
 const Grid = <T,>(props: Props<T>) => <table />
 const X: FC<P> = (p) => <div />`,
             code`
-import { observer } from "mobx-react-plugin/observer";
+import { observer } from "mobx-react-lite";
 const List = observer(function List<T>(props: Props<T>): JSX.Element {
   "use no memo";
 
@@ -184,7 +184,7 @@ describe("self references", () => {
             code`
 export function Tree({ node }) { return <ul>{node.children.map(c => <Tree key={c.id} node={c} />)}</ul> }`,
             code`
-import { observer } from "mobx-react-plugin/observer";
+import { observer } from "mobx-react-lite";
 export const Tree = observer(function Tree({
   node
 }) {
@@ -202,7 +202,7 @@ const _Tree = Tree;`
 const Tree = ({ node }) => <ul>{node.children.map(c => <Tree node={c} />)}</ul>
 export { Tree }`,
             code`
-import { observer } from "mobx-react-plugin/observer";
+import { observer } from "mobx-react-lite";
 const Tree = observer(function Tree({
   node
 }) {
@@ -220,7 +220,7 @@ export { Tree };`
             code`
 export default function Tree({ node }) { return <Tree.Item node={node} /> }`,
             code`
-import { observer } from "mobx-react-plugin/observer";
+import { observer } from "mobx-react-lite";
 const Tree = observer(function Tree({
   node
 }) {
@@ -425,7 +425,7 @@ const Input = forwardRef((props, ref) => <input ref={ref} />)
 export default forwardRef(function Area(props, ref) { return <textarea ref={ref} /> })`,
             code`
 import { forwardRef } from "react";
-import { observer } from "mobx-react-plugin/observer";
+import { observer } from "mobx-react-lite";
 const Input = observer(forwardRef(function Input(props, ref) {
   "use no memo";
 
@@ -447,7 +447,7 @@ function Input(props, ref) { return <input ref={ref} /> }
 export default forwardRef(Input)`,
             code`
 import { forwardRef } from "react";
-import { observer } from "mobx-react-plugin/observer";
+import { observer } from "mobx-react-lite";
 function Input(props, ref) {
   "use no memo";
 
@@ -486,7 +486,7 @@ const X = memo(() => <div />)
 export default memo(function Y() { return <div /> })`,
             code`
 import { memo } from "react";
-import { observer } from "mobx-react-plugin/observer";
+import { observer } from "mobx-react-lite";
 const X = observer(function X() {
   "use no memo";
 
@@ -507,7 +507,7 @@ import { memo } from "react"
 const X = memo((p) => <div />, areEqual)`,
             code`
 import { memo } from "react";
-import { observer } from "mobx-react-plugin/observer";
+import { observer } from "mobx-react-lite";
 const X = memo(observer(function X(p) {
   "use no memo";
 
@@ -524,7 +524,7 @@ const X = memo(forwardRef((p, ref) => <div ref={ref} />))
 const Y = memo(forwardRef((p, ref) => <div ref={ref} />), eq)`,
             code`
 import { memo, forwardRef } from "react";
-import { observer } from "mobx-react-plugin/observer";
+import { observer } from "mobx-react-lite";
 const X = observer(forwardRef(function X(p, ref) {
   "use no memo";
 
@@ -546,7 +546,7 @@ const X = React.memo(() => <div />)
 const Y = React.forwardRef((p, ref) => <div />)`,
             code`
 import React from "react";
-import { observer } from "mobx-react-plugin/observer";
+import { observer } from "mobx-react-lite";
 const X = observer(function X() {
   "use no memo";
 
@@ -590,7 +590,7 @@ export const useNothing = () => 1;`
 function A() { return <div /> }
 function useA() { return useB() }`,
             code`
-import { observer } from "mobx-react-plugin/observer";
+import { observer } from "mobx-react-lite";
 const A = observer(function A() {
   "use no memo";
 
@@ -676,7 +676,7 @@ function A() { "use no memo"; return <div /> }
 function B() { "use no forget"; return <div /> }
 function C() { "use strict"; return <div /> }`,
             code`
-import { observer } from "mobx-react-plugin/observer";
+import { observer } from "mobx-react-lite";
 const A = observer(function A() {
   "use no memo";
 
@@ -734,7 +734,7 @@ function useA() { return useB() }`,
             code`
 "use no memo";
 
-import { observer } from "mobx-react-plugin/observer";
+import { observer } from "mobx-react-lite";
 const A = observer(function A() {
   return <div />;
 });
@@ -750,7 +750,7 @@ function useA() {
 function A() { return <div /> }
 function useA() { return useB() }`,
             code`
-import { observer } from "mobx-react-plugin/observer";
+import { observer } from "mobx-react-lite";
 const A = observer(function A() {
   return <div />;
 });
@@ -796,9 +796,24 @@ const A = obs(function A() {
 const observer = new IntersectionObserver(() => {})
 function A() { return <div /> }`,
             code`
-import { observer as _observer } from "mobx-react-plugin/observer";
+import { observer as _observer } from "mobx-react-lite";
 const observer = new IntersectionObserver(() => {});
 const A = _observer(function A() {
+  "use no memo";
+
+  return <div />;
+});`
+        )
+    })
+
+    test("adds observer to an existing mobx-react-lite import", () => {
+        expectTransform(
+            code`
+import { Observer } from "mobx-react-lite"
+function A() { return <div /> }`,
+            code`
+import { Observer, observer } from "mobx-react-lite";
+const A = observer(function A() {
   "use no memo";
 
   return <div />;
@@ -815,7 +830,7 @@ module.exports = A`,
             code`
 const {
   observer
-} = require("mobx-react-plugin/observer");
+} = require("mobx-react-lite");
 const React = require("react");
 const A = observer(function A() {
   "use no memo";
@@ -833,7 +848,7 @@ module.exports = A;`,
 import type { Props } from "./types"
 function A(props: Props) { return <div /> }`,
             code`
-import { observer } from "mobx-react-plugin/observer";
+import { observer } from "mobx-react-lite";
 const A = observer(function A(props) {
   "use no memo";
 

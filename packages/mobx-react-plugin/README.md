@@ -37,7 +37,7 @@ class DiceStore {
 is compiled into:
 
 ```tsx
-import { observer } from "mobx-react-plugin/observer"
+import { observer } from "mobx-react-lite"
 
 export const Dice = observer(function Dice() {
     "use no memo"
@@ -71,10 +71,13 @@ Components also keep their names in React DevTools (arrow functions become named
 ## Installation
 
 ```sh
-npm install mobx-react-plugin
+npm install mobx-react-lite
+npm install --save-dev mobx-react-plugin
 ```
 
-It is a regular dependency, not a dev dependency: the generated code imports `observer` from `mobx-react-plugin/observer`, which re-exports it from `mobx-react-lite`. `mobx-react-lite` is a peer dependency, so the generated code and your own imports share one copy. npm, pnpm and Bun install it automatically; with Yarn, add it yourself.
+The generated code imports `observer` from `mobx-react-lite`, so it must be a dependency of your app. The plugin itself only runs at build time.
+
+`react-compiler-healthcheck` reports `mobx-react-lite` as incompatible with React Compiler. That does not apply here: the plugin marks every observed component with `"use no memo"`, so the compiler leaves it to MobX.
 
 ## Requirements
 
@@ -221,7 +224,7 @@ Details worth knowing:
 
 -   A function declaration becomes a `const`. Code that referenced the component **before** its declaration at module evaluation time (for example a routes table above the component) now throws a "cannot access before initialization" error instead of relying on hoisting. Move the declaration up.
 -   A component that renders itself (tree views) keeps working: the recursive reference is redirected to the observed component.
--   If the file already imports `observer` (from `mobx-react-plugin/observer`, `mobx-react-lite` or `mobx-react`) that import is reused.
+-   If the file already imports `observer` (from `mobx-react-lite` or `mobx-react`) that import is reused.
 
 ## Async methods become flows
 
@@ -311,7 +314,7 @@ A module-level `"use no memo"` keeps the automatic `observer` but skips the func
 ## Migrating from `mobx-react-observer`
 
 -   `import plugin from "mobx-react-observer/vite-plugin"` becomes `import mobxReactPlugin from "mobx-react-plugin/vite"`.
--   `importPath` is removed: `observer` always comes from `mobx-react-plugin/observer`.
+-   `importPath` is removed: `observer` always comes from `mobx-react-lite`. Replace the `mobx-react-observer` dependency with `mobx-react-lite`.
 -   `exclude` also accepts RegExps and predicates. `include` is new.
 
 ## ESLint

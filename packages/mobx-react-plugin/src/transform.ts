@@ -24,8 +24,8 @@ const NO_MEMO_DIRECTIVE = "use no memo"
 const HOOK_NAME_RE = /^use[A-Z0-9]/
 const COMPONENT_NAME_RE = /^[A-Z]/
 const OBSERVER_NAME = "observer"
-const OBSERVER_SOURCE = "mobx-react-plugin/observer"
-const KNOWN_OBSERVER_SOURCES = [OBSERVER_SOURCE, "mobx-react", "mobx-react-lite"]
+const OBSERVER_SOURCE = "mobx-react-lite"
+const KNOWN_OBSERVER_SOURCES = [OBSERVER_SOURCE, "mobx-react"]
 
 export interface TransformResult {
     wrapped: string[]

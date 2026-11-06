@@ -17,10 +17,6 @@
         "./vite": {
             "types": "./dist/vite.d.ts",
             "default": "./dist/vite.js"
-        },
-        "./observer": {
-            "types": "./dist/observer.d.ts",
-            "default": "./dist/observer.js"
         }
     },
     "files": [

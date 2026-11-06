@@ -18,7 +18,7 @@ describe("Vite plugin", () => {
     test("transforms tsx and jsx files and provides a source map", async () => {
         const plugin = createPlugin()
         const result = await plugin.transform(COMPONENT, "/project/src/App.tsx?v=123")
-        expect(result!.code).toContain('import { observer } from "mobx-react-plugin/observer"')
+        expect(result!.code).toContain('import { observer } from "mobx-react-lite"')
         expect(result!.code).toContain("observer(function App()")
         expect(result!.code).toContain('"use no memo"')
         expect(result!.map).toBeTruthy()
