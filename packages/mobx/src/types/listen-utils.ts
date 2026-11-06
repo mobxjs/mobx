@@ -26,13 +26,16 @@ export function registerListener(listenable: IListenable, handler: Function): La
 
 export function notifyListeners<T>(listenable: IListenable, change: T) {
     const prevU = untrackedStart()
-    let listeners = listenable.changeListeners_
-    if (!listeners) {
-        return
+    try {
+        let listeners = listenable.changeListeners_
+        if (!listeners) {
+            return
+        }
+        listeners = listeners.slice()
+        for (let i = 0, l = listeners.length; i < l; i++) {
+            listeners[i](change)
+        }
+    } finally {
+        untrackedEnd(prevU)
     }
-    listeners = listeners.slice()
-    for (let i = 0, l = listeners.length; i < l; i++) {
-        listeners[i](change)
-    }
-    untrackedEnd(prevU)
 }
