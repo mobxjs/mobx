@@ -311,12 +311,6 @@ MobX already memoizes observed components, so in an application where most compo
 
 A module-level `"use no memo"` keeps the automatic `observer` but skips the function-level directives, since the compiler skips the whole file anyway.
 
-## Migrating from `mobx-react-observer`
-
--   `import plugin from "mobx-react-observer/vite-plugin"` becomes `import mobxReactPlugin from "mobx-react-plugin/vite"`.
--   `importPath` is removed: `observer` always comes from `mobx-react-lite`. Replace the `mobx-react-observer` dependency with `mobx-react-lite`.
--   `exclude` also accepts RegExps and predicates. `include` is new.
-
 ## ESLint
 
 With this plugin the [`mobx/missing-observer`](../eslint-plugin-mobx/README.md) rule of `eslint-plugin-mobx` is no longer needed for the files it transforms.
