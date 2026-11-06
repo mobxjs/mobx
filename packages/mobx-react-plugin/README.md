@@ -74,7 +74,7 @@ Components also keep their names in React DevTools (arrow functions become named
 npm install mobx-react-plugin
 ```
 
-It is a regular dependency, not a dev dependency: the generated code imports `observer` from `mobx-react-plugin/observer`, which re-exports it from `mobx-react-lite`. Your app only needs `mobx`, `react` and `mobx-react-plugin`. Add `mobx-react-lite` only if you import from it yourself.
+It is a regular dependency, not a dev dependency: the generated code imports `observer` from `mobx-react-plugin/observer`, which re-exports it from `mobx-react-lite`. `mobx-react-lite` is a peer dependency, so the generated code and your own imports share one copy. npm, pnpm and Bun install it automatically; with Yarn, add it yourself.
 
 ## Requirements
 
