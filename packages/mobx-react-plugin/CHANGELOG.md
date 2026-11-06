@@ -1,5 +1,11 @@
 # mobx-react-plugin
 
+## 1.0.1
+
+### Patch Changes
+
+-   [`99ff7cefd3fa1bc7724705b89ebcf3bfcc0a0821`](https://github.com/mobxjs/mobx/commit/99ff7cefd3fa1bc7724705b89ebcf3bfcc0a0821) [#4767](https://github.com/mobxjs/mobx/pull/4767) Thanks [@kubk](https://github.com/kubk)! - Vite plugin: fix "Invalid hook call" and a page reload on the first dev-server start. Vite's dependency scanner does not see the `observer` import the plugin adds to components, so it discovered `mobx-react-lite` late and re-optimized while the page was loading. The plugin now adds `mobx-react-lite` to `optimizeDeps.include`.
+
 ## 1.0.0
 
 ### Major Changes
