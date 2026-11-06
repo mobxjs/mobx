@@ -1,5 +1,11 @@
 # mobx
 
+## 7.1.5
+
+### Patch Changes
+
+-   [`c99023b9fcfce88221cb22b6e34333e389746dcf`](https://github.com/mobxjs/mobx/commit/c99023b9fcfce88221cb22b6e34333e389746dcf) [#4765](https://github.com/mobxjs/mobx/pull/4765) Thanks [@b84330808](https://github.com/b84330808)! - `add`, `delete` and `replace` of an observable set no longer subscribe the running derivation to the set, matching observable maps and arrays.
+
 ## 7.1.4
 
 ### Patch Changes
