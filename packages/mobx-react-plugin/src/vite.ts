@@ -2,6 +2,7 @@ import { transformAsync } from "@babel/core"
 import type { ParserOptions, TransformOptions } from "@babel/core"
 import babelPlugin = require("./babel")
 import { normalizeOptions, shouldProcessFile } from "./options"
+import { OBSERVER_SOURCE } from "./transform"
 
 const DEFAULT_INCLUDE = /\.[cm]?[jt]sx?$/
 
@@ -13,6 +14,15 @@ function mobxReactPlugin(options: mobxReactPlugin.Options = {}): mobxReactPlugin
     return {
         name: "mobx-react-plugin",
         enforce: "pre",
+        config(userConfig) {
+            if (
+                pluginOptions.observer === false ||
+                userConfig?.optimizeDeps?.exclude?.includes(OBSERVER_SOURCE)
+            ) {
+                return null
+            }
+            return { optimizeDeps: { include: [OBSERVER_SOURCE] } }
+        },
         configResolved(config) {
             root = config.root
         },
@@ -81,6 +91,9 @@ namespace mobxReactPlugin {
     export interface VitePlugin {
         name: string
         enforce: "pre"
+        config(userConfig?: {
+            optimizeDeps?: { exclude?: string[] }
+        }): { optimizeDeps: { include: string[] } } | null
         configResolved(config: { root: string }): void
         transform(
             code: string,
