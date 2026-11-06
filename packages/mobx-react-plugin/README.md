@@ -215,7 +215,7 @@ Left alone:
 -   class components (use `observer` from `mobx-react`);
 -   callbacks passed to unknown higher-order functions, such as `styled(() => ...)` or `connect(...)(Component)`: wrap these manually;
 -   components defined inside other functions: wrapping them would create a new component type on every call. They still get the directive if React Compiler would compile them;
--   components that start with `"use memo"`: see [opting out](#opting-out).
+-   components and hooks that start with `"use memo"`: see [opting out](#opting-out).
 
 Details worth knowing:
 
