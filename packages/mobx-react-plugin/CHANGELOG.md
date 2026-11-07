@@ -1,5 +1,11 @@
 # mobx-react-plugin
 
+## 1.0.2
+
+### Patch Changes
+
+-   [`b433c95720ced6f987d2379913933d49517cb48f`](https://github.com/mobxjs/mobx/commit/b433c95720ced6f987d2379913933d49517cb48f) [#4770](https://github.com/mobxjs/mobx/pull/4770) Thanks [@kubk](https://github.com/kubk)! - Faster transforms: files that cannot contain components, hooks or flows are skipped without being parsed, and the Vite plugin only generates code when something changed. Code generation options for the Vite plugin now go in `babel.generatorOpts`.
+
 ## 1.0.1
 
 ### Patch Changes
