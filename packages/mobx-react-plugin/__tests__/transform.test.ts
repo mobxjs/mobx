@@ -131,6 +131,34 @@ const A = observer(() => {
         )
     })
 
+    test("arrow functions using `arguments` are kept, unless it is a property or in a nested function", () => {
+        expectTransform(
+            code`
+const B = () => { return <a>{arguments[0]}</a> }`,
+            code`
+import { observer } from "mobx-react-lite";
+const B = observer(() => {
+  "use no memo";
+
+  return <a>{arguments[0]}</a>;
+});`
+        )
+        expectTransform(
+            code`
+const C = () => { const f = function () { return arguments[0] }; return <a title={x.arguments} onClick={f} /> }`,
+            code`
+import { observer } from "mobx-react-lite";
+const C = observer(function C() {
+  "use no memo";
+
+  const f = function () {
+    return arguments[0];
+  };
+  return <a title={x.arguments} onClick={f} />;
+});`
+        )
+    })
+
     test("function expressions", () => {
         expectTransform(
             code`
@@ -920,5 +948,85 @@ describe("options", () => {
         expect(() =>
             transform("const a = 1", { options: { observer: { foo: 1 } } as any })
         ).toThrow(/Unknown observer option "foo"/)
+    })
+})
+
+describe("files are only analyzed when they can contain components or hooks", () => {
+    test(".ts files with hook calls", () => {
+        expectTransform(
+            code`
+export function useCount(store) { return useSyncExternalStore(store.subscribe, store.get) }`,
+            code`
+export function useCount(store) {
+  "use no memo";
+
+  return useSyncExternalStore(store.subscribe, store.get);
+}`,
+            { filename: "/project/src/useCount.ts" }
+        )
+    })
+
+    test("JSX with whitespace after the angle bracket", () => {
+        expectTransform(
+            code`
+export function App() { return < div /> }`,
+            code`
+import { observer } from "mobx-react-lite";
+export const App = observer(function App() {
+  "use no memo";
+
+  return <div />;
+});`
+        )
+    })
+})
+
+describe("scope information stays correct for later plugins", () => {
+    const commonjs = require.resolve("@babel/plugin-transform-modules-commonjs")
+
+    test("the observer import and the wrapped component", () => {
+        const output = transform(
+            code`
+export function App() { return <div>{store.count}</div> }
+export function useStore() { return useContext(StoreContext) }`,
+            { plugins: [commonjs] }
+        )
+        expect(output).toContain(
+            "const App = exports.App = (0, _mobxReactLite.observer)(function App()"
+        )
+        expect(output).toContain("exports.useStore = useStore")
+    })
+
+    test("the flow import", () => {
+        const output = transform(
+            code`
+import { makeObservable, action } from "mobx"
+export class Store {
+    constructor() { makeObservable(this, { load: action }) }
+    async load() { await api.load() }
+}`,
+            { plugins: [commonjs] }
+        )
+        expect(output).toContain("load: _mobx.flow")
+        expect(output).toContain("*load()")
+    })
+
+    test("observer applied to a shadowing binding does not count for the module level component", () => {
+        expectTransform(
+            code`
+function App() { return <div /> }
+function wrap() { const App = () => null; return observer(App) }`,
+            code`
+import { observer as _observer } from "mobx-react-lite";
+const App = _observer(function App() {
+  "use no memo";
+
+  return <div />;
+});
+function wrap() {
+  const App = () => null;
+  return observer(App);
+}`
+        )
     })
 })

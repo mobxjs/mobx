@@ -49,7 +49,6 @@ interface Context {
     program: NodePath<t.Program>
     result: FlowResult
     imports: Map<string, string>
-    importAdded: boolean
 }
 
 export function transformFlows(types: Types, program: NodePath<t.Program>): FlowResult {
@@ -57,8 +56,7 @@ export function transformFlows(types: Types, program: NodePath<t.Program>): Flow
         t: types,
         program,
         result: { flows: [] },
-        imports: new Map(),
-        importAdded: false
+        imports: new Map()
     }
     program.traverse({
         Class(path) {
@@ -68,9 +66,6 @@ export function transformFlows(types: Types, program: NodePath<t.Program>): Flow
             transformObjectCall(ctx, path)
         }
     })
-    if (ctx.importAdded) {
-        program.scope.crawl()
-    }
     return ctx.result
 }
 
@@ -336,7 +331,6 @@ function ensureMobxImport(ctx: Context, name: string): string {
     let local = ctx.imports.get(name) ?? findImport(ctx.t, ctx.program, name, [MOBX_SOURCE])
     if (local === null) {
         local = addImport(ctx.t, ctx.program, name, MOBX_SOURCE)
-        ctx.importAdded = true
     }
     ctx.imports.set(name, local)
     return local

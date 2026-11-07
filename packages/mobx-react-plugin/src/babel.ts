@@ -1,67 +1,12 @@
-import type { PluginObj, PluginPass, types as t } from "@babel/core"
-import { transformFlows } from "./flow"
-import { normalizeOptions, shouldProcessFile } from "./options"
-import { transformProgram } from "./transform"
+import { createBabelPlugin } from "./plugin"
 
-interface BabelApi {
-    types: typeof t
-    assertVersion(range: string | number): void
-}
-
-function mobxReactPlugin(
-    api: BabelApi,
-    rawOptions?: mobxReactPlugin.Options
-): PluginObj<PluginPass> {
-    api.assertVersion("^7.0.0 || ^8.0.0-0")
-    const options = normalizeOptions(rawOptions)
-    return {
-        name: "mobx-react-plugin",
-        visitor: {
-            Program: {
-                enter(program, state) {
-                    const filename = state.filename
-                    const root = (state.file.opts as { root?: string | null }).root ?? state.cwd
-                    if (!shouldProcessFile(filename, root, options)) {
-                        return
-                    }
-                    const result: mobxReactPlugin.TransformResult = {
-                        wrapped: [],
-                        directives: [],
-                        aliased: [],
-                        flows: []
-                    }
-                    if (options.observer) {
-                        const observed = transformProgram(
-                            api.types,
-                            program,
-                            options.observer,
-                            filename
-                        )
-                        result.wrapped = observed.wrapped
-                        result.directives = observed.directives
-                        result.aliased = observed.aliased
-                    }
-                    if (options.flow) {
-                        result.flows = transformFlows(api.types, program).flows
-                    }
-                    const metadata = state.file.metadata as Record<string, unknown>
-                    metadata.mobxReactPlugin = result
-                }
-            }
-        }
-    }
-}
+const mobxReactPlugin = createBabelPlugin(false)
 
 namespace mobxReactPlugin {
     export type Options = import("./options").Options
     export type ObserverOptions = import("./options").ObserverOptions
     export type FilterPattern = import("./options").FilterPattern
-    export interface TransformResult {
-        wrapped: string[]
-        directives: string[]
-        aliased: string[]
-        flows: string[]
-    }
+    export type TransformResult = import("./plugin").TransformResult
 }
 
 export = mobxReactPlugin

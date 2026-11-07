@@ -1,14 +1,35 @@
 import { transformAsync } from "@babel/core"
-import type { ParserOptions, TransformOptions } from "@babel/core"
+import type { ParserOptions, PluginItem, TransformOptions } from "@babel/core"
+import generate from "@babel/generator"
 import babelPlugin = require("./babel")
 import { normalizeOptions, shouldProcessFile } from "./options"
+import { createBabelPlugin, hasChanges } from "./plugin"
+import { neededTransforms, TS_FILE_RE } from "./precheck"
 import { OBSERVER_SOURCE } from "./transform"
 
 const DEFAULT_INCLUDE = /\.[cm]?[jt]sx?$/
+// Babel accepts `false`, the typings do not.
+const NO_INPUT_SOURCE_MAP = false as unknown as TransformOptions["inputSourceMap"]
+
+const standaloneBabelPlugin = createBabelPlugin(true)
 
 function mobxReactPlugin(options: mobxReactPlugin.Options = {}): mobxReactPlugin.VitePlugin {
     const { babel: babelOptions, include, exclude, ...pluginOptions } = options
-    const filter = normalizeOptions({ include: include ?? DEFAULT_INCLUDE, exclude })
+    const normalized = normalizeOptions({
+        ...pluginOptions,
+        include: include ?? DEFAULT_INCLUDE,
+        exclude
+    })
+    const extraTransforms = Boolean(
+        babelOptions?.plugins?.length ||
+            babelOptions?.presets?.length ||
+            babelOptions?.overrides?.length ||
+            babelOptions?.env
+    )
+    const plugins: PluginItem[] = [
+        [extraTransforms ? babelPlugin : standaloneBabelPlugin, pluginOptions],
+        ...(babelOptions?.plugins ?? [])
+    ]
     let root = process.cwd()
 
     return {
@@ -16,7 +37,7 @@ function mobxReactPlugin(options: mobxReactPlugin.Options = {}): mobxReactPlugin
         enforce: "pre",
         config(userConfig) {
             if (
-                pluginOptions.observer === false ||
+                normalized.observer === null ||
                 userConfig?.optimizeDeps?.exclude?.includes(OBSERVER_SOURCE)
             ) {
                 return null
@@ -31,8 +52,14 @@ function mobxReactPlugin(options: mobxReactPlugin.Options = {}): mobxReactPlugin
                 return null
             }
             const filename = id.split("?")[0]
-            if (!shouldProcessFile(filename, root, filter)) {
+            if (!shouldProcessFile(filename, root, normalized)) {
                 return null
+            }
+            if (!extraTransforms) {
+                const needed = neededTransforms(code, filename, normalized)
+                if (!needed.observer && !needed.flow) {
+                    return null
+                }
             }
             const result = await transformAsync(code, {
                 ...babelOptions,
@@ -41,30 +68,25 @@ function mobxReactPlugin(options: mobxReactPlugin.Options = {}): mobxReactPlugin
                 babelrc: false,
                 configFile: false,
                 browserslistConfigFile: false,
-                sourceMaps: true,
+                inputSourceMap: NO_INPUT_SOURCE_MAP,
                 sourceType: "module",
                 parserOpts: {
                     ...babelOptions?.parserOpts,
                     plugins: resolveParserPlugins(filename, babelOptions?.parserOpts?.plugins)
                 },
-                plugins: [[babelPlugin, pluginOptions], ...(babelOptions?.plugins ?? [])]
+                plugins,
+                code: false,
+                ast: true
             })
-            if (!result || result.code == null) {
+            if (!result?.ast || (!extraTransforms && !hasChanges(result.metadata))) {
                 return null
             }
-            const meta = (
-                result.metadata as { mobxReactPlugin?: babelPlugin.TransformResult } | undefined
-            )?.mobxReactPlugin
-            const extraTransforms = Boolean(
-                babelOptions?.plugins?.length || babelOptions?.presets?.length
+            const output = generate(
+                result.ast,
+                { ...babelOptions?.generatorOpts, sourceMaps: true, sourceFileName: filename },
+                code
             )
-            if (
-                !extraTransforms &&
-                (!meta || Object.values(meta).every(list => list.length === 0))
-            ) {
-                return null
-            }
-            return { code: result.code, map: result.map }
+            return { code: output.code, map: output.map }
         }
     }
 }
@@ -74,7 +96,7 @@ function resolveParserPlugins(
     babelOptionPlugins: ParserOptions["plugins"] | undefined
 ): NonNullable<ParserOptions["plugins"]> {
     const plugins: NonNullable<ParserOptions["plugins"]> = []
-    if (!/\.[cm]?ts$/.test(filename)) {
+    if (!TS_FILE_RE.test(filename)) {
         plugins.push("jsx")
     }
     if (/\.[cm]?tsx?$/.test(filename)) {
@@ -111,7 +133,8 @@ namespace mobxReactPlugin {
     }
     export interface Options extends babelPlugin.Options {
         /**
-         * Extra Babel options merged into the transform call (advanced).
+         * Extra Babel options merged into the transform call (advanced). Code generation
+         * options go in `generatorOpts`.
          */
         babel?: TransformOptions
     }
