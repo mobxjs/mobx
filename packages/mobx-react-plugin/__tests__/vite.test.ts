@@ -87,4 +87,61 @@ export const App = () => <div />`
         )
         expect(result!.code).toContain("react/compiler-runtime")
     })
+
+    test("files that cannot contain components or flows are skipped without being parsed", async () => {
+        const plugin = createPlugin()
+        // Not valid syntax: parsing would throw.
+        const broken = "export const total = (a: number) => a +;"
+        expect(await plugin.transform(broken, "/project/src/math.ts")).toBeNull()
+        expect(
+            await plugin.transform(`${broken}; Array<string>`, "/project/src/types.ts")
+        ).toBeNull()
+        expect(
+            await plugin.transform(
+                `${broken}; class Api { async load() {} }`,
+                "/project/src/api.ts"
+            )
+        ).toBeNull()
+        await expect(
+            plugin.transform(`${broken}\n<div />`, "/project/src/App.tsx")
+        ).rejects.toThrow()
+        await expect(
+            plugin.transform(`${broken}; useStore()`, "/project/src/useStore.ts")
+        ).rejects.toThrow()
+        await expect(
+            plugin.transform(
+                `${broken}; class S { async f() {} }; makeAutoObservable(s)`,
+                "/project/src/s.ts"
+            )
+        ).rejects.toThrow()
+        await expect(
+            plugin.transform(`${broken}; class S { @action async f() {} }`, "/project/src/s.ts")
+        ).rejects.toThrow()
+    })
+
+    test("nothing is returned when the file does not change", async () => {
+        const plugin = createPlugin({ observer: { useNoMemo: false } })
+        expect(
+            await plugin.transform(
+                `export const App = observer(() => <div />)`,
+                "/project/src/App.tsx"
+            )
+        ).toBeNull()
+    })
+
+    test("generator options from the babel option are applied", async () => {
+        const plugin = createPlugin({ babel: { generatorOpts: { compact: true } } })
+        const result = await plugin.transform(COMPONENT, "/project/src/App.tsx")
+        expect(result!.code).toContain("observer(function App()")
+        expect(result!.code).not.toContain("\n")
+    })
+
+    test("parser options from the babel option are applied", async () => {
+        const plugin = createPlugin({ babel: { parserOpts: { allowReturnOutsideFunction: true } } })
+        const result = await plugin.transform(
+            `if (!ok) return\nexport function App() { return <div /> }`,
+            "/project/src/App.tsx"
+        )
+        expect(result!.code).toContain("observer(function App()")
+    })
 })

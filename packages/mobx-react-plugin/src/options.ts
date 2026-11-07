@@ -147,6 +147,9 @@ export function shouldProcessFile(
     if (/(^|\/)node_modules\//.test(absolute)) {
         return false
     }
+    if (options.include === null && options.exclude.length === 0) {
+        return true
+    }
     let relative: string | null = null
     if (cwd) {
         const rel = toPosix(path.relative(cwd, filename))

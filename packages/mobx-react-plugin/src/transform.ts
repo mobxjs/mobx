@@ -9,6 +9,7 @@ type Types = typeof t
 type FunctionPath = NodePath<
     t.FunctionDeclaration | t.FunctionExpression | t.ArrowFunctionExpression
 >
+type FunctionNode = t.FunctionDeclaration | t.FunctionExpression | t.ArrowFunctionExpression
 type CallPath = NodePath<t.CallExpression>
 type WrapperKind = "observer" | "forwardRef" | "memo"
 
@@ -57,7 +58,6 @@ interface Context {
     observedNames: Set<string>
     forwardRefNames: Set<string>
     forwardRefCalls: CallPath[]
-    changed: boolean
 }
 
 export function transformProgram(
@@ -76,8 +76,7 @@ export function transformProgram(
         observerLocal: findImport(types, program, OBSERVER_NAME, KNOWN_OBSERVER_SOURCES),
         observedNames: new Set(),
         forwardRefNames: new Set(),
-        forwardRefCalls: [],
-        changed: false
+        forwardRefCalls: []
     }
 
     const moduleOptOut = program.node.directives.some(d => OPT_OUT_DIRECTIVES.has(d.value.value))
@@ -89,9 +88,6 @@ export function transformProgram(
     }
     if (addDirectives) {
         addDirectivesToRemainingFunctions(ctx)
-    }
-    if (ctx.changed) {
-        program.scope.crawl()
     }
     return ctx.result
 }
@@ -125,22 +121,14 @@ function getWrapperKind(ctx: Context, callee: NodePath): WrapperKind | null {
 }
 
 function collectWrapperReferences(ctx: Context): void {
-    const { program } = ctx
-    program.traverse({
-        CallExpression(call) {
+    const bindings = ctx.program.scope.bindings
+    for (const name of Object.keys(bindings)) {
+        for (const ref of bindings[name].referencePaths) {
+            const call = ref.parentPath
+            if (!call || !call.isCallExpression() || call.node.arguments[0] !== ref.node) {
+                continue
+            }
             const kind = getWrapperKind(ctx, call.get("callee"))
-            if (kind === null) {
-                return
-            }
-            const arg = call.get("arguments")[0]
-            if (!arg || !arg.isIdentifier()) {
-                return
-            }
-            const name = arg.node.name
-            const binding = call.scope.getBinding(name)
-            if (!binding || binding.scope !== program.scope) {
-                return
-            }
             if (kind === "observer") {
                 ctx.observedNames.add(name)
             } else if (kind === "forwardRef") {
@@ -148,7 +136,7 @@ function collectWrapperReferences(ctx: Context): void {
                 ctx.forwardRefCalls.push(call)
             }
         }
-    })
+    }
 }
 
 function unwrapWrappers(
@@ -296,50 +284,76 @@ function isHookNameNode(ctx: Context, node: t.Node | null | undefined): boolean 
     return false
 }
 
-interface BodyScan {
+interface FunctionScan {
     rootJsx: boolean
     deepJsx: boolean
     rootHooks: boolean
+    returnsNonNode: boolean
 }
 
-function scanBody(ctx: Context, fn: FunctionPath): BodyScan {
-    const { t } = ctx
-    const scan: BodyScan = { rootJsx: false, deepJsx: false, rootHooks: false }
-    const root = fn.node
-    const isNested = (p: NodePath) => {
-        let parent: NodePath | null = p.parentPath
-        while (parent && parent.node !== root) {
-            if (
-                parent.isArrowFunctionExpression() ||
-                parent.isFunctionExpression() ||
-                parent.isFunctionDeclaration()
-            ) {
-                return true
-            }
-            parent = parent.parentPath
-        }
-        return false
+function forEachChild(t: Types, node: t.Node, visit: (child: t.Node) => void): void {
+    const keys = t.VISITOR_KEYS[node.type]
+    if (!keys) {
+        return
     }
-    fn.traverse({
-        JSXElement(p) {
-            scan.deepJsx = true
-            if (!isNested(p)) {
-                scan.rootJsx = true
+    const children = node as unknown as Record<string, t.Node | (t.Node | null)[] | null>
+    for (const key of keys) {
+        const child = children[key]
+        if (Array.isArray(child)) {
+            for (const item of child) {
+                if (item) {
+                    visit(item)
+                }
             }
-        },
-        JSXFragment(p) {
-            scan.deepJsx = true
-            if (!isNested(p)) {
-                scan.rootJsx = true
-            }
-        },
-        CallExpression(call) {
-            if (!scan.rootHooks && isHookNameNode(ctx, call.node.callee) && !isNested(call)) {
-                scan.rootHooks = true
-            }
+        } else if (child) {
+            visit(child)
         }
-    })
-    void t
+    }
+}
+
+function scanFunction(ctx: Context, root: FunctionNode): FunctionScan {
+    const { t } = ctx
+    const scan: FunctionScan = {
+        rootJsx: false,
+        deepJsx: false,
+        rootHooks: false,
+        returnsNonNode: false
+    }
+    if (t.isArrowFunctionExpression(root) && !t.isBlockStatement(root.body)) {
+        scan.returnsNonNode = isNonNode(ctx, root.body)
+    }
+    const visit = (node: t.Node, nested: boolean, ownReturns: boolean): void => {
+        switch (node.type) {
+            case "JSXElement":
+            case "JSXFragment":
+                scan.deepJsx = true
+                if (!nested) {
+                    scan.rootJsx = true
+                }
+                break
+            case "CallExpression":
+                if (!nested && isHookNameNode(ctx, node.callee)) {
+                    scan.rootHooks = true
+                }
+                break
+            case "ReturnStatement":
+                if (ownReturns) {
+                    scan.returnsNonNode = isNonNode(ctx, node.argument)
+                }
+                break
+            case "ArrowFunctionExpression":
+            case "FunctionExpression":
+            case "FunctionDeclaration":
+                nested = true
+                ownReturns = false
+                break
+            case "ObjectMethod":
+                ownReturns = false
+                break
+        }
+        forEachChild(t, node, child => visit(child, nested, ownReturns))
+    }
+    forEachChild(t, root, child => visit(child, false, true))
     return scan
 }
 
@@ -386,9 +400,9 @@ function isValidPropsAnnotation(ctx: Context, annotation: t.Node | null | undefi
     return true
 }
 
-function isValidComponentParams(ctx: Context, fn: FunctionPath): boolean {
+function isValidComponentParams(ctx: Context, fn: FunctionNode): boolean {
     const { t } = ctx
-    const params = fn.node.params
+    const params = fn.params
     if (params.length === 0) {
         return true
     }
@@ -422,48 +436,22 @@ function isNonNode(ctx: Context, node: t.Node | null | undefined): boolean {
     return false
 }
 
-function returnsNonNode(ctx: Context, fn: FunctionPath): boolean {
-    const { t } = ctx
-    let result = false
-    if (fn.isArrowFunctionExpression() && !t.isBlockStatement(fn.node.body)) {
-        result = isNonNode(ctx, fn.node.body)
-    }
-    const root = fn.node
-    const skipNested = (p: NodePath) => {
-        if (p.node !== root) {
-            p.skip()
-        }
-    }
-    fn.traverse({
-        ReturnStatement(ret) {
-            result = isNonNode(ctx, ret.node.argument)
-        },
-        ArrowFunctionExpression: skipNested,
-        FunctionExpression: skipNested,
-        FunctionDeclaration: skipNested,
-        ObjectMethod(p) {
-            p.skip()
-        }
-    })
-    return result
-}
-
 type FunctionType = "component" | "hook"
 
 function classifyCandidate(ctx: Context, candidate: Candidate): FunctionType | null {
     const { fn, name } = candidate
     if (name !== null && HOOK_NAME_RE.test(name)) {
-        const scan = scanBody(ctx, fn)
+        const scan = scanFunction(ctx, fn.node)
         return scan.rootJsx || scan.rootHooks ? "hook" : null
     }
     if (name !== null && !COMPONENT_NAME_RE.test(name)) {
         return null
     }
-    const scan = scanBody(ctx, fn)
+    const scan = scanFunction(ctx, fn.node)
     if (!(scan.deepJsx || scan.rootHooks)) {
         return null
     }
-    if (!isValidComponentParams(ctx, fn) || returnsNonNode(ctx, fn)) {
+    if (!isValidComponentParams(ctx, fn.node) || scan.returnsNonNode) {
         return null
     }
     return "component"
@@ -471,29 +459,25 @@ function classifyCandidate(ctx: Context, candidate: Candidate): FunctionType | n
 
 function getCompilerFunctionName(
     ctx: Context,
-    fn: FunctionPath
+    fn: FunctionNode,
+    parent: t.Node
 ): t.Identifier | t.MemberExpression | null {
     const { t } = ctx
-    if (fn.isFunctionDeclaration()) {
-        return fn.node.id ?? null
+    if (t.isFunctionDeclaration(fn)) {
+        return fn.id ?? null
     }
-    const parent = fn.parent
     let id: t.Node | null | undefined = null
-    if (t.isVariableDeclarator(parent) && parent.init === fn.node) {
+    if (t.isVariableDeclarator(parent) && parent.init === fn) {
         id = parent.id
-    } else if (
-        t.isAssignmentExpression(parent) &&
-        parent.right === fn.node &&
-        parent.operator === "="
-    ) {
+    } else if (t.isAssignmentExpression(parent) && parent.right === fn && parent.operator === "=") {
         id = parent.left
     } else if (
         (t.isObjectProperty(parent) || t.isClassProperty(parent)) &&
-        parent.value === fn.node &&
+        parent.value === fn &&
         !parent.computed
     ) {
         id = parent.key
-    } else if (t.isAssignmentPattern(parent) && parent.right === fn.node) {
+    } else if (t.isAssignmentPattern(parent) && parent.right === fn) {
         id = parent.left
     }
     if (t.isIdentifier(id) || t.isMemberExpression(id)) {
@@ -502,9 +486,8 @@ function getCompilerFunctionName(
     return null
 }
 
-function isReactApiCallback(ctx: Context, fn: FunctionPath, api: "forwardRef" | "memo"): boolean {
+function isReactApiCallback(ctx: Context, parent: t.Node, api: "forwardRef" | "memo"): boolean {
     const { t } = ctx
-    const parent = fn.parent
     if (!t.isCallExpression(parent)) {
         return false
     }
@@ -518,34 +501,34 @@ function isReactApiCallback(ctx: Context, fn: FunctionPath, api: "forwardRef" | 
     )
 }
 
-function compilerFunctionType(ctx: Context, fn: FunctionPath): FunctionType | null {
+function compilerFunctionType(ctx: Context, fn: FunctionNode, parent: t.Node): FunctionType | null {
     const { t } = ctx
-    const nameNode = getCompilerFunctionName(ctx, fn)
+    const nameNode = getCompilerFunctionName(ctx, fn, parent)
     if (nameNode && t.isIdentifier(nameNode) && COMPONENT_NAME_RE.test(nameNode.name)) {
-        const scan = scanBody(ctx, fn)
+        const scan = scanFunction(ctx, fn)
         return (scan.rootJsx || scan.rootHooks) &&
             isValidComponentParams(ctx, fn) &&
-            !returnsNonNode(ctx, fn)
+            !scan.returnsNonNode
             ? "component"
             : null
     }
     if (nameNode && isHookNameNode(ctx, nameNode)) {
-        const scan = scanBody(ctx, fn)
+        const scan = scanFunction(ctx, fn)
         return scan.rootJsx || scan.rootHooks ? "hook" : null
     }
     if (
-        (fn.isFunctionExpression() || fn.isArrowFunctionExpression()) &&
-        (isReactApiCallback(ctx, fn, "forwardRef") || isReactApiCallback(ctx, fn, "memo"))
+        (t.isFunctionExpression(fn) || t.isArrowFunctionExpression(fn)) &&
+        (isReactApiCallback(ctx, parent, "forwardRef") || isReactApiCallback(ctx, parent, "memo"))
     ) {
-        const scan = scanBody(ctx, fn)
+        const scan = scanFunction(ctx, fn)
         return scan.rootJsx || scan.rootHooks ? "component" : null
     }
     return null
 }
 
-function functionDisplayName(ctx: Context, fn: FunctionPath): string | null {
+function functionDisplayName(ctx: Context, fn: FunctionNode, parent: t.Node): string | null {
     const { t } = ctx
-    const nameNode = getCompilerFunctionName(ctx, fn)
+    const nameNode = getCompilerFunctionName(ctx, fn, parent)
     if (t.isIdentifier(nameNode)) {
         return nameNode.name
     }
@@ -555,8 +538,8 @@ function functionDisplayName(ctx: Context, fn: FunctionPath): string | null {
     return null
 }
 
-function findDirective(ctx: Context, fn: FunctionPath, set: Set<string>): string | null {
-    const body = fn.node.body
+function findDirective(ctx: Context, fn: FunctionNode, set: Set<string>): string | null {
+    const body = fn.body
     if (!ctx.t.isBlockStatement(body)) {
         return null
     }
@@ -564,56 +547,47 @@ function findDirective(ctx: Context, fn: FunctionPath, set: Set<string>): string
     return found ? found.value.value : null
 }
 
-function addNoMemoDirective(ctx: Context, fn: FunctionPath, name: string | null): void {
+function addNoMemoDirective(ctx: Context, fn: FunctionNode, name: string | null): void {
     const { t } = ctx
-    const node = fn.node
-    if (!t.isBlockStatement(node.body)) {
-        node.body = t.blockStatement([t.returnStatement(node.body)])
-        ctx.changed = true
+    if (!t.isBlockStatement(fn.body)) {
+        fn.body = t.blockStatement([t.returnStatement(fn.body)])
     }
-    const body = node.body
-    if (body.directives.some(d => OPT_OUT_DIRECTIVES.has(d.value.value))) {
+    if (findDirective(ctx, fn, OPT_OUT_DIRECTIVES) !== null) {
         return
     }
-    body.directives.push(t.directive(t.directiveLiteral(NO_MEMO_DIRECTIVE)))
+    fn.body.directives.push(t.directive(t.directiveLiteral(NO_MEMO_DIRECTIVE)))
     ctx.result.directives.push(name ?? "<anonymous>")
-    ctx.changed = true
 }
 
 function addDirectivesToRemainingFunctions(ctx: Context): void {
-    ctx.program.traverse({
-        Function(p) {
-            if (
-                !(
-                    p.isFunctionDeclaration() ||
-                    p.isFunctionExpression() ||
-                    p.isArrowFunctionExpression()
-                )
-            ) {
+    const { t } = ctx
+    const visit = (node: t.Node, parent: t.Node): void => {
+        switch (node.type) {
+            case "ClassDeclaration":
+            case "ClassExpression":
                 return
+            case "FunctionDeclaration":
+            case "FunctionExpression":
+            case "ArrowFunctionExpression": {
+                if (ctx.handled.has(node)) {
+                    return
+                }
+                const type = compilerFunctionType(ctx, node, parent)
+                if (type !== null) {
+                    if (
+                        findDirective(ctx, node, OPT_IN_DIRECTIVES) === null &&
+                        (type === "component" || ctx.opts.useNoMemoHooks)
+                    ) {
+                        addNoMemoDirective(ctx, node, functionDisplayName(ctx, node, parent))
+                    }
+                    return
+                }
             }
-            const fn = p as FunctionPath
-            if (ctx.handled.has(fn.node)) {
-                fn.skip()
-                return
-            }
-            const type = compilerFunctionType(ctx, fn)
-            if (type === null) {
-                return
-            }
-            fn.skip()
-            if (findDirective(ctx, fn, OPT_IN_DIRECTIVES) !== null) {
-                return
-            }
-            if (type === "hook" && !ctx.opts.useNoMemoHooks) {
-                return
-            }
-            addNoMemoDirective(ctx, fn, functionDisplayName(ctx, fn))
-        },
-        Class(p) {
-            p.skip()
         }
-    })
+        forEachChild(t, node, child => visit(child, node))
+    }
+    const program = ctx.program.node
+    forEachChild(t, program, child => visit(child, program))
 }
 
 function describeCandidate(candidate: Candidate): string {
@@ -636,7 +610,7 @@ function processCandidate(ctx: Context, candidate: Candidate, addDirectives: boo
         inlineObserver ||
         (candidate.binding !== null && name !== null && ctx.observedNames.has(name))
 
-    const optIn = findDirective(ctx, fn, OPT_IN_DIRECTIVES)
+    const optIn = findDirective(ctx, fn.node, OPT_IN_DIRECTIVES)
     if (optIn !== null) {
         if (observed) {
             throw fn.buildCodeFrameError(
@@ -650,13 +624,13 @@ function processCandidate(ctx: Context, candidate: Candidate, addDirectives: boo
 
     if (type === "hook") {
         if (addDirectives && ctx.opts.useNoMemoHooks) {
-            addNoMemoDirective(ctx, fn, name)
+            addNoMemoDirective(ctx, fn.node, name)
         }
         return
     }
 
     if (addDirectives) {
-        addNoMemoDirective(ctx, fn, name)
+        addNoMemoDirective(ctx, fn.node, name)
     }
     if (observed) {
         redirectObservedSelfReferences(ctx, candidate, inlineObserver)
@@ -686,37 +660,33 @@ function resolveWrapPlan(wrappers: Wrapper[]): WrapPlan | null {
     return null
 }
 
-function canConvertArrow(ctx: Context, fn: NodePath<t.ArrowFunctionExpression>): boolean {
+// An arrow function can become a named function expression unless it uses `this`, `super`,
+// `new.target` or `arguments` (nested arrows share them, other functions have their own).
+function canConvertArrow(ctx: Context, fn: t.ArrowFunctionExpression): boolean {
+    const { t } = ctx
     let safe = true
-    fn.traverse({
-        ThisExpression() {
-            safe = false
-        },
-        Super() {
-            safe = false
-        },
-        MetaProperty() {
-            safe = false
-        },
-        Identifier(p) {
-            if (p.node.name === "arguments" && p.isReferencedIdentifier()) {
+    const visit = (node: t.Node, parent: t.Node, grandparent: t.Node | undefined): void => {
+        switch (node.type) {
+            case "ThisExpression":
+            case "Super":
+            case "MetaProperty":
                 safe = false
-            }
-        },
-        FunctionExpression(p) {
-            p.skip()
-        },
-        FunctionDeclaration(p) {
-            p.skip()
-        },
-        ObjectMethod(p) {
-            p.skip()
-        },
-        Class(p) {
-            p.skip()
+                return
+            case "Identifier":
+                if (node.name === "arguments" && t.isReferenced(node, parent, grandparent)) {
+                    safe = false
+                }
+                return
+            case "FunctionExpression":
+            case "FunctionDeclaration":
+            case "ObjectMethod":
+            case "ClassDeclaration":
+            case "ClassExpression":
+                return
         }
-    })
-    void ctx
+        forEachChild(t, node, child => visit(child, node, parent))
+    }
+    forEachChild(t, fn, child => visit(child, fn, undefined))
     return safe
 }
 
@@ -728,9 +698,7 @@ function decideFunctionName(ctx: Context, candidate: Candidate): string | null {
     if (fn.isFunctionExpression()) {
         return fn.node.id ? fn.node.id.name : name
     }
-    return name !== null && canConvertArrow(ctx, fn as NodePath<t.ArrowFunctionExpression>)
-        ? name
-        : null
+    return name !== null && canConvertArrow(ctx, fn.node as t.ArrowFunctionExpression) ? name : null
 }
 
 function collectSelfReferences(ctx: Context, candidate: Candidate, fnName: string): NodePath[] {
@@ -852,17 +820,26 @@ function wrapComponent(ctx: Context, candidate: Candidate): void {
             }
         }
     } else {
-        let fnPath: NodePath<t.Expression> = fn as NodePath<t.Expression>
-        if (fn.isArrowFunctionExpression() && fnName !== null) {
-            ;[fnPath] = fn.replaceWith(buildFunctionExpression(ctx, fn.node, fnName))
-        } else if (fn.isFunctionExpression() && !fn.node.id && fnName !== null) {
-            fn.node.id = t.identifier(fnName)
+        const expr = fn as NodePath<t.FunctionExpression | t.ArrowFunctionExpression>
+        let fnNode: t.Expression = expr.node
+        if (expr.isArrowFunctionExpression() && fnName !== null) {
+            fnNode = buildFunctionExpression(ctx, expr.node, fnName)
+        } else if (expr.isFunctionExpression() && !expr.node.id && fnName !== null) {
+            expr.node.id = t.identifier(fnName)
         }
-        const target = plan.target === "fn" ? fnPath : plan.target
-        if (plan.memoCall && plan.memoCall.node.arguments.length === 1) {
-            plan.memoCall.get("callee").replaceWith(observer())
+        if (plan.target === "fn" && !plan.memoCall) {
+            // One replacement: unlike a function expression, a call has no scope to crawl.
+            expr.replaceWith(t.callExpression(observer(), [fnNode]))
         } else {
-            target.replaceWith(t.callExpression(observer(), [target.node]))
+            if (fnNode !== expr.node) {
+                expr.replaceWith(fnNode)
+            }
+            if (plan.memoCall && plan.memoCall.node.arguments.length === 1) {
+                plan.memoCall.get("callee").replaceWith(observer())
+            } else {
+                const target: NodePath<t.Expression> = plan.target === "fn" ? expr : plan.target
+                target.replaceWith(t.callExpression(observer(), [target.node]))
+            }
         }
         if (aliasDecl && site.kind === "declarator") {
             let stmt: NodePath = site.declarator.parentPath
@@ -874,7 +851,6 @@ function wrapComponent(ctx: Context, candidate: Candidate): void {
     }
 
     ctx.result.wrapped.push(name ?? "<anonymous>")
-    ctx.changed = true
 }
 
 function constDeclaration(
@@ -951,7 +927,6 @@ function redirectObservedSelfReferences(
         }
         renameReferences(selfRefs, observedName)
         ctx.result.aliased.push(name)
-        ctx.changed = true
         return
     }
 
@@ -990,7 +965,6 @@ function redirectObservedSelfReferences(
         return
     }
     ctx.result.aliased.push(fnName)
-    ctx.changed = true
 }
 
 function wrapForwardRefCallSites(ctx: Context, name: string): void {
@@ -1014,7 +988,6 @@ function wrapForwardRefCallSites(ctx: Context, name: string): void {
     }
     if (wrapped) {
         ctx.result.wrapped.push(name)
-        ctx.changed = true
     }
 }
 
@@ -1034,7 +1007,6 @@ function moduleVariableName(ctx: Context, call: CallPath): string | null {
 function ensureObserverImport(ctx: Context): string {
     if (ctx.observerLocal === null) {
         ctx.observerLocal = addImport(ctx.t, ctx.program, OBSERVER_NAME, OBSERVER_SOURCE)
-        ctx.changed = true
     }
     return ctx.observerLocal
 }
