@@ -1101,12 +1101,7 @@ test("1072 - @observable accessor without initial value and observe before first
     observe(user, "loginCount", () => {})
 })
 
-test("unobserved computed reads should warn with requiresReaction enabled", () => {
-    const warnings: string[] = []
-    jest.spyOn(console, "warn").mockImplementation((...args) => {
-        warnings.push(...args)
-    })
-
+test("unobserved computed reads should throw with requiresReaction enabled", () => {
     class A {
         @observable accessor x = 0
 
@@ -1118,22 +1113,14 @@ test("unobserved computed reads should warn with requiresReaction enabled", () =
 
     const a = new A()
 
-    a.y
+    expect(() => a.y).toThrow("is being read outside a reactive context")
     const d = mobx.reaction(
         () => a.y,
         () => {}
     )
-    a.y
+    expect(a.y).toBe(0)
     d()
-    a.y
-
-    expect(warnings.length).toEqual(2)
-    expect(warnings[0]).toContain(
-        "is being read outside a reactive context. Doing a full recompute."
-    )
-    expect(warnings[1]).toContain(
-        "is being read outside a reactive context. Doing a full recompute."
-    )
+    expect(() => a.y).toThrow("is being read outside a reactive context")
 })
 
 test("multiple inheritance should work", () => {

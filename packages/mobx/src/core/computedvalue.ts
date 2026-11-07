@@ -323,14 +323,13 @@ export class ComputedValue<T> implements IObservable, IWritableComputedValue<T>,
     }
 
     warnAboutUntrackedRead_() {
+        if (this.requiresReaction_) {
+            die(45, this.name_)
+        }
         if (!__DEV__) {
             return
         }
-        if (
-            typeof this.requiresReaction_ === "boolean"
-                ? this.requiresReaction_
-                : globalState.computedRequiresReaction
-        ) {
+        if (this.requiresReaction_ !== false && globalState.computedRequiresReaction) {
             console.warn(
                 `[mobx] Computed value '${this.name_}' is being read outside a reactive context. Doing a full recompute.`
             )
