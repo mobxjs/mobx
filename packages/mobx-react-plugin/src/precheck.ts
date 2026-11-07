@@ -11,9 +11,6 @@ export interface NeededTransforms {
     flow: boolean
 }
 
-// Textual checks that let a file skip parsing and analysis. They may report a transform as
-// needed for a file that does not change, never the other way round. An empty `code` (Babel
-// was given an AST only) needs everything.
 export function neededTransforms(
     code: string,
     filename: string | null | undefined,
@@ -29,7 +26,6 @@ export function neededTransforms(
 }
 
 function mayNeedObserver(code: string, filename: string | null | undefined): boolean {
-    // `.ts` files have no JSX, so `Array<string>` and the like do not count.
     const jsx = !filename || !TS_FILE_RE.test(filename)
     return HOOK_CALL_RE.test(code) || (jsx && JSX_RE.test(code))
 }

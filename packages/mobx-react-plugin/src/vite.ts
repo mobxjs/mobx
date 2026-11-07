@@ -8,7 +8,7 @@ import { neededTransforms, TS_FILE_RE } from "./precheck"
 import { OBSERVER_SOURCE } from "./transform"
 
 const DEFAULT_INCLUDE = /\.[cm]?[jt]sx?$/
-// Vite chains source maps itself. Babel accepts `false`, @types/babel__core does not know it.
+// Babel accepts `false`, the typings do not.
 const NO_INPUT_SOURCE_MAP = false as unknown as TransformOptions["inputSourceMap"]
 
 const standaloneBabelPlugin = createBabelPlugin(true)
@@ -20,8 +20,6 @@ function mobxReactPlugin(options: mobxReactPlugin.Options = {}): mobxReactPlugin
         include: include ?? DEFAULT_INCLUDE,
         exclude
     })
-    // Other Babel plugins or presets in the pass need the whole file traversed and returned,
-    // even when this plugin changes nothing.
     const extraTransforms = Boolean(babelOptions?.plugins?.length || babelOptions?.presets?.length)
     const plugins: PluginItem[] = [
         [extraTransforms ? babelPlugin : standaloneBabelPlugin, pluginOptions],

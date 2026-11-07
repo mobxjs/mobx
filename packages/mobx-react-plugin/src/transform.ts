@@ -660,8 +660,6 @@ function resolveWrapPlan(wrappers: Wrapper[]): WrapPlan | null {
     return null
 }
 
-// An arrow function can become a named function expression unless it uses `this`, `super`,
-// `new.target` or `arguments` (nested arrows share them, other functions have their own).
 function canConvertArrow(ctx: Context, fn: t.ArrowFunctionExpression): boolean {
     const { t } = ctx
     let safe = true

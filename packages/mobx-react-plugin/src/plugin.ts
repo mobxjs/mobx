@@ -17,10 +17,6 @@ export interface TransformResult extends ObserverResult {
 
 export type BabelPlugin = (api: BabelApi, rawOptions?: Options) => PluginObj<PluginPass>
 
-/**
- * @param standalone The plugin is the only one in its Babel pass (the Vite plugin), so the
- * traversal stops at `Program` and the scope is not re-crawled.
- */
 export function createBabelPlugin(standalone: boolean): BabelPlugin {
     return function mobxReactPlugin(api, rawOptions) {
         api.assertVersion("^7.0.0 || ^8.0.0-0")
@@ -67,7 +63,6 @@ function transformFile(
     if (needed.flow) {
         result.flows = transformFlows(types, program).flows
     }
-    // Directives add no bindings; wrapping, aliasing and the flow import do.
     const bindingsChanged =
         result.wrapped.length > 0 || result.aliased.length > 0 || result.flows.length > 0
     if (bindingsChanged && !standalone) {

@@ -90,7 +90,6 @@ export const App = () => <div />`
 
     test("files that cannot contain components or flows are skipped without being parsed", async () => {
         const plugin = createPlugin()
-        // Not valid syntax: parsing would throw.
         const broken = "export const total = (a: number) => a +;"
         expect(await plugin.transform(broken, "/project/src/math.ts")).toBeNull()
         expect(
