@@ -20,7 +20,12 @@ function mobxReactPlugin(options: mobxReactPlugin.Options = {}): mobxReactPlugin
         include: include ?? DEFAULT_INCLUDE,
         exclude
     })
-    const extraTransforms = Boolean(babelOptions?.plugins?.length || babelOptions?.presets?.length)
+    const extraTransforms = Boolean(
+        babelOptions?.plugins?.length ||
+            babelOptions?.presets?.length ||
+            babelOptions?.overrides?.length ||
+            babelOptions?.env
+    )
     const plugins: PluginItem[] = [
         [extraTransforms ? babelPlugin : standaloneBabelPlugin, pluginOptions],
         ...(babelOptions?.plugins ?? [])

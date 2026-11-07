@@ -88,6 +88,17 @@ export const App = () => <div />`
         expect(result!.code).toContain("react/compiler-runtime")
     })
 
+    test("plugins from babel overrides and env count as extra transforms", async () => {
+        const reactCompiler = [require.resolve("babel-plugin-react-compiler"), {}]
+        const source = `export function Pure({ value }) { "use memo"; return <div>{value}</div> }`
+        const overrides = createPlugin({ babel: { overrides: [{ plugins: [reactCompiler] }] } })
+        const env = createPlugin({ babel: { env: { test: { plugins: [reactCompiler] } } } })
+        for (const plugin of [overrides, env]) {
+            const result = await plugin.transform(source, "/project/src/Pure.tsx")
+            expect(result!.code).toContain("react/compiler-runtime")
+        }
+    })
+
     test("files that cannot contain components or flows are skipped without being parsed", async () => {
         const plugin = createPlugin()
         const broken = "export const total = (a: number) => a +;"
