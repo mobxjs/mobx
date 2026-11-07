@@ -67,7 +67,7 @@ export function isPlainObject(value: any) {
         return false
     }
     const proto = Object.getPrototypeOf(value)
-    if (proto == null) {
+    if (proto == null || proto === Object.prototype) {
         return true
     }
     const protoConstructor = hasProp(proto, "constructor") && proto.constructor
