@@ -1,5 +1,11 @@
 # mobx
 
+## 7.1.6
+
+### Patch Changes
+
+-   [`2a97ff69a8bb4d6c3c8582da07ffd1c53c6612db`](https://github.com/mobxjs/mobx/commit/2a97ff69a8bb4d6c3c8582da07ffd1c53c6612db) [#4772](https://github.com/mobxjs/mobx/pull/4772) Thanks [@b84330808](https://github.com/b84330808)! - perf: check for `Object.prototype` first in `isPlainObject`
+
 ## 7.1.5
 
 ### Patch Changes
