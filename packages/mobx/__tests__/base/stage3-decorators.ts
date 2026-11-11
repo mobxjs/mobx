@@ -812,7 +812,10 @@ test("#4248 toJS includes @observable accessor fields", () => {
     const adm = (store as any)[$mobx]
     expect(adm.values_.has("read")).toBe(true)
     expect(adm.lazyObservableKeys_?.has("unread")).toBe(true)
-    expect(adm.lazyObservableKeys_?.has("#secret")).toBe(true)
+    // A private field is kept under a symbol of its own, not under its name
+    const lazyKeys = [...adm.lazyObservableKeys_.keys()]
+    expect(lazyKeys).not.toContain("#secret")
+    expect(lazyKeys.map(String)).toContain("Symbol(#secret)")
 
     const res = mobx.toJS(store) as any
     expect(res).toEqual({
