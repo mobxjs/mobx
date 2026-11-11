@@ -810,12 +810,13 @@ test("#4248 toJS includes @observable accessor fields", () => {
     const store = new Store()
     store.read
     const adm = (store as any)[$mobx]
-    expect(adm.values_.has("read")).toBe(true)
-    expect(adm.lazyObservableKeys_?.has("unread")).toBe(true)
+    // A read outside a derivation creates no ObservableValue
+    expect(adm.values_.has("read")).toBe(false)
     // A private field is kept under a symbol of its own, not under its name
-    const lazyKeys = [...adm.lazyObservableKeys_.keys()]
-    expect(lazyKeys).not.toContain("#secret")
-    expect(lazyKeys.map(String)).toContain("Symbol(#secret)")
+    const fieldKeys = [...adm.accessorFields_.keys()]
+    expect(fieldKeys).toContain("unread")
+    expect(fieldKeys).not.toContain("#secret")
+    expect(fieldKeys.map(String)).toContain("Symbol(#secret)")
 
     const res = mobx.toJS(store) as any
     expect(res).toEqual({
@@ -858,9 +859,12 @@ test("#4248 toJS includes @observable accessor fields after all of them were rea
     const store = new Store()
     store.a
     store.b
-    // Every field is materialized, toJS relies on `null` here to still find them
-    expect((store as any)[$mobx].lazyObservableKeys_).toBe(null)
     expect(mobx.toJS(store)).toEqual({ a: 1, b: 2 })
+    // toJS also finds them once every field has its ObservableValue
+    const dispose = autorun(() => [store.a, store.b])
+    expect((store as any)[$mobx].values_.size).toBe(2)
+    expect(mobx.toJS(store)).toEqual({ a: 1, b: 2 })
+    dispose()
 })
 
 test("#4248 toJS handles cycles through @observable accessor fields", () => {
@@ -1149,10 +1153,10 @@ test("multiple inheritance should work", () => {
     }
 
     const adm = mobx._getAdministration(new B()) as any
-    // @observable accessor is lazy (#4616 follow-up), so unread fields live in
-    // `lazyObservableKeys_` until first read. Union with `values_` to see them all.
-    const obsvKeys = [...adm.values_.keys(), ...(adm.lazyObservableKeys_?.keys() ?? [])].sort()
-    expect(obsvKeys).toEqual(["x", "y"])
+    // @observable accessor is lazy (#4616 follow-up), so fields have no entry in `values_`
+    // until something observes them. `accessorFields_` lists them all.
+    expect([...adm.values_.keys()]).toEqual([])
+    expect([...adm.accessorFields_.keys()].sort()).toEqual(["x", "y"])
 })
 
 // 19.12.2020 @urugator:
@@ -1380,17 +1384,19 @@ test("4616 - @observable accessor should be lazy", () => {
     const adm: any = (o as any)[$mobx]
     expect(adm.values_.has("unused")).toBe(false)
     expect(adm.values_.has("used")).toBe(false)
-    expect(adm.lazyObservableKeys_.has("unused")).toBe(true)
-    expect(adm.lazyObservableKeys_.has("used")).toBe(true)
 
-    // First access materialises the ObservableValue
+    // A read outside a derivation does not materialise the ObservableValue
     t.equal(o.used, 2)
+    expect(adm.values_.has("used")).toBe(false)
+
+    // The first read inside a derivation does
+    const dispose = autorun(() => o.used)
     expect(adm.values_.has("used")).toBe(true)
-    expect(adm.lazyObservableKeys_.has("used")).toBe(false)
+    dispose()
 
     // The unused field remains lazy
     expect(adm.values_.has("unused")).toBe(false)
-    expect(adm.lazyObservableKeys_.has("unused")).toBe(true)
+    t.equal(isObservableProp(o, "unused"), true)
 })
 
 test("4616 - observe on @observable accessor before first read materialises it", () => {
@@ -1412,7 +1418,7 @@ test("4616 - observe on @observable accessor before first read materialises it",
     t.deepEqual(events, [5, 7])
 })
 
-test("4616 - set on @observable accessor before first read materialises it", () => {
+test("4616 - set on @observable accessor that nothing observes does not materialise it", () => {
     class Counter {
         @observable accessor count: number = 0
     }
@@ -1422,8 +1428,209 @@ test("4616 - set on @observable accessor before first read materialises it", () 
     expect(adm.values_.has("count")).toBe(false)
 
     o.count = 42
-    expect(adm.values_.has("count")).toBe(true)
+    expect(adm.values_.has("count")).toBe(false)
     t.equal(o.count, 42)
+
+    const seen: number[] = []
+    const dispose = autorun(() => seen.push(o.count))
+    expect(adm.values_.has("count")).toBe(true)
+    o.count = 43
+    dispose()
+    t.deepEqual(seen, [42, 43])
+})
+
+test("lazy @observable accessor - writes keep their events without an ObservableValue", () => {
+    class Counter {
+        @observable accessor count: number = 0
+    }
+
+    const o = new Counter()
+    const adm: any = (o as any)[$mobx]
+    const observed: any[] = []
+    const spied: any[] = []
+    const disposeObserve = observe(o, change => observed.push(change))
+    const disposeSpy = mobx.spy(event => {
+        if (event.type === "update") spied.push(event)
+    })
+    const disposeIntercept = mobx.intercept(o, change => {
+        if ((change as any).newValue === 13) return null
+        if ((change as any).newValue === 2) (change as any).newValue = 20
+        return change
+    })
+
+    o.count = 1
+    o.count = 1 // unchanged
+    o.count = 13 // cancelled
+    o.count = 2 // rewritten
+    disposeObserve()
+    disposeSpy()
+    disposeIntercept()
+
+    expect(adm.values_.has("count")).toBe(false)
+    expect(o.count).toBe(20)
+    const pick = ({ type, name, oldValue, newValue, object, observableKind }: any) => ({
+        type,
+        name,
+        oldValue,
+        newValue,
+        observableKind,
+        isCounter: object === o
+    })
+    const update = { type: "update", name: "count", observableKind: "object", isCounter: true }
+    const expected = [
+        { ...update, oldValue: 0, newValue: 1 },
+        { ...update, oldValue: 1, newValue: 20 }
+    ]
+    expect(observed.map(pick)).toEqual(expected)
+    expect(spied.map(pick)).toEqual(expected)
+})
+
+test("lazy @observable accessor - enhancers apply without an ObservableValue", () => {
+    class Store {
+        @observable accessor items = [{ x: 1 }]
+        @observableRef accessor ref = { y: 2 }
+        @mobx.observableStruct accessor point = { x: 1, y: 2 }
+    }
+
+    const store = new Store()
+    const adm: any = (store as any)[$mobx]
+    const items = store.items
+    const ref = store.ref
+    const point = store.point
+    expect(isObservable(items)).toBe(true)
+    expect(store.items).toBe(items)
+    expect(isObservable(ref)).toBe(false)
+
+    // struct: an equal value keeps the old reference
+    store.point = { x: 1, y: 2 }
+    expect(store.point).toBe(point)
+    // deep: a plain value is converted on write
+    store.items = [{ x: 2 }] as any
+    expect(isObservable(store.items)).toBe(true)
+    const newItems = store.items
+    expect(adm.values_.size).toBe(0)
+
+    // The values stay the same objects once the ObservableValues exist
+    const seen: any[] = []
+    const dispose = autorun(() => seen.push([store.items, store.ref, store.point]))
+    expect(adm.values_.size).toBe(3)
+    expect(seen[0][0]).toBe(newItems)
+    expect(seen[0][1]).toBe(ref)
+    expect(seen[0][2]).toBe(point)
+    store.ref = { y: 3 }
+    expect(seen.length).toBe(2)
+    dispose()
+})
+
+test("lazy @observable accessor - an initial value is converted on first use, not at construction", () => {
+    let reads = 0
+    const source = new Proxy([1, 2, 3], {
+        get(target, key, receiver) {
+            reads++
+            return Reflect.get(target, key, receiver)
+        }
+    })
+
+    class Store {
+        @observable accessor used = source
+        @observable accessor overwritten = source
+        constructor() {
+            this.overwritten = [4]
+        }
+    }
+
+    const store = new Store()
+    expect(reads).toBe(0)
+    expect(store.overwritten.slice()).toEqual([4])
+    expect(reads).toBe(0)
+
+    expect(store.used.slice()).toEqual([1, 2, 3])
+    expect(reads).toBeGreaterThan(0)
+    expect(isObservable(store.used)).toBe(true)
+    expect(store.used).not.toBe(source)
+})
+
+test("lazy @observable accessor - APIs that work on the ObservableValue create it", () => {
+    class Counter {
+        @observable accessor a: number = 0
+        @observable accessor b: number = 0
+        @observable accessor c: number = 0
+    }
+
+    const o = new Counter()
+    const adm: any = (o as any)[$mobx]
+
+    const becameObserved: string[] = []
+    mobx.onBecomeObserved(o, "a", () => becameObserved.push("a"))
+    expect(adm.values_.has("a")).toBe(true)
+    expect(mobx.getAtom(o, "b")).toBe(adm.values_.get("b"))
+    const intercepted: any[] = []
+    mobx.intercept(o, "c", change => {
+        intercepted.push(change.newValue)
+        return change
+    })
+    o.c = 5
+    expect(intercepted).toEqual([5])
+
+    const dispose = autorun(() => o.a)
+    expect(becameObserved).toEqual(["a"])
+    dispose()
+})
+
+test("lazy @observable accessor - warnings do not need an ObservableValue", () => {
+    class Counter {
+        @observable accessor count: number = 0
+    }
+
+    const o = new Counter()
+    const warn = jest.spyOn(console, "warn").mockImplementation(() => {})
+    mobx.configure({ enforceActions: "always", observableRequiresReaction: true })
+    o.count = 1
+    o.count
+
+    expect((o as any)[$mobx].values_.has("count")).toBe(false)
+    expect(warn).toHaveBeenCalledTimes(2)
+    expect(warn.mock.calls[0][0]).toContain("without using an action")
+    expect(warn.mock.calls[0][0]).toContain(".count")
+    expect(warn.mock.calls[1][0]).toContain(".count' being read outside a reactive context")
+})
+
+test("lazy @observable accessor - reading it on the prototype leaves the prototype alone", () => {
+    class Store {
+        @observable accessor x = 1
+    }
+
+    expect(() => (Store.prototype as any).x).toThrow(TypeError)
+    expect(isObservable(Store.prototype)).toBe(false)
+    expect(new Store().x).toBe(1)
+})
+
+test("lazy @observable accessor - works through a Proxy and behind another decorator", () => {
+    const doubled = (target: any) => ({
+        get(this: any) {
+            return target.get.call(this) * 2
+        }
+    })
+
+    class Store {
+        @observable accessor x = 1
+        @(doubled as any) @observable accessor y = 2
+    }
+
+    const store = new Store()
+    const proxy = new Proxy(store, {})
+    expect(proxy.x).toBe(1)
+    proxy.x = 3
+    expect(store.x).toBe(3)
+    expect(isObservableProp(store, "y")).toBe(true)
+    expect(mobx.toJS(store)).toEqual({ x: 3, y: 4 })
+
+    const seen: number[] = []
+    const dispose = autorun(() => seen.push(proxy.x + store.y))
+    store.y = 5
+    proxy.x = 0
+    dispose()
+    expect(seen).toEqual([7, 13, 10])
 })
 
 test("4616 - autorun reacts to @observable accessor that is lazy on entry", () => {

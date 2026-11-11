@@ -498,3 +498,83 @@ test("private observable accessor and private computed getter with the same name
         [10, 20]
     ])
 })
+
+test("observable accessor of a subclass replaces the one of its parent, also when instances alternate", () => {
+    class Parent {
+        @observable accessor value = 1
+    }
+
+    class Child extends Parent {
+        @observable accessor value = 2
+    }
+
+    const read = (instance: Parent) => {
+        const seen: number[] = []
+        const dispose = autorun(() => seen.push(instance.value))
+        runInAction(() => {
+            instance.value += 10
+        })
+        dispose()
+        return [seen, toJS(instance), isObservableProp(instance, "value")]
+    }
+
+    expect(read(new Child())).toEqual([[2, 12], { value: 12 }, true])
+    expect(read(new Parent())).toEqual([[1, 11], { value: 11 }, true])
+    expect(read(new Child())).toEqual([[2, 12], { value: 12 }, true])
+})
+
+test("a parent constructor can assign the observable accessors of a subclass", () => {
+    const duringConstruction: any[] = []
+
+    class Parent {
+        id = 0
+
+        constructor(data: object) {
+            Object.assign(this, data)
+            duringConstruction.push(toJS(this), isObservableProp(this, "name"))
+        }
+    }
+
+    class Child extends Parent {
+        @observable accessor name = "initial"
+        @observable accessor untouched = "untouched"
+    }
+
+    const child = new Child({ id: 1, name: "assigned" })
+    // The assignment wins over the initializer, and fields that are not initialized yet are left out
+    expect(duringConstruction).toEqual([{ id: 1, name: "assigned" }, true])
+    expect(toJS(child)).toEqual({ id: 1, name: "assigned", untouched: "untouched" })
+
+    const seen: string[] = []
+    const dispose = autorun(() => seen.push(child.name))
+    runInAction(() => {
+        child.name = "changed"
+    })
+    dispose()
+    expect(seen).toEqual(["assigned", "changed"])
+})
+
+test("a parent constructor with observable accessors can assign those of a subclass too", () => {
+    class Parent {
+        @observable accessor id = 0
+
+        constructor(data: object) {
+            Object.assign(this, data)
+        }
+    }
+
+    class Child extends Parent {
+        @observable accessor name = "initial"
+    }
+
+    const child = new Child({ id: 1, name: "assigned" })
+    expect(toJS(child)).toEqual({ id: 1, name: "assigned" })
+
+    const seen: string[] = []
+    const dispose = autorun(() => seen.push(child.name))
+    runInAction(() => {
+        child.name = "changed"
+    })
+    dispose()
+    expect(seen).toEqual(["assigned", "changed"])
+})

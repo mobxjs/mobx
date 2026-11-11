@@ -70,14 +70,14 @@ function toJSHelper(source, __alreadySeen: Map<any, any>) {
 
 /**
  * Copies `@observable accessor` fields, which are defined on the prototype, so they are neither own nor enumerable.
- * Their values live in the administration: in `values_` once read, and in `lazyObservableKeys_` until then.
+ * Their values live in the administration once they have an ObservableValue, and in the accessor's own slot until then.
  * Computed values and private accessors are left out.
  * Kept here instead of on the administration, so it is tree shaken away when `toJS` is not used.
  */
 function copyObservableAccessors(source, res, __alreadySeen: Map<any, any>) {
     const adm: ObservableObjectAdministration = source[$mobx]
-    if (adm.lazyObservableKeys_ === undefined) {
-        // No `@observable accessor` field ever registered (it becomes `null`, not `undefined`, once all were read)
+    if (!adm.accessorFields_) {
+        // No `@observable accessor` field on this object
         return
     }
     const target = adm.target_
@@ -87,12 +87,15 @@ function copyObservableAccessors(source, res, __alreadySeen: Map<any, any>) {
             res[key] = toJSHelper(source[key], __alreadySeen)
         }
     }
-    // Fields that were never read have no entry in `values_` yet, reading them creates it
-    if (adm.lazyObservableKeys_) {
-        for (const key of adm.lazyObservableKeys_.keys()) {
-            if (!adm.values_.has(key) && !hasProp(target, key) && key in target) {
-                res[key] = toJSHelper(source[key], __alreadySeen)
-            }
+    // Fields without an ObservableValue, except those the constructor has yet to initialize
+    for (const [key, field] of adm.accessorFields_) {
+        if (
+            !adm.values_.has(key) &&
+            adm.isAccessorFieldInitialized_(field) &&
+            !hasProp(target, key) &&
+            key in target
+        ) {
+            res[key] = toJSHelper(source[key], __alreadySeen)
         }
     }
 }

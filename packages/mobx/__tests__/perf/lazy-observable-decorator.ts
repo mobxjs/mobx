@@ -14,8 +14,9 @@ import * as path from "path"
 const distPath = path.resolve(__dirname, "..", "..", "..", "dist", "mobx.cjs.development.js")
 const mobx = require(distPath) as {
     observable: any
+    autorun: any
 }
-const { observable } = mobx
+const { observable, autorun } = mobx
 
 const INSTANCES = 50_000
 const RUNS = 3
@@ -116,6 +117,25 @@ function readFields(instances: any[], fields: readonly Field[]): number {
     return sink
 }
 
+// First call per set of instances: one autorun per instance reads `fields`, which is the first
+// read inside a derivation. Later calls read the same, by then observed, fields outside of it.
+function observeThenRead(fields: readonly Field[]) {
+    let observed: any[] | undefined
+    let disposers: Array<() => void> = []
+    return (instances: any[]): number => {
+        if (observed === instances) return readFields(instances, fields)
+        disposers.forEach(dispose => dispose())
+        observed = instances
+        let sink = 0
+        disposers = instances.map(inst =>
+            autorun(() => {
+                for (let f = 0; f < fields.length; f++) sink += inst[fields[f]]
+            })
+        )
+        return sink
+    }
+}
+
 function writeField(instances: any[], field: Field): number {
     let sink = 0
     for (let i = 0; i < INSTANCES; i++) {
@@ -195,9 +215,9 @@ function runScenario(
     console.log(
         `avg | ${fmt(avg(s => s.constructHeapMB))}          | ${fmt(
             avg(s => s.constructMs)
-        )}     | ${fmt(avg(s => s.firstReadMs))}      | ${fmt(
-            avg(s => s.reReadMs)
-        )}     | ${fmt(avg(s => s.writeMs))}`
+        )}     | ${fmt(avg(s => s.firstReadMs))}      | ${fmt(avg(s => s.reReadMs))}     | ${fmt(
+            avg(s => s.writeMs)
+        )}`
     )
 }
 
@@ -230,6 +250,12 @@ function main() {
         AssignedAllWide,
         instances => readFields(instances, FIELDS),
         "f9"
+    )
+    runScenario(
+        "OBSERVED: constructor assigns all 10, an autorun per instance reads 3, re-read those 3, then write observed f0",
+        AssignedAllWide,
+        observeThenRead(READ_THREE),
+        "f0"
     )
 }
 
