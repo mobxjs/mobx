@@ -43,7 +43,3 @@ export function isAnnotation(thing: any) {
         isFunction(thing.extend_)
     )
 }
-
-export function isAnnotationMapEntry(thing: any) {
-    return typeof thing === "boolean" || isAnnotation(thing)
-}

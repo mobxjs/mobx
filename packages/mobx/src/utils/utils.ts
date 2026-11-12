@@ -43,10 +43,6 @@ export function isFunction(fn: any): fn is Function {
     return typeof fn === "function"
 }
 
-export function isString(value: any): value is string {
-    return typeof value === "string"
-}
-
 export function isStringish(value: any): value is string | number | symbol {
     const t = typeof value
     switch (t) {

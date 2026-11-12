@@ -46,12 +46,12 @@ export type ISetDidChange<T = any> =
           oldValue: T
       }
 
-export type ISetWillDeleteChange<T = any> = {
+type ISetWillDeleteChange<T = any> = {
     type: "delete"
     object: ObservableSet<T>
     oldValue: T
 }
-export type ISetWillAddChange<T = any> = {
+type ISetWillAddChange<T = any> = {
     type: "add"
     object: ObservableSet<T>
     newValue: T

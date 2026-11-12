@@ -11,8 +11,6 @@ import {
 import { createDecoratorAnnotation, type DecoratorAnnotation } from "./decoratorannotation"
 import type { ClassMethodDecorator } from "../types/decorator_fills"
 
-export const FLOW = "flow"
-
 let generatorId = 0
 
 export class FlowCancellationError extends Error {

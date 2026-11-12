@@ -33,10 +33,10 @@ import {
 import { createDecoratorAnnotation, type DecoratorAnnotation } from "./decoratorannotation"
 import type { ClassAccessorAndFieldDecorator } from "../types/decorator_fills"
 
-export const OBSERVABLE = "observable"
-export const OBSERVABLE_REF = "observableRef"
-export const OBSERVABLE_SHALLOW = "observableShallow"
-export const OBSERVABLE_STRUCT = "observableStruct"
+const OBSERVABLE = "observable"
+const OBSERVABLE_REF = "observableRef"
+const OBSERVABLE_SHALLOW = "observableShallow"
+const OBSERVABLE_STRUCT = "observableStruct"
 
 export type CreateObservableOptions = {
     name?: string
@@ -48,14 +48,14 @@ export type CreateObservableOptions = {
 
 // Predefined bags of create observable options, to avoid allocating temporarily option objects
 // in the majority of cases
-export const defaultCreateObservableOptions: CreateObservableOptions = {
+const defaultCreateObservableOptions: CreateObservableOptions = {
     deep: true,
     name: undefined,
     defaultDecorator: undefined
 }
 Object.freeze(defaultCreateObservableOptions)
 
-export function asCreateObservableOptions(thing: any): CreateObservableOptions {
+function asCreateObservableOptions(thing: any): CreateObservableOptions {
     return thing || defaultCreateObservableOptions
 }
 
@@ -76,7 +76,7 @@ function createObservableDecoratorAnnotation(
     return createDecoratorAnnotation(annotation, decorateObservable20223_)
 }
 
-export function getEnhancerFromOptions(options: CreateObservableOptions): IEnhancer<any> {
+function getEnhancerFromOptions(options: CreateObservableOptions): IEnhancer<any> {
     return options.deep === true
         ? deepEnhancer
         : options.deep === false
@@ -90,7 +90,7 @@ export function getAnnotationFromOptions(
     return options ? options.defaultDecorator ?? getAutoAnnotation(options) : undefined
 }
 
-export function getEnhancerFromAnnotation(annotation?: Annotation): IEnhancer<any> {
+function getEnhancerFromAnnotation(annotation?: Annotation): IEnhancer<any> {
     return !annotation ? deepEnhancer : annotation.options_?.enhancer_ ?? deepEnhancer
 }
 
@@ -137,12 +137,12 @@ function createObservable(v: any, arg2?: any, arg3?: any) {
     return observable.box(v, arg2)
 }
 
-export interface IObservableValueFactory {
+interface IObservableValueFactory {
     <T>(value: T, options?: CreateObservableOptions): IObservableValue<T>
     <T>(value?: T, options?: CreateObservableOptions): IObservableValue<T | undefined>
 }
 
-export interface IObservableMapFactory {
+interface IObservableMapFactory {
     <K = any, V = any>(): ObservableMap<K, V>
     <K, V>(initialValues?: IMapEntries<K, V>, options?: CreateObservableOptions): ObservableMap<
         K,

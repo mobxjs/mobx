@@ -21,7 +21,7 @@ const AUTO = "true"
 
 export const autoAnnotation: Annotation = createAutoAnnotation()
 
-export function createAutoAnnotation(options?: object): Annotation {
+function createAutoAnnotation(options?: object): Annotation {
     return {
         annotationType_: AUTO,
         options_: options,

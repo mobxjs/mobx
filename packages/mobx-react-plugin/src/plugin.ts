@@ -15,7 +15,7 @@ export interface TransformResult extends ObserverResult {
     flows: string[]
 }
 
-export type BabelPlugin = (api: BabelApi, rawOptions?: Options) => PluginObj<PluginPass>
+type BabelPlugin = (api: BabelApi, rawOptions?: Options) => PluginObj<PluginPass>
 
 export function createBabelPlugin(standalone: boolean): BabelPlugin {
     return function mobxReactPlugin(api, rawOptions) {
