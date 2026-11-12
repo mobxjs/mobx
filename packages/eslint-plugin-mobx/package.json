@@ -30,8 +30,7 @@
         "mobx": "^7.0.0"
     },
     "dependencies": {
-        "@types/eslint": "^9.6.1",
-        "@types/estree": "^1.0.0"
+        "@types/eslint": "^9.6.1"
     },
     "devDependencies": {
         "eslint-7": "npm:eslint@^7.0.0",
