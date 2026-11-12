@@ -1,6 +1,6 @@
 import { $mobx, getAtom, isComputedValue, isObservableObject, die, isStringish } from "../internal"
 
-export function _isComputed(value, property?: PropertyKey): boolean {
+function _isComputed(value, property?: PropertyKey): boolean {
     if (property === undefined) {
         return isComputedValue(value)
     }

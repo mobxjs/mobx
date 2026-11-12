@@ -364,7 +364,7 @@ export function createObservableArray<T>(
 }
 
 // eslint-disable-next-line
-export var arrayExtensions = {
+var arrayExtensions = {
     clear(): any[] {
         return this.splice(0)
     },

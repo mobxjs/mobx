@@ -91,7 +91,7 @@ export function removeObserver(observable: IObservable, node: IDerivation) {
     // invariant(observable._observers.indexOf(node) === -1, "INTERNAL ERROR remove already removed node2");
 }
 
-export function queueForUnobservation(observable: IObservable) {
+function queueForUnobservation(observable: IObservable) {
     if (observable.isPendingUnobservation === false) {
         // invariant(observable._observers.length === 0, "INTERNAL ERROR, should only queue for unobservation unobserved observables");
         observable.isPendingUnobservation = true

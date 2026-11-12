@@ -13,7 +13,7 @@ import {
     isStringish
 } from "../internal"
 
-export type ReadInterceptor<T> = (value: any) => T
+type ReadInterceptor<T> = (value: any) => T
 
 /** Experimental feature right now, tested indirectly via Mobx-State-Tree */
 export function interceptReads<T>(value: IObservableValue<T>, handler: ReadInterceptor<T>): Lambda

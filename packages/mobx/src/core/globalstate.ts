@@ -21,7 +21,7 @@ const persistentKeys: (keyof MobXGlobals)[] = [
 
 export type IUNCHANGED = {}
 
-export class MobXGlobals {
+class MobXGlobals {
     /**
      * MobXGlobals version.
      * MobX compatiblity with other versions loaded in memory as long as this version matches.

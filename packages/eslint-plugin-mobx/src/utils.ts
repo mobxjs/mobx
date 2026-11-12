@@ -24,11 +24,3 @@ export function findAncestor(node, match) {
     if (match(parent)) return parent
     return findAncestor(parent, match)
 }
-
-export function assert(expr, error?) {
-    if (!expr) {
-        error ??= "Assertion failed"
-        error = error instanceof Error ? error : new Error(error)
-        throw error
-    }
-}

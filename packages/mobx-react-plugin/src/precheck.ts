@@ -6,7 +6,7 @@ const JSX_RE = /<\s*[A-Za-z_$>]/
 const ASYNC_RE = /\basync\b/
 const FLOW_TARGET_RE = /\bmake(?:Auto)?Observable\b|@\s*(?:flow|action)/
 
-export interface NeededTransforms {
+interface NeededTransforms {
     observer: NormalizedObserverOptions | null
     flow: boolean
 }

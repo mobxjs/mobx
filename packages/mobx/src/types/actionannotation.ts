@@ -119,7 +119,7 @@ function assertActionDescriptor(
     }
 }
 
-export function createActionDescriptor(
+function createActionDescriptor(
     adm: ObservableObjectAdministration,
     annotation: Annotation,
     key: PropertyKey,

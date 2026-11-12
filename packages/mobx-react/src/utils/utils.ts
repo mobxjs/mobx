@@ -35,7 +35,7 @@ function is(x: any, y: any): boolean {
 const mobxMixins = Symbol("patchMixins")
 const mobxPatchedDefinition = Symbol("patchedDefinition")
 
-export interface Mixins extends Record<string, any> {
+interface Mixins extends Record<string, any> {
     locks: number
     methods: Array<Function>
 }

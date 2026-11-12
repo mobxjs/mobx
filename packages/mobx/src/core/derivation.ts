@@ -330,7 +330,7 @@ export function allowStateReadsEnd(prev: boolean) {
  * needed to keep `lowestObserverState` correct. when changing from (2 or 1) to 0
  *
  */
-export function changeDependenciesStateTo0(derivation: IDerivation) {
+function changeDependenciesStateTo0(derivation: IDerivation) {
     if (derivation.dependenciesState_ === IDerivationState_.UP_TO_DATE_) {
         return
     }

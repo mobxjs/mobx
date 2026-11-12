@@ -7,7 +7,7 @@ const MOBX_SOURCE = "mobx"
 const FLOW_NAME = "flow"
 const FLOW_BOUND_NAME = "flowBound"
 
-export interface FlowResult {
+interface FlowResult {
     flows: string[]
 }
 

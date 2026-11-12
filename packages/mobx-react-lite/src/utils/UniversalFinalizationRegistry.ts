@@ -1,4 +1,4 @@
-export declare class FinalizationRegistryType<T> {
+declare class FinalizationRegistryType<T> {
     constructor(finalize: (value: T) => void)
     register(target: object, value: T, token?: object): void
     unregister(token: object): void
