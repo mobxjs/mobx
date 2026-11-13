@@ -96,7 +96,6 @@ export class ComputedValue<T> implements IObservable, IWritableComputedValue<T>,
     unboundDepsCount_ = 0
     protected value_: T | undefined | CaughtException = new CaughtException(null)
     name_: string
-    triggeredBy_?: string
 
     private flags_ = 0b00000
 

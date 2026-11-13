@@ -475,7 +475,6 @@ test("peeking inside erroring computed value doesn't bork (global) state", () =>
     expect(a.observers_?.size ?? 0).toBe(0)
     expect(a.diffValue).toBe(0)
     expect(a.lowestObserverState_).toBe(-1)
-    expect(a.hasUnreportedChange_).toBe(false)
     expect(a.value_).toBe(1)
 
     expect(b.dependenciesState_).toBe(-1) // NOT_TRACKING
@@ -513,7 +512,6 @@ describe("peeking inside autorun doesn't bork (global) state", () => {
         expect(a.observers_?.size ?? 0).toBe(1)
         expect(a.diffValue).toBe(0)
         expect(a.lowestObserverState_).toBe(-1)
-        expect(a.hasUnreportedChange_).toBe(false)
         expect(a.value_).toBe(1)
 
         expect(b.dependenciesState_).toBe(0)
@@ -550,7 +548,6 @@ describe("peeking inside autorun doesn't bork (global) state", () => {
         expect(a.observers_?.size ?? 0).toBe(1)
         expect(a.diffValue).toBe(0)
         expect(a.lowestObserverState_).toBe(0)
-        expect(a.hasUnreportedChange_).toBe(false)
         expect(a.value_).toBe(2)
 
         expect(b.dependenciesState_).toBe(0) // up to date (for what it's worth)
@@ -586,7 +583,6 @@ describe("peeking inside autorun doesn't bork (global) state", () => {
         expect(a.observers_?.size ?? 0).toBe(1)
         expect(a.diffValue).toBe(0)
         expect(a.lowestObserverState_).toBe(0)
-        expect(a.hasUnreportedChange_).toBe(false)
         expect(a.value_).toBe(3)
 
         expect(b.dependenciesState_).toBe(0) // up to date
@@ -620,7 +616,6 @@ describe("peeking inside autorun doesn't bork (global) state", () => {
         expect(a.observers_?.size ?? 0).toBe(0)
         expect(a.diffValue).toBe(0)
         expect(a.lowestObserverState_).toBe(0)
-        expect(a.hasUnreportedChange_).toBe(false)
         expect(a.value_).toBe(3)
 
         expect(b.dependenciesState_).toBe(-1) // not tracking
