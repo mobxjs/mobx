@@ -123,7 +123,7 @@ setInterval(() => {
 It can be overridden by setting the annotation with the `keepAlive` option ([try it out yourself](https://codesandbox.io/s/computed-3cjo9?file=/src/index.tsx)) or by creating a no-op `autorun(() => { someObject.someComputed })`, which can be nicely cleaned up later if needed.
 Note that both solutions have the risk of creating memory leaks. Changing the default behavior here is an anti-pattern.
 
-MobX can also be configured with the [`computedRequiresReaction`](configuration.md#computedrequiresreaction-boolean) option, to report an error when computeds are accessed outside of a reactive context.
+MobX can also be configured with the [`computedRequiresReaction`](configuration.md#computedrequiresreaction-boolean) option, to warn when computeds are accessed outside of a reactive context.
 
 </details>
 
@@ -257,7 +257,7 @@ You can import these functions from `mobx`. They can be used for `reaction` as w
 
 ### `requiresReaction`
 
-It is recommended to set this one to `true` on very expensive computed values. If you try to read its value outside of the reactive context, in which case it might not be cached, it will cause the computed to throw instead of doing an expensive re-evalution.
+It is recommended to set this one to `true` on very expensive computed values. If you read its value outside of a reactive context, where it isn't cached, MobX warns in development builds before doing the expensive re-evaluation. The value is still computed and returned, and production builds don't warn. This option takes precedence over the global [`computedRequiresReaction`](configuration.md#computedrequiresreaction-boolean) setting, so `false` silences the warning for this computed.
 
 ### `keepAlive`
 
