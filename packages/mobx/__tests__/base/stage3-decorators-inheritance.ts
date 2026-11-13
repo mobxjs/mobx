@@ -386,3 +386,115 @@ test("computed sibling can read parent computed with super before child computed
     expect(child.parentNumber).toBe(1)
     expect(child.number).toBe(2)
 })
+
+test("private observable accessors with the same name in parent and subclass are separate fields", () => {
+    class Parent {
+        @observable accessor #value = 1
+
+        get parentValue() {
+            return this.#value
+        }
+
+        setParentValue(value: number) {
+            this.#value = value
+        }
+    }
+
+    class Child extends Parent {
+        @observable accessor #value = 2
+
+        get childValue() {
+            return this.#value
+        }
+    }
+
+    const child = new Child()
+    expect([child.parentValue, child.childValue]).toEqual([1, 2])
+
+    const seen: number[][] = []
+    const dispose = autorun(() => seen.push([child.parentValue, child.childValue]))
+    runInAction(() => child.setParentValue(10))
+    dispose()
+
+    expect(seen).toEqual([
+        [1, 2],
+        [10, 2]
+    ])
+})
+
+test("private computed getters with the same name in parent and subclass are separate getters", () => {
+    class Parent {
+        @observable accessor count = 1
+
+        @computed
+        get #scaled() {
+            return this.count * 10
+        }
+
+        get parentScaled() {
+            return this.#scaled
+        }
+    }
+
+    class Child extends Parent {
+        @computed
+        get #scaled() {
+            return this.count * 100
+        }
+
+        get childScaled() {
+            return this.#scaled
+        }
+    }
+
+    const child = new Child()
+    const seen: number[][] = []
+    const dispose = autorun(() => seen.push([child.parentScaled, child.childScaled]))
+    runInAction(() => {
+        child.count = 2
+    })
+    dispose()
+
+    expect(seen).toEqual([
+        [10, 100],
+        [20, 200]
+    ])
+})
+
+test("private observable accessor and private computed getter with the same name do not collide", () => {
+    class Parent {
+        @observable accessor #value = 1
+
+        get parentValue() {
+            return this.#value
+        }
+
+        setParentValue(value: number) {
+            this.#value = value
+        }
+    }
+
+    class Child extends Parent {
+        @computed
+        get #value() {
+            return this.parentValue * 2
+        }
+
+        get childValue() {
+            return this.#value
+        }
+    }
+
+    const child = new Child()
+    expect([child.parentValue, child.childValue]).toEqual([1, 2])
+
+    const seen: number[][] = []
+    const dispose = autorun(() => seen.push([child.parentValue, child.childValue]))
+    runInAction(() => child.setParentValue(10))
+    dispose()
+
+    expect(seen).toEqual([
+        [1, 2],
+        [10, 20]
+    ])
+})

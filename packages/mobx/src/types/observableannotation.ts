@@ -7,6 +7,7 @@ import {
     assert20223DecoratorType,
     ObservableValue,
     asObservableObject,
+    getDecoratedMemberKey,
     $mobx
 } from "../internal"
 
@@ -61,11 +62,13 @@ export function decorateObservable20223_(
     }
 
     const ann = annotation
-    const { kind, name } = context
+    const { kind } = context
 
     if (kind !== "accessor") {
         return
     }
+
+    const name = getDecoratedMemberKey(context)
 
     // Defer ObservableValue construction until first access. The factory is
     // materialised by ObservableObjectAdministration on demand, so unused
@@ -79,8 +82,8 @@ export function decorateObservable20223_(
                     value,
                     ann.options_?.enhancer_ ?? deepEnhancer,
                     __DEV__
-                        ? `${adm.name_}.${name.toString()}`
-                        : `ObservableObject.${name.toString()}`,
+                        ? `${adm.name_}.${context.name.toString()}`
+                        : `ObservableObject.${context.name.toString()}`,
                     false
                 )
         )
