@@ -95,8 +95,8 @@ In the rare case where you create observables lazily, for example in a computed 
 
 #### `computedRequiresReaction: boolean`
 
-Forbids the direct access of any unobserved computed value from outside an action or reaction.
-This guarantees you aren't using computed values in a way where MobX won't cache them. **Default: `false`**.
+Warns in development builds when an unobserved computed value is accessed directly from outside an action or reaction.
+This helps you spot computed values that are used in a way where MobX won't cache them. The value is still computed and returned. **Default: `false`**.
 
 In the following example, MobX won't cache the computed value in the first code block, but will cache the result in the second and third block:
 
