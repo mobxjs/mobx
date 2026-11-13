@@ -1,5 +1,11 @@
 # mobx-react-lite
 
+## 5.1.3
+
+### Patch Changes
+
+-   [`efbff0be0157cd8b962e88ba04109aedc11b73d9`](https://github.com/mobxjs/mobx/commit/efbff0be0157cd8b962e88ba04109aedc11b73d9) [#4776](https://github.com/mobxjs/mobx/pull/4776) Thanks [@kubk](https://github.com/kubk)! - Remove dead code and stop exporting internal helpers that nothing outside their own module uses
+
 ## 5.1.2
 
 ### Patch Changes

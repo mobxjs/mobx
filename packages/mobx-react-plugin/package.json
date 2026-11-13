@@ -1,6 +1,6 @@
 {
     "name": "mobx-react-plugin",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "Wraps React components in `observer`, marks them \"use no memo\" so React Compiler leaves them to MobX, and turns async methods of observable classes into flows.",
     "main": "dist/babel.js",
     "types": "dist/babel.d.ts",
@@ -67,7 +67,7 @@
         "@types/babel__generator": "^7.6.8",
         "@types/picomatch": "^4.0.0",
         "babel-plugin-react-compiler": "1.0.0",
-        "mobx-react-lite": "^5.1.2"
+        "mobx-react-lite": "^5.1.3"
     },
     "scripts": {
         "prebuild": "rm -rf dist",
