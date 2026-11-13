@@ -57,7 +57,6 @@ export class ObservableValue<T>
     extends Atom
     implements IObservableValue<T>, IInterceptable<IValueWillChange<T>>, IListenable
 {
-    hasUnreportedChange_ = false
     interceptors_
     changeListeners_
     value_
