@@ -42,7 +42,9 @@ import {
     getAdministration,
     getDebugName,
     checkIfStateModificationsAreAllowed,
-    assign
+    checkIfStateReadsAreAllowed,
+    assign,
+    compareDefault
 } from "../internal"
 
 const descriptorCache = Object.create(null)
@@ -94,8 +96,10 @@ export class ObservableObjectAdministration
     appliedAnnotations_?: object
     private pendingKeys_: undefined | Map<PropertyKey, ObservableValue<boolean>>
     lazyComputedKeys_: undefined | Map<PropertyKey, () => ComputedValue<any>>
-    // `null` once all fields were read, so `toJS` can tell objects with `@observable accessor` fields apart
-    lazyObservableKeys_: undefined | null | Map<PropertyKey, () => ObservableValue<any>>
+    // The `@observable accessor` fields of the target's class, shared by all its instances
+    accessorFields_: undefined | Map<PropertyKey, ObservableAccessorField>
+    // How many of them the constructor of the target has initialized so far
+    accessorFieldsInitialized_ = 0
 
     constructor(
         public target_: any,
@@ -140,24 +144,82 @@ export class ObservableObjectAdministration
     }
 
     materializeLazyObservable_(key: PropertyKey): ObservableValue<any> | undefined {
-        const factory = this.lazyObservableKeys_?.get(key)
-        if (!factory) {
-            return undefined
-        }
-        this.lazyObservableKeys_!.delete(key)
-        if (this.lazyObservableKeys_!.size === 0) {
-            this.lazyObservableKeys_ = null
-        }
-        const observable = factory()
+        const field = this.accessorFields_?.get(key)
+        return field && this.isAccessorFieldInitialized_(field)
+            ? this.materializeAccessorField_(key, field)
+            : undefined
+    }
+
+    isAccessorFieldInitialized_(field: ObservableAccessorField): boolean {
+        return field.index_ < this.accessorFieldsInitialized_
+    }
+
+    /** Moves the value of an `@observable accessor` field from its slot into an ObservableValue */
+    materializeAccessorField_(
+        key: PropertyKey,
+        field: ObservableAccessorField
+    ): ObservableValue<any> {
+        const target = this.target_
+        const value = field.get_.call(target)
+        field.set_.call(target, undefined)
+        return this.createAccessorObservable_(
+            key,
+            field,
+            value instanceof UnenhancedValue ? value.value_ : value
+        )
+    }
+
+    createAccessorObservable_(
+        key: PropertyKey,
+        field: ObservableAccessorField,
+        value: any
+    ): ObservableValue<any> {
+        const observable = new ObservableValue(
+            value,
+            field.enhancer_,
+            this.getAccessorFieldName_(field),
+            false
+        )
         this.values_.set(key, observable)
         return observable
     }
 
-    setObservablePropValue_(key: PropertyKey, newValue): boolean | null {
-        const observable =
-            this.values_.get(key) ??
-            this.materializeLazyComputed_(key) ??
-            this.materializeLazyObservable_(key)
+    getAccessorFieldName_(field: ObservableAccessorField): string {
+        return __DEV__ ? `${this.name_}.${field.name_}` : field.name_
+    }
+
+    /** Reads an `@observable accessor` field that has no ObservableValue, outside of derivations */
+    getAccessorFieldValue_(field: ObservableAccessorField): any {
+        if (__DEV__ && !globalState.allowStateReads && globalState.observableRequiresReaction) {
+            checkIfStateReadsAreAllowed({ name_: this.getAccessorFieldName_(field) } as any)
+        }
+        const target = this.target_
+        let value = field.get_.call(target)
+        if (value instanceof UnenhancedValue) {
+            value = field.enhancer_(value.value_, undefined, this.getAccessorFieldName_(field))
+            field.set_.call(target, value)
+        }
+        return value
+    }
+
+    setObservablePropValue_(
+        key: PropertyKey,
+        newValue,
+        // Given by `@observable accessor`, whose fields get an ObservableValue once they need one
+        field?: ObservableAccessorField
+    ): boolean | null {
+        let observable = this.values_.get(key) ?? this.materializeLazyComputed_(key)
+        if (!observable) {
+            if (!field) {
+                observable = this.materializeLazyObservable_(key)
+            } else if (!this.isAccessorFieldInitialized_(field)) {
+                // Written before the constructor initialized the field, like a superclass
+                // constructor that assigns the fields of its subclasses. The accessor's slot
+                // does not exist yet.
+                this.accessorFields_ ??= getAccessorFields(this.target_)
+                observable = this.createAccessorObservable_(key, field, newValue)
+            }
+        }
         if (observable instanceof ComputedValue) {
             observable.set(newValue)
             return true
@@ -176,7 +238,30 @@ export class ObservableObjectAdministration
             }
             newValue = (change as any).newValue
         }
-        newValue = (observable as any).prepareNewValue_(newValue)
+        let oldValue
+        if (observable) {
+            oldValue = observable.value_
+            newValue = (observable as any).prepareNewValue_(newValue)
+        } else {
+            // No ObservableValue, so no observers: the value only goes into the accessor's slot
+            if (
+                __DEV__ &&
+                !globalState.allowStateChanges &&
+                globalState.enforceActions === "always"
+            ) {
+                checkIfStateModificationsAreAllowed({
+                    name_: this.getAccessorFieldName_(field!)
+                } as any)
+            }
+            oldValue = field!.get_.call(this.target_)
+            if (oldValue instanceof UnenhancedValue) {
+                oldValue = oldValue.value_
+            }
+            newValue = field!.enhancer_(newValue, oldValue, this.getAccessorFieldName_(field!))
+            if (compareDefault(oldValue, newValue)) {
+                newValue = globalState.UNCHANGED
+            }
+        }
 
         // notify spy & observers
         if (newValue !== globalState.UNCHANGED) {
@@ -189,7 +274,7 @@ export class ObservableObjectAdministration
                           observableKind: "object",
                           debugObjectName: this.name_,
                           object: this.proxy_ || this.target_,
-                          oldValue: (observable as any).value_,
+                          oldValue,
                           name: key,
                           newValue
                       }
@@ -198,7 +283,11 @@ export class ObservableObjectAdministration
             if (__DEV__ && notifySpy) {
                 spyReportStart(change!)
             }
-            ;(observable as ObservableValue<any>).setNewValue_(newValue)
+            if (observable) {
+                observable.setNewValue_(newValue)
+            } else {
+                field!.set_.call(this.target_, newValue)
+            }
             if (notify) {
                 notifyListeners(this, change)
             }
@@ -625,6 +714,48 @@ export class ObservableObjectAdministration
 
 export interface IIsObservableObject {
     [$mobx]: ObservableObjectAdministration
+}
+
+/**
+ * An `@observable accessor` field, shared by all instances of the class that declares it.
+ *
+ * Such a field has no ObservableValue until something needs one: a read inside a derivation,
+ * or an API that works on it, like `getAtom`, `observe(object, key)`, `intercept(object, key)`
+ * and `onBecomeObserved`. Until then the value lives in the accessor's own backing slot, so a
+ * field that nothing observes costs no allocation, however often it is read or written.
+ */
+export type ObservableAccessorField = {
+    enhancer_: IEnhancer<any>
+    /** Reads the accessor's backing slot */
+    get_: (this: any) => any
+    /** Writes the accessor's backing slot */
+    set_: (this: any, value: any) => void
+    /** The field name in development, the debug name of its ObservableValue in production */
+    name_: string
+    /**
+     * Position among the `@observable accessor` fields of an instance, which are initialized in
+     * a fixed order. `Infinity` until the first instance initializes the field.
+     */
+    index_: number
+}
+
+/**
+ * An initial value the enhancer has not seen yet, so that a field nobody reads does not pay for
+ * the conversion
+ */
+export class UnenhancedValue {
+    constructor(public value_: any) {}
+}
+
+const accessorFieldsByPrototype = new WeakMap<object, Map<PropertyKey, ObservableAccessorField>>()
+
+export function getAccessorFields(target: object): Map<PropertyKey, ObservableAccessorField> {
+    const proto = Object.getPrototypeOf(target)
+    let fields = accessorFieldsByPrototype.get(proto)
+    if (!fields) {
+        accessorFieldsByPrototype.set(proto, (fields = new Map()))
+    }
+    return fields
 }
 
 export function asObservableObject(

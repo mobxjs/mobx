@@ -25,7 +25,7 @@ function _isObservable(value, property?: PropertyKey): boolean {
             return (
                 adm.values_.has(property) ||
                 !!adm.lazyComputedKeys_?.has(property) ||
-                !!adm.lazyObservableKeys_?.has(property)
+                !!adm.accessorFields_?.has(property)
             )
         }
         return false

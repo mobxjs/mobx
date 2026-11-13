@@ -12,3 +12,13 @@ export function assert20223DecoratorType(
         )
     }
 }
+
+/**
+ * The key under which the administration keeps a decorated member.
+ * `context.name` of a private member is only its description, like "#value". A class and its
+ * subclass can each declare a private member with that description, so every private member
+ * gets a key of its own.
+ */
+export function getDecoratedMemberKey(context: ClassMemberDecoratorContext): PropertyKey {
+    return context.private ? Symbol(String(context.name)) : context.name
+}

@@ -386,3 +386,195 @@ test("computed sibling can read parent computed with super before child computed
     expect(child.parentNumber).toBe(1)
     expect(child.number).toBe(2)
 })
+
+test("private observable accessors with the same name in parent and subclass are separate fields", () => {
+    class Parent {
+        @observable accessor #value = 1
+
+        get parentValue() {
+            return this.#value
+        }
+
+        setParentValue(value: number) {
+            this.#value = value
+        }
+    }
+
+    class Child extends Parent {
+        @observable accessor #value = 2
+
+        get childValue() {
+            return this.#value
+        }
+    }
+
+    const child = new Child()
+    expect([child.parentValue, child.childValue]).toEqual([1, 2])
+
+    const seen: number[][] = []
+    const dispose = autorun(() => seen.push([child.parentValue, child.childValue]))
+    runInAction(() => child.setParentValue(10))
+    dispose()
+
+    expect(seen).toEqual([
+        [1, 2],
+        [10, 2]
+    ])
+})
+
+test("private computed getters with the same name in parent and subclass are separate getters", () => {
+    class Parent {
+        @observable accessor count = 1
+
+        @computed
+        get #scaled() {
+            return this.count * 10
+        }
+
+        get parentScaled() {
+            return this.#scaled
+        }
+    }
+
+    class Child extends Parent {
+        @computed
+        get #scaled() {
+            return this.count * 100
+        }
+
+        get childScaled() {
+            return this.#scaled
+        }
+    }
+
+    const child = new Child()
+    const seen: number[][] = []
+    const dispose = autorun(() => seen.push([child.parentScaled, child.childScaled]))
+    runInAction(() => {
+        child.count = 2
+    })
+    dispose()
+
+    expect(seen).toEqual([
+        [10, 100],
+        [20, 200]
+    ])
+})
+
+test("private observable accessor and private computed getter with the same name do not collide", () => {
+    class Parent {
+        @observable accessor #value = 1
+
+        get parentValue() {
+            return this.#value
+        }
+
+        setParentValue(value: number) {
+            this.#value = value
+        }
+    }
+
+    class Child extends Parent {
+        @computed
+        get #value() {
+            return this.parentValue * 2
+        }
+
+        get childValue() {
+            return this.#value
+        }
+    }
+
+    const child = new Child()
+    expect([child.parentValue, child.childValue]).toEqual([1, 2])
+
+    const seen: number[][] = []
+    const dispose = autorun(() => seen.push([child.parentValue, child.childValue]))
+    runInAction(() => child.setParentValue(10))
+    dispose()
+
+    expect(seen).toEqual([
+        [1, 2],
+        [10, 20]
+    ])
+})
+
+test("observable accessor of a subclass replaces the one of its parent, also when instances alternate", () => {
+    class Parent {
+        @observable accessor value = 1
+    }
+
+    class Child extends Parent {
+        @observable accessor value = 2
+    }
+
+    const read = (instance: Parent) => {
+        const seen: number[] = []
+        const dispose = autorun(() => seen.push(instance.value))
+        runInAction(() => {
+            instance.value += 10
+        })
+        dispose()
+        return [seen, toJS(instance), isObservableProp(instance, "value")]
+    }
+
+    expect(read(new Child())).toEqual([[2, 12], { value: 12 }, true])
+    expect(read(new Parent())).toEqual([[1, 11], { value: 11 }, true])
+    expect(read(new Child())).toEqual([[2, 12], { value: 12 }, true])
+})
+
+test("a parent constructor can assign the observable accessors of a subclass", () => {
+    const duringConstruction: any[] = []
+
+    class Parent {
+        id = 0
+
+        constructor(data: object) {
+            Object.assign(this, data)
+            duringConstruction.push(toJS(this), isObservableProp(this, "name"))
+        }
+    }
+
+    class Child extends Parent {
+        @observable accessor name = "initial"
+        @observable accessor untouched = "untouched"
+    }
+
+    const child = new Child({ id: 1, name: "assigned" })
+    // The assignment wins over the initializer, and fields that are not initialized yet are left out
+    expect(duringConstruction).toEqual([{ id: 1, name: "assigned" }, true])
+    expect(toJS(child)).toEqual({ id: 1, name: "assigned", untouched: "untouched" })
+
+    const seen: string[] = []
+    const dispose = autorun(() => seen.push(child.name))
+    runInAction(() => {
+        child.name = "changed"
+    })
+    dispose()
+    expect(seen).toEqual(["assigned", "changed"])
+})
+
+test("a parent constructor with observable accessors can assign those of a subclass too", () => {
+    class Parent {
+        @observable accessor id = 0
+
+        constructor(data: object) {
+            Object.assign(this, data)
+        }
+    }
+
+    class Child extends Parent {
+        @observable accessor name = "initial"
+    }
+
+    const child = new Child({ id: 1, name: "assigned" })
+    expect(toJS(child)).toEqual({ id: 1, name: "assigned" })
+
+    const seen: string[] = []
+    const dispose = autorun(() => seen.push(child.name))
+    runInAction(() => {
+        child.name = "changed"
+    })
+    dispose()
+    expect(seen).toEqual(["assigned", "changed"])
+})

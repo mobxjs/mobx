@@ -7,7 +7,8 @@ import {
     $mobx,
     asObservableObject,
     ComputedValue,
-    assign
+    assign,
+    getDecoratedMemberKey
 } from "../internal"
 
 export function createComputedAnnotation(name: string, options?: object): Annotation {
@@ -55,7 +56,8 @@ export function decorateComputed20223_(
         assert20223DecoratorType(context, ["getter"])
     }
     const ann = annotation
-    const { name: key, addInitializer } = context
+    const { addInitializer } = context
+    const key = getDecoratedMemberKey(context)
     let computedValues: WeakMap<object, ComputedValue<any>> | undefined
 
     // Defer ComputedValue creation until first access — avoids allocating
@@ -67,8 +69,8 @@ export function decorateComputed20223_(
             context: target
         })
         options.name ||= __DEV__
-            ? `${adm.name_}.${key.toString()}`
-            : `ObservableObject.${key.toString()}`
+            ? `${adm.name_}.${context.name.toString()}`
+            : `ObservableObject.${context.name.toString()}`
         return new ComputedValue(options)
     }
 
