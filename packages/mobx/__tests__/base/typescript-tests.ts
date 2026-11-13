@@ -1650,13 +1650,8 @@ test("issue #1122", done => {
     }, 100)
 })
 
-test("unobserved computed reads should warn with requiresReaction enabled", () => {
-    const warnings: string[] = []
-    jest.spyOn(console, "warn").mockImplementation((...args) => {
-        warnings.push(...args)
-    })
-
-    const expectedWarnings: string[] = []
+test("unobserved computed reads should throw with requiresReaction enabled", () => {
+    const expectedError = `[MobX] Computed value 'a.y' is being read outside a reactive context. This is not allowed because it was created with 'requiresReaction: true'.`
 
     class A {
         x = 0
@@ -1677,26 +1672,18 @@ test("unobserved computed reads should warn with requiresReaction enabled", () =
 
     const a = new A()
 
-    a.y
-    expectedWarnings.push(
-        `[mobx] Computed value 'a.y' is being read outside a reactive context. Doing a full recompute.`
-    )
+    expect(() => a.y).toThrow(expectedError)
 
     const d = mobx.reaction(
         () => a.y,
         () => {}
     )
 
-    a.y
+    expect(a.y).toBe(0)
 
     d()
 
-    a.y
-    expectedWarnings.push(
-        `[mobx] Computed value 'a.y' is being read outside a reactive context. Doing a full recompute.`
-    )
-
-    expect(warnings).toEqual(expectedWarnings)
+    expect(() => a.y).toThrow(expectedError)
 })
 
 test("multiple inheritance should work", () => {
