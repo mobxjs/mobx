@@ -1,5 +1,13 @@
 # eslint-plugin-mobx
 
+## 0.2.2
+
+### Patch Changes
+
+-   [`efbff0be0157cd8b962e88ba04109aedc11b73d9`](https://github.com/mobxjs/mobx/commit/efbff0be0157cd8b962e88ba04109aedc11b73d9) [#4776](https://github.com/mobxjs/mobx/pull/4776) Thanks [@kubk](https://github.com/kubk)! - Remove dead code and stop exporting internal helpers that nothing outside their own module uses
+
+-   [`a0b06e6dbe9f9813b5ccca9a9e723ad4e27e325c`](https://github.com/mobxjs/mobx/commit/a0b06e6dbe9f9813b5ccca9a9e723ad4e27e325c) [#4778](https://github.com/mobxjs/mobx/pull/4778) Thanks [@kubk](https://github.com/kubk)! - Remove unused dependencies
+
 ## 0.2.1
 
 ### Patch Changes

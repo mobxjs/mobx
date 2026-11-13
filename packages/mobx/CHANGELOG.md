@@ -1,5 +1,15 @@
 # mobx
 
+## 7.1.7
+
+### Patch Changes
+
+-   [`277264ce070429b87178cd86432f12d881bd11bf`](https://github.com/mobxjs/mobx/commit/277264ce070429b87178cd86432f12d881bd11bf) [#4774](https://github.com/mobxjs/mobx/pull/4774) Thanks [@gesposito](https://github.com/gesposito)! - Fix private `@observable accessor` fields and private `@computed` getters sharing state when a class and its subclass both declare one with the same name, such as `#value`. They are separate members, but MobX kept both under the name `"#value"`, so the parent's field read and wrote the subclass's value. Private members are now kept under a key of their own. As a result `isObservableProp(obj, "#value")`, `getAtom(obj, "#value")` and `observe(obj, "#value", ...)` no longer find a private member by its name, and change events of a private field carry a symbol as `name`.
+
+-   [`efbff0be0157cd8b962e88ba04109aedc11b73d9`](https://github.com/mobxjs/mobx/commit/efbff0be0157cd8b962e88ba04109aedc11b73d9) [#4776](https://github.com/mobxjs/mobx/pull/4776) Thanks [@kubk](https://github.com/kubk)! - Remove dead code and stop exporting internal helpers that nothing outside their own module uses
+
+-   [`410d1fa795e21741e1fde217e037f4e5483677bd`](https://github.com/mobxjs/mobx/commit/410d1fa795e21741e1fde217e037f4e5483677bd) [#4779](https://github.com/mobxjs/mobx/pull/4779) Thanks [@kubk](https://github.com/kubk)! - Remove the unused internal fields `ComputedValue.triggeredBy_` and `ObservableValue.hasUnreportedChange_`
+
 ## 7.1.6
 
 ### Patch Changes
