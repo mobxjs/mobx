@@ -279,7 +279,7 @@ export const CounterView = observer(() => {
 })
 ```
 
-React Compiler caches the JSX of `CounterView`. When `counterStore.count` changes, MobX re-renders the component, but the cached JSX is returned and the DOM stays stale, silently. See [facebook/react#37000](https://github.com/facebook/react/issues/37000) and [mobxjs/mobx#3874](https://github.com/mobxjs/mobx/issues/3874).
+React Compiler caches the JSX of `CounterView`. When `counterStore.count` changes, MobX re-renders the component, but the cached JSX is returned and the DOM stays stale, silently. See [react/react#37000](https://github.com/react/react/issues/37000) and [mobxjs/mobx#3874](https://github.com/mobxjs/mobx/issues/3874).
 
 The plugin adds React's [`"use no memo"` directive](https://react.dev/reference/react-compiler/directives/use-no-memo) to every observed component, so React Compiler leaves it to MobX. See [MobX and React Compiler](https://mobx.js.org/react-compiler.html) for more background.
 
