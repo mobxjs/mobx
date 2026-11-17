@@ -827,6 +827,15 @@ describe("dehances", () => {
         expect([...array.values()]).toEqual([...dehanced.values()])
     })
 
+    test("keys", () => {
+        expect([...array.keys()]).toEqual([...dehanced.keys()])
+    })
+
+    test("Symbol.iterator", () => {
+        expect([...array]).toEqual([...dehanced])
+        expect(Array.from(array)).toEqual(dehanced)
+    })
+
     test("toReversed", () => {
         expect(array.toReversed()).toEqual(dehanced.toReversed())
     })
@@ -867,6 +876,43 @@ describe("dehances", () => {
         })
         expect(flattenedArray).toEqual(dehancedNestedArray.flat(1))
     })
+})
+
+test("iterating an observable array is tracked", () => {
+    const array = observable([1, 2])
+    const seen = []
+    const d = autorun(() => {
+        const values = []
+        for (const value of array) values.push(value)
+        seen.push(
+            [
+                values,
+                [...array],
+                Array.from(array.keys()),
+                Array.from(array.entries(), ([index, value]) => index + ":" + value)
+            ].join(" | ")
+        )
+    })
+    array.push(3)
+    array[0] = 0
+    array.splice(1, 1)
+    d()
+    expect(seen).toEqual([
+        "1,2 | 1,2 | 0,1 | 0:1,1:2",
+        "1,2,3 | 1,2,3 | 0,1,2 | 0:1,1:2,2:3",
+        "0,2,3 | 0,2,3 | 0,1,2 | 0:0,1:2,2:3",
+        "0,3 | 0,3 | 0,1 | 0:0,1:3"
+    ])
+})
+
+test("array iterators see items added during iteration", () => {
+    const array = observable([1, 2])
+    const values = []
+    for (const value of array) {
+        values.push(value)
+        if (value < 4) array.push(value + 2)
+    }
+    expect(values).toEqual([1, 2, 3, 4, 5])
 })
 
 test("reduce without initial value #2432", () => {
