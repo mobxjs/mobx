@@ -5,7 +5,7 @@ This is the list of individual or one time contributions!
 Our monthly donors can be found on open collective https://opencollective.com/mobx#contributors!
 Monthly donations can be done through https://opencollective.com/mobx.
 
-Want to make a one-time contribution? https://mobxjs.github.io/mobx/donate.html
+Want to make a one-time contribution? https://opencollective.com/mobx/donate
 
 -   Anders Sjöberg
 -   Andrei Zvonimir Crnković
