@@ -28,6 +28,6 @@ A nice list is WIP, but see this [github issue](https://github.com/mobxjs/mobx/i
 ## Philosophy
 
 -   [Making React reactive: the pursuit of high performing, easily maintainable React apps](https://www.mendix.com/tech-blog/making-react-reactive-pursuit-high-performing-easily-maintainable-react-apps/)
--   [SurviveJS interview on Mobservable, React and Flux](http://survivejs.com/blog/mobservable-interview/)
+-   [SurviveJS interview on Mobservable, React and Flux](https://survivejs.com/blog/mobservable-interview)
 -   [Pure rendering in the light of time and state](https://medium.com/@mweststrate/pure-rendering-in-the-light-of-time-and-state-4b537d8d40b1)
 -   [Official homepage](http://mobxjs.github.io/mobx/)
