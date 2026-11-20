@@ -11,7 +11,7 @@ afterEach(cleanup)
 test("should not prevent GC of uncomitted components", async () => {
     expect(typeof globalThis.FinalizationRegistry).toBe("function")
 
-    // This specific setup causes first instance of A not being commited.
+    // This specific setup causes first instance of A not being committed.
     // This is checked by comparing constructor and componentDidMount invocation counts.
     // There is no profound reason why that's the case, if you know a simpler or more robust setup
     // feel free to change this.

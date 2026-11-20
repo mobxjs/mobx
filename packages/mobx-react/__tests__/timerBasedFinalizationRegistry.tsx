@@ -9,7 +9,7 @@ expect(globalThis.FinalizationRegistry).toBeUndefined()
 
 afterEach(cleanup)
 
-test("should unregister from FinalizationRegistry once commited #3776", async () => {
+test("should unregister from FinalizationRegistry once committed #3776", async () => {
     const o = mobx.observable({ x: 0 })
 
     @observer
