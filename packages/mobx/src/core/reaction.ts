@@ -235,7 +235,10 @@ export class Reaction implements IDerivation, IReactionPublic {
 
     getDisposer_(abortSignal?: GenericAbortSignal): IReactionDisposer {
         const dispose = (() => this.dispose()) as IReactionDisposer
-        if (abortSignal?.addEventListener && !this.isDisposed) {
+        // The first synchronous run can abort before this disposer is created.
+        if (abortSignal?.aborted) {
+            this.dispose()
+        } else if (abortSignal?.addEventListener && !this.isDisposed) {
             abortSignal.addEventListener("abort", dispose)
             this.removeAbortListener_ = () => abortSignal.removeEventListener?.("abort", dispose)
         }
