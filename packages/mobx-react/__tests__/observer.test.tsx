@@ -796,7 +796,7 @@ test("SSR works #3448", () => {
     expect(consoleWarnMock).toMatchSnapshot()
 })
 
-test("#3492 should not cause warning by calling forceUpdate on uncommited components", async () => {
+test("#3492 should not cause warning by calling forceUpdate on uncommitted components", async () => {
     consoleWarnMock = jest.spyOn(console, "warn").mockImplementation(() => {})
 
     const o = observable({ x: 0 })
