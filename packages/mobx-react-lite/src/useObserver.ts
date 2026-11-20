@@ -82,7 +82,7 @@ export function useObserver<T>(render: () => T, baseComponentName: string = "obs
 
     if (!admRef.current) {
         // First render
-        admRef.current = createObserverAdministration(baseComponentName)
+        admRef.current = /*#__NOINLINE__*/ createObserverAdministration(baseComponentName)
     }
 
     const adm = admRef.current!
