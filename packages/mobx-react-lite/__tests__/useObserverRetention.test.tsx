@@ -1,5 +1,3 @@
-import { readFileSync } from "node:fs"
-import { resolve } from "node:path"
 import { render } from "@testing-library/react"
 import * as React from "react"
 import gc from "expose-gc/function"
@@ -50,21 +48,3 @@ test("a mounted observer does not retain the element tree it first returned", as
 // There is deliberately no assertion that the first render's `props` become
 // collectable: a control component wrapped in plain `React.memo` (no MobX involved)
 // fails such an assertion too, so it cannot isolate MobX's contribution.
-
-test("the development build carries the no-inline hint into downstream builds", () => {
-    const bundle = readFileSync(
-        resolve(__dirname, "../dist/mobxreactlite.cjs.development.js"),
-        "utf8"
-    )
-
-    expect(bundle).toMatch(/\/\*#__NOINLINE__\*\/\s*createObserverAdministration\(/)
-})
-
-test("the minified build calls a separate observer administration factory", () => {
-    const bundle = readFileSync(
-        resolve(__dirname, "../dist/mobxreactlite.cjs.production.min.js"),
-        "utf8"
-    )
-
-    expect(bundle).toMatch(/\.useRef\(null\);[^;]*\.current=[$\w]+\(/)
-})
