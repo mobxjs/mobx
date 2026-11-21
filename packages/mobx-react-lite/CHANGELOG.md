@@ -1,5 +1,11 @@
 # mobx-react-lite
 
+## 5.1.4
+
+### Patch Changes
+
+-   [`4720499b076d848aee59e58370627d9db107a3f1`](https://github.com/mobxjs/mobx/commit/4720499b076d848aee59e58370627d9db107a3f1) [#4786](https://github.com/mobxjs/mobx/pull/4786) Thanks [@vkrol](https://github.com/vkrol)! - Prevent production minifiers from inlining the observer factory into `useObserver` and retaining the first render's element tree.
+
 ## 5.1.3
 
 ### Patch Changes
