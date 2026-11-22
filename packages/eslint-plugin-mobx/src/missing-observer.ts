@@ -1,6 +1,6 @@
 import type { Rule } from "eslint"
 
-function isWrappedElsewhere(context, sourceCode, cmp, cmpOrForwardRef) {
+function isWrappedElsewhere(sourceCode, cmp, cmpOrForwardRef) {
     const declarator =
         cmpOrForwardRef.parent?.type === "VariableDeclarator" ? cmpOrForwardRef.parent : undefined
     const owner = declarator ?? (cmp.type.endsWith("Declaration") ? cmp : undefined)
@@ -8,9 +8,7 @@ function isWrappedElsewhere(context, sourceCode, cmp, cmpOrForwardRef) {
     if (!owner || !bindingName) {
         return false
     }
-    const declared = sourceCode.getDeclaredVariables
-        ? sourceCode.getDeclaredVariables(owner)
-        : context.getDeclaredVariables(owner)
+    const declared = sourceCode.getDeclaredVariables(owner)
     const variable = declared.find(v => v.name === bindingName)
     return !!variable?.references.some(ref => {
         const parent = ref.identifier.parent
@@ -23,7 +21,7 @@ function isWrappedElsewhere(context, sourceCode, cmp, cmpOrForwardRef) {
 }
 
 function create(context) {
-    const sourceCode = context.sourceCode ?? context.getSourceCode()
+    const sourceCode = context.sourceCode
 
     return {
         "FunctionDeclaration,FunctionExpression,ArrowFunctionExpression,ClassDeclaration,ClassExpression":
@@ -78,7 +76,7 @@ function create(context) {
                     }
                 }
 
-                if (isWrappedElsewhere(context, sourceCode, cmp, cmpOrForwardRef)) {
+                if (isWrappedElsewhere(sourceCode, cmp, cmpOrForwardRef)) {
                     return
                 }
 

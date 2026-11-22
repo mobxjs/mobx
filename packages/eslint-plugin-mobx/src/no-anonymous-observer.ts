@@ -1,7 +1,7 @@
 import type { Rule } from "eslint"
 
 function create(context) {
-    const sourceCode = context.sourceCode ?? context.getSourceCode()
+    const sourceCode = context.sourceCode
 
     return {
         'CallExpression[callee.name="observer"]': observer => {

@@ -8,9 +8,13 @@ Mobx specific linting rules for `eslint`.
 npm install --save-dev eslint @typescript-eslint/parser eslint-plugin-mobx
 ```
 
+Requires ESLint 9 or 10. For ESLint 8 or older, use `eslint-plugin-mobx` 0.2.x.
+
 ## Configuration
 
 ### Legacy Config
+
+Only for ESLint 9 with `ESLINT_USE_FLAT_CONFIG=false`. ESLint 10 supports flat config only.
 
 ```javascript
 // .eslintrc.js
@@ -92,8 +96,8 @@ class Cmp extends React.Component { }
 class Cmp extends Component { }
 const Cmp = class extends React.Component { }
 const Cmp = class extends Component { }
-class extends Component { }
-class extends React.Component { }
+export default class extends Component { }
+export default class extends React.Component { }
 
 function Named() { }
 const foo = function Named() { }

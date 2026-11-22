@@ -51,8 +51,14 @@ const invalids = [
         "const Cmp = class extends Component { }",
         "const Cmp = observer(class extends Component { })"
     ],
-    ["class extends Component { }", "observer(class extends Component { })"],
-    ["class extends React.Component { }", "observer(class extends React.Component { })"]
+    [
+        "export default class extends Component { }",
+        "export default observer(class extends Component { })"
+    ],
+    [
+        "export default class extends React.Component { }",
+        "export default observer(class extends React.Component { })"
+    ]
 ]
 
 tester.run("missing-observer", rule, {
