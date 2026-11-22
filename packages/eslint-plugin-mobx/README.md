@@ -28,8 +28,7 @@ export default [
         rules: {
             // these values are the same as recommended
             "mobx/exhaustive-make-observable": "warn",
-            "mobx/unconditional-make-observable": "error",
-            "mobx/missing-observer": "warn"
+            "mobx/unconditional-make-observable": "error"
         }
     }
 ]
@@ -63,40 +62,6 @@ your current usage (even if it may be wrong), you should run the autofix with th
 
 Makes sure the `make(Auto)Observable(this)` is called unconditionally inside a constructor.
 
-### mobx/missing-observer
-
-Makes sure every React component is wrapped with `observer`. A React component is considered to be any _class_ extending from `Component` or `React.Component` and any _function_ which name has the first letter capitalized (for anonymous functions the name is inferred from variable). These are all considered components:
-
-```javascript
-class Cmp extends React.Component { }
-class Cmp extends Component { }
-const Cmp = class extends React.Component { }
-const Cmp = class extends Component { }
-export default class extends Component { }
-export default class extends React.Component { }
-
-function Named() { }
-const foo = function Named() { }
-const Anonym = function () { };
-const Arrow = () => { };
-```
-
-**Autofix** wraps the component with `observer` and if necessary declares a constant of the same name: `const Name = observer(function Name() {})`.
-It's a bit opinionated and can lead to a lot of false positives depending on your conventions. You will probably want to enable it only for some files, eg:
-
-```javascript
-// eslint.config.js
-export default [
-    // ...
-    {
-        files: ["**/*.jsx"],
-        rules: {
-            "mobx/missing-observer": "error"
-        }
-    }
-]
-```
-
 ### mobx/no-anonymous-observer (deprecated)
 
 _Deprecated in favor of [react/display-name](https://github.com/jsx-eslint/eslint-plugin-react/blob/master/docs/rules/display-name.md) + [componentWrapperFunctions](https://github.com/jsx-eslint/eslint-plugin-react). Example of **eslint.config.js**:_
@@ -119,5 +84,5 @@ export default [
 
 Forbids anonymous functions or classes as `observer` components.
 Improves debugging experience and [avoids problem with inability to customize `displayName`](https://github.com/mobxjs/mobx/issues/2721).
-Plays nice with `eslint-plugin-react-hooks` and `mobx/missing-observer` as both of these don't recognize anonymous function as component.
+Plays nice with `eslint-plugin-react-hooks`, which doesn't recognize anonymous functions as components.
 **Autofix** infers the name from variable if possible.

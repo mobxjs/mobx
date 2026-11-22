@@ -5,7 +5,6 @@ import type { ESLint, Linter } from "eslint"
 
 import exhaustiveMakeObservable from "./exhaustive-make-observable"
 import unconditionalMakeObservable from "./unconditional-make-observable"
-import missingObserver from "./missing-observer"
 import noAnonymousObserver from "./no-anonymous-observer"
 
 const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "package.json"), "utf8"))
@@ -18,7 +17,6 @@ const pluginMobx: ESLint.Plugin = {
     rules: {
         "exhaustive-make-observable": exhaustiveMakeObservable,
         "unconditional-make-observable": unconditionalMakeObservable,
-        "missing-observer": missingObserver,
         "no-anonymous-observer": noAnonymousObserver
     }
 }
@@ -33,8 +31,7 @@ const plugin: typeof pluginMobx & {
             plugins: { mobx: pluginMobx },
             rules: {
                 "mobx/exhaustive-make-observable": "warn",
-                "mobx/unconditional-make-observable": "error",
-                "mobx/missing-observer": "warn"
+                "mobx/unconditional-make-observable": "error"
             }
         }
     }
