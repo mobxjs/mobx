@@ -8,7 +8,7 @@ Mobx specific linting rules for `eslint`.
 npm install --save-dev eslint @typescript-eslint/parser eslint-plugin-mobx
 ```
 
-Requires ESLint 9 or 10. For ESLint 8 or older, use `eslint-plugin-mobx` 0.2.x.
+Requires ESLint 9.10+ or 10. For ESLint 8 or older, use `eslint-plugin-mobx` 0.2.x.
 
 ## Configuration
 

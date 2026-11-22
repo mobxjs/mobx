@@ -26,14 +26,11 @@
     ],
     "homepage": "https://mobx.js.org/",
     "peerDependencies": {
-        "eslint": "^9.0.0 || ^10.0.0",
+        "eslint": "^9.10.0 || ^10.0.0",
         "mobx": "^7.0.0"
     },
-    "dependencies": {
-        "@types/eslint": "^9.6.1"
-    },
     "devDependencies": {
-        "eslint-9": "npm:eslint@^9.0.0",
+        "eslint-9": "npm:eslint@^9.10.0",
         "eslint-10": "npm:eslint@^10.0.0"
     },
     "keywords": [
