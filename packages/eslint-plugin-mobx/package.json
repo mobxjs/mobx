@@ -33,6 +33,8 @@
         "@types/eslint": "^9.6.1"
     },
     "devDependencies": {
+        "@typescript-eslint/parser": "^5.62.0",
+        "eslint": "^7.32.0",
         "eslint-7": "npm:eslint@^7.0.0",
         "eslint-9": "npm:eslint@^9.0.0"
     },
