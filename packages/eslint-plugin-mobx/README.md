@@ -61,28 +61,3 @@ your current usage (even if it may be wrong), you should run the autofix with th
 ### mobx/unconditional-make-observable
 
 Makes sure the `make(Auto)Observable(this)` is called unconditionally inside a constructor.
-
-### mobx/no-anonymous-observer (deprecated)
-
-_Deprecated in favor of [react/display-name](https://github.com/jsx-eslint/eslint-plugin-react/blob/master/docs/rules/display-name.md) + [componentWrapperFunctions](https://github.com/jsx-eslint/eslint-plugin-react). Example of **eslint.config.js**:_
-
-```javascript
-export default [
-    // ...
-    {
-        rules: {
-            "react/display-name": "warn"
-        },
-        settings: {
-            componentWrapperFunctions: ["observer"]
-        }
-    }
-]
-```
-
----
-
-Forbids anonymous functions or classes as `observer` components.
-Improves debugging experience and [avoids problem with inability to customize `displayName`](https://github.com/mobxjs/mobx/issues/2721).
-Plays nice with `eslint-plugin-react-hooks`, which doesn't recognize anonymous functions as components.
-**Autofix** infers the name from variable if possible.
