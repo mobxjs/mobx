@@ -25,7 +25,7 @@
         "check-size": "node scripts/size/index.js",
         "test": "jest",
         "coverage": "jest --coverage",
-        "lint": "eslint packages/mobx/src packages/mobx-react/src packages/mobx-react-lite/src packages/mobx-react-plugin/src packages/eslint-plugin-mobx/src",
+        "lint": "eslint .",
         "prettier": "prettier --write **/*.{js,ts,md}",
         "release": "npm run prepublishOnly --workspaces --if-present && changeset publish",
         "mobx": "npm -w mobx run",

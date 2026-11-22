@@ -4,12 +4,14 @@ const globals = require("globals")
 
 module.exports = [
     {
+        // Lint only packages/*/src, and skip mobx-undecorate
         ignores: [
-            "**/__tests__/**",
-            "**/dist/**",
-            "**/lib/**",
-            "**/es/**",
-            "packages/mobx-undecorate/**"
+            "**",
+            "!packages/",
+            "!packages/*/",
+            "!packages/*/src/",
+            "!packages/*/src/**",
+            "packages/mobx-undecorate/"
         ]
     },
     js.configs.recommended,
