@@ -23,28 +23,19 @@ const pluginMobx: ESLint.Plugin = {
     }
 }
 
-const recommendedRules: Linter.RulesRecord = {
-    "mobx/exhaustive-make-observable": "warn",
-    "mobx/unconditional-make-observable": "error",
-    "mobx/missing-observer": "warn"
-}
-
 const plugin: typeof pluginMobx & {
-    configs: { recommended: Linter.LegacyConfig }
-    flatConfigs: { recommended: Linter.Config }
+    configs: { recommended: Linter.Config }
 } = {
     ...pluginMobx,
     configs: {
         recommended: {
-            plugins: ["mobx"],
-            rules: recommendedRules
-        }
-    },
-    flatConfigs: {
-        recommended: {
             name: "mobx/recommended",
             plugins: { mobx: pluginMobx },
-            rules: recommendedRules
+            rules: {
+                "mobx/exhaustive-make-observable": "warn",
+                "mobx/unconditional-make-observable": "error",
+                "mobx/missing-observer": "warn"
+            }
         }
     }
 }

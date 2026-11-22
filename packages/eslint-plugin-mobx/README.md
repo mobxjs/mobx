@@ -12,30 +12,6 @@ Requires ESLint 9 or 10. For ESLint 8 or older, use `eslint-plugin-mobx` 0.2.x.
 
 ## Configuration
 
-### Legacy Config
-
-Only for ESLint 9 with `ESLINT_USE_FLAT_CONFIG=false`. ESLint 10 supports flat config only.
-
-```javascript
-// .eslintrc.js
-module.exports = {
-    parser: "@typescript-eslint/parser",
-    // Include "mobx" in plugins array:
-    plugins: ["mobx"],
-    // Either extend our recommended configuration:
-    extends: "plugin:mobx/recommended",
-    // ...or specify and customize individual rules:
-    rules: {
-        // these values are the same as recommended
-        "mobx/exhaustive-make-observable": "warn",
-        "mobx/unconditional-make-observable": "error",
-        "mobx/missing-observer": "warn"
-    }
-}
-```
-
-### Flat Config
-
 ```javascript
 // eslint.config.js
 import pluginMobx from "eslint-plugin-mobx"
@@ -44,7 +20,7 @@ export default [
     // ...
 
     // Either extend our recommended configuration:
-    pluginMobx.flatConfigs.recommended,
+    pluginMobx.configs.recommended,
 
     // ...or specify and customize individual rules:
     {
@@ -81,7 +57,7 @@ Does not warn about annotated non-existing fields (there is a runtime check, but
 
 This is a boolean value that controls if the field is annotated with `true` or `false`.
 If you are migrating an existing project using `makeObservable` and do not want this rule to override
-your current usage (even if it may be wrong), you should run the autofix with the annotation set to `false` to maintain existing behaviour: `eslint --no-eslintrc --fix --rule='mobx/exhaustive-make-observable: [2, { "autofixAnnotation": false }]' .`
+your current usage (even if it may be wrong), you should run the autofix with the annotation set to `false` to maintain existing behaviour: `eslint --fix --rule='mobx/exhaustive-make-observable: [2, { "autofixAnnotation": false }]' .`
 
 ### mobx/unconditional-make-observable
 
@@ -106,35 +82,37 @@ const Arrow = () => { };
 ```
 
 **Autofix** wraps the component with `observer` and if necessary declares a constant of the same name: `const Name = observer(function Name() {})`.
-It's a bit opinionated and can lead to a lot of false positives depending on your conventions. You will probably want to combine this rule with `overrides` option, eg:
+It's a bit opinionated and can lead to a lot of false positives depending on your conventions. You will probably want to enable it only for some files, eg:
 
 ```javascript
-// .eslintrc.js
-"overrides": [
-  {
-    "files": ["*.jsx"],
-    "rules": {
-      "mobx/missing-observer": "error"
+// eslint.config.js
+export default [
+    // ...
+    {
+        files: ["**/*.jsx"],
+        rules: {
+            "mobx/missing-observer": "error"
+        }
     }
-  }
 ]
 ```
 
 ### mobx/no-anonymous-observer (deprecated)
 
-_Deprecated in favor of [react/display-name](https://github.com/jsx-eslint/eslint-plugin-react/blob/master/docs/rules/display-name.md) + [componentWrapperFunctions](https://github.com/jsx-eslint/eslint-plugin-react). Example of **.eslintrc**:_
+_Deprecated in favor of [react/display-name](https://github.com/jsx-eslint/eslint-plugin-react/blob/master/docs/rules/display-name.md) + [componentWrapperFunctions](https://github.com/jsx-eslint/eslint-plugin-react). Example of **eslint.config.js**:_
 
-```
-{
-  "rules": {
-    "react/display-name": "warn"
-  },
-  "settings": {
-    "componentWrapperFunctions": [
-      "observer"
-    ]
-  }
-}
+```javascript
+export default [
+    // ...
+    {
+        rules: {
+            "react/display-name": "warn"
+        },
+        settings: {
+            componentWrapperFunctions: ["observer"]
+        }
+    }
+]
 ```
 
 ---
