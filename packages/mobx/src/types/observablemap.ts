@@ -30,7 +30,9 @@ import {
     UPDATE,
     IAtom,
     PureSpyEvent,
-    initObservable
+    initObservable,
+    arrayFrom,
+    isArray
 } from "../internal"
 
 export interface IKeyValueMap<V = any> {
@@ -354,7 +356,7 @@ export class ObservableMap<K = any, V = any>
                 getPlainObjectKeys(other).forEach((key: any) =>
                     this.set(key as K, (other as IKeyValueMap)[key])
                 )
-            } else if (Array.isArray(other)) {
+            } else if (isArray(other)) {
                 other.forEach(([key, value]) => this.set(key, value))
             } else if (isES6Map(other)) {
                 if (!isPlainES6Map(other)) {
@@ -466,7 +468,7 @@ export class ObservableMap<K = any, V = any>
     }
 
     toJSON(): [K, V][] {
-        return Array.from(this)
+        return arrayFrom(this)
     }
 
     get [Symbol.toStringTag]() {
@@ -487,7 +489,7 @@ function makeIterableForMap<T>(iterator: Iterator<T>): MapIterator<T> {
 function convertToMap(dataStructure: any): Map<any, any> {
     if (isES6Map(dataStructure) || isObservableMap(dataStructure)) {
         return dataStructure
-    } else if (Array.isArray(dataStructure)) {
+    } else if (isArray(dataStructure)) {
         return new Map(dataStructure)
     } else if (isPlainObject(dataStructure)) {
         const map = new Map()

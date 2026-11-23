@@ -14,7 +14,8 @@ import {
     autoAction,
     flow,
     isFlow,
-    isGenerator
+    isGenerator,
+    isArray
 } from "../internal"
 
 export interface IEnhancer<T> {
@@ -33,7 +34,7 @@ export function deepEnhancer(v, _, name) {
     }
 
     // something that can be converted and mutated?
-    if (Array.isArray(v)) {
+    if (isArray(v)) {
         return observable.array(v, { name })
     }
     if (isPlainObject(v)) {
@@ -62,7 +63,7 @@ export function shallowEnhancer(v, _, name): any {
     if (isObservableObject(v) || isObservableArray(v) || isObservableMap(v) || isObservableSet(v)) {
         return v
     }
-    if (Array.isArray(v)) {
+    if (isArray(v)) {
         return observable.array(v, { name, deep: false })
     }
     if (isPlainObject(v)) {

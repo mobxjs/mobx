@@ -15,7 +15,8 @@ import {
     EMPTY_ARRAY,
     die,
     getDescriptor,
-    defineProperty
+    defineProperty,
+    arrayFrom
 } from "../internal"
 
 // we don't use globalState for these in order to avoid possible issues with multiple
@@ -98,7 +99,7 @@ export function _startAction(
     let startTime_: number = 0
     if (notifySpy_) {
         startTime_ = Date.now()
-        const flattenedArgs = args ? Array.from(args) : EMPTY_ARRAY
+        const flattenedArgs = args ? arrayFrom(args) : EMPTY_ARRAY
         spyReportStart({
             type: ACTION,
             name: actionName,

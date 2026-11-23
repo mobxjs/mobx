@@ -11,7 +11,8 @@ import {
     isObservableSet,
     isObservableObject,
     startBatch,
-    die
+    die,
+    arrayFrom
 } from "../internal"
 
 export function keys<K>(map: ObservableMap<K, any>): ReadonlyArray<K>
@@ -25,7 +26,7 @@ export function keys(obj: any): any {
         ).keys_()
     }
     if (isObservableMap(obj) || isObservableSet(obj)) {
-        return Array.from(obj.keys())
+        return arrayFrom(obj.keys())
     }
     if (isObservableArray(obj)) {
         return obj.map((_, index) => index)
@@ -45,7 +46,7 @@ export function values(obj: any): string[] {
         return keys(obj).map(key => obj.get(key))
     }
     if (isObservableSet(obj)) {
-        return Array.from(obj.values())
+        return arrayFrom(obj.values())
     }
     if (isObservableArray(obj)) {
         return obj.slice()
@@ -67,7 +68,7 @@ export function entries(obj: any): any {
         return keys(obj).map(key => [key, obj.get(key)])
     }
     if (isObservableSet(obj)) {
-        return Array.from(obj.entries())
+        return arrayFrom(obj.entries())
     }
     if (isObservableArray(obj)) {
         return obj.map((key, index) => [index, key])

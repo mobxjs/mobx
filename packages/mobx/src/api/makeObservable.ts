@@ -17,7 +17,8 @@ import {
     MakeResult,
     objectPrototype,
     recordAnnotationApplied,
-    hasProp
+    hasProp,
+    getPrototypeOf
 } from "../internal"
 
 export function makeObservable<T extends object, AdditionalKeys extends PropertyKey = never>(
@@ -43,7 +44,7 @@ export function makeAutoObservable<T extends object, AdditionalKeys extends Prop
     options?: CreateObservableOptions
 ): T {
     if (__DEV__) {
-        if (!isPlainObject(target) && !isPlainObject(Object.getPrototypeOf(target))) {
+        if (!isPlainObject(target) && !isPlainObject(getPrototypeOf(target))) {
             die(`'makeAutoObservable' can only be used for classes that don't have a superclass`)
         }
         if (isObservableObject(target)) {
@@ -63,7 +64,7 @@ export function makeAutoObservable<T extends object, AdditionalKeys extends Prop
         // Optimization: cache keys on proto
         // Assumes makeAutoObservable can be called only once per object and can't be used in subclass
         if (!target[keysSymbol]) {
-            const proto = Object.getPrototypeOf(target)
+            const proto = getPrototypeOf(target)
             const keys = new Set([...ownKeys(target), ...ownKeys(proto)])
             keys.delete("constructor")
             keys.delete($mobx)
@@ -110,7 +111,7 @@ function make_(
                 break
             }
         }
-        source = Object.getPrototypeOf(source)
+        source = getPrototypeOf(source)
     }
     recordAnnotationApplied(adm, annotation, key)
 }

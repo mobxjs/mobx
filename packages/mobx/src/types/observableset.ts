@@ -23,7 +23,9 @@ import {
     DELETE,
     ADD,
     die,
-    initObservable
+    initObservable,
+    arrayFrom,
+    isArray
 } from "../internal"
 
 const ObservableSetMarker = {}
@@ -271,7 +273,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
             other = new Set(other)
         }
 
-        if (Array.isArray(other) || isES6Set(other)) {
+        if (isArray(other) || isES6Set(other)) {
             // Only emit `delete`/`add` events (and `reportChanged`) for values that
             // actually change, instead of clearing and re-adding everything. `add` and
             // `delete` are already no-ops for values that are respectively already
@@ -311,7 +313,7 @@ export class ObservableSet<T = any> implements Set<T>, IInterceptable<ISetWillCh
         return this
     }
     toJSON(): T[] {
-        return Array.from(this)
+        return arrayFrom(this)
     }
 
     toString(): string {
