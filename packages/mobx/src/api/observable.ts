@@ -28,7 +28,8 @@ import {
     createObservableAnnotation,
     getAutoAnnotation,
     initObservable,
-    decorateObservable20223_
+    decorateObservable20223_,
+    isArray
 } from "../internal"
 import { createDecoratorAnnotation, type DecoratorAnnotation } from "./decoratorannotation"
 import type { ClassAccessorAndFieldDecorator } from "../types/decorator_fills"
@@ -114,7 +115,7 @@ function createObservable(v: any, arg2?: any, arg3?: any) {
     }
 
     // Array
-    if (Array.isArray(v)) {
+    if (isArray(v)) {
         return observable.array(v, arg2)
     }
 

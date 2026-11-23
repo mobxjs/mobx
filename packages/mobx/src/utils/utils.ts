@@ -5,6 +5,9 @@ export const assign = Object.assign
 export const getDescriptor = Object.getOwnPropertyDescriptor
 export const defineProperty = Object.defineProperty
 export const objectPrototype = Object.prototype
+export const getPrototypeOf = Object.getPrototypeOf
+export const arrayFrom = Array.from
+export const isArray = Array.isArray
 
 export const EMPTY_ARRAY = []
 Object.freeze(EMPTY_ARRAY)
@@ -62,7 +65,7 @@ export function isPlainObject(value: any) {
     if (!isObject(value)) {
         return false
     }
-    const proto = Object.getPrototypeOf(value)
+    const proto = getPrototypeOf(value)
     if (proto == null || proto === objectPrototype) {
         return true
     }
@@ -120,16 +123,16 @@ export function createInstanceofPredicate<T>(
  * Yields true for both native and observable Map, even across different windows.
  */
 export function isES6Map(thing: unknown): thing is Map<any, any> {
-    return thing != null && Object.prototype.toString.call(thing) === "[object Map]"
+    return thing != null && objectPrototype.toString.call(thing) === "[object Map]"
 }
 
 /**
  * Makes sure a Map is an instance of non-inherited native or observable Map.
  */
 export function isPlainES6Map(thing: Map<unknown, unknown>): boolean {
-    const mapProto = Object.getPrototypeOf(thing)
-    const objectProto = Object.getPrototypeOf(mapProto)
-    const nullProto = Object.getPrototypeOf(objectProto)
+    const mapProto = getPrototypeOf(thing)
+    const objectProto = getPrototypeOf(mapProto)
+    const nullProto = getPrototypeOf(objectProto)
     return nullProto === null
 }
 
@@ -137,7 +140,7 @@ export function isPlainES6Map(thing: Map<unknown, unknown>): boolean {
  * Yields true for both native and observable Set, even across different windows.
  */
 export function isES6Set(thing: unknown): thing is Set<any> {
-    return thing != null && Object.prototype.toString.call(thing) === "[object Set]"
+    return thing != null && objectPrototype.toString.call(thing) === "[object Set]"
 }
 
 /**

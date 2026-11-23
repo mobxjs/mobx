@@ -6,7 +6,8 @@ import {
     isObservableSet,
     hasProp,
     isFunction,
-    objectPrototype
+    objectPrototype,
+    arrayFrom
 } from "../internal"
 
 declare const Symbol
@@ -175,10 +176,10 @@ function unwrap(a: any) {
         return a.slice()
     }
     if (isES6Map(a) || isObservableMap(a)) {
-        return Array.from(a.entries())
+        return arrayFrom(a.entries())
     }
     if (isES6Set(a) || isObservableSet(a)) {
-        return Array.from(a.entries())
+        return arrayFrom(a.entries())
     }
     return a
 }

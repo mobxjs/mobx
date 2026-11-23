@@ -1,4 +1,4 @@
-import { IDepTreeNode, getAtom, getObservers, hasObservers } from "../internal"
+import { IDepTreeNode, getAtom, getObservers, hasObservers, arrayFrom } from "../internal"
 
 export interface IDependencyTree {
     name: string
@@ -33,11 +33,11 @@ function nodeToObserverTree(node: IDepTreeNode): IObserverTree {
         name: node.name_
     }
     if (hasObservers(node as any)) {
-        result.observers = Array.from(<any>getObservers(node as any), <any>nodeToObserverTree)
+        result.observers = arrayFrom(<any>getObservers(node as any), <any>nodeToObserverTree)
     }
     return result
 }
 
 function unique<T>(list: T[]): T[] {
-    return Array.from(new Set(list))
+    return arrayFrom(new Set(list))
 }
