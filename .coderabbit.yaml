@@ -1,4 +1,5 @@
 reviews:
+  review_status: false
   auto_review:
     ignore_title_keywords:
       - Version Packages
