@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+# CodeRabbit is opt-in per PR: add the `coderabbit` label to a PR to have it
+# reviewed (and re-reviewed on every new push). Unlabeled PRs are left alone.
+reviews:
+  # don't post "review skipped" status comments on unlabeled PRs
+  review_status: false
+  auto_review:
+    enabled: true
+    drafts: false
+    # keep watching the PR after the label is added
+    auto_incremental_review: true
+    # only review PRs carrying one of these labels
+    labels:
+      - coderabbit
