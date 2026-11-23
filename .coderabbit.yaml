@@ -2,7 +2,8 @@
 # CodeRabbit is opt-in per PR: add the `coderabbit` label to a PR to have it
 # reviewed (and re-reviewed on every new push). Unlabeled PRs are left alone.
 reviews:
-  # don't post "review skipped" status comments on unlabeled PRs
+  # no status comments at all: hides "review skipped" on unlabeled PRs,
+  # and also the "review details" block on reviewed ones (fine by us)
   review_status: false
   auto_review:
     enabled: true
