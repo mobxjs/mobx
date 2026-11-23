@@ -57,7 +57,7 @@ module.exports = [
                 ...Object.entries(mobxGlobalAliases).map(([global, alias]) => {
                     const [object, property] = global.split(".")
                     return {
-                        selector: `MemberExpression[object.name="${object}"][property.name="${property}"]:not(VariableDeclarator > .init)`,
+                        selector: `MemberExpression[object.name="${object}"][property.name="${property}"]:not(VariableDeclarator[id.name="${alias}"] > .init)`,
                         message: `Use the \`${alias}\` alias from utils/utils.ts, it minifies better.`
                     }
                 })
