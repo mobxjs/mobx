@@ -75,7 +75,7 @@
         "useLocalObservable"
     ],
     "scripts": {
-        "lint": "eslint src/**/* --ext .js,.ts,.tsx",
+        "lint": "eslint .",
         "build": "rollup --config rollup.config.mjs",
         "build:test": "npm run build -- --environment TARGET:test",
         "test": "jest",

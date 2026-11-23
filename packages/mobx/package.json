@@ -77,7 +77,7 @@
     ],
     "scripts": {
         "test": "jest --config jest.projects.js",
-        "lint": "eslint src/**/*",
+        "lint": "eslint .",
         "build": "rollup --config rollup.config.mjs",
         "build:test": "npm run build -- --environment TARGET:test",
         "perf": "scripts/perf.sh",

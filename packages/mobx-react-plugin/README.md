@@ -310,10 +310,6 @@ A module-level `"use no memo"` keeps the automatic `observer` but skips the func
 
 `react-compiler-healthcheck` lists `mobx-react-lite` as incompatible because your `package.json` depends on it. You can ignore that: the plugin adds `"use no memo"` to every `observer` component in the files it transforms, so React Compiler skips them.
 
-## ESLint
-
-With this plugin the [`mobx/missing-observer`](../eslint-plugin-mobx/README.md) rule of `eslint-plugin-mobx` is no longer needed for the files it transforms.
-
 ## Credits
 
 The idea of automatically wrapping components in `observer` at build time comes from [Christian Alfoni](https://github.com/christianalfoni) and his [mobx-react-observer](https://github.com/christianalfoni/mobx-react-observer) package.
