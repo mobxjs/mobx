@@ -302,6 +302,25 @@ test("fireImmediately should not be honored when passed already aborted AbortSig
     expect(values).toEqual([])
 })
 
+test("reaction stops when its first run aborts the AbortSignal", () => {
+    const a = mobx.observable.box(1)
+    const ac = new AbortController()
+    const values = []
+
+    reaction(
+        () => a.get(),
+        newValue => {
+            values.push(newValue)
+            ac.abort()
+        },
+        { signal: ac.signal, fireImmediately: true }
+    )
+
+    a.set(2)
+
+    expect(values).toEqual([1])
+})
+
 test("abort listener is removed when a reaction disposes itself", async () => {
     const listeners = new Set()
     const signal = {

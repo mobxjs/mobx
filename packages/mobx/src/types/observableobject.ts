@@ -101,7 +101,7 @@ export class ObservableObjectAdministration
         public target_: any,
         public values_ = new Map<PropertyKey, ObservableValue<any> | ComputedValue<any>>(),
         public name_: string,
-        // Used anytime annotation is not explicitely provided
+        // Used anytime annotation is not explicitly provided
         public defaultAnnotation_: Annotation = autoAnnotation
     ) {
         this.keysAtom_ = new Atom(__DEV__ ? `${this.name_}.keys` : "ObservableObject.keys")

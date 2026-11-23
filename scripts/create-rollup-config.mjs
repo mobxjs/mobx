@@ -32,7 +32,8 @@ const tsconfigDefaults = {
 }
 
 const defaultTerserOptions = format => ({
-    output: { comments: false },
+    // Preserve optimizer annotations for the second Terser pass.
+    output: { comments: false, preserve_annotations: true },
     compress: {
         keep_infinity: true,
         pure_getters: true,

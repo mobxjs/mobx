@@ -74,6 +74,24 @@ test("autorun should not run first time when passing already aborted AbortSignal
     expect(values).toEqual([])
 })
 
+test("autorun stops when its first run aborts the AbortSignal", function () {
+    const a = mobx.observable.box(1)
+    const ac = new AbortController()
+    const values = []
+
+    mobx.autorun(
+        () => {
+            values.push(a.get())
+            ac.abort()
+        },
+        { signal: ac.signal }
+    )
+
+    a.set(2)
+
+    expect(values).toEqual([1])
+})
+
 test("autorun warns when passed an action", function () {
     const action = mobx.action(() => {})
     expect.assertions(1)

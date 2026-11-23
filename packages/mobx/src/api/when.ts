@@ -94,6 +94,9 @@ function whenPromise(
             reject(new Error("WHEN_ABORTED"))
         }
         opts?.signal?.addEventListener?.("abort", abort)
+        if (opts?.signal?.aborted) {
+            abort()
+        }
     }).finally(() => opts?.signal?.removeEventListener?.("abort", abort))
     ;(res as any).cancel = cancel
     return res as any
