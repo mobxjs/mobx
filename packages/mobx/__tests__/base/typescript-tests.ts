@@ -1830,6 +1830,19 @@ test("sync when can be aborted", async () => {
     x.set(3)
 })
 
+test("promised when rejects when its first predicate run aborts the signal", async () => {
+    const ac = new AbortController()
+    const p = mobx.when(
+        () => {
+            ac.abort()
+            return false
+        },
+        { signal: ac.signal }
+    )
+
+    await expect(p).rejects.toThrow("WHEN_ABORTED")
+})
+
 test("it should support asyncAction as decorator (ts)", async () => {
     mobx.configure({ enforceActions: "observed" })
 
