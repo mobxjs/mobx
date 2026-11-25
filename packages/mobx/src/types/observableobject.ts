@@ -2,6 +2,7 @@ import {
     CreateObservableOptions,
     getAnnotationFromOptions,
     propagateChanged,
+    hasObservers,
     isAnnotation,
     $mobx,
     Atom,
@@ -535,6 +536,9 @@ export class ObservableObjectAdministration
                 this.values_.delete(key)
                 // for computed, value is undefined
                 if (observable instanceof ObservableValue) {
+                    if (hasObservers(observable)) {
+                        checkIfStateModificationsAreAllowed(observable)
+                    }
                     value = observable.value_
                 }
                 // Notify: autorun(() => obj[key]), see #1796
