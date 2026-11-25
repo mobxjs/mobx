@@ -493,6 +493,10 @@ export class ObservableObjectAdministration
         if (!hasProp(this.target_, key)) {
             return true
         }
+        const observable = this.values_.get(key)
+        if (observable instanceof ObservableValue && hasObservers(observable)) {
+            checkIfStateModificationsAreAllowed(observable)
+        }
 
         // Intercept
         if (hasInterceptors(this)) {
@@ -512,7 +516,6 @@ export class ObservableObjectAdministration
             startBatch()
             const notify = hasListeners(this)
             const notifySpy = __DEV__ && isSpyEnabled()
-            const observable = this.values_.get(key)
             // Value needed for spies/listeners
             let value = undefined
             // Optimization: don't pull the value unless we will need it
@@ -536,9 +539,6 @@ export class ObservableObjectAdministration
                 this.values_.delete(key)
                 // for computed, value is undefined
                 if (observable instanceof ObservableValue) {
-                    if (hasObservers(observable)) {
-                        checkIfStateModificationsAreAllowed(observable)
-                    }
                     value = observable.value_
                 }
                 // Notify: autorun(() => obj[key]), see #1796
