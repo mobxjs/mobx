@@ -48,6 +48,8 @@ Migrating a large code base with lots of classes might be daunting. But no worri
 
 ## Upgrading your code with the `mobx-undecorate` codemod
 
+> `mobx-undecorate` is no longer maintained. It still works for MobX 4/5 code bases, but it won't receive fixes.
+
 If you are an existing MobX user you have code that uses a lot of decorators, or the equivalent calls to `decorate`.
 
 The [`mobx-undecorate`](https://www.npmjs.com/package/mobx-undecorate) package provides a codemod that can automatically update your code to be conformant to MobX 6. There is no need to install it; instead you download and execute it using the [`npx`](https://www.npmjs.com/package/npx) tool which you do need to install if you haven't already.

@@ -16,14 +16,13 @@ const mobxGlobalAliases = {
 
 module.exports = [
     {
-        // Lint only packages/*/src, and skip mobx-undecorate
+        // Lint only packages/*/src
         ignores: [
             "**",
             "!packages/",
             "!packages/*/",
             "!packages/*/src/",
-            "!packages/*/src/**",
-            "packages/mobx-undecorate/"
+            "!packages/*/src/**"
         ]
     },
     js.configs.recommended,
