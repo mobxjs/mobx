@@ -1,5 +1,11 @@
 # eslint-plugin-mobx
 
+## 1.0.0
+
+### Major Changes
+
+-   [`3826b97e5e9dea4284a12a06145b2b022d9840fa`](https://github.com/mobxjs/mobx/commit/3826b97e5e9dea4284a12a06145b2b022d9840fa) [#4790](https://github.com/mobxjs/mobx/pull/4790) Thanks [@kubk](https://github.com/kubk)! - Support only ESLint 9.10+ and 10, with flat config only. The `eslint` peer dependency is now `^9.10.0 || ^10.0.0`, and `@types/eslint` is no longer a dependency, since ESLint ships its own types. `configs.recommended` is now the flat config, and the eslintrc config and `flatConfigs` are removed: replace `pluginMobx.flatConfigs.recommended` with `pluginMobx.configs.recommended`. The `missing-observer` rule is removed: wrap components in `observer` yourself, or use `mobx-react-plugin` to wrap them all at build time. The deprecated `no-anonymous-observer` rule is removed too; use `react/display-name` with `componentWrapperFunctions: ["observer"]` instead. Projects on ESLint 8 or older, or on eslintrc, should stay on `eslint-plugin-mobx` 0.2.x.
+
 ## 0.2.2
 
 ### Patch Changes
