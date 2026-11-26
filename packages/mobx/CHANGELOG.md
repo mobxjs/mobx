@@ -1,5 +1,13 @@
 # mobx
 
+## 7.1.8
+
+### Patch Changes
+
+-   [`543203c5726569f373e9409db2d84dbb2d70994d`](https://github.com/mobxjs/mobx/commit/543203c5726569f373e9409db2d84dbb2d70994d) [#4792](https://github.com/mobxjs/mobx/pull/4792) Thanks [@kubk](https://github.com/kubk)! - Alias `Array.from`, `Array.isArray` and `Object.getPrototypeOf` internally to reduce the minified bundle size.
+
+-   [`abd3a5879796bcd0f1a23967444a5ff90c99709a`](https://github.com/mobxjs/mobx/commit/abd3a5879796bcd0f1a23967444a5ff90c99709a) [#4787](https://github.com/mobxjs/mobx/pull/4787) Thanks [@charan-rathore](https://github.com/charan-rathore)! - Honor AbortSignal cancellation that happens during the initial synchronous run of autorun, reaction, or when.
+
 ## 7.1.7
 
 ### Patch Changes
