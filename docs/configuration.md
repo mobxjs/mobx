@@ -55,7 +55,7 @@ The autofix feature can also help with the boilerplate code.
 
 The goal of _enforceActions_ is that you don't forget to wrap event handlers in [`action`](actions.md).
 
-When a mutation violates this setting, MobX logs a warning in development builds and still applies the mutation. Production builds skip the warning.
+When a mutation violates this setting, MobX logs a warning in development builds. The warning does not block the mutation, though an [`intercept`](intercept-and-observe.md) handler can still cancel it. Production builds skip the warning.
 
 Possible options:
 
