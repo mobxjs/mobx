@@ -1,4 +1,37 @@
-import { observable, observe, computed } from "../../src/mobx"
+import { observable, observe, computed, autorun } from "../../src/mobx"
+
+test("a throwing observer restores tracking in the calling derivation", () => {
+    const observed = observable.box(0)
+    const tracked = observable.box(0)
+    const untracked = observable.box(0)
+    const error = new Error("observer error")
+    const values: number[] = []
+    const errors: unknown[] = []
+    let updates = 0
+    const stopObserver = observe(observed, () => {
+        untracked.get()
+        throw error
+    })
+    const stopAutorun = autorun(() => {
+        try {
+            observed.set(++updates)
+        } catch (e) {
+            errors.push(e)
+        }
+        values.push(tracked.get())
+    })
+
+    try {
+        untracked.set(1)
+        expect(values).toEqual([0])
+        tracked.set(1)
+        expect(values).toEqual([0, 1])
+        expect(errors).toEqual([error, error])
+    } finally {
+        stopAutorun()
+        stopObserver()
+    }
+})
 
 test("observe object and map properties", () => {
     const map = observable.map({ a: 1 })
