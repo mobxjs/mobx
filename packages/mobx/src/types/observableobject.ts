@@ -2,6 +2,7 @@ import {
     CreateObservableOptions,
     getAnnotationFromOptions,
     propagateChanged,
+    hasObservers,
     isAnnotation,
     $mobx,
     Atom,
@@ -492,6 +493,10 @@ export class ObservableObjectAdministration
         if (!hasProp(this.target_, key)) {
             return true
         }
+        const observable = this.values_.get(key)
+        if (observable instanceof ObservableValue && hasObservers(observable)) {
+            checkIfStateModificationsAreAllowed(observable)
+        }
 
         // Intercept
         if (hasInterceptors(this)) {
@@ -511,7 +516,6 @@ export class ObservableObjectAdministration
             startBatch()
             const notify = hasListeners(this)
             const notifySpy = __DEV__ && isSpyEnabled()
-            const observable = this.values_.get(key)
             // Value needed for spies/listeners
             let value = undefined
             // Optimization: don't pull the value unless we will need it

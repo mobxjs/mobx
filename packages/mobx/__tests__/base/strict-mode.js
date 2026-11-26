@@ -246,6 +246,36 @@ test("adding or deleting an observed observable map key outside an action warns 
     d()
 })
 
+test("deleting an observed observable object property outside an action warns in strict mode", () => {
+    const o = mobx.observable({ x: 1, y: 2 })
+    const d = mobx.autorun(() => o.x)
+
+    expect(utils.grabConsole(() => delete o.x)).toMatch(strictError)
+    expect(utils.grabConsole(() => mobx.remove(o, "y"))).toBe("")
+    expect("x" in o).toBe(false)
+
+    d()
+
+    // The check runs before the property is removed
+    const v = mobx.observable({ x: 1 })
+    const dv = mobx.autorun(() => v.x)
+    const warn = console.warn
+    console.warn = () => {
+        throw new Error("warned")
+    }
+    try {
+        expect(() => delete v.x).toThrow("warned")
+    } finally {
+        console.warn = warn
+    }
+    expect("x" in v).toBe(true)
+    dv()
+
+    mobx.configure({ enforceActions: "always" })
+    const u = mobx.observable({ x: 1 })
+    expect(utils.supressConsole(() => delete u.x)).toHaveLength(1)
+})
+
 test("warn on unsafe reads of computed", function () {
     mobx.configure({ computedRequiresReaction: true })
     const x = mobx.observable({
